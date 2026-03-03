@@ -1,71 +1,70 @@
-Return-Path: <netdev+bounces-263178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Lo8AOLSpmnHWgAAu9opvQ
-	(envelope-from <netdev+bounces-263178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:24:02 +0100
+	id o3lrHezTpmnCXQAAu9opvQ
+	(envelope-from <netdev+bounces-263181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:28:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5913E1EF552
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:24:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E08211EF6A2
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:28:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F42B3016B1B
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 12:23:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8C2EF30B92D9
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 12:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBF1311975;
-	Tue,  3 Mar 2026 12:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F49A311975;
+	Tue,  3 Mar 2026 12:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Hbmryubh"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="x+xlK0lj"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59EC0337BA0;
-	Tue,  3 Mar 2026 12:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82175341674;
+	Tue,  3 Mar 2026 12:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772540629; cv=none; b=TjSl+6+dgJNa9tgoklxi7d3fggHAaDaEJpXcjfd1PimNipGBf7cRw7kvg3RN73KX2L1EDKYZysWRb+khsUsOQFAaMym7lBST32gwcFmWPSH758yHA0pVMkgXkl8l9IMDCKX3LBJxGVMMo93gKeyfFi2Q72m34XYfvU0ZwQ8GeqI=
+	t=1772540634; cv=none; b=TcT5l4dE3zZy6v4jAN+z1oO7BfkOZx5IKg7k03Yzpvooz08S7wmsRfZpxTEcUF+VFEUEXStUL82MDGqqB8714IjkCRX3whtlSr5KqWQ+WmynoWedmKg1O2SsZBhsEGfVfdmeuPT2y6dOAjut75wXKKJ8duWD3XF/11jd3xholAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772540629; c=relaxed/simple;
-	bh=g3fKDlurWC1PfL7BGX0dpJf2FNsgSqsCMdJ5IN8RwKc=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=XuXyRWNm/1k0JzQD/EQlEaUs4867PEA8AWKdxVu136bdk5vOhxdYIpIT3NoJv5jhnCVAmVdwtFVEzrcYqAGnuiTCi4IivzaW2DVARmjc2M4cApPkgjj1OQfCEE81zZzjarCpd3e4RiThGtaF1g+xqe6L2Q79H0Djp1fxwfC9/pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Hbmryubh; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1772540634; c=relaxed/simple;
+	bh=iZ88B2rsditqyP2mnTWwXPfzkX0SetwWX8uXsRarq6k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=gbo5kIhlgpyna2+2AGx5ja7AtnlyJtze2fpd4Mrf2q/wq3YZqCLT1z+h3OAgkTYvHNN5njVHUzOZ+2Q5oh5jm9uQGoXXDX1zTfDCNa3hMtRl2rpJVWSFmvyLMugGr7/4iKGa4qrvStXpSabhks2rij9kN7ekFVRWORhvOPyQ8oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=x+xlK0lj; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772540627; x=1804076627;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=g3fKDlurWC1PfL7BGX0dpJf2FNsgSqsCMdJ5IN8RwKc=;
-  b=HbmryubhJW/rdfk4vg+ed2gnZ1DnWKkfE0W8XHzBoC1ARetHXeuP+42j
-   CMbGD2DmEQ3DRdLu//I5Cr00iiQSHVcXZgI22Ys9OTzVEIKOMrcIAkEOl
-   g6Gf9oIkpreE/ZsoGJjqxdn2uy+a5XY3AE2XcLNAo7YQLP4gq3riBh+p3
-   HtxOjtGwqv8Ec67DeaLxWHOCZEsn87AK3hc9jv/m0C0+wYb3ywXiGQJRV
-   cRUbL8CuitshQf5kn6xXcQKyu6c0th1DnN/nTcrxhO4LnCYwjOoQai54p
-   E7QlG/VsxFW+KilZkj0C30/ft7VyCuQMSRvAqTceY2B8SCAU0s6lXhxmR
+  t=1772540632; x=1804076632;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=iZ88B2rsditqyP2mnTWwXPfzkX0SetwWX8uXsRarq6k=;
+  b=x+xlK0ljl6H3BA6aMz4feOz2IdGa2SSpNtnZBNgotwWALLQ6qQccqmm9
+   muVWLxUut/fC849fFqcKtYSNCuOe0p9Jb25bRR9JjcFX3D9qj4QV0CWF7
+   18fn+M2ABRE9MDtvUb/zj/9amYYCeOrkRaLH9KPTo15jh8qmUuGS71Xug
+   MsWMXhAkOTrT7HvPRLx+hCLDKRHfx4P8BNtB2V9oukGllsv6UDuAR6xlX
+   wgFfvUDP3IR8g3mD1xU88aFqe2b2+2nd3q07Nwk2mgIy4G9VMQ4B1RDK4
+   IN6hrCrFPnVtNUdhy9yIZ6pfmaVyGDrRboSxDZYfIZ+J6DR8r6+5oZC4M
    g==;
-X-CSE-ConnectionGUID: O5MLb/nJR+Ce7h6ad0rSrA==
-X-CSE-MsgGUID: a4jxtFRLR5O47naYPXqVkQ==
+X-CSE-ConnectionGUID: Bvv5iBs2RB2HNvVYiRTm5Q==
+X-CSE-MsgGUID: CMWe1FEBQ1G0jytQBslmwg==
 X-IronPort-AV: E=Sophos;i="6.21,321,1763449200"; 
-   d="scan'208";a="285516796"
+   d="scan'208";a="53397692"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Mar 2026 05:23:40 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 05:23:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 3 Mar 2026 05:23:19 -0700
+ 15.2.2562.35; Tue, 3 Mar 2026 05:23:22 -0700
 Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex01.mchp-main.com
  (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Tue, 3 Mar 2026 05:23:16 -0700
+ Transport; Tue, 3 Mar 2026 05:23:19 -0700
 From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
 	<jensemil.schulzostergaard@microchip.com>
-Subject: [PATCH net-next 0/8] net: dsa: add DSA support for the LAN9645x
- switch chip family
-Date: Tue, 3 Mar 2026 13:22:26 +0100
-Message-ID: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+Date: Tue, 3 Mar 2026 13:22:27 +0100
+Subject: [PATCH net-next 1/8] net: dsa: add tag driver for LAN9645X
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,9 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAILSpmkC/x3NTQrCMBBA4auUWRtIUq3oVaSE/EztgIwyE2qg9
- O4Gl9/mvR0UhVDhPuwguJHSmzvcaYC8Rn6iodIN3vrJemdN0RhekW/T+dKCfqnmNRShDSWkqGh
- G51Na8njFkqBXPoILtf/hAYzVMLYK83H8AKyZSs57AAAA
+Message-ID: <20260303-dsa_lan9645x_switch_driver_base-v1-1-bff8ca1396f5@microchip.com>
+References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+In-Reply-To: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
 To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
  Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
  Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -89,19 +88,19 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
 	<jensemil.schulzostergaard@microchip.com>
 X-Mailer: b4 0.15-dev
-X-Rspamd-Queue-Id: 5913E1EF552
+X-Rspamd-Queue-Id: E08211EF6A2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263178-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263181-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -117,153 +116,574 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,microchip.com:dkim,microchip.com:email,microchip.com:mid]
 X-Rspamd-Action: no action
 
-This series provides the Microchip LAN9645X Switch driver.
+Add tag driver for LAN9645x using a front port as CPU port. This mode
+is called an NPI port in the datasheet.
+Use long prefix on extraction (RX) and no prefix on injection (TX). A
+long prefix on extraction helps get through the conduit port on host
+side, since it will see a broadcast MAC.
 
-The LAN9645x is a family of chips with ethernet switch functionality and
-multiple peripheral functions. The switch delivers up to 9 ethernet
-ports and 12 Gbps switching bandwidth.
+The LAN9645x chip is in the same design architecture family as ocelot
+and lan966x. The tagging protocol has the same structure as these chips,
+but the particular fields are different or have different sizes.
+Therefore, this tag driver is similar to tag_ocelot.c, but the
+differences in fields makes it hard to reuse.
 
-The switch chip has 5 integrated copper PHYs, support for 2x RGMII
-interfaces, 2x SGMII and one QSGMII interface.
+LAN9645x supports 3 different tag formats for extraction/injection of
+frames from a CPU port: long prefix, short prefix and no prefix.
 
-The switch chip is from the same design architecture family as ocelot
-and lan966x, and the driver reflects this similarity. However, LAN9645x
-does not have an internal CPU in any package, and must be driven
-externally. For register IO it supports interfaces such as SPI, I2C and
-MDIO.
+The tag is prepended to the frame. The critical data for the chip is
+contained in an internal frame header (IFH) which is 28 bytes. The
+prefix formats look like this:
 
-The chip supports a variety of network features such as
+Long prefix (16 bytes) + IFH:
+- DMAC    = 0xffffffffffff on extraction.
+- SMAC    = 0xfeffffffffff on extraction.
+- ETYPE   = 0x8880
+- payload = 0x0011
+- IFH
 
-* Mactable for MDB/FDB functionality
-* Bridge forwarding offload
-* VLAN-aware bridging
-* IGMP/MLD snooping
-* Link aggregation
-* PTP timestamping
-* FRER (802.1CB)
-* Media Redundancy Protocol
-* Parallel Redundancy and High-Availability Seamless Redundancy
-  (HSR/PRP) in DANH/DANP mode
-* Per stream filtering and policing
-* Shapers such as Credit Based Shaping and Time Aware Shaing
-* Frame preemption
-* A TCAM (VCAP) for line-rate frame processing
+Short prefix (4 bytes) + IFH:
+- 0x8880
+- 0x0011
+- IFH
 
-The LAN9645x family consists of the following SKUs:
+No prefix:
+- IFH
 
-LAN96455F
-LAN96457F
-LAN96459F
-LAN96455S
-LAN96457S
-LAN96459S
+The format can be configured asymmetrically on RX and TX.
 
-The difference between the SKUs is the number of supported ports (5, 7
-or 9) and features supported. The F subfamily supports HSR/PRP and TSN,
-while the S subfamily does not.
-
-The intended way to bind this driver is using a parent MFD driver,
-responsible for the register IO protocol, and distributing regmaps to
-child devices. The goal is to use the same approach as the MFD driver in
-drivers/mfd/ocelot-spi.c.
-
-This driver expects to request named regmaps from a parent device. This
-approach is similar to the DSA driver
-
-drivers/net/dsa/ocelot/ocelot_ext.c
-
-which supports being driven by an external CPU via SPI with parent
-device drivers/mfd/ocelot-spi.c.
-
-The MFD driver will come in a later series, because there are
-requirements on the number of child devices before a driver qualifies as
-a MFD device.
-
-Development is done using the LAN966x as a host CPU, running the lan966x
-swichdev driver, using the EVB-LAN9668 EDS2 board.
-
-The datasheet is available here:
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/LAN9645xF-Data-Sheet-DS00006065.pdf
-
-This series will deliver the following features:
-
-* Standalone ports
-* Bridge forwarding and FDB offloading
-* VLAN-aware bridge
-* Stats integration
-
-More support will be added at a later stage. Here is a tentative plan of
-future patches for this DSA driver:
-
-* Add LAG support.
-* Add MDB support.
-* Add TC matchall mirror support.
-* Add TC matchall police support.
-* Add DCB/qos support.
-* Add simple TC support: mqprio, cbs, tbf, ebf.
-* Add TC flower filter support.
-* Add HSR/PRP offloading support.
-* Add PTP support.
-* Add TC taprio support.
-
-For completeness I include tentative plan of planned patches for
-LAN9645x peripherals:
-
-* Extend pinctrl-ocelot for LAN9645x:
-  https://lore.kernel.org/linux-gpio/20260119-pinctrl_ocelot_extend_support_for_lan9645x-v1-0-1228155ed0ee@microchip.com/
-* Add driver for internal PHY:
-  https://lore.kernel.org/netdev/20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com/
-* MFD driver for managing register IO protocol and child device
-  initialization.
-* Extend pinctrl-microchip-sgpio for LAN9645x support.
-* Extend i2c_designware for LAN9645x support.
-* Add driver for outbound interrupt controller.
-* Add serdes driver for lan9645x.
-
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
-Jens Emil Schulz Østergaard (8):
-      net: dsa: add tag driver for LAN9645X
-      dt-bindings: net: lan9645x: add LAN9645X switch bindings
-      net: dsa: lan9645x: add autogenerated register macros
-      net: dsa: lan9645x: add basic dsa driver for LAN9645X
-      net: dsa: lan9645x: add bridge support
-      net: dsa: lan9645x: add vlan support
-      net: dsa: lan9645x: add mac table integration
-      net: dsa: lan9645x: add port statistics
+ MAINTAINERS                  |   8 ++
+ include/linux/dsa/lan9645x.h | 290 +++++++++++++++++++++++++++++++++++++++++++
+ include/net/dsa.h            |   2 +
+ net/dsa/Kconfig              |  10 ++
+ net/dsa/Makefile             |   1 +
+ net/dsa/tag_lan9645x.c       | 143 +++++++++++++++++++++
+ 6 files changed, 454 insertions(+)
 
- .../net/dsa/microchip,lan9645x-switch.yaml         |  137 ++
- MAINTAINERS                                        |   10 +
- drivers/net/dsa/microchip/Makefile                 |    1 +
- drivers/net/dsa/microchip/lan9645x/Kconfig         |   12 +
- drivers/net/dsa/microchip/lan9645x/Makefile        |   10 +
- drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c  |  413 +++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.c |  884 ++++++++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  478 +++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c  |   99 ++
- .../net/dsa/microchip/lan9645x/lan9645x_phylink.c  |  537 ++++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |  294 ++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h | 1851 ++++++++++++++++++++
- .../net/dsa/microchip/lan9645x/lan9645x_stats.c    |  825 +++++++++
- .../net/dsa/microchip/lan9645x/lan9645x_stats.h    |  288 +++
- drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c |  339 ++++
- drivers/net/ethernet/microchip/Kconfig             |    1 +
- include/linux/dsa/lan9645x.h                       |  290 +++
- include/net/dsa.h                                  |    2 +
- net/dsa/Kconfig                                    |   10 +
- net/dsa/Makefile                                   |    1 +
- net/dsa/tag_lan9645x.c                             |  143 ++
- 21 files changed, 6625 insertions(+)
----
-base-commit: 01857fc712f6469cab9cc578120cdc80f1c2a634
-change-id: 20260210-dsa_lan9645x_switch_driver_base-312bbfc37edb
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2265e2c9bfbe..2712aaf7cedd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17286,6 +17286,14 @@ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/phy/microchip_t1.c
+ 
++MICROCHIP LAN9645X ETHERNET SWITCH DRIVER
++M:	Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
++M:	UNGLinuxDriver@microchip.com
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	include/linux/dsa/lan9645x.h
++F:	net/dsa/tag_lan9645x.c
++
+ MICROCHIP LAN966X ETHERNET DRIVER
+ M:	Horatiu Vultur <horatiu.vultur@microchip.com>
+ M:	UNGLinuxDriver@microchip.com
+diff --git a/include/linux/dsa/lan9645x.h b/include/linux/dsa/lan9645x.h
+new file mode 100644
+index 000000000000..37b74dde9611
+--- /dev/null
++++ b/include/linux/dsa/lan9645x.h
+@@ -0,0 +1,290 @@
++/* SPDX-License-Identifier: GPL-2.0
++ * Copyright (C) 2026 Microchip Technology Inc.
++ */
++
++#ifndef _NET_DSA_TAG_LAN9645X_H_
++#define _NET_DSA_TAG_LAN9645X_H_
++
++#include <linux/if_bridge.h>
++#include <linux/if_vlan.h>
++#include <net/dsa.h>
++
++/* LAN9645x supports 3 different formats on an NPI port, long prefix, short
++ * prefix and no prefix. The format can be configured asymmetrically on RX and
++ * TX. We use long prefix on extraction (RX), and no prefix on injection.
++ * The long prefix on extraction helps get through the conduit port on host
++ * side, since it will see a broadcast MAC.
++ *
++ * The internal frame header (IFH) is 28 bytes, and the fields are documented
++ * below.
++ *
++ * Long prefix, 16 bytes + IFH:
++ * - DMAC    = 0xFFFFFFFFFFFF on extraction.
++ * - SMAC    = 0xFEFFFFFFFFFF on extraction.
++ * - ETYPE   = 0x8880
++ * - payload = 0x0011
++ * - IFH
++ *
++ * Short prefix, 4 bytes + IFH:
++ * - 0x8880
++ * - 0x0011
++ * - IFH
++ *
++ * No prefix:
++ * - IFH
++ *
++ */
++#define LAN9645X_IFH_TAG_TYPE_C	0
++#define LAN9645X_IFH_TAG_TYPE_S	1
++#define LAN9645X_IFH_LEN_U32		7
++#define LAN9645X_IFH_LEN		(LAN9645X_IFH_LEN_U32 * sizeof(u32))
++#define LAN9645X_IFH_BITS		(LAN9645X_IFH_LEN * BITS_PER_BYTE)
++#define LAN9645X_SHORT_PREFIX_LEN	4
++#define LAN9645X_LONG_PREFIX_LEN	16
++#define LAN9645X_TOTAL_TAG_LEN (LAN9645X_LONG_PREFIX_LEN + LAN9645X_IFH_LEN)
++
++#define IFH_INJ_TIMESTAMP		192
++#define IFH_BYPASS			191
++#define IFH_MASQ			190
++#define IFH_TIMESTAMP			186
++#define IFH_TIMESTAMP_NS		194
++#define IFH_TIMESTAMP_SUBNS		186
++#define IFH_MASQ_PORT			186
++#define IFH_RCT_INJ			185
++#define IFH_LEN				171
++#define IFH_WRDMODE			169
++#define IFH_RTAGD			167
++#define IFH_CUTTHRU			166
++#define IFH_REW_CMD			156
++#define IFH_REW_OAM			155
++#define IFH_PDU_TYPE			151
++#define IFH_FCS_UPD			150
++#define IFH_DP				149
++#define IFH_RTE_INB_UPDATE		148
++#define IFH_POP_CNT			146
++#define IFH_ETYPE_OFS			144
++#define IFH_SRCPORT			140
++#define IFH_SEQ_NUM			120
++#define IFH_TAG_TYPE			119
++#define IFH_TCI				103
++#define IFH_DSCP			97
++#define IFH_QOS_CLASS			94
++#define IFH_CPUQ			86
++#define IFH_LEARN_FLAGS			84
++#define IFH_SFLOW_ID			80
++#define IFH_ACL_HIT			79
++#define IFH_ACL_IDX			73
++#define IFH_ISDX			65
++#define IFH_DSTS			55
++#define IFH_FLOOD			53
++#define IFH_SEQ_OP			51
++#define IFH_IPV				48
++#define IFH_AFI				47
++#define IFH_RTP_ID			37
++#define IFH_RTP_SUBID			36
++#define IFH_PN_DATA_STATUS		28
++#define IFH_PN_TRANSF_STATUS_ZERO	27
++#define IFH_PN_CC			11
++#define IFH_DUPL_DISC_ENA		10
++#define IFH_RCT_AVAIL			9
++
++#define IFH_INJ_TIMESTAMP_SZ		32
++#define IFH_BYPASS_SZ			1
++#define IFH_MASQ_SZ			1
++#define IFH_TIMESTAMP_SZ		38
++#define IFH_TIMESTAMP_NS_SZ		30
++#define IFH_TIMESTAMP_SUBNS_SZ		8
++#define IFH_MASQ_PORT_SZ		4
++#define IFH_RCT_INJ_SZ			1
++#define IFH_LEN_SZ			14
++#define IFH_WRDMODE_SZ			2
++#define IFH_RTAGD_SZ			2
++#define IFH_CUTTHRU_SZ			1
++#define IFH_REW_CMD_SZ			10
++#define IFH_REW_OAM_SZ			1
++#define IFH_PDU_TYPE_SZ			4
++#define IFH_FCS_UPD_SZ			1
++#define IFH_DP_SZ			1
++#define IFH_RTE_INB_UPDATE_SZ		1
++#define IFH_POP_CNT_SZ			2
++#define IFH_ETYPE_OFS_SZ		2
++#define IFH_SRCPORT_SZ			4
++#define IFH_SEQ_NUM_SZ			16
++#define IFH_TAG_TYPE_SZ			1
++#define IFH_TCI_SZ			16
++#define IFH_DSCP_SZ			6
++#define IFH_QOS_CLASS_SZ		3
++#define IFH_CPUQ_SZ			8
++#define IFH_LEARN_FLAGS_SZ		2
++#define IFH_SFLOW_ID_SZ			4
++#define IFH_ACL_HIT_SZ			1
++#define IFH_ACL_IDX_SZ			6
++#define IFH_ISDX_SZ			8
++#define IFH_DSTS_SZ			10
++#define IFH_FLOOD_SZ			2
++#define IFH_SEQ_OP_SZ			2
++#define IFH_IPV_SZ			3
++#define IFH_AFI_SZ			1
++#define IFH_RTP_ID_SZ			10
++#define IFH_RTP_SUBID_SZ		1
++#define IFH_PN_DATA_STATUS_SZ		8
++#define IFH_PN_TRANSF_STATUS_ZERO_SZ	1
++#define IFH_PN_CC_SZ			16
++#define IFH_DUPL_DISC_ENA_SZ		1
++#define IFH_RCT_AVAIL_SZ		1
++
++#define LAN9645X_VALIDATE_FIELD(_fld, _fld_sz)				\
++do {									\
++	BUILD_BUG_ON_MSG((_fld_sz) > 32, "IFH field size wider than 32.");\
++	BUILD_BUG_ON_MSG((_fld_sz) == 0, "IFH field size of 0.");	\
++	BUILD_BUG_ON_MSG((_fld) + (_fld_sz) > LAN9645X_IFH_BITS,	\
++			 "IFH field overflows IFH");			\
++} while (0)
++
++#define LAN9645X_IFH_GET(_ifh, _fld) \
++({ \
++	LAN9645X_VALIDATE_FIELD(_fld, _fld##_SZ);\
++	lan9645x_ifh_get((_ifh), (_fld), _fld##_SZ); \
++})
++
++#define LAN9645X_IFH_SET(_ifh, _fld, _val) \
++({ \
++	LAN9645X_VALIDATE_FIELD(_fld, _fld##_SZ);\
++	lan9645x_ifh_set((_ifh), (_val), (_fld), _fld##_SZ); \
++})
++
++#define BTM_MSK(n)	((u8)GENMASK(n, 0))
++#define TOP_MSK(n)	((u8)GENMASK(7, n))
++
++static inline void set_merge_mask(u8 *on_zero, u8 on_one, u8 mask)
++{
++	*on_zero =  *on_zero ^ ((*on_zero ^ on_one) & mask);
++}
++
++/* The internal frame header (IFH) is a big-endian 28 byte unpadded bit array.
++ * Frames can be prepended with an IFH on injection and extraction. There
++ * are two field layouts, one for extraction and one for injection.
++ *
++ *    IFH bits go from high to low, for instance
++ *    ifh[0]  = [223:215]
++ *    ifh[27] = [7:0]
++ *
++ * Here is an example of setting a value starting at bit 13 of bit length 17.
++ *
++ * val    = 0x1ff
++ * pos    = 13
++ * length = 17
++ *
++ *
++ * IFH[]   0                         23       24       25        26      27
++ *
++ *                                           end_u8           start_u8
++ *      +--------+----------------+--------+--------+--------+--------+--------+
++ *      |        |                |        |        |        |        |        |
++ * IFH  |        | ....           |        |  vvvvvvvvvvvvvvvvvvv     |        |
++ *      |        |                |        |  |     |        |  |     |        |
++ *      +--------+----------------+--------+--+-----+--------+--+-----+--------+
++ * Bits  223                       39    32 31|   24 23    16 15|    8 7      0
++ *                                            |                 |
++ *                                            |                 |
++ *                                            |                 |
++ *                                            v                 v
++ *                                        end       = 29       pos        = 13
++ *                                        end_rem   = 5        pos_rem    = 5
++ *                                        end_u8    = 3        start_u8   = 1
++ *                                        BTM_MSK(5)= 0x3f     TOP_MSK(5) = 0xe0
++ *
++ *
++ * In end_u8 and start_u8 we must merge the existing IFH byte with the new
++ * value. In the 'middle' bytes of the value we can overwrite the corresponding
++ * IFH byte.
++ */
++static inline void lan9645x_ifh_set(u8 *ifh, u32 val, size_t pos, size_t length)
++{
++	size_t end = (pos + length) - 1;
++	size_t start_u8 = pos >> 3;
++	size_t end_u8 = end >> 3;
++	size_t end_rem = end & 0x7;
++	size_t pos_rem = pos & 0x7;
++	u8 end_mask, start_mask;
++	size_t vshift;
++	u8 *ptr;
++
++	end_mask = BTM_MSK(end_rem);
++	start_mask = TOP_MSK(pos_rem);
++
++	ptr = &ifh[LAN9645X_IFH_LEN - 1 - end_u8];
++
++	if (end_u8 == start_u8)
++		return set_merge_mask(ptr, val << pos_rem,
++				      end_mask & start_mask);
++
++	vshift = length - end_rem - 1;
++	set_merge_mask(ptr++, val >> vshift, end_mask);
++
++	for (size_t j = 1; j < end_u8 - start_u8; j++) {
++		vshift -= 8;
++		*ptr++ = val >> vshift;
++	}
++
++	set_merge_mask(ptr, val << pos_rem, start_mask);
++}
++
++static inline u32 lan9645x_ifh_get(const u8 *ifh, size_t pos, size_t length)
++{
++	size_t end = (pos + length) - 1;
++	size_t start_u8 = pos >> 3;
++	size_t end_u8 = end >> 3;
++	size_t end_rem = end & 0x7;
++	size_t pos_rem = pos & 0x7;
++	u8 end_mask, start_mask;
++	const u8 *ptr;
++	u32 val;
++
++	end_mask = BTM_MSK(end_rem);
++	start_mask = TOP_MSK(pos_rem);
++
++	ptr = &ifh[LAN9645X_IFH_LEN - 1 - end_u8];
++
++	if (end_u8 == start_u8)
++		return (*ptr & end_mask & start_mask) >> pos_rem;
++
++	val = *ptr++ & end_mask;
++
++	for (size_t j = 1; j < end_u8 - start_u8; j++)
++		val = val << 8 | *ptr++;
++
++	return val << (8 - pos_rem) | (*ptr & start_mask) >> pos_rem;
++}
++
++static inline void lan9645x_xmit_get_vlan_info(struct sk_buff *skb,
++					       struct net_device *br,
++					       u32 *vlan_tci, u32 *tag_type)
++{
++	struct vlan_ethhdr *hdr;
++	u16 proto, tci;
++
++	if (!br || !br_vlan_enabled(br)) {
++		*vlan_tci = 0;
++		*tag_type = LAN9645X_IFH_TAG_TYPE_C;
++		return;
++	}
++
++	hdr = (struct vlan_ethhdr *)skb_mac_header(skb);
++	br_vlan_get_proto(br, &proto);
++
++	if (ntohs(hdr->h_vlan_proto) == proto) {
++		vlan_remove_tag(skb, &tci);
++		*vlan_tci = tci;
++	} else {
++		rcu_read_lock();
++		br_vlan_get_pvid_rcu(br, &tci);
++		rcu_read_unlock();
++		*vlan_tci = tci;
++	}
++
++	*tag_type = (proto != ETH_P_8021Q) ? LAN9645X_IFH_TAG_TYPE_S :
++					     LAN9645X_IFH_TAG_TYPE_C;
++}
++
++#endif /* _NET_DSA_TAG_LAN9645X_H_ */
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 6c17446f3dcc..977b35aa9f16 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -58,6 +58,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_YT921X_VALUE		30
+ #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
+ #define DSA_TAG_PROTO_MXL862_VALUE		32
++#define DSA_TAG_PROTO_LAN9645X_VALUE		33
+ 
+ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+@@ -93,6 +94,7 @@ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
+ 	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+ 	DSA_TAG_PROTO_MXL862		= DSA_TAG_PROTO_MXL862_VALUE,
++	DSA_TAG_PROTO_LAN9645X		= DSA_TAG_PROTO_LAN9645X_VALUE,
+ };
+ 
+ struct dsa_switch;
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index 5ed8c704636d..8592cccde7ff 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -211,4 +211,14 @@ config NET_DSA_TAG_YT921X
+ 	  Say Y or M if you want to enable support for tagging frames for
+ 	  Motorcomm YT921x switches.
+ 
++config NET_DSA_TAG_LAN9645X
++	tristate "Tag driver for Lan9645x switches"
++	help
++	  Say Y or M if you want to enable NPI tagging for the Lan9645x switches.
++	  In this mode, the frames over the Ethernet CPU port are prepended with
++	  a hardware-defined injection/extraction frame header.
++	  On injection a 28 byte internal frame header (IFH) is used. On
++	  extraction a 16 byte prefix is prepended before the internal frame
++	  header. This prefix starts with a broadcast MAC, to ease passage
++	  through the host side RX filter.
+ endif
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index bf7247759a64..dddcd85c81ce 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -42,6 +42,7 @@ obj-$(CONFIG_NET_DSA_TAG_TRAILER) += tag_trailer.o
+ obj-$(CONFIG_NET_DSA_TAG_VSC73XX_8021Q) += tag_vsc73xx_8021q.o
+ obj-$(CONFIG_NET_DSA_TAG_XRS700X) += tag_xrs700x.o
+ obj-$(CONFIG_NET_DSA_TAG_YT921X) += tag_yt921x.o
++obj-$(CONFIG_NET_DSA_TAG_LAN9645X) += tag_lan9645x.o
+ 
+ # for tracing framework to find trace.h
+ CFLAGS_trace.o := -I$(src)
+diff --git a/net/dsa/tag_lan9645x.c b/net/dsa/tag_lan9645x.c
+new file mode 100644
+index 000000000000..39eb2fb388e5
+--- /dev/null
++++ b/net/dsa/tag_lan9645x.c
+@@ -0,0 +1,143 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
++
++#include <linux/dsa/lan9645x.h>
++#include <linux/if_ether.h>
++#include <linux/if_hsr.h>
++#include <linux/if_vlan.h>
++#include <linux/igmp.h>
++#include <linux/kernel.h>
++#include <linux/netdevice.h>
++#include <linux/skbuff.h>
++#include <net/addrconf.h>
++#include <net/dsa.h>
++
++#include "tag.h"
++
++#define LAN9645X_NAME "lan9645x"
++
++static struct sk_buff *lan9645x_xmit(struct sk_buff *skb,
++				     struct net_device *ndev)
++{
++	struct dsa_port *dp = dsa_user_to_port(ndev);
++	struct dsa_switch *ds = dp->ds;
++	u32 cpu_port = ds->num_ports;
++	u32 vlan_tci, tag_type;
++	u32 qos_class;
++	void *ifh;
++
++	lan9645x_xmit_get_vlan_info(skb, dsa_port_bridge_dev_get(dp), &vlan_tci,
++				    &tag_type);
++
++	qos_class = netdev_get_num_tc(ndev) ?
++		netdev_get_prio_tc_map(ndev, skb->priority) :
++		skb->priority;
++
++	/* Make room for IFH */
++	ifh = skb_push(skb, LAN9645X_IFH_LEN);
++	memset(ifh, 0, LAN9645X_IFH_LEN);
++
++	LAN9645X_IFH_SET(ifh, IFH_BYPASS, 1);
++	LAN9645X_IFH_SET(ifh, IFH_SRCPORT, cpu_port);
++	LAN9645X_IFH_SET(ifh, IFH_QOS_CLASS, qos_class);
++	LAN9645X_IFH_SET(ifh, IFH_TCI, vlan_tci);
++	LAN9645X_IFH_SET(ifh, IFH_TAG_TYPE, tag_type);
++	LAN9645X_IFH_SET(ifh, IFH_DSTS, BIT(dp->index));
++
++	return skb;
++}
++
++static struct sk_buff *lan9645x_rcv(struct sk_buff *skb,
++				    struct net_device *ndev)
++{
++	u32 src_port, qos_class, vlan_tci, tag_type, popcnt, etype_ofs;
++	u8 *orig_skb_data = skb->data;
++	struct dsa_port *dp;
++	u32 ifh_gap_len = 0;
++	u16 vlan_tpid;
++	u8 *ifh;
++
++	/* DSA master already consumed DMAC,SMAC,ETYPE from long prefix. Go back
++	 * to beginning of frame.
++	 */
++	skb_push(skb, ETH_HLEN);
++	/* IFH starts after our long prefix */
++	ifh = skb_pull(skb, LAN9645X_LONG_PREFIX_LEN);
++
++	src_port = LAN9645X_IFH_GET(ifh, IFH_SRCPORT);
++	qos_class = LAN9645X_IFH_GET(ifh, IFH_QOS_CLASS);
++	tag_type = LAN9645X_IFH_GET(ifh, IFH_TAG_TYPE);
++	vlan_tci = LAN9645X_IFH_GET(ifh, IFH_TCI);
++	popcnt = LAN9645X_IFH_GET(ifh, IFH_POP_CNT);
++	etype_ofs = LAN9645X_IFH_GET(ifh, IFH_ETYPE_OFS);
++
++	/* Set skb->data at start of real header
++	 *
++	 * Since REW_PORT_NO_REWRITE=0 is required on the NPI port, we need to
++	 * account for any tags popped by the hardware, as that will leave a gap
++	 * between the IFH and DMAC.
++	 */
++	if (popcnt == 0 && etype_ofs == 0)
++		ifh_gap_len = 2 * VLAN_HLEN;
++	else if (popcnt == 3)
++		ifh_gap_len = VLAN_HLEN;
++
++	skb_pull(skb, LAN9645X_IFH_LEN + ifh_gap_len);
++	skb_reset_mac_header(skb);
++	skb_set_network_header(skb, ETH_HLEN);
++	skb_reset_mac_len(skb);
++
++	/* Reset skb->data past the actual ethernet header. */
++	skb_pull(skb, ETH_HLEN);
++	skb_postpull_rcsum(skb, orig_skb_data,
++			   LAN9645X_TOTAL_TAG_LEN + ifh_gap_len);
++
++	skb->dev = dsa_conduit_find_user(ndev, 0, src_port);
++	if (WARN_ON_ONCE(!skb->dev)) {
++		/* This should never happen since we have disabled reflection
++		 * back to CPU_PORT.
++		 */
++		return NULL;
++	}
++
++	dsa_default_offload_fwd_mark(skb);
++
++	skb->priority = qos_class;
++
++	/* While we have REW_PORT_NO_REWRITE=0 on the NPI port, we still disable
++	 * port VLAN tagging with REW_TAG_CFG. Any classified VID, different
++	 * from a VID in the frame, will not be written to the frame, but is
++	 * only communicated via the IFH. So for VLAN-aware ports we add the IFH
++	 * vlan to the skb.
++	 */
++	dp = dsa_user_to_port(skb->dev);
++	vlan_tpid = tag_type ? ETH_P_8021AD : ETH_P_8021Q;
++
++	if (dsa_port_is_vlan_filtering(dp) &&
++	    eth_hdr(skb)->h_proto == htons(vlan_tpid)) {
++		u16 dummy_vlan_tci;
++
++		skb_push_rcsum(skb, ETH_HLEN);
++		__skb_vlan_pop(skb, &dummy_vlan_tci);
++		skb_pull_rcsum(skb, ETH_HLEN);
++		__vlan_hwaccel_put_tag(skb, htons(vlan_tpid), vlan_tci);
++	}
++
++	return skb;
++}
++
++static const struct dsa_device_ops lan9645x_netdev_ops = {
++	.name = LAN9645X_NAME,
++	.proto = DSA_TAG_PROTO_LAN9645X,
++	.xmit = lan9645x_xmit,
++	.rcv = lan9645x_rcv,
++	.needed_headroom = LAN9645X_TOTAL_TAG_LEN,
++	.promisc_on_conduit = false,
++};
++
++MODULE_DESCRIPTION("DSA tag driver for LAN9645x family of switches, using NPI port");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_LAN9645X, LAN9645X_NAME);
++
++module_dsa_tag_driver(lan9645x_netdev_ops);
 
-Best regards,
 -- 
-Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+2.52.0
 
 
