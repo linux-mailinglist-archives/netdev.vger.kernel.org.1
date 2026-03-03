@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-263347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAJ9J6Yjp2mMegAAu9opvQ
-	(envelope-from <netdev+bounces-263347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:08:38 +0100
+	id cj03Jucjp2mrewAAu9opvQ
+	(envelope-from <netdev+bounces-263349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:09:43 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20B161F4FDA
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:08:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BF11F507E
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6AD0306B9D9
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:04:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90CC9315D130
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52CA1D90DD;
-	Tue,  3 Mar 2026 18:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D19B351C25;
+	Tue,  3 Mar 2026 18:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="r18DtKyP"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="W437R3O0"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7358E37F01A;
-	Tue,  3 Mar 2026 18:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B2E37703A;
+	Tue,  3 Mar 2026 18:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561083; cv=none; b=cDhHZK+aGv4eM0cPgGCUAoL13352sg3isksyO4G50Zl2iUpfMYDYwzYqyyl1rFtPd8+Tx6lHR4uX6L59vKWaIb1fxtIpzimfIFLdn3ZA/Eqh9OoAv+7PGoT4OeLWgI6WyIgG2+qp32bNqeEW7FiYKWrPHEKFy3JvrU0dVfmvXRY=
+	t=1772561085; cv=none; b=EB4NaECe4Cu+IzUDxSM/VDlvKJPSLG2SFnA0rmf6dUF1UqC9nAaWD5j7dCgwFbpTrCPX0cIJXq2nMvGafqqiADokkFLnr1u986jYzv1cauvKdFIxZYaXAJBniVKoXJ3K0PxL7L+IIOpc3e4xG/JW5g0584Ii/ziuAcbdCbZ5+bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561083; c=relaxed/simple;
-	bh=hioxzY+gEVd1ChDcz9lwQg5PKNGBcQMuxrI2BTfYFkc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J7qtncLuGBh+snK7651BQQkqIyV05aRzshsxo/uSjWs0B1JI9GROkhWUhvumYb62/aCKgXM2lsWAdIYETn70PDxM0ktO9D0JgYag6H7Ieoc8qwCV8xsRzv3n127W5qc6lzbKEn/m5Rd7M26HHAcaBo9cfJ71vpf6Hd6aBuZtYTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=r18DtKyP; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1772561085; c=relaxed/simple;
+	bh=g3fSJ4nyyCP2XBDrOADHU5vpGMsdP/J5+NVWogUdb1s=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tzCifF5/iImXP2i98eYJ+9P87yVgBENkx5H5mmfU9PsTr1N93MES/mVLkccea5TjPCyFy0OeTwFsJJVHRwXDHqbFuSXrqnevyJp5tXjTEs8OSITB3pF8o4kIDYmKj6vlZaDkfaMXwn/V3pSkPiGr+OOm6W+iCjGCzcnHDXefIdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=W437R3O0; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772561082; x=1804097082;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hioxzY+gEVd1ChDcz9lwQg5PKNGBcQMuxrI2BTfYFkc=;
-  b=r18DtKyPJTy95SojHdqmeqN4DdysnnbbOvHRgJIw8OZ/VvT/0AWYDFHz
-   kfxjxjiXlkl9CUl4ToANPCOZQL+SavPXJzD+kl2+8FQ3tBAJmlakwcUdX
-   WUPF7so73hO6MlhlISUeVj1uRUo6tvF9x4qiHY1WueMcu9p07hmMTp+Cz
-   8qW+J2w6WBBZopAWIUJ9Nztr4KBi2Ez7BRDiipkGRjabz9E2P1FEyKSkU
-   7D+3VnnZQkCo5//DrB+GfLtYTIqHG7ajZChlz3W6tDHvBTdsI85vO2LW7
-   FNgg7xpAdtkiOhcRFFO8Y0z5UIiMqxuSLjXDiJu09Sa39oR7TRZMCCLnS
+  t=1772561084; x=1804097084;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=g3fSJ4nyyCP2XBDrOADHU5vpGMsdP/J5+NVWogUdb1s=;
+  b=W437R3O0U5wt67yVzpjkhloS0QoQiGQ5984kEBRHS+wwHELNaySOUdNs
+   6QBdij23x7X6VIJDiajixh5PnYPYMflmpgEkyEJIFWswJoeuQwoQx1tBm
+   tc3Rjahi60hIf57wOT8xTmRH/bBoR0AsxTWYDxQ0FA37OIJVPtjI9ZTRZ
+   ebG2bODSIWVPYN4iJRSfGMu10HpJ2OanXExOLFvoFXQd3rd4h1K8lsEf0
+   e5Ya8Ej2Vs8l2P0lBBdChAHL+Tpt/YCxUx1Qg0jwzZ+BIGE992VOHbD7w
+   MH8MWZy2s1q4BF5IWzUwH9KXW5qol6WKEpx8RkWbbrq+6VMBQsTsxAINd
    w==;
-X-CSE-ConnectionGUID: R0Y1SJ/2TCKiAbvM64J+LA==
-X-CSE-MsgGUID: p5mK4CBCSIyLdVY9U0Ug5Q==
+X-CSE-ConnectionGUID: GMMSakTvRG+HtI9KzbPdDQ==
+X-CSE-MsgGUID: dwFoa6vIT5KAcl3hWKOj1A==
 X-IronPort-AV: E=Sophos;i="6.21,322,1763449200"; 
-   d="scan'208";a="53419559"
+   d="scan'208";a="221432060"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Mar 2026 11:04:41 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 11:04:43 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 3 Mar 2026 11:04:09 -0700
+ 15.2.2562.35; Tue, 3 Mar 2026 11:04:15 -0700
 Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Tue, 3 Mar 2026 11:04:08 -0700
+ 15.1.2507.58 via Frontend Transport; Tue, 3 Mar 2026 11:04:15 -0700
 From: Charles Perry <charles.perry@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: Charles Perry <charles.perry@microchip.com>, Andrew Lunn
@@ -69,10 +70,12 @@ CC: Charles Perry <charles.perry@microchip.com>, Andrew Lunn
 	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nicolas Ferre
 	<nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next 0/4] Initial support for p64h GEM
-Date: Tue, 3 Mar 2026 10:03:14 -0800
-Message-ID: <20260303180318.1814791-1-charles.perry@microchip.com>
+Subject: [PATCH net-next 1/4] dt-bindings: net: cdns,macb: add a compatible for Microchip p64h
+Date: Tue, 3 Mar 2026 10:03:15 -0800
+Message-ID: <20260303180318.1814791-2-charles.perry@microchip.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260303180318.1814791-1-charles.perry@microchip.com>
+References: <20260303180318.1814791-1-charles.perry@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Rspamd-Queue-Id: 20B161F4FDA
+X-Rspamd-Queue-Id: 17BF11F507E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -98,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263347-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263349-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -109,45 +112,31 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,microchip.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello,
+"p64h" is shorthand for "PIC64-HPSC" and "PIC64HX"
 
-This series add basic support for Microchip "PIC64-HPSC" and "PIC64HX"
-(abbreviated "p64h") Ethernet endpoint. Both MPUs contain 4 GEM IP with
-support for MII/RGMII/SGMII/USXGMII at rates of 10M to 10G. Only RGMII and
-SGMII at a rate of 1G is tested for now. Each GEM IP has 8 priority queues
-and the revision register reads 0x220c010e.
+The generic compatible "cdns,gem" works but offers limited features.
+Keep it as a fallback.
 
-One particularity of this instantiation of GEM is that the MDIO controller
-within the GEM IP is disconnected from any physical pin and p64h rely on
-another standalone MDIO controller. For that reason, I've added a dt
-binding rule to forbid phys from being added under the gem DT node. See
-patch 2.
+Signed-off-by: Charles Perry <charles.perry@microchip.com>
+---
+ Documentation/devicetree/bindings/net/cdns,macb.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-The maximum jumbo frame size also seems to be different on p64h (16383)
-than what most other platforms use (10240). I've found that I need to
-tweak a bit the MTU calculation for this, otherwise the RXBS field of the
-DMACFG register overflows. See patch 3 for more details.
-
-p64h also supports other features guarded behind CAPS bit like
-MACB_CAPS_QBV but I've omitted those intentionally because I didn't test
-these.
-
-Thanks,
-Charles
-
-Charles Perry (4):
-  dt-bindings: net: cdns,macb: add a compatible for Microchip p64h
-  dt-bindings: net: cdns,macb: forbid phy nodes for Microchip p64h
-  net: macb: add safeguards for jumbo frame larger than 10240
-  net: macb: add support for Microchip p64h ethernet endpoint
-
- .../devicetree/bindings/net/cdns,macb.yaml       | 12 ++++++++++++
- drivers/net/ethernet/cadence/macb_main.c         | 16 ++++++++++++++--
- 2 files changed, 26 insertions(+), 2 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index cb14c35ba996..dff350302098 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -27,6 +27,7 @@ properties:
+ 
+       - items:
+           - enum:
++              - microchip,p64h-gem    # Microchip P64H SoC
+               - xlnx,versal-gem       # Xilinx Versal
+               - xlnx,zynq-gem         # Xilinx Zynq-7xxx SoC
+               - xlnx,zynqmp-gem       # Xilinx Zynq Ultrascale+ MPSoC
 -- 
 2.47.3
 
