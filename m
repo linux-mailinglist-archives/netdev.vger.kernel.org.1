@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-263443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wIKLDtRYp2lsgwAAu9opvQ
-	(envelope-from <netdev+bounces-263443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:32 +0100
+	id KByFLLtYp2lsgwAAu9opvQ
+	(envelope-from <netdev+bounces-263444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B512C1F7CF2
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3061F7CCB
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 352E830883AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:54:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 40D8C303B364
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E9E336891;
-	Tue,  3 Mar 2026 21:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF33368A4;
+	Tue,  3 Mar 2026 21:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpheB+q2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bl6zdMPU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F73F33688A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018B233689D
 	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772574828; cv=none; b=TKPjMnV22J144zhuYuC3hvsoXxIwiI9sUsoC1f0U+ITiCRYr7C3BfRZEvDo3Lp7RIQ1ZhsgkPUraHwcXXNAWGNVNNF/PwotjhG0fZF/jpNDAPZNv2TTQBq2YlukidhA5ueecHLekFZh8W5Gp3ekvG9NBaBnuJXX6VIF0U7QAlBg=
+	t=1772574829; cv=none; b=ObvtGa7bhXqFsthmKAHKTTh0uFJOfRNvSiEIZfncFtClGZnDDUpGlcnDDPQcrCVgCfeR2pPV0aEPDMf8xC8I5RMIXQUIIpWjuxQ/oArA8y85Ectt5pgLLDU7eGSvsS+YCGYGcLTe9yvGntkmWfzozPyMMfxr2Z65GC7eR4IuSOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772574828; c=relaxed/simple;
-	bh=halFq8lcU72mwJNwh3ms5LmfIfvH/rYGfW2CiKKnM84=;
+	s=arc-20240116; t=1772574829; c=relaxed/simple;
+	bh=s+bxBAW7Fds1wr0QE/kY1k9u90jC0RSPBPGEDJDGdPk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tf5Z9znkcvZlMKxnjqNHb9zdmfycxEv3YaOOzsNL0esAIm16n1Y+K98zVsXrl6uK31FU3pVkEzj5IgkdvruiaEyKAdd8eVmhDfa1h0FjmkArYwYnYTIjL+t2cxzRsHW1Uilx7bec4RjcEia11aZTbO6+1pZp1oWCIgSyEAR/aEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpheB+q2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39C4C2BCAF;
-	Tue,  3 Mar 2026 21:53:47 +0000 (UTC)
+	 MIME-Version; b=q9p9Lb5OLnDFGPGCSmt56WKx0MxfqUYb64WfNDsZk3Lko0FUZYBic13t73oaeaJn4rq+syjjYqdKRNvC4b1D+5hB63tz6MK5H999UVDJhSIE/bsj/uulR5c61pq2z8dXC3DVzflWfMhhceUtUtVEH6lwQQ5XEpkF6UFSk54LNaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bl6zdMPU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61309C116C6;
+	Tue,  3 Mar 2026 21:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772574828;
-	bh=halFq8lcU72mwJNwh3ms5LmfIfvH/rYGfW2CiKKnM84=;
+	bh=s+bxBAW7Fds1wr0QE/kY1k9u90jC0RSPBPGEDJDGdPk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JpheB+q2vMyA7y0rmJF8q4+BmBtr5nByJSfbTbe7bNvmPeDLwbs/WTyv6W/97MI3S
-	 ERyRVum3rECYm8mpLJj9Vm2Ao8A4GJ8owSfCfPNOiDG7wacDUWA4WULTOfT+Tt2D1D
-	 NlHRB1f1YkUKRLyeN33IuvnvHHF2bzLVFciBBxLSpOP3IHaFgcnDbzyGSG/X5wuSdD
-	 bWchAYNNivS2rxXFP4gRLgTbzVkzBgowgXdaojv0Y/xwphWUm+HeLsBWKqdHMmpTk6
-	 l1RVPhS0QhIYyr8oZVN6NdfN54bY3u2HR+3W+p3ZI4WDW45jwpdtq9FfLBHOWoNw5F
-	 U8hCBoSKzi4oQ==
+	b=Bl6zdMPUVVt3J+GEVm1JsjjLok0IIvP912lHqd+qGr12YPVpunmv3ephaOYzbW3yk
+	 9CL47PiJkWBYf+3cOyYafk5ABrsbz7FYSEzAtuRdXuYxVieVVaPefJ+NZ+5BKr3IuP
+	 z2EwNn6rEAVRSWNdOboaZKM7JhBpDtzEngFz9mpK14CuWUesEl25vm7Vo4Tywhpzax
+	 B96tqpgchclk6+kFfLOEfJ66dWvlHi0BjUQB99tPTVSOdNIRMHzcnxtzuYj6NNMRwf
+	 iS8A9CXhDRldDMWeBgrhybjkZF4AFQ1HSyI62rTBaM72vC+1MOjGEZNZupHZHsI43H
+	 H4j7O7VK937ZA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,11 +52,12 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	taras.chornyi@plvision.eu,
-	enachman@marvell.com
-Subject: [PATCH net 09/11] MAINTAINERS: replace Taras Chornyi with Elad Nachman for Marvell Prestera
-Date: Tue,  3 Mar 2026 13:53:09 -0800
-Message-ID: <20260303215339.2333548-10-kuba@kernel.org>
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	vladimir.oltean@nxp.com
+Subject: [PATCH net 10/11] MAINTAINERS: remove Claudiu Manoil and Alexandre Belloni from Ocelot switch
+Date: Tue,  3 Mar 2026 13:53:10 -0800
+Message-ID: <20260303215339.2333548-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303215339.2333548-1-kuba@kernel.org>
 References: <20260303215339.2333548-1-kuba@kernel.org>
@@ -67,7 +68,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B512C1F7CF2
+X-Rspamd-Queue-Id: AF3061F7CCB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -75,7 +76,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -84,9 +85,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263443-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263444-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -94,49 +95,60 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,marvell.com:email,intel.com:email,lunn.ch:email,plvision.eu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:email,bootlin.com:email,nxp.com:email,intel.com:email]
 X-Rspamd-Action: no action
 
-We have not seen emails or tags from Taras in over 5 years,
-and there is no recent mailing list activity.
-Elad Nachman has been providing reviews in the last couple
-of years and is the top reviewer for this subsystem.
+We have not seen tags from Claudiu for the Ocelot switch driver
+in over 5 years. He is active upstream in other NXP subsystems
+(ENETC, gianfar), with 46 emails on lore since 2024.
+We have not seen tags from Alexandre for the Ocelot switch driver
+in over 5 years. He is very active upstream in other subsystems
+(RTC, I3C, Atmel/Microchip SoC), with over 1,200 emails on lore
+since 2024.
+Vladimir Oltean is active.
 
-Subsystem MARVELL PRESTERA ETHERNET SWITCH DRIVER
-  Changes 39 / 157 (24%)
-  (No activity)
+Subsystem OCELOT ETHERNET SWITCH DRIVER
+  Changes 180 / 494 (36%)
+  Last activity: 2026-02-12
+  Vladimir Oltean <vladimir.oltean@nxp.com>:
+    Author c22ba07c827f 2026-02-10 00:00:00 33
+    Tags 026f6513c588 2026-02-12 00:00:00 39
+  Claudiu Manoil <claudiu.manoil@nxp.com>:
+  Alexandre Belloni <alexandre.belloni@bootlin.com>:
   Top reviewers:
-    [8]: enachman@marvell.com
-    [6]: horms@kernel.org
-    [4]: idosch@nvidia.com
-    [3]: andrew@lunn.ch
-    [3]: jacob.e.keller@intel.com
-    [3]: jiri@nvidia.com
-  INACTIVE MAINTAINER Taras Chornyi <taras.chornyi@plvision.eu>
+    [49]: f.fainelli@gmail.com
+    [19]: horms@kernel.org
+    [10]: richardcochran@gmail.com
+    [9]: jacob.e.keller@intel.com
+    [8]: colin.foster@in-advantage.com
+  INACTIVE MAINTAINER Claudiu Manoil <claudiu.manoil@nxp.com>
 
+Acked-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Cc: taras.chornyi@plvision.eu
-Cc: enachman@marvell.com
+Cc: vladimir.oltean@nxp.com
+Cc: claudiu.manoil@nxp.com
+Cc: alexandre.belloni@bootlin.com
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 61fd624c673d..8123339e4769 100644
+index 8123339e4769..8f208f877746 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -15485,7 +15485,7 @@ S:	Supported
- F:	drivers/perf/marvell_pem_pmu.c
+@@ -19218,8 +19218,6 @@ F:	tools/objtool/
  
- MARVELL PRESTERA ETHERNET SWITCH DRIVER
--M:	Taras Chornyi <taras.chornyi@plvision.eu>
-+M:	Elad Nachman <enachman@marvell.com>
+ OCELOT ETHERNET SWITCH DRIVER
+ M:	Vladimir Oltean <vladimir.oltean@nxp.com>
+-M:	Claudiu Manoil <claudiu.manoil@nxp.com>
+-M:	Alexandre Belloni <alexandre.belloni@bootlin.com>
+ M:	UNGLinuxDriver@microchip.com
+ L:	netdev@vger.kernel.org
  S:	Supported
- W:	https://github.com/Marvell-switching/switchdev-prestera
- F:	drivers/net/ethernet/marvell/prestera/
 -- 
 2.53.0
 
