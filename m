@@ -1,360 +1,212 @@
-Return-Path: <netdev+bounces-263016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJi9H01QpmmxNwAAu9opvQ
-	(envelope-from <netdev+bounces-263016-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:06:53 +0100
+	id sB/EG6FQpmmxNwAAu9opvQ
+	(envelope-from <netdev+bounces-263017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:08:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C877D1E8514
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:06:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D36B01E853B
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:08:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FB643092099
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:05:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EDEF83014A30
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A3D36AB53;
-	Tue,  3 Mar 2026 03:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A8337CD30;
+	Tue,  3 Mar 2026 03:08:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1142A37CD2C
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 03:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EF91A6810;
+	Tue,  3 Mar 2026 03:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772507101; cv=none; b=H3c9fJdzahAPwQdThjp25SHGmJkuGZp9TKyKebe8y3aO7+zk1UiF8ZSbOsd5AXBUJMjeeYOjl0ShVeKVe65IFVeqGP5enOJWUNDsJhBSRT9lfci01IoP4tnM1WirVA/hXrFxYmh5iHpbUvJbgkR7Vynk4Mt0GNe5rSnpXu5s8VA=
+	t=1772507294; cv=none; b=WBmjBZfSg3KTtHFIL78Hw223KmWDVA/bRktBSDZKfE5m1HaFYvDTTmr1SBKZo5W/E2QdqwSkCi4iYCQdSX5bzq1EAKzU2aC2WlVEPw7MUIPsuQuw9fN0tWXMTYfxSYXAc3/fUbHbEc1uHfHyMhmZnw0p3AE+SdnTq22K5P0wjK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772507101; c=relaxed/simple;
-	bh=RWkOU4XdLdTJ5pLHoCQYiR7O7fwS7XVhQxZA7Yn7hag=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iYGBw9ThPjc9c6YoV4k2Kv/MTWckfVUe5bnWL2l+89amr9690EBpLN91NqUq0DceYoHDjQqqxXguPbvXvTYznQ9FGsemPmTOgesuc9+n+pdhzgvkMSFsglaipA4tFBW5kHM+CQEyHOrcH+MlkHGOu1KzGamdregPHvGvwATdQUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz19t1772507052t49a06210
-X-QQ-Originating-IP: LJ05SJqAAEeg5JIKcOaR9zWBOhlsuZMJhz4oUNvGF9w=
-Received: from lap-jiawenwu.trustnetic.com ( [125.120.70.252])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 03 Mar 2026 11:04:10 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2608189590102710063
-EX-QQ-RecipientCnt: 18
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kees Cook <kees@kernel.org>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Joe Damato <joe@dama.to>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Abdun Nihaal <abdun.nihaal@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 9/9] net: wangxun: implement pci_error_handlers ops
-Date: Tue,  3 Mar 2026 11:03:31 +0800
-Message-Id: <20260303030331.24076-10-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260303030331.24076-1-jiawenwu@trustnetic.com>
-References: <20260303030331.24076-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1772507294; c=relaxed/simple;
+	bh=fq6lGRuk4vbotXrNf1S/WwF5IykOhcBaxmdcw2erxK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Je1KmQ5A8PNxDvoM7qFtIHjerezhRRZsh/9158F7qdoEX9hdyci+IgjfWtnBDLXN+KgVOwp8DOeCd5tT26m19Q7cGWh5cIVTEs9mnzUvEmianwxsFepNo7cQx0BgHpJp1FJHZWlfPerH+H7Se66vcsChC5hjqUdpd0GfBJN5tcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fQ11v1HR2zYQtwr;
+	Tue,  3 Mar 2026 11:07:31 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 625254058F;
+	Tue,  3 Mar 2026 11:08:04 +0800 (CST)
+Received: from [10.67.111.176] (unknown [10.67.111.176])
+	by APP4 (Coremail) with SMTP id gCh0CgAHtPSTUKZpZsOGJQ--.57459S2;
+	Tue, 03 Mar 2026 11:08:04 +0800 (CST)
+Message-ID: <17c72eb9-deac-44aa-a055-b3ed9c455498@huaweicloud.com>
+Date: Tue, 3 Mar 2026 11:08:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: M6I+dON63j22W+vUurmqvFaqN/ebYAVP92915nGCvDKijZqfHIRKiv6c
-	hqmFJXuJYfbmjjNM2lgwi/CO994PRFhIxhxqUze0s8DttoTd+FVD43U7TnfGt9ofoCB/rNo
-	01Z+KtN1t915qQfrwtidv377CDQEo93ADssTtgihoyrgfxtgKUGVgIFEdgSCKxwbuH02IGa
-	rflqjWPpiaXum19p1/ltFFX0jz/PIyfmhWle1lmhmJ92YW+z7C00iGIg2xO4WYArnGE++SR
-	clu++zcUpVKNf5bDejn8aGtcO0nDF/WwYE7hC82YTHOHeEOU40cFqkkczbkuZAo5eOOglpw
-	0mylTvCUK3hSEuegTI2qcjsYbh+h04Kh/iRU/FcavJlW7ymubm+i4klcyxt4l0H75RflV0U
-	WN1phC0Zybhmd8zSL5B9KIdoTaASHXP+NZxE2ZKR3qQZS4zMQoQqbz41csQCHvcNyXKBrJX
-	MKTaR6GhgjyhR7myMT2jBUhUb5PqVdiqDk7f/EGG8ivyATWt/vUQIWyhSFlEz463j1xsVfW
-	fgRhdpLoQetvZ7nnVkfq9gswuDLV6s1klmov7NvT8sUVhoPpghmegNH3rbWFJBLKKBGpgW7
-	nutNWy04EFXOS5gREUfbSyWyeF4oqEeNm7RcvGI/uAm7HfC6D4S+fVSlGuQrJEohYdAoLFg
-	6FyfAnIc/1817M31JNbSKwZdvmHbF6NXWwMOS4vQBTebAL93ICtIhmdZNVnr3uq5iBgxpUA
-	KW9aqa2PEMu5yUKpC/tnL3NAYOZ6fdYnoh0AGGgqsdSzAsQ5LR+pDJdO/th5bMWPM79o64/
-	ODtWu0iLQb0RWQ49KCV5ZVwzqVoTzwk5nkGpPxx8xy6vMq3nkQZ1hyikDo7amYMud2kXRzp
-	9cs58eVXp8+8XbcXUEpTpY1fAc2py3SguHCaurFWRfufoNWypeoUfvuwJqRIal7vpY5/Xva
-	vJ05C+vuceyr830u5Y+fKdW91A04JJSiCauKXRiqF/AyLGBJCIVOhe9zTiSnQQtKV+hIgqC
-	jy7gD/pRxMfCes4tgb+ynC8Bp2h2HykX6PwBasm3zmW3clncfunRcSVWYjDXv8CCMplL8gm
-	4d9fdU6LUjnKM6vvkZpb5Q=
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: C877D1E8514
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] cgroup: add lockless fast-path checks to
+ cgroup_file_notify()
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Daniel Sedlak <daniel.sedlak@cdn77.com>,
+ Meta kernel team <kernel-team@meta.com>, linux-mm@kvack.org,
+ netdev@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+References: <20260228142018.3178529-1-shakeel.butt@linux.dev>
+ <20260228142018.3178529-3-shakeel.butt@linux.dev>
+ <40c77bba-0862-4422-b23e-2a10cd01c728@huaweicloud.com>
+ <aaW2feETIF7I65i1@linux.dev>
+Content-Language: en-US
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <aaW2feETIF7I65i1@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgAHtPSTUKZpZsOGJQ--.57459S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGF17WrW7XrykKFWktrW5Wrg_yoW5trWkpa
+	98CF9Yka15GFyUCwn2q34Y9FyFg3yxGrW7XrW7X340yF9rt3WIqFW29r1UWFy8Ars7Gr42
+	vr4YqrW3Cr1jyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
+	7KsUUUUUU==
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+X-Rspamd-Queue-Id: D36B01E853B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263016-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-0.912];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,dama.to,debian.org,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.818];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263017-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[huaweicloud.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:email]
 X-Rspamd-Action: no action
 
-Support AER driver to handle the PCIe errors.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 102 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   3 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   5 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +-
- 6 files changed, 115 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index bb77bdce69d2..86b318647a3c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -3,11 +3,113 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
-+
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_save_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev))
-+		netdev->netdev_ops->ndo_open(netdev);
-+
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- static void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index e317e6c8d928..8b1a7863b5b1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_handle_errors_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 5a21478a592b..1cd73b424d7f 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3418,7 +3418,8 @@ static void wx_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- int wx_suspend(struct pci_dev *pdev, pm_message_t state)
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 434a582393d7..142b166117fa 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1196,6 +1196,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index e0f5d3b49db7..18bd627f63db 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -819,6 +819,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -869,7 +870,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver ngbe_driver = {
-@@ -881,6 +883,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index d4f87fbb9565..c9fdad7f0df2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -886,6 +886,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -956,7 +957,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -968,6 +970,7 @@ static struct pci_driver txgbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
+On 2026/3/3 0:14, Shakeel Butt wrote:
+> Hi Chen, thanks for taking a look.
+> 
+> On Mon, Mar 02, 2026 at 09:50:53AM +0800, Chen Ridong wrote:
+>>
+>> Hi Shakeel,
+>>
+>> Good series to move away from the global lock.
+>>
+>> On 2026/2/28 22:20, Shakeel Butt wrote:
+>>> Add two lockless checks before acquiring the lock:
+>>>
+>>> 1. READ_ONCE(cfile->kn) NULL check to skip torn-down files.
+>>> 2. READ_ONCE(cfile->notified_at) check to skip when within the
+>>>    rate-limit window (~10ms).
+>>>
+>>> Both checks have safe error directions -- a stale read can only cause
+>>> unnecessary lock acquisition, never a missed notification.  Annotate
+>>> all write sites with WRITE_ONCE() to pair with the lockless readers.
+>>>
+>>> The trade-off is that trailing timer_reduce() calls during bursts are
+>>> skipped, so the deferred notification that delivers the final state
+>>> may be lost.  This is acceptable for the primary callers like
+>>> __memcg_memory_event() where events keep arriving.
+>>>
+>>> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+>>> Reported-by: Jakub Kicinski <kuba@kernel.org>
+>>> ---
+>>>  kernel/cgroup/cgroup.c | 21 ++++++++++++++-------
+>>>  1 file changed, 14 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+>>> index 33282c7d71e4..5473ebd0f6c1 100644
+>>> --- a/kernel/cgroup/cgroup.c
+>>> +++ b/kernel/cgroup/cgroup.c
+>>> @@ -1749,7 +1749,7 @@ static void cgroup_rm_file(struct cgroup *cgrp, const struct cftype *cft)
+>>>  		struct cgroup_file *cfile = (void *)css + cft->file_offset;
+>>>  
+>>>  		spin_lock_irq(&cgroup_file_kn_lock);
+>>> -		cfile->kn = NULL;
+>>> +		WRITE_ONCE(cfile->kn, NULL);
+>>>  		spin_unlock_irq(&cgroup_file_kn_lock);
+>>>  
+>>>  		timer_delete_sync(&cfile->notify_timer);
+>>> @@ -4430,7 +4430,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
+>>>  		timer_setup(&cfile->notify_timer, cgroup_file_notify_timer, 0);
+>>>  
+>>>  		spin_lock_irq(&cgroup_file_kn_lock);
+>>> -		cfile->kn = kn;
+>>> +		WRITE_ONCE(cfile->kn, kn);
+>>>  		spin_unlock_irq(&cgroup_file_kn_lock);
+>>>  	}
+>>>  
+>>> @@ -4686,20 +4686,27 @@ int cgroup_add_legacy_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
+>>>   */
+>>>  void cgroup_file_notify(struct cgroup_file *cfile)
+>>>  {
+>>> -	unsigned long flags;
+>>> +	unsigned long flags, last, next;
+>>>  	struct kernfs_node *kn = NULL;
+>>>  
+>>> +	if (!READ_ONCE(cfile->kn))
+>>> +		return;
+>>> +
+>>> +	last = READ_ONCE(cfile->notified_at);
+>>> +	if (time_before_eq(jiffies, last + CGROUP_FILE_NOTIFY_MIN_INTV))
+>>> +		return;
+>>> +
+>>
+>> Previously, if a notification arrived within the rate-limit window, we would
+>> still call timer_reduce(&cfile->notify_timer, next) to schedule a deferred
+>> notification.
+>>
+>> With this change, returning early here bypasses that timer scheduling entirely.
+>> Does this risk missing notifications that would have been delivered by the timer?
+>>
+> 
+> You are indeed right that this can cause missed notifications. After giving some
+> thought I think the lockless check-and-return can be pretty much simplified to
+> timer_pending() check. If timer is active, just do nothing and the notification
+> will be delivered eventually.
+> 
+> I will send the updated version soon. Any comments on the other two patches?
+> 
+
+The other two patches are fine to me.
+
 -- 
-2.48.1
+Best regards,
+Ridong
 
 
