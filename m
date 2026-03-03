@@ -1,212 +1,182 @@
-Return-Path: <netdev+bounces-263017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263018-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sB/EG6FQpmmxNwAAu9opvQ
-	(envelope-from <netdev+bounces-263017-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:08:17 +0100
+	id 6AVqEf1RpmkbOAAAu9opvQ
+	(envelope-from <netdev+bounces-263018-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:14:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36B01E853B
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:08:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5ECC1E85B9
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EDEF83014A30
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:08:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A6DF300F59E
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A8337CD30;
-	Tue,  3 Mar 2026 03:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F8C376BE5;
+	Tue,  3 Mar 2026 03:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GTSv7btl"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EF91A6810;
-	Tue,  3 Mar 2026 03:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6730E36AB53
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 03:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772507294; cv=none; b=WBmjBZfSg3KTtHFIL78Hw223KmWDVA/bRktBSDZKfE5m1HaFYvDTTmr1SBKZo5W/E2QdqwSkCi4iYCQdSX5bzq1EAKzU2aC2WlVEPw7MUIPsuQuw9fN0tWXMTYfxSYXAc3/fUbHbEc1uHfHyMhmZnw0p3AE+SdnTq22K5P0wjK0=
+	t=1772507640; cv=none; b=GgD2KGd3G/HoX5/NhRQga9sHUOSoSygt4sGobEAKCti41hXEgi43fEXgP1lraLDs7OAlt5+CeY1qbWT2UVoNW432jxUNl8D2Z336q9tUGlz3SaErSSAuUEbq0G5e5lnZOyX8FbJr8Pn1v+YM0v4CXeJGJf9eoigyLizQZuPhXvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772507294; c=relaxed/simple;
-	bh=fq6lGRuk4vbotXrNf1S/WwF5IykOhcBaxmdcw2erxK0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Je1KmQ5A8PNxDvoM7qFtIHjerezhRRZsh/9158F7qdoEX9hdyci+IgjfWtnBDLXN+KgVOwp8DOeCd5tT26m19Q7cGWh5cIVTEs9mnzUvEmianwxsFepNo7cQx0BgHpJp1FJHZWlfPerH+H7Se66vcsChC5hjqUdpd0GfBJN5tcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fQ11v1HR2zYQtwr;
-	Tue,  3 Mar 2026 11:07:31 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 625254058F;
-	Tue,  3 Mar 2026 11:08:04 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP4 (Coremail) with SMTP id gCh0CgAHtPSTUKZpZsOGJQ--.57459S2;
-	Tue, 03 Mar 2026 11:08:04 +0800 (CST)
-Message-ID: <17c72eb9-deac-44aa-a055-b3ed9c455498@huaweicloud.com>
-Date: Tue, 3 Mar 2026 11:08:02 +0800
+	s=arc-20240116; t=1772507640; c=relaxed/simple;
+	bh=K6AlHqnS/7kLdIFnNna34u22cqVsdxLjKhDZOmX1IRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dsh9SnCk/3Qjie9DUceIn2X/xvUDHKAYaGTn2eCA25yMkOcZ/iwh4oPNVFBB2Cjyjzh964YHNDIAwDrzt5QPb6igriBGxGfvDc/oasBgH7WRUxOB8UIZM+cQJPWKAq040ieXsgAz7FL840/vXiAXVtEBAHDkmzwBu3n/NAVyksk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GTSv7btl; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772507637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=D6qexQ4j4clxuPTGBn1CJqco2P+dhoqeOUpk4a5MPl8=;
+	b=GTSv7btlK5h+/vJ12pI9d7njPVIQnnv25FLqSae2M4+6pmNky961IYEPZNQdh1Jj1X7c9U
+	KF1VzAWHSCEkkaNLBmJiVFXFKNZm/Rm1+L6D8vLxY4EFy6JKgnvbGjDH5/hirqjpb3qdqo
+	GtmBLG3+8PtClmYm7GeMD28jidSGYqA=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: jiayuna.chen@linux.dev,
+	jiayuna.chen@shopee.com,
+	idosch@nvidia.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v3 0/2] net: ipv6: fix panic when IPv4 route references loopback IPv6 nexthop and add selftest
+Date: Tue,  3 Mar 2026 11:13:13 +0800
+Message-ID: <20260303031318.339716-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] cgroup: add lockless fast-path checks to
- cgroup_file_notify()
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- Daniel Sedlak <daniel.sedlak@cdn77.com>,
- Meta kernel team <kernel-team@meta.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org, cgroups@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <20260228142018.3178529-1-shakeel.butt@linux.dev>
- <20260228142018.3178529-3-shakeel.butt@linux.dev>
- <40c77bba-0862-4422-b23e-2a10cd01c728@huaweicloud.com>
- <aaW2feETIF7I65i1@linux.dev>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <aaW2feETIF7I65i1@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgAHtPSTUKZpZsOGJQ--.57459S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF17WrW7XrykKFWktrW5Wrg_yoW5trWkpa
-	98CF9Yka15GFyUCwn2q34Y9FyFg3yxGrW7XrW7X340yF9rt3WIqFW29r1UWFy8Ars7Gr42
-	vr4YqrW3Cr1jyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	7KsUUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
-X-Rspamd-Queue-Id: D36B01E853B
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: D5ECC1E85B9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	NEURAL_HAM(-0.00)[-0.912];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263018-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263017-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[huaweicloud.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:email]
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:email,linux.dev:dkim,linux.dev:mid]
 X-Rspamd-Action: no action
 
+syzbot reported a kernel panic [1] when an IPv4 route references
+a loopback IPv6 nexthop object:
 
+BUG: unable to handle page fault for address: ffff8d069e7aa000
+PF: supervisor read access in kernel mode
+PF: error_code(0x0000) - not-present page
+PGD 6aa01067 P4D 6aa01067 PUD 0
+Oops: Oops: 0000 [#1] SMP PTI
+CPU: 2 UID: 0 PID: 530 Comm: ping Not tainted 6.19.0+ #193 PREEMPT
+RIP: 0010:ip_route_output_key_hash_rcu+0x578/0x9e0
+RSP: 0018:ffffd2ffc1573918 EFLAGS: 00010286
+RAX: ffff8d069e7aa000 RBX: ffffd2ffc1573988 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffd2ffc1573978 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff8d060d496000
+R13: 0000000000000000 R14: ffff8d060399a600 R15: ffff8d06019a6ab8
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff8d069e7aa000 CR3: 0000000106eb0001 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ip_route_output_key_hash+0x86/0x1a0
+ __ip4_datagram_connect+0x2b5/0x4e0
+ udp_connect+0x2c/0x60
+ inet_dgram_connect+0x88/0xd0
+ __sys_connect_file+0x56/0x90
+ __sys_connect+0xa8/0xe0
+ __x64_sys_connect+0x18/0x30
+ x64_sys_call+0xfb9/0x26e0
+ do_syscall_64+0xd3/0x1510
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-On 2026/3/3 0:14, Shakeel Butt wrote:
-> Hi Chen, thanks for taking a look.
-> 
-> On Mon, Mar 02, 2026 at 09:50:53AM +0800, Chen Ridong wrote:
->>
->> Hi Shakeel,
->>
->> Good series to move away from the global lock.
->>
->> On 2026/2/28 22:20, Shakeel Butt wrote:
->>> Add two lockless checks before acquiring the lock:
->>>
->>> 1. READ_ONCE(cfile->kn) NULL check to skip torn-down files.
->>> 2. READ_ONCE(cfile->notified_at) check to skip when within the
->>>    rate-limit window (~10ms).
->>>
->>> Both checks have safe error directions -- a stale read can only cause
->>> unnecessary lock acquisition, never a missed notification.  Annotate
->>> all write sites with WRITE_ONCE() to pair with the lockless readers.
->>>
->>> The trade-off is that trailing timer_reduce() calls during bursts are
->>> skipped, so the deferred notification that delivers the final state
->>> may be lost.  This is acceptable for the primary callers like
->>> __memcg_memory_event() where events keep arriving.
->>>
->>> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
->>> Reported-by: Jakub Kicinski <kuba@kernel.org>
->>> ---
->>>  kernel/cgroup/cgroup.c | 21 ++++++++++++++-------
->>>  1 file changed, 14 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
->>> index 33282c7d71e4..5473ebd0f6c1 100644
->>> --- a/kernel/cgroup/cgroup.c
->>> +++ b/kernel/cgroup/cgroup.c
->>> @@ -1749,7 +1749,7 @@ static void cgroup_rm_file(struct cgroup *cgrp, const struct cftype *cft)
->>>  		struct cgroup_file *cfile = (void *)css + cft->file_offset;
->>>  
->>>  		spin_lock_irq(&cgroup_file_kn_lock);
->>> -		cfile->kn = NULL;
->>> +		WRITE_ONCE(cfile->kn, NULL);
->>>  		spin_unlock_irq(&cgroup_file_kn_lock);
->>>  
->>>  		timer_delete_sync(&cfile->notify_timer);
->>> @@ -4430,7 +4430,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
->>>  		timer_setup(&cfile->notify_timer, cgroup_file_notify_timer, 0);
->>>  
->>>  		spin_lock_irq(&cgroup_file_kn_lock);
->>> -		cfile->kn = kn;
->>> +		WRITE_ONCE(cfile->kn, kn);
->>>  		spin_unlock_irq(&cgroup_file_kn_lock);
->>>  	}
->>>  
->>> @@ -4686,20 +4686,27 @@ int cgroup_add_legacy_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
->>>   */
->>>  void cgroup_file_notify(struct cgroup_file *cfile)
->>>  {
->>> -	unsigned long flags;
->>> +	unsigned long flags, last, next;
->>>  	struct kernfs_node *kn = NULL;
->>>  
->>> +	if (!READ_ONCE(cfile->kn))
->>> +		return;
->>> +
->>> +	last = READ_ONCE(cfile->notified_at);
->>> +	if (time_before_eq(jiffies, last + CGROUP_FILE_NOTIFY_MIN_INTV))
->>> +		return;
->>> +
->>
->> Previously, if a notification arrived within the rate-limit window, we would
->> still call timer_reduce(&cfile->notify_timer, next) to schedule a deferred
->> notification.
->>
->> With this change, returning early here bypasses that timer scheduling entirely.
->> Does this risk missing notifications that would have been delivered by the timer?
->>
-> 
-> You are indeed right that this can cause missed notifications. After giving some
-> thought I think the lockless check-and-return can be pretty much simplified to
-> timer_pending() check. If timer is active, just do nothing and the notification
-> will be delivered eventually.
-> 
-> I will send the updated version soon. Any comments on the other two patches?
-> 
+Reproduction:
 
-The other two patches are fine to me.
+    ip -6 nexthop add id 100 dev lo
+    ip route add 172.20.20.0/24 nhid 100
+    ping -c1 172.20.20.1     # kernel crash
+
+Problem Description
+
+When a standalone IPv6 nexthop object is created with a loopback device,
+fib6_nh_init() misclassifies it as a reject route. Nexthop objects have
+no destination prefix (fc_dst=::), so fib6_is_reject() always matches
+any loopback nexthop. The reject path skips fib_nh_common_init(), leaving
+nhc_pcpu_rth_output unallocated. When an IPv4 route later references
+this nexthop and triggers a route lookup, __mkroute_output() calls
+raw_cpu_ptr(nhc->nhc_pcpu_rth_output) on a NULL pointer, causing a page
+fault.
+
+The reject classification was designed for regular IPv6 routes to prevent
+kernel routing loops, but nexthop objects should not be subject to this
+check since they carry no destination information. Loop prevention is
+handled separately when the route itself is created.
+
+Solution
+
+Patch 1: Fix the kernel panic.
+Patch 2: Add a selftest reproducing the crash scenario.
+
+Changes since v2:
+https://lore.kernel.org/netdev/20260302051132.66314-1-jiayuan.chen@linux.dev/
+- Simplify the reject check in fib6_nh_init() to only match RTF_REJECT
+  instead of using fib6_is_reject(), since the loopback promotion
+  heuristic is handled separately by ip6_route_info_create()
+  (Suggested by Ido Schimmel <idosch@nvidia.com>)
+
+[1] https://syzkaller.appspot.com/bug?extid=334190e097a98a1b81bb
+
+Jiayuan Chen (2):
+  net: ipv6: fix panic when IPv4 route references loopback IPv6 nexthop
+  selftests: net: add test for IPv4 route with loopback IPv6 nexthop
+
+ net/ipv6/route.c                            |  8 +++-----
+ tools/testing/selftests/net/fib_nexthops.sh | 11 +++++++++++
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
 -- 
-Best regards,
-Ridong
+2.43.0
 
 
