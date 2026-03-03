@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-263442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBsiFr5Yp2lsgwAAu9opvQ
-	(envelope-from <netdev+bounces-263442-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:10 +0100
+	id wIKLDtRYp2lsgwAAu9opvQ
+	(envelope-from <netdev+bounces-263443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C591F7CDA
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B512C1F7CF2
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:55:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D426230B5B60
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:54:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 352E830883AF
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA53C4F7998;
-	Tue,  3 Mar 2026 21:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E9E336891;
+	Tue,  3 Mar 2026 21:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZSRc47C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpheB+q2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C866A4F7992
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F73F33688A
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772574827; cv=none; b=VDu9ilY2jMaHt6b5d5plc4BucOGca1TsC/jUATCxQBMjQQSO/2WBoc87GhsanrUiRh5kjjgdlfH8krQL93n1jwUARo13mxEeYjCGbH8ekHHVfhepzQvv/uG3+dOS3Ej1uOoFOx93u5runPeUIsMvWzzCPzNZ4UGR4a0RfJ1bHCk=
+	t=1772574828; cv=none; b=TKPjMnV22J144zhuYuC3hvsoXxIwiI9sUsoC1f0U+ITiCRYr7C3BfRZEvDo3Lp7RIQ1ZhsgkPUraHwcXXNAWGNVNNF/PwotjhG0fZF/jpNDAPZNv2TTQBq2YlukidhA5ueecHLekFZh8W5Gp3ekvG9NBaBnuJXX6VIF0U7QAlBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772574827; c=relaxed/simple;
-	bh=lEBKAklM0OyF/HUpgtDTOfVs/ElnKlulYfZqBbfjIso=;
+	s=arc-20240116; t=1772574828; c=relaxed/simple;
+	bh=halFq8lcU72mwJNwh3ms5LmfIfvH/rYGfW2CiKKnM84=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZZuJOGm3q8msBjZbxYeQy1obXMtFSfwGl6EUE1CFZj4kjMkyorMlTw44yCZ/jlcPPlinqUW7tI0iAJS1a3SXnz7W+jFWSp8+1DSfLEUal+nZdbHI8wFq8lq+y1foTY5FKofypHor1RrgQp/XNGbb4Fk8OyuReGTqEiF0/WqB18U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZSRc47C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4882FC2BC87;
+	 MIME-Version; b=tf5Z9znkcvZlMKxnjqNHb9zdmfycxEv3YaOOzsNL0esAIm16n1Y+K98zVsXrl6uK31FU3pVkEzj5IgkdvruiaEyKAdd8eVmhDfa1h0FjmkArYwYnYTIjL+t2cxzRsHW1Uilx7bec4RjcEia11aZTbO6+1pZp1oWCIgSyEAR/aEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpheB+q2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39C4C2BCAF;
 	Tue,  3 Mar 2026 21:53:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772574827;
-	bh=lEBKAklM0OyF/HUpgtDTOfVs/ElnKlulYfZqBbfjIso=;
+	s=k20201202; t=1772574828;
+	bh=halFq8lcU72mwJNwh3ms5LmfIfvH/rYGfW2CiKKnM84=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iZSRc47CHwys4KNh4tcOc0NCApAMHMkM25cp2HBmwzrRLTiHL9wkX2AQKM0meT0Jy
-	 IuQvY5dul620OEPOya8QHrTfzLchIaUrit9lVN+FciP59phXlI4ZjaBHjeRTBqzOuW
-	 NdV6+0sY3T8ltZM/V9bvoWup14hx7s+Ct5EQaV2MvO5hlA1xeILra2VCImNr6yHJ7P
-	 LH3KjWDE4w9lng59E+9eY2b5O49cKAZsghxH6QyVMa+JIpYvsD+IenYDKWIcQ/adOt
-	 xopS8tlYPt4yFwLH+hTAVMiAwgCYAazG9iOcdQJUFXo0Sw4SbOPHMQbU47l/qgc/3A
-	 /KpWguPV0ewPw==
+	b=JpheB+q2vMyA7y0rmJF8q4+BmBtr5nByJSfbTbe7bNvmPeDLwbs/WTyv6W/97MI3S
+	 ERyRVum3rECYm8mpLJj9Vm2Ao8A4GJ8owSfCfPNOiDG7wacDUWA4WULTOfT+Tt2D1D
+	 NlHRB1f1YkUKRLyeN33IuvnvHHF2bzLVFciBBxLSpOP3IHaFgcnDbzyGSG/X5wuSdD
+	 bWchAYNNivS2rxXFP4gRLgTbzVkzBgowgXdaojv0Y/xwphWUm+HeLsBWKqdHMmpTk6
+	 l1RVPhS0QhIYyr8oZVN6NdfN54bY3u2HR+3W+p3ZI4WDW45jwpdtq9FfLBHOWoNw5F
+	 U8hCBoSKzi4oQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,11 +52,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	jonathan.lemon@gmail.com
-Subject: [PATCH net 08/11] MAINTAINERS: remove Jonathan Lemon from OpenCompute PTP
-Date: Tue,  3 Mar 2026 13:53:08 -0800
-Message-ID: <20260303215339.2333548-9-kuba@kernel.org>
+	taras.chornyi@plvision.eu,
+	enachman@marvell.com
+Subject: [PATCH net 09/11] MAINTAINERS: replace Taras Chornyi with Elad Nachman for Marvell Prestera
+Date: Tue,  3 Mar 2026 13:53:09 -0800
+Message-ID: <20260303215339.2333548-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303215339.2333548-1-kuba@kernel.org>
 References: <20260303215339.2333548-1-kuba@kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D6C591F7CDA
+X-Rspamd-Queue-Id: B512C1F7CF2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -75,88 +75,68 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,linux.dev,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263442-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263443-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,intel.com:email,colino.net:email,geekounet.org:url,linux.dev:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,marvell.com:email,intel.com:email,lunn.ch:email,plvision.eu:email]
 X-Rspamd-Action: no action
 
-We have not seen emails or tags from Jonathan in over 5 years,
+We have not seen emails or tags from Taras in over 5 years,
 and there is no recent mailing list activity.
-Vadim Fedorenko is active.
+Elad Nachman has been providing reviews in the last couple
+of years and is the top reviewer for this subsystem.
 
-Subsystem OPENCOMPUTE PTP CLOCK DRIVER
-  Changes 49 / 130 (37%)
-  Last activity: 2025-11-25
-  Jonathan Lemon <jonathan.lemon@gmail.com>:
-  Vadim Fedorenko <vadim.fedorenko@linux.dev>:
-    Author d3ca2ef0c915 2025-09-19 00:00:00 5
-    Tags 648282e2d1e5 2025-11-25 00:00:00 20
+Subsystem MARVELL PRESTERA ETHERNET SWITCH DRIVER
+  Changes 39 / 157 (24%)
+  (No activity)
   Top reviewers:
-    [7]: horms@kernel.org
-    [4]: jiri@nvidia.com
-    [3]: richardcochran@gmail.com
-    [2]: aleksandr.loktionov@intel.com
-  INACTIVE MAINTAINER Jonathan Lemon <jonathan.lemon@gmail.com>
+    [8]: enachman@marvell.com
+    [6]: horms@kernel.org
+    [4]: idosch@nvidia.com
+    [3]: andrew@lunn.ch
+    [3]: jacob.e.keller@intel.com
+    [3]: jiri@nvidia.com
+  INACTIVE MAINTAINER Taras Chornyi <taras.chornyi@plvision.eu>
 
-Add Jonathan to CREDITS as the initial author of ptp_ocp.
-
-Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Cc: jonathan.lemon@gmail.com
-Cc: vadim.fedorenko@linux.dev
+Cc: taras.chornyi@plvision.eu
+Cc: enachman@marvell.com
 ---
- MAINTAINERS | 1 -
- CREDITS     | 4 ++++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 165147562e1e..61fd624c673d 100644
+index 61fd624c673d..8123339e4769 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -19805,7 +19805,6 @@ F:	arch/*/boot/dts/
- F:	include/dt-bindings/
+@@ -15485,7 +15485,7 @@ S:	Supported
+ F:	drivers/perf/marvell_pem_pmu.c
  
- OPENCOMPUTE PTP CLOCK DRIVER
--M:	Jonathan Lemon <jonathan.lemon@gmail.com>
- M:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
- L:	netdev@vger.kernel.org
- S:	Maintained
-diff --git a/CREDITS b/CREDITS
-index 98aaf196567a..339712b62e99 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -2415,6 +2415,10 @@ S: Am Muehlenweg 38
- S: D53424 Remagen
- S: Germany
- 
-+N: Jonathan Lemon
-+E: jonathan.lemon@gmail.com
-+D: OpenCompute PTP clock driver (ptp_ocp)
-+
- N: Colin Leroy
- E: colin@colino.net
- W: http://www.geekounet.org/
+ MARVELL PRESTERA ETHERNET SWITCH DRIVER
+-M:	Taras Chornyi <taras.chornyi@plvision.eu>
++M:	Elad Nachman <enachman@marvell.com>
+ S:	Supported
+ W:	https://github.com/Marvell-switching/switchdev-prestera
+ F:	drivers/net/ethernet/marvell/prestera/
 -- 
 2.53.0
 
