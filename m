@@ -1,693 +1,174 @@
-Return-Path: <netdev+bounces-263403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263404-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJ6oHrE+p2kNgAAAu9opvQ
-	(envelope-from <netdev+bounces-263403-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 21:04:01 +0100
+	id SCwIC/k+p2kNgAAAu9opvQ
+	(envelope-from <netdev+bounces-263404-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 21:05:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C53D1F6943
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 21:04:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C3E1F6974
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 21:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58576319E6C8
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 20:00:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B4294302A9D0
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 20:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB14C38911E;
-	Tue,  3 Mar 2026 20:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE063395D96;
+	Tue,  3 Mar 2026 20:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="cP/RFnC5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bSIsRVe6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-106103.protonmail.ch (mail-106103.protonmail.ch [79.135.106.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C0938911C;
-	Tue,  3 Mar 2026 20:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8BA389117
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 20:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772568019; cv=none; b=f5B83L5prouNIaN4cCCUzQ2RXnYT+MIGegGlj05DVXIu6CsX0I63LgmpCONpDIepIhWSKuhAw8hztFpFfHQCBdTlfOhCTOWjG+NJPfO+7anICakV3K/LCSJaVY3ptus2IzRmbSE6cVedTqVkyYUZxamtjnYg2LWqDB8i4albrlk=
+	t=1772568309; cv=none; b=kImGtoWIa4tD+Hw3ZrF6VVCUikN/bbpfaIJPWnrBy8z+B1Zdm5cI9uxskvQhZxj6ZZIxaIb9pNWftTSjLwG3nfQXLpox6tPJ6kr8xfm9bmME+Dofz0ir+rVy+87zc+BHWz5VRcP0uzQB5YKnau+wkbpNiDsRAcDO8cEcbn6FtN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772568019; c=relaxed/simple;
-	bh=r1W0UzcTc627clE6NCpMGdnGOfY4mcd3imz6Bz/sTaA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Iyx2wLfns+tjlHjAeRRx+MTrRH1n+dpKLM5uxwqJnovBAJuRufbROvNE92UNUd8a9rLOE1wR5AOlKJkHu+OZ/rqz9ClcFuJXjXd0I9XaoLmDn5futMs4gDlKjzY4dyyRfPlB+HnfBoPzF1yqkFY5PyrKAcJ5k9DlYA3kmzuWY/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=cP/RFnC5; arc=none smtp.client-ip=79.135.106.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1772568015; x=1772827215;
-	bh=oZ1/+oJMtiACJFq+jYl7jua6twiuA0Yr6qtE4n9sNeM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=cP/RFnC58GIyJs2N/DzwsSDqr2YMQDWZGc5SVOHXljQcOBbn9YHeodCu3sfo9zPgv
-	 rLSn2arKveD4YuKsggwsEPGew9jeI9WrdHEfBYJi26tZStcwJzR2TfA08kvHBZ2TC5
-	 DQt4bAINPGa/sDinIvOOxIXhCxKQodOKh76TEbkUZVWrOhnkQFvz6anJAkisWMeRz5
-	 0+yJOos8joqC/SvbeqrfDyqwctplLrvcC/LhCF+Og+bi1Se+aJERnZos9ndDmLAKPO
-	 Y35QxEIFKIcFE2WFdVbMbgQW+3Sig3B8GQbLdBoCfChXHdySse02uSEgDpaM3hplEe
-	 +739g77owrJFA==
-Date: Tue, 03 Mar 2026 20:00:12 +0000
-To: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-From: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, "Remy D. Farley" <one-d-wide@protonmail.com>
-Subject: [PATCH net-next v8 5/5] doc/netlink: nftables: Fill out operation attributes
-Message-ID: <20260303195638.381642-6-one-d-wide@protonmail.com>
-In-Reply-To: <20260303195638.381642-1-one-d-wide@protonmail.com>
-References: <20260303195638.381642-1-one-d-wide@protonmail.com>
-Feedback-ID: 59017272:user:proton
-X-Pm-Message-ID: 9e4013a7d6a0b6359218a1ed775948ff7cacf6be
+	s=arc-20240116; t=1772568309; c=relaxed/simple;
+	bh=bzPb6xmAmChlVP1q/WZM2tU9RBqtVAwunFB11U2PeFk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FDDixKtRYvppYeTX75WPW88Pt/d/a3hXGInThvCQ9Ya91ApfehxX35nn0IqexH21j3tjnS4vQF6ZZVE1rUMxCzVuP0bfm7ic/jenMkjEdniii10h26HRucIBnLD9Z/qxgKA4fTVV3tXfGfAgyTqLh/4m+/d1idzqc4aSULI9Fqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bSIsRVe6; arc=none smtp.client-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-126ea4b77adso7888542c88.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 12:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772568308; x=1773173108; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HuHhGttXcFsF+4KHE6jrs5iwTBoeSrOICFq+9jlRCq0=;
+        b=bSIsRVe6UZvWI4nIJSQTLM2z/mRTQTIzATYGx2TntqAnXap3tmmLkSLfW37VEEQPbG
+         Coj+sog5Kav5y8SSyaTUJTA6XBN5UxnLLyn8rPIwHnAX0jgGUq74/fMNpRVCdS8eacJi
+         BR7c2IwyAFQVkIC0I1fqKOSCe5D5d86/div2hvsGsHuUZq6FoTif1NdHDvxsmYISW2aT
+         pQmQVZ9f6cjEf27FTX9rWYOIO7rfblQ7pV+3KMyzE0LCttzjxkcVe4Y4CddADgxf1pXX
+         Nwjt5pgKaS94yu80oruGpIyJWOtuZjo93uFFToglgA+vlaerNDeZONsds4aDcA5iFjkn
+         LLyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772568308; x=1773173108;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HuHhGttXcFsF+4KHE6jrs5iwTBoeSrOICFq+9jlRCq0=;
+        b=d2hNNcWdP31o/heqIMuuJneQ2psxL7pG7Zd6g5fwRQkU9wQGDUuVXBmUiZaGA5FAT/
+         P2ppiaZHb07ULRgIAWyy8gDQ6usoPLBLGyFm/li2B8biMP0GfmWuxGeThkVVfqACQjMl
+         jU/epaRqpd56sBEIFimfWTNtQ5trzsiR3xlXw3q5KfK2IcG1NB9DY0S5MMHQB9QuQXzj
+         mQO3gA17xG8dwXEkI/M/inSVqd4Z8/BdwNqkncnU6CS4tnTZuXAKovF04ZTusavSschU
+         /LBwSclPBi3Y847vbOd3SvQlok/C7Q7YS+VB5y2lwgX7IGLrvQGN/uuVxBSF2BeQHNcm
+         yD9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUA9C2EQFS6xVN2ZvQxOmh8RTSI7PETnkcEDIJ34m6PWoox1rRdXxp1+pJoQjX2uXoA4jzJaSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ4kS2JhGqG8VKxQG5HfoyeGNi0pV+5taQqVwpP85K9y83ZqJo
+	qBfnzSOHBqvZ8qTeEpRr1aBrZL2yntr4M5x7vYQxErSpj6Azr/7JhodL
+X-Gm-Gg: ATEYQzyrypIp0TNTCaAgSNXa6wbfLR5wKXFz8iNKWpdBGWmATsPdEzRKmw7TujwjiO7
+	P0SM0t3h/onnkMM4JYnWGmoyLFV2seHPl4/WqdGjPzDH5MI3KjL/BoUbyFNV3C2oKpN8yq8rmGM
+	n51LRQO5uP9air9RNflTuPNqXUaT4aq6My7BZYtVdXTue6/7F0DiE23jSN0/8Oa99YojrLKP3C2
+	NhjnxYRzllV+25Bmr9w1V1i7ybPzhHHFKOyibqngvOIBfPSsTNeKZq2LRQGzwRWXO0+mRLvnqBA
+	x+KDmsCLWdGSTp/pBuabvUR4OsKQoRwE2YLDVcS8YGrITwWN4Z9j3Sm6/DPhOMh6JgSjLIVZAJS
+	bKgntUjnNOHplaAI00nehtbnvN6Z7QCMX8lInoXtBAIIgpVgBOGoJKBpZXJRBG3vBxqEXsB+zDE
+	8EQMHJEbw1oDUI0Knk/1aWRAqGrzhoOhvgFS7VT2B5GH1YsjSgjqzAzbub0iKEflBN8ZuI5Jhdn
+	wRytnv2
+X-Received: by 2002:a05:7022:b97:b0:11b:9b98:aa4b with SMTP id a92af1059eb24-1278fb6859cmr8038142c88.6.1772568307717;
+        Tue, 03 Mar 2026 12:05:07 -0800 (PST)
+Received: from ?IPv6:2a03:83e0:115c:1:bf8e:1331:ef2b:145d? ([2620:10d:c090:500::3:4473])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-127899df391sm20207397c88.5.2026.03.03.12.05.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 12:05:07 -0800 (PST)
+Message-ID: <c40dd219ea60f810d52576f998e68cc0d731f761.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v4 1/2] bpf: Support new pointer param types
+ via SCALAR_VALUE for trampolines
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Slava Imameev <slava.imameev@crowdstrike.com>, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org
+Cc: martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, 	jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, 	pabeni@redhat.com, horms@kernel.org,
+ shuah@kernel.org, 	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, 	linux-kselftest@vger.kernel.org,
+ linux-open-source@crowdstrike.com
+Date: Tue, 03 Mar 2026 12:05:04 -0800
+In-Reply-To: <20260303095427.38981-2-slava.imameev@crowdstrike.com>
+References: <20260303095427.38981-1-slava.imameev@crowdstrike.com>
+	 <20260303095427.38981-2-slava.imameev@crowdstrike.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1C53D1F6943
+X-Rspamd-Queue-Id: C4C3E1F6974
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263403-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263404-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,vger.kernel.org,protonmail.com];
-	DKIM_TRACE(0.00)[protonmail.com:+];
+	FREEMAIL_CC(0.00)[linux.dev,kernel.org,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.984];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[one-d-wide@protonmail.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[protonmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,protonmail.com:dkim,protonmail.com:email,protonmail.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Filled out operation attributes:
-- newtable
-- gettable
-- deltable
-- destroytable
-- newchain
-- getchain
-- delchain
-- destroychain
-- newrule
-- getrule
-- getrule-reset
-- delrule
-- destroyrule
-- newset
-- getset
-- delset
-- destroyset
-- newsetelem
-- getsetelem
-- getsetelem-reset
-- delsetelem
-- destroysetelem
-- getgen
-- newobj
-- getobj
-- delobj
-- destroyobj
-- newflowtable
-- getflowtable
-- delflowtable
-- destroyflowtable
+On Tue, 2026-03-03 at 20:54 +1100, Slava Imameev wrote:
 
-Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
----
- Documentation/netlink/specs/nftables.yaml | 285 ++++++++++++++++++----
- 1 file changed, 243 insertions(+), 42 deletions(-)
+[...]
 
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netl=
-ink/specs/nftables.yaml
-index 086b16b12..21edf3d25 100644
---- a/Documentation/netlink/specs/nftables.yaml
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -1568,7 +1568,10 @@ operations:
-         request:
-           value: 0xa00
-           attributes:
-+            # Mentioned in nf_tables_newtable()
-             - name
-+            - flags
-+            - userdata
-     -
-       name: gettable
-       doc: Get / dump tables.
-@@ -1578,11 +1581,21 @@ operations:
-         request:
-           value: 0xa01
-           attributes:
-+            # Mentioned in nf_tables_gettable()
-             - name
-         reply:
-           value: 0xa00
--          attributes:
-+          attributes: &get-table
-+            # Mentioned in nf_tables_fill_table_info()
-             - name
-+            - use
-+            - handle
-+            - flags
-+            - owner
-+            - userdata
-+      dump:
-+        reply:
-+          attributes: *get-table
-     -
-       name: deltable
-       doc: Delete an existing table.
-@@ -1591,8 +1604,10 @@ operations:
-       do:
-         request:
-           value: 0xa02
--          attributes:
-+          attributes: &del-table
-+            # Mentioned in nf_tables_deltable()
-             - name
-+            - handle
-     -
-       name: destroytable
-       doc: |
-@@ -1603,8 +1618,7 @@ operations:
-       do:
-         request:
-           value: 0xa1a
--          attributes:
--            - name
-+          attributes: *del-table
-     -
-       name: newchain
-       doc: Create a new chain.
-@@ -1614,7 +1628,19 @@ operations:
-         request:
-           value: 0xa03
-           attributes:
-+            # Mentioned in nf_tables_newchain()
-+            - table
-+            - handle
-+            - policy
-+            - flags
-+            # Mentioned in nf_tables_updchain()
-+            - hook
-             - name
-+            - counters
-+            # Mentioned in nf_tables_addchain()
-+            - userdata
-+            # Mentioned in nft_chain_parse_hook()
-+            - type
-     -
-       name: getchain
-       doc: Get / dump chains.
-@@ -1624,11 +1650,27 @@ operations:
-         request:
-           value: 0xa04
-           attributes:
-+            # Mentioned in nf_tables_getchain()
-+            - table
-             - name
-         reply:
-           value: 0xa03
--          attributes:
-+          attributes: &get-chain
-+            # Mentioned in nf_tables_fill_chain_info()
-+            - table
-             - name
-+            - handle
-+            - hook
-+            - policy
-+            - type
-+            - flags
-+            - counters
-+            - id
-+            - use
-+            - userdata
-+      dump:
-+        reply:
-+          attributes: *get-chain
-     -
-       name: delchain
-       doc: Delete an existing chain.
-@@ -1637,8 +1679,12 @@ operations:
-       do:
-         request:
-           value: 0xa05
--          attributes:
-+          attributes: &del-chain
-+            # Mentioned in nf_tables_delchain()
-+            - table
-+            - handle
-             - name
-+            - hook
-     -
-       name: destroychain
-       doc: |
-@@ -1649,8 +1695,7 @@ operations:
-       do:
-         request:
-           value: 0xa1b
--          attributes:
--            - name
-+          attributes: *del-chain
-     -
-       name: newrule
-       doc: Create a new rule.
-@@ -1660,7 +1705,16 @@ operations:
-         request:
-           value: 0xa06
-           attributes:
--            - name
-+            # Mentioned in nf_tables_newrule()
-+            - table
-+            - chain
-+            - chain-id
-+            - handle
-+            - position
-+            - position-id
-+            - expressions
-+            - userdata
-+            - compat
-     -
-       name: getrule
-       doc: Get / dump rules.
-@@ -1669,12 +1723,30 @@ operations:
-       do:
-         request:
-           value: 0xa07
--          attributes:
--            - name
-+          attributes: &get-rule-request
-+            # Mentioned in nf_tables_getrule_single()
-+            - table
-+            - chain
-+            - handle
-         reply:
-           value: 0xa06
-+          attributes: &get-rule
-+            # Mentioned in nf_tables_fill_rule_info()
-+            - table
-+            - chain
-+            - handle
-+            - position
-+            - expressions
-+            - userdata
-+      dump:
-+        request:
-           attributes:
--            - name
-+            # Mentioned in nf_tables_dump_rules_start()
-+            - table
-+            - chain
-+        reply:
-+          attributes: *get-rule
-+
-     -
-       name: getrule-reset
-       doc: Get / dump rules and reset stateful expressions.
-@@ -1683,12 +1755,15 @@ operations:
-       do:
-         request:
-           value: 0xa19
--          attributes:
--            - name
-+          attributes: *get-rule-request
-         reply:
-           value: 0xa06
--          attributes:
--            - name
-+          attributes: *get-rule
-+      dump:
-+        request:
-+          attributes: *get-rule-request
-+        reply:
-+          attributes: *get-rule
-     -
-       name: delrule
-       doc: Delete an existing rule.
-@@ -1697,8 +1772,11 @@ operations:
-       do:
-         request:
-           value: 0xa08
--          attributes:
--            - name
-+          attributes: &del-rule
-+            - table
-+            - chain
-+            - handle
-+            - id
-     -
-       name: destroyrule
-       doc: |
-@@ -1708,8 +1786,7 @@ operations:
-       do:
-         request:
-           value: 0xa1c
--          attributes:
--            - name
-+          attributes: *del-rule
-     -
-       name: newset
-       doc: Create a new set.
-@@ -1719,7 +1796,21 @@ operations:
-         request:
-           value: 0xa09
-           attributes:
-+            # Mentioned in nf_tables_newset()
-+            - table
-             - name
-+            - key-len
-+            - id
-+            - key-type
-+            - flags
-+            - data-type
-+            - data-len
-+            - obj-type
-+            - timeout
-+            - gc-interval
-+            - policy
-+            - desc
-+            - userdata
-     -
-       name: getset
-       doc: Get / dump sets.
-@@ -1729,11 +1820,35 @@ operations:
-         request:
-           value: 0xa0a
-           attributes:
-+            # Mentioned in nf_tables_getset()
-+            - table
-             - name
-         reply:
-           value: 0xa09
--          attributes:
-+          attributes: &get-set
-+            # Mentioned in nf_tables_fill_set()
-+            - table
-             - name
-+            - handle
-+            - flags
-+            - key-len
-+            - key-type
-+            - data-type
-+            - data-len
-+            - obj-type
-+            - gc-interval
-+            - policy
-+            - userdata
-+            - desc
-+            - expr
-+            - expressions
-+      dump:
-+        request:
-+          attributes:
-+            # Mentioned in nf_tables_getset()
-+            - table
-+        reply:
-+          attributes: *get-set
-     -
-       name: delset
-       doc: Delete an existing set.
-@@ -1742,7 +1857,10 @@ operations:
-       do:
-         request:
-           value: 0xa0b
--          attributes:
-+          attributes: &del-set
-+            # Mentioned in nf_tables_delset()
-+            - table
-+            - handle
-             - name
-     -
-       name: destroyset
-@@ -1753,8 +1871,7 @@ operations:
-       do:
-         request:
-           value: 0xa1d
--          attributes:
--            - name
-+          attributes: *del-set
-     -
-       name: newsetelem
-       doc: Create a new set element.
-@@ -1764,7 +1881,11 @@ operations:
-         request:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_newsetelem()
-+            - table
-+            - set
-+            - set-id
-+            - elements
-     -
-       name: getsetelem
-       doc: Get / dump set elements.
-@@ -1774,11 +1895,27 @@ operations:
-         request:
-           value: 0xa0d
-           attributes:
--            - name
-+            # Mentioned in nf_tables_getsetelem()
-+            - table
-+            - set
-+            - elements
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_fill_setelem_info()
-+            - elements
-+      dump:
-+        request:
-+          attributes: &dump-set-request
-+            # Mentioned in nft_set_dump_ctx_init()
-+            - table
-+            - set
-+        reply:
-+          attributes: &dump-set
-+            # Mentioned in nf_tables_dump_set()
-+            - table
-+            - set
-+            - elements
-     -
-       name: getsetelem-reset
-       doc: Get / dump set elements and reset stateful expressions.
-@@ -1788,11 +1925,20 @@ operations:
-         request:
-           value: 0xa21
-           attributes:
--            - name
-+            # Mentioned in nf_tables_getsetelem_reset()
-+            - elements
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_dumpreset_set()
-+            - table
-+            - set
-+            - elements
-+      dump:
-+        request:
-+          attributes: *dump-set-request
-+        reply:
-+          attributes: *dump-set
-     -
-       name: delsetelem
-       doc: Delete an existing set element.
-@@ -1801,8 +1947,11 @@ operations:
-       do:
-         request:
-           value: 0xa0e
--          attributes:
--            - name
-+          attributes: &del-setelem
-+            # Mentioned in nf_tables_delsetelem()
-+            - table
-+            - set
-+            - elements
-     -
-       name: destroysetelem
-       doc: Delete an existing set element with destroy semantics.
-@@ -1811,8 +1960,7 @@ operations:
-       do:
-         request:
-           value: 0xa1e
--          attributes:
--            - name
-+          attributes: *del-setelem
-     -
-       name: getgen
-       doc: Get / dump rule-set generation.
-@@ -1821,12 +1969,16 @@ operations:
-       do:
-         request:
-           value: 0xa10
--          attributes:
--            - name
-         reply:
-           value: 0xa0f
--          attributes:
--            - name
-+          attributes: &get-gen
-+            # Mentioned in nf_tables_fill_gen_info()
-+            - id
-+            - proc-pid
-+            - proc-name
-+      dump:
-+        reply:
-+          attributes: *get-gen
-     -
-       name: newobj
-       doc: Create a new stateful object.
-@@ -1836,7 +1988,12 @@ operations:
-         request:
-           value: 0xa12
-           attributes:
-+            # Mentioned in nf_tables_newobj()
-+            - type
-             - name
-+            - data
-+            - table
-+            - userdata
-     -
-       name: getobj
-       doc: Get / dump stateful objects.
-@@ -1846,11 +2003,29 @@ operations:
-         request:
-           value: 0xa13
-           attributes:
-+            # Mentioned in nf_tables_getobj_single()
-             - name
-+            - type
-+            - table
-         reply:
-           value: 0xa12
--          attributes:
-+          attributes: &obj-info
-+            # Mentioned in nf_tables_fill_obj_info()
-+            - table
-             - name
-+            - type
-+            - handle
-+            - use
-+            - data
-+            - userdata
-+      dump:
-+        request:
-+          attributes:
-+            # Mentioned in nf_tables_dump_obj_start()
-+            - table
-+            - type
-+        reply:
-+          attributes: *obj-info
-     -
-       name: delobj
-       doc: Delete an existing stateful object.
-@@ -1860,7 +2035,11 @@ operations:
-         request:
-           value: 0xa14
-           attributes:
-+            # Mentioned in nf_tables_delobj()
-+            - table
-             - name
-+            - type
-+            - handle
-     -
-       name: destroyobj
-       doc: Delete an existing stateful object with destroy semantics.
-@@ -1870,7 +2049,11 @@ operations:
-         request:
-           value: 0xa1f
-           attributes:
-+            # Mentioned in nf_tables_delobj()
-+            - table
-             - name
-+            - type
-+            - handle
-     -
-       name: newflowtable
-       doc: Create a new flow table.
-@@ -1880,7 +2063,11 @@ operations:
-         request:
-           value: 0xa16
-           attributes:
-+            # Mentioned in nf_tables_newflowtable()
-+            - table
-             - name
-+            - hook
-+            - flags
-     -
-       name: getflowtable
-       doc: Get / dump flow tables.
-@@ -1890,11 +2077,22 @@ operations:
-         request:
-           value: 0xa17
-           attributes:
-+            # Mentioned in nf_tables_getflowtable()
-             - name
-+            - table
-         reply:
-           value: 0xa16
--          attributes:
-+          attributes: &flowtable-info
-+            # Mentioned in nf_tables_fill_flowtable_info()
-+            - table
-             - name
-+            - handle
-+            - use
-+            - flags
-+            - hook
-+      dump:
-+        reply:
-+          attributes: *flowtable-info
-     -
-       name: delflowtable
-       doc: Delete an existing flow table.
-@@ -1903,8 +2101,12 @@ operations:
-       do:
-         request:
-           value: 0xa18
--          attributes:
-+          attributes: &del-flowtable
-+            # Mentioned in nf_tables_delflowtable()
-+            - table
-             - name
-+            - handle
-+            - hook
-     -
-       name: destroyflowtable
-       doc: Delete an existing flow table with destroy semantics.
-@@ -1913,8 +2115,7 @@ operations:
-       do:
-         request:
-           value: 0xa20
--          attributes:
--            - name
-+          attributes: *del-flowtable
-=20
- mcast-groups:
-   list:
---=20
-2.51.2
+> @@ -6902,11 +6921,7 @@ bool btf_ctx_access(int off, int size, enum bpf_ac=
+cess_type type,
+>  		}
+>  	}
+> =20
+> -	/*
+> -	 * If it's a pointer to void, it's the same as scalar from the verifier
+> -	 * safety POV. Either way, no futher pointer walking is allowed.
+> -	 */
+> -	if (is_void_or_int_ptr(btf, t))
+> +	if (is_ptr_treated_as_scalar(btf, t))
+>  		return true;
 
+I'm probably missing a point here, but what's wrong with Alexei's
+suggestion to do this instead:
 
+	if (is_ptr_treated_as_scalar(btf, t))
+		 return true;
+?
+
+Only two new tests fail:
+- #554/62  verifier_ctx_ptr_param/fentry/pointer to float - invalid ctx acc=
+ess:FAIL
+- #554/63  verifier_ctx_ptr_param/fentry/double pointer to float - invalid =
+ctx access:FAIL
+
+But I'd say this shouldn't matter.
+This will also make selftests much simpler.
+
+> =20
+>  	/* this is a pointer to another type */
 
