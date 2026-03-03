@@ -1,118 +1,130 @@
-Return-Path: <netdev+bounces-262979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gF+oLFU6pmnQMgAAu9opvQ
-	(envelope-from <netdev+bounces-262979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:33:09 +0100
+	id MELfOm8/pmkZNAAAu9opvQ
+	(envelope-from <netdev+bounces-262988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:54:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DD501E7B52
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:33:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BF11E7DAA
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:54:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7B8423032DE6
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:33:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2C79306FE22
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E66F373C09;
-	Tue,  3 Mar 2026 01:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE3C374174;
+	Tue,  3 Mar 2026 01:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bj1dklSB"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HOgQ5imi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A15830148B;
-	Tue,  3 Mar 2026 01:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B9B373C1E;
+	Tue,  3 Mar 2026 01:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772501584; cv=none; b=IC1u+8cBCK7alKO4itomJZzWpkl8RpsJC/yQBr34lvYXwdcV5q7PMoBm/FE0Pc/BdLhBL0kh/0gahgP0mt4XTOnLuyU/BoAdmOLFJN4PysT/MXNtfSUtgLEJ3T+tWW6lj/A9DbEFwkVr2UT/cginq/2rzt5kqEqDevF6H8s5Uvs=
+	t=1772502775; cv=none; b=soSEKiMHBfuOhl7MK9YeGo1KOq0J+ppn0bj5N/1SPGrrsbX12L5ANnbvQfYhwWKp9AiFKobhM9YZN5K5Wecw8qdJx/t+YPaVNmwSEZR3DUtak8wkcfLRt6hiJICY+V5LYWAzqSkDw2PD5zPZowQoQ4svgJ5Vgcwr/8ACIUg4tYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772501584; c=relaxed/simple;
-	bh=IUUZMklsuDqt9XDyM9yk4sjEMlG0JCQemvWf3MVHwlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W5HJdpj9BRDpMqJhCD1ZQR/vRK0cRVlBhK8lbM+WU8g4r9e0IhWFBk5/fFmJlKCqZqkvpQxSY5BCSixaZtpQpxjW+AWQG5bnkl51sMZnLI70s3rUfTW7cezop2PSnuN6rrMwrmISf2jnIcFr9YB2P8JoA3MaDmcxwSu+anffkPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bj1dklSB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9B6C19423;
-	Tue,  3 Mar 2026 01:33:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772501583;
-	bh=IUUZMklsuDqt9XDyM9yk4sjEMlG0JCQemvWf3MVHwlE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Bj1dklSB20+0Kay/8hcYBsj29heJW2oqguhj7spRmyhM8d0TF6NbRWyKNGDjZ0Dvc
-	 3Rsq1JnW2WuGk36M6P9w8+MsFx3wVl0cKkz1lJ3lKIcsUBw3b0qMznwdouEHq/5j+D
-	 y2NfYxMS7DzP0mRyTdHMgbTDhEWqm3fwYSqBaiEA1LlKLXR/BBSSvRM6QWRavvlv8Y
-	 8XdtHbycUO3SV91pgi4YKG/ExD+oYobj3cmt580hxvcoAs4thhzmQKrSz9yDnJDeOO
-	 zmIS4Js6XenCLxEAoTRCF4Ax4M3T9MWRg4om8OmUzj0Y9It+csZRPF2eS20yPnZV0e
-	 JlGtq4Bm1NpEg==
-Date: Mon, 2 Mar 2026 17:33:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pabeni@redhat.com, edumazet@google.com, rds-devel@oss.oracle.com,
- horms@kernel.org, linux-rdma@vger.kernel.org, allison.henderson@oracle.com
-Subject: Re: [PATCH net-next v1 0/2] selftests: rds: refactor and expand rds
- selftests test
-Message-ID: <20260302173302.4d1634be@kernel.org>
-In-Reply-To: <20260302055518.301620-1-achender@kernel.org>
-References: <20260302055518.301620-1-achender@kernel.org>
+	s=arc-20240116; t=1772502775; c=relaxed/simple;
+	bh=JZvMyrY5V3kzs/3jcRLWkNDy/3HjAklixRnfXAdFXyw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pgzAzblKG7fcTnm38C3avm2ELtxxD+cVEsU/J0MC9mcGz6eukkiIENkxq1P+bY+FBIHoh27//d024c/SMLGNwpVYrSVBHbsfOH+IwthIZxqaElb6xr0buCuVRpyWcfYlnszNH/NaA2fjeflUnWcPdmQOKmTUfzAcaSV8KgpeCeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HOgQ5imi; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=2YhXVcXFOvl4RE+GcFTcGZzoQ+UcaaWJmcXg81gKeR0=;
+	b=HOgQ5imigO06MUzgcGo2v2RJaPNLmyZ6bvZB/rglUU5bh7ersziWGtvol14QgM/ycT0Hw7AJF
+	cSa6K2k1QfDpbKSWfFH18IUTJ2tBGyXPviJHZc0tmCAyuaIjPUQRkbBRmXITVvG12sKErWpwt8F
+	KPJSJP+JJDD2FBL7YspYpBw=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fPzGM4FJZz12LCl;
+	Tue,  3 Mar 2026 09:48:11 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id D40A82025F;
+	Tue,  3 Mar 2026 09:52:48 +0800 (CST)
+Received: from kwepemq200017.china.huawei.com (7.202.195.228) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 3 Mar 2026 09:52:48 +0800
+Received: from hulk-vt.huawei.com (10.67.174.72) by
+ kwepemq200017.china.huawei.com (7.202.195.228) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 3 Mar 2026 09:52:48 +0800
+From: Cai Xinchen <caixinchen1@huawei.com>
+To: <ioana.ciornei@nxp.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<caixinchen1@huawei.com>
+Subject: [PATCH -next] dpaa2-switch: Add depend on FSL_DPAA2_ETH to FSL_DPAA2_SWITCH
+Date: Tue, 3 Mar 2026 01:38:14 +0000
+Message-ID: <20260303013814.338989-1-caixinchen1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2DD501E7B52
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200017.china.huawei.com (7.202.195.228)
+X-Rspamd-Queue-Id: 68BF11E7DAA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-262979-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[caixinchen1@huawei.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-262988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid]
 X-Rspamd-Action: no action
 
-On Sun,  1 Mar 2026 22:55:16 -0700 Allison Henderson wrote:
-> This series aims to improve the current rds selftests.  The first patch
-> refactors the existing test.py such that the networking set up can be
-> reused as general purpose infrastructure for other tests.  The existing
-> send and receive code is hoisted into a separate rds_basic.py.  The next
-> patch adds a new rds_stress.py that exercises RDS via the external
-> rds-stress tool from the rds-tools package if it is available on the host.
-> We add two new flags to test.py, -b and -s to select rds_basic or
-> rds_stress respectively.  The intent is to make the RDS selftests more
-> modular and extensible.  Let me know what you all think.
-> 
-> Questions, comments, suggestions appreciated!
+When CONFIG_FSL_DPAA2_ETH=n, dpaa2 cannot be compiled. Thus Add
+depend on FSL_DPAA2_ETH to FSL_DPAA2_SWITCH in Kconfig
 
-IDK Allison. I tried to integrate the remaining tests with Netdev CI
-this weekend. The two groups of networking tests which can't be run
-like all the other selftests are vsock and RDS. I get vsock being
-different. vsock is used to communicate between VMs and host, setting
-up the vms with the locally built kernel makes it different.
+Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
+---
+ drivers/net/ethernet/freescale/dpaa2/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-But I'm not exactly sure what makes RDS different. Would you mind
-explaining the challenges with fitting RDS into the ksft framework?
+diff --git a/drivers/net/ethernet/freescale/dpaa2/Kconfig b/drivers/net/ethernet/freescale/dpaa2/Kconfig
+index d029b69c3f18..b303af155a86 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/Kconfig
++++ b/drivers/net/ethernet/freescale/dpaa2/Kconfig
+@@ -34,6 +34,7 @@ config FSL_DPAA2_SWITCH
+ 	tristate "Freescale DPAA2 Ethernet Switch"
+ 	depends on BRIDGE || BRIDGE=n
+ 	depends on NET_SWITCHDEV
++	depends on FSL_DPAA2_ETH
+ 	help
+ 	  Driver for Freescale DPAA2 Ethernet Switch. This driver manages
+ 	  switch objects discovered on the Freeescale MC bus.
+-- 
+2.34.1
+
 
