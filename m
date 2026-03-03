@@ -1,233 +1,138 @@
-Return-Path: <netdev+bounces-263107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263108-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4BEwH7uxpmn9SgAAu9opvQ
-	(envelope-from <netdev+bounces-263107-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:02:35 +0100
+	id UOhgKmuxpmn9SgAAu9opvQ
+	(envelope-from <netdev+bounces-263108-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:01:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B8D1EC411
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:02:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2345B1EC3B0
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59B183037177
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 09:57:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BDC1030774DA
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 10:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C880A38F62B;
-	Tue,  3 Mar 2026 09:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DA038F655;
+	Tue,  3 Mar 2026 10:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3GhRHEa";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbZ9oMV1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnGaK1LL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2D43845A8
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 09:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE81A3909AA;
+	Tue,  3 Mar 2026 10:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772531833; cv=none; b=NfaenIMErniO80OxNvqzww0Z1REo1SPtevIjxoyrBytoqXhF8RmSXiqRzQ1TjSKY68LJHDkG2oKkU7iDn44pv2znhzZhXGvTAKfqb0mva5e88WJ45MKJscN1ux3O+7Nzhmy29o3nqokmzNMg038Pnu78d1W628GFJ8gKaZQnZKM=
+	t=1772532010; cv=none; b=GVZkvv84lSUbHUlBn5y8O1B1hG20xArkJHo81WNRkorpc+SnSRF2JD8hltEANWd8gitYE5RX46SfyyZ2y6Ukv4OMNs426BqOyf/rtauogYniAy+UcQ/lmXOdi5g98h2vpd8S6R6p4zrdla1cJJp14fZmAoI34G8hkFS16EGCPd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772531833; c=relaxed/simple;
-	bh=aSsbmcc3uv2X4kalVkoQ6KfLu1yix/ZoBPk6o3r4yzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p+WWG+XgSwAnwi/++KhqOjfgR3pAV+P/V77ubv7/P1Rl9fW7RgehkNSbFcbNOqvlmi/2jf/gH/aZHTygJWw+1EB07cpY75SyuolfH84i1lvJ9KCRgA0+WjjN0+Oy++2lwnQ/9wlMJRyFiG+J0tvrx+ZfbfooGDGY8R6mTTkrQ2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3GhRHEa; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AbZ9oMV1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772531831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2C72I9p1Nz7IP8frqX4kg2UxiKmszT8JtYVPjpeLGo0=;
-	b=c3GhRHEaU434ZA4sccAR9F4WLkZOMf5wrUW2FQE9V2o0a9+kBMznyOiG5GB4jU5ey2xTz7
-	QRw5+EG9sDgpYVBaRhPjCwLHTjQ6RGYnRAJPgwb669jWDYfpJbHgFKcywPs/QP5TzY38eb
-	rp3o2WfWAfB+mFWD27EZdySQBRDQ7Xk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-UZr07FR_ObyAMrW7ysHx1A-1; Tue, 03 Mar 2026 04:57:10 -0500
-X-MC-Unique: UZr07FR_ObyAMrW7ysHx1A-1
-X-Mimecast-MFC-AGG-ID: UZr07FR_ObyAMrW7ysHx1A_1772531829
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4837bfcfe0dso68598255e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 01:57:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772531829; x=1773136629; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2C72I9p1Nz7IP8frqX4kg2UxiKmszT8JtYVPjpeLGo0=;
-        b=AbZ9oMV1R4IxENJ/igmrvz3H68v6kzkBQ49uCwRBJ6l0orLSDDutNHol9KCF8Yc3z4
-         vyE/1eaGnZCT92CbIXJgmXo6R45pfH6lCyMyekDVlTbZPjUCZfqRp5+z3T7H+FVsUhc7
-         oevm0MqR3uYNlHPB8Pt3V10yfVpLPjWdI8oe9EdFRaj8zhrWMP69QPWxKKGh6Tqm1i3Z
-         hA2nXNM/tx+nyGgX+xxyVSWCVMgbVuHSJiaMqbweISsNzsBo9j8klAaUqdRZBw/cQ8Ns
-         bXp84P+47K8TMPTMWJ4XoO56tq15mE8UWQzQ2gsh26wFnrBlmLLcahXfwKj8eQb40zNK
-         7lgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772531829; x=1773136629;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2C72I9p1Nz7IP8frqX4kg2UxiKmszT8JtYVPjpeLGo0=;
-        b=PNK369VC/p5fQ7J4f34wAvQQ9TjqyLeI2HsH3WiHyRgS7WHQ2vtp11x+M9lIHD2hC5
-         7cr4XNbi71PBrHdHxYKC2D7wSHdJgHAqy8vB3xqkogdbhm+LNvcG3xtDp0C1Fa3btDJM
-         8QtMo5Nqv39VLY3VMPd4czz2MFQLVfqpfaQbQBC2qPsSxVgsXyxB1jA9Q2O5icCWWwHB
-         OkNX7jAzHaEFlJZ6JUaQ+a1vCKXFehsyOZKw1NueNoQFN7ZBg7Feyi4tNbPd3nyODWbh
-         S0ogkO4Jfcsfq9hUYQ01u0Tv+BokKDRb9Ot+nIuh6a5pzNSzhtshUMdjZnaeVTQ6+dV4
-         W0Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCWCm0Ocpg4AnUDgiDUZWCcnYW9N+6ZUOkswgP9ZRV7J5f/Be7F5IZ3Fd8Wu6/xzvpAaDB5vvoY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdsJ97rhvMgrT/lM4G8NU0c3gfUMMgML1nh9hWquTYvM0Joxjy
-	eXXqAkRjAZ4EH2JFnM64nrHXdhfHkQH+vicK6hvMUdhqr2ZgOI8HVfZUbhG9+3/Jstx2Lv5ihzX
-	hxHB4SGlXtvfWOUnv9q4rNTRwI4t2XWO17GHdjbWWzsDdKmTsJObHUHJJCQ==
-X-Gm-Gg: ATEYQzy1Ea0e2D24dzr51P+xF5dUDoi5/QWdmYu3KByHzVq4zHADKFuTaqtoYp99ZfD
-	UNLP06B85Y+pG1tmNvsNr+xBsnN48LnC2HPVXwwvvS29Gz03wr36gozdb7ea1U3ndTiMAX7ewGN
-	weBJiqODgouURgapuAtC4Hri3DkeGN564obiRdE98xCdTLYrWhm1pZ9X8ZDpNwRz7M/6WmiYK6Z
-	1mxTGwvmvt76gzX2BA4FTxabuPwyhI/HxdnsWDzBqU4fwDFRNEcn7DskrhCpiXUBLjO3TZ5BIkZ
-	fh29/VDAfd1NFMR3hxhoU/YLhoLA/uEpM53Rd492+L74La4OAlpCaJv9TazBmLnDxTxP0DdxIO0
-	OObbISJQc/nlRqD7DhEIgWdtcY+LpgK5GqWjoT9tB29ZIpxtYkt2mO7bCpX+aJemhXJxrTPU=
-X-Received: by 2002:a05:600c:154b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-483c9b9ebd0mr256452485e9.12.1772531828862;
-        Tue, 03 Mar 2026 01:57:08 -0800 (PST)
-X-Received: by 2002:a05:600c:154b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-483c9b9ebd0mr256452075e9.12.1772531828251;
-        Tue, 03 Mar 2026 01:57:08 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485125bbb48sm21095135e9.0.2026.03.03.01.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 01:57:07 -0800 (PST)
-Date: Tue, 3 Mar 2026 10:57:01 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alexander Graf <graf@amazon.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
-	Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, nh-open-source@amazon.com
-Subject: Re: [PATCH] vsock: Enable H2G override
-Message-ID: <aaau2WWQa9T0zTg2@sgarzare-redhat>
-References: <20260302104138.77555-1-graf@amazon.com>
- <aaVrsXMmULivV4Se@sgarzare-redhat>
- <aaV80wWlpjEtYCQJ@sgarzare-redhat>
- <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
- <20260302145121-mutt-send-email-mst@kernel.org>
- <079fcb93-cd01-45db-9ff7-d6cafd8fb7d5@amazon.com>
- <20260303021723-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1772532010; c=relaxed/simple;
+	bh=2XJmhHdjfoxa8F7+fhCdXOQGrgSRsK9e7VLWwQnm3c4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SysZ1r54breypFdXc3sNxl7miWIPdsNILvZldyGUzpdbcJWjVhjF8/l9tf1gPdjpVTkvFc4r8S23X2OdOxaKsTapPAkVVd1HYaPb9fNmKQrVddZn+IqUirTpHYEt9tONvFIOusBq0IR3oD84XLgBw7UGbHfM4XX8JKxX+JzUd7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnGaK1LL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A76C19425;
+	Tue,  3 Mar 2026 10:00:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772532010;
+	bh=2XJmhHdjfoxa8F7+fhCdXOQGrgSRsK9e7VLWwQnm3c4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bnGaK1LL7eOE7q7B7wgiek/S9+W5NRvZ9MqmFXWRNFRGolXx5bmQczYH9b/iyV4LA
+	 LkViQ2Qa214PHGpeEGaGhRh0fya7PGaHRNUGF15Y+LYJRN5LtZ+A0QbrQE5NucWo7J
+	 +3QaJlV7kMzo0iM+CKPCF6kWLA9Wuv3abaNqIsmpr9bcWO0IxZK4QWazUAeQfI05g7
+	 xRYTxNbh9K0SEQ01vDfx8fH9i/JxD260l4LbcMrx3m/mbGIQaJ7CYL0C5AbRCVOgMy
+	 mfz7ENktqZEKQJXS5ZfJsF9GdZZT3wtY3cmHZhAfuFmdRoUIyTPgFHY45k7lRX1SIU
+	 SzQlcmrQtuCww==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D72380A961;
+	Tue,  3 Mar 2026 10:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260303021723-mutt-send-email-mst@kernel.org>
-X-Rspamd-Queue-Id: D7B8D1EC411
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1 0/2] bonding: fix missing XDP compat check on
+ xmit_hash_policy change
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177253201154.775036.12280212702681060217.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Mar 2026 10:00:11 +0000
+References: <20260226080306.98766-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260226080306.98766-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com, jv@jvosburgh.net,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, andrii@kernel.org, eddyz87@gmail.com, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ jon.toppins+linux@gmail.com, joamaki@gmail.com, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-Rspamd-Queue-Id: 2345B1EC3B0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263107-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263108-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,linux];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oasis-open.org:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 02:19:13AM -0500, Michael S. Tsirkin wrote:
->On Tue, Mar 03, 2026 at 07:51:32AM +0100, Alexander Graf wrote:
->>
->> On 02.03.26 20:52, Michael S. Tsirkin wrote:
->> > On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
->> > > On 02.03.26 13:06, Stefano Garzarella wrote:
->> > > > CCing Bryan, Vishnu, and Broadcom list.
->> > > >
->> > > > On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
->> > > > > Please target net-next tree for this new feature.
->> > > > >
->> > > > > On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
->> > > > > > Vsock maintains a single CID number space which can be used to
->> > > > > > communicate to the host (G2H) or to a child-VM (H2G). The current logic
->> > > > > > trivially assumes that G2H is only relevant for CID <= 2 because these
->> > > > > > target the hypervisor.  However, in environments like Nitro
->> > > > > > Enclaves, an
->> > > > > > instance that hosts vhost_vsock powered VMs may still want to
->> > > > > > communicate
->> > > > > > to Enclaves that are reachable at higher CIDs through virtio-vsock-pci.
->> > > > > >
->> > > > > > That means that for CID > 2, we really want an overlay. By default, all
->> > > > > > CIDs are owned by the hypervisor. But if vhost registers a CID,
->> > > > > > it takes
->> > > > > > precedence.  Implement that logic. Vhost already knows which CIDs it
->> > > > > > supports anyway.
->> > > > > >
->> > > > > > With this logic, I can run a Nitro Enclave as well as a nested VM with
->> > > > > > vhost-vsock support in parallel, with the parent instance able to
->> > > > > > communicate to both simultaneously.
->> > > > > I honestly don't understand why VMADDR_FLAG_TO_HOST (added
->> > > > > specifically for Nitro IIRC) isn't enough for this scenario and we
->> > > > > have to add this change.  Can you elaborate a bit more about the
->> > > > > relationship between this change and VMADDR_FLAG_TO_HOST we added?
->> > >
->> > > The main problem I have with VMADDR_FLAG_TO_HOST for connect() is that it
->> > > punts the complexity to the user. Instead of a single CID address space, you
->> > > now effectively create 2 spaces: One for TO_HOST (needs a flag) and one for
->> > > TO_GUEST (no flag). But every user space tool needs to learn about this
->> > > flag. That may work for super special-case applications. But propagating
->> > > that all the way into socat, iperf, etc etc? It's just creating friction.
->> > >
->> > > IMHO the most natural experience is to have a single CID space, potentially
->> > > manually segmented by launching VMs of one kind within a certain range.
->> > >
->> > > At the end of the day, the host vs guest problem is super similar to a
->> > > routing table.
->> > If this is what's desired, some bits could be stolen from the CID
->> > to specify the destination type. Would that address the issue?
->> > Just a thought.
+Hello:
 
-Nope :-( VMMs some times use random u32 to set CID (avoiding reserved 
-ones like 0, 1, 2, 3, U32_MAX). We also documented them in virtio spec:
-https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-4780004
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
->>
->>
->> If we had thought of this from the beginning, yes. But now that everyone
->> thinks CID (guest) == CID (host), I believe this is no longer feasible.
+On Thu, 26 Feb 2026 16:03:00 +0800 you wrote:
+> syzkaller reported a bug https://syzkaller.appspot.com/bug?extid=5a287bcdc08104bc3132
+> 
+> When a bond device is in 802.3ad or balance-xor mode, XDP is supported
+> only when xmit_hash_policy != vlan+srcmac.  This constraint is enforced
+> in bond_option_mode_set() via bond_xdp_check(), which prevents switching
+> to an XDP-incompatible mode while a program is loaded.  However, the
+> symmetric path -- changing xmit_hash_policy while XDP is loaded -- had
+> no such guard in bond_option_xmit_hash_policy_set().
+> 
+> [...]
 
-We added a new flag (VMADDR_FLAG_TO_HOST) in struct sockaddr_vm exactly 
-for that use case around 6 years ago [1], but not much work was done to 
-propagate that change to userspace tools.
+Here is the summary with links:
+  - [net,v1,1/2] bpf/bonding: reject vlan+srcmac xmit_hash_policy change when XDP is loaded
+    https://git.kernel.org/netdev/net/c/479d589b40b8
+  - [net,v1,2/2] selftests/bpf: add test for xdp_bonding xmit_hash_policy compat
+    https://git.kernel.org/netdev/net/c/181cafbd8a01
 
-IMO that should be improved, and if for Nitro this is useful, you should 
-try to help on that effort.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Stefano
-
-[1] 
-https://lore.kernel.org/netdev/20201214161122.37717-1-andraprs@amazon.com/
-
->>
->>
->> Alex
->
->
->I don't really insist, but just to point out that if we wanted to, we
->could map multiple CIDs to host. Anyway.
 
 
