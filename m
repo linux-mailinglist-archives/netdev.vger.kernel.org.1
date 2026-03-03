@@ -1,175 +1,216 @@
-Return-Path: <netdev+bounces-263205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IMdEb7hpmkPYQAAu9opvQ
-	(envelope-from <netdev+bounces-263205-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:27:26 +0100
+	id oC2mIoThpmkPYQAAu9opvQ
+	(envelope-from <netdev+bounces-263206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:26:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3401F030A
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:27:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A841F02B6
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 608BB304E803
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:22:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AA96E303D7C3
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3F53CC9F8;
-	Tue,  3 Mar 2026 13:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7FB42883C;
+	Tue,  3 Mar 2026 13:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLQvoYFU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUqskrCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4DB34C9A3
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 13:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274F6345CD3;
+	Tue,  3 Mar 2026 13:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772544153; cv=none; b=GM50tKeW0k21KYn69ftZ/SC/EqyJKHbWyY1/RC1v7n+B4IB8bCYdcqWR+HndcjkkVCOPH+KB+tWwrXLwQteS7aKT8qtuGa5AfBn2pmx7ZRYqjn7Q8Hh4e/MjZG4z7P2d6r11K5pQmVoL0Yxc1g7UFD8lXvv/kC6H7Pv+4P0S1D0=
+	t=1772544224; cv=none; b=eQHQONCdbku/dIBWMvUxSYgOC2LTupXX8Ij/8Qo55efTAJ9/fyMVpc458aUxB09meYSj+sD0AmqGr/jgpfwYwFKgbQUIBeD5apPL9ruDRin3HxigyBezEFXNsGI2p43KBK3GBy53hBVSod4mfXV7p4sk+Pvz/7gvXpRN7cuExVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772544153; c=relaxed/simple;
-	bh=AA/rC8J0bWYxDqY4WhfEhh5yf0+vIt1t0AD3KtpELOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BagKLgA5Ih+fxA20xPWmaYnDy0jYMerFpgMSn38fgUAI78BXqa3zE54YVk4dW/6TBSV32BQEs/8081zXTfVTwy35psCIYyczAT89fRwsBAhMH6TZEs/UOrjWqNmxR2gHYWhcCANQe8MpLerBnkS0MIGnekEKQF/EfNofAj2HnTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLQvoYFU; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48378e60742so6642545e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 05:22:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772544151; x=1773148951; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jhjoAq3MmovlrlE8lgBAJ1EdXOnr75atWGwQPHXyE58=;
-        b=mLQvoYFUsaxB2oqpFTKAcasCdy0u/VYZvaQemjYO3XrJkRlFgdYLj1lpITml2savsP
-         YeBuE5hcdvt2/VsZbk72aYv7GOgCJzuVS1PrqBS/rK8qngP7LOQ+zABCVtYC+OXnTSFr
-         Ofo272WawhZi+sCmEtl/5QNx3UqHiVnuhUl1D9o2vVi3aTPrKPznwLpjOhIKQmTQ0odx
-         j6YBkDAXHNcmD0+4Q5ZWstme2zjWUzlxto9+35unHn6fGOPHaFvFwOOYR/nxn215WGXT
-         FGUMdM4V+JPItBx+tifRlDfX26Z8HChctwOmjyvR1QHqfoP6jptqyfOTHdipWuivgmZU
-         ajjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772544151; x=1773148951;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jhjoAq3MmovlrlE8lgBAJ1EdXOnr75atWGwQPHXyE58=;
-        b=CfZ/fp46uO8wpdYo/+WZNx7mNAeTVE1+f+e8KOTKGjG9NE8oIkw5gf9abFJkj4PU8D
-         BoqpEf5hR6IyJKh2gGGZMBtABHy0vJVBP3P41ztNDA4C4RYgp4XFZM/6bX8h/d3WBMux
-         ZcbRAGFOfmw1GVJJXMPTc3E/Jn0x/dgUJA8UgwbhtTHTx9bRLHBq2ouYoo2TCO41SL16
-         FcBSf3B5yrLaI3KSS1zMQQpkxyQDAZvH8b9USvc9prtNAwlfF7WG+DSs3ip36kJ8nYfM
-         xuBBhDdCGlSOf+ra8M2qAja1Si77iiogtt60dY/up9ucIACmGsQyrHhI/wvIuJdwUQVT
-         XOJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNz7SDUqNxHc/ULF8bl79TBVkFzZYZ+G93PCd70wfOCm2hmkVznEZ0KnahjM8hQXcW4ZDnCbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE9cpVsxANBgv2yGDrxgTyBt2iULwcVTqu6ypoOgAXljXZWF8g
-	aAWgNuPBJWVxisHHp6HWVodTQYoXyTbHnJtpeuwnhUPqJBTtAD48EDRM
-X-Gm-Gg: ATEYQzybdx9ufkVPSxMyB3c4Mcl9hpMivDcmWZuw0QExt8UoMYo7wnTo3rY8nNeDiJA
-	MGSsaZ8+Mtz8qwqcKnCDvQCS8Bt5E6rWrXlAVqzXsH+kGPv4CIgig5ncmaNrbLwYJqJfKQZcVlu
-	ZrPmxfGXIok1c09+9SysoUfFqzd1WosTw/GHSBnA8VLx1sA+tCDHtznLIzg4lWc/j0BeH2RrBO0
-	SU95w2MGPomkQbkZ45dV3AarJpBZWM1E4O9rFvbd7l4NCFSRkfQkELvkKzsBk0b1TiSbvjBcLcU
-	WUV5KdeiutLCge/fUc+myvBmg+bR5If9+grmSnaclqUsWonFfelXEd8q8sNhaSj5eRIaTOKvQPZ
-	25KkEAfLWutiUcFF7a9O5LLbp4ydb+TZq3joNQ5CpWqoSQQdsqsp396VnPQAAYzZOx9YGu6ipGV
-	57NaCVMuDz2IFlRJo=
-X-Received: by 2002:a05:600c:8b56:b0:477:9fa8:bc99 with SMTP id 5b1f17b1804b1-483c9bba8cfmr153881545e9.4.1772544150700;
-        Tue, 03 Mar 2026 05:22:30 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d00e:3600:2472:8e4a:cf12:bb30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485135d0232sm15234605e9.28.2026.03.03.05.22.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 05:22:29 -0800 (PST)
-Date: Tue, 3 Mar 2026 15:22:26 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jens Emil Schulz =?utf-8?Q?=C3=98stergaard?= <jensemil.schulzostergaard@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
- switch bindings
-Message-ID: <20260303132226.6de5boh5pl6hi3hh@skbuf>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
+	s=arc-20240116; t=1772544224; c=relaxed/simple;
+	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oYvFByKF4oBMoOxG2Fuk6yJDlbM2xNVjCXLjge33phcmrdHQLtAKBL1VW6lYO0xw85tymfAdh/G7pLvE8ABx/1CFqwDV01zM/GocT2kaHa3YWr6Y7qkufXcl36gXmOoXnXoAD/M3V0fWdfv2995hgcNm+dvnGfAqoQmPeYb7u7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUqskrCw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D507C116C6;
+	Tue,  3 Mar 2026 13:23:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772544223;
+	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RUqskrCwytKCoz7NpxBgmM4C3jhH3crzoSTNxyVDDTwdv8G6ut6sKfUyApTW2XPoX
+	 9WHaPeALwgD1XPhAKHOr8dE5Mmp1hV0mv0icFbbVLyfqOMlB3UFv/NkSMzIy7aazPM
+	 LdTVjsG8/D2BW2Zl/G9fcDN8ulWmHcRG52y8mHgO0MyvHUIjhvPYk2YZ18z0zXPDpj
+	 yuJOHNq8K+qFXpcELSHkihdCXpjX+HOVnTo0OJK69xLWZ/AgFFQfFspe14PlLLfoZJ
+	 NKogQHOeytqZA3J7+vluUG0QdVF0rs6keDsM4BukFNuOL5XGuuFpvWPQbjoNvL4Gc4
+	 iY8vhh/W4qIcw==
+Message-ID: <29d38308-e8ae-42aa-8eeb-1c3b347c284b@kernel.org>
+Date: Tue, 3 Mar 2026 14:23:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Content-Language: en-GB, fr-BE
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ Netdev <netdev@vger.kernel.org>, rcu@vger.kernel.org,
+ MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "luto@kernel.org" <luto@kernel.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
-X-Rspamd-Queue-Id: 9A3401F030A
+X-Rspamd-Queue-Id: 96A841F02B6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-263206-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263205-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,0.0.0.0:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 01:22:28PM +0100, Jens Emil Schulz Østergaard wrote:
-> +examples:
-> +  - |
-> +    soc {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +      ethernet-switch@0 {
-> +        reg = <0>;
-> +        compatible = "microchip,lan96459f-switch", "microchip,lan96455s-switch";
-> +        pinctrl-0 = <&lan9645x_leds>;
-> +        pinctrl-names = "default";
-> +
-> +        ethernet-ports {
-> +          #address-cells = <1>;
-> +          #size-cells = <0>;
-> +
-> +          port@0 {
-> +            reg = <0>;
-> +            label = "lan0";
+Hi Jiri,
 
-Please remove labels from DSA examples. They do not constitute best
-practice, and it is preferable they don't leak into device trees by
-promoting them through binding examples.
+On 26/02/2026 11:37, Jiri Slaby wrote:
+> On 06. 02. 26, 12:54, Matthieu Baerts wrote:
+>> Our CI for the MPTCP subsystem is now regularly hitting various stalls
+>> before even starting the MPTCP test suite. These issues are visible on
+>> top of the latest net and net-next trees, which have been sync with
+>> Linus' tree yesterday. All these issues have been seen on a "public CI"
+>> using GitHub-hosted runners with KVM support, where the tested kernel is
+>> launched in a nested (I suppose) VM. I can see the issue with or without
+>> debug.config. According to the logs, it might have started around
+>> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
+>> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
+>> and the CI doesn't currently have the ability to execute bisections.
+> 
+> Hmm, after the switch of the qemu guest kernels to 6.19, our (opensuse)
+> build service is stalling in smp_call_function_many_cond() randomly too:
+> https://bugzilla.suse.com/show_bug.cgi?id=1258936
+> 
+> The attachment from there contains sysrq-t logs too:
+> https://bugzilla.suse.com/attachment.cgi?id=888612
 
-It is currently recommended to name DSA (like other) network interfaces
-using udev rules set up by user space. Using labels is perhaps only
-tolerated for cases where the udev implementation is sub-par, like
-OpenWrt.
+I'm glad I'm not the only one with this issue :)
+
+In your case, do you also have nested VMs with KVM support?
+
+Are you able to easily reproduce the issue and change the guest kernel
+in your build service?
+
+On my side, any debugging steps need to be automated. Lately, it looks
+like the issue is more easily triggered on a stable 6.19 kernel, than on
+the last RC.
+
+>> The stalls happen before starting the MPTCP test suite. The init program
+>> creates a VSOCK listening socket via socat [1], and different hangs are
+>> then visible: RCU stalls followed by a soft lockup [2], only a soft
+>> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
+>> there is no RCU stalls or soft lockups detected after one minute, but VM
+>> is stalled [6]. In the last case, the VM is stopped after having
+>> launched GDB to get more details about what was being executed.
+>>
+>> It feels like the issue is not directly caused by the VSOCK listening
+>> socket, but the stalls always happen after having started the socat
+>> command [1] in the background.
+> 
+> It fails randomly while building random packages (go, libreoffice,
+> bayle, ...). I don't think it is VSOCK related in those cases, but who
+> knows what the builds do...
+
+Indeed, unlikely to be VSOCK then.
+
+> I cannot reproduce locally either.
+> 
+> I came across:
+> Â  614da1d3d4cd x86: make page fault handling disable interrupts properly
+> but I have no idea if it could have impact on this at all.
+
+Did it help to revert it?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
