@@ -1,282 +1,171 @@
-Return-Path: <netdev+bounces-263052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IARROvh9pmnhQQAAu9opvQ
-	(envelope-from <netdev+bounces-263052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:21:44 +0100
+	id GKfTIUB/pmnhQQAAu9opvQ
+	(envelope-from <netdev+bounces-263053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:27:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508091E992C
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:21:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C071E99AF
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:27:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FFAA301DAEE
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 06:17:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F24AE302A1A8
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 06:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BAB363092;
-	Tue,  3 Mar 2026 06:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A12A383C90;
+	Tue,  3 Mar 2026 06:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mlObZq1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC8B374E78;
-	Tue,  3 Mar 2026 06:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5592E8DEB;
+	Tue,  3 Mar 2026 06:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772518672; cv=none; b=lg1BmBXLUHPDUYudxwY/QSKcxmEtWKXHgQ47K2OFoAIOkdIP12zo4q5AzGXOC8xHeC7ni+F1MNeFCaURtaCNQeb8ZdQegBl0ndk7Em4IG7m46yJmiFiVTmAvz5xKcOmoHQ5KDwn6gk9a9yLXuO3dSJWzlgDnN6XCkkwjfSNmLJA=
+	t=1772519230; cv=none; b=VzoWSNMskuYqEAqpQ130VUtv2nrqNKGrBxJ/9llW+pN/NouPmPAc5np2Uf5vC9BDRH5P/7NhdP9MfteTKwsTjtWs++YmyZxRLi4QiDif/Z/93l/yiW7IHOPVYCJD5zFZ1VwOI61JRD5omszehEFQnZW6VrJFd9p7gDoqFX+rBHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772518672; c=relaxed/simple;
-	bh=UWR+oiD02I8haxQYzdp3mBi3cN0XN9nqeNYehcSvgbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=exwjtxZSrkMd9MwMSZWUqe2fMe63sSZVRBNBbME308/uiCEWVKFT4ZimUx3WYv9OOTORUnRu8ff05QTrZlL96oY9d4G+62OlNXYO3cVBTT5o32dkJLFlmEjDz8XWjAEQuah0TWVq2smyq8SprK00ipiZk0WIa0X/AcLU8m3Sh9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app2 (Coremail) with SMTP id TQJkCgD3DaEAfaZpgzgFAA--.27688S2;
-	Tue, 03 Mar 2026 14:17:37 +0800 (CST)
-From: lizhi2@eswincomputing.com
-To: devicetree@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	wens@kernel.org,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: ningyu@eswincomputing.com,
-	linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com,
-	pritesh.patel@einfochips.com,
-	weishangjuan@eswincomputing.com,
-	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH net-next v3 3/3] riscv: dts: eswin: eic7700-hifive-premier-p550: enable Ethernet controller
-Date: Tue,  3 Mar 2026 14:17:32 +0800
-Message-ID: <20260303061732.918-1-lizhi2@eswincomputing.com>
-X-Mailer: git-send-email 2.52.0.windows.1
-In-Reply-To: <20260303061525.846-1-lizhi2@eswincomputing.com>
-References: <20260303061525.846-1-lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1772519230; c=relaxed/simple;
+	bh=fxKizMzMIayJYvrsnvg5v7c9n+Cb/G9sDjZiXulqffo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cjjrPWTTbzidlZNKtCN8vCWsROK+r3uejHiMnOor/yZohQcGh0lT2ZCwjgqYkqf/jO7aN9TOP0XED9gGaR0IPB0enCFnRbfdrE0ckl5fOrB+tgoycFDCopXYc9iHa06mHRzRmdDZLXXhRPpFsP5jfEEEXBfgzZ0/GpBqtQ7iFnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mlObZq1N; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d7f3dabd-e6da-496d-927e-590a41dee009@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772519226;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lwL4R6Tjrx15lo/+8rlSFcr3K3tEG+s7YuJdiIPQfcQ=;
+	b=mlObZq1NJMCT2YKc+UgG3MhwDSoJWI5YGFMX8WYVq9r9rX14M+5v3onDsRjK3DVNSOHLbh
+	aKAWgG+6xv7vvh5YkdO02SzyfhVQo2qx2MMYbM5sUrcDPHprQpYhGrhWVpOY4e/1WGa92u
+	fI8POhPiuEVxN4ygfBAegFI70AyW5LU=
+Date: Tue, 3 Mar 2026 14:26:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue
+ sysctl
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Leon Hwang <leon.huangfu@shopee.com>,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?=
+ <ij@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260225074633.149590-1-leon.huangfu@shopee.com>
+ <20260225174354.5a698ddb@kernel.org>
+ <f611be70-8280-44c8-86af-5866c0b302be@linux.dev>
+ <20260302162251.733b520e@kernel.org>
+ <3a623176-fc5f-4dd4-bbfc-64d211f53645@linux.dev>
+ <CANn89iJ0=Tx0i+1UXEdcoFuk1F_MfP41-L-kgGDTN+RcLTRcFA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <CANn89iJ0=Tx0i+1UXEdcoFuk1F_MfP41-L-kgGDTN+RcLTRcFA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgD3DaEAfaZpgzgFAA--.27688S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF4DWr1rKrW3tF4fGryrtFb_yoWrGFWkpF
-	47urZ5Xr4rWr1Iy34avFy09FZxJws7WF95Krn7tFyUGF4q9FWYvr1Yy3WfJF17ArWUX3y5
-	WFs3t34FkF4vy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBG14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4U
-	JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcV
-	C2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRdWrXUUUUU=
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
-X-Rspamd-Queue-Id: 508091E992C
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 04C071E99AF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263052-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263053-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	DMARC_NA(0.00)[eswincomputing.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,shopee.com,vger.kernel.org,davemloft.net,redhat.com,lwn.net,linuxfoundation.org,google.com,nvidia.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email,3.19.90.128:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.831];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[3.9.72.96:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,3.1.11.0:email,3.1.50.16:email,eswincomputing.com:mid,eswincomputing.com:email]
+	NEURAL_HAM(-0.00)[-0.991];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid]
 X-Rspamd-Action: no action
 
-From: Zhi Li <lizhi2@eswincomputing.com>
 
-Enable the on-board Gigabit Ethernet controller on the
-HiFive Premier P550 development board.
 
-Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
----
- .../dts/eswin/eic7700-hifive-premier-p550.dts | 50 +++++++++++++++++
- arch/riscv/boot/dts/eswin/eic7700.dtsi        | 54 +++++++++++++++++++
- 2 files changed, 104 insertions(+)
+On 3/3/26 11:55, Eric Dumazet wrote:
+> On Tue, Mar 3, 2026 at 3:12 AM Leon Hwang <leon.hwang@linux.dev> wrote:
+>>
+>>
+>>
+>> On 3/3/26 08:22, Jakub Kicinski wrote:
+>>> On Mon, 2 Mar 2026 17:55:59 +0800 Leon Hwang wrote:
+>>>> On 26/2/26 09:43, Jakub Kicinski wrote:
+>>>>> On Wed, 25 Feb 2026 15:46:33 +0800 Leon Hwang wrote:
+>>>>>> Issue:
+>>>>>> When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
+>>>>>> current implementation does not clear the socket's receive queue. This
+>>>>>> causes SKBs in the queue to remain allocated until the socket is
+>>>>>> explicitly closed by the application. As a consequence:
+>>>>>>
+>>>>>> 1. The page pool pages held by these SKBs are not released.
+>>>>>
+>>>>> On what kernel version and driver are you observing this?
+>>>>
+>>>> # uname -r
+>>>> 6.19.0-061900-generic
+>>>>
+>>>> # ethtool -i eth0
+>>>> driver: mlx5_core
+>>>> version: 6.19.0-061900-generic
+>>>> firmware-version: 26.43.2566 (MT_0000000531)
+>>>
+>>> Okay... this kernel + driver should just patiently wait for the page
+>>> pool to go away.
+>>>
+>>> What is the actual, end user problem that you're trying to solve?
+>>> A few kB of data waiting to be freed is not a huge problem..
+>>
+>> Yes, it is not a huge problem.
+>>
+>> The actual end-user issue was discussed in
+>> "page_pool: Add page_pool_release_stalled tracepoint" [1].
+>>
+>> I think it would be useful to provide a way for SREs to purge the
+>> receive queue when CLOSE_WAIT TCP sockets receive RST packets. If the
+>> NIC, e.g., Mellanox, flaps, the underlying page pool and pages can be
+>> released at the same time.
+>>
+>> Links:
+>> [1]
+>> https://lore.kernel.org/netdev/b676baa0-2044-4a74-900d-f471620f2896@linux.dev/
+> 
+> Perhaps SRE could use this in an emergency?
+> 
+> ss -t -a state close-wait -K
 
-diff --git a/arch/riscv/boot/dts/eswin/eic7700-hifive-premier-p550.dts b/arch/riscv/boot/dts/eswin/eic7700-hifive-premier-p550.dts
-index 131ed1fc6b2e..d558f0fdfb38 100644
---- a/arch/riscv/boot/dts/eswin/eic7700-hifive-premier-p550.dts
-+++ b/arch/riscv/boot/dts/eswin/eic7700-hifive-premier-p550.dts
-@@ -13,6 +13,8 @@ / {
- 
- 	aliases {
- 		serial0 = &uart0;
-+		ethernet0 = &gmac0;
-+		ethernet1 = &gmac1;
- 	};
- 
- 	chosen {
-@@ -20,6 +22,54 @@ chosen {
- 	};
- };
- 
-+&gmac0 {
-+	phy-handle = <&gmac0_phy0>;
-+	phy-mode = "rgmii-id";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gpio106_pins>;
-+	rx-internal-delay-ps = <20>;
-+	tx-internal-delay-ps = <100>;
-+	status = "okay";
-+
-+	mdio {
-+		compatible = "snps,dwmac-mdio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		gmac0_phy0: ethernet-phy@0 {
-+			compatible = "ethernet-phy-id001c.c916";
-+			reg = <0>;
-+			reset-gpios = <&gpioD 10 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <80000>;
-+		};
-+	};
-+};
-+
-+&gmac1 {
-+	phy-handle = <&gmac1_phy0>;
-+	phy-mode = "rgmii-rxid";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gpio111_pins>;
-+	rx-internal-delay-ps = <200>;
-+	tx-internal-delay-ps = <200>;
-+	status = "okay";
-+
-+	mdio {
-+		compatible = "snps,dwmac-mdio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		gmac1_phy0: ethernet-phy@0 {
-+			compatible = "ethernet-phy-id001c.c916";
-+			reg = <0>;
-+			reset-gpios = <&gpioD 15 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <80000>;
-+		};
-+	};
-+};
-+
- &uart0 {
- 	status = "okay";
- };
-diff --git a/arch/riscv/boot/dts/eswin/eic7700.dtsi b/arch/riscv/boot/dts/eswin/eic7700.dtsi
-index c3ed93008bca..c6f504f0d096 100644
---- a/arch/riscv/boot/dts/eswin/eic7700.dtsi
-+++ b/arch/riscv/boot/dts/eswin/eic7700.dtsi
-@@ -5,6 +5,8 @@
- 
- /dts-v1/;
- 
-+#include <dt-bindings/gpio/gpio.h>
-+
- / {
- 	#address-cells = <2>;
- 	#size-cells = <2>;
-@@ -295,6 +297,58 @@ uart4: serial@50940000 {
- 			status = "disabled";
- 		};
- 
-+		gmac0: ethernet@50400000 {
-+			compatible = "eswin,eic7700-qos-eth", "snps,dwmac-5.20";
-+			reg = <0x0 0x50400000 0x0 0x10000>;
-+			interrupts = <61>;
-+			interrupt-names = "macirq";
-+			clocks = <&clk 186>,
-+				 <&clk 171>,
-+				 <&clk 40>,
-+				 <&clk 193>;
-+			clock-names = "axi", "cfg", "stmmaceth", "tx";
-+			resets = <&reset 95>;
-+			reset-names = "stmmaceth";
-+			eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x114 0x118 0x11c>;
-+			snps,aal;
-+			snps,fixed-burst;
-+			snps,tso;
-+			snps,axi-config = <&stmmac_axi_setup_gmac0>;
-+			status = "disabled";
-+
-+			stmmac_axi_setup_gmac0: stmmac-axi-config {
-+				snps,blen = <0 0 0 0 16 8 4>;
-+				snps,rd_osr_lmt = <2>;
-+				snps,wr_osr_lmt = <2>;
-+			};
-+		};
-+
-+		gmac1: ethernet@50410000 {
-+			compatible = "eswin,eic7700-qos-eth-clk-inversion", "snps,dwmac-5.20";
-+			reg = <0x0 0x50410000 0x0 0x10000>;
-+			interrupts = <70>;
-+			interrupt-names = "macirq";
-+			clocks = <&clk 186>,
-+				 <&clk 171>,
-+				 <&clk 40>,
-+				 <&clk 194>;
-+			clock-names = "axi", "cfg", "stmmaceth", "tx";
-+			resets = <&reset 94>;
-+			reset-names = "stmmaceth";
-+			eswin,hsp-sp-csr = <&hsp_sp_csr 0x200 0x208 0x214 0x218 0x21c>;
-+			snps,aal;
-+			snps,fixed-burst;
-+			snps,tso;
-+			snps,axi-config = <&stmmac_axi_setup_gmac1>;
-+			status = "disabled";
-+
-+			stmmac_axi_setup_gmac1: stmmac-axi-config {
-+				snps,blen = <0 0 0 0 16 8 4>;
-+				snps,rd_osr_lmt = <2>;
-+				snps,wr_osr_lmt = <2>;
-+			};
-+		};
-+
- 		gpio@51600000 {
- 			compatible = "snps,dw-apb-gpio";
- 			reg = <0x0 0x51600000 0x0 0x80>;
--- 
-2.25.1
+This ss command is acceptable in an emergency.
+
+A sysctl option would be better for persistent SRE operations.
+
+Thanks,
+Leon
 
 
