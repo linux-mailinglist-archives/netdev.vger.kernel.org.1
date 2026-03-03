@@ -1,188 +1,220 @@
-Return-Path: <netdev+bounces-263337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Cr/IkEYp2m+dgAAu9opvQ
-	(envelope-from <netdev+bounces-263337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:20:01 +0100
+	id mH1QFxMZp2m+dgAAu9opvQ
+	(envelope-from <netdev+bounces-263339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:23:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E670B1F4838
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:20:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B52C61F4943
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D71C3021EA5
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:19:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EE25302F720
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06308439011;
-	Tue,  3 Mar 2026 17:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A127C3537D6;
+	Tue,  3 Mar 2026 17:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PsT6SkmH"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q6eAugzz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zKH0MltG";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q6eAugzz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zKH0MltG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11532351C31;
-	Tue,  3 Mar 2026 17:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E76F3537D3
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 17:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772558380; cv=none; b=ncTF0SGGrcVuRsre9RZj0M6JrJ+r+TTsJlCDEuVD9QfI5wjlRJhBHCaJC4OaKIqsFysXN5EDa375eTDnC2PTb3eFX2vJcRzuHsu/j71RIxLEuLL55bfu+Ao00gMDtmx1zI8on/kt6WhbrCQE1sNWkF1NDp9QZDDP/bexBWQxAVI=
+	t=1772558475; cv=none; b=YMjH3qfcixeydAJimVJqeOSUIXCE2G623UpJSHLkbChPp/SBjzNKGIf2qvNRKhELuoH6OJvD0Z5D0NBzxJITztyHvpm3x47L9ptBwL8YvK4T5HyKY/cU2/znWkzDbyuwCp5VEuLgwmjx/4MOeiK/arU4ylm6ClHGn7tVnNFmBuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772558380; c=relaxed/simple;
-	bh=Ca+ARr12/XdBIhnv7QrCLpRPeKuqqx38eJrQDvnhluA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lu2kGaBQsmDzFlk/IJOLUfEiX+WP9/9F6G3cyTYym/M/tRxLVJ8OhUEGvRxakOp0+4aiBly8Ceg6rr0cgdNiPLSFdK60pa1fdEEzoTxWdTgO1HwZawKE4sh06Pfs79wyhG537nUXLKPQP4RN6JR43movH3jdQAECAYhkp20ZtnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PsT6SkmH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FWEQDeYjZ/Kvx6qPEMl2sy6hl+csZIw5LCAMUKWoglQ=; b=PsT6SkmHwqV5c+BFaY/sSATpj0
-	dahDe3Pnj8a6qokJxyJB4U4OolAl4dyJ+dbpeXihHVxwJ1RXwt3vMOSn9okNJ4Hrq0f0EHeP+VeV/
-	GgbpNUa571Kdj5X0+tRKzX+SuNT1zY81z/YdFVtlijJp1T3K+2NPOqO9x5CWZNIJyg8Lgct2sFXZj
-	Q+idnQF9keH4o4LoPiIKBHqr3ZpZ3aqfTHVys5XSmCeskb0acb3CwJkxPPuQ2TH3hwbGaneNH5LUQ
-	0w0zHK4DggshS7iECxwkimq04+7qltJa19/b0j7AwQMxvdWbe0yElbZZy62HKBxN+OR+zY/OEGZTS
-	Vf2OAD8g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47280)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vxTP3-000000005Qr-3lP3;
-	Tue, 03 Mar 2026 17:19:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vxTOz-0000000076m-1NPo;
-	Tue, 03 Mar 2026 17:19:21 +0000
-Date: Tue, 3 Mar 2026 17:19:21 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] net: sfp: Describe and handle regulators
-Message-ID: <aacYGTBobbfJgZpp@shell.armlinux.org.uk>
-References: <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
- <aab51KbpIq72wtSU@shell.armlinux.org.uk>
- <9586950.CDJkKcVGEf@fw-rgant>
+	s=arc-20240116; t=1772558475; c=relaxed/simple;
+	bh=UgMVHhT7bJXcwtHBrRORGZbG5E41isnJfRjcvYRM1UI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oB8wIZso2g8jKgC9IWQkhJNY7j/rjJeRLmvC4MMeMYtdvNGM2lLSD0JzBK4UmhUg5AQrFIVw0Y51sj39QeB/wRrL/wSS0bs0eEiRC5M7mxte9PMfiQ4rHP1XkgJ9tdK4RxGgEyHDXlZpQx2c/s4VKltpZ2cfR20S9PlEgBJKkFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q6eAugzz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zKH0MltG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q6eAugzz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zKH0MltG; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 68E0C5BE14;
+	Tue,  3 Mar 2026 17:21:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772558472; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ckw4o+PBREtPUkXpxwPxb4i84vuQvXCd5PQCjVPS2nw=;
+	b=Q6eAugzzx1zILpjuL4dqDH5T07BIiRQ8fPkEZsCPwA8vkNiErKauUciaQTWVl7VTFaDS1A
+	kxbLt6iRU8nO3gJytsG1FHK4opkqGjdzVxdyyC/niz8Z0xOB2F4R+DdvzqCZBHtxQHQIOB
+	h3Csr4OYrXDQXT7gI+14SoKPVaYYw5A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772558472;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ckw4o+PBREtPUkXpxwPxb4i84vuQvXCd5PQCjVPS2nw=;
+	b=zKH0MltG6c8UctZHFxv14EjB/VVSPAG1rDkPv8tC8BI+jcYqybzg31oPLczgwOYsXI+z5g
+	eXHMCFwOSLcv4IAw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772558472; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ckw4o+PBREtPUkXpxwPxb4i84vuQvXCd5PQCjVPS2nw=;
+	b=Q6eAugzzx1zILpjuL4dqDH5T07BIiRQ8fPkEZsCPwA8vkNiErKauUciaQTWVl7VTFaDS1A
+	kxbLt6iRU8nO3gJytsG1FHK4opkqGjdzVxdyyC/niz8Z0xOB2F4R+DdvzqCZBHtxQHQIOB
+	h3Csr4OYrXDQXT7gI+14SoKPVaYYw5A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772558472;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ckw4o+PBREtPUkXpxwPxb4i84vuQvXCd5PQCjVPS2nw=;
+	b=zKH0MltG6c8UctZHFxv14EjB/VVSPAG1rDkPv8tC8BI+jcYqybzg31oPLczgwOYsXI+z5g
+	eXHMCFwOSLcv4IAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D47EA3EA69;
+	Tue,  3 Mar 2026 17:21:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 9zr5MIcYp2mlRwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 03 Mar 2026 17:21:11 +0000
+Message-ID: <870fb7c8-e5a8-4cf9-a502-fccc90634bad@suse.de>
+Date: Tue, 3 Mar 2026 18:21:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9586950.CDJkKcVGEf@fw-rgant>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: E670B1F4838
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ipsec] xfrm: iptfs: fix skb_put() panic on non-linear skb
+ during reassembly
+To: netdev@vger.kernel.org
+Cc: chopps@labn.net, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, herbert@gondor.apana.org.au,
+ steffen.klassert@secunet.com, Hao Long <me@imlonghao.com>
+References: <20260303171029.4072-1-fmancera@suse.de>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260303171029.4072-1-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: B52C61F4943
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263337-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.259];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263339-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,imlonghao.com:email,suse.de:dkim,suse.de:email,suse.de:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 04:54:56PM +0100, Romain Gantois wrote:
-> Hi Russell,
+On 3/3/26 6:10 PM, Fernando Fernandez Mancera wrote:
+> In iptfs_reassem_cont(), IP-TFS attempts to append data to the new inner
+> packet 'newskb' that is being reassembled. First a zero-copy approach is
+> tried if it succeeds then newskb becomes non-linear.
 > 
-> On Tuesday, 3 March 2026 16:10:12 CET Russell King (Oracle) wrote:
-> > On Tue, Mar 03, 2026 at 02:54:25PM +0100, Romain Gantois wrote:
-> > > Hi everyone,
-> > > 
-> > > This series describes regulators supplying the VccT and VccR pins of an
-> > > SFP
-> > > cage or soldered-down transceiver.
-> > > 
-> > > These regulators can then be turned on only when the SFP device is probed,
-> > > thus saving power on systems which only load SFP cage support at certain
-> > > times, or load SFP device descriptions via device tree overlays.
-> > > 
-> > > Please let me know what you think.
-> > 
-> > As ever, I don't want to be adding support for stuff into mainline
-> > which doesn't ever get used - historically, we've had a lot of that.
-> > So, any patch set which adds some kind of facility like this needs to
-> > be accompanied by a user of it.
-> > 
+> When a subsequent fragment in the same datagram does not meet the
+> fast-path conditions, a memory copy is performed. It calls skb_put() to
+> append the data and as newskb is non-linear it triggers
+> SKB_LINEAR_ASSERT check.
 > 
-> I understand, though I'm dealing with an out-of-tree board but I understand 
-> that this doesn't really count as a valid first use case.
+>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
+>   [...]
+>   RIP: 0010:skb_put+0x3c/0x40
+>   [...]
+>   Call Trace:
+>    <IRQ>
+>    iptfs_reassem_cont+0x1ab/0x5e0 [xfrm_iptfs]
+>    iptfs_input_ordered+0x2af/0x380 [xfrm_iptfs]
+>    iptfs_input+0x122/0x3e0 [xfrm_iptfs]
+>    xfrm_input+0x91e/0x1a50
+>    xfrm4_esp_rcv+0x3a/0x110
+>    ip_protocol_deliver_rcu+0x1d7/0x1f0
+>    ip_local_deliver_finish+0xbe/0x1e0
+>    __netif_receive_skb_core.constprop.0+0xb56/0x1120
+>    __netif_receive_skb_list_core+0x133/0x2b0
+>    netif_receive_skb_list_internal+0x1ff/0x3f0
+>    napi_complete_done+0x81/0x220
+>    virtnet_poll+0x9d6/0x116e [virtio_net]
+>    __napi_poll.constprop.0+0x2b/0x270
+>    net_rx_action+0x162/0x360
+>    handle_softirqs+0xdc/0x510
+>    __irq_exit_rcu+0xe7/0x110
+>    irq_exit_rcu+0xe/0x20
+>    common_interrupt+0x85/0xa0
+>    </IRQ>
+>    <TASK>
 > 
-> > This is especially true in this case, because I want to see why you're
-> > wanting to have two regulators, when INF-8074 suggests that both VccT
-> > and VccR should be derived from the same supply. The reason the
-> > modules have separate supplies for the transmitter and receiver is
-> > because the host side has the supply filtering networks to ensure
-> > cross-talk between each is kept to a minimum.
+> Fix this by checking if the skb is non-linear. If it is, linearize it by
+> calling skb_linearize(). As the initial allocation of newskb originally
+> reserved enough tailroom for the entire reassembled packet we do not
+> need to check if we have enough tailroom or extend it.
 > 
-> Interesting, I wasn't aware of this. I thought it was something like "being 
-> able to shut down the transmitter side only while waiting for a WoL packet".
+> Fixes: 075694765446 ("xfrm: iptfs: handle received fragmented inner packets")
+> Reported-by: Hao Long <me@imlonghao.com>
+> Closes: https://lore.kernel.org/netdev/DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com/
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+>   net/xfrm/xfrm_iptfs.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> index 050a82101ca5..4d1a84a6fc45 100644
+> --- a/net/xfrm/xfrm_iptfs.c
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -901,6 +901,12 @@ static u32 iptfs_reassem_cont(struct xfrm_iptfs_data *xtfs, u64 seq,
+>   	    iptfs_skb_can_add_frags(newskb, fragwalk, data, copylen)) {
+>   		iptfs_skb_add_frags(newskb, fragwalk, data, copylen);
+>   	} else {
+> +		if (skb_is_nonlinear(newskb) && skb_linearize(newskb)) {
 
-A transceiver module is permitted to internally connect VccT and VccR,
-which would make separate supplies questionable. See INF-8074, table 1
-note 8, on page 22.
+This will indeed require a V2. skb_linearize() is enough here as this is 
+calling skb_is_nonlinear() inside it. *face-palm*
 
-I suspect there could be boards out there which do have separate
-control of each supply, but they need to be prepared for a module that
-does physically connect VccT and VccR together on the module.
+> +			XFRM_INC_STATS(xs_net(xtfs->x),
+> +				       LINUX_MIB_XFRMINBUFFERERROR);
+> +			goto abandon;
+> +		}
+> +
+>   		/* copy fragment data into newskb */
+>   		if (skb_copy_seq_read(st, data, skb_put(newskb, copylen),
+>   				      copylen)) {
 
-There is the problem that these documents do not specify which Vcc
-pins supply power to the EEPROM, and if one powers down the supply
-for the EEPROM, or the PHY/uC in the case of a copper module, that
-could cause ESD diodes to conduct, pulling down the I2C bus. It
-would also be out of spec. For example, the M24C02C datasheet from
-Microchip states in 1.0 under the Absolute Maximum Ratings (beyond
-which damage may occur) that for any input or output, the allowable
-voltage range is -0.6V to Vcc + 1.0V - this is normally because of
-the ESD diodes that clamp the input pin voltages to be within the
-supply voltage pins +/- the diode drop.
-
-Thus, powering down supplies to a SFP/SFF module while it's plugged
-in and keeping IOs at their normal levels would have unspecified
-behaviour, especially if there is no way to isolate the I2C bus from
-the module and/or if other signals are actively driven or pulled up
-to their "high" state.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
