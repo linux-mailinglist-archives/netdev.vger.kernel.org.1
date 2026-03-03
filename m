@@ -1,266 +1,208 @@
-Return-Path: <netdev+bounces-262977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFh0Ic84pmnQMgAAu9opvQ
-	(envelope-from <netdev+bounces-262977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:26:39 +0100
+	id mJDwIs82pmloMgAAu9opvQ
+	(envelope-from <netdev+bounces-262975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:18:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5801E7A9D
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:26:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3526A1E79B8
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:18:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 93A873025269
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:26:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 848F3306B4D5
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FB2358387;
-	Tue,  3 Mar 2026 01:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095E634A775;
+	Tue,  3 Mar 2026 01:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="Wc4TKdAE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FZHYM4FK"
 X-Original-To: netdev@vger.kernel.org
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F9E36403D
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 01:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9283535BDAC
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 01:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772501196; cv=none; b=q+BKSnjKC/SxQST5oLYYSKX446iOOwPSiTtISayuE6I/m0zSqzCWW5rmUM7vUrcOd0xs1g3MQ+8+aTSapdPThYJL+OXiatZVet2v6BqvZQ3pF7X2hHAnonABWh72o2+7zaR9bAXCk+pG44+sxMVYC+EoKzHbva7Ku1fmuFUOCZ4=
+	t=1772500680; cv=none; b=MMtaWY8RH48tZKw4+mOyb/POa/ouZvkuaA2t5hhG5tqMWhvKGuBSy7g7l7BuNToYi08KoMST1m39QZXGBCisOmWY56X0ZinxcZ4/oeGMNypG1OS14gRkaprwdG5MQozfPuaOOed1PgnGiTf+BznjQ2PWZHEi0XyRKx5g1PguRVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772501196; c=relaxed/simple;
-	bh=g+VdGlVLVkH1poZKLQaU9Z6Cz1tsg2GNZN6MfKpgxB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CwpxjkPdjwWTGvn01GcqDS86hvdMwVIfTXTHkvMGS8UGg2edA+F53JHafnBXy51c90zntFA1NTpJdlQwHN1GtKn1lGyAtoGmMqjDNNjUVysL2P1jUuMaqs+cH6FaHLHMq8J8zAmQQwoz/1j08tzhHhqCfTuoLdSRTcPM6NgEoGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=Wc4TKdAE; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from macsyma.thunk.org (pool-173-48-102-84.bstnma.fios.verizon.net [173.48.102.84])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 6231Pu3R026610
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 2 Mar 2026 20:25:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1772501160; bh=/4PzqDjQa596+Pxv5nyCAFN8lvFTxej9AhTZolOU+To=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=Wc4TKdAEZiew43ZUa9oyK9BzvbQO3OJloJSKo3pd6MKCTHI4a2teHHPqzw1FRDL2y
-	 +yu6xwBU02gN3nI0t8y5UIoSUv5mdCVHfMEIdSd/UzmQ8n8XljJLn8WdsWZlzyvKGT
-	 rAz3wh7Iki5RyLotCb/Z/VDWmYDbAE0BsYdyvuoQ8F38jRx/zf/TpFP5KA5Lqp0Cw+
-	 Ng03SymNceY21qntaXusQUmsrvhvWlmHGa8roce7/UvpNA6pe9TJunmAktEO3gj4vh
-	 AMgTW7BxiT//fgI8Xnd0Mi0ldl+zhjAuEvp4QGZN3wtROS2Wpi13Sob+oCVUSW/6ZX
-	 sKXZK8+2UchSg==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 33A7D5AC5A1E; Mon,  2 Mar 2026 20:25:56 -0500 (EST)
-Date: Mon, 2 Mar 2026 20:25:56 -0500
-From: "Theodore Tso" <tytso@mit.edu>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Muchun Song <muchun.song@linux.dev>,
-        Oscar Salvador <osalvador@suse.de>,
-        David Hildenbrand <david@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Paulo Alcantara <pc@manguebit.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
-        Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-        Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Bharath SM <bharathsm@microsoft.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Sterba <dsterba@suse.com>,
-        Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-        Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        Yangtao Li <frank.li@vivo.com>,
-        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
-        Zhihao Cheng <chengzhihao1@huawei.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        John Johansen <john.johansen@canonical.com>,
-        Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
-        Stephen Smalley <stephen.smalley.work@gmail.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemb@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-        Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        James Clark <james.clark@linaro.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>,
-        Eric Paris <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Remi Denis-Courmont <courmisch@gmail.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Xin Long <lucien.xin@gmail.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-        Stanislav Fomichev <sdf@fomichev.me>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
-        fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-        autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
-        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-        netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
-        audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
-        bpf@vger.kernel.org
-Subject: Re: [PATCH v2 001/110] vfs: introduce kino_t typedef and PRIino
- format macro
-Message-ID: <20260303012556.GA6520@macsyma-wired.lan>
-References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
- <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
+	s=arc-20240116; t=1772500680; c=relaxed/simple;
+	bh=YyV/2W+rzuQDsuStd2bW++jjatn642X5DiNInwOahgE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ua1muCMg28RJn8/q6ScrZLPclrHGKoU7TMNe2jl5c40SmFUsuOh/rZ0MjK6Zi7OwTIEZo3+/y1MDvls+mZcHftpvtcKNXcdfOMImJIXLuDd8woPX+A/aGKCFZrdscKZC+FYbR7qA4IyPpDeEJ2GBEPwRLvfTxMc3fpwCDixZCTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FZHYM4FK; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772500678; x=1804036678;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YyV/2W+rzuQDsuStd2bW++jjatn642X5DiNInwOahgE=;
+  b=FZHYM4FK9stcAj/aGBN7C/us6iZRTGCO4Di4dMhO7wfniEgN0sdLtwEB
+   W5ofbxOB+4Q1py0FHPe4DqoGvxPSuwHxh/UITlfCw1Qd91848kF+i/8+Z
+   MXXx2/YlJJDkgpVscx0pW1n4efW6ke+T1QPXLr1XkpagUgtGgfCUYAhCL
+   +duz6KVnYu9lCC3u1Sw4+QvHo0HPu3YOgrqyAWN97pdeB9EA93Am3uhZm
+   a1FmMnG7/E2WKhqC0cwaTzkIc0r8A/JCv5NFQYGhlQPL5Apkyy15O5TZa
+   w4F8R8MUOF5nZRfutISIzfhR03kCCLpIwep9+eRrGN/3/1R5dZEboDLAW
+   w==;
+X-CSE-ConnectionGUID: dlLOSBVXTN2urIf+jCwbpw==
+X-CSE-MsgGUID: llO2CEDhTF6ZmacQK05AXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="96137598"
+X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
+   d="scan'208";a="96137598"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 17:17:57 -0800
+X-CSE-ConnectionGUID: 7B/3Sl81TgG4P9UlbQocbg==
+X-CSE-MsgGUID: r7+fbmdWQ/+ld7cGDSSWwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
+   d="scan'208";a="217064310"
+Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
+  by orviesa010.jf.intel.com with ESMTP; 02 Mar 2026 17:17:57 -0800
+From: Joshua Hay <joshua.a.hay@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_info ptr
+Date: Mon,  2 Mar 2026 17:28:31 -0800
+Message-Id: <20260303012831.662492-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
-X-Rspamd-Queue-Id: 6C5801E7A9D
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3526A1E79B8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mit.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[mit.edu:s=outgoing];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,telemann.coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.o
- rg];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262977-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mit.edu:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tytso@mit.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[171];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[macsyma-wired.lan:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262975-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 03:23:45PM -0500, Jeff Layton wrote:
-> The PRIino macro is a length modifier, not a complete format specifier.
-> It is used as: "%" PRIino "u" for decimal, "%" PRIino "x" for hex, etc.
-> This follows the pattern used by userspace PRIu64/PRIx64 macros.
+Deinit calls idpf_idc_deinit_core_aux_device to free the cdev_info
+memory, but leaves the adapter->cdev_info field with a stale pointer
+value. This will bypass subsequent "if (!cdev_info)" checks if cdev_info
+is not reallocated. For example, if idc_init fails after a reset,
+cdev_info will already have been freed during the reset handling, but it
+will not have been reallocated. The next reset or rmmod will result in a
+crash.
 
-For the record, I really hate the inttypes.h format specifiers, but I
-agree that we should forward the example of the C99 spec, for better
-or for worse.
+[  +0.000008] BUG: kernel NULL pointer dereference, address: 00000000000000d0
+[  +0.000033] #PF: supervisor read access in kernel mode
+[  +0.000020] #PF: error_code(0x0000) - not-present page
+[  +0.000017] PGD 2097dfa067 P4D 0
+[  +0.000017] Oops: Oops: 0000 [#1] SMP NOPTI
+...
+[  +0.000018] RIP: 0010:device_del+0x3e/0x3d0
+[  +0.000010] Call Trace:
+[  +0.000010]  <TASK>
+[  +0.000012]  idpf_idc_deinit_core_aux_device+0x36/0x70 [idpf]
+[  +0.000034]  idpf_vc_core_deinit+0x3e/0x180 [idpf]
+[  +0.000035]  idpf_remove+0x40/0x1d0 [idpf]
+[  +0.000035]  pci_device_remove+0x42/0xb0
+[  +0.000020]  device_release_driver_internal+0x19c/0x200
+[  +0.000024]  driver_detach+0x48/0x90
+[  +0.000018]  bus_remove_driver+0x6d/0x100
+[  +0.000023]  pci_unregister_driver+0x2e/0xb0
+[  +0.000022]  __do_sys_delete_module.isra.0+0x18c/0x2b0
+[  +0.000025]  ? kmem_cache_free+0x2c2/0x390
+[  +0.000023]  do_syscall_64+0x107/0x7d0
+[  +0.000023]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-That being said, the userspace PRIu64, et. al macros are complete
-format specifiers, not just a length modifier.  And I think this
-results in less ugly format specifiers in our kernel code.
+Pass the adapter struct into idpf_idc_deinit_core_aux_device instead and
+clear the cdev_info ptr.
 
----- cut here ---
-#!/bin/sh
-cat <<EOF > /tmp/blah.c
-#include <inttypes.h>
-#include <stdio.h>
+Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf.h          | 2 +-
+ drivers/net/ethernet/intel/idpf/idpf_idc.c      | 6 ++++--
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 +-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-int main(int arg, char **argv)
-{
-        printf("PRIu64 is %s\n", PRIu64);
-        printf("PRId64 is %s\n", PRId64);
-        printf("PRIx64 is %s\n", PRIx64);
-        return 0;
-}
-EOF
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index b206fba092c8..ec1b75f039bb 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -1066,7 +1066,7 @@ bool idpf_vport_set_hsplit(const struct idpf_vport *vport, u8 val);
+ int idpf_idc_init(struct idpf_adapter *adapter);
+ int idpf_idc_init_aux_core_dev(struct idpf_adapter *adapter,
+ 			       enum iidc_function_type ftype);
+-void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info);
++void idpf_idc_deinit_core_aux_device(struct idpf_adapter *adapter);
+ void idpf_idc_deinit_vport_aux_device(struct iidc_rdma_vport_dev_info *vdev_info);
+ void idpf_idc_issue_reset_event(struct iidc_rdma_core_dev_info *cdev_info);
+ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+index bd4785fb8d3e..7e4f4ac92653 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+@@ -470,10 +470,11 @@ int idpf_idc_init_aux_core_dev(struct idpf_adapter *adapter,
+ 
+ /**
+  * idpf_idc_deinit_core_aux_device - de-initialize Auxiliary Device(s)
+- * @cdev_info: IDC core device info pointer
++ * @adapter: driver private data structure
+  */
+-void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info)
++void idpf_idc_deinit_core_aux_device(struct idpf_adapter *adapter)
+ {
++	struct iidc_rdma_core_dev_info *cdev_info = adapter->cdev_info;
+ 	struct iidc_rdma_priv_dev_info *privd;
+ 
+ 	if (!cdev_info)
+@@ -485,6 +486,7 @@ void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info)
+ 	kfree(privd->mapped_mem_regions);
+ 	kfree(privd);
+ 	kfree(cdev_info);
++	adapter->cdev_info = NULL;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index d5a877e1fef8..113ecfc16dd7 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -3668,7 +3668,7 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+ 
+ 	idpf_ptp_release(adapter);
+ 	idpf_deinit_task(adapter);
+-	idpf_idc_deinit_core_aux_device(adapter->cdev_info);
++	idpf_idc_deinit_core_aux_device(adapter);
+ 	idpf_rel_rx_pt_lkup(adapter);
+ 	idpf_intr_rel(adapter);
+ 
+-- 
+2.39.2
 
-clang -m32 -o /tmp/blah /tmp/blah.c
-/tmp/blah
----- cut here ---
-
-% /tmp/blah.sh
-PRIu64 is llu
-PRId64 is lld
-PRIx64 is llx
-
-Thanks!
-
-						- Ted
 
