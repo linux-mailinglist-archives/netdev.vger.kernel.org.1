@@ -1,400 +1,222 @@
-Return-Path: <netdev+bounces-263047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gy39CyF3pmnxQAAAu9opvQ
-	(envelope-from <netdev+bounces-263047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:52:33 +0100
+	id X4HVH6t6pml7QQAAu9opvQ
+	(envelope-from <netdev+bounces-263048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:07:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 395971E9511
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:52:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BDC41E9652
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 07:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B768C303AB7F
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 05:52:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA84430459FB
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 06:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF6F7262F;
-	Tue,  3 Mar 2026 05:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lIMuLjJ+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB81C347531;
+	Tue,  3 Mar 2026 06:07:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D7029A2;
-	Tue,  3 Mar 2026 05:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEC430F95C
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 06:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772517149; cv=none; b=GtkVnYwxdgvunD9G2qziF4wJR8GGgG5hm/b+bZsZOvrbpl970bKjmRAIQKg+1wZlQPA359Youm7JvGbY7rg1zeZc4JMXcUDYerUE3gsOANkspLlx/Au7uUYk/b5xvcOGCH/Y5URthdRlfTmZVWesR3B7x7RDo+I7Ilkl2IqgaVA=
+	t=1772518053; cv=none; b=Sfpz++BEo9goz/Y8NqtjfGKkwZhSItInMH687n7R9FdPDYvyiiZLBpY+SEYwZ3J2cGwuxSHAfyDu3inaGEVMTMF5KywJ4ez7/1Gg8/wg1QA/9VcS6vi9aI7c4YYpcgn+OFmUIQeIkL4kw+t+LWxxRSlrbZGtsZcvSn0wmW6Wu/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772517149; c=relaxed/simple;
-	bh=srsGL27ODkb32v+jJnRQHGZJU3/SbDJAk4aL/3CdEAQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QILFVf2A55Us50IsBKfbPhoMA6sZXYiO7TZXJwDKY5OKsV/jsfwGYr7VaQmfR5fAXQEKnqIaxa0IMBMd3+rpaVdXvrPX7fogegwNR6bjpKFwZ2rgQs4mZVyAU+kPs3tAx0XOlFk5e3jc3JmyT4J9yb16YN6xWds6nado4ZFb/jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lIMuLjJ+; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=9j
-	neQjI3DzzG0MEdCPF569r0V3d6StOOexg2c0rY+3M=; b=lIMuLjJ+FfznC1uk5y
-	++eDeP0uTPAmap6S9FO4Aqmyay1nA4H18oID3yG9Cr0ZVraBHKp0DL+BPNplPNmZ
-	MV4N50kjTeJzLaR20ZLq0P0UtpLV73BFJK211xYR+AM0ZunMXgil0ZjB9ulB+M2k
-	f5/vftsmJK3KWIs4h9qTUjgWM=
-Received: from pek-lpg-core5.wrs.com (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgA3CNnXdqZpLe3SRA--.197S2;
-	Tue, 03 Mar 2026 13:51:23 +0800 (CST)
-From: Robert Garcia <rob_garcia@163.com>
-To: stable@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Ma Ke <make24@iscas.ac.cn>,
-	Robert Garcia <rob_garcia@163.com>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6.12.y] net: dsa: properly keep track of conduit reference
-Date: Tue,  3 Mar 2026 13:51:20 +0800
-Message-Id: <20260303055120.2111614-1-rob_garcia@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1772518053; c=relaxed/simple;
+	bh=vvrILT+iq8oS4mB6nITgoC6Lmr1isJ71LVd3pdQSF6E=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ktd7gqwTaJXLMz1PkCvSYPefbhNmNot7YR4gNA4EuAk6i3+VkMC+y2p71J8DoaFsSy3CpwwGha+N+dn7ffpSJVIpc3Lk1JHQPilJxuo9EdGeUn5/tFLit7cSYKKEjngBHD2vrug4qUAhkmyzkqP8GOv99nxop7SYhIifBpYLGFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-679a47a1febso103270937eaf.3
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 22:07:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772518051; x=1773122851;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EXYLFdJyo3qj8tElYEFbgHcNzB4ixy6p8N0OWxG4X4A=;
+        b=duuLJejy5rY8RBIvhNLxdHs3dR7h59PwxsV0Y/KCBeNFSfzogPKqG5f3YSm/J1BQht
+         mRmQ4m+JpKD+kfMdtFSztAlBOU+vqqED07VDjEviwmlorkf5VIimBlRYNUfw94awAesC
+         RNXI4ohyWpdxu2u43C1qeR+xZeEcp3vza1DYw4JnRUYltxrr04O0dT5YUdOh6SVIrGwc
+         vKVCyxARUyJaDj6LxQp9HelR+IjCJMDZjnXpCxEUVAPqMXEyIirXYOieD5LAAyZ5OOMN
+         2JesLYlgBoOGRoA5gQAO38ccF5q8q+fE13y++GUiXL3e/zvAaQFp14W4DpAOmts97y/P
+         b80w==
+X-Forwarded-Encrypted: i=1; AJvYcCVxOavfTmzrxbfAu/xd0BGIsn7RaCIrWy9KP7uRCy7Ri7xAjtch5cPfJqB9rWV+ubc9TaWpFxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywhv4aeRLaiAy9QMAhLvy1uJ2y6U0q3Fn+cgHWChLd0RZrl4EDg
+	kGcb9OVfAA+qQUKXcx/Z4JCbES6DuC899G7JFghvWYXiopkKJvGQ9S015xhUaFZbuYLiC6dxqhz
+	ug2zN2uqTmKIHNxyHpVQAl6T5ivV3buIZ7Bse6UnwJDdgaEzdrkhqVh5G3yY=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgA3CNnXdqZpLe3SRA--.197S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWfGF4rtr15Aw4xCF4furWkCrg_yoWkAw4xpF
-	43Ga43t3ykG3y7Grs8Wa1UuFyrAw4Fyay3G34UK34furn8Gry0yry8KFZa9345CrZ3GF9x
-	XFZ8Za4rCFZ8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UxnYwUUUUU=
-X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAR3YRGmmdt3QvgAA3K
-X-Rspamd-Queue-Id: 395971E9511
+X-Received: by 2002:a05:6820:208a:b0:679:97d5:dd25 with SMTP id
+ 006d021491bc7-679faf4e60bmr8716001eaf.56.1772518051182; Mon, 02 Mar 2026
+ 22:07:31 -0800 (PST)
+Date: Mon, 02 Mar 2026 22:07:31 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a67aa3.a70a0220.b118c.000a.GAE@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in nl80211_send_pmsr_capa
+From: syzbot <syzbot+c686c6b197d10ff3a749@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 1BDC41E9652
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=10f867da86e38691];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263047-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[163.com:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,iscas.ac.cn,163.com,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,iscas.ac.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,msgid.link:url]
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263048-lists,netdev=lfdr.de,c686c6b197d10ff3a749];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.927];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,storage.googleapis.com:url,appspotmail.com:email,googlegroups.com:email,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Hello,
 
-[ Upstream commit 06e219f6a706c367c93051f408ac61417643d2f9 ]
+syzbot found the following issue on:
 
-Problem description
--------------------
+HEAD commit:    eb71ab2bf722 Merge tag 'bpf-fixes' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b7d0ba580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=10f867da86e38691
+dashboard link: https://syzkaller.appspot.com/bug?extid=c686c6b197d10ff3a749
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-DSA has a mumbo-jumbo of reference handling of the conduit net device
-and its kobject which, sadly, is just wrong and doesn't make sense.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-There are two distinct problems.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fcbe8b5437ef/disk-eb71ab2b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/245a6565a05b/vmlinux-eb71ab2b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a83b065baa80/bzImage-eb71ab2b.xz
 
-1. The OF path, which uses of_find_net_device_by_node(), never releases
-   the elevated refcount on the conduit's kobject. Nominally, the OF and
-   non-OF paths should result in objects having identical reference
-   counts taken, and it is already suspicious that
-   dsa_dev_to_net_device() has a put_device() call which is missing in
-   dsa_port_parse_of(), but we can actually even verify that an issue
-   exists. With CONFIG_DEBUG_KOBJECT_RELEASE=y, if we run this command
-   "before" and "after" applying this patch:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c686c6b197d10ff3a749@syzkaller.appspotmail.com
 
-(unbind the conduit driver for net device eno2)
-echo 0000:00:00.2 > /sys/bus/pci/drivers/fsl_enetc/unbind
+=====================================================
+BUG: KMSAN: uninit-value in nl80211_send_pmsr_ftm_capa net/wireless/nl80211.c:2302 [inline]
+BUG: KMSAN: uninit-value in nl80211_send_pmsr_capa+0x6fe/0x1b50 net/wireless/nl80211.c:2404
+ nl80211_send_pmsr_ftm_capa net/wireless/nl80211.c:2302 [inline]
+ nl80211_send_pmsr_capa+0x6fe/0x1b50 net/wireless/nl80211.c:2404
+ nl80211_send_wiphy+0x1464/0x96d0 net/wireless/nl80211.c:3302
+ nl80211_dump_wiphy+0x5b6/0xc80 net/wireless/nl80211.c:3447
+ genl_dumpit+0x14e/0x2a0 net/netlink/genetlink.c:1026
+ netlink_dump+0xbaa/0x1800 net/netlink/af_netlink.c:2325
+ netlink_recvmsg+0xc8a/0xfe0 net/netlink/af_netlink.c:1976
+ sock_recvmsg_nosec+0x23e/0x2e0 net/socket.c:1078
+ ____sys_recvmsg+0x4e5/0x620 net/socket.c:2810
+ ___sys_recvmsg+0x20b/0x850 net/socket.c:2854
+ do_recvmmsg+0x40e/0xdf0 net/socket.c:2949
+ __sys_recvmmsg net/socket.c:3023 [inline]
+ __do_sys_recvmmsg net/socket.c:3046 [inline]
+ __se_sys_recvmmsg net/socket.c:3039 [inline]
+ __x64_sys_recvmmsg+0x383/0x500 net/socket.c:3039
+ x64_sys_call+0x96d/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:300
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x134/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-we see these lines in the output diff which appear only with the patch
-applied:
+Uninit was stored to memory at:
+ mac80211_hwsim_new_radio+0x60b8/0x7e20 drivers/net/wireless/virtual/mac80211_hwsim.c:5837
+ hwsim_new_radio_nl+0x1839/0x3160 drivers/net/wireless/virtual/mac80211_hwsim.c:6504
+ genl_family_rcv_msg_doit+0x338/0x3f0 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0xac5/0xc00 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x54d/0x680 net/netlink/af_netlink.c:2550
+ genl_rcv+0x41/0x60 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0xf04/0x12b0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x10b2/0x1250 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xfe7/0x1080 net/socket.c:2592
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2681
+ x64_sys_call+0x1e20/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x134/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-kobject: 'eno2' (ffff002009a3a6b8): kobject_release, parent 0000000000000000 (delayed 1000)
-kobject: '109' (ffff0020099d59a0): kobject_release, parent 0000000000000000 (delayed 1000)
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4522 [inline]
+ slab_alloc_node mm/slub.c:4844 [inline]
+ __kmalloc_cache_noprof+0x35e/0x1260 mm/slub.c:5353
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ hwsim_new_radio_nl+0x1705/0x3160 drivers/net/wireless/virtual/mac80211_hwsim.c:6492
+ genl_family_rcv_msg_doit+0x338/0x3f0 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0xac5/0xc00 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x54d/0x680 net/netlink/af_netlink.c:2550
+ genl_rcv+0x41/0x60 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0xf04/0x12b0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x10b2/0x1250 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xfe7/0x1080 net/socket.c:2592
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2681
+ x64_sys_call+0x1e20/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x134/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-2. After we find the conduit interface one way (OF) or another (non-OF),
-   it can get unregistered at any time, and DSA remains with a long-lived,
-   but in this case stale, cpu_dp->conduit pointer. Holding the net
-   device's underlying kobject isn't actually of much help, it just
-   prevents it from being freed (but we never need that kobject
-   directly). What helps us to prevent the net device from being
-   unregistered is the parallel netdev reference mechanism (dev_hold()
-   and dev_put()).
+CPU: 0 UID: 0 PID: 15981 Comm: syz.5.4560 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+=====================================================
 
-Actually we actually use that netdev tracker mechanism implicitly on
-user ports since commit 2f1e8ea726e9 ("net: dsa: link interfaces with
-the DSA master to get rid of lockdep warnings"), via netdev_upper_dev_link().
-But time still passes at DSA switch probe time between the initial
-of_find_net_device_by_node() code and the user port creation time, time
-during which the conduit could unregister itself and DSA wouldn't know
-about it.
 
-So we have to run of_find_net_device_by_node() under rtnl_lock() to
-prevent that from happening, and release the lock only with the netdev
-tracker having acquired the reference.
-
-Do we need to keep the reference until dsa_unregister_switch() /
-dsa_switch_shutdown()?
-1: Maybe yes. A switch device will still be registered even if all user
-   ports failed to probe, see commit 86f8b1c01a0a ("net: dsa: Do not
-   make user port errors fatal"), and the cpu_dp->conduit pointers
-   remain valid.  I haven't audited all call paths to see whether they
-   will actually use the conduit in lack of any user port, but if they
-   do, it seems safer to not rely on user ports for that reference.
-2. Definitely yes. We support changing the conduit which a user port is
-   associated to, and we can get into a situation where we've moved all
-   user ports away from a conduit, thus no longer hold any reference to
-   it via the net device tracker. But we shouldn't let it go nonetheless
-   - see the next change in relation to dsa_tree_find_first_conduit()
-   and LAG conduits which disappear.
-   We have to be prepared to return to the physical conduit, so the CPU
-   port must explicitly keep another reference to it. This is also to
-   say: the user ports and their CPU ports may not always keep a
-   reference to the same conduit net device, and both are needed.
-
-As for the conduit's kobject for the /sys/class/net/ entry, we don't
-care about it, we can release it as soon as we hold the net device
-object itself.
-
-History and blame attribution
------------------------------
-
-The code has been refactored so many times, it is very difficult to
-follow and properly attribute a blame, but I'll try to make a short
-history which I hope to be correct.
-
-We have two distinct probing paths:
-- one for OF, introduced in 2016 in commit 83c0afaec7b7 ("net: dsa: Add
-  new binding implementation")
-- one for non-OF, introduced in 2017 in commit 71e0bbde0d88 ("net: dsa:
-  Add support for platform data")
-
-These are both complete rewrites of the original probing paths (which
-used struct dsa_switch_driver and other weird stuff, instead of regular
-devices on their respective buses for register access, like MDIO, SPI,
-I2C etc):
-- one for OF, introduced in 2013 in commit 5e95329b701c ("dsa: add
-  device tree bindings to register DSA switches")
-- one for non-OF, introduced in 2008 in commit 91da11f870f0 ("net:
-  Distributed Switch Architecture protocol support")
-
-except for tiny bits and pieces like dsa_dev_to_net_device() which were
-seemingly carried over since the original commit, and used to this day.
-
-The point is that the original probing paths received a fix in 2015 in
-the form of commit 679fb46c5785 ("net: dsa: Add missing master netdev
-dev_put() calls"), but the fix never made it into the "new" (dsa2)
-probing paths that can still be traced to today, and the fixed probing
-path was later deleted in 2019 in commit 93e86b3bc842 ("net: dsa: Remove
-legacy probing support").
-
-That is to say, the new probing paths were never quite correct in this
-area.
-
-The existence of the legacy probing support which was deleted in 2019
-explains why dsa_dev_to_net_device() returns a conduit with elevated
-refcount (because it was supposed to be released during
-dsa_remove_dst()). After the removal of the legacy code, the only user
-of dsa_dev_to_net_device() calls dev_put(conduit) immediately after this
-function returns. This pattern makes no sense today, and can only be
-interpreted historically to understand why dev_hold() was there in the
-first place.
-
-Change details
---------------
-
-Today we have a better netdev tracking infrastructure which we should
-use. Logically netdev_hold() belongs in common code
-(dsa_port_parse_cpu(), where dp->conduit is assigned), but there is a
-tradeoff to be made with the rtnl_lock() section which would become a
-bit too long if we did that - dsa_port_parse_cpu() also calls
-request_module(). So we duplicate a bit of logic in order for the
-callers of dsa_port_parse_cpu() to be the ones responsible of holding
-the conduit reference and releasing it on error. This shortens the
-rtnl_lock() section significantly.
-
-In the dsa_switch_probe() error path, dsa_switch_release_ports() will be
-called in a number of situations, one being where dsa_port_parse_cpu()
-maybe didn't get the chance to run at all (a different port failed
-earlier, etc). So we have to test for the conduit being NULL prior to
-calling netdev_put().
-
-There have still been so many transformations to the code since the
-blamed commits (rename master -> conduit, commit 0650bf52b31f ("net:
-dsa: be compatible with masters which unregister on shutdown")), that it
-only makes sense to fix the code using the best methods available today
-and see how it can be backported to stable later. I suspect the fix
-cannot even be backported to kernels which lack dsa_switch_shutdown(),
-and I suspect this is also maybe why the long-lived conduit reference
-didn't make it into the new DSA probing paths at the time (problems
-during shutdown).
-
-Because dsa_dev_to_net_device() has a single call site and has to be
-changed anyway, the logic was just absorbed into the non-OF
-dsa_port_parse().
-
-Tested on the ocelot/felix switch and on dsa_loop, both on the NXP
-LS1028A with CONFIG_DEBUG_KOBJECT_RELEASE=y.
-
-Reported-by: Ma Ke <make24@iscas.ac.cn>
-Closes: https://lore.kernel.org/netdev/20251214131204.4684-1-make24@iscas.ac.cn/
-Fixes: 83c0afaec7b7 ("net: dsa: Add new binding implementation")
-Fixes: 71e0bbde0d88 ("net: dsa: Add support for platform data")
-Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Link: https://patch.msgid.link/20251215150236.3931670-1-vladimir.oltean@nxp.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Robert Garcia <rob_garcia@163.com>
 ---
- include/net/dsa.h |  1 +
- net/dsa/dsa.c     | 59 +++++++++++++++++++++++++++--------------------
- 2 files changed, 35 insertions(+), 25 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 877f9b270cf6..a1f730d9f01b 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -296,6 +296,7 @@ struct dsa_port {
- 	struct devlink_port	devlink_port;
- 	struct phylink		*pl;
- 	struct phylink_config	pl_config;
-+	netdevice_tracker	conduit_tracker;
- 	struct dsa_lag		*lag;
- 	struct net_device	*hsr_dev;
- 
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 76a086e846c4..95f87e1f90af 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1246,14 +1246,25 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
- 	if (ethernet) {
- 		struct net_device *conduit;
- 		const char *user_protocol;
-+		int err;
- 
-+		rtnl_lock();
- 		conduit = of_find_net_device_by_node(ethernet);
- 		of_node_put(ethernet);
--		if (!conduit)
-+		if (!conduit) {
-+			rtnl_unlock();
- 			return -EPROBE_DEFER;
-+		}
-+
-+		netdev_hold(conduit, &dp->conduit_tracker, GFP_KERNEL);
-+		put_device(&conduit->dev);
-+		rtnl_unlock();
- 
- 		user_protocol = of_get_property(dn, "dsa-tag-protocol", NULL);
--		return dsa_port_parse_cpu(dp, conduit, user_protocol);
-+		err = dsa_port_parse_cpu(dp, conduit, user_protocol);
-+		if (err)
-+			netdev_put(conduit, &dp->conduit_tracker);
-+		return err;
- 	}
- 
- 	if (link)
-@@ -1386,37 +1397,30 @@ static struct device *dev_find_class(struct device *parent, char *class)
- 	return device_find_child(parent, class, dev_is_class);
- }
- 
--static struct net_device *dsa_dev_to_net_device(struct device *dev)
--{
--	struct device *d;
--
--	d = dev_find_class(dev, "net");
--	if (d != NULL) {
--		struct net_device *nd;
--
--		nd = to_net_dev(d);
--		dev_hold(nd);
--		put_device(d);
--
--		return nd;
--	}
--
--	return NULL;
--}
--
- static int dsa_port_parse(struct dsa_port *dp, const char *name,
- 			  struct device *dev)
- {
- 	if (!strcmp(name, "cpu")) {
- 		struct net_device *conduit;
-+		struct device *d;
-+		int err;
- 
--		conduit = dsa_dev_to_net_device(dev);
--		if (!conduit)
-+		rtnl_lock();
-+		d = dev_find_class(dev, "net");
-+		if (!d) {
-+			rtnl_unlock();
- 			return -EPROBE_DEFER;
-+		}
- 
--		dev_put(conduit);
-+		conduit = to_net_dev(d);
-+		netdev_hold(conduit, &dp->conduit_tracker, GFP_KERNEL);
-+		put_device(d);
-+		rtnl_unlock();
- 
--		return dsa_port_parse_cpu(dp, conduit, NULL);
-+		err = dsa_port_parse_cpu(dp, conduit, NULL);
-+		if (err)
-+			netdev_put(conduit, &dp->conduit_tracker);
-+		return err;
- 	}
- 
- 	if (!strcmp(name, "dsa"))
-@@ -1484,6 +1488,9 @@ static void dsa_switch_release_ports(struct dsa_switch *ds)
- 	struct dsa_vlan *v, *n;
- 
- 	dsa_switch_for_each_port_safe(dp, next, ds) {
-+		if (dsa_port_is_cpu(dp) && dp->conduit)
-+			netdev_put(dp->conduit, &dp->conduit_tracker);
-+
- 		/* These are either entries that upper layers lost track of
- 		 * (probably due to bugs), or installed through interfaces
- 		 * where one does not necessarily have to remove them, like
-@@ -1636,8 +1643,10 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
- 	/* Disconnect from further netdevice notifiers on the conduit,
- 	 * since netdev_uses_dsa() will now return false.
- 	 */
--	dsa_switch_for_each_cpu_port(dp, ds)
-+	dsa_switch_for_each_cpu_port(dp, ds) {
- 		dp->conduit->dsa_ptr = NULL;
-+		netdev_put(dp->conduit, &dp->conduit_tracker);
-+	}
- 
- 	rtnl_unlock();
- out:
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
