@@ -1,218 +1,150 @@
-Return-Path: <netdev+bounces-263077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKNLICGdpmlqRwAAu9opvQ
-	(envelope-from <netdev+bounces-263077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 09:34:41 +0100
+	id 2KnCFaaepmlqRwAAu9opvQ
+	(envelope-from <netdev+bounces-263078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 09:41:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 068E51EADB8
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 09:34:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4571EAE60
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 09:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 015633023066
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 08:34:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 279D6302F712
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 08:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C481538552F;
-	Tue,  3 Mar 2026 08:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AB3382398;
+	Tue,  3 Mar 2026 08:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTkOf/On"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aGQ3g/fy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151AE38756E
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 08:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB44387344
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 08:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772526853; cv=none; b=PKN9tcUxFG1ihTYP7iQdGLic7p47dYsgW2QCwFSnqjiGuJd5z9TcJteVgX4+W9YYiKkKuISlcZg0Sp7Fly7QkrIyu6uNF1QjHS23eqJ6CEAXGY3rKNkI9OOhJLNB/A0n/uy7LIuAw4nJhYN4zJFVeQNcYi5DOUuibrRsIQzMjm0=
+	t=1772527267; cv=none; b=YO0b80je6P/D/ndto0QgQ1m2bFfb6fMUXFPbx4bbCeS0pdiNlYnCNECOLyHLElmLmXYqCHhSHlMJSTxBKxlQRkwqdFg/5917QS+ZYmYpvgVk1DboBe3q7z9nNmOzHgUW6LNsqdFIKdVPrmzHwUP8mE0Cy9FN3bpsfpyDq+ksjtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772526853; c=relaxed/simple;
-	bh=28/2SD0zKnxVxONz58kqvH8l9p8IW3PnbEu16NUlN4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qHNRerxhLaDFJr5Xw/yk00q9yaRGX8cCpeaLYglwGaF2ZbILShf1IvqXAFWFUBnc6Z8rsECaFEBTSTzPkmUPa7vHtjBdsP5HAW4kLKohMn+dbMx7uHi+rfK3JfzkORHWk1hjMmO2o7sS1zwOn6k65z9gEJLRsvn9vv4JhdmETiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MTkOf/On; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772526851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oGGteXDhadojqghSFLLImSNgVRBGSngpOjwddhC7BTg=;
-	b=MTkOf/OnyUQCUFfQWjfoVyUKUI/wbAQeTJo/I3S7PHHimhLiPvgv1A1SvV8AuzKDHXtBUP
-	MEwXbcLJzhjFNFR5Zyvaz8suxPskhGrBUzK1i1cOTjrnco+6p2zpkH2M5mTBM3B3arx6ea
-	uUkqrKq9z8kufCiaE6n4pTc4N0gzjEY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-654-UHN8XmceNhG8w14WNhQxuw-1; Tue,
- 03 Mar 2026 03:34:08 -0500
-X-MC-Unique: UHN8XmceNhG8w14WNhQxuw-1
-X-Mimecast-MFC-AGG-ID: UHN8XmceNhG8w14WNhQxuw_1772526844
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 63C481956048;
-	Tue,  3 Mar 2026 08:34:04 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.134])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6964219560A2;
-	Tue,  3 Mar 2026 08:33:54 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: lucien.xin@gmail.com
-Cc: hepengtao@xiaomi.com,
-	kuba@kernel.org,
-	jlayton@kernel.org,
-	metze@samba.org,
-	davem@davemloft.net,
-	kernel-tls-handshake@lists.linux.dev,
-	horms@kernel.org,
-	hare@suse.de,
-	aahringo@redhat.com,
-	tfanelli@redhat.com,
-	mail@johnericson.me,
-	andrew.gospodarek@broadcom.com,
-	linkinjeon@kernel.org,
-	dhowells@redhat.com,
-	matttbe@kernel.org,
-	xiyou.wangcong@gmail.com,
-	dreibh@simula.no,
-	jbaron@akamai.com,
-	quic@lists.linux.dev,
-	pc@manguebit.com,
-	marc@fiuczynski.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	alibuda@linux.alibaba.com,
-	steved@redhat.com,
-	illiliti@protonmail.com,
-	tom@talpey.com,
-	marcelo.leitner@gmail.com,
-	sd@queasysnail.net,
-	linux-cifs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	mbuhl@openbsd.org,
-	smfrench@gmail.com,
-	chuck.lever@oracle.com,
-	daniel@haxx.se
-Subject: Re: [net-next,v10,15/15] quic: add packet parser base
-Date: Tue,  3 Mar 2026 09:33:51 +0100
-Message-ID: <20260303083351.35558-1-pabeni@redhat.com>
-In-Reply-To: <08a63705058aff77dd54fb388870f0bca6036c95.1771986861.git.lucien.xin@gmail.com>
-References: <08a63705058aff77dd54fb388870f0bca6036c95.1771986861.git.lucien.xin@gmail.com>
+	s=arc-20240116; t=1772527267; c=relaxed/simple;
+	bh=rT8Fkif7BqKMnIB2XsTOFaBhv6+TxHOx57ZE5yrK8tQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LXZcEnVLwaJlMYtKz/n55hyfkav/v2bMXvOL8FC3Aqntt0na83UDFtc19Q77PhrV0D37ccLUh+gRcVuLxmpslt+ODpn7XoDy3JBvsag2PiOVN02rcW+hU+Fk0UeRrykR48nPZnmrMir9ht8xkeQkY5fE4O+yZwcKiUCFPB8TyU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aGQ3g/fy; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Sd3HnYHwrvQfSw2yT41GkMgTViyo9N7uJ9ebYI1iadw=; b=aGQ3g/fyXF9zL8llOarDhmZx9X
+	e4atWgS0MEtKdWsyOCUifAXoQIRAfs1vFE3peXPk9u6VD/Axw4vlfA+r7OlD6WXMx+M0Suk6B8Q51
+	q60w1pR/jwJMSxFcAOg3Ew1xv3KZ/XB8Ej0LLgMiB4+y20mfjQSxVZ3Vhi1TrmGPZ5BjB2OIhmXYD
+	SXLN6TiPI01U8HO9EKex4FGwqFAwIWUy0KwovDTMkTZS/UE9gBpgqKMr58+XycWoYxttKRf8F/uty
+	m/2FDHlvqAZhrH98cQO92Gbve3v2VIk7zXRZf7e3jEZ4Yd8jUHmqfX8M9ZtAn5EEQD6+X1rGzly6v
+	U2ZGTNog==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49962)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vxLJG-000000004ta-3CiY;
+	Tue, 03 Mar 2026 08:40:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vxLJA-000000006nO-17VQ;
+	Tue, 03 Mar 2026 08:40:48 +0000
+Date: Tue, 3 Mar 2026 08:40:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kees Cook <kees@kernel.org>,
+	Michal Kubiak <michal.kubiak@intel.com>, Joe Damato <joe@dama.to>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Abdun Nihaal <abdun.nihaal@gmail.com>,
+	Breno Leitao <leitao@debian.org>
+Subject: Re: [PATCH net-next v3 1/9] net: ngbe: move the WOL functions to
+ libwx
+Message-ID: <aaaekLi5vE7Qid3O@shell.armlinux.org.uk>
+References: <20260303030331.24076-1-jiawenwu@trustnetic.com>
+ <20260303030331.24076-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: 068E51EADB8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260303030331.24076-2-jiawenwu@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: AC4571EAE60
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[xiaomi.com,kernel.org,samba.org,davemloft.net,lists.linux.dev,suse.de,redhat.com,johnericson.me,broadcom.com,gmail.com,simula.no,akamai.com,manguebit.com,fiuczynski.com,google.com,linux.alibaba.com,protonmail.com,talpey.com,queasysnail.net,vger.kernel.org,openbsd.org,oracle.com,haxx.se];
+	TAGGED_FROM(0.00)[bounces-263078-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,intel.com,dama.to,debian.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-263077-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[36];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-0.988];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.847];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-quic: add packet parser base
-
-This patch uses 'quic_packet' to handle packing of QUIC packets on the
-receive (RX) path. It introduces mechanisms to parse the ALPN from
-client Initial packets to determine the correct listener socket.
-Received packets are then routed and processed accordingly.
-
-> diff --git a/net/quic/packet.c b/net/quic/packet.c
-> index a56edc745bb1..a23ce99a6656 100644
-> --- a/net/quic/packet.c
-> +++ b/net/quic/packet.c
-
-[ ... ]
-
-> +/* Extract the Destination Connection ID (DCID) from a QUIC Long header packet. */
-> +int quic_packet_get_dcid(struct quic_conn_id *dcid, struct sk_buff *skb)
+On Tue, Mar 03, 2026 at 11:03:23AM +0800, Jiawen Wu wrote:
+> +int wx_set_wol(struct net_device *netdev,
+> +	       struct ethtool_wolinfo *wol)
 > +{
-> +	u32 plen = skb->len;
-> +	u8 *p = skb->data;
-> +	u64 len;
+> +	struct wx *wx = netdev_priv(netdev);
+> +	struct pci_dev *pdev = wx->pdev;
 > +
-> +	if (plen < QUIC_HLEN + QUIC_VERSION_LEN)
-> +		return -EINVAL;
-> +	plen -= (QUIC_HLEN + QUIC_VERSION_LEN);
-> +	p += (QUIC_HLEN + QUIC_VERSION_LEN);
+> +	if (!wx->wol_hw_supported)
+> +		return -EOPNOTSUPP;
 > +
-> +	if (!quic_get_int(&p, &plen, &len, 1) ||
-> +	    len > plen || len > QUIC_CONN_ID_MAX_LEN)
-> +		return -EINVAL;
-> +	quic_conn_id_update(dcid, p, len);
-> +	return 0;
-> +}
+> +	wx->wol = 0;
+> +	if (wol->wolopts & WAKE_MAGIC)
+> +		wx->wol = WX_PSR_WKUP_CTL_MAG;
+> +	netdev->ethtool->wol_enabled = !!(wx->wol);
 
-This parsing logic looks nearly identical to what's already in
-quic_packet_get_version_and_connid().  Both skip QUIC_HLEN +
-QUIC_VERSION_LEN, read the length byte, validate against
-QUIC_CONN_ID_MAX_LEN, and call quic_conn_id_update().
+Please see net/ethtool/ioctl.c::ethtool_set_wol() and
+net/ethtool/wol.c::ethnl_set_wol(). Both of these call your set_wol()
+method, and then if it was successful, sets
+netdev->ethtool->wol_enabled as appropriate. So whatever you do here
+will be overwritten by core code.
 
-Could quic_packet_get_dcid() call quic_packet_get_version_and_connid()
-with dummy parameters, or could both share a helper to extract just the
-DCID portion?
+Maybe an initial patch to remove this prior to moving the code would
+be a good idea?
 
-> diff --git a/net/quic/path.c b/net/quic/path.c
-> index 9414c4f813c5..655f38af4107 100644
-> --- a/net/quic/path.c
-> +++ b/net/quic/path.c
-> @@ -17,6 +17,8 @@
->  #include "family.h"
->  #include "path.h"
->
-> +extern int quic_packet_rcv(struct sock *sk, struct sk_buff *skb, u8 err);
-
-Could this include packet.h instead? The canonical declaration already
-exists in packet.h (after this patch). Using 'extern' here creates a
-duplicate signature.
-
-If the signature in packet.h changes later, this extern could silently
-become stale depending on calling conventions. Since packet.h has no
-include directives and wouldn't create a circular dependency, including
-it would keep the declaration in sync.
-
-> +
->  static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
->  {
->  	memset(skb->cb, 0, sizeof(skb->cb));
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
