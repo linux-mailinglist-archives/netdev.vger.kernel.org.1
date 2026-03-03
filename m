@@ -1,173 +1,171 @@
-Return-Path: <netdev+bounces-263237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOdQIJHypmkzawAAu9opvQ
-	(envelope-from <netdev+bounces-263237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:39:13 +0100
+	id SKpMEVXypmmSagAAu9opvQ
+	(envelope-from <netdev+bounces-263238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:38:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 458431F1A3E
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:39:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081451F1A0B
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7E5030162B7
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:34:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 724AF30022F9
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6F93E51E4;
-	Tue,  3 Mar 2026 14:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DCA3CB2F8;
+	Tue,  3 Mar 2026 14:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="KIHyNZF9"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD731374197
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 14:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB6935CB70;
+	Tue,  3 Mar 2026 14:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772548457; cv=none; b=fJ1GHE1GRIis3x+XI0Nh48EOV/LPWh8FHg63hTF3LkZ+o4xJ/ioocokvzY3J0Bvd0yWQ94WYoYxFoyvorgQhdvQUJ05EySu5KF5vLjUE+td9wjW9DkhzSfY6F3e53mtYBZZb0vu2BjqPemcSDroYUEQ2efw657N4LKjC68MMP5E=
+	t=1772548691; cv=none; b=lgQ7KbCrTJ7CwpTTTLqqgOFdoITx0p4UU1Spdzk6/98UJK8cVQNVqjMckOrhtElP/0nfjfiYFrgoG9Li9cro4QH2RXDZoVStvfGUv5qrwIQcO/h9GqIpQ+uZVr4YrtImWY45Hr/YVhlKwuS7frCE8ealMJkBAnMIokBWPqlJmak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772548457; c=relaxed/simple;
-	bh=FUhXqTSNIMEp8iaYn8OBWSOCIM/X7x4hwk5d9Rx1uCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKxoYU+pqMO2ZHzIOwchQvhN+wDloVDQH3PvmszuzVcTvlewkG795isB5iryOXaE+8UTbmYKu76/8XfOLTjOrKAYePPtnRBSd7+/BzahgXPiAvkB5JqmB4uvnEYgnFxw6ki4tLR4U6wj/g2bCCvje3YUHvHF+Unf7u8NTfnVn6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vxQoz-0000xn-LC; Tue, 03 Mar 2026 15:34:01 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vxQox-003YuD-0E;
-	Tue, 03 Mar 2026 15:34:00 +0100
-Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 213AD4F696F;
-	Tue, 03 Mar 2026 14:34:00 +0000 (UTC)
-Date: Tue, 3 Mar 2026 15:33:59 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	linux-can@vger.kernel.org, kernel@pengutronix.de, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Vincent Mailhol <mailhol@kernel.org>, stable@kernel.org
-Subject: Re: [PATCH net 05/12] can: ems_usb: ems_usb_read_bulk_callback():
- check the proper length of a message
-Message-ID: <20260303-independent-fair-bullmastiff-d8a994-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260302152755.1700177-1-mkl@pengutronix.de>
- <20260302152755.1700177-6-mkl@pengutronix.de>
- <7c39c1dd-dd49-4847-9238-d6cf147598da@redhat.com>
+	s=arc-20240116; t=1772548691; c=relaxed/simple;
+	bh=C8/PO83Q2Din2/lr3WwejMQpaaI7Juh5iQMzPDJxdz4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mEpfIfyz5V/NPfneoWJGJOjCVfEZYN5L0x8QskVZcp7BqpdsdvKz7YwnSueEQ7sj/Lu/JZcAtnFPqIRaoGrPkuKz7qCmJuAO3p7KilFRv1y2YoEGiinrPsQNC0A8GDakuf19u7vIQHy0maNVUbcwWQhLI6agbZrunRSnpUxegEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=KIHyNZF9; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772548689; x=1804084689;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MpS4sVC3hqe8pCkVdEGIPoy6oo+rArp6AEF/WIq0eFU=;
+  b=KIHyNZF9wru8tnbHQfuyeIA6xDuzMZmugwn1ml+fNWzOySTcseTDpqtb
+   IE44jaKFZ7+jXUc0dwWBAxrHuWW4ZhDC4ToBiDI0CrWkeyk6644bhw8OQ
+   NsY7cE4Fm1GtkzjRLlZF+tpmixP+XqFE3fuhqkCVw0CrX51BOhMOrQW9y
+   Wq/bUfJtJ8SVySKxgH3tRJsDvTHgWK+PcvGqKjyjOpgBX1aSUq6xUb1NO
+   FYCsSnZ9fMb9WFy/Wst7Z/9pIhI2+DDEP1To5bfPXR5MvUysef44p8lFx
+   js7p5cHIRp2aHvqb3Oa78oR9N2dLwuSeYcRn1jbPaANsZEZCx+nZg6FPk
+   g==;
+X-CSE-ConnectionGUID: hEvhgFTESEKkBaKofoRIqA==
+X-CSE-MsgGUID: E94225xzTNSH15MhaFZTRA==
+X-IronPort-AV: E=Sophos;i="6.21,322,1763424000"; 
+   d="scan'208";a="14070024"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 14:38:09 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:26174]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.67:2525] with esmtp (Farcaster)
+ id 63560b5f-7e28-490b-8e43-a2241f2b96ce; Tue, 3 Mar 2026 14:38:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 63560b5f-7e28-490b-8e43-a2241f2b96ce
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 3 Mar 2026 14:38:09 +0000
+Received: from 6c7e67c92ceb.amazon.com (10.106.178.6) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 3 Mar 2026 14:38:07 +0000
+From: Nathan Gao <zcgao@amazon.com>
+To: <stable@vger.kernel.org>
+CC: <gregkh@linuxfoundation.org>, <sashal@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<shuah@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<ap420073@gmail.com>, <zcgao@amazon.com>
+Subject: [PATCH 6.1.y] Revert "selftests: net: amt: wait longer for connection before sending packets"
+Date: Tue, 3 Mar 2026 06:37:50 -0800
+Message-ID: <20260303143750.57741-1-zcgao@amazon.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dcotyxahcferzui3"
-Content-Disposition: inline
-In-Reply-To: <7c39c1dd-dd49-4847-9238-d6cf147598da@redhat.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 458431F1A3E
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Rspamd-Queue-Id: 081451F1A0B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.56 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263237-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.852];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_DKIM_NA(0.00)[];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com,amazon.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263238-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zcgao@amazon.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	NEURAL_HAM(-0.00)[-0.991];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
+This reverts commit 7724036d4804222007689cd69f248347eb154793 which is
+commit 04708606fd7bdc34b69089a4ff848ff36d7088f9 upstream.
 
---dcotyxahcferzui3
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net 05/12] can: ems_usb: ems_usb_read_bulk_callback():
- check the proper length of a message
-MIME-Version: 1.0
+The reverted patch introduced dependency on lib.sh under net selftests.
+The file was introduced in v6.8-rc1 via commit 25ae948b4478
+("selftests/net: add lib.sh").
 
-On 03.03.2026 15:20:01, Paolo Abeni wrote:
-> AI noticed the following:
-> ---
-> Does the check validate enough of the message? The code checks that the
-> 11-byte header (CPC_MSG_HEADER_LEN) fits in the buffer, but
-> ems_usb_rx_can_msg() and ems_usb_rx_err() both access fields in the
-> msg->msg union payload starting at offset 11.
->
-> For example, ems_usb_rx_can_msg() reads:
-> - msg->msg.can_msg.id (4 bytes at offset 11)
-> - msg->msg.can_msg.length (1 byte at offset 15)
-> - msg->msg.can_msg.msg[i] (up to 8 bytes at offset 16)
->
-> Similarly, ems_usb_rx_err() reads:
-> - msg->msg.can_state (1 byte at offset 11)
-> - msg->msg.error.cc.regs.sja1000.{ecc,txerr,rxerr} (3 bytes at offset 11+)
->
-> A malicious USB device could send a packet where actual_length equals
-> CPC_HEADER_SIZE + CPC_MSG_HEADER_LEN (15 bytes total), which would pass
-> this check but provide zero payload bytes. The callees would then read
-> beyond the received buffer before reaching the second check at the end
-> of the loop.
->
-> Should the validation check that both the header and payload
-> (msg->length bytes) fit within actual_length before calling the
-> processing functions?
-> ---
-> I guess this patch could need a follow-up? Not blocking the PR, as
-> AFAICS worst case this patch still improves the current situation.
+Without lib.sh, the amt test fails with:
+./amt.sh: line 76: source: lib.sh: file not found
 
-Yes, Greg said he'll look into this
+The whole history of lib.sh includes about 50 commits and considering
+the file never landed on 6.1 it may be better to not introduce it.
 
-| https://lore.kernel.org/all/2026030253-lather-pulse-3bb5@gregkh/
+Signed-off-by: Nathan Gao <zcgao@amazon.com>
+---
+ tools/testing/selftests/net/amt.sh | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Marc
+diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+index ea40b469a8c1..7e7ed6c558da 100755
+--- a/tools/testing/selftests/net/amt.sh
++++ b/tools/testing/selftests/net/amt.sh
+@@ -73,8 +73,6 @@
+ #       +------------------------+
+ #==============================================================================
+ 
+-source lib.sh
+-
+ readonly LISTENER=$(mktemp -u listener-XXXXXXXX)
+ readonly GATEWAY=$(mktemp -u gateway-XXXXXXXX)
+ readonly RELAY=$(mktemp -u relay-XXXXXXXX)
+@@ -242,15 +240,14 @@ test_ipv6_forward()
+ 
+ send_mcast4()
+ {
+-	sleep 5
+-	wait_local_port_listen ${LISTENER} 4000 udp
++	sleep 2
+ 	ip netns exec "${SOURCE}" bash -c \
+ 		'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
+ }
+ 
+ send_mcast6()
+ {
+-	wait_local_port_listen ${LISTENER} 6000 udp
++	sleep 2
+ 	ip netns exec "${SOURCE}" bash -c \
+ 		'printf "%s %128s" 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6000' &
+ }
+-- 
+2.47.3
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---dcotyxahcferzui3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCaabxVQAKCRDMOmT6rpmt
-0nhJAP9HVgQ5h+hdpOg4OLZ+pCb6wosQZm+cqIlVtwwjBktXegEAzH6QhssQ7+lu
-y4eZx9nPL+PPtGe7/uYimKWiO+Ft8As=
-=S/L9
------END PGP SIGNATURE-----
-
---dcotyxahcferzui3--
 
