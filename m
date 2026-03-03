@@ -1,211 +1,287 @@
-Return-Path: <netdev+bounces-263336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHE7At4Wp2m+dgAAu9opvQ
-	(envelope-from <netdev+bounces-263336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:14:06 +0100
+	id yJp3DJQYp2m+dgAAu9opvQ
+	(envelope-from <netdev+bounces-263338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:21:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765A81F478D
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:14:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAEE01F48D9
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A33D3053B17
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:10:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 515F630A7A41
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA8439A070;
-	Tue,  3 Mar 2026 17:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305E84F799F;
+	Tue,  3 Mar 2026 17:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="drYu3bfS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vxCb4xzZ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="drYu3bfS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vxCb4xzZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dwtx7drr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C1D3C6A52
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 17:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0296F183CC3;
+	Tue,  3 Mar 2026 17:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772557851; cv=none; b=IAoDHPEtzVJOvduokQihlOD4/YhNMNEph6NJmHb7DkIfEGd7aEt1GvpcOLBCYfmuzQu2EsW9c50fVZB0srUDufhslMj+F6zVTIfWdoLirQdFqLza8BrbTLscUUizeeS7TEygiacmLy84hYeP76Sj5m+N8CPrC4q0WSLDS8Gi7SM=
+	t=1772558399; cv=none; b=ekt/cX3B2w7to1gVz8JshD1eK1rXumHZMeOqt03TBoNVtJ/iBLHSLfOc6m/AMnyfV/dIkGCVRAg5NJqSkn6h0dw7gYXqD2AD3S/l+lfvoqLqI1fVX2ZK6UjRhqbEBVzxxRI/5E/p6srCysp9z81lQ8tCsolpuyBm0qz1KcuNeYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772557851; c=relaxed/simple;
-	bh=7wTA9xJOLOuwDtmCxCv1/Dc/z66aABMCxSIvnXNrocI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QoIhhy4OGgPZY0anhY9YL6CIAZVfgYx/C1NoEwYJosaTZi9FkboeXmpNXHAJ209dukgKxrOnEP4J1BXZf7zf4sXybufnG6mVMQxXjuyIQm57AbdogNWQvcWkhO0smyRsmLDsfG9GuLcPC8xHrFQYgDVSJEKI2DFBPfoD2zjBeFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=drYu3bfS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vxCb4xzZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=drYu3bfS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vxCb4xzZ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C47FA5BE14;
-	Tue,  3 Mar 2026 17:10:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772557848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=QKE+VJAg7cCUYPsawCi89DA318H5LyXeeJGiKPF2EeE=;
-	b=drYu3bfSscJgGOgZMZWYzgJ/WksUyTMNhsn6yccwtf246ePLqbVxnUr6O/vMCoYouKjTUb
-	YJFkMiXxDh+/ltGRsdojnkYNYgydZX/t3k83CiQtCxt/LCM8A6x4s2UbWX2nDqb9F/+qYC
-	LMG+KJ0EDJqbBJiQwbWzMA0gsTtZm/k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772557848;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=QKE+VJAg7cCUYPsawCi89DA318H5LyXeeJGiKPF2EeE=;
-	b=vxCb4xzZ6O7b1cHK7o7w8HIX8cTbPc1IrVBh971diA1rt3O0QEFxv5CSt7q1zk9//ZzxCR
-	7EmJ8OocbLX2g2Cw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772557848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=QKE+VJAg7cCUYPsawCi89DA318H5LyXeeJGiKPF2EeE=;
-	b=drYu3bfSscJgGOgZMZWYzgJ/WksUyTMNhsn6yccwtf246ePLqbVxnUr6O/vMCoYouKjTUb
-	YJFkMiXxDh+/ltGRsdojnkYNYgydZX/t3k83CiQtCxt/LCM8A6x4s2UbWX2nDqb9F/+qYC
-	LMG+KJ0EDJqbBJiQwbWzMA0gsTtZm/k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772557848;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=QKE+VJAg7cCUYPsawCi89DA318H5LyXeeJGiKPF2EeE=;
-	b=vxCb4xzZ6O7b1cHK7o7w8HIX8cTbPc1IrVBh971diA1rt3O0QEFxv5CSt7q1zk9//ZzxCR
-	7EmJ8OocbLX2g2Cw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1C44D3EA69;
-	Tue,  3 Mar 2026 17:10:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Z7koAxgWp2kgPQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 03 Mar 2026 17:10:48 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: chopps@labn.net,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	steffen.klassert@secunet.com,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	Hao Long <me@imlonghao.com>
-Subject: [PATCH ipsec] xfrm: iptfs: fix skb_put() panic on non-linear skb during reassembly
-Date: Tue,  3 Mar 2026 18:10:29 +0100
-Message-ID: <20260303171029.4072-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772558399; c=relaxed/simple;
+	bh=zqFmimCwr8ga6Oi8betk9+WgAjdJVqsFjZR3BnaMo9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FJU8ArEJePyNj+In/zTSMkguXn8P07VS/hU7wdxw6MlQMyc9QfsgtJuqIW20UmcaoIGDRaAuR50r5mSTAK4KFGZIVSUriaI6iZLNafZ7c+NIgxX2ltwSRhDBUxGjSa1ADJ6qzmojwjvVHtaDsPXeh6bfBEa96ACTFGlg5sg5JyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Dwtx7drr; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Tao3d1V6YUWjQGbciieZF7tZIWM4RPJQYZqAieQGxVw=; b=Dwtx7drrLMoXnL7AZ4mDDb+Dr1
+	pHpHIG972dhLGyxzFcAQx+NudbFIcurMxKVq97sQTr1lhz5PGW3hew2GVT9QoeCbheZzl/O82STLK
+	vg8zfOueGsejINU32tZqwfKdGcdQbjZuH93Vwz2pTaPZIsUFcvRc5p4xprv+YZmZa41AUiirVclTo
+	qxIIHl6PoQ8QMH4z3vU3H3gUflIy+NEXbLJEmvYHKdxOjT+/NqRvilsvA6ZnM/G8lcC5UPT2gBhSW
+	z8jZyRc6CCB7fazc1OBmrw5oOtDAXe2WSm0mby/ncmsCi8bS24bckEVTfiMaEfIq2JCGnv34ZS2p+
+	wh5wZg3A==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vxTOA-0000000BrGK-29fG;
+	Tue, 03 Mar 2026 17:18:30 +0000
+Date: Tue, 3 Mar 2026 17:18:30 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, Theodore Tso <tytso@mit.edu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Yangtao Li <frank.li@vivo.com>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>,
+	Joerg Reuter <jreuter@yaina.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+	autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+	ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
+	audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v2 001/110] vfs: introduce kino_t typedef and PRIino
+ format macro
+Message-ID: <aacX5metux-C_xBw@casper.infradead.org>
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+ <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
+ <20260303012556.GA6520@macsyma-wired.lan>
+ <20260303042546.GF13868@frogsfrogsfrogs>
+ <33228005140684201de2ca0c157441d3b6a06413.camel@kernel.org>
+ <aabkBadGzo7IZpSU@infradead.org>
+ <19e4e79a59dcfc4c61c8cf263af345d0d7026fc8.camel@kernel.org>
+ <aabpPQxCTweoTp8Z@infradead.org>
+ <1310fc5c09cce52ec00344b936275fe584c88dea.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 765A81F478D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1310fc5c09cce52ec00344b936275fe584c88dea.camel@kernel.org>
+X-Rspamd-Queue-Id: CAEE01F48D9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263336-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[infradead.org,kernel.org,mit.edu,zeniv.linux.org.uk,suse.cz,goodmis.org,efficios.com,intel.com,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,telemann.coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.
+ linaro.org];
+	TAGGED_FROM(0.00)[bounces-263338-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[171];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willy@infradead.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,imlonghao.com:email]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,casper.infradead.org:mid]
 X-Rspamd-Action: no action
 
-In iptfs_reassem_cont(), IP-TFS attempts to append data to the new inner
-packet 'newskb' that is being reassembled. First a zero-copy approach is
-tried if it succeeds then newskb becomes non-linear.
+On Tue, Mar 03, 2026 at 09:19:42AM -0500, Jeff Layton wrote:
+> There are really only three options here:
+> 
+> 1/ Do (almost) all of the changes in one giant patch
+> 
+> 2/ Accept that the build may break during the interim stages
+> 
+> 3/ This series: using a typedef and macro to work around the breakage
+> until the type can be changed, at the expense of some extra churn in
+> the codebase
 
-When a subsequent fragment in the same datagram does not meet the
-fast-path conditions, a memory copy is performed. It calls skb_put() to
-append the data and as newskb is non-linear it triggers
-SKB_LINEAR_ASSERT check.
+4/ Don't do anything, drop the patch series (I'm not in favour of this,
+but it is an option)
 
- Oops: invalid opcode: 0000 [#1] SMP NOPTI
- [...]
- RIP: 0010:skb_put+0x3c/0x40
- [...]
- Call Trace:
-  <IRQ>
-  iptfs_reassem_cont+0x1ab/0x5e0 [xfrm_iptfs]
-  iptfs_input_ordered+0x2af/0x380 [xfrm_iptfs]
-  iptfs_input+0x122/0x3e0 [xfrm_iptfs]
-  xfrm_input+0x91e/0x1a50
-  xfrm4_esp_rcv+0x3a/0x110
-  ip_protocol_deliver_rcu+0x1d7/0x1f0
-  ip_local_deliver_finish+0xbe/0x1e0
-  __netif_receive_skb_core.constprop.0+0xb56/0x1120
-  __netif_receive_skb_list_core+0x133/0x2b0
-  netif_receive_skb_list_internal+0x1ff/0x3f0
-  napi_complete_done+0x81/0x220
-  virtnet_poll+0x9d6/0x116e [virtio_net]
-  __napi_poll.constprop.0+0x2b/0x270
-  net_rx_action+0x162/0x360
-  handle_softirqs+0xdc/0x510
-  __irq_exit_rcu+0xe7/0x110
-  irq_exit_rcu+0xe/0x20
-  common_interrupt+0x85/0xa0
-  </IRQ>
-  <TASK>
+5/ Do the conversion(s) _once_ per filesystem.  Here's one way to do
+it:
 
-Fix this by checking if the skb is non-linear. If it is, linearize it by
-calling skb_linearize(). As the initial allocation of newskb originally
-reserved enough tailroom for the entire reassembled packet we do not
-need to check if we have enough tailroom or extend it.
+-	unsigned long           i_ino;
++	union {
++		u64 i_ino64;
++		struct {
++#if defined(CONFIG_64BIT)
++			unsigned long i_ino;
++#elif defined(CONFIG_CPU_BIG_ENDIAN)
++			unsigned long i_ino;
++			unsigned long i_ino_pad;
++#else
++			unsigned long i_ino_pad;
++			unsigned long i_ino;
++#endif
++		};
++	};
 
-Fixes: 075694765446 ("xfrm: iptfs: handle received fragmented inner packets")
-Reported-by: Hao Long <me@imlonghao.com>
-Closes: https://lore.kernel.org/netdev/DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com/
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
- net/xfrm/xfrm_iptfs.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+[...]
+#define i_ino(inode)	(inode)->i_ino64
 
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 050a82101ca5..4d1a84a6fc45 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -901,6 +901,12 @@ static u32 iptfs_reassem_cont(struct xfrm_iptfs_data *xtfs, u64 seq,
- 	    iptfs_skb_can_add_frags(newskb, fragwalk, data, copylen)) {
- 		iptfs_skb_add_frags(newskb, fragwalk, data, copylen);
- 	} else {
-+		if (skb_is_nonlinear(newskb) && skb_linearize(newskb)) {
-+			XFRM_INC_STATS(xs_net(xtfs->x),
-+				       LINUX_MIB_XFRMINBUFFERERROR);
-+			goto abandon;
-+		}
-+
- 		/* copy fragment data into newskb */
- 		if (skb_copy_seq_read(st, data, skb_put(newskb, copylen),
- 				      copylen)) {
--- 
-2.53.0
+So that's patch one.  All plain references to i_ino access the lower
+bits of i_ino64, so everything will continue to work as it does today.
 
+Once you've got the VFS core in shape, you can convert filesystems one
+at a time to use i_ino(inode).  Once you're done you can delete the
+scaffolding from the core and go back to calling i_ino64 just i_ino.
+You could delete the i_ino() uses from filesystems at that point, but
+why bother?
+
+I'm sure there are other ways to do it, this is just the one I came up
+with.  But for the love of god stop spamming hundreds of people on the
+cc of this patchset.  In fact, take me off for next time -- I get each
+one of these fucking patches four times.
 
