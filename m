@@ -1,288 +1,366 @@
-Return-Path: <netdev+bounces-263243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEnoKXb2pmmgawAAu9opvQ
-	(envelope-from <netdev+bounces-263243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:55:50 +0100
+	id CCSzG873pmmgawAAu9opvQ
+	(envelope-from <netdev+bounces-263252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:01:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8C31F1DC1
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:55:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07CF01F1F08
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:01:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E14A43022FA0
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:51:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFB4630810B7
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279543E95AC;
-	Tue,  3 Mar 2026 14:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F2A47DFBE;
+	Tue,  3 Mar 2026 14:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fxn+FZQL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWFnVb+S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96728374E76
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 14:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B35247DD7C;
+	Tue,  3 Mar 2026 14:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772549497; cv=none; b=tT24VQWdxvTqnxE0j4zJXnIkjhxt3WBvolfciPl7Jjj55lAuU6dRRSpg/ZM4GJnGpnEArdqVoXX2IPQcUmD1LOff0LYwJGsMyTjl0bBhFoht8IymXyTm/zucLX390D8NYZWs9oZ3x58Wh+kDl4vhPg/+vdeAF/B73wdAy2vKRyE=
+	t=1772549594; cv=none; b=Wg7FYIxkiyGoB1tIXigReYOeNJeOxJuDr7Xe8E0u8ULrPfdqM+YmFkQvPwRrZC5XBD21eoGhObIgGyMvQtjf6iZdMgwZnKbO1Vx0yU+ALlrINJ3cnXgJFrTtPq0BL5+UkkMXr3xHkSFKP3mCByMYf4tPPFjV/W9Nt1iuE3dTuJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772549497; c=relaxed/simple;
-	bh=6KdAnhQrt+OtDqhpU53NGZUuv8Yx4CgsDTHUa/zHqBk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=raJuATY4lmbSzgFmpwR9acxZaeyP27jHBqnv+NiSCKljq4mNww3epI3656x1NXuzNpkoAZg4a7eRxSi1M2+43a/IYlyyOoVpGlLfiqG9rVwqs87URP6GwerUXfnM67qVCPuPnzFLeb8KOdXMia8N/zuwfkAwaivu6pRvImdKi/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fxn+FZQL; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48378e60742so6739685e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 06:51:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772549494; x=1773154294; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YEdSGTNZRnrKg7rdXD/O1fVlFTgm/leciP0nfy91AHw=;
-        b=Fxn+FZQLFum5I9kK2LgMpQYThU8VFT5GBrKHN9e7zDdip3HjkfW7TJLoqb7c94suR1
-         vRyZouXtlvhHZZev4l6lbSO8NzOnwLqALP4KsNb9w9YAVIlD8eKz87Xx5F3BVA2U8SpM
-         AnYUmyLikjEn8UpEQ8veuFeD6NJzYxenbCzZi6DnLOpngFHqF8FBCuNDNbuZwCo4OYTS
-         qDEraDAceAx2DEUvdKPybUdGB49WPIyc8V5cjebf0z4wgefqMPKW4y/P7gsyyBAhxWtN
-         hgNXqP2Ff1qT5OOrmN8VE41aNq1FCR8Qy02752JKbvxlErGVqR2rWBGY3n55um7wVkuw
-         5qLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772549494; x=1773154294;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YEdSGTNZRnrKg7rdXD/O1fVlFTgm/leciP0nfy91AHw=;
-        b=hrsKyC2OS3qdDpqg9w7wHJOdJOjWR9RxPXSyY5+IT+hvwn5XIuTyVLBVW0PRaLuQST
-         lnm7Wf83vvLTVNiQRex5m4vXLHZONNLEyktSTVqAmIElWN6gQ5rZvlvlValX2VeHtOFm
-         xE36n2drCUF9vycYSa5DYUbz9xDHRfY/hAbKmQy82J9wgYIJ50xyS4qPhHCOAd7dhha5
-         RKqEW8wGH7g2/zKMaOo/V9FH3nG9HK5apaaBSveNCkehf3FVVUjwOTlIKaz0CfLqIhe7
-         gbN4fmpVIclni0e6Noe7LK2TVxrCJn3mxLkj65398WS4PBqob+hX+v8HffppTF+f6ZEA
-         rf1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVjLwz/YSFrCscrQe9R0mhdSW/9RAkrssypPEPGMzM6RHEmGHn3yIw0p7xKHw89Jv5dZqzNz+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvl2WRBTS+P3G3yXuBJlhAmfpss/XJQ8rWh4iqXgSYWNwvdK8s
-	oE+0OvGr+AZ7weAKcN4oXpdW3Nka3uhwMIThDk0FDERcGFoNdWORNAHF
-X-Gm-Gg: ATEYQzyB49mzVW2sTMBqA+VyYrIPgMAAhJESKR5N6arN1QH1Kr2mMLZLfDqnCscC3Ck
-	pTIKsDI35vgYNmuSmdvM9U4Wp1hQrM4UGiAbOkPU1d4o2IrAl3powVdYsZNFCCqn/Ovag79jddJ
-	FjxP1AnmwNAEveGLc0por6Q2SkpOpwZCAA6FH80jlnOP45y6NObs3RUZjiQ40/Ywc+/n6SFLE4J
-	LZtm4mmjZ98nY9XhoSGCYGDGy8xFkfyfHYjVsQltV/2Mre9JNW4bozhd5JNJborhkRvC+MAliZI
-	9/0wRM7/UVe8JpOIO1FEqlNp2BhDA05wbjIkoubzbpZW3JWAqoCoCjoQjk3kLnwFJqwbIvZI6QG
-	GePM5Zjz/97zz7uK657kcCktlYqNCVD5MHm2K7eJpfTVigaWeGz/klUxAq1RNjbgrqNpSzAteNp
-	8UJEh6H2dy9miLjKE=
-X-Received: by 2002:a05:600c:3542:b0:477:5b01:7d42 with SMTP id 5b1f17b1804b1-483c9bc3f6bmr156313945e9.5.1772549493842;
-        Tue, 03 Mar 2026 06:51:33 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d00e:3600:2472:8e4a:cf12:bb30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483c3b84023sm356468875e9.12.2026.03.03.06.51.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 06:51:33 -0800 (PST)
-Date: Tue, 3 Mar 2026 16:51:30 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jens Emil Schulz =?utf-8?Q?=C3=98stergaard?= <jensemil.schulzostergaard@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 5/8] net: dsa: lan9645x: add bridge support
-Message-ID: <20260303145130.rbp3qycr3eh5ifcp@skbuf>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-5-bff8ca1396f5@microchip.com>
+	s=arc-20240116; t=1772549594; c=relaxed/simple;
+	bh=mPB+8jSnehbEHKBNReaI36+tVxnO/gz5hMo6CDtR1vU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JY949EHxhGh5rrgkp7RhEVZwOMaPfDBjIlm2tx6a/sKzvySqvxSxobuLYRJZeAEear/Wn6EsHM/7SoR1zOCa/EY/iRQv2C9Ei0yomOlIDFYn66NIZ2+/yTphAfnDeVexSRmMb9jm9qf0j7UH+/sBYurAOkylpR5PRqL3qC7WEAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWFnVb+S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D73C19422;
+	Tue,  3 Mar 2026 14:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772549594;
+	bh=mPB+8jSnehbEHKBNReaI36+tVxnO/gz5hMo6CDtR1vU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IWFnVb+SAOFAW6k2lmD7xM2MmjXDlaKtuLQfi1BOXrrQ730APm7WOFiF67wuUnc++
+	 EGSzMenoInTEUWIO7CSSf/bFBl4ZeUXZjL85avoqiMtQK/oSff46KbycV28M9WkDvY
+	 XUnahFU9ulGTN30W+mMw/EMqmtkIduKav8WJUB/2TDsOz+bW+urOzRV9Fi1DNqM4ee
+	 y8ZD8ab8w73Luic7Ff60S0bNdLT8kqI7mAwcYvulxf5n9Crzb9z2+s2S3vi5j4rpkZ
+	 kPzV3aBM8fN2nX5iOYorO3X9cnpTBIe8tlimk92fP+EUrdxUrMwniVlPpd88G7WOWL
+	 5SvNPVQd6C1oA==
+Received: from localhost ([::1])
+	by mail.kernel.org with esmtp (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vxR7W-00000007JR5-48Lo;
+	Tue, 03 Mar 2026 15:53:11 +0100
+Date: Tue, 3 Mar 2026 15:53:10 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Jonathan Corbet
+ <corbet@lwn.net>, Kees Cook <kees@kernel.org>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, intel-wired-lan@lists.osuosl.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH 00/38] docs: several improvements to kernel-doc
+Message-ID: <20260303155310.5235b367@localhost>
+In-Reply-To: <33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+References: <cover.1771408406.git.mchehab+huawei@kernel.org>
+	<33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260303-dsa_lan9645x_switch_driver_base-v1-5-bff8ca1396f5@microchip.com>
-X-Rspamd-Queue-Id: 0D8C31F1DC1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 07CF01F1F08
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263243-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-263252-lists,netdev=lfdr.de,huawei];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,python.org:url]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 01:22:31PM +0100, Jens Emil Schulz Østergaard wrote:
-> Add support for hardware offloading of the bridge. We support a single
-> bridge device.
+On Mon, 23 Feb 2026 15:47:00 +0200
+Jani Nikula <jani.nikula@linux.intel.com> wrote:
+
+> On Wed, 18 Feb 2026, Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> > As anyone that worked before with kernel-doc are aware, using regex to
+> > handle C input is not great. Instead, we need something closer to how
+> > C statements and declarations are handled.
+> >
+> > Yet, to avoid breaking  docs, I avoided touching the regex-based algorithms
+> > inside it with one exception: struct_group logic was using very complex
+> > regexes that are incompatible with Python internal "re" module.
+> >
+> > So, I came up with a different approach: NestedMatch. The logic inside
+> > it is meant to properly handle brackets, square brackets and parenthesis,
+> > which is closer to what C lexical parser does. On that time, I added
+> > a TODO about the need to extend that.  
 > 
-> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
-> ---
->  drivers/net/dsa/microchip/lan9645x/lan9645x_main.c | 196 +++++++++++++++++++++
->  drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  11 ++
->  drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |   2 +
->  3 files changed, 209 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> index 739013f049d0..b6efaf669a3f 100644
-> --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> @@ -171,6 +171,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
->  		return err;
->  	}
->  
-> +	mutex_init(&lan9645x->fwd_domain_lock);
-> +
->  	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
->  	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
->  	       ANA_AGGR_CFG_AC_DMAC_ENA,
-> @@ -288,6 +290,192 @@ static void lan9645x_port_phylink_get_caps(struct dsa_switch *ds, int port,
->  	lan9645x_phylink_get_caps(ds->priv, port, config);
->  }
->  
-> +static int lan9645x_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-> +{
-> +	u32 age_secs = max(1, msecs / 1000 / 2);
+> There's always the question, if you're putting a lot of effort into
+> making kernel-doc closer to an actual C parser, why not put all that
+> effort into using and adapting to, you know, an actual C parser?
 
-s/1000/MSEC_PER_SEC/
+Playing with this idea, it is not that hard to write an actual C
+parser - or at least a tokenizer. There is already an example of it
+at:
 
-> +	struct lan9645x *lan9645x = ds->priv;
-> +
-> +	/* Entry is must suffer two aging scans before it is removed, so an
+	https://docs.python.org/3/library/re.html
 
-"An entry must suffer (...), so it is aged"
+I did a quick implementation, and it seems to be able to do its job:
 
-> +	 * entry is aged after 2*AGE_PERIOD, and the unit is in seconds.
-> +	 * An age period of 0 disables automatic aging.
-> +	 */
-> +	lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(age_secs),
-> +		ANA_AUTOAGE_AGE_PERIOD,
-> +		lan9645x, ANA_AUTOAGE);
-> +	return 0;
-> +}
-> +
-> +static int lan9645x_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-> +					  struct switchdev_brport_flags flags,
-> +					  struct netlink_ext_ack *extack)
-> +{
-> +	if (flags.mask &
-> +	    ~(BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +static void lan9645x_port_pgid_set(struct lan9645x *lan9645x, u16 pgid,
-> +				   int chip_port, bool enabled)
-> +{
-> +	u32 reg_msk, port_msk;
-> +
-> +	WARN_ON(chip_port > CPU_PORT);
-> +
-> +	port_msk = ANA_PGID_PGID_SET(enabled ? BIT(chip_port) : 0);
-> +	reg_msk = ANA_PGID_PGID_SET(BIT(chip_port));
-> +
-> +	lan_rmw(port_msk, reg_msk, lan9645x, ANA_PGID(pgid));
-> +}
-> +
-> +static void lan9645x_port_set_learning(struct lan9645x *lan9645x, int port,
-> +				       bool enabled)
-> +{
-> +	struct lan9645x_port *p;
-> +
-> +	lan_rmw(ANA_PORT_CFG_LEARN_ENA_SET(enabled), ANA_PORT_CFG_LEARN_ENA,
-> +		lan9645x, ANA_PORT_CFG(port));
+    $ ./tokenizer.py ./include/net/netlink.h
+      1:  0  COMMENT       '/* SPDX-License-Identifier: GPL-2.0 */'
+      2:  0  CPP           '#ifndef'
+      2:  8  ID            '__NET_NETLINK_H'
+      3:  0  CPP           '#define'
+      3:  8  ID            '__NET_NETLINK_H'
+      5:  0  CPP           '#include'
+      5:  9  OP            '<'
+      5: 10  ID            'linux'
+      5: 15  OP            '/'
+      5: 16  ID            'types'
+      5: 21  PUNC          '.'
+      5: 22  ID            'h'
+      5: 23  OP            '>'
+      6:  0  CPP           '#include'
+      6:  9  OP            '<'
+      6: 10  ID            'linux'
+      6: 15  OP            '/'
+      6: 16  ID            'netlink'
+      6: 23  PUNC          '.'
+      6: 24  ID            'h'
+      6: 25  OP            '>'
+      7:  0  CPP           '#include'
+      7:  9  OP            '<'
+      7: 10  ID            'linux'
+      7: 15  OP            '/'
+      7: 16  ID            'jiffies'
+      7: 23  PUNC          '.'
+      7: 24  ID            'h'
+      7: 25  OP            '>'
+      8:  0  CPP           '#include'
+      8:  9  OP            '<'
+      8: 10  ID            'linux'
+      8: 15  OP            '/'
+      8: 16  ID            'in6'
+...
+     12:  1  COMMENT       '/**\n  * Standard attribute types to specify validation policy\n  */'
+     13:  0  ENUM          'enum'
+     13:  5  PUNC          '{'
+     14:  1  ID            'NLA_UNSPEC'
+     14: 11  PUNC          ','
+     15:  1  ID            'NLA_U8'
+     15:  7  PUNC          ','
+     16:  1  ID            'NLA_U16'
+     16:  8  PUNC          ','
+     17:  1  ID            'NLA_U32'
+     17:  8  PUNC          ','
+     18:  1  ID            'NLA_U64'
+     18:  8  PUNC          ','
+     19:  1  ID            'NLA_STRING'
+     19: 11  PUNC          ','
+     20:  1  ID            'NLA_FLAG'
+...
+     41:  0  STRUCT        'struct'
+     41:  7  ID            'netlink_range_validation'
+     41: 32  PUNC          '{'
+     42:  1  ID            'u64'
+     42:  5  ID            'min'
+     42:  8  PUNC          ','
+     42: 10  ID            'max'
+     42: 13  PUNC          ';'
+     43:  0  PUNC          '}'
+     43:  1  PUNC          ';'
+     45:  0  STRUCT        'struct'
+     45:  7  ID            'netlink_range_validation_signed'
+     45: 39  PUNC          '{'
+     46:  1  ID            's64'
+     46:  5  ID            'min'
+     46:  8  PUNC          ','
+     46: 10  ID            'max'
+     46: 13  PUNC          ';'
+     47:  0  PUNC          '}'
+     47:  1  PUNC          ';'
+     49:  0  ENUM          'enum'
+     49:  5  ID            'nla_policy_validation'
+     49: 27  PUNC          '{'
+     50:  1  ID            'NLA_VALIDATE_NONE'
+     50: 18  PUNC          ','
+     51:  1  ID            'NLA_VALIDATE_RANGE'
+     51: 19  PUNC          ','
+     52:  1  ID            'NLA_VALIDATE_RANGE_WARN_TOO_LONG'
+     52: 33  PUNC          ','
+     53:  1  ID            'NLA_VALIDATE_MIN'
+     53: 17  PUNC          ','
+     54:  1  ID            'NLA_VALIDATE_MAX'
+     54: 17  PUNC          ','
+     55:  1  ID            'NLA_VALIDATE_MASK'
+     55: 18  PUNC          ','
+     56:  1  ID            'NLA_VALIDATE_RANGE_PTR'
+     56: 23  PUNC          ','
+     57:  1  ID            'NLA_VALIDATE_FUNCTION'
+     57: 22  PUNC          ','
+     58:  0  PUNC          '}'
+     58:  1  PUNC          ';'
 
-Actually, the port may be in an STP state where learning shouldn't be
-enabled, when this function is called. Enabling the "learning" bridge
-port flag shouldn't change that.
+It sounds doable to use it, and, at least on this example, it
+properly picked the IDs.
 
-> +
-> +	p = lan9645x_to_port(lan9645x, port);
-> +	p->learn_ena = enabled;
-> +}
-> +
-> +static int lan9645x_port_bridge_flags(struct dsa_switch *ds, int port,
-> +				      struct switchdev_brport_flags f,
-> +				      struct netlink_ext_ack *extack)
-> +{
-> +	struct lan9645x *l = ds->priv;
+On the other hand, using it would require lots of changes at
+kernel-doc. So, I guess I'll add a tokenizer to kernel-doc, but
+we should likely start using it gradually.
 
-Could we have some consistency in variable naming throughout the driver,
-at least for the main private structure? I don't have an issue with it
-being called l, it's just that I would prefer it being called the same
-everywhere.
+Maybe starting with NestedSearch and with public/private
+comment handling (which is currently half-broken).
 
-> +
-> +	if (WARN_ON(port == l->npi))
-> +		return -EINVAL;
-> +
-> +	if (f.mask & BR_LEARNING)
-> +		lan9645x_port_set_learning(l, port, !!(f.val & BR_LEARNING));
-> +
-> +	if (f.mask & BR_FLOOD)
-> +		lan9645x_port_pgid_set(l, PGID_UC, port, !!(f.val & BR_FLOOD));
-> +
-> +	if (f.mask & BR_MCAST_FLOOD) {
-> +		bool ena = !!(f.val & BR_MCAST_FLOOD);
-> +
-> +		lan9645x_port_pgid_set(l, PGID_MC, port, ena);
-> +		lan9645x_port_pgid_set(l, PGID_MCIPV4, port, ena);
-> +		lan9645x_port_pgid_set(l, PGID_MCIPV6, port, ena);
-> +	}
-> +
-> +	if (f.mask & BR_BCAST_FLOOD)
-> +		lan9645x_port_pgid_set(l, PGID_BC, port,
-> +				       !!(f.val & BR_BCAST_FLOOD));
-> +
-> +	return 0;
-> +}
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> index 038868ae0a32..b60c64458957 100644
-> --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> @@ -15,6 +15,8 @@ int lan9645x_port_init(struct lan9645x *lan9645x, int port)
->  		ANA_PORT_CFG_LEARN_ENA,
->  		lan9645x, ANA_PORT_CFG(p->chip_port));
->  
-> +	p->learn_ena = false;
-> +
+As a reference, the above was generated with the code below,
+which was based on the Python re documentation.
 
-This is already zero-initialized memory.
+Comments?
 
->  	lan9645x_port_set_maxlen(lan9645x, port, ETH_DATA_LEN);
->  
->  	lan9645x_phylink_port_down(lan9645x, port);
-> 
-> -- 
-> 2.52.0
-> 
+---
+
+One side note: right now, we're not using typing at kernel-doc,
+nor really following a proper coding style.
+
+I wanted to use it during the conversion, and place consts in
+uppercase, as this is currently the best practices, but doing
+it while converting from Perl were very annoying. So, I opted
+to make things simpler. Now that we have it coded, perhaps it
+is time to define a coding style and apply it to kernel-doc.
+
+-- 
+Thanks,
+Mauro
+
+#!/usr/bin/env python3
+
+import sys
+import re
+
+class Token():
+    def __init__(self, type, value, line, column):
+        self.type = type
+        self.value = value
+        self.line = line
+        self.column = column
+
+class CTokenizer():
+    C_KEYWORDS = {
+        "struct", "union", "enum",
+    }
+
+    TOKEN_LIST = [
+        ("COMMENT", r"//[^\n]*|/\*[\s\S]*?\*/"),
+
+        ("STRING",  r'"(?:\\.|[^"\\])*"'),
+        ("CHAR",    r"'(?:\\.|[^'\\])'"),
+
+        ("NUMBER",  r"0[xX][0-9a-fA-F]+[uUlL]*|0[0-7]+[uUlL]*|"
+                    r"[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?[fFlL]*"),
+
+        ("ID",      r"[A-Za-z_][A-Za-z0-9_]*"),
+
+        ("OP",      r"\+\+|\-\-|\->|==|\!=|<=|>=|&&|\|\||<<|>>|\+=|\-=|\*=|/=|%="
+                    r"|&=|\|=|\^=|=|\+|\-|\*|/|%|<|>|&|\||\^|~|!|\?|\:"),
+
+        ("PUNC",    r"[;,\.\[\]\(\)\{\}]"),
+
+        ("CPP",     r"#\s*(define|include|ifdef|ifndef|if|else|elif|endif|undef|pragma)"),
+
+        ("HASH",    r"#"),
+
+        ("NEWLINE", r"\n"),
+
+        ("SKIP",    r"[\s]+"),
+
+        ("MISMATCH",r"."),
+    ]
+
+    def __init__(self):
+        re_tokens = []
+
+        for name, pattern in self.TOKEN_LIST:
+            re_tokens.append(f"(?P<{name}>{pattern})")
+
+        self.re_scanner = re.compile("|".join(re_tokens),
+                                     re.MULTILINE | re.DOTALL)
+
+    def tokenize(self, code):
+        # Handle continuation lines
+        code = re.sub(r"\\\n", "", code)
+
+        line_num = 1
+        line_start = 0
+
+        for match in self.re_scanner.finditer(code):
+            kind   = match.lastgroup
+            value  = match.group()
+            column = match.start() - line_start
+
+            if kind == "NEWLINE":
+                line_start = match.end()
+                line_num += 1
+                continue
+
+            if kind in {"SKIP"}:
+                continue
+
+            if kind == "MISMATCH":
+                raise RuntimeError(f"Unexpected character {value!r} on line {line_num}")
+
+            if kind == "ID" and value in self.C_KEYWORDS:
+                kind = value.upper()
+
+            # For all other tokens we keep the raw string value
+            yield Token(kind, value, line_num, column)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"Usage: python {sys.argv[0]} <fname>")
+        sys.exit(1)
+
+    fname = sys.argv[1]
+
+    try:
+        with open(fname, 'r', encoding='utf-8') as file:
+            sample = file.read()
+    except FileNotFoundError:
+        print(f"Error: The file '{fname}' was not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"An error occurred while reading the file: {str(e)}")
+        sys.exit(1)
+
+    print(f"Tokens from {fname}:")
+
+    for tok in CTokenizer().tokenize(sample):
+        print(f"{tok.line:3d}:{tok.column:3d}  {tok.type:12}  {tok.value!r}")
+
 
