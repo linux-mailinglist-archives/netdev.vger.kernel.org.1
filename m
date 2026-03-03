@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-263202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kOsHCWXgpmkPYQAAu9opvQ
-	(envelope-from <netdev+bounces-263202-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:41 +0100
+	id 2EUUGWPgpmkPYQAAu9opvQ
+	(envelope-from <netdev+bounces-263201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0FA1F01C4
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7DFE1F01B6
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BBECF302F737
+	by sea.lore.kernel.org (Postfix) with ESMTP id 849133029AF9
 	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194983CC9F8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CA434C9A3;
 	Tue,  3 Mar 2026 13:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IA14q2Ze"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TyYqaB5r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B9E28469B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A9C27E1DC;
 	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772543921; cv=none; b=Jf/hDwYfx4pSOC8iP26JNfo0Qpd4J0xNmpy20fK4RquXAtGn46mpQ3OAngZWEc+lHtrOXS5s3NK6oG4c3ESOYak7rX3yoAttM9cX72V7eKIC8uH1MJu8psxV4Tn3TySeMdNJbnfNAzt6GutXbwGuJKhpn4VqS/FmCML+TyYLHz0=
+	t=1772543921; cv=none; b=R08IUJdSbkYWhozzt9T6/HBMzSKJKEsiTgs/slaz75DquonwFmYsKGZ7OwPFhhXA9g4+MjmktRrZSHeKrzlbhzcnmuuHJxLuZgsovQV3jRvvhAKLtMK3DlxgucjEPXhHXaEcKkcOv86xIIIEuxSAAIbC7oM7SLhqcWgqbrXnReU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772543921; c=relaxed/simple;
-	bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NaKcItZVcUlpG+RDKq8cCqLEz59y98+ZkCDKfwl4oMv7BsOFRNik0qrNTrOf0jdA82zuFDfs5tjtQbodYUgLizX9JqVlPtckj7NTJTe2FRrv8n1b6mdahd9rG1fhub7gF4HU5VvXZyjjfn+AqPzjLf/UJwcy+E50jJFhOQMEupM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IA14q2Ze; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8873AC116C6;
+	bh=S4vp4JQ72s3eWuG8J9mcgxDfPnpnYZ+oZQ9woXEJC0c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=UjJauge9UEQ7YmS9VfpDSaZk/BSJoYt+3aSud1eQvBICQs8YCPO+j93C9JkYISkLLk9BtA9NBI/hG7mg6zmu+LKqTVUEjOqsFERBLcGLUSP+hR3kUZNeEobW6GEgc+UYLCNeo+IC6lJ+BK58uV1ZTxH0vev6LaH5VDbPpGOj49Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TyYqaB5r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A45E8C2BC9E;
 	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772543920;
-	bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=IA14q2Ze+IT2P9oHMy+iw8GaOeyEctcTew+o198t3cknLJScO1TvDvneMYpU+kCY2
-	 brWYJoa/1ww3BZImEM0SKfOteMTkQbkIc12ZpNCDXkIIF+EjfQn7Iz2H5Iy4xi3SWB
-	 6/fXhTAmIYsnWf28NdC2ay0asihQuSVLMck6VyW7N5EuZQFgMhXhrOwp38R4sjCGgy
-	 oba0pE0E9PBy+nHfkq+CsjZTJYbrasywBDgcEaOmj4iArYfedWjbDqw03ZUo3nTYGB
-	 6ouxkdcLGUmtQM+6V7Ag60oVBxnFdvAsA3idWmTWyuCVeFSU75blY0dDwW53p5bb9C
-	 VNH4Dn598m+Nw==
+	bh=S4vp4JQ72s3eWuG8J9mcgxDfPnpnYZ+oZQ9woXEJC0c=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=TyYqaB5rYDZ7OJf8DsvtXCspw/YmCp5o1ltlUiEZ2wcBEhwslkw6pWOcjEpr5aeJv
+	 g+mAJ74krEXwZTxA630/aBz+Q9rAp2qndnkpoZUcL98v12wAp66pOMos5pMTTY6Ihu
+	 vxuPZBVvSG7up4wVv1TFrd0DigHbNJcvE8wJNiMHpYaX5AaoBL+iht87NGwLN+l0XE
+	 dERQ2mfmhDFjpz5sS6MKjG1hDXdxAkQbVZ6RIqJkcdzCjt/8lW+ztYqs2d7ZflK04W
+	 E7ACsBo3rXeeCQ7lvXMSKEi4cAydEURyoM8f0T58Ewm+BrVwrDbyxkoHhhIZSOHf26
+	 2sztwy2PevH6A==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709DAEC1431;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CAC4EC143C;
 	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
 From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
-Subject: [PATCH net-next v5 0/2] net: dsa: mv88e6xxx: Add partial support
- for TCAM entries
-Date: Tue, 03 Mar 2026 14:18:22 +0100
-Message-Id: <20260303-net-next-mv88e6xxx-tcam-v5-0-6f9129687276@luminex.be>
+Date: Tue, 03 Mar 2026 14:18:23 +0100
+Subject: [PATCH net-next v5 1/2] net/sched: cls_flower: remove unions from
+ fl_flow_key
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,12 +59,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJ7fpmkC/4XQzWrDMAwH8FcpPs/DUvzFTnuP0kNiy6thSUeSG
- peSd68aGGSUsIMOQvr/BLqLicZMk/g43MVIJU/5MnBj3g4inNvhi2SO3AtUaBVCIweaueos++I
- 92VqrnEPby2RNR2CV8qkTnP4ZKeW6ykfxGxInnpzzNF/G23qywDr/Vy8gQSoDZAwStil8fl/7z
- JvvHa1owS3k9iFkKHodkkYVW21foGYDod6HmicUwHvvooOEL5DeQmYf0gwBuMS/Iw3R/YGWZXk
- Ab8UCLKQBAAA=
-X-Change-ID: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+Message-Id: <20260303-net-next-mv88e6xxx-tcam-v5-1-6f9129687276@luminex.be>
+References: <20260303-net-next-mv88e6xxx-tcam-v5-0-6f9129687276@luminex.be>
+In-Reply-To: <20260303-net-next-mv88e6xxx-tcam-v5-0-6f9129687276@luminex.be>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -73,18 +70,18 @@ To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  Cedric Jehasse <cedric.jehasse@luminex.be>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772543918; l=3038;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772543918; l=1808;
  i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
- bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
- b=c8aJlUABhwLNo3o3FK+7ONdPmVADYDp/ridO3hs8O9ayH5CnzXGGwQOiSRd/yeZIqWCd7NOnm
- f4QMGpUJoO/DHMZQVnR89VV8OaXBhRV4vRtoNEg8M4mJfkvb7SNLFVn
+ bh=XHxAavS3OSIr6KhDGV4nKk6jIBOKNR2K6BPZWurwweQ=;
+ b=gbTT7fjU3RO8peEn8VdgpzNxuE3GHZv6YwDBC+asrnpgA0gTLml6+wwTTZVUvuKASiuNom4yq
+ OSR+1nd3pOMCBeoxEgqUrBjZHOcB0UGRfrI/byA8CGmtH+DW97Z0Q75
 X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
  pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
 X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
  with auth_id=638
 X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
 Reply-To: cedric.jehasse@luminex.be
-X-Rspamd-Queue-Id: BF0FA1F01C4
+X-Rspamd-Queue-Id: B7DFE1F01B6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -94,7 +91,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263202-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
+	TAGGED_FROM(0.00)[bounces-263201-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -109,87 +106,64 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.998];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This series adds partial Ternary Content Addressable Memory (TCAM) for
-the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
-switch to match the first 48 or 96 bytes of a frame and take actions on
-matched frames.
+From: Cedric Jehasse <cedric.jehasse@luminex.be>
 
-This patch introduces a subset of the available TCAM functionality.
-Matching on ip addresses/protocol and trapping to the cpu.
+When creating a flower classifier with an ipv4 address the
+flow_dissector has both FLOW_DISSECTOR_KEY_IPV4_ADDRS and
+FLOW_DISSECTOR_KEY_IPV6_ADDRS bits set in used_keys.
+This happens because ipv4/ipv6 fields are a union and
+FL_KEY_SET_IF_MASKED() will interpret either being set as both.
 
-Eg. to trap traffic with destination ip 224.0.1.129 to the cpu:
+Removing the unions fixes this behavior without needing special handling
+for union fields.
 
-tc qdisc add dev p1 clsact
+Example of a command that caused FLOW_DISSECTOR_KEY_IPV4_ADDRS and
+FLOW_DISSECTOR_KEY_IPV6_ADDRS to be set:
 tc filter add dev p1 ingress protocol ip flower skip_sw \
     dst_ip 224.0.1.129 action trap
 
-Review of the mv88e6xxx changes have brought to light something in
-cls_flower:
-When adding a classifier with an ipv4 address both
-FLOW_DISSECTOR_KEY_IPV4_ADDRS and FLOW_DISSECTOR_KEY_IPV6_ADDRS bits are
-set in dissector->used_keys.
-A change was made to address this.
-
 Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
 ---
-Changes in v5:
-- changes to cls_flower to only set the correct
-  FLOW_DISSECTOR_KEY_IPV*_ADDRS bits
-- Link to v4: https://lore.kernel.org/r/20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be
+ net/sched/cls_flower.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-Changes in v4:
-- return -ENOMEM on allocation failure
-- fix double mv88e6xxx_reg_unlock
-- return -EOPNOTSUPP for unsupported addr_type
-- improve error handling in mv88e6xxx_tcam_entry_del
-- Link to v3: https://lore.kernel.org/r/20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index 7669371c1354..b95dbe847dde 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -59,18 +59,14 @@ struct fl_flow_key {
+ 	struct flow_dissector_key_eth_addrs eth;
+ 	struct flow_dissector_key_vlan vlan;
+ 	struct flow_dissector_key_vlan cvlan;
+-	union {
+-		struct flow_dissector_key_ipv4_addrs ipv4;
+-		struct flow_dissector_key_ipv6_addrs ipv6;
+-	};
++	struct flow_dissector_key_ipv4_addrs ipv4;
++	struct flow_dissector_key_ipv6_addrs ipv6;
+ 	struct flow_dissector_key_ports tp;
+ 	struct flow_dissector_key_icmp icmp;
+ 	struct flow_dissector_key_arp arp;
+ 	struct flow_dissector_key_keyid enc_key_id;
+-	union {
+-		struct flow_dissector_key_ipv4_addrs enc_ipv4;
+-		struct flow_dissector_key_ipv6_addrs enc_ipv6;
+-	};
++	struct flow_dissector_key_ipv4_addrs enc_ipv4;
++	struct flow_dissector_key_ipv6_addrs enc_ipv6;
+ 	struct flow_dissector_key_ports enc_tp;
+ 	struct flow_dissector_key_mpls mpls;
+ 	struct flow_dissector_key_tcp tcp;
 
-Changes in v3:
-- move locking to top level functions
-- use defines for match field offsets
-- use correct comment style
-- remove warning used for debugging
-- rename rc variables to err
-- limit line length to 80 characters
-- Link to v2: https://lore.kernel.org/r/20260217-net-next-mv88e6xxx-tcam-v2-1-d84cf420da46@luminex.be
-
-Changes in RFC-v2:
-- moved tcam_addr to chip info struct and remove tcam_support field
-- added 6393-specific tcam ops that write the TCAM extension register
-- rename the defines for TCAM registers to be consistent
-- reverse christmas tree variable declarations
-- Link to v1: https://lore.kernel.org/r/20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be
-
----
-Cedric Jehasse (2):
-      net/sched: cls_flower: remove unions from fl_flow_key
-      net: dsa: mv88e6xxx: Add partial support for TCAM entries
-
- drivers/net/dsa/mv88e6xxx/Makefile   |   2 +
- drivers/net/dsa/mv88e6xxx/chip.c     |  30 ++++
- drivers/net/dsa/mv88e6xxx/chip.h     |  51 ++++++
- drivers/net/dsa/mv88e6xxx/port.c     |  27 ++-
- drivers/net/dsa/mv88e6xxx/port.h     |   7 +-
- drivers/net/dsa/mv88e6xxx/tcam.c     | 325 +++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/tcam.h     |  41 +++++
- drivers/net/dsa/mv88e6xxx/tcflower.c | 159 +++++++++++++++++
- drivers/net/dsa/mv88e6xxx/tcflower.h |  13 ++
- net/sched/cls_flower.c               |  12 +-
- 10 files changed, 657 insertions(+), 10 deletions(-)
----
-base-commit: cd51b40495c09b92beea6893663b3d0ed7605e81
-change-id: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
-
-Best regards,
 -- 
-Cedric Jehasse <cedric.jehasse@luminex.be>
+2.43.0
 
 
 
