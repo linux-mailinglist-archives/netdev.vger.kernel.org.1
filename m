@@ -1,181 +1,191 @@
-Return-Path: <netdev+bounces-263354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CE5fE6clp2mrewAAu9opvQ
-	(envelope-from <netdev+bounces-263354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:11 +0100
+	id aKNYAHAmp2k3fAAAu9opvQ
+	(envelope-from <netdev+bounces-263355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:20:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E45771F5236
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD3C1F5324
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 079ED3014BCE
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:11:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E3113103FA1
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1193537D6;
-	Tue,  3 Mar 2026 18:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800A82FF164;
+	Tue,  3 Mar 2026 18:15:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLgxNHN0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jh/LPOgd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B41351C0F;
-	Tue,  3 Mar 2026 18:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE6828314E;
+	Tue,  3 Mar 2026 18:15:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561508; cv=none; b=ph+ht7RaeDrrUK/quJMAX0SdgytofpIcarM6b+9FcmVhi1pOELPlM48qMMiVGJ1l3kmgw76ezT3Too5wRsFyzCmbjfUd5xNtwWgzAJ1oDLJF2MUhqt6It6FH1TJ2FnojY9sHeY3db2sx8GjGzvCCrXvsC0R+wPtf2JBiAnt/UaM=
+	t=1772561747; cv=none; b=MDt4ToJ8pp7EQ0fio5WrMRkjdCGvWVMtoo8CHVHS0iYJL3edBLtlDujysYRMoy4xxjLGui37vc/6Hd+KhJN3YWUY6L1YwVA8e9sduGIpHW1zbtoS+/Y3xy/KMKHHcdpJV90zQFAPS0dvm+YwEEytZf+rQbFyyMOn+seSYqewMcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561508; c=relaxed/simple;
-	bh=ooftv9lYM0YxXQ/qu8gsttncrPPQ7/k8pB7S7dbDKXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryMHWRgaseWE7Zc9WHPdvMtHS6PbDJVXC69Km5wpETnaJxaCct8nZZCcalQvDDaxiyWPnSYXH5wbmkez7ukLxSn50kJtfZQd1vgZi8LYUbMK6JCOrni1V6zBvWrllMO2dyXw1VX9y7D+Rt3WQQcndEdNK9T4dsTl5D7G6E/YGjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLgxNHN0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F2DAC116C6;
-	Tue,  3 Mar 2026 18:11:44 +0000 (UTC)
+	s=arc-20240116; t=1772561747; c=relaxed/simple;
+	bh=7NQsM+lugV83l3nTYmooXBAC7dbMpHbk/5K5ZR+QtoA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kg4XwN/Ej2dvQEoxRGquK0zvk5f4BjO7n1VArKzcMTZv11ZXIcQcYM/5FP8dwMbYUfDBxMHtFDU7u3sG5jpia/HgloDTopJylV+OXgaHZI2Z0s5CEW64O2ALjLMeHGyfCNaEn/J3C1BeXrH6dmKIE1oXPDXtASPZb7hI1B6OaK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jh/LPOgd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9A4C116C6;
+	Tue,  3 Mar 2026 18:15:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772561507;
-	bh=ooftv9lYM0YxXQ/qu8gsttncrPPQ7/k8pB7S7dbDKXg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lLgxNHN0OgfoenWoM/vJ497zA6eUGYMgLkikAIIwGbqPDSKLsCydLdkWvbD6b3erz
-	 JkaISw+TFKiYt+6X8yvt/iWqbTgfiOKeVXxGi1Yo1V2WbFanddBl/44WULbAp9+nNu
-	 LQY+7f3FStO74Cro7F30NFIbOvGLaiEq3SbVDNuyA1hwb/2UqKydQcjj6cLrrbDusV
-	 22gL4fPmXKaAQ6axo2FHkmm6YqeQ/uFBKlX/PCipVi1PknCAjGc8MrcXewax2RfaO6
-	 NQ0a8V7LrQGfCSA3LCCekqSneDDGsWTGIOveoisinBMUCDuWRu4IKki9LmF/tUj1Ry
-	 NOoSncHIX/T3w==
-Date: Tue, 3 Mar 2026 18:11:42 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=k20201202; t=1772561747;
+	bh=7NQsM+lugV83l3nTYmooXBAC7dbMpHbk/5K5ZR+QtoA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jh/LPOgdTbwPc5SHM5rlA5AEvfNgYYKtNh/H978t0JXLImB/OaxmLgFqYRysX72V8
+	 EmfMreFAtDpG5xZBLY4sfJgVV+w8pI8X1ml/Or0Y57f+XIejg3dOFTsr/ttxuc56AQ
+	 +pjFoLq0vYrcq748H08brFRVsTJ7oMfTGwTx0WPvQ4W7qaOatXWr0TPDHoCKX19xf7
+	 PDQL+5UKF3Xi82zB7w8iwRjizuOVDhby3bCS7sIRRMhhxCAo/wDQTXEsqOUvUzE6/G
+	 0WT85qN7ovQ26wDYE8qCNu2rVZPf0tz+W8gCSn3VFbdmq597pqHBbYgVOqTZV1r3ax
+	 kcnjAkrlwDFXw==
+From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] dt-bindings: net: cdns,macb: forbid phy
- nodes for Microchip p64h
-Message-ID: <20260303-curse-shudder-9bd286fa6cd0@spud>
-References: <20260303180318.1814791-1-charles.perry@microchip.com>
- <20260303180318.1814791-3-charles.perry@microchip.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next 0/5] ethtool: Dynamic RSS context indirection table resizing
+Date: Tue,  3 Mar 2026 19:15:28 +0100
+Message-ID: <20260303181535.2671734-1-bjorn@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kVYLEYPFNlPTY8zB"
-Content-Disposition: inline
-In-Reply-To: <20260303180318.1814791-3-charles.perry@microchip.com>
-X-Rspamd-Queue-Id: E45771F5236
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5AD3C1F5324
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [1.01 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	R_MIXED_CHARSET(0.67)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263354-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263355-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devicetree.org:url,80.111.88.32:email,microchip.com:email,0.0.0.0:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ethtool-rss.sh:url,rss_drv.py:url]
 X-Rspamd-Action: no action
 
+Hi!
 
---kVYLEYPFNlPTY8zB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Some NICs (e.g. bnxt) change their RSS indirection table size based on
+the queue count, because the hardware table is a shared resource. The
+ethtool core locks ctx->indir_size at context creation, so drivers
+have to reject channel changes when RSS contexts exist.
 
-On Tue, Mar 03, 2026 at 10:03:16AM -0800, Charles Perry wrote:
-> The GEM IPs within Microchip p64h have their MDIO controllers
-> unconnected from any physical pin.
->=20
-> When compiling a p64h device tree with a phy on a GEM node with
-> CHECK_DTBS=3D1, this generates an error like:
->=20
-> ```
-> linux/arch/riscv/boot/dts/microchip/p64h-hb130x.dtb:
-> ethernet@40004180000 (microchip,p64h-gem): ethernet-phy@0: False
-> schema does not allow {'reg': [[0]]}
-> 	from schema $id:
-> http://devicetree.org/schemas/net/cdns,macb.yaml#
-> ```
+This series adds resize helpers and wires them up in bnxt and
+netdevsim.
 
-This should just be part of the patch adding the compatible. Adding it
-incorrectly only to fix it up one patch later doesn't make sense.
-Additionally, remove this information about the error adding this
-produces, all you need here is the justification for it.
+Patch 1 adds three core helpers:
+  ethtool_rxfh_indir_can_resize() - read-only validation
+  ethtool_rxfh_indir_resize() - fold/unfold a raw table in place
+  ethtool_rxfh_contexts_resize_all() - resize all non-default
+    contexts (all-or-none), with locking and RSS_NTF notifications
 
-pw-bot: changes-requested
+Patch 2 uses them in bnxt_set_channels(), replacing the -EINVAL
+rejection. Context 0 is validated first, then non-default contexts are
+resized, then context 0 is mutated.
 
->=20
-> Signed-off-by: Charles Perry <charles.perry@microchip.com>
-> ---
->  Documentation/devicetree/bindings/net/cdns,macb.yaml | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Docum=
-entation/devicetree/bindings/net/cdns,macb.yaml
-> index dff350302098..be66cc9a42fd 100644
-> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> @@ -197,6 +197,17 @@ allOf:
->        required:
->          - phys
-> =20
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: microchip,p64h-gem
-> +    then:
-> +      patternProperties:
-> +        "^ethernet-phy@[0-9a-f]$": false
-> +      properties:
-> +        mdio: false
-> +
->  unevaluatedProperties: false
-> =20
->  examples:
-> --=20
-> 2.47.3
->=20
+Patch 3 adds RSS context support to netdevsim with dynamic table
+sizing (roundup_pow_of_two(channels) * 16), exercising the full resize
+path.
 
---kVYLEYPFNlPTY8zB
-Content-Type: application/pgp-signature; name="signature.asc"
+Patches 4-5 add tests:
+  ethtool-rss.sh - netdevsim-specific bash test
+  rss_drv.py - Python test that runs on any device with dynamic
+    table sizing (skips otherwise)
 
------BEGIN PGP SIGNATURE-----
+Running the tests:
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaackXgAKCRB4tDGHoIJi
-0mEFAP4x/utBAYjtDikgFeZ09Z1bpUmjAVX6LWWhhf6+IjNITAEA8pui39GfmaF7
-oDKupcUfRRsbTw6GX3RpDguW8JnWrQk=
-=TfYY
------END PGP SIGNATURE-----
+  # netdevsim bash test (requires root, netdevsim module)
+  cd tools/testing/selftests/drivers/net/netdevsim
+  sudo ./ethtool-rss.sh
 
---kVYLEYPFNlPTY8zB--
+  # Python test on netdevsim
+  cd tools/testing/selftests/drivers/net/hw
+  sudo ./rss_drv.py
+
+  # Python test on real hardware
+  sudo NETIF=eth0 ./rss_drv.py
+
+Open items:
+
+ - Pre-existing bug in bnxt: the IFF_RXFH_CONFIGURED guard in
+   bnxt_set_channels() only protects context 0. If context 0 uses
+   defaults but non-default contexts exist, channel changes that
+   change the table size succeed without updating ctx->indir_size for
+   those contexts. The core's ethtool_check_max_channel() prevents
+   invalid queue references but not the size mismatch itself. This
+   series fixes it by resizing all contexts. Should a separate fix be
+   sent to net for the existing bug?
+
+ - No user-controlled minimum table size yet. The plan is to record
+   the user-provided indirection table length in the context (e.g.
+   ctx->user_indir_size) and use it as a floor when folding: reject if
+   new_size < user_indir_size. This way the user's original table size
+   serves as an implicit minimum, preventing the driver from shrinking
+   below what the user intended. Left for a follow-up.
+
+ - rss_drv.py lives in drivers/net/hw/ but runs on netdevsim too now.
+   Maybe move up a level?
+
+
+Björn Töpel (5):
+  ethtool: Add RSS indirection table resize helpers
+  bnxt_en: Resize RSS contexts on channel count change
+  netdevsim: Add RSS context support with dynamic table sizing
+  selftests: netdevsim: Add RSS indirection table resize test
+  selftests: rss_drv: Add RSS indirection table resize tests
+
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  23 +++-
+ drivers/net/netdevsim/ethtool.c               | 119 ++++++++++++++++-
+ drivers/net/netdevsim/netdevsim.h             |   4 +
+ include/linux/ethtool.h                       |   3 +
+ net/ethtool/common.c                          | 126 ++++++++++++++++++
+ .../selftests/drivers/net/hw/rss_drv.py       | 101 +++++++++++++-
+ .../selftests/drivers/net/netdevsim/Makefile  |   1 +
+ .../drivers/net/netdevsim/ethtool-rss.sh      | 123 +++++++++++++++++
+ 8 files changed, 488 insertions(+), 12 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh
+
+
+base-commit: ed0abfe93fd135dac223e87a3c945017b1fa8bfc
+-- 
+2.53.0
+
 
