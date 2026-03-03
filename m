@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-263355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKNYAHAmp2k3fAAAu9opvQ
-	(envelope-from <netdev+bounces-263355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:20:32 +0100
+	id AMDZFRYmp2k3fAAAu9opvQ
+	(envelope-from <netdev+bounces-263356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:19:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD3C1F5324
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:20:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FD51F5292
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:19:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E3113103FA1
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:15:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7BD8E30ABBA8
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800A82FF164;
-	Tue,  3 Mar 2026 18:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA50346FD2;
+	Tue,  3 Mar 2026 18:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jh/LPOgd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+pB0rAR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE6828314E;
-	Tue,  3 Mar 2026 18:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1C828314E;
+	Tue,  3 Mar 2026 18:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561747; cv=none; b=MDt4ToJ8pp7EQ0fio5WrMRkjdCGvWVMtoo8CHVHS0iYJL3edBLtlDujysYRMoy4xxjLGui37vc/6Hd+KhJN3YWUY6L1YwVA8e9sduGIpHW1zbtoS+/Y3xy/KMKHHcdpJV90zQFAPS0dvm+YwEEytZf+rQbFyyMOn+seSYqewMcQ=
+	t=1772561750; cv=none; b=ine3I1oixqZTIlO1G7n1VCIgOE7BNyQgND/nAFTf32AqKkOPJRSy0WxKxY8smehfG8TeUhwRXeZChVScRgt4/uA2W93BS7J/uaUPHfDScHZ2Iq5ZDJBaa4fSUH2uS3BOdSw55BYA6x/9iJNi5hBuCAVPO/rKSdtg7lY3bNIu6lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561747; c=relaxed/simple;
-	bh=7NQsM+lugV83l3nTYmooXBAC7dbMpHbk/5K5ZR+QtoA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kg4XwN/Ej2dvQEoxRGquK0zvk5f4BjO7n1VArKzcMTZv11ZXIcQcYM/5FP8dwMbYUfDBxMHtFDU7u3sG5jpia/HgloDTopJylV+OXgaHZI2Z0s5CEW64O2ALjLMeHGyfCNaEn/J3C1BeXrH6dmKIE1oXPDXtASPZb7hI1B6OaK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jh/LPOgd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9A4C116C6;
-	Tue,  3 Mar 2026 18:15:43 +0000 (UTC)
+	s=arc-20240116; t=1772561750; c=relaxed/simple;
+	bh=8vdI1F6+AEYct1WtP6LjxtoTORydqwvmamGsdLjOBLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lWJs02j8DHiDdbahb0t6vzg3ULPYKa7gW8da4RqsWgcVNOLQqfM3w3PybO1sl9EzwbB1sFHzpade9SOZuDx1Puns202DfgelWM1qnQxK4PJVmOkSdhhJsImIvWJF419he2mfgT9XXWdhNp/dNQP7RhDY5B6VLFDg1Tly+2JGV9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+pB0rAR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794FDC19425;
+	Tue,  3 Mar 2026 18:15:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772561747;
-	bh=7NQsM+lugV83l3nTYmooXBAC7dbMpHbk/5K5ZR+QtoA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Jh/LPOgdTbwPc5SHM5rlA5AEvfNgYYKtNh/H978t0JXLImB/OaxmLgFqYRysX72V8
-	 EmfMreFAtDpG5xZBLY4sfJgVV+w8pI8X1ml/Or0Y57f+XIejg3dOFTsr/ttxuc56AQ
-	 +pjFoLq0vYrcq748H08brFRVsTJ7oMfTGwTx0WPvQ4W7qaOatXWr0TPDHoCKX19xf7
-	 PDQL+5UKF3Xi82zB7w8iwRjizuOVDhby3bCS7sIRRMhhxCAo/wDQTXEsqOUvUzE6/G
-	 0WT85qN7ovQ26wDYE8qCNu2rVZPf0tz+W8gCSn3VFbdmq597pqHBbYgVOqTZV1r3ax
-	 kcnjAkrlwDFXw==
+	s=k20201202; t=1772561750;
+	bh=8vdI1F6+AEYct1WtP6LjxtoTORydqwvmamGsdLjOBLA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=q+pB0rARCe+SA7fiV4K2qPDSPoMFq56w3iZ0WsumUWcrntw0m6WUoGeHSkEw6TWAp
+	 cilZKRqC8fjMZBM7SqHRETKmMwvLONWBn8RsqiDZWmCVmAgEmEw2jdSHZcjCU58uGI
+	 6EMuBMMF6ljsRst0rAuKuhhxaFVkmzmDRtP6UUzKXKKl7vmVF8XyxXOFVmRSh9fhce
+	 TRd+ks0E0lJUgfTj9V9dgg8aN926FShFnjz4kn1FvYfkarbkKTINvdDZrPx72zr/Xt
+	 /1hHATTYvdyk9n6yX9bc3uZqJ9syoc9QCjk70seK1jubdPYhIHdIWJPtDYt14ACfht
+	 pGHAz76hcPtvQ==
 From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
 To: Michael Chan <michael.chan@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>,
@@ -57,10 +58,12 @@ To: Michael Chan <michael.chan@broadcom.com>,
 	linux-kselftest@vger.kernel.org
 Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 0/5] ethtool: Dynamic RSS context indirection table resizing
-Date: Tue,  3 Mar 2026 19:15:28 +0100
-Message-ID: <20260303181535.2671734-1-bjorn@kernel.org>
+Subject: [PATCH net-next 1/5] ethtool: Add RSS indirection table resize helpers
+Date: Tue,  3 Mar 2026 19:15:29 +0100
+Message-ID: <20260303181535.2671734-2-bjorn@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260303181535.2671734-1-bjorn@kernel.org>
+References: <20260303181535.2671734-1-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +72,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 5AD3C1F5324
+X-Rspamd-Queue-Id: C7FD51F5292
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.01 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -78,12 +81,12 @@ X-Spamd-Result: default: False [1.01 / 15.00];
 	R_MIXED_CHARSET(0.67)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263355-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263356-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -97,94 +100,191 @@ X-Spamd-Result: default: False [1.01 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ethtool-rss.sh:url,rss_drv.py:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi!
+The core locks ctx->indir_size when an RSS context is created. Some
+NICs (e.g. bnxt) change their indirection table size based on the
+channel count, because the hardware table is a shared resource. This
+forces drivers to reject channel changes when RSS contexts exist.
 
-Some NICs (e.g. bnxt) change their RSS indirection table size based on
-the queue count, because the hardware table is a shared resource. The
-ethtool core locks ctx->indir_size at context creation, so drivers
-have to reject channel changes when RSS contexts exist.
+Add helpers to resize indirection tables:
 
-This series adds resize helpers and wires them up in bnxt and
-netdevsim.
+ethtool_rxfh_indir_can_resize() checks whether a table can be resized
+without modifying it.
 
-Patch 1 adds three core helpers:
-  ethtool_rxfh_indir_can_resize() - read-only validation
-  ethtool_rxfh_indir_resize() - fold/unfold a raw table in place
-  ethtool_rxfh_contexts_resize_all() - resize all non-default
-    contexts (all-or-none), with locking and RSS_NTF notifications
+ethtool_rxfh_indir_resize() resizes a raw u32 table in place. Folding
+(shrink) requires the table to be periodic at the new size;
+non-periodic tables are rejected. Unfolding (grow) replicates the
+existing pattern. Sizes must be multiples of each other.
 
-Patch 2 uses them in bnxt_set_channels(), replacing the -EINVAL
-rejection. Context 0 is validated first, then non-default contexts are
-resized, then context 0 is mutated.
+ethtool_rxfh_contexts_resize_all() resizes all non-default RSS
+contexts. Validates every context before modifying any, so either all
+succeed or none are changed. Sends ETHTOOL_MSG_RSS_NTF per resized
+context after releasing rss_lock.
 
-Patch 3 adds RSS context support to netdevsim with dynamic table
-sizing (roundup_pow_of_two(channels) * 16), exercising the full resize
-path.
+No reallocation is needed because ethtool_rxfh_ctx_alloc() reserves
+space for rxfh_indir_space entries, and key_off is based on that
+maximum.
 
-Patches 4-5 add tests:
-  ethtool-rss.sh - netdevsim-specific bash test
-  rss_drv.py - Python test that runs on any device with dynamic
-    table sizing (skips otherwise)
+Signed-off-by: Björn Töpel <bjorn@kernel.org>
+---
+ include/linux/ethtool.h |   3 +
+ net/ethtool/common.c    | 126 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 129 insertions(+)
 
-Running the tests:
-
-  # netdevsim bash test (requires root, netdevsim module)
-  cd tools/testing/selftests/drivers/net/netdevsim
-  sudo ./ethtool-rss.sh
-
-  # Python test on netdevsim
-  cd tools/testing/selftests/drivers/net/hw
-  sudo ./rss_drv.py
-
-  # Python test on real hardware
-  sudo NETIF=eth0 ./rss_drv.py
-
-Open items:
-
- - Pre-existing bug in bnxt: the IFF_RXFH_CONFIGURED guard in
-   bnxt_set_channels() only protects context 0. If context 0 uses
-   defaults but non-default contexts exist, channel changes that
-   change the table size succeed without updating ctx->indir_size for
-   those contexts. The core's ethtool_check_max_channel() prevents
-   invalid queue references but not the size mismatch itself. This
-   series fixes it by resizing all contexts. Should a separate fix be
-   sent to net for the existing bug?
-
- - No user-controlled minimum table size yet. The plan is to record
-   the user-provided indirection table length in the context (e.g.
-   ctx->user_indir_size) and use it as a floor when folding: reject if
-   new_size < user_indir_size. This way the user's original table size
-   serves as an implicit minimum, preventing the driver from shrinking
-   below what the user intended. Left for a follow-up.
-
- - rss_drv.py lives in drivers/net/hw/ but runs on netdevsim too now.
-   Maybe move up a level?
-
-
-Björn Töpel (5):
-  ethtool: Add RSS indirection table resize helpers
-  bnxt_en: Resize RSS contexts on channel count change
-  netdevsim: Add RSS context support with dynamic table sizing
-  selftests: netdevsim: Add RSS indirection table resize test
-  selftests: rss_drv: Add RSS indirection table resize tests
-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  23 +++-
- drivers/net/netdevsim/ethtool.c               | 119 ++++++++++++++++-
- drivers/net/netdevsim/netdevsim.h             |   4 +
- include/linux/ethtool.h                       |   3 +
- net/ethtool/common.c                          | 126 ++++++++++++++++++
- .../selftests/drivers/net/hw/rss_drv.py       | 101 +++++++++++++-
- .../selftests/drivers/net/netdevsim/Makefile  |   1 +
- .../drivers/net/netdevsim/ethtool-rss.sh      | 123 +++++++++++++++++
- 8 files changed, 488 insertions(+), 12 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh
-
-
-base-commit: ed0abfe93fd135dac223e87a3c945017b1fa8bfc
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 798abec67a1b..add7d16ca398 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -214,6 +214,9 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
+ }
+ 
+ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
++int ethtool_rxfh_indir_can_resize(const u32 *tbl, u32 old_size, u32 new_size);
++int ethtool_rxfh_indir_resize(u32 *tbl, u32 old_size, u32 new_size);
++int ethtool_rxfh_contexts_resize_all(struct net_device *dev, u32 new_indir_size);
+ 
+ struct link_mode_info {
+ 	int	speed;
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index e252cf20c22f..8df84ff9efa4 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -1204,6 +1204,132 @@ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id)
+ }
+ EXPORT_SYMBOL(ethtool_rxfh_context_lost);
+ 
++static bool ethtool_rxfh_indir_is_periodic(const u32 *tbl, u32 old_size, u32 new_size)
++{
++	u32 i;
++
++	for (i = new_size; i < old_size; i++)
++		if (tbl[i] != tbl[i % new_size])
++			return false;
++	return true;
++}
++
++/**
++ * ethtool_rxfh_indir_can_resize - Check if an indirection table can be resized
++ * @tbl: indirection table
++ * @old_size: current number of entries in the table
++ * @new_size: desired number of entries
++ *
++ * Validate that @tbl can be resized from @old_size to @new_size without
++ * data loss. Read-only; does not modify the table.
++ *
++ * Return: 0 if resize is possible, -%EINVAL otherwise.
++ */
++int ethtool_rxfh_indir_can_resize(const u32 *tbl, u32 old_size, u32 new_size)
++{
++	if (old_size == 0 || new_size == 0)
++		return -EINVAL;
++	if (new_size == old_size)
++		return 0;
++
++	if (new_size < old_size) {
++		if (old_size % new_size != 0)
++			return -EINVAL;
++		if (!ethtool_rxfh_indir_is_periodic(tbl, old_size, new_size))
++			return -EINVAL;
++		return 0;
++	}
++
++	if (new_size % old_size != 0)
++		return -EINVAL;
++	return 0;
++}
++EXPORT_SYMBOL(ethtool_rxfh_indir_can_resize);
++
++/* Resize without validation; caller must have called can_resize first */
++static void __ethtool_rxfh_indir_resize(u32 *tbl, u32 old_size, u32 new_size)
++{
++	u32 i;
++
++	/* Unfold (grow): replicate existing pattern; fold is a no-op on the data */
++	for (i = old_size; i < new_size; i++)
++		tbl[i] = tbl[i % old_size];
++}
++
++/**
++ * ethtool_rxfh_indir_resize - Fold or unfold an indirection table
++ * @tbl: indirection table (must have room for max(old_size, new_size) entries)
++ * @old_size: current number of entries in the table
++ * @new_size: desired number of entries
++ *
++ * Resize an RSS indirection table in place. When folding (shrinking),
++ * the table must be periodic with period @new_size; otherwise the
++ * operation is rejected. When unfolding (growing), the existing
++ * pattern is replicated. Both directions require the sizes to be
++ * multiples of each other.
++ *
++ * Return: 0 on success, -%EINVAL on failure (no mutation on failure).
++ */
++int ethtool_rxfh_indir_resize(u32 *tbl, u32 old_size, u32 new_size)
++{
++	int ret;
++
++	ret = ethtool_rxfh_indir_can_resize(tbl, old_size, new_size);
++	if (ret)
++		return ret;
++
++	__ethtool_rxfh_indir_resize(tbl, old_size, new_size);
++	return 0;
++}
++EXPORT_SYMBOL(ethtool_rxfh_indir_resize);
++
++/**
++ * ethtool_rxfh_contexts_resize_all - Resize all RSS context indirection tables
++ * @dev: network device
++ * @new_indir_size: new indirection table size
++ *
++ * Resize the indirection table of every non-default RSS context to
++ * @new_indir_size. Intended to be called from drivers when the
++ * device's indirection table size changes (e.g. on channel count
++ * change). An %ETHTOOL_MSG_RSS_NTF is sent for each resized context.
++ *
++ * All contexts are validated before any are modified, so either all
++ * contexts are resized or none are.
++ *
++ * Return: 0 on success, negative errno on failure.
++ */
++int ethtool_rxfh_contexts_resize_all(struct net_device *dev, u32 new_indir_size)
++{
++	struct ethtool_rxfh_context *ctx;
++	unsigned long context;
++	int ret;
++
++	if (dev->ethtool_ops->rxfh_indir_space == 0 ||
++	    new_indir_size > dev->ethtool_ops->rxfh_indir_space)
++		return -EINVAL;
++
++	scoped_guard(mutex, &dev->ethtool->rss_lock) {
++		xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
++			ret = ethtool_rxfh_indir_can_resize(ethtool_rxfh_context_indir(ctx),
++							    ctx->indir_size, new_indir_size);
++			if (ret)
++				return ret;
++		}
++
++		xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
++			__ethtool_rxfh_indir_resize(ethtool_rxfh_context_indir(ctx),
++						    ctx->indir_size, new_indir_size);
++			ctx->indir_size = new_indir_size;
++		}
++	}
++
++	xa_for_each(&dev->ethtool->rss_ctx, context, ctx)
++		ethtool_rss_notify(dev, ETHTOOL_MSG_RSS_NTF, context);
++
++	return 0;
++}
++EXPORT_SYMBOL(ethtool_rxfh_contexts_resize_all);
++
+ enum ethtool_link_medium ethtool_str_to_medium(const char *str)
+ {
+ 	int i;
 -- 
 2.53.0
 
