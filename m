@@ -1,190 +1,195 @@
-Return-Path: <netdev+bounces-263204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INU9O/DfpmkPYQAAu9opvQ
-	(envelope-from <netdev+bounces-263204-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:19:44 +0100
+	id kOsHCWXgpmkPYQAAu9opvQ
+	(envelope-from <netdev+bounces-263202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA721F0164
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:19:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0FA1F01C4
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EA2DA3019FCD
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:19:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBECF302F737
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6C633F5AB;
-	Tue,  3 Mar 2026 13:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194983CC9F8;
+	Tue,  3 Mar 2026 13:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IA14q2Ze"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A71E1946DA;
-	Tue,  3 Mar 2026 13:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B9E28469B;
+	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772543977; cv=none; b=gDhD7EYXecLaveKAtYnRGgNnAeM8hfYHJ/AKMP/Amd7CPbsllGDUV3lCwDA0j5tMFnMznHfj5dUOKHCznd8ynSILO+LXlgy1APPfGoS9GqfPErCrGA0XgrmkqOIkwPxKv+JiABks3/icBFeqVeF7PSUIDx3gsDds4FS5uSIUF/U=
+	t=1772543921; cv=none; b=Jf/hDwYfx4pSOC8iP26JNfo0Qpd4J0xNmpy20fK4RquXAtGn46mpQ3OAngZWEc+lHtrOXS5s3NK6oG4c3ESOYak7rX3yoAttM9cX72V7eKIC8uH1MJu8psxV4Tn3TySeMdNJbnfNAzt6GutXbwGuJKhpn4VqS/FmCML+TyYLHz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772543977; c=relaxed/simple;
-	bh=JeETUM50RezrqM2Bv0bJk4qh+t9LBTzGYmLdO7iEb2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GsuYAB0OS7WTvpmr1TZUsAEWRc4X0K9aT2LMXt1s6QG2ZqU/0hoPH/cfWwC29Cg/i8jn5d+SLLuhkY17vXLdq9LB54Lf39GIRiZrZLU1oC2ZkNWCYSko5dpLzGZguM/9WAeSBeTJulyVK7FLccgpylbAESdJgD/egWnLWj0t2PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 83BC74C2C37D6F;
-	Tue, 03 Mar 2026 14:18:05 +0100 (CET)
-Message-ID: <9805389e-9ea4-4e7a-a122-65f733ead33c@molgen.mpg.de>
-Date: Tue, 3 Mar 2026 14:18:03 +0100
+	s=arc-20240116; t=1772543921; c=relaxed/simple;
+	bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NaKcItZVcUlpG+RDKq8cCqLEz59y98+ZkCDKfwl4oMv7BsOFRNik0qrNTrOf0jdA82zuFDfs5tjtQbodYUgLizX9JqVlPtckj7NTJTe2FRrv8n1b6mdahd9rG1fhub7gF4HU5VvXZyjjfn+AqPzjLf/UJwcy+E50jJFhOQMEupM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IA14q2Ze; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8873AC116C6;
+	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772543920;
+	bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=IA14q2Ze+IT2P9oHMy+iw8GaOeyEctcTew+o198t3cknLJScO1TvDvneMYpU+kCY2
+	 brWYJoa/1ww3BZImEM0SKfOteMTkQbkIc12ZpNCDXkIIF+EjfQn7Iz2H5Iy4xi3SWB
+	 6/fXhTAmIYsnWf28NdC2ay0asihQuSVLMck6VyW7N5EuZQFgMhXhrOwp38R4sjCGgy
+	 oba0pE0E9PBy+nHfkq+CsjZTJYbrasywBDgcEaOmj4iArYfedWjbDqw03ZUo3nTYGB
+	 6ouxkdcLGUmtQM+6V7Ag60oVBxnFdvAsA3idWmTWyuCVeFSU75blY0dDwW53p5bb9C
+	 VNH4Dn598m+Nw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709DAEC1431;
+	Tue,  3 Mar 2026 13:18:40 +0000 (UTC)
+From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
+Subject: [PATCH net-next v5 0/2] net: dsa: mv88e6xxx: Add partial support
+ for TCAM entries
+Date: Tue, 03 Mar 2026 14:18:22 +0100
+Message-Id: <20260303-net-next-mv88e6xxx-tcam-v5-0-6f9129687276@luminex.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v4] igb: Retrieve Tx timestamp from BH workqueue
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Miroslav Lichvar <mlichvar@redhat.com>,
- Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260303-igb_irq_ts-v4-1-cbae7f127061@linutronix.de>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260303-igb_irq_ts-v4-1-cbae7f127061@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: ECA721F0164
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJ7fpmkC/4XQzWrDMAwH8FcpPs/DUvzFTnuP0kNiy6thSUeSG
+ peSd68aGGSUsIMOQvr/BLqLicZMk/g43MVIJU/5MnBj3g4inNvhi2SO3AtUaBVCIweaueos++I
+ 92VqrnEPby2RNR2CV8qkTnP4ZKeW6ykfxGxInnpzzNF/G23qywDr/Vy8gQSoDZAwStil8fl/7z
+ JvvHa1owS3k9iFkKHodkkYVW21foGYDod6HmicUwHvvooOEL5DeQmYf0gwBuMS/Iw3R/YGWZXk
+ Ab8UCLKQBAAA=
+X-Change-ID: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Cedric Jehasse <cedric.jehasse@luminex.be>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772543918; l=3038;
+ i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
+ bh=1yttYSVoCc4wVdOLhQS/GWTNRDveH6F9hWygpeQuzIU=;
+ b=c8aJlUABhwLNo3o3FK+7ONdPmVADYDp/ridO3hs8O9ayH5CnzXGGwQOiSRd/yeZIqWCd7NOnm
+ f4QMGpUJoO/DHMZQVnR89VV8OaXBhRV4vRtoNEg8M4mJfkvb7SNLFVn
+X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
+ pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
+X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
+ with auth_id=638
+X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
+Reply-To: cedric.jehasse@luminex.be
+X-Rspamd-Queue-Id: BF0FA1F01C4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-263202-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263204-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[mpg.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,linux.dev,lists.osuosl.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.818];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,msgid.link:url,linutronix.de:email,mpg.de:email,molgen.mpg.de:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Dear Kurt,
+This series adds partial Ternary Content Addressable Memory (TCAM) for
+the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
+switch to match the first 48 or 96 bytes of a frame and take actions on
+matched frames.
+
+This patch introduces a subset of the available TCAM functionality.
+Matching on ip addresses/protocol and trapping to the cpu.
+
+Eg. to trap traffic with destination ip 224.0.1.129 to the cpu:
+
+tc qdisc add dev p1 clsact
+tc filter add dev p1 ingress protocol ip flower skip_sw \
+    dst_ip 224.0.1.129 action trap
+
+Review of the mv88e6xxx changes have brought to light something in
+cls_flower:
+When adding a classifier with an ipv4 address both
+FLOW_DISSECTOR_KEY_IPV4_ADDRS and FLOW_DISSECTOR_KEY_IPV6_ADDRS bits are
+set in dissector->used_keys.
+A change was made to address this.
+
+Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
+---
+Changes in v5:
+- changes to cls_flower to only set the correct
+  FLOW_DISSECTOR_KEY_IPV*_ADDRS bits
+- Link to v4: https://lore.kernel.org/r/20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be
+
+Changes in v4:
+- return -ENOMEM on allocation failure
+- fix double mv88e6xxx_reg_unlock
+- return -EOPNOTSUPP for unsupported addr_type
+- improve error handling in mv88e6xxx_tcam_entry_del
+- Link to v3: https://lore.kernel.org/r/20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be
+
+Changes in v3:
+- move locking to top level functions
+- use defines for match field offsets
+- use correct comment style
+- remove warning used for debugging
+- rename rc variables to err
+- limit line length to 80 characters
+- Link to v2: https://lore.kernel.org/r/20260217-net-next-mv88e6xxx-tcam-v2-1-d84cf420da46@luminex.be
+
+Changes in RFC-v2:
+- moved tcam_addr to chip info struct and remove tcam_support field
+- added 6393-specific tcam ops that write the TCAM extension register
+- rename the defines for TCAM registers to be consistent
+- reverse christmas tree variable declarations
+- Link to v1: https://lore.kernel.org/r/20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be
+
+---
+Cedric Jehasse (2):
+      net/sched: cls_flower: remove unions from fl_flow_key
+      net: dsa: mv88e6xxx: Add partial support for TCAM entries
+
+ drivers/net/dsa/mv88e6xxx/Makefile   |   2 +
+ drivers/net/dsa/mv88e6xxx/chip.c     |  30 ++++
+ drivers/net/dsa/mv88e6xxx/chip.h     |  51 ++++++
+ drivers/net/dsa/mv88e6xxx/port.c     |  27 ++-
+ drivers/net/dsa/mv88e6xxx/port.h     |   7 +-
+ drivers/net/dsa/mv88e6xxx/tcam.c     | 325 +++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcam.h     |  41 +++++
+ drivers/net/dsa/mv88e6xxx/tcflower.c | 159 +++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcflower.h |  13 ++
+ net/sched/cls_flower.c               |  12 +-
+ 10 files changed, 657 insertions(+), 10 deletions(-)
+---
+base-commit: cd51b40495c09b92beea6893663b3d0ed7605e81
+change-id: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+
+Best regards,
+-- 
+Cedric Jehasse <cedric.jehasse@luminex.be>
 
 
-Thank you for the patch.
-
-Am 03.03.26 um 12:48 schrieb Kurt Kanzenbach:
-> Retrieve Tx timestamp from system BH instead of regular system workqueue.
-> 
-> The current implementation uses schedule_work() which is executed by the
-> system work queue and kworkers to retrieve Tx timestamps. This increases
-> latency and can lead to timeouts in case of heavy system load. i210 is
-> often used in industrial systems, where timestamp timeouts can be fatal.
-> 
-> Therefore, switch to the system BH workqueues which are executed directly
-> at the end of the IRQ handler.
-
-Thank you for implementing this.
-
-> Tested on Intel i210 and i350 with ptp4l.
-
-It would be great, if you shared the numbers. Did Miroslav already test 
-this?
-
-Also, if you could add a comment/summary, that doing this in the IRQ 
-path with your theory on why, that’d be great.
-
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
-> Changes in v4:
-> - Use BH workqueue (tasklet) instead of doing timestamping in IRQ path (Jakub Kicinski)
-> - Link to v3: https://patch.msgid.link/20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de
-> 
-> Changes in v3:
-> - Switch back to IRQ, but for i210 only
-> - Keep kworker for all other NICs like i350 (Miroslav)
-> - Link to v2: https://lore.kernel.org/r/20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de
-> 
-> Changes in v2:
-> - Switch from IRQ to PTP aux worker due to NTP performance regression (Miroslav)
-> - Link to v1: https://lore.kernel.org/r/20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de
-> ---
->   drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
->   drivers/net/ethernet/intel/igb/igb_ptp.c  | 2 +-
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index ee99fd8fd513..9fd29fedb9f5 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -6572,7 +6572,7 @@ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *skb,
->   			adapter->ptp_tx_skb = skb_get(skb);
->   			adapter->ptp_tx_start = jiffies;
->   			if (adapter->hw.mac.type == e1000_82576)
-> -				schedule_work(&adapter->ptp_tx_work);
-> +				queue_work(system_bh_wq, &adapter->ptp_tx_work);
->   		} else {
->   			adapter->tx_hwtstamp_skipped++;
->   		}
-> @@ -7076,7 +7076,7 @@ static void igb_tsync_interrupt(struct igb_adapter *adapter)
->   
->   	if (tsicr & E1000_TSICR_TXTS) {
->   		/* retrieve hardware timestamp */
-> -		schedule_work(&adapter->ptp_tx_work);
-> +		queue_work(system_bh_wq, &adapter->ptp_tx_work);
->   	}
->   
->   	if (tsicr & TSINTR_TT0)
-> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> index bd85d02ecadd..7b44f9090631 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> @@ -832,7 +832,7 @@ static void igb_ptp_tx_work(struct work_struct *work)
->   		igb_ptp_tx_hwtstamp(adapter);
->   	else
->   		/* reschedule to check later */
-> -		schedule_work(&adapter->ptp_tx_work);
-> +		queue_work(system_bh_wq, &adapter->ptp_tx_work);
->   }
->   
->   static void igb_ptp_overflow_check(struct work_struct *work)
-The diff looks fine.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
 
