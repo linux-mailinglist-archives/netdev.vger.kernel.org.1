@@ -1,232 +1,181 @@
-Return-Path: <netdev+bounces-263353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKgZMXEjp2mMegAAu9opvQ
-	(envelope-from <netdev+bounces-263353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:07:45 +0100
+	id CE5fE6clp2mrewAAu9opvQ
+	(envelope-from <netdev+bounces-263354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9483E1F4F9F
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:07:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E45771F5236
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9554E304789D
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:07:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 079ED3014BCE
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C757381AEC;
-	Tue,  3 Mar 2026 18:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1193537D6;
+	Tue,  3 Mar 2026 18:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFn59tBE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLgxNHN0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38669381AE7;
-	Tue,  3 Mar 2026 18:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B41351C0F;
+	Tue,  3 Mar 2026 18:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561226; cv=none; b=kd2Ivn/LjpyReLOG6jWSSq3727OLF+rhMFGXAzRCafyCEqmQDc9YPwCwGGAIiH63J6+gD6pjAjF1d2Ke9+5XU3YeT3uJ3MDagiIbagKYCt1g4G6QBEYO0jiOaifzlix3Z2qhMGLvcARDHllppeWtF5b7MDC9w9z23nIqJtxFE1k=
+	t=1772561508; cv=none; b=ph+ht7RaeDrrUK/quJMAX0SdgytofpIcarM6b+9FcmVhi1pOELPlM48qMMiVGJ1l3kmgw76ezT3Too5wRsFyzCmbjfUd5xNtwWgzAJ1oDLJF2MUhqt6It6FH1TJ2FnojY9sHeY3db2sx8GjGzvCCrXvsC0R+wPtf2JBiAnt/UaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561226; c=relaxed/simple;
-	bh=Vbtwpil7ZEF+eSxTpXm54O7ORfkDhNMpmIaREOK4zcI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oK5PIIPxi7WqAJhpmbI1Vb6j2O8ni1f0Qlf22bVi0egpjz8hmarv/cj+TZYCp/bXqYVeP9x8rqOBl2vxB8TGoMkNmaYq7+YJDH8mfKyH1U3Vael212IJhhwNEevITX+sY+4GXpLfWCXb6u5w7HLsXM/k2e21Ah2iVRehc4ullZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFn59tBE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7190EC116C6;
-	Tue,  3 Mar 2026 18:07:02 +0000 (UTC)
+	s=arc-20240116; t=1772561508; c=relaxed/simple;
+	bh=ooftv9lYM0YxXQ/qu8gsttncrPPQ7/k8pB7S7dbDKXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ryMHWRgaseWE7Zc9WHPdvMtHS6PbDJVXC69Km5wpETnaJxaCct8nZZCcalQvDDaxiyWPnSYXH5wbmkez7ukLxSn50kJtfZQd1vgZi8LYUbMK6JCOrni1V6zBvWrllMO2dyXw1VX9y7D+Rt3WQQcndEdNK9T4dsTl5D7G6E/YGjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLgxNHN0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F2DAC116C6;
+	Tue,  3 Mar 2026 18:11:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772561225;
-	bh=Vbtwpil7ZEF+eSxTpXm54O7ORfkDhNMpmIaREOK4zcI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gFn59tBETeDBUA4ZijYtktG36jO0BmtokcBGSoH8Vvwqk+6J0guotA+DUq3YEBN3U
-	 0VBaK1uxB8KU4JbPjcYqI4wtgDqB+NeUqC5G+KES9ETvIbSAMyX6ctZZk6Bly29fER
-	 yPxsX2RiADfiV8E8bNq3GonralDGNaAGRu/vOSa2VtJjGMfRxEpuPCti4MunhM2Vya
-	 ++ODQNIf2ZMi4T7jfTn11yCbq6rhSPWAyHAAJTECg4KuBz6JoRM4i0Po/DhpcCmWaS
-	 geWX/n3/N7MgnWk/Yf0Zq8hEFUt937JN9Nuxf6FxrKggKcm1qYRCTz3MHQjCjoO3iF
-	 M27QDjKTLum2w==
-Message-ID: <57061768-a136-49b8-b020-609016f217ed@kernel.org>
-Date: Tue, 3 Mar 2026 19:06:59 +0100
+	s=k20201202; t=1772561507;
+	bh=ooftv9lYM0YxXQ/qu8gsttncrPPQ7/k8pB7S7dbDKXg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lLgxNHN0OgfoenWoM/vJ497zA6eUGYMgLkikAIIwGbqPDSKLsCydLdkWvbD6b3erz
+	 JkaISw+TFKiYt+6X8yvt/iWqbTgfiOKeVXxGi1Yo1V2WbFanddBl/44WULbAp9+nNu
+	 LQY+7f3FStO74Cro7F30NFIbOvGLaiEq3SbVDNuyA1hwb/2UqKydQcjj6cLrrbDusV
+	 22gL4fPmXKaAQ6axo2FHkmm6YqeQ/uFBKlX/PCipVi1PknCAjGc8MrcXewax2RfaO6
+	 NQ0a8V7LrQGfCSA3LCCekqSneDDGsWTGIOveoisinBMUCDuWRu4IKki9LmF/tUj1Ry
+	 NOoSncHIX/T3w==
+Date: Tue, 3 Mar 2026 18:11:42 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Charles Perry <charles.perry@microchip.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] dt-bindings: net: cdns,macb: forbid phy
+ nodes for Microchip p64h
+Message-ID: <20260303-curse-shudder-9bd286fa6cd0@spud>
+References: <20260303180318.1814791-1-charles.perry@microchip.com>
+ <20260303180318.1814791-3-charles.perry@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] mptcp: fix soft lockup in mptcp_recvmsg()
-Content-Language: en-GB, fr-BE
-To: Li Xiasong <lixiasong1@huawei.com>, martineau@kernel.org,
- geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, weiyongjun1@huawei.com, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com
-References: <20260302052651.1466983-1-lixiasong1@huawei.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260302052651.1466983-1-lixiasong1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9483E1F4F9F
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kVYLEYPFNlPTY8zB"
+Content-Disposition: inline
+In-Reply-To: <20260303180318.1814791-3-charles.perry@microchip.com>
+X-Rspamd-Queue-Id: E45771F5236
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263353-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263354-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,huawei.com:email]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devicetree.org:url,80.111.88.32:email,microchip.com:email,0.0.0.0:email]
 X-Rspamd-Action: no action
 
-Hi Li,
 
-On 02/03/2026 06:26, Li Xiasong wrote:
-> syzbot reported a soft lockup in mptcp_recvmsg() [0].
-> 
-> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
-> removed from the sk_receive_queue. This causes sk_wait_data() to always
-> find available data and never perform actual waiting, leading to a soft
-> lockup.
-> 
-> Fix this by adding a 'last' parameter to track the last peeked skb.
-> This allows sk_wait_data() to make informed waiting decisions and prevent
-> infinite loops when MSG_PEEK is used.
+--kVYLEYPFNlPTY8zB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(...)
+On Tue, Mar 03, 2026 at 10:03:16AM -0800, Charles Perry wrote:
+> The GEM IPs within Microchip p64h have their MDIO controllers
+> unconnected from any physical pin.
+>=20
+> When compiling a p64h device tree with a phy on a GEM node with
+> CHECK_DTBS=3D1, this generates an error like:
+>=20
+> ```
+> linux/arch/riscv/boot/dts/microchip/p64h-hb130x.dtb:
+> ethernet@40004180000 (microchip,p64h-gem): ethernet-phy@0: False
+> schema does not allow {'reg': [[0]]}
+> 	from schema $id:
+> http://devicetree.org/schemas/net/cdns,macb.yaml#
+> ```
 
-> Fixes: 612f71d7328c ("mptcp: fix possible stall on recvmsg()")
-> Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+This should just be part of the patch adding the compatible. Adding it
+incorrectly only to fix it up one patch later doesn't make sense.
+Additionally, remove this information about the error adding this
+produces, all you need here is the justification for it.
+
+pw-bot: changes-requested
+
+>=20
+> Signed-off-by: Charles Perry <charles.perry@microchip.com>
 > ---
->  net/mptcp/protocol.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> index cf1852b99963..7a65c2101f63 100644
-> --- a/net/mptcp/protocol.c
-> +++ b/net/mptcp/protocol.c
-> @@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
->  static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
->  				size_t len, int flags, int copied_total,
->  				struct scm_timestamping_internal *tss,
-> -				int *cmsg_flags)
-> +				int *cmsg_flags, struct sk_buff **last)
->  {
->  	struct mptcp_sock *msk = mptcp_sk(sk);
->  	struct sk_buff *skb, *tmp;
-> @@ -2058,6 +2058,8 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
->  			}
->  
->  			mptcp_eat_recv_skb(sk, skb);
-> +		} else {
-> +			*last = skb;
+>  Documentation/devicetree/bindings/net/cdns,macb.yaml | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Docum=
+entation/devicetree/bindings/net/cdns,macb.yaml
+> index dff350302098..be66cc9a42fd 100644
+> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> @@ -197,6 +197,17 @@ allOf:
+>        required:
+>          - phys
+> =20
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: microchip,p64h-gem
+> +    then:
+> +      patternProperties:
+> +        "^ethernet-phy@[0-9a-f]$": false
+> +      properties:
+> +        mdio: false
+> +
+>  unevaluatedProperties: false
+> =20
+>  examples:
+> --=20
+> 2.47.3
+>=20
 
-Out of curiosity, why only setting *last for MSG_PEEK? Is it not better
-to always call sk_wait_data() later with the last skb, even when
-MSG_PEEK is not used?
+--kVYLEYPFNlPTY8zB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Or will this cause other troubles?
+-----BEGIN PGP SIGNATURE-----
 
->  		}
->  
->  		if (copied >= len)
-> @@ -2263,6 +2265,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->  {
->  	struct mptcp_sock *msk = mptcp_sk(sk);
->  	struct scm_timestamping_internal tss;
-> +	struct sk_buff *last = NULL;
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaackXgAKCRB4tDGHoIJi
+0mEFAP4x/utBAYjtDikgFeZ09Z1bpUmjAVX6LWWhhf6+IjNITAEA8pui39GfmaF7
+oDKupcUfRRsbTw6GX3RpDguW8JnWrQk=
+=TfYY
+-----END PGP SIGNATURE-----
 
-Detail: the scope of this variable could eventually be reduced by moving
-it inside the while-loop. This should hopefully help to reduce conflicts
-during backports.
-
->  	int copied = 0, cmsg_flags = 0;
->  	int target;
->  	long timeo;
-> @@ -2291,7 +2294,8 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->  		int err, bytes_read;
->  
->  		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
-> -						  copied, &tss, &cmsg_flags);
-> +						  copied, &tss, &cmsg_flags,
-> +						  &last);
->  		if (unlikely(bytes_read < 0)) {
->  			if (!copied)
->  				copied = bytes_read;
-> @@ -2343,7 +2347,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->  
->  		pr_debug("block timeout %ld\n", timeo);
->  		mptcp_cleanup_rbuf(msk, copied);
-> -		err = sk_wait_data(sk, &timeo, NULL);
-> +		err = sk_wait_data(sk, &timeo, last);
->  		if (err < 0) {
->  			err = copied ? : err;
->  			goto out_err;
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+--kVYLEYPFNlPTY8zB--
 
