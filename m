@@ -1,201 +1,197 @@
-Return-Path: <netdev+bounces-263295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJ8zCakFp2k7bgAAu9opvQ
-	(envelope-from <netdev+bounces-263295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:00:41 +0100
+	id eEihL0sFp2k7bgAAu9opvQ
+	(envelope-from <netdev+bounces-263296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:59:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609F31F31FD
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:00:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA0E1F319D
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4C0630432D6
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:54:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E025F303F08C
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6033B492196;
-	Tue,  3 Mar 2026 15:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C34492520;
+	Tue,  3 Mar 2026 15:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vPJ4KfPp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="woXOvWDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B7048C3E1;
-	Tue,  3 Mar 2026 15:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBB2492501
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 15:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772553268; cv=none; b=NPCpBcwUTrQ0Bx4kEAz+7hveUxxp5xMa5GktZAW5E78imBN9/Yt/J4MUPgJL7kvunSvvcoIgRYEsfKjpHfLW9f+LEM7Gm6h5Q6n+FRxj3TqwxkV6o9O/Bcyxr+T0qDR0ui4tMqusDtqrST3HRRNCQm4EQCQ/IDZP8Jo+o3pOSdc=
+	t=1772553311; cv=none; b=MflEfKLvMd3tQsGO88mNlO5WGC4ombVIFB5VJWVsP+VFBKLIe4EEdCrP9MdDvCfqe8GCDqTvsVw9K9v1OD3kTzj4htg+cJ63TJkm7B9xd3X5LJl4k5FGHmK6S0HVKBxBV2knKbzhd980LZmjMu3ScIx2wE+QVaPQcwaBW5IoCtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772553268; c=relaxed/simple;
-	bh=7fnQX0U0YtGfmjHwM/E4VwsHMnZkZCWuxwqP8/MrHAY=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=aLEObUaoghzH8gJZpx/mNUtq+eIlLdUwATQBLbjEeVxvvbO+7fGDD9bLR2V2ZSt0qaQpAsQBsL/RyMJwCkedzfEhq7H8K/YG59SG6nkCqRojO7jZpPivge7+hRgO+IpOJbYu8WVHGCxmkL2PcrD3GxT23AhyklKfSTCVONKnyEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vPJ4KfPp; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BFbhB1U0UZupokUSqo0EdHa5dENa2SzHBjSH0liGHwg=; b=vPJ4KfPpmsEylywie15z/HfGzw
-	N9nLQmqko0XuU6YQ4EHI5hJMjHfPDtP1ZyzSzDFRliEXVAAJfQjE7H5lb7a2C+3T0XCdYgDCZgweU
-	dWHAH8QbkotoZy6krBaME3J/OeJMhBAMw0Fv2BGtkC/3S5Fgdwnow7XcRX72vocR4ZrASJRYDI4nD
-	Flgm/GQr9fa3QGoqjYslksBikjI/Plk5Z+cVPnyGLJQp5btJCh1EvVkcqUcN/5YIzyQzpnDLEm/BV
-	+kUDPOYpEY6zivBSvRkXUpQdBTmtl9yUKeMWEIh6wCTUFZbWhVu9BE/PFh+kuK10kJPjbBt9RLxi/
-	rL6RRLbg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54248 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vxS4a-000000005LD-15QK;
-	Tue, 03 Mar 2026 15:54:13 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vxS4U-0000000BQXy-1Q1v;
-	Tue, 03 Mar 2026 15:54:06 +0000
-In-Reply-To: <aacD3osfaZkLsGxm@shell.armlinux.org.uk>
-References: <aacD3osfaZkLsGxm@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next v2 7/7] net: stmmac: qcom-ethqos: remove
- phy_set_mode_ext() after phy_power_on()
+	s=arc-20240116; t=1772553311; c=relaxed/simple;
+	bh=7b8F1HaCkpN6fayVr7HNxwpvh017ORH7b3smsXK8+0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CkhA9iZo32Qztb+2KRIOFHFTMVa5PMADxdwtBlPEswM3f6s/OV3m4lcYwjLV4OQjaWRdFexvj/opoguxY9aKqNbbwtcWdwOM8huCvHsXbB/e/ah8kOTzS4f5jsBhFE4gawPuoRCXkXT/Tdr7rbzc1Zj4kdKsVgEi5rCG/94LTh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=woXOvWDl; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id EAF35C40FAF;
+	Tue,  3 Mar 2026 15:55:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 374305FF29;
+	Tue,  3 Mar 2026 15:55:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 823341036915A;
+	Tue,  3 Mar 2026 16:55:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772553305; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=SH5CVKmEIbnVEu71258fPU3XMEnF0AcPei/4hXDNKko=;
+	b=woXOvWDlKUBjnhuOi/e1OGikcft5vpeuygIsCNkvN1tsXPHf+Lfw/KgOnxveeki9Eoiyb9
+	AKMH/InS9g+yX9oOEPzwV+iZWv2+NVAB+FExPvuoeksDdqIEqHIAokikSvLaT2qkqBWI4D
+	TvQDeB/UcsKVIUwxnNTS6a9/NznBF30sGWDzhUm3WANLH/3QnC9h884Wg3frFDjVdiG1w6
+	98MCuCeIkV8BJGqMcNSU/JfqPdDON0XhQq784puj/8x0f6f0KH3bVBPPrhAu06qMpOVayp
+	YohGh713fBhUAj//3xNE4WCBimRQsQOpJUG5kp8gcNl7ZGVOdQsTKXD/35xdTA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/2] net: sfp: Describe and handle regulators
+Date: Tue, 03 Mar 2026 16:54:56 +0100
+Message-ID: <9586950.CDJkKcVGEf@fw-rgant>
+In-Reply-To: <aab51KbpIq72wtSU@shell.armlinux.org.uk>
+References:
+ <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
+ <aab51KbpIq72wtSU@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vxS4U-0000000BQXy-1Q1v@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 03 Mar 2026 15:54:06 +0000
-X-Rspamd-Queue-Id: 609F31F31FD
+Content-Type: multipart/signed; boundary="nextPart3331196.5fSG56mABF";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: CBA0E1F319D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263295-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-263296-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.288];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[romain.gantois@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:email,nxp.com:email,qualcomm.com:email]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:url]
 X-Rspamd-Action: no action
 
-The call to phy_set_mode_ext() after phy_power_on() was a work-around
-for the qcom-sgmii-eth SerDes driver that only re-enabled its clocks on
-phy_power_on() but did not configure the PHY. Now that the SerDes driver
-fully configures the SerDes at phy_power_on(), there is no need to call
-phy_set_mode_ext() immediately afterwards.
+--nextPart3331196.5fSG56mABF
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Date: Tue, 03 Mar 2026 16:54:56 +0100
+Message-ID: <9586950.CDJkKcVGEf@fw-rgant>
+In-Reply-To: <aab51KbpIq72wtSU@shell.armlinux.org.uk>
+MIME-Version: 1.0
 
-This also means we no longer need to record the previous operating mode
-of the driver - this is up to the SerDes driver. In any case, the only
-thing that we care about is the SerDes provides the necessary clocks to
-the stmmac core to allow it to reset at this point. The actual mode is
-irrelevant at this point as the correct mode will be configured in
-ethqos_mac_finish_serdes() just before the network device is brought
-online.
+Hi Russell,
 
-Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c         | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+On Tuesday, 3 March 2026 16:10:12 CET Russell King (Oracle) wrote:
+> On Tue, Mar 03, 2026 at 02:54:25PM +0100, Romain Gantois wrote:
+> > Hi everyone,
+> > 
+> > This series describes regulators supplying the VccT and VccR pins of an
+> > SFP
+> > cage or soldered-down transceiver.
+> > 
+> > These regulators can then be turned on only when the SFP device is probed,
+> > thus saving power on systems which only load SFP cage support at certain
+> > times, or load SFP device descriptions via device tree overlays.
+> > 
+> > Please let me know what you think.
+> 
+> As ever, I don't want to be adding support for stuff into mainline
+> which doesn't ever get used - historically, we've had a lot of that.
+> So, any patch set which adds some kind of facility like this needs to
+> be accompanied by a user of it.
+> 
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 8913f6f02b9e..cb1c074c2053 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -105,7 +105,6 @@ struct qcom_ethqos {
- 
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
--	phy_interface_t serdes_mode;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *rgmii_por;
-@@ -648,17 +647,8 @@ static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
- 		return ret;
- 
- 	ret = phy_power_on(ethqos->serdes_phy);
--	if (ret) {
--		phy_exit(ethqos->serdes_phy);
--		return ret;
--	}
--
--	ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
--			       ethqos->serdes_mode);
--	if (ret) {
--		phy_power_off(ethqos->serdes_phy);
-+	if (ret)
- 		phy_exit(ethqos->serdes_phy);
--	}
- 
- 	return ret;
- }
-@@ -681,12 +671,9 @@ static int ethqos_mac_finish_serdes(struct net_device *ndev, void *priv,
- 	qcom_ethqos_set_sgmii_loopback(ethqos, false);
- 
- 	if (interface == PHY_INTERFACE_MODE_SGMII ||
--	    interface == PHY_INTERFACE_MODE_2500BASEX) {
-+	    interface == PHY_INTERFACE_MODE_2500BASEX)
- 		ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
- 				       interface);
--		if (ret == 0)
--			ethqos->serdes_mode = interface;
--	}
- 
- 	return ret;
- }
-@@ -839,7 +826,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->host_dma_width = data->dma_addr_width;
- 
- 	if (ethqos->serdes_phy) {
--		ethqos->serdes_mode = PHY_INTERFACE_MODE_SGMII;
- 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
- 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
- 	}
+I understand, though I'm dealing with an out-of-tree board but I understand 
+that this doesn't really count as a valid first use case.
+
+> This is especially true in this case, because I want to see why you're
+> wanting to have two regulators, when INF-8074 suggests that both VccT
+> and VccR should be derived from the same supply. The reason the
+> modules have separate supplies for the transmitter and receiver is
+> because the host side has the supply filtering networks to ensure
+> cross-talk between each is kept to a minimum.
+
+Interesting, I wasn't aware of this. I thought it was something like "being 
+able to shut down the transmitter side only while waiting for a WoL packet".
+
+It seems like there won't be a v2 anyway but I just wanted to explain why I 
+went with two regulators in the first place.
+
+Thanks,
+
 -- 
-2.47.3
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+--nextPart3331196.5fSG56mABF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmmnBFAACgkQKCYAIARz
+eA4vBg/9E05YtpfuVD6K6O/qoRgoBV79Ne0/MmCdsIQGo39YkLlJOMkJdP6M3hkD
+teYVSQdBdlF3+0gJv0JyzlV5o6yiIzGLVjKZ7GkS1CSXbn2CgUvw4Tuqdy+ExmAb
+q8phnrFep3qUlxXbqXb8lVW0++JBx8ci+fyxCUO7SvWkXM7TlgfFNb3DkuHwlpO+
+NqzxBDZ5/i+4JjEMhESlGV+YEVKToeUcIrhSBVnskQbBnPNaepJWVaCEf0Y3HBw1
+RV3XQf0B6lEdjAlzMJRr3Uoj9RlHsNYw5tuDBjzjhuhLo7Zjk30u0EahSf7bHeOu
+9oiTxreZiGfmKoROElaLxJW4hnPBJk49uHuJ9ZEA3piy4vyXNcDkamVX1KNirrx0
+DAa0wmOm/c1Shh7YPcM49190QwqMBhq8gzj08zqgFGrGYtgC+zctmrWrdhYCH5et
+jrYZzk92SjrzRA1sTSUjb389D1FVZlNMSSw0wVuKplah43Df6Igj2yukQ/kpcOCk
+9lB3SL9riKr9T10PJDcrFPoqkEOaMbcdfjRByIlOHLIMvf4k3AM4Od6PSJi/TQ9S
+XL5mCULfyxrBAd8sniXcZyhzP531Xv88KqD8tknk5OfSw35xvfWmQzoXEElr34hf
+ZAi9MzKythZOiU/0xU2NSTMBY7Y+WD1RaO1LV9XUaEDwU8ih1No=
+=u1tT
+-----END PGP SIGNATURE-----
+
+--nextPart3331196.5fSG56mABF--
+
+
 
 
