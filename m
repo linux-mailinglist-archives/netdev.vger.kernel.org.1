@@ -1,208 +1,146 @@
-Return-Path: <netdev+bounces-262975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJDwIs82pmloMgAAu9opvQ
-	(envelope-from <netdev+bounces-262975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:18:07 +0100
+	id OOF9Its5pmnQMgAAu9opvQ
+	(envelope-from <netdev+bounces-262978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:31:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3526A1E79B8
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:18:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25D041E7B22
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:31:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 848F3306B4D5
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:18:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 444803012B75
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095E634A775;
-	Tue,  3 Mar 2026 01:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B33136B062;
+	Tue,  3 Mar 2026 01:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FZHYM4FK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TF5B/smj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9283535BDAC
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 01:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897DF3603C3;
+	Tue,  3 Mar 2026 01:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772500680; cv=none; b=MMtaWY8RH48tZKw4+mOyb/POa/ouZvkuaA2t5hhG5tqMWhvKGuBSy7g7l7BuNToYi08KoMST1m39QZXGBCisOmWY56X0ZinxcZ4/oeGMNypG1OS14gRkaprwdG5MQozfPuaOOed1PgnGiTf+BznjQ2PWZHEi0XyRKx5g1PguRVA=
+	t=1772501465; cv=none; b=e7WamQ3BnDb5OjW65h2CBZWm9BfVRtaa1NdmANlxpY6zHI3y1VpbAIr9mZweu9H33UpZbDbY9n2F/TFB994AOv8cW1HFdwIK2jzTqCVQqZxqoO73o5t208yyKnNyTaGPfbyJo858vMFv5BNWDt7lyQvJrO5wnkCdVIbebprlKaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772500680; c=relaxed/simple;
-	bh=YyV/2W+rzuQDsuStd2bW++jjatn642X5DiNInwOahgE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ua1muCMg28RJn8/q6ScrZLPclrHGKoU7TMNe2jl5c40SmFUsuOh/rZ0MjK6Zi7OwTIEZo3+/y1MDvls+mZcHftpvtcKNXcdfOMImJIXLuDd8woPX+A/aGKCFZrdscKZC+FYbR7qA4IyPpDeEJ2GBEPwRLvfTxMc3fpwCDixZCTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FZHYM4FK; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772500678; x=1804036678;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YyV/2W+rzuQDsuStd2bW++jjatn642X5DiNInwOahgE=;
-  b=FZHYM4FK9stcAj/aGBN7C/us6iZRTGCO4Di4dMhO7wfniEgN0sdLtwEB
-   W5ofbxOB+4Q1py0FHPe4DqoGvxPSuwHxh/UITlfCw1Qd91848kF+i/8+Z
-   MXXx2/YlJJDkgpVscx0pW1n4efW6ke+T1QPXLr1XkpagUgtGgfCUYAhCL
-   +duz6KVnYu9lCC3u1Sw4+QvHo0HPu3YOgrqyAWN97pdeB9EA93Am3uhZm
-   a1FmMnG7/E2WKhqC0cwaTzkIc0r8A/JCv5NFQYGhlQPL5Apkyy15O5TZa
-   w4F8R8MUOF5nZRfutISIzfhR03kCCLpIwep9+eRrGN/3/1R5dZEboDLAW
-   w==;
-X-CSE-ConnectionGUID: dlLOSBVXTN2urIf+jCwbpw==
-X-CSE-MsgGUID: llO2CEDhTF6ZmacQK05AXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="96137598"
-X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="96137598"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 17:17:57 -0800
-X-CSE-ConnectionGUID: 7B/3Sl81TgG4P9UlbQocbg==
-X-CSE-MsgGUID: r7+fbmdWQ/+ld7cGDSSWwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="217064310"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
-  by orviesa010.jf.intel.com with ESMTP; 02 Mar 2026 17:17:57 -0800
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_info ptr
-Date: Mon,  2 Mar 2026 17:28:31 -0800
-Message-Id: <20260303012831.662492-1-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1772501465; c=relaxed/simple;
+	bh=4YJ21+u9iaHR/3fliCDM5sQsRGumRp1QiMPhtK95E8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RBUwYZ3X1qNinBIIMA+ZSzTdETGKNNs+vdzrtfYvByn1P4Zkt9RUg65qFHucCbqbelQzK2UJvbmwNiRk5Gpj5bLHzdIZ8jA+nvp7HY1WDsxdTrx6OB4vJnUJM/5Kyamzs+FQd+Y7vDkcqjjQRY8Uu3iqehockj0FLip/sqL/66w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TF5B/smj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HUKL9Y5s8qQvy223sWGjb++3da04HXQ26Z6GEuwMerc=; b=TF5B/smjiLlQUtcGCfFsFPta+Q
+	1ont1wMORchdXMOo5dHeQKh92q1h4bXTT8IichY2T2BiPzhYhKw9xqEvdkPCBG6A50bik8lgs2ZTZ
+	b0F8FKG1cnbzD68qMusKDyL+TXyi/JRRIkyxbRJ/c5cUfoXXONa7rrnAkTQctM7hqLR8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vxEar-009mO2-I2; Tue, 03 Mar 2026 02:30:37 +0100
+Date: Tue, 3 Mar 2026 02:30:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Po-Yu Chuang <ratbert@faraday-tech.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org, taoren@meta.com
+Subject: Re: [PATCH net-next v6 0/5] Add AST2600 RGMII delay into ftgmac100
+Message-ID: <ef88bb50-9f2c-458d-a7e5-dc5ecb9c777a@lunn.ch>
+References: <20260302-rgmii_delay_2600-v6-0-68319a4c4110@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3526A1E79B8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260302-rgmii_delay_2600-v6-0-68319a4c4110@aspeedtech.com>
+X-Rspamd-Queue-Id: 25D041E7B22
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262975-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-262978-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Deinit calls idpf_idc_deinit_core_aux_device to free the cdev_info
-memory, but leaves the adapter->cdev_info field with a stale pointer
-value. This will bypass subsequent "if (!cdev_info)" checks if cdev_info
-is not reallocated. For example, if idc_init fails after a reset,
-cdev_info will already have been freed during the reset handling, but it
-will not have been reallocated. The next reset or rmmod will result in a
-crash.
+On Mon, Mar 02, 2026 at 06:24:27PM +0800, Jacky Chou wrote:
+> This patch series adds support for configuring RGMII internal delays for the
+> Aspeed AST2600 FTGMAC100 Ethernet MACs.
 
-[  +0.000008] BUG: kernel NULL pointer dereference, address: 00000000000000d0
-[  +0.000033] #PF: supervisor read access in kernel mode
-[  +0.000020] #PF: error_code(0x0000) - not-present page
-[  +0.000017] PGD 2097dfa067 P4D 0
-[  +0.000017] Oops: Oops: 0000 [#1] SMP NOPTI
-...
-[  +0.000018] RIP: 0010:device_del+0x3e/0x3d0
-[  +0.000010] Call Trace:
-[  +0.000010]  <TASK>
-[  +0.000012]  idpf_idc_deinit_core_aux_device+0x36/0x70 [idpf]
-[  +0.000034]  idpf_vc_core_deinit+0x3e/0x180 [idpf]
-[  +0.000035]  idpf_remove+0x40/0x1d0 [idpf]
-[  +0.000035]  pci_device_remove+0x42/0xb0
-[  +0.000020]  device_release_driver_internal+0x19c/0x200
-[  +0.000024]  driver_detach+0x48/0x90
-[  +0.000018]  bus_remove_driver+0x6d/0x100
-[  +0.000023]  pci_unregister_driver+0x2e/0xb0
-[  +0.000022]  __do_sys_delete_module.isra.0+0x18c/0x2b0
-[  +0.000025]  ? kmem_cache_free+0x2c2/0x390
-[  +0.000023]  do_syscall_64+0x107/0x7d0
-[  +0.000023]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+I've been thinking about this some more. And i would like to propose a
+completely different solution.
 
-Pass the adapter struct into idpf_idc_deinit_core_aux_device instead and
-clear the cdev_info ptr.
+What we are trying to achieve is allowing the correct phy-mode to be
+used in DT, rgmii-id. Being able to specify internal delays is nice to
+have, but for most platforms should not be needed. It is only needed
+for badly designed boards where the designer of the PCB did not take
+care with the length of the traces.
 
-Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf.h          | 2 +-
- drivers/net/ethernet/intel/idpf/idpf_idc.c      | 6 ++++--
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 +-
- 3 files changed, 6 insertions(+), 4 deletions(-)
+Part of the problem is that the MAC driver is not actually
+"broken". It does what we recommend, read the phy-mode value from DT,
+and pass it to the PHY. The real issue is that the bootloader enabled
+delays in the MAC, behind the MAC drivers back. Because the MAC driver
+is not "broken", it is hard to "fix" the issue in the MAC driver.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index b206fba092c8..ec1b75f039bb 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -1066,7 +1066,7 @@ bool idpf_vport_set_hsplit(const struct idpf_vport *vport, u8 val);
- int idpf_idc_init(struct idpf_adapter *adapter);
- int idpf_idc_init_aux_core_dev(struct idpf_adapter *adapter,
- 			       enum iidc_function_type ftype);
--void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info);
-+void idpf_idc_deinit_core_aux_device(struct idpf_adapter *adapter);
- void idpf_idc_deinit_vport_aux_device(struct iidc_rdma_vport_dev_info *vdev_info);
- void idpf_idc_issue_reset_event(struct iidc_rdma_core_dev_info *cdev_info);
- void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index bd4785fb8d3e..7e4f4ac92653 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -470,10 +470,11 @@ int idpf_idc_init_aux_core_dev(struct idpf_adapter *adapter,
- 
- /**
-  * idpf_idc_deinit_core_aux_device - de-initialize Auxiliary Device(s)
-- * @cdev_info: IDC core device info pointer
-+ * @adapter: driver private data structure
-  */
--void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info)
-+void idpf_idc_deinit_core_aux_device(struct idpf_adapter *adapter)
- {
-+	struct iidc_rdma_core_dev_info *cdev_info = adapter->cdev_info;
- 	struct iidc_rdma_priv_dev_info *privd;
- 
- 	if (!cdev_info)
-@@ -485,6 +486,7 @@ void idpf_idc_deinit_core_aux_device(struct iidc_rdma_core_dev_info *cdev_info)
- 	kfree(privd->mapped_mem_regions);
- 	kfree(privd);
- 	kfree(cdev_info);
-+	adapter->cdev_info = NULL;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index d5a877e1fef8..113ecfc16dd7 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -3668,7 +3668,7 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
- 
- 	idpf_ptp_release(adapter);
- 	idpf_deinit_task(adapter);
--	idpf_idc_deinit_core_aux_device(adapter->cdev_info);
-+	idpf_idc_deinit_core_aux_device(adapter);
- 	idpf_rel_rx_pt_lkup(adapter);
- 	idpf_intr_rel(adapter);
- 
--- 
-2.39.2
+So lets solve this in the bootloader. I suggest you patch the
+bootloader to no longer enable the delays in the MAC. It also needs to
+patch the DT blob. If the blob says "rgmii", change it to
+"rgmii-id". u-boot should be able to do this.
 
+That should give backwards compatibility:
+
+* Existing DT blobs with old bootloader gain the delays in the MAC.
+
+* Existing DT blobs with the new bootloader gain delays in the PHY.
+
+* For new boards being added to Linux, we NACK them with "rgmii", tell
+  the developer to upgrade the bootloader, and use the correct
+  rgmii-id. This is a power we do have.
+
+* Developers of existing .dts files can submit patches to replace
+  "rgmii" with "rgmii-id" once they are happy all platforms have had
+  their bootloader upgraded. That might be never, since developers are
+  lazy, and we cannot force this on them.
+
+	Andrew
 
