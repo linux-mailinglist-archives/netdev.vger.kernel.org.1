@@ -1,197 +1,181 @@
-Return-Path: <netdev+bounces-263099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CLyMAuupmn9SgAAu9opvQ
-	(envelope-from <netdev+bounces-263099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:46:51 +0100
+	id mEsRFXiupmn9SgAAu9opvQ
+	(envelope-from <netdev+bounces-263100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:48:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267C91EC130
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:46:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF4C1EC15D
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 136E530DDE16
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 09:42:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 207623044BBE
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 09:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84EB38C438;
-	Tue,  3 Mar 2026 09:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1017838C407;
+	Tue,  3 Mar 2026 09:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mf87Jsgj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxPywm04"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SdWD26Aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902A326C38C
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 09:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772530957; cv=pass; b=JoUo1ZhlPGvEIUXaO7esdR2POxto5ni2dB4q7s3qOPyT9mzjivhtVuK3h8dnxgOlE+/zcOeD5D4mUF677jZFi9ATuqCiC5omYQ0szBAzedkzrwsE6PQlwQwpHzJ2w5fygaGTTwD+o5/odHoMjqyEn99OVDxEwQbt3M7jZBdFnbg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772530957; c=relaxed/simple;
-	bh=/yj2mW0NBVKsw8Lzty5GF5IiC48Z0uRzqpsfTB7QeQQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SL9GzJYunn69mZoURbwAwEkha5syfmqaBnUyHG1L6rXUBV3xkzKsb1GwrmRBIgp7EL0gGGMl4O6G+yMgqfsmhZEBABHzLdK8w+uBYtRTinhgzB/T6hfQLJzkOW0u1fFAuUZnICgsHjsCkubGhoXcPn3H7s/gv56P25xjfJGPJCo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mf87Jsgj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WxPywm04; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772530953;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=280O4eJ/wV+tCznStLFLW+f7jjqPyV02bSsKWxFTH3o=;
-	b=Mf87Jsgj381bJkP9XMM39icaHQxDwGmFVrIq/xb4PkWBMPlNlne5X5Q4ok+s6YYH3in6hj
-	IrgDS7INZiwwm2Aod3QTm0IVaoXA0VyhNQi+9xmJFHICfs1ifiAkcw7EyWrRcmceDcVpXQ
-	lhbCN/rB/w7IvG6MNalIck5n6U8jZP0=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-KvUFhRFeNnSpSpdLlzB-cA-1; Tue, 03 Mar 2026 04:42:30 -0500
-X-MC-Unique: KvUFhRFeNnSpSpdLlzB-cA-1
-X-Mimecast-MFC-AGG-ID: KvUFhRFeNnSpSpdLlzB-cA_1772530950
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-79868eae64fso109545667b3.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 01:42:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772530950; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Xz5Z1rn+rPRL/c+6oRsG/LgOQHzwMh599lcjDR9qmhibdiH1rBcKN7s89TNyfZ2PZI
-         VV/ivS1SaXr5qLtzPmxMrtOnpJM+NkUiVE9tPQdEej4VyM9XCijm6fuk2CfxHD+xDt/n
-         befq8zJB6qMmcGD4sa4k+b9alogM8VlnQhn4o5MzbU70WULKkGNMUZ1tq1DwkY1w9mgb
-         RSdTZvu830TErfE5yUwWmUWXIWegncP0Djb6WqKhCg1ACR8jOc9CT9hY/tXmb7pk3zQ8
-         lTNHck9pqllht/FDagabmupXXyM0lW7b5QDXc0CVlwyqfIa25Yl9VoN8SHV+nnJ8wSaC
-         qg6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=280O4eJ/wV+tCznStLFLW+f7jjqPyV02bSsKWxFTH3o=;
-        fh=jINEsUBQWOZd+deGc3FHL4g0nsUug9R4JEYroMqMj4Q=;
-        b=SEQOJ3Nm1qELlu/3oFFYyMz49LRsdZ+P9f0grHWV2+pY7NSyRG3/IZC93DBt3F2HQW
-         lLxgo0cbpkfJl4jgG6pJdfpicFCjdyVHdEQ2E4/hiu68n6gFILdWhDRLRz6hPiZl6afU
-         36t4f5M1LMFvxTvJIhbIpNANCW2BjQlC08VGk6meLgsSSC7qODG0zOGUKxswcgEtPSTn
-         M8ShWlgRB/tYJAmr7Sfqpwg9ruaHtvrbrJBdcnIRwY2zAm7ihkonBbn1zWi3uYTMYxRu
-         sak+vb4xM0KKCHlnVXAuxQj6IgzSas73ISvmQJJCqX1J3T51oKaYm9yeNEIxKtZ0sVtP
-         iTcw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2ED38C2D7
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 09:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772530993; cv=none; b=MIyLfjcJU60JvpIsbuIR5WgxkEajTQEW4t9b7oDhsza7Es8W56a3PCkSlJr08sgJF0R7JggmppNefDvTYFDz7ASfhDHqXfMkLuaf08xkowwArLJMfGe99mNaKZih7jAJqs7t3TG0UA+kwvvSgVlMYS4a2FXS/XZylX9gBwE2HIo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772530993; c=relaxed/simple;
+	bh=+Ls+70EODi+1G0THgyYCXhR2Z7n4Ltp2CPCQLxSWUTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jiRNiRBJM5XkYcMFGDe+OCFnf6iN43Q6WJ9e+oE7w2AsQ/MkxWvkIdwWKfPklrsAJwjtHsG34Xs7TD/JVnGVW0r40YTP6IqHS+2ZWS21wOoxWyaXJaXcmnz/fQAFPuiFe7arQ8Iuy2rFHV6SDCC00Geyqz8Rm5RNZYRWRO16BcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SdWD26Aa; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ab39b111b9so26134265ad.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 01:43:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772530950; x=1773135750; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=280O4eJ/wV+tCznStLFLW+f7jjqPyV02bSsKWxFTH3o=;
-        b=WxPywm04zcNWMfgMPm9fGyTPbUGs0DFPmQF1OP4djXpQXz5Dc/DP+LwDzjN/3kfnL3
-         RKbGupFzeB0gXdRqz/6d93jhb736mhvLgdld4IQeZAWLYgMD9KmG/o2sW4gwHBZQajDM
-         0ReYoVfTxR7J89mK0gPc+Ww+noCe81pwCW8fcS8MnkM/7lxO1Iq1cGD1ImoIE4MUbd3f
-         drD1xoBiBexgN0msD72BsKm95PvTp0WNmzYNUbmTzXj/g8IkADT8HBSUQ2N7XABRp+iq
-         9uPVcun0CYiLXm0mcwOq8KhKsXz49xTGe9b/ogLXo1M7XQcoq8eygVmCqDF8VhOVHW6J
-         zqFA==
+        d=gmail.com; s=20230601; t=1772530991; x=1773135791; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fAG/yCp5zU1Q+E1ywZBao8oWa/l/DBt64PVYUKwkwbw=;
+        b=SdWD26Aajp7HNW76ZK5EJyo8tMF2PzNHFuSSRX64k/gAWuwxWZlbIXfPGkqmsxCcp2
+         gVpJ38327yY8ngVwDYlhxQQFe4yv8BlnsleAxkY7psKRsNYb1z52ybBr/GCM/cYgCldR
+         6LwabdaQngf912hjg+q2InXAuqKGlrM4ZqvrZm3RL4cejxXhFy9mO6tZhMAyGapzWtjM
+         HP+P9JlryR8Dg2aMvYvZRzdy+iuOgml4sGRt4TRwA/GBWCLJtHIEseyg86q8jdTcWIs4
+         fwANlHpEje9AaaTQXFaFFHVUJvYaEecH+zZy2Nt87I6NQ4se0ElPHlffh9Lkjq+4Bp2o
+         LHVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772530950; x=1773135750;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+        d=1e100.net; s=20230601; t=1772530991; x=1773135791;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=280O4eJ/wV+tCznStLFLW+f7jjqPyV02bSsKWxFTH3o=;
-        b=b6I+tKrxkOm1gzH3JB79acGVav/APlONbCl4V399gFCs0c3uWjKqkUgVYQx05Z+msl
-         VwL/mKKdNiga1Xh8p21DLtgIQgPKn+5usZfQbH6YCmZyK8LmydZOG/7x/PRrAGlnZoYf
-         pEhWTFfGSWYLjQT8w200DEp9o5KPWK34nNz6pXk6SCldI7YXP7aCTTfX2cFQC5cydhWz
-         pAyJqB32jkpuptZTIfCRYlucGPyl7EgOY3XLfNT1WEfxyZ6ap5mJQbRykQQ6Zx/L6ixK
-         obLlnItOfeTqPfwsl3aNy7PxxPs+GR5OugrQNg7d7OYDBKOFcn622EgU8PdhH4ofdckp
-         WpAg==
-X-Forwarded-Encrypted: i=1; AJvYcCVXCqErmctZZUN2wZ+Te6MLn1pIcdWrSIvhTdliDVC0//Jk/G/k8cM6+5FzoFQJ6YAmWTFahLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhPK1S8vaOLye7QsIQsEWKmS6DjsR5Rhg2Q0qDmqEyNTGbtxFF
-	Uc+s5w4GfDmA3p219OZKPTRzIA0+IKNGJomA2ZUMELzwOj2i0/gWDuLu1tLND94Q/6kF/yaf2mJ
-	o8m7zHLUpnu9LFDCY+Wc9ZPIBnG2vevLmn21stePPsDbWzM3ssOHphFZZJt7RqRtnowBEJjyCPu
-	nbQnFi2kTWXjPYRjvBItUps2wTxAkxvimL
-X-Gm-Gg: ATEYQzzzUdcOASRN15LreBZ/Nt0fwHnXAlW2qP+vrGk9WvEXGGtJ+v4TxNUKEHdWwoG
-	oe6ibXCkBoCeCOh5uSS9OGZBJ3lcCvmh/mnge/5Qkc04ArdF0tj5jsf1JvOXKUro7TWu2Nbu2r+
-	GwPtH7fvxxv/3GASCBpHX+WMyVyStpU3S8uRCm22VsX7XpuWFrKzRtVI25AKmTUqKF/RZFDey1o
-	VhAnXc=
-X-Received: by 2002:a05:690c:e:b0:797:ce9d:5c71 with SMTP id 00721157ae682-798855c6320mr145284167b3.45.1772530949840;
-        Tue, 03 Mar 2026 01:42:29 -0800 (PST)
-X-Received: by 2002:a05:690c:e:b0:797:ce9d:5c71 with SMTP id
- 00721157ae682-798855c6320mr145283957b3.45.1772530949457; Tue, 03 Mar 2026
- 01:42:29 -0800 (PST)
+        bh=fAG/yCp5zU1Q+E1ywZBao8oWa/l/DBt64PVYUKwkwbw=;
+        b=PQJfnKEW3fDewoekL+k4HKfYUWtWdlqVymNkvdB25eIDD4vLvNXPCJmL4aGSme8rTU
+         JZjmkZ5gYjm17BLdDSoZHv3E3LkNiyyHuyWlBrL5ttWcoGrglTWCeXOn8iGYvZq6MWeQ
+         bDgphlq+F+q/mqQR422Fe3eBKSjJOomrgL4SlrvyHIZcNVSp9bl8YvcEYPZND6dmZRb/
+         A79/W6VJE25PTSlWRzd3l0KUnxL3bYpCmP2NWd9AG2jn3PZI/9iWZf7vheEUEwk4AamH
+         bMYd6zgtVXieoNPv0XhSGZylSoRjlw6EKJWzVLm0E5jdGPniE6BOrAcSzkDgjwM7P2p+
+         F5lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtX6mBauGGb/v94kDDnBCz7DIFhQnWMemURqwDbAXy0oQ43FENY0+bMlk3onJS7XiM5/v2L+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZAFiyFn7RLHOeSyLJyWjf36vzxJ4p0aySYsL3BWnn1AHisCm5
+	9zqnowEYuB3yEsNWTcTar2AY6BA8FhGzqKbGYhNRqErCLhLjtJCCq631
+X-Gm-Gg: ATEYQzwI0G4FQCu08d1ucaGdwi7OK8GRsPIVUNMk3Rge6tqsaZMa69qfpQoMxdg++z1
+	IXvvZUVljvjSoJTs1m/EgI5gc1pC5/BQ1T6v7+V4J/qMG0gNcwKwIwxRP1DFG/C+bMDgg5Yvy7E
+	iSxv16P/vBepNZcJoAQPBtgq0JKM4qdTPVx4xfglN3Wv95oVmI7bsf8CDf0RKq3r03iYC3VAHtO
+	0XCKl5Q5kXb/aD+5jpqnXdFrafuuWCBsoKH+yF/0ZGX5v4BlvzcYPG9McZZ2F/kTWNqnTwY6yoE
+	BKFnQG7f2Qtvq4HusCgGcpiV8S07FiaJ09YxuOsw3YcYLKEaHHEL4iA5Mu8jiJjC1d0KI2fJgcW
+	pZZFtDpX6ay3Z5ZtfY8AcO37evnKiFgYFFKd/jvedKLtddViUnW4hb6TPPHEnp1XqCA8CYealwe
+	zpFSKXufpWWpsGe1tvaPoWMMOyvy5BEUrrqJVPYVS4p+WZg85mBUTDJvErLrI=
+X-Received: by 2002:a17:902:ef4e:b0:2ae:3ab7:1545 with SMTP id d9443c01a7336-2ae3ab716c3mr100913675ad.43.1772530991099;
+        Tue, 03 Mar 2026 01:43:11 -0800 (PST)
+Received: from SLSGDTSWING002 ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69f283sm163382885ad.49.2026.03.03.01.43.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 01:43:10 -0800 (PST)
+Date: Tue, 3 Mar 2026 17:43:06 +0800
+From: Weiming Shi <bestswngs@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: security@kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xmei5@asu.edu
+Subject: Re: [PATCH net] net/core: add xmit recursion limit to qdisc transmit
+ path
+Message-ID: <aaatKuzRBaR_cSL2@SLSGDTSWING002>
+References: <20260303022947.3061602-2-bestswngs@gmail.com>
+ <CANn89i+mK-CqGPeW65RBeOe2R-YjqjxU9W9AGbvV1Ef+HS4DtA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 3 Mar 2026 10:42:18 +0100
-X-Gm-Features: AaiRm51ZULYt-vLs6o1MyOGTDebdiHIeo2M9vqVZ7FwXgbPhxa9AQgGMccX0isk
-Message-ID: <CAF6piCKbxHF7DASK47-q3DFdtKgvheAGdLUaTwYsfg3ikZAi-w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: datagram: Bypass usercopy checks for kernel iterators
-To: Chuck Lever <cel@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, Network Development <netdev@vger.kernel.org>, 
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 267C91EC130
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+mK-CqGPeW65RBeOe2R-YjqjxU9W9AGbvV1Ef+HS4DtA@mail.gmail.com>
+X-Rspamd-Queue-Id: ACF4C1EC15D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	FAKE_REPLY(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263099-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263100-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TO_DN_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 2/25/26 5:25 PM, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
->
-> Profiling NFSD under an iozone workload showed that hardened
-> usercopy checks consume roughly 1.3% of CPU in the TCP receive path.
-> These checks validate memory regions during copies, but provide no
-> security benefit when both source (skb data) and destination (kernel
-> pages in BVEC/KVEC iterators) reside in kernel address space.
+On 26-03-03 05:30, Eric Dumazet wrote:
+> On Tue, Mar 3, 2026 at 3:37 AM <bestswngs@gmail.com> wrote:
+> >
+> > From: Weiming Shi <bestswngs@gmail.com>
+> >
+> > __dev_queue_xmit() has two transmit code paths depending on whether the
+> > device has a qdisc attached:
+> >
+> >   1. Qdisc path (q->enqueue): calls __dev_xmit_skb()
+> >   2. No-qdisc path: calls dev_hard_start_xmit() directly
+> >
+> > Commit 745e20f1b626 ("net: add a recursion limit in xmit path") added
+> > recursion protection to the no-qdisc path via dev_xmit_recursion()
+> > check and dev_xmit_recursion_inc()/dec() tracking. However, the qdisc
+> > path performs no recursion depth checking at all.
+> >
+> > This allows unbounded recursion through qdisc-attached devices. For
+> > example, a bond interface in broadcast mode with gretap slaves whose
+> > remote endpoints route back through the bond creates an infinite
+> > transmit loop that exhausts the kernel stack:
+> 
+> Non lltx drivers would deadlock in HARD_TX_LOCK().
+> 
+> I would prefer we try to fix this issue at configuration time instead
+> of adding yet another expensive operations in the fast path.
+> 
+> Can you provide a test ?
+> 
+> Thanks.
 
-Are you sure? AFAICS:
+Thanks for the review. I have two follow-up questions:
 
-size_t copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
-{
-        if (check_copy_size(addr, bytes, false))
-                return _copy_from_iter(addr, bytes, i);
+1. For the configuration-time approach: the loop in this case is
+ formed through the routing layer (gretap remote endpoint routes
+ back through the bond), not through direct upper/lower device
+ links. Since routes can change dynamically after enslave, would
+ this require adding checks in all of bond_enslave(), route change,
+ and address change paths to be complete? I want to make sure I
+ understand the scope before going down that path.
 
-calls check_copy_size() on the source address, and the latter:
+2. As an alternative, would it be acceptable to move the recursion
+ check into the bonding driver itself (e.g., bond_start_xmit() or
+ bond_xmit_broadcast())? This would avoid touching the generic fast
+ path entirely, and since bond is LLTX, there is no HARD_TX_LOCK()
+ deadlock concern. It would narrowly target the driver that causes
+ the fan-out recursion.
 
-static __always_inline __must_check bool
-check_copy_size(const void *addr, size_t bytes, bool is_source)
-{
-        int sz = __builtin_object_size(addr, 0);
-        if (unlikely(sz >= 0 && sz < bytes)) {
-        if (!__builtin_constant_p(bytes))
-                        copy_overflow(sz, bytes);
-                else if (is_source)$
-                        __bad_copy_from();
-                else
-                        __bad_copy_to();
-                return false;
-        }
-        if (WARN_ON_ONCE(bytes > INT_MAX))
-                return false;
-
-Validates vs overflow regardless of the source address being in kernel
-space or user-space.
-
-FTR, I also observe a relevant overhead in check_copy_size(), especially
-for oldish CPUs.
-
-/P
-
+Happy to respin in either direction, or explore other approaches
+ you have in mind.
 
