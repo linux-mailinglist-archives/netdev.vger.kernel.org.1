@@ -1,590 +1,149 @@
-Return-Path: <netdev+bounces-263270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AA54OCb7pmltbwAAu9opvQ
-	(envelope-from <netdev+bounces-263270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:15:50 +0100
+	id yKzSJpD7pmk7bgAAu9opvQ
+	(envelope-from <netdev+bounces-263271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:17:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F201F24CE
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:15:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C001F2572
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 463613070DCE
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:09:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1012530BD4D4
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC42F48033E;
-	Tue,  3 Mar 2026 15:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7977E48123E;
+	Tue,  3 Mar 2026 15:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OQq0Fu2c"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UL0NOTKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D7148165E
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 15:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88925480952;
+	Tue,  3 Mar 2026 15:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550554; cv=none; b=SAAe15gl6nOOdQOE07EbHpSxlA5k0lUDKWE6vZ4YyiCUUOw+e5++l8IN21b4tPTFFt+pIkinvEdTX/ID8PIIGD1u+SYOg+J6KwNzu0X16HsxKXwTS71h2Lb4SxoFYH0ve6OWkb8GOSwwR3inOYZPPjKyaC7abSc4PLa8wce8tU8=
+	t=1772550639; cv=none; b=HuOk0M61P7gHaw+HcuoLgNCWiJFQMj9qrBGdUzPfkKX2ffnupp6pdBiQ0obY9Itl1ROPHApz8CDaHH+DcffJdbTvY9rZgayKmeoOTK3icsC19/rzBGinI93QWTgDK3ht0PAbOqq34Zx/ZkZjvZkJtg+KbLbp4MJ9W9D5Qv7Dl7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550554; c=relaxed/simple;
-	bh=P0lp57O3xVx8qjH4XeIzmvz7D2tk1xI95GIqlyzq810=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HoD3WgqJVqtaK8GbDuPxVWnZ16DTDxazMRmnVzOPkr+EtOOaqAgY+m1CXMZ7TbYwRYaFYnxeqG5lAtobd/666KEnDyRtqkh5GqrIGitNdLYuFQ9Fj0H449jb72RqKobpKkO0JvtbLBX5Akp1AWyZzz6t13+HiulDpyk1feHgHVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OQq0Fu2c; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772550551;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ALIJ7LIlV+z/PhSVVXXCJAIsp2KMkktx7GQtroRZcKI=;
-	b=OQq0Fu2cy9cgIa0MBtWggp966iyuOuCotoKjX4+y10OD0SMW2KgN52DH5TiVNakRYuVQwr
-	W+Ri1qTl/tIwTfc2nMxOSGX+5lMmxO1fVrO6Vbx+7eC3PsL2C2H+Pzy+AiL4XXpDE7izIv
-	IrmBadGnVVVMRUpeskMauF5PAh5W888=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Feng Yang <yangfeng@kylinos.cn>,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Menglong Dong <menglong8.dong@gmail.com>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Pu Lehui <pulehui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next v3 6/6] selftests/bpf: Add tests to verify prog_array map compatibility
-Date: Tue,  3 Mar 2026 23:06:39 +0800
-Message-ID: <20260303150639.85007-7-leon.hwang@linux.dev>
-In-Reply-To: <20260303150639.85007-1-leon.hwang@linux.dev>
-References: <20260303150639.85007-1-leon.hwang@linux.dev>
+	s=arc-20240116; t=1772550639; c=relaxed/simple;
+	bh=kmLW65LGn3lj3fNViRHixN/BqzcnjNHXl6jmk7uSGv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3i/jXTRWRYS6VkY2+j26Myk6XBlnJZtsvjRudkTPqiy01D2OD/2qSjNWcXGhKUCXk8SY4MftISS3mf3I45oB/fsbJqRlC/Y9KjGs+WxrsNy3dhNE2XT6GGLzGhCQRC1ebsiu/aAbbIfgMsIq80ePwtkrDCPJWKL6YLG7EDzsro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UL0NOTKK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hatu/QAzhv1FKvPqz3f9cN8vip3SjPUH9A/AXblImUk=; b=UL0NOTKKFgwr5abFCaIzbuqIrF
+	j52NEejCHRQi6r0gZjeTvlnUWYqC8VMgDc0UTOUVlixXNyZBnWpZ0bysqEu3J/ie0gGxZi/EiZd31
+	NGN7ZlDyI89p53kvfzC3iHz6vG075v8soCLh3FazqxqA7zMMiWIco7dm5gwC2m7sqAtucsSEMXe3J
+	mN1Tq9LUHE12fgtSouBqlcDjg0ax8waT0o1pk1FQXMJcEYmDWnEls2bEWD2Oi1icPfjxWJjrv7n8e
+	Z1k2Ai9Hyl0iR9dy6vD38xJstYroFI5k7gdq44WuHIJKODU9kHZE5I1sM5LHR3x/EvllWh8UbMT0Q
+	bJOdXeQw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34698)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vxRO4-000000005Ew-2Bvk;
+	Tue, 03 Mar 2026 15:10:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vxRO0-0000000071d-45k0;
+	Tue, 03 Mar 2026 15:10:13 +0000
+Date: Tue, 3 Mar 2026 15:10:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/2] net: sfp: Describe and handle regulators
+Message-ID: <aab51KbpIq72wtSU@shell.armlinux.org.uk>
+References: <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 41F201F24CE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 01C001F2572
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,vger.kernel.org,fb.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-263270-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-263271-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_SPAM(0.00)[0.260];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add tests to verify the following tail call restrictions:
+On Tue, Mar 03, 2026 at 02:54:25PM +0100, Romain Gantois wrote:
+> Hi everyone,
+> 
+> This series describes regulators supplying the VccT and VccR pins of an SFP
+> cage or soldered-down transceiver.
+> 
+> These regulators can then be turned on only when the SFP device is probed,
+> thus saving power on systems which only load SFP cage support at certain
+> times, or load SFP device descriptions via device tree overlays.
+> 
+> Please let me know what you think.
 
-* !kprobe_write_ctx progs are not compatible with kprobe_write_ctx progs.
-* !call_get_func_ip progs are not compatible with call_get_func_ip progs.
-* !call_session_cookie progs are not compatible with call_session_cookie
-  progs.
+As ever, I don't want to be adding support for stuff into mainline
+which doesn't ever get used - historically, we've had a lot of that.
+So, any patch set which adds some kind of facility like this needs to
+be accompanied by a user of it.
 
-For kprobe_write_ctx, call_get_func_ip, and call_session_cookie, a
-prog_array map cannot be shared between progs with different values.
+This is especially true in this case, because I want to see why you're
+wanting to have two regulators, when INF-8074 suggests that both VccT
+and VccR should be derived from the same supply. The reason the
+modules have separate supplies for the transmitter and receiver is
+because the host side has the supply filtering networks to ensure
+cross-talk between each is kept to a minimum.
 
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
----
- .../selftests/bpf/prog_tests/tailcalls.c      | 319 ++++++++++++++++++
- .../bpf/progs/tailcall_map_compatible.c       | 103 ++++++
- 2 files changed, 422 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/tailcall_map_compatible.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/tailcalls.c b/tools/testing/selftests/bpf/prog_tests/tailcalls.c
-index 7d534fde0af9..1063e73ecffa 100644
---- a/tools/testing/selftests/bpf/prog_tests/tailcalls.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tailcalls.c
-@@ -9,6 +9,7 @@
- #include "tc_bpf2bpf.skel.h"
- #include "tailcall_fail.skel.h"
- #include "tailcall_sleepable.skel.h"
-+#include "tailcall_map_compatible.skel.h"
- 
- /* test_tailcall_1 checks basic functionality by patching multiple locations
-  * in a single program for a single tail call slot with nop->jmp, jmp->nop
-@@ -1725,6 +1726,312 @@ static void test_tailcall_sleepable(void)
- 	tailcall_sleepable__destroy(skel);
- }
- 
-+#ifdef __x86_64__
-+/* uprobe attach point */
-+static noinline int trigger_uprobe_fn(int a)
-+{
-+	asm volatile ("" : "+r"(a));
-+	return a;
-+}
-+
-+static void test_map_compatible_update_kprobe_write_ctx(void)
-+{
-+	struct bpf_program *dummy, *kprobe, *fsession;
-+	struct tailcall_map_compatible *skel;
-+	struct bpf_link *link = NULL;
-+	int err, prog_fd, key = 0;
-+	struct bpf_map *map;
-+	LIBBPF_OPTS(bpf_kprobe_opts, kprobe_opts);
-+	LIBBPF_OPTS(bpf_uprobe_opts, uprobe_opts);
-+	LIBBPF_OPTS(bpf_test_run_opts, topts);
-+
-+	skel = tailcall_map_compatible__open();
-+	if (!ASSERT_OK_PTR(skel, "tailcall_map_compatible__open"))
-+		return;
-+
-+	dummy = skel->progs.dummy_kprobe;
-+	bpf_program__set_autoload(dummy, true);
-+
-+	kprobe = skel->progs.kprobe;
-+	bpf_program__set_autoload(kprobe, true);
-+
-+	fsession = skel->progs.fsession_tailcall;
-+	bpf_program__set_autoload(fsession, true);
-+
-+	skel->bss->data = 0xdeadbeef;
-+
-+	err = tailcall_map_compatible__load(skel);
-+	if (!ASSERT_OK(err, "tailcall_map_compatible__load"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(kprobe);
-+	map = skel->maps.prog_array_dummy;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_ERR(err, "bpf_map_update_elem kprobe");
-+
-+	skel->links.dummy_kprobe = bpf_program__attach_kprobe_opts(dummy, "bpf_fentry_test1",
-+								   &kprobe_opts);
-+	if (!ASSERT_OK_PTR(skel->links.dummy_kprobe, "bpf_program__attach_kprobe_opts"))
-+		goto out;
-+
-+	skel->links.fsession_tailcall = bpf_program__attach_trace(fsession);
-+	if (!ASSERT_OK_PTR(skel->links.fsession_tailcall, "bpf_program__attach_trace"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(fsession), &topts);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts fsession");
-+
-+	ASSERT_EQ(topts.retval, 0, "dummy retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 1, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, 0xdeadbeef, "data");
-+
-+	err = bpf_map_delete_elem(bpf_map__fd(map), &key);
-+	ASSERT_TRUE(!err || err == -ENOENT, "bpf_map_delete_elem");
-+
-+	uprobe_opts.func_name = "trigger_uprobe_fn";
-+	link = bpf_program__attach_uprobe_opts(kprobe, 0, "/proc/self/exe", 0, &uprobe_opts);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_uprobe_opts"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(dummy);
-+	map = skel->maps.prog_array_kprobe;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_OK(err, "bpf_map_update_elem dummy");
-+
-+	ASSERT_EQ(trigger_uprobe_fn(1), 0, "trigger_uprobe_fn retval"); /* modified by uprobe */
-+
-+	ASSERT_EQ(topts.retval, 0, "dummy retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 2, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, 0, "data");
-+
-+out:
-+	bpf_link__destroy(link);
-+	tailcall_map_compatible__destroy(skel);
-+}
-+#else
-+static void test_map_compatible_update_kprobe_write_ctx(void)
-+{
-+	test__skip();
-+}
-+#endif
-+
-+static void test_map_compatible_update_get_func_ip(void)
-+{
-+	struct tailcall_map_compatible *skel;
-+	struct bpf_program *dummy, *fentry;
-+	struct bpf_link *link = NULL;
-+	int err, prog_fd, key = 0;
-+	struct bpf_map *map;
-+	__u64 func_ip;
-+	LIBBPF_OPTS(bpf_test_run_opts, topts);
-+
-+	skel = tailcall_map_compatible__open();
-+	if (!ASSERT_OK_PTR(skel, "tailcall_map_compatible__open"))
-+		return;
-+
-+	dummy = skel->progs.dummy_fentry;
-+	bpf_program__set_autoload(dummy, true);
-+
-+	fentry = skel->progs.fentry;
-+	bpf_program__set_autoload(fentry, true);
-+
-+	err = tailcall_map_compatible__load(skel);
-+	if (!ASSERT_OK(err, "tailcall_map_compatible__load"))
-+		goto out;
-+
-+	link = bpf_program__attach_trace(fentry);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_trace fentry"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(fentry), &topts);
-+	if (!ASSERT_OK(err, "bpf_prog_test_run_opts fentry"))
-+		goto out;
-+
-+	ASSERT_EQ(topts.retval, 0, "fentry retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 0, "dummy_run");
-+	ASSERT_NEQ(skel->bss->data, 0, "data");
-+	func_ip = skel->bss->data;
-+
-+	skel->bss->data = 0xdeadbeef;
-+
-+	err = bpf_link__destroy(link);
-+	link = NULL;
-+	if (!ASSERT_OK(err, "bpf_link__destroy"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(fentry);
-+	map = skel->maps.prog_array_dummy;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_ERR(err, "bpf_map_update_elem fentry");
-+
-+	link = bpf_program__attach_trace(dummy);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_trace dummy"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(dummy), &topts);
-+	if (!ASSERT_OK(err, "bpf_prog_test_run_opts dummy"))
-+		goto out;
-+
-+	ASSERT_EQ(topts.retval, 0, "dummy retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 1, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, 0xdeadbeef, "data");
-+	ASSERT_NEQ(skel->bss->data, func_ip, "data func_ip");
-+
-+	err = bpf_link__destroy(link);
-+	link = NULL;
-+	if (!ASSERT_OK(err, "bpf_link__destroy"))
-+		goto out;
-+
-+	err = bpf_map_delete_elem(bpf_map__fd(map), &key);
-+	ASSERT_TRUE(!err || err == -ENOENT, "bpf_map_delete_elem");
-+
-+	prog_fd = bpf_program__fd(dummy);
-+	map = skel->maps.prog_array_tracing;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_OK(err, "bpf_map_update_elem dummy");
-+
-+	link = bpf_program__attach_trace(fentry);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_trace fentry"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(fentry), &topts);
-+	if (!ASSERT_OK(err, "bpf_prog_test_run_opts fentry"))
-+		goto out;
-+
-+	ASSERT_EQ(topts.retval, 0, "fentry retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 2, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, func_ip, "data");
-+
-+out:
-+	bpf_link__destroy(link);
-+	tailcall_map_compatible__destroy(skel);
-+}
-+
-+static void test_map_compatible_update_session_cookie(void)
-+{
-+	struct tailcall_map_compatible *skel;
-+	struct bpf_program *dummy, *fsession;
-+	struct bpf_link *link = NULL;
-+	int err, prog_fd, key = 0;
-+	struct bpf_map *map;
-+	LIBBPF_OPTS(bpf_test_run_opts, topts);
-+
-+	skel = tailcall_map_compatible__open();
-+	if (!ASSERT_OK_PTR(skel, "tailcall_map_compatible__open"))
-+		return;
-+
-+	dummy = skel->progs.dummy_fsession;
-+	bpf_program__set_autoload(dummy, true);
-+
-+	fsession = skel->progs.fsession_cookie;
-+	bpf_program__set_autoload(fsession, true);
-+
-+	skel->bss->data = 0xdeadbeef;
-+
-+	err = tailcall_map_compatible__load(skel);
-+	if (err == -EOPNOTSUPP) {
-+		test__skip();
-+		goto out;
-+	}
-+	if (!ASSERT_OK(err, "tailcall_map_compatible__load"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(fsession);
-+	map = skel->maps.prog_array_dummy;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_ERR(err, "bpf_map_update_elem fsession");
-+
-+	link = bpf_program__attach_trace(dummy);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_trace dummy"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(dummy), &topts);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts dummy");
-+
-+	ASSERT_EQ(topts.retval, 0, "dummy retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 2, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, 0xdeadbeef, "data");
-+
-+	err = bpf_link__destroy(link);
-+	link = NULL;
-+	if (!ASSERT_OK(err, "bpf_link__destroy"))
-+		goto out;
-+
-+	err = bpf_map_delete_elem(bpf_map__fd(map), &key);
-+	ASSERT_TRUE(!err || err == -ENOENT, "bpf_map_delete_elem");
-+
-+	prog_fd = bpf_program__fd(dummy);
-+	map = skel->maps.prog_array_tracing;
-+	err = bpf_map_update_elem(bpf_map__fd(map), &key, &prog_fd, BPF_ANY);
-+	ASSERT_OK(err, "bpf_map_update_elem dummy");
-+
-+	link = bpf_program__attach_trace(fsession);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_trace fsession"))
-+		goto out;
-+
-+	err = bpf_prog_test_run_opts(bpf_program__fd(fsession), &topts);
-+	if (!ASSERT_OK(err, "bpf_prog_test_run_opts fsession"))
-+		goto out;
-+
-+	ASSERT_EQ(topts.retval, 0, "fsession retval");
-+	ASSERT_EQ(skel->bss->dummy_run, 4, "dummy_run");
-+	ASSERT_EQ(skel->bss->data, 0, "data");
-+
-+out:
-+	bpf_link__destroy(link);
-+	tailcall_map_compatible__destroy(skel);
-+}
-+
-+static void test_map_compatible_init(const char *prog1, const char *prog2)
-+{
-+	struct tailcall_map_compatible *skel;
-+	struct bpf_program *p1, *p2;
-+	int err;
-+
-+	skel = tailcall_map_compatible__open();
-+	if (!ASSERT_OK_PTR(skel, "tailcall_map_compatible__open"))
-+		return;
-+
-+	p1 = bpf_object__find_program_by_name(skel->obj, prog1);
-+	if (!ASSERT_OK_PTR(p1, "bpf_object__find_program_by_name prog1"))
-+		goto out;
-+	bpf_program__set_autoload(p1, true);
-+
-+	p2 = bpf_object__find_program_by_name(skel->obj, prog2);
-+	if (!ASSERT_OK_PTR(p2, "bpf_object__find_program_by_name prog2"))
-+		goto out;
-+	bpf_program__set_autoload(p2, true);
-+
-+	err = tailcall_map_compatible__load(skel);
-+	if (err == -EOPNOTSUPP) {
-+		test__skip();
-+		goto out;
-+	}
-+	ASSERT_ERR(err, "tailcall_map_compatible__load");
-+
-+out:
-+	tailcall_map_compatible__destroy(skel);
-+}
-+
-+static void test_map_compatible_init_kprobe_write_ctx(void)
-+{
-+#ifdef __x86_64__
-+	test_map_compatible_init("kprobe", "kprobe_tailcall");
-+#else
-+	test__skip();
-+#endif
-+}
-+
-+static void test_map_compatible_init_call_get_func_ip(void)
-+{
-+	test_map_compatible_init("fentry", "fentry_tailcall");
-+}
-+
-+static void test_map_compatible_init_call_session_cookie(void)
-+{
-+	test_map_compatible_init("fsession_cookie", "fsession_tailcall");
-+}
-+
- void test_tailcalls(void)
- {
- 	if (test__start_subtest("tailcall_1"))
-@@ -1781,4 +2088,16 @@ void test_tailcalls(void)
- 		test_tailcall_failure();
- 	if (test__start_subtest("tailcall_sleepable"))
- 		test_tailcall_sleepable();
-+	if (test__start_subtest("map_compatible/update/kprobe_write_ctx"))
-+		test_map_compatible_update_kprobe_write_ctx();
-+	if (test__start_subtest("map_compatible/update/get_func_ip"))
-+		test_map_compatible_update_get_func_ip();
-+	if (test__start_subtest("map_compatible/update/session_cookie"))
-+		test_map_compatible_update_session_cookie();
-+	if (test__start_subtest("map_compatible/init/kprobe_write_ctx"))
-+		test_map_compatible_init_kprobe_write_ctx();
-+	if (test__start_subtest("map_compatible/init/call_get_func_ip"))
-+		test_map_compatible_init_call_get_func_ip();
-+	if (test__start_subtest("map_compatible/init/call_session_cookie"))
-+		test_map_compatible_init_call_session_cookie();
- }
-diff --git a/tools/testing/selftests/bpf/progs/tailcall_map_compatible.c b/tools/testing/selftests/bpf/progs/tailcall_map_compatible.c
-new file mode 100644
-index 000000000000..991b799c89ac
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/tailcall_map_compatible.c
-@@ -0,0 +1,103 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <vmlinux.h>
-+#include <bpf/bpf_tracing.h>
-+#include <bpf/bpf_helpers.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+int dummy_run;
-+u64 data;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
-+	__uint(max_entries, 1);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+} prog_array_dummy SEC(".maps");
-+
-+#if defined(__TARGET_ARCH_x86)
-+SEC("?kprobe")
-+int dummy_kprobe(void *ctx)
-+{
-+	dummy_run++;
-+	bpf_tail_call_static(ctx, &prog_array_dummy, 0);
-+	return 0;
-+}
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
-+	__uint(max_entries, 1);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+} prog_array_kprobe SEC(".maps");
-+
-+SEC("?kprobe")
-+int kprobe(struct pt_regs *regs)
-+{
-+	data = regs->di = 0;
-+	bpf_tail_call_static(regs, &prog_array_kprobe, 0);
-+	return 0;
-+}
-+
-+SEC("?kprobe")
-+int kprobe_tailcall(struct pt_regs *regs)
-+{
-+	bpf_tail_call_static(regs, &prog_array_kprobe, 0);
-+	return 0;
-+}
-+#endif
-+
-+SEC("?fentry/bpf_fentry_test1")
-+int dummy_fentry(void *ctx)
-+{
-+	dummy_run++;
-+	bpf_tail_call_static(ctx, &prog_array_dummy, 0);
-+	return 0;
-+}
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
-+	__uint(max_entries, 1);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+} prog_array_tracing SEC(".maps");
-+
-+SEC("?fentry/bpf_fentry_test1")
-+int BPF_PROG(fentry)
-+{
-+	data = bpf_get_func_ip(ctx);
-+	bpf_tail_call_static(ctx, &prog_array_tracing, 0);
-+	return 0;
-+}
-+
-+SEC("?fentry/bpf_fentry_test1")
-+int BPF_PROG(fentry_tailcall)
-+{
-+	bpf_tail_call_static(ctx, &prog_array_tracing, 0);
-+	return 0;
-+}
-+
-+SEC("?fsession/bpf_fentry_test2")
-+int dummy_fsession(void *ctx)
-+{
-+	dummy_run++;
-+	bpf_tail_call_static(ctx, &prog_array_dummy, 0);
-+	return 0;
-+}
-+
-+SEC("?fsession/bpf_fentry_test2")
-+int BPF_PROG(fsession_cookie)
-+{
-+	u64 *cookie = bpf_session_cookie(ctx);
-+
-+	data = *cookie = 0;
-+	bpf_tail_call_static(ctx, &prog_array_tracing, 0);
-+	return 0;
-+}
-+
-+SEC("?fsession/bpf_fentry_test2")
-+int BPF_PROG(fsession_tailcall)
-+{
-+	bpf_tail_call_static(ctx, &prog_array_tracing, 0);
-+	return 0;
-+}
 -- 
-2.52.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
