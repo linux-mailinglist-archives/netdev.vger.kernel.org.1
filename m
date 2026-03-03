@@ -1,96 +1,78 @@
-Return-Path: <netdev+bounces-263453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPncHdtlp2mghAAAu9opvQ
-	(envelope-from <netdev+bounces-263453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:51:07 +0100
+	id 8EyTB0lnp2mghAAAu9opvQ
+	(envelope-from <netdev+bounces-263454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:57:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB531F82B8
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:51:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3AB21F8372
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:57:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 80E2430354A5
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 22:51:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A283230523F7
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 22:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36135361653;
-	Tue,  3 Mar 2026 22:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D14A390224;
+	Tue,  3 Mar 2026 22:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="i1xzRmq5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2uw9J4n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A2E16DC28
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 22:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC90A3644CB
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 22:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772578265; cv=none; b=T2hUXFS/XBY0PbnN0/sDjPie9Eji7WY7TbWcmJuitr/YHLHCcBnVU2TSsO1SaWhwo3ERVRCM0RRDWmhimTP2J3jVaMryDdlpn2SVt6zZRhpsCc2KdQiJ62CE8oRDegTWdxX7W0ZUMHwUytjFraJ+f1SA4J2dT57jhyp6wRME6zw=
+	t=1772578521; cv=none; b=AXAmQ2ASsTGsUFJvKRc+66ZiDKItZ4wdGk9+F45y+D2F5otiF9akih2J0J91xvXd1Fu8c1YJs77SrOytYK5jlPv5mm6C5ViMLDMEH4uc4Um/icVo11aeamRz4rgEclP5uGne067inxDPhnHFozdIhPVdjTisZOC3tFK4QIWca6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772578265; c=relaxed/simple;
-	bh=oJPg8ngFkWbAjDHnV+FPiRZWOJRL0IebQ2cas9eMRqw=;
+	s=arc-20240116; t=1772578521; c=relaxed/simple;
+	bh=VGKG2ImUg34B0C6o1nUVQQpbbrDIgsJoShVgk68zd9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lQlBmFdEJdDR6+R7EecJatLc/GaCUElXcK5jgbLT+Glu8ObeYfGGYqb2lKPBp8h3fDK+Qcipadu1WpHQfUg8yqK4USorgWfwRt87Y7NH+VB3dwnJockNcZiUt48lRXiyWBj4TrwWxAY2UrNHfdxvyzqRxkUzBBvZKDzMWlbEGzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=i1xzRmq5; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35980423087so1637803a91.3
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 14:51:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772578263; x=1773183063; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e8nfthd7ZxjhMqe0CrJ3b93FJHo4Cq0tHeMrNC2OcZ4=;
-        b=i1xzRmq5/yeivJB1hT7EHHUTTWtE4bZyOR2RJGF1RJYFTKa5Ib5Pu4pT7Qo8rXRnbd
-         KkPunPet/2MqFl8UZDRocS1+w02C7Wp95l43FyShjxZxzww7FecwGxuJC22OkFhI2x2I
-         ws7Lacfs5pAAicVCRnnW9Tx+DHN3K90sn/3MigKOWSxIvmIWxzlZOSy1GfAHyYI0VRcc
-         IdYl+matDGZo01OmKnCnkoxbE29Pf4/vbAGtjZ8fn3mSwL1Q2c4xuM72xfuJA6/CrjOt
-         mD8qvYW0qGJQ3A4jgBEsAkPCYD3+A3ewXnfeLaBYauon1y8Dvc9oA1TAuSzpDhz83HuP
-         VDGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772578263; x=1773183063;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e8nfthd7ZxjhMqe0CrJ3b93FJHo4Cq0tHeMrNC2OcZ4=;
-        b=da5z7emxECAGzm8Wc1xCGVKsL8r08dbXILMGtLYZ0ykCsHp324WQKj/nj457MotmRL
-         b9NCOLZ24fD3de9a8CvewZOX7A4we7bmuT1G58dhj5jFKgJ4vBHr5yNJNG00/aSID2YV
-         KMF7H55uGl8ujB57Rvvdv0743JbVoCPPlaJjTWhgy3SGf1rQ8afWvb+pl6/91kao7ADy
-         LL44exj4OtXgzdp7TMhkWwXUgq9tFkcbm0ukCrvockMmfaU17hRObOT0oscsvoUYW0qv
-         bf2HaCHOw8B0arNIIFkTn5JFN3g6GoWYKqO4p23dSqwndnNlqnX023OTQ3x/YbnhB5bN
-         ftYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhgvSGUrq/PKb4FWou+YCUn6ROHqvni1RBJwV8IxtLejVrEGPqRFhUFlyP8+mv49xOKDMExTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAXMR75m/zrNAL+WO3B73CT3qr4aW2se1TYnWNJZHQ6iF/gCVA
-	oGIQpaUEIaIlR1huxKEpc4kP+O/0leEn5OXSYDV2RLqq42VdrTiMmtUsnaJsgOSCCwaZtl80T5K
-	t/wPcrRk=
-X-Gm-Gg: ATEYQzxmDtVtfKiagBZjePSDWThbDVbOupvorSE//dQyI6oHsqUrw2L3VBgIg2mMORT
-	aZcqwLUjIglkexF0HME6OpHntCfs+K7+GaCx7waCehyuMIWac90Lo/K/SX14SYje9p5D7uPx1aO
-	gh6xjYGfNJ4ysAIVjTh6ty7kKnGylsbXm6ZifuLK6YmrJO7Yrhkt3692VgL9z2eWvcM+pwmvPyu
-	UJbDx0Lc1+nF7WXVitRK5N6/TRFK9ric/x3aMXE0zkYotDxB9ZehmkYBVdm4wCe000W9pT72gjB
-	RB3LNM2XtC8nvDe/b1IHd154SLoWtVn0HwhK0BxJqRL5AoatVFtcDwozDKZs7lFqU41FUlwPFyf
-	s+XVGoeZmEBk1Vq5nCikJG8mHuFqVL4Tx2xJdNZpAsQhnqrW2/8OMqIopDSBO1/ALvVUxVkqPcT
-	yPj/Y=
-X-Received: by 2002:a17:90b:3945:b0:359:94d8:34e7 with SMTP id 98e67ed59e1d1-359a6a7ea1amr17117a91.32.1772578263511;
-        Tue, 03 Mar 2026 14:51:03 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:5::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3599cc5cacdsm1772179a91.14.2026.03.03.14.51.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 14:51:03 -0800 (PST)
-Date: Tue, 3 Mar 2026 14:51:02 -0800
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net 5/5] nfc: rawsock: cancel tx_work before socket
- teardown
-Message-ID: <aadl1gXK0u6HBYIT@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-References: <20260303162346.2071888-1-kuba@kernel.org>
- <20260303162346.2071888-6-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQ2V4jwDDOqUhp22Tpvx3hkNHq9a+/8DA2M4LRtdAu+LOAMcG6uMdNUaJipqN0UDVpmClhP+5Injvt5HZArgCgYtZkj7AwWtTiVvWJTUiHW8dKp/jQ7p5m/54CAelawXJRkTEMagOz+8fhOhsy+XM4VsFVwD7YZl6fih0zBshek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g2uw9J4n; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772578520; x=1804114520;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VGKG2ImUg34B0C6o1nUVQQpbbrDIgsJoShVgk68zd9w=;
+  b=g2uw9J4n/8uvZ4iPMQw03b2B+FMd4Z8Y1OjVARIuRmj50IjGKd8JfHs1
+   pvO+hQgoZ4tkrF+UNPlc8C6Qicm+vC3HmGMaydiRKcsqWP8aGmutmIp5F
+   pc/x5UQPIgTEd34ZWwp0WeJMZfjYXvqyeLM7CPRSheD+AjIS8t4P1G5R7
+   cO9QMf8gxe50mNKCLFoHqh0oy/t06V6J4UEdO3nRh99LCQNHMzAM3tWBq
+   rLlFu06pxIXDgpEoRRMWgeLJbM081M/X1flGdg9umGTWcP2Ml8phPJQbs
+   GGoUpaajBz1mvOz7yNoq8T4qUmoV0Ips39X0xpiZ7acfFz7Gu/PQox4Wy
+   g==;
+X-CSE-ConnectionGUID: Bh+njRcGR+iBXQiEZKAqUA==
+X-CSE-MsgGUID: LNFMc7jYQwK3oagjXu1PaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="73547943"
+X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
+   d="scan'208";a="73547943"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 14:55:19 -0800
+X-CSE-ConnectionGUID: LoWXKm9/SEKsrfaX9rkAkw==
+X-CSE-MsgGUID: UlLP56elSZSO6XuI64meaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
+   d="scan'208";a="223149268"
+Received: from dalessan-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.32])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 14:55:17 -0800
+Date: Wed, 4 Mar 2026 00:55:14 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH net-next 3/4] i40e: Add missing header
+Message-ID: <aadm0q5QuWM3hGNx@ashevche-desk.local>
+References: <20260302234105.2658400-1-anthony.l.nguyen@intel.com>
+ <20260302234105.2658400-4-anthony.l.nguyen@intel.com>
+ <aaaVnmx_QHcpiVbG@ashevche-desk.local>
+ <39f4c46c-4db9-4178-99e0-8e3f3a452ab4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,58 +81,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303162346.2071888-6-kuba@kernel.org>
-X-Rspamd-Queue-Id: 1AB531F82B8
+In-Reply-To: <39f4c46c-4db9-4178-99e0-8e3f3a452ab4@intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Rspamd-Queue-Id: E3AB21F8372
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263453-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[intel.com:?];
+	TAGGED_FROM(0.00)[bounces-263454-lists,netdev=lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.419];
+	R_DKIM_TEMPFAIL(0.00)[intel.com:s=Intel];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DMARC_DNSFAIL(0.00)[intel.com : SPF/DKIM temp error,none];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,dama-to.20230601.gappssmtp.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 08:23:45AM -0800, Jakub Kicinski wrote:
-> In rawsock_release(), cancel any pending tx_work and purge the write
-> queue before orphaning the socket.  rawsock_tx_work runs on the system
-> workqueue and calls nfc_data_exchange which dereferences the NCI
-> device.  Without synchronization, tx_work can race with socket and
-> device teardown when a process is killed (e.g. by SIGKILL), leading
-> to use-after-free or leaked references.
+On Tue, Mar 03, 2026 at 08:37:40AM -0800, Tony Nguyen wrote:
+> On 3/3/2026 12:02 AM, Andy Shevchenko wrote:
+> > On Mon, Mar 02, 2026 at 03:41:01PM -0800, Tony Nguyen wrote:
+> > 
+> > > When cleaning up another header I have met this build error:
+> > > 
+> > > drivers/net/ethernet/intel/i40e/i40e_hmc.h:105:22: error: implicit declaration of function 'upper_32_bits' [-Wimplicit-function-declaration]
+> > >    105 |         val1 = (u32)(upper_32_bits(pa));                                \
+> > > 
+> > > This is due to missing header, add it to fix the possible issue.
+> > 
+> > There was a v2 with the other (missing here) tag is added (it was given against
+> > v1 conditionally) and Subject amendeded.
 > 
-> Set SEND_SHUTDOWN first so that if tx_work is already running it will
-> see the flag and skip transmitting, then use cancel_work_sync to wait
-> for any in-progress execution to finish, and finally purge any
-> remaining queued skbs.
-> 
-> Fixes: 23b7869c0fd0 ("NFC: add the NFC socket raw protocol")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/nfc/rawsock.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
+> I assumed you had found another missing header with that other patch; guess
+> I should've looked closer :(
 
-Reviewed-by: Joe Damato <joe@dama.to>
+I was talking about commit message tag and an updated Subject. The code is
+the same.
+
+> I'll update the PR with the new one.
+
+Thanks!
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
