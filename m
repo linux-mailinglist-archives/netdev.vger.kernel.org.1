@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-263000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFtjOnBLpmm1NgAAu9opvQ
-	(envelope-from <netdev+bounces-263000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:46:08 +0100
+	id iBQwM8dLpmm1NgAAu9opvQ
+	(envelope-from <netdev+bounces-263001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:47:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4A81E82A5
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:46:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 769731E82E9
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 069EC304B5E4
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:45:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83A6730D9113
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE4B375F9D;
-	Tue,  3 Mar 2026 02:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AAD374E51;
+	Tue,  3 Mar 2026 02:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DXGmEapC"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GqMaWQ1i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F45377029
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0FA267714
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772505951; cv=none; b=Xh4TJNun5lbrKluO1kVp0ztk66wG6zaAhTcsCQHn4mgK7hgq7lwEA2B8jgH9WDWqXtuIo3GEOpYW7x7HqQ5Mkvj7OfB9ac7YsM+WgvQURyZtWp4wDd8Yf03y7BCLsHdzYO90ioUdbepljewCPeBRi+Rl204R++XscDKRqVvgnxA=
+	t=1772505958; cv=none; b=Cw7wUioe/qL8rK1XRdEuqsXWqoDzOX9pzZl9y8N0XGvd4n6VsNsM+P69nIofn4ZBkKuaOTwDlMjStMvXQiicAlnDm/vh2WosTCRZSYSEF8HydGGDpbP8t8NB/qwc7SqcTTE8jLQrjL6mZeYwQc0ETKGDVeIYBsnl3U1mB3O8RjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772505951; c=relaxed/simple;
-	bh=pElAbihQQNOxujkBD8Lomv7fDpeamcGOpqHzxcFZtCg=;
+	s=arc-20240116; t=1772505958; c=relaxed/simple;
+	bh=8czuKxIXstw0JG+VhrpdbQpiwcgQIXQoU+tZtK84puo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=szH+uVS2Azzh2nl6MR8h8eFNhOJqQRnsJY1YQsswTsgdUgN4XFCXDDsJi7fd+vnuLDIsiur8x2UD/9JqYpja7kfC9CjYxc3cApeUcvgFRTBhPevdHDNPqKIj6mJoo1G9kUe+mxn3ZvT+UiKUfQ4xCzcm89297KOHmcnbDCwKyCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DXGmEapC; arc=none smtp.client-ip=209.85.161.45
+	 MIME-Version; b=klxYf3pdg4lkqDu1APxQspK05AlAnNjethVVtf/mxI/V0xVh3R3cUriqFvkAYk78kbpPa8KI4G4tjXWyxJIoy7DwXcx6l0J3Ulws/wRQnVJwx5QlPGInPdbj7SF3rGPr7Qi1qwjXR5izX6gknFBEbuCMvd+tL1Q0epjWpdZQpNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GqMaWQ1i; arc=none smtp.client-ip=209.85.161.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-676815e147dso2788137eaf.3
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 18:45:50 -0800 (PST)
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-662f2fa7e67so2278766eaf.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 18:45:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1772505949; x=1773110749; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1772505953; x=1773110753; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YB/Rf8h8lr04XqCKhyJqZtv0aOaL1JDOz6tQ0DYFlVY=;
-        b=DXGmEapCErVyjnu3lcbgNy7WKwH5ChrVlQ9jl92PRsx1qKvEIrqkqz3o5xohxPF9/v
-         XGO8Nt2vF6D0uWYPzftwMwe0yOzTpNskZyctpxZ5FCcRuHawkWa9hKgPO0Nsg/aJZfTZ
-         0d+YSfN+VASZ/16n2usSPxpc1DuEbIxY/3/hqXFAXP0ssRjk8B47VAz0dHQmIxODAiAb
-         Gwj0XTSND/TPinHZw1Q//ktgN10HsLQTadZYGTWLkXjBi0RoK3p9lABLlKIITrv1GJVn
-         MQo9OGDWAN55rgNhFuln5GYKvsSkNbV9ZXe40vA4RES0S8iLp9iASS/SKHmicwL5vgkU
-         rNSg==
+        bh=l4PoAMNeLEmpnpNk8ugY9fn6SRetloOwm3+eWZzi2Xs=;
+        b=GqMaWQ1irCmbLXvmv+p0rhMEdl5OyJGOWqVclFccU819sY5d1kfd2iXsRfJtK64WW3
+         bT0w5kAdHTIPy4Ic1jap4jbhcX3MfTnAkKhXbtbX9OTnv2L4wmRkaWb/coGtHUIg+ktA
+         ecjy3CbXzj3Rtzw8HGz4aIM+3EPwjDhg6dOjLR/zIjdMGqYECNTdSqr2608G7VOOAeL4
+         PKpBPPcU8mCgwo4cJwQLu8KOgj/0tL+t9WwoDKFhbvUxikgICnZJMeLyfzpEUvPtQ1UY
+         gL5kiC942h4QCNLHAGjfKZKbiLVLAaveMG2yqxB+Un/c1dlK8Fp83AZRnTnBl6/GMsKQ
+         I1fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772505949; x=1773110749;
+        d=1e100.net; s=20230601; t=1772505953; x=1773110753;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=YB/Rf8h8lr04XqCKhyJqZtv0aOaL1JDOz6tQ0DYFlVY=;
-        b=e1VAC9Oq+DjBZwNttZT+zn3syhYb0v1j2FWyi7NUQfAcU0w21LATX5rIbo/Uq0cNX5
-         4kk/LXQ8GDXyhvlPXyGkALEYLH4TOKxZz4jKG8vEH+FAoLYvaybVjpxqyqxIHTjdBhoL
-         AW+jNdYY+IfnM3gRdCYfapPSn9xyQvjn9JZILSB65pRSWESWq1s3FrJ3FWlXr62Vrsov
-         oCmgDWC7VU+73N2H6+vXAhyGwC0JVFkYLqTFsUpqm9wJqBVVZ5urK0RK9OLS0wR/j7eh
-         QyPm/degogppR1vWghyvl3OpGWhNfrolFWTiNdRKrY71U0qfaJa/rPS0TjNCiXDXtuoN
-         4Jzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFFQ7aaIDyQA3K3Ho3ulCg3pwhf3dDscROI+NxrC5UuWzixTeApDMR3QTWRxnO2ISPimJXqus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjyyJjhkdn8xvAK80Z1eR2hdzQeeBNNEj9AUAYLtLxBQPUIZIb
-	PQ5KJHaEhJzZmmiwmE5AdxXY2fl23pKJH7CouU694U97FDE+4L58u78BJFbFIcp1mfk=
-X-Gm-Gg: ATEYQzzk/zpORCtF33GzKfYdacSl3G6UeQtNpeuipxd+/7gM6Txc50lapI+9RdsYVV5
-	JIN7oztt6MIZjoPNMwSf3M4CFAszySXSwvCmnwebRyAMHNkfuZ+EL9ohH09zJbQHSSdCJsRGX0I
-	ZRB/Y+gfvIAfqeMfcd6IXuurdi1aJM7gqJ4N0UcqDpGXYFMrUlsHUoNtjHTAEtvU7OKVQPVJ4cI
-	zeXnWhKdYub5nSigfbMJDN6/s5yP4nmFDtxbI7iPGCTYyozR5CCtp19JSYGGfNPxlC3/BY2j/Gs
-	TukjKDa9hWfk+RwsMo28IO3sSUUga2nTHZ43xity6uXPUdl3aJ6z8XtH3lVyc5Y/XyR5VglldNn
-	WmAL/aODiX59/O/QlJj3eTj1Go7ftbwNTX+BglmC6XmVZbeurCpV5L/dS0srQmWjitp/SnEDtGp
-	bWz3T/caeURLPkp4uVTw==
-X-Received: by 2002:a4a:ce86:0:b0:67a:42d:85e with SMTP id 006d021491bc7-67a042d09aemr4383427eaf.47.1772505949549;
-        Mon, 02 Mar 2026 18:45:49 -0800 (PST)
+        bh=l4PoAMNeLEmpnpNk8ugY9fn6SRetloOwm3+eWZzi2Xs=;
+        b=s61Q+BjmCrTtFoJMt9O0PCfy8aBGfMiY6NxngtcYFY22XHIqdOiPPdapCAb4610idK
+         8E4hHOcW995xSo1cK5Jw36lEGLAaQWqxKr+mR/MMuDvdSsyTqzCjtCE9yUfVSeREpjfe
+         2kE8aOjMFBvyM7sgFtF3+O/I2FCXBNxzJcPZvvJOcagi+foluupfOSJDbri5a2nDI4lL
+         3ALFMAMfAgNTuEQKIy/94HbcgJVYzOEHsJVySe6+kUuf5r25YtNt4nmT2+piGjbDAcEX
+         KdusZB5j9O3K7LVSANwlx/l1vtE6a6SRYGcKaf4Ol44RY4PsLMEFe8aZ3nNckSMIAa77
+         jN/g==
+X-Forwarded-Encrypted: i=1; AJvYcCW1pA8bVf/tN/QkbfOV4oiffzSGlQaquy1xvJODKivxRfRjbNCbDxmmaLNuggMfYO0HrAyIges=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzaj7ULCGezqqGECrVU7GPp23ChPmSD35QosyVWjgEJr0XUb567
+	MjhiOHnr2hKWy+BoOBXS/Zsh5oRFmNdJOSOjVRTgOnKs1NYgdWrqX9PAHbuIq5Td1W0=
+X-Gm-Gg: ATEYQzzXYYoPSVL6PpnrEcWnkcc1UI1DDAdhfYLawFpKAngZ0itE28SoR2vZ1J3tLBz
+	lu6DighUZ05MEYqDL1lp8K10cQQ10qZ316EmPzgOQewbEFBJKpoSXnGMsYCcs50mLO+iurUIGPR
+	52Pt3hXyK8PSVlTlX3SAuNmqQxRFNwDWjUBRZXZUWOQCbRxGH2K+DD4ejJaGtFb7IFymvMFVFZi
+	+N6jdbeiZNlmxMA8oJeWLoFhCexP4Zb2ZUgvHerhNav4xAPiR9ClQs6R5fQkBU4kcb1T1taMnvj
+	C/uEAjsj7olx5UExM7jvtu+xELvC7VWh/I73wsxTXyBdAUBXUI+IXZ5jiJua6Gr/lxR/JhJw3Ke
+	U6xqi0W7Hk9gvF/yq2dpiK+jHUBizN1WR5E1JmncJO1CJIrCoF6WDwWZN4RnQAGWMMuoTomM/uD
+	v7DBDwCf0=
+X-Received: by 2002:a05:6820:826:b0:66d:f051:e91f with SMTP id 006d021491bc7-679fae12f41mr8641870eaf.23.1772505953400;
+        Mon, 02 Mar 2026 18:45:53 -0800 (PST)
 Received: from 20HS2G4.. ([2a09:bac1:76c0:540::a2:70])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679f2d84dacsm10205642eaf.9.2026.03.02.18.45.47
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679f2d84dacsm10205642eaf.9.2026.03.02.18.45.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 18:45:49 -0800 (PST)
+        Mon, 02 Mar 2026 18:45:52 -0800 (PST)
 From: Chris J Arges <carges@cloudflare.com>
 To: michael.chan@broadcom.com,
 	pavan.chebbi@broadcom.com,
@@ -85,6 +85,8 @@ To: michael.chan@broadcom.com,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Simon Horman <horms@kernel.org>,
 	Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
@@ -92,12 +94,13 @@ To: michael.chan@broadcom.com,
 	Stanislav Fomichev <sdf@fomichev.me>
 Cc: kernel-team@cloudflare.com,
 	Chris J Arges <carges@cloudflare.com>,
-	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH net-next v2 2/4] bnxt_en: Implement XDP RSS hash metadata extraction
-Date: Mon,  2 Mar 2026 20:43:50 -0600
-Message-ID: <20260303024510.644962-3-carges@cloudflare.com>
+Subject: [PATCH net-next v2 3/4] selftests: net: move common xdp.py functions into lib
+Date: Mon,  2 Mar 2026 20:43:51 -0600
+Message-ID: <20260303024510.644962-4-carges@cloudflare.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260303024510.644962-1-carges@cloudflare.com>
 References: <20260213192449.1294830-1-carges@cloudflare.com>
@@ -109,7 +112,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AD4A81E82A5
+X-Rspamd-Queue-Id: 769731E82E9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-6.16 / 15.00];
 	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
@@ -119,17 +122,17 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
 	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263000-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263001-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[broadcom.com,dama.to,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
@@ -137,136 +140,321 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	DKIM_TRACE(0.00)[cloudflare.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.997];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,xdp.py:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add support for extracting RSS hash values and hash types from hardware
-completion descriptors in XDP programs for bnxt_en.
-
-Add IP_TYPE definition for determining if completion is ipv4 or ipv6. In
-addition add ITYPE_ICMP flag for identifying ICMP completions.
+This moves a few functions which can be useful to other python programs
+that manipulate XDP programs. This also refactors xdp.py to use the
+refactored functions.
 
 Signed-off-by: Chris J Arges <carges@cloudflare.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 47 +++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  3 ++
- 4 files changed, 57 insertions(+)
+ .../selftests/drivers/net/lib/py/__init__.py  |  2 +
+ tools/testing/selftests/drivers/net/xdp.py    | 95 +++++--------------
+ .../testing/selftests/net/lib/py/__init__.py  |  2 +
+ tools/testing/selftests/net/lib/py/bpf.py     | 68 +++++++++++++
+ 4 files changed, 95 insertions(+), 72 deletions(-)
+ create mode 100644 tools/testing/selftests/net/lib/py/bpf.py
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ab73aad40593..c06033cf9f82 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15906,6 +15906,10 @@ static const struct net_device_ops bnxt_netdev_ops = {
- 	.ndo_hwtstamp_set	= bnxt_hwtstamp_set,
- };
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index 5872d114f142..f64e84b90574 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -23,6 +23,7 @@ try:
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+         fd_read_timeout, ip, rand_port, rand_ports, wait_port_listen, wait_file
++    from net.lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
+     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup, ksft_variants, KsftNamedVariant
+@@ -36,6 +37,7 @@ try:
+                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
+                "fd_read_timeout", "ip", "rand_port", "rand_ports",
+                "wait_port_listen", "wait_file",
++               "bpf_map_set", "bpf_map_dump", "bpf_prog_map_ids",
+                "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
+                "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
+                "ksft_setup", "ksft_variants", "KsftNamedVariant",
+diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
+index e54df158dfe9..10d821156db1 100755
+--- a/tools/testing/selftests/drivers/net/xdp.py
++++ b/tools/testing/selftests/drivers/net/xdp.py
+@@ -16,7 +16,8 @@ from lib.py import KsftNamedVariant, ksft_variants
+ from lib.py import KsftFailEx, NetDrvEpEnv
+ from lib.py import EthtoolFamily, NetdevFamily, NlError
+ from lib.py import bkg, cmd, rand_port, wait_port_listen
+-from lib.py import ip, bpftool, defer
++from lib.py import ip, defer
++from lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
  
-+static const struct xdp_metadata_ops bnxt_xdp_metadata_ops = {
-+	.xmo_rx_hash		= bnxt_xdp_rx_hash,
-+};
-+
- static void bnxt_get_queue_stats_rx(struct net_device *dev, int i,
- 				    struct netdev_queue_stats_rx *stats)
- {
-@@ -16790,6 +16794,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto init_err_free;
  
- 	dev->netdev_ops = &bnxt_netdev_ops;
-+	dev->xdp_metadata_ops = &bnxt_xdp_metadata_ops;
- 	dev->stat_ops = &bnxt_stat_ops;
- 	dev->watchdog_timeo = BNXT_TX_TIMEOUT;
- 	dev->ethtool_ops = &bnxt_ethtool_ops;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 90fa3e93c8d6..34bb98709f2b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -232,6 +232,7 @@ struct rx_cmp {
- 	 #define RX_CMP_FLAGS_ITYPE_UDP				 (3 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_FCOE			 (4 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_ROCE			 (5 << 12)
-+	 #define RX_CMP_FLAGS_ITYPE_ICMP			 (7 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_PTP_WO_TS			 (8 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_PTP_W_TS			 (9 << 12)
- 	#define RX_CMP_LEN					(0xffff << 16)
-@@ -311,6 +312,7 @@ struct rx_cmp_ext {
- 	#define RX_CMP_FLAGS2_T_IP_CS_CALC			(0x1 << 2)
- 	#define RX_CMP_FLAGS2_T_L4_CS_CALC			(0x1 << 3)
- 	#define RX_CMP_FLAGS2_META_FORMAT_VLAN			(0x1 << 4)
-+	#define RX_CMP_FLAGS2_IP_TYPE				(0x1 << 8)
- 	__le32 rx_cmp_meta_data;
- 	#define RX_CMP_FLAGS2_METADATA_TCI_MASK			0xffff
- 	#define RX_CMP_FLAGS2_METADATA_VID_MASK			0xfff
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 85cbeb35681c..1ab3d9f9b3ac 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -472,3 +472,50 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
- 				  xdp_buff_get_skb_flags(xdp));
- 	return skb;
- }
+ class TestConfig(Enum):
+@@ -122,47 +123,11 @@ def _load_xdp_prog(cfg, bpf_info):
+     xdp_info = ip(f"-d link show dev {cfg.ifname}", json=True)[0]
+     prog_info["id"] = xdp_info["xdp"]["prog"]["id"]
+     prog_info["name"] = xdp_info["xdp"]["prog"]["name"]
+-    prog_id = prog_info["id"]
+-
+-    map_ids = bpftool(f"prog show id {prog_id}", json=True)["map_ids"]
+-    prog_info["maps"] = {}
+-    for map_id in map_ids:
+-        name = bpftool(f"map show id {map_id}", json=True)["name"]
+-        prog_info["maps"][name] = map_id
++    prog_info["maps"] = bpf_prog_map_ids(prog_info["id"])
+ 
+     return prog_info
+ 
+ 
+-def format_hex_bytes(value):
+-    """
+-    Helper function that converts an integer into a formatted hexadecimal byte string.
+-
+-    Args:
+-        value: An integer representing the number to be converted.
+-
+-    Returns:
+-        A string representing hexadecimal equivalent of value, with bytes separated by spaces.
+-    """
+-    hex_str = value.to_bytes(4, byteorder='little', signed=True)
+-    return ' '.join(f'{byte:02x}' for byte in hex_str)
+-
+-
+-def _set_xdp_map(map_name, key, value):
+-    """
+-    Updates an XDP map with a given key-value pair using bpftool.
+-
+-    Args:
+-        map_name: The name of the XDP map to update.
+-        key: The key to update in the map, formatted as a hexadecimal string.
+-        value: The value to associate with the key, formatted as a hexadecimal string.
+-    """
+-    key_formatted = format_hex_bytes(key)
+-    value_formatted = format_hex_bytes(value)
+-    bpftool(
+-        f"map update name {map_name} key hex {key_formatted} value hex {value_formatted}"
+-    )
+-
+-
+ def _get_stats(xdp_map_id):
+     """
+     Retrieves and formats statistics from an XDP map.
+@@ -177,25 +142,11 @@ def _get_stats(xdp_map_id):
+     Raises:
+         KsftFailEx: If the stats retrieval fails.
+     """
+-    stats_dump = bpftool(f"map dump id {xdp_map_id}", json=True)
+-    if not stats_dump:
++    stats = bpf_map_dump(xdp_map_id)
++    if not stats:
+         raise KsftFailEx(f"Failed to get stats for map {xdp_map_id}")
+ 
+-    stats_formatted = {}
+-    for key in range(0, 5):
+-        val = stats_dump[key]["formatted"]["value"]
+-        if stats_dump[key]["formatted"]["key"] == XDPStats.RX.value:
+-            stats_formatted[XDPStats.RX.value] = val
+-        elif stats_dump[key]["formatted"]["key"] == XDPStats.PASS.value:
+-            stats_formatted[XDPStats.PASS.value] = val
+-        elif stats_dump[key]["formatted"]["key"] == XDPStats.DROP.value:
+-            stats_formatted[XDPStats.DROP.value] = val
+-        elif stats_dump[key]["formatted"]["key"] == XDPStats.TX.value:
+-            stats_formatted[XDPStats.TX.value] = val
+-        elif stats_dump[key]["formatted"]["key"] == XDPStats.ABORT.value:
+-            stats_formatted[XDPStats.ABORT.value] = val
+-
+-    return stats_formatted
++    return stats
+ 
+ 
+ def _test_pass(cfg, bpf_info, msg_sz):
+@@ -211,8 +162,8 @@ def _test_pass(cfg, bpf_info, msg_sz):
+     prog_info = _load_xdp_prog(cfg, bpf_info)
+     port = rand_port()
+ 
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.PASS.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, XDPAction.PASS.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     ksft_eq(_test_udp(cfg, port, msg_sz), True, "UDP packet exchange failed")
+     stats = _get_stats(prog_info["maps"]["map_xdp_stats"])
+@@ -258,8 +209,8 @@ def _test_drop(cfg, bpf_info, msg_sz):
+     prog_info = _load_xdp_prog(cfg, bpf_info)
+     port = rand_port()
+ 
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.DROP.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, XDPAction.DROP.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     ksft_eq(_test_udp(cfg, port, msg_sz), False, "UDP packet exchange should fail")
+     stats = _get_stats(prog_info["maps"]["map_xdp_stats"])
+@@ -305,8 +256,8 @@ def _test_xdp_native_tx(cfg, bpf_info, payload_lens):
+     prog_info = _load_xdp_prog(cfg, bpf_info)
+     port = rand_port()
+ 
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.TX.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, XDPAction.TX.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     expected_pkts = 0
+     for payload_len in payload_lens:
+@@ -454,15 +405,15 @@ def _test_xdp_native_tail_adjst(cfg, pkt_sz_lst, offset_lst):
+     prog_info = _load_xdp_prog(cfg, bpf_info)
+ 
+     # Configure the XDP map for tail adjustment
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.TAIL_ADJST.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, XDPAction.TAIL_ADJST.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     for offset in offset_lst:
+         tag = format(random.randint(65, 90), "02x")
+ 
+-        _set_xdp_map("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
++        bpf_map_set("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
+         if offset > 0:
+-            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
++            bpf_map_set("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
+ 
+         for pkt_sz in pkt_sz_lst:
+             test_str = "".join(random.choice(string.ascii_lowercase) for _ in range(pkt_sz))
+@@ -574,8 +525,8 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
+     prog_info = _load_xdp_prog(cfg, BPFProgInfo(prog, "xdp_native.bpf.o", "xdp.frags", 9000))
+     port = rand_port()
+ 
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, XDPAction.HEAD_ADJST.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, XDPAction.HEAD_ADJST.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     hds_thresh = get_hds_thresh(cfg)
+     for offset in offset_lst:
+@@ -595,11 +546,11 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
+             test_str = ''.join(random.choice(string.ascii_lowercase) for _ in range(pkt_sz))
+             tag = format(random.randint(65, 90), '02x')
+ 
+-            _set_xdp_map("map_xdp_setup",
++            bpf_map_set("map_xdp_setup",
+                      TestConfig.ADJST_OFFSET.value,
+                      offset)
+-            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
+-            _set_xdp_map("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
++            bpf_map_set("map_xdp_setup", TestConfig.ADJST_TAG.value, int(tag, 16))
++            bpf_map_set("map_xdp_setup", TestConfig.ADJST_OFFSET.value, offset)
+ 
+             recvd_str = _exchg_udp(cfg, port, test_str)
+ 
+@@ -691,8 +642,8 @@ def test_xdp_native_qstats(cfg, act):
+     prog_info = _load_xdp_prog(cfg, bpf_info)
+     port = rand_port()
+ 
+-    _set_xdp_map("map_xdp_setup", TestConfig.MODE.value, act.value)
+-    _set_xdp_map("map_xdp_setup", TestConfig.PORT.value, port)
++    bpf_map_set("map_xdp_setup", TestConfig.MODE.value, act.value)
++    bpf_map_set("map_xdp_setup", TestConfig.PORT.value, port)
+ 
+     # Discard the input, but we need a listener to avoid ICMP errors
+     rx_udp = f"socat -{cfg.addr_ipver} -T 2 -u UDP-RECV:{port},reuseport " + \
+diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+index a584e7f806a4..ff9b83890773 100644
+--- a/tools/testing/selftests/net/lib/py/__init__.py
++++ b/tools/testing/selftests/net/lib/py/__init__.py
+@@ -15,6 +15,7 @@ from .nsim import NetdevSim, NetdevSimDev
+ from .utils import CmdExitFailure, fd_read_timeout, cmd, bkg, defer, \
+     bpftool, ip, ethtool, bpftrace, rand_port, rand_ports, wait_port_listen, \
+     wait_file, tool
++from .bpf import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
+ from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily, RtnlAddrFamily
+ from .ynl import NetshaperFamily, DevlinkFamily, PSPFamily
+ 
+@@ -28,6 +29,7 @@ __all__ = ["KSRC",
+            "CmdExitFailure", "fd_read_timeout", "cmd", "bkg", "defer",
+            "bpftool", "ip", "ethtool", "bpftrace", "rand_port", "rand_ports",
+            "wait_port_listen", "wait_file", "tool",
++           "bpf_map_set", "bpf_map_dump", "bpf_prog_map_ids",
+            "NetdevSim", "NetdevSimDev",
+            "NetshaperFamily", "DevlinkFamily", "PSPFamily", "NlError",
+            "YnlFamily", "EthtoolFamily", "NetdevFamily", "RtnlFamily",
+diff --git a/tools/testing/selftests/net/lib/py/bpf.py b/tools/testing/selftests/net/lib/py/bpf.py
+new file mode 100644
+index 000000000000..96b29d41c34b
+--- /dev/null
++++ b/tools/testing/selftests/net/lib/py/bpf.py
+@@ -0,0 +1,68 @@
++# SPDX-License-Identifier: GPL-2.0
 +
-+int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-+		     enum xdp_rss_hash_type *rss_type)
-+{
-+	const struct bnxt_xdp_buff *xdp = (void *)ctx;
-+	const struct rx_cmp *rxcmp = xdp->rxcmp;
-+	const struct rx_cmp_ext *rxcmp1 = xdp->rxcmp1;
-+	enum xdp_rss_hash_type hash_type = 0;
-+	u32 itypes;
++"""
++BPF helper utilities for kernel selftests.
 +
-+	if (!rxcmp || !RX_CMP_HASH_VALID(rxcmp))
-+		return -ENODATA;
++Provides common operations for interacting with BPF maps and programs
++via bpftool, used by XDP and other BPF-based test files.
++"""
 +
-+	*hash = le32_to_cpu(rxcmp->rx_cmp_rss_hash);
++from .utils import bpftool
 +
-+	if (!rxcmp1) {
-+		*rss_type = XDP_RSS_TYPE_L2;
-+		return 0;
-+	}
++def format_hex_bytes(value):
++    """
++    Helper function that converts an integer into a formatted hexadecimal byte string.
 +
-+	if (xdp->cmp_type == CMP_TYPE_RX_L2_CMP) {
-+		itypes = RX_CMP_ITYPES(rxcmp);
-+		if (rxcmp1->rx_cmp_flags2 &
-+		    cpu_to_le32(RX_CMP_FLAGS2_IP_TYPE)) {
-+			hash_type |= XDP_RSS_TYPE_L3_IPV6;
-+		} else {
-+			hash_type |= XDP_RSS_TYPE_L3_IPV4;
-+		}
++    Args:
++        value: An integer representing the number to be converted.
 +
-+		switch (itypes) {
-+		case RX_CMP_FLAGS_ITYPE_TCP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_TCP;
-+			break;
-+		case RX_CMP_FLAGS_ITYPE_UDP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_UDP;
-+			break;
-+		case RX_CMP_FLAGS_ITYPE_ICMP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_ICMP;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
++    Returns:
++        A string representing hexadecimal equivalent of value, with bytes separated by spaces.
++    """
++    hex_str = value.to_bytes(4, byteorder='little', signed=True)
++    return ' '.join(f'{byte:02x}' for byte in hex_str)
 +
-+	*rss_type = hash_type;
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-index 8c66698bde11..fb4f9143929f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-@@ -41,4 +41,7 @@ void bnxt_xdp_buff_frags_free(struct bnxt_rx_ring_info *rxr,
- struct sk_buff *bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb,
- 				   u8 num_frags, struct bnxt_rx_ring_info *rxr,
- 				   struct xdp_buff *xdp);
-+int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-+		     enum xdp_rss_hash_type *rss_type);
 +
- #endif
++def bpf_map_set(map_name, key, value):
++    """
++    Updates an XDP map with a given key-value pair using bpftool.
++
++    Args:
++        map_name: The name of the XDP map to update.
++        key: The key to update in the map, formatted as a hexadecimal string.
++        value: The value to associate with the key, formatted as a hexadecimal string.
++    """
++    key_formatted = format_hex_bytes(key)
++    value_formatted = format_hex_bytes(value)
++    bpftool(
++        f"map update name {map_name} key hex {key_formatted} value hex {value_formatted}"
++    )
++
++def bpf_map_dump(map_id):
++    """Dump all entries of a BPF array map.
++
++    Args:
++        map_id: Numeric map ID (as returned by bpftool prog show).
++
++    Returns:
++        A dict mapping formatted key (int) to formatted value (int).
++    """
++    raw = bpftool(f"map dump id {map_id}", json=True)
++    return {e["formatted"]["key"]: e["formatted"]["value"] for e in raw}
++
++
++def bpf_prog_map_ids(prog_id):
++    """Get the map name-to-ID mapping for a loaded BPF program.
++
++    Args:
++        prog_id: Numeric program ID.
++
++    Returns:
++        A dict mapping map name (str) to map ID (int).
++    """
++    map_ids = bpftool(f"prog show id {prog_id}", json=True)["map_ids"]
++    maps = {}
++    for mid in map_ids:
++        name = bpftool(f"map show id {mid}", json=True)["name"]
++        maps[name] = mid
++    return maps
 -- 
 2.43.0
 
