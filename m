@@ -1,136 +1,152 @@
-Return-Path: <netdev+bounces-263027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2AErHvlUpmkbOAAAu9opvQ
-	(envelope-from <netdev+bounces-263027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:26:49 +0100
+	id 6OMcA75Xpmk2OQAAu9opvQ
+	(envelope-from <netdev+bounces-263028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:38:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABC21E87C1
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:26:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 122701E883C
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CE9B4300E5D2
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:26:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AE5A308833B
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234E637CD52;
-	Tue,  3 Mar 2026 03:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064C737CD53;
+	Tue,  3 Mar 2026 03:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZzYK34q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGM+GQgi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDA61A6810;
-	Tue,  3 Mar 2026 03:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D3B35E93D
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 03:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772508403; cv=none; b=l2bHR3AmJowFyFrb9ZWiqlntTP7jVHv5VPK50C2zXiurKZd+2JGbneYVL91SOcVplecHT0qryt0dNmOJdQtmR5wWjVxjk8bCqyIw7krVTPyk5DNukamyR93FxBoCtnifZa6/1WrAmYujO2G8CEb0mkdzp/celxU3X/O7qEzXdFw=
+	t=1772509073; cv=none; b=JnzaY12AOHIundBvyqG0owHSv59P+DMRgRmcyIr8e+wxnx+xShFoYfzVSJUtmngJK0kMR8puHMI8fxqN+1SuNgTa5OhFVsdfA3MN1GoaH1D36v4zwETXWG1ZFn2bIjm+An/wYLBbLbqjvXxGuku6ckcfr+IQ+gaBlucQQyhn4v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772508403; c=relaxed/simple;
-	bh=4zf61ALQTMK14img1HViSIDfxFknaHCr69Rl17qSQGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UBm03PgMY975O5aWP/6kSLknKhXHdqO3N9tqzdL7Ul5SBUIVUHgL9eWmN6UcpTnaYxeevr7qyIDxVSwJeIW3Dnf5Tamtuxose+e/zZp+BGuJymxhGpi+vt36UZNc/ZQzPjtPGr0khCNWzXEwLm40jvGsG3cBz1purs2uqLIFaAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZzYK34q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4766C19423;
-	Tue,  3 Mar 2026 03:26:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772508402;
-	bh=4zf61ALQTMK14img1HViSIDfxFknaHCr69Rl17qSQGw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sZzYK34q0BRTj07TilzGsQwaXUIwwANpvSCCq/V9QelZ5EHSUiF8FPL24xGhjPWTw
-	 /k/VfPBRODiDwVF8MTGdyebPO/HSzlCyaBCfVc8MSodNuEWJaXblnXJ0bJULhRY5lG
-	 glziYAWp9B5Ti71/OQRLLuaNin8ZjvbZVD1N1SqvXX4+Y2Xj1S74JfBzPbz9//ggVo
-	 WCtESLc46MPYF1kEzz8O1hSY/HrPw+PAKHL8h1k93eGDWmcr5eorH6d+jv37SXPTLg
-	 ttKItjGaEyPwHMrqgahjd80aG/McSVbE//TsRlaJIRO3DFGkUFiUJ9+PQqPfw4sp7H
-	 yR+RnyItx4wfA==
-Date: Mon, 2 Mar 2026 19:26:40 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos
- Tatulea <dtatulea@nvidia.com>, Shay Drory <shayd@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net-next V3 00/10] devlink: add per-port resource
- support
-Message-ID: <20260302192640.49af074f@kernel.org>
-In-Reply-To: <20260226221916.1800227-1-tariqt@nvidia.com>
-References: <20260226221916.1800227-1-tariqt@nvidia.com>
+	s=arc-20240116; t=1772509073; c=relaxed/simple;
+	bh=ti+F8gi46xGdX9LBLfoqgRNGde048rXCFzZQnl9YDnE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ox/KtXM0BJ23FmWHDIWdugDPgolOzoMaKc/TtE6iFQpas70oK4R4Lx8jWAr7e+r/4WKHwrmKzLYUrdVcT+7OrzOe+SkH88JwiSiHyMrwC+INSOkThHlsIeZORlr3oeWy6z6FUGEOltIkfCLCcXJjEhNvRdi1SC/8nkgkBxUb3S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGM+GQgi; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8273e0fb87aso2788333b3a.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 19:37:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772509072; x=1773113872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7VLgLYUsL/uRRIdiq+OpOVCTafl9uDLlA5ann5kAl+U=;
+        b=gGM+GQgiHOV8jYQgqULVz4gjkVGfdH0T4SI/4i4vZKKXMJTmHb1++XfERx6QlZOtz2
+         HyUw766406wlPd1HO96QApVKdz2F4vuzgJLecdTz3GytYvd8BqyEj+Ga62dmBege8tcb
+         h30Up0Ib+IFH0M7gvgdoIEdAuMdq3drjWNHaUE+UjMCELGlhQdy7pTWOMdL6hNsAMI4/
+         VUbgHxkPSm/b6Q9opecFqVm3UEAbXb7gNDpoc3dOMPBwBed7k4CVwN9DXTyGeoJk5yHI
+         4+oXvVg4b2ouTiTipnD4KBZ/jC6i6iWTqasos3tZRjyE1VZ6ZyXiy/eL0vEE/4iIt2wt
+         rTXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772509072; x=1773113872;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7VLgLYUsL/uRRIdiq+OpOVCTafl9uDLlA5ann5kAl+U=;
+        b=NTHhsGsmPX+3bTZTWEhcpjSgjCWSvHFZAuaUyarcJdnMOKecMP5W4i1Lj9dW/RnG/P
+         ILzDTGALt4XDSHJbtgUqT9F4VLHave9i7EwsctXDDzT0cUSsafKiB+cQkpJ58TeLTXaA
+         pv46anHlcHII4GaBsfUAOL5JoLPKL9u0mov9irzIAyPehfZvXB5X+Oj4FnuqE5jiZSoG
+         fdTMcyrFCXX9nxUTw0A23M8Wp3UzKk0R1Ue9T3hCuNz3BEdwj4EwVYD1fxuc1LkYvhdc
+         XBDh2jQdKmc29g4pFaKDEt9/U9p3myolH1zmK4Q5MV1Cp2cd13gxkL9v+l2pfGmqB2qK
+         MbCA==
+X-Gm-Message-State: AOJu0YwQComf1U0rnRtjdNyTzWhjaEy1jdVIK/z+11FByQ6+ydq/sCEr
+	XxLFzAAEcuPZWzBBk7xVi979t7TI+HQcKzUEJxnLoUYitSmRznsn4Tpr
+X-Gm-Gg: ATEYQzxWK+I+tZtw6D8iH21I3F4Z7xiXkx8wawvcB+NFcZUsAEkdiPEuw34ZExRi7HU
+	v9DCxkDXUOhBwvmd/14m6QYa84tFt0+RCzIY65jVYGx5ia+ASRmOv2fVZf3HsWjfviGJNHHAtmV
+	jAYdYH4WPGlnl2Z7CV+t9TwoZJXx/Kymh+WgzhuxBbxkss1KeunkceUg7P79S8MTS0duIph128v
+	Oe4GQ9TxaLaEBBXBj+vqN9BJA4tnWBAKARXxLXA13kPIsKtkhoBIpfBc/0Ho6DVyEuVnVHjEr1U
+	pDcMILlilfQFiKTQTnmxOsYAC2z8gCSiEtbDIuPnQk3cTZV1YzojjkOqESxzsjJS9RCj6RrC6fw
+	7sPmNGP9NrPQhq3dodxOGpUCh0SiMhHxbuRZMuoSd+16/OhRGBe3KpH6QddSWWAFuqoMznXWZ3Q
+	W8r35oW+7Jw3jK+r2sIV7MzE5A8iaVoIlccoNZXTOE9kDcbrOliIMUfrvXikAhNF+lHmxudQ==
+X-Received: by 2002:a05:6a20:734c:b0:393:f002:ff63 with SMTP id adf61e73a8af0-395c3b03ed5mr14309867637.43.1772509071845;
+        Mon, 02 Mar 2026 19:37:51 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739ff1ca9sm13896871b3a.36.2026.03.02.19.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 19:37:51 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] mailmap: reflect my gmail as default
+Date: Tue,  3 Mar 2026 11:37:20 +0800
+Message-Id: <20260303033720.84108-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 3ABC21E87C1
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 122701E883C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263027-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,nvidia.com,kernel.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-263028-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 00:19:06 +0200 Tariq Toukan wrote:
-> With this series, users can query per-port resources:
-> 
-> $ devlink port resource show pci/0000:03:00.0/196608
-> pci/0000:03:00.0/196608:
->   name max_SFs size 20 unit entry
-> 
-> $ devlink port resource show
-> pci/0000:03:00.0/196608:
->   name max_SFs size 20 unit entry
-> pci/0000:03:00.1/262144:
->   name max_SFs size 20 unit entry
+From: Jason Xing <kernelxing@tencent.com>
 
-Code LGTM, I have a question about having a new cmd, tho.
+Use my gmail instead so that I can easily handle those emails
+that CC me.
 
-Does it matter to the user how the resource is scoped? 
-Whether the resource is at the instance level or at the port level?
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+Jakub, Paolo, can you take this patch in the network tree? Thanks.
+---
+ .mailmap | 1 +
+ 1 file changed, 1 insertion(+)
 
-I worry we are mechanically following the design of other commands.
-Since the dump handler is new we could just dump resources with port-id
-there. No existing user space may be using it. Alternatively we could
-add a new attribute to select a bitmask of which scope user wants to
-dump.
+diff --git a/.mailmap b/.mailmap
+index e1cf6bb85d33..412819ecb14c 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -348,6 +348,7 @@ Jarkko Sakkinen <jarkko@kernel.org> <jarkko.sakkinen@opinsys.com>
+ Jason Gunthorpe <jgg@ziepe.ca> <jgg@mellanox.com>
+ Jason Gunthorpe <jgg@ziepe.ca> <jgg@nvidia.com>
+ Jason Gunthorpe <jgg@ziepe.ca> <jgunthorpe@obsidianresearch.com>
++Jason Xing <kerneljasonxing@gmail.com>  <kernelxing@tencent.com>
+ <javier@osg.samsung.com> <javier.martinez@collabora.co.uk>
+ Javi Merino <javi.merino@kernel.org> <javi.merino@arm.com>
+ Jayachandran C <c.jayachandran@gmail.com> <jayachandranc@netlogicmicro.com>
+-- 
+2.43.5
 
-I have a strong suspicion that the user will want to access all
-resources of a device. `devlink resource show [$dev]` should dump 
-all resources devlink knows about, including port ones.
-
-What's the reason for the new command?
 
