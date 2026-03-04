@@ -1,260 +1,230 @@
-Return-Path: <netdev+bounces-263663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIYOOOHyp2mtmwAAu9opvQ
-	(envelope-from <netdev+bounces-263663-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:52:49 +0100
+	id OCVyMKPxp2mGmgAAu9opvQ
+	(envelope-from <netdev+bounces-263655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:47:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1991FCF52
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:52:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F4F1FCD6C
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:47:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C49530D803D
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:49:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A71D3034C5B
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF091394480;
-	Wed,  4 Mar 2026 08:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154AC37C107;
+	Wed,  4 Mar 2026 08:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QnfJO3bC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7134F3932FF;
-	Wed,  4 Mar 2026 08:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90B233D4E2;
+	Wed,  4 Mar 2026 08:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772614152; cv=none; b=X1Rr6IqYwdvZkUuLMJnnLoBGIKXo5cO83bo/G+kMeaGEtTH3rS/vySRn/P5aA9kKD4nSpnfDW2i29aTSaxsvRjUfEflnfI03u6xZvHNPVPj3OmCpDzZI+ckRtVNxZ+jeUl4b3d7L7U/DtIpRvwou2uqjdceezRtm7i39lJCEM8k=
+	t=1772614045; cv=none; b=SiRIRhLIk9UND5KUZxiBZWJvpbLpqyBDzFrSQXsIJ0B9aNme7ZQTSjRMhNoZ9/V+t+GZ7sJECdA/Dmf/9X0cEh0uGwQ1oYZIodTEwbU0p/y7iqyGdaLMVfAb5REOiho5kNsCCiqoX18zDyPwL/xom5W1nOE3Ijdi7ZkqCf5Wqs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772614152; c=relaxed/simple;
-	bh=6v1p+7b+6BkrSFjV0I2Cqtd4z35GtCQpxTfB77HtQFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PiyobcJIayve4RNg85XkX/yzfd+1tdbANTeByV0daLWbOjnSNHf9L63C0MB4sIvGb5L6Pt7iqcGA6bX9g/jqE3Wr4Jl4Co1RJsFwiK5zSlLycQCkmXzXid+tnNWcokTb1A9gS86ssh6x2BGyKTXqFEssd3xl4iUALOTORhd6Vvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
-X-QQ-mid: esmtpgz14t1772614125t2bfa0f2e
-X-QQ-Originating-IP: D4BgEeHgoRuCNoPDChBAMO7QLhZdagX3B2v823XZXTY=
-Received: from localhost.localdomain ( [119.167.27.218])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 04 Mar 2026 16:48:42 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11675765092982434808
-EX-QQ-RecipientCnt: 8
-From: Jialu Xu <xujialu@vimux.org>
-To: linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linusw@kernel.org,
-	brgl@kernel.org,
-	krzk@kernel.org,
-	kees@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jialu Xu <xujialu@vimux.org>
-Subject: [PATCH 3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
-Date: Wed,  4 Mar 2026 16:47:04 +0800
-Message-ID: <44DCF3FEA681AA9F+20260304084808.440955-4-xujialu@vimux.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260304084808.440955-1-xujialu@vimux.org>
-References: <20260304084808.440955-1-xujialu@vimux.org>
+	s=arc-20240116; t=1772614045; c=relaxed/simple;
+	bh=tdnOPIZfhKwu3MgtOaiNYyGgY/oCQPEL0L49OtC0di0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bj8pgU/+2HDlqr2WQiTpKXpkvb7iBUCTKoyun/6D9yVixvGXQVOrXTKwbtM0Ozv8I5iiuneD8DmQGSPMhEz9qRHXnSYJ7QqNL/sTOE6HbrR7xx/bXO64L6i7lIRdSWe5nVbI8sVlk5tO8MvOffkDe/4ghtO5MDUITnifi0F7EJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QnfJO3bC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC56C19423;
+	Wed,  4 Mar 2026 08:47:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772614045;
+	bh=tdnOPIZfhKwu3MgtOaiNYyGgY/oCQPEL0L49OtC0di0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QnfJO3bCLkXPWyO8cJDe7kI3imKwtsD7cZGVY70UEFdPDa34x+pVaNl690XPklP1E
+	 9AtGUGwpgVrAOYzsTqhZlY+uJHZ+tEKkctpwu0j/Soj3tpm5N8Gpvt3NwmvsuI6ReO
+	 rhrUSoik1Hb0RQspb/+SR3qrjpw76mNpAjP1RpKOE2iocQTbFWwJwFoB9eGslgVnFS
+	 cwadH7bOaUTsUEeSfAfUaHMZyX61nvgdjcCDxfmiWcxZ6cNubQACzNViMmowApOjZ7
+	 oRjOVcNj6D7TkQG4urobKQrzQcSqBIT53RTYraC+tYq+niOLPurxLmQS7+83ZpggFe
+	 bfGHLGWagLUUw==
+Message-ID: <65003279-7312-46c0-b7dc-2ad9e925a9b4@kernel.org>
+Date: Wed, 4 Mar 2026 09:47:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from
+ zap_page_range_single()
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+ Alice Ryhl <aliceryhl@google.com>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ David Rientjes <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>,
+ H Hartley Sweeten <hsweeten@visionengravers.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-3-david@kernel.org> <aaLh2BxSgC9Jl5iS@google.com>
+ <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+ <aaVf5gv4XjV6Ddt-@google.com>
+ <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
+ <aaVnifbdxKhBddQp@google.com>
+ <5f8dcb7f-9e4f-4484-b160-3a9ce541d63c@kernel.org>
+ <aaWvtn48X8UizaaN@google.com>
+ <CANiq72nK8P1rUYw=y3fMzWZR3f_mW2v0_LSLWR1i0dQTtOqu2w@mail.gmail.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <CANiq72nK8P1rUYw=y3fMzWZR3f_mW2v0_LSLWR1i0dQTtOqu2w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: M51yY3USHbjFG1ItX1khFPLtjMkR3ajvCwVEpXUeJTxsqVi/BeT5GgoY
-	AjI1zG0TmUUA62/pjE3vrC1PZhBxIz9pt2BSR6ncuiE9GRQIWbOZTatd/pf+5EmJiiphkc8
-	lLnYIpKD2kqz311n198Q3wZW9VIvClFXmdRDtHnQzYlEVCWA4mV9Mlu3hUkU+jEjuauu2W3
-	XjmNDM8fqQn8VpeGAtEve9YRffYb9ooObDdsBBv8/uGCpE9qGH/dSbMdkvd2JHQUToV1ceI
-	lOu4U2tZxMchr5MhwI6j6LHAta1BQQpqBFJjCJY2qHc2BbSg9dzThvx/+UnSFXZOjoBhWbN
-	uwgY0Mdw3OqBd70EwXQYtNtbFktEweiUAON0yNAZebqEykmYBh6SHVFjPy3EBjWg6hAJE9p
-	2rBa933/fRkG0Lih9LeoKx0w07VqRHlvdA0hZ/RTfliEgn9IbzxlZAbl2P9jt1ZWkyIc1MB
-	M9b2HB5TFV8Tm7gJzNOWZFLUnATFYvbFY0tgA3Go8vvkMA+NADVGf8lV/977xiRyU/He5Dy
-	wmMdMFV1K4c+8mkeGrckEH/YA2FoSPwPqyiFVWtHO0jlWfdwsHNzbPGuflQ3ZeANfoo2aof
-	Y5uRtGpyPPApvATowDiwyajpSZ6w2pgje6rZNsslHHyHYbX4uRd/FZHy/zGrVfjrEHSpsSc
-	J3H4EYeQm5AE/x/sMFk5PIGhu8W+93Mnv3L4t9PgQl1zFVrGEqq65lnns7K/PCJYmVDn3E+
-	P68WJUq58Qt4kvPUJRWWU/oUMHRtAguNJ9OqDI1Qrqu1JdP4KvVAlHrb0kePDJON1e8Tv3W
-	H2YtR3GuuQsRuezSp/7BVbw2XrFHUawaWYwK4Jibl47swf6hee31PVcSnd4lCVPIoNWoG6a
-	zTd2wDyeV1pN//LRsHrmmZSRpWEqgogms2uQ2vcXchaWwrBIr82O+DjX6n4py5TluY8YeWn
-	j1LObI8rZ5SCbIbHgtl5AJLOvOaVG5qygs4JvMEIeLmHaekVYIPwaENyGA1Po4NcHa2IE2S
-	GuITc8CQ7NM5Ff/uj5hy2CAEiqJDT9unwdkZoMU6EbV3m1SuJ5jZJM4d0D0TSIkEk9oPEAw
-	j16fYJbd3I8/QGYgzA8mRo=
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 5A1991FCF52
+X-Rspamd-Queue-Id: 65F4F1FCD6C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-263655-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263663-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[mvista.com:server fail,tor.lore.kernel.org:server fail,vimux.org:server fail];
+	FREEMAIL_TO(0.00)[gmail.com,google.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[74];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vimux.org:mid,vimux.org:email,mvista.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-All in-tree consumers have been converted to the descriptor-based API.
-Remove the deprecated of_get_named_gpio() helper and delete the
-<linux/of_gpio.h> header.
+On 3/3/26 21:49, Miguel Ojeda wrote:
+> On Mon, Mar 2, 2026 at 4:41 PM Alice Ryhl <aliceryhl@google.com> wrote:
+>>
+>> It's not relevant in this patch, but another thing that may be useful is
+>> to add CLIPPY=1 to the make invocation when building normally. This
+>> causes additional warnings to be checked using a tool called clippy.
+> 
+> Yes, please do use `CLIPPY=1` -- the build should be Clippy clean
+> modulo exceptional cases that may slip through (and soon linux-next
+> will probably start reporting those warnings too).
 
-Signed-off-by: Jialu Xu <xujialu@vimux.org>
----
- drivers/gpio/TODO         | 28 ----------------------------
- drivers/gpio/gpiolib-of.c | 27 ---------------------------
- include/linux/of_gpio.h   | 38 --------------------------------------
- 3 files changed, 93 deletions(-)
- delete mode 100644 include/linux/of_gpio.h
+Understood. One thing I realized is that most (or all?) defconfigs will
+not enable rust.
 
-diff --git a/drivers/gpio/TODO b/drivers/gpio/TODO
-index 5acaeab029ec6..7ce80fde1f17e 100644
---- a/drivers/gpio/TODO
-+++ b/drivers/gpio/TODO
-@@ -58,34 +58,6 @@ Work items:
- 
- -------------------------------------------------------------------------------
- 
--Get rid of <linux/of_gpio.h>
--
--This header and helpers appeared at one point when there was no proper
--driver infrastructure for doing simpler MMIO GPIO devices and there was
--no core support for parsing device tree GPIOs from the core library with
--the [devm_]gpiod_get() calls we have today that will implicitly go into
--the device tree back-end. It is legacy and should not be used in new code.
--
--Work items:
--
--- Change all consumer drivers that #include <linux/of_gpio.h> to
--  #include <linux/gpio/consumer.h> and stop doing custom parsing of the
--  GPIO lines from the device tree. This can be tricky and often involves
--  changing board files, etc.
--
--- Pull semantics for legacy device tree (OF) GPIO lookups into
--  gpiolib-of.c: in some cases subsystems are doing custom flags and
--  lookups for polarity inversion, open drain and what not. As we now
--  handle this with generic OF bindings, pull all legacy handling into
--  gpiolib so the library API becomes narrow and deep and handle all
--  legacy bindings internally. (See e.g. commits 6953c57ab172,
--  6a537d48461d etc)
--
--- Delete <linux/of_gpio.h> when all the above is complete and everything
--  uses <linux/gpio/consumer.h> or <linux/gpio/driver.h> instead.
--
---------------------------------------------------------------------------------
--
- Collect drivers
- 
- Collect GPIO drivers from arch/* and other places that should be placed
-diff --git a/drivers/gpio/gpiolib-of.c b/drivers/gpio/gpiolib-of.c
-index ef1ac68b94b78..f293fb677fbc4 100644
---- a/drivers/gpio/gpiolib-of.c
-+++ b/drivers/gpio/gpiolib-of.c
-@@ -14,7 +14,6 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_gpio.h>
- #include <linux/pinctrl/pinctrl.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-@@ -446,32 +445,6 @@ static struct gpio_desc *of_get_named_gpiod_flags(const struct device_node *np,
- 	return desc;
- }
- 
--/**
-- * of_get_named_gpio() - Get a GPIO number to use with GPIO API
-- * @np:		device node to get GPIO from
-- * @propname:	Name of property containing gpio specifier(s)
-- * @index:	index of the GPIO
-- *
-- * **DEPRECATED** This function is deprecated and must not be used in new code.
-- *
-- * Returns:
-- * GPIO number to use with Linux generic GPIO API, or one of the errno
-- * value on the error condition.
-- */
--int of_get_named_gpio(const struct device_node *np, const char *propname,
--		      int index)
--{
--	struct gpio_desc *desc;
--
--	desc = of_get_named_gpiod_flags(np, propname, index, NULL);
--
--	if (IS_ERR(desc))
--		return PTR_ERR(desc);
--	else
--		return desc_to_gpio(desc);
--}
--EXPORT_SYMBOL_GPL(of_get_named_gpio);
--
- /* Converts gpio_lookup_flags into bitmask of GPIO_* values */
- static unsigned long of_convert_gpio_flags(enum of_gpio_flags flags)
- {
-diff --git a/include/linux/of_gpio.h b/include/linux/of_gpio.h
-deleted file mode 100644
-index d0f66a5e1b2a7..0000000000000
---- a/include/linux/of_gpio.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0+ */
--/*
-- * OF helpers for the GPIO API
-- *
-- * Copyright (c) 2007-2008  MontaVista Software, Inc.
-- *
-- * Author: Anton Vorontsov <avorontsov@ru.mvista.com>
-- */
--
--#ifndef __LINUX_OF_GPIO_H
--#define __LINUX_OF_GPIO_H
--
--#include <linux/compiler.h>
--#include <linux/gpio/driver.h>
--#include <linux/gpio.h>		/* FIXME: Shouldn't be here */
--#include <linux/of.h>
--
--struct device_node;
--
--#ifdef CONFIG_OF_GPIO
--
--extern int of_get_named_gpio(const struct device_node *np,
--			     const char *list_name, int index);
--
--#else /* CONFIG_OF_GPIO */
--
--#include <linux/errno.h>
--
--/* Drivers may not strictly depend on the GPIO support, so let them link. */
--static inline int of_get_named_gpio(const struct device_node *np,
--                                   const char *propname, int index)
--{
--	return -ENOSYS;
--}
--
--#endif /* CONFIG_OF_GPIO */
--
--#endif /* __LINUX_OF_GPIO_H */
+$ make defconfig
+...
+$ grep RUST .config
+CONFIG_RUST_IS_AVAILABLE=y
+# CONFIG_RUST is not set
+CONFIG_HAVE_RUST=y
+# CONFIG_HID_THRUSTMASTER is not set
+# CONFIG_TRUSTED_KEYS is not set
+# CONFIG_IMA_SECURE_AND_OR_TRUSTED_BOOT is not set
+CONFIG_SYSTEM_TRUSTED_KEYRING=y
+CONFIG_SYSTEM_TRUSTED_KEYS=""
+# CONFIG_SECONDARY_TRUSTED_KEYRING is not set
+
+That could imply that it might not receive as much build testing from
+people/build bots.
+
 -- 
-2.47.3
+Cheers,
 
+David
 
