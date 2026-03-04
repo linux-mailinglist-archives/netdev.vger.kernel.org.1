@@ -1,198 +1,241 @@
-Return-Path: <netdev+bounces-263921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE2cOvZdqGmZtgAAu9opvQ
-	(envelope-from <netdev+bounces-263921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:29:42 +0100
+	id 6CKFJNVeqGmZtgAAu9opvQ
+	(envelope-from <netdev+bounces-263922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:33:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC463204465
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:29:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98139204572
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A394830634C4
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:17:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 100FB300517F
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FE035E954;
-	Wed,  4 Mar 2026 16:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299983644C0;
+	Wed,  4 Mar 2026 16:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXjZZcfO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXg30rks"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A3635F17A
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054B0364057;
+	Wed,  4 Mar 2026 16:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772641054; cv=none; b=OSl/q8t0EW3jsTqzkX6q8cZ38SIiVCSi9acE558gPqvX30dztH1fWXiJWKw24fQ2fDXfJ6lt1LivCJo7t7TAUVcREF9UZtskvkFijwKIHaa47GSKJE3o7o71f/95lrVcoOO6zVSFZhla06Y88iU25am2U9OngKCdHz425uH2yg4=
+	t=1772641416; cv=none; b=ISu7IUbuOTMnZH0HL4wW/ZBGq7660kBjVCBD2oRkrYTGrDkCaTkSoE3bH3wI+qsyRAcN4pI9KLaKddwCMZIlJQ424AtdxRVgeh0VyVqsDLGBhcT7vboOUAIA4nbAWBB/Dqivs/orfWA0eC0u80A0VtyvkpE3/rf2WKqPl587h9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772641054; c=relaxed/simple;
-	bh=Jvb1rVCOM6U/ZqwMEdVq2XIa/Y++7Mt5uVCXqrWQMRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hIrKA2Exs0K3By+lh0vKXlMWivTJbWmAjYrlmQHzv9ZU30afbaOLo4BTNjynhonDKGtst6BIAJVqgwlOzstF0LpPLXfCHpLeVH0/pUFHUEal+MhHb2khLlFTTBOPiWelZ6Mv9q0wHglhhiKW29OYoNfugx04PerFzoxHuVmuFbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXjZZcfO; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-89a1347051aso26613606d6.2
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:17:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772641051; x=1773245851; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yRJEH4pR8LqfPxQHnyHrv9zCGvjvaxYgR3oxj/WbAzE=;
-        b=KXjZZcfOxzwN+IvLAEEd19+K4v97MiKyGS8LeI3d1J4IdPtVZUcfYb1kJNJOxZ1xIB
-         8aCaAAgoSsFZNxWF58xxuriktBm6bEybXbNokt4rPxmF0OZ0IZbNgsGCvN9FYavY+9vW
-         97C1tlh17ZkZbshuWhz2LQMlo1M7Xl7MJt0WTytvjGLbVEt/rfDos49+ZktrFlrncavB
-         J+l7KEhXInhH1fxsfu5pQ97HItUFTTYwKNs76MbG8Ik50G24hfCoOtMSqigt0qEh3OCg
-         PUgmfwslr+V0yNzLLjssIyZYNMyR0AXHpmBFmV/ChoN/GUhtnQJGgX1wzAEUn2sDaa0A
-         ZGKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772641051; x=1773245851;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yRJEH4pR8LqfPxQHnyHrv9zCGvjvaxYgR3oxj/WbAzE=;
-        b=nk6ULiV7IdRLpUgmIrdpd+Jgf5E98Dr1ksLhwhGqGGJxkBhJT7Y5szyDqFcJdD7RIe
-         smScMdKoYj8Z05+8UcTPdZEHY/HDdMdrNiD7bILh2KGHHjf5Eyy+8IvZVXI2nJqYSgEp
-         sx7CwzIYZRKEHsCoJ17d1qr2s3tEnTAQzNRDFLzbEuLBZo8IwI6G3cOrdHTkrnJlwve0
-         6lvSY3FFl73RxlAsQlo2WXFKXyACmoOqaw0rkYWwSDJeN9kp6+89JtCfk7WNK0J6DrT5
-         muGgFhNcZ0ygkmFdqDf2dm6UKp3wA70a0RtshzxJtAw/84907tB7kwuQd/9m1e5YSjhI
-         0z5A==
-X-Forwarded-Encrypted: i=1; AJvYcCV6T1rIv09VLwSzfnkX3KTlbZdOyabKG/5ZscqLIJMFrFOCBB969hCaUrW9WW1l5mENfr8Rgkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc6PX/OQVEElcz6NBs4qFx8izX3/CNN4W7FUeHhCIRUB9MiHyc
-	8OHQ9Q2RLocJh4qu3bB2/k9v1u4Gnsbjxfy/AQpyM3PqZiYnoMQVJrOc
-X-Gm-Gg: ATEYQzzUdACoZgU1qeT+U4mETv7aJs98LHx0fpih2Qxh5PQ/MPQvETpPvqGTZm3dqXv
-	R68GznRzNY5c84ViGFrwpFJLg/6S5IVHr0nPf9JwsJn6f3/qtO9BZrQOzLm2pcvmgzD3opQF605
-	a+Ojr7CdE4FJZiNoQ+DL0+1O79V+UMbJuVTU5bml/UeztAACcRl0dhOoc5HgfX93ojB9a48AFj1
-	pA6D4mK2hrx7Wz8Eil7YvwAfgqHlXevJ9XqPzdh2yhQWoT1Jl/7B5TcrTVm8AMvLyHkzkcPG62W
-	y9jhFGeTmWCF44LTF+zlzoa6VmB5XXz7BMN6VI3F2fgUcYVj7URUz98ICnmvnXjL5jB3elXXh6c
-	5m31+bHdmnhRGZLRwCGgxcok0xFA872XuP2KepLBmWUam8xogTsBBgXKT25CBlESamF/EIt8pRH
-	9F9IjJTaymJuiNE/Qn6gPRenPTNItjvtP8cdyKxGOHaZS/3d6cg/q4
-X-Received: by 2002:a05:6214:1c08:b0:897:306d:98c1 with SMTP id 6a1803df08f44-89a19d215c4mr34833766d6.34.1772641051357;
-        Wed, 04 Mar 2026 08:17:31 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1145:4:d19b:d485:ed5f:e15b? ([2620:10d:c091:500::3418])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899e608cfc6sm100754396d6.14.2026.03.04.08.17.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Mar 2026 08:17:31 -0800 (PST)
-Message-ID: <316b1fdd-f495-4a12-acd8-669ba5f2bf26@gmail.com>
-Date: Wed, 4 Mar 2026 11:17:29 -0500
+	s=arc-20240116; t=1772641416; c=relaxed/simple;
+	bh=pplMQwlU/qk2kc7S0JatE+vPlZLnQrEDb4hZ3STRhak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTWV9PV02d/6wOjoQljzzA+t/H+Oc0qcCMbsXOx4oVlGMwRsZjeCR4tEs/G429TImoW+SDbu2LLvS6mZJXTQQuKRbjl51wdTXaPdetfwmXS/qhpmvboYtThR2mHr0WcG1zNtRjstFpNrY0EbDG1gGfG2BYSxsg7TvcYTCnzBJfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXg30rks; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480FEC4CEF7;
+	Wed,  4 Mar 2026 16:23:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772641415;
+	bh=pplMQwlU/qk2kc7S0JatE+vPlZLnQrEDb4hZ3STRhak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hXg30rksEHLGgzN/y8BGCq2UrzTehXMyVPYn7PyPz2dNqbq97RcS0vdukPZHd/5sC
+	 dd2wFAjseQyAMXw25F/YW0+JEtbAxlxQVNsm2nCsEaFkULab44EcI0VHFjqSHUZbcY
+	 whXtpla29jo8hc0PkFqx9OWqn/VgfK0pvzW9C8o516E1RFbomifXbh/q1IBmeiitWd
+	 WmGzV3KbDRs40WvaeHuwkwQI2WceSI38h7y+7C0H3GVXkNu/jBe9gGd933s9APtR0H
+	 lrZPVWhCSOeyu8xljD5U9nC+oEDKLyNf206XDkP+2g1Q7aZv0x16Y5Ywu+EL82i1Br
+	 TvZjJKSPk3KHQ==
+Date: Wed, 4 Mar 2026 16:23:30 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Charles Perry <charles.perry@microchip.com>
+Cc: netdev@vger.kernel.org, Sean Anderson <sean.anderson@linux.dev>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <20260304-unvented-crinkle-37f0bfd03541@spud>
+References: <20260224202854.112813-1-charles.perry@microchip.com>
+ <20260224202854.112813-2-charles.perry@microchip.com>
+ <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
+ <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 6/9] psp: Add new netlink cmd for dev-assoc
- and dev-disassoc
-To: Wei Wang <weibunny@fb.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-References: <20260304000050.3366381-1-weibunny@fb.com>
- <20260304000050.3366381-7-weibunny@fb.com>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <20260304000050.3366381-7-weibunny@fb.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: EC463204465
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="NmsvHff0AKgJhbpH"
+Content-Disposition: inline
+In-Reply-To: <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
+X-Rspamd-Queue-Id: 98139204572
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263921-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[fb.com,vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-263922-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:email]
 X-Rspamd-Action: no action
 
 
+--NmsvHff0AKgJhbpH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 3/3/26 7:00 PM, Wei Wang wrote:
-> +int psp_nl_dev_disassoc_doit(struct sk_buff *skb, struct genl_info *info)
-> +{
-> +	struct psp_assoc_dev *entry, *found = NULL;
-> +	struct psp_dev *psd = info->user_ptr[0];
-> +	u32 assoc_ifindex;
-> +	struct sk_buff *rsp;
-> +	struct net *net;
-> +	int nsid;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX) ||
-> +	    GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_NSID))
-> +		return -EINVAL;
-> +
-> +	nsid = nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
-> +	net = get_net_ns_by_id(genl_info_net(info), nsid);
-> +	if (!net) {
-> +		NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_NSID]);
-> +		return -EINVAL;
-> +	}
-> +
-> +	assoc_ifindex = nla_get_u32(info->attrs[PSP_A_DEV_IFINDEX]);
-> +
-> +	/* Search the association list by ifindex and netns */
-> +	list_for_each_entry(entry, &psd->assoc_dev_list, dev_list) {
-> +		if (entry->assoc_dev->ifindex == assoc_ifindex &&
-> +		    dev_net(entry->assoc_dev) == net) {
-> +			found = entry;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!found) {
-> +		put_net(net);
-> +		NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_IFINDEX]);
-> +		return -ENODEV;
-> +	}
-> +
-> +	rsp = psp_nl_reply_new(info);
-> +	if (!rsp) {
-> +		put_net(net);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	/* Remove from the association list */
-> +	list_del(&found->dev_list);
-> +	rcu_assign_pointer(found->assoc_dev->psp_dev, NULL);
-> +	netdev_put(found->assoc_dev, &found->dev_tracker);
-> +	kfree(found);
+On Wed, Mar 04, 2026 at 06:59:35AM -0800, Charles Perry wrote:
+> On Wed, Mar 04, 2026 at 11:15:43AM +0000, Conor Dooley wrote:
+> > On Tue, Feb 24, 2026 at 12:28:52PM -0800, Charles Perry wrote:
+> > > Make it possible to connect a PHY which does not use inband
+> > > autoneg to a gem MAC using phylink's information.
+> > >=20
+> > > The previous implementation relied on whether or not the link
+> > > was a fixed-link to disable SGMII autoneg. This commit extend
+> > > this to all link which are not configured for inband
+> > > autonegotiation.
+> > >=20
+> > > Signed-off-by: Charles Perry <charles.perry@microchip.com>
+> >=20
+> > This breaks the macb on mpfs-icicle-kit, I get stuck with:
+> >=20
+> > [    7.189102] mpfs-sys-controller syscontroller: Registered MPFS syste=
+m controller
+> > [    7.260946] macb 20110000.ethernet eth0: PHY [20112000.ethernet-ffff=
+ffff:08] driver [Vitesse VSC8662] (irq=3DPOLL)
+> > [    7.273881] macb 20110000.ethernet eth0: configuring for phy/sgmii l=
+ink mode
+> > [    7.296580] macb 20110000.ethernet: gem-ptp-timer ptp clock register=
+ed.
+> > [    7.345782] macb 20112000.ethernet eth1: PHY [20112000.ethernet-ffff=
+ffff:09] driver [Vitesse VSC8662] (irq=3DPOLL)
+> > [    7.358082] macb 20112000.ethernet eth1: configuring for phy/sgmii l=
+ink mode
+> > [    7.380479] macb 20112000.ethernet: gem-ptp-timer ptp clock register=
+ed.
+> > [   11.376763] macb 20110000.ethernet eth0: Link is Up - 1Gbps/Full - f=
+low control off
+> > [   11.398403] Sending DHCP requests .
+> > [   11.472699] macb 20112000.ethernet eth1: Link is Up - 1Gbps/Full - f=
+low control off
+> > [   13.938425] ..... timed out!
+> > [   93.598491] macb 20110000.ethernet eth0: Link is Down
+> > [   93.641823] macb 20110000.ethernet: gem-ptp-timer ptp clock unregist=
+ered.
+> > [   93.659433] macb 20112000.ethernet eth1: Link is Down
+> > [   93.691724] macb 20112000.ethernet: gem-ptp-timer ptp clock unregist=
+ered.
+> > [   93.703977] IP-Config: Retrying forever (NFS root)...
+> > [   93.758382] macb 20110000.ethernet eth0: PHY [20112000.ethernet-ffff=
+ffff:08] driver [Vitesse VSC8662] (irq=3DPOLL)
+> > [   93.770655] macb 20110000.ethernet eth0: configuring for phy/sgmii l=
+ink mode
+> > [   93.786497] macb 20110000.ethernet eth0: Link is Up - 1Gbps/Full - f=
+low control off
+> > [   93.795840] macb 20110000.ethernet: gem-ptp-timer ptp clock register=
+ed.
+> > [   93.844481] macb 20112000.ethernet eth1: PHY [20112000.ethernet-ffff=
+ffff:09] driver [Vitesse VSC8662] (irq=3DPOLL)
+> > [   93.856769] macb 20112000.ethernet eth1: configuring for phy/sgmii l=
+ink mode
+> > [   93.870926] macb 20112000.ethernet eth1: Link is Up - 1Gbps/Full - f=
+low control off
+> > [   93.880302] macb 20112000.ethernet: gem-ptp-timer ptp clock register=
+ed.
+> >=20
+>=20
+> Hello Conor,
+>=20
+> I checked the driver for the VSC8662 and it doesn't have the
+> ->inband_caps() and ->config_inband() callbacks so Linux leaves whatever
+> the bootloader puts or uses the defaults. Looking at the datasheet, this
+> should be register 23 (Extended PHY Control Set 1) bit 13 (MAC interface
+> auto-negotiation)
+>=20
+> My guess is that this bit is set and since this patch disable inband
+> autonegotiation (because phylink decides it), there is a mismatch.
+>=20
+> Can you add 'managed =3D "in-band-status"' in your device tree under the =
+macb
+> node? That's not necessarily the fix, I just want to confirm my theory.
 
-in the case where found was the last associated device in its netns in 
-psd->assoc_dev_list, listeners in that netns will not receive any 
-notification that a psp device has gone away.
+No, it just produces a different error:
+[    5.769864] mpfs-sys-controller syscontroller: Registered MPFS system co=
+ntroller
+[    5.829146] macb 20110000.ethernet eth0: Could not attach PHY (-19)
+[    5.854232] IP-Config: Failed to open eth0
+[    5.897152] macb 20112000.ethernet eth1: Could not attach PHY (-19)
+[    5.921061] IP-Config: Failed to open eth1
+[    5.925592] IP-Config: No network devices available
+[    5.938800] clk: Disabling unused clocks
+[    5.944156] PM: genpd: Disabling unused power domains
+[    5.961029] check access for rdinit=3D/usr/sbin/init failed: -2, ignoring
 
-> +
-> +	put_net(net);
-> +
-> +	psp_nl_notify_dev(psd, PSP_CMD_DEV_CHANGE_NTF);
+> Also '#define DEBUG' in 'drivers/net/phy/phylink.c' can help if you can
+> recompile your kernel.
 
+Setting this provided no further logs, seemingly.
 
+Adding some basic prints shows that the driver changed the state of the
+PCSCNTRL register from 0x1040 to 0x40, so it disabled auto neg. The
+driver previously left it as it was, 0x1040 before and 0x1040 after.
+
+> > and because I am NFS root, it breaks boot :)
+> >=20
+> > btw, I don't see an explanation in hte commit message for why the
+> > macb_is_gem(bp) got dropped? Is this now done unconditionally when it
+> > was conditional before?
+> >=20
+>=20
+> Well if you get to the ->macb_pcs_config() callback, you most certainly
+> have an SGMII PCS block. Does your IP have the PCS registers? (0x200 to
+> 0x23c) Also I thought that macb doesn't do SGMII (only GEM does) so it
+> can't reach ->macb_pcs_config().=20
+
+When I said "macb on" I meant to say "macb driver on", but omitted the
+word. Unfortunately, the idiot who added the original mpfs compatible,
+because the platform was using the "cdns,macb" compatible rather than a
+soc-specific one, did not check if the platform was actually a macb
+before doing so, and trusted the original dts author. This is actually a
+gem.
+
+--NmsvHff0AKgJhbpH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaahcggAKCRB4tDGHoIJi
+0jNvAP9F+T30MPLczKC1PjYWpoud+tNJ+2nn5/YGvA5EJsqCFAD+Ot/DFgczTyG2
+QmUFOmdMRj8XoaKHOTOYTj/ukfCX1Qg=
+=lSI9
+-----END PGP SIGNATURE-----
+
+--NmsvHff0AKgJhbpH--
 
