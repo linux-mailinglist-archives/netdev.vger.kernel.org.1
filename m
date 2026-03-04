@@ -1,213 +1,364 @@
-Return-Path: <netdev+bounces-263758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGK/J8ARqGmzngAAu9opvQ
-	(envelope-from <netdev+bounces-263758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:04:32 +0100
+	id CIhaLpUTqGnUngAAu9opvQ
+	(envelope-from <netdev+bounces-263759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:12:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BDFC1FEA4B
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:04:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 214161FEC48
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95AC23036D66
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:04:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 160AB3147CD3
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE3539FCA5;
-	Wed,  4 Mar 2026 11:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B331A39D6FB;
+	Wed,  4 Mar 2026 11:08:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D7A39F192
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 11:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9F6371D02;
+	Wed,  4 Mar 2026 11:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772622269; cv=none; b=dbJ7Oz43sDByANOH4dQf/Gd7jeW6gF/xsrfCl4FOvMXZmmKV5hKNMLJW00wThQOcgojhBfG73Yf0Sq3z5SqJEDxmPOxmAgRdT+auIJKky/8ZGghJXGFF8caBU758nqXWaKUSSxSovJcm8mci4CQmqSQ39/47mU/0Os7gd+QLoLI=
+	t=1772622488; cv=none; b=hJ8lxsXDP2Fp/UhddW5ljFKqfXRogzmPn04Z2hJqxLHP8vUZrMW4xftJSJDEXR8R/ugtlCWFqq+hDPjgRbvw23E32yK5m+cdBmPqX+Sp2ylGI+bdlHI77uInI5qKd3RNNfMDy5WdHRSxh9495GrwOU3CLOaRDG2hEeb/hnIcPHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772622269; c=relaxed/simple;
-	bh=fr44pu6eP9IkM5YUt595mhZ3W4sn/W8ZQZsjYWWozEE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rYHAcW96ieFZAxSdR8LvKNnHYE1IruZFIXDzMDolDbHd+cyUYFU0fKxqLkfmrsXE31Jas9IuCA4Y6O7HRpSBm+kZXlhyrMIzE5VMuPawng+Z78c9zj+gic7BNqPyXUTgJxzGOdw7uGGBF/qfa+1tPkUs7Ai5vuB+2mmk5ldWTE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7d4bd83e456so76387163a34.2
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 03:04:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772622265; x=1773227065;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U5WCXt9LsN66XnnTEurLe8lJmGdgFJdCpOL3D02k03o=;
-        b=Uc+OrwWKJ0yEiEyE7U1SSf1B2NxnHR5EXdE0QoVon1yYThB45ITQwXxkx1iEkg+XNp
-         e1+b6J/0ZdCz9ZZebNZDNnhFD5NOb9YBVa61u4hBUsYLEQnUKQPKa9bjND51tLywEE9D
-         XfKFAUz2/ynpZkDzLI5bOI/w07HgFa6k1UEN8JG7w3227jn/FJPUTBYZih5i29RjzQRq
-         4DZrYiSiSXq7dnGRCAJV6xaHQaAs7ObwwuhX5ioNlfdLC7AtVDaWLEcA7ww8awIFwPhC
-         Iun0Kz8aH87gNfIuE2JeLI57XfkrQNnovJR8alWOI931uL37GzofVSL62pkdoCGJ05YN
-         AxcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVP5RjNQQ6dReYOt93307rzls40pWVxonNvQJ3CmxS3JlO4HWwWVSK26bhOZjsBvzfJhylDXWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFP/ODEZ/ucbpt6vzT3xeCZduieeZmBnGvjDb1mEm5NCpzLlxN
-	sdPGMLrXsTilGGKwnYRn81inldxvxV6ybhdFeIFTKyQCB/g6penCq2RLRiB3fsZ2rOF4J4b9QJr
-	9N999DEyFJVv+FIhYPeN3VAWDM99AoAluYoR6zvAOFi9A/5JofUnCPBGVClo=
+	s=arc-20240116; t=1772622488; c=relaxed/simple;
+	bh=WEHh9zjvjGqN8Yuxxy6+/8dLl1UNXuYrDbU8ahN0HfY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=j8BpaHqZ0izmCt8H/DCihimv5E8S5X9Xo3vBUoYmJQWDOtZ/BwwydaeS+eaWyPr/daplNPRr141VDw/LTNNv2fW47FwOxUTM3W93qCcTy4OM9kZyw9dVbC3fauKRPBG6kTOfFn92z96P10Mgnr7NhXjfOcosr8EQ7uNZ3YE3jbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
+X-QQ-mid: zesmtpgz3t1772622471t047521a1
+X-QQ-Originating-IP: KDuq9/1zr7V0KeqUhUY2NZ9mVljaT6FuPwYAadcNXKA=
+Received: from localhost.localdomain ( [39.65.248.64])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 04 Mar 2026 19:07:49 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3064715555804836238
+EX-QQ-RecipientCnt: 8
+From: Jialu Xu <xujialu@vimux.org>
+To: xujialu@vimux.org
+Cc: brgl@kernel.org,
+	kees@kernel.org,
+	krzk@kernel.org,
+	linusw@kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 1/3] nfc: s3fwrn5: convert to gpio descriptors
+Date: Wed,  4 Mar 2026 19:07:38 +0800
+Message-ID: <815AD68AB84E0ECD+20260304110740.548318-1-xujialu@vimux.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <1777BBA64A3D0F97+20260304105215.536399-1-xujialu@vimux.org>
+References: <1777BBA64A3D0F97+20260304105215.536399-1-xujialu@vimux.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2208:b0:679:920a:9b73 with SMTP id
- 006d021491bc7-67b176e81c1mr994302eaf.6.1772622265608; Wed, 04 Mar 2026
- 03:04:25 -0800 (PST)
-Date: Wed, 04 Mar 2026 03:04:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69a811b9.a70a0220.b118c.0019.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in u32_change (2)
-From: syzbot <syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 0BDFC1FEA4B
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: OCEllDxgdh9VkWLJuFOVucdUQ742jopLH6Ow3N8nuBobvb7kn6nEkR1M
+	E9zj2RW0CZGYaeX8vAw9+tfXNQxml71ZGsZtA2yG9yISO/XDtkDMbUQxZhw8EuoOz2h/mTF
+	Rpo5rhNP8b0+e2NvUwyOKY4PG7IzabZrfdchOkV/wCia4SJ5PxQx80BJ0JoTGsyuDuo88yn
+	x3iV9MPz7AGYVU8yH9yQHf1yfw3276iFXl8Lg8Kuwr7O68BawOq0OC6OULwIcz71xM8BvDC
+	+C9iA2zOnCz6Tz8IzTnL6VaZ7kAWULGTFd8bIEef9Ly9OucdJAdl1dM6ZbU4MeMEgo8lc+3
+	jfJllVqAXhkIfYhk3j6x7vwCW6DC4mt0mYawV80OjJkiZ1iz0nCWnkK8hFaU9gBI+KAGAJn
+	e35hwZPGivdGitAQVPC5UdB/cgA7vKeo/ehdNMubSeCEoOG7oZNk8YYjc9pGrQmgxrvVssQ
+	RuWCVO7SeQXsBV7FFtvulgfNd329vsA6jLbro8bevZmz0LjZ+bn8tG538YIoI57soM4+CgX
+	1FZlo/MbI5euDnCVZiO6XQw9pw/wcsIbXaf91ZORjgCHuSZwIA9hR3QqlRijPdK6d5vOaKN
+	xABXMz5P3R6bS3qByHDi4blaYuPHcHubkG9uU9CI/XWmyoSFaTFnZsuYYmHyF2tTQ6bdKWm
+	VNS/l4hnxx2SaWikSRRevf/AmOcrxrn8iPKpTNDSsXOOL33acFFhD8sO8QRKr1b/Q2ttDEE
+	Q1xNOV4WGGg969Mfh9XV1pW5XIBoRM3eFH4PRX5GnvQd4TC8j0gZc/wAy5cFhSeKCqhrxnO
+	nhaCdG/2Ob7OutYAB2vrpvY7GhferwRFfcAGKinPVDE/uGbD9+INwT2gd+Cre3Lbi90aCwx
+	8xdDWeSURsfpUQflADDYQCA8V9xIWH8hzAkWc166LH2UhbNC5QJ0K2SjtUxKB2P3SKlGAbA
+	BddjNkJDr5b1e1SZkU0BoVhwVYmRn0C2o6lUDo2zViul6so/TCrFIzobzAGFIamuEJaf4Ry
+	VJt8E8zQ==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: 214161FEC48
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=65722f41f7edc17e];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263759-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-263758-lists,netdev=lfdr.de,d5ace703ed883df56e42];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
 	TO_DN_NONE(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,goo.gl:url,appspotmail.com:email,googlegroups.com:email,syzkaller.appspot.com:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,vimux.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    a95f71ad3e2e Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c27c02580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=65722f41f7edc17e
-dashboard link: https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b189e6580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=134c0006580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-a95f71ad.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cef9447ff4b5/vmlinux-a95f71ad.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a1176fe9ea48/bzImage-a95f71ad.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com
-
-netlink: 44 bytes leftover after parsing attributes in process `syz.0.17'.
-------------[ cut here ]------------
-memcpy: detected field-spanning write (size 32) of single field "&new->sel" at net/sched/cls_u32.c:855 (size 16)
-WARNING: net/sched/cls_u32.c:855 at u32_init_knode net/sched/cls_u32.c:855 [inline], CPU#0: syz.0.17/5487
-WARNING: net/sched/cls_u32.c:855 at u32_change+0x1da0/0x2720 net/sched/cls_u32.c:921, CPU#0: syz.0.17/5487
-Modules linked in:
-CPU: 0 UID: 0 PID: 5487 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:u32_init_knode net/sched/cls_u32.c:855 [inline]
-RIP: 0010:u32_change+0x1daf/0x2720 net/sched/cls_u32.c:921
-Code: 3d 4c eb 42 06 01 75 33 e8 0e 0e 0d f8 eb 50 e8 07 0e 0d f8 48 8d 3d 00 1f 68 06 b9 10 00 00 00 4c 89 f6 48 c7 c2 00 64 e1 8c <67> 48 0f b9 3a e9 af ee ff ff e8 e2 0d 0d f8 eb 24 e8 db 0d 0d f8
-RSP: 0018:ffffc90004976fc0 EFLAGS: 00010293
-RAX: ffffffff89b88e29 RBX: ffff888038a7c800 RCX: 0000000000000010
-RDX: ffffffff8ce16400 RSI: 0000000000000020 RDI: ffffffff9020ad30
-RBP: ffffc90004977178 R08: 0000000000000dc0 R09: 00000000ffffffff
-R10: dffffc0000000000 R11: fffffbfff20232f7 R12: ffff888033a63ce8
-R13: 0000000000000001 R14: 0000000000000020 R15: 0000000000000001
-FS:  00005555621f5500(0000) GS:ffff88808ca5b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffe0048eff8 CR3: 000000005563f000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- tc_new_tfilter+0xe1c/0x1630 net/sched/cls_api.c:2423
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmmsg+0x27c/0x4e0 net/socket.c:2735
- __do_sys_sendmmsg net/socket.c:2762 [inline]
- __se_sys_sendmmsg net/socket.c:2759 [inline]
- __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2759
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f78ead9c629
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff46c64d98 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f78eb015fa0 RCX: 00007f78ead9c629
-RDX: 04000000000001f2 RSI: 0000200000000000 RDI: 0000000000000004
-RBP: 00007f78eae32b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f78eb015fac R14: 00007f78eb015fa0 R15: 00007f78eb015fa0
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	3d 4c eb 42 06       	cmp    $0x642eb4c,%eax
-   5:	01 75 33             	add    %esi,0x33(%rbp)
-   8:	e8 0e 0e 0d f8       	call   0xf80d0e1b
-   d:	eb 50                	jmp    0x5f
-   f:	e8 07 0e 0d f8       	call   0xf80d0e1b
-  14:	48 8d 3d 00 1f 68 06 	lea    0x6681f00(%rip),%rdi        # 0x6681f1b
-  1b:	b9 10 00 00 00       	mov    $0x10,%ecx
-  20:	4c 89 f6             	mov    %r14,%rsi
-  23:	48 c7 c2 00 64 e1 8c 	mov    $0xffffffff8ce16400,%rdx
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	e9 af ee ff ff       	jmp    0xffffeee3
-  34:	e8 e2 0d 0d f8       	call   0xf80d0e1b
-  39:	eb 24                	jmp    0x5f
-  3b:	e8 db 0d 0d f8       	call   0xf80d0e1b
-
-
+Use <linux/gpio/consumer.h> instead of <linux/of_gpio.h>.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/gpio/gpiolib-of.c        |  4 +++
+ drivers/nfc/s3fwrn5/i2c.c        | 55 +++++---------------------------
+ drivers/nfc/s3fwrn5/phy_common.c | 11 +++----
+ drivers/nfc/s3fwrn5/phy_common.h |  5 +--
+ drivers/nfc/s3fwrn5/uart.c       | 45 +++++++-------------------
+ 5 files changed, 32 insertions(+), 88 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/gpio/gpiolib-of.c b/drivers/gpio/gpiolib-of.c
+index ef1ac68b94b78..3bdd9af674474 100644
+--- a/drivers/gpio/gpiolib-of.c
++++ b/drivers/gpio/gpiolib-of.c
+@@ -542,6 +542,10 @@ static struct gpio_desc *of_find_gpio_rename(struct device_node *np,
+ 		{ "reset",	"reset-n-io",	"marvell,nfc-uart" },
+ 		{ "reset",	"reset-n-io",	"mrvl,nfc-uart" },
+ #endif
++#if IS_ENABLED(CONFIG_NFC_S3FWRN5_I2C)
++		{ "en",		"s3fwrn5,en-gpios",	"samsung,s3fwrn5-i2c" },
++		{ "wake",	"s3fwrn5,fw-gpios",	"samsung,s3fwrn5-i2c" },
++#endif
+ #if IS_ENABLED(CONFIG_PCI_LANTIQ)
+ 		/* MIPS Lantiq PCI */
+ 		{ "reset",	"gpio-reset",	"lantiq,pci-xway" },
+diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
+index 110d086cfe5ba..3f508b5fbf06b 100644
+--- a/drivers/nfc/s3fwrn5/i2c.c
++++ b/drivers/nfc/s3fwrn5/i2c.c
+@@ -8,10 +8,8 @@
+ 
+ #include <linux/clk.h>
+ #include <linux/i2c.h>
+-#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+-#include <linux/of_gpio.h>
+-#include <linux/of_irq.h>
+ #include <linux/module.h>
+ 
+ #include <net/nfc/nfc.h>
+@@ -146,37 +144,6 @@ static irqreturn_t s3fwrn5_i2c_irq_thread_fn(int irq, void *phy_id)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static int s3fwrn5_i2c_parse_dt(struct i2c_client *client)
+-{
+-	struct s3fwrn5_i2c_phy *phy = i2c_get_clientdata(client);
+-	struct device_node *np = client->dev.of_node;
+-
+-	if (!np)
+-		return -ENODEV;
+-
+-	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_en)) {
+-		/* Support also deprecated property */
+-		phy->common.gpio_en = of_get_named_gpio(np,
+-							"s3fwrn5,en-gpios",
+-							0);
+-		if (!gpio_is_valid(phy->common.gpio_en))
+-			return -ENODEV;
+-	}
+-
+-	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
+-		/* Support also deprecated property */
+-		phy->common.gpio_fw_wake = of_get_named_gpio(np,
+-							     "s3fwrn5,fw-gpios",
+-							     0);
+-		if (!gpio_is_valid(phy->common.gpio_fw_wake))
+-			return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+ static int s3fwrn5_i2c_probe(struct i2c_client *client)
+ {
+ 	struct s3fwrn5_i2c_phy *phy;
+@@ -193,20 +160,14 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
+ 	phy->i2c_dev = client;
+ 	i2c_set_clientdata(client, phy);
+ 
+-	ret = s3fwrn5_i2c_parse_dt(client);
+-	if (ret < 0)
+-		return ret;
+-
+-	ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
+-				    GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
+-	if (ret < 0)
+-		return ret;
++	phy->common.gpio_en = devm_gpiod_get(&client->dev, "en", GPIOD_OUT_HIGH);
++	if (IS_ERR(phy->common.gpio_en))
++		return PTR_ERR(phy->common.gpio_en);
+ 
+-	ret = devm_gpio_request_one(&phy->i2c_dev->dev,
+-				    phy->common.gpio_fw_wake,
+-				    GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
+-	if (ret < 0)
+-		return ret;
++	phy->common.gpio_fw_wake = devm_gpiod_get(&client->dev, "wake",
++						   GPIOD_OUT_LOW);
++	if (IS_ERR(phy->common.gpio_fw_wake))
++		return PTR_ERR(phy->common.gpio_fw_wake);
+ 
+ 	/*
+ 	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
+diff --git a/drivers/nfc/s3fwrn5/phy_common.c b/drivers/nfc/s3fwrn5/phy_common.c
+index deb2c039f0fd6..39a60e34136c5 100644
+--- a/drivers/nfc/s3fwrn5/phy_common.c
++++ b/drivers/nfc/s3fwrn5/phy_common.c
+@@ -8,7 +8,6 @@
+  * Bongsu Jeon <bongsu.jeon@samsung.com>
+  */
+ 
+-#include <linux/gpio.h>
+ #include <linux/delay.h>
+ #include <linux/module.h>
+ 
+@@ -19,7 +18,7 @@ void s3fwrn5_phy_set_wake(void *phy_id, bool wake)
+ 	struct phy_common *phy = phy_id;
+ 
+ 	mutex_lock(&phy->mutex);
+-	gpio_set_value(phy->gpio_fw_wake, wake);
++	gpiod_set_value(phy->gpio_fw_wake, wake);
+ 	if (wake)
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+ 	mutex_unlock(&phy->mutex);
+@@ -33,14 +32,14 @@ bool s3fwrn5_phy_power_ctrl(struct phy_common *phy, enum s3fwrn5_mode mode)
+ 
+ 	phy->mode = mode;
+ 
+-	gpio_set_value(phy->gpio_en, 1);
+-	gpio_set_value(phy->gpio_fw_wake, 0);
++	gpiod_set_value(phy->gpio_en, 1);
++	gpiod_set_value(phy->gpio_fw_wake, 0);
+ 	if (mode == S3FWRN5_MODE_FW)
+-		gpio_set_value(phy->gpio_fw_wake, 1);
++		gpiod_set_value(phy->gpio_fw_wake, 1);
+ 
+ 	if (mode != S3FWRN5_MODE_COLD) {
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+-		gpio_set_value(phy->gpio_en, 0);
++		gpiod_set_value(phy->gpio_en, 0);
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+ 	}
+ 
+diff --git a/drivers/nfc/s3fwrn5/phy_common.h b/drivers/nfc/s3fwrn5/phy_common.h
+index 9cef25436bf90..871bec53dd0a9 100644
+--- a/drivers/nfc/s3fwrn5/phy_common.h
++++ b/drivers/nfc/s3fwrn5/phy_common.h
+@@ -12,6 +12,7 @@
+ #define __NFC_S3FWRN5_PHY_COMMON_H
+ 
+ #include <linux/mutex.h>
++#include <linux/gpio/consumer.h>
+ #include <net/nfc/nci_core.h>
+ 
+ #include "s3fwrn5.h"
+@@ -21,8 +22,8 @@
+ struct phy_common {
+ 	struct nci_dev *ndev;
+ 
+-	int gpio_en;
+-	int gpio_fw_wake;
++	struct gpio_desc *gpio_en;
++	struct gpio_desc *gpio_fw_wake;
+ 
+ 	struct mutex mutex;
+ 
+diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
+index 9c09c10c2a464..5977a6b58f6fb 100644
+--- a/drivers/nfc/s3fwrn5/uart.c
++++ b/drivers/nfc/s3fwrn5/uart.c
+@@ -10,13 +10,12 @@
+ 
+ #include <linux/device.h>
+ #include <linux/kernel.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/nfc.h>
+ #include <linux/netdevice.h>
+-#include <linux/of.h>
+ #include <linux/serdev.h>
+-#include <linux/gpio.h>
+-#include <linux/of_gpio.h>
++#include <linux/gpio/consumer.h>
+ 
+ #include "phy_common.h"
+ 
+@@ -88,25 +87,6 @@ static const struct of_device_id s3fwrn82_uart_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, s3fwrn82_uart_of_match);
+ 
+-static int s3fwrn82_uart_parse_dt(struct serdev_device *serdev)
+-{
+-	struct s3fwrn82_uart_phy *phy = serdev_device_get_drvdata(serdev);
+-	struct device_node *np = serdev->dev.of_node;
+-
+-	if (!np)
+-		return -ENODEV;
+-
+-	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_en))
+-		return -ENODEV;
+-
+-	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_fw_wake))
+-		return -ENODEV;
+-
+-	return 0;
+-}
+-
+ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
+ {
+ 	struct s3fwrn82_uart_phy *phy;
+@@ -140,20 +120,19 @@ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
+ 
+ 	serdev_device_set_flow_control(serdev, false);
+ 
+-	ret = s3fwrn82_uart_parse_dt(serdev);
+-	if (ret < 0)
+-		goto err_serdev;
+-
+-	ret = devm_gpio_request_one(&phy->ser_dev->dev, phy->common.gpio_en,
+-				    GPIOF_OUT_INIT_HIGH, "s3fwrn82_en");
+-	if (ret < 0)
++	phy->common.gpio_en = devm_gpiod_get(&serdev->dev, "en",
++					      GPIOD_OUT_HIGH);
++	if (IS_ERR(phy->common.gpio_en)) {
++		ret = PTR_ERR(phy->common.gpio_en);
+ 		goto err_serdev;
++	}
+ 
+-	ret = devm_gpio_request_one(&phy->ser_dev->dev,
+-				    phy->common.gpio_fw_wake,
+-				    GPIOF_OUT_INIT_LOW, "s3fwrn82_fw_wake");
+-	if (ret < 0)
++	phy->common.gpio_fw_wake = devm_gpiod_get(&serdev->dev, "wake",
++						   GPIOD_OUT_LOW);
++	if (IS_ERR(phy->common.gpio_fw_wake)) {
++		ret = PTR_ERR(phy->common.gpio_fw_wake);
+ 		goto err_serdev;
++	}
+ 
+ 	ret = s3fwrn5_probe(&phy->common.ndev, phy, &phy->ser_dev->dev,
+ 			    &uart_phy_ops);
+-- 
+2.47.3
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
