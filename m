@@ -1,162 +1,160 @@
-Return-Path: <netdev+bounces-264032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CAs3HwmSqGkLvwAAu9opvQ
-	(envelope-from <netdev+bounces-264032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:11:53 +0100
+	id CLHZME2SqGkLvwAAu9opvQ
+	(envelope-from <netdev+bounces-264033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D620D20776B
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:11:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2048C207782
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BF3A306EC8E
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 20:10:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A25C301B925
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 20:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23D3382397;
-	Wed,  4 Mar 2026 20:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B582382F2C;
+	Wed,  4 Mar 2026 20:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V64sl+BM"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hkxLvpfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D79538228A
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 20:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772655025; cv=pass; b=Q0arA/N7CLNNf1axnUom91zu35kMtH6hWLh5bocjzeitjCRCP+fEshAfdQ7NNj/ywu4QFG1CsjiUHNF8tuhsxnpsZz7/hyq8HbaDFUo3G/RuqHcWXMe6i9wNWzAGHZ7tJO2LqK9jiwLfgz5HW8NMPdPkwaShECJbnWjy4QZ22j0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772655025; c=relaxed/simple;
-	bh=04LKILsO5rNiAUfHFDSzhrapeXZC7tNvPfppW4ypo34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KAQ1l1SJw2LUMCqpaaJdFW1325hvSOze91MVMePDGFTnM8vdl4wZpZD5EnaLsiPADLffmS3c5k8tLfLYVSzDYTmre6ozxsTpYGnVU260GrmjmDJ+01CxELxTvXRlBRFNjlVmvm2gNXAKvzCXFT+ayQ8ezyLNuCGxgr+cWrHFAcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V64sl+BM; arc=pass smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-660bdba9390so2919540a12.1
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 12:10:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772655022; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bLA5y4F8IgyCALIdvVUi8sjFwtXZ7dy9wpCq2J1nyf+P7PaWK/HmKq5qDYiz3DeoBa
-         kC2RZHtDq6wqjW/EUFaOtCYn6KA/sOLtM1RYqYP3swv3Ql9SqK4l51IDbmEHs90i8bjk
-         eSse25g4r6VKIQ/jVsUqgXRu/vH73yzrwLKagViGuuSFImjdBeKu7vD/2nsemDQXYfQd
-         8oGjvN6l+L15Ca2nyiqFYFCcm8upF4VDNEkz4VZWj3qzXvgleBTe1CFaluQ3BM1vlBYJ
-         fW9966FGiPJ84OS0Pf67Av5yCjSBNYTBUwW07M470tNmEhq6waSRvOxzDL5dCzZqZMx1
-         EYSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=04LKILsO5rNiAUfHFDSzhrapeXZC7tNvPfppW4ypo34=;
-        fh=6Bz2mGO/XMPpXTlYcE2toBrRM+UjcqmRGK7gHrsIgJc=;
-        b=IAbxCQbSYaYacZeW4xu0y4KjFPOrjXeE5CwH1POtCTrwpsmHlKRyHAmFA7OeCle2Z9
-         STVNaNxrNkfVe/rVRWghZvmgEgFJYXXGLkQT1ElxvTlKhgyt907p8wuaKoaXEjMFhXFu
-         ALNC8tWRKAkhuPtC2G7iGCRcrrjvm/Crm17kbVStP9FaEz4X1BYy/VBswfPZfzsuYoX+
-         rPnHHTJTzqdvdsU+rfd8Wx51IBgkLhh0b/9lwsaRXPysSWXwA+x+2Y6aIyrJk/F8JdHt
-         yU48Xam/ctJliwOSD5ITWqfw/cKr6pKZKQ5h/cu8x/QRO7a4byYuIG9foY5om0f8TagZ
-         6SyQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6734382F06
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 20:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772655115; cv=none; b=qEoR6fm4DL4AcT6TKUUP/DrmB9FDKRl6WVas8OgIqh5o35AXPzdJPhnQzgsGEnFb3/mhP+U5f1eYtaR5Fe27k5tbSQu+s4gfQ8zghKAD5LMQUytSYWX4M/A7O6YyiZvocKJ2uRnub8amy21DEUJcqe9D89lSMe5L7W8neR8djxQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772655115; c=relaxed/simple;
+	bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TieJsTEjb30+ywvy+x7xUT9MOB6RsNgG62ltnw1YxF6AZCP5l1YHMAmaGYLPS+gMCY7XOtvZ8dnsYZ7y5xXO+EJg/CM/BcedryJFYBaQXq1MxHcA3rQuwYpPwpL4cJUjb84eF8BLkexhm4bmgLiqFm1jecw/xHhFRkGtSo7/YK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hkxLvpfh; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb4097794dso712268785a.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 12:11:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772655022; x=1773259822; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=04LKILsO5rNiAUfHFDSzhrapeXZC7tNvPfppW4ypo34=;
-        b=V64sl+BMSg4zPXZRnPsXVARtaGQVo/8+G//RqWaONUXEUmMReWfRq2pv1b6t9TJaSs
-         81w1csb5a0Rk54GhyhVfMoOs8k/hTuYNlGW1wLonARrtwI1vQOoa+ZSLADE7RbPocpvc
-         PGU/Y3YkFaFExYr889o716bMoN0zOhkxGLObANDE9+m7kFRn+CwoiIaIGbl5439ro6pL
-         xxAETba7rbOnZTpJ6Y/e/C1UqrpF/J8JALuQEt3zrzdn8RvBi39wtEytQMjB8T5lHcY4
-         mJDamM5InRi3p11Of2QbagUt4YILkrviGdGoYB8GXYoJaIbwtGXKNKHjIEGtKJTT5CdG
-         fNxQ==
+        d=ziepe.ca; s=google; t=1772655112; x=1773259912; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
+        b=hkxLvpfhuH/fIqBn1y2+H7WYWeGmjn3p9329bc9ZMQEXlqajhD8zjcsPy/UbEEEXIP
+         5+O+c1OtvN6whhfIhVJBtBJFrODqfNdG/gBFoFYEGbGXCfyvF3sbSJGBv4j++qCeu+yP
+         CMQiAg8s5OYSiu6SGa8X7c0zwhTQtB4o6WV8EyUuHFMMZLAySlLLxlnq7Ct/wo4R82BR
+         4UJ74ejLrfBUdGSisY9oSwWkKvtO3yApB9SBPRliJuB2XwLAtNT5LTjpFrdL6Fn+eLez
+         W9pyKyeoQQdqvJKlGAM+qpS1OaRG1zlkrWVmyVLb5QaZAvS0oFd7ZJZbTiQmdImrswgk
+         YRUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772655022; x=1773259822;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=04LKILsO5rNiAUfHFDSzhrapeXZC7tNvPfppW4ypo34=;
-        b=v4Ml9nWpIGc3nYSj2wXA8HQ1gP//UUvUCpaFgstbbBgG+bUWajJ+CS+BNBNhZjV/Y/
-         UnsTZ8jR4zdugwIhaJUwTu+Vy5cGi8SE7/tlO5FlPKX/cxDqe9pWypaAia2qk/uts7Rj
-         OpbCcbeSDEhW1jBlIJpeSXuR+fU8A/2dPLgnnnCBsA+1INmVNu2lRvJm2d+R7n/DFBhs
-         MWJml4WH/hoATck+MGSEmIrx3kqBpNmEqgMLVk5bxeY/swxUAXeOWWuUADexjq1zvAUE
-         mwiaBkHsfhjfgXTizssI5gs/E/AkpNwhOaLjQ7MGCRyY7wQdHYxSa5oTGKg0P7unLxfL
-         kDNg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4Wob2tKbzoa8jC4NOcAf3tTZeIPB+SRab+RQ5qRjpOyfwIw100nktDB+8sCejdLPWxmSYGoY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4zweNCU44PbCclD218T11xJNTMAfKM4/J2hb7Ac74sUhBSvRS
-	YEnXd5eyhuZ2VhtTilGtb0DfcSg7rf51VvZaA1VlnzWoAkUp/s5LcOaOVYCraSs+30xyHUZOdw3
-	wnpJX/hLGEGJCmejXRZsSDOVupbJr6oJO+wJ4KFOa
-X-Gm-Gg: ATEYQzz3w1mJCqoiez0xbXnCOiUnj+PnOquTKwG7SLak2ogYBmr67VBFtt26EmZSkiQ
-	b3Op41yjLEJXsvtphXaxIJf9jTWDMXVJTbvcM7RjDOK46NbsQWVQbE92OpsfSDazIImKKi2zVWs
-	+PdAxSiqvnfaSRvoTp09QCEjhxbZHfi4Fr/++knEUI0c6tc9l4haQIsNeb4c7VXy4LulXlPnTBg
-	yjMtWF2eu5H8ttS6xw+ROnmSXrOlfqGgW7HVJewSuIWPFEtTILjeR3G8YJUr2huVqLvs8BhOFSd
-	AodO+rWbRdw1FTYpupc0v6HDgO3kvlFMfkwnoFnoqEYItu0Qiau5R3TB8ZMwzWimhxU3r4FMhst
-	jX+Dn
-X-Received: by 2002:a05:6402:40cb:b0:659:4853:5382 with SMTP id
- 4fb4d7f45d1cf-660f06dbdaemr1874810a12.32.1772655022124; Wed, 04 Mar 2026
- 12:10:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772655112; x=1773259912;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
+        b=RbJeyOwyMkXxGA7ZXpAdfvRamhnZcYjIkqZum1PczjsS5WzRNvCcNA5uG+9Dev7jqU
+         FYhaQ4eaRxRAt94XBLtmchNPgbhjo7gFKsu7f4XrH+oLviupL6vHrzlqh3PbhjeXbIc2
+         ZbVcRF579CpzypLY7GJyrORXSe28TQNij0/YiD/FOwSs2C1FUQ5IOIKenhK7tfcPEm0E
+         johRdbPn9ubURcmwxeTQlPeEndUtmH8evVVFY2qARImA5jQsXP9D5GaEeAq8AH6aRQqO
+         9UqNXDnplBNgo5hSSKXB6eHpvmcvXVlS4PyhGEoHEKsH6qpRnWzic3wdFqKiAx48o49m
+         O8jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIRRo9gyJJnpx/KmNETyD+5fglTrlnwjkWILa4wYsUypHWsoSnDMd+9hJjdOFe+4hHFGkd27o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcHmgtxKn4niOV61gOh1EUJbNg1rCWSPYxJDsTEtTkga8zd9Zl
+	I/xDwy8e0J2l6vULZIv+hNrRn63ShMiqK3uRoL38p+yCJh+wOYAND6kYaZvq640tPX8=
+X-Gm-Gg: ATEYQzz1y9DPY3NnwG65KO9ty7Zkq1Wanf6t0udbARveHUGHCaGtxPmIpc0NWPLkYto
+	aClyWDoMZ30Ke98FchX+xvIhwf8KCkAW0K1htTeMSP7gAi7GS0gHNaH7zWYIDZrMpvBHuwnYmln
+	BJDxJOFkKXucfwANzuQwnWNFd9moxLEDXBSdx/LtOgM68YIzMokgVC8ZBnK4aFo044hR2wE2CVk
+	eG+rmCrlrYVY1Ozgb/pn1ju2U4UEdlxLnsL6l2IDXPOe8syrPcNtEwEaZSH+rpr9CmyxGGcxojw
+	LfiWLWsY0yKFIPPNu5j/y8U0tVH6/tSDcOixejOvmeKA2IZkjb2RabScDlMxxFdzmyv6d3DPtgE
+	BV8JOTOIuTS16gDWA27AraPAp8wNUKgYjoTY5MNplWGxvY3tdgYFLPuT6448Zpydausxn+9eJGC
+	OLXpC6RN5+2LgfGGdSJr2UrYHffnm9oOwDxBhlSvxA3UYOciTzwHGewdxUiZ9j+w2txgeK/Wzoj
+	z2pmtUR
+X-Received: by 2002:ac8:5f90:0:b0:504:3c8f:f9bf with SMTP id d75a77b69052e-508db413ccfmr43341111cf.74.1772655112470;
+        Wed, 04 Mar 2026 12:11:52 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5075feb4db9sm110731301cf.22.2026.03.04.12.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2026 12:11:52 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vxsZT-00000005OXj-1UJX;
+	Wed, 04 Mar 2026 16:11:51 -0400
+Date: Wed, 4 Mar 2026 16:11:51 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+	mbloch@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rama.nichanamatlu@oracle.com,
+	manjunath.b.patil@oracle.com, anand.a.khoje@oracle.com
+Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
+Message-ID: <20260304201151.GI964116@ziepe.ca>
+References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304193034.1870586-1-kuniyu@google.com> <aaiNufodmq7l94ZN@strlen.de>
-In-Reply-To: <aaiNufodmq7l94ZN@strlen.de>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 4 Mar 2026 12:10:08 -0800
-X-Gm-Features: AaiRm53hzYllwoOcVNb9iNEeYqSvIBRggW0yf9XSsAEu8_kyIXQilzxLYrNbejY
-Message-ID: <CAAVpQUB5bpTS5oR6nEKU4bjnnTJaga5PFAjtZig6htoQnvtQHA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 00/15] udp: Retire UDP-Lite.
-To: Florian Westphal <fw@strlen.de>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D620D20776B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+X-Rspamd-Queue-Id: 2048C207782
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264032-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264033-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ziepe.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ziepe.ca:dkim,ziepe.ca:mid]
 X-Rspamd-Action: no action
 
-On Wed, Mar 4, 2026 at 11:53=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> > In 2023, syzbot found a null-ptr-deref bug triggered when UDP-Lite
-> > attempted to charge an skb after the total memory usage for UDP-Lite
-> > _and_ UDP exceeded a system-wide threshold, net.ipv4.udp_mem[1].
->
-> Thanks, I think removal makes sense.
->
-> I'll followup with NF_CT_PROTO_UDPLITE removal once this has been merged.
+On Wed, Mar 04, 2026 at 04:17:04PM +0000, Praveen Kumar Kannoju wrote:
+> Interrupt lost scenario has been observed in multiple issues during IRQ
+> migration due to cpu scaling activity. This further led to the presence of
+> unhandled EQE's causing corresponding Mellanox transmission queues to
+> become full and get timedout. This patch overcomes this situation by
+> polling the EQ associated with the IRQ which undergoes migration, to
+> recover any unhandled EQE's and keep the transmission uninterrupted from
+> the corresponding queue.
 
-Sounds good !
-I plan to remove UDP-Lite bits in fou/gue and tc act_csum later.
+What? This does not seem like something we should do like this.
+
+IRQ migration is not supposed to loose interrupts, this seems like a
+IRQ layer bug to me. If it is buggy and loosing interrupts it should
+probably inject a spurious interrupt around these events so all
+devices can be enjoy the bug fix.
+
+Basically you need to explain with alot more detail why the IRQ was
+lost, not just some hand wavey "migration something something"..
+
+BTW there are known bugs in things like qemu that can loose interrupts
+around changes to the MSI (and worse than that too), but I thought
+they were all fixed now?
+
+Jason
 
