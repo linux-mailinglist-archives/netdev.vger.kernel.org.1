@@ -1,257 +1,204 @@
-Return-Path: <netdev+bounces-263825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IB7END88qGl6rQAAu9opvQ
-	(envelope-from <netdev+bounces-263825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:05:51 +0100
+	id iLltBRM7qGkTqgAAu9opvQ
+	(envelope-from <netdev+bounces-263826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:00:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37643200F2F
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:05:51 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99EE200E06
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4426930490E2
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 13:59:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1854B300C321
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 14:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC36D3A4F5B;
-	Wed,  4 Mar 2026 13:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA643195F9;
+	Wed,  4 Mar 2026 14:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Q43SxBt9"
+	dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b="oIPfIpBG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-relay92-hz2.antispameurope.com (mx-relay92-hz2.antispameurope.com [94.100.136.192])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020123.outbound.protection.outlook.com [52.101.193.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9547036A00F
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 13:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=94.100.136.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B20515E5DC
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 14:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.123
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772632746; cv=pass; b=GXprRarSmCxNh/Uu7G8qWQGoAJnOwKB4dNAhNGlO/nm+kCB6+RMT0AOa/dT+WjtzePvCKs2jz/TJAbkFMhGlxKjFPhcumXXp2tp/hAP9UqhRR0BkdKCaGMQKEUCx4TnkIRee705FVcrHbt248YnZWIG7UZsk+awF8sPHsa8XzNQ=
+	t=1772632847; cv=fail; b=GcLl5JrfAAeUM4R0OnJfiaO6AaGyRNuUdVO4RJOn3c9v7Z72rKYsoDzX0PqbFYF9+KR9wMstK2IQUjc2Px+jd1/oiSXpX4pW7RNny2XBvdG4df0bu5WQcp73V1JxyBqzNLSOeEoHgzk3+IUNRvZbfFQpI3EW1+bm0HoQhctvJe4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772632746; c=relaxed/simple;
-	bh=YjQvBPnz5w+n6o4jeKrsQnkPSb1XKtMdj2bYvjGkJfk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=acTXbOCdSl0WRJmSqrqd7ukPbSO5ZQ+iAt9A/sMocwhaH7comPbbVNkNJMESms+QweyjCpUDkGz5jaydmZhhiLofT6H8csgzmgYhc7/XBZ6cWFA5TtWURqkCcUhojCVcvc/vSjTPzSYe/yYclivCvSyo+K4426QZ0QuclNqnNHw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Q43SxBt9; arc=pass smtp.client-ip=94.100.136.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-ARC-Authentication-Results: i=1; mx-gate92-hz2.hornetsecurity.com 1; spf=pass
- reason=mailfrom (ip=94.100.132.6, headerfrom=ew.tq-group.com)
- smtp.mailfrom=ew.tq-group.com
- smtp.helo=hmail-p-smtp01-out04-hz1.hornetsecurity.com; dmarc=pass
- header.from=ew.tq-group.com orig.disposition=pass
-ARC-Message-Signature: a=rsa-sha256;
- bh=5DnBcRqn/2PHlj5yIxkWZa44u0ODIznnWZcL8KBuF3E=; c=relaxed/relaxed;
- d=hornetsecurity.com; h=from:to:date:subject:mime-version:; i=1; s=hse1;
- t=1772632712;
- b=YijssvdSpzqTBxujTfJBgLJSU7mVmsdTFC6Ivj+fcayaAy/I4yglHa84De0YBGLsOKnu5ehY
- YdzC7OC82+IHjzE5OOqlGkA8Kq4NYokRfD685KGyFj/5jTt/HuSfVzmo2TBAOSPgxEuFt1aqdPI
- iATPqOJi8nlZfgV9yiGNOFlqOul7FJIjN26rMQTyfbFpsvuP3whnXhB+MVgC5v7wg7Swf1nwILu
- g/TGyuvw1ceS5uVvvrCHyjHLYymx25LHNaM6EHM2WFAzFezwRpE3JO2v+9SSSrGLpzMl/2cI9Qh
- t3jVeGuMBa0BSwHA9W6ugCWHFDh5gUByZ9NWL68mG9k8w==
-ARC-Seal: a=rsa-sha256; cv=none; d=hornetsecurity.com; i=1; s=hse1;
- t=1772632712;
- b=W5rOsfempN0w/0rtB1sBxCLldBpAi8nxPApvs3ueZUWNvglNhiLc1340LjMwasbkmPKcu5R3
- zaJYSwhSm4b+8rAMQG8UnsDj9X+puvjbPGfvEvMNSG5m+pPnLG1sX70zy5WQehpE9QD0rmcMv3F
- PQMwBsh1ryrej/96kTztYS9kBM9KQWV0rxjE7bjgVutRpt1ZI8QDZKcw6FPH9uBkZEWIo3mkPeh
- aXcOaTSMZ1K5J0sCI4DvKiVCD1AgsZPWr2As2SLQvcTQytaj/ylFh2WMr7vbDzPygpeGtLbSUYB
- soY3t7AbtsB8SViXP0t53B0bAUQkrnMB5KnNjIgxgP87g==
-Received: from he-nlb01-hz1.hornetsecurity.com ([94.100.132.6]) by mx-relay92-hz2.antispameurope.com;
- Wed, 04 Mar 2026 14:58:32 +0100
-Received: from steina-w.localnet (host-82-135-125-110.customer.m-online.net [82.135.125.110])
-	(Authenticated sender: alexander.stein@ew.tq-group.com)
-	by hmail-p-smtp01-out04-hz1.hornetsecurity.com (Postfix) with ESMTPSA id 1850C22074F;
-	Wed,  4 Mar 2026 14:58:18 +0100 (CET)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Wei Fang <wei.fang@nxp.com>
-Cc: aziz.sellami@nxp.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Subject:
- Re: [PATCH net] net: enetc: fix fallback PHY address handling and do not skip
- setting for addr 0
-Date: Wed, 04 Mar 2026 14:58:18 +0100
-Message-ID: <6437896.GXAFRqVoOG@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <20260303103047.228005-1-wei.fang@nxp.com>
-References: <20260303103047.228005-1-wei.fang@nxp.com>
+	s=arc-20240116; t=1772632847; c=relaxed/simple;
+	bh=JFyuEp6GrH1UNdTwCJULqMtycfobq2dAhNgUlZ6Dh1I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=P5Dci8VLjyAsKJYhyO4YWt8KXSi3B91Akut3qONuURLVURXyUp9qoRaVEdLr6ajKpww0PSTRhm6eSmvdPCdKpBuh4GI1TDqnjVwQODnCDdcnb1EhLcR2g/C30tr7JrAfBz/ivQy4Onmv9G1SAHvozdsX7eEOTDT/+WdJOWv1sFE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=labn.net; spf=pass smtp.mailfrom=labn.net; dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b=oIPfIpBG; arc=fail smtp.client-ip=52.101.193.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=labn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=labn.net
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dP9G1h2UvpP90XSj5RBlruB2Qe7a2lY4f7wzZmB7WtH/pcC8m+5m6cnOwDJIJHXuxaNYvJ3cE3/6ixwJwh8ud+MWEPPZkNQYAaUmK1DBg7LTpZLgVvk8V0mJmyRN5kG6Qupa14k0nctC9zK1ws8clJc0j/K4L2tIymsRzbvphg+9nTvXOd/z3aRsiGwDttNh3OFMKWdgK2KkvNiVN3Rzw91DLymuWdtN5+sSfIOPgSdcrYeiymE/NMv9xC7UJc9XBj1aic6aisLXWAAF4FDSsDt28OW6WXfxujDXCSpSoKOumeLLmR/DFc25CF+seWoaQKrGhFiISsGthp1dHPJoKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JFyuEp6GrH1UNdTwCJULqMtycfobq2dAhNgUlZ6Dh1I=;
+ b=CuSE1dd8QgAdFe+duroWxWzwmvJAIwob1NZpAKdrneQ4paeZsUgKRMoRbUW2z/XHulaJ1+0i2f4hy/AXRHbBlU97gSwbqAXRucmjOWeVo8OuYNWDUF8+cixk+FSxIaWBC34y6Sm3ypa/FqVWIwqBD6RIxKCnmypUAUA6Vgo3Dagu/vz6mkkTwB8Y7bkXo7RJIEuOCgTReiADC4KFrxH+KLqLGWLmPRhWljT2NCtam81wwicWT9c9d6rIfieHL/wmI0zWxjkbmLK2VkrzAzcM9ALjuZmpjh8rkxaXBOJqxOu0wyVI/+fiEIfeqDboG/Dkaq+o34OQ/a1wBkcbmXw9sA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=labn.net; dmarc=pass action=none header.from=labn.net;
+ dkim=pass header.d=labn.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=labn.onmicrosoft.com;
+ s=selector2-labn-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JFyuEp6GrH1UNdTwCJULqMtycfobq2dAhNgUlZ6Dh1I=;
+ b=oIPfIpBGd+K4hHejDUQj2SzGGlG60IUtCXr5GkgwoJmBNjiNhHs3PR1GcsQpbFx/11j1HBMR4PnR8M8H1GapxIMSn5LvrxiSgj7eKe+6gWd3KlvbW+YssFFY4kaphXjBf8vhnIYRUBZ9qvsOPNgbQBkf+Yn/2Ue4R9kbQ1xKUl0=
+Received: from CH2PR14MB4152.namprd14.prod.outlook.com (2603:10b6:610:a9::10)
+ by CH3PR14MB7214.namprd14.prod.outlook.com (2603:10b6:610:15a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.17; Wed, 4 Mar
+ 2026 14:00:42 +0000
+Received: from CH2PR14MB4152.namprd14.prod.outlook.com
+ ([fe80::a4de:970c:e431:fe83]) by CH2PR14MB4152.namprd14.prod.outlook.com
+ ([fe80::a4de:970c:e431:fe83%4]) with mapi id 15.20.9654.022; Wed, 4 Mar 2026
+ 14:00:42 +0000
+From: Christian Hopps <chopps@labn.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+CC: Hao Long <me@imlonghao.com>, netdev <netdev@vger.kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [BUG] Kernel Panic in iptfs_reassem_cont when handling large
+ packets
+Thread-Topic: [BUG] Kernel Panic in iptfs_reassem_cont when handling large
+ packets
+Thread-Index: AQHcqhxGIbvg+PghtUinsRA2sdsNQLWeak6A
+Date: Wed, 4 Mar 2026 14:00:41 +0000
+Message-ID: <F4AA8F05-F065-480A-8F83-7D9FD730650F@labn.net>
+References: <DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com>
+ <aaVGVTelUZ9gFhkT@secunet.com>
+In-Reply-To: <aaVGVTelUZ9gFhkT@secunet.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Apple Mail (2.3864.400.21)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=labn.net;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH2PR14MB4152:EE_|CH3PR14MB7214:EE_
+x-ms-office365-filtering-correlation-id: 8e0b0342-f1c8-48ec-7c3e-08de79f66c4e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ EiLP9BrN0S9F0MDUvfObBirKrSfE99Ex/LJPlLJBHdZLFbUroRgJX2eCsPXkhdbMdzz1cifXLY0HcgJ4DHF7aWXq0YGoueVwHEuQCYn7nNcXJJOAsH+WOPXxnIdQ8xDczG/g2RhXL2ZgOFfQRLJUy4Gh5oEXuYaSIWdMZ6UcOlg67KdtoXA4MQFaX0q/h19UwQGgS1oBFlsKfvbdtHXqkHsJXHH6SfNQaXABfs+mLMhVHjUfTIxxsDPl0uy/dKDRn4uo0ENcU/tyh0DECtfbqqVey7t9bmsll48SqINIzlVRJqIkvubCv2L5gRjMeezpdohXHuKl/aBlWw2bLPHRIuY0Iw988NU6buTg3UuYFfD/05I7B50n/mDovqTC6qrVeZ+1BDL7sQRtvttEjnAJ/0FxiBLYaT/Hxt4oYQB601wvJDXlN2JNPobg3zJEoE6ro55e7TDKCbxT0/xkK7BmsdstB+IxJv8/irHT9TL+BDdfE6j3F8qYiSM+rnLOExcUoQ7eCJww/GrKZo5CJpQwrdigcolk2mun2d1e4mEgGyt2wgbdvA5ceocVeXh3ywSQpI+eEVXwWKs84xLSEIOLWWjcU8sSV0uKRncH22HdAjFOWaUSnWVm93Gs6bEITTntOMdnaVfWqaVuvHGmevW96T3o/7oa9ftjTusgEXISX0hgX1HEbPCpbAxveZI1/FWw/SS4kKltWF/+dCCm1qJLD8xLKB61peQW52T4Tx5LldHit/s94v1sIvjGLNOxQIGqov8MMKCR5pB6Oerxer2DlTCOiEw92dnW32PUvPTUYGc=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR14MB4152.namprd14.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?wzIGcJCKTtCzZsA0g0S1XNM3uivfsJ50zSMlaLV8vvcrPirrxT8SBWPfbEEe?=
+ =?us-ascii?Q?sB2JXp6D9+LdiZp8MHrL2OmnQ7arM4LbNSuneFrqwZB/ejwaCHeAT0RfVmkc?=
+ =?us-ascii?Q?hUT85pLsoSfWtwY8HRVlmejnzLXRNjCpXgzdDKuArrZcZmtGM6BQsMsghiCj?=
+ =?us-ascii?Q?iRGZIPqpQG4aqvX303rhGR/KdeoWl38RzkbRuCxfint+4X5Ccp+ryqo6wOT6?=
+ =?us-ascii?Q?y7fHbVsjhE/5aQPP72i6/6vg4x84R+HAw2mEOYOLC504EzCap+BvO9cEtQH0?=
+ =?us-ascii?Q?K6wspj9TqGDeYMO9PCnCxLGlgHZRd9JCNEm6hlLTCQH/GOdr2mqy9o+2RmBo?=
+ =?us-ascii?Q?6JWOhL5SOivSHDXpirUDSr4gTItcvWVgqDMR7AiaO7s7iezJjkZL7RAcdGzt?=
+ =?us-ascii?Q?cOONP6pdXhdAQXbt5304likeYZlbilxkl97yTiGaNY8Lvf76KnA9GEOznciU?=
+ =?us-ascii?Q?98TAvTQTXweFxvhiXgcddRWvFP9E8TjBlmArZddw+8iVSb/7Xqgg2RHuEVP7?=
+ =?us-ascii?Q?De69HsFfNXN/bNLmkvyq08UfSTMIPXSm/TZWjB7W3oMQ/2lClNFhe3rdFpwg?=
+ =?us-ascii?Q?bhPIY9aQwM41Z+ttE470Wdy3GJyKuyV2Z1O/zOoZoigvzXUJIxc906JRwBxS?=
+ =?us-ascii?Q?VgyLnBM16KzNMkCmzEOzT2Hgb9lRUxRDCpydDAhiJqMXpzrNik0Ecd5+jEcL?=
+ =?us-ascii?Q?N7j9+yYKgjLvdaIjSbwP/hKHR3ZhxFWNoDiPdb/vhT8yM68bMpP4LlprOYXM?=
+ =?us-ascii?Q?GZJig5Gfy8xKTHdWDIUz0r4yFT4dJGlkyLUCLodyGt4dVqrD129uU7PJr9dH?=
+ =?us-ascii?Q?SvIrolqjyavR3Addl1F6A11DIpkSxGdRxkbhKkpnD+5yevSTUGpyCEiPf1rq?=
+ =?us-ascii?Q?d4p9yyvpKy89ecmZJj1H9nmPyrx8otGqFhCGrSkhGDLotL0sv1SaJjIQednA?=
+ =?us-ascii?Q?3rxzeSDk/IGwXpjJOyJjKP1xToEX8vuanFh4PFXP163a7L0qZq/b7volv3hb?=
+ =?us-ascii?Q?tq8CvE5q1iYa++LR5q+H5iBHpMJr4abV/K0eyvABNT9qdIHSjgiEmTGaE8Nu?=
+ =?us-ascii?Q?4tuFbq9fjOstifXPPSdW7sVJKvklpTVwBUEgZxUvN+GHj3PhLXdnZ758SfBu?=
+ =?us-ascii?Q?tkRZZq0Ln1DhS8X/Y3J0usiCmqkJqvl2nmdaCQNCE1FgjJDP67QpOuv/IqyR?=
+ =?us-ascii?Q?mPicr1k77ZZfdATHcg0GkYaEhCsTerXKwKoJMpxTvE9qynUQ74W34wk7Npdb?=
+ =?us-ascii?Q?Is8JbmEcXiIFrPhkurwKbMHK7Saq0mpbAWEue0R2YZQCB6TkP1UYUxawFG9c?=
+ =?us-ascii?Q?xt0gNMo+6J3iUQAI90mxVzN4YtXwfRFDbQftd3pGS9PeQGMMGu6pVUt9mM2E?=
+ =?us-ascii?Q?IChLyd0R2DvKQV5KaylsOvUPoM1AWl+DWbaxVTuBOyizVd/dtXGXcTOOR1q0?=
+ =?us-ascii?Q?M1pIMKchDjYNu/HVY4EUDXdyUOconb5kzXF6QyvGSYhFNg1hXNtp7pSiCHZx?=
+ =?us-ascii?Q?l9UwgMPMFGaOcM0ITVQV0D1NYQ5y4uU/x/oyFe2S/11xcVkOIoHGwEgb4x8e?=
+ =?us-ascii?Q?lQGHL39NYc1H9o0huO7fcKln5+Phucf+RuzdH1XDRw6d9rb1hUqWZh4E82i9?=
+ =?us-ascii?Q?GKIFDRgLcNkotqIHdSl8y4Me36/b1pt/fhU/qX78l7bYNZ7lkH8smRCa3mMT?=
+ =?us-ascii?Q?8DvWwgCagD69hf6FpOUhEcI1/SdG1DJuNm9AqEgqh91yygHM6z1k66OBqbD+?=
+ =?us-ascii?Q?X1j70a+UkQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A3DA15333C83A34F9B3739F023E8246C@namprd14.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-cloud-security-sender:alexander.stein@ew.tq-group.com
-X-cloud-security-recipient:netdev@vger.kernel.org
-X-cloud-security-crypt: load encryption module
-X-cloud-security-Mailarchiv: E-Mail archived for: alexander.stein@ew.tq-group.com
-X-cloud-security-Mailarchivtype:outbound
-X-cloud-security-Virusscan:CLEAN
-X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-relay92-hz2.antispameurope.com with 4fQvQL6yj6z1R5Wq
-X-cloud-security-connect: he-nlb01-hz1.hornetsecurity.com[94.100.132.6], TLS=1, IP=94.100.132.6
-X-cloud-security-Digest:f8a0c59699ddcf4d7cbc1c4697f18c93
-X-cloud-security:scantime:2.460
-DKIM-Signature: a=rsa-sha256;
- bh=5DnBcRqn/2PHlj5yIxkWZa44u0ODIznnWZcL8KBuF3E=; c=relaxed/relaxed;
- d=ew.tq-group.com;
- h=content-type:mime-version:subject:from:to:message-id:date; s=hse1;
- t=1772632711; v=1;
- b=Q43SxBt9AC9tT62SvvqYo56cWN3zCPM2l0QvxK0RfWwTSpaD3ylttu75LIeKsr8W8r9HxBhN
- 1mh26BSXBaKDcB0b0NiAvH+sdYDSmL/bNFUqfzsVWAOqOVXa7dcIJ9qQsCNymjuIZc9Vs2H7T+Z
- 55+LcYd37l9sMxP5yhz9Bhc1g0PJCD4N9mjYyhB36l4LQosEPgGKmK+LthUMWvIA7FWbcS8M78X
- nTisAt3CWR95EziIFXS9CCOLqnU9QoUC2ms5UKbVp2KIEyrHxz2SJWuM3HpfY5Ca2Yqr2Ie4UE0
- z9EGLfgAmTEntv6yS+AisEGlxLdoMPPaXlf2LfuNGzr+g==
-X-Rspamd-Queue-Id: 37643200F2F
+X-OriginatorOrg: labn.net
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR14MB4152.namprd14.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e0b0342-f1c8-48ec-7c3e-08de79f66c4e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2026 14:00:41.8714
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: eb60ac54-2184-4344-9b60-40c8b2b72561
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Y6reUDbYzcL61O1R/V4cXQsXFW1i/5N4JW0M1SgRaLmD/vAv/q++4zZbGB/aGQbZpO9nQ98W+8Ke1Ks88em9Yg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR14MB7214
+X-Rspamd-Queue-Id: A99EE200E06
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=hse1];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[labn.onmicrosoft.com:s=selector2-labn-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263825-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263826-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ew.tq-group.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexander.stein@ew.tq-group.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[labn.net];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[labn.onmicrosoft.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chopps@labn.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	APPLE_MAILER(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tq-group.com:url,tq-group.com:email,nxp.com:email,ew.tq-group.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,labn.net:mid,init_env.sh:url]
 X-Rspamd-Action: no action
 
-Am Dienstag, 3. M=E4rz 2026, 11:30:47 CET schrieb Wei Fang:
-> The current netc_get_phy_addr() implementation falls back to PHY address
-> 0 when the "mdio" node or any PHY child node is missing. On i.MX95, this
-> causes failures when a real PHY is actually assigned address 0 and is
-> managed through the EMDIO interface, the bit 0 of phy_mask becomes set,
-> leading imx95_enetc_mdio_phyaddr_config() to return an error, and the
-> netc_blk_ctrl driver probe subsequently fails. Fix this by returning
-> -ENODEV when neither an "mdio" node nor any PHY node is present.
->=20
-> Given that some platforms may use PHY address 0 (I suppose the PHY may
-> not treat address 0 as a broadcast address or default response address).
-> It is possible for some boards to connect multiple PHYs to a single
-> ENETC MAC, for example:
->=20
->   - a SGMII PHY with a non-zero address (selected via DTS_A)
->   - a RGMII PHY with address 0 (selected via DTS_B)
->=20
-> For the case where the ENETC port MDIO is used to manage the PHY, when
-> switching from DTS_A to DTS_B via soft reboot, LaBCR[MDIO_PHYAD_PRTAD]
-> must be updated to 0 because the NETCMIX block is not reset during soft
-> reboot. However, the current driver explicitly skips configuring address
-> 0, which leaves the hardware in an inconsistent state.
->=20
-> Therefore, remove the special-case skip of PHY address 0 so that valid
-> configurations using address 0 are properly supported.
->=20
-> Reported-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-> Closes: https://lore.kernel.org/all/7825188.GXAFRqVoOG@steina-w
-> Fixes: 6633df05f3ad ("net: enetc: set the external PHY address in IERB fo=
-r port MDIO usage")
-> Fixes: 50bfd9c06f0f ("net: enetc: set external PHY address in IERB for i.=
-MX94 ENETC")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+
+Steffen Klassert <steffen.klassert@secunet.com> writes:
+> Add Chris, the author of IPTFS, to the Cc.
+
+Got it, will take a look soon.
 
 Thanks,
-Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+Chris.
 
-> ---
->  .../ethernet/freescale/enetc/netc_blk_ctrl.c  | 24 ++++++++-----------
->  1 file changed, 10 insertions(+), 14 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c b/drive=
-rs/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-> index 7fd39f895290..92a0f824dae7 100644
-> --- a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-> +++ b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-> @@ -333,11 +333,13 @@ static int netc_get_phy_addr(struct device_node *np)
-> =20
->  	mdio_node =3D of_get_child_by_name(np, "mdio");
->  	if (!mdio_node)
-> -		return 0;
-> +		return -ENODEV;
-> =20
->  	phy_node =3D of_get_next_child(mdio_node, NULL);
-> -	if (!phy_node)
-> +	if (!phy_node) {
-> +		err =3D -ENODEV;
->  		goto of_put_mdio_node;
-> +	}
-> =20
->  	err =3D of_property_read_u32(phy_node, "reg", &addr);
->  	if (err)
-> @@ -423,6 +425,9 @@ static int imx95_enetc_mdio_phyaddr_config(struct pla=
-tform_device *pdev)
-> =20
->  			addr =3D netc_get_phy_addr(gchild);
->  			if (addr < 0) {
-> +				if (addr =3D=3D -ENODEV)
-> +					continue;
-> +
->  				dev_err(dev, "Failed to get PHY address\n");
->  				return addr;
->  			}
-> @@ -433,12 +438,6 @@ static int imx95_enetc_mdio_phyaddr_config(struct pl=
-atform_device *pdev)
->  				return -EINVAL;
->  			}
-> =20
-> -			/* The default value of LaBCR[MDIO_PHYAD_PRTAD ] is
-> -			 * 0, so no need to set the register.
-> -			 */
-> -			if (!addr)
-> -				continue;
-> -
->  			switch (bus_devfn) {
->  			case IMX95_ENETC0_BUS_DEVFN:
->  				netc_reg_write(priv->ierb, IERB_LBCR(0),
-> @@ -578,16 +577,13 @@ static int imx94_enetc_mdio_phyaddr_config(struct n=
-etc_blk_ctrl *priv,
-> =20
->  	addr =3D netc_get_phy_addr(np);
->  	if (addr < 0) {
-> +		if (addr =3D=3D -ENODEV)
-> +			return 0;
-> +
->  		dev_err(dev, "Failed to get PHY address\n");
->  		return addr;
->  	}
-> =20
-> -	/* The default value of LaBCR[MDIO_PHYAD_PRTAD] is 0,
-> -	 * so no need to set the register.
-> -	 */
-> -	if (!addr)
-> -		return 0;
-> -
->  	if (phy_mask & BIT(addr)) {
->  		dev_err(dev,
->  			"Find same PHY address in EMDIO and ENETC node\n");
->=20
-
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+> On Sun, Mar 01, 2026 at 05:49:19PM +0800, Hao Long wrote:
+>> Hello,
+>>=20
+>> Recently I set up a strongSwan tunnel in AGGFRAG mode[1] in order to see
+>> how it fragments large packets.
+>>=20
+>> Later I found out the receiver node will kernel panic when handling
+>> large packets, I tested in different distro and both panic.
+>>=20
+>> Tested environment:
+>> - Arch Linux 6.18.13-arch1-1 strongswan-6.0.4-2
+>> - Arch Linux 7.0.0-rc1-1-mainline strongswan-6.0.4-2
+>> - NixOS 6.18.13 strongswan-6.0.4
+>>=20
+>> Step to reproduce:
+>> 1. install strongSwan and create tunnel interface in vm1, see the
+>> attachment init_env.sh
+>> 2. do step1 in vm2, but remember to switch local_addrs and remote_addrs,
+>> also the ip assignment
+>> 3. run `ping -s 3333 10.0.1.2` in vm1, 10.0.1.2 is the ip from vm2
+>> 4. kernel panic in vm2
 
