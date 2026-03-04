@@ -1,164 +1,143 @@
-Return-Path: <netdev+bounces-263767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJEFDr0WqGlTnwAAu9opvQ
-	(envelope-from <netdev+bounces-263767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:25:49 +0100
+	id AHccOoIYqGmgnwAAu9opvQ
+	(envelope-from <netdev+bounces-263768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:33:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64E21FEF2E
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:25:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7A651FF02E
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:33:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D2CD3035260
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:25:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 00D753012520
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F243ACA7C;
-	Wed,  4 Mar 2026 11:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8523451AE;
+	Wed,  4 Mar 2026 11:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="geXO56BO"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="rHjF4s7c"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626F43A8738;
-	Wed,  4 Mar 2026 11:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A573258EE9;
+	Wed,  4 Mar 2026 11:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772623505; cv=none; b=cejdFnWLbOkdr/w13LqY85SuMQt4WsFPii4oEnQd1A94LA4GAvWV+WO5EraA6Cb3hZbmyIoYoHVcpa26DFX8UEJlIJCMyBxzLDrYwUTrz1dpAypfT0JmHW5dqHtYAK14nrM4bBCBcJl+tlN0PyJ9ROG3C5REz5n51cQnIoOJJ9E=
+	t=1772623998; cv=none; b=cq/uHMb6vXjDBnfAg2rkMjh/oapOwmdPqpEl+PTHK61dmBc13KxVmGtsCdlLMADBgwkZH2Q6Wvhu5USZYNx2RUWIFLT7iERQVXRBiSNjvgmCddnUXQJhV5F/X33RubHY23wuLZlS/7KviO/FcQVuoKhDVTC3PVzCO2d32hYn5/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772623505; c=relaxed/simple;
-	bh=T1MqSj4t02fYLwrDUd4BceSRqO9Y7bt8oS2LbSoXV+w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=loc5aKKclr4n+OkrKdyC/hVorwOmdLKJr2yRJJfFU/c+Z3oWCmUt4RPToYmiqV0aBvMmTQmeCO3bRc39PmsHhlcunY2Wcw38T11Aab3NJBQyZEjiUljE0xhGVoHiKEwf7mibi1HJ0KMGNWa8hI8CYXUtXVwtE9r+pfuL5dVklcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=geXO56BO; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=bkOgEIlWHb2dcsrAoQ0NNF/UqerkSCmXqlLQzBvfEZc=; t=1772623504; x=1773833104; 
-	b=geXO56BORWFfEhCgA668eetxKSULZhlcdPw+aeBUQdkxAdzU0d4lxPP7pOeOx9Wd5TKHT8UOhRB
-	ayYe+2pj+y+WYmu3Uvz85OgQHuRwjC/1E8o+8sxUxYPUHhvaVIxEaz1vuHNajKViSd+tySE6EPmzW
-	Q7VLN99y2AvJnWZ1kki78TxU42jauVUE5A7pv3PaNW94iEkCyKqUb8fbeGkjNoO1gvbgCFFAHMGAQ
-	aRRp2rQ8Nid9CfZiNt7pPnNDKgy7969eP+kSGkW8Bnd4D30Es2bFNYjyu8PNEMB69WBon2H/dMdKh
-	nuCLpenEMAvx01q8B830ujgYsSGYd35B/F8A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vxkLe-000000082jc-1kqN;
-	Wed, 04 Mar 2026 12:25:02 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2026-03-04
-Date: Wed,  4 Mar 2026 12:24:37 +0100
-Message-ID: <20260304112500.169639-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1772623998; c=relaxed/simple;
+	bh=wk7qrXfDrYD6cJFDXktxKGoJNqd2Xpl/v52eEJv+3MI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:CC:
+	 In-Reply-To:Content-Type; b=RPR/Toi68OL1E/Ha7P3NlHcPJgZtE/QwwBFFGXHbikVQ3L7q+Q8FGKbOMTYa7+Iaojku3hTZe4/0h1CLL1ceRCiACqnY94CvwXUymqXliQXQk36p69HcptOyqmrDjxqS6ypLdpPxi8qQ1XpfdB3SD5+kkNpOurhyrnCtGuad5IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=rHjF4s7c; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=eEYIAbhssCXP/hvMfg0IJSwg33oSZSj04dcBiemSHFk=;
+	b=rHjF4s7cSbzKNWekoCMwNPRZQr3RBfn1E5Dnrf4q6BIK/jKX6H4uf+PWJwkByyjh47eO2vmbM
+	BbKe1LyMebuSgqOfYURP1oepyH/GSG03se8JNDKz/x957foLTQwn1ZV/L9wU11QkvvG0ERAxvMJ
+	4IJ3QXupa7pCcWHpP2/9bRg=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fQr5b4tqBz12LCr;
+	Wed,  4 Mar 2026 19:28:35 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1FB444056A;
+	Wed,  4 Mar 2026 19:33:12 +0800 (CST)
+Received: from [10.174.178.79] (10.174.178.79) by
+ kwepemj500018.china.huawei.com (7.202.194.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 4 Mar 2026 19:33:11 +0800
+Message-ID: <11702093-2cda-4d02-ac26-31d9c827c63e@huawei.com>
+Date: Wed, 4 Mar 2026 19:33:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C64E21FEF2E
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] mptcp: fix soft lockup in mptcp_recvmsg()
+To: Paolo Abeni <pabeni@redhat.com>
+References: <20260302052651.1466983-1-lixiasong1@huawei.com>
+ <64132462-e640-4ea6-82e8-48ca07a6ad44@redhat.com>
+From: Li Xiasong <lixiasong1@huawei.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <geliang@kernel.org>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<martineau@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
+	<mptcp@lists.linux.dev>, <netdev@vger.kernel.org>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
+In-Reply-To: <64132462-e640-4ea6-82e8-48ca07a6ad44@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Rspamd-Queue-Id: D7A651FF02E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263767-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sipsolutions.net:dkim,sipsolutions.net:mid]
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-263768-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,huawei.com:dkim,huawei.com:mid]
 X-Rspamd-Action: no action
 
-Hi,
+Hi Paolo,
 
-A couple more fixes, I'm mostly sending this for the mt76
-fixes which conflict with some other upcoming work for
--next, so I can put it all together next week.
+On 3/4/2026 5:07 PM, Paolo Abeni wrote:
+> On 3/2/26 6:26 AM, Li Xiasong wrote:
+>> @@ -2343,7 +2347,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>>  
+>>  		pr_debug("block timeout %ld\n", timeo);
+>>  		mptcp_cleanup_rbuf(msk, copied);
+>> -		err = sk_wait_data(sk, &timeo, NULL);
+>> +		err = sk_wait_data(sk, &timeo, last);
+> 
+> Isn't
+> 		err = sk_wait_data(sk, &timeo,  skb_peek_tail(&sk->sk_receive_queue));
+> 
+> Enough?
 
-Please pull and let us know if there's any problem.
+Thanks for the review! In the general case, letting sk_wait_data block is
+correct. The exception is within __mptcp_recvmsg_mskq, where a failure in
+skb_copy_datagram_msg will cause a break in the consumption loop. This
+leaves the actual processing position inconsistent with
+skb_peek_tail(&sk->sk_receive_queue), and at that point, we must not wait.
+
+> 
+> Also, could you please add a paired tests-case? Thanks!
+> 
+
+Further to our discussion, a minimal reproduction case for this scenario is
+available here:
+https://lore.kernel.org/netdev/e91bf909-bf4d-4f90-a370-688a9424478b@huawei.com/
+
+When running the reproduced program, you can observe the server's sy
+(system) CPU usage hitting 100%.
 
 Thanks,
-johannes
+Li Xiasong
 
-
-
-The following changes since commit b9c8fc2caea6ff7e45c6942de8fee53515c66b34:
-
-  Merge tag 'net-7.0-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-02-26 08:00:13 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-03-04
-
-for you to fetch changes up to 4e10a730d1b511ff49723371ed6d694dd1b2c785:
-
-  wifi: mt76: Fix possible oob access in mt76_connac2_mac_write_txwi_80211() (2026-03-03 12:13:36 +0100)
-
-----------------------------------------------------------------
-Some more fixes:
- - mt76 gets three almost identical new length checks
- - cw1200 & ti: locking fixes
- - mac80211 has a fix for the recent EML frame handling
- - rsi driver no longer oddly responds to config, which
-   had triggered a warning in mac80211
- - ath12k has two fixes for station statistics handling
-
-----------------------------------------------------------------
-Baochen Qiang (2):
-      wifi: ath12k: use correct pdev id when requesting firmware stats
-      wifi: ath12k: fix station lookup failure when disconnecting from AP
-
-Bart Van Assche (2):
-      wifi: cw1200: Fix locking in error paths
-      wifi: wlcore: Fix a locking bug
-
-Johannes Berg (1):
-      Merge tag 'ath-current-20260302' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Lorenzo Bianconi (3):
-      wifi: mt76: mt7996: Fix possible oob access in mt7996_mac_write_txwi_80211()
-      wifi: mt76: mt7925: Fix possible oob access in mt7925_mac_write_txwi_80211()
-      wifi: mt76: Fix possible oob access in mt76_connac2_mac_write_txwi_80211()
-
-MeiChia Chiu (1):
-      wifi: mac80211: fix missing ieee80211_eml_params member initialization
-
-Sebastian Krzyszkowiak (1):
-      wifi: rsi: Don't default to -EOPNOTSUPP in rsi_mac80211_config
-
- drivers/net/wireless/ath/ath12k/mac.c              |  6 ++--
- drivers/net/wireless/ath/ath12k/wmi.c              | 36 ++++++++--------------
- .../net/wireless/mediatek/mt76/mt76_connac_mac.c   |  1 +
- drivers/net/wireless/mediatek/mt76/mt7925/mac.c    |  1 +
- drivers/net/wireless/mediatek/mt76/mt7996/mac.c    |  1 +
- drivers/net/wireless/rsi/rsi_91x_mac80211.c        |  2 +-
- drivers/net/wireless/st/cw1200/pm.c                |  2 ++
- drivers/net/wireless/ti/wlcore/main.c              |  4 +--
- net/mac80211/eht.c                                 |  1 +
- 9 files changed, 25 insertions(+), 29 deletions(-)
 
