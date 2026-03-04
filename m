@@ -1,129 +1,72 @@
-Return-Path: <netdev+bounces-263810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263811-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFlNO7oqqGnJpAAAu9opvQ
-	(envelope-from <netdev+bounces-263810-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:51:06 +0100
+	id OCVEDnEqqGkdpAAAu9opvQ
+	(envelope-from <netdev+bounces-263811-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:49:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64FC1FFDC0
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:51:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981E71FFD8B
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 30D8D305B58D
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:48:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A9A43017026
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E51217704;
-	Wed,  4 Mar 2026 12:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB8D1DF256;
+	Wed,  4 Mar 2026 12:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U5NhpZCn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="WSbAMbLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB0A1E5B68;
-	Wed,  4 Mar 2026 12:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F4F18FDBD;
+	Wed,  4 Mar 2026 12:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772628492; cv=none; b=T7JMNVU4O0qVbH+hZ9kFF873vfg8YZHC4ZBEWq2YPicKQaZk0MYgQI1Xu9yCJZ7zCZOeEGN3McuAhahB0GJAZZeVlgD4Jj6eLOmdMH26fbP9oytkinlRcacgCm/9JCq+b13GJQjwrplm80iMsoli8ySrDEy3HHqTXMb0hY9SYgo=
+	t=1772628590; cv=none; b=XRKgscLnl9v1JeIIizcRO5LIKA9NoCBcGH1W/CYOR7qoF/sg2Yzkbh/JJFMoAwV6qXW36JRK3q73pB5cBokNuTVWq3ebsahE2oMSNO9zv/XEvv5FHxNl15HXBcckOOrXWm6asCDyEQbKXNptBqC4sJ560Do9XqcTzPf6jKhH9eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772628492; c=relaxed/simple;
-	bh=ZqxKumdP+DNsxXXslcjyg5g3aU/VfpjJU2mvzXFg4hE=;
+	s=arc-20240116; t=1772628590; c=relaxed/simple;
+	bh=K1NSkyT/5yk5JIolv12DBjooKk2618aNUDcYaGNnQns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dy1SJW5kA264gHFLvdfEHrvMBsl4yppJR340k91AqnYcVap1dAXWhIak3rsYMddSlzDUlzdjHUKDt14MzyMWl2c1p8kyFSgZjnr41TdafcLhb+dJL9a3MHPgoUnqPjKaB8EdGKMbnUREn8kMH2aJr1CMLZvQ/zCztAIVI4/mbeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U5NhpZCn; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YsXg2qDZ+ZjnQnj/eNfiIgU3SLUyimkRR7bx5y5oB4w=; b=U5NhpZCn934XojSyVFL1nj1S/W
-	2SwNvFKnKgDXQSzq6m51IMvSlZX+ne4bEh4E01vZtYgpLee5ixUDi8qEHb4R97fy2f4d2ReNAtXFl
-	2Myy/FM9yjpIi4F5MCjGcXNEoyN2WDgyc7039UPkredIXwYhk1etVNasHnwai+IB6c4ro8VQTd24m
-	dlAjACdWYLWNFfSy+VdBxKivYhNczBRSHxMPHao0CvqQusPNjCznq/i4rksmb+FqExqEhxu3s5ruZ
-	HIicL8wW2i2h8YBWX0vQS1a34HK9wPAQFs79TabY9VaeD6tSKbvzAdMAvOXPYXBWy7iVhi1jbb7PJ
-	KVa5pNSQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vxle2-00000004Z41-2FWR;
-	Wed, 04 Mar 2026 12:48:06 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 07040300666; Wed, 04 Mar 2026 13:48:06 +0100 (CET)
-Date: Wed, 4 Mar 2026 13:48:05 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
-	Yury Norov <ynorov@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>, Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Anna Schumaker <anna@kernel.org>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Aswin Karuvally <aswin@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>, Carlos Maiolino <cem@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Yu <chao@kernel.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Airlie <airlied@gmail.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Dongsheng Yang <dongsheng.yang@linux.dev>,
-	Eric Dumazet <edumazet@google.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Linus Walleij <linusw@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <pjw@kernel.org>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Simona Vetter <simona@ffwll.ch>, Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-	Yury Norov <yury.norov@gmail.com>, Zheng Gu <cengku@gmail.com>,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	dm-devel@lists.linux.dev, netdev@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
-	v9fs@lists.linux.dev, virtualization@lists.linux.dev,
-	linux-sound@vger.kernel.org
-Subject: Re: [PATCH 0/8] mm: globalize rest_of_page() macro
-Message-ID: <20260304124805.GB2277644@noisy.programming.kicks-ass.net>
-References: <20260304012717.201797-1-ynorov@nvidia.com>
- <20260303182845.250bb2de@kernel.org>
- <f8d86743-6231-414d-a5e8-65e867123fea@kernel.dk>
- <aaedwFwXh9QXS3Ju@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DN+CLCiHVjg5VW8/1bnmkvffdb3L0H6JlLh1zN/1tK+yD5743XCgWzoQtWLG/paWKnS35zj9MWZgocbaeUl+xTScARC/jnBPjRWaUipooJvf402Xf2jngXy3Av565q6UU87c+jakQEnm3wA5b2FaAtjSsIHNRwZsP3eMfOq0+/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=WSbAMbLF; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wjUSe32dbNkWbFtSmbGolwtwpZu2UyUPLb7b+Y7uY84=; b=WSbAMbLFdVcW6SZ6egx5ri9xYF
+	+vE6KQppBNhPkvFXi8DA6AjcQR5CNOFs4w1y5pGiMEWilUmQyv+UZOS3Yc39g58hh0N7w8T2ab2VL
+	0X3HmDnaMKTv1AF4WTnnqVC7rmVLjz4yqmBTuTtRjh1EWk7KovVttAiuL8n3SBWgdBDnQFSIC8Wxp
+	RFX6lrXg6fXredpEoG7b2TDdfHX/2jZEpG5Ks5DyMJAbghIJV+CuWlOj/47++1CZHFDZj2/FTJGNn
+	HEZMyKmBslhK9fR5QEu9CJFByqrD/GdLB1riQp55szeee9Bknxoqc/3xX7MbRfQIwr/I1sln0nZUV
+	raOiGw6A==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.98.2)
+	(envelope-from <phil@nwl.cc>)
+	id 1vxlfe-0000000081O-2E5K;
+	Wed, 04 Mar 2026 13:49:46 +0100
+Date: Wed, 4 Mar 2026 13:49:46 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Helen Koike <koike@igalia.com>, fw@strlen.de,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-dev@igalia.com
+Subject: Re: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
+Message-ID: <aagqaq6LNJnrg8eC@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Helen Koike <koike@igalia.com>, fw@strlen.de,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-dev@igalia.com
+References: <20260302212605.689909-1-koike@igalia.com>
+ <aaYYiPTO5JYOlhhY@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -132,64 +75,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aaedwFwXh9QXS3Ju@google.com>
-X-Rspamd-Queue-Id: A64FC1FFDC0
+In-Reply-To: <aaYYiPTO5JYOlhhY@chamomile>
+X-Rspamd-Queue-Id: 981E71FFD8B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_REJECT(1.00)[nwl.cc:s=mail2022];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,nvidia.com,linux-foundation.org,davemloft.net,redhat.com,mit.edu,eecs.berkeley.edu,fb.com,linux.ibm.com,zeniv.linux.org.uk,dilger.ca,lunn.ch,opensynergy.com,alien8.de,arm.com,linux.intel.com,gmail.com,codewreck.org,linux.dev,google.com,gondor.apana.org.au,perex.cz,ionkov.net,ellerman.id.au,szeredi.hu,dabbelt.com,intel.com,ffwll.ch,suse.com,ursulin.net,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.sourceforge.net,kvack.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263810-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263811-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[nwl.cc];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[nwl.cc:-];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[85];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[phil@nwl.cc,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.230];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,noisy.programming.kicks-ass.net:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,igalia.com:email,orbyte.nwl.cc:mid,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 06:49:36PM -0800, Sean Christopherson wrote:
-> On Tue, Mar 03, 2026, Jens Axboe wrote:
-> > On 3/3/26 7:28 PM, Jakub Kicinski wrote:
-> > > On Tue,  3 Mar 2026 20:27:08 -0500 Yury Norov wrote:
-> > >> The net/9p networking driver has a handy macro to calculate the
-> > >> amount of bytes from a given pointer to the end of page. Move it
-> > >> to core/mm, and apply tree-wide. No functional changes intended.
-> > >>
-> > >> This series was originally introduced as a single patch #07/12 in:
-> > >>
-> > >> https://lore.kernel.org/all/20260219181407.290201-1-ynorov@nvidia.com/
-> > >>
-> > >> Split it for better granularity and submit separately.
-> > > 
-> > > I don't get what the motivation is here. Another helper developers
-> > > and readers of the code will need to know about just to replace 
-> > > obvious and easy to comprehend math.
+On Tue, Mar 03, 2026 at 12:08:56AM +0100, Pablo Neira Ayuso wrote:
+> On Mon, Mar 02, 2026 at 06:26:05PM -0300, Helen Koike wrote:
+> > struct nf_hook_ops has a pointer to dev, which can be used by
+> > __nf_unregister_net_hook() after it has been freed by tun_chr_close().
 > > 
-> > I fully agree, I had the same thought reading this.
+> > Fix it  by calling dev_hold() when saving dev to ops struct.
 > 
-> +1 from KVM-land.
+> Sorry, I don't think this patch works, dev_hold()/dev_put() use
+> per_cpu area.
 
-Right, this. I hate these pointless helpers that obscure perfectly
-sensible and obvious code -- and for me that includes things like
-rounddown() and DIV_ROUND_UP().
+Why is this problematic? netdev_refcnt_read() sums the per-cpu variables
+up, so it should be fine if we refcount_inc on one CPU and refcount_dec
+on another, no?
 
-It just makes the code harder to read.
+> The nf_tables_flowtable_event() function used to release the hook, but
+> now things have changed since there is auto-hook registration.
+
+But isn't __nf_unregister_net_hook() still called immediately when
+handling NETDEV_UNREGISTER event? I guess struct nf_hook_ops::dev may
+still be accessed afterwards since ops is RCU-freed. Is Helen's report
+inaccurate in that regard?
+
+Looking at netdev_wait_allrefs_any(), I see NETDEV_UNREGISTER
+notification before rcu_barrier() call. Does that suffice for our
+kfree_rcu() upon NETDEV_UNREGISTER?
+
+If we really risk losing the device pointer while the holding
+nf_hook_ops object is still in use, dev_hold/_put should help. But where
+to call dev_put() then? AIUI, nft_netdev_hook_free_ops() does not apply
+to the NETDEV_UNREGISTER event code path, does it?
+
+Cheers, Phil
+
+> > Reported-by: syzbot+bb9127e278fa198e110c@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=bb9127e278fa198e110c
+> > Signed-off-by: Helen Koike <koike@igalia.com>
+> > ---
+> >  net/netfilter/nf_tables_api.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+> > index fd7f7e4e2a43..00b5f900a51d 100644
+> > --- a/net/netfilter/nf_tables_api.c
+> > +++ b/net/netfilter/nf_tables_api.c
+> > @@ -352,6 +352,7 @@ static void nft_netdev_hook_free_ops(struct nft_hook *hook)
+> >  
+> >  	list_for_each_entry_safe(ops, next, &hook->ops_list, list) {
+> >  		list_del(&ops->list);
+> > +		dev_put(ops->dev);
+> >  		kfree(ops);
+> >  	}
+> >  }
+> > @@ -2374,6 +2375,7 @@ static struct nft_hook *nft_netdev_hook_alloc(struct net *net,
+> >  			err = -ENOMEM;
+> >  			goto err_hook_free;
+> >  		}
+> > +		dev_hold(dev);
+> >  		ops->dev = dev;
+> >  		list_add_tail(&ops->list, &hook->ops_list);
+> >  	}
+> > -- 
+> > 2.53.0
+> > 
+> 
 
