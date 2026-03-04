@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-263694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GM7KF8f9p2mlnAAAu9opvQ
-	(envelope-from <netdev+bounces-263694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:39:19 +0100
+	id +BKwDc79p2mlnAAAu9opvQ
+	(envelope-from <netdev+bounces-263695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:39:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3CB1FDBE5
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:39:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600231FDBEC
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA13A30F11B1
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:36:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8521309838C
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4473E39902E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C25D39A05B;
 	Wed,  4 Mar 2026 09:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="gU6aUdC6"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="E2WwY63k"
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63473947A9;
-	Wed,  4 Mar 2026 09:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365453988F5;
+	Wed,  4 Mar 2026 09:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616978; cv=none; b=gd6xiY2N9KbYSJMzIMqxYbmXa5JLKIbCAi7p6jSE90lei/wgRXf5EP2cli5sCoPKG2WFp2OQIU6LDk1l5WE3yjM728vM3JjR87HRjXj3urQnZJfYicJ408O0sKEyFeTKjURXG+3dltVhSrjT3YBuxA3WXUIUWtE48wN9nj5oeyc=
+	t=1772616978; cv=none; b=hbO2WgkqySmV45rj+W7qRx6C41XfGxPA3Mwj+9IpkNi8ykMM8hFa2ZkXgV6XFEzsqo0gh6WOV9eawiq5oPK4gTdtT30WGS4+LxfCwBzNCKUsv0Y4TyQU1JCn99EQ3O6Ko5AUiqpP8O2TcNQtoEOXFaOHVvIfHacZG2WVNKNzUAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772616978; c=relaxed/simple;
-	bh=2R7/eNnX/6fgjXow5X/hQIDpbueZctqQyMkZeUPD3Zg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=h9UceQthZjyRgzLkcyemEJrA58rycfNzBmqCfsEGA1BNr+zfXpkErZNOuR6cbJFhGqRYtAli+BqEq6Qzj8bWp+EbL3q7cdoBrwKEKR0DhUYYGNBv3QQXXwpuTBbDPyCQ59MOkf0C87rhBuW+4Nwj8yd3C0m1+jBStwfDL80uewY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=gU6aUdC6; arc=none smtp.client-ip=148.251.105.195
+	bh=miZBEDWHYrtNxaEL5LHvKe/AtdLtzl62S7Z+ArLM+Dg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=biOgIMKQg38u51mMpazgN6Wap995cJSkSKidFJbyUeTZPdvF/4tkOMUOsrlnxjYYN+1JIw8hkju0kLqfK51/WHJkFZevbIefe73UxG0qxJ4dcRN9mpIsmZqP6IDw/3520CrAynLnsiMfu9IxabnmUgRCl2HHq5ICwxQmvE0HlWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=E2WwY63k; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1772616974;
-	bh=2R7/eNnX/6fgjXow5X/hQIDpbueZctqQyMkZeUPD3Zg=;
-	h=From:Subject:Date:To:Cc:From;
-	b=gU6aUdC6kbOfvCyKVzGIJ/YbT+A+agy1LU6O9HNv865acYzDED1GDlGlo1GlUNzZs
-	 hFHNHcXGwVwaINPH2UZe3W6epkwfbQ0NDi/mmgNqnCv26bcdfHqT1y6P95+khcUM/r
-	 RS+cs3N8W+k3MZP8ermqcqBPZ3MSHNhl5I+SEDmq98Ey2Mtnsct20i1h7wBmmPho6I
-	 ECpegWJmCPKKtPLlrTFVPZ1B/lbBJf84s9CGrSHSSyPRLyq2wEB50HfkoMXyYcmZc4
-	 1eD8fuD2BwSs1cKeHNRMemITm2dy/A+OTKgYSfmNtuUKMywPBnLVvI0f9crOXMpNkU
-	 /JtFQBmErgh9w==
+	s=mail; t=1772616975;
+	bh=miZBEDWHYrtNxaEL5LHvKe/AtdLtzl62S7Z+ArLM+Dg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=E2WwY63k/nO7YWPAwoykFub8ajR5xmvZPrGMFBqtUAITbBt2kodoDXtDyb07QNmqZ
+	 L9qzOX6S9a1+8zduug2O6YfbEDGKedJcIe2KSmALVxAD1fSnUT9toWRCRwHYPkxMqD
+	 Wmf4x0xycuHz9G1FaQwajPH8buWLbPvsh0l3Ok+9yp93VIJYofy8mXn9AW739d99bm
+	 d2yvCgAl/M6aUfNEgyyYlsSn0pCnZ1lnqivkOnl6wJV0XKj/1tHZ3xDg5T0/W6Trbh
+	 kXZFIrYGPsZGrSmbDiGqiUD05mMmAYJEgrget3aUohDjfPV0v7ANS/263VX9B7EoEb
+	 +6x5rPjc9h+aw==
 Received: from yukiji.home (amontpellier-657-1-116-247.w83-113.abo.wanadoo.fr [83.113.51.247])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laeyraud)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1BE1817E0D90;
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E5D4F17E0EAA;
 	Wed,  4 Mar 2026 10:36:14 +0100 (CET)
 From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Subject: [PATCH net-next 0/2] Introduce Airoha AN8801R series Gigabit
- Ethernet PHY driver
-Date: Wed, 04 Mar 2026 10:35:27 +0100
-Message-Id: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
+Date: Wed, 04 Mar 2026 10:35:28 +0100
+Subject: [PATCH net-next 1/2] dt-bindings: net: Add support for Airoha
+ AN8801/R GbE PHY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,11 +63,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/y2Nyw6DIBBFf8XMupOAYH38SuNihKGyEC1gY2L89
- 5K2y5OTe+4JiaPnBEN1QuS3T34NBeStAjNTeDJ6WxhqUd+FEgrJWiQf15mQQtcJiWnftjVmbFr
- baE2aHFso+y2y88e3/YDAGQMfGcafifzay1n+64kSo1mXxeehYitoctwrZ6VqLJm6Vty1pEyvG
- yHbSTrqJmdgvK4Pj9Ed7cEAAAA=
-X-Change-ID: 20260303-add-airoha-an8801-support-57d544a4afed
+Message-Id: <20260304-add-airoha-an8801-support-v1-1-0ae4ee5a2f9d@collabora.com>
+References: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
+In-Reply-To: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -82,26 +80,26 @@ Cc: kevin-kw.huang@airoha.com, macpaul.lin@mediatek.com,
  linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org, 
  Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772616974; l=1977;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772616974; l=3058;
  i=louisalexis.eyraud@collabora.com; s=20250113; h=from:subject:message-id;
- bh=2R7/eNnX/6fgjXow5X/hQIDpbueZctqQyMkZeUPD3Zg=;
- b=B87Z3g8NFoaXD7nNm4y0khdWOoYUP0ZxT7XGmcxAmxVfRqLR0uhRDIQ5g80Nfsm/ij0CMbfr+
- KPeAsHQGPYPBEo5C2/v6ECbJjUGY1JsYdwMRHa9aoqb6l8PtiaDDT37
+ bh=f1uOi1KCiYeObZzr04y0dnDloVcq2c6mZeNHSqkgqr4=;
+ b=s1qI102nFjzdVzHn9zMO8wE5OeJcAb2pRGPcCgfMSEVJa4T8L03bUKAcJW45QYPTbLaQrd/1e
+ nHGjJ1GfAwJASKuFXp+LC8ieVuk2vl69fOfOe9w+ASGvVPoBkclcvHn
 X-Developer-Key: i=louisalexis.eyraud@collabora.com; a=ed25519;
  pk=CHFBDB2Kqh4EHc6JIqFn69GhxJJAzc0Zr4e8QxtumuM=
-X-Rspamd-Queue-Id: 0C3CB1FDBE5
+X-Rspamd-Queue-Id: 600231FDBEC
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
 	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263694-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263695-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -118,55 +116,110 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gitlab.com:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,0.0.0.0:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,0.0.0.1:email,0.0.0.2:email]
 X-Rspamd-Action: no action
 
-This series introduces the Airoha AN8801R Gigabit Ethernet PHY initial
-support.
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-The Airoha AN8801R is a low power single-port Ethernet PHY Transceiver
-with Single-port serdes interface for 1000Base-X/RGMII.
-This chip is compliant with 10Base-T, 100Base-TX and 1000Base-T IEEE
-802.3(u,ab) and supports:
-  - Energy Efficient Ethernet (802.3az)
-  - Full Duplex Control Flow (802.3x)
-  - auto-negotiation
-  - crossover detect and autocorrection,
-  - Wake-on-LAN with Magic Packet
-  - Jumbo Frame up to 9 Kilobytes.
-This PHY also supports up to three user-configurable LEDs, which are
-usually used for LAN Activity, 100M, 1000M indication.
+Add a new binding to support the Airoha AN8801R Series Gigabit
+Ethernet PHY.
 
-The series provides the devicetree binding and the driver that have been
-written by AngeloGioacchino Del Regno, based on downstream
-implementation ([1]). The driver allows setting up PHY LEDs, 10/100M,
-1000M speeds, and Wake on LAN and PHY interrupts.
-
-The series is based on net-next kernel tree (sha1: ed0abfe93fd1) and
-I have tested it on Mediatek Genio 720-EVK board (that integrates an
-Airoha AN8801RIN/A Ethernet PHY) with early board hardware enablement
-patches.
-
-[1]: https://gitlab.com/mediatek/aiot/bsp/linux/-/blob/mtk-v6.6/drivers/net/phy/an8801.c
-
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 ---
-AngeloGioacchino Del Regno (2):
-      dt-bindings: net: Add support for Airoha AN8801/R GbE PHY
-      net: phy: Introduce Airoha AN8801/R Gigabit Ethernet PHY driver
+ .../devicetree/bindings/net/airoha,an8801.yaml     | 81 ++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
- .../devicetree/bindings/net/airoha,an8801.yaml     |   81 ++
- drivers/net/phy/Kconfig                            |    5 +
- drivers/net/phy/Makefile                           |    1 +
- drivers/net/phy/air_an8801.c                       | 1059 ++++++++++++++++++++
- 4 files changed, 1146 insertions(+)
----
-base-commit: ed0abfe93fd135dac223e87a3c945017b1fa8bfc
-change-id: 20260303-add-airoha-an8801-support-57d544a4afed
+diff --git a/Documentation/devicetree/bindings/net/airoha,an8801.yaml b/Documentation/devicetree/bindings/net/airoha,an8801.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..f251c9d2fbbed3675c9fd7ff22174049a13a7b5e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,an8801.yaml
+@@ -0,0 +1,81 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,an8801.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha AN8801R Series PHY
++
++maintainers:
++  - AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
++
++description:
++  The Airoha AN8801R is a low power single-port Ethernet PHY Transceiver
++  with Single-port serdes interface for 1000Base-X/RGMII; this chip is
++  compliant with 10Base-T, 100Base-TX and 1000Base-T IEEE 802.3(u,ab)
++  and supports Energy Efficient Ethernet (802.3az), Full Duplex Control
++  Flow (802.3x), auto-negotiation, crossover detect and autocorrection,
++  Wake-on-LAN with Magic Packet, and Jumbo Frame up to 9 Kilobytes.
++  This PHY also supports up to three user-configurable LEDs, which are
++  usually used for LAN Activity, 100M, 1000M indication.
++
++allOf:
++  - $ref: ethernet-phy.yaml#
++
++properties:
++  compatible:
++    enum:
++      - ethernet-phy-idc0ff.0421
++
++  reg:
++    maxItems: 1
++
++  leds: true
++
++required:
++  - reg
++  - leds
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/leds/common.h>
++
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-phy@0 {
++            compatible = "ethernet-phy-idc0ff.0421";
++            reg = <0>;
++
++            leds {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                led@0 {
++                    reg = <0>;
++                    color = <LED_COLOR_ID_GREEN>;
++                    function = LED_FUNCTION_LAN;
++                    default-state = "keep";
++                };
++
++                led@1 {
++                    reg = <1>;
++                    color = <LED_COLOR_ID_GREEN>;
++                    function = LED_FUNCTION_LAN;
++                    function-enumerator = <1>;
++                    default-state = "keep";
++                };
++
++                led@2 {
++                    reg = <2>;
++                    color = <LED_COLOR_ID_YELLOW>;
++                    function = LED_FUNCTION_LAN;
++                    function-enumerator = <2>;
++                    default-state = "keep";
++                };
++            };
++        };
++    };
 
-Best regards,
 -- 
-Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+2.53.0
 
 
