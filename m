@@ -1,113 +1,122 @@
-Return-Path: <netdev+bounces-264068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPK3N06yqGlSwgAAu9opvQ
-	(envelope-from <netdev+bounces-264068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:29:34 +0100
+	id qLiDB5CyqGlSwgAAu9opvQ
+	(envelope-from <netdev+bounces-264069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:30:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5D020895A
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:29:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3B22089FA
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 95E4830263CE
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 22:29:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2E07302960F
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 22:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25363101A0;
-	Wed,  4 Mar 2026 22:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45456389113;
+	Wed,  4 Mar 2026 22:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n2HElQtP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwFCGa+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53DD384244;
-	Wed,  4 Mar 2026 22:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232CC35DA50;
+	Wed,  4 Mar 2026 22:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772663362; cv=none; b=mzuEVEC59IUWI8DTe5IBtrz25TAdxgonITjuEHXE6U2+p/mH2L7kfsXpxkwEBw3eCCiDBjdFy1eMEFsowyfo4tMDcIICnx0knyESUC82qg0dZH58gau5h0wDNaGZlmQ8y+AoF7jdrWmVnBzv+frshisUnUJNEQsc42dNx13jRxA=
+	t=1772663406; cv=none; b=eTXvfRgeoE5Wu9WZqcBXKU/evwbGuDSWs2ax9gWlTivx+3BVVlhmqNz2e9HhC2Ejn5EpKL6gGybW4LDiptfTss6Dvr9gbi6YAmPz3zQBHm0Ddz3oL42VLJ7Co9zuf3ps9FdV6U6UpkmqM4bWUuKOIPwP2YS6FeA92mHh56YzIio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772663362; c=relaxed/simple;
-	bh=hP+D4QE9xksD/WvSztrk2ZIAVMy+HTU4vrPxs7NRpXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mxSrW6OR7bN5YRwVsmzcZc0VdBxLRGfBiGW0T8nT45RxUnMxJcIF6k85a4nfL/ZcYiOH2oW3HLFy8BC/MUW5ZJRKQ6vhUcLNbzIKu9UCDPKWXCEEsLN7tQXmGfTW+ptfAkr5dHrCEFlaQSOuChXx/er4ny341XL7rSWypFDfRAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n2HElQtP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ndwHByA9+rPpcw7aenooep5yaqS0L412XpVw3mJ5S2Y=; b=n2HElQtP92EIhUCnCa6CVlf3pY
-	qxyCOpqdiH2QBUshhls/62Vq1l7ycd4FOoPGXh2Vb/+9jUbdsHKLKOCqrX5QRHHAXc1928LyimG1A
-	3o2UK3eYpUmBdotImYqAhQ5xtRaVAPnyrQ1X8+1isNr0xbZO1dN05ATmXsjomU9lYL2Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vxuiH-00ABPT-Mx; Wed, 04 Mar 2026 23:29:05 +0100
-Date: Wed, 4 Mar 2026 23:29:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fan Wu <fanwu01@zju.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	heiko@sntech.de, romain.perier@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: arc: fix use-after-free in probe error
- path
-Message-ID: <b6ac1471-e33a-41d3-9e67-e6463612f05b@lunn.ch>
-References: <20260304025303.145493-1-fanwu01@zju.edu.cn>
+	s=arc-20240116; t=1772663406; c=relaxed/simple;
+	bh=pD0kSiZySkKY37bE0Yo8qKrQT159uPb5YHFw9/k8NbU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Re+Zur6coNudi0W6eNPXbg0dBwSdWCmMcpw1CV9qrHimhva72fkWYED+Wc/KoroN+Is/2UyY0u//sfKqC9bSZHkacX00i1NXsvUkQiVdM8n6ueKY0PeNQtgzj6Nj//Gwnua6qRVNQSHomtJHmRudbLByBjdFzIacntf6Cma2nzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwFCGa+5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB607C19425;
+	Wed,  4 Mar 2026 22:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772663406;
+	bh=pD0kSiZySkKY37bE0Yo8qKrQT159uPb5YHFw9/k8NbU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RwFCGa+5jIs6khKID/RuHxBSJr0kFGQiU8FjQF5MlQPg/Wd60VcVfhT41y5uLiJW0
+	 FBJSW6ybzIm/+/55t+zmoNj1p6MxsfcOaQhuwX5kh1+3P2XJRdZ2gmisSdrwUlUw4B
+	 ZO4wWTaWgSH9yy7F15ANNxf/QxsfZ9kcEgvcVOIq24p2Q7uGWQroTO4Yv6Ti53qGAa
+	 YWLUL70IXJUbnxcvNjH2swPIAwMOf51fnZKluND7IPMnwFUy3sYS/8TMvB8nlhfeRY
+	 m+bjbIUH80YxM+01loIh/x76b2yownAYlj+pJ06IgLJY1gBEUmcIXsl1LXRTiGryLB
+	 QbJUbalpkwOSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CECE3808200;
+	Wed,  4 Mar 2026 22:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304025303.145493-1-fanwu01@zju.edu.cn>
-X-Rspamd-Queue-Id: 6C5D020895A
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] mailmap: Add entry for Joe Damato
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177266340630.2419970.10346524013152706786.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Mar 2026 22:30:06 +0000
+References: <20260303024202.2526604-1-joe@dama.to>
+In-Reply-To: <20260303024202.2526604-1-joe@dama.to>
+To: Joe Damato <joe@dama.to>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
+X-Rspamd-Queue-Id: 8C3B22089FA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264068-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,lunn.ch,sntech.de,gmail.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-264069-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama.to:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 02:53:03AM +0000, Fan Wu wrote:
-> The arc_emac_probe() function calls devm_request_irq() with the
-> net_device as the dev_id. However, in the error path of
-> emac_rockchip_probe(), free_netdev(ndev) is called before the devm
-> cleanup happens. This creates a race window where an interrupt can
-> fire and the ISR (arc_emac_intr) will access the already freed
-> net_device structure.
+Hello:
 
-It looks like interrupts are only enabled in arc_emac_open(). Have you
-seen interrupts before this?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-     Andrew
+On Mon,  2 Mar 2026 18:42:01 -0800 you wrote:
+> My Fastly email address is no longer used. Add a mailmap entry to
+> reflect that.
+> 
+> Signed-off-by: Joe Damato <joe@dama.to>
+> ---
+>  .mailmap | 1 +
+>  1 file changed, 1 insertion(+)
+
+Here is the summary with links:
+  - mailmap: Add entry for Joe Damato
+    https://git.kernel.org/netdev/net/c/126fe7ef12ff
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
