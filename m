@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-263606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263607-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIh5CunTp2nNkAAAu9opvQ
-	(envelope-from <netdev+bounces-263606-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:40:41 +0100
+	id cFzvNJrTp2nEkAAAu9opvQ
+	(envelope-from <netdev+bounces-263607-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:39:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2BB1FB422
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:40:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FD1E1FB3B2
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4D9730F7FDA
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 06:38:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76357305CA3C
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 06:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E133806A8;
-	Wed,  4 Mar 2026 06:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E465381AF5;
+	Wed,  4 Mar 2026 06:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xfDP4xHP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d528Oi+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DB3381AF4
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 06:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C282237FF46
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 06:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772606309; cv=none; b=VReWhW5xhHX0lkBc3hOUhQCsl3W/Zxctu3k9gh6s2T87pBtMIfVaFMlXhtVMViDERY1Rky00y9LS/inD9y9IHr7EwlGszONxzgWjIOj0k6upAiyvNrkwHbDtwYmagUJmHG+ebS8ExDCZ5vXYyFN7RSIIGGjcb7nGTfkDL6z3wvo=
+	t=1772606334; cv=none; b=ZpEHo0sXyxwL3fpVK1Uc+EDnNOo/GGnFcG6+K6Y9tFhxDmF3jAdRaNxEWouZvM7MusWHPLedKsSa7qoIgCKRNCwbSwY7dZMAKG/jTrwRQNwo25CT9xi96fvOp2qsFsLANkFutYDzAMrvOp5LcyVlcusB+fphNLV7dG1YX1c2gm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772606309; c=relaxed/simple;
-	bh=rnvgDuIM8vQ4Ur2khkq6Tdvxz0lxrQhZ/hIDvNzyy0U=;
+	s=arc-20240116; t=1772606334; c=relaxed/simple;
+	bh=KvbS4fqeuLB3Xt9vJYeJeK3CkPVEUl3hZINO1cNAVoU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WWjLn4xdOtux9Owtmo6MnqOhSxTje9eVr7jSW/SZlYp1e50JdYIACQkGpX5i6PQxoWob+L6125E18uJH2Y1X3cmDRvK6FHYdnPXeeqjJbBxJR+NbrXDDcuU+GhK/rVveTzTAu+S0ie4C8PJkj+tgJBKQz+rLsbp5A6TWQCIRrtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xfDP4xHP; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version:Content-Type; b=oIE4GG1pMLOOFaeyOwqHVy6uj2oy523kvkXyYUGOrU1/uCFNiWHkLSGSHrcE9On62xrwDbi3ID69K3FGRSob9KcdiPyQfm0WSDVYDR6g2sz5CklHA+J7AphbxCiz5XWocmN3Rmh3+OG4nBTkjfMchxcV3N0ZSrVsW58zx5H8UQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d528Oi+o; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772606305;
+	t=1772606330;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mOpTXC80TFbvx4uT0sZN6YnfWzBhPWN4KMs+EKSr7jQ=;
-	b=xfDP4xHPEXKJwwyYAnMNy7mgd5Pd43uM7Ho6f2jDCU6ljHy6Gj141uHst5V5g4l6/XC/7S
-	J1Jf33ygGa0eJtR7tct3MO1tBTXJ032HyyW+jflHGZL5MidbafqtCEJRPM3ew3bNXPezn+
-	OY6J7HrtubuC74j7W3yDI4MIh2/2ma0=
+	bh=beX/DihSdzlZL0tDa9069FjqX9WJryfpvUqCEqHPrTc=;
+	b=d528Oi+oRw4iNMJOtC1tQzAVg1+WrYyFLg0wp7dp0gpwc87orZljKi9wF828reEmGgCjy9
+	4PP4BypmWfGH6AruFo4FUj2wlJ1CYNC39HiNnqIDvD5EhO93IE5MmotJb5LR9bXvgPbJor
+	X/dePstwvu6QYlIRYtdhRn04e1AgeA0=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org,
 	john.fastabend@gmail.com,
@@ -59,11 +59,11 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Willem de Bruijn <willemb@google.com>,
 	David Ahern <dsahern@kernel.org>,
 	Neal Cardwell <ncardwell@google.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
 	Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	KP Singh <kpsingh@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v1 3/7] tcp_bpf: refactor recvmsg with read actor abstraction
-Date: Wed,  4 Mar 2026 14:33:54 +0800
-Message-ID: <20260304063643.14581-4-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf-next v1 4/7] tcp_bpf: add splice_read support for sockmap
+Date: Wed,  4 Mar 2026 14:33:55 +0800
+Message-ID: <20260304063643.14581-5-jiayuan.chen@linux.dev>
 In-Reply-To: <20260304063643.14581-1-jiayuan.chen@linux.dev>
 References: <20260304063643.14581-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -88,328 +88,209 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: BE2BB1FB422
+X-Rspamd-Queue-Id: 4FD1E1FB3B2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263606-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-263607-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,cloudflare.com];
 	RCPT_COUNT_TWELVE(0.00)[31];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.alibaba.com,rbox.co,vger.kernel.org];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,cloudflare.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,fomichev.me,linux.alibaba.com,rbox.co,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,buf.page:url]
 X-Rspamd-Action: no action
 
-Refactor the read operation with no functional changes.
+Implement splice_read for sockmap using an always-copy approach.
+Each page from the psock ingress scatterlist is copied to a newly
+allocated page before being added to the pipe, avoiding lifetime
+and slab-page issues.
 
-tcp_bpf has two read paths: strparser and non-strparser. Currently
-the differences are implemented directly in their respective recvmsg
-functions, which works fine. However, upcoming splice support would
-require duplicating the same logic for both paths. To avoid this,
-extract the strparser-specific differences into an independent
-abstraction that can be reused by splice.
+Add sk_msg_splice_actor() which allocates a fresh page via
+alloc_page(), copies the data with memcpy(), then passes it to
+add_to_pipe(). The newly allocated page already has a refcount
+of 1, so no additional get_page() is needed. On add_to_pipe()
+failure, no explicit cleanup is needed since add_to_pipe()
+internally calls pipe_buf_release().
 
-For ingress_msg data processing, introduce a function pointer
-callback approach. The current implementation passes
-sk_msg_recvmsg_actor(), which performs copy_page_to_iter() - the
-same copy logic previously embedded in sk_msg_recvmsg(). This
-provides the extension point for future splice support, where a
-different actor can be plugged in.
+Also fix sk_msg_read_core() to update msg_rx->sg.start when the
+actor returns 0 mid-way through processing. The loop processes
+msg_rx->sg entries sequentially — if the actor fails (e.g. pipe
+full for splice, or user buffer fault for recvmsg), prior entries
+may already be consumed with sge->length set to 0. Without
+advancing sg.start, subsequent calls would revisit these
+zero-length entries and return -EFAULT. This is especially
+common with the splice actor since the pipe has a small fixed
+capacity (16 slots), but theoretically affects recvmsg as well.
 
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- include/linux/skmsg.h |  12 ++++-
- net/core/skmsg.c      |  24 +++++++--
- net/ipv4/tcp_bpf.c    | 123 ++++++++++++++++++++++++++++--------------
- 3 files changed, 112 insertions(+), 47 deletions(-)
+ net/core/skmsg.c   | 10 ++++++
+ net/ipv4/tcp_bpf.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+)
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 19f4f253b4f9..d53756914b2f 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -143,8 +143,16 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
- 			     struct sk_msg *msg, u32 bytes);
- int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 		   int len, int flags);
--int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
--		     int len, int flags, int *copied_from_self);
-+typedef int (*sk_msg_read_actor_t)(void *arg, struct page *page,
-+				   unsigned int offset, size_t len);
-+/* Core function for reading ingress_msg, dispatches to the given actor */
-+int sk_msg_read_core(struct sock *sk, struct sk_psock *psock,
-+		     size_t len, int flags,
-+		     sk_msg_read_actor_t actor, void *actor_arg,
-+		     int *copied_from_self);
-+int sk_msg_recvmsg_actor(void *arg, struct page *page,
-+			 unsigned int offset, size_t len);
-+
- bool sk_msg_is_readable(struct sock *sk);
- 
- static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
 diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 2e26174c9919..6a906bfe3aa4 100644
+index 6a906bfe3aa4..2fcbf8eaf4cf 100644
 --- a/net/core/skmsg.c
 +++ b/net/core/skmsg.c
-@@ -409,10 +409,12 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
- }
- EXPORT_SYMBOL_GPL(sk_msg_memcopy_from_iter);
- 
--int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
--		     int len, int flags, int *copied_from_self)
-+/* Core function for reading ingress_msg, dispatches to the given actor */
-+int sk_msg_read_core(struct sock *sk, struct sk_psock *psock,
-+		     size_t len, int flags,
-+		     sk_msg_read_actor_t actor, void *actor_arg,
-+		     int *copied_from_self)
- {
--	struct iov_iter *iter = &msg->msg_iter;
- 	int peek = flags & MSG_PEEK;
- 	struct sk_msg *msg_rx;
- 	int i, copied = 0;
-@@ -440,7 +442,8 @@ int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg
- 			if (copied + copy > len)
- 				copy = len - copied;
- 			if (copy)
--				copy = copy_page_to_iter(page, sge->offset, copy, iter);
-+				copy = actor(actor_arg, page,
-+					     sge->offset, copy);
+@@ -445,6 +445,16 @@ int sk_msg_read_core(struct sock *sk, struct sk_psock *psock,
+ 				copy = actor(actor_arg, page,
+ 					     sge->offset, copy);
  			if (!copy) {
++				/*
++				 * The loop processes msg_rx->sg entries
++				 * sequentially and prior entries may
++				 * already be consumed. Advance sg.start
++				 * so the next call resumes at the correct
++				 * entry, otherwise it would revisit
++				 * zero-length entries and return -EFAULT.
++				 */
++				if (!peek)
++					msg_rx->sg.start = i;
  				copied = copied ? copied : -EFAULT;
  				goto out;
-@@ -495,12 +498,23 @@ int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg
- out:
- 	return copied;
- }
-+EXPORT_SYMBOL_GPL(sk_msg_read_core);
-+
-+int sk_msg_recvmsg_actor(void *arg, struct page *page,
-+			 unsigned int offset, size_t len)
-+{
-+	struct msghdr *msg = arg;
-+
-+	return copy_page_to_iter(page, offset, len, &msg->msg_iter);
-+}
-+EXPORT_SYMBOL_GPL(sk_msg_recvmsg_actor);
- 
- /* Receive sk_msg from psock->ingress_msg to @msg. */
- int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 		   int len, int flags)
- {
--	return __sk_msg_recvmsg(sk, psock, msg, len, flags, NULL);
-+	return sk_msg_read_core(sk, psock, len, flags,
-+				sk_msg_recvmsg_actor, msg, NULL);
- }
- EXPORT_SYMBOL_GPL(sk_msg_recvmsg);
- 
+ 			}
 diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index c449a044895e..606c2b079f86 100644
+index 606c2b079f86..e85a27e32ea7 100644
 --- a/net/ipv4/tcp_bpf.c
 +++ b/net/ipv4/tcp_bpf.c
-@@ -218,31 +218,26 @@ static bool is_next_msg_fin(struct sk_psock *psock)
- 	return false;
+@@ -7,6 +7,7 @@
+ #include <linux/init.h>
+ #include <linux/wait.h>
+ #include <linux/util_macros.h>
++#include <linux/splice.h>
+ 
+ #include <net/inet_common.h>
+ #include <net/tls.h>
+@@ -444,6 +445,85 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	return ret;
  }
  
--static int tcp_bpf_recvmsg_parser(struct sock *sk,
--				  struct msghdr *msg,
--				  size_t len,
--				  int flags,
--				  int *addr_len)
-+/*
-+ * __tcp_bpf_recvmsg_parser - inner recvmsg for strparser path
-+ *
-+ * Handles TCP seq tracking, pre-accept receive_queue draining, FIN detection,
-+ * and receive window updates. The actual data read is delegated to @actor.
-+ *
-+ * Caller must hold a psock ref. Socket lock is acquired/released internally.
-+ * Returns bytes read, or negative error.
-+ */
-+static int __tcp_bpf_recvmsg_parser(struct sock *sk, struct sk_psock *psock,
-+				    sk_msg_read_actor_t actor, void *actor_arg,
-+				    size_t len, int flags)
- {
- 	int peek = flags & MSG_PEEK;
--	struct sk_psock *psock;
--	struct tcp_sock *tcp;
-+	struct tcp_sock *tcp = tcp_sk(sk);
- 	int copied_from_self = 0;
- 	int copied = 0;
- 	u32 seq;
- 
--	if (unlikely(flags & MSG_ERRQUEUE))
--		return inet_recv_error(sk, msg, len, addr_len);
--
--	if (!len)
--		return 0;
--
--	psock = sk_psock_get(sk);
--	if (unlikely(!psock))
--		return tcp_recvmsg(sk, msg, len, flags, addr_len);
--
- 	lock_sock(sk);
--	tcp = tcp_sk(sk);
- 	seq = tcp->copied_seq;
- 	/* We may have received data on the sk_receive_queue pre-accept and
- 	 * then we can not use read_skb in this context because we haven't
-@@ -264,7 +259,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 	}
- 
- msg_bytes_ready:
--	copied = __sk_msg_recvmsg(sk, psock, msg, len, flags, &copied_from_self);
-+	copied = sk_msg_read_core(sk, psock, len, flags,
-+				  actor, actor_arg, &copied_from_self);
- 	/* The typical case for EFAULT is the socket was gracefully
- 	 * shutdown with a FIN pkt. So check here the other case is
- 	 * some error on copy_page_to_iter which would be unexpected.
-@@ -329,10 +325,34 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 
- unlock:
- 	release_sock(sk);
--	sk_psock_put(sk, psock);
- 	return copied;
- }
- 
-+static int tcp_bpf_recvmsg_parser(struct sock *sk,
-+				  struct msghdr *msg,
-+				  size_t len,
-+				  int flags,
-+				  int *addr_len)
++struct tcp_bpf_splice_ctx {
++	struct pipe_inode_info *pipe;
++};
++
++static int sk_msg_splice_actor(void *arg, struct page *page,
++			       unsigned int offset, size_t len)
 +{
++	struct tcp_bpf_splice_ctx *ctx = arg;
++	struct pipe_buffer buf = {
++		.ops = &nosteal_pipe_buf_ops,
++	};
++	ssize_t ret;
++
++	buf.page = alloc_page(GFP_KERNEL);
++	if (!buf.page)
++		return 0;
++
++	memcpy(page_address(buf.page), page_address(page) + offset, len);
++	buf.offset = 0;
++	buf.len = len;
++
++	/*
++	 * add_to_pipe() calls pipe_buf_release() on failure, which
++	 * handles put_page() via nosteal_pipe_buf_ops, so no explicit
++	 * cleanup is needed here.
++	 */
++	ret = add_to_pipe(ctx->pipe, &buf);
++	if (ret <= 0)
++		return 0;
++	return ret;
++}
++
++static ssize_t tcp_bpf_splice_read(struct socket *sock, loff_t *ppos,
++				   struct pipe_inode_info *pipe, size_t len,
++				   unsigned int flags)
++{
++	struct tcp_bpf_splice_ctx ctx = { .pipe = pipe };
++	int bpf_flags = flags & SPLICE_F_NONBLOCK ? MSG_DONTWAIT : 0;
++	struct sock *sk = sock->sk;
 +	struct sk_psock *psock;
 +	int ret;
 +
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return inet_recv_error(sk, msg, len, addr_len);
++	psock = sk_psock_get(sk);
++	if (unlikely(!psock))
++		return tcp_splice_read(sock, ppos, pipe, len, flags);
++	if (!skb_queue_empty(&sk->sk_receive_queue) &&
++	    sk_psock_queue_empty(psock)) {
++		sk_psock_put(sk, psock);
++		return tcp_splice_read(sock, ppos, pipe, len, flags);
++	}
 +
-+	if (!len)
-+		return 0;
++	ret = __tcp_bpf_recvmsg(sk, psock, sk_msg_splice_actor, &ctx,
++				len, bpf_flags);
++	sk_psock_put(sk, psock);
++	if (!ret)
++		return tcp_splice_read(sock, ppos, pipe, len, flags);
++	return ret;
++}
++
++static ssize_t tcp_bpf_splice_read_parser(struct socket *sock, loff_t *ppos,
++					  struct pipe_inode_info *pipe,
++					  size_t len, unsigned int flags)
++{
++	struct tcp_bpf_splice_ctx ctx = { .pipe = pipe };
++	int bpf_flags = flags & SPLICE_F_NONBLOCK ? MSG_DONTWAIT : 0;
++	struct sock *sk = sock->sk;
++	struct sk_psock *psock;
++	int ret;
 +
 +	psock = sk_psock_get(sk);
 +	if (unlikely(!psock))
-+		return tcp_recvmsg(sk, msg, len, flags, addr_len);
++		return tcp_splice_read(sock, ppos, pipe, len, flags);
 +
-+	ret = __tcp_bpf_recvmsg_parser(sk, psock,
-+				       sk_msg_recvmsg_actor, msg, len, flags);
++	ret = __tcp_bpf_recvmsg_parser(sk, psock, sk_msg_splice_actor, &ctx,
++				       len, bpf_flags);
 +	sk_psock_put(sk, psock);
 +	return ret;
 +}
 +
- static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+ 				struct sk_msg *msg, int *copied, int flags)
  {
- 	bool slow;
-@@ -351,29 +371,25 @@ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
- 	return 0;
+@@ -671,6 +751,7 @@ static void tcp_bpf_rebuild_protos(struct proto prot[TCP_BPF_NUM_CFGS],
+ 	prot[TCP_BPF_BASE].destroy		= sock_map_destroy;
+ 	prot[TCP_BPF_BASE].close		= sock_map_close;
+ 	prot[TCP_BPF_BASE].recvmsg		= tcp_bpf_recvmsg;
++	prot[TCP_BPF_BASE].splice_read		= tcp_bpf_splice_read;
+ 	prot[TCP_BPF_BASE].sock_is_readable	= sk_msg_is_readable;
+ 	prot[TCP_BPF_BASE].ioctl		= tcp_bpf_ioctl;
+ 
+@@ -679,9 +760,11 @@ static void tcp_bpf_rebuild_protos(struct proto prot[TCP_BPF_NUM_CFGS],
+ 
+ 	prot[TCP_BPF_RX]			= prot[TCP_BPF_BASE];
+ 	prot[TCP_BPF_RX].recvmsg		= tcp_bpf_recvmsg_parser;
++	prot[TCP_BPF_RX].splice_read		= tcp_bpf_splice_read_parser;
+ 
+ 	prot[TCP_BPF_TXRX]			= prot[TCP_BPF_TX];
+ 	prot[TCP_BPF_TXRX].recvmsg		= tcp_bpf_recvmsg_parser;
++	prot[TCP_BPF_TXRX].splice_read		= tcp_bpf_splice_read_parser;
  }
  
--static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
--			   int flags, int *addr_len)
-+/*
-+ * __tcp_bpf_recvmsg - inner recvmsg for non-parser (verdict only) path
-+ *
-+ * No TCP seq tracking needed (tcp_eat_skb handles it at verdict time).
-+ * Returns bytes read, 0 if caller should fall back to the normal TCP
-+ * read path (data on receive_queue but not in psock), or negative error.
-+ *
-+ * Caller must hold a psock ref. Socket lock is acquired/released internally.
-+ */
-+static int __tcp_bpf_recvmsg(struct sock *sk, struct sk_psock *psock,
-+			     sk_msg_read_actor_t actor, void *actor_arg,
-+			     size_t len, int flags)
- {
--	struct sk_psock *psock;
- 	int copied, ret;
- 
--	if (unlikely(flags & MSG_ERRQUEUE))
--		return inet_recv_error(sk, msg, len, addr_len);
--
--	if (!len)
--		return 0;
--
--	psock = sk_psock_get(sk);
--	if (unlikely(!psock))
--		return tcp_recvmsg(sk, msg, len, flags, addr_len);
--	if (!skb_queue_empty(&sk->sk_receive_queue) &&
--	    sk_psock_queue_empty(psock)) {
--		sk_psock_put(sk, psock);
--		return tcp_recvmsg(sk, msg, len, flags, addr_len);
--	}
- 	lock_sock(sk);
- msg_bytes_ready:
--	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
-+	copied = sk_msg_read_core(sk, psock, len, flags,
-+				  actor, actor_arg, NULL);
- 	if (!copied) {
- 		long timeo;
- 		int data;
-@@ -388,8 +404,7 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			if (!sk_psock_queue_empty(psock))
- 				goto msg_bytes_ready;
- 			release_sock(sk);
--			sk_psock_put(sk, psock);
--			return tcp_recvmsg(sk, msg, len, flags, addr_len);
-+			return 0;
- 		}
- 		copied = -EAGAIN;
- 	}
-@@ -397,7 +412,35 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- unlock:
- 	release_sock(sk);
-+	return ret;
-+}
-+
-+static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-+			   int flags, int *addr_len)
-+{
-+	struct sk_psock *psock;
-+	int ret;
-+
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return inet_recv_error(sk, msg, len, addr_len);
-+
-+	if (!len)
-+		return 0;
-+
-+	psock = sk_psock_get(sk);
-+	if (unlikely(!psock))
-+		return tcp_recvmsg(sk, msg, len, flags, addr_len);
-+	if (!skb_queue_empty(&sk->sk_receive_queue) &&
-+	    sk_psock_queue_empty(psock)) {
-+		sk_psock_put(sk, psock);
-+		return tcp_recvmsg(sk, msg, len, flags, addr_len);
-+	}
-+
-+	ret = __tcp_bpf_recvmsg(sk, psock, sk_msg_recvmsg_actor, msg,
-+				len, flags);
- 	sk_psock_put(sk, psock);
-+	if (!ret)
-+		return tcp_recvmsg(sk, msg, len, flags, addr_len);
- 	return ret;
- }
- 
+ static void tcp_bpf_check_v6_needs_rebuild(struct proto *ops)
 -- 
 2.43.0
 
