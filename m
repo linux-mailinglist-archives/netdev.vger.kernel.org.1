@@ -1,184 +1,483 @@
-Return-Path: <netdev+bounces-263509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCvrBJqIp2nliAAAu9opvQ
-	(envelope-from <netdev+bounces-263509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:19:22 +0100
+	id 4GKABeWJp2nliAAAu9opvQ
+	(envelope-from <netdev+bounces-263510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:24:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79C2F1F92C7
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:19:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD63A1F9339
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0305F3076501
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:19:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 637AD3034658
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4FA3093BB;
-	Wed,  4 Mar 2026 01:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA97D1E5702;
+	Wed,  4 Mar 2026 01:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WV6MAc78"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WcRRtXTt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE7E2765E2
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 01:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39121448E0
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 01:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587159; cv=none; b=TgzxvZwhSZmE3Y1wE9bdP5UMzm+b3dYLm5hBtuKGIu8zpBIKaQ5dNX3rKCIRsJXqZfIQhvr1ZkLWCBAxGirmV3qL5j3EtFnQD8lrEWyvk9UlGq88LSC6BgIp9VHuerGMkFML0EV0unVDW3ujxxQI2cBpcSvSacnX48nwcQ4AaSk=
+	t=1772587488; cv=none; b=J/NtgJwijecqIg4VWMUSoS5JSjTBNURjYcqHGoDHtIspGCGz/Yds0R2eoCBH1UKzAvN34v/HdP64fPBgSBKlAkzdYHa7BiPgl1P7fWUTYrnQiz7OJZwGVGQRH4LYrBrXKCoBR34y5sJx7Ru/HDSg0GRd9fuYiblvODYGaJv8uME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587159; c=relaxed/simple;
-	bh=rdDyhELc7hSIr6ByJJWu3JPfPVveq+7o3+8nhUm+zc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m25L6HVeOTCAOPiVptEhOCTziNULSAf+kLvlE3ZTqUTmK+nE4JsBP8ga/vA6a1cPVjQXiAXtQlSTGeyhW5/lzYHZzgiLf5mPFWh8vJet153nvlXouL2zb00wKKVt0ZYC4iPJv1PJWVmg5wATUb5iGEQCP1GAhsGfFNFGU8KCLCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WV6MAc78; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso3675206eec.0
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 17:19:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772587157; x=1773191957; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gvvy8mrMhzjULjG/waJaGKSbWOymXRI0aiNwOWuVKAk=;
-        b=WV6MAc78RB8PldkwMpwzKY2soJ4AMRocvWmV1o73BS0+vfQajVl4Mo8WIBlI0idUzo
-         MWVNLFEvHi1L3FG4jwfCucdOqCEAYH9s2Ia7StCK7C+h+mwedKQuODpfbbNWU10x0hBM
-         lSgB7sT9piaqU3TDThacV5Q2mUxiJPXpVcXB74Pd7HWufh7h+76iJH4b0lR6K+ssprKO
-         rT2glzNJSnLNw7ruMJWv6EBEtH+GOImml5jfRrh2L2FRf2UGEiby9O1GFo893Fm16K1F
-         JJBOCz4QHUTkP9C36fAkOJlZyTQHbrWA5teT3V4a4lPuVMNqmNhxmXf3+xHLRnAfGWuL
-         PACQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772587157; x=1773191957;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gvvy8mrMhzjULjG/waJaGKSbWOymXRI0aiNwOWuVKAk=;
-        b=jNc5WJNxhN7fwQjv40u6Mmw+TzRhcOUwxiziblm2dNWGlVaY2nJI6cosx/t1+aHkFN
-         UzjP/KY9M7A0QYYcMzaeP1IleaWpSHCTNfuk+tvO2U4ahq1pxdft/nDUU/8NV906V/r7
-         aNplq6wMGQTQ4ullU9q3TZ77hXPKwA12WXZ79mnxYzAmR7HKFFi8oeNRO4Am2Z+bDtoX
-         6wB7PT9ZbNuKXz1ObQy+x/NnabSV+ojQqjuFXv6k82WIe7NGL7RDvlmBlddADy7uuZzu
-         p1uwjE5c1NfCXni7lq1ydgVP3HRMp8ScF0SCYoxlgg4CFDtUtmSuG6yJtI/qz1xEi9/x
-         EGTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUTp8qh7cIiX+QikRgvenNO9VNDAl9TbablC3bAjVR0Aa5+xyD3PGKXXnkuZAC+gVbEH/iJT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS00D8UvsjdkNqOUg6rBdKShllZf4XdkvtEQoqgpmh8D+KwgkO
-	gdGzwCqmi77WlLWVTsN2f/HSgSySnnVZq2SoowiYM35156gQBbi7+2lJ
-X-Gm-Gg: ATEYQzz8rchDjl5BSquZpQqY09CDGDJNqaOjGgxwQ/7jPEe2zhpowG52Bxrg9KlewSS
-	+SiP2hDHZOpk6SbEwk32aE5fH0uII4LweZxBsZ2yoUpuBLXMp7xf1VmfBksqav47EMi+Mb0YSay
-	43HqgC0LGisvq5tXW0GWrIVE7XhRkSfuPENAHoiOYkFbHhPY2G2+0rzu+Ouv78PTuL2vEehVMBL
-	xiKrm02zBwCRCVTMyT/WOpzCU0TR7rJkY4vGTvOiVU5jn7nxAIM1rcO9+9VXxNOn80ZWT7NT2Gw
-	JyvWsFYjS8HyGdTIV5X66XvyQ8vEh1IUPmAoiZW7MGc1ED803VRmOkyLPdvVPsRN6QxPPr5ks1X
-	iUAXsz4OU4ka2CHSJMEELtRQNTPXRPh+vq3jAaVgtIuuyB6H9+1aw/PKCQOKUbXE4WYUgWK+cBE
-	xDDg23lP9cxXOlSFjsz8c8uYhOwYPDTH6KBrvxFSjr8JKIeic=
-X-Received: by 2002:a05:7300:ac81:b0:2be:969:75f6 with SMTP id 5a478bee46e88-2be2344da48mr1494176eec.9.1772587157326;
-        Tue, 03 Mar 2026 17:19:17 -0800 (PST)
-Received: from [172.16.0.242] ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be0d7e0d40sm6999679eec.12.2026.03.03.17.19.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Mar 2026 17:19:16 -0800 (PST)
-Message-ID: <05a15890-392c-41c3-9566-8eb506ddfe5f@gmail.com>
-Date: Tue, 3 Mar 2026 17:23:18 -0800
+	s=arc-20240116; t=1772587488; c=relaxed/simple;
+	bh=ZeGtRfef+CDqALlJQdtl5vPgxw4RQ/2/aUMNzTE8Qc4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wa+JNWjyYI30XdjX/DJQ2H5ChiICyIfVqGC8dKtY1ihZkbsPm//ROdCvIbwCBl0+ABNhZFLlL8Liuc7KX+zlb+lPoxjQaqtPRbPbHVnaTjDZlqYNjgwIYMxURsnSF5Lh4QPSbSqMRazzHa7nllbxezdFO/vwAZbez8t8DUM5YbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WcRRtXTt; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=eWA9OW7ap2xOq+63BGl01cSrDMEAjz5Y/jKiwjUaFTU=; b=WcRRtXTttWXbW/YDkVc60gQY4q
+	NIs6Xpkr2cc1Qk1h+m9qd2fyoxgSnHaTi23SR3Dns8SnvgqHL4uujOg+39ODSwiT2lTn/CFYrAquo
+	NwQhnbuFbVu7f9FVSYVvvUA800khfEAf075ESBHNn91b3N9TaZQqevxlrnWFWlzAgBtA+CeEFwa2t
+	NOnb2eu1VGAICF2lA5KRlk1czCdzRsMzupnWpavi7p+kCdaMmIAdSd++kCkV2cs0Z/LqBYKlAyJSj
+	MOVHwmyG+e8PdoAvBtx3dPVcT0W43S/l3dBwGGSc7m+/+187IN12fdLbjF77jQ9UkpytEuP0EXnQk
+	JXmA+fzA==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vxayc-0000000GEhH-1dyl;
+	Wed, 04 Mar 2026 01:24:38 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	dev@openvswitch.org
+Subject: [PATCH net-next v5] net: openvswitch: clean up some kernel-doc warnings
+Date: Tue,  3 Mar 2026 17:24:37 -0800
+Message-ID: <20260304012437.469151-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: ethernet: eswin: add clock
- sampling control
-To: Conor Dooley <conor@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: lizhi2@eswincomputing.com, devicetree@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, wens@kernel.org,
- pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
- linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ningyu@eswincomputing.com, linmin@eswincomputing.com,
- pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
- weishangjuan@eswincomputing.com
-References: <20260303061525.846-1-lizhi2@eswincomputing.com>
- <20260303061637.872-1-lizhi2@eswincomputing.com>
- <20260303163846.156d18f7@kernel.org>
- <20260304-regulate-verdict-c3a361d2dc83@spud>
-Content-Language: en-US
-From: Bo Gan <ganboing@gmail.com>
-In-Reply-To: <20260304-regulate-verdict-c3a361d2dc83@spud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 79C2F1F92C7
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DD63A1F9339
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,einfochips.com];
-	TAGGED_FROM(0.00)[bounces-263509-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263510-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ganboing@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Hi All,
+Fix some kernel-doc warnings in openvswitch.h:
 
-On 3/3/26 16:47, Conor Dooley wrote:
-> On Tue, Mar 03, 2026 at 04:38:46PM -0800, Jakub Kicinski wrote:
->> On Tue,  3 Mar 2026 14:16:37 +0800 lizhi2@eswincomputing.com wrote:
->>> There are currently no in-tree users of the EIC7700 Ethernet driver, so
->>> these changes are safe.
->>
->> What do you mean by this sentence? The commit under Fixes was part of
->> Linux v6.19 already.
-> 
-> The "funny" thing is that caring about users doesn't even really matter
-> on the devicetree patch, except for this hunk:
-> |@@ -81,7 +99,9 @@ properties:
-> |                          or external clock selection
-> |           - description: Offset of AXI clock controller Low-Power request
-> |                          register
-> |+          - description: Offset of register controlling TXD delay
-> |           - description: Offset of register controlling TX/RX clock delay
-> |+          - description: Offset of register controlling RXD delay
-> |
-> | required:
-> |   - compatible
-> And it only matters here because an item is injected mid-list. If this
-> was moved to the end with the RXD delay, the **dt-binding** changes
-> don't have issues with safety. I've not looked at whether there are
-> knock-on concerns about users in the driver or whatever yet, but from a
-> binding POV only that hunk can break something that currently works.
+Mark enum placeholders that are not used as "private" so that kernel-doc
+comments are not needed for them.
 
-This was already discussed here in v1:
-https://lore.kernel.org/lkml/e7183ae1-8b8b-4e77-9f4e-3bc1b4b63556@lunn.ch/
+Correct names for 2 enum values:
+Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+ '@OVS_VPORT_UPCALL_SUCCESS' description in 'ovs_vport_upcall_attr'
+Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+ '@OVS_VPORT_UPCALL_FAIL' description in 'ovs_vport_upcall_attr'
 
-The device-tree is not checked in yet by ESWIN folks, so there's currently
-no user of the dt-binding. No need to worry about backward compat.
+Convert one comment from "/**" kernel-doc to a plain C "/*" comment:
+Warning: include/uapi/linux/openvswitch.h:638 This comment starts with
+ '/**', but isn't a kernel-doc comment.
+ * Omit attributes for notifications.
 
-> 
->>> Fixes: 888bd0eca93c ("dt-bindings: ethernet: eswin: Document for EIC7700 SoC")
+Add more kernel-doc:
+- add kernel-doc for kernel-only enums;
+- add missing kernel-doc for enum ovs_datapath_attr;
+- add missing kernel-doc for enum ovs_flow_attr;
+- add missing kernel-doc for enum ovs_sample_attr;
+- add kernel-doc for enum ovs_check_pkt_len_attr;
+- add kernel-doc for enum ovs_action_attr;
+- add kernel-doc for enum ovs_action_push_eth;
+- add kernel-doc for enum ovs_vport_attr;
 
-Bo
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+v5: fix one description (thanks, Ilya);
+    put periods at the end of enum short desriptions;
+v4: more updates/corrections from Ilya (Thanks!);
+    use "net-next" (Jakub);
+v3: update descriptions based on Ilya's feedback;
+v2: correct -net to net for tree destination/designation;
+    add more kernel-doc for various enums;
 
+Cc: Aaron Conole <aconole@redhat.com>
+Cc: Eelco Chaudron <echaudro@redhat.com>
+Cc: Ilya Maximets <i.maximets@ovn.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: dev@openvswitch.org
+
+ include/uapi/linux/openvswitch.h |   76 +++++++++++++++++++++++++----
+ 1 file changed, 68 insertions(+), 8 deletions(-)
+
+--- linux-next-20260227.orig/include/uapi/linux/openvswitch.h
++++ linux-next-20260227/include/uapi/linux/openvswitch.h
+@@ -70,12 +70,15 @@ enum ovs_datapath_cmd {
+  * set on the datapath port (for OVS_ACTION_ATTR_MISS).  Only valid on
+  * %OVS_DP_CMD_NEW requests. A value of zero indicates that upcalls should
+  * not be sent.
++ * @OVS_DP_ATTR_MASKS_CACHE_SIZE: Number of the entries in the flow table
++ * masks cache.
+  * @OVS_DP_ATTR_PER_CPU_PIDS: Per-cpu array of PIDs for upcalls when
+  * OVS_DP_F_DISPATCH_UPCALL_PER_CPU feature is set.
+  * @OVS_DP_ATTR_STATS: Statistics about packets that have passed through the
+  * datapath.  Always present in notifications.
+  * @OVS_DP_ATTR_MEGAFLOW_STATS: Statistics about mega flow masks usage for the
+  * datapath. Always present in notifications.
++ * @OVS_DP_ATTR_USER_FEATURES: OVS_DP_F_* flags.
+  * @OVS_DP_ATTR_IFINDEX: Interface index for a new datapath netdev. Only
+  * valid for %OVS_DP_CMD_NEW requests.
+  *
+@@ -83,18 +86,23 @@ enum ovs_datapath_cmd {
+  * payload for %OVS_DP_* commands.
+  */
+ enum ovs_datapath_attr {
++	/* private: */
+ 	OVS_DP_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_DP_ATTR_NAME,		/* name of dp_ifindex netdev */
+ 	OVS_DP_ATTR_UPCALL_PID,		/* Netlink PID to receive upcalls */
+ 	OVS_DP_ATTR_STATS,		/* struct ovs_dp_stats */
+ 	OVS_DP_ATTR_MEGAFLOW_STATS,	/* struct ovs_dp_megaflow_stats */
+ 	OVS_DP_ATTR_USER_FEATURES,	/* OVS_DP_F_*  */
++	/* private: */
+ 	OVS_DP_ATTR_PAD,
++	/* public: */
+ 	OVS_DP_ATTR_MASKS_CACHE_SIZE,
+ 	OVS_DP_ATTR_PER_CPU_PIDS,   /* Netlink PIDS to receive upcalls in
+ 				     * per-cpu dispatch mode
+ 				     */
+ 	OVS_DP_ATTR_IFINDEX,
++	/* private: */
+ 	__OVS_DP_ATTR_MAX
+ };
+ 
+@@ -181,6 +189,7 @@ enum ovs_packet_cmd {
+  * %OVS_USERSPACE_ATTR_EGRESS_TUN_PORT attribute, which is sent only if the
+  * output port is actually a tunnel port. Contains the output tunnel key
+  * extracted from the packet as nested %OVS_TUNNEL_KEY_ATTR_* attributes.
++ * @OVS_PACKET_ATTR_PROBE: Packet operation is a feature probe.
+  * @OVS_PACKET_ATTR_MRU: Present for an %OVS_PACKET_CMD_ACTION and
+  * @OVS_PACKET_ATTR_LEN: Packet size before truncation.
+  * %OVS_PACKET_ATTR_USERSPACE action specify the Maximum received fragment
+@@ -196,21 +205,26 @@ enum ovs_packet_cmd {
+  * payload for %OVS_PACKET_* commands.
+  */
+ enum ovs_packet_attr {
++	/* private: */
+ 	OVS_PACKET_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_PACKET_ATTR_PACKET,      /* Packet data. */
+ 	OVS_PACKET_ATTR_KEY,         /* Nested OVS_KEY_ATTR_* attributes. */
+ 	OVS_PACKET_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. */
+ 	OVS_PACKET_ATTR_USERDATA,    /* OVS_ACTION_ATTR_USERSPACE arg. */
+ 	OVS_PACKET_ATTR_EGRESS_TUN_KEY,  /* Nested OVS_TUNNEL_KEY_ATTR_*
+ 					    attributes. */
++	/* private: */
+ 	OVS_PACKET_ATTR_UNUSED1,
+ 	OVS_PACKET_ATTR_UNUSED2,
++	/* public: */
+ 	OVS_PACKET_ATTR_PROBE,      /* Packet operation is a feature probe,
+ 				       error logging should be suppressed. */
+ 	OVS_PACKET_ATTR_MRU,	    /* Maximum received IP fragment size. */
+ 	OVS_PACKET_ATTR_LEN,	    /* Packet size before truncation. */
+ 	OVS_PACKET_ATTR_HASH,	    /* Packet hash. */
+ 	OVS_PACKET_ATTR_UPCALL_PID, /* u32 Netlink PID. */
++	/* private: */
+ 	__OVS_PACKET_ATTR_MAX
+ };
+ 
+@@ -257,6 +271,11 @@ enum ovs_vport_type {
+  * upcalls should not be sent.
+  * @OVS_VPORT_ATTR_STATS: A &struct ovs_vport_stats giving statistics for
+  * packets sent or received through the vport.
++ * @OVS_VPORT_ATTR_IFINDEX: Provides the ifindex of a vport, or sets the desired
++ * ifindex while creating a new vport with type %OVS_VPORT_TYPE_INTERNAL.
++ * @OVS_VPORT_ATTR_NETNSID: Provides the netns id of the vport if it's not local.
++ * @OVS_VPORT_ATTR_UPCALL_STATS: Provides upcall statistics for a vport.
++ * Contains nested %OVS_VPORT_UPCALL_ATTR_* attributes.
+  *
+  * These attributes follow the &struct ovs_header within the Generic Netlink
+  * payload for %OVS_VPORT_* commands.
+@@ -272,7 +291,9 @@ enum ovs_vport_type {
+  * ovs_header plus %OVS_VPORT_ATTR_PORT_NO determine the vport.
+  */
+ enum ovs_vport_attr {
++	/* private: */
+ 	OVS_VPORT_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_VPORT_ATTR_PORT_NO,	/* u32 port number within datapath */
+ 	OVS_VPORT_ATTR_TYPE,	/* u32 OVS_VPORT_TYPE_* constant. */
+ 	OVS_VPORT_ATTR_NAME,	/* string name, up to IFNAMSIZ bytes long */
+@@ -280,23 +301,27 @@ enum ovs_vport_attr {
+ 	OVS_VPORT_ATTR_UPCALL_PID, /* array of u32 Netlink socket PIDs for */
+ 				/* receiving upcalls */
+ 	OVS_VPORT_ATTR_STATS,	/* struct ovs_vport_stats */
++	/* private: */
+ 	OVS_VPORT_ATTR_PAD,
++	/* public: */
+ 	OVS_VPORT_ATTR_IFINDEX,
+ 	OVS_VPORT_ATTR_NETNSID,
+ 	OVS_VPORT_ATTR_UPCALL_STATS,
++	/* private: */
+ 	__OVS_VPORT_ATTR_MAX
+ };
+ 
+ #define OVS_VPORT_ATTR_MAX (__OVS_VPORT_ATTR_MAX - 1)
+ 
+ /**
+- * enum ovs_vport_upcall_attr - attributes for %OVS_VPORT_UPCALL* commands
+- * @OVS_VPORT_UPCALL_SUCCESS: 64-bit upcall success packets.
+- * @OVS_VPORT_UPCALL_FAIL: 64-bit upcall fail packets.
++ * enum ovs_vport_upcall_attr - attributes for %OVS_VPORT_ATTR_UPCALL_STATS
++ * @OVS_VPORT_UPCALL_ATTR_SUCCESS: 64-bit upcall success packets.
++ * @OVS_VPORT_UPCALL_ATTR_FAIL: 64-bit upcall fail packets.
+  */
+ enum ovs_vport_upcall_attr {
+ 	OVS_VPORT_UPCALL_ATTR_SUCCESS,
+ 	OVS_VPORT_UPCALL_ATTR_FAIL,
++	/* private: */
+ 	__OVS_VPORT_UPCALL_ATTR_MAX
+ };
+ 
+@@ -431,6 +456,7 @@ enum ovs_frag_type {
+ 	OVS_FRAG_TYPE_NONE,
+ 	OVS_FRAG_TYPE_FIRST,
+ 	OVS_FRAG_TYPE_LATER,
++	/* private: */
+ 	__OVS_FRAG_TYPE_MAX
+ };
+ 
+@@ -604,6 +630,8 @@ struct ovs_nsh_key_md1 {
+  * a wildcarded match. Omitting attribute is treated as wildcarding all
+  * corresponding fields. Optional for all requests. If not present,
+  * all flow key bits are exact match bits.
++ * @OVS_FLOW_ATTR_PROBE: Flow operation is a feature probe, error logging
++ * should be suppressed.
+  * @OVS_FLOW_ATTR_UFID: A value between 1-16 octets specifying a unique
+  * identifier for the flow. Causes the flow to be indexed by this value rather
+  * than the value of the %OVS_FLOW_ATTR_KEY attribute. Optional for all
+@@ -617,7 +645,9 @@ struct ovs_nsh_key_md1 {
+  * payload for %OVS_FLOW_* commands.
+  */
+ enum ovs_flow_attr {
++	/* private: */
+ 	OVS_FLOW_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_FLOW_ATTR_KEY,       /* Sequence of OVS_KEY_ATTR_* attributes. */
+ 	OVS_FLOW_ATTR_ACTIONS,   /* Nested OVS_ACTION_ATTR_* attributes. */
+ 	OVS_FLOW_ATTR_STATS,     /* struct ovs_flow_stats. */
+@@ -629,13 +659,14 @@ enum ovs_flow_attr {
+ 				  * logging should be suppressed. */
+ 	OVS_FLOW_ATTR_UFID,      /* Variable length unique flow identifier. */
+ 	OVS_FLOW_ATTR_UFID_FLAGS,/* u32 of OVS_UFID_F_*. */
++	/* private: */
+ 	OVS_FLOW_ATTR_PAD,
+ 	__OVS_FLOW_ATTR_MAX
+ };
+ 
+ #define OVS_FLOW_ATTR_MAX (__OVS_FLOW_ATTR_MAX - 1)
+ 
+-/**
++/*
+  * Omit attributes for notifications.
+  *
+  * If a datapath request contains an %OVS_UFID_F_OMIT_* flag, then the datapath
+@@ -653,17 +684,23 @@ enum ovs_flow_attr {
+  * fractions of packets.
+  * @OVS_SAMPLE_ATTR_ACTIONS: Set of actions to execute in sampling event.
+  * Actions are passed as nested attributes.
++ * @OVS_SAMPLE_ATTR_ARG: For in-kernel use, passing &struct sample_arg
++ * derived from other attributes.
+  *
+  * Executes the specified actions with the given probability on a per-packet
+  * basis. Nested actions will be able to access the probability value of the
+  * parent @OVS_ACTION_ATTR_SAMPLE.
+  */
+ enum ovs_sample_attr {
++	/* private: */
+ 	OVS_SAMPLE_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_SAMPLE_ATTR_PROBABILITY, /* u32 number */
+ 	OVS_SAMPLE_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. */
++	/* private: */
+ 	__OVS_SAMPLE_ATTR_MAX,
+ 
++	/* public: */
+ #ifdef __KERNEL__
+ 	OVS_SAMPLE_ATTR_ARG          /* struct sample_arg  */
+ #endif
+@@ -693,12 +730,15 @@ struct sample_arg {
+  * @OVS_USERSPACE_ATTR_ACTIONS: If present, send actions with upcall.
+  */
+ enum ovs_userspace_attr {
++	/* private: */
+ 	OVS_USERSPACE_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_USERSPACE_ATTR_PID,	      /* u32 Netlink PID to receive upcalls. */
+ 	OVS_USERSPACE_ATTR_USERDATA,  /* Optional user-specified cookie. */
+ 	OVS_USERSPACE_ATTR_EGRESS_TUN_PORT,  /* Optional, u32 output port
+ 					      * to get tunnel info. */
+ 	OVS_USERSPACE_ATTR_ACTIONS,   /* Optional flag to get actions. */
++	/* private: */
+ 	__OVS_USERSPACE_ATTR_MAX
+ };
+ 
+@@ -819,7 +859,9 @@ struct ovs_action_hash {
+  * @OVS_CT_ATTR_TIMEOUT: Variable length string defining conntrack timeout.
+  */
+ enum ovs_ct_attr {
++	/* private: */
+ 	OVS_CT_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_CT_ATTR_COMMIT,     /* No argument, commits connection. */
+ 	OVS_CT_ATTR_ZONE,       /* u16 zone id. */
+ 	OVS_CT_ATTR_MARK,       /* mark to associate with this connection. */
+@@ -831,6 +873,7 @@ enum ovs_ct_attr {
+ 	OVS_CT_ATTR_EVENTMASK,  /* u32 mask of IPCT_* events. */
+ 	OVS_CT_ATTR_TIMEOUT,	/* Associate timeout with this connection for
+ 				 * fine-grain timeout tuning. */
++	/* private: */
+ 	__OVS_CT_ATTR_MAX
+ };
+ 
+@@ -859,7 +902,9 @@ enum ovs_ct_attr {
+  * @OVS_NAT_ATTR_PROTO_RANDOM: Flag for fully randomized L4 port mapping
+  */
+ enum ovs_nat_attr {
++	/* private: */
+ 	OVS_NAT_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_NAT_ATTR_SRC,
+ 	OVS_NAT_ATTR_DST,
+ 	OVS_NAT_ATTR_IP_MIN,
+@@ -869,38 +914,44 @@ enum ovs_nat_attr {
+ 	OVS_NAT_ATTR_PERSISTENT,
+ 	OVS_NAT_ATTR_PROTO_HASH,
+ 	OVS_NAT_ATTR_PROTO_RANDOM,
++	/* private: */
+ 	__OVS_NAT_ATTR_MAX,
+ };
+ 
+ #define OVS_NAT_ATTR_MAX (__OVS_NAT_ATTR_MAX - 1)
+ 
+-/*
++/**
+  * struct ovs_action_push_eth - %OVS_ACTION_ATTR_PUSH_ETH action argument.
+  * @addresses: Source and destination MAC addresses.
+- * @eth_type: Ethernet type
+  */
+ struct ovs_action_push_eth {
+ 	struct ovs_key_ethernet addresses;
+ };
+ 
+-/*
++/**
+  * enum ovs_check_pkt_len_attr - Attributes for %OVS_ACTION_ATTR_CHECK_PKT_LEN.
+  *
+  * @OVS_CHECK_PKT_LEN_ATTR_PKT_LEN: u16 Packet length to check for.
+  * @OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER: Nested OVS_ACTION_ATTR_*
+  * actions to apply if the packer length is greater than the specified
+  * length in the attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
+- * @OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL - Nested OVS_ACTION_ATTR_*
++ * @OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL: Nested OVS_ACTION_ATTR_*
+  * actions to apply if the packer length is lesser or equal to the specified
+  * length in the attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
++ * @OVS_CHECK_PKT_LEN_ATTR_ARG: For in-kernel use, passing &struct
++ * check_pkt_len_arg derived from other attributes.
+  */
+ enum ovs_check_pkt_len_attr {
++	/* private: */
+ 	OVS_CHECK_PKT_LEN_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_CHECK_PKT_LEN_ATTR_PKT_LEN,
+ 	OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER,
+ 	OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL,
++	/* private: */
+ 	__OVS_CHECK_PKT_LEN_ATTR_MAX,
+ 
++	/* public: */
+ #ifdef __KERNEL__
+ 	OVS_CHECK_PKT_LEN_ATTR_ARG          /* struct check_pkt_len_arg  */
+ #endif
+@@ -968,6 +1019,9 @@ enum ovs_psample_attr {
+  * from the packet.
+  * @OVS_ACTION_ATTR_SAMPLE: Probabilitically executes actions, as specified in
+  * the nested %OVS_SAMPLE_ATTR_* attributes.
++ * @OVS_ACTION_ATTR_RECIRC: Recirculate the clone of the packet through the
++ * datapath with the new id (u32 recirc_id).
++ * @OVS_ACTION_ATTR_HASH: Compute the packet hash, using &struct ovs_action_hash.
+  * @OVS_ACTION_ATTR_PUSH_MPLS: Push a new MPLS label stack entry onto the
+  * top of the packets MPLS label stack.  Set the ethertype of the
+  * encapsulating frame to either %ETH_P_MPLS_UC or %ETH_P_MPLS_MC to
+@@ -997,6 +1051,8 @@ enum ovs_psample_attr {
+  * start of the packet or at the start of the l3 header depending on the value
+  * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
+  * argument.
++ * @OVS_ACTION_ATTR_DEC_TTL: Decrement TTL or hop limit of the packet. Execute
++ * nested %OVS_DEC_TTL_ATTR_* actions if the value is less or equal to 1.
+  * @OVS_ACTION_ATTR_DROP: Explicit drop action.
+  * @OVS_ACTION_ATTR_PSAMPLE: Send a sample of the packet to external observers
+  * via psample.
+@@ -1010,7 +1066,9 @@ enum ovs_psample_attr {
+  */
+ 
+ enum ovs_action_attr {
++	/* private: */
+ 	OVS_ACTION_ATTR_UNSPEC,
++	/* public: */
+ 	OVS_ACTION_ATTR_OUTPUT,	      /* u32 port number. */
+ 	OVS_ACTION_ATTR_USERSPACE,    /* Nested OVS_USERSPACE_ATTR_*. */
+ 	OVS_ACTION_ATTR_SET,          /* One nested OVS_KEY_ATTR_*. */
+@@ -1040,9 +1098,11 @@ enum ovs_action_attr {
+ 	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
+ 	OVS_ACTION_ATTR_PSAMPLE,      /* Nested OVS_PSAMPLE_ATTR_*. */
+ 
++	/* private: */
+ 	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+ 				       * from userspace. */
+ 
++	/* public: */
+ #ifdef __KERNEL__
+ 	OVS_ACTION_ATTR_SET_TO_MASKED, /* Kernel module internal masked
+ 					* set action converted from
 
