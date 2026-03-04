@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-264055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264056-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 1CElDLaqqGmfwQAAu9opvQ
-	(envelope-from <netdev+bounces-264055-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:57:10 +0100
+	id sNH5Ke+qqGmfwQAAu9opvQ
+	(envelope-from <netdev+bounces-264056-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:58:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5C4208384
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:57:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09D292083AC
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:58:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C16F3301E949
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 21:57:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F02A3027B42
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 21:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215CE390217;
-	Wed,  4 Mar 2026 21:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99C03845C2;
+	Wed,  4 Mar 2026 21:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="T1VgREoe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VOgGVB59"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B746826CE11;
-	Wed,  4 Mar 2026 21:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CA3350A1B;
+	Wed,  4 Mar 2026 21:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772661427; cv=none; b=XgN206lQ3NxQ8280hlKHxDHDA+JOtsPO7xKauBilsZpH3hKPrO9rUJ32/z5I2EkSBkXNGrPwbmw6ortYVydiGwEzhG9GP7GeIYdBEtXdA1e2TQRgH0l63LKD+M+aEMwNAqsKy49/XpzkV3FHNeW/DSkQz4YK2DNANSHswAaxOGk=
+	t=1772661461; cv=none; b=e0i+1PtbxjOYGB7/zYgcFn+qsRKxNgG/sqAcr37b8JVg4m8RoOebOv8jnLrLgXz6xRepzxD2Si9NCevbXbDwcFEyAo1FwNmIn8E5+BR2oW3LeV6k9SoxZCY93op0Ol0zKmpW1qqiQBRHoS56pe8dRIBBHYawYTZq7wOP2O0b6cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772661427; c=relaxed/simple;
-	bh=bazpq+SK+eoSsQxMUAjR0z1xDF+0vDKXWPNbWnOt65M=;
+	s=arc-20240116; t=1772661461; c=relaxed/simple;
+	bh=5soMW4aNp7iFsOYNETdn8IhUIEKg/x1IGH4TY7VqBfQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iv/NiDmZAhZM62gYwgCoLCr5XsrYPUf2ZzMe2RvEXdImTq69VsIBMWPE82AFeGtsANymNCaHHwVGZlc9sBPl2TqXkobGpcpBTnYVtOF9EUlVftbW5nQzlyGQRY1a9r5h4fzfT778uFQzWH0u1dQ9La1lqNoQ7emLPzqsm14hxQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=T1VgREoe; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id D65BA60251;
-	Wed,  4 Mar 2026 22:57:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1772661423;
-	bh=NZcQ+LOkyu6s20xwD3Bz2rY2z596cUhb0rAmyG47cpk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1VgREoeiBgiv/Z41ARc6LbmDPM63wse5ULAlEPTEtoVreap9B1bTJ8lC3Z0C8sSt
-	 IRXmzSSnY2LAd6iK7Ia9fv+LZBa5gPd5OGUuGJNNGsIQVhKrlfK2PHvYSksWqT8iEi
-	 fKkXOk+SVa12adKEz8QbK2Q2NGDhlys0rVYNiCamCGs86tyu66pBN1jfsxbTAHO7oD
-	 cDW8vjhSTuWhkawO8H+blO2C8vU7BC2KtOhUALfmC2ibdE7CV9jJkEpBlG7Y6PTrPg
-	 VG5jSN3oSD91lWrxgqf/YmU7/QfyMqR7XX5q+BDkNzSZEdA3h3NT+PRuJ+VEtvK8Rd
-	 LNhaj/bXdOpZQ==
-Date: Wed, 4 Mar 2026 22:57:00 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=j+3jIDLvbO1LF2tw5ttl2sCIi/RstIBa6S2iAi4hdc+hOBYeO6hxvLBNdygNtwjcBairKRSNnloeNRvlVQWzcc7+kg0Aep5IbiS87HLXAs2AB+rpplbcLtccfIQED/qERTZaeyuJeHcFZgDc04Dg7RVFfvFD/RGuXLHNlrEXmVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VOgGVB59; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=5wtEcQbkHH7RQPJdQSDw5NIynjI0hasjRRVJitQYmLY=; b=VO
+	gGVB59ss7jgaZGzrQcTCN3WctHEQJt+AHh7wwHD/RVdKBkcPT4ps0zr7y2ZXg1CrHW/KsoJb1Da/k
+	rq2/rEyyYnWIUiXmplDCTBW8OcOL0/KGtJNxnoMIdxkEKFrX3Tsq7JJHEqtBMqBJQIWupA3yJ1x//
+	D0D6ntIiWtePFhs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vxuDc-00ABDR-Ly; Wed, 04 Mar 2026 22:57:24 +0100
+Date: Wed, 4 Mar 2026 22:57:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 0/4] netfilter: updates for net
-Message-ID: <aaiqrFrus1syOmlT@chamomile>
-References: <20260304172940.24948-1-fw@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: bcmgenet: fix bcmgenet_get_eee() clobbered by
+ phy_ethtool_get_eee()
+Message-ID: <fd675389-b044-4783-be16-c5ba34163ef2@lunn.ch>
+References: <20260303153918.538902-1-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +69,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260304172940.24948-1-fw@strlen.de>
-X-Rspamd-Queue-Id: 6A5C4208384
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260303153918.538902-1-nb@tipi-net.de>
+X-Rspamd-Queue-Id: 09D292083AC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264056-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-264055-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Florian,
+On Tue, Mar 03, 2026 at 04:39:18PM +0100, Nicolai Buchwitz wrote:
+> bcmgenet_get_eee() sets the MAC-managed tx_lpi_enabled and tx_lpi_timer
+> fields, then calls phy_ethtool_get_eee() which internally calls
+> eeecfg_to_eee() — overwriting eee_enabled, tx_lpi_enabled and
+> tx_lpi_timer with the PHY's eee_cfg values.  For non-phylink MACs like
+> GENET, these PHY-level fields are never initialized (they are only set
+> by phylink via phy_support_eee()), so the ethtool report always shows
+> eee_enabled=false and tx_lpi_enabled=false regardless of the actual MAC
+> state.
 
-On Wed, Mar 04, 2026 at 06:29:36PM +0100, Florian Westphal wrote:
-> Hi,
-> 
-> The following patchset contains Netfilter fixes for *net*:
-> 
-> 1) Fix a bug with vlan headers in the flowtable infrastructure.
->    Existing code uses skb_vlan_push() helper, but that helper
->    requires skb->data to point to the MAC header, which isn't the
->    case for flowtables.  Switch to a new helper, modeled on the
->    existing PPPoE helper. From Eric Woudstra. This bug was added
->    in v6.19-rc1.
+I think the MAC driver is missing a call to phy_support_eee() to let
+phylib know the MAC supports EEE. Have you tried that.
 
-In patch 1/4, why is this new function so different wrt. skb_vlan_push?
- 
-int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
-{
-        if (skb_vlan_tag_present(skb)) {
-                int offset = skb->data - skb_mac_header(skb);
-                int err;
- 
-                if (WARN_ONCE(offset,
-                              "skb_vlan_push got skb with skb->data not at mac header (offset %d)\n",
-                              offset)) {
-                        return -EINVAL;
-                }
- 
-                err = __vlan_insert_tag(skb, skb->vlan_proto,
-                                        skb_vlan_tag_get(skb));
-                if (err)
-                        return err;
- 
-                skb->protocol = skb->vlan_proto;
-                skb->network_header -= VLAN_HLEN;
- 
-                skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
-        }
-        __vlan_hwaccel_put_tag(skb, vlan_proto, vlan_tci);
- 
- 
-In case there are two VLANs, the existing in hwaccel gets pushed into
-the VLAN header, and the outer VLAN becomes the one that is offloaded?
- 
-Is this reversed in this patch? The first VLAN tag is offloaded, then
-the next one coming is pushed as a VLAN header?
-
-Thanks.
+       Andrew
 
