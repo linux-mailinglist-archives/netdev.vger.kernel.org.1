@@ -1,448 +1,292 @@
-Return-Path: <netdev+bounces-264086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DHsLUm8qGlbwwAAu9opvQ
-	(envelope-from <netdev+bounces-264086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:12:09 +0100
+	id CPjFIJ28qGlbwwAAu9opvQ
+	(envelope-from <netdev+bounces-264087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:13:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1826C208E35
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:12:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F07C8208E6B
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A579C306ECB4
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 23:07:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D25633013A58
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 23:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D83F386579;
-	Wed,  4 Mar 2026 23:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19F738C2C8;
+	Wed,  4 Mar 2026 23:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="fUMAuEou"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoM+7H9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA838E13F
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 23:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772665634; cv=none; b=a+Osf9nwAM/V+pCX8WaP242qfsvWtUW/4RybUE3TbvX6BZVduK3ZWDGbHwCzwCwAiWby0750ZBTRYZE2l1+ftRnd0MrNOouieunhMFXLuHqf451cwi/t90/BvLn8kqNK3fdCGKq/0bNXnPZ/7wJN8OsLHX+dewVxeozMc4ghDuY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772665634; c=relaxed/simple;
-	bh=AFP9NZ/vqopfXgtkXW92y3xf2b8sr19klfhl7CQ56Jk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PD11jZpQrjwyYtZggx6QkVuaYsspsBaZOGIEwnz8mwBKrJ47CyZeqVdAwqY1uUFAoD44Se/9y9AEFEhsknBL97fFmnalYHOBmEWFbRpkuD57Mqz59s7Kt5cZPaRQR4jBuMso4jLzuju+DJmEJpMEeR+XJ++3kg0EvK4OxZlEEpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=fUMAuEou; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4806f3fc50bso79816445e9.0
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 15:07:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909B1371046
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 23:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772666010; cv=pass; b=I2hUEukPgWxPL5olb04lO5fQslHNuSoS8uI1D81rDJdqDdqcQFcQ3Jb3z5a7CrEZktVVqHOeVzkzR5X7OXYeg6i8qAGjbMBqo3nuol/BXx8GrNPy4ESCRQe0QPlkOYuCdoIpKKolvit8o9e2MwiEBMGCRngZNF/2X3Vjchzmmo8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772666010; c=relaxed/simple;
+	bh=5l7t5GUb2D/4t62FXPSct37+0hReMV23ketRmHriGMw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MVL4RgTGH80KF1TI28JbmYtutd2f7+6VaE7NI43XIv0fq7OlgvF+rSutQVl7Lgh+2S4A0DAVjF22WBJ4vT4xJtVc1HKIqv08ToZU8Y0POnWpgOD74o655Oog/v2r5JHL/4hGT3OsjD3wG2YEiTQ2DXr6DpVmHQMI8qBypwHYoyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoM+7H9G; arc=pass smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-5ffbcfbcecaso530778137.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 15:13:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772666008; cv=none;
+        d=google.com; s=arc-20240605;
+        b=W9qKYckImNvFbTEJjfxdNUGDNmNeoU4z5W4wEbDeZqG3uUnYQ1wi8vXr84Sa8HDw+9
+         5Sjlml86dXU18Pw98gVpXHb3vUnQdQt2WBcovaSyeyPmAaDGic+X/G7GdrLKsa4afCrm
+         ivaT86JOvLSRruZHH8s12d6hNj3XMai+ll7eBTon/Qe07Ow3WdcY/ZNabTN0mRRlSoVS
+         w7wjydfYsQP6zzNWvTvu3DB3QvTRRQnWFZKbMvGXeFo19B1t4Rbs9LS/PqHe6vPZqF6Q
+         FPbmqi15PlmkY8FUSceiTzCwVEkJCJV4e/OcGpCXy+u4Zm7WNgGooh1b+alyAKicOBZ0
+         /lGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
+        fh=OGZMZo5o5hTmSPgqxUhoz2DxkhPddfMx1G56yhOmgqc=;
+        b=b8uNe0dNjGjFhAxoJuVvfcWdVHVGrrLptgbyTp1Sd6lZJ4vv1R/aK1pTML5/esCgjJ
+         Wo2OcFZtb7oFmVib1YU8GfSHJaJ3TBRrRW2NmPn9Zzp7lam+GA46EBj5xePiQiSb5Npj
+         pPFhR1q7UIKrIQn9ukLbDpX7laSSepHFoghvf14wEDjJXgU6oca7/ek2xi0WA5IGOlse
+         7YTDSCrz1mi5T5lSIZc9GFohEDsbXhxIKVWv8JEvYjWuYyMxVS/8h2v+dj5+MSmLNAE4
+         2yZ5Rvb5Rptfgjzslgq1SZ4Ou49Ml/eHpNGRvOgH+iok8VwfYe8ZmtwxItBXkaCQve0S
+         x5NQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1772665631; x=1773270431; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772666008; x=1773270808; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jPEi0ax5mTDuEvjQZIR/MRm1RUNDHNmjGN20GR2EhTI=;
-        b=fUMAuEouvwj7H2AV1k6RCOwb+JjYTYgUqycCoEWnlotv1cHa+Xbq2fvRMczVZMcP+A
-         EAYNlx5RhKdn1eodClmF94wMz/9eoJYMsqbrm8YzlDj7V9IpAUObaxrIxWHaGn7HZ6R3
-         2+U9canwkVLJefPvokXvzTCfpXlDFHJjdYHR/4qk3w6ujykfUP6o+oK+viBh7LnZQKLo
-         sCsj/sffNHv8yTwI10V7hAiGsc/yQ+D4YMYPEzqSKs3M2TyHAf6aQmuFffLivava8AME
-         NRqqjLN7EDlwNPChZd+xX3HaFvFrDb5+t3tim46ZavBvieS+bwTkEXwSy3JwJPGZNJL0
-         CiMA==
+        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
+        b=FoM+7H9G6QmKyKIpSt7BuADbqN6Y46624d1yiJkV2lFt2bXbo6y7zJ7w69sefkqHYt
+         stw+2pKpN2Fve9nXj1jmeLSjMiwH5IuFwRfztJ44f0oFi5Xq3cjs8tikVUynRA4/HcUt
+         v3UwKJKuqOaoCAaedkq00VktAtmIbFmM1p3nt/HeKn+ZAfR6nBaBAsMPYEDDuvt1/YHw
+         e6QThDGY6a2QQNSFUYiVT7KxBEtQx621jO9D6+DCis7czg3KTr1y7yE2IqpfFR8Trf4V
+         jl89SG40RPLh9wtrDiLPaLS60YY9wXOmHtjg7qV1HP8ufdS6HQgrh2N6uCMrhsu9b++E
+         L7WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772665631; x=1773270431;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772666008; x=1773270808;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jPEi0ax5mTDuEvjQZIR/MRm1RUNDHNmjGN20GR2EhTI=;
-        b=vcJn3QXpGsbZjrq6LyT1gEGBllMTP3VAthZ3Pj1jxFJ+HutwspuKvT09cJunAToIhb
-         H/tWl87giUgo2GsZ9Aa/cxxVMjxvh7VougJUVFDrMxkwClkn35HlsQCQW40jKUG0ncq+
-         iW4LZqGL4CzOU+WquNrNIt1MPNnXRwkXgfh6FD9Jk9LoGMkxQl6rZdPU6++9ma2Vg+Qo
-         FzS5zrsRY/qYdNb2hP0DSthdbU2qSKGn1UY4Nh+wL8z8o2cGJFRm8v6oyuIvYMr1XMBR
-         BEZMNPUm/XLGorFHyUsM0bqm27iRTggcnNFXXMqMyjelWHW7weWOEvUWqwGqqtu32XDy
-         cA9g==
-X-Gm-Message-State: AOJu0Yy6HKn7cDb+mhtUQwoe59HpvBnPoMD1Q3vofwHXsasSwVsREs+x
-	lv2XEuXCDOBfIyJWB5lTlzG91ts99mmW9TiKYvwrI46RAvBU8qW6n4gVP7cuy88lCJC5d/Uo2aO
-	or8yzwsGlF4kvNjzke/KdN072Mrr0IASYVCmprMjAhRYf8w/MuadOZLrbwW7YIyog
-X-Gm-Gg: ATEYQzz8c2L2DY35M8U/ETlq+mMDRba3Fzy/2yGDFIJQ5XDy+XooJby19A/zD1aDfw5
-	s4w66EAuPt7JorjI7au19SIGfuqdCEHJXrmxsTbMSdiMvXtOzrBLHUGuV897MhN/zzlUG+snhf3
-	7KE/BTWOKW8AOepMXErLWpLaxsXD8fPE7UHHqCj0K18rRcVuiMt0JnuugVMZ7jPL2oLplarwDtN
-	E3xaOZbUsZljDYbZmF57QIAo/hH656sD8/jfGEeln2nYtwS5vaZuKkyAO/YoQN+fEpZjmXAXQVO
-	BoMxVV/cFWfkBkqEim0Jx8G/bhyQcG7Yc6FycmCthfptzvOLevJJpoaPxFwqShc6yzhP3fYBX84
-	HpwIXTLHdCuzVrq0Szxi9AZsKHkzct/WX+DqAohzbABKLU7xOxkYe9fJgjY6Es89OGfMIurEEdE
-	FuHX/qiGymT6pa4dKexvSKUrE2rKskMc+XrF0=
-X-Received: by 2002:a05:600c:3b29:b0:483:afbb:a077 with SMTP id 5b1f17b1804b1-4851983a5c5mr63140225e9.1.1772665630532;
-        Wed, 04 Mar 2026 15:07:10 -0800 (PST)
-Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:880:4d86:fc53:5d46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485187caf9fsm87713475e9.7.2026.03.04.15.07.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 15:07:09 -0800 (PST)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: Ralf Lici <ralf@mandelbit.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next 9/9] ovpn: consolidate crypto allocations in one chunk
-Date: Thu,  5 Mar 2026 00:06:27 +0100
-Message-ID: <20260304230643.1014-10-antonio@openvpn.net>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260304230643.1014-1-antonio@openvpn.net>
-References: <20260304230643.1014-1-antonio@openvpn.net>
+        bh=cT8TknxJNuHJgHXdge5Ni6drCi6rxzjYWQCjsyroxlk=;
+        b=RAGkjSEpeCgTs1rlMzRXdYrtI29nUGBWxJHF7GwSXJYaQ028QJsWlOmBJ6lwut65EJ
+         UgW6M4V3cG96bJeFhMyao9Ud2Q2iH12Hse6VTo/uaGw+KZk+lf32NdM9YV7ItSVGE12c
+         1xcXMqLnImFotEvdbUrNMhSECMDLgdZ9CiIW14GUBbXS+yZIlO05IVM11XDAHHWJPfTK
+         yFgc7nRvhHqX6xweAfYsJ2VqqIq61Wo0yJ2ec5CvJvtvU3pz9j8sdMMy90DwjI3JnGSA
+         k8NcZRxWiJVERT9K4nYlbCmXXF7VFMOisodnUwkUaVvvlXI3HLtsisDaXs/uuAsYkNPi
+         ez+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVrTGG0iW5mEASNl+l8DSjHpqxEbcgvEoEXN4eE6jjOaNnQTxSEdnTnB/qXVo+Jara/XXoVsBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI9coLnOn1nxpf/h3pbph/m2P1VO1QJ2KdYXTlpvDEHQuuV0wJ
+	Smem+T3cU0HibGV8G5ZHFR19hUL3MAq6br3Nzr0bEzGgoLgVCSva2TYPCMtMkHwXDMyjPnyDEEM
+	N2DBaTJ7JzfgrPePBFW3jONPCUivesps=
+X-Gm-Gg: ATEYQzyE1/DTT1VRcPQMy9isgdUV3b6uNIh040aG8q2pQuxSHdmyUd9rbcoPNaRFlXd
+	t68Xdk4KJBb9qajHaVZRcM/D9/oow6iraTwKgzmxTBxS3KGHhuz4/iZTK6wPYqW6guXKCa0JOtu
+	ZezwSuw+NBeq8vFWn3RKMRopkb60xzHcd9M8pTboQqrZIdroxbPHwd+deopnzUHhPqt3YRjn2RP
+	YCmkgx6DVvjEwDxTxhc0Pqj3YU+/1sgl4mib9IFrmBOQjEkumrBtZalXuB8StgbqFaDf1odKyW7
+	n7i08QfhPNp6nngfIVFROvNkagO8D6gQ6lGkWau+YwkEq9+GU08tKRkWsi7gnFuAbPaAw0g0Ch/
+	o7u7QiFYyiZgmJ9R/
+X-Received: by 2002:a05:6102:5489:b0:5fe:652:5d2e with SMTP id
+ ada2fe7eead31-5ffaaef0e47mr1704970137.24.1772666008447; Wed, 04 Mar 2026
+ 15:13:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1826C208E35
+References: <e49a24b97a25a9c25bd33411b8212978dd566bd3.1771986861.git.lucien.xin@gmail.com>
+ <20260303083338.35544-1-pabeni@redhat.com>
+In-Reply-To: <20260303083338.35544-1-pabeni@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 4 Mar 2026 18:13:15 -0500
+X-Gm-Features: AaiRm527Z74RAkiN-mCfJkeNg8yTAxvy5WGzpm2A5_gQLEbJOF1OYgOVWbRr1Wc
+Message-ID: <CADvbK_eo-aMrhr39ai6i+QU4d30_-Z=_5Cn4K9Yr2=XQat_51w@mail.gmail.com>
+Subject: Re: [net-next,v10,14/15] quic: add packet builder base
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: hepengtao@xiaomi.com, kuba@kernel.org, jlayton@kernel.org, metze@samba.org, 
+	davem@davemloft.net, kernel-tls-handshake@lists.linux.dev, horms@kernel.org, 
+	hare@suse.de, aahringo@redhat.com, tfanelli@redhat.com, mail@johnericson.me, 
+	andrew.gospodarek@broadcom.com, linkinjeon@kernel.org, dhowells@redhat.com, 
+	matttbe@kernel.org, xiyou.wangcong@gmail.com, dreibh@simula.no, 
+	jbaron@akamai.com, quic@lists.linux.dev, pc@manguebit.com, 
+	marc@fiuczynski.com, edumazet@google.com, alibuda@linux.alibaba.com, 
+	steved@redhat.com, illiliti@protonmail.com, tom@talpey.com, 
+	marcelo.leitner@gmail.com, sd@queasysnail.net, linux-cifs@vger.kernel.org, 
+	netdev@vger.kernel.org, mbuhl@openbsd.org, smfrench@gmail.com, 
+	chuck.lever@oracle.com, daniel@haxx.se
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: F07C8208E6B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264086-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264087-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FREEMAIL_CC(0.00)[xiaomi.com,kernel.org,samba.org,davemloft.net,lists.linux.dev,suse.de,redhat.com,johnericson.me,broadcom.com,gmail.com,simula.no,akamai.com,manguebit.com,fiuczynski.com,google.com,linux.alibaba.com,protonmail.com,talpey.com,queasysnail.net,vger.kernel.org,openbsd.org,oracle.com,haxx.se];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mandelbit.com:email,openvpn.net:dkim,openvpn.net:email,openvpn.net:mid,queasysnail.net:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-From: Ralf Lici <ralf@mandelbit.com>
+On Tue, Mar 3, 2026 at 3:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> quic: add packet builder base
+>
+> This patch introduces 'quic_packet' to handle packing of QUIC packets on
+> the transmit path, including frame packing, packet construction,
+> encryption, bundling, and transmission logic.
+>
+> > diff --git a/net/quic/Makefile b/net/quic/Makefile
+> > index 2ccf01ad9e22..0f903f4a7ff1 100644
+> > --- a/net/quic/Makefile
+> > +++ b/net/quic/Makefile
+> > @@ -6,4 +6,4 @@
+> >  obj-$(CONFIG_IP_QUIC) +=3D quic.o
+> >
+> >  quic-y :=3D common.o family.o protocol.o socket.o stream.o connid.o pa=
+th.o \
+> > -       cong.o pnspace.o crypto.o timer.o
+> > +       cong.o pnspace.o crypto.o timer.o packet.o
+> > diff --git a/net/quic/packet.c b/net/quic/packet.c
+> > new file mode 100644
+> > index 000000000000..a56edc745bb1
+> > --- /dev/null
+> > +++ b/net/quic/packet.c
+>
+> [ ... ]
+>
+> > +/* Perform routing for the QUIC packet on the specified path, update h=
+eader length and MSS
+> > + * accordingly, reset path and start PMTU timer.
+> > + */
+> > +int quic_packet_route(struct sock *sk)
+> > +{
+> > +     struct quic_path_group *paths =3D quic_paths(sk);
+> > +     struct quic_packet *packet =3D quic_packet(sk);
+> > +     union quic_addr *sa, *da;
+> > +     u32 pmtu;
+> > +     int err;
+> > +
+> > +     da =3D quic_path_daddr(paths, packet->path);
+> > +     sa =3D quic_path_saddr(paths, packet->path);
+> > +     err =3D quic_flow_route(sk, da, sa, &paths->fl);
+> > +     if (err)
+> > +             return err;
+> > +
+> > +     packet->hlen =3D quic_encap_len(da);
+> > +     pmtu =3D min_t(u32, dst_mtu(__sk_dst_get(sk)), QUIC_PATH_MAX_PMTU=
+);
+> > +     quic_packet_mss_update(sk, pmtu - packet->hlen);
+> > +
+> > +     quic_path_pl_reset(paths);
+> > +     quic_timer_reset(sk, QUIC_TIMER_PMTU, paths->plpmtud_interval);
+> > +     return 0;
+> > +}
+> > +
+> > +/* Configure the QUIC packet header and routing based on encryption le=
+vel and path. */
+> > +int quic_packet_config(struct sock *sk, u8 level, u8 path)
+> > +{
+>
+> [ ... ]
+>
+> > +
+> > +     /* Perform routing and MSS update for the configured packet. */
+> > +     if (quic_packet_route(sk) < 0)
+> > +             return -1;
+> > +     return 0;
+> > +}
+>
+> Should quic_packet_config() propagate the error code from
+> quic_packet_route() instead of returning -1?
+>
+> The function quic_packet_route() returns proper negative errno values
+> (via quic_flow_route()), but quic_packet_config() replaces any error
+> with -1 (which is -EPERM). This could be misleading when diagnosing
+> routing failures.
+Currently quic_packet_config() callers will either skip the process or
+return -ENETUNREACH on the failures. But maybe it's better to use the
+errno from quic_packet_route(). I will try to improve this.
 
-Currently ovpn uses three separate dynamically allocated structures to
-set up cryptographic operations for both encryption and decryption. This
-adds overhead to performance-critical paths and contribute to memory
-fragmentation.
+>
+> > diff --git a/net/quic/packet.h b/net/quic/packet.h
+> > new file mode 100644
+> > index 000000000000..8c23be386207
+> > --- /dev/null
+> > +++ b/net/quic/packet.h
+>
+> [ ... ]
+>
+> > +static inline u8 quic_packet_taglen(struct quic_packet *packet)
+> > +{
+> > +     return packet->taglen[!!packet->level];
+> > +}
+> > +
+> > +static inline void quic_packet_set_taglen(struct quic_packet *packet, =
+u8 taglen)
+> > +{
+> > +     packet->taglen[0] =3D taglen;
+> > +}
+> > +
+> > +static inline u32 quic_packet_mss(struct quic_packet *packet)
+> > +{
+> > +     return packet->mss[0] - packet->taglen[!!packet->level];
+> > +}
+> > +
+> > +static inline u32 quic_packet_max_payload(struct quic_packet *packet)
+> > +{
+> > +     return packet->mss[0] - packet->overhead - packet->taglen[!!packe=
+t->level];
+> > +}
+> > +
+> > +static inline u32 quic_packet_max_payload_dgram(struct quic_packet *pa=
+cket)
+> > +{
+> > +     return packet->mss[1] - packet->overhead - packet->taglen[!!packe=
+t->level];
+> > +}
+>
+> This isn't a bug, but quic_packet_mss(), quic_packet_max_payload(),
+> and quic_packet_max_payload_dgram() all repeat the expression
+> 'packet->taglen[!!packet->level]'.
+>
+> Could these use quic_packet_taglen(packet) instead for consistency?
+>
+OK.
 
-This commit consolidates those allocations into a single temporary blob,
-similar to what esp_alloc_tmp() does.
-
-The resulting performance gain is +7.7% and +4.3% for UDP when using AES
-and ChaChaPoly respectively, and +4.3% for TCP.
-
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
----
- drivers/net/ovpn/crypto_aead.c | 160 +++++++++++++++++++++++++--------
- drivers/net/ovpn/io.c          |   8 +-
- drivers/net/ovpn/skb.h         |  13 ++-
- 3 files changed, 135 insertions(+), 46 deletions(-)
-
-diff --git a/drivers/net/ovpn/crypto_aead.c b/drivers/net/ovpn/crypto_aead.c
-index 59848c41b7b2..8f07c418622b 100644
---- a/drivers/net/ovpn/crypto_aead.c
-+++ b/drivers/net/ovpn/crypto_aead.c
-@@ -36,6 +36,104 @@ static int ovpn_aead_encap_overhead(const struct ovpn_crypto_key_slot *ks)
- 		crypto_aead_authsize(ks->encrypt);	/* Auth Tag */
- }
- 
-+/**
-+ * ovpn_aead_crypto_tmp_size - compute the size of a temporary object containing
-+ *			       an AEAD request structure with extra space for SG
-+ *			       and IV.
-+ * @tfm: the AEAD cipher handle
-+ * @nfrags: the number of fragments in the skb
-+ *
-+ * This function calculates the size of a contiguous memory block that includes
-+ * the initialization vector (IV), the AEAD request, and an array of scatterlist
-+ * entries. For alignment considerations, the IV is placed first, followed by
-+ * the request, and then the scatterlist.
-+ * Additional alignment is applied according to the requirements of the
-+ * underlying structures.
-+ *
-+ * Return: the size of the temporary memory that needs to be allocated
-+ */
-+static unsigned int ovpn_aead_crypto_tmp_size(struct crypto_aead *tfm,
-+					      const unsigned int nfrags)
-+{
-+	unsigned int len = OVPN_NONCE_SIZE;
-+
-+	DEBUG_NET_WARN_ON_ONCE(crypto_aead_ivsize(tfm) != OVPN_NONCE_SIZE);
-+
-+	/* min size for a buffer of ivsize, aligned to alignmask */
-+	len += crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment() - 1);
-+	/* round up to the next multiple of the crypto ctx alignment */
-+	len = ALIGN(len, crypto_tfm_ctx_alignment());
-+
-+	/* reserve space for the AEAD request */
-+	len += sizeof(struct aead_request) + crypto_aead_reqsize(tfm);
-+	/* round up to the next multiple of the scatterlist alignment */
-+	len = ALIGN(len, __alignof__(struct scatterlist));
-+
-+	/* add enough space for nfrags + 2 scatterlist entries */
-+	len += array_size(sizeof(struct scatterlist), nfrags + 2);
-+	return len;
-+}
-+
-+/**
-+ * ovpn_aead_crypto_tmp_iv - retrieve the pointer to the IV within a temporary
-+ *			     buffer allocated using ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @tmp: a pointer to the beginning of the temporary buffer
-+ *
-+ * This function retrieves a pointer to the initialization vector (IV) in the
-+ * temporary buffer. If the AEAD cipher specifies an IV size, the pointer is
-+ * adjusted using the AEAD's alignment mask to ensure proper alignment.
-+ *
-+ * Returns: a pointer to the IV within the temporary buffer
-+ */
-+static u8 *ovpn_aead_crypto_tmp_iv(struct crypto_aead *aead, void *tmp)
-+{
-+	return likely(crypto_aead_ivsize(aead)) ?
-+		      PTR_ALIGN((u8 *)tmp, crypto_aead_alignmask(aead) + 1) :
-+		      tmp;
-+}
-+
-+/**
-+ * ovpn_aead_crypto_tmp_req - retrieve the pointer to the AEAD request structure
-+ *			      within a temporary buffer allocated using
-+ *			      ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @iv: a pointer to the initialization vector in the temporary buffer
-+ *
-+ * This function computes the location of the AEAD request structure that
-+ * immediately follows the IV in the temporary buffer and it ensures the request
-+ * is aligned to the crypto transform context alignment.
-+ *
-+ * Returns: a pointer to the AEAD request structure
-+ */
-+static struct aead_request *ovpn_aead_crypto_tmp_req(struct crypto_aead *aead,
-+						     const u8 *iv)
-+{
-+	return (void *)PTR_ALIGN(iv + crypto_aead_ivsize(aead),
-+				 crypto_tfm_ctx_alignment());
-+}
-+
-+/**
-+ * ovpn_aead_crypto_req_sg - locate the scatterlist following the AEAD request
-+ *			     within a temporary buffer allocated using
-+ *			     ovpn_aead_crypto_tmp_size
-+ * @aead: the AEAD cipher handle
-+ * @req: a pointer to the AEAD request structure in the temporary buffer
-+ *
-+ * This function computes the starting address of the scatterlist that is
-+ * allocated immediately after the AEAD request structure. It aligns the pointer
-+ * based on the alignment requirements of the scatterlist structure.
-+ *
-+ * Returns: a pointer to the scatterlist
-+ */
-+static struct scatterlist *ovpn_aead_crypto_req_sg(struct crypto_aead *aead,
-+						   struct aead_request *req)
-+{
-+	return (void *)ALIGN((unsigned long)(req + 1) +
-+			     crypto_aead_reqsize(aead),
-+			     __alignof__(struct scatterlist));
-+}
-+
- int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 		      struct sk_buff *skb)
- {
-@@ -45,6 +143,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	struct scatterlist *sg;
- 	int nfrags, ret;
- 	u32 pktid, op;
-+	void *tmp;
- 	u8 *iv;
- 
- 	ovpn_skb_cb(skb)->peer = peer;
-@@ -71,13 +170,17 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(nfrags + 2 > (MAX_SKB_FRAGS + 2)))
- 		return -ENOSPC;
- 
--	/* sg may be required by async crypto */
--	ovpn_skb_cb(skb)->sg = kmalloc(sizeof(*ovpn_skb_cb(skb)->sg) *
--				       (nfrags + 2), GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->sg))
-+	/* allocate temporary memory for iv, sg and req */
-+	tmp = kmalloc(ovpn_aead_crypto_tmp_size(ks->encrypt, nfrags),
-+		      GFP_ATOMIC);
-+	if (unlikely(!tmp))
- 		return -ENOMEM;
- 
--	sg = ovpn_skb_cb(skb)->sg;
-+	ovpn_skb_cb(skb)->crypto_tmp = tmp;
-+
-+	iv = ovpn_aead_crypto_tmp_iv(ks->encrypt, tmp);
-+	req = ovpn_aead_crypto_tmp_req(ks->encrypt, iv);
-+	sg = ovpn_aead_crypto_req_sg(ks->encrypt, req);
- 
- 	/* sg table:
- 	 * 0: op, wire nonce (AD, len=OVPN_OP_SIZE_V2+OVPN_NONCE_WIRE_SIZE),
-@@ -105,13 +208,6 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(ret < 0))
- 		return ret;
- 
--	/* iv may be required by async crypto */
--	ovpn_skb_cb(skb)->iv = kmalloc(OVPN_NONCE_SIZE, GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->iv))
--		return -ENOMEM;
--
--	iv = ovpn_skb_cb(skb)->iv;
--
- 	/* concat 4 bytes packet id and 8 bytes nonce tail into 12 bytes
- 	 * nonce
- 	 */
-@@ -130,12 +226,6 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	/* AEAD Additional data */
- 	sg_set_buf(sg, skb->data, OVPN_AAD_SIZE);
- 
--	req = aead_request_alloc(ks->encrypt, GFP_ATOMIC);
--	if (unlikely(!req))
--		return -ENOMEM;
--
--	ovpn_skb_cb(skb)->req = req;
--
- 	/* setup async crypto operation */
- 	aead_request_set_tfm(req, ks->encrypt);
- 	aead_request_set_callback(req, 0, ovpn_encrypt_post, skb);
-@@ -156,6 +246,7 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	struct aead_request *req;
- 	struct sk_buff *trailer;
- 	struct scatterlist *sg;
-+	void *tmp;
- 	u8 *iv;
- 
- 	payload_offset = OVPN_AAD_SIZE + tag_size;
-@@ -184,13 +275,17 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	if (unlikely(nfrags + 2 > (MAX_SKB_FRAGS + 2)))
- 		return -ENOSPC;
- 
--	/* sg may be required by async crypto */
--	ovpn_skb_cb(skb)->sg = kmalloc(sizeof(*ovpn_skb_cb(skb)->sg) *
--				       (nfrags + 2), GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->sg))
-+	/* allocate temporary memory for iv, sg and req */
-+	tmp = kmalloc(ovpn_aead_crypto_tmp_size(ks->decrypt, nfrags),
-+		      GFP_ATOMIC);
-+	if (unlikely(!tmp))
- 		return -ENOMEM;
- 
--	sg = ovpn_skb_cb(skb)->sg;
-+	ovpn_skb_cb(skb)->crypto_tmp = tmp;
-+
-+	iv = ovpn_aead_crypto_tmp_iv(ks->decrypt, tmp);
-+	req = ovpn_aead_crypto_tmp_req(ks->decrypt, iv);
-+	sg = ovpn_aead_crypto_req_sg(ks->decrypt, req);
- 
- 	/* sg table:
- 	 * 0: op, wire nonce (AD, len=OVPN_OPCODE_SIZE+OVPN_NONCE_WIRE_SIZE),
-@@ -213,24 +308,11 @@ int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
- 	/* append auth_tag onto scatterlist */
- 	sg_set_buf(sg + ret + 1, skb->data + OVPN_AAD_SIZE, tag_size);
- 
--	/* iv may be required by async crypto */
--	ovpn_skb_cb(skb)->iv = kmalloc(OVPN_NONCE_SIZE, GFP_ATOMIC);
--	if (unlikely(!ovpn_skb_cb(skb)->iv))
--		return -ENOMEM;
--
--	iv = ovpn_skb_cb(skb)->iv;
--
- 	/* copy nonce into IV buffer */
- 	memcpy(iv, skb->data + OVPN_OPCODE_SIZE, OVPN_NONCE_WIRE_SIZE);
- 	memcpy(iv + OVPN_NONCE_WIRE_SIZE, ks->nonce_tail_recv,
- 	       OVPN_NONCE_TAIL_SIZE);
- 
--	req = aead_request_alloc(ks->decrypt, GFP_ATOMIC);
--	if (unlikely(!req))
--		return -ENOMEM;
--
--	ovpn_skb_cb(skb)->req = req;
--
- 	/* setup async crypto operation */
- 	aead_request_set_tfm(req, ks->decrypt);
- 	aead_request_set_callback(req, 0, ovpn_decrypt_post, skb);
-@@ -273,7 +355,11 @@ static struct crypto_aead *ovpn_aead_init(const char *title,
- 		goto error;
- 	}
- 
--	/* basic AEAD assumption */
-+	/* basic AEAD assumption
-+	 * all current algorithms use OVPN_NONCE_SIZE.
-+	 * ovpn_aead_crypto_tmp_size and ovpn_aead_encrypt/decrypt
-+	 * expect this.
-+	 */
- 	if (crypto_aead_ivsize(aead) != OVPN_NONCE_SIZE) {
- 		pr_err("%s IV size must be %d\n", title, OVPN_NONCE_SIZE);
- 		ret = -EINVAL;
-diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-index 955c9a37e1f8..db43a1f8a07a 100644
---- a/drivers/net/ovpn/io.c
-+++ b/drivers/net/ovpn/io.c
-@@ -119,9 +119,7 @@ void ovpn_decrypt_post(void *data, int ret)
- 	peer = ovpn_skb_cb(skb)->peer;
- 
- 	/* crypto is done, cleanup skb CB and its members */
--	kfree(ovpn_skb_cb(skb)->iv);
--	kfree(ovpn_skb_cb(skb)->sg);
--	aead_request_free(ovpn_skb_cb(skb)->req);
-+	kfree(ovpn_skb_cb(skb)->crypto_tmp);
- 
- 	if (unlikely(ret < 0))
- 		goto drop;
-@@ -248,9 +246,7 @@ void ovpn_encrypt_post(void *data, int ret)
- 	peer = ovpn_skb_cb(skb)->peer;
- 
- 	/* crypto is done, cleanup skb CB and its members */
--	kfree(ovpn_skb_cb(skb)->iv);
--	kfree(ovpn_skb_cb(skb)->sg);
--	aead_request_free(ovpn_skb_cb(skb)->req);
-+	kfree(ovpn_skb_cb(skb)->crypto_tmp);
- 
- 	if (unlikely(ret == -ERANGE)) {
- 		/* we ran out of IVs and we must kill the key as it can't be
-diff --git a/drivers/net/ovpn/skb.h b/drivers/net/ovpn/skb.h
-index 64430880f1da..4fb7ea025426 100644
---- a/drivers/net/ovpn/skb.h
-+++ b/drivers/net/ovpn/skb.h
-@@ -18,12 +18,19 @@
- #include <linux/socket.h>
- #include <linux/types.h>
- 
-+/**
-+ * struct ovpn_cb - ovpn skb control block
-+ * @peer: the peer this skb was received from/sent to
-+ * @ks: the crypto key slot used to encrypt/decrypt this skb
-+ * @crypto_tmp: pointer to temporary memory used for crypto operations
-+ *		containing the IV, the scatter gather list and the aead request
-+ * @payload_offset: offset in the skb where the payload starts
-+ * @nosignal: whether this skb should be sent with the MSG_NOSIGNAL flag (TCP)
-+ */
- struct ovpn_cb {
- 	struct ovpn_peer *peer;
- 	struct ovpn_crypto_key_slot *ks;
--	struct aead_request *req;
--	struct scatterlist *sg;
--	u8 *iv;
-+	void *crypto_tmp;
- 	unsigned int payload_offset;
- 	bool nosignal;
- };
--- 
-2.52.0
-
+Thanks.
 
