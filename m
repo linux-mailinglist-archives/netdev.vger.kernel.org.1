@@ -1,127 +1,171 @@
-Return-Path: <netdev+bounces-263546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263548-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMWDIkeTp2meiQAAu9opvQ
-	(envelope-from <netdev+bounces-263546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:04:55 +0100
+	id ECdFM62Up2mqiQAAu9opvQ
+	(envelope-from <netdev+bounces-263548-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:10:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3522E1F9C49
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7541F9C92
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 916893055419
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 02:04:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC61030528AE
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 02:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA7C2405E7;
-	Wed,  4 Mar 2026 02:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DA25A359;
+	Wed,  4 Mar 2026 02:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="psLq4C/c"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-217.mail.aliyun.com (out28-217.mail.aliyun.com [115.124.28.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5BB1F0995;
-	Wed,  4 Mar 2026 02:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.217
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772589874; cv=none; b=Z8dFoglEvfdcq+T9zLJCl0VAvLwq0k4G3Ibq2DMCH1haYl0KWnTaXtBwSMfj6hc4q2IOIgtP4P3NSxi8NW4sFyQq0d/DwJnW3nFkGLxGs8Ao4IKfXiEdzRYRPCXb1/54mQRjZ8V0beQrVxvaSBRJFgn40mfuGjDQKxLjhyT5Rgg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772589874; c=relaxed/simple;
-	bh=ybml9HInb4+o4VrF6ndpG1Umf4zPo60hG3kil2zXiiY=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
-	 In-Reply-To:Content-Type; b=iOkmSz/SB27VZ9/+mgo9dmRr7Amfp8nufdsoetaMzKd3tVa4l7CXG8l4GXnasm3npCfxSKsGwjCRPnZC5KQZBBJ3dhOAPLOAiZ37dfCpdMyIn3qQRbDa9la58g7twX7ZuA7CLSVeslySMNIYhIqFcPcyESjjNWMaQxZeJntx5ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07844513|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0096324-0.000205348-0.990162;FP=13633870077576090782|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033065182171;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DW;RN=16;RT=16;SR=0;TI=W4_0.2.3_21202854_1772589537699_o7001c48e;
-Received: from WS-web (Illusion.Wang@nebula-matrix.com[W4_0.2.3_21202854_1772589537699_o7001c48e] cluster:ay29) at Wed, 04 Mar 2026 10:04:18 +0800
-Date: Wed, 04 Mar 2026 10:04:18 +0800
-From: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: "Dimon" <dimon.zhao@nebula-matrix.com>,
-  "Alvin" <alvin.wang@nebula-matrix.com>,
-  "Sam" <sam.chen@nebula-matrix.com>,
-  "netdev" <netdev@vger.kernel.org>,
-  "andrew+netdev" <andrew+netdev@lunn.ch>,
-  "corbet" <corbet@lwn.net>,
-  "kuba" <kuba@kernel.org>,
-  "linux-doc" <linux-doc@vger.kernel.org>,
-  "lorenzo" <lorenzo@kernel.org>,
-  "pabeni" <pabeni@redhat.com>,
-  "horms" <horms@kernel.org>,
-  "vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-  "lukas.bulwahn" <lukas.bulwahn@redhat.com>,
-  "edumazet" <edumazet@google.com>,
-  "open list" <linux-kernel@vger.kernel.org>
-Reply-To: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-Message-ID: <a6a6a721-46f5-4639-a78e-9911eda1e3ba.Illusion.Wang@nebula-matrix.com>
-Subject: =?UTF-8?B?5Zue5aSN77yaW1BBVENIIHY1IG5ldC1uZXh0IDA1LzExXSBuZXQvbmVidWxhLW1hdHJpeDog?=
-  =?UTF-8?B?YWRkIGNoYW5uZWwgbGF5ZXI=?=
-X-Mailer: [Alimail-Mailagent revision 1106][W4_0.2.3][null][Chrome]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF919F513
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 02:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772590213; cv=pass; b=kc4+32rlSQhK6eLJfNVF6+AuaDH4lX9Ivds0dBOze/4B09d9UYqqWWgfQngJwHNzOZAWkkk5C2RUOyLTGibiRPEsZlTFeiAfvm9/3RFs8JWpQD3faAeTq2ssM53z2QpQBBWaxI8pUd4Euto5DeRBXP72APZvsrcZX23kgp3HA2s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772590213; c=relaxed/simple;
+	bh=iFqGXl6hkZDQJhz/yG3pXP1EubzoZZcVech5ZrFSTDY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=htaXwZU/97VsO/aCMtZWr4BQKmUit5SKaqG5RbZcCgeP8l9UvSiMBhyYpgBXAeqO2W9P+/ThT4HmziYwHmdzGxQ+i+0KDCaSJH6Hvq+Fvn0rMXa7vOssCxPg8MOLo/9XFnWZxbZ+3eCsuldojCrxLpDyrf2ryY2jYcMqBXVwB0Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=psLq4C/c; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-506a355aedfso742791cf.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 18:10:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772590211; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K/oMnspaQUh1LsvMSWBfY5zY95KuEBNyzHfgcqlqRKIn7rIY6WuIBvcQge5qjXewrp
+         KTDXz9+iGaxThVEv4IA6I+cn1dWm65VuJjdCrHZ1js/iAnp4qG25TqNzIBwp6wtYIZvt
+         h68IR4FXE4e2l/1ut6TFa6HcETD4fa9Ec2tBzrsNa1GewP9+sig1ae3NUuiT1A7DDk3q
+         wsQDt/52YCJHHt3MLqivweSRIZ2i1ay3h3kbLlqwMQc7zdKKiRv1QHGD4pKzmBAR2Vfb
+         hBLyxszCZnG51Qxpe997OsfY3Vb9D7tusV8+c76rHt52ssZHh8ZBa/3xfwOv6vOifgRP
+         O9Wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iFqGXl6hkZDQJhz/yG3pXP1EubzoZZcVech5ZrFSTDY=;
+        fh=ioUQmgdPowOpJ0GAUChr4zlarMNf9wVU5l1vspxjDSU=;
+        b=Np45veKSbrKTmAkxmj7U8+XckGlW+DuvVURbHkj+Eg0bn7VN+LeYKqraNPovwnBT8y
+         QsZqCUAZxyx9Xssqz6NIxkh9EjLqLxRREjkC52pyuecyY7h9S3SoaUcUDJ40hRPvEIFH
+         wUnKP8eRFNd9Q+twZg++m/fh6Zw2s4I3+xzNNrF/X5S/ZiaJFzu8H1JGtf+hWmBrn237
+         cUTEro+KARJoRAvPClPuQxCVmgYCpnLllAlRoOEkvbAIaxUFG2x/+mwgX46i00YU6TR1
+         WrZayQBO6dAULM9UHKZLKxjQarNGplSWY5ZhebkolzOp8D40ztII21i/z3MvEj3g5VCH
+         I9Qg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772590211; x=1773195011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iFqGXl6hkZDQJhz/yG3pXP1EubzoZZcVech5ZrFSTDY=;
+        b=psLq4C/c8VMYe9Dv1Ocb7CAOhpyOTAsq1AQC1cDz6bHoPuLWw1X0moBPC+KGLyRhIp
+         VOGecd4bm81s0kvaVdStb8jAO2HxqBJvYWCyb8rbbBW+83FMowyzYmSRqa7Trq6tk5nd
+         IFvJ8zqqUPkWlq3FOhZ7EC9To4DfbXOIHYSFttfLa//P9aG/evjUdYSrqKwwbWWiX1Bq
+         h2/JCRNyOnh+BgNJs/ByrAiupx+fmDevl77TjyokI8A8g6U9+TtoFFt4NBKZy6nEMaSF
+         XXHAs4asps8hB7aBYAAeeBsieAzExMGEWT2cPp1viqGaYvsnP289/xDesBxP3O4+Gq3N
+         TVVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772590211; x=1773195011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iFqGXl6hkZDQJhz/yG3pXP1EubzoZZcVech5ZrFSTDY=;
+        b=OMMHOJ9qKP6wmuXEsrP+YrGfRzXUh1klWPTTCK6SmZzDnLjDt5RhFMED3ybKL9gVfw
+         zy8SNaCEZlYGPXwqt6dVsTr/52EuaUgxFrUNv8V11MDy4Ms6HZ7WXSbj/0PjLixPgGMA
+         Bqh7UG1joctQNgzwSNUM6Ia4N3YuYKdm8Xgs5QEaw/DEesp0U8HuPfQDmNpAS++NFNsO
+         zKtHXVX4Qe38qR0+HsAkXYqT6tEvFNobWo9kBT+1BSLKeMVsWJh7juD+IgkdvePfSwjZ
+         gJhtVlsoFeyu87zpG/4RPwG3+IYakeH7xYV1NUdyLV2Ryw+iETLytvss3dtJqwaRFaOj
+         RYeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMiSJ4aa6Z1tzWIwfVwnAoqchh8IJ2dTWTergqI6EDb8zYumhISuKi7cNRo9nQ7+G7LrWoFfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6noHyr0eQCEJTw1OCUzY/CFIjmT1K/WrBPfMigHIX6MofvyfP
+	J2wTOp1XAsDxBdZuG7VXGvWS8jNIU6rdsei7moilGKPhOE8a7AlZDdy1W7hgt0BpKi73blWCbFY
+	QC1Atx1qpBmj3OH3TFSNKbdLfY47yjV1JIP/Tk6X7
+X-Gm-Gg: ATEYQzxnWSfyviu9GZFfODB/d/9jtHKgeLV1nKhRrPyZgMEfoC9Ag/oghDiPlwLf3nm
+	wDtnVImcHl2GJDaKivhGFZcEORB9gktwVP+IBDEhU4MMDpZmlKU1Ybpsoj7bRwgb9v+R9C1bqog
+	XrzPmCI2Q/ZNFSsenURDuFMiXMq2zb41vGrhonMt3RX9V8x6CBnMDxXd/wpoEa2RsfxmE5RetAA
+	C/NJ0gAjrHyp+N247V96f0yYNFinBTSXeH3fV6qgw8wgfLhQ+QXOiSGPpWv2G/Ds85S0TWbd86Y
+	McNmdVyqS4jz29M70zECvqDNCOKjinDrMe5IRjpy3685cLXe/wxWNT0nMNLhA+zHgdss
+X-Received: by 2002:a05:622a:106:b0:506:6ff1:fce with SMTP id
+ d75a77b69052e-5075fd1d5c6mr46761801cf.2.1772590210251; Tue, 03 Mar 2026
+ 18:10:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-x-aliyun-im-through: {"version":"v1.0"}
-References: <20260226073840.3222-1-illusion.wang@nebula-matrix.com> <20260226073840.3222-6-illusion.wang@nebula-matrix.com>,<a3cd8ff5-7545-44a8-96ac-cf7f773df66e@lunn.ch>
-x-aliyun-mail-creator: W4_0.2.3_null_EuMTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMy4wLjY5NDMuMTQyIFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoOC4yLjE1LVJlbGVhc2UuMjYwMjI1MDAxKSBNb2pvLzEuMC4wIE5hdGl2ZSBBcHBUeXBlKHJlbGVhc2UpIENoYW5uZWwvMjAxMjAwIEFyY2hpdGVjdHVyZS94ODZfNjQgd2ViRHQvUEM=uL
-In-Reply-To: <a3cd8ff5-7545-44a8-96ac-cf7f773df66e@lunn.ch>
+References: <20260304015640.961780-1-edumazet@google.com>
+In-Reply-To: <20260304015640.961780-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 3 Mar 2026 18:09:53 -0800
+X-Gm-Features: AaiRm522wqHqE8RyVNC1oj1WMWgAYIrDumqJG7sNsjSMcDYzUEcf_4T597YwK0I
+Message-ID: <CADVnQyn30yeYsdu03Nw2037Vp=9+qY2G4yf1PSLD7JbgwoA-tA@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: sch_fq: clear q->band_pkt_count[] in fq_reset()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-X-Rspamd-Queue-Id: 3522E1F9C49
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3C7541F9C92
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nebula-matrix.com:replyto,nebula-matrix.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[Illusion.Wang@nebula-matrix.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Illusion.Wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263546-lists,netdev=lfdr.de];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-263548-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	REPLYTO_EQ_FROM(0.00)[]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-PiA+ICsjZGVmaW5lIE5CTF9DSEFOX1RYX1JJTkdfVE9fREVTQyh0eF9yaW5nLCBpKSBcCj4gPiAr
-ICgmKCgoc3RydWN0IG5ibF9jaGFuX3R4X2Rlc2MgKikoKHR4X3JpbmcpLT4gPmRlc2MpKVtpXSkp
-Cj4gPiArI2RlZmluZSBOQkxfQ0hBTl9SWF9SSU5HX1RPX0RFU0MocnhfcmluZywgaSkgXAo+ID4g
-KyAoJigoKHN0cnVjdCBuYmxfY2hhbl9yeF9kZXNjICopKChyeF9yaW5nKS0+ID5kZXNjKSlbaV0p
-KQoKPkFyZSB0aGUgY2FzdHMgbmVlZGVkIGhlcmU/Cgo+ID4gK3N0cnVjdCBuYmxfY2hhbl90eF9k
-ZXNjIHsKPiA+ICsgdTE2IGZsYWdzOwo+ID4gKyB1MTYgc3JjaWQ7Cj4gPiArIHUxNiBkc3RpZDsK
-PiA+ICsgdTE2IGRhdGFfbGVuOwoKPiA+ICsgdTE2IGJ1Zl9sZW47Cgo+ID4gKyB1NjQgYnVmX2Fk
-ZHI7Cj4gPiArIHUxNiBtc2dfdHlwZTsKPiA+ICsgdTggZGF0YVsxNl07Cj4gPiArIHUxNiBtc2dp
-ZDsKPiA+ICsgdTggcnN2WzI2XTsKPiA+ICt9IF9fcGFja2VkOwoKPlRoaXMgaXMgYSBoYXJkd2Fy
-ZSBkZXNjcmlwdG9yPyBJdCBpcyBhY3R1YWxseSBpbiBtZW1vcnkgbGlrZSB0aGlzLAo+d2l0aCB0
-aGUgdTY0IGJ1Zl9hZGRyIGJhZGx5IGFsaWduZWQ/IFdoYXQgd2FzIHRoZSBoYXJkd2FyZSBlbmdp
-bmVlcgo+dGhpbmtpbmc/IEp1c3Qgc3dhcHBpbmcgYnVmX2FkZHIgYW5kIGJ1Zl9sZW4gd291bGQg
-b2YgbWFkZSBpdCBhIGxvdAo+YmV0dGVyLgoKPiA+ICtzdHJ1Y3QgbmJsX2NoYW5fcnhfZGVzYyB7
-Cj4gPiArIHUxNiBmbGFnczsKPiA+ICsgdTMyIGJ1Zl9sZW47Cj4gPiArIHUxNiBidWZfaWQ7Cj4g
-PiArIHU2NCBidWZfYWRkcjsKPiA+ICt9IF9fcGFja2VkOwoKPlNpbWlsYXJseSBiYWRseSBkZXNp
-Z25lZC4KClRoYW5rIHlvdSBmb3IgeW91ciBmZWVkYmFjay4KU2luY2UgbmJsX2NoYW5fcmluZy0+
-ZGVzYyBpcyBhIHZvaWQgKiwgY2FzdGluZyBpcyByZXF1aXJlZCBmb3IgZGlmZmVyZW50IHNjZW5h
-cmlvcy4KVGhlIGRlc2lnbiBvZiBuYmxfY2hhbl90eF9kZXNjL25ibF9jaGFuX3J4X2Rlc2MgaXMg
-aW5kZWVkIHBvb3IsIGJ1dCB0aGUgY2hpcCBoYXMKYWxyZWFkeSBiZWVuIHRhcGVkIG91dCAoaS5l
-LiwgbWFudWZhY3R1cmVkKS4gV2UgaGF2ZSByZWNvZ25pemVkIHRoaXMgaXNzdWUgYW5kCmhhdmUg
-Y29ycmVjdGVkIGl0IGluIHRoZSBuZXh0LWdlbmVyYXRpb24gY2hpcC4KCi0taWxsdXNpb24ud2Fu
-Zw==
+On Tue, Mar 3, 2026 at 5:56=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> When/if a NIC resets, queues are deactivated by dev_deactivate_many(),
+> then reactivated when the reset operation completes.
+>
+> fq_reset() removes all the skbs from various queues.
+>
+> If we do not clear q->band_pkt_count[], these counters keep growing
+> and can eventually reach sch->limit, preventing new packets to be queued.
+>
+> Many thanks to Praveen for discovering the root cause.
+>
+> Fixes: 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR scheduling")
+> Diagnosed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> ---
+
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
+
+Thanks, Eric and Praveen!
+
+neal
 
