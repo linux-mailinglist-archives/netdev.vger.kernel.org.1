@@ -1,154 +1,235 @@
-Return-Path: <netdev+bounces-263953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yM6GD2JtqGn9uQAAu9opvQ
-	(envelope-from <netdev+bounces-263953-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:35:30 +0100
+	id MO5CAzVvqGkkugAAu9opvQ
+	(envelope-from <netdev+bounces-263954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:43:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2884A20536A
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:35:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846A5205563
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E900F30234F7
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 17:35:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4FF1E3003730
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 17:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63603C3C15;
-	Wed,  4 Mar 2026 17:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5E43890F3;
+	Wed,  4 Mar 2026 17:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p3gRyRbA"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kr93UXMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846C03C2796;
-	Wed,  4 Mar 2026 17:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC3337CD50;
+	Wed,  4 Mar 2026 17:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772645722; cv=none; b=QBvN4aZSi8lBnDNKGAnHGMdR7OmD2clz4+49CPJfb2jB0wTRn8HQgFYR7yovOSdiuEf4u9zwCE+3dWx1mzn+Rb+tag6/mO4BUJ4Bkv+eXuxlw/CuRj6ZlR29PZTTygZqCvQVKIwLkWZH/n7lpVGx2nTrCQro8GdaSrP974lg2bU=
+	t=1772645878; cv=none; b=LK687KLfL56B+8JLQ4QzQjWs1JPjN+J5NM0wyEoHdvbTwuG+BDmGt3KfJ4I1AGXJG+EDpFXQ089g/nnzzRU5uIkipM0B1LwadZZCBjL1Q2D3WR0n7OOaBGPzGddfnIbiGqqf6te9LSqzmt1MrELCNIu7yQ0+DI96XaS3ea9PvWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772645722; c=relaxed/simple;
-	bh=G9vyc/ilKI+19PmiBHaHsKJ89Xu7vIMfI3QiSI5VErY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qrh2JJAaZezbUVr81myQ6njNg/NWr4lbFIZQ5mE/jpl2cawZ89z/lIp8IgcYT/o9qGWFwPulL1RlMkmZ7Rtp7OI9vaZoO5cQMGlhNDQegsD4cwGIbEzhKmIhtBPbJDbjL0sDL9lyC35acKySSr9CEwL80frdEgqF1koGN0w3Dtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p3gRyRbA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 829B1C4CEF7;
-	Wed,  4 Mar 2026 17:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772645722;
-	bh=G9vyc/ilKI+19PmiBHaHsKJ89Xu7vIMfI3QiSI5VErY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=p3gRyRbAmt88QYW+qJdvWj5qtD8qosiS8iWmV/39WnJFzuC4DFAe3Tyh3mY5h74qn
-	 7FInoYzEWeFQ7CY8OwV54MEwdqBRVWYnNQjTVdnKRUwBSziNDWA8ecqaRvzzK/Ff90
-	 NfHNcwk1I3PM4D715Ch9BaVnphe1VPolSNNw/U/tzszjymiQfwM4YNdTcdbZC7y810
-	 7RYshqucnV1ca7eqd5+alsDV7oBEf6j/gB6X5uQ0hYuTexFE8Xvio9sCPsXsInNbYo
-	 9ZA6X79vEceTQn8vjICVOHvGoStAFiT1AZGx6edtfTQ2DKM/24xYE+6Yy8QIDT5o5s
-	 kOKClwu9c5Q9w==
-Message-ID: <f00b1812-a27f-49db-9277-6697af098248@kernel.org>
-Date: Wed, 4 Mar 2026 09:35:19 -0800
+	s=arc-20240116; t=1772645878; c=relaxed/simple;
+	bh=u0FL7n3o5OqNavd4ndHJcVM7ITc0E6s2IOEChl2PixE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d1WEUHu+jYiu2v85RV8fF34z+bQ0Sqz6dlk6B9n69/AZguyo5efzZNxZRM1MM4IRZPQju3VgtiORURIcPYf9gkxv1PHBVWHZhMDlteJicylNknelNol6csKqNXaZSAsOFJ8C1rls11Xsl1R7pfUpJDhxklYU89j/YtfRsimSDU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kr93UXMK; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1772645876; x=1804181876;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=u0FL7n3o5OqNavd4ndHJcVM7ITc0E6s2IOEChl2PixE=;
+  b=kr93UXMKNs5Guutxi8SfVw98ctD6ju5OTSQWMc26ZkehjZF1HqEJVKP7
+   RUenA2ie99vIf32di2JY/KKHChWUewSnGHKAg4ztGkPBN7rdsrXgpgZmx
+   a3RpCw486MhKCOq+5brNAOMO7ibAYmMl34B/l4X5A5+oABs9zWkABNzV7
+   6OgTxwO7z1DqIqrEhC4NHacicWYDzIoTYbcb1d5nHbfWUA19G6jxQYb/W
+   YY0BUymsZnnri3PtVYR2rcGH2LAALmzJFlDMch1pDbUX4XRCOrlEoJvPy
+   Ea1wAWKXPuoj7zF8gf5XzTugjMSB0ItcXE7qsCYRvhqRct7ZM8DEpP83I
+   g==;
+X-CSE-ConnectionGUID: SHXOS1CLR9CzaeSnJnbHlA==
+X-CSE-MsgGUID: VXuQEQMITaO7HRdDdsHnjg==
+X-IronPort-AV: E=Sophos;i="6.21,324,1763449200"; 
+   d="scan'208";a="54654667"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:37:56 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Wed, 4 Mar 2026 10:37:25 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Wed, 4 Mar 2026 10:37:25 -0700
+Date: Wed, 4 Mar 2026 09:37:23 -0800
+From: Charles Perry <charles.perry@microchip.com>
+To: Conor Dooley <conor@kernel.org>
+CC: <netdev@vger.kernel.org>, Sean Anderson <sean.anderson@linux.dev>,
+	"Nicolas Ferre" <nicolas.ferre@microchip.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King
+	<linux@armlinux.org.uk>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260224202854.112813-1-charles.perry@microchip.com>
+ <20260224202854.112813-2-charles.perry@microchip.com>
+ <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
+ <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
+ <20260304-unvented-crinkle-37f0bfd03541@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/14] arc: axs10x: drop unneeded dependency on OF_GPIO
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Alexey Brodkin <abrodkin@synopsys.com>, Vineet Gupta <vgupta@kernel.org>,
- Scott Wood <oss@buserror.net>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Dvorkin Dmitry <dvorkin@tibbo.com>, Wells Lu <wellslutw@gmail.com>,
- Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
- Guenter Roeck <linux@roeck-us.net>, Wim Van Sebroeck
- <wim@linux-watchdog.org>, Mauro Carvalho Chehab <mchehab@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sebastian Reichel <sre@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-amlogic@lists.infradead.org, linux-leds@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-pm@vger.kernel.org
-References: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com>
- <20260304-gpio-of-kconfig-v1-2-d597916e79e7@oss.qualcomm.com>
-From: Vineet Gupta <vgupta@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20260304-gpio-of-kconfig-v1-2-d597916e79e7@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2884A20536A
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260304-unvented-crinkle-37f0bfd03541@spud>
+X-Rspamd-Queue-Id: 846A5205563
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263953-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,arm.com,kernel.org,synopsys.com,buserror.net,linux.ibm.com,ellerman.id.au,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,baylibre.com,googlemail.com,tibbo.com,roeck-us.net,linux-watchdog.org,linuxfoundation.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263954-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vgupta@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bby-cbu-swbuild03.eng.microchip.com:mid]
 X-Rspamd-Action: no action
 
+On Wed, Mar 04, 2026 at 04:23:30PM +0000, Conor Dooley wrote:
+> On Wed, Mar 04, 2026 at 06:59:35AM -0800, Charles Perry wrote:
+> > On Wed, Mar 04, 2026 at 11:15:43AM +0000, Conor Dooley wrote:
+> > > On Tue, Feb 24, 2026 at 12:28:52PM -0800, Charles Perry wrote:
+> > > > Make it possible to connect a PHY which does not use inband
+> > > > autoneg to a gem MAC using phylink's information.
+> > > > 
+> > > > The previous implementation relied on whether or not the link
+> > > > was a fixed-link to disable SGMII autoneg. This commit extend
+> > > > this to all link which are not configured for inband
+> > > > autonegotiation.
+> > > > 
+> > > > Signed-off-by: Charles Perry <charles.perry@microchip.com>
+> > > 
+> > > This breaks the macb on mpfs-icicle-kit, I get stuck with:
+> > > 
+> > > [    7.189102] mpfs-sys-controller syscontroller: Registered MPFS system controller
+> > > [    7.260946] macb 20110000.ethernet eth0: PHY [20112000.ethernet-ffffffff:08] driver [Vitesse VSC8662] (irq=POLL)
+> > > [    7.273881] macb 20110000.ethernet eth0: configuring for phy/sgmii link mode
+> > > [    7.296580] macb 20110000.ethernet: gem-ptp-timer ptp clock registered.
+> > > [    7.345782] macb 20112000.ethernet eth1: PHY [20112000.ethernet-ffffffff:09] driver [Vitesse VSC8662] (irq=POLL)
+> > > [    7.358082] macb 20112000.ethernet eth1: configuring for phy/sgmii link mode
+> > > [    7.380479] macb 20112000.ethernet: gem-ptp-timer ptp clock registered.
+> > > [   11.376763] macb 20110000.ethernet eth0: Link is Up - 1Gbps/Full - flow control off
+> > > [   11.398403] Sending DHCP requests .
+> > > [   11.472699] macb 20112000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+> > > [   13.938425] ..... timed out!
+> > > [   93.598491] macb 20110000.ethernet eth0: Link is Down
+> > > [   93.641823] macb 20110000.ethernet: gem-ptp-timer ptp clock unregistered.
+> > > [   93.659433] macb 20112000.ethernet eth1: Link is Down
+> > > [   93.691724] macb 20112000.ethernet: gem-ptp-timer ptp clock unregistered.
+> > > [   93.703977] IP-Config: Retrying forever (NFS root)...
+> > > [   93.758382] macb 20110000.ethernet eth0: PHY [20112000.ethernet-ffffffff:08] driver [Vitesse VSC8662] (irq=POLL)
+> > > [   93.770655] macb 20110000.ethernet eth0: configuring for phy/sgmii link mode
+> > > [   93.786497] macb 20110000.ethernet eth0: Link is Up - 1Gbps/Full - flow control off
+> > > [   93.795840] macb 20110000.ethernet: gem-ptp-timer ptp clock registered.
+> > > [   93.844481] macb 20112000.ethernet eth1: PHY [20112000.ethernet-ffffffff:09] driver [Vitesse VSC8662] (irq=POLL)
+> > > [   93.856769] macb 20112000.ethernet eth1: configuring for phy/sgmii link mode
+> > > [   93.870926] macb 20112000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+> > > [   93.880302] macb 20112000.ethernet: gem-ptp-timer ptp clock registered.
+> > > 
+> > 
+> > Hello Conor,
+> > 
+> > I checked the driver for the VSC8662 and it doesn't have the
+> > ->inband_caps() and ->config_inband() callbacks so Linux leaves whatever
+> > the bootloader puts or uses the defaults. Looking at the datasheet, this
+> > should be register 23 (Extended PHY Control Set 1) bit 13 (MAC interface
+> > auto-negotiation)
+> > 
+> > My guess is that this bit is set and since this patch disable inband
+> > autonegotiation (because phylink decides it), there is a mismatch.
+> > 
+> > Can you add 'managed = "in-band-status"' in your device tree under the macb
+> > node? That's not necessarily the fix, I just want to confirm my theory.
+> 
+> No, it just produces a different error:
+> [    5.769864] mpfs-sys-controller syscontroller: Registered MPFS system controller
+> [    5.829146] macb 20110000.ethernet eth0: Could not attach PHY (-19)
+> [    5.854232] IP-Config: Failed to open eth0
+> [    5.897152] macb 20112000.ethernet eth1: Could not attach PHY (-19)
+> [    5.921061] IP-Config: Failed to open eth1
+> [    5.925592] IP-Config: No network devices available
+> [    5.938800] clk: Disabling unused clocks
+> [    5.944156] PM: genpd: Disabling unused power domains
+> [    5.961029] check access for rdinit=/usr/sbin/init failed: -2, ignoring
+> 
+> > Also '#define DEBUG' in 'drivers/net/phy/phylink.c' can help if you can
+> > recompile your kernel.
+> 
+> Setting this provided no further logs, seemingly.
+> 
+> Adding some basic prints shows that the driver changed the state of the
+> PCSCNTRL register from 0x1040 to 0x40, so it disabled auto neg. The
+> driver previously left it as it was, 0x1040 before and 0x1040 after.
+> 
+
+Thank you for this info.
+
+Are you able to check register 23, bit 13 of your PHY by any chance? Maybe
+with the mdio/mii commands in U-Boot if you have that.
+
+> > > and because I am NFS root, it breaks boot :)
+> > > 
+> > > btw, I don't see an explanation in hte commit message for why the
+> > > macb_is_gem(bp) got dropped? Is this now done unconditionally when it
+> > > was conditional before?
+> > > 
+> > 
+> > Well if you get to the ->macb_pcs_config() callback, you most certainly
+> > have an SGMII PCS block. Does your IP have the PCS registers? (0x200 to
+> > 0x23c) Also I thought that macb doesn't do SGMII (only GEM does) so it
+> > can't reach ->macb_pcs_config(). 
+> 
+> When I said "macb on" I meant to say "macb driver on", but omitted the
+> word. Unfortunately, the idiot who added the original mpfs compatible,
+> because the platform was using the "cdns,macb" compatible rather than a
+> soc-specific one, did not check if the platform was actually a macb
+> before doing so, and trusted the original dts author. This is actually a
+> gem.
+
+Ok, well I think its correct to remove the macb_is_gem() check in
+macb_pcs_config() because if we get to that function, SGMII was picked and
+macb doesn't have SGMII. Furthermore, __set_bit(PHY_INTERFACE_MODE_SGMII
+...) is guarded by a macb_is_gem() so even if someone puts 'phy-mode =
+"sgmii"' in their macb device tree, we shouldn't get there.
+
+Agreed that this should have been documented in the commit message.
+
+Regards,
+Charles
 
 
-On 3/4/26 1:02 AM, Bartosz Golaszewski wrote:
-> OF_GPIO is automatically enabled on all OF systems. There's no need to
-> select it explicitly.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  arch/arc/plat-axs10x/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/arc/plat-axs10x/Kconfig b/arch/arc/plat-axs10x/Kconfig
-> index b9652c69d1b90e506f82b3b8c5be373c51246671..40f2a74d404ad9759ab9d6764c2496159eea045a 100644
-> --- a/arch/arc/plat-axs10x/Kconfig
-> +++ b/arch/arc/plat-axs10x/Kconfig
-> @@ -7,7 +7,6 @@ menuconfig ARC_PLAT_AXS10X
->  	bool "Synopsys ARC AXS10x Software Development Platforms"
->  	select DW_APB_ICTL
->  	select GPIO_DWAPB
-> -	select OF_GPIO
->  	select HAVE_PCI
->  	select GENERIC_IRQ_CHIP
->  	select GPIOLIB
-
-Acked-by: Vineet Gupta <vgupta@kernel.org>
-
-Thx and apologies for the delay in getting to it.
-
-Cheers,
--Vineet
 
