@@ -1,203 +1,188 @@
-Return-Path: <netdev+bounces-263895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gB2tLadZqGlxtgAAu9opvQ
-	(envelope-from <netdev+bounces-263895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:11:19 +0100
+	id kDtZHOBcqGmZtgAAu9opvQ
+	(envelope-from <netdev+bounces-263897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F1B203DF9
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:11:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99352042D4
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1D71C306B056
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 15:59:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09E6031D1765
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A6F35B65D;
-	Wed,  4 Mar 2026 15:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF04E199FBA;
+	Wed,  4 Mar 2026 16:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="bCl7mpAT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VaD8vMyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C83222585
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 15:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772639953; cv=none; b=PPq0p5qFaHnQbyXsWLxnl1zaWsr6BbqhCfoUjOJnaBABzVfVFsG+nlSdm5UDKZaDKj4UV7ih29+kOc5xdwh/NXXt39OHyJdBLIvurlk7lEuEKYHOkSkyLYa9qW4fLiVJoYTW0ixU6OFJ8bF2OS6kwkBCc7Pl4XiM3kzRd5Sl3xA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772639953; c=relaxed/simple;
-	bh=sRkO7eLIQ3gUqOEx4ySJKyymRH2K2LfoKGh++9p0oBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHQZr1MCeuKwdWS6EZQqCNd5KjaSTRCSpZMXkdDrH4XynJ1cnXCjgUgXzuwu/yCIhxm9kSGvoxfZ68fofzhyQsO/U1p47TeV5KqRoTcgnqvAD0dvyhiPw660GH8/JEri1rnlGF8YxKoaYqqjWmnHWIw7Ne6/XMZgICnnEhv6gEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=bCl7mpAT; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso58829185e9.1
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 07:59:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C9230FC26
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772640015; cv=pass; b=VwjgLv5gQzDQgLb7tQG5gQaPvS0y81KLndAj6nHDXEqQuOUyh0Zo4MmS6X/NOarHg0DuqmWSZQ+84AEHiJw/jB+PkWEEhxvARCE+BHJOPPiFVF14ihOlrSS40l0RalOMlhMGV15Balp0c6QFAwabRqTL1ciR1h6LcytIc1BUir8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772640015; c=relaxed/simple;
+	bh=rI1GyFyPrXzA+/a7clGqi3FniatUTe9TjanGamzeT1c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r+JUB8XPGTjZoCXqGwhHWqIh1GeUTNwCDgGeu3hXY7aNZ85XPTW9RtDBBm6LSQowW1i7AQjHMNZMy5tD5wUZB3+rMXA/URyrwCQl46hw7H73xUQmkKzPztTdRWiuzSnrI+oEVVF7clRbL5ll2juQo+U2K/ja6piQAK4de1csqp4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VaD8vMyF; arc=pass smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8cb3825b0fbso677793085a.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:00:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772640013; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X9BcHdeAh1Xy5Z0DpgqAcx+ANGX2znoQbla2WM7BgJeY/f9NuOZbxo211qmZqVWpfo
+         uuMP5dAqicjakdUSXECJh7167JDQZyHusxrNxuMu2eTzpvzd5n+E2j6ac4uSQPpbUBZ+
+         thDyRD2ZXRfRlmtBHUoDGmrVclEyW5/szcUrlz5+K5nuyWtZVRwfVbIGi9Cml7DhChzL
+         Rf6stzh7iWJJLVBICpcpEvG4X3vYUpa/1xtM9DVLIFhLy2RzHmRmMJcexxi2cXCAKb3y
+         5by3xliWHsLqxZFaYPsQBlPAsF4uMcqbFn8bq7y1YYOSMVN6OHZIhmGnGF3FYMAeNDQ4
+         rjyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
+        fh=GDCqGVd+gGKqSibXF3Hjf6G6XtLT97S7PZsiYhvbiM8=;
+        b=ejeZ0ggQRJcquonkGhgyYzBJPocOSkWIlljf/uOhkux+efEMm2Txk7UfpBy7bys7BJ
+         BrHhvsdnw3a+m3QljNMc/dXxni2rUXXo5h7lbCahQ921Ut7L/043vlJYEVT3Q9Mqrq56
+         BJKDLXBwZBoglkUCb+1WNxjB8abW3rFMOsokzFKl9FvzVPKoqGNffUtRWujCdjzSRQBY
+         lgCC3Sd/OQqtLyHa1sMgTPQYKLgNWpTVM8QYsDr81qMtXya8sB92PCweKLLnJbXiClw8
+         DXDvH0qfnATfyNi5hw2MpDEQHhry+lJfUts8cTXGtHYc20whfMG7eoIH73GfrR5RH56Z
+         OVtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1772639949; x=1773244749; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HOSnZzfeSc3oCHq3PRnVd2F+xX7z1Nwp9tzlqrjRhhw=;
-        b=bCl7mpATphtDitT/eSLxiEA6FtOIYGrpkTySJuJVnZiyRj41rVH10N6ylXXNJcoasi
-         JuIc2+hmQ++Ja5/gsKlcal7/XTp+xh8nfblN5go2qu2QJLQeNVnJ4NXThFznSTlyl0We
-         jTJ4oYxSdgPhhjrWcmBvZvZ/csYOhhTtSgkpX+qlwj0k1NCWQwO+2E7QrH56xXdsq3lx
-         np5cNxcuPyXHDADxhrNVpJeKRU2VR5OK2WK51Q8JeGpZsQ4q6w6DstTeKZPVYN6G7lv8
-         cJdfsXJRot7b8jyykENAjFS3lFAIvPoMCDLB7H1wq3p+bynF/CRsfz682RXxQEsIIGv5
-         pA2g==
+        d=google.com; s=20230601; t=1772640013; x=1773244813; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
+        b=VaD8vMyFfWiS2jJefwjzWOs62wvDFgQISEIzqVg98BoRYTfxyfS1mrqa7IUc5G6LEJ
+         GugpYDaqKG06z3uo49+HEqRvOmLWXf7mhLYAaeLKi6HSSoRH9X7I6tLBJ9dGeZozdao8
+         wfYiREDMMZ8SvQ9d3TIiy8fcWculAIc1U8YKw9kUB63OmGZU/lIIEWnV1/7q9fQWQnou
+         Ydr9n5c0i+mLpjXG1kbdVJIg8boY4dNy7Wy2PqBZTaHAakcUDruEOzy40LQlr7rlvqmk
+         gb0KSWPh9OMBihXgGPhkBSCUHw10oaebg91nUAeP9DhEPd1Cm9GwlR+WyD9uW76EYa+h
+         0Qww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772639949; x=1773244749;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HOSnZzfeSc3oCHq3PRnVd2F+xX7z1Nwp9tzlqrjRhhw=;
-        b=F5Zo+7wEwQuQ+HOD2flKr9D3eLMchMA9l1w6BPqutz29Z8rLbNinzbuhXGGFBrXa4W
-         pw//HNtPjIisnOhnWDN9HVao6ceh1msXMwWJTnK8K0hXuhdhgCK/l1kEszKNPWxcfUHf
-         ThRQvnb1Peu2WWN5P/IwXd7nQMeSlZWijkms5eoP+pgdSEkdyQ70wXbZ/CKPcNdd/Pcb
-         feJWaiTcQA6hUrrsijb06pPRjZet0xKpHay5RVxEXrQFUzhR8bK1eB5043aqDXQe/agQ
-         Y9seWhQSRIhYCPZsBod4u7rLNtuslrYWqU3Zo3Y8RTlb9J+bscCUocQA5v2Fbb9lBsbd
-         DA0w==
-X-Forwarded-Encrypted: i=1; AJvYcCU6Km20fqwmRjj7dHGuttsHo1Igq8qkVfVaF5D0TnK4FKgA9klU7rNWB+fjC+qEC4m89J3npTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxci7yuVvfZunCSd+nSDJha6LLwMUNF0TTh74jYw34WSa8Z7ANy
-	2+sFExIy+nQB0nOGuisT2GYvJ/8lRka6A6pBCFHQytIdS68kFRjwV4DA2eMUeYjsEFg=
-X-Gm-Gg: ATEYQzxatFZmr79kJ7UusoB78A11L8ataY/qSPdxNL6pjsrBS4IQ0CSOTUnSjcybWkQ
-	djay91mmkk8zyyRp1BA0AwDXkd2qui6ZOJ4dGG/kP5XqxbRHtdajHJaIzJwtWGonCYcQbTw5SYK
-	mUD0LI8bI5hoGmeJHwihtN0/CiAOdOb4vRGOGVOkTz/y+g6hvGb5nr2hrJGeBapv9ZaiAZz/jiH
-	PdX/IyTTvqj3hwRZdM5o7iI5MF//QLwVrC2c0gse7wa0MuK62GL4XkzTiJQTgfLBuJ5ReoZc2wX
-	YqUrojMehWtZtmP81JWGLgXKiVtGQ1UAEm0brhN5BtYATcviUPyY5SLe3rspR73qeFQg8aMZ3OM
-	pDdJEPOi5MGGLjQItkIAy3PmWEepXaOP7ID8z6y3+O8OqVybqPHKQO3UsklT5LAVvAc8fWkjnPy
-	TSTDI74tIiJFOGHT6bPLHP6NoweQ8hJX5+BU0OXjEpJ+LTvolr71g9sAfI4A==
-X-Received: by 2002:a05:600c:3b29:b0:483:7980:4687 with SMTP id 5b1f17b1804b1-48519899381mr45743415e9.17.1772639948325;
-        Wed, 04 Mar 2026 07:59:08 -0800 (PST)
-Received: from localhost (176.111.182.151.kyiv.nat.volia.net. [176.111.182.151])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851acfa177sm21037355e9.4.2026.03.04.07.59.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 07:59:07 -0800 (PST)
-Date: Wed, 4 Mar 2026 17:59:06 +0200
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: jv@jvosburgh.net, netdev@vger.kernel.org, jiayuan.chen@shopee.com,
-	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Jussi Maki <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-Message-ID: <aahWymAi_CtRG0gJ@penguin>
-References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
- <20260304074301.35482-2-jiayuan.chen@linux.dev>
+        d=1e100.net; s=20230601; t=1772640013; x=1773244813;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
+        b=Co8bpg9J7KlwesUo721lf2ysAexwXRpIVQ6aoY1XVZJn7EoF3khS53NJ/TqcUzYgLp
+         3Ku7tSByxsiMK4y6tvYgCBAgyxGqA3ImOZA8erSo/zOeKwhw2aKgJPL6j++uYDMwFKAj
+         q+XjPffvOrVz6ruqUJbFwjtEsfHnR5ydZqPwlqjiHojAY5ecgeTGZ5PNgWGMyz9/nx1K
+         zLY68v1b3hJkh4yYQz5V8NgIR2I4S6Fu9XETV8wHB02sK81OJdaavAilFD2X/nHX2VKd
+         rfByeSM84VXM1frKaDDgjydEpeX+arSFyGOXxJsXyrHl/U7assvxAK91oQmT7u0vZrmX
+         ymhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTzejQXt5InRdqyQLXPxbGo3s8/0pqKMhv2SmvgQDdQy6CUd+0xU2K8UQIbSpBXhm8/FmYaz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz08egoL8LuTm+Y9n58alpT1XU7H9PAN4MJB+VQO0DQjcl0kpi
+	oGBvr2CpsDzDJTVgbGHILhPOyANS/Czl/T2i+q0zbfMLkwGI+i8M+AhRSNywO9gRC9xssMjtnFG
+	3Q2Y1Aj2BVZP9gEYdkifWxPAv6bsfHh2/v97aLdg7
+X-Gm-Gg: ATEYQzwIMfYDBpVYSKavdWMBhhDfAW+7TUAB7NQzTf1/Grj+jz66QQBajhGP5vQ+2BH
+	iHmqii9iNWI41Abm535NyYJfxLw6832/sQg2nFXOmUKxZt4+mFv+rRjrfdmrQnX9nLQJH6l5fIx
+	oOMzXC/lC8s0lzvMdEnjhofb69otcC+ssl09tY1js4STbro2EipVbDpFR5IkuoDRrjHm9U0eAG2
+	D/qCq09XsRM7DeClPA5vPsKeAI+/F5QOD29JJma8w8OSiDupxKHKLeW77PJloXckKdwkVTuQrjV
+	p+AGHbZL
+X-Received: by 2002:a05:622a:1998:b0:501:4730:fbe1 with SMTP id
+ d75a77b69052e-508db2a7ab9mr33833311cf.22.1772640011899; Wed, 04 Mar 2026
+ 08:00:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304074301.35482-2-jiayuan.chen@linux.dev>
-X-Rspamd-Queue-Id: B3F1B203DF9
+References: <20260304094318.1769536-1-edumazet@google.com> <93b5fb6d-7aa0-481f-823f-995ed8ab0e52@kernel.org>
+In-Reply-To: <93b5fb6d-7aa0-481f-823f-995ed8ab0e52@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 4 Mar 2026 17:00:00 +0100
+X-Gm-Features: AaiRm50I60QlYPJhewzIEKmMOkyfI19MLdtQwUrLgqb-LpW56f69_ysZ6MKpDwo
+Message-ID: <CANn89i+SQd4H7q=ELJp7-aaN5PyZ-Oakoy9MHZpbuX1iGKV1ag@mail.gmail.com>
+Subject: Re: [PATCH net-next] inet_diag: report delayed ack timer information
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: D99352042D4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263895-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	RCPT_COUNT_TWELVE(0.00)[32];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[jvosburgh.net,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-263897-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,blackwall.org:dkim,shopee.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 03:42:57PM +0800, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
-> check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
-> when the bond mode is round-robin. If the bond device was never brought
-> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
-> 
-> The XDP redirect path can reach this code even when the bond is not up:
-> bpf_master_redirect_enabled_key is a global static key, so when any bond
-> device has native XDP attached, the XDP_TX -> xdp_master_redirect()
-> interception is enabled for all bond slaves system-wide. This allows the
-> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
-> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
-> reached on a bond that was never opened.
-> 
-> Fix this by allocating rr_tx_counter unconditionally in bond_init()
-> (ndo_init), which is called by register_netdevice() and covers both
-> device creation paths (bond_create() and bond_newlink()). This also
-> handles the case where bond mode is changed to round-robin after device
-> creation. The conditional allocation in bond_open() is removed. Since
-> bond_destructor() already unconditionally calls
-> free_percpu(bond->rr_tx_counter), the lifecycle is clean: allocate at
-> ndo_init, free at destructor.
-> 
-> Note: rr_tx_counter is only used by round-robin mode, so this
-> deliberately allocates a per-cpu u32 that goes unused for other modes.
-> Conditional allocation (e.g., in bond_option_mode_set) was considered
-> but rejected: the XDP path can race with mode changes on a downed bond,
-> and adding memory barriers to the XDP hot path is not justified for
-> saving 4 bytes per CPU.
-> 
-> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
-> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> ---
->  drivers/net/bonding/bond_main.c | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
-> 
+On Wed, Mar 4, 2026 at 4:48=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 3/4/26 2:43 AM, Eric Dumazet wrote:
+> > inet_sk_diag_fill() populates r->idiag_timer with the following
+> > precedence order:
+> >
+> > 1 - Retransmit timer.
+> > 4 - Probe0 timer.
+> > 2 - Keepalive timer.
+> >
+> > This patch adds a new value, last in the list, if other timers
+> > are not active.
+> >
+> > 5 - Delayed ACK timer.
+> >
+> > A corresponding iproute2 patch is needed to replace "unknown"
+> > with "delack":
+>
+> ...
+>
+> > diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+> > index 9d215485b5c7e7ba29dd53c924f0245439d74af5..e4cb18061aefcc22df04644=
+c00bf5c7db4e150d2 100644
+> > --- a/net/ipv4/inet_diag.c
+> > +++ b/net/ipv4/inet_diag.c
+> > @@ -298,6 +298,10 @@ int inet_sk_diag_fill(struct sock *sk, struct inet=
+_connection_sock *icsk,
+> >               r->idiag_retrans =3D READ_ONCE(icsk->icsk_probes_out);
+> >               r->idiag_expires =3D
+> >                       jiffies_delta_to_msecs(icsk->icsk_keepalive_timer=
+.expires - jiffies);
+> > +     } else if (timer_pending(&icsk->icsk_delack_timer)) {
+> > +             r->idiag_timer =3D 5;
+>
+> How come the idiag_timer values an enum in
+> include/uapi/linux/inet_diag.h since this is a uapi?
 
-IMO it's not worth it to waste memory in all modes, for an unpopular mode.
-I think it'd be better to add a null check in bond_rr_gen_slave_id(),
-READ/WRITE_ONCE() should be enough since it is allocated only once, and
-freed when the xmit code cannot be reachable anymore (otherwise we'd have
-more bugs now). The branch will be successfully predicted practically always,
-and you can also mark the ptr being null as unlikely. That way only RR takes
-a very minimal hit, if any.
+Yes, this can be done, although we survived all these years without it.
 
-Cheers,
- Nik
+Do you want to send a patch or should I implement this idea ?
 
