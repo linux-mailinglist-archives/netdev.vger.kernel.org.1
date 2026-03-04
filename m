@@ -1,236 +1,171 @@
-Return-Path: <netdev+bounces-263652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKhNIz/xp2mGmgAAu9opvQ
-	(envelope-from <netdev+bounces-263652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:45:51 +0100
+	id eP8DJdPwp2mWlwAAu9opvQ
+	(envelope-from <netdev+bounces-263654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:44:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652741FCD02
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:45:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B681FCC9F
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:44:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7C533014116
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:42:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 55266301BEF3
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211B7382299;
-	Wed,  4 Mar 2026 08:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10913932D4;
+	Wed,  4 Mar 2026 08:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mgYV3ZW1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLVQiFvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF048375AD9
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6293932C8
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772613757; cv=none; b=BNZ2Vdkglm1ZiI3iogQxmH6IvnXNPnDG3pf/AmWIK/QXbNuGnDHAxguiPo5EuBnJfSmoKpoeMmS3QNkYrH8p9gzyq52bw5KXcCyH8OQr+oJJ9HOLSAxVAnzrfT44xb1RocTGTUOkpp2+hx4ZAIT2A41w+pl320ldkqJf08OIxP0=
+	t=1772613831; cv=none; b=lZsWmTnoFxZ0MEFFeF23fhyXhH1V6YqRFfoOErUJ5Ga/RTWRscutfnB1EM/NDhfhDNYamyjSG/bTu2CMwA1MOy0WHYDuaGVobX4YkIHpUEM4OXebenCDlTcYNOuu4DOfZDGbcq+pz79QzNiICg6LwLycJIs+uwFvIxgRAMPLgO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772613757; c=relaxed/simple;
-	bh=BKssnUpC3b9eO8LjpnPOwjycyVQrdp45Uj5fbygo95o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qHkLWikfdemjMlgYbHs40067AGyz04q4yx1BA2yPtHtshDOpCKDMYWnxWQUnE5LNDns0RrFBYMOF8c3hDOLujTt/f7NQwmWtlsHNmGRFm/XB2X/6qPr9CckpfRtIeROni3INv916u+DrdLo4QqZIEtN6g3Hd+/j0Cqoa2Yeko2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mgYV3ZW1; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772613756; x=1804149756;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BKssnUpC3b9eO8LjpnPOwjycyVQrdp45Uj5fbygo95o=;
-  b=mgYV3ZW1PGEBfTL+GauFzzN+f2jwoI8RM63Aseka+34UyMDSymxEgp2O
-   NojTtREnFpK+qH8BOEl+RDMJf2BchAyBy00CiqKFbXuQt8I8gVJOrPEWP
-   InnvXNpiBlS5OvR6BIdBbYDjSy6dFG/rYCH68ibB3VZslaamu6psYfuW3
-   h6x3qyPZfoXhkEeGYmdHkDdiGB9Co54oHKvILK64Z1i7rob5VAqXGVdGT
-   pRnAwoYjYZsA3bIRv7it/8vV2AUkoDkBHvN06R9M8qDoES/vMSKh1m9zd
-   Hn2RA3SlZ8DljGgkkH3wbc3jUQOpKo9cERcKeTxnBzFsC1bwaVrvy1DuO
-   A==;
-X-CSE-ConnectionGUID: OtJFI7bgQfyQwBTD1O5jMg==
-X-CSE-MsgGUID: oNmpr1jUTaS91x+a4M+CFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="73736620"
-X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
-   d="scan'208";a="73736620"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 00:42:35 -0800
-X-CSE-ConnectionGUID: OgIxrAcgSuKhqP54zY8mEw==
-X-CSE-MsgGUID: bwVf6cETSwS5ob7SiSHtsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
-   d="scan'208";a="223270421"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa005.jf.intel.com with ESMTP; 04 Mar 2026 00:42:34 -0800
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-net v1] ixgbe: stop re-reading flash on every get_drvinfo for e610
-Date: Wed,  4 Mar 2026 09:42:32 +0100
-Message-ID: <20260304084232.2937498-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1772613831; c=relaxed/simple;
+	bh=VIJxBhv7XGCFbPbdOeAB7Qdcmzlygb76zrm9jwwzsOA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LrD+YMZItpuhI0Ru8XvmpIbRfJMNaO0hqRoLUP7wKRueTQh2GazFxf6xmtn9dpgAN/PooLf6EvEgjv29arDlzhv0APGgqD1HseP26lDU1BkussHBcevSVxYZA0MUdrfMOddlUKX+gReO30GO4zAsiPlDgwDhm0rdYzRr0pTTgoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLVQiFvT; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-824b5cae336so2623297b3a.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 00:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772613830; x=1773218630; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3vMQO/IQoYaKESJWlFHP+qMU8qosPwTVj93SXFE13Y=;
+        b=RLVQiFvT6sJ/P5I+bpFCEWEUsXmIpCPKMODFKfSa3ClISRLGGNP6+WXqe2hnZ7pee9
+         br/024vPcTglhUKNbgy2Bkqrp03LeVZexAZc5L3RACLr9gdMbh7lMAuq8q9ZpxgnZxM3
+         9qRi2vY9FueJKRiw9ajtI5oBYwWQoufnbMYyKDB3gluqBSfmKQIratAvyqIVc5gs4LTE
+         RWUTVPKySt3coo+6Npmf/rw0TcUi0W/+pDsYmQRchRZ8HK2nLTAlegDvGMzx5lUOUcfx
+         6r358bsGfwwvy7fjFuf4a3HkEUs9J6ATTcOCL4tOPWNZRVYPKUCf1tmSvk80JdrUiL4x
+         wsGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772613830; x=1773218630;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3vMQO/IQoYaKESJWlFHP+qMU8qosPwTVj93SXFE13Y=;
+        b=ObDiQyA88UrkCyHHKKfGf1V5KiKSHZbQ2sf2TLKakQJyS9fKTd8GGOJp+Gkem4A0YV
+         wSN4jJ+toknYtlTwyauxRVpQAipseUPE+vxy2P0xpdZF/bY0H/ADyliWEflSldyXJw0Z
+         mxmpbkTeDixA/L77vCZW5Rmt5B8XHzHaEkJHBB0VAV84SBoiSABqGs1d2GFBCaT1xLIY
+         DGK3RQjApmbIyK+Qp/WFce61NPJRVFvzI9tdpJ40kv+yg9viX5c+xOb9Y/10S5DmmvYc
+         2SPPe3EjBPsGW6KwvTaqZyT4irGNa55hhx1Sll7yu6A2B4zQ7d3wjG/rBp5UR8fqPrw+
+         NHmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXiotWrFzV4KhEYF4oP3pIg2afQZbRjIEJ1WZ5QDsh1ro8/xVoVt8xjBitvx5BbfyN3d0iXSig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQ6lKFqppvZ5Fd2fUZhDhkNd5Gb3DuaNIXAEPuky+aEdGjr5CG
+	1tw4u/xv6iX2Y+kancUN9dKBdBQFCNmiQSXDSi1eqJNnCFW64w8xAPkMuiqnxwoSsrTWZPrII4X
+	b3NnK9A==
+X-Received: from pfbbj10.prod.google.com ([2002:a05:6a00:318a:b0:7cf:2dad:ff87])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:438f:b0:827:2ee0:411f
+ with SMTP id d2e1a72fcca58-82972b61332mr1138758b3a.4.1772613829535; Wed, 04
+ Mar 2026 00:43:49 -0800 (PST)
+Date: Wed,  4 Mar 2026 08:42:57 +0000
+In-Reply-To: <20260304-br-nd-suppress-ipv6-null-fix-v1-1-084356ba8257@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 652741FCD02
+Mime-Version: 1.0
+References: <20260304-br-nd-suppress-ipv6-null-fix-v1-1-084356ba8257@gmail.com>
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260304084348.1075022-1-kuniyu@google.com>
+Subject: Re: [PATCH] net: bridge: fix NULL dereference in br_do_suppress_nd
+ when ipv6.disable=1
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: devnull+maximilianpezzullo.gmail.com@kernel.org
+Cc: bridge@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
+	gurucp2005@bugzilla.kernel.org, horms@kernel.org, idosch@nvidia.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, maximilianpezzullo@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, razor@blackwall.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 08B681FCC9F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,bugzilla.kernel.org,kernel.org,nvidia.com,vger.kernel.org,gmail.com,redhat.com,blackwall.org];
+	TAGGED_FROM(0.00)[bounces-263654-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263652-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,maximilianpezzullo.gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-ixgbe_get_drvinfo() calls ixgbe_refresh_fw_version() on every ethtool
-query for e610 adapters.  That ends up in ixgbe_discover_flash_size(),
-which bisects the full 16 MB NVM space issuing one ACI command per
-step (~20 ms each, ~24 steps total = ~500 ms).
+From: Maximilian Pezzullo via B4 Relay <devnull+maximilianpezzullo.gmail.com@kernel.org>
+Date: Wed, 04 Mar 2026 09:20:23 +0100
+> From: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
+> 
+> When the kernel is booted with ipv6.disable=1, the IPv6 module loads
+> but skips full initialization, leaving ipv6_stub as NULL. If the bridge
+> neigh_suppress feature is enabled on a port and an ICMPv6 Neighbor
+> Solicitation arrives, br_do_suppress_nd() calls neigh_lookup() via
+> ipv6_stub->nd_tbl without first checking whether ipv6_stub is valid,
+> causing a kernel panic.
+> 
+> Fix this by returning early if ipv6_stub or its nd_tbl pointer is NULL.
+> 
+> Reported-by: Guruprasad C P <gurucp2005@bugzilla.kernel.org>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221143
+> Signed-off-by: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
+> ---
+>  net/bridge/br_arp_nd_proxy.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+> index 1e2b51769eec..0b1b9ba29b7d 100644
+> --- a/net/bridge/br_arp_nd_proxy.c
+> +++ b/net/bridge/br_arp_nd_proxy.c
+> @@ -455,6 +455,9 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+>  		return;
+>  	}
+>  
+> +	if (!ipv6_stub || !ipv6_stub->nd_tbl)
+> +		return;
 
-Profiling on an idle E610-XAT2 system with telegraf scraping ethtool
-stats every 10 seconds:
+ipv6_stub is never be NULL.
 
-  kretprobe:ixgbe_get_drvinfo took 527603 us
-  kretprobe:ixgbe_get_drvinfo took 523978 us
-  kretprobe:ixgbe_get_drvinfo took 552975 us
-  kretprobe:ice_get_drvinfo   took       3 us
-  kretprobe:igb_get_drvinfo   took       2 us
-  kretprobe:i40e_get_drvinfo  took       5 us
+Also, Fernando is already working on the fix.
+https://lore.kernel.org/netdev/20260226234059.19402-1-fmancera@suse.de/
+https://lore.kernel.org/netdev/20260302140847.5941-1-fmancera@suse.de/
 
-The half-second stall happens under the RTNL lock, causing visible
-latency on ip-link and friends.
 
-The FW version can only change after an EMPR reset.  All flash data is
-already populated at probe time and the cached adapter->eeprom_id is
-what get_drvinfo should be returning.  The only place that needs to
-trigger a re-read is ixgbe_devlink_reload_empr_finish(), right after
-the EMPR completes and new firmware is running.  Additionally, refresh
-the FW version in ixgbe_reinit_locked() so that any PF that undergoes a
-reinit after an EMPR (e.g. triggered by another PF's devlink reload)
-also picks up the new version in adapter->eeprom_id.
-
-ixgbe_devlink_info_get() keeps its refresh call for explicit
-"devlink dev info" queries, which is fine given those are user-initiated.
-
-Fixes: c9e563cae19e ("ixgbe: add support for devlink reload")
-Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/devlink/devlink.c |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   | 13 +++++++------
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 10 ++++++++++
- 4 files changed, 19 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-index d227f4d..f32e640 100644
---- a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-@@ -474,7 +474,7 @@ static int ixgbe_devlink_reload_empr_finish(struct devlink *devlink,
- 	adapter->flags2 &= ~(IXGBE_FLAG2_API_MISMATCH |
- 			     IXGBE_FLAG2_FW_ROLLBACK);
- 
--	return 0;
-+	return ixgbe_refresh_fw_version(adapter);
- }
- 
- static const struct devlink_ops ixgbe_devlink_ops = {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index dce4936..047f040455 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -973,7 +973,7 @@ int ixgbe_init_interrupt_scheme(struct ixgbe_adapter *adapter);
- bool ixgbe_wol_supported(struct ixgbe_adapter *adapter, u16 device_id,
- 			 u16 subdevice_id);
- void ixgbe_set_fw_version_e610(struct ixgbe_adapter *adapter);
--void ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter);
-+int ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter);
- #ifdef CONFIG_PCI_IOV
- void ixgbe_full_sync_mac_table(struct ixgbe_adapter *adapter);
- #endif
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index bb4b53f..358b50c 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -1155,12 +1155,17 @@ static int ixgbe_set_eeprom(struct net_device *netdev,
- 	return ret_val;
- }
- 
--void ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter)
-+int ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter)
- {
- 	struct ixgbe_hw *hw = &adapter->hw;
-+	int err;
-+
-+	err = ixgbe_get_flash_data(hw);
-+	if (err)
-+		return err;
- 
--	ixgbe_get_flash_data(hw);
- 	ixgbe_set_fw_version_e610(adapter);
-+	return 0;
- }
- 
- static void ixgbe_get_drvinfo(struct net_device *netdev,
-@@ -1168,10 +1173,6 @@ static void ixgbe_get_drvinfo(struct net_device *netdev,
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
- 
--	/* need to refresh info for e610 in case fw reloads in runtime */
--	if (adapter->hw.mac.type == ixgbe_mac_e610)
--		ixgbe_refresh_fw_version(adapter);
--
- 	strscpy(drvinfo->driver, ixgbe_driver_name, sizeof(drvinfo->driver));
- 
- 	strscpy(drvinfo->fw_version, adapter->eeprom_id,
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index c58051e4..8b07f25 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -6289,6 +6289,16 @@ void ixgbe_reinit_locked(struct ixgbe_adapter *adapter)
- 	if (adapter->flags & IXGBE_FLAG_SRIOV_ENABLED)
- 		msleep(2000);
- 	ixgbe_up(adapter);
-+
-+	/* E610 has no FW event to notify all PFs of an EMPR reset, so
-+	 * refresh the FW version here to pick up any new FW version after
-+	 * a hardware reset (e.g. EMPR triggered by another PF's devlink
-+	 * reload).  ixgbe_refresh_fw_version() updates both hw->flash and
-+	 * adapter->eeprom_id so ethtool -i reports the correct string.
-+	 */
-+	if (adapter->hw.mac.type == ixgbe_mac_e610)
-+		(void)ixgbe_refresh_fw_version(adapter);
-+
- 	clear_bit(__IXGBE_RESETTING, &adapter->state);
- }
- 
--- 
-2.52.0
-
+> +
+>  	n = neigh_lookup(ipv6_stub->nd_tbl, &msg->target, vlandev);
+>  	if (n) {
+>  		struct net_bridge_fdb_entry *f;
+> 
+> ---
+> base-commit: af4e9ef3d78420feb8fe58cd9a1ab80c501b3c08
+> change-id: 20260304-br-nd-suppress-ipv6-null-fix-0a516fc27f1a
+> 
+> Best regards,
+> -- 
+> Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 
