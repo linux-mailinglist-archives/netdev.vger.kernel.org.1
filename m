@@ -1,218 +1,194 @@
-Return-Path: <netdev+bounces-263800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADewMWwjqGl3ogAAu9opvQ
-	(envelope-from <netdev+bounces-263800-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:19:56 +0100
+	id 4ELwD4QjqGl3ogAAu9opvQ
+	(envelope-from <netdev+bounces-263801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:20:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACEAF1FF99B
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:19:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E651FF9D6
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE7D0303EC3A
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:17:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1DA7B302D1A5
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5906A23F26A;
-	Wed,  4 Mar 2026 12:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC773A6EE4;
+	Wed,  4 Mar 2026 12:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="MVhNYwAR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CsaHi6sB"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C1F336884
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 12:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B613321D8;
+	Wed,  4 Mar 2026 12:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772626673; cv=none; b=QZkqC752cQIB75y+ZDO6WsAOsVe40e9zrP1MOQznuoLUm4RZs0lVXFvK6PAEP+gbhVrfJshiKYy4iUwX449EB8+Bh+/J0e9xTvPAqltU3uN577TagWpJ2dFb+O1ddQrgx1agh1f7u0F2aDrQuNRuTsZPb4SpPyXG6x4cLoleWe0=
+	t=1772626815; cv=none; b=B0YOg87mBsBaFtVEBjHjraHI6NP6gE8L/BhUmeBoI1xo2mB38kcY33tWbDPiMzpUF/cOBMEMpfZsW7wTRx+8I/VECnp/GOurXomPUWHo10t6mmsXqC99XqgKFyvKp8m76sYHBBFigyLeEw6pHKw89zi7mrt4S550NAGfQAH5O/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772626673; c=relaxed/simple;
-	bh=POCV8JaymNScyiai3RphyoFmi0IjfXAolvC5ruoI32k=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=lBFa359I8ayFT7UOLiOMfi3e4rSI9/6bs1Nk1vovw3iYz5ksVBBcHy6rQ3mt/wI1A408Qs5Yg9yy9jnvkIHJQsjmhEtdqY+cQKL498XEAuco8Cy+sZezbTlEvI2/sfjFUImsHgVk72pnqWGYArEnLkwTSEse4hmTVujlH0qus1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=MVhNYwAR; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=WTCkzXr8IJyYwxxrufKTwxw++AWw05Y+lvv/LZr2SbU=;
-	b=MVhNYwARwZFJqby7/VOJtPXWC7CasZNm99haPHGSKK2hYltR4JsOZu5QkDxNKllaa+ISsfRjf
-	oIEDZzEyGNwzDdXR4N98HyomdB5McqY6rbqFs4vzj4wrKsfuDKnBowZ1VePA9acr1iUsO6apGVc
-	uPnnGT3iQ/ekdZiAVq6NhDE=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4fQs485NWzzcZyH;
-	Wed,  4 Mar 2026 20:12:24 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 86584202D3;
-	Wed,  4 Mar 2026 20:17:38 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 4 Mar 2026 20:17:37 +0800
-Message-ID: <259cd032-2ccb-452b-8524-75bc7162e138@huawei.com>
-Date: Wed, 4 Mar 2026 20:17:36 +0800
+	s=arc-20240116; t=1772626815; c=relaxed/simple;
+	bh=WnoeAiH2zeYFOAvm4hMpg8jxN72aiERbJc4YfUHDZDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MoOl23hFG+KmuSM7wNFqxi+BaClBlniK6g2ihG+4j6lVc1hKm1E2213yS0ytviUr2iOQCZs0XCheZBSh6HGVPPIKEF2TVcYIUw7fJflqPL8eh2XvQahbkvlLfqsB+mWA8vrc04EliWyaz+OcB5hARfRqGD4DmFlE1WqjdU7KMaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CsaHi6sB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C382BC19423;
+	Wed,  4 Mar 2026 12:20:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772626814;
+	bh=WnoeAiH2zeYFOAvm4hMpg8jxN72aiERbJc4YfUHDZDQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CsaHi6sBwsPfp+NPjbz2Ilf7H2PfoN78U0IiIBUR7ZEsgvy/StYpQiCXoCbsVjdVh
+	 uIajtSgfMOWXoR5kBOMZgxml5ZKxV8s4pVAs1I9rDpqJnu4cYOvuJneB/aLBPwECrH
+	 FjWIvg1nw7NqJdX9gDc3RWowg5IRaYCCywN7nBxuZLSbYT7npvOGy713OjEla6wbf1
+	 caFy362tRt7y/cuxjfFkh7Ur+qpOjZ54lm7TjUcdH4Km4lTEPbzyTPJSeAa00bBy5h
+	 eLhgctkNXLFCEeRs6EgEflzgOR+9ThZEI1kmWEvK/daxZ2qRS5JJb115fYSW+VQ8Eg
+	 8TwoXf5+SjXLQ==
+Received: from localhost ([::1])
+	by mail.kernel.org with esmtp (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vxlD2-0000000BmbB-2bXO;
+	Wed, 04 Mar 2026 13:20:12 +0100
+Date: Wed, 4 Mar 2026 13:20:11 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Kees Cook <kees@kernel.org>, Mauro Carvalho
+ Chehab <mchehab@kernel.org>, intel-wired-lan@lists.osuosl.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [Intel-wired-lan] [PATCH 00/38] docs: several improvements to
+ kernel-doc
+Message-ID: <20260304132011.1a9567b7@localhost>
+In-Reply-To: <352c3f9f8ffd2d031c86a476e532a8ea6ffcf1ed@intel.com>
+References: <cover.1771408406.git.mchehab+huawei@kernel.org>
+	<33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+	<878qcj8pvw.fsf@trenco.lwn.net>
+	<352c3f9f8ffd2d031c86a476e532a8ea6ffcf1ed@intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <salil.mehta@huawei.com>
-Subject: Re: [PATCH net 04/11] MAINTAINERS: remove Salil Mehta from HiSilicon
- network drivers
-To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
-References: <20260303215339.2333548-1-kuba@kernel.org>
- <20260303215339.2333548-5-kuba@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260303215339.2333548-5-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
-X-Rspamd-Queue-Id: ACEAF1FF99B
+X-Rspamd-Queue-Id: D1E651FF9D6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263800-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263801-lists,netdev=lfdr.de,huawei];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,hisilicon.com:url,linuxtag.org:email]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email]
 X-Rspamd-Action: no action
 
 
-on 2026/3/4 5:53, Jakub Kicinski wrote:
-> We have not seen tags from Salil for HiSilicon network drivers
-> in over 5 years. He is active upstream in other subsystems
-> (KVM/ARM64 vCPU hotplug). Jian Shen and Jijie Shao are active
-> in HNS3, and the review coverage is good (55%).
+On Wed, 04 Mar 2026 12:07:45 +0200
+Jani Nikula <jani.nikula@linux.intel.com> wrote:
 
-Hi Jakub,
+> On Mon, 23 Feb 2026, Jonathan Corbet <corbet@lwn.net> wrote:
+> > Jani Nikula <jani.nikula@linux.intel.com> writes:
+> >  
+> >> There's always the question, if you're putting a lot of effort into
+> >> making kernel-doc closer to an actual C parser, why not put all that
+> >> effort into using and adapting to, you know, an actual C parser?  
+> >
+> > Not speaking to the current effort but ... in the past, when I have
+> > contemplated this (using, say, tree-sitter), the real problem is that
+> > those parsers simply strip out the comments.  Kerneldoc without comments
+> > ... doesn't work very well.  If there were a parser without those
+> > problems, and which could be made to do the right thing with all of our
+> > weird macro usage, it would certainly be worth considering.  
+> 
+> I think e.g. libclang and its Python bindings can be made to work. The
+> main problems with that are passing proper compiler options (because
+> it'll need to include stuff to know about types etc. because it is a
+> proper parser), preprocessing everything is going to take time, you need
+> to invest a bunch into it to know how slow exactly compared to the
+> current thing and whether it's prohitive, and it introduces an extra
+> dependency.
 
-Thanks for the update. I would like to clarify that Salil is a co-author of HNS3/HNS driver
-and still remains our active MAINTAINER.
+It is not just that. Assume we're parsing something like this:
 
-Based in our Cambridge, UK office, Salil has been away for extended periods recently due to a challenging personal situation.
-This explains his recent lack of tags or direct networking contributions; he was outside the UK for much of this time
-and had limited access to our Cambridge hardware labs. However, he continued to contribute to other areas like virtualization
-where hardware dependency (especially the extensive hardware setup required for networking) was not an factor.
-
-Despite his limited availability, he has been reviewing code in the background and working with our HQ team on HNS3 enhancements,
-including performance improvements and XDP support. Many of these patches are currently pending and will be submitted soon.
-We expect him to return to full capacity in mid-March, and his networking expertise remains deeply valued by Huawei.
-
-We request that you keep him on the MAINTAINER list so he remains in the loop for all HNS3/HNS driver communications.
-
-Thanks for your understanding.
-
-Best regards,
-Jijie Shao
+	static __always_inline int _raw_read_trylock(rwlock_t *lock)
+		__cond_acquires_shared(true, lock);
 
 
->
-> Subsystem HISILICON NETWORK SUBSYSTEM 3 DRIVER (HNS3)
->    Changes 69 / 125 (55%)
->    Last activity: 2026-02-06
->    Jian Shen <shenjian15@huawei.com>:
->      Author 6d2f142b1e4b 2026-02-06 00:00:00 22
->      Tags 6d2f142b1e4b 2026-02-06 00:00:00 26
->    Salil Mehta <salil.mehta@huawei.com>:
->    Jijie Shao <shaojijie@huawei.com>:
->      Author 6a0fc0ea61bd 2026-01-27 00:00:00 19
->      Tags 6d2f142b1e4b 2026-02-06 00:00:00 97
->    Top reviewers:
->      [30]: horms@kernel.org
->      [12]: andrew@lunn.ch
->      [10]: arnd@arndb.de
->      [5]: michal.swiatkowski@linux.intel.com
->      [4]: jacob.e.keller@intel.com
->    INACTIVE MAINTAINER Salil Mehta <salil.mehta@huawei.com>
->
-> Subsystem HISILICON NETWORK SUBSYSTEM DRIVER
->    Changes 108 / 200 (54%)
->    Last activity: 2026-02-06
->    Jian Shen <shenjian15@huawei.com>:
->      Author 6d2f142b1e4b 2026-02-06 00:00:00 22
->      Tags 6d2f142b1e4b 2026-02-06 00:00:00 26
->    Salil Mehta <salil.mehta@huawei.com>:
->    Top reviewers:
->      [52]: horms@kernel.org
->      [17]: shaojijie@huawei.com
->      [16]: andrew@lunn.ch
->      [10]: arnd@arndb.de
->      [6]: jacob.e.keller@intel.com
->      [6]: michal.swiatkowski@linux.intel.com
->    INACTIVE MAINTAINER Salil Mehta <salil.mehta@huawei.com>
->
-> Add Salil to CREDITS as the initial author of HNS3.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Cc: shenjian15@huawei.com
-> Cc: salil.mehta@huawei.com
-> Cc: shaojijie@huawei.com
-> ---
->   MAINTAINERS | 2 --
->   CREDITS     | 4 ++++
->   2 files changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 49eb81ec3709..b9b8a7695ddb 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11527,7 +11527,6 @@ F:	drivers/bus/hisi_lpc.c
->   
->   HISILICON NETWORK SUBSYSTEM 3 DRIVER (HNS3)
->   M:	Jian Shen <shenjian15@huawei.com>
-> -M:	Salil Mehta <salil.mehta@huawei.com>
->   M:	Jijie Shao <shaojijie@huawei.com>
->   L:	netdev@vger.kernel.org
->   S:	Maintained
-> @@ -11542,7 +11541,6 @@ F:	drivers/net/ethernet/hisilicon/hibmcge/
->   
->   HISILICON NETWORK SUBSYSTEM DRIVER
->   M:	Jian Shen <shenjian15@huawei.com>
-> -M:	Salil Mehta <salil.mehta@huawei.com>
->   L:	netdev@vger.kernel.org
->   S:	Maintained
->   W:	http://www.hisilicon.com
-> diff --git a/CREDITS b/CREDITS
-> index d74c8b2b7ed3..98aaf196567a 100644
-> --- a/CREDITS
-> +++ b/CREDITS
-> @@ -2770,6 +2770,10 @@ E: merker@linuxtag.org
->   D: DECstation framebuffer drivers
->   S: Germany
->   
-> +N: Salil Mehta
-> +E: salil.mehta@huawei.com
-> +D: Upstreaming of the HiSilicon HNS3 network driver
-> +
->   N: Michael Meskes
->   E: meskes@debian.org
->   P: 1024/04B6E8F5 6C 77 33 CA CC D6 22 03  AB AB 15 A3 AE AD 39 7D
+using a cpp (or libclang). We would need to define/undefine 3 symbols:
+
+	#if defined(WARN_CONTEXT_ANALYSIS) && !defined(__CHECKER__) && !defined(__GENKSYMS__)
+
+(in this particular case, the default is OK, but on others, it may not
+be)
+
+This is by far more complex than just writing a logic that would
+convert the above into:
+
+	static int _raw_read_trylock(rwlock_t *lock);
+
+which is the current kernel-doc approach.
+
+-
+
+Using a C preprocessor, we might have a very big prototype - and even have
+arch-specific defines affecting it, as some includes may be inside 
+arch/*/include.
+
+So, we would need a kernel-doc ".config" file with a set of defines
+that can be hard to maintain.
+
+> So yeah, there are definitely tradeoffs there. But it's not like this
+> constant patching of kernel-doc is exactly burden free either. I don't
+> know, is it just me, but I'd like to think as a profession we'd be past
+> writing ad hoc C parsers by now.
+
+I'd say that the binding logic and the ".config" kernel-doc defines will
+be complex to maintain. Maybe more complex than kernel-doc patching and
+a simple C parser, like the one on my test.
+
+> > On Mon, 23 Feb 2026 15:47:00 +0200
+> > Jani Nikula <jani.nikula@linux.intel.com> wrote:  
+> >> There's always the question, if you're putting a lot of effort into
+> >> making kernel-doc closer to an actual C parser, why not put all that
+> >> effort into using and adapting to, you know, an actual C parser?  
+> >
+> > Playing with this idea, it is not that hard to write an actual C
+> > parser - or at least a tokenizer.  
+> 
+> Just for the record, I suggested using an existing parser, not going all
+> NIH and writing your own.
+
+I know, but I suspect that a simple tokenizer similar to my example might
+do the job without any major impact, but yeah, tests are needed.
+
+
+-- 
+Thanks,
+Mauro
 
