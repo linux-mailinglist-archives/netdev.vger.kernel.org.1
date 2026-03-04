@@ -1,218 +1,159 @@
-Return-Path: <netdev+bounces-263806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263807-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gOmeFTYmqGlhowAAu9opvQ
-	(envelope-from <netdev+bounces-263806-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:31:50 +0100
+	id mygYAKonqGnoowAAu9opvQ
+	(envelope-from <netdev+bounces-263807-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:38:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2641FFB66
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:31:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C0F1FFBD7
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E43A23063B41
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:26:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A94703010832
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DCB3AE1B9;
-	Wed,  4 Mar 2026 12:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE9913790B;
+	Wed,  4 Mar 2026 12:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Wr8aqQjB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RzHi1LdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DD632FA14;
-	Wed,  4 Mar 2026 12:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A7D336883
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 12:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772627212; cv=none; b=mqTa8ayPxSRFy7+RBTEfy9jCRgAR7IW45831qlEfBlUwgK8s7vPZZoAz7hD/P0Jm6ZCYXbvhtAGtOuWQ1gHsENVeG6CT3/uNb1loVl49SUPTbFrsdMOFlsRaNSiO1NPQoZzrrV5Y0w38MrUKd4gtQ/qSgW+V1JYZbKFwnyNuM/A=
+	t=1772627874; cv=none; b=kjbmPMe6cmKrWsRADCJDNzBep2L7ajrGn4d3VsPm9+KOVIOMSGRWM1uhxMoef3U4H8YP1BwHyZYvKhv+53zRnr6LGMAcqJOgYIsonfDt1syp+ASeJQ3wGMw2XTLgSwN1/i2ttXt556vVp8n37Ba1qPDlaLsILRYWyVxs/px0htY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772627212; c=relaxed/simple;
-	bh=kzmYBN4Fmy2qyuiyCC4PywlZajPfYpzfGmvBUtDfGn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FYjOBrTUk3Z9sb/rzUmXqTNx3OBoa4/svP7D1Zn1R9mVmfojVvgwGsGQRI0YyciUgj0l6u/Wq8CmsUQbnBsErc2oGXqI4AF/OJVLAuZRgEoMXJk7RVEMwsYp2dVsrG9XI+Hsk24BVLGJc9oYeRtKKZmxkbyCDTaVQeyNNgjZfOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=Wr8aqQjB; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=KVKUva0XatBIz6K7/luN9CsihaDlLT4xSzZFo+SpHCs=; b=Wr8aqQjBpiPOWloOg6M/sLtw0R
-	yTikI93KKK5A/JN1pmiLMKCxsLlrV8kYcfBxSWAJplx+5QYmZBWstrsMq9XYVslAeqA5/CoUDluiO
-	0iJ23Go/jmhDCUUFsVNjfS7DLxsRcUdIlMn3E/fTAT/ovHoptrxJP/LJuuEhsmdGhtYUw7+MefSiu
-	fwUCLaafMDhXUjHkg3lSxbooUY71DTbk0vYc2E/MghfQJ7y0bQIiP+vID/fU61Xr0KQf0KC/745yU
-	vLLVkVHkr0UI6f3Nas8JyYw3QbsQogSbAFMkH9MdgROEZrjGu0Cw8OGpneFUGVS+9LAW0F357sa3B
-	BfsypjcA==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.98.2)
-	(envelope-from <phil@nwl.cc>)
-	id 1vxlJJ-000000007Wu-1Du8;
-	Wed, 04 Mar 2026 13:26:41 +0100
-Date: Wed, 4 Mar 2026 13:26:41 +0100
-From: Phil Sutter <phil@nwl.cc>
-To: Florian Westphal <fw@strlen.de>
-Cc: Helen Koike <koike@igalia.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-dev@igalia.com
-Subject: Re: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
-Message-ID: <aaglAU8E48EF1m-_@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Florian Westphal <fw@strlen.de>, Helen Koike <koike@igalia.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-dev@igalia.com
-References: <20260302212605.689909-1-koike@igalia.com>
- <aaYYiPTO5JYOlhhY@chamomile>
- <17499d82-ad03-44a9-ab3a-429d2ebea02f@igalia.com>
- <aafD369eE31dh1VP@strlen.de>
+	s=arc-20240116; t=1772627874; c=relaxed/simple;
+	bh=zJuo7qMutHORFwQoVNSSuIoEfHsEUlmjBsGv1qbTk3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RxdyCYl3M7Q/oTtyTGq4xQuaJH6tdnIG6ttDRkHcvKxKtRpSXTKz5PCAVbIUcHUMuD0M9w1TAv5FpRhMy5iTHYLNd0UL9sRtS8QujvEKbzNWlzQV/DHdXnJ49ssQamTKVIHpA8YeP0hgRVVyFr7LBv2jHaY3oIpMUqkzg796/jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RzHi1LdL; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-483a233819aso66918365e9.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 04:37:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772627872; x=1773232672; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UxB/uFtMk7BfQyoh1WMZKIcALFnrrxe/IZwZ8/zch24=;
+        b=RzHi1LdLnHZhTUDlkDjWx705yW7nMp5SCcE6YFZo+lgpo2RoVx4FnG2xpfN97NIp0A
+         svpyAyC3+EssTHbgM04HQYwgtEwtssaRDmTBgUUunNPVmCRcP3XaucIMEgUe9e0XAnVP
+         0J9oDvky1YRAlXKA+P9i4v998vZjUZyq12a+/hHFu2xG7Uw14CQQzNhyJc1EMWZUZbPI
+         Q+LTMdc9lRJ/dHTASXqDcf3oQERjxCZmfR9RUS3gk13NVVuf2bz7PwgXIrIfu2Qie9D7
+         vyV1+2762D+SLCno+tpjiRJaflZWyVKaHi/HxgjXZw+Zc/chwm30YvEN2yfNiegi3J8O
+         aI1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772627872; x=1773232672;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UxB/uFtMk7BfQyoh1WMZKIcALFnrrxe/IZwZ8/zch24=;
+        b=HSm03fPxJo9J5y14UduohkNyBH3MBuHxtWWbyxWrQJKp8wI0XctCu7z6votX6GDA2e
+         FGVhPWZODin+wz3iuEuMlBI3A6eZA/bXWjxYHnh/enauT1GNXCMkqWMQPLXT3g4H6hMR
+         efULmnt99YHvwBvtmP1iUyHR3zKWO8e+6xWnoHBrjkgIvzeY2sG+hs6ONyYpn1VIQ7Zy
+         Ltd9EEKta+eJNcHY5ExOuFNRZiZa1wrmTX9RUDkRselcC5A6YbdgGvh7FEOEzJyaheHw
+         FW3ZuZaSRLWcsb8cpR5fA08YDpH7/ZfevSEQh4sM2c5QzTXSPpDGFGaU8ys8zllB+LDi
+         SFBw==
+X-Forwarded-Encrypted: i=1; AJvYcCV29cQVDI61nL1LfSma9FOggmUWDkcp6y94lmDbdk625fS8ClZq8JfJAblrUZJq5rqgp3MNH1w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJNi0vlGTYFEe8Ug8ybkVFjb+FziO5LJIt+BcDBCVWz55n6FxK
+	8lWt0nEzDMtuB22iSiuH9RoXqZWdJKltCUkonrYXuwbg0vPL2btsORwg
+X-Gm-Gg: ATEYQzxUpqp8buSvS371Yp/obL6I7kkmx0uiZDnPSmr2J+TWoY/oNVqcomoxnJ/wTcW
+	zBk5Jf1Bhbfpi7j6oyen2pkaWraaXxk9qGCKIj53SKLoKUgBc3cNYUkQoyA6gopKggFJDhYdAks
+	CSOC/TlSu/dPAv7o8HIc2C+WsW6OtMJRur7/UZKzmaj37Ze+epzyw8oUUEKzGp26o4vjc1OZmob
+	3lGHpmiL8r5XF29mV/QdRY+ujmjLXq+oYV08umA2ndDHnMk4mM/VmbEn6tyiLFgT2dQKAWpTeF8
+	wLsw4hCP56jJzIPOb/hKpIzrb3LT2BpIT2LfV7GOVrJz66WvfN1u+uWr2rZM+mWlOyJ2oHsfXmo
+	KiRNl4Y4ZSNK7n5Dc8xa208Vr2h1O6yCSn0zRXyVKf1enrdggYEMHv8x18USwemhxVF3a08Hqkf
+	Enc74OOpm0TLKoF2xWRLofKsmAg6dRPLc+JszHOYNGUBb9YKyOI3w8WqnRA13ELxSCsOpvvTzjP
+	s6As0DNVhUWbNf+9/pShlms5+yR5w==
+X-Received: by 2002:a05:600c:8105:b0:477:7bca:8b34 with SMTP id 5b1f17b1804b1-4851983bf08mr28109745e9.6.1772627871679;
+        Wed, 04 Mar 2026 04:37:51 -0800 (PST)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851a7fef84sm26505775e9.1.2026.03.04.04.37.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2026 04:37:51 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	axboe@kernel.dk,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/1] io_uring/zcrx: use READ_ONCE with user shared RQEs
+Date: Wed,  4 Mar 2026 12:37:43 +0000
+Message-ID: <e93675f7a196a178d2f389c69ad96079cf98e1bb.1772627580.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aafD369eE31dh1VP@strlen.de>
-X-Rspamd-Queue-Id: AE2641FFB66
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E1C0F1FFBD7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[nwl.cc:s=mail2022];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263806-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[nwl.cc];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[nwl.cc:-];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-263807-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phil@nwl.cc,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.351];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[igalia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,orbyte.nwl.cc:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi,
+Refill queue entries are shared with the user space, use READ_ONCE when
+reading them.
 
-On Wed, Mar 04, 2026 at 06:32:15AM +0100, Florian Westphal wrote:
-> Helen Koike <koike@igalia.com> wrote:
-> 
-> Phil, can you please take a look at this?
-> 
-> The reg/unregister logic is ... strange.
-> 
-> > But if I understood correctly from your comment below, the proper 
-> > solution would be to fix the order that the hooks are released, is my 
-> > understanding correct?
-> 
-> I don't think its about ordering.  I think the code allows to register
-> devices multiple times in the same flowtable, but UNREG doesn't handle
-> that.
-> 
-> static int nft_flowtable_event(unsigned long event, struct net_device *dev,
-> 			       struct nft_flowtable *flowtable, bool changename)
-> {
-> 	struct nf_hook_ops *ops;
-> 	struct nft_hook *hook;
-> 	bool match;
-> 
-> 	list_for_each_entry(hook, &flowtable->hook_list, list) {
-> 		ops = nft_hook_find_ops(hook, dev);
-> 		match = !strncmp(hook->ifname, dev->name, hook->ifnamelen);
-> 
-> 		switch (event) {
-> 		case NETDEV_UNREGISTER:
-> 			/* NOP if not found or new name still matching */
-> 			if (!ops || (changename && match))
-> 				continue;
-> 
-> 			/* flow_offload_netdev_event() cleans up entries for us. */
-> 			nft_unregister_flowtable_ops(dev_net(dev),
-> 						     flowtable, ops);
-> 			list_del_rcu(&ops->list);
-> 			kfree_rcu(ops, rcu);
-> 			break;
-> 		case NETDEV_REGISTER:
-> 			/* NOP if not matching or already registered */
-> 			if (!match || (changename && ops))
-> 				continue;
-> 
-> And *THIS* looks buggy.
-> Shouldn't that simply be:
-> 			if (!match || ops)
-> 				continue;
-> 
-> Or can you explain why changename has any relevance here?
-> changename means dev->name has already been updated.
+Fixes: 34a3e60821ab9 ("io_uring/zcrx: implement zerocopy receive pp memory provider");
+Cc: stable@vger.kernel.org
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ io_uring/zcrx.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-The changename parameter is true if the event handler was called for a
-NETDEV_CHANGENAME event. In that, case, we call nft_flowtable_event()
-twice for each flowtable: First with NETDEV_REGISTER event value and
-second with NETDEV_UNREGISTER value. If a device is renamed, we will try
-to register it with all flowtables having a matching interface spec if
-not already registered with. If that succeeds, we try to unregister it
-from all flowtables it's registered with if not matching anymore.
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 19b287d21f4b..0461edebb042 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -927,11 +927,12 @@ static inline bool io_parse_rqe(struct io_uring_zcrx_rqe *rqe,
+ 				struct io_zcrx_ifq *ifq,
+ 				struct net_iov **ret_niov)
+ {
++	__u64 off = READ_ONCE(rqe->off);
+ 	unsigned niov_idx, area_idx;
+ 	struct io_zcrx_area *area;
+ 
+-	area_idx = rqe->off >> IORING_ZCRX_AREA_SHIFT;
+-	niov_idx = (rqe->off & ~IORING_ZCRX_AREA_MASK) >> ifq->niov_shift;
++	area_idx = off >> IORING_ZCRX_AREA_SHIFT;
++	niov_idx = (off & ~IORING_ZCRX_AREA_MASK) >> ifq->niov_shift;
+ 
+ 	if (unlikely(rqe->__pad || area_idx))
+ 		return false;
+-- 
+2.53.0
 
-In "changename mode" therefore, NETDEV_REGISTER case is skipped if name
-matches but device is registered already. NETDEV_UNREGISTER case is
-skipped if already registered but name still matches.
-
-In regular mode, i.e. either real NETDEV_REGISTER or NETDEV_UNREGISTER,
-the NETDEV_UNREGISTER case is skipped if the device was not registered.
-If it was, the name is not relevant, we have to unregister it anyway.
-The NETDEV_REGISTER case is skipped if the name does not match. If it
-matches, we assume it is not registered already. This is true since
-NETDEV_REGISTER notifier runs for each device just once, right?
-
-> So, we want to skip a new registration if either:
-> 1. the name doesn't match
-> 2. it matches but its already registered.
-
-The "already registered" part should not happen in real NETDEV_REGISTER
-event, though: When parsing netdev hooks, non-distinct prefixes are
-eliminated so that a given device name will never match more than a
-single hook per flowtable. This is done by comparing with min prefix
-length in nft_hook_list_find().
-
-> In case changename is true, only UNREGISTER: case is
-> relevant: If its not matching anymore -> unregister.
-> 
-> Still matching?  Keep it.  In that case, we havn't
-> registered the device again because 'ops' was non-null in
-> REGISTER case.
-
-You're right, the 'changename' check in NETDEV_REGISTER is not needed
-because even if not changing names one should skip if already
-registered. Actually, this indicates a bug unless handling
-NETDEV_CHANGENAME. Maybe add a WARN_ON_ONCE()?
-
-> 		}
-> 		break;
-> 
-> If its allowed to register the same device twice (or more), then the
-> above 'break' needs to be removed, AND one has to alter UNREGISTER
-> above to loop until no more ops are found, i.e.
-
-A device may register to a single flowtable multiple times only
-temporary while it is being renamed: If one hook matches the old name
-and another the new name. It is supposed to register to the newly
-matching hook first, then unregister from the no longer matching one.
-
-Cheers, Phil
 
