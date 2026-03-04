@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-264001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEGNJL96qGmHuwAAu9opvQ
-	(envelope-from <netdev+bounces-264001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:32:31 +0100
+	id gOAkNKV7qGmHuwAAu9opvQ
+	(envelope-from <netdev+bounces-264002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:36:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C19206648
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:32:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B84C20673C
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:36:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A7EAB301CDB9
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 18:26:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 927F032CE472
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 18:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535F83D6CBF;
-	Wed,  4 Mar 2026 18:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5F53E1219;
+	Wed,  4 Mar 2026 18:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iL4Rac+l"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WO7lo1Xn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E063DBD4C;
-	Wed,  4 Mar 2026 18:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4803E0C69;
+	Wed,  4 Mar 2026 18:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772648696; cv=none; b=fqC7YxNmlbpuy5/WFwcNOZ9NMq0bG0TA+4JpgghY9GJllx/3btWZsniwEVQ7cXszxuHgiVuGW44LZvObTRYHXoulZ8jpc/+tVmV2hrMth2S5xwkhmuDTIq7jy0YdbB+cKTKeWqWotb3HIofraiZhgzUs5vRSQgms+Xvxm5KWpl8=
+	t=1772648697; cv=none; b=pJGj+awl/dnvPKUzP7Kf9PMB7YvDFSXh5RJTRPnz3W1iSaFXEpTZieo7bir0+rElUdakCPGZy0vUuAmYlZrDBQry8fTgEuNKASfW0pPI6ZOryJ4tfdnfwQQNDsYHwnOVIkcW/LDaeMO0OlwQyPQKhZmIknQEIh0NMI5a8PnLjWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772648696; c=relaxed/simple;
-	bh=lQQjYjZNPUbQ7rcixRKkV5WLW2kgdqScBVux9Qg7dOE=;
+	s=arc-20240116; t=1772648697; c=relaxed/simple;
+	bh=V1cxfz1RVnwzXZRXsNSqaV7vjhBBeY9wugZ2uCUAE30=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WisRr7diVtAWl1Um3OB8W6FQ2JhkVKvG7+FffCy7E4pFDQo5ImpzrhAqJ2BV0yt7dT4Hc+VEmosp/0F6vHCJ+9FfVmqHhd1FfwLy5bzgdEbFuqkwH7w0vAEcpSRQ7MfFLcm8Z5i5R3UDHPrlHnfO1OYJ9wA/Xf/5Q1EXrWaWnAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iL4Rac+l; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=FcYfUYwGtqUhG7TkQwDAsoXidHwOCkcXivGGHAaDSo1HYmZhg48Njx8cbD1rG/B78AJyYb/fgK9h6O4XveEhjbnnngx0EVkhhbbY1ylVWxkrnJdNfxR8TRjtCNJB6RMoXiU+r9XrCjt60/X2aYzx3nvPqF1EMxuy9YThl+KegX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WO7lo1Xn; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 926034E4253B;
-	Wed,  4 Mar 2026 18:24:53 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 2B18E1A2CB5;
+	Wed,  4 Mar 2026 18:24:55 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 68A205FF5C;
-	Wed,  4 Mar 2026 18:24:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B40B810369605;
-	Wed,  4 Mar 2026 19:24:49 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 008675FF5C;
+	Wed,  4 Mar 2026 18:24:55 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 47E8E103695EE;
+	Wed,  4 Mar 2026 19:24:52 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772648692; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1772648693; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=JtnE5Dd9ijOOlqqPU5d8+YUT29h7RsvROog7pXP+pnI=;
-	b=iL4Rac+lgRRZlK5K9Z3NWm7OEqAghfHX5+HLhBmZgpqdm1fvWXyLD8QzvXvTd6zSqIE5BJ
-	uvhIA+/VyxBTkf2st98+LoVyQ+YFydEO6kCvkdME8y+JfUvVBUsBeT/cQGjkaJPMdbpaOF
-	9uH1OIrLKPpkhEGxrMBYkh72wg4+SxFhWDxw3jIy5fzCXIWkhwomZy+/TbS4U73fhbVwiu
-	URkYbqM5wAD4aHHmcq8U6y4SP5kShnKtNV/VIRvpS7w/gbm8pD/1IEBGCFzGdlHgq+pjsv
-	yeSDixI21qcc+HbKWCNHkkctq1Cov/iwVh149n+vjlVziJCeNhZ5GfoJsYZwMg==
+	bh=u1s91F5grS0fyQv6iyaQkfETkK6uLonCQoWR9iCw2sk=;
+	b=WO7lo1XnDtILDDaRKOWMMFgOaKZWlrIjV14E2hymfx2CBiuOobTb/6fz8nQqAn+oVF0xRU
+	EXsqFXH2jdh9jR3uQkZZlToYwRAQuBzqi3OSu1ou56etETfZR7/EkIL5owpf7uR2DUX0I4
+	qA48joQlgSWH1B9YXp/xC2fsUwRdhH5xLg6ya/SIZmprpTx5fPMXEL6F7mHQWDkUxcsHEX
+	03BX7D1La37q24DubVKojI4ud8/QJ51bfMA26IEiVzp+24n8fosZ0f+b2tacU8lE9SMkbj
+	K6gRKXSXDVTeC9pmDvuKgnfrhqE7ZFgifVYFrK/0E962zpjOGObjebQS36mn6A==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 04 Mar 2026 19:24:28 +0100
-Subject: [PATCH net-next 5/8] net: macb: move macb_xdp_submit_frame() body
- to helper function
+Date: Wed, 04 Mar 2026 19:24:29 +0100
+Subject: [PATCH net-next 6/8] net: macb: add infrastructure for XSK buffer
+ pool
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260304-macb-xsk-v1-5-ba2ebe2bdaa3@bootlin.com>
+Message-Id: <20260304-macb-xsk-v1-6-ba2ebe2bdaa3@bootlin.com>
 References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
 In-Reply-To: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
 To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
@@ -86,26 +86,26 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
 X-Mailer: b4 0.14.3
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 11C19206648
+X-Rspamd-Queue-Id: 3B84C20673C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264001-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264002-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -116,214 +116,150 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
 X-Rspamd-Action: no action
 
-Part of macb_xdp_submit_frame() is specific to the handling of an XDP
-buffer (pick a queue for emission, DMA map or sync, report emitted
-bytes), part is chitchat with hardware to update DMA descriptor and
-start transmit.
+Store a XSK buffer pool per queue, assigned through .ndo_bpf() with
+command == XDP_SETUP_XSK_POOL.
 
-Move the hardware specific code out of macb_xdp_submit_frame() into a
-macb_xdp_submit_buff() helper function. The goal is to make code
-reusable to support XSK buffers.
+We have no sequence upstream to disable a single queue, free its
+buffers, refill it and re-enable the queue (without affecting other
+queues). Therefore we protect our operation with interface-wide close
+and open.
 
-The macb_xdp_submit_frame() body is modified slightly: we bring the
-dma_map_single() call outside of the queue->tx_ptr_lock critical
-section, to minimise its span.
+Also, prepare the terrain with a .ndo_xsk_wakeup() operation that does
+the pre-flight-checks but is a no-op.
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 143 +++++++++++++++++--------------
- 1 file changed, 78 insertions(+), 65 deletions(-)
+ drivers/net/ethernet/cadence/macb.h      |  1 +
+ drivers/net/ethernet/cadence/macb_main.c | 66 +++++++++++++++++++++++++++++++-
+ 2 files changed, 66 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 009a44e94726..a9e6f0289ecb 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1278,6 +1278,7 @@ struct macb_queue {
+ 	struct napi_struct	napi_rx;
+ 	struct queue_stats stats;
+ 	struct page_pool	*page_pool;
++	struct xsk_buff_pool	*xsk_pool;
+ 	struct sk_buff		*skb;
+ 	struct xdp_rxq_info	xdp_rxq;
+ };
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ed94f9f0894b..65c2ec2a843c 100644
+index 65c2ec2a843c..a72d59ffd1cf 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -1208,6 +1208,52 @@ static bool ptp_one_step_sync(struct sk_buff *skb)
- 	return false;
+@@ -38,6 +38,7 @@
+ #include <linux/types.h>
+ #include <linux/udp.h>
+ #include <net/pkt_sched.h>
++#include <net/xdp_sock_drv.h>
+ #include "macb.h"
+ 
+ /* This structure is only used for MACB on SiFive FU540 devices */
+@@ -1564,6 +1565,24 @@ static int gem_xdp_xmit(struct net_device *dev, int num_frame,
+ 	return xmitted;
  }
  
-+static void macb_xdp_submit_buff(struct macb *bp, unsigned int queue_index,
-+				 struct macb_tx_buff buff)
++static int gem_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
 +{
-+	struct macb_queue *queue = &bp->queues[queue_index];
-+	struct net_device *netdev = bp->dev;
-+	struct macb_tx_buff *tx_buff;
-+	struct macb_dma_desc *desc;
-+	unsigned int next_head;
-+	u32 ctrl;
++	struct macb *bp = netdev_priv(dev);
++	struct macb_queue *queue = &bp->queues[qid];
 +
-+	next_head = queue->tx_head + 1;
++	if (unlikely(!netif_carrier_ok(dev)))
++		return -ENETDOWN;
 +
-+	ctrl = MACB_BIT(TX_USED);
-+	desc = macb_tx_desc(queue, next_head);
-+	desc->ctrl = ctrl;
++	if (unlikely(qid >= bp->num_queues ||
++		     !rcu_access_pointer(bp->prog) ||
++		     !queue->xsk_pool))
++		return -ENXIO;
 +
-+	desc = macb_tx_desc(queue, queue->tx_head);
-+	tx_buff = macb_tx_buff(queue, queue->tx_head);
-+	*tx_buff = buff;
++	/* no-op, until rx/tx implement XSK support */
 +
-+	ctrl = (u32)buff.size;
-+	ctrl |= MACB_BIT(TX_LAST);
-+
-+	if (unlikely(macb_tx_ring_wrap(bp, queue->tx_head) == (bp->tx_ring_size - 1)))
-+		ctrl |= MACB_BIT(TX_WRAP);
-+
-+	/* Set TX buffer descriptor */
-+	macb_set_addr(bp, desc, buff.mapping);
-+	/* desc->addr must be visible to hardware before clearing
-+	 * 'TX_USED' bit in desc->ctrl.
-+	 */
-+	wmb();
-+	desc->ctrl = ctrl;
-+	queue->tx_head = next_head;
-+
-+	/* Make newly initialized descriptor visible to hardware */
-+	wmb();
-+
-+	spin_lock(&bp->lock);
-+	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
-+	spin_unlock(&bp->lock);
-+
-+	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
-+		netif_stop_subqueue(netdev, queue_index);
++	return 0;
 +}
 +
- static int macb_tx_complete(struct macb_queue *queue, int budget)
- {
- 	struct macb *bp = queue->bp;
-@@ -1430,44 +1476,25 @@ static void discard_partial_frame(struct macb_queue *queue, unsigned int begin,
- }
- 
- static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
--				 struct net_device *dev, bool dma_map,
-+				 struct net_device *netdev, bool dma_map,
- 				 dma_addr_t addr)
- {
-+	struct device *dev = &bp->pdev->dev;
- 	enum macb_tx_buff_type buff_type;
--	struct macb_tx_buff *tx_buff;
- 	int cpu = smp_processor_id();
--	struct macb_dma_desc *desc;
- 	struct macb_queue *queue;
--	unsigned int next_head;
- 	unsigned long flags;
- 	dma_addr_t mapping;
- 	u16 queue_index;
- 	int err = 0;
--	u32 ctrl;
--
--	queue_index = cpu % bp->num_queues;
--	queue = &bp->queues[queue_index];
--	buff_type = dma_map ? MACB_TYPE_XDP_NDO : MACB_TYPE_XDP_TX;
--
--	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
--
--	/* This is a hard error, log it. */
--	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1) {
--		netif_stop_subqueue(dev, queue_index);
--		netdev_dbg(bp->dev, "tx_head = %u, tx_tail = %u\n",
--			   queue->tx_head, queue->tx_tail);
--		err = -ENOMEM;
--		goto unlock;
--	}
- 
- 	if (dma_map) {
--		mapping = dma_map_single(&bp->pdev->dev,
--					 xdpf->data,
--					 xdpf->len, DMA_TO_DEVICE);
--		if (unlikely(dma_mapping_error(&bp->pdev->dev, mapping))) {
--			err = -ENOMEM;
--			goto unlock;
--		}
-+		mapping = dma_map_single(dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
-+		err = dma_mapping_error(&bp->pdev->dev, mapping);
-+		if (unlikely(err))
-+			return err;
-+
-+		buff_type = MACB_TYPE_XDP_NDO;
- 	} else {
- 		/* progs can adjust the head. Sync and set the adjusted one.
- 		 * This also implicitly takes into account ip alignment,
-@@ -1476,52 +1503,38 @@ static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
- 		mapping = addr + xdpf->headroom + sizeof(*xdpf);
- 		dma_sync_single_for_device(&bp->pdev->dev, mapping,
- 					   xdpf->len, DMA_BIDIRECTIONAL);
-+
-+		buff_type = MACB_TYPE_XDP_TX;
- 	}
- 
--	next_head = queue->tx_head + 1;
-+	queue_index = cpu % bp->num_queues;
-+	queue = &bp->queues[queue_index];
- 
--	ctrl = MACB_BIT(TX_USED);
--	desc = macb_tx_desc(queue, next_head);
--	desc->ctrl = ctrl;
-+	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
- 
--	desc = macb_tx_desc(queue, queue->tx_head);
--	tx_buff = macb_tx_buff(queue, queue->tx_head);
--	tx_buff->ptr = xdpf;
--	tx_buff->type = buff_type;
--	tx_buff->mapping = dma_map ? mapping : 0;
--	tx_buff->size = xdpf->len;
--	tx_buff->mapped_as_page = false;
-+	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1) {
-+		/* This is a hard error, log it. */
-+		netif_stop_subqueue(netdev, queue_index);
-+		netdev_dbg(netdev, "tx_head = %u, tx_tail = %u\n",
-+			   queue->tx_head, queue->tx_tail);
-+		err = -ENOMEM;
-+	} else {
-+		macb_xdp_submit_buff(bp, queue_index, (struct macb_tx_buff){
-+			.ptr = xdpf,
-+			.mapping = dma_map ? mapping : 0,
-+			.size = xdpf->len,
-+			.mapped_as_page = false,
-+			.type = buff_type,
-+		});
- 
--	ctrl = (u32)tx_buff->size;
--	ctrl |= MACB_BIT(TX_LAST);
-+		netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index), xdpf->len);
-+	}
- 
--	if (unlikely(macb_tx_ring_wrap(bp, queue->tx_head) == (bp->tx_ring_size - 1)))
--		ctrl |= MACB_BIT(TX_WRAP);
--
--	/* Set TX buffer descriptor */
--	macb_set_addr(bp, desc, mapping);
--	/* desc->addr must be visible to hardware before clearing
--	 * 'TX_USED' bit in desc->ctrl.
--	 */
--	wmb();
--	desc->ctrl = ctrl;
--	queue->tx_head = next_head;
--
--	/* Make newly initialized descriptor visible to hardware */
--	wmb();
--
--	spin_lock(&bp->lock);
--	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
--	spin_unlock(&bp->lock);
--
--	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index), xdpf->len);
--
--	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
--		netif_stop_subqueue(dev, queue_index);
--
--unlock:
- 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
- 
-+	if (err && dma_map)
-+		dma_unmap_single(dev, mapping, xdpf->len, DMA_TO_DEVICE);
-+
+ static u32 gem_xdp_run(struct macb_queue *queue, void *buff_head,
+ 		       unsigned int *len, unsigned int *headroom,
+ 		       dma_addr_t addr)
+@@ -3580,6 +3599,46 @@ static int gem_xdp_setup(struct net_device *dev, struct bpf_prog *prog,
  	return err;
  }
  
++static int gem_xdp_setup_xsk_pool(struct net_device *netdev,
++				  struct xsk_buff_pool *pool, u16 qid)
++{
++	struct macb *bp = netdev_priv(netdev);
++	unsigned long attrs = DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING;
++	struct macb_queue *queue = &bp->queues[qid];
++	bool running = netif_running(netdev);
++	struct device *dev = &bp->pdev->dev;
++	int err = 0;
++
++	if (qid >= bp->num_queues)
++		return -EINVAL;
++
++	if (pool && queue->xsk_pool)
++		return -EBUSY;
++
++	if (running)
++		macb_close(netdev);
++
++	if (pool) {
++		err = xsk_pool_dma_map(pool, dev, attrs);
++		if (err)
++			netdev_err(netdev, "xdp: failed to DMA map XSK pool\n");
++		else
++			queue->xsk_pool = pool;
++	} else {
++		if (queue->xsk_pool)
++			xsk_pool_dma_unmap(queue->xsk_pool, attrs);
++		queue->xsk_pool = NULL;
++	}
++
++	if (running) {
++		int err_open = macb_open(netdev);
++
++		err = err ?: err_open;
++	}
++
++	return err;
++}
++
+ static int gem_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ {
+ 	struct macb *bp = netdev_priv(dev);
+@@ -3590,6 +3649,9 @@ static int gem_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	switch (xdp->command) {
+ 	case XDP_SETUP_PROG:
+ 		return gem_xdp_setup(dev, xdp->prog, xdp->extack);
++	case XDP_SETUP_XSK_POOL:
++		return gem_xdp_setup_xsk_pool(dev, xdp->xsk.pool,
++					      xdp->xsk.queue_id);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -4852,6 +4914,7 @@ static const struct net_device_ops macb_netdev_ops = {
+ 	.ndo_setup_tc		= macb_setup_tc,
+ 	.ndo_bpf		= gem_xdp,
+ 	.ndo_xdp_xmit		= gem_xdp_xmit,
++	.ndo_xsk_wakeup		= gem_xsk_wakeup,
+ };
+ 
+ /* Configure peripheral capabilities according to device tree
+@@ -6156,7 +6219,8 @@ static int macb_probe(struct platform_device *pdev)
+ 
+ 		dev->xdp_features = NETDEV_XDP_ACT_BASIC |
+ 				    NETDEV_XDP_ACT_REDIRECT |
+-				    NETDEV_XDP_ACT_NDO_XMIT;
++				    NETDEV_XDP_ACT_NDO_XMIT |
++				    NETDEV_XDP_ACT_XSK_ZEROCOPY;
+ 	}
+ 
+ 	netif_carrier_off(dev);
 
 -- 
 2.53.0
