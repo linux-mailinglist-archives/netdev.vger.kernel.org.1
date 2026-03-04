@@ -1,177 +1,164 @@
-Return-Path: <netdev+bounces-263766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBQOIk8WqGlTnwAAu9opvQ
-	(envelope-from <netdev+bounces-263766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:23:59 +0100
+	id sJEFDr0WqGlTnwAAu9opvQ
+	(envelope-from <netdev+bounces-263767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:25:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8FC1FEECF
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:23:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C64E21FEF2E
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 661F4303675F
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:23:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D2CD3035260
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B699D3ACA74;
-	Wed,  4 Mar 2026 11:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F243ACA7C;
+	Wed,  4 Mar 2026 11:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWQyvxcV"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="geXO56BO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8873D372693;
-	Wed,  4 Mar 2026 11:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626F43A8738;
+	Wed,  4 Mar 2026 11:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772623421; cv=none; b=PJ7W3y9IIg45RWPfHCr5Cn7vpZO+cQRYla12sjYvjSjwgyWVpVbRORL3+a+HWol8jnWp2J2T7SjtwpscMIMb4/ixJB+M6T0906c0dfWQY0o1zJD3RPkwxWqEgFXb2UirKv97oob80f2cx98b7p3MsntE1f9eKOeYZNDbvJpVaOQ=
+	t=1772623505; cv=none; b=cejdFnWLbOkdr/w13LqY85SuMQt4WsFPii4oEnQd1A94LA4GAvWV+WO5EraA6Cb3hZbmyIoYoHVcpa26DFX8UEJlIJCMyBxzLDrYwUTrz1dpAypfT0JmHW5dqHtYAK14nrM4bBCBcJl+tlN0PyJ9ROG3C5REz5n51cQnIoOJJ9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772623421; c=relaxed/simple;
-	bh=h9cK7pBF4PrYZeuQA4C5C9xLaF0GsLQIP8AyKutBfBQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SCbs+7kp59bB69Sap995w5uIiRgXr7SvnbF+KHSmJEeRTIXP7MaBL22CusSrRifuR4vF1wS2eKduBkS+NGqPiAnUl4eWKmLt4yxgf5AcJM8wAjVnQVqJi0JLxHsGhzvtsySTsnlRiDxb5/0nGabl0hCQQvKLQXmOg6dnhi3PbAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWQyvxcV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458E1C19423;
-	Wed,  4 Mar 2026 11:23:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772623421;
-	bh=h9cK7pBF4PrYZeuQA4C5C9xLaF0GsLQIP8AyKutBfBQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qWQyvxcVOI9I/fIn34XDL82Wiv/j9A/0CO+HIzbod1hKepstSs1YL1ATVeJEuknoO
-	 G1E4RF2B/MFABg8S/0HhAy7IvbBvPtrGcibTxXxqkZQ7xBDxvBJC+yaoeOlcsC6Ee+
-	 ndfD62jjuB1WSwU9SVxtgMsERFivVEvg8KyfWfUpQ6HpK0FeTcVeHuK+vhjHF+mHdR
-	 7iIAPaFKpFinAHvRkXItep1op8e6chjhnFmk+4fHsAdkX3yQkRo/ZVscYgN2TuR0Cp
-	 cg3k1KseLgnQfcRh46WMlVr7dOefgQP+hRWN1QSYHzDduu6zyCnUwr/opYJn6h1XZx
-	 PclxjlJCDXevA==
-Date: Wed, 4 Mar 2026 11:23:29 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alexey Brodkin <abrodkin@synopsys.com>,
-	Vineet Gupta <vgupta@kernel.org>, Scott Wood <oss@buserror.net>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Dvorkin Dmitry <dvorkin@tibbo.com>, Wells Lu <wellslutw@gmail.com>,
-	Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, linux-leds@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-pm@vger.kernel.org
-Subject: Re: [PATCH 05/14] regulator: drop unneeded dependencies on OF_GPIO
-Message-ID: <31c9910c-8157-40bb-9128-9db34704d637@sirena.org.uk>
-References: <20260304-gpio-of-kconfig-v1-0-d597916e79e7@oss.qualcomm.com>
- <20260304-gpio-of-kconfig-v1-5-d597916e79e7@oss.qualcomm.com>
+	s=arc-20240116; t=1772623505; c=relaxed/simple;
+	bh=T1MqSj4t02fYLwrDUd4BceSRqO9Y7bt8oS2LbSoXV+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=loc5aKKclr4n+OkrKdyC/hVorwOmdLKJr2yRJJfFU/c+Z3oWCmUt4RPToYmiqV0aBvMmTQmeCO3bRc39PmsHhlcunY2Wcw38T11Aab3NJBQyZEjiUljE0xhGVoHiKEwf7mibi1HJ0KMGNWa8hI8CYXUtXVwtE9r+pfuL5dVklcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=geXO56BO; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=bkOgEIlWHb2dcsrAoQ0NNF/UqerkSCmXqlLQzBvfEZc=; t=1772623504; x=1773833104; 
+	b=geXO56BORWFfEhCgA668eetxKSULZhlcdPw+aeBUQdkxAdzU0d4lxPP7pOeOx9Wd5TKHT8UOhRB
+	ayYe+2pj+y+WYmu3Uvz85OgQHuRwjC/1E8o+8sxUxYPUHhvaVIxEaz1vuHNajKViSd+tySE6EPmzW
+	Q7VLN99y2AvJnWZ1kki78TxU42jauVUE5A7pv3PaNW94iEkCyKqUb8fbeGkjNoO1gvbgCFFAHMGAQ
+	aRRp2rQ8Nid9CfZiNt7pPnNDKgy7969eP+kSGkW8Bnd4D30Es2bFNYjyu8PNEMB69WBon2H/dMdKh
+	nuCLpenEMAvx01q8B830ujgYsSGYd35B/F8A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vxkLe-000000082jc-1kqN;
+	Wed, 04 Mar 2026 12:25:02 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-03-04
+Date: Wed,  4 Mar 2026 12:24:37 +0100
+Message-ID: <20260304112500.169639-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zVeDWCP0gn6RDW1P"
-Content-Disposition: inline
-In-Reply-To: <20260304-gpio-of-kconfig-v1-5-d597916e79e7@oss.qualcomm.com>
-X-Cookie: Take it easy, we're in a hurry.
-X-Rspamd-Queue-Id: EA8FC1FEECF
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C64E21FEF2E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263766-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263767-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[arm.com,kernel.org,synopsys.com,buserror.net,linux.ibm.com,ellerman.id.au,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,baylibre.com,googlemail.com,tibbo.com,roeck-us.net,linux-watchdog.org,linuxfoundation.org,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[46];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sipsolutions.net:dkim,sipsolutions.net:mid]
 X-Rspamd-Action: no action
 
+Hi,
 
---zVeDWCP0gn6RDW1P
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+A couple more fixes, I'm mostly sending this for the mt76
+fixes which conflict with some other upcoming work for
+-next, so I can put it all together next week.
 
-On Wed, Mar 04, 2026 at 10:02:26AM +0100, Bartosz Golaszewski wrote:
-> OF_GPIO is selected automatically on all OF systems. Any symbols it
-> controls also provide stubs so there's really no reason to select it
-> explicitly.
+Please pull and let us know if there's any problem.
 
-> diff --git a/drivers/regulator/Kconfig b/drivers/regulator/Kconfig
-> index d10b6f9243d51574a9ac662b93d4678cd7d94a4f..10e64e3ffb1f5f60e0b62b16ab513f002a42fa1f 100644
-> --- a/drivers/regulator/Kconfig
-> +++ b/drivers/regulator/Kconfig
-> @@ -1232,7 +1232,6 @@ config REGULATOR_RASPBERRYPI_TOUCHSCREEN_ATTINY
->  	depends on ARM || ARM64 || COMPILE_TEST
->  	depends on BACKLIGHT_CLASS_DEVICE
->  	depends on I2C
-> -	depends on OF_GPIO
->  	select REGMAP_I2C
->  	help
->  	  This driver supports ATTINY regulator on the Raspberry Pi 7-inch
+Thanks,
+johannes
 
-This is a depends rather than a select, though it's fairly redundant
-with the arch:
 
-Acked-by: Mark Brown <broonie@kernel.org>
 
---zVeDWCP0gn6RDW1P
-Content-Type: application/pgp-signature; name="signature.asc"
+The following changes since commit b9c8fc2caea6ff7e45c6942de8fee53515c66b34:
 
------BEGIN PGP SIGNATURE-----
+  Merge tag 'net-7.0-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-02-26 08:00:13 -0800)
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmoFjAACgkQJNaLcl1U
-h9CHUQf+OxkRqulw7IQRBWvsy5b7fUXsBVsAfKiGM5xDUpiNuKd4S1A6tLOnAn45
-3I8XeQGoX3PGjjNCIQsc3+Tsta1x1lKnTINxC1oxhPg4vuQF8O96ExfK5rw2SbNu
-wIgQOz00KrJnhI/QkBNPEUhw2mWXzQuqkwd4ljTlDlUXJCwgc0bWAcR6W7LWq9bW
-YeqQrGM7BM83jHyDJAFQsnVLeA6gQM+fV/LkZSTwcNYN3SMz3Csdy3wlcHOEpkbE
-Tl7qsVyLstyKIr9F6wUeYRPOH2hl9/Oi9cTvCYBRu1CK/zLsDPyczcWKF0yhfMaO
-Q+nIB9oU+/dYWlYxHma+RHEckx9A8A==
-=6Y+O
------END PGP SIGNATURE-----
+are available in the Git repository at:
 
---zVeDWCP0gn6RDW1P--
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-03-04
+
+for you to fetch changes up to 4e10a730d1b511ff49723371ed6d694dd1b2c785:
+
+  wifi: mt76: Fix possible oob access in mt76_connac2_mac_write_txwi_80211() (2026-03-03 12:13:36 +0100)
+
+----------------------------------------------------------------
+Some more fixes:
+ - mt76 gets three almost identical new length checks
+ - cw1200 & ti: locking fixes
+ - mac80211 has a fix for the recent EML frame handling
+ - rsi driver no longer oddly responds to config, which
+   had triggered a warning in mac80211
+ - ath12k has two fixes for station statistics handling
+
+----------------------------------------------------------------
+Baochen Qiang (2):
+      wifi: ath12k: use correct pdev id when requesting firmware stats
+      wifi: ath12k: fix station lookup failure when disconnecting from AP
+
+Bart Van Assche (2):
+      wifi: cw1200: Fix locking in error paths
+      wifi: wlcore: Fix a locking bug
+
+Johannes Berg (1):
+      Merge tag 'ath-current-20260302' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+Lorenzo Bianconi (3):
+      wifi: mt76: mt7996: Fix possible oob access in mt7996_mac_write_txwi_80211()
+      wifi: mt76: mt7925: Fix possible oob access in mt7925_mac_write_txwi_80211()
+      wifi: mt76: Fix possible oob access in mt76_connac2_mac_write_txwi_80211()
+
+MeiChia Chiu (1):
+      wifi: mac80211: fix missing ieee80211_eml_params member initialization
+
+Sebastian Krzyszkowiak (1):
+      wifi: rsi: Don't default to -EOPNOTSUPP in rsi_mac80211_config
+
+ drivers/net/wireless/ath/ath12k/mac.c              |  6 ++--
+ drivers/net/wireless/ath/ath12k/wmi.c              | 36 ++++++++--------------
+ .../net/wireless/mediatek/mt76/mt76_connac_mac.c   |  1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/mac.c    |  1 +
+ drivers/net/wireless/mediatek/mt76/mt7996/mac.c    |  1 +
+ drivers/net/wireless/rsi/rsi_91x_mac80211.c        |  2 +-
+ drivers/net/wireless/st/cw1200/pm.c                |  2 ++
+ drivers/net/wireless/ti/wlcore/main.c              |  4 +--
+ net/mac80211/eht.c                                 |  1 +
+ 9 files changed, 25 insertions(+), 29 deletions(-)
 
