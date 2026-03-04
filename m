@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-263537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMOxIdGPp2lKiQAAu9opvQ
-	(envelope-from <netdev+bounces-263537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:50:09 +0100
+	id 0KlmKfSPp2lKiQAAu9opvQ
+	(envelope-from <netdev+bounces-263538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:50:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D631F9AD0
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:50:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B4E51F9AE6
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:50:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54CD43015E3C
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:50:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA538307B238
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A227E18A6DB;
-	Wed,  4 Mar 2026 01:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF94E327BEC;
+	Wed,  4 Mar 2026 01:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oioS2hzO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZR4K7Gm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F812336882;
-	Wed,  4 Mar 2026 01:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB953254BB;
+	Wed,  4 Mar 2026 01:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772589006; cv=none; b=sPyI22Gah+LiruXngBqsztCmOG6l9rBXFihPDusDwqjU1bTY91tNkhMIeFZeyvT1s7Vna8jBThrkb4V60UAz2W60rG40Tp5nutS/vtG7A7z/E4TFyBagzR8PfeA03Nmkk+cLl9vRHs95DjlxoIOcTCRF9vQQbHutyyAD7KzmeHE=
+	t=1772589007; cv=none; b=cyC6Aj9U3CyUfXkvHiN094LGPrKTNp+ECyNBa7xwPZaoSK9+bTJnJMXDkU5FdkW34yNzhahh30VGoLKokkT7WzE4yr0aCqPCVh76SN8cnFkimJklXADpWACA+jj97CAs+aHa1MsT3K21WtOtVYSO4BMFuto7locpDDYbmjbp11M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772589006; c=relaxed/simple;
-	bh=LX/70GT9Trt2zlliZIToeuLyvUbthChKseeWWPrJZDY=;
+	s=arc-20240116; t=1772589007; c=relaxed/simple;
+	bh=QLjMQ/UhrxwgKgLAFqRbQ0R6O6SIrJ0zVQp+v0Uxi5Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W31VmvMdJB+sp2EG8xz7QXiDLz43rjMT6W6awBoh3LiU8QUh8ItFydOt0i2VCunvWPEO/LytXKqoMYgWfN+jAAIC5NQa4XunhAWZrkvH3m6q5ENiyTKsUYloPdNCYasqPyeYOa87+F3Jzv5Qtx/HokY7P61pD+QrpTdjlV/GmN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oioS2hzO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EA66C116C6;
-	Wed,  4 Mar 2026 01:50:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=u1E9dsQTIgWkXEPd01dS7AHFxCo+hDoBSte4GKRdeUP1VsQIIFCN2t2o052i/8clK6MV69sKqSqs+XbWPXxfOKDXr0NHaMRATBOfOq3cKgHviRmc/zoOt8NEZwCl9iHLKPaHAp17eSDv5crj01qqiNb+OgRXmYVvS/eX9SWEqXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZR4K7Gm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71D9BC19422;
+	Wed,  4 Mar 2026 01:50:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772589006;
-	bh=LX/70GT9Trt2zlliZIToeuLyvUbthChKseeWWPrJZDY=;
+	s=k20201202; t=1772589007;
+	bh=QLjMQ/UhrxwgKgLAFqRbQ0R6O6SIrJ0zVQp+v0Uxi5Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oioS2hzONSVBfnV7kdVxTTdNl6u1MLLuvgYgvcB+NLmkp6N3v7n8mbqHm7ns8RRIx
-	 aRvshgljBE9n1p7sZ+GSC3YWJAhdVkruSSoRB7T7xtTmXTFyx7NGUOsv8Pt20EtpX7
-	 0oUGutIpJK9JL9OyDcEziLdEIu++0avOIYBiigma6gqkMR93PD6X1Udi60rxjvvypI
-	 A14xBt1F3qA1hhO73VwwLER7+AFPZMpN56Vq9TA0dbjHhVPfamMvP3aefRE6VU5PI9
-	 npm2wpgOCOQnUk5AL/Oy1Xb3W9Oq9Lhju5uLx+CPURd2DVZvu9pYIzdbyfI/aN3X+E
-	 2BIjFYQv9+lyQ==
+	b=UZR4K7GmpiwBz2oe+WKaxoNVIHsqst2PtkiXfoh4fCn9+CaXiArLvbqArjIWorSyN
+	 T6oopneJ8DUS6+4Ud2wlXtyazmVMayMGJBjKm9WzhOOM3P1d9Lsyj7Yfd8IVSCJPEu
+	 JBwygeaDWK6R8qM7OMqUj4P1ahovNGZUO2Ex78VlcafpI4a5ELGplwDErzu5WzbQfm
+	 e4dTJnqRCMyrKQVAS4nhnPkFUmTUPOhf0x1hEFj0BU2+IWoFxKggyzxpCT+5XtlBb0
+	 pSauJYolO6fXgQ3N32wTA8eXMSShxkUlMA19+G2sWIcdZnwkfUly+Trot9dXLO/YjD
+	 xdY/o9WEg2EsA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 401A73808200;
-	Wed,  4 Mar 2026 01:50:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EBC3808200;
+	Wed,  4 Mar 2026 01:50:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,32 +55,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] netconsole: fix sysdata_release_enabled_show checking
- wrong flag
+Subject: Re: [PATCH net v3] amd-xgbe: fix sleep while atomic on suspend/resume
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177258900705.1554347.8845916164165638231.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Mar 2026 01:50:07 +0000
-References: <20260302-sysdata_release_fix-v1-1-e5090f677c7c@debian.org>
-In-Reply-To: <20260302-sysdata_release_fix-v1-1-e5090f677c7c@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@meta.com, stable@vger.kernel.org
-X-Rspamd-Queue-Id: E1D631F9AD0
+ <177258900829.1554347.5287441049219471036.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Mar 2026 01:50:08 +0000
+References: <20260302042124.1386445-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20260302042124.1386445-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, Thomas.Lendacky@amd.com
+X-Rspamd-Queue-Id: 0B4E51F9AE6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-263537-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-263538-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -90,10 +89,10 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
@@ -103,21 +102,20 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 02 Mar 2026 03:40:46 -0800 you wrote:
-> sysdata_release_enabled_show() checks SYSDATA_TASKNAME instead of
-> SYSDATA_RELEASE, causing the configfs release_enabled attribute to
-> reflect the taskname feature state rather than the release feature
-> state. This is a copy-paste error from the adjacent
-> sysdata_taskname_enabled_show() function.
+On Mon, 2 Mar 2026 09:51:24 +0530 you wrote:
+> The xgbe_powerdown() and xgbe_powerup() functions use spinlocks
+> (spin_lock_irqsave) while calling functions that may sleep:
+> - napi_disable() can sleep waiting for NAPI polling to complete
+> - flush_workqueue() can sleep waiting for pending work items
 > 
-> The corresponding _store function already uses the correct
-> SYSDATA_RELEASE flag.
+> This causes a "BUG: scheduling while atomic" error during suspend/resume
+> cycles on systems using the AMD XGBE Ethernet controller.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] netconsole: fix sysdata_release_enabled_show checking wrong flag
-    https://git.kernel.org/netdev/net/c/5af6e8b54927
+  - [net,v3] amd-xgbe: fix sleep while atomic on suspend/resume
+    https://git.kernel.org/netdev/net/c/e2f27363aa6d
 
 You are awesome, thank you!
 -- 
