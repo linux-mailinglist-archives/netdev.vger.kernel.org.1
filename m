@@ -1,212 +1,218 @@
-Return-Path: <netdev+bounces-263805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFvQLz4lqGl3ogAAu9opvQ
-	(envelope-from <netdev+bounces-263805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:27:42 +0100
+	id gOmeFTYmqGlhowAAu9opvQ
+	(envelope-from <netdev+bounces-263806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:31:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F55B1FFAF9
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:27:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2641FFB66
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 371B530B8269
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:24:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E43A23063B41
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA5B3A63E4;
-	Wed,  4 Mar 2026 12:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DCB3AE1B9;
+	Wed,  4 Mar 2026 12:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RIP6yxVd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Wr8aqQjB"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011070.outbound.protection.outlook.com [40.93.194.70])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328C7370D52;
-	Wed,  4 Mar 2026 12:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772627045; cv=fail; b=YRGkN1R8LgvbiLLx887Lui9I3GC1XSnwCBJI7L1/z8PWgFBjab+GFwEjfwezUbH9xQeRtlHndDkUx0dYlv2smH4g5eFPTVmzPxtheU8jrNK8pMm8yD0pppcyOI8VCpaOt1BmNv3HoAgNfe90Kats5erCii5SH4NxHm6bdqAXIrg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772627045; c=relaxed/simple;
-	bh=4vMWbSMMlgebrvknDwJDU+BCzmYRO0p2S9OCZHoXHK8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eYtIKgbxHH/yP6rVeDFYSX64szkvfmojWvB49x3FsXCx0VrfFioWIrpLhh6hesKyO7ZSy2f6bzt7tlCl7HiVliTcZc3IcvDAHo0P1hOFyte3FpowVhTTtNO7MiVEYSFeECBdlzZYNupsvJldOpMkXZB3+imQjCZWs4tlCSH5bg0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RIP6yxVd; arc=fail smtp.client-ip=40.93.194.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P924ISABG13VPuSe5JM+vxJgK+cU1SUXzvzh/kI1gSQJ811C5ri9lWWrTImwlTDpa/eXSjpK8I4U4hY7ib+S3DPWZAEYbTcUM4B5flPhXljswmutvN97x4J2Bn18Q/LkYeD4gMEp0yKAN6sILbrq/uFKkVwVoEHC03PgX+ZHONNx7T1r2nSqo7rRU0MCGf3L/A3Z87WutbvFC/gdTva12Miv0z+eLNLfBlMz0GUPZWSYmO0pJ2G4peY+RFm7CkOH+SqD+eN+PD1rWnKuSLZy7s8+9+LRYu0OpVkD5kfxXr2H2fFTg2sFSf0+7LjZJWVK3mpfLKLoApI/At9V1ZnJqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TargNyUTnJJPTHkHQ7JsIMdEpxsLwSXcifNujEv2ke4=;
- b=RA2CuDyc0vHOA6NX97ZGDmSo+J/Y42tFu+k40Uy2oAyFEJ4tiPqZuk8DCv5esPL0y3A+Rn4Ibf650r7LlzmAiKrxRQn+2P8j96/PmBcLGId8lllLWDL3k1keY8s+63y7ewl0UbPlxPLdj1VhKuh88nrtu65vjiHSn8Ac/3kjYncQjlw5mY3ktgeHoOIcLYx2fR+ww6WxaeeVPCfv/lINnhEm34KE+YY8eRSQx6mhxD9Q4WRmU2GSRlwqBzXJdhnoEWU1Dtf9DrMS+3iAeZe2KKP2QVx+0+N7F6vqmbTP2siqneGRwYRHo8BSeWSsNRGqKvvf8uu1rtQklpBxVKZPog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TargNyUTnJJPTHkHQ7JsIMdEpxsLwSXcifNujEv2ke4=;
- b=RIP6yxVduC/X3vbsQ8T7LI1Lm+C/LkdhYKxQruMsChMBxSl06BXNHDh9zzXKQLns3ab2effPywvsKCRv626E5OL0EKHWd+IiJwyEvkaHwqafmhFxzD8f68kq2mPBf5L84wJs66vwpx1jhlz5fKgWnyxncYEowR97AqFdRRa507g=
-Received: from CH2PR18CA0013.namprd18.prod.outlook.com (2603:10b6:610:4f::23)
- by CH3PR12MB8548.namprd12.prod.outlook.com (2603:10b6:610:165::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.17; Wed, 4 Mar
- 2026 12:23:59 +0000
-Received: from CH2PEPF0000014A.namprd02.prod.outlook.com
- (2603:10b6:610:4f:cafe::31) by CH2PR18CA0013.outlook.office365.com
- (2603:10b6:610:4f::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Wed,
- 4 Mar 2026 12:23:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH2PEPF0000014A.mail.protection.outlook.com (10.167.244.107) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Wed, 4 Mar 2026 12:23:59 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 4 Mar
- 2026 06:23:56 -0600
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
-	<Raju.Rangoju@amd.com>
-Subject: [PATCH net 3/3] amd-xgbe: reset PHY settings before starting PHY
-Date: Wed, 4 Mar 2026 17:53:05 +0530
-Message-ID: <20260304122305.812541-4-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260304122305.812541-1-Raju.Rangoju@amd.com>
-References: <20260304122305.812541-1-Raju.Rangoju@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DD632FA14;
+	Wed,  4 Mar 2026 12:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772627212; cv=none; b=mqTa8ayPxSRFy7+RBTEfy9jCRgAR7IW45831qlEfBlUwgK8s7vPZZoAz7hD/P0Jm6ZCYXbvhtAGtOuWQ1gHsENVeG6CT3/uNb1loVl49SUPTbFrsdMOFlsRaNSiO1NPQoZzrrV5Y0w38MrUKd4gtQ/qSgW+V1JYZbKFwnyNuM/A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772627212; c=relaxed/simple;
+	bh=kzmYBN4Fmy2qyuiyCC4PywlZajPfYpzfGmvBUtDfGn0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FYjOBrTUk3Z9sb/rzUmXqTNx3OBoa4/svP7D1Zn1R9mVmfojVvgwGsGQRI0YyciUgj0l6u/Wq8CmsUQbnBsErc2oGXqI4AF/OJVLAuZRgEoMXJk7RVEMwsYp2dVsrG9XI+Hsk24BVLGJc9oYeRtKKZmxkbyCDTaVQeyNNgjZfOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=Wr8aqQjB; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=KVKUva0XatBIz6K7/luN9CsihaDlLT4xSzZFo+SpHCs=; b=Wr8aqQjBpiPOWloOg6M/sLtw0R
+	yTikI93KKK5A/JN1pmiLMKCxsLlrV8kYcfBxSWAJplx+5QYmZBWstrsMq9XYVslAeqA5/CoUDluiO
+	0iJ23Go/jmhDCUUFsVNjfS7DLxsRcUdIlMn3E/fTAT/ovHoptrxJP/LJuuEhsmdGhtYUw7+MefSiu
+	fwUCLaafMDhXUjHkg3lSxbooUY71DTbk0vYc2E/MghfQJ7y0bQIiP+vID/fU61Xr0KQf0KC/745yU
+	vLLVkVHkr0UI6f3Nas8JyYw3QbsQogSbAFMkH9MdgROEZrjGu0Cw8OGpneFUGVS+9LAW0F357sa3B
+	BfsypjcA==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.98.2)
+	(envelope-from <phil@nwl.cc>)
+	id 1vxlJJ-000000007Wu-1Du8;
+	Wed, 04 Mar 2026 13:26:41 +0100
+Date: Wed, 4 Mar 2026 13:26:41 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Florian Westphal <fw@strlen.de>
+Cc: Helen Koike <koike@igalia.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-dev@igalia.com
+Subject: Re: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
+Message-ID: <aaglAU8E48EF1m-_@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>, Helen Koike <koike@igalia.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-dev@igalia.com
+References: <20260302212605.689909-1-koike@igalia.com>
+ <aaYYiPTO5JYOlhhY@chamomile>
+ <17499d82-ad03-44a9-ab3a-429d2ebea02f@igalia.com>
+ <aafD369eE31dh1VP@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|CH3PR12MB8548:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6a8cc4c-91c9-48b8-f5d0-08de79e8e9a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700016;
-X-Microsoft-Antispam-Message-Info:
-	GXMeAcNCm8vOVDu3/o011mG1ByQronGsS3VGY1vTlCPbfbGhqaCLS4wYni7MuOd984JNPA4chAr+zwTo7Gs2PO/Lf2Y6GxaDu1yRd1eCaElhDPB/gp/Qcs4PsuNVgAcTB5AHwF+oLOxvJikI5g2fNQn6SZgBkuBVIOymFo8sqcHlcdodPQm1lqyAvGsYHQfieDfMaYXDfKfUK3YX/CfKPD+GpnCHISk5vGPSXGnvq2xrpo2Vn1QcwbmCXF6hpJlZOHvLYxuYqXf35YwtNpmMRhLLbj0nZwQ5T9MljFvLwpABy33EQDVrshonXtpDqkrXwAubcu0Cd56XuRIVziQtLLxfb20OnAKUvmZH8VIg+vU/EteDsktKWwkEa+P8XA1Gz9UBm9N6FMzl1xyrwsRrDSeTnrCiGpMizpmVVHU5824UK011maIjcsHrhc2oqUZ5843e4Tqza9Qe/HVnrMqUsu38Czq0RwB68zvMnjelfN97yQz6ECuD7SPKjGzbDUAjujVvuAZrA9oAy708I6qqYHkPo5/UzT75JZ+qK97z4ZBgONhMQsNWCKTZKBMh+iP/cDl2t1COKSKNsOTWK00sPKyT9+V3JZqoA5gQzXG95uH9LinHSMfv3UYueuMqg+Re5HP3piPEpFuNAvKLk5hxEwthDzQKXsCmn5HtnmcabfBcgUmQ/ftQHr6KXTjnKEPZls88+lPlqwxZx+BMrxYQ6sBXiq7EgWznUfpVyxd6Q+al+IgF2QLRSVrNXlW14BVCJvY74WJdjxrzGGDnFhatCQ==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	9dUxGhJtvjIg2Fk6bae9AWnh2lQ4/riw3QRrqA03xxgcHDZUI3zJf25eBGdDvuNBi2tS2NIknLHB5SaZzSUvx1KajkyopecKryb4ayCu5lkxKaLdt+AfG5pzSrYE76Ti62D8ba2tffDMgwAUQB+h8rPSdX7sGEfi3GS6AmZyFS7ctOaRcc9Y/leeadGR/HR/WZ7/7I7AFySfcX0wQ7CMjNjwVGGqOiLatIcKw5wZWnRTG4h752eF+BptJWIOV2Pok98ocrhHxT3+1bOrJbURejL0kbCgGrjVmqudDSGDl/z+sHCRJSjbVjqrDZDr2tjJPCw7kvApQ6Si+nxLWd5rc49WliZvFnCuY0CxxjaXSkggLwoLpr/f2qMPAe4ac7PFBjrIIbNVNdMRs8rStfA+FNjpRyX9PDuAkdvpBw3WSBF7EvYEnLroZKTWayPYJYLo
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2026 12:23:59.1982
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6a8cc4c-91c9-48b8-f5d0-08de79e8e9a5
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000014A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8548
-X-Rspamd-Queue-Id: 2F55B1FFAF9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aafD369eE31dh1VP@strlen.de>
+X-Rspamd-Queue-Id: AE2641FFB66
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[nwl.cc:s=mail2022];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263805-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amd.com:dkim,amd.com:email,amd.com:mid];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-263806-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[nwl.cc];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[nwl.cc:-];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FROM_NEQ_ENVFROM(0.00)[phil@nwl.cc,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.351];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[igalia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,orbyte.nwl.cc:mid]
 X-Rspamd-Action: no action
 
-commit f93505f35745 ("amd-xgbe: let the MAC manage PHY PM") moved
-xgbe_phy_reset() from xgbe_open() to xgbe_start(), placing it after
-phy_start(). As a result, the PHY settings were being reset after the
-PHY had already started.
+Hi,
 
-Reorder the calls so that the PHY settings are reset before
-phy_start() is invoked.
+On Wed, Mar 04, 2026 at 06:32:15AM +0100, Florian Westphal wrote:
+> Helen Koike <koike@igalia.com> wrote:
+> 
+> Phil, can you please take a look at this?
+> 
+> The reg/unregister logic is ... strange.
+> 
+> > But if I understood correctly from your comment below, the proper 
+> > solution would be to fix the order that the hooks are released, is my 
+> > understanding correct?
+> 
+> I don't think its about ordering.  I think the code allows to register
+> devices multiple times in the same flowtable, but UNREG doesn't handle
+> that.
+> 
+> static int nft_flowtable_event(unsigned long event, struct net_device *dev,
+> 			       struct nft_flowtable *flowtable, bool changename)
+> {
+> 	struct nf_hook_ops *ops;
+> 	struct nft_hook *hook;
+> 	bool match;
+> 
+> 	list_for_each_entry(hook, &flowtable->hook_list, list) {
+> 		ops = nft_hook_find_ops(hook, dev);
+> 		match = !strncmp(hook->ifname, dev->name, hook->ifnamelen);
+> 
+> 		switch (event) {
+> 		case NETDEV_UNREGISTER:
+> 			/* NOP if not found or new name still matching */
+> 			if (!ops || (changename && match))
+> 				continue;
+> 
+> 			/* flow_offload_netdev_event() cleans up entries for us. */
+> 			nft_unregister_flowtable_ops(dev_net(dev),
+> 						     flowtable, ops);
+> 			list_del_rcu(&ops->list);
+> 			kfree_rcu(ops, rcu);
+> 			break;
+> 		case NETDEV_REGISTER:
+> 			/* NOP if not matching or already registered */
+> 			if (!match || (changename && ops))
+> 				continue;
+> 
+> And *THIS* looks buggy.
+> Shouldn't that simply be:
+> 			if (!match || ops)
+> 				continue;
+> 
+> Or can you explain why changename has any relevance here?
+> changename means dev->name has already been updated.
 
-Fixes: f93505f35745 ("amd-xgbe: let the MAC manage PHY PM")
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+The changename parameter is true if the event handler was called for a
+NETDEV_CHANGENAME event. In that, case, we call nft_flowtable_event()
+twice for each flowtable: First with NETDEV_REGISTER event value and
+second with NETDEV_UNREGISTER value. If a device is renamed, we will try
+to register it with all flowtables having a matching interface spec if
+not already registered with. If that succeeds, we try to unregister it
+from all flowtables it's registered with if not matching anymore.
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 8b79d88480db..fd4f451efcb2 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -1271,6 +1271,12 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 	if (ret)
- 		goto err_napi;
- 
-+	/* Reset the phy settings */
-+	ret = xgbe_phy_reset(pdata);
-+	if (ret)
-+		goto err_irqs;
-+
-+	/* Start the phy */
- 	ret = phy_if->phy_start(pdata);
- 	if (ret)
- 		goto err_irqs;
-@@ -1280,11 +1286,6 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 
- 	udp_tunnel_nic_reset_ntf(netdev);
- 
--	/* Reset the phy settings */
--	ret = xgbe_phy_reset(pdata);
--	if (ret)
--		goto err_txrx;
--
- 	netif_tx_start_all_queues(netdev);
- 
- 	xgbe_start_timers(pdata);
-@@ -1294,10 +1295,6 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 
- 	return 0;
- 
--err_txrx:
--	hw_if->disable_rx(pdata);
--	hw_if->disable_tx(pdata);
--
- err_irqs:
- 	xgbe_free_irqs(pdata);
- 
--- 
-2.34.1
+In "changename mode" therefore, NETDEV_REGISTER case is skipped if name
+matches but device is registered already. NETDEV_UNREGISTER case is
+skipped if already registered but name still matches.
 
+In regular mode, i.e. either real NETDEV_REGISTER or NETDEV_UNREGISTER,
+the NETDEV_UNREGISTER case is skipped if the device was not registered.
+If it was, the name is not relevant, we have to unregister it anyway.
+The NETDEV_REGISTER case is skipped if the name does not match. If it
+matches, we assume it is not registered already. This is true since
+NETDEV_REGISTER notifier runs for each device just once, right?
+
+> So, we want to skip a new registration if either:
+> 1. the name doesn't match
+> 2. it matches but its already registered.
+
+The "already registered" part should not happen in real NETDEV_REGISTER
+event, though: When parsing netdev hooks, non-distinct prefixes are
+eliminated so that a given device name will never match more than a
+single hook per flowtable. This is done by comparing with min prefix
+length in nft_hook_list_find().
+
+> In case changename is true, only UNREGISTER: case is
+> relevant: If its not matching anymore -> unregister.
+> 
+> Still matching?  Keep it.  In that case, we havn't
+> registered the device again because 'ops' was non-null in
+> REGISTER case.
+
+You're right, the 'changename' check in NETDEV_REGISTER is not needed
+because even if not changing names one should skip if already
+registered. Actually, this indicates a bug unless handling
+NETDEV_CHANGENAME. Maybe add a WARN_ON_ONCE()?
+
+> 		}
+> 		break;
+> 
+> If its allowed to register the same device twice (or more), then the
+> above 'break' needs to be removed, AND one has to alter UNREGISTER
+> above to loop until no more ops are found, i.e.
+
+A device may register to a single flowtable multiple times only
+temporary while it is being renamed: If one hook matches the old name
+and another the new name. It is supposed to register to the newly
+matching hook first, then unregister from the no longer matching one.
+
+Cheers, Phil
 
