@@ -1,156 +1,170 @@
-Return-Path: <netdev+bounces-263697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4L9QAIL+p2nUnAAAu9opvQ
-	(envelope-from <netdev+bounces-263697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:42:26 +0100
+	id SDZgA8H+p2nUnAAAu9opvQ
+	(envelope-from <netdev+bounces-263698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:43:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FA1A1FDC5F
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:42:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C231FDC7D
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5601A30C693E
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:40:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B5BA2304AAFD
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7DC39D6C8;
-	Wed,  4 Mar 2026 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A14439A06E;
+	Wed,  4 Mar 2026 09:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OAp3voBI";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="K3E4IYZb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oxgpf30n"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EE137756D;
-	Wed,  4 Mar 2026 09:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA87739A05A
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 09:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772617228; cv=none; b=f7T4KyS5JFw3MykVN+ziyLCU7/C7wCeq8jozrMjiJ7prpTBx6tL5Ye6FcZ6YEynvqmbJGXl6K2TtlLs+tLAHe61yfFNIRJh/J5ahDrLIqJhJCE2YwESasDyxnv93SlUV6KidAAnKJsVK64rpsSWzFFdocV8JkjBtpE63Iy0u2GA=
+	t=1772617402; cv=none; b=ZhNEaaIi/oG9ACenLzFmvE1wwztrwnFz+0r+OUyO24p97xWa9S7hnLBvjoamw+H7pD5zkHGrnECz3+hDyorqJZcj27HgVjmIIPyvNIulYMYme0nEt3voSBPV7mT6D7GDvTB6v8oxwe5I2VHH0y12FiJ3DE44Xrs8i2uqBpcwOsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772617228; c=relaxed/simple;
-	bh=AO4HBzUh5EP6nb40VVibWTz1NPRn67r816VYbLssLbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SwStHmg3rvrIVFuyEsXO10p6Q5+9KeTd5RgaGNGYUK+07r/qYYs9Z2Hxg6LDo4GSbQ9D3W5rdLlmkeZF8zVce219+h7BC7pE6V+y0/dHm+u9s9Ier+oPcyQ1nJbHKxhxqPuteOIoHryj3yW0BbhkFcfPLAj5s5bPnoh4GDa5q+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=OAp3voBI; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=K3E4IYZb; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 4 Mar 2026 10:40:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1772617222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q657n44NPR8EAAxyaBxEl5qa/lvFmu4t7TcVp8HrJ7Y=;
-	b=OAp3voBIC0L4UmhpZ2/EAVtSPuaBfY6rUqIWrxu75Cw+lLn65bvdFd1WzX/AKsNg2gKBiw
-	Z6I9txSZCxn1OKQcxSMdmh03zI8UjppHhFwotw05wqcYEIiumIBoMboVyfq349GiDbXlYQ
-	ufIqW3hTcq/BKDWlpfn1KMe1HKcftN4QrZqKYxZC8ghFt56WFj4Yjc5fpo0eeHCEVYRyzd
-	fp1K19HKj5QkG8YHNN2vzJcArZpDYEemMrqIv7WpG8oLfiwASx4pap/kpsUTx8o4zOTrR5
-	guCmjaNKgPjuAvmbzsFavSth2zFbsgSZHzAvPD5UF7Be9/jDOp7n9W1nr6yLZA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1772617222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q657n44NPR8EAAxyaBxEl5qa/lvFmu4t7TcVp8HrJ7Y=;
-	b=K3E4IYZbNFpbtPuBz2Nep+jxFPN0D/7DPJh4DozcQd42LeMWFbaL8m7nL21IIouc5ID0z3
-	4mMqBIs4V19rOeAQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, jv@jvosburgh.net,
-	netdev@vger.kernel.org, jiayuan.chen@shopee.com,
-	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Jussi Maki <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-Message-ID: <20260304094020.mrSO02-z@linutronix.de>
-References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
- <20260304074301.35482-2-jiayuan.chen@linux.dev>
- <4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net>
+	s=arc-20240116; t=1772617402; c=relaxed/simple;
+	bh=R0uCK9WbpzHSEfbrqjG/qMQI25IjsDAb0fQJV8yYDoY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YECEjJa8pvyLwRRnObH8f4SCNoYC7rm/F07isf66hyg+RJJo8LLV3s6VXxmY9JjLZ3fI0BFzfW6zjNtFclWg7GAk/s3Wh1zb8kzVaDrr4hSudKyykGI3c9KKqjGG+eElYFoF/uHuxbWmeEXKb44xvSwOXwjLhtHcZNME6Ym3eeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Oxgpf30n; arc=none smtp.client-ip=74.125.224.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-64ca2fce86bso7817901d50.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 01:43:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772617400; x=1773222200; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=l8Uxe4MkiFK1BvC9hzWNs2GqCwXMfpiybl/gcG4/irI=;
+        b=Oxgpf30nb0iAVDu7GtSGayVVa+7wrr4dkeXTa2ka6+TIy3HxIvoPRE4roL7o5y85gK
+         dARJ4WgQjieoGyh4STu+C1c7Dgv36BobUwaFI5n0KSHNx8p/hN9Qh5/yLODUib7t+QgW
+         zYeQ3+8PeF1rCDVlN5+u+je42y/KDy7qPM2o3sXszvgz+6+gtITv143q9+p6CilMkl1n
+         2rnZYATRTf0HZVP2jCPCJqET+0eW6ElR3KLFO6gh5rz0yV+No3vhqqXS1R66GPV50pMI
+         jTk9Tdn1DNrW9nbl70M2rm8EJhru0QVTlCrN6UyZx8d1h7f7tJ++u0eM/Bui13wMSDf6
+         fHNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772617400; x=1773222200;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l8Uxe4MkiFK1BvC9hzWNs2GqCwXMfpiybl/gcG4/irI=;
+        b=jfJg+dSt/144Eg0gb7hs2ZSeQKC/9BmnNJCD1cbslUqhRw+oJqtENAh3BZGYUobMsZ
+         4TCA/Ba6LiuAOV30/DFje4cUjglc4hpCh2gLVdLxF5oLiDbOT0wYIPmuJl+SYIo6vD48
+         RkbQ7/Bnp5EA8+IlhYcJWqXfTg6qBUCs8gr6J+795f0aFEa40sWrxaAuF3zkR4rSUwfm
+         V7Kllc7elS2siS8Rdt4DTaF8oH41IPfj1ZR/CZxra6LgaLXR96UMhwvVaJcdi/1oS7Ny
+         730j4/OJ7gH963bpRYuA06OUf9uhh7Syjpr83lrxmFRpX5usMqFamtsWMG0694dC41FV
+         96iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV54wlnn8UdQv2tUaP2dLWeuUsLN/8Sf0bxgyZ76D4OBl0eKXMHJhLe2qRr6JOIPLq9TLKr3Fs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywge1h/4TK5rPKfr9Lf9ojMyHPw6kz03i5/kRhchcXMIp0Ijlac
+	WEFUt+juupnlL/JnFWjcN0C6qWqvu5M0fHikxXwDSMm/caDdSzpz+erScj4kotnOO9NY/BQ5li9
+	dKVGA1DE2Qr4k4A==
+X-Received: from yxzt31.prod.google.com ([2002:a05:690e:16df:b0:64c:9ac0:70be])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a53:864e:0:b0:64a:d6a2:c6a with SMTP id 956f58d0204a3-64cf9c1d63cmr838590d50.88.1772617399824;
+ Wed, 04 Mar 2026 01:43:19 -0800 (PST)
+Date: Wed,  4 Mar 2026 09:43:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net>
-X-Rspamd-Queue-Id: 5FA1A1FDC5F
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260304094318.1769536-1-edumazet@google.com>
+Subject: [PATCH net-next] inet_diag: report delayed ack timer information
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: A4C231FDC7D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263697-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.dev,jvosburgh.net,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,goodmis.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263698-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On 2026-03-04 09:20:27 [+0100], Daniel Borkmann wrote:
-> Arguably it's a corner case, but could we not just do sth like this to
-> actually check if the device is up and if not drop?
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index ba019ded773d..c447fd989a27 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -4387,6 +4387,9 @@ u32 xdp_master_redirect(struct xdp_buff *xdp)
->         struct net_device *master, *slave;
->         master = netdev_master_upper_dev_get_rcu(xdp->rxq->dev);
-> +       if (unlikely(!(master->flags & IFF_UP)))
-> +               return XDP_ABORTED;
+inet_sk_diag_fill() populates r->idiag_timer with the following
+precedence order:
 
-preemption (vcpu scheduled), while paused the other CPU could put the
-device down, or is it too much of a corner case?
-Also, there is also ndo_get_xmit_slave which at this time is only used
-by Infiniband and supports only active-backup mode [0].
+1 - Retransmit timer.
+4 - Probe0 timer.
+2 - Keepalive timer.
 
-[0] https://lore.kernel.org/netdev/999129.1772247707@famine/
+This patch adds a new value, last in the list, if other timers
+are not active.
 
-> +
->         slave = master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp);
->         if (slave && slave != xdp->rxq->dev) {
->                 /* The target device is different from the receiving device, so
+5 - Delayed ACK timer.
 
-Sebastian
+A corresponding iproute2 patch is needed to replace "unknown"
+with "delack":
+
+ESTAB 10     0   [2002:a05:6830:1f86::]:12875 [2002:a05:6830:1f85::]:50438
+
+    timer:(unknown,003ms,0) ino:152178 sk:3004 cgroup:unreachable:189 <->
+
+    skmem:(r1344,rb12780520,t0,tb262144,f2752,w0,o250,bl0,d0) ts usec_ts
+    sack ecnseen bbr2s wscale:12,12 rto:10 rtt:4.073/0.205 ato:4 mss:4096
+    pmtu:5000 rcvmss:536 advmss:4096 cwnd:48 ssthresh:48 bytes_sent:288980
+    bytes_retrans:20 bytes_acked:288960 bytes_received:288970 segs_out:28986
+    segs_in:30626 data_segs_out:28898 data_segs_in:28897
+    bbr2:(bw:575Mbps,mrtt:0.049,bw_hi:1.48e+08Tbps,inflight_hi:48,
+    extra_acked:1,mode:2,phase:PROBE_BW_UP,pacing_gain:1.25,cwnd_gain:2.25)
+    send 386Mbps lastsnd:5 lastrcv:1 lastack:1 pacing_rate 711Mbps
+    delivery_rate 575Mbps delivered:28898 app_limited busy:91010ms retrans:0/2
+    dsack_dups:1 rcv_rtt:151640 rcv_space:266250 rcv_ssthresh:265904
+    minrtt:0.049 snd_wnd:270336 rcv_wnd:266240 rehash:1
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/inet_diag.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 9d215485b5c7e7ba29dd53c924f0245439d74af5..e4cb18061aefcc22df04644c00bf5c7db4e150d2 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -298,6 +298,10 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
+ 		r->idiag_retrans = READ_ONCE(icsk->icsk_probes_out);
+ 		r->idiag_expires =
+ 			jiffies_delta_to_msecs(icsk->icsk_keepalive_timer.expires - jiffies);
++	} else if (timer_pending(&icsk->icsk_delack_timer)) {
++		r->idiag_timer = 5;
++		r->idiag_expires =
++			jiffies_delta_to_msecs(icsk_delack_timeout(icsk) - jiffies);
+ 	}
+ 
+ 	if ((ext & (1 << (INET_DIAG_INFO - 1))) && handler->idiag_info_size) {
+-- 
+2.53.0.473.g4a7958ca14-goog
+
 
