@@ -1,139 +1,126 @@
-Return-Path: <netdev+bounces-263848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263849-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBJOApJPqGmmtAAAu9opvQ
-	(envelope-from <netdev+bounces-263848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 16:28:18 +0100
+	id QJFcLKRKqGmvsgAAu9opvQ
+	(envelope-from <netdev+bounces-263849-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 16:07:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68466202A9D
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 16:28:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468452023B3
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 16:07:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D5E2D310FFF3
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 15:03:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6E94304D262
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 15:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658C13BED35;
-	Wed,  4 Mar 2026 14:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE3A3BED75;
+	Wed,  4 Mar 2026 14:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="KJ7vsDvn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtWTefmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656A43B7B7C;
-	Wed,  4 Mar 2026 14:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9C03BED6F;
+	Wed,  4 Mar 2026 14:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772636363; cv=none; b=ewdY8tGWzEaaUx2592qp3paWhW9HToluQlJqsI/a08Yk+RKUmoasAXPFn6F44J42Rvn7/4R13QJEApEfoXhr2jw7GCqsV74n6LpIlDGzLXd+W3SRMmHQEGLdLvzLr8igizGoJ2qw+zKv5V+nVOEXTPyeyofVtYwdWFMUVSSajy0=
+	t=1772636366; cv=none; b=s3Jravt6TB6w2Dp2Qlxgtb4jCHCNEvQ9DC1+vp9RIvk7vOm2Dm6o23w01tP642C6pvnCPcIbGe9tMhy6NKsCQbs5yOqoYk8MNegBCMDzBl/c0UdFwX3qbR2aAx1KfFzVYr6sy5d3cL5erjmNsJy7GkUaB8VX4laPIugWesksZWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772636363; c=relaxed/simple;
-	bh=/lNwR+ZYE4Pp0j2tZP/j9awuxcDAzLdyRMP+40EdGrI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Ngf5JPkzeE1XZz06aWHRYF8jCDE+xawvnqr+D5TWKPxxLb9mdEfHT4XN3NqtnlLTTpKHof12RQtimCCJENJP8mFgH0RYJgWI3wDwZdLwJY1F3R0nXKBQ6DXqZLAK1io2Gj41GVYTzly0P/8r2yo3sl1LVTis6C1ykiZZ6JcqVLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=KJ7vsDvn; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sUIfRa+g8fpmxFfqp2XG0bd5OP0+/q3uVgqVEbYGmPA=; b=KJ7vsDvn/Oknk0T9J4ShzV/hkt
-	EhjXH1u565mXeKNI40Hiq/ld2F8vOGUMqaUEiJqOH+46feMARlLXq/FjJpgfwGEdMKEN+TDlvGgys
-	9lc+lQHi0qlSDtKQSXX5jLivT9pCzF5mW/YKHZ6YIyGXMGOq8WDPi3XeuBVdcLxMqX7vr2PUXQQRn
-	SvjG4aaTjzBEMeK18o0s1m3PlPk5u0+IadndvJz9AwzWLHfBBDYkJb+uABSR4A4hUnoIFHX/8SSMM
-	2tJlVNrOu+5TgTQKkffGTZdLv9TJR4KW9XSUhlA92WwnyRbanA4fXdMOzb+f1ZRUFoX21Te7EnphF
-	webg1muw==;
-Received: from [179.221.50.217] (helo=[192.168.0.108])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1vxngv-008y27-95; Wed, 04 Mar 2026 15:59:13 +0100
-Message-ID: <279c7a14-2b8a-410e-85d5-ee11b0e5371e@igalia.com>
-Date: Wed, 4 Mar 2026 11:59:05 -0300
+	s=arc-20240116; t=1772636366; c=relaxed/simple;
+	bh=8m978avJtiE2qwB6faByNUDUe1e7gXag3V+oKgVdQq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iG0Rk7ccFfZnDS0ckS3tlYm2kf0XJHbqoATvfXEnlLOuATzH4Nnp79ppr3CwHoLxzBDU+2SPl3xNCjzR3FomA8hLYiQWA77ATlo8qukd/WlCW4UHTcQujgCSdnIQ5bS1c0ic/Rv+P8eon8Kdbud3OkdPp48kWYhGuKviyfm0maQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtWTefmX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55526C4CEF7;
+	Wed,  4 Mar 2026 14:59:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772636366;
+	bh=8m978avJtiE2qwB6faByNUDUe1e7gXag3V+oKgVdQq8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZtWTefmXgeEhcwLoFHXUM1GGgI4QjmtCYv8wWgveRlhz/bPFHwoa0iJKLAM8J25X8
+	 RScoKb4hzBZdcb4eyojTFnXNhz9XxM1HGKyR0lZrnwXgeeL0izQz9Q57qMoz6MNnh9
+	 gTXo+4IUbCoFXxgN/oLsyJCtRxIUz0F2M/lKP1urewzhCIh9UDqNE+9ZMm66yaT+S5
+	 EXOR/SF2D1DhaCr7xxA1aVSSskcjc9XPB5t9FcsEMsbHGz4+uidqSCEgZegulijpel
+	 FulLg9DpmRPaemiUangA5QSg/sr3l2ZLEFwWkURTWy7cnMHD0iifmgVenelSg4fX/q
+	 H1GBj8Dine3Gw==
+Date: Wed, 4 Mar 2026 16:59:23 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Long Li <longli@microsoft.com>
+Cc: "K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 6/6] RDMA/mana_ib: Allocate interrupt
+ contexts on EQs
+Message-ID: <20260304145923.GE12611@unreal>
+References: <20260304000017.333312-1-longli@microsoft.com>
+ <20260304000017.333312-7-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
-To: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
- Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-dev@igalia.com
-References: <20260302212605.689909-1-koike@igalia.com>
- <aaYYiPTO5JYOlhhY@chamomile>
- <17499d82-ad03-44a9-ab3a-429d2ebea02f@igalia.com>
- <aafD369eE31dh1VP@strlen.de> <aaglAU8E48EF1m-_@orbyte.nwl.cc>
- <aag18YM3g0sS7wXW@strlen.de>
-Content-Language: en-US
-From: Helen Koike <koike@igalia.com>
-In-Reply-To: <aag18YM3g0sS7wXW@strlen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 68466202A9D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304000017.333312-7-longli@microsoft.com>
+X-Rspamd-Queue-Id: 468452023B3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[igalia.com:s=20170329];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[igalia.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263848-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263849-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[igalia.com:-];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.574];
-	FROM_NEQ_ENVFROM(0.00)[koike@igalia.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nwl.cc:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,igalia.com:mid,igalia.com:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-
-
-On 3/4/26 10:38 AM, Florian Westphal wrote:
-> Phil Sutter <phil@nwl.cc> wrote:
->>> And *THIS* looks buggy.
->>> Shouldn't that simply be:
->>> 			if (!match || ops)
->>> 				continue;
+On Tue, Mar 03, 2026 at 04:00:17PM -0800, Long Li wrote:
+> Use the GIC functions to allocate interrupt contexts for RDMA EQs. These
+> interrupt contexts may be shared with Ethernet EQs when MSI-X vectors
+> are limited.
 > 
-
-I tested this change locally (with syz reproducer) and I'm unable to 
-trigger the issue anymore. Without this change I always reproduce it.
-
-If you are to send this patch, please add:
-
-Tested-by: Helen Koike <koike@igalia.com>
-
-
-
-> FWIW I can't get the reproducer to trigger a splat with this change.
-> I've fed this to syzbot to double-check.
+> The driver now supports allocating dedicated MSI-X for each EQ. Indicate
+> this capability through driver capability bits.
 > 
->> You're right, the 'changename' check in NETDEV_REGISTER is not needed
->> because even if not changing names one should skip if already
->> registered. Actually, this indicates a bug unless handling
->> NETDEV_CHANGENAME. Maybe add a WARN_ON_ONCE()?
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+>  drivers/infiniband/hw/mana/main.c | 33 ++++++++++++++++++++++++++-----
+>  include/net/mana/gdma.h           |  7 +++++--
+>  2 files changed, 33 insertions(+), 7 deletions(-)
 > 
-> Well, it does trigger, afaics.
-
 
 Thanks,
-Helen
+Acked-by: Leon Romanovsky <leon@kernel.org>
 
