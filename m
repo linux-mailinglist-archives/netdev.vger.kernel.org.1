@@ -1,123 +1,150 @@
-Return-Path: <netdev+bounces-263542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Np5OL6Qp2lqiQAAu9opvQ
-	(envelope-from <netdev+bounces-263542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:54:06 +0100
+	id kFwOMl+Rp2l7iQAAu9opvQ
+	(envelope-from <netdev+bounces-263543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:56:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 762B01F9BA0
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:54:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3AD1F9BE1
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:56:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D1FB30185A0
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:54:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 131BF3019FE2
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BC73101A0;
-	Wed,  4 Mar 2026 01:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583F030F531;
+	Wed,  4 Mar 2026 01:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U8IvRiTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA1FE55A;
-	Wed,  4 Mar 2026 01:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12721156CA
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 01:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772589244; cv=none; b=R+cTjG9VgGfC2ihZPG5uZQ0fnsKzqTfYsrvYoBNir/L2x4U+Qv64weh6y9D9m6D3BH6d3/LqbDE5WioOC9O7cGJCfxshg4ecYtFqfIg+9n31MqXKBl+vG3CkXIRWrqcZQcH94D928Lne8lQwVbVBdUegnzwCVmcaSDEYn3jXbbQ=
+	t=1772589405; cv=none; b=RUkw9GQT8O8BolHaKLQXm7vIjieE/JdtqdxgpcoLbLL0Zl1QS1HcQqreKuBtBetC/Fe/Pa9T4pw626jMgD3/SPxBbDL2Ge6Tkb020WLr0X6up5sTDChRfWln4E94L8zv4HCD6zuhsRXl0vMQxDXuL6tS98oEfO9p81eYATwB724=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772589244; c=relaxed/simple;
-	bh=wf+9WYI4wz+u51rXJN5W21h2IU7JZQleKEyPyJdCCGc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=M8flhAjUDegLPAaPXjxc1X30uEsTz9/fY/sCxwRPQsa/SyOvp9GpU4a6JFmNyzcLYRuvbjm2DTzRSkevH7aMpvwI+elSmINBFHCAVRyNVOpeodyvVUJjB8I9UXyRRyHSuf3CYNXkzLIplV2XljmtStouKvD+EvQEI7uXWhHM19k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from mop.sam.mop (2.8.3.0.0.0.0.0.0.0.0.0.0.0.0.0.a.5.c.d.c.d.9.1.0.b.8.0.1.0.0.2.ip6.arpa [IPv6:2001:8b0:19dc:dc5a::382])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: sam)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 6F7C6341620;
-	Wed, 04 Mar 2026 01:53:59 +0000 (UTC)
-From: Sam James <sam@gentoo.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org,  netfilter@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [ANNOUNCE] iptables 1.8.13 release
-In-Reply-To: <aaeMFWURL-6YWIkz@chamomile>
-Organization: Gentoo
-References: <aaeMFWURL-6YWIkz@chamomile>
-User-Agent: mu4e 1.12.15; emacs 31.0.50
-Date: Wed, 04 Mar 2026 01:53:55 +0000
-Message-ID: <87h5qwgy18.fsf@gentoo.org>
+	s=arc-20240116; t=1772589405; c=relaxed/simple;
+	bh=yy9c6NEKVdXmBGUthHCM0IoQeVjTTmiTse3WyDECnjo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GLEYD5vH9ciTpqsi2AAotjozCjhsxxMUA6NVnnlj2BA+KltV3ByKn5YDMA/2ZHVOIM0EKyX+fZ0TRWnYN6RUSjOvIZ4QQ9AtETXB5FnZSxM21NxMNt7HukwXsf/zor6DCffP9p2l2nvBbDEG5J2Iak5caIEZglu4peGbH6QEBEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U8IvRiTQ; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-506c0da79c5so540888021cf.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 17:56:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772589403; x=1773194203; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AuoEPwW5QTT8aPRUAFOSydZ3LlNir/FcjvUC/OXM7zc=;
+        b=U8IvRiTQfdmUOwwlir9TtPPmf5eBodsB9h2tDLh9+M5F0+1Z3d3eR2PIcq04glAABN
+         9NUl2vksdpb4AH9K6EmfTTyG6H6lbeGOz+6bvIXBLuoG2DkzvyJ/1G6weaVeBN0VgbKj
+         4819FSc7zpcQ+WO9QaffMMciXdY8HFAnRJ2rzkCM8AwozDZvwwhsQCNBmLBvxkHBlSAc
+         B+z1fpvO/rAWd7UbasBDwQHJnHBkRqtmWam368WdWv9dLXR2jkG5f3IRMJKMUd+NW4uE
+         kuYfOQtfpgJVamdXreUwWKtGOcMMUzHfSw9NYSyx5f0c8IPbpS2yY/+zNTNNZq8nKv6y
+         0YFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772589403; x=1773194203;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AuoEPwW5QTT8aPRUAFOSydZ3LlNir/FcjvUC/OXM7zc=;
+        b=WarVkI5da8jmHld5WkZ0Qn1nNQxvbhGUTBBKKVAy7Sw8cku20KDaN9uRAxiA6HlUwC
+         GGkaw1BW8kLnV+gT+8tmed1vqrbwP0ce1OjCrtYcqsSTISNwfqZr5s+kkBqpUbaPQhBe
+         k0wmVXiXQXyo3ved+rpzlVCxer9x/J9oP6zjJZKMRft/VC9LLY4taQRZblrv6nefOeYp
+         OS7FnjRLO+3jZ46UwM3jDROI7jkuS/XobTRZD1dWtz1cFiIpNVa/y89ZKurYjMMIrmpP
+         Y6AFCrA4Ya8wqEa8LBOaiX9nmLvEB8e/zCoVwEf00lJAsO5L762LzbpUSffdsVTX13SK
+         0A+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWSoX4Kev0JJBkWtMD6/jARNpgZMi0a4i2PLB8i8hdbm8AW3J7nQ9KprAkecMgh+xf1S6bDMng=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8xXK9mQ3pAoPnNIMk5dO/k4XkyOKTV6lR3LzUOhxV/PP+K1n3
+	tMMXLy2LKIR6mo5XR/PetePl0dBNw5U07Iwp2IoMoIH3XB0hDnrqu52JR/3rBL3ErIj9t6/7kom
+	w55n91LfSMLOyKg==
+X-Received: from qtwv8.prod.google.com ([2002:a05:622a:148:b0:506:d20d:b893])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:1888:b0:4f4:a9cf:5d40 with SMTP id d75a77b69052e-508db2910a4mr6665521cf.11.1772589402825;
+ Tue, 03 Mar 2026 17:56:42 -0800 (PST)
+Date: Wed,  4 Mar 2026 01:56:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-X-Rspamd-Queue-Id: 762B01F9BA0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260304015640.961780-1-edumazet@google.com>
+Subject: [PATCH net] net_sched: sch_fq: clear q->band_pkt_count[] in fq_reset()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 5C3AD1F9BE1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.96 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[gentoo.org : SPF not aligned (relaxed), No valid DKIM,none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263542-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263543-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam@gentoo.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.986];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
---=-=-=
-Content-Type: text/plain
+When/if a NIC resets, queues are deactivated by dev_deactivate_many(),
+then reactivated when the reset operation completes.
 
-Pablo Neira Ayuso <pablo@netfilter.org> writes:
+fq_reset() removes all the skbs from various queues.
 
-> Hi!
->
-> The Netfilter project proudly presents:
->
->         iptables 1.8.13
+If we do not clear q->band_pkt_count[], these counters keep growing
+and can eventually reach sch->limit, preventing new packets to be queued.
 
-Thanks! BTW, tag seems to be missing?
+Many thanks to Praveen for discovering the root cause.
 
-> [...]
+Fixes: 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR scheduling")
+Diagnosed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+---
+ net/sched/sch_fq.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-sam
+diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+index 80235e85f8440ee83032f171cf28df6f161473db..05084c9af48e1c7254a695b30293806a8ac78632 100644
+--- a/net/sched/sch_fq.c
++++ b/net/sched/sch_fq.c
+@@ -827,6 +827,7 @@ static void fq_reset(struct Qdisc *sch)
+ 	for (idx = 0; idx < FQ_BANDS; idx++) {
+ 		q->band_flows[idx].new_flows.first = NULL;
+ 		q->band_flows[idx].old_flows.first = NULL;
++		q->band_pkt_count[idx] = 0;
+ 	}
+ 	q->delayed		= RB_ROOT;
+ 	q->flows		= 0;
+-- 
+2.53.0.473.g4a7958ca14-goog
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEBBAEWCgCpFiEEJaa7iN2bdkxrVUHCc4QJ9SDfkZAFAmmnkLMbFIAAAAAABAAO
-bWFudTIsMi41KzEuMTIsMiwyXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25z
-Lm9wZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQyNUE2QkI4OEREOUI3NjRDNkI1NTQx
-QzI3Mzg0MDlGNTIwREY5MTkwDxxzYW1AZ2VudG9vLm9yZwAKCRBzhAn1IN+RkDWm
-AQDG1itKhDBKp8TtTm03507mTqkb36bB+qO7PjkNjrkyngD9EACNce97xukbTvI7
-bShwGO8BJkI+4PlNFmiCie9nXgQ=
-=cm49
------END PGP SIGNATURE-----
---=-=-=--
 
