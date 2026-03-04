@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-263827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLoOLU0/qGl6rQAAu9opvQ
-	(envelope-from <netdev+bounces-263827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:18:53 +0100
+	id WIzKMk4/qGl6rQAAu9opvQ
+	(envelope-from <netdev+bounces-263828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:18:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06ECC201324
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:18:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389E220132B
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 15:18:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC4FC31AC45A
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 14:10:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B87C3268B25
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 14:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596AA3B8942;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973AB3CA48B;
 	Wed,  4 Mar 2026 14:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vKUV++cL"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="MivpS8qd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739AC3CA493
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 14:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAB53CA49A
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 14:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772633185; cv=none; b=df1A6/yjPVOfFXyATlyewAnaGPWMHdLYWVQ9x+7LG2ZCtx9yu+5bd9o9ekxAbiKsiwuOCOeMoWLjNXxbhykzJIESAI/9DwAiRl25137qAkVV9gq2C7oD5MXQesFnXAJQWYGquIKTTTCc31ZskPkBf0Jt5uGsID2Sb2j8rlEGYiw=
+	t=1772633185; cv=none; b=c5w1o4N/auuPOmkqJhcyuhiPJdAPMk5JhAmqDfjYkfFf2D9CASAIk1sJ63pGODDqr/jFgECsW7kDKxZ548sDQHyNS9cV2XgM1TCPLEKfMyvBWE0GBf538eUruyQkm8Izjafy6Fh1cn8d0yP4TJJQ8v0fvq9vmA8IAZOjdyzAWvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772633185; c=relaxed/simple;
-	bh=60+S0Km/fNmBSdleS4NEH2E+mo8emyx2HPUsv0Z8Cjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OwpZsN5CJFZ6uJOZx5XQ+xBNH+KErFLB63Yar9ozfb++kCaJdHs7S8T7EPXLl4Tb9p27zKxkj5qBm6BCs8al6Ld2VUAzdbl2EVz6wdY38xjb+FKHd5Dx/pLeCHX5+fua/dHhH6CUJSzzuX98Yb9tm/fk24wRo+SKiytUBoBS7fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=vKUV++cL; arc=none smtp.client-ip=209.85.160.169
+	bh=xBeXXKixO+4fxzQ5BLEMoh0DC90ck4SdiNRvMyLIHeY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=RlWNdKMHymNxWEdVVukhbUxmDGg43bxpVpZA1noEfpAZEaAmif5QqMLuZvGpeHTDJ9WO17LwgnywIa0+AOPLTY1fpQDGsWkQU7XnYVy6zPbcLgSIHbTOJ6ycG4klG70KRhNH0aKhyBHSgR+UgYFBjjO0mq32qWQdxOawW3BpjrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=MivpS8qd; arc=none smtp.client-ip=209.85.160.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5062fc5d86aso61978811cf.1
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 06:06:22 -0800 (PST)
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-506aa68065eso62960481cf.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 06:06:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772633181; x=1773237981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Se626sDRSCACdO4SyYn1OIhH9ryu8vhzyNzpum4YEC0=;
-        b=vKUV++cL5uRYrL7juTc7U8We7waw/18Eyz1CsvmFgFPRBqxneC0saz1d1jMR4StI/l
-         zQldl6KI2w6AFCDq20/5BnLQcS6IrajL1VVYa5RmDxq2fqf8m0tViMH4+I2GZ/e0lzv7
-         a/A24f6mrI7towYAUd0+DbRp4iMPSfHnP2zQLCh51TxAodlvjB2BJo5TdILjXZKBVP/z
-         xwd8jzDtbj9i/zKR8+dgZ+ap3s+zQb0Lbn7L+3IjMR3KJRKmze91ok7F33M9fx+8c0NP
-         IDBKj/u8ajcohR8YpzmWyWwqA+WS1F/xRHNFjtDUIWhZQwIYmwcmd0HawgSmmv1IZZtH
-         RMKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772633181; x=1773237981;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772633182; x=1773237982; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Se626sDRSCACdO4SyYn1OIhH9ryu8vhzyNzpum4YEC0=;
-        b=SoM27cV9sweNrpTPsYs9bUqF9UCIQ9H9GObmcsYv7CEd2tktfgPGscxBgjlx1TbAir
-         gSTl6cDtPoYGsPQje5bdJXk4pXfESKQ71b+p9Pu18lWAn9CeaKnMI2c/I0FI2KbAawU6
-         IZcguYDPb4QyEsAFI2iJTNxlfw2nREfSQ4vcUuBJl3yDTWAhsPzKtg3deWrqssebXvBN
-         5a9o4ItkKRYKrtnUjEqIPgNwYPUr2vU/7YV+eTCg+SNlVsuVwirT7eWVHiAh32NKgRKD
-         7U+F/t6JfQgYeG2EJutG/V/7W3Pa6ZmAADi/vMJHgxvnMkIr9gfYbj/MpnKQGP5at5fx
-         G0Kg==
-X-Gm-Message-State: AOJu0Yws+Qo3c/63ykQlA1DQXl9oyhQZ2nhHjQdHqZYvQ+9NsBdwc+OY
-	VHZtrgL5aTlseYenWrBRXTnQLZelN89xFcKy3ycMl69R1z01Gg46nXsjO7ElIFaGu0FiGS8BEMg
-	Jlz8=
-X-Gm-Gg: ATEYQzzEW67VkaxakB/b3XOMOFhxIWU7n9XiqWSiA/JABBpSPmYeMdWVtR3dbYxLBZ8
-	8d8rXKkkCYe69YuJLcRMjPJznvYoQU0aGVldPzT1MqW2IgpA9J6sVff/zXQSL9nHBarshrMKIWe
-	kBpaqc0Ti23aFX/mbn5tu6vXXMaB3aI/+G6T8Byc1Rt2MOjZtj+nsfJnUMQ4MjNOB5aVutQD7aE
-	QJqjHjhl8kzrz8ql3WjCj+z7TqAkRbPc4YZ98KzOCjDhGWlzQnVQw7WBj60SrGakAO0qNkBQB3q
-	4XRP3rE1A7oHU30OxfG56vBVCVCFb0jxevBeEmxl6We4FCC2BVHC+7Iym3ph6xs2OdRsxpr+EQ1
-	IFzpja6rOMnjICEqCGThMgJegkC7WUK2+32WThfBAbuz1eouEbAejm1yAJRWAQ6h1nQFl7+bzXd
-	vImf6CGeow+N20590IFkPrJMYM508ucFVYhA==
-X-Received: by 2002:a05:622a:11cd:b0:4ed:6803:6189 with SMTP id d75a77b69052e-508db38a4famr26963881cf.53.1772633180665;
-        Wed, 04 Mar 2026 06:06:20 -0800 (PST)
+        bh=y4EPHxJkTM6rk1zIhdLCVien7vvKWbt0Byh1qE1FeuM=;
+        b=MivpS8qdxThevit0758msMxp9zbU6ULaNq511c3oCpdB9WoL/5NUleA26WEogmpXeW
+         iP8Y6d6ozJCbh9oYiFitWJmTOqnLjx9a+Ve3d1QBLwum0a/kD6/Nt63ECVLpcMnLS5We
+         unzHhgwOGTRtRLBenMEHyPJs27GGgK3s6YFKtI3tnahecO2GL2cYlbH1P42N1XvABXrn
+         ximzgxlKGP4BEFCmToqQQjg+fpiyZkMqBCDvvDUYZri7JuFGN8qK43EI/gO5YEYJPQRC
+         ZTkmyEKzqJObUsU2G/CSJJ9ilOvvskGBr77f1KwNfZjNhkHN9DNTyJ+CYmjHby6eouZy
+         E+Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772633182; x=1773237982;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y4EPHxJkTM6rk1zIhdLCVien7vvKWbt0Byh1qE1FeuM=;
+        b=EjRAsCCfGxbDMZ0JIa/XUmMDNaPPuOXAWZhuQjT9VZ5A5mD/ZSOK0QWcBXXg2ZPUj6
+         F7llYOtnlxKMdbivT5If6i8ZKKAf687cKLiu00rPPp/Vl4Pyt1yLvbbTDP/km4sH2B69
+         eSPghAT822KZ7+3HrlDaWhvxYo1aXRKZXDcNk8FSmM6Fm4AjPabggkhU6W3BDa6NVNNe
+         W1TYFX67O7/lU+5bpaB98SxbaQicshy3ocW0JppUAgaCcaN/ecGy9htIeLT2E4s312Dh
+         puNUYIhZK9aMJGwwX/GiLz4eFt4jMKmQ88+jj4REJjwtYlIOgl61OqfpbG2JoG0MoC5Q
+         6oQA==
+X-Gm-Message-State: AOJu0YzYzFyOOhZKmhwEjte9iz6OQwssNJ0+LwiPZoHqsTFplhniPSHv
+	RZCYtdQjwZvqf3WFNuTAAD1BicM8ku7aQihmvFUUzt1m4J6pqOVwwjsvxC3f4BoYlRMClCvOzqa
+	i5WI=
+X-Gm-Gg: ATEYQzwtdG4fVTz8XEMAxy3JzOySKk2wOvL0yq7Y9zshPfRSLrx5qRwxXTe0XPfjUTO
+	Lsjc7KRoOuqgdGIYIFgZ6v+SFfQwZYIMltFbUYbNR8Vy0XR5CwhJo0XRCr92jpN1eTzaHPOg3Bd
+	wblwjyO4Q7f/y/JBdCUQ+9+M5r8ObkSOMOR1n0579aR+pvRUq3LTKCmfPvOraIjucnqJ2a17tz2
+	sVtIS2VgOvIyAVwMVNhVmiRDLk/Bb4XIYAMD1APV20b1YjDzrhtrZvt1q71sfRBok16nBL0Q95f
+	Yj/6iZQt6HSQjkILruvv7tNDnLB2OYx/2O4vEx1C44rXXP3JfUTj6MVKthBDgrb4GCISGeWFv0a
+	gQkxfeaVp+yWpJusfI4kGqDTnrCjYcB+3kzLYr9JSCCYmodBdzLPsIKQO2j0QLDDaTkjlvVMOxF
+	TXHRZBhvPJFjyKyPrsSn8/41U=
+X-Received: by 2002:a05:622a:241:b0:4f1:b9e1:f08f with SMTP id d75a77b69052e-508db28b16fmr28066261cf.5.1772633181892;
+        Wed, 04 Mar 2026 06:06:21 -0800 (PST)
 Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50744ad885bsm152429791cf.28.2026.03.04.06.06.19
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50744ad885bsm152429791cf.28.2026.03.04.06.06.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 06:06:20 -0800 (PST)
+        Wed, 04 Mar 2026 06:06:21 -0800 (PST)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jiri@resnulli.us,
@@ -85,10 +87,12 @@ Cc: jiri@resnulli.us,
 	victor@mojatatu.com,
 	cnitlrt@gmail.com,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net 1/2] net/sched: act_ife: Fix metalist update behavior
-Date: Wed,  4 Mar 2026 09:06:02 -0500
-Message-Id: <20260304140603.76500-1-jhs@mojatatu.com>
+Subject: [PATCH net 2/2] selftests/tc-testing: Add tests exercising act_ife metalist replace behaviour
+Date: Wed,  4 Mar 2026 09:06:03 -0500
+Message-Id: <20260304140603.76500-2-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260304140603.76500-1-jhs@mojatatu.com>
+References: <20260304140603.76500-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,19 +100,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 06ECC201324
+X-Rspamd-Queue-Id: 389E220132B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263827-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263828-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	DMARC_NA(0.00)[mojatatu.com];
@@ -116,7 +120,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -128,392 +132,129 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Whenever an ife action replace changes the metalist, instead of
-replacing the old data on the metalist, the current ife code is appending
-the new metadata. Aside from being innapropriate behavior, this may lead
-to an unbounded addition of metadata to the metalist which might cause an
-out of bounds error when running the encode op:
+From: Victor Nogueira <victor@mojatatu.com>
 
-[  138.423369][    C1] ==================================================================
-[  138.424317][    C1] BUG: KASAN: slab-out-of-bounds in ife_tlv_meta_encode (net/ife/ife.c:168)
-[  138.424906][    C1] Write of size 4 at addr ffff8880077f4ffe by task ife_out_out_bou/255
-[  138.425778][    C1] CPU: 1 UID: 0 PID: 255 Comm: ife_out_out_bou Not tainted 7.0.0-rc1-00169-gfbdfa8da05b6 #624 PREEMPT(full)
-[  138.425795][    C1] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[  138.425800][    C1] Call Trace:
-[  138.425804][    C1]  <IRQ>
-[  138.425808][    C1]  dump_stack_lvl (lib/dump_stack.c:122)
-[  138.425828][    C1]  print_report (mm/kasan/report.c:379 mm/kasan/report.c:482)
-[  138.425839][    C1]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
-[  138.425844][    C1]  ? __virt_addr_valid (./arch/x86/include/asm/preempt.h:95 (discriminator 1) ./include/linux/rcupdate.h:975 (discriminator 1) ./include/linux/mmzone.h:2207 (discriminator 1) arch/x86/mm/physaddr.c:54 (discriminator 1))
-[  138.425853][    C1]  ? ife_tlv_meta_encode (net/ife/ife.c:168)
-[  138.425859][    C1]  kasan_report (mm/kasan/report.c:221 mm/kasan/report.c:597)
-[  138.425868][    C1]  ? ife_tlv_meta_encode (net/ife/ife.c:168)
-[  138.425878][    C1]  kasan_check_range (mm/kasan/generic.c:186 (discriminator 1) mm/kasan/generic.c:200 (discriminator 1))
-[  138.425884][    C1]  __asan_memset (mm/kasan/shadow.c:84 (discriminator 2))
-[  138.425889][    C1]  ife_tlv_meta_encode (net/ife/ife.c:168)
-[  138.425893][    C1]  ? ife_tlv_meta_encode (net/ife/ife.c:171)
-[  138.425898][    C1]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
-[  138.425903][    C1]  ife_encode_meta_u16 (net/sched/act_ife.c:57)
-[  138.425910][    C1]  ? __pfx_do_raw_spin_lock (kernel/locking/spinlock_debug.c:114)
-[  138.425916][    C1]  ? __asan_memcpy (mm/kasan/shadow.c:105 (discriminator 3))
-[  138.425921][    C1]  ? __pfx_ife_encode_meta_u16 (net/sched/act_ife.c:45)
-[  138.425927][    C1]  ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:221)
-[  138.425931][    C1]  tcf_ife_act (net/sched/act_ife.c:847 net/sched/act_ife.c:879)
+Add 2 test cases to exercise fix in act_ife's internal metalist
+behaviour.
 
-To solve this issue, fix the replace behavior by adding the metalist to
-the ife rcu data structure.
+- Update decode ife action into encode with tcindex metadata
+- Update decode ife action into encode with multiple metadata
 
-Fixes: aa9fd9a325d51 ("sched: act: ife: update parameters via rcu handling")
-Reported-by: Ruitong Liu <cnitlrt@gmail.com>
-Tested-by: Ruitong Liu <cnitlrt@gmail.com>
-Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/tc_act/tc_ife.h |  4 +-
- net/sched/act_ife.c         | 93 ++++++++++++++++++-------------------
- 2 files changed, 45 insertions(+), 52 deletions(-)
+ .../tc-testing/tc-tests/actions/ife.json      | 99 +++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
-diff --git a/include/net/tc_act/tc_ife.h b/include/net/tc_act/tc_ife.h
-index c7f24a2da1ca..24d4d5a62b3c 100644
---- a/include/net/tc_act/tc_ife.h
-+++ b/include/net/tc_act/tc_ife.h
-@@ -13,15 +13,13 @@ struct tcf_ife_params {
- 	u8 eth_src[ETH_ALEN];
- 	u16 eth_type;
- 	u16 flags;
--
-+	struct list_head metalist;
- 	struct rcu_head rcu;
- };
- 
- struct tcf_ife_info {
- 	struct tc_action common;
- 	struct tcf_ife_params __rcu *params;
--	/* list of metaids allowed */
--	struct list_head metalist;
- };
- #define to_ife(a) ((struct tcf_ife_info *)a)
- 
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index 79df81d12894..d5e8a91bb4eb 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -293,8 +293,8 @@ static int load_metaops_and_vet(u32 metaid, void *val, int len, bool rtnl_held)
- /* called when adding new meta information
- */
- static int __add_metainfo(const struct tcf_meta_ops *ops,
--			  struct tcf_ife_info *ife, u32 metaid, void *metaval,
--			  int len, bool atomic, bool exists)
-+			  struct tcf_ife_params *p, u32 metaid, void *metaval,
-+			  int len, bool atomic)
- {
- 	struct tcf_meta_info *mi = NULL;
- 	int ret = 0;
-@@ -313,45 +313,40 @@ static int __add_metainfo(const struct tcf_meta_ops *ops,
- 		}
- 	}
- 
--	if (exists)
--		spin_lock_bh(&ife->tcf_lock);
--	list_add_tail(&mi->metalist, &ife->metalist);
--	if (exists)
--		spin_unlock_bh(&ife->tcf_lock);
-+	list_add_tail(&mi->metalist, &p->metalist);
- 
- 	return ret;
- }
- 
- static int add_metainfo_and_get_ops(const struct tcf_meta_ops *ops,
--				    struct tcf_ife_info *ife, u32 metaid,
--				    bool exists)
-+				    struct tcf_ife_params *p, u32 metaid)
- {
- 	int ret;
- 
- 	if (!try_module_get(ops->owner))
- 		return -ENOENT;
--	ret = __add_metainfo(ops, ife, metaid, NULL, 0, true, exists);
-+	ret = __add_metainfo(ops, p, metaid, NULL, 0, true);
- 	if (ret)
- 		module_put(ops->owner);
- 	return ret;
- }
- 
--static int add_metainfo(struct tcf_ife_info *ife, u32 metaid, void *metaval,
--			int len, bool exists)
-+static int add_metainfo(struct tcf_ife_params *p, u32 metaid, void *metaval,
-+			int len)
- {
- 	const struct tcf_meta_ops *ops = find_ife_oplist(metaid);
- 	int ret;
- 
- 	if (!ops)
- 		return -ENOENT;
--	ret = __add_metainfo(ops, ife, metaid, metaval, len, false, exists);
-+	ret = __add_metainfo(ops, p, metaid, metaval, len, false);
- 	if (ret)
- 		/*put back what find_ife_oplist took */
- 		module_put(ops->owner);
- 	return ret;
- }
- 
--static int use_all_metadata(struct tcf_ife_info *ife, bool exists)
-+static int use_all_metadata(struct tcf_ife_params *p)
- {
- 	struct tcf_meta_ops *o;
- 	int rc = 0;
-@@ -359,7 +354,7 @@ static int use_all_metadata(struct tcf_ife_info *ife, bool exists)
- 
- 	read_lock(&ife_mod_lock);
- 	list_for_each_entry(o, &ifeoplist, list) {
--		rc = add_metainfo_and_get_ops(o, ife, o->metaid, exists);
-+		rc = add_metainfo_and_get_ops(o, p, o->metaid);
- 		if (rc == 0)
- 			installed += 1;
- 	}
-@@ -371,7 +366,7 @@ static int use_all_metadata(struct tcf_ife_info *ife, bool exists)
- 		return -EINVAL;
- }
- 
--static int dump_metalist(struct sk_buff *skb, struct tcf_ife_info *ife)
-+static int dump_metalist(struct sk_buff *skb, struct tcf_ife_params *p)
- {
- 	struct tcf_meta_info *e;
- 	struct nlattr *nest;
-@@ -379,14 +374,14 @@ static int dump_metalist(struct sk_buff *skb, struct tcf_ife_info *ife)
- 	int total_encoded = 0;
- 
- 	/*can only happen on decode */
--	if (list_empty(&ife->metalist))
-+	if (list_empty(&p->metalist))
- 		return 0;
- 
- 	nest = nla_nest_start_noflag(skb, TCA_IFE_METALST);
- 	if (!nest)
- 		goto out_nlmsg_trim;
- 
--	list_for_each_entry(e, &ife->metalist, metalist) {
-+	list_for_each_entry(e, &p->metalist, metalist) {
- 		if (!e->ops->get(skb, e))
- 			total_encoded += 1;
- 	}
-@@ -403,13 +398,11 @@ static int dump_metalist(struct sk_buff *skb, struct tcf_ife_info *ife)
- 	return -1;
- }
- 
--/* under ife->tcf_lock */
--static void _tcf_ife_cleanup(struct tc_action *a)
-+static void __tcf_ife_cleanup(struct tcf_ife_params *p)
- {
--	struct tcf_ife_info *ife = to_ife(a);
- 	struct tcf_meta_info *e, *n;
- 
--	list_for_each_entry_safe(e, n, &ife->metalist, metalist) {
-+	list_for_each_entry_safe(e, n, &p->metalist, metalist) {
- 		list_del(&e->metalist);
- 		if (e->metaval) {
- 			if (e->ops->release)
-@@ -422,18 +415,23 @@ static void _tcf_ife_cleanup(struct tc_action *a)
- 	}
- }
- 
-+static void tcf_ife_cleanup_params(struct rcu_head *head)
-+{
-+	struct tcf_ife_params *p = container_of(head, struct tcf_ife_params,
-+						rcu);
-+
-+	__tcf_ife_cleanup(p);
-+	kfree(p);
-+}
-+
- static void tcf_ife_cleanup(struct tc_action *a)
- {
- 	struct tcf_ife_info *ife = to_ife(a);
- 	struct tcf_ife_params *p;
- 
--	spin_lock_bh(&ife->tcf_lock);
--	_tcf_ife_cleanup(a);
--	spin_unlock_bh(&ife->tcf_lock);
--
- 	p = rcu_dereference_protected(ife->params, 1);
- 	if (p)
--		kfree_rcu(p, rcu);
-+		call_rcu(&p->rcu, tcf_ife_cleanup_params);
- }
- 
- static int load_metalist(struct nlattr **tb, bool rtnl_held)
-@@ -455,8 +453,7 @@ static int load_metalist(struct nlattr **tb, bool rtnl_held)
- 	return 0;
- }
- 
--static int populate_metalist(struct tcf_ife_info *ife, struct nlattr **tb,
--			     bool exists, bool rtnl_held)
-+static int populate_metalist(struct tcf_ife_params *p, struct nlattr **tb)
- {
- 	int len = 0;
- 	int rc = 0;
-@@ -468,7 +465,7 @@ static int populate_metalist(struct tcf_ife_info *ife, struct nlattr **tb,
- 			val = nla_data(tb[i]);
- 			len = nla_len(tb[i]);
- 
--			rc = add_metainfo(ife, i, val, len, exists);
-+			rc = add_metainfo(p, i, val, len);
- 			if (rc)
- 				return rc;
- 		}
-@@ -523,6 +520,7 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	p = kzalloc_obj(*p);
- 	if (!p)
- 		return -ENOMEM;
-+	INIT_LIST_HEAD(&p->metalist);
- 
- 	if (tb[TCA_IFE_METALST]) {
- 		err = nla_parse_nested_deprecated(tb2, IFE_META_MAX,
-@@ -567,8 +565,6 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	ife = to_ife(*a);
--	if (ret == ACT_P_CREATED)
--		INIT_LIST_HEAD(&ife->metalist);
- 
- 	err = tcf_action_check_ctrlact(parm->action, tp, &goto_ch, extack);
- 	if (err < 0)
-@@ -600,8 +596,7 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	if (tb[TCA_IFE_METALST]) {
--		err = populate_metalist(ife, tb2, exists,
--					!(flags & TCA_ACT_FLAGS_NO_RTNL));
-+		err = populate_metalist(p, tb2);
- 		if (err)
- 			goto metadata_parse_err;
- 	} else {
-@@ -610,7 +605,7 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 		 * as we can. You better have at least one else we are
- 		 * going to bail out
- 		 */
--		err = use_all_metadata(ife, exists);
-+		err = use_all_metadata(p);
- 		if (err)
- 			goto metadata_parse_err;
- 	}
-@@ -626,13 +621,14 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
- 	if (p)
--		kfree_rcu(p, rcu);
-+		call_rcu(&p->rcu, tcf_ife_cleanup_params);
- 
- 	return ret;
- metadata_parse_err:
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
- release_idr:
-+	__tcf_ife_cleanup(p);
- 	kfree(p);
- 	tcf_idr_release(*a, bind);
- 	return err;
-@@ -679,7 +675,7 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- 	if (nla_put(skb, TCA_IFE_TYPE, 2, &p->eth_type))
- 		goto nla_put_failure;
- 
--	if (dump_metalist(skb, ife)) {
-+	if (dump_metalist(skb, p)) {
- 		/*ignore failure to dump metalist */
- 		pr_info("Failed to dump metalist\n");
- 	}
-@@ -693,13 +689,13 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- 	return -1;
- }
- 
--static int find_decode_metaid(struct sk_buff *skb, struct tcf_ife_info *ife,
-+static int find_decode_metaid(struct sk_buff *skb, struct tcf_ife_params *p,
- 			      u16 metaid, u16 mlen, void *mdata)
- {
- 	struct tcf_meta_info *e;
- 
- 	/* XXX: use hash to speed up */
--	list_for_each_entry(e, &ife->metalist, metalist) {
-+	list_for_each_entry_rcu(e, &p->metalist, metalist) {
- 		if (metaid == e->metaid) {
- 			if (e->ops) {
- 				/* We check for decode presence already */
-@@ -716,10 +712,13 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- {
- 	struct tcf_ife_info *ife = to_ife(a);
- 	int action = ife->tcf_action;
-+	struct tcf_ife_params *p;
- 	u8 *ifehdr_end;
- 	u8 *tlv_data;
- 	u16 metalen;
- 
-+	p = rcu_dereference_bh(ife->params);
-+
- 	bstats_update(this_cpu_ptr(ife->common.cpu_bstats), skb);
- 	tcf_lastuse_update(&ife->tcf_tm);
- 
-@@ -745,7 +744,7 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- 			return TC_ACT_SHOT;
- 		}
- 
--		if (find_decode_metaid(skb, ife, mtype, dlen, curr_data)) {
-+		if (find_decode_metaid(skb, p, mtype, dlen, curr_data)) {
- 			/* abuse overlimits to count when we receive metadata
- 			 * but dont have an ops for it
- 			 */
-@@ -769,12 +768,12 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- /*XXX: check if we can do this at install time instead of current
-  * send data path
- **/
--static int ife_get_sz(struct sk_buff *skb, struct tcf_ife_info *ife)
-+static int ife_get_sz(struct sk_buff *skb, struct tcf_ife_params *p)
- {
--	struct tcf_meta_info *e, *n;
-+	struct tcf_meta_info *e;
- 	int tot_run_sz = 0, run_sz = 0;
- 
--	list_for_each_entry_safe(e, n, &ife->metalist, metalist) {
-+	list_for_each_entry_rcu(e, &p->metalist, metalist) {
- 		if (e->ops->check_presence) {
- 			run_sz = e->ops->check_presence(skb, e);
- 			tot_run_sz += run_sz;
-@@ -795,7 +794,7 @@ static int tcf_ife_encode(struct sk_buff *skb, const struct tc_action *a,
- 	   OUTERHDR:TOTMETALEN:{TLVHDR:Metadatum:TLVHDR..}:ORIGDATA
- 	   where ORIGDATA = original ethernet header ...
- 	 */
--	u16 metalen = ife_get_sz(skb, ife);
-+	u16 metalen = ife_get_sz(skb, p);
- 	int hdrm = metalen + skb->dev->hard_header_len + IFE_METAHDRLEN;
- 	unsigned int skboff = 0;
- 	int new_len = skb->len + hdrm;
-@@ -833,25 +832,21 @@ static int tcf_ife_encode(struct sk_buff *skb, const struct tc_action *a,
- 	if (!ife_meta)
- 		goto drop;
- 
--	spin_lock(&ife->tcf_lock);
--
- 	/* XXX: we dont have a clever way of telling encode to
- 	 * not repeat some of the computations that are done by
- 	 * ops->presence_check...
- 	 */
--	list_for_each_entry(e, &ife->metalist, metalist) {
-+	list_for_each_entry_rcu(e, &p->metalist, metalist) {
- 		if (e->ops->encode) {
- 			err = e->ops->encode(skb, (void *)(ife_meta + skboff),
- 					     e);
- 		}
- 		if (err < 0) {
- 			/* too corrupt to keep around if overwritten */
--			spin_unlock(&ife->tcf_lock);
- 			goto drop;
- 		}
- 		skboff += err;
- 	}
--	spin_unlock(&ife->tcf_lock);
- 	oethh = (struct ethhdr *)skb->data;
- 
- 	if (!is_zero_ether_addr(p->eth_src))
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json b/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
+index f587a32e44c4..808aef4afe22 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
+@@ -1279,5 +1279,104 @@
+         "teardown": [
+             "$TC actions flush action ife"
+         ]
++    },
++    {
++        "id": "f2a0",
++        "name": "Update decode ife action with encode metadata",
++        "category": [
++            "actions",
++            "ife"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            [
++                "$TC actions flush action ife",
++                0,
++                1,
++                255
++            ],
++            "$TC actions add action ife decode index 10"
++        ],
++        "cmdUnderTest": "$TC actions replace action ife encode use tcindex 1 index 10",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j actions get action ife index 10",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "ife",
++                        "mode": "encode",
++                        "control_action": {
++                            "type": "pipe"
++                        },
++                        "type": "0xed3e",
++                        "tcindex": 1,
++                        "index": 10,
++                        "ref": 1,
++                        "bind": 0,
++                        "not_in_hw": true
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            "$TC actions flush action ife"
++        ]
++    },
++    {
++        "id": "d352",
++        "name": "Update decode ife action into encode with multiple metadata",
++        "category": [
++            "actions",
++            "ife"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            [
++                "$TC actions flush action ife",
++                0,
++                1,
++                255
++            ],
++            "$TC actions add action ife decode index 10"
++        ],
++        "cmdUnderTest": "$TC actions replace action ife encode use tcindex 1 use mark 22 index 10",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j actions get action ife index 10",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "ife",
++                        "mode": "encode",
++                        "control_action": {
++                            "type": "pipe"
++                        },
++                        "type": "0xed3e",
++                        "tcindex": 1,
++                        "mark": 22,
++                        "index": 10,
++                        "ref": 1,
++                        "bind": 0,
++                        "not_in_hw": true
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            "$TC actions flush action ife"
++        ]
+     }
+ ]
 -- 
 2.34.1
 
