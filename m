@@ -1,456 +1,354 @@
-Return-Path: <netdev+bounces-263641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOFHJsfop2mDlgAAu9opvQ
-	(envelope-from <netdev+bounces-263641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:09:43 +0100
+	id 2KBKClrqp2nelgAAu9opvQ
+	(envelope-from <netdev+bounces-263642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:16:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4235A1FC3F7
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:09:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93A1E1FC5AB
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:16:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AAD00304E359
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:08:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 80FB330FB5E7
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4491F39150D;
-	Wed,  4 Mar 2026 08:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8D1391518;
+	Wed,  4 Mar 2026 08:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9vNfe+K"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DSmqdIzM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-oo1-f98.google.com (mail-oo1-f98.google.com [209.85.161.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD5B3914EC
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772611686; cv=none; b=VHdajRoPbesWQIX8z0qTlCfMi3xqC4H6SuQ3kC4r4YxjjfJ83gMLJrnhSPTY3h1jhIQ4WHDnrLWTdIF8Veu528MGkiy5v4DL2AA5OdKhQZy5fWaMQrcqW4CB/FoWWp3pEUOFDsRhamTl//jvGpWNHBk335kvx9+7aCpVsMQodQo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772611686; c=relaxed/simple;
-	bh=p0rFqAYZqEKkzRH5u/9gD91Ht/ugLnboq4OW0DT1V2A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pMh+TLnHSbCjzgyanWMTXaQ9XnEJ1NJ1hmpwKRNFMxKALHSn/rvI9JrPoo55I1b2mRKgd3KxN0vN3PcmyCUgVrLiUHAZJx65nYa+8FDaW7PpUf8fL/GA5m/nxnd9J63hCriGJYJwcP8KLf4u6/5FIUJ6I8INrnZ9F6UXZeENRIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9vNfe+K; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3599019ae92so1622893a91.0
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 00:08:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772611683; x=1773216483; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=azstXuQ8g7c6uZJVCh/RgGYawbhjIlM7tPZKAy/20Nc=;
-        b=j9vNfe+K+LpzWnpN7ncicR96dV/stNRJv4KcwZ0QPmnBfRFDNwd2DT4NBPqCdzyOuC
-         OfgDa64Or7FHWgAuDfvS8jb1J1Y3mcwi3jqWTSthmCXHb7Wl7V28kb3Ljb/FeumjR3KW
-         ht9u4gbkGLA/e84vQbh/BpF1zRnng0LpqzrX8JWqHznIze6/1TAO9qFh2uiDFRZX7hS6
-         pQzku4avIiQ9OVok0k+4knf1mZhZZ9gOZKO4t4U1x90tRrS/g0OudJFBOHvJUhTbA3NB
-         K4M5hQGDuzTuBYhfep9TBP+eLDDffnCGcHbUDuq4zFSgPeKE5DBmpT8ew6mTXWXDHzZg
-         6N4w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF03538C2DF
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772611734; cv=pass; b=GNXM2TQFau+LNzjHS2dHaGlvZ6nadjztCiK9btqHokCph3vyweoBbrYolUPPbR/l90SRshkYFjjCZeI0sGgtBbC+Em5OzVzgdoF4n/iSkaDcIgP0ty8cAWKJ1JYBCnItXPSIpl3yoYRVg4gylXLavyrCXFn2qP4lzhElEjOCtMM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772611734; c=relaxed/simple;
+	bh=c/jmA8c69/tEBmF2Ab0nmBNFmu4RD1CoSzWrUuZ/gIA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HkG9GRm/YwZ1yvMbwV/2xtu6rlp30snXJ81UcOfxLik/z+nVJ5uUCQIVOgHe6bf5+SQNTLtqp8/uPQpJVJXvUGcj9hUdcbG446tC8OzNMH09RjZin6M6Z6Nj7ifBLPcQB7c/i3VG3sMldQ/HwBHomz1JHxxfeJIMr6p38BZY8aY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DSmqdIzM; arc=pass smtp.client-ip=209.85.161.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oo1-f98.google.com with SMTP id 006d021491bc7-679f980a239so3116947eaf.2
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 00:08:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772611683; x=1773216483;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=azstXuQ8g7c6uZJVCh/RgGYawbhjIlM7tPZKAy/20Nc=;
-        b=lRP9yB08Uz5fbt5ENkwqsf52awunyVq+ODtI0VtK4tkfnRBqAQmL/7eackSiPNmCEp
-         EzCPbW40THjKM+yuPq80qsDQIMMFAfWX73N0ugA7iqb7MLr1JdY/enGkBk22VZF/jVZo
-         +WW+jlBXpAoM3feMK8sjBBlCo4ysPUjtsCLZ3lmeV+TZ2TfE1MLPXrhXGXrwc3FoyxSd
-         JyLDzwhkIcL3gA/9hOY1YGUgsvYOaU35czGBDdd7FTHhX3svEMqCQ0mxFiMPxiVySvc8
-         Y+FW2XUk776gR2lehpH8bCVTVe/OBWOWQtREVEq1JpSolKmEXH660P8Rj2XgBR37xxW1
-         JH+A==
-X-Gm-Message-State: AOJu0YzgTTSdU5Xc0Ls9EaSN9JVohWqIKK7QnvS+kS/cI5bFnomJk1B6
-	8JabGgPDbzGtwJ1+DYfOjftviZZeSgsyjSHraI9IWzcL6XHz7mKjln0u
-X-Gm-Gg: ATEYQzyL7cXYMIo3SlH5TnwTJ6FjGrDmp2rDSKA195yq5tq9u3FMAPPnrRh0M5Cktz7
-	rIV2YJVZHaI39qe/A3D5YqxKZ0+oqrl9h+vb/z/hNLjep/4inl91iBw9lgZCHyQhYczEiO7ieyr
-	JsoPB+jBU1r/Q/pf6ZI7wW+P+81nGS70U2HvI2EschuqM168cvd0WiINAufyWkhgOvHcsTBTbjV
-	nw8CCH7bJ0WhF6UH+ds9OJhGumCh3OE7gTYKBBj0OaZBijehKoYmYVEhfF1nj8O2KAemCMyHIF7
-	7dJj1OsdkeX8o/M9Y/W6DkBnkAEvB0OjlfOTbvRj2qdSIQhwqJ8t8w6PrCbi2vzZRu/7ENOgYKj
-	E+KKnykCIcrlqZ69Drm+/y4suDevKZ7ZgSlv3tYgHcyIn1RTIG54EHt0Q0sEUj/pyqrt6q2MiKw
-	ZK4/AnH1XDoQ5/PM4xKBZXvnE=
-X-Received: by 2002:a17:90b:538c:b0:356:2db3:1206 with SMTP id 98e67ed59e1d1-359a69dae4emr1318069a91.13.1772611682959;
-        Wed, 04 Mar 2026 00:08:02 -0800 (PST)
-Received: from localhost ([2001:19f0:8001:1b2d:5400:5ff:fefa:a95d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359a913ba77sm344382a91.2.2026.03.04.00.08.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 00:08:02 -0800 (PST)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Yixun Lan <dlan@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Yao Zi <me@ziyao.cc>,
-	Yanteng Si <siyanteng@cqsoftware.com.cn>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Shangjuan Wei <weishangjuan@eswincomputing.com>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Quentin Schulz <quentin.schulz@cherry.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	spacemit@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH net-next v7 3/3] net: stmmac: Add glue layer for Spacemit K3 SoC
-Date: Wed,  4 Mar 2026 16:07:20 +0800
-Message-ID: <20260304080721.1658224-4-inochiama@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260304080721.1658224-1-inochiama@gmail.com>
-References: <20260304080721.1658224-1-inochiama@gmail.com>
+        d=1e100.net; s=20230601; t=1772611732; x=1773216532;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hXGJxrNATX1cswT2K4taLMFU78X5VBtwUcZ4FOsr4lo=;
+        b=fjaJLeuKVpYWsREXf5EsATLS47PGs9zUZO5B6gaDakz/3L1Snj9bwuR9wKQ27TTAcK
+         Imwb6ORoeXkuowHkKj63DiJxbAuWyV5bbxOSuLFRR3HxOmU1wSsJRCUcnl28UocczEeM
+         ikiZLbBQFKewE5ssW559/IRg1nI+je3k7UpWtx6MmBvw/jyioL8meZ5jziotawzX8dIC
+         bzoWwvEQQfoMxIu5XqUahqqkPJQZntegC3tQvh0Jp/gAlV3KJnakgIciOpM//NM5eeLV
+         qjcJmm7ReL0hC1s60NBhuH6FI8dYd7WlERoa/xlp8fIkkGqcU829KWg5VQnDPoGnrxqA
+         ZleA==
+X-Forwarded-Encrypted: i=2; AJvYcCXAobLK5P3YHATzdCw0HewYuNTrveisfhwcUGPt7pqFF++Ph2RpYXcX9vgDnO49nMa2nEk5BkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJWn7diIIEWtXU0Tm9Hhu83XgjXt6YNZ4CFWDl2pRaRd3gcy6F
+	AxbjcIXbZ8VVV4OKP1g8cO/N50L/N5KZtqTsiSqYMlCnq9fknhzAQSPfJ0FSK7iKMTliImUEDab
+	3fS6PnNVa2iYYmK/3iMYe6durNMwfqJ1nLXjH8+09aPW5ByUVtLj5U47hTrEd91UOKsDp3IEvDT
+	3jgfr4PnWn5ckpctKA9b5P8QJC2kiQiNAKIKqUShj9ICbeaGzBoxTJqmqRbhnYCqYuKW4soRv+d
+	8b84V9PqVbzJxTHdQ==
+X-Gm-Gg: ATEYQzzP68XPKiltu4xPth7To/C2RHESkAt8E4DLobnjOXrKhQ0LskkLhzmZvSL2hIA
+	D71PxiGz3BWwpAyVMxUIa5WlEl4aJdnuOJKZgYW9L72hXzMjKvejKnsyoi1sZU0fIeXG5qCOnD8
+	ynOqgJuhnuwhnETMDcWoTEN4nj+98NFVxVZQySbaNEPz6IAQtxuop2XJlxKdQnLI5KcNYWVNELO
+	3eCZ+JlJdPOp/Bufwa3ariu2Zx+D97nMWNSJpX/ziUe1FfZ95krdemswMPLRQjKmCaq4Z89tCSy
+	vRwJtek6pgd2EjStzawZhLE818QH3akqx/vwwsQsJp/NxFTY6h+WgqF6dZsV8jd7B/6lySSucb5
+	k+Ls0f2IBEiTYPi9p5UQzMZLRGICo923f6VL4SUAWO7zURpS8N+kRpeaouACzQhoB5feuNGRltK
+	XC3wfTBoIdRmkyetZ1JnjAYh65lwUnpafLx9kYJaDVqQ+WDXO8ZgKceZGfIxLveUiuLw==
+X-Received: by 2002:a05:6820:228d:b0:672:7258:c4f0 with SMTP id 006d021491bc7-67b17759031mr700925eaf.53.1772611731514;
+        Wed, 04 Mar 2026 00:08:51 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-4160d21dff0sm2839831fac.12.2026.03.04.00.08.50
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Mar 2026 00:08:51 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-2be1a486968so41221096eec.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 00:08:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772611730; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a5RQlla+zR7JaJAjb1/2nel9q8CoUefMOMlm1wuuOdJP/+b2cY+KaVyPKJHQwzaoAt
+         BjDOSkkWof4g8b58kqAdJ8xvA0NQZtFHPAzcd+4OPccp/OpsTnXZ1Uee6CTD3RPdeFeQ
+         PRE37cY2MIf1KWi7ayiXFgoRqzNUQtBebIaZPGgV1/6xtJcSb5BCpSu68xUPxEvFAQkE
+         eap0ukJ5yAKMi1WsoFTUFtfTgT1a4732dpSeVde+fz1kizBeoxT47ee0JEFhQ/r2m/+U
+         JtajCkywjK4kLUmHHj6qZMK8qY+lnDBhiw/WiEh9HDpzxNCwDvuqj7G2MStOR9BfKEnl
+         e2XA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=hXGJxrNATX1cswT2K4taLMFU78X5VBtwUcZ4FOsr4lo=;
+        fh=k39V4aPI25sAIWFBNJyTC9rEenA6mvIAnf6ZDfUyszM=;
+        b=iAOxPp1Lc/URgwTUX6ZPUPZwOJvSZT6csGvdXlFNHPWV7G4R5b9rdOE5JxA+BG8Xc7
+         nKQ993cX3A0RVf6JUyRjGmgxzuRjHfRnCQhmqxnvDSKun36PJlCOOoqVwJSYZ6xTUI+I
+         m2bp4eOfKLtVmc0HozWGgEPyh/F96Uy6D2EQep1FrFj8AEjV3DMmROlMEGKY81dOz/QC
+         VoIu88tf7fEM77qyvQe/SSDXXgiEJqNuxjhQ5+W0wWjfitFMkcjSzPWEEdrLki3BA5WU
+         DA+1z8bkwMuhtkrJKUdAzU2Is7jsdvNvQmUexSkinJYNsTsmbWDhEOG31qbxpY3H9bFp
+         ZLnw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1772611730; x=1773216530; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hXGJxrNATX1cswT2K4taLMFU78X5VBtwUcZ4FOsr4lo=;
+        b=DSmqdIzMS5E+l1NNSuU64J4Vy8zgQlzsJ8o8nSKeAf/TL7rCaRfKV0oUAqTNQgZWM+
+         /sh9CxGnujkh3iCp4jvKEKR/S3/wmsR2NuRT/fE7hmSBSsbJ6Kj/aoW2DRXiH59P7HhO
+         rGuT6AXkAYpxRv2BkEn0beI4NJGTWvMDb8NWc=
+X-Forwarded-Encrypted: i=1; AJvYcCWiaQjk3NHbfSR8uoDdHCBcDidEAbYw61nfX2Jtv6m8LOmCgonbqETaA3KZRsTvWw0jTM3z4GU=@vger.kernel.org
+X-Received: by 2002:a05:7300:5710:b0:2be:6f6:a39f with SMTP id 5a478bee46e88-2be310ae9fdmr490496eec.26.1772611729759;
+        Wed, 04 Mar 2026 00:08:49 -0800 (PST)
+X-Received: by 2002:a05:7300:5710:b0:2be:6f6:a39f with SMTP id
+ 5a478bee46e88-2be310ae9fdmr490486eec.26.1772611729175; Wed, 04 Mar 2026
+ 00:08:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4235A1FC3F7
+References: <20260228072715.1632280-7-bhargava.marreddy@broadcom.com> <20260303030036.1885679-1-kuba@kernel.org>
+In-Reply-To: <20260303030036.1885679-1-kuba@kernel.org>
+From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+Date: Wed, 4 Mar 2026 13:38:35 +0530
+X-Gm-Features: AaiRm52fdg10KrThJAyZu-eh3flSOoBLY3IYYjuyjjdXXITGDXfc_DB463GRA4E
+Message-ID: <CANXQDtaMHmzU32jyyooXk7qdHPqroW9Y-Nni==qritBgegn2Dg@mail.gmail.com>
+Subject: Re: [net-next,v3,6/8] bng_en: add initial support for ethtool stats display
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: edumazet@google.com, andrew+netdev@lunn.ch, ajit.khaparde@broadcom.com, 
+	horms@kernel.org, pabeni@redhat.com, michael.chan@broadcom.com, 
+	linux-kernel@vger.kernel.org, vsrama-krishna.nemani@broadcom.com, 
+	davem@davemloft.net, netdev@vger.kernel.org, rajashekar.hudumula@broadcom.com, 
+	vikas.gupta@broadcom.com, pavan.chebbi@broadcom.com, 
+	rahul-rg.gupta@broadcom.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000080f290064c2e54a7"
+X-Rspamd-Queue-Id: 93A1E1FC5AB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263641-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263642-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,nxp.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org,gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,mail.gmail.com:mid,broadcom.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The ethernet controller on Spacemit K3 SoC is Synopsys DesignWare
-MAC (version 5.40a), with the following special points:
-1. The rate of the tx clock line is auto changed when the mac speed
-   rate is changed, and no need for changing the input tx clock.
-2. This controller require a extra syscon device to configure the
-   interface type, enable wake up interrupt and delay configuration
-   if needed.
+--00000000000080f290064c2e54a7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add Spacemit dwmac driver support on the Spacemit K3 SoC.
+On Tue, Mar 3, 2026 at 8:30=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> bng_en: add initial support for ethtool stats display
+>
+> This commit implements ethtool -S callbacks for per-ring RX/TX, TPA,
+> and port-level MAC/extended statistics, including string names, counts,
+> and DMA-backed memory allocation for port stats via HWRM wrappers.
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/driver=
+s/net/ethernet/broadcom/bnge/bnge_ethtool.c
+> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
+> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
+> > @@ -31,6 +31,331 @@ static int bnge_nway_reset(struct net_device *dev)
+> >       return rc;
+> >  }
+> >
+> > +static const char * const bnge_ring_rx_stats_str[] =3D {
+> > +     "rx_ucast_packets",
+> > +     "rx_mcast_packets",
+> > +     "rx_bcast_packets",
+> > +     "rx_discards",
+> > +     "rx_errors",
+> > +     "rx_ucast_bytes",
+> > +     "rx_mcast_bytes",
+> > +     "rx_bcast_bytes",
+> > +};
+> > +
+> > +static const char * const bnge_ring_tx_stats_str[] =3D {
+> > +     "tx_ucast_packets",
+> > +     "tx_mcast_packets",
+> > +     "tx_bcast_packets",
+> > +     "tx_errors",
+> > +     "tx_discards",
+>
+> Jakub Kicinski raised this concern during v3 review: standard stats like
+> rx_errors and tx_errors should not be duplicated in ethtool -S output.
+> While this patch adds structured callbacks (.get_eth_mac_stats,
+> .get_rmon_stats, etc.) for standard stats, rx_errors and tx_errors still
+> appear in the bnge_ring_rx_stats_str[] and bnge_ring_tx_stats_str[]
+> arrays above.
+>
+> These arrays are used by bnge_get_strings() which feeds ethtool -S,
+> meaning the standard stats will still appear in ethtool -S output.
+>
+> Should rx_errors and tx_errors be removed from these arrays to comply
+> with the kernel policy against duplicating standard stats?
 
-Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-spacemit.c  | 228 ++++++++++++++++++
- 3 files changed, 241 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
+Thanks, Jakub.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 07088d03dbab..d3a6ab7383fc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -216,6 +216,18 @@ config DWMAC_SOPHGO
- 	  for the stmmac device driver. This driver is used for the
- 	  ethernet controllers on various Sophgo SoCs.
- 
-+config DWMAC_SPACEMIT
-+	tristate "Spacemit dwmac support"
-+	depends on OF && (ARCH_SPACEMIT || COMPILE_TEST)
-+	select MFD_SYSCON
-+	default m if ARCH_SPACEMIT
-+	help
-+	  Support for ethernet controllers on Spacemit RISC-V SoCs
-+
-+	  This selects the Spacemit platform specific glue layer support
-+	  for the stmmac device driver. This driver is used for the
-+	  Spacemit K3 ethernet controllers.
-+
- config DWMAC_STARFIVE
- 	tristate "StarFive dwmac support"
- 	depends on OF && (ARCH_STARFIVE || COMPILE_TEST)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index c9263987ef8d..945c5354eced 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -27,6 +27,7 @@ obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
- obj-$(CONFIG_DWMAC_S32)		+= dwmac-s32.o
- obj-$(CONFIG_DWMAC_SOCFPGA)	+= dwmac-altr-socfpga.o
- obj-$(CONFIG_DWMAC_SOPHGO)	+= dwmac-sophgo.o
-+obj-$(CONFIG_DWMAC_SPACEMIT)	+= dwmac-spacemit.o
- obj-$(CONFIG_DWMAC_STARFIVE)	+= dwmac-starfive.o
- obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
- obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
-new file mode 100644
-index 000000000000..22aa25a7417b
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
-@@ -0,0 +1,228 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Spacemit DWMAC platform driver
-+ *
-+ * Copyright (C) 2026 Inochi Amaoto <inochiama@gmail.com>
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/math.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/property.h>
-+#include <linux/regmap.h>
-+
-+#include "stmmac_platform.h"
-+
-+/* ctrl register bits */
-+#define CTRL_PHY_INTF_RGMII		BIT(3)
-+#define CTRL_PHY_INTF_MII		BIT(4)
-+#define CTRL_WAKE_IRQ_EN		BIT(9)
-+#define CTRL_PHY_IRQ_EN			BIT(12)
-+
-+/* dline register bits */
-+#define RGMII_RX_DLINE_EN		BIT(0)
-+#define RGMII_RX_DLINE_STEP		GENMASK(5, 4)
-+#define RGMII_RX_DLINE_CODE		GENMASK(15, 8)
-+#define RGMII_TX_DLINE_EN		BIT(16)
-+#define RGMII_TX_DLINE_STEP		GENMASK(21, 20)
-+#define RGMII_TX_DLINE_CODE		GENMASK(31, 24)
-+
-+#define MAX_DLINE_DELAY_CODE		0xff
-+#define MAX_WORKED_DELAY		2800
-+/* Note: the delay step value is at 0.1ps */
-+#define K3_DELAY_STEP			367
-+
-+struct spacmit_dwmac {
-+	struct regmap *apmu;
-+	unsigned int ctrl_offset;
-+	unsigned int dline_offset;
-+};
-+
-+static int spacemit_dwmac_set_delay(struct spacmit_dwmac *dwmac,
-+				    unsigned int tx_code, unsigned int rx_code)
-+{
-+	unsigned int mask, val;
-+
-+	mask = RGMII_TX_DLINE_STEP | RGMII_TX_DLINE_CODE | RGMII_TX_DLINE_EN |
-+	       RGMII_RX_DLINE_STEP | RGMII_RX_DLINE_CODE | RGMII_RX_DLINE_EN;
-+
-+	/*
-+	 * Since the delay step provided by config 0 is small enough, and
-+	 * it can cover the range of the valid delay, so there is no needed
-+	 * to use other step config.
-+	 */
-+	val = FIELD_PREP(RGMII_TX_DLINE_STEP, 0) |
-+	      FIELD_PREP(RGMII_TX_DLINE_CODE, tx_code) | RGMII_TX_DLINE_EN |
-+	      FIELD_PREP(RGMII_RX_DLINE_STEP, 0) |
-+	      FIELD_PREP(RGMII_RX_DLINE_CODE, rx_code) | RGMII_RX_DLINE_EN;
-+
-+	return regmap_update_bits(dwmac->apmu, dwmac->dline_offset,
-+				  mask, val);
-+}
-+
-+static int spacemit_dwmac_detected_delay_value(unsigned int delay)
-+{
-+	if (delay == 0)
-+		return 0;
-+
-+	if (delay > MAX_WORKED_DELAY)
-+		return -EINVAL;
-+
-+	/*
-+	 * Note K3 require a specific factor for calculate
-+	 * the delay, in this scenario it is 0.9. So the
-+	 * formula is code * step / 10 * 0.9
-+	 */
-+	return DIV_ROUND_CLOSEST(delay * 10 * 10, K3_DELAY_STEP * 9);
-+}
-+
-+static int spacemit_dwmac_fix_delay(struct spacmit_dwmac *dwmac,
-+				    struct plat_stmmacenet_data *plat_dat,
-+				    unsigned int tx_delay,
-+				    unsigned int rx_delay)
-+{
-+	int rx_code;
-+	int tx_code;
-+
-+	rx_code = spacemit_dwmac_detected_delay_value(rx_delay);
-+	if (rx_code < 0)
-+		return rx_code;
-+
-+	tx_code = spacemit_dwmac_detected_delay_value(tx_delay);
-+	if (tx_code < 0)
-+		return tx_code;
-+
-+	return spacemit_dwmac_set_delay(dwmac, tx_code, rx_code);
-+}
-+
-+static int spacemit_dwmac_update_irq_config(struct spacmit_dwmac *dwmac,
-+					    struct stmmac_resources *stmmac_res)
-+{
-+	unsigned int mask = CTRL_WAKE_IRQ_EN;
-+	unsigned int val = stmmac_res->wol_irq >= 0 ? CTRL_WAKE_IRQ_EN : 0;
-+
-+	return regmap_update_bits(dwmac->apmu, dwmac->ctrl_offset,
-+				  mask, val);
-+}
-+
-+static void spacemit_get_interfaces(struct stmmac_priv *priv, void *bsp_priv,
-+				    unsigned long *interfaces)
-+{
-+	__set_bit(PHY_INTERFACE_MODE_MII, interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_RMII, interfaces);
-+	phy_interface_set_rgmii(interfaces);
-+}
-+
-+static int spacemit_set_phy_intf_sel(void *bsp_priv, u8 phy_intf_sel)
-+{
-+	struct spacmit_dwmac *dwmac = bsp_priv;
-+	unsigned int mask = CTRL_PHY_INTF_MII | CTRL_PHY_INTF_RGMII;
-+	unsigned int val = 0;
-+
-+	switch (phy_intf_sel) {
-+	case PHY_INTF_SEL_GMII_MII:
-+		val = CTRL_PHY_INTF_MII;
-+		break;
-+
-+	case PHY_INTF_SEL_RMII:
-+		break;
-+
-+	case PHY_INTF_SEL_RGMII:
-+		val = CTRL_PHY_INTF_RGMII;
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return regmap_update_bits(dwmac->apmu, dwmac->ctrl_offset,
-+				  mask, val);
-+}
-+
-+static int spacemit_dwmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct device *dev = &pdev->dev;
-+	struct spacmit_dwmac *dwmac;
-+	unsigned int offset[2];
-+	struct regmap *apmu;
-+	struct clk *clk_tx;
-+	u32 rx_delay = 0;
-+	u32 tx_delay = 0;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "failed to get platform resources\n");
-+
-+	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
-+	if (!dwmac)
-+		return -ENOMEM;
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return dev_err_probe(dev, PTR_ERR(plat_dat),
-+				     "failed to parse DT parameters\n");
-+
-+	clk_tx = devm_clk_get_enabled(&pdev->dev, "tx");
-+	if (IS_ERR(clk_tx))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(clk_tx),
-+				     "failed to get tx clock\n");
-+
-+	apmu = syscon_regmap_lookup_by_phandle_args(pdev->dev.of_node,
-+						    "spacemit,apmu", 2,
-+						    offset);
-+	if (IS_ERR(apmu))
-+		return dev_err_probe(dev, PTR_ERR(apmu),
-+				"Failed to get apmu regmap\n");
-+
-+	dwmac->apmu = apmu;
-+	dwmac->ctrl_offset = offset[0];
-+	dwmac->dline_offset = offset[1];
-+
-+	ret = spacemit_dwmac_update_irq_config(dwmac, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Failed to configure irq config\n");
-+
-+	of_property_read_u32(pdev->dev.of_node, "tx-internal-delay-ps",
-+			     &tx_delay);
-+	of_property_read_u32(pdev->dev.of_node, "rx-internal-delay-ps",
-+			     &rx_delay);
-+
-+	plat_dat->get_interfaces = spacemit_get_interfaces;
-+	plat_dat->set_phy_intf_sel = spacemit_set_phy_intf_sel;
-+	plat_dat->bsp_priv = dwmac;
-+
-+	ret = spacemit_dwmac_fix_delay(dwmac, plat_dat, tx_delay, rx_delay);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Failed to configure delay\n");
-+
-+	return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id spacemit_dwmac_match[] = {
-+	{ .compatible = "spacemit,k3-dwmac" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, spacemit_dwmac_match);
-+
-+static struct platform_driver spacemit_dwmac_driver = {
-+	.probe  = spacemit_dwmac_probe,
-+	.remove = stmmac_pltfr_remove,
-+	.driver = {
-+		.name = "spacemit-dwmac",
-+		.pm = &stmmac_pltfr_pm_ops,
-+		.of_match_table = spacemit_dwmac_match,
-+	},
-+};
-+module_platform_driver(spacemit_dwmac_driver);
-+
-+MODULE_AUTHOR("Inochi Amaoto <inochiama@gmail.com>");
-+MODULE_DESCRIPTION("Spacemit DWMAC platform driver");
-+MODULE_LICENSE("GPL");
--- 
-2.53.0
+I see the issue. These aren't actually duplicates of the standard
+per-interface stats.
+They are unique per-ring hardware counters, but the strings happen to match=
+.
 
+To fix the collision, I'll prefix the entire ring stat arrays with
+rxq_ and txq_.
+
+Example of the new output:
+  - Per-ring stats (via ethtool -S):
+      # ethtool -S eno12399np0 | grep rxq_errors
+        [0]: rxq_errors: 0
+         [1]: rxq_errors: 0
+         ...
+        [n-1]: rxq_errors: 0
+
+  - Standard interface stats (via .ndo_get_stats64 / sysfs):
+      # cat /sys/class/net/eno12399np0/statistics/rx_errors
+         0
+
+Does this approach look okay for v4?
+
+Thanks,
+Bhargava Marreddy.
+
+--00000000000080f290064c2e54a7
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIVdAYJKoZIhvcNAQcCoIIVZTCCFWECAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghLhMIIGqDCCBJCgAwIBAgIQfofDCS7XZu8vIeKo0KeY9DANBgkqhkiG9w0BAQwFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSNjETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMzA0MTkwMzUzNTNaFw0yOTA0MTkwMDAwMDBaMFIxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBS
+NiBTTUlNRSBDQSAyMDIzMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwjAEbSkPcSyn
+26Zn9VtoE/xBvzYmNW29bW1pJZ7jrzKwPJm/GakCvy0IIgObMsx9bpFaq30X1kEJZnLUzuE1/hlc
+hatYqyORVBeHlv5V0QRSXY4faR0dCkIhXhoGknZ2O0bUJithcN1IsEADNizZ1AJIaWsWbQ4tYEYj
+ytEdvfkxz1WtX3SjtecZR+9wLJLt6HNa4sC//QKdjyfr/NhDCzYrdIzAssoXFnp4t+HcMyQTrj0r
+pD8KkPj96sy9axzegLbzte7wgTHbWBeJGp0sKg7BAu+G0Rk6teO1yPd75arbCvfY/NaRRQHk6tmG
+71gpLdB1ZhP9IcNYyeTKXIgfMh2tVK9DnXGaksYCyi6WisJa1Oa+poUroX2ESXO6o03lVxiA1xyf
+G8lUzpUNZonGVrUjhG5+MdY16/6b0uKejZCLbgu6HLPvIyqdTb9XqF4XWWKu+OMDs/rWyQ64v3mv
+Sa0te5Q5tchm4m9K0Pe9LlIKBk/gsgfaOHJDp4hYx4wocDr8DeCZe5d5wCFkxoGc1ckM8ZoMgpUc
+4pgkQE5ShxYMmKbPvNRPa5YFzbFtcFn5RMr1Mju8gt8J0c+dxYco2hi7dEW391KKxGhv7MJBcc+0
+x3FFTnmhU+5t6+CnkKMlrmzyaoeVryRTvOiH4FnTNHtVKUYDsCM0CLDdMNgoxgkCAwEAAaOCAX4w
+ggF6MA4GA1UdDwEB/wQEAwIBhjBMBgNVHSUERTBDBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQB
+gjcUAgIGCisGAQQBgjcKAwwGCisGAQQBgjcKAwQGCSsGAQQBgjcVBjASBgNVHRMBAf8ECDAGAQH/
+AgEAMB0GA1UdDgQWBBQAKTaeXHq6D68tUC3boCOFGLCgkjAfBgNVHSMEGDAWgBSubAWjkxPioufi
+1xzWx/B/yGdToDB7BggrBgEFBQcBAQRvMG0wLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwMi5nbG9i
+YWxzaWduLmNvbS9yb290cjYwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjYuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yNi5jcmwwEQYDVR0gBAowCDAGBgRVHSAAMA0GCSqGSIb3DQEBDAUAA4IC
+AQCRkUdr1aIDRmkNI5jx5ggapGUThq0KcM2dzpMu314mJne8yKVXwzfKBtqbBjbUNMODnBkhvZcn
+bHUStur2/nt1tP3ee8KyNhYxzv4DkI0NbV93JChXipfsan7YjdfEk5vI2Fq+wpbGALyyWBgfy79Y
+IgbYWATB158tvEh5UO8kpGpjY95xv+070X3FYuGyeZyIvao26mN872FuxRxYhNLwGHIy38N9ASa1
+Q3BTNKSrHrZngadofHglG5W3TMFR11JOEOAUHhUgpbVVvgCYgGA6dSX0y5z7k3rXVyjFOs7KBSXr
+dJPKadpl4vqYphH7+P40nzBRcxJHrv5FeXlTrb+drjyXNjZSCmzfkOuCqPspBuJ7vab0/9oeNERg
+nz6SLCjLKcDXbMbKcRXgNhFBlzN4OUBqieSBXk80w2Nzx12KvNj758WavxOsXIbX0Zxwo1h3uw75
+AI2v8qwFWXNclO8qW2VXoq6kihWpeiuvDmFfSAwRLxwwIjgUuzG9SaQ+pOomuaC7QTKWMI0hL0b4
+mEPq9GsPPQq1UmwkcYFJ/Z4I93DZuKcXmKMmuANTS6wxwIEw8Q5MQ6y9fbJxGEOgOgYL4QIqNULb
+5CYPnt2LeiIiEnh8Uuh8tawqSjnR0h7Bv5q4mgo3L1Z9QQuexUntWD96t4o0q1jXWLyrpgP7Zcnu
+CzCCBYMwggNroAMCAQICDkXmuwODM8OFZUjm/0VRMA0GCSqGSIb3DQEBDAUAMEwxIDAeBgNVBAsT
+F0dsb2JhbFNpZ24gUm9vdCBDQSAtIFI2MRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpH
+bG9iYWxTaWduMB4XDTE0MTIxMDAwMDAwMFoXDTM0MTIxMDAwMDAwMFowTDEgMB4GA1UECxMXR2xv
+YmFsU2lnbiBSb290IENBIC0gUjYxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2Jh
+bFNpZ24wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCVB+hzymb57BTKezz3DQjxtEUL
+LIK0SMbrWzyug7hBkjMUpG9/6SrMxrCIa8W2idHGsv8UzlEUIexK3RtaxtaH7k06FQbtZGYLkoDK
+RN5zlE7zp4l/T3hjCMgSUG1CZi9NuXkoTVIaihqAtxmBDn7EirxkTCEcQ2jXPTyKxbJm1ZCatzEG
+xb7ibTIGph75ueuqo7i/voJjUNDwGInf5A959eqiHyrScC5757yTu21T4kh8jBAHOP9msndhfuDq
+jDyqtKT285VKEgdt/Yyyic/QoGF3yFh0sNQjOvddOsqi250J3l1ELZDxgc1Xkvp+vFAEYzTfa5MY
+vms2sjnkrCQ2t/DvthwTV5O23rL44oW3c6K4NapF8uCdNqFvVIrxclZuLojFUUJEFZTuo8U4lptO
+TloLR/MGNkl3MLxxN+Wm7CEIdfzmYRY/d9XZkZeECmzUAk10wBTt/Tn7g/JeFKEEsAvp/u6P4W4L
+sgizYWYJarEGOmWWWcDwNf3J2iiNGhGHcIEKqJp1HZ46hgUAntuA1iX53AWeJ1lMdjlb6vmlodiD
+D9H/3zAR+YXPM0j1ym1kFCx6WE/TSwhJxZVkGmMOeT31s4zKWK2cQkV5bg6HGVxUsWW2v4yb3BPp
+DW+4LtxnbsmLEbWEFIoAGXCDeZGXkdQaJ783HjIH2BRjPChMrwIDAQABo2MwYTAOBgNVHQ8BAf8E
+BAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUrmwFo5MT4qLn4tcc1sfwf8hnU6AwHwYD
+VR0jBBgwFoAUrmwFo5MT4qLn4tcc1sfwf8hnU6AwDQYJKoZIhvcNAQEMBQADggIBAIMl7ejR/ZVS
+zZ7ABKCRaeZc0ITe3K2iT+hHeNZlmKlbqDyHfAKK0W63FnPmX8BUmNV0vsHN4hGRrSMYPd3hckSW
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGqjCCBJKg
+AwIBAgIMFJTEEB7G+bRSFHogMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI1MDYyMDEzNTI1NVoXDTI3MDYyMTEzNTI1NVowge0xCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzERMA8GA1UEBBMITWFycmVkZHkxGDAWBgNVBCoTD0JoYXJnYXZhIENoZW5uYTEWMBQGA1UE
+ChMNQlJPQURDT00gSU5DLjEnMCUGA1UEAwweYmhhcmdhdmEubWFycmVkZHlAYnJvYWRjb20uY29t
+MS0wKwYJKoZIhvcNAQkBFh5iaGFyZ2F2YS5tYXJyZWRkeUBicm9hZGNvbS5jb20wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQCq1sbXItt9Z31lzjb1WqEEegmLi72l7kDsxOJCWBCSkART
+C/LTHOEoELrltkLJnRJiEujzwxS1/cV0LQse38GKog0UmiG5Jsq4YbNxmC7s3BhuuZYSoyCQ7Jg+
+BzqQDU+k9ESjiD/R/11eODWJOxHipYabn/b+qYM+7CTSlVAy7vlJ+z1E/LnygVYHkWFN+IJSuY26
+OWgSyvM8/+TPOrECYbo+kLcjqZfLS9/8EDThXQgg9oCeQOD8pwExycHc9w6ohJLoK7mVWrDol6cl
+vW0XPONZARkdcZ69nJIHt/aMhihlyTUEqD0R8yRHfBp9nQwoSs8z+8xZ+cczX/XvtCVJAgMBAAGj
+ggHiMIIB3jAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADCBkwYIKwYBBQUHAQEEgYYwgYMw
+RgYIKwYBBQUHMAKGOmh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZz
+bWltZWNhMjAyMy5jcnQwOQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dz
+Z2NjcjZzbWltZWNhMjAyMzBlBgNVHSAEXjBcMAkGB2eBDAEFAwMwCwYJKwYBBAGgMgEoMEIGCisG
+AQQBoDIKAwIwNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3Np
+dG9yeS8wQQYDVR0fBDowODA2oDSgMoYwaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3I2
+c21pbWVjYTIwMjMuY3JsMCkGA1UdEQQiMCCBHmJoYXJnYXZhLm1hcnJlZGR5QGJyb2FkY29tLmNv
+bTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAd
+BgNVHQ4EFgQUkiPQZ5IKnCUHj3xJyO85n4OdVl4wDQYJKoZIhvcNAQELBQADggIBALtu8uco00Hh
+dGp+c7lMOYHnFquYd6CXMYL1sBTi51PmiOKDO2xgfVvR7XI/kkqK5Iut0PYzv7kvUJUpG7zmL+XW
+ABC2V9jvp5rUPlGSfP9Ugwx7yoGYEO+x42LeSKypUNV0UbBO8p32C1C/OkqikHlrQGuy8oUMNvOl
+rrSoYMXdlZEravXgTAGO1PLgwVHEpXKy+D523j8B7GfDKHG7M7FjuqqyuxiDvFSoo3iEjYVzKZO9
+NkcawmbO73W8o/5QE6GiIIvXyc+YUfVSNmX5/XpZFqbJ/uFhmiMmBhsT7xJA+L0NHTR7m09xCfZd
++XauyU42jyqUrgRWA36o20SMf1IURZYWgH4V7gWF2f95BiJs0uV1ddjo5ND4pejlKGkCGBfXSAWP
+Ye5wAfgaC3LLKUnpYc3o6q5rUrhp9JlPey7HcnY9yJzQsw++DgKprh9TM/9jwlek8Kw1SIIiaFry
+iriecfkPEiR9HVip63lbWsOrBFyroVEsNmmWQYKaDM4DLIDItDZNDw0FgM1b6R/E2M0ME1Dibn8P
+alTJmpepLqlS2uwywOFZMLeiiVfTYSHwV/Gikq70KjVLNF59BWZMtRvyD5EoPHQavcOQTr7I/5Gc
+GboBOYvJvkYzugiHmztSchEvGtPA10eDOxR1voXJlPH95MB73ZQwqQNpRPq04ElwMYICVzCCAlMC
+AQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMf
+R2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0EgMjAyMwIMFJTEEB7G+bRSFHogMA0GCWCGSAFlAwQC
+AQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBvYub3VFZt9jpFbtNFOHZQINHW7iQfbLY5kFAQm2LTyTAY
+BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjAzMDQwODA4NTBaMFwG
+CSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYI
+KoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB4Acvc
+czcXw8iOr0IzGPocT7tXLRd2NBTMcTjtnpmaodP8ZZ2vXn2NLlrsjuWG8mENnDHVHwvCtSPXpFmm
+7WeqgcmiDjc/JYb0CwJn3gLtEsyNcRD0yEsPgWyGWNYYTtNFFjE89HrGgQU3Gzvzosj6upDF4FqR
+cWugVbxsmShub/HDmrbjvTidqIbpxru3l7qdzYcWu3lALcCR5mVDC/6Zce6Fg2UQyvWvUSkwTWo2
+/RGoZG1V6jUv84Rje4ACW5KWu14+j/TngrUiUYgZjiE4zDKfp/USbxaNvQhhYCFzMoMkIv5cczlI
+DwsKY+QkbFdMuGapBcLM+N4/lJJQSXGH
+--00000000000080f290064c2e54a7--
 
