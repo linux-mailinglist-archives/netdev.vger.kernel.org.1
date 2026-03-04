@@ -1,235 +1,212 @@
-Return-Path: <netdev+bounces-263936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBgDOFNgqGnPuAAAu9opvQ
-	(envelope-from <netdev+bounces-263936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:39:47 +0100
+	id sLsDIr9dqGmZtgAAu9opvQ
+	(envelope-from <netdev+bounces-263913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:28:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5302047A1
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:39:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DD1204429
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:28:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F217E300B457
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:37:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 198603047533
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4A7377EBD;
-	Wed,  4 Mar 2026 16:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FC834DB79;
+	Wed,  4 Mar 2026 16:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W1fvYWFH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="V96PDJpt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D647374745;
-	Wed,  4 Mar 2026 16:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B091C34A78F
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772642184; cv=none; b=rX9MoWhVD4cpgGrf0E973SYRNzBocEczVHXN0hxLJWuvKnNSMHEi5JpXVetuoPcTwrUr3YRPf3Ue0AqilBIIhuV9kARMl/rHMb7MlBOPgmPVID9w0eyvflE1Jlaxa8uoF182V/GoyE0nlkekV3nr2V7sTaSQdkj3lM+nh+mP2ys=
+	t=1772640556; cv=none; b=fMEnNbiF6zNrv06oZoOTuffOIRo96T5HyKkbqZG3upc7YXUFTIcoOKxqCgIqJKpFXRad7nsKQaMQ4NWYyp2TNiqIj/NRo6lhe+tLwfp5ce41gP3Qyhr8g2VJ397VgDYYxiPNG9iiNdLOlm5Kuntvsko0Q3XfSrpCYUg1YDHQgpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772642184; c=relaxed/simple;
-	bh=xSoRegfDOP/5IirhtXxj8ro8oytZUXfZQIPbEnLhFj0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fKLX5/v2yVkpSvyRNb3gnXtagZyMWNJ0rq2Z7HUTSGIwARmHuAdc+Z5DPcXh64ci1u3AW923gQ6nt1hGkzA9Apdhf06z90ajIXEehlH7KKpLb3SK4ibu61RoxcbqSkm43gN4qbFh1ktT3RKcVkAXqj5SFQw3ZidHjEUZ2VjGk4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W1fvYWFH; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772642176; x=1804178176;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xSoRegfDOP/5IirhtXxj8ro8oytZUXfZQIPbEnLhFj0=;
-  b=W1fvYWFHPWDTUvwr+a6TUurNqZ/eK7OHMrVTvsKdUEegMXpoVQChGinI
-   1GjOKr9JJyANH+TkqeLaIy7z8KeEknOgV7czEtfVZblp22HWnCKF4We/g
-   VEkABcEN9q4fTOvQNPj3c3XGMF/C1osDQszLCwJRSO+rtHvAFNtFI8PbM
-   MJO/Y8rILcbXS55L2/tdTyhMl9N4aPT2SMxwqgffyb9vsX9Sy73HmV9Aa
-   doxQ4cs5T7pVkB3H4nqrcQnoJJR7G5A+Pf4WiyaEsgDvw3M6tmABDP/zm
-   wuVfRasade6sYtJu49yel6SvrB0c1CpihF/4Y0oDibNst+nr3f+5ke/gz
-   g==;
-X-CSE-ConnectionGUID: lPlGa30tR7a5mWu+tY9sEA==
-X-CSE-MsgGUID: XIKd8roiTBCe43olBpK+NA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="72906460"
-X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="72906460"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 08:36:15 -0800
-X-CSE-ConnectionGUID: 7wkR9efNR9uyL5ijqtiN3Q==
-X-CSE-MsgGUID: 1fYrwHwiR7qWLIM1XMTJOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="241405043"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 04 Mar 2026 08:36:11 -0800
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 109DB312CB;
-	Wed,  4 Mar 2026 16:36:10 +0000 (GMT)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Natalia Wochtman <natalia.wochtman@intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v3 10/10] ixgbevf: allow changing MTU when XDP program is attached
-Date: Wed,  4 Mar 2026 17:03:42 +0100
-Message-ID: <20260304160345.1340940-11-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260304160345.1340940-1-larysa.zaremba@intel.com>
-References: <20260304160345.1340940-1-larysa.zaremba@intel.com>
+	s=arc-20240116; t=1772640556; c=relaxed/simple;
+	bh=cyPiqNTMV9/2OwOGOP5t4mZiXAj1R4qSbE3YHJvUUMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P+HEqCdWfxOW7TodqCY7uVoQc18z//0wkiLkZTuogvmIukVnlg2fs7AoLvu6CLTPG9FfBUzJc6ySCzuOdtT2jmZFBJwvN3QRln/QP4VBYLpbyP/0wDFupwwa1zs3IJOku2NiC6wkqEwWLqGChhoUd+Vf1986xl4ubOXZP5xj7r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=V96PDJpt; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 0CB3BC16573;
+	Wed,  4 Mar 2026 16:09:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B9F765FF5C;
+	Wed,  4 Mar 2026 16:09:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EEBEA10369526;
+	Wed,  4 Mar 2026 17:09:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772640551; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=o2/XV9ZfCgAgiuSeujNtGFRamCoYCgmA2/cu0ytNEpE=;
+	b=V96PDJpt9PWanbUhWbce/TGSLT34xeihw/YwV29JTSuYkf6IvIK28jJYeUe60g9+I4+pVt
+	rw+YTiErvwBQkgQ3D6FymrwPywgT5FUfOcMi8VA5gJQh4CEA1xqU5GaAWzPlF0LRqeABUN
+	gWtfZoEdmgtH0d9/E5kaMtRey8OJkEfqZ2w9RDbP5x6d6Yuo1npJFCjC9EDls3mopeFGDJ
+	0lPYNPgsinQ00Iq0XO0Zq4pThB6E8HalYcZkOxayyyRDAkAtGJyDLEds/PdgSg32Pu9cJZ
+	B6m6TX/pvqUpnheeh4Xr0wt5IG57pKoEJ1znXrD9ZGZLYRcekMoYQDqMwOvTqg==
+Message-ID: <9c674e92-efc4-4f4d-9bd6-2b210ffd7c9e@bootlin.com>
+Date: Wed, 4 Mar 2026 17:09:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 0/4] ethtool: CMIS module diagnostic loopback
+ support
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
+ Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <20260219130050.2390226-1-bjorn@kernel.org>
+ <415c4922-cc8d-4e35-bbac-3a532f44d238@lunn.ch>
+ <20260219160519.323041bf@kernel.org>
+ <3b0949fa-0b05-4bce-86c0-2a7a058865a5@lunn.ch>
+ <20260220131254.03874c4c@kernel.org>
+ <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
+ <20260223150401.7993b11a@kernel.org>
+ <CAJ+HfNjmRjr6VtRijmN9=4zPwxstw9B8D-_XVn3hwJzNHka1Jw@mail.gmail.com>
+ <363527d6-1f29-4399-83a7-978785d1e11f@lunn.ch>
+ <CAJ+HfNhwM82H-sgbz0+WJGRjXJc8Ww0aCnp_YTNi-CB4aBMi=w@mail.gmail.com>
+ <4c51f18c-5eb1-4a9e-93b9-70cf7a4fd387@lunn.ch>
+ <f2ce4c3b-407e-4c01-b117-c646feed877f@bootlin.com>
+ <CAJ+HfNga2510HrgpDH==H7CpmKBAEsoQkEmhFBMPxqM296p2eA@mail.gmail.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <CAJ+HfNga2510HrgpDH==H7CpmKBAEsoQkEmhFBMPxqM296p2eA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AA5302047A1
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: E6DD1204429
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263936-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263913-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,broadcom.com,marvell.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-xskxceiver attempts to change MTU after attaching XDP program,
-ixgbevf rejects the request leading to test being failed.
+Hi Björn,
 
-Support MTU change operation even when XDP program is already attached,
-perform the same frame size check as when attaching a program.
+On 04/03/2026 16:52, Björn Töpel wrote:
+> Hey!
+> 
+> On Mon, 2 Mar 2026 at 10:01, Maxime Chevallier
+> <maxime.chevallier@bootlin.com> wrote:
+> 
+>> The overall approach after all these discussions sounds fine to me, I do
+>> think that the index of the component that does the loopback needs to be
+>> there somewhere, when relevant.
+>>
+>> Either through a name string, or a combo of an enum indicating the
+>> component type (MAC/PHY/Module/etc.) + its index. I think it's safe to
+>> assume that indices will fit in u32 ?
+>>
+>> something like :
+>>
+>> # MAC PCS loopback
+>> ethtool --set-loopback eth0 loc mac name pcs
+>>
+>> # PHY id 2 PMA loopback (I'm making things up here)
+>> ethtool --set-loopback eth0 loc phy id 2 name pma
+>>
+>> That way we can extend that fairly easily for, say, combo-port devices
+>> where we could select which of the port we want to loopback :)
+> 
+> Ok! I'll spin a new version with this in mind. To improve my mental
+> model, could you give an example how you would use a combo-port from a
+> userland perspective?
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- .../net/ethernet/intel/ixgbevf/ixgbevf_main.c | 37 ++++++++++++++-----
- 1 file changed, 27 insertions(+), 10 deletions(-)
+Of course :)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 196e51eb516a..08ea2ae45cea 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -569,8 +569,8 @@ static void ixgbevf_alloc_rx_buffers(struct ixgbevf_ring *rx_ring,
- 	};
- 	u16 ntu = rx_ring->next_to_use;
+Considering this setup :
+
+ +-----+     +-----+
+ | MAC |     | PHY |----- SFP
+ |     |-----|     |----- RJ45
+ +-----+     +-----+
+
+It's still WIP but the current state of what I have in the pipe looks like :
+
+# List the ports
+ethtool --show-ports eth0
+
+Port for eth10:       # <- This port represents the RJ45 port of the PHY
+	Port id: 1
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+	Active: yes
+	Link: up
+
+Port for eth1:          # <- This port represents the SFP cage
+	Port id: 2
+	Vacant: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+	Active: no
+
+Port for eth1:          # <- This port represents the SFP module inside the cage
+	Port id: 4
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+	Active: no
+	Link: up
+
+
+# Select the SFP port as the active one (note that we could either use
+port 2 or 4 here for the same result) :
+
+ethtool --set-port eth0 id 4 active on 
+
+I may add something like :
+
+ethtool --set-port eth0 type sfp active on
+ethtool --set-port eth0 type tp active on
  
--	/* nothing to do or no valid netdev defined */
--	if (unlikely(!cleaned_count || !rx_ring->netdev))
-+	/* nothing to do or page pool is not present */
-+	if (unlikely(!cleaned_count || !fq.pp))
- 		return;
- 
- 	rx_desc = IXGBEVF_RX_DESC(rx_ring, ntu);
-@@ -1764,6 +1764,7 @@ static void ixgbevf_configure_rx_ring(struct ixgbevf_adapter *adapter,
- 	bool rlpml_valid = false;
- 	u64 rdba = ring->dma;
- 	u32 rxdctl;
-+	int err;
- 
- 	/* disable queue to avoid issues while updating state */
- 	rxdctl = IXGBE_READ_REG(hw, IXGBE_VFRXDCTL(reg_idx));
-@@ -1797,7 +1798,13 @@ static void ixgbevf_configure_rx_ring(struct ixgbevf_adapter *adapter,
- 	ring->next_to_clean = 0;
- 	ring->next_to_use = 0;
- 
--	ixgbevf_rx_create_pp(ring);
-+	err = ixgbevf_rx_create_pp(ring);
-+	if (err) {
-+		netdev_err(ring->netdev,
-+			   "Failed to create Page Pool for buffer allocation: (%pe), RxQ %d is disabled, driver reload may be needed\n",
-+			   ERR_PTR(err), ring->queue_index);
-+		return;
-+	}
- 
- 	/* RXDCTL.RLPML does not work on 82599 */
- 	if (adapter->hw.mac.type != ixgbe_mac_82599_vf) {
-@@ -4082,6 +4089,18 @@ static int ixgbevf_set_mac(struct net_device *netdev, void *p)
- 	return 0;
- }
- 
-+static bool ixgbevf_xdp_mtu_ok(const struct ixgbevf_adapter *adapter,
-+			       const struct bpf_prog *prog, unsigned int mtu)
-+{
-+	u32 frame_size = mtu + LIBETH_RX_LL_LEN;
-+	bool requires_mbuf;
-+
-+	requires_mbuf = frame_size > IXGBEVF_RX_PAGE_LEN(LIBETH_XDP_HEADROOM) ||
-+			adapter->flags & IXGBEVF_FLAG_HSPLIT;
-+
-+	return prog->aux->xdp_has_frags || !requires_mbuf;
-+}
-+
- /**
-  * ixgbevf_change_mtu - Change the Maximum Transfer Unit
-  * @netdev: network interface device structure
-@@ -4097,8 +4116,10 @@ static int ixgbevf_change_mtu(struct net_device *netdev, int new_mtu)
- 	int ret;
- 
- 	/* prevent MTU being changed to a size unsupported by XDP */
--	if (adapter->xdp_prog) {
--		dev_warn(&adapter->pdev->dev, "MTU cannot be changed while XDP program is loaded\n");
-+	if (adapter->xdp_prog &&
-+	    !ixgbevf_xdp_mtu_ok(adapter, adapter->xdp_prog, new_mtu)) {
-+		netdev_warn(netdev,
-+			    "MTU value provided cannot be set while current XDP program is attached\n");
- 		return -EPERM;
- 	}
- 
-@@ -4261,14 +4282,10 @@ ixgbevf_features_check(struct sk_buff *skb, struct net_device *dev,
- static int ixgbevf_xdp_setup(struct net_device *dev, struct bpf_prog *prog,
- 			     struct netlink_ext_ack *extack)
- {
--	u32 frame_size = READ_ONCE(dev->mtu) + LIBETH_RX_LL_LEN;
- 	struct ixgbevf_adapter *adapter = netdev_priv(dev);
- 	struct bpf_prog *old_prog;
--	bool requires_mbuf;
- 
--	requires_mbuf = frame_size > IXGBEVF_RX_PAGE_LEN(LIBETH_XDP_HEADROOM) ||
--			adapter->flags & IXGBEVF_FLAG_HSPLIT;
--	if (prog && !prog->aux->xdp_has_frags && requires_mbuf) {
-+	if (prog && !ixgbevf_xdp_mtu_ok(adapter, prog, READ_ONCE(dev->mtu))) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Configured MTU or HW limitations require non-linear frames and XDP prog does not support frags");
- 		return -EOPNOTSUPP;
--- 
-2.52.0
+Maxime
 
 
