@@ -1,137 +1,194 @@
-Return-Path: <netdev+bounces-263602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFuVHwnSp2l7kAAAu9opvQ
-	(envelope-from <netdev+bounces-263602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:32:41 +0100
+	id 6OAROSvTp2nEkAAAu9opvQ
+	(envelope-from <netdev+bounces-263603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:37:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 610C71FB2EC
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:32:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF311FB351
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 07:37:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3395F301701C
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 06:32:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76A95305184C
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 06:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E80366568;
-	Wed,  4 Mar 2026 06:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF9637F8D2;
+	Wed,  4 Mar 2026 06:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="YYdNvKf9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dSdIUZn/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.14])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BD622CBF1
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 06:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E2C33AD88
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 06:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772605946; cv=none; b=I8Yq4xKqgmhXqes1ew3RRGa8UHpKnu8Qyx9MYI++XcudBrsIej7F6WmQPyCbflPlj96u9X3MZfzr8ZE96LPzKFvQBKlZy/4eJfN+DujnGkFcfLpsngcZtOtKCBjjSdvmjHkOIarPnq+2XecnJUq+brsbeofjN1oEMatkdTZkdLU=
+	t=1772606246; cv=none; b=RdfO/OQrRssojeHU3wefUxgjRnOuiBTDRXIv5ywcNjFm4JgG5x7stWFAqLshbNZFWPVeFs3xD61gr/0YDb0vveqMHMx7LqaLpjqums7rkwfNyVZEa2F8b5u8d4VC/kgqp0VRmHdmDWB1ehdcYzCmrKQ5rUjbmopJhPyjaZKg2ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772605946; c=relaxed/simple;
-	bh=HVfQkiV51veq3wmq+a4sx0+wWXtsnnD6Z55dsxRBT04=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=F5Gkt9JTEzEL0u7rQOhTdo0k2CtqyCYUNaXAGgJAHLhsbDt9cUcTJfIWpvOmWuAWnX8JbhMixI3oMkyQiafbXYyiwH2H8vcUNXdMkr9kU+u65N8v7SHS2PTa7dfjEki6MJJeO9WAT/tFmeGOETICMqpCp3tIC6Wcf803v7KcHO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=YYdNvKf9; arc=none smtp.client-ip=1.95.21.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Message-ID:Date:MIME-Version:To:From:Subject:
-	Content-Type; bh=+sZDNwyjcOjiVkOaFfTRGX4IQP/rCpWEkThWxU3UuS0=;
-	b=YYdNvKf9+C/lHlwOGVeRC6TU5UZ107rfNqzHcloWOGRnVV6rwYR8hJe3iJ5kJt
-	tqxYM4Qf6N/Df+WQ5wetrns/V4SamwIQucpgv9T7Q/vHG2PWR3Z9lqAEb09RAbzH
-	L7DQ0fGCVBIDLODyGhnjjjM7oBS5YtK5VaP6biBxpfWz4=
-Received: from [7.247.167.131] (unknown [])
-	by gzsmtp2 (Coremail) with UTF8SMTPA id Ms8vCgDH7rDS0adpgjUDAg--.7725S2;
-	Wed, 04 Mar 2026 14:31:47 +0800 (CST)
-Message-ID: <b0355e40-814b-42dc-8158-3ff32b80f14f@yeah.net>
-Date: Wed, 4 Mar 2026 14:31:46 +0800
+	s=arc-20240116; t=1772606246; c=relaxed/simple;
+	bh=C+GWh0X/x+E8K8Heufepk3oNTNdSdcGqi5B/uREcWyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OONr88yxVVu43dr3DJNzZsjlOgIDSxzxKN78e8Lm3/XMv/QTEq14V3lybjl4upUPWdkyYYZXkYwtxDvs7MrZTQwef7h0rqGG8ZVm0OVpJvYFYyAu2Jq9teEKBkhLMXXiK9N/xceOP3MleeKNr+QRdbWLb0wSPT1F9dtcZIatqGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dSdIUZn/; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772606232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BezM0d3Efmj5Mb5nol+0YNAjnV5cCAH9C7KVaf9ncPM=;
+	b=dSdIUZn/Je1e4TEMSMz6sz+HWz+Z67hLlAtKW/MRyVywEMHOVKjHo/LTFV+CR0iPzbus5U
+	7SEeOmQamZI4V90SkQbQamxfBYQsMQCgKvpvG5qUExT1RlLbxEE4uCNGgwmpx0z7Mgvb9v
+	mW3Cf0vE+qmUXg97JEPoKMATXtCr9IU=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	Michal Luczaj <mhal@rbox.co>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v1 0/7] bpf/sockmap: add splice support for tcp_bpf
+Date: Wed,  4 Mar 2026 14:33:51 +0800
+Message-ID: <20260304063643.14581-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org
-Cc: jramaseu@redhat.com, kuba@kernel.org
-From: xietangxin <xietangxin@yeah.net>
-Subject: [QUERY] net: gso: question about commit 864e3396976e affecting
- tunneled IPv6-in-IPv4 packets
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:Ms8vCgDH7rDS0adpgjUDAg--.7725S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Aw18ur15try7ZFyxJF4ktFb_yoW8WFy5pa
-	4kKFy8tw4DWF45Aw1UAr1Fv390yr4kGa13WrnavryUtws8WryF9FWSgrZIvFyDGa1fG3WY
-	9ryjqryrA3Z8JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jxL08UUUUU=
-X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiIRPsIWmn0dMBQgAA3w
-X-Rspamd-Queue-Id: 610C71FB2EC
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 4DF311FB351
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[yeah.net:+];
-	TAGGED_FROM(0.00)[bounces-263602-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-263603-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[yeah.net];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,cloudflare.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.alibaba.com,rbox.co,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid]
 X-Rspamd-Action: no action
 
-Hello,
+Starting from Go 1.22.0, TCPConn implements the WriteTo interface [1],
+which internally uses the splice(2) syscall to transfer data between
+file descriptors [2].
 
-I'm writing regarding commit 864e3396976e ("net: gso: Forbid IPv6 TSO with
-extensions on devices with only IPV6_CSUM"). The commit added a condition to
-disable TSO6 for IPv6 packets with extension headers when the device only
-supports NETIF_F_IPV6_CSUM.
+However, for sockets with sockmap enabled, sk_prot is replaced with
+tcp_bpf_prots which does not provide a splice_read callback. When data
+is redirected to a socket's psock ingress queue via bpf_msg_redirect,
+splice(2) cannot read from it because the splice path has no knowledge
+of the psock queue. This causes TCPConn.WriteTo to return 0 bytes,
+effectively breaking Go applications that rely on io.Copy between TCP
+connections when sockmap/BPF is in use [3].
 
-In our environment with a hinic NIC (which supports TSO6 and IPV6_CSUM), we use
-VXLAN tunnels where the outer header is IPv4 and the inner is IPv6 (TCP).
-After this commit, large packets (>MTU) no longer use hardware TSO and fall back
-to software segmentation.
+The simplest fix would be registering a splice callback that just calls
+copy_splice_read(), but this results in redundant copies (socket -> kernel
+buffer -> pipe -> destination), which defeats the purpose of splice.
 
-After debugging, I found the condition:
+Patch 1 adds splice_read to struct proto and sets it in TCP.
+Patch 2 adds inet_splice_read and uses it in inet_stream_ops.
+Patch 3 refactors tcp_bpf recvmsg with a read actor abstraction.
+Patch 4 adds basic splice_read support for sockmap, but this still
+involves 2 data copies.
+Patch 5 optimizes the splice implementation by transferring page
+ownership directly into the pipe, achieving true zero-copy. Benchmarks
+show performance on par with the read(2) path.
+Patch 6 adds splice selftests. Since splice can seamlessly replace read
+operations, we redefine read to splice in the existing selftests so
+that all existing test cases also cover the splice path.
+Patch 7 adds splice to the sockmap benchmark, which also serves to
+verify the effectiveness of our zero-copy implementation.
 
-	if (features & NETIF_F_IPV6_CSUM &&
-	    (skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-	     (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-	      vlan_get_protocol(skb) == htons(ETH_P_IPV6))) &&
-	    skb_transport_header_was_set(skb) &&
-	    skb_network_header_len(skb) != sizeof(struct ipv6hdr) &&
-	    !ipv6_has_hopopt_jumbo(skb))
-		features &= ~(NETIF_F_IPV6_CSUM | NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4);
+Benchmark results with rx-verdict-ingress mode (loopback, 8 CPUs):
 
-In the VXLAN IPv6-in-IPv4 case, `skb_shinfo(skb)->gso_type` includes
-`SKB_GSO_TCPV6` (inner is IPv6 TCP), but the network header points to the outer
-IPv4 header. Thus `skb_network_header_len(skb)` returns the IPv4 header length
-(usually 20), which is not equal to `sizeof(struct ipv6hdr)` (40). This causes
-the condition to trigger and clears `NETIF_F_TSO6`, even though the inner IPv6
-packet has no extension headers and the device is capable of handling TSO for
-such packets.
+  read(2):                  ~4292 MB/s
+  splice(2) + zero-copy:    ~4270 MB/s
+  splice(2) + always-copy:  ~2770 MB/s
 
-I would like to ask:
-- Is my case expected to have TSO disabled?
-- If not, what is the proper fix?
+Zero-copy splice achieves near-parity with read(2), while the
+always-copy fallback is ~35% slower.
 
-Any feedback or guidance would be greatly appreciated.
+[1] https://github.com/golang/go/blob/master/src/net/tcpsock.go#L173
+[2] https://github.com/golang/go/blob/fdf3bee/src/net/tcpsock_posix.go#L57
+[3] https://github.com/jschwinger233/bpf_msg_redirect_bug_reproducer
 
-Thanks,
-tangxin xie
+Jiayuan Chen (7):
+  net: add splice_read to struct proto and set it in tcp_prot/tcpv6_prot
+  inet: add inet_splice_read() and use it in
+    inet_stream_ops/inet6_stream_ops
+  tcp_bpf: refactor recvmsg with read actor abstraction
+  tcp_bpf: add splice_read support for sockmap
+  tcp_bpf: optimize splice_read with zero-copy for non-slab pages
+  selftests/bpf: add splice_read tests for sockmap
+  selftests/bpf: add splice option to sockmap benchmark
+
+ include/linux/skmsg.h                         |  12 +-
+ include/net/inet_common.h                     |   3 +
+ include/net/sock.h                            |   3 +
+ net/core/skmsg.c                              |  34 ++-
+ net/ipv4/af_inet.c                            |  15 +-
+ net/ipv4/tcp_bpf.c                            | 227 +++++++++++++++---
+ net/ipv4/tcp_ipv4.c                           |   1 +
+ net/ipv6/af_inet6.c                           |   2 +-
+ net/ipv6/tcp_ipv6.c                           |   1 +
+ .../selftests/bpf/benchs/bench_sockmap.c      |  57 ++++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  28 ++-
+ .../bpf/prog_tests/sockmap_helpers.h          |  62 +++++
+ .../selftests/bpf/prog_tests/sockmap_strp.c   |  28 ++-
+ 13 files changed, 421 insertions(+), 52 deletions(-)
+
+-- 
+2.43.0
 
 
