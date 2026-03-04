@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-263534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263535-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PMqKpyNp2nliAAAu9opvQ
-	(envelope-from <netdev+bounces-263534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:40:44 +0100
+	id 0GDiBcSNp2nliAAAu9opvQ
+	(envelope-from <netdev+bounces-263535-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:41:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA2C1F9915
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B091F991E
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:41:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61ACB321402D
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:31:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA4EF30EA2E6
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E220330B2F;
-	Wed,  4 Mar 2026 01:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3736030EF91;
+	Wed,  4 Mar 2026 01:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJoHfH5S"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="txCzLKVJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3A232ED58;
-	Wed,  4 Mar 2026 01:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA16430CDAB;
+	Wed,  4 Mar 2026 01:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587842; cv=none; b=sUzu6XT/qqBpL8sc60ImdNDdX+e6orcGNSDpccFqwWJoAqvxYYag/wdI6XE6yytQo9VlhiVMw36Tl0CiNWNg55LPDH7EiIwG0hAjP5QmnZnpa5fwjjzUoWH10v5HP7+rEdm1tytL5qzrCWmuRhL3EQTjikg0yLPxN7Iznj3wzz0=
+	t=1772588059; cv=none; b=YcYkezPJtfFsHQ7AGmB+hdfsFuEyClfAPXk+/Oq1bh7pWPa+vW+M+C83XAeNGxO02fFiE2O2nOD6iCk52FEFKnb2vENHhVyLwDz8ll0jYu+kexLTxBYgNXaymiO6oNtXzdGfFPcvAkqkrdW+iRfERJ2/K40M+k7Lh/vR6P7POPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587842; c=relaxed/simple;
-	bh=v0spz6zycLGHWW4CpULPNZmqE/CwAExEJbdkdVT/GvY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pyZ9ylAGowrGMd49Brj0vl04rK9clRl/d+C4h1/DDqCDGxCxD5rIl4qmP7F3LRNEmOGPx5F5Q6UaJHkjMk1/+3vTy3oQh1m2q6YiCO87XM9hmuozkA13V8JxVYjXg+2wXF+nADtaF097R7pWYGO8VJLqz4HJBnQPuJArbEfCJ5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJoHfH5S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34DC0C116C6;
-	Wed,  4 Mar 2026 01:30:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772587842;
-	bh=v0spz6zycLGHWW4CpULPNZmqE/CwAExEJbdkdVT/GvY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kJoHfH5SevufvAOw8NAa1tAAbW3FHBCAMT/5EHEb+Wywl0Vyt41Sy1uzLrnwX4Xat
-	 UTUAX++Hvt7SB4ea3XPvsRqu58199bNKx9J6gykY2rr6c9YIAQR0BDXDpvs5EKpoRg
-	 p0PjnRy/AQ8gJaXaeS6nscbbeGwZzyLhBaR3zA3STabnpxrMtwOxd24uuG9dWuloF0
-	 ujha1uholOK5HEgVky4XVmjGAKqyfblbY4Tc+hMpHZqwJdtBRKiX1ul/MUWfOn1lFK
-	 Mc3WsQE/PnylVFfzUS+tEmB/oPjP+EDZFkmvs9B3/IDnXV44povlorvmsgyhPIaysf
-	 xfCANbplv1JvA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE473808200;
-	Wed,  4 Mar 2026 01:30:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772588059; c=relaxed/simple;
+	bh=t9gZ16sRwNdgu704XD8+TWQ1hwtxbyjiFS75MDq6tvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=W15SG+mQUOnVD+wiMuBChKP1Ep1tEptm5p+UKV2o9gWvr8VQraw2sxv8hnvHGVSPb2umhMcIMcTBq+px35ADN65xhCtJPOlWYmvbPdbS/r4uFxtg8PmOOxh4uM4dIMfoP92OdQjnaoGtGoynJAWQNv2RIuaUioEUzugx3NMVQio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=txCzLKVJ; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 1767E6017D;
+	Wed,  4 Mar 2026 02:34:16 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1772588056;
+	bh=KoOkUHlebztnj5ySuklW6b9Nj06PUyO4YBSJZL9llZc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=txCzLKVJAikh/h4JjRvsinV/8Cwl8LvBztCQ6CIPkEqfKU4/17V8hoywe0y5DctJ2
+	 TyeVQJ+uWahRyjIQ8384a4IKlolHIrsFfHdNhoL4VI4irFgHxHwJpXRv7HZUVFAFcm
+	 3Ouua5bu9p6FTc/9aVmufGexwvPMKg3iOOTDdhJWVMPg5iJGYFosy5shILlGVrUvpf
+	 pFMi0dFiz+5zTKunP9q6AnsOD3Bx3r4CqsgEXVJVlAsU+csmw9mPbYT2r+5umHcR54
+	 3QZZQMLEnrAdQYjHEWsyS4IpP5KyYNA9NnvH/AFctCfP8YIy65/dWRAdWQ2AR3r8sB
+	 K3VhTpQ2RGuhw==
+Date: Wed, 4 Mar 2026 02:34:13 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
+Cc: netfilter-announce@lists.netfilter.org, lwn@lwn.net,
+	netdev@vger.kernel.org
+Subject: [ANNOUNCE] iptables 1.8.13 release
+Message-ID: <aaeMFWURL-6YWIkz@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] NFC: nxp-nci: Replace strcpy() with strscpy()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177258784304.1546050.13043250991778322020.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Mar 2026 01:30:43 +0000
-References: <20260301135633.214497-1-tomasz.unger@yahoo.pl>
-In-Reply-To: <20260301135633.214497-1-tomasz.unger@yahoo.pl>
-To: None <tomasz.unger@yahoo.pl>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Rspamd-Queue-Id: 0DA2C1F9915
+Content-Type: multipart/mixed; boundary="+j7gPogMzyv6nJsr"
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 89B091F991E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-263534-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-263535-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.pl];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	HAS_ATTACHMENT(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5]
 X-Rspamd-Action: no action
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+--+j7gPogMzyv6nJsr
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-On Sun,  1 Mar 2026 14:56:33 +0100 you wrote:
-> From: Tomasz Unger <tomasz.unger@yahoo.pl>
-> 
-> Replace strcpy() with strscpy() which limits the copy to the size of
-> the destination buffer. Since fw_info->name is an array, the
-> two-argument variant of strscpy() is used - the compiler deduces
-> the buffer size automatically.
-> 
-> [...]
+Hi!
 
-Here is the summary with links:
-  - [net-next,v1] NFC: nxp-nci: Replace strcpy() with strscpy()
-    https://git.kernel.org/netdev/net-next/c/66e807f96f4e
+The Netfilter project proudly presents:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+        iptables 1.8.13
+
+This release contains the following fixes:
+
+* Revert "libxtables: refuse to run under file capabilities",
+  which breaks Docker.
+* Fix compilation warning with strchr() and const.
+
+Upgrade from iptables 1.8.12 is recommended.
+
+See changelog for more details (attached to this email).
+
+You can download this new release from:
+
+  https://www.netfilter.org/projects/iptables/downloads.html
+  https://www.netfilter.org/pub/iptables/
+
+To build the code, libnftnl >= 1.2.6 is required:
+
+  http://netfilter.org/projects/libnftnl/downloads.html
+
+In case of bugs and feature requests, file them via:
+
+  https://bugzilla.netfilter.org
+
+Happy firewalling.
+
+--+j7gPogMzyv6nJsr
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename="changes-iptables-1.8.13.txt"
+
+Florian Westphal (1):
+      Revert "libxtables: refuse to run under file capabilities"
+
+Pablo Neira Ayuso (1):
+      configure: Bump version for 1.8.13 release
+
+Rudi Heitbaum (1):
+      src: fix discards 'const' qualifier
 
 
+--+j7gPogMzyv6nJsr--
 
