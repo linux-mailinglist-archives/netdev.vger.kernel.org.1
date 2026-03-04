@@ -1,212 +1,218 @@
-Return-Path: <netdev+bounces-263797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLQJDusfqGlQoQAAu9opvQ
-	(envelope-from <netdev+bounces-263797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:04:59 +0100
+	id ADewMWwjqGl3ogAAu9opvQ
+	(envelope-from <netdev+bounces-263800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:19:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6D01FF766
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:04:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACEAF1FF99B
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 13:19:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB5EC302C932
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:04:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE7D0303EC3A
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 12:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACBC351C1C;
-	Wed,  4 Mar 2026 12:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5906A23F26A;
+	Wed,  4 Mar 2026 12:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YScXSqBg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0h2+HkXU";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YScXSqBg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0h2+HkXU"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="MVhNYwAR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB13B314D1E
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 12:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C1F336884
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 12:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772625864; cv=none; b=bCJUNoLDrrvUtNtsn0jy1917Z+iQ5MjlskRfskcRDY6AChpafiFVS58jTGgmfiU+yiMSw9s73U4zI3drZ0PF6R0t3kIw0Qa6agFJvIjqKu7X4SSnZERU62nbgTanWJp5xQ4v1+8RAlxXlLvpf7LRUraoYmIroKEijOY4Bo2LI3g=
+	t=1772626673; cv=none; b=QZkqC752cQIB75y+ZDO6WsAOsVe40e9zrP1MOQznuoLUm4RZs0lVXFvK6PAEP+gbhVrfJshiKYy4iUwX449EB8+Bh+/J0e9xTvPAqltU3uN577TagWpJ2dFb+O1ddQrgx1agh1f7u0F2aDrQuNRuTsZPb4SpPyXG6x4cLoleWe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772625864; c=relaxed/simple;
-	bh=67Xrp0u9d33OgxEmG2g86y+w9UQ+1Shs+NBa0hxWSQc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pg0XEjQdzxjLwrdopRiqDlCXleFZE2aHGiBQK8/qxjhMIwAPJ1NszLsXLkgZDcqqxvHhfsd+p3bVJch5QR3Mq1ngoUftjcuaWM9lG8HIwG7lwkAnay1+f9ZaRbMYjdZWzqdKrzS+6WGBFDIugUWP2PF1/+FqpOYJfxeHj5zbGGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YScXSqBg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0h2+HkXU; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YScXSqBg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0h2+HkXU; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0A8983E7CE;
-	Wed,  4 Mar 2026 12:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772625861; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vD1OCYwk5gzbTYTOeNyV94+f10qcqATMVc8osJETivc=;
-	b=YScXSqBg+JA33/Ej9Aw+ZNMlS42def+UOOo3wJm63imHekk82XcDPQTkOWJyB4Q/AmsO3+
-	bXDVz2yC7PGqvg0txM8IKS9g6Gi3Kne7d1yLr/05HdIsIG3TpRQ2fIw7lkaA0nyQZjU8rr
-	6gxbS4P+YA1hy5heXKU7Bm69eTdGOyE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772625861;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vD1OCYwk5gzbTYTOeNyV94+f10qcqATMVc8osJETivc=;
-	b=0h2+HkXU6KD41Ab1gYBwddKswpFwsg3fuhHRJZrsTh6qmNH7+da4n31ZC1OmsuODOeYEEj
-	GKqPFTcmEL0Af+BQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772625861; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vD1OCYwk5gzbTYTOeNyV94+f10qcqATMVc8osJETivc=;
-	b=YScXSqBg+JA33/Ej9Aw+ZNMlS42def+UOOo3wJm63imHekk82XcDPQTkOWJyB4Q/AmsO3+
-	bXDVz2yC7PGqvg0txM8IKS9g6Gi3Kne7d1yLr/05HdIsIG3TpRQ2fIw7lkaA0nyQZjU8rr
-	6gxbS4P+YA1hy5heXKU7Bm69eTdGOyE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772625861;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vD1OCYwk5gzbTYTOeNyV94+f10qcqATMVc8osJETivc=;
-	b=0h2+HkXU6KD41Ab1gYBwddKswpFwsg3fuhHRJZrsTh6qmNH7+da4n31ZC1OmsuODOeYEEj
-	GKqPFTcmEL0Af+BQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 344E73EA69;
-	Wed,  4 Mar 2026 12:04:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sDevCcQfqGkSdQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 04 Mar 2026 12:04:20 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: bridge@lists.linux.dev,
-	roopa@cumulusnetworks.com,
-	sdf@fomichev.me,
-	petrm@nvidia.com,
-	horms@kernel.org,
-	idosch@nvidia.com,
-	razor@blackwall.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 net v3] net: vxlan: fix nd_tbl NULL dereference when IPv6 is disabled
-Date: Wed,  4 Mar 2026 13:03:57 +0100
-Message-ID: <20260304120357.9778-2-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260304120357.9778-1-fmancera@suse.de>
-References: <20260304120357.9778-1-fmancera@suse.de>
+	s=arc-20240116; t=1772626673; c=relaxed/simple;
+	bh=POCV8JaymNScyiai3RphyoFmi0IjfXAolvC5ruoI32k=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=lBFa359I8ayFT7UOLiOMfi3e4rSI9/6bs1Nk1vovw3iYz5ksVBBcHy6rQ3mt/wI1A408Qs5Yg9yy9jnvkIHJQsjmhEtdqY+cQKL498XEAuco8Cy+sZezbTlEvI2/sfjFUImsHgVk72pnqWGYArEnLkwTSEse4hmTVujlH0qus1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=MVhNYwAR; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=WTCkzXr8IJyYwxxrufKTwxw++AWw05Y+lvv/LZr2SbU=;
+	b=MVhNYwARwZFJqby7/VOJtPXWC7CasZNm99haPHGSKK2hYltR4JsOZu5QkDxNKllaa+ISsfRjf
+	oIEDZzEyGNwzDdXR4N98HyomdB5McqY6rbqFs4vzj4wrKsfuDKnBowZ1VePA9acr1iUsO6apGVc
+	uPnnGT3iQ/ekdZiAVq6NhDE=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4fQs485NWzzcZyH;
+	Wed,  4 Mar 2026 20:12:24 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 86584202D3;
+	Wed,  4 Mar 2026 20:17:38 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 4 Mar 2026 20:17:37 +0800
+Message-ID: <259cd032-2ccb-452b-8524-75bc7162e138@huawei.com>
+Date: Wed, 4 Mar 2026 20:17:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Rspamd-Queue-Id: AA6D01FF766
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <salil.mehta@huawei.com>
+Subject: Re: [PATCH net 04/11] MAINTAINERS: remove Salil Mehta from HiSilicon
+ network drivers
+To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
+References: <20260303215339.2333548-1-kuba@kernel.org>
+ <20260303215339.2333548-5-kuba@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260303215339.2333548-5-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
+X-Rspamd-Queue-Id: ACEAF1FF99B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263797-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263800-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:dkim,suse.de:email,suse.de:mid]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,hisilicon.com:url,linuxtag.org:email]
 X-Rspamd-Action: no action
 
-When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
-initialized because inet6_init() exits before ndisc_init() is called
-which initializes it. If an IPv6 packet is injected into the interface,
-route_shortcircuit() is called and a NULL pointer dereference happens on
-neigh_lookup().
 
- BUG: kernel NULL pointer dereference, address: 0000000000000380
- Oops: Oops: 0000 [#1] SMP NOPTI
- [...]
- RIP: 0010:neigh_lookup+0x20/0x270
- [...]
- Call Trace:
-  <TASK>
-  vxlan_xmit+0x638/0x1ef0 [vxlan]
-  dev_hard_start_xmit+0x9e/0x2e0
-  __dev_queue_xmit+0xbee/0x14e0
-  packet_sendmsg+0x116f/0x1930
-  __sys_sendto+0x1f5/0x200
-  __x64_sys_sendto+0x24/0x30
-  do_syscall_64+0x12f/0x1590
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+on 2026/3/4 5:53, Jakub Kicinski wrote:
+> We have not seen tags from Salil for HiSilicon network drivers
+> in over 5 years. He is active upstream in other subsystems
+> (KVM/ARM64 vCPU hotplug). Jian Shen and Jijie Shao are active
+> in HNS3, and the review coverage is good (55%).
 
-Fix this by adding an early check on route_shortcircuit() when protocol
-is ETH_P_IPV6. Note that ipv6_mod_enabled() cannot be used here because
-VXLAN can be built-in even when IPv6 is built as a module.
+Hi Jakub,
 
-Fixes: e15a00aafa4b ("vxlan: add ipv6 route short circuit support")
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: use ipv6_mod_enabled() instead of a NULL check
-v3: go back to nd_tbl NULL check as ipv6_mod_enabled() might not be
-available. Added a comment so it doesn't seem random.
----
- drivers/net/vxlan/vxlan_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks for the update. I would like to clarify that Salil is a co-author of HNS3/HNS driver
+and still remains our active MAINTAINER.
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 05558b6afecd..17c941aac32d 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -2130,6 +2130,11 @@ static bool route_shortcircuit(struct net_device *dev, struct sk_buff *skb)
- 	{
- 		struct ipv6hdr *pip6;
- 
-+		/* check if nd_tbl is not initiliazed due to
-+		 * ipv6.disable=1 set during boot
-+		 */
-+		if (!ipv6_stub->nd_tbl)
-+			return false;
- 		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
- 			return false;
- 		pip6 = ipv6_hdr(skb);
--- 
-2.53.0
+Based in our Cambridge, UK office, Salil has been away for extended periods recently due to a challenging personal situation.
+This explains his recent lack of tags or direct networking contributions; he was outside the UK for much of this time
+and had limited access to our Cambridge hardware labs. However, he continued to contribute to other areas like virtualization
+where hardware dependency (especially the extensive hardware setup required for networking) was not an factor.
 
+Despite his limited availability, he has been reviewing code in the background and working with our HQ team on HNS3 enhancements,
+including performance improvements and XDP support. Many of these patches are currently pending and will be submitted soon.
+We expect him to return to full capacity in mid-March, and his networking expertise remains deeply valued by Huawei.
+
+We request that you keep him on the MAINTAINER list so he remains in the loop for all HNS3/HNS driver communications.
+
+Thanks for your understanding.
+
+Best regards,
+Jijie Shao
+
+
+>
+> Subsystem HISILICON NETWORK SUBSYSTEM 3 DRIVER (HNS3)
+>    Changes 69 / 125 (55%)
+>    Last activity: 2026-02-06
+>    Jian Shen <shenjian15@huawei.com>:
+>      Author 6d2f142b1e4b 2026-02-06 00:00:00 22
+>      Tags 6d2f142b1e4b 2026-02-06 00:00:00 26
+>    Salil Mehta <salil.mehta@huawei.com>:
+>    Jijie Shao <shaojijie@huawei.com>:
+>      Author 6a0fc0ea61bd 2026-01-27 00:00:00 19
+>      Tags 6d2f142b1e4b 2026-02-06 00:00:00 97
+>    Top reviewers:
+>      [30]: horms@kernel.org
+>      [12]: andrew@lunn.ch
+>      [10]: arnd@arndb.de
+>      [5]: michal.swiatkowski@linux.intel.com
+>      [4]: jacob.e.keller@intel.com
+>    INACTIVE MAINTAINER Salil Mehta <salil.mehta@huawei.com>
+>
+> Subsystem HISILICON NETWORK SUBSYSTEM DRIVER
+>    Changes 108 / 200 (54%)
+>    Last activity: 2026-02-06
+>    Jian Shen <shenjian15@huawei.com>:
+>      Author 6d2f142b1e4b 2026-02-06 00:00:00 22
+>      Tags 6d2f142b1e4b 2026-02-06 00:00:00 26
+>    Salil Mehta <salil.mehta@huawei.com>:
+>    Top reviewers:
+>      [52]: horms@kernel.org
+>      [17]: shaojijie@huawei.com
+>      [16]: andrew@lunn.ch
+>      [10]: arnd@arndb.de
+>      [6]: jacob.e.keller@intel.com
+>      [6]: michal.swiatkowski@linux.intel.com
+>    INACTIVE MAINTAINER Salil Mehta <salil.mehta@huawei.com>
+>
+> Add Salil to CREDITS as the initial author of HNS3.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> Cc: shenjian15@huawei.com
+> Cc: salil.mehta@huawei.com
+> Cc: shaojijie@huawei.com
+> ---
+>   MAINTAINERS | 2 --
+>   CREDITS     | 4 ++++
+>   2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 49eb81ec3709..b9b8a7695ddb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11527,7 +11527,6 @@ F:	drivers/bus/hisi_lpc.c
+>   
+>   HISILICON NETWORK SUBSYSTEM 3 DRIVER (HNS3)
+>   M:	Jian Shen <shenjian15@huawei.com>
+> -M:	Salil Mehta <salil.mehta@huawei.com>
+>   M:	Jijie Shao <shaojijie@huawei.com>
+>   L:	netdev@vger.kernel.org
+>   S:	Maintained
+> @@ -11542,7 +11541,6 @@ F:	drivers/net/ethernet/hisilicon/hibmcge/
+>   
+>   HISILICON NETWORK SUBSYSTEM DRIVER
+>   M:	Jian Shen <shenjian15@huawei.com>
+> -M:	Salil Mehta <salil.mehta@huawei.com>
+>   L:	netdev@vger.kernel.org
+>   S:	Maintained
+>   W:	http://www.hisilicon.com
+> diff --git a/CREDITS b/CREDITS
+> index d74c8b2b7ed3..98aaf196567a 100644
+> --- a/CREDITS
+> +++ b/CREDITS
+> @@ -2770,6 +2770,10 @@ E: merker@linuxtag.org
+>   D: DECstation framebuffer drivers
+>   S: Germany
+>   
+> +N: Salil Mehta
+> +E: salil.mehta@huawei.com
+> +D: Upstreaming of the HiSilicon HNS3 network driver
+> +
+>   N: Michael Meskes
+>   E: meskes@debian.org
+>   P: 1024/04B6E8F5 6C 77 33 CA CC D6 22 03  AB AB 15 A3 AE AD 39 7D
 
