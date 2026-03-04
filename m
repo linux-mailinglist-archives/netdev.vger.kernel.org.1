@@ -1,160 +1,234 @@
-Return-Path: <netdev+bounces-263924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIRrLRpdqGmZtgAAu9opvQ
-	(envelope-from <netdev+bounces-263924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:26:02 +0100
+	id wF1TB8VgqGmduAAAu9opvQ
+	(envelope-from <netdev+bounces-263925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:41:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BBF4204345
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:26:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D482047E4
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:41:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D7A913006178
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:25:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C55AF300A640
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED4F365A0F;
-	Wed,  4 Mar 2026 16:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296D436A03E;
+	Wed,  4 Mar 2026 16:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3MioEWH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kcAhc82X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEC234DB79
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27AD319848;
+	Wed,  4 Mar 2026 16:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772641552; cv=none; b=d/3eQ+2nz9b8PcwD1y7dpAiMlQydc6ayIgwudVv8UqRUj+aJZG44jzor1GKBbyBMqS5hmxdjxOEaltEPcxF605s0Q0eMd5Yy3FsUOJqTYSxLDG989gJECVr5q7SryeYDUTOu50FBTCKd9turv/vfsNltdy6KPcwKXtkUNJxjWGk=
+	t=1772641952; cv=none; b=qn2aNVuee2XKjZa119zrJYyqlO7lZKmKk5n5a0AV3MzxxcLswlrOWGw1m2M8FzQDkpu6PjORofglNDvaobKex+Gl0HklK8aOJB4dCf3+EwQp5N+Kkuts5/mCsMoRU+51xGkEAbdwkBqtHSSj9N5ds3OlyosoiHBobiqnLHbzWdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772641552; c=relaxed/simple;
-	bh=CgXj9Qujm5Mk8E7ObsRSKFPcojwrTPtAnj4q/sYm/Rw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=WmO0B1hoNfcE8xa0/G7PyREIHZCEqPlu0aBJ8S2xu3T8CWGz6/W0ZgKf3PXMZMQqLhYQ/m1Cg1/Ke+40/1OvqH6F6MddZlMn7lCYKCwcpz9PLEH+mdzd6jCG8909G8k5rI85uO05zzK5aUe7pZgmyalrwrQSh0Ak/UT1hbGJ4Y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3MioEWH; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-798578e2918so65682157b3.2
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:25:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772641550; x=1773246350; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gDMrZMXgcltiopzyN+7A+ZMtPGsdEkDU2ngRM+C0IHs=;
-        b=f3MioEWHhVzf20h/LaZIm6q7wSvdw5fH0JP8uLv2gv9JFsbRGnxPFbSKAVRQEDPsAc
-         e9fXKUfaEBbQUoiUE4hKewuZrRigngOx/IqdsYtKi1mQX0D8lpE0284ETGue5c+hDtJ2
-         E5Gtx+84lhFztPq6QOvrcQ2eu43lgqcUEOY9DEPBqlwmcO7VJeP/4vvWVVfgbgT8SSs0
-         mNSIVyeShdObMb/fAlm/bej/6RUNtZkuuaQVawzBfBit894nCO3OAkm2m2093QZy0jDf
-         QefZ9TsJkW/y0nPnCQrNcP0AgkDnwc1tRzyC/on4XJgxyHVop/YIxcO+lxhJJSGiQYxa
-         JosA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772641550; x=1773246350;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gDMrZMXgcltiopzyN+7A+ZMtPGsdEkDU2ngRM+C0IHs=;
-        b=rtAoJkcm4HRSq0OtHZFZfIqbd9cIpE/97JipJdfr+NXCvI9xIk6oGS1G+np03LdGDY
-         em24qFKsLRSHGs59CCtSggPXz/AjMJVKz1tLOHQ6wzSvli7ihaknNCQIpXQt/EFmYRVq
-         HgrcVnV9h/rVzX0EmvzGdZcddwR6d42MWoC626rkDwQjU6HFwf5v+eWn18Sz6b0I/Bh0
-         Z5/C9ZBQ2U/4sfD2uCoZSVew2MKVk2/g5HExrvl1siv7L9Kmcg7cHd6qxL8fBDNwHFf+
-         xO+bkVz2ebdqb65Nol1Y2p3DEvLnjlVxJ/wkHosS0hIseheI3quzLV73hI2mjFZKWOd/
-         2qFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHyhLs4xV4/gMhL2dljmV4Bw+4/ffHCKOW21o702cnv82B72bvmpQq8jNdSQ2KDCOSuJk9bPs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoNsOf8Kf8LCr3fFsYxC6BQm/94zfG8Pgz3fYW5x8Cc0tyhrbM
-	0GpAnk76Z5qb7c0bHc38DdGgmvfSQzYL3lgRKsw1h+KxvU0qhbVGLmJf
-X-Gm-Gg: ATEYQzz/8wQqo17nViimN+Bb+pFiOsicQOYCdLeledjXbvo/NbXObc0aoLrI5ikDmEA
-	F5fxaCGdot+AHms9Qof8fKEFA+VGiXq1ll4+5qqqhwNviH0LrKelB3XJ1GLGWtQgqrHlByiufYu
-	+3hpEPu/gWkZeyeBa0dmtvKnTZe1SAbjdZLCXc7jX6IjHhSwx8sqbosjMUGgjKOFriDga/07//X
-	EjlERsLNe16xdoZ0BY7t6W7WkyiuCE/gUvq/lGrssHdlxxrFfo+L8TCfeyuR1VfP4raJvWd/G7e
-	LZ4Blyc6o0BOefi358jjKYnG/e5un/walrPvVb/aTZ2aUH72+llSdhQ85OmDxwmzTmDQJdC0mq4
-	hsCf2oJifRZtTYVHP9/Scl6B4gUk3B5Y66mdi237kO2uCxVudRH1KAj8EzhAgUic4uIPYyzzIBK
-	YZ/FqZSUDhaM1ZPd27/6iqoW6K6klv6vC8+9CCiY6T9lsPiam5l2pkI+5+fX4lN8ToDVTsLhc=
-X-Received: by 2002:a05:690c:45c1:b0:798:980f:6706 with SMTP id 00721157ae682-798c6c01630mr20906417b3.22.1772641549748;
-        Wed, 04 Mar 2026 08:25:49 -0800 (PST)
-Received: from gmail.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79876c40439sm78064377b3.37.2026.03.04.08.25.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 08:25:49 -0800 (PST)
-Date: Wed, 04 Mar 2026 11:25:48 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Wei Wang <weibunny@fb.com>, 
- netdev@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- Daniel Zahka <daniel.zahka@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- David Wei <dw@davidwei.uk>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>
-Cc: Wei Wang <weibunny@fb.com>
-Message-ID: <willemdebruijn.kernel.2c99d96277de8@gmail.com>
-In-Reply-To: <20260304000050.3366381-6-weibunny@fb.com>
-References: <20260304000050.3366381-1-weibunny@fb.com>
- <20260304000050.3366381-6-weibunny@fb.com>
-Subject: Re: [PATCH v2 net-next 5/9] psp: add unprivileged version of
- psp_device_get_locked
+	s=arc-20240116; t=1772641952; c=relaxed/simple;
+	bh=jg6J//vb12263kITZC9G8reXF2e1rvW3uaZ0PYjlsSU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W/PE0Jj83lFekEKkdUQGg6Q6H2OJdGxewHwlZ9fLkLCxUJXNWLLTzWlhxLmaSkV0+zSN/J76q3Q8XO5qafouhVAqWU0OEyRstL45OawLLw3yHylBZ+fopEVv7FhDWtsYmVQsS0FCDxuQLw8Xr9ja/3Dv5PMGsvqhykIhbNISC+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kcAhc82X; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4E81S360LZJasm+z9mMQB95l0sk0q8GKUxtXCQeVoTg=; b=kcAhc82XV2zj4ATHfuIl5oAz9H
+	UPBtKS/AafU12aOJQMXH35D//2gq8JYzL3mNfaqnaTYYFO/5+sGwgybnjea9DTJQYbf+gkQ3PiJGQ
+	7+8gKBfoPFnKyJv2KXp9d+gkA8/THuduL5z8Ch4B78IMQEdnoendq2zWEMG0HxbXGE4BqzmSgYvek
+	er0OB5Y6bfjxP41aJPnZGKoLtRTGqVBuAc+GMh4Hg8Iq90oKKMh0tOjYJjcjeRs1mvzdehedLVz79
+	y3Y1uJH9Bx9MpiWee51iTuYKzuH2hoH9A5ngD4rBH1UnS8Azh0X3NgxnuGWkaKnnhZON21RDILiRb
+	s4+hQCSw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56966)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vxp8w-000000006lU-3Xbg;
+	Wed, 04 Mar 2026 16:32:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vxp8s-0000000082X-3150;
+	Wed, 04 Mar 2026 16:32:10 +0000
+Date: Wed, 4 Mar 2026 16:32:10 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, kevin-kw.huang@airoha.com,
+	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
+	kernel@collabora.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: phy: Introduce Airoha AN8801/R Gigabit
+ Ethernet PHY driver
+Message-ID: <aaheilkwpQ90xMmR@shell.armlinux.org.uk>
+References: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
+ <20260304-add-airoha-an8801-support-v1-2-0ae4ee5a2f9d@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5BBF4204345
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304-add-airoha-an8801-support-v1-2-0ae4ee5a2f9d@collabora.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 24D482047E4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263924-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263925-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[fb.com,vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_SPAM(0.00)[0.120];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.990];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,shell.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-Wei Wang wrote:
-> Add a place holder function called psp_device_get_locked_unpriv() which
-> will be used for commands that are unprivileged and are used for
-> exisiting commands like dev-dump, dev-get, rx-assoc, tx-assoc.
-> Commands including dev-add/delete/change-ntf, key-rotate would keep
-> using the privileged version.
-> 
-> Following commit will be implementing the unprivileged version check.
+On Wed, Mar 04, 2026 at 10:35:29AM +0100, Louis-Alexis Eyraud wrote:
+> +static void an8801r_get_wol(struct phy_device *phydev,
+> +			    struct ethtool_wolinfo *wol)
+> +{
+> +	u32 reg_val;
+> +
+> +	air_buckpbus_reg_read(phydev, AN8801_BPBUS_REG_WAKEUP_CTL1, &reg_val);
+> +
+> +	wol->supported = WAKE_MAGIC;
+> +
+> +	if (reg_val & AN8801_WOL_WAKE_MAGIC_EN)
+> +		wol->wolopts |= WAKE_MAGIC;
+> +	else
+> +		wol->wolopts &= ~WAKE_MAGIC;
 
-Can you define what unprivileged means concretely in this context.
+Please only support WoL if you know that the PHY has been wired up in
+such a way to allow it to actually wake the system. The PHY itself
+merely supporting WoL is insufficient.
 
-From the follow-on patch, it seems to only affect
-psp_dev_check_access, where it additionally allows some operations
-from other netns if that netns has an associated device.
+Please look at my recent change to realtek_main.c in commit
+b826bf795564 ("net: phy: realtek: fix RTL8211F wake-on-lan support")
+to see a possible way to achieve this.
 
-Can you give a concise reason for which operations to allow from
-another netns and which to deny. Also as forward looking heuristic for
-when new operations may be added.
+> +static int an8801r_config_init(struct phy_device *phydev)
+> +{
+> +	u8 led_default_function[AN8801R_NUM_LEDS] = { 0 };
+> +	int prev_page, ret;
+> +
+> +	ret = an8801r_of_init_leds(phydev, led_default_function);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Disable Low Power Mode (LPM) */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, AN8801_REG_PHY_INTERNAL0,
+> +			    FIELD_PREP(AN8801_PHY_INTFUNC_MASK, 0x1e));
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, AN8801_REG_PHY_INTERNAL1,
+> +			    FIELD_PREP(AN8801_PHY_INTFUNC_MASK, 0x2));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Disable EEE by default */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_EEE_ADV, 0);
+> +	if (ret)
+> +		return ret;
 
-Btw minor typo in first sentence of next commit: associcate.
+Are you sure this is safe, e.g. over a suspend/resume, and doesn't
+cause the hardware vs software state to desync?
+
+> +
+> +	prev_page = phy_select_page(phydev, AIR_PHY_PAGE_EXTENDED_1);
+> +	if (prev_page < 0)
+> +		return prev_page;
+
+No, this is buggy. Please read the phy_select_page() documentation to
+find out why.
+
+> +
+> +	/* Set the PHY to perform auto-downshift after 3 auto-negotiation
+> +	 * attempts
+> +	 */
+> +	__phy_write(phydev, AN8801_EXT_REG_PHY,
+> +		    FIELD_PREP(AN8801_EXT_PHY_CTRL1, 0x1d) |
+> +		    FIELD_PREP(AN8801_EXT_PHY_DOWNSHIFT_CTL, 1) |
+> +		    AN8801_EXT_PHY_DOWNSHIFT_EN);
+> +
+> +	ret = phy_restore_page(phydev, prev_page, ret);
+> +	if (ret)
+> +		return ret;
+
+However, the bug could've been avoided by using the appropriate
+accessor:
+
+	ret = phy_write_paged(phydev, AIR_PHY_PAGE_EXTENDED_1,
+			      AN8801_EXT_REG_PHY,
+			      FIELD_PREP(AN8801_EXT_PHY_CTRL1, 0x1d) |
+			      FIELD_PREP(AN8801_EXT_PHY_DOWNSHIFT_CTL, 1) |
+			      AN8801_EXT_PHY_DOWNSHIFT_EN);
+	if (ret < 0)
+		return ret;
+
+> +static int an8801r_read_status(struct phy_device *phydev)
+> +{
+> +	int prev_speed, ret;
+> +	u32 val;
+> +
+> +	prev_speed = phydev->speed;
+> +
+> +	ret = genphy_read_status(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!phydev->link)
+> +		return 0;
+> +
+> +	if (prev_speed != phydev->speed) {
+
+Maybe:
+
+	if (phydev->link && prev_speed != phydev->speed) {
+
+?
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
