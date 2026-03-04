@@ -1,153 +1,308 @@
-Return-Path: <netdev+bounces-263628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECriOMjip2mrlAAAu9opvQ
-	(envelope-from <netdev+bounces-263628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:44:08 +0100
+	id GKtEFgLip2mrlAAAu9opvQ
+	(envelope-from <netdev+bounces-263629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:40:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F5A1FBC6C
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:44:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B746C1FBBA9
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA6303084CB7
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 07:39:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E1958300B56D
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 07:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFD8371869;
-	Wed,  4 Mar 2026 07:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EDB371D12;
+	Wed,  4 Mar 2026 07:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fx6eA5xb"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E6vGClwN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+nB8IvXR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="geFxisl7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="42wvlBEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E9035CB7A;
-	Wed,  4 Mar 2026 07:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9205937186B
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 07:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772609985; cv=none; b=Y8vgRQ05j1bwR2VIrS/gQqgq7sBYLUHgigImu2+emv/6LPiuzrFa+0uxbJhE4MINmSmLh+Qe5nnJ+FIau6Z/KL4eOclTueUQRU7c0ML62vEyC5jgkuq95q5MDcRX5RJAi4suPveN0WT2xzIRhRp/FmURep4r2LjJNgJnD7ojDwA=
+	t=1772610007; cv=none; b=XQ8VVVLMr4p3f11fEwvzOej/CGfXFWPzk6agi3TnCvhB7qjCulAbPir0pT/24WpQmGcgZRA1CvnZVCzR/ms4+eCpyAf/IVCCyExi228JN9S/VHqLVbPP0B1yjlwPSt8ugI6/uF4ZxugV6RKYlclpeS120UE9b19/gS3MVJd6ICI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772609985; c=relaxed/simple;
-	bh=qdRtPAje6I7hfutoJeNmqVJEJbOGSUjuE1RqijSch3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tklNOci2Y8x3G0BFODq1xJERUPfNVheygoTQTs1zjg/yfq51L6lQRT/zlD2pPHwEf17V7xxwa4n7QN3toHPyL0onDpE5IAJvoR41dVSQ6LUdDR2Un+4TGgIU51LdZ7/yLBPuStpsDBhnfo/owqnIDgl2owr/QLe+FtUaW+iUipA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fx6eA5xb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BE5AC19423;
-	Wed,  4 Mar 2026 07:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772609984;
-	bh=qdRtPAje6I7hfutoJeNmqVJEJbOGSUjuE1RqijSch3c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fx6eA5xbdBXKpUHh3/IErKPDYWgCQMOpGOgNwTTtlboSsMT2zDcFz4NP5doi6f89r
-	 wDKDYQeygqdWZ3mckkpNuFdbCfd9ISn/LHbPM9+po9wMN0ke2Sq7okB4Em152CfeS7
-	 cHnKusNJdzuRkyL49/kkyPGm0S05gkX52f+CEf8AkGOXVj/UAh7L7oxwfIh2Wjrk0z
-	 Uxwt75SSIBzP873g1BaZ1O28zSg88gOejUG65uXc3y0NEGpIfjbh1ee3vw3ipsZ+K4
-	 RNckEFqYZcobNZEEh/wYAn7allEHlvCfsipl4IjAMA9/4k7dAre3Z5h+ezsAFDvhaq
-	 dolGMc42cY2Dg==
-Date: Wed, 4 Mar 2026 08:39:42 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Bo Gan <ganboing@gmail.com>
-Cc: Conor Dooley <conor@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	lizhi2@eswincomputing.com, devicetree@vger.kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, 
-	wens@kernel.org, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	alex@ghiti.fr, linux-riscv@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, ningyu@eswincomputing.com, linmin@eswincomputing.com, 
-	pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: ethernet: eswin: add clock
- sampling control
-Message-ID: <20260304-stalwart-raptor-of-cleaning-446b61@quoll>
-References: <20260303061525.846-1-lizhi2@eswincomputing.com>
- <20260303061637.872-1-lizhi2@eswincomputing.com>
- <20260303163846.156d18f7@kernel.org>
- <20260304-regulate-verdict-c3a361d2dc83@spud>
- <05a15890-392c-41c3-9566-8eb506ddfe5f@gmail.com>
+	s=arc-20240116; t=1772610007; c=relaxed/simple;
+	bh=9XDwVawTB5i0dwNPOvXRjbdJoKpYXoXFga4KM/0Z2gM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o+NoqfAJt7iqbbRtYXXVZhh1EdnOpXLCgcfY+q/eQUSSAoFdBYUJPJ/X47n1Ce20ZFgxs87a6Qb2lyIhHIx8v1S3jy4/8GFcgcm84zjgU3ecR5CPRijtLIDvfyEA95yGkMLbWnYchujJ/VUSi4bRx2ZnFT+IRkiPZitWRF64YwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E6vGClwN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+nB8IvXR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=geFxisl7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=42wvlBEb; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id F3AA13F778;
+	Wed,  4 Mar 2026 07:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772610004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hx6QBAZ/g48FrY3KwtZ+m4mLgleN1Z8nKszuKUbXlAA=;
+	b=E6vGClwNDLUB3Nt39zL+Uv4g1EKF3tgURy5iNvMD+VJarmFyYTHzOFjvUMo6scb5TIqdJK
+	iy599/BxOghpLpRIZ8sRdbl7kaS+jg9Mm4Lg5M9ibzncHs1KqFXu5BI5dQnk5LdP9vgSEU
+	P5t7B9zcIzbSieTxh7iKt+5IhPtUvS8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772610004;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hx6QBAZ/g48FrY3KwtZ+m4mLgleN1Z8nKszuKUbXlAA=;
+	b=+nB8IvXRH00vrXkJdtdgl4/RhZYEQdVF1yhm1Gi4gfTza1Uq+1pq/Iwdv7DkR5NxYWC6qS
+	pkQeJfnDaErPEuBw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772610002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hx6QBAZ/g48FrY3KwtZ+m4mLgleN1Z8nKszuKUbXlAA=;
+	b=geFxisl7YkRy/RMf7sQhkfF87QEmHXiE6wv3B9DQ8u8rO8C4RgLdwgNfxotkflNc0A1oiN
+	sU4O9kj2lIb95pICnKkjyNYhKX9LuomKgsUbr94Ck1T//ofYkoxkZDAyPOoS1UN//mEIGB
+	nGq0Tgzq3N3PHcXl1uDnZHTaCkUbhGk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772610002;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hx6QBAZ/g48FrY3KwtZ+m4mLgleN1Z8nKszuKUbXlAA=;
+	b=42wvlBEbt9zZEV1FWhsWg2TdimuiQ5+IIAlcFn92nVDxXbn0xY6zUvpMi4Vttjl5GHkeyI
+	ifX1ghQc5aBpXbBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E2F733EA69;
+	Wed,  4 Mar 2026 07:40:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ytg2MtDhp2kWWgAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 04 Mar 2026 07:40:00 +0000
+Message-ID: <103c958f-d5f9-47d3-9be8-dd7225368fd5@suse.de>
+Date: Wed, 4 Mar 2026 08:40:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <05a15890-392c-41c3-9566-8eb506ddfe5f@gmail.com>
-X-Rspamd-Queue-Id: 49F5A1FBC6C
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/5] nvme-tcp: Support KeyUpdate
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20260304053500.590630-1-alistair.francis@wdc.com>
+ <20260304053500.590630-5-alistair.francis@wdc.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260304053500.590630-5-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Rspamd-Queue-Id: B746C1FBBA9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263629-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263628-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,einfochips.com];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,eswincomputing.com:email]
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 05:23:18PM -0800, Bo Gan wrote:
-> Hi All,
+On 3/4/26 06:34, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
 > 
-> On 3/3/26 16:47, Conor Dooley wrote:
-> > On Tue, Mar 03, 2026 at 04:38:46PM -0800, Jakub Kicinski wrote:
-> > > On Tue,  3 Mar 2026 14:16:37 +0800 lizhi2@eswincomputing.com wrote:
-> > > > There are currently no in-tree users of the EIC7700 Ethernet driver, so
-> > > > these changes are safe.
-> > > 
-> > > What do you mean by this sentence? The commit under Fixes was part of
-> > > Linux v6.19 already.
-> > 
-> > The "funny" thing is that caring about users doesn't even really matter
-> > on the devicetree patch, except for this hunk:
-> > |@@ -81,7 +99,9 @@ properties:
-> > |                          or external clock selection
-> > |           - description: Offset of AXI clock controller Low-Power request
-> > |                          register
-> > |+          - description: Offset of register controlling TXD delay
-> > |           - description: Offset of register controlling TX/RX clock delay
-> > |+          - description: Offset of register controlling RXD delay
-> > |
-> > | required:
-> > |   - compatible
-> > And it only matters here because an item is injected mid-list. If this
-> > was moved to the end with the RXD delay, the **dt-binding** changes
-> > don't have issues with safety. I've not looked at whether there are
-> > knock-on concerns about users in the driver or whatever yet, but from a
-> > binding POV only that hunk can break something that currently works.
+> If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
+> EKEYEXPIRED then the underlying TLS keys need to be updated. This occurs
+> on an KeyUpdate event as described in RFC8446
+> https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3.
 > 
-> This was already discussed here in v1:
-> https://lore.kernel.org/lkml/e7183ae1-8b8b-4e77-9f4e-3bc1b4b63556@lunn.ch/
+> If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
+> allow the NVMe layer to process the KeyUpdate request and forward the
+> request to userspace. Userspace must then update the key to keep the
+> connection alive.
 > 
-> The device-tree is not checked in yet by ESWIN folks, so there's currently
-> no user of the dt-binding. No need to worry about backward compat.
+> This patch allows us to handle the NVMe target sending a KeyUpdate
+> request without aborting the connection. At this time we don't support
+> initiating a KeyUpdate.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> v7:
+>   - Use read_sock_cmsg instead of recvmsg() to handle KeyUpdate
+> v6:
+>   - Don't use `struct nvme_tcp_hdr` to determine TLS_HANDSHAKE_KEYUPDATE,
+>     instead look at the cmsg fields.
+>   - Don't flush async_event_work
+> v5:
+>   - Cleanup code flow
+>   - Check for MSG_CTRUNC in the msg_flags return from recvmsg
+>     and use that to determine if it's a control message
+> v4:
+>   - Remove all support for initiating KeyUpdate
+>   - Don't call cancel_work() when updating keys
+> v3:
+>   - Don't cancel existing handshake requests
+> v2:
+>   - Don't change the state
+>   - Use a helper function for KeyUpdates
+>   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
+>   - Remove command message using recvmsg
+> 
+>   drivers/nvme/host/tcp.c | 59 ++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 58 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 8b6172dd1c0f..ade11d2ac9ef 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -171,6 +171,7 @@ struct nvme_tcp_queue {
+>   	bool			tls_enabled;
+>   	u32			rcv_crc;
+>   	u32			snd_crc;
+> +	key_serial_t		handshake_session_id;
+>   	__le32			exp_ddgst;
+>   	__le32			recv_ddgst;
+>   	struct completion       tls_complete;
+> @@ -1361,6 +1362,59 @@ static int nvme_tcp_try_send(struct nvme_tcp_queue *queue)
+>   	return ret;
+>   }
+>   
+> +static void update_tls_keys(struct nvme_tcp_queue *queue)
+> +{
+> +	int qid = nvme_tcp_queue_id(queue);
+> +	int ret;
+> +
+> +	dev_dbg(queue->ctrl->ctrl.device,
+> +		"updating key for queue %d\n", qid);
+> +
+> +	ret = nvme_tcp_start_tls(&(queue->ctrl->ctrl),
+> +				 queue, queue->ctrl->ctrl.tls_pskid,
+> +				 HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
+> +
+> +	if (ret < 0) {
+> +		dev_err(queue->ctrl->ctrl.device,
+> +			"failed to update the keys %d\n", ret);
+> +		nvme_tcp_fail_request(queue->request);
+> +	}
+> +}
+> +
+> +static int nvme_tcp_recv_cmsg(read_descriptor_t *desc,
+> +			      struct sk_buff *skb,
+> +			      unsigned int offset, size_t len,
+> +			      u8 content_type)
+> +{
+> +	struct nvme_tcp_queue *queue = desc->arg.data;
+> +	struct socket *sock = queue->sock;
+> +	struct sock *sk = sock->sk;
+> +
+> +	switch (content_type) {
+> +	case TLS_RECORD_TYPE_HANDSHAKE:
+> +		if (len == 5) {
+> +			u8 header[5];
+> +
+> +			if (!skb_copy_bits(skb, offset, header,
+> +					   sizeof(header))) {
+> +				if (header[0] == TLS_HANDSHAKE_KEYUPDATE) {
+> +					dev_err(queue->ctrl->ctrl.device, "KeyUpdate message\n");
+> +					release_sock(sk);
+> +					update_tls_keys(queue);
+> +					lock_sock(sk);
+> +					return 0;
+> +				}
+> +			}
+> +		}
+> +
+> +		break;
+> +	default:
+> +		break;
+> +	}
 
-Of course there is user of this binding, for example ESWIN. Or many
-other vendors using it out of tree. You documented ABI.
+I think a simple 'if' condition would be sufficient here, or do you have
+handling of other TLS record types queued somewhere?
+And we should log unhandled TLS records.
 
-Best regards,
-Krzysztof
+> +
+> +	return -EAGAIN;
+> +}
+> +
+>   static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+>   {
+>   	struct socket *sock = queue->sock;
+> @@ -1372,7 +1426,8 @@ static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+>   	rd_desc.count = 1;
+>   	lock_sock(sk);
+>   	queue->nr_cqe = 0;
+> -	consumed = sock->ops->read_sock(sk, &rd_desc, nvme_tcp_recv_skb);
+> +	consumed = sock->ops->read_sock_cmsg(sk, &rd_desc, nvme_tcp_recv_skb,
+> +					     nvme_tcp_recv_cmsg);
+>   	release_sock(sk);
+>   	return consumed == -EAGAIN ? 0 : consumed;
+>   }
+> @@ -1708,6 +1763,7 @@ static void nvme_tcp_tls_done(void *data, int status, key_serial_t pskid,
+>   			ctrl->ctrl.tls_pskid = key_serial(tls_key);
+>   		key_put(tls_key);
+>   		queue->tls_err = 0;
+> +		queue->handshake_session_id = handshake_session_id;
+>   	}
+>   
+>   out_complete:
+> @@ -1737,6 +1793,7 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *nctrl,
+>   		keyring = key_serial(nctrl->opts->keyring);
+>   	args.ta_keyring = keyring;
+>   	args.ta_timeout_ms = tls_handshake_timeout * 1000;
+> +	args.ta_handshake_session_id = queue->handshake_session_id;
+>   	queue->tls_err = -EOPNOTSUPP;
+>   	init_completion(&queue->tls_complete);
+>   	if (keyupdate == HANDSHAKE_KEY_UPDATE_TYPE_UNSPEC)
 
+Otherwise looks good.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
