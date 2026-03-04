@@ -1,199 +1,155 @@
-Return-Path: <netdev+bounces-263656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGFgEcbxp2k1mwAAu9opvQ
-	(envelope-from <netdev+bounces-263656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:48:06 +0100
+	id WC6kNFnyp2lmmwAAu9opvQ
+	(envelope-from <netdev+bounces-263657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:50:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE5861FCDB8
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:48:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EE9C1FCE97
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B8112305149F
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:47:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1C0A330C57DC
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DC337C90A;
-	Wed,  4 Mar 2026 08:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B05386C2A;
+	Wed,  4 Mar 2026 08:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E3EtE0oN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RQL7HIlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC68375F92
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159C53822A9;
+	Wed,  4 Mar 2026 08:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772614059; cv=none; b=qEVa3xhyOb7KOHEWFNUdo3EPoOddbYUL8NGGc8xYmjKBBl1XEj3cTmvazIsAUulcFxmGiHBwjIjSRpDOHKsksNCsuGjUsedUvdx9vJRmu6QjAkzQlvvEct0PQzE/FxdrMxUyVcOTqtU4ijh+MtgZu9jKUtzjnX+n7oxhaiI0dOY=
+	t=1772614077; cv=none; b=WLRQc0ioTQmzH0ep9ShmLjTrJSO+ZT+HhhOHaa4xiSQ8mui6And/1iv67nf3CbU/dOBxUNeurO0A3w2hT6zNKthneeWpWpOSEhRsvRnksFvRyUw1NNyky+uZOGzdt8qPL9O1K4KpjA0zJm/aeQH1Ty8g5ZnE/5+lZIODvQG+RhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772614059; c=relaxed/simple;
-	bh=cgfolX/7P15FKtMsJb6MX1V6rbxoScmH5mSHaS1xVR4=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=BjwPeSu+fVqOALz7TQo0re6TX0FfIytrLdLli9peuEScHJ6kKe3v4Tp3qnXkzZQvMU4PxBs7M1hcz7qx4Y0BSaINtTfAk2X6wrB0O0zd68b6Gal2E6f3IsvesU8jSoGqxUN7wqlhu94N/eJ0uPcwWSK7F41c64+801jL3H4fyoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E3EtE0oN; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772614077; c=relaxed/simple;
+	bh=clGftPmj2+c1YG99mGBbz50S6DhXt1AyOqKowzose9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=JLvg6jA5A9csut7Q4kMC6a29tVsdOXKMR+RIf7A61gilug1V90gusyerfdEjhGjQEWANrLsT63ldfKB7EHbLlUuQCkynfxvXl/lv8dLrPGNqwWcQJd6PUMVEvKbSDxDOH5xb8JSAENAyEAFgnAs0+7lrgADduMA6eZ6WmuYMI7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RQL7HIlc; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=R3yEO4bBe5WxEVH7suRiLaNUM3m0kjyEmV+fOL4Vhyo=; b=RQL7HIlcO587or0eFJTfqe3qxN
+	QB4xHV4oKbgXumQ3KWKvGNAlQQIHCjoiKr1kzKqN40dQoemka3vzfaCMKXLIhHiV26xEfIw9OYMZA
+	97syH3PRdGQgFqdmORM9NYSAv3XxZLUmgahw07UO9IhBeM88wesm7Jj7rvHS5o/25TNUZgP5GjzXB
+	GUruRtRiwES8/z4UZ+mtVS/PhOoFTDzhpWav1na63WCNZC0PJdjBrk5HLMean2+40K3Rtwk7TujVo
+	juNKdMYisrY83m+58imHgtUy3gDALyQzt5kRxFae3QId3CGe1nMneKSXKcd3T2A7BvvxyLDc7r50A
+	KS2EKrfg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56142)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vxhtL-0000000068d-3e9B;
+	Wed, 04 Mar 2026 08:47:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vxhtI-000000007lz-1Biy;
+	Wed, 04 Mar 2026 08:47:36 +0000
+Date: Wed, 4 Mar 2026 08:47:36 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH RFC net-next v2 0/7] net: stmmac: improve PCS support
+Message-ID: <aafxqCvJ_XY4YbWw@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772614045;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dc/aEcqelhTT2IvgJHrb+iCX75+YFw+/qXWWRUVS9lU=;
-	b=E3EtE0oNbTyvC5M1kZvNH9BIoDQEjd51tBmBwvFLbjoxEfR6D46JqwqDREAxIuNb1pJU83
-	ri5yj8mbfF0oimBpWeaatrFO5KgLm9VWGpSlYT96oZV/qJ4/URs8NOSCO/204RaxpZbwGL
-	sSIr/CnDXTjXtyvL+7/fF3XTlhmEjB8=
-Date: Wed, 04 Mar 2026 08:47:22 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <e5b871b9b2817219f50d43f7479df8d1cca38901@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-To: "Daniel Borkmann" <daniel@iogearbox.net>, jv@jvosburgh.net,
- netdev@vger.kernel.org
-Cc: jiayuan.chen@shopee.com,
- syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Alexei Starovoitov" <ast@kernel.org>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
- <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>,
- "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>, "Song
- Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "KP
- Singh" <kpsingh@kernel.org>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
- <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Sebastian Andrzej
- Siewior" <bigeasy@linutronix.de>, "Clark Williams"
- <clrkwllms@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>, "Jussi
- Maki" <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-In-Reply-To: <4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net>
-References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
- <20260304074301.35482-2-jiayuan.chen@linux.dev>
- <4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: AE5861FCDB8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 4EE9C1FCE97
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263656-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263657-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,shopee.com:email,linux.dev:dkim,linux.dev:mid]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.451];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,armlinux.org.uk:url]
 X-Rspamd-Action: no action
 
-March 4, 2026 at 16:20, "Daniel Borkmann" <daniel@iogearbox.net mailto:da=
-niel@iogearbox.net?to=3D%22Daniel%20Borkmann%22%20%3Cdaniel%40iogearbox.n=
-et%3E > wrote:
+Resending this as the original RFC now conflicts with net-next.
 
+This series is the next of the three part series sorting out the PCS
+support in stmmac, building on part 2, which was posted yesterday:
 
->=20
->=20On 3/4/26 8:42 AM, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >  bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NU=
-LL
-> >  check. rr_tx_counter is a per-CPU counter only allocated in bond_ope=
-n()
-> >  when the bond mode is round-robin. If the bond device was never brou=
-ght
-> >  up, rr_tx_counter remains NULL, causing a null-ptr-deref.
-> >  The XDP redirect path can reach this code even when the bond is not =
-up:
-> >  bpf_master_redirect_enabled_key is a global static key, so when any =
-bond
-> >  device has native XDP attached, the XDP_TX -> xdp_master_redirect()
-> >  interception is enabled for all bond slaves system-wide. This allows=
- the
-> >  path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
-> >  bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
-> >  reached on a bond that was never opened.
-> >  Fix this by allocating rr_tx_counter unconditionally in bond_init()
-> >  (ndo_init), which is called by register_netdevice() and covers both
-> >  device creation paths (bond_create() and bond_newlink()). This also
-> >  handles the case where bond mode is changed to round-robin after dev=
-ice
-> >  creation. The conditional allocation in bond_open() is removed. Sinc=
-e
-> >  bond_destructor() already unconditionally calls
-> >  free_percpu(bond->rr_tx_counter), the lifecycle is clean: allocate a=
-t
-> >  ndo_init, free at destructor.
-> >  Note: rr_tx_counter is only used by round-robin mode, so this
-> >  deliberately allocates a per-cpu u32 that goes unused for other mode=
-s.
-> >  Conditional allocation (e.g., in bond_option_mode_set) was considere=
-d
-> >  but rejected: the XDP path can race with mode changes on a downed bo=
-nd,
-> >  and adding memory barriers to the XDP hot path is not justified for
-> >  saving 4 bytes per CPU.
-> >=20
->=20Arguably it's a corner case, but could we not just do sth like this t=
-o
-> actually check if the device is up and if not drop?
->=20
->=20diff --git a/net/core/filter.c b/net/core/filter.c
-> index ba019ded773d..c447fd989a27 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -4387,6 +4387,9 @@ u32 xdp_master_redirect(struct xdp_buff *xdp)
->  struct net_device *master, *slave;
->  master =3D netdev_master_upper_dev_get_rcu(xdp->rxq->dev);
-> + if (unlikely(!(master->flags & IFF_UP)))
-> + return XDP_ABORTED;
-> +
->  slave =3D master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp);
->  if (slave && slave !=3D xdp->rxq->dev) {
->  /* The target device is different from the receiving device, so
->
+	net: stmmac: qcom-ethqos: further serdes reorganisation
 
-Hi Daniel,
+Similar patches have been posted previously. This series does away with
+the common SerDes PHY support, instead using a flag to indicate whether
+2500Mbps mode is supported (STMMAC_FLAG_SERDES_SUPPORTS_2500M.) At this
+time, I have no plans to resurect the common SerDes PHY support - the
+generic PHY layer implementations are just too random to consider that,
+and I certainly do not want the extra work of fixing that.
 
-It was discussed at [1].
+I've also changed the last patch which prints warnings when qcom-ethqos
+changes the PCS state - this will now indicate in a readable form
+whether the ANE or SGMRAL bits have changed state, rather than having
+to refer back to the definitions in the code or the databook.
 
-The primary concern at the time was that assuming
-bond->rr_tx_counter had been allocated based on the
-interface being up was too implicit.
+I am hoping that - subject to this working for qcom-ethqos - we can
+drop this last patch in the final submission, along with the
+dwmac_ctrl_ane() and ethqos_pcs_set_inband() functions and associated
+definitions. This will also mean that stmmac will finally be driving
+the PCS correctly from a phylink point of view.
 
-[1] https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@li=
-nux.dev/T/#t
+ drivers/net/ethernet/stmicro/stmmac/common.h       |   4 -
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  12 +-
+ .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   8 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 160 +++++++++++++++++++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   |  29 +++-
+ include/linux/stmmac.h                             |   1 +
+ 10 files changed, 200 insertions(+), 46 deletions(-)
 
-Feel free to share any other thoughts or ideas
-
-Thanks,
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
