@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-263532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IInPCYuNp2nliAAAu9opvQ
-	(envelope-from <netdev+bounces-263532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:40:27 +0100
+	id EAfUI6iMp2nliAAAu9opvQ
+	(envelope-from <netdev+bounces-263533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:36:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943261F9906
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:40:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C411F9874
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:36:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAF72317E75F
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:31:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B590F3077142
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FE232AAC5;
-	Wed,  4 Mar 2026 01:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA2233065C;
+	Wed,  4 Mar 2026 01:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJJFuH6z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YALUO8XS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAD430DEB0;
-	Wed,  4 Mar 2026 01:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08162330317;
+	Wed,  4 Mar 2026 01:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587839; cv=none; b=DGTgg8uN6Dpv31CtU/ltwKBjA4g/bQerqLTegJJdOt+8uZ8o0yT6ILNmr6YG5WOUvXI137r4yjJQU7Sz/sbWUOlXlPWSfJt9f8P4SPmRGSNE8S+YJREIcqSYbG28S1LadK3U/cZ7JWjnthjfqXKHuurgZgg9YknpgBs8JeX1EfY=
+	t=1772587841; cv=none; b=o+yTGR16XkSIwUY+p2fu9vxrU79LIHQQOsd61qmQ4B6XHIGCYS7bZoSTQtx9VmJVY1noez/todCJOAyfzUmdTocFzIA+0o7+uKbq7SHrGKr5aYDyXWGU0JJMmJxdJsgostgzfFF22/Jfp0raGFqNqPQ3yVs5rlqpytNU71Fyxi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587839; c=relaxed/simple;
-	bh=J+o42nD30Q9XGQPhZRpHPHFlthgqLGGBwjilk3yA/QU=;
+	s=arc-20240116; t=1772587841; c=relaxed/simple;
+	bh=nNM89GMzz09FFMOfCSNaVw2W0NXvOj3qbMWRcIk6TEQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t3AFtJXcXYFX67KXrQrHTRno/ej3XDplY7ibIdVfJNJITw3X49eL5ZwzfGL5XlSP48x9JNeOYlCBekoHfuRyIFGOA1ULtr0qBw/ifnPbsznG6VRSdIyp8NkH1TG3hygfJIfwVkTS2NsGwyD5RTg4J3G26AGzsTnakAta4DDYQzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJJFuH6z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E8DC2BC9E;
-	Wed,  4 Mar 2026 01:30:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kmY8JVV82XA6Btn1+IGz/5cj6CdsdnizRHwvlDtRstHA4ZfHdjnRrjpAwUrrjGEkv8qDZmR6ZVyexoPN+WWgtruZ+gReTnGZ214wye0CM8ocsZatqHQKBnvByPVBZVbmEMCeUdlvYsgnVeNoue3m2KHB4vjAy6gwSJ94wfUNaJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YALUO8XS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5DE0C19422;
+	Wed,  4 Mar 2026 01:30:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772587839;
-	bh=J+o42nD30Q9XGQPhZRpHPHFlthgqLGGBwjilk3yA/QU=;
+	s=k20201202; t=1772587840;
+	bh=nNM89GMzz09FFMOfCSNaVw2W0NXvOj3qbMWRcIk6TEQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UJJFuH6zut4KhTOQ29J7wMeZRhFoTYpXyC6Ns2UwrbAwxhgpiGyp3jfDw9E+fvFfh
-	 xxVQGOdnxkRrGB27gdhQuvnG7UCehHDDltbGN6R7Uenx4AfTmJuQ97qMI4Q36W2z43
-	 hY5IoFXfm0YvMmH3fEJiWUmWUeI35kPjVMsiu80aUSubAaRp/Dg7XVyMIeBtXA0DMx
-	 l6hxr2NxiHoI0pYxts8H2fzJ1RcNnjmge2CYSqducJ3MJVMrLFqOr8fVUWEKMsJmX4
-	 MtL8KzAiaOtKR6LtTMzEdbQO/5ETusRuFkgE9n6+AvKQvQsjsvTw8dq+UAcZK6AQ9x
-	 YqhV15UFE38Kw==
+	b=YALUO8XSCqxOOyWMP4oQlO/tiVUYJxrzF28XmjpKBBLD8i7siP52vuG1dFs1ewAwg
+	 4vTjdY0xlrLGZ44cvdQch+f+8dR4p6yQDGNeWs+djVt6ECSze1E/+a5qhTMGmJgHAR
+	 PDupUq3Rg3WuaQL/XaYljXqWTA02jmQDzA08uRVlaHs0V41orNUtFrh47qPFxwzt3l
+	 TmyX4ygSgmTepFQwqhD2vWln+yNpz8C84/WzejM0WMp4QVpEO9SP1D6XD2ZmP09Giz
+	 uDGr4WZrUggfDfNE7sXuwzDnPfSFzrgM+jUtn1UhSfnLec7QM7q3y42oZUu/X4rIVm
+	 3B4BZ4PurteOQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D0683808200;
-	Wed,  4 Mar 2026 01:30:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E623808200;
+	Wed,  4 Mar 2026 01:30:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,44 +55,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] NFC: pn544: i2c: Replace strcpy() with
- strscpy()
+Subject: Re: [PATCH v1 bpf-next] net: core: allow
+ netdev_upper_get_next_dev_rcu
+ from bh context
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177258784004.1546050.18331574720470240854.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Mar 2026 01:30:40 +0000
-References: <20260301121254.174354-1-tomasz.unger@yahoo.pl>
-In-Reply-To: <20260301121254.174354-1-tomasz.unger@yahoo.pl>
-To: None <tomasz.unger@yahoo.pl>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Rspamd-Queue-Id: 943261F9906
+ <177258784156.1546050.14252305363021482077.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Mar 2026 01:30:41 +0000
+References: <20260220110922.94781-1-kohei@enjuk.jp>
+In-Reply-To: <20260220110922.94781-1-kohei@enjuk.jp>
+To: Kohei Enju <kohei@enjuk.jp>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, toke@redhat.com,
+ kohei.enju@gmail.com
+X-Rspamd-Queue-Id: 59C411F9874
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-263532-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-263533-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.pl];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
@@ -101,19 +107,22 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun,  1 Mar 2026 13:12:54 +0100 you wrote:
-> From: Tomasz Unger <tomasz.unger@yahoo.pl>
+On Fri, 20 Feb 2026 11:09:17 +0000 you wrote:
+> Since XDP programs are called from a NAPI poll context, the RCU
+> reference liveness is ensured by local_bh_disable().
 > 
-> Replace strcpy() with strscpy() which limits the copy to the size of
-> the destination buffer. Since phy->firmware_name is an array, the
-> two-argument variant of strscpy() is used - the compiler deduces
-> the buffer size automatically.
+> Commit aeea1b86f936 ("bpf, devmap: Exclude XDP broadcast to master
+> device") started to call netdev_upper_get_next_dev_rcu() from this
+> context, but missed adding rcu_read_lock_bh_held() as a condition to the
+> RCU checks.
+> While both bh_disabled and rcu_read_lock() provide RCU protection,
+> lockdep complains since the check condition is insufficient [1].
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v4] NFC: pn544: i2c: Replace strcpy() with strscpy()
-    https://git.kernel.org/netdev/net-next/c/e63f5918adb8
+  - [v1,bpf-next] net: core: allow netdev_upper_get_next_dev_rcu from bh context
+    https://git.kernel.org/netdev/net-next/c/39feb171f361
 
 You are awesome, thank you!
 -- 
