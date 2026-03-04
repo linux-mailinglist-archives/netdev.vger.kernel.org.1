@@ -1,114 +1,174 @@
-Return-Path: <netdev+bounces-263564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GwcIQSep2n2igAAu9opvQ
-	(envelope-from <netdev+bounces-263564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:50:44 +0100
+	id sL6hEieep2nTigAAu9opvQ
+	(envelope-from <netdev+bounces-263565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:51:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D9BB1FA0DF
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:50:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85471FA0FC
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 03:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C311830B3883
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 02:49:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3149311C301
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 02:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE220351C1F;
-	Wed,  4 Mar 2026 02:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4BA3537EF;
+	Wed,  4 Mar 2026 02:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPDFwxYb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jbJx9YHi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAAA3502A0;
-	Wed,  4 Mar 2026 02:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249D034DCCD
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 02:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772592543; cv=none; b=qKDba7UKyrsQ4DtAYVq85rXGosRzKUu3ftqf4acCO6ghq02KQsFloXmdxdqBRzBx9RdVl/if5Rb1s+XnpYs3eQ+pm8ySTHA9HL41N8PRI/nIGvOza0rskiptEXc5oCYk6xBNsQzsZBCDApx8taUVinY8HuFUfyx77JoQgFE+yvo=
+	t=1772592580; cv=none; b=dmAp0/1ZqYwMfzdDK+JXPHA9Vmrv0BYQwUdt/KCnZ68nM5fcYpVOI+IiAx7dHD5dxmZ7x6bZ9w42xNK8bv1Ek34NjH4yV9Rmx8DvcozkWNV/TN2EIEtuInOhpVzvOMS/KdtKEPkbhzD4GfydRhBmv7zezWc8929vFvkpkLWvGHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772592543; c=relaxed/simple;
-	bh=yed4GoPy0UTnDhtLDMT/CQakx0GtcO/iiACle8PR4Wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ibv7wKmHamRMuu1hKrWAoJDVOdqbHF+20k/OD67jkrlxWQtAsUq31glLBBQq026aRlwO/r5iHg+EzTsOWns5eoVRoOhYYOp7ZxqEpMqRtzT8yJLTKwcbq8dDl3IenzXljM0cCgaSEnl8Yq8pRIU01d0j0UMuYOR1ZLkRyZwmXmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPDFwxYb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6E9DC116C6;
-	Wed,  4 Mar 2026 02:49:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772592543;
-	bh=yed4GoPy0UTnDhtLDMT/CQakx0GtcO/iiACle8PR4Wg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BPDFwxYbpbg+yvckuXRHdTLP6CIaLFf3mA2IX3yvthdA1VfkiqMxXIMeBy1kCogAH
-	 TycHfm9o1EiwwFJGqs7POBG5GzSKE4IVx+COEpWcXIn88zA8Zb/X5AS0hG62HO17Od
-	 SSMDjqbL6Bkm+4nZyTO/+cBShoNVGdvCgNk0oY1vRm+Z7MnmAsiNES+3rMr+Eb4E6K
-	 6RFdTs3JCHKuCoWgh3wTwrpQCIueUluNuetTL4YVz01ZQd/O3HrfwA6MZI9y8EhzaN
-	 rLXOKwHETDnEF8WrY5sJkwxUF0TsZgMwGjcmV/6780Et8ST4MjFdg33pYg5JHOAVKl
-	 YKy+XHTXCecmg==
-Date: Tue, 3 Mar 2026 18:49:01 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Naveen A <mr.navi8680@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- jhs@mojatatu.com, jiri@resnulli.us, shuah@kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: tc-testing: fix list_categories() crash on
- list type
-Message-ID: <20260303184901.011fe650@kernel.org>
-In-Reply-To: <CACQ1SaB0cnBgEAiX0iTM+WXL0cXYOsoi9wMUMvpcK-04hZLhAg@mail.gmail.com>
-References: <20260228074735.10438-1-mr.navi8680@gmail.com>
-	<20260303181700.25878b2a@kernel.org>
-	<CACQ1SaB0cnBgEAiX0iTM+WXL0cXYOsoi9wMUMvpcK-04hZLhAg@mail.gmail.com>
+	s=arc-20240116; t=1772592580; c=relaxed/simple;
+	bh=Yh8dBMe3ibg8tK09EirKlKZM1uMUm94vien5uMRloZQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=r7EphHwJNhhlVR892SEEww3fjJHPJqCqRi+EJyt0swe7eFeOKKYMUJJxTGFQNwLFVaKR0jV0g3bc2xc0F/1TJWSUGxGXosEEaDEsc+0+2MFiWwIL5uOv3DYttbtbCCZCqb9X1m4nQXmmdiQOlfE7kGBRkQUo7oCC6Pnkh20f7ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jbJx9YHi; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adef9d486bso57001095ad.2
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 18:49:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772592578; x=1773197378; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wlfxAiLCYE9X+ss6Nds/jzCWOjzdQvgrRAY6r5Hx7j0=;
+        b=jbJx9YHiJ+WPah7GaRASFMPpnhJpC89X1VEt7t7uOXdxW9ui4S5BV8nEmnFwwucLuy
+         2DP1g+BXTNfahxRQ3c5bNOmsk4VGpCJTV/DeH/KU5FknJBbeV//S2UbbE3LMF1facWh1
+         hHRMG3MaiJ+/3JjlZpYQypG6vavbkLj/WGXr/+JZB9Di0csdOnzeuSYtRrZUuzFXPVlZ
+         V+nHwfQ+OOu93OkF5KrOhH7PDYq8/lNNOH/PhUY+Lq7Lq+C6cphl8HZhs7RqN9Nwr+Gz
+         GGJcSKdbL2CXSVi8oionrs44kO1BzATDhtuqGPXHN7yc2Wtk0yLhrD+fgpgILH7GlC8D
+         CrBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772592578; x=1773197378;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wlfxAiLCYE9X+ss6Nds/jzCWOjzdQvgrRAY6r5Hx7j0=;
+        b=oTH9wDTCNJAIb3JV0mOt73hefc/3a1h5ztjXwi1XKUUTJcPPmI0GsJeM3LBQGc5LNs
+         GQbrP4MladxOQ63k6LDa/JyiKJfzNC50lIUDPsYC56Aoe0/yX+qULyqxILWNchzeSaYz
+         sNbdfO94I7xDkDpKQrAkBN7x1EoAR0Cp2Mah959p7o4u2vdmGot9MzxFNMGFF+iZO2Zi
+         63d5nLOO8vONkMX6PRCflX9x0I3VV0IfIlPxRdOmAHouDqKaKnctKrbySLxZ3DPZa0fM
+         Y89mIDr/R97BMOKR5ddXta9xhXTl0NPfGoQzVMHTrHEZlfzwUQ/kchfMdkRAZsHq+w8U
+         8WOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUiuyb2lxZ/Us5GETno6ZARD09lqkTtm8xXhrAgw9dmMEo0qizj3jPvOajj9YTv43NpUqTIygU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4eFeB7vpasi6+YpRu7h3ZFi6uYmJmYtA+X0bWnyW1281Q8MBv
+	0MUrgSpjVsY1bEAuLzUcOu4KwKLuAFTKRjo/l2JDqvb9UmPOqJSsofgikvr0h8v/q3Skd4Er4/D
+	Ohnprgw==
+X-Received: from plzv9.prod.google.com ([2002:a17:902:b7c9:b0:2ae:6338:73ca])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2446:b0:2ae:483f:b239
+ with SMTP id d9443c01a7336-2ae6aaf9469mr6114485ad.30.1772592577810; Tue, 03
+ Mar 2026 18:49:37 -0800 (PST)
+Date: Tue, 3 Mar 2026 18:49:36 -0800
+In-Reply-To: <f8d86743-6231-414d-a5e8-65e867123fea@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2D9BB1FA0DF
+Mime-Version: 1.0
+References: <20260304012717.201797-1-ynorov@nvidia.com> <20260303182845.250bb2de@kernel.org>
+ <f8d86743-6231-414d-a5e8-65e867123fea@kernel.dk>
+Message-ID: <aaedwFwXh9QXS3Ju@google.com>
+Subject: Re: [PATCH 0/8] mm: globalize rest_of_page() macro
+From: Sean Christopherson <seanjc@google.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Yury Norov <ynorov@nvidia.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "Theodore Ts'o" <tytso@mit.edu>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexander Duyck <alexanderduyck@fb.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Alexandra Winter <wintera@linux.ibm.com>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Anna Schumaker <anna@kernel.org>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Aswin Karuvally <aswin@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, 
+	Carlos Maiolino <cem@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Chao Yu <chao@kernel.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Christian Brauner <brauner@kernel.org>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	David Airlie <airlied@gmail.com>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Dongsheng Yang <dongsheng.yang@linux.dev>, Eric Dumazet <edumazet@google.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Jaroslav Kysela <perex@perex.cz>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Linus Walleij <linusw@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, Mark Brown <broonie@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Namhyung Kim <namhyung@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <pjw@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Simona Vetter <simona@ffwll.ch>, Takashi Iwai <tiwai@suse.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Trond Myklebust <trondmy@kernel.org>, Tvrtko Ursulin <tursulin@ursulin.net>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Yury Norov <yury.norov@gmail.com>, 
+	Zheng Gu <cengku@gmail.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-block@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	dm-devel@lists.linux.dev, netdev@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
+	linux-perf-users@vger.kernel.org, v9fs@lists.linux.dev, 
+	virtualization@lists.linux.dev, linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: E85471FA0FC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263564-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,linux-foundation.org,davemloft.net,redhat.com,mit.edu,eecs.berkeley.edu,fb.com,linux.ibm.com,zeniv.linux.org.uk,dilger.ca,lunn.ch,opensynergy.com,alien8.de,arm.com,linux.intel.com,gmail.com,codewreck.org,linux.dev,google.com,gondor.apana.org.au,perex.cz,ionkov.net,ellerman.id.au,szeredi.hu,dabbelt.com,infradead.org,intel.com,ffwll.ch,suse.com,ursulin.net,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.sourceforge.net,kvack.org];
+	TAGGED_FROM(0.00)[bounces-263565-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_GT_50(0.00)[85];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tdc_helper.py:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tdc.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, 4 Mar 2026 08:04:18 +0530 Naveen A wrote:
-> > How did you find this issue? I can't figure out what's calling this
-> > function in the first place.  
+On Tue, Mar 03, 2026, Jens Axboe wrote:
+> On 3/3/26 7:28 PM, Jakub Kicinski wrote:
+> > On Tue,  3 Mar 2026 20:27:08 -0500 Yury Norov wrote:
+> >> The net/9p networking driver has a handy macro to calculate the
+> >> amount of bytes from a given pointer to the end of page. Move it
+> >> to core/mm, and apply tree-wide. No functional changes intended.
+> >>
+> >> This series was originally introduced as a single patch #07/12 in:
+> >>
+> >> https://lore.kernel.org/all/20260219181407.290201-1-ynorov@nvidia.com/
+> >>
+> >> Split it for better granularity and submit separately.
+> > 
+> > I don't get what the motivation is here. Another helper developers
+> > and readers of the code will need to know about just to replace 
+> > obvious and easy to comprehend math.
 > 
-> I encountered this while running the tc-testing selftests locally.
+> I fully agree, I had the same thought reading this.
 
-Running locally meaning? via tdc.py ? Or some other way ?
-
-$ git grep list_categories
-tools/testing/selftests/tc-testing/tdc_helper.py:def list_categories(testlist):
-
-I guess I don't understand what the purpose if tdc_helper.py is
-but the function you're polishing appears not to be called today..
++1 from KVM-land.
 
