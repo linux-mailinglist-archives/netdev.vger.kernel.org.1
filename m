@@ -1,237 +1,220 @@
-Return-Path: <netdev+bounces-263507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLySDC+Hp2nOiAAAu9opvQ
-	(envelope-from <netdev+bounces-263507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:13:19 +0100
+	id eEu2IYmHp2nOiAAAu9opvQ
+	(envelope-from <netdev+bounces-263508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:14:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCA521F922E
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:13:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DDD801F9278
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:14:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18A8A30C7EF1
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:12:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31FD2307BD86
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7151E30BB93;
-	Wed,  4 Mar 2026 01:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682F93064A9;
+	Wed,  4 Mar 2026 01:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WgCKlAsk"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="K0DrDC/J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7DBBA21;
-	Wed,  4 Mar 2026 01:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86EC30596D;
+	Wed,  4 Mar 2026 01:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772586771; cv=none; b=FJ5oxib+iMUZMn/h0EDI9NwfHXLTVP98P6ekCJ2e2R4xLh95kZoZXdOVEBv2xUlsoiMcF6eVeiaNeEDL09eiQHlDGKtjKTiVpXW2mxvh202a2juJ3IrwJ0D0GAK97O69Zcld6YtyfegExB7f2Cyy1QuNRuT71boqhOmIsqNNgCs=
+	t=1772586785; cv=none; b=IKeP1O4w1iurPWssUCUCY8TdCTr3X8SUgj0EQ81fPpNc3chfgtdBix99YxgenIlCSGV/IX62UIbXeQ9RKwSAzCK9d1M7RVBKhjGOlzVObi/NacB97AaPpjAt9OySgIXk7cikLhgYFFYC0O4BAwggUvC17Fr4HLvUO75uohF55rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772586771; c=relaxed/simple;
-	bh=GFMrZQJwS7/We+LO7SGzzxn2lFIugPuzG0DMG56Js2Y=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=FOveOG2TCR43Cu4l15Xs8uudLCORKU0jvm/lNs67JB2g1Fdnguzid5cc01D5H0mSBvka/MVmFAv8+QrpbcUddkzceXJC4YSoZu7zw/H13wA7FQ034GDwrjUEgYm0Iw+/wS3gKkpRk6a4JfJTJW0NEDSdC5RKTeYVNU6ziQ6/zYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WgCKlAsk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC630C116C6;
-	Wed,  4 Mar 2026 01:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772586770;
-	bh=GFMrZQJwS7/We+LO7SGzzxn2lFIugPuzG0DMG56Js2Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WgCKlAsk3bXb+r/1s8b+OdlG4mX+icJAS45Uq+KKMNYvC49iKTzsvQ1tAfDcKjOHO
-	 pKVaQRChw5HLqCsmNleVgIcsLZe/mxOdeaALYcjfevERMGUkXjesPWWweCyhou7fQl
-	 VQ4Mb37EKNYYDJ4P3igTTUB/rwlUKWDzyHL6MaEPUYg4GKRNARAdOpQi37TER+bijy
-	 ujXwk/T7EtjhMi3TyZMPQ0jsSUIHCkGDCCDxAdqRqWs1EQh9//lrZ/RlcnBRfnGFFQ
-	 Jo6qgWMK/+GUePLR79A6WJNPJzwq2R2bZgMbaePiL9CPpPo5lJ+0GFE54ESH67v3gD
-	 aYrfgbEpOhAMQ==
-Date: Wed, 4 Mar 2026 10:12:29 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner
- <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Steven Rostedt
- <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox
- <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>,
- "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>,
- Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>,
- David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, Trond
- Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck
- Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
- Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, Ronnie Sahlberg
- <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Bharath
- SM <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko
- <slava@dubeyko.com>, Eric Van Hensbergen <ericvh@kernel.org>, Latchesar
- Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>, David Sterba
- <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>, Ian Kent
- <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>, Salah Triki
- <salah.triki@gmail.com>, "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
- Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, Jan
- Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Nicolas Pitre
- <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>, Amir Goldstein
- <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>, John Paul
- Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li
- <frank.li@vivo.com>, Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
- David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>,
- Dave Kleikamp <shaggy@kernel.org>, Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
- Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
- <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen
- <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal
- <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, Johannes
- Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
- Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin
- <dmitry.kasatkin@gmail.com>, Eric Snowberg <eric.snowberg@oracle.com>, Fan
- Wu <wufan@kernel.org>, Stephen Smalley <stephen.smalley.work@gmail.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler
- <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Sumit Semwal
- <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>, Kuniyuki
- Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Oleg Nesterov
- <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar
- <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung
- Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Alexander
- Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa
- <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
- <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>,
- "Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>,
- Eric Paris <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>, Marcel
- Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp
- <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, David
- Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, Steffen
- Klassert <steffen.klassert@secunet.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Remi Denis-Courmont <courmisch@gmail.com>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
- <lucien.xin@gmail.com>, Magnus Karlsson <magnus.karlsson@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- nvdimm@lists.linux.dev, fsverity@lists.linux.dev, linux-mm@kvack.org,
- netfs@lists.linux.dev, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-nilfs@vger.kernel.org, v9fs@lists.linux.dev,
- linux-afs@lists.infradead.org, autofs@vger.kernel.org,
- ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org,
- jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev,
- ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org,
- selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
- linux-x25@vger.kernel.org, audit@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
- linux-sctp@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2 053/110] uprobes: use PRIino format for i_ino
-Message-Id: <20260304101229.bc9fba5fcb816b7325fdf57d@kernel.org>
-In-Reply-To: <20260302-iino-u64-v2-53-e5388800dae0@kernel.org>
-References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
-	<20260302-iino-u64-v2-53-e5388800dae0@kernel.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772586785; c=relaxed/simple;
+	bh=jSEtLFlW2KW7ktkQ+ZLui/2ozn3ulBLlfLou/kxEBaU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hGCvaYWEHAeRmbbeO7Kfd4ss4vDivP0uSfoCWAeKG9X7YKDr3IRArGtDfKtlhph8CCX2i1UgE8f70QXg4fzzyp9B0beeBTlLkuchdDOsEVULVtaN/th1WTuwOMQV6JvcflNEVRa8mH18QyEqTjV/9+CieWCtJnW+AGYW52AEqZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=K0DrDC/J; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1772586774;
+	bh=jSEtLFlW2KW7ktkQ+ZLui/2ozn3ulBLlfLou/kxEBaU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=K0DrDC/J3lokggUaecka0esrARi3BAKrt6fTCTrTl+dXFRpp7PUWnRJYHsmgORKGm
+	 tIeKpEn9B8r7mVA5XsR32sDui7y15amyaa6/7myaND2MNI5vc259XZc5JSdk2UWMmw
+	 JInq00q6Cf8kex+I71W1eWHBpuNeHIXxEEn7vqcYSVwky+QDvuCh0sUxBGO9ZxbvV1
+	 L/4mcz2Ud1qUQ+RVX6wvKHoXUZospu7tl2KgGfPjmb870ihxBHp7OZzpWtaNA+oZXc
+	 qLuSdVPB668m/qDzkbhybAJkvtD5fWsO9hSp2zQs6LgxO4+PcFlGCCDYwsoYEZzuAW
+	 ib5HXgAClYHYg==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 2C46C6016C;
+	Wed,  4 Mar 2026 09:12:51 +0800 (AWST)
+Message-ID: <d0c4ad6f1a5b7ed4326e3b4a64dfe1f21042da3e.camel@codeconstruct.com.au>
+Subject: Re: [net-next v32 2/2] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@os.amperecomputing.com>, Matt Johnston
+ <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Huisong Li <lihuisong@huawei.com>
+Date: Wed, 04 Mar 2026 09:12:51 +0800
+In-Reply-To: <20260303213649.237851-3-admiyo@os.amperecomputing.com>
+References: <20260303213649.237851-1-admiyo@os.amperecomputing.com>
+	 <20260303213649.237851-3-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CCA521F922E
+MIME-Version: 1.0
+X-Rspamd-Queue-Id: DDD801F9278
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.56 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.or
- g];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263507-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263508-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_GT_50(0.00)[171];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhiramat@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Mon, 02 Mar 2026 15:24:37 -0500
-Jeff Layton <jlayton@kernel.org> wrote:
+SGkgQWRhbSwKClRoaXMgaXMgbG9va2luZyBwcmV0dHkgY29uY2lzZSBub3csIG5pY2Ugd29yay4g
+QSBmZXcgdGhpbmdzIGlubGluZToKCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L21jdHAvTWFr
+ZWZpbGUgYi9kcml2ZXJzL25ldC9tY3RwL01ha2VmaWxlCj4gaW5kZXggYzM2MDA2ODQ5YTFlLi4w
+YTU5MTI5OWZmYTkgMTAwNjQ0Cj4gLS0tIGEvZHJpdmVycy9uZXQvbWN0cC9NYWtlZmlsZQo+ICsr
+KyBiL2RyaXZlcnMvbmV0L21jdHAvTWFrZWZpbGUKPiBAQCAtMSw0ICsxLDUgQEAKPiDCoG9iai0k
+KENPTkZJR19NQ1RQX1NFUklBTCkgKz0gbWN0cC1zZXJpYWwubwo+IMKgb2JqLSQoQ09ORklHX01D
+VFBfVFJBTlNQT1JUX0kyQykgKz0gbWN0cC1pMmMubwo+IMKgb2JqLSQoQ09ORklHX01DVFBfVFJB
+TlNQT1JUX0kzQykgKz0gbWN0cC1pM2Mubwo+ICtvYmotJChDT05GSUdfTUNUUF9UUkFOU1BPUlRf
+UENDKSArPSBtY3RwLXBjYy5vCj4gwqBvYmotJChDT05GSUdfTUNUUF9UUkFOU1BPUlRfVVNCKSAr
+PSBtY3RwLXVzYi5vCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L21jdHAvbWN0cC1wY2MuYyBi
+L2RyaXZlcnMvbmV0L21jdHAvbWN0cC1wY2MuYwo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gaW5k
+ZXggMDAwMDAwMDAwMDAwLi5kMGU3Njk5ZWJlODIKPiAtLS0gL2Rldi9udWxsCj4gKysrIGIvZHJp
+dmVycy9uZXQvbWN0cC9tY3RwLXBjYy5jCj4gQEAgLTAsMCArMSwzMjIgQEAKPiArLy8gU1BEWC1M
+aWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAKPiArLyoKPiArICogbWN0cC1wY2MuYyAtIERyaXZl
+ciBmb3IgTUNUUCBvdmVyIFBDQy4KPiArICogQ29weXJpZ2h0IChjKSAyMDI0LTIwMjUsIEFtcGVy
+ZSBDb21wdXRpbmcgTExDCgpNaW5vciwgYnV0IGlmIHlvdSBlbmQgdXAgcmUtcm9sbGluZzogLTIw
+MjYuCgo+ICsgKgo+ICsgKi8KPiArCj4gKy8qIEltcGxlbWVudGF0aW9uIG9mIE1DVFAgb3ZlciBQ
+Q0MgRE1URiBTcGVjaWZpY2F0aW9uIERTUDAyNTYKPiArICogaHR0cHM6Ly93d3cuZG10Zi5vcmcv
+c2l0ZXMvZGVmYXVsdC9maWxlcy9zdGFuZGFyZHMvZG9jdW1lbnRzL0RTUDAyOTJfMS4wLjBXSVA1
+MC5wZGYKPiArICovCj4gKwo+ICsjaW5jbHVkZSA8bGludXgvYWNwaS5oPgo+ICsjaW5jbHVkZSA8
+bGludXgvaHJ0aW1lci5oPgo+ICsjaW5jbHVkZSA8bGludXgvaWZfYXJwLmg+Cj4gKyNpbmNsdWRl
+IDxsaW51eC9pbml0Lmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9rZXJuZWwuaD4KPiArI2luY2x1ZGUg
+PGxpbnV4L21haWxib3hfY2xpZW50Lmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4KPiAr
+I2luY2x1ZGUgPGxpbnV4L25ldGRldmljZS5oPgo+ICsjaW5jbHVkZSA8bGludXgvcGxhdGZvcm1f
+ZGV2aWNlLmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9za2J1ZmYuaD4KPiArI2luY2x1ZGUgPGxpbnV4
+L3N0cmluZy5oPgo+ICsKPiArI2luY2x1ZGUgPGFjcGkvYWNwaV9idXMuaD4KPiArI2luY2x1ZGUg
+PGFjcGkvYWNwaV9kcml2ZXJzLmg+Cj4gKyNpbmNsdWRlIDxhY3BpL2FjcmVzdHlwLmg+Cj4gKyNp
+bmNsdWRlIDxhY3BpL2FjdGJsLmg+Cj4gKyNpbmNsdWRlIDxhY3BpL3BjYy5oPgo+ICsjaW5jbHVk
+ZSA8bmV0L21jdHAuaD4KPiArI2luY2x1ZGUgPG5ldC9tY3RwZGV2aWNlLmg+Cj4gKwo+ICsjZGVm
+aW5lIE1DVFBfU0lHTkFUVVJFwqDCoMKgwqDCoMKgwqDCoMKgICJNQ1RQIgo+ICsjZGVmaW5lIE1D
+VFBfU0lHTkFUVVJFX0xFTkdUSMKgwqAgKHNpemVvZihNQ1RQX1NJR05BVFVSRSkgLSAxKQo+ICsj
+ZGVmaW5lIE1DVFBfTUlOX01UVcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgNjgKPiArI2RlZmluZSBQ
+Q0NfRFdPUkRfVFlQRcKgwqDCoMKgwqDCoMKgwqDCoCAweDBjCj4gKwo+ICtzdHJ1Y3QgbWN0cF9w
+Y2NfbWFpbGJveCB7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGluZGV4Owo+ICvCoMKgwqDCoMKgwqDC
+oHN0cnVjdCBwY2NfbWJveF9jaGFuICpjaGFuOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtYm94
+X2NsaWVudCBjbGllbnQ7Cj4gK307Cj4gKwo+ICsvKiBUaGUgbmV0ZGV2IHN0cnVjdHVyZS4gT25l
+IG9mIHRoZXNlIHBlciBQQ0MgYWRhcHRlci4gKi8KPiArc3RydWN0IG1jdHBfcGNjX25kZXYgewo+
+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2Owo+ICvCoMKgwqDCoMKgwqDC
+oHN0cnVjdCBhY3BpX2RldmljZSAqYWNwaV9kZXZpY2U7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0
+IG1jdHBfcGNjX21haWxib3ggaW5ib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNj
+X21haWxib3ggb3V0Ym94Owo+ICt9Owo+ICsKPiArc3RhdGljIHZvaWQgbWN0cF9wY2NfY2xpZW50
+X3J4X2NhbGxiYWNrKHN0cnVjdCBtYm94X2NsaWVudCAqY2wsIHZvaWQgKm1zc2cpCj4gK3sKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgYWNwaV9wY2N0X2V4dF9wY2Nfc2hhcmVkX21lbW9yeSBwY2Nf
+aGVhZGVyOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19u
+ZGV2Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3BjY19tYWlsYm94ICppbmJveDsKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9za2JfY2IgKmNiOwo+ICvCoMKgwqDCoMKgwqDCoHN0
+cnVjdCBza19idWZmICpza2I7Cj4gK8KgwqDCoMKgwqDCoMKgaW50IHNpemU7Cj4gKwo+ICvCoMKg
+wqDCoMKgwqDCoG1jdHBfcGNjX25kZXYgPSBjb250YWluZXJfb2YoY2wsIHN0cnVjdCBtY3RwX3Bj
+Y19uZGV2LCBpbmJveC5jbGllbnQpOwo+ICvCoMKgwqDCoMKgwqDCoGluYm94ID0gJm1jdHBfcGNj
+X25kZXYtPmluYm94Owo+ICvCoMKgwqDCoMKgwqDCoHNpemUgPSBwY2NfbWJveF9xdWVyeV9ieXRl
+c19hdmFpbGFibGUoaW5ib3gtPmNoYW4pOwo+ICvCoMKgwqDCoMKgwqDCoGlmIChzaXplID09IDAp
+Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKCllvdXIgbmV3IHBjY19t
+Ym94X3F1ZXJ5X2J5dGVzX2F2YWlsYWJsZSgpIHJldHVybnMgLTEgb24gZXJyb3IsIGJ1dCB5b3UK
+ZG9uJ3QgaGFuZGxlIHRoYXQgaGVyZS4KCgo+ICvCoMKgwqDCoMKgwqDCoHNrYiA9IG5ldGRldl9h
+bGxvY19za2IobWN0cF9wY2NfbmRldi0+bmRldiwgc2l6ZSk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYg
+KCFza2IpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZGV2X2RzdGF0c19yeF9k
+cm9wcGVkKG1jdHBfcGNjX25kZXYtPm5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqByZXR1cm47Cj4gK8KgwqDCoMKgwqDCoMKgfQo+ICvCoMKgwqDCoMKgwqDCoHNrYl9wdXQo
+c2tiLCBzaXplKTsKPiArwqDCoMKgwqDCoMKgwqBza2ItPnByb3RvY29sID0gaHRvbnMoRVRIX1Bf
+TUNUUCk7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX21ib3hfcmVhZF9mcm9tX2J1ZmZlcihpbmJveC0+
+Y2hhbiwgc2l6ZSwgc2tiLT5kYXRhKTsKPiArwqDCoMKgwqDCoMKgwqBkZXZfZHN0YXRzX3J4X2Fk
+ZChtY3RwX3BjY19uZGV2LT5uZGV2LCBza2ItPmxlbik7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiX3Jl
+c2V0X21hY19oZWFkZXIoc2tiKTsKPiArwqDCoMKgwqDCoMKgwqBza2JfcHVsbChza2IsIHNpemVv
+ZihwY2NfaGVhZGVyKSk7CgpEbyB5b3Ugd2FudCB0byBjaGVjayB0aGF0IHRoZSBoZWFkZXIgZGVz
+Y3JpYmVzIGEgdmFsaWQgTUNUUC1vdmVyLVBDQwpwYWNrZXQ/Cgo+ICvCoMKgwqDCoMKgwqDCoHNr
+Yl9yZXNldF9uZXR3b3JrX2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoGNiID0gX19tY3Rw
+X2NiKHNrYik7Cj4gK8KgwqDCoMKgwqDCoMKgY2ItPmhhbGVuID0gMDsKPiArwqDCoMKgwqDCoMKg
+wqBuZXRpZl9yeChza2IpOwo+ICt9Cj4gKwo+ICtzdGF0aWMgbmV0ZGV2X3R4X3QgbWN0cF9wY2Nf
+dHgoc3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IG5ldF9kZXZpY2UgKm5kZXYpCj4gK3sKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgYWNwaV9wY2N0X2V4dF9wY2Nfc2hhcmVkX21lbW9yeSAqcGNj
+X2hlYWRlcjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbXBuZCA9IG5l
+dGRldl9wcml2KG5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoGludCBsZW4gPSBza2ItPmxlbjsKPiAr
+wqDCoMKgwqDCoMKgwqBpbnQgcmM7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHJjID0gc2tiX2Nvd19o
+ZWFkKHNrYiwgc2l6ZW9mKCpwY2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKHJjKSB7
+Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9kc3RhdHNfdHhfZHJvcHBlZChu
+ZGV2KTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKga2ZyZWVfc2tiKHNrYik7Cj4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiBORVRERVZfVFhfT0s7Cj4gK8Kg
+wqDCoMKgwqDCoMKgfQo+ICsKPiArwqDCoMKgwqDCoMKgwqBwY2NfaGVhZGVyID0gc2tiX3B1c2go
+c2tiLCBzaXplb2YoKnBjY19oZWFkZXIpKTsKPiArwqDCoMKgwqDCoMKgwqBwY2NfaGVhZGVyLT5z
+aWduYXR1cmUgPSBQQ0NfU0lHTkFUVVJFIHwgbXBuZC0+b3V0Ym94LmluZGV4Owo+ICvCoMKgwqDC
+oMKgwqDCoHBjY19oZWFkZXItPmZsYWdzID0gUENDX0NNRF9DT01QTEVUSU9OX05PVElGWTsKPiAr
+wqDCoMKgwqDCoMKgwqBtZW1jcHkoJnBjY19oZWFkZXItPmNvbW1hbmQsIE1DVFBfU0lHTkFUVVJF
+LCBNQ1RQX1NJR05BVFVSRV9MRU5HVEgpOwo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXItPmxl
+bmd0aCA9IGxlbiArIE1DVFBfU0lHTkFUVVJFX0xFTkdUSDsKPiArCj4gK8KgwqDCoMKgwqDCoMKg
+cmMgPSBtYm94X3NlbmRfbWVzc2FnZShtcG5kLT5vdXRib3guY2hhbi0+bWNoYW4sIHNrYik7Cj4g
+K8KgwqDCoMKgwqDCoMKgaWYgKHJjIDwgMCkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqBuZXRpZl9zdG9wX3F1ZXVlKG5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqByZXR1cm4gTkVUREVWX1RYX0JVU1k7CgpJZiB5b3UgcmV0dXJuIE5FVERFVl9UWF9CVVNZ
+IGhlcmUsIGFuZCB0aGUgY29yZSBkb2VzIGEgcmV0cmFuc21pdCwKeW91IHdpbGwgZW5kIHVwIHBy
+ZXBlbmRpbmcgYW5vdGhlciBoZWFkZXIuCgpKdXN0IHRvIGNvbmZpcm0gZnJvbSBlYXJsaWVyIGRp
+c2N1c3Npb25zOiB5b3UgaGF2ZSBubyB3YXkgdG8gZGV0ZXJtaW5lCnRoYXQgdGhlIGNoYW5uZWwg
+aXMgdW5hdmFpbGFibGUgaW4gYWR2YW5jZSwgcmlnaHQ/Cgo+ICvCoMKgwqDCoMKgwqDCoH0KPiAr
+Cj4gK8KgwqDCoMKgwqDCoMKgZGV2X2RzdGF0c190eF9hZGQobmRldiwgbGVuKTsKPiArwqDCoMKg
+wqDCoMKgwqByZXR1cm4gTkVUREVWX1RYX09LOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBtY3Rw
+X3BjY190eF9wcmVwYXJlKHN0cnVjdCBtYm94X2NsaWVudCAqY2wsIHZvaWQgKm1zc2cpCj4gK3sK
+PiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldjsKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCAqb3V0Ym94Owo+ICvCoMKgwqDC
+oMKgwqDCoHN0cnVjdCBza19idWZmICpza2IgPSBtc3NnOwo+ICvCoMKgwqDCoMKgwqDCoGludCBs
+ZW5fc2VudDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9IGNvbnRhaW5lcl9v
+ZihjbCwgc3RydWN0IG1jdHBfcGNjX25kZXYsIG91dGJveC5jbGllbnQpOwo+ICvCoMKgwqDCoMKg
+wqDCoG91dGJveCA9ICZtY3RwX3BjY19uZGV2LT5vdXRib3g7Cj4gKwo+ICvCoMKgwqDCoMKgwqDC
+oGlmICghc2tiKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm47Cj4gKwo+
+ICvCoMKgwqDCoMKgwqDCoGxlbl9zZW50ID0gcGNjX21ib3hfd3JpdGVfdG9fYnVmZmVyKG91dGJv
+eC0+Y2hhbiwgc2tiLT5sZW4sIHNrYi0+ZGF0YSk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGxlbl9z
+ZW50ID09IDApCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG5ldGRldl9pbmZvKG1j
+dHBfcGNjX25kZXYtPm5kZXYswqAgInBhY2tldCBkcm9wcGVkIik7CgpZb3UgcHJvYmFibHkgZG9u
+J3Qgd2FudCBhIG5ldGRldl9pbmZvKCkgaGVyZSwgcGVyaGFwcyBuZXRkZXZfZGJnKCkuCgpPciwg
+Y291bGQgeW91IGluY3JlbWVudCB0aGUgdHhfZHJvcHBlZCBzdGF0PyBJIHNlZSB5b3UncmUgZG9p
+bmcgYWxsIHRoZQpzdGF0cyBhY2NvdW50aW5nIGluIHN0YXJ0X3htaXQgLSBJJ20gbm90IGZhbWls
+aWFyIHdpdGggdGhlIFBDQyBBUEksIGJ1dAp0aGVyZSBzZWVtIHRvIGJlIGZhaWx1cmUgcGF0aHMg
+cGFzdCB0aGF0IHBvaW50LiBJcyBpdCBwb3NzaWJsZSB0bwpkaXN0aW5ndWlzaCBiZXR3ZWVuIHN1
+Y2Nlc3NmdWwgdHggYW5kIGRyb3BwZWQgdHggaW4gdGhlIHR4X2RvbmUKY2FsbGJhY2ssIGFuZCBk
+byB0aGUgYWNjb3VudGluZyB0aGVyZSwgcGVyaGFwcz8KCk9yIGlzIHRoaXMgYSB0cml2aWFsLWVu
+b3VnaCBjYXNlIChsZW4gPiBzaG1lbV9zaXplKSB0byBub3Qgd29ycnkgYWJvdXQKYWNjb3VudGlu
+Zz8KCkNoZWVycywKCgpKZXJlbXkK
 
-> Convert uprobes i_ino format strings to use the PRIino format
-> macro in preparation for the widening of i_ino via kino_t.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-
-Looks good to me.
-
-Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-
-Thanks,
-
-> ---
->  kernel/events/uprobes.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/events/uprobes.c b/kernel/events/uprobes.c
-> index 923b24b321cc0fbdecaf016645cdac0457a74463..d5bf51565851223730c63b50436c493c0c05eafd 100644
-> --- a/kernel/events/uprobes.c
-> +++ b/kernel/events/uprobes.c
-> @@ -344,7 +344,7 @@ __update_ref_ctr(struct mm_struct *mm, unsigned long vaddr, short d)
->  static void update_ref_ctr_warn(struct uprobe *uprobe,
->  				struct mm_struct *mm, short d)
->  {
-> -	pr_warn("ref_ctr %s failed for inode: 0x%lx offset: "
-> +	pr_warn("ref_ctr %s failed for inode: 0x%" PRIino "x offset: "
->  		"0x%llx ref_ctr_offset: 0x%llx of mm: 0x%p\n",
->  		d > 0 ? "increment" : "decrement", uprobe->inode->i_ino,
->  		(unsigned long long) uprobe->offset,
-> @@ -982,7 +982,7 @@ static struct uprobe *insert_uprobe(struct uprobe *uprobe)
->  static void
->  ref_ctr_mismatch_warn(struct uprobe *cur_uprobe, struct uprobe *uprobe)
->  {
-> -	pr_warn("ref_ctr_offset mismatch. inode: 0x%lx offset: 0x%llx "
-> +	pr_warn("ref_ctr_offset mismatch. inode: 0x%" PRIino "x offset: 0x%llx "
->  		"ref_ctr_offset(old): 0x%llx ref_ctr_offset(new): 0x%llx\n",
->  		uprobe->inode->i_ino, (unsigned long long) uprobe->offset,
->  		(unsigned long long) cur_uprobe->ref_ctr_offset,
-> 
-> -- 
-> 2.53.0
-> 
-
-
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
