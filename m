@@ -1,184 +1,142 @@
-Return-Path: <netdev+bounces-263620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263617-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDp0CTfcp2lnkgAAu9opvQ
-	(envelope-from <netdev+bounces-263620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:16:07 +0100
+	id YNsdBtLbp2kRkQAAu9opvQ
+	(envelope-from <netdev+bounces-263617-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:14:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931841FB747
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:16:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E98C1FB703
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 08:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 65471302FEA2
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 07:15:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 091AC3018E3A
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 07:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3872330668;
-	Wed,  4 Mar 2026 07:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE36372EE2;
+	Wed,  4 Mar 2026 07:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZpsIkHn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2Nv6Dth"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A625833B966
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 07:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6293C2AE8D;
+	Wed,  4 Mar 2026 07:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772608505; cv=none; b=P/lwtuSdhycWYNcbhgmNlgbg/hxZ3PtaGvVl8Aj9Z6Slj1vAJotG3qPwn2hE2k4vtG6uyMa9JYk2uoskCZcp5rpC1eWK4hFFfUIIagTt6LhBkfyBKB7QC+U8uogU/+y51x3Hof+cc4Femq91XQcDbz3qvIaUR49uzVqBqpjpV7k=
+	t=1772608460; cv=none; b=GFk+Ol3IeIExfnBu1PEqAm/rIMQP8RLcALvRVhyFwkA842Tm/XbxbFeg+niqGEtajg5nsBJRzG5oFia4XzO9n22gV1XxT4YYX8be+t+I6sDTpknSrybSDfYKgYdJrz9L4RLP7TX1a5PfXEIn3m3zVt+z+yF4mQ4dKutBe2z+CKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772608505; c=relaxed/simple;
-	bh=4suyWihyC1ry/HvunGlIS6YHwIWLTnzKEYrI3QwXGaQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qp23N2q8wNduBlwk/ztRVzaVP7OpMNBCZV2YAlbVjjSHz9xCje/QWRkcwaRYTEiP9f6iIBKtn+vp0k9QZp8uOTlSS1VT9z78/8J0fioWcusZgDuSdanHkpOmKeRcXddurwEvFVznF1IZrYP/oqoy7TzB7qRXjRjd3cAmtkR6R0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lZpsIkHn; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c7381c4345cso40539a12.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 23:15:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772608504; x=1773213304; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pDl+XTs6aW3UhEf8SPsZqwG+HpyZqHIJ08ht/L1JbFE=;
-        b=lZpsIkHn34+/vdnx7ROu3/5LFy9fyVh5CrOqbHuNddNB+G/vHk+F9jpQrFsDH4EZNy
-         QE5EtuLbpBZ5wY8TdsbzypBGHvy9fBwO/CEab9AQxMndlWdEtCp//2u/rrnCy3PW986L
-         VyyGD5hSIZlQuizvLIf2Eo/upLixH0CD7pb300meaYdag8vxd5rY+seeOHc37kzBbU2g
-         xdj/kp0KKp6h6DlM7uNTX2OS8sBLdUjcXlo4X+mTP+eZwONllkCHYM/ws72qmXglh5SM
-         yeNCHmWhloyfd6G3llpEuxgIeEkcfYD/EBAbr7OyOOvjzjdedID6cJv99xxDy3INPKdO
-         0Lzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772608504; x=1773213304;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pDl+XTs6aW3UhEf8SPsZqwG+HpyZqHIJ08ht/L1JbFE=;
-        b=mBdSuMdXB4WIu2ufRL7pZGe5leimRKKkw9+1HEs1wiAwfK2yxuj5r7JDcF8aEcwbkA
-         4W08xE2Y1Rtz5vgu3ctc0/GFyuJ5oZ/NhEdRpRymMsXSmIsE1TaEM64aXIPEyKX5P/ZR
-         1T2Ir7rQXTPtrM2x3W0rXyDapmBVEOtRfkqPHf8M/qmNIKqba0PDSitVSjMXqyc7BaaY
-         dgk1hZ7WPkoSXHC9kAd+0lfu+MiTCCKKFuP2JbMUb/6dVhuHIlFlegFakh08eXVyl/fn
-         BFtpBV1AiMLYQ7O+ohSQ7T7L65enOSFdCBXLaeQiPyGPZwpaPhZhPOpJ/CBMEX7HWhfG
-         lZLQ==
-X-Gm-Message-State: AOJu0YwsbBCBPg0Sn9YPQU9DmuEyiOJO+UD+z0/kASbiqAIyKbTW1spV
-	ih3Iqi5d6GmwATeX8hlzcOZlNvj2xId2GRDhx/DPxszJu/CNc1X5748A
-X-Gm-Gg: ATEYQzyU0k/oWjV8a8FZJ/u77jmFi4Sspp6+6SmCvq9sxbxIT3InB+N46mF0sRXc5X+
-	SEn5h/uZ/GK6jGjNwDMusJFrG4SCsn7v6pbZNkm7Ag+ipP1iED413yELaaPOKdR8EiC2nnFvXsA
-	iVzOQh1NO07FL68MxA4e8bifSa2QIQ94oN52YoJ3T9TZcy2s2FadwKCPnBBYc5avWN7LvyiTnM6
-	KX/jXfHZ4b2COvW2V9YRMWuuDbDmqbs7OHr880UXoI/Nz+XhvLxg0oVchxP6ozdh3jvEhcoqiGE
-	GtRr6IssRY+CnB45wicc+zxFxIZTmNfQVvT4hwajRw2YjwBhqh4OIrb3frzQxKDrHZFfJAwReW2
-	xgvV3KLPRq0tZhWMhvGTHT7WSB9luD/0vCZr0uV01gRCN/WL9/m4SkcQJneAo5S/H+AQ2oKaXcp
-	IGUtWL2io76fKU/Cd9rec6tVX3+uSN765yLmQN6BvfTZFg4nGBB5gb6hilpHyfgq+ZZp2KuWskt
-	IaL/jI+wX0gC0nYEpPD6v7Ib5u3sItSRcSsxKwGrHP2rhtSk7dz
-X-Received: by 2002:a17:90b:2691:b0:359:84a3:1942 with SMTP id 98e67ed59e1d1-3599cecc8bamr4364578a91.13.1772608504029;
-        Tue, 03 Mar 2026 23:15:04 -0800 (PST)
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([240e:34c:576b:6b60:293b:552b:9870:28a3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359aa3ebb2csm85731a91.12.2026.03.03.23.14.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 23:15:03 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Wed, 04 Mar 2026 15:13:54 +0800
-Subject: [PATCH net 2/2] bonding: handle BOND_LINK_FAIL, BOND_LINK_BACK as
- valid link states
+	s=arc-20240116; t=1772608460; c=relaxed/simple;
+	bh=cPZJfPbuDa1fkt02QXSIQH0+wvGAsNbNKl/OpOppkw4=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=F91a3e0PQGEPxriQqJlz1y/IdKxuKO8apN9H7utE27phK1u7/8M6l5L5p8bVkEAOjn7MWaAr4amqDasla730V7ZlTf4ngjqlUeCR9EIYFsfVH19f47+6NewL9/Ck59f5ty1BdTTLFI8DFU/mqOs6PL26mkyTVxUfBl/Jd4XJXd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2Nv6Dth; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5786DC19423;
+	Wed,  4 Mar 2026 07:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772608459;
+	bh=cPZJfPbuDa1fkt02QXSIQH0+wvGAsNbNKl/OpOppkw4=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=B2Nv6DthxweQOzN4B5mA5GUF94adCUfwqJgJZ0DJyTf5mqabGwVAsWGWLhNy8P6+I
+	 g31FjrQWFyZmS3CE8jVMu6ey2jyvfKhlux1CDPpecNyCy3r0a9G6lPO/0giVJM4Mmd
+	 v6q2w6opQF5ZuUkP6wK2nleEQJBf/fijKg7vjBWABnvYEPPTExbjSRvYoJd4vEOyNX
+	 oimsY1dxixhYpwpb6i80C8IwuDzT0mZcM7FUR/RwLC6TUnRH6+Eyt1mq9enjdwGEr8
+	 x2NcNY3sQOxGL9bOapLXLo17/MGKIcp/hdXLj8dLQb7uO6TXuozWMQZKbgBVSUBjjg
+	 F8CxB1kl59W8w==
+Content-Type: multipart/mixed; boundary="===============8248387453652486925=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260304-b4-bond_updelay-v1-2-f72eb2e454d0@gmail.com>
-References: <20260304-b4-bond_updelay-v1-0-f72eb2e454d0@gmail.com>
-In-Reply-To: <20260304-b4-bond_updelay-v1-0-f72eb2e454d0@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Tonghao Zhang <tonghao@bamaicloud.com>, Hangbin Liu <liuhangbin@gmail.com>, 
- Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jay Vosburgh <jay.vosburgh@canonical.com>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 931841FB747
+Message-Id: <772806bbb78e8d4cfc9525b6122c44496a1c345616a31f0bbb7f8dd12c621844@mail.kernel.org>
+In-Reply-To: <20260304063643.14581-4-jiayuan.chen@linux.dev>
+References: <20260304063643.14581-4-jiayuan.chen@linux.dev>
+Subject: Re: [PATCH bpf-next v1 3/7] tcp_bpf: refactor recvmsg with read actor abstraction
+From: bot+bpf-ci@kernel.org
+To: jiayuan.chen@linux.dev,bpf@vger.kernel.org,john.fastabend@gmail.com,jakub@cloudflare.com
+Cc: jiayuan.chen@linux.dev,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,kuniyu@google.com,willemb@google.com,dsahern@kernel.org,ncardwell@google.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,jiapeng.chong@linux.alibaba.com,ihor.solodrai@linux.dev,mhal@rbox.co,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Wed,  4 Mar 2026 07:14:19 +0000 (UTC)
+X-Rspamd-Queue-Id: 1E98C1FB703
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-263617-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.alibaba.com,rbox.co,vger.kernel.org,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263620-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bamaicloud.com,gmail.com,blackwall.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_TO(0.00)[linux.dev,vger.kernel.org,gmail.com,cloudflare.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.kernel.org:mid]
 X-Rspamd-Action: no action
 
-Before the fixed commit, we check slave->new_link during commit
-state, which values are only BOND_LINK_{NOCHANGE, UP, DOWN}. After
-the commit, we start using slave->link_new_state, which state also could
-be BOND_LINK_{FAIL, BACK}.
+--===============8248387453652486925==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-For example, when we set updelay/downdelay, after a failover,
-the slave->link_new_state could be set to BOND_LINK_{FAIL, BACK} in
-bond_miimon_inspect(). And later in bond_miimon_commit(), it will treat
-it as invalid and print an error, which would cause confusion for users.
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 2e26174c9919..6a906bfe3aa4 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
 
-[  106.440254] bond0: (slave veth2): link status down for interface, disabling it in 200 ms
-[  106.440265] bond0: (slave veth2): invalid new link 1 on slave
-[  106.648276] bond0: (slave veth2): link status definitely down, disabling slave
-[  107.480271] bond0: (slave veth2): link status up, enabling it in 200 ms
-[  107.480288] bond0: (slave veth2): invalid new link 3 on slave
-[  107.688302] bond0: (slave veth2): link status definitely up, 10000 Mbps full duplex
+[ ... ]
 
-Let's handle BOND_LINK_{FAIL, BACK} as valid link states.
+> @@ -440,7 +442,8 @@ int __sk_msg_recvmsg(struct sock *sk, ...
+>  			if (copy)
+> -				copy = copy_page_to_iter(page, sge->offset, copy, iter);
+> +				copy = actor(actor_arg, page,
+> +					     sge->offset, copy);
 
-Fixes: 1899bb325149 ("bonding: fix state transition issue in link monitoring")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+The direct copy_page_to_iter() call is now replaced by the actor
+callback here, but deeper in the same function the peek-path comment
+still references copy_page_to_iter() by name:
+
+net/core/skmsg.c:sk_msg_read_core() {
+    ...
+		} else {
+			/* Lets not optimize peek case if copy_page_to_iter
+			 * didn't copy the entire length lets just break.
+			 */
+			if (copy != sge->length)
+				goto out;
+    ...
+}
+
+Should this comment say "the actor" instead of "copy_page_to_iter"
+now that the copy operation is abstracted behind the callback? Once
+the splice actor is added later in this series, the reference to
+copy_page_to_iter will be inaccurate for that path.
+
+
 ---
- drivers/net/bonding/bond_main.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 93a32a368d31..444519078da3 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2801,8 +2801,14 @@ static void bond_miimon_commit(struct bonding *bond)
- 
- 			continue;
- 
-+		case BOND_LINK_FAIL:
-+		case BOND_LINK_BACK:
-+			slave_dbg(bond->dev, slave->dev, "link_new_state %d on slave\n",
-+				  slave->link_new_state);
-+			continue;
-+
- 		default:
--			slave_err(bond->dev, slave->dev, "invalid new link %d on slave\n",
-+			slave_err(bond->dev, slave->dev, "invalid link_new_state %d on slave\n",
- 				  slave->link_new_state);
- 			bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
- 
-
--- 
-Git-155)
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22658462977
+--===============8248387453652486925==--
 
