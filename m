@@ -1,332 +1,386 @@
-Return-Path: <netdev+bounces-263522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YH/kGJ6Lp2nliAAAu9opvQ
-	(envelope-from <netdev+bounces-263522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:32:14 +0100
+	id CA74HgWLp2kUiQAAu9opvQ
+	(envelope-from <netdev+bounces-263519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:29:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF341F9721
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:32:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A4A1F95B9
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6440A307F41E
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:29:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D216830AC2BD
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F66F33F374;
-	Wed,  4 Mar 2026 01:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075DD329C7B;
+	Wed,  4 Mar 2026 01:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="maidt9YU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ewR1Z+zt"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011055.outbound.protection.outlook.com [52.101.52.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99063334C27;
-	Wed,  4 Mar 2026 01:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587677; cv=fail; b=mGdlLRhVxepy/MwCyuQH8Dw+bwSxZRFu5QgRuJfZwfp6vwVm55uIfgqCzHKij6YV0tap3Fr1L7koJlCfsfyOt5BFMJLv8U/ilvHYUw+VLvQRXo4zVibRbmPzNwzcQLSWy+kmuzOxEnmzdd282QEwV5t+r9QR1TibRx+i87A/UQk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587677; c=relaxed/simple;
-	bh=dacBUh9K0QdXUvNywbAyvPt5HJ99IaNmZU28a1tpGFQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rAVALJOIhIGtNOGsxnxNRnHbGL/pexi73AtG0PMuj49xcGQoJZ1vj024GgBvIQy5ggBKVoXUSUUEuFR9L49/XzRetPJ2VFwUMydjrFkDFyI4gIdfn+Qid2CiXESAtrxATTV/x2FRthIrlyGiZCBWknpor+dtOSJVYkMOxFVvy/c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=maidt9YU; arc=fail smtp.client-ip=52.101.52.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p7IyXyBnfC59bhh/QDlC4xjm8gnxI/aVjCQ8NWjD+TQ/phVsvcvuW+NLBwz88oegj1uUlu3Eo3WVXfBEPFYLVctAff3OGVKs6Xv8Wggf01j3o0MSOeSxHA5GJqJjudqqXN/2oDkFpLWG7rNbgythWaGJW701F+WT+MDBwzxmlu9SXw/oaP0PeGTAWeV9kaOO841TnqajI5htVvdPBVcphxbO0+fCcLLs3ACa6zPrI8LdN0/pSUTyF6rkpr0iKAmaNhVLW3qunh4s7ITlNquQXbSIEekdoDCyuvRtVfUJe+oVe99SGOdiQIwubQe36N7K0Itb8+4Q5Sa+OhGYRxeCXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SMCVXE/QqXcN89uo56glYVb2KUIcE1svTHLTUm91N2M=;
- b=w+esDmCCph9thTxJi6D9QEtzrUzS5rQDHMVxzz6TS7qPP7AfnGlXihVXA05VntXiv4B6vEmeBEDvccO27e4Ko2dC7bs65ACkzY3wPreezzZgngCi9P8sE/duNHHHgFmmJN9NBZsU0Us9uaLpK0fJZ3mT/4xh4/TBtjrO2R3aQOUNEn7ml8MMFvfkHLLP3AVkyhgcLytd9ojZ31UtxREx6DQU0dataSsAq3aoeyhGOxQFcMtKumoym/0xXP8VzElidNH1V2VsQqfhnizX85t/USGwEFg+FsJhWpfu+cj7+GVZy9VnGvbC3Ym8VvzmSwj3kSb6OPoRbdlrpNeO3pp4+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SMCVXE/QqXcN89uo56glYVb2KUIcE1svTHLTUm91N2M=;
- b=maidt9YUEg9SE1s2e15IkLkTmsj5XGLJ0eWvmZLG17QCRfvRHNiGN9W3S5yzM2gLA3ZwjtK0HMjZkNSiN9sN7bTS9l2uk3KeXEbIqBn3LZ9aPcH2V7tMnIv7aSCbInGtrtlF2wl2hQtVVFRA0iLD8deJv7DgLNRD88+Qtd+yFA1TrYXYHfU+Y/QQCMYfQ8QTzb+CCv4rUUsIG1ZLmGNhWtC5E+8P0TBA208y90uayInBW54MyAATkCPSzlbHYLLHap/J/tssthm9awMpbHFDACRlatTjRTT4e7jAMrCvGEqGDgfcCtwSioUqVWfEw6oStZDZTh77KMsRBqjrVmO03A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
- by IA1PR12MB6651.namprd12.prod.outlook.com (2603:10b6:208:3a0::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Wed, 4 Mar
- 2026 01:27:38 +0000
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9654.022; Wed, 4 Mar 2026
- 01:27:38 +0000
-From: Yury Norov <ynorov@nvidia.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Anna Schumaker <anna@kernel.org>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Aswin Karuvally <aswin@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Carlos Maiolino <cem@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Yu <chao@kernel.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Airlie <airlied@gmail.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Dongsheng Yang <dongsheng.yang@linux.dev>,
-	Eric Dumazet <edumazet@google.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Jens Axboe <axboe@kernel.dk>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Linus Walleij <linusw@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Takashi Iwai <tiwai@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Yury Norov <yury.norov@gmail.com>,
-	Zheng Gu <cengku@gmail.com>
-Cc: Yury Norov <ynorov@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	dm-devel@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-perf-users@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	virtualization@lists.linux.dev,
-	linux-sound@vger.kernel.org
-Subject: [PATCH 8/8] arch: use rest_of_page() macro where appropriate
-Date: Tue,  3 Mar 2026 20:27:16 -0500
-Message-ID: <20260304012717.201797-9-ynorov@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260304012717.201797-1-ynorov@nvidia.com>
-References: <20260304012717.201797-1-ynorov@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BN0PR04CA0111.namprd04.prod.outlook.com
- (2603:10b6:408:ec::26) To PH0PR12MB8800.namprd12.prod.outlook.com
- (2603:10b6:510:26f::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0393176EE
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 01:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772587672; cv=none; b=VLGpOjE97oGtKYAREFOg0oecB62mal84kYPOWlBmedDcC2QtO6Niz2aGpdGLkmGo5yuZXoBlh2k1KE4NHIccBH2wjIzC+f7VeS+/KjUQf936OrcPPR5WK8d4BoFi9TgUESqfRylww7XjmRh5eliPOKhlNykaJYlISEqQp9yeP6k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772587672; c=relaxed/simple;
+	bh=KUZB677fj64ErOTTv2t3Z8EXBwfjrjd9x8cic5yPMGw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oihoo7FtlNPN08PgYMel42vjngEUAGizKYFFpJnYQ/C2t/ytlex18/3UGcjyPMl0MlXqq80IoNiMnBrz6nDR6TsQ3Ig2iw+LtKcQcNPd3zzmEj0qaY2u+1/EYnJDewl/4bTHSBn3n6eveyrY9Oieo/qkQymlRFao5t11Clq25ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ewR1Z+zt; arc=none smtp.client-ip=74.125.224.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-64ca3de57f1so6938740d50.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 17:27:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772587669; x=1773192469; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=glBDZ7pZyXb+Yv+XoAjBDtDP6IdGnFzP0uekTFhKGMk=;
+        b=ewR1Z+ztvTvfTCidqVFt/ZTMHvNbffANSHOWfrWuJG4KHFRZ8f9gxZicroAnIZn49C
+         5ATsuZhVd5g2ellgN2M76nPjUgsV4q+jJDGkKUyEeOLhj1mYmPSaOajYModfka8/DROK
+         /+Z5Lih9Y6k3w5Xis6oXWLjxXfIll9HlFLHns1NSaMAdxu/iLclpjeWoNpbXIgxhdgmO
+         qVCNYWHAbT6EBoYwM5/NVmTJmpm6hWNP8FILNebtI16dyZ6k+yMpoae4bYcttvQ+g6eK
+         Rm89ZaAbx5YQqOX5W4kqcDeb348EM1CPt4cyGhPkZ8HaAv9AVaQv2Q0y1cFSmlUcDr8k
+         I9kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772587669; x=1773192469;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=glBDZ7pZyXb+Yv+XoAjBDtDP6IdGnFzP0uekTFhKGMk=;
+        b=JBcMK2pJTwqc+YNxYVoGnbgjuau9G72SJsEZGUq6UYLJ2+xX6+1PeZpaN/SZQxBDwQ
+         LJvZMAng8KFOb/ZMFINNIgpHvXJKbLkRHIhQA/uAo77Lc+SXAoQ4DV4HdiLwncjIYQG3
+         qLYWxS0/OUHeGtR9nN00QoJc5TUoNw3tw/0zr6rbi/qNNdRYlV6YSVwTlj5bZCX92LTy
+         q3MA8fQaHeT1CUPJOBKKKxW+nXtokoldmByPz5kl46Kx6+T0mCnSq/bA3Gnf0g2JQqzS
+         mX/q2kCnf4rlwBCL13Ro2/hc2rM5qrmbj1PP6bi1r0MKIwNl0fwfbMjcGX144rgd7sNe
+         JuFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUS7M+lUL8EKB0NjbEgTTnMyPYz9GXj1N070y4AFDDZhVun7gNxFKLMgHeO+LSHbZxgMn49cAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9BplyRBR6mmxf+Ogb86Ei5Gl8BrIPJ9Dz4Wil8ejFO+iputr9
+	sInL5bRntjdAbJpqTI4fNvdIMKW3oC8XkkZ3MgIvKGxlNckL2ExRk7x5Vv1zfy6UME9O/jmr6vm
+	OO4KZU4v4BZrJcQ==
+X-Received: from yxw1.prod.google.com ([2002:a53:ac81:0:b0:64c:f18f:1096])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:1697:b0:64c:ed24:13da with SMTP id 956f58d0204a3-64cf9bbef4dmr480056d50.57.1772587669149;
+ Tue, 03 Mar 2026 17:27:49 -0800 (PST)
+Date: Wed,  4 Mar 2026 01:27:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|IA1PR12MB6651:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2609bae3-d7b5-4d6c-cdad-08de798d38be
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|10070799003|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	xtr88SI7Q4AcFK/iCkO/xPPWk0+R3vDrTpAEkNkbZ8qomfK3bAqE3XXgk3WCNroUewaQ35DD4OpAJK1mIhUjhWYvBFTqoeATTFnLAmqOp15cQE84BTc+8CnbiKwRE0wOPvR4+P9wrFVo6jX1SM5uRem1u/Gq0/uFWMPPtwK4pVRqQ6TaZagPbb9tU2AbyJI96CdJV+D/9u2lDuLkmio5k8PimILuLSWNRKkjzizNdjFIBx5FcpjDsKEPd36qCC8fgQ8K5WsoA4hd5dyEORYzDfvI2oH/zoDgA0hctTSJSGry0uzr+8AI9tV8nUZjlMsrDCf2UMGeEBPxCmE01gt5eH7odkBaAXu3EvlsN6LtmIu5GU5fD4aHKyOhJRiFYkfo3RM9lHPrff6Rd/B1e0mihJxDWgodSpZDp2Bpzx+5nG3mrD3EQJBDgDvfDixNyRZ+D2aSppWErIY/rwuO20KAcDloK2pH91Uj1qnwopT2ICDEqyTmNOvm+Gnr6DBGgKdRRa6zeWiOM/aYM9V6u0Pp7f4YTFLa/5PvZfCBhkWFIQy0buCigXXjKYExH4rTtmmMH+bAOCnV8nCxPP4RNKGZRMZGwhL9BYG4V4IVzgQ/aZ3+XTJFWe/5uwHcrp5qPa1zQTsFD/7c32RWrSRS12+/v+bw81rbNRTnOAvEZy5XDi1Eenxd3W6HyH5I09MHMhmlW1TOC/u2untYVG3C00LNI6+bNraN5Rg/0lUN9gfUQLS/TQXgz9Ud6SR48QdzfL6/4dmZN94g9vM+nkmTSClPgw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jZT52MDM+eEm2ajfhuGGg1je2uDA86dzD5RM7cWtaSUcZsmLo3p4LUo+VZgH?=
- =?us-ascii?Q?CcFY4fZq73cONvgI/up9p5BMyftLSMlvV00Vm3N2XA2UaJorXSvVHlN6e9rG?=
- =?us-ascii?Q?+BS2M5jomKURFg3P4QGjVyE9mdjFeF/n4cBQznI+N8UtjPZtlqzw/pXI8KHJ?=
- =?us-ascii?Q?Jx8Li/Gt32NxfUzyb0Re2KRK2EpLasBGScpnd5rc93/stq2s6BEU/S9JEtQK?=
- =?us-ascii?Q?0J2Ig3D27nnZt1DlT36YFV/Z+bGIN1t7oc+eMYIJpkmGuytatGb6NtHeW9Qc?=
- =?us-ascii?Q?otPJ6O82PeDiCAbVWKAIGs3yRNs/jU7k0xlBn6jLHxH7TFNKFK5kVghg523j?=
- =?us-ascii?Q?oX4r5I9M2ZnolMGZb1AZcCOyJZe+YZOBWqTA8i6z72KvugdAVo9VtSpTTxLS?=
- =?us-ascii?Q?BiAlthrnV8VTo2+a4EracIh+n+0e5ma3dxFtYhg41j2oJp5krPwgvyFpYE1q?=
- =?us-ascii?Q?gMgzWOMwd+/EjN7Jmg97D8iRFNCImOLvjk/FwATm86gkRu7Fpj/L2qJLcp8f?=
- =?us-ascii?Q?9OirouLpKCmoGuAycTa4DutOGkyJXTl0yb5aiFywqakzGWYOCiK8p8fOjzVw?=
- =?us-ascii?Q?iJmYDNPuAuXYA6ifAnDtnyXjSYpku7Vd4oCULY+YgrnR+mD8jN8oUbTsfxDJ?=
- =?us-ascii?Q?70dcbbGaemRAcZ3oDRNwmkIIMM3OmgbkVbyPt0V4HT8ZIOCAN8xFEF4p6cGO?=
- =?us-ascii?Q?eW9Ix7e20XVgZMGLl7Rf4bR0GJbrbrvHzK5p6O8K530TWx2RmTkMKKovm9d6?=
- =?us-ascii?Q?hRiCXlxG9Mwxk8xdLTLIgXKCd2DteHO+ouNXq8Vy/6bTe2q9lFY/nozPKuSj?=
- =?us-ascii?Q?3XiTDROtScMtG+K/Sx8p0yHfEDmN8m4+AcFQDS5z0pUFiNGUNxzyWTdSlqXp?=
- =?us-ascii?Q?NCH3PO6j9oS5Rz6N9b7La609E0iQ+8jqEkej5ry+SuPdbJtjfWcZsxcpbA2l?=
- =?us-ascii?Q?PKq1KNKu5R4L67Dt5dzmNkYIj1t5aezZMVNdaTUYopF69DGNpu6XCnMIdzmx?=
- =?us-ascii?Q?YuclF7I1XJRth9WYwy50lhD7wU0Yx7UkWn0srKPJcBh6COcsxslET61mBVZY?=
- =?us-ascii?Q?hiRG2fLtJQw5l3Y7iLDndQBLijJWAeuWbrOFhTMeYQiOJsLuZD34AcS4n6I9?=
- =?us-ascii?Q?CSKMBYHwj3GQ1sjrBRQcLTs5r/rAu524+LplcySqtzj31wxZWNEsSGDhkhWq?=
- =?us-ascii?Q?gUHEJGESGgSe7ricmXWRJu/bL0g555G+7khTbaBSErtMHZO8cp4BPDMjlF8Y?=
- =?us-ascii?Q?AJh3p8vJq0AxIeaJW7+CEweIQWdGYANN2l/oBAA/seklaYQhht7LMXx47aEv?=
- =?us-ascii?Q?fe7x/gjpSQ6qh0sxrjjga5a2bxc/M1BYS1G0gpwCM7jIEl3r3Woh6Np/SssN?=
- =?us-ascii?Q?0bRjcJjYMdGY8VfCjp2wtkZgxg75kLzeHKTUkw1jiUTz+zJxIFneVF9ZOBS5?=
- =?us-ascii?Q?TZdcNGY9VNNZdRgyvbi61Lu/TOCIf+vn3O9hJ4SQzqE+XF2Fyvbf4qvfYGAj?=
- =?us-ascii?Q?TC+KI43yWW7FPkdnVxH0fYofJDaG+Z7428TtImGS7j10tIa2cscZjOsPhgHW?=
- =?us-ascii?Q?7r7El9t92QBbstiWTNULLaGH0t1N2FN8XcT0xQ8t4xk5O7IeK/48IZ6YiYqg?=
- =?us-ascii?Q?Nb04R/5oI4l0W1ht89mqdstkVexYsc2UQ1BQEX0A1uDg7sXC0xuBvZQ4yOKh?=
- =?us-ascii?Q?5ceyzxrZLiFnpOfqTHF2HzrtUnQDhu2Xj+OZwNZcxC1k777PWjJy30XAifgM?=
- =?us-ascii?Q?XXCFrLmaSRas1lUilO2bKMt1CtRSz/X7urTZvi79BSv9E/gD9ePe?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2609bae3-d7b5-4d6c-cdad-08de798d38be
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2026 01:27:38.4368
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CXt8e378FJ0B3MzdzzWaWK9oK5KIDe3bPOTtrn+uSqUA2hwKB8rT9SRgsjZlbcdaW7oWw1Rhh0hszU/hvHkVeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6651
-X-Rspamd-Queue-Id: 4AF341F9721
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260304012747.881644-1-edumazet@google.com>
+Subject: [PATCH net-next] net: use ktime_t in struct scm_timestamping_internal
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: C2A4A1F95B9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,davemloft.net,redhat.com,mit.edu,eecs.berkeley.edu,fb.com,linux.ibm.com,zeniv.linux.org.uk,dilger.ca,lunn.ch,kernel.org,opensynergy.com,alien8.de,arm.com,linux.intel.com,gmail.com,codewreck.org,linux.dev,google.com,gondor.apana.org.au,perex.cz,kernel.dk,ionkov.net,ellerman.id.au,szeredi.hu,dabbelt.com,infradead.org,intel.com,ffwll.ch,suse.com,ursulin.net];
-	TAGGED_FROM(0.00)[bounces-263522-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263519-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	RCPT_COUNT_GT_50(0.00)[86];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Switch arch code to using the macro. No functional changes intended.
+Instead of using struct timespec64 in scm_timestamping_internal,
+use ktime_t, saving 24 bytes in kernel stack.
 
-Signed-off-by: Yury Norov <ynorov@nvidia.com>
+This makes tcp_update_recv_tstamps() small enough to be inlined.
+
+The ktime_t -> timespec64 conversions happen after socket lock
+has been released in tcp_recvmsg(), and only if the application
+requested them.
+
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux
+add/remove: 0/2 grow/shrink: 5/4 up/down: 146/-277 (-131)
+Function                                     old     new   delta
+tcp_zerocopy_receive                        2383    2425     +42
+mptcp_recvmsg                               1565    1607     +42
+tcp_recvmsg_locked                          3797    3823     +26
+put_cmsg_scm_timestamping64                  131     149     +18
+put_cmsg_scm_timestamping                    131     149     +18
+__pfx_tcp_update_recv_tstamps                 16       -     -16
+do_tcp_getsockopt                           4024    4006     -18
+tcp_recv_timestamp                           474     430     -44
+tcp_zc_handle_leftover                       417     371     -46
+__sock_recv_timestamp                       1087    1031     -56
+tcp_update_recv_tstamps                       97       -     -97
+Total: Before=25223788, After=25223657, chg -0.00%
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- arch/arm64/kernel/patching.c     | 4 +---
- arch/powerpc/lib/code-patching.c | 6 +++---
- arch/riscv/kernel/sbi.c          | 4 ++--
- 3 files changed, 6 insertions(+), 8 deletions(-)
+ include/linux/socket.h |  2 +-
+ include/net/tcp.h      | 11 ++++++--
+ net/core/scm.c         | 12 ++++++---
+ net/ipv4/tcp.c         | 61 +++++++++++++++---------------------------
+ net/socket.c           | 23 ++++++++--------
+ 5 files changed, 51 insertions(+), 58 deletions(-)
 
-diff --git a/arch/arm64/kernel/patching.c b/arch/arm64/kernel/patching.c
-index 1041bc67a3ee..4c3a4401719b 100644
---- a/arch/arm64/kernel/patching.c
-+++ b/arch/arm64/kernel/patching.c
-@@ -116,9 +116,7 @@ static void *__text_poke(text_poke_f func, void *addr, void *src, size_t len)
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index ec715ad4bf25f5f759d2cab3c6b796fed84df932..ec4a0a0257939a5363c55bed3ccb20182965b2e3 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -415,7 +415,7 @@ struct __kernel_timespec;
+ struct old_timespec32;
  
- 	while (patched < len) {
- 		ptr = addr + patched;
--		size = min_t(size_t, PAGE_SIZE - offset_in_page(ptr),
--			     len - patched);
+ struct scm_timestamping_internal {
+-	struct timespec64 ts[3];
++	ktime_t ts[3];
+ };
+ 
+ extern void put_cmsg_scm_timestamping64(struct msghdr *msg, struct scm_timestamping_internal *tss);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 9cf8785ef0b42460a2389b4aa75570b3aa31cbb4..fea6081cf6c798fe5f3f3b3ab3335619d7324f6e 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -503,8 +503,15 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		int flags);
+ int tcp_set_rcvlowat(struct sock *sk, int val);
+ int tcp_set_window_clamp(struct sock *sk, int val);
+-void tcp_update_recv_tstamps(struct sk_buff *skb,
+-			     struct scm_timestamping_internal *tss);
++
++static inline void
++tcp_update_recv_tstamps(struct sk_buff *skb,
++			struct scm_timestamping_internal *tss)
++{
++	tss->ts[0] = skb->tstamp;
++	tss->ts[2] = skb_hwtstamps(skb)->hwtstamp;
++}
++
+ void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
+ 			struct scm_timestamping_internal *tss);
+ void tcp_data_ready(struct sock *sk);
+diff --git a/net/core/scm.c b/net/core/scm.c
+index a29aa8fb8065665f8a8f2255ec3e55df973a6b0a..eec13f50ecaf6fa7caf9316bf17ab401d98d0efc 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -318,8 +318,10 @@ void put_cmsg_scm_timestamping64(struct msghdr *msg, struct scm_timestamping_int
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(tss.ts); i++) {
+-		tss.ts[i].tv_sec = tss_internal->ts[i].tv_sec;
+-		tss.ts[i].tv_nsec = tss_internal->ts[i].tv_nsec;
++		struct timespec64 tv = ktime_to_timespec64(tss_internal->ts[i]);
++
++		tss.ts[i].tv_sec = tv.tv_sec;
++		tss.ts[i].tv_nsec = tv.tv_nsec;
+ 	}
+ 
+ 	put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMPING_NEW, sizeof(tss), &tss);
+@@ -332,8 +334,10 @@ void put_cmsg_scm_timestamping(struct msghdr *msg, struct scm_timestamping_inter
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(tss.ts); i++) {
+-		tss.ts[i].tv_sec = tss_internal->ts[i].tv_sec;
+-		tss.ts[i].tv_nsec = tss_internal->ts[i].tv_nsec;
++		struct timespec64 tv = ktime_to_timespec64(tss_internal->ts[i]);
++
++		tss.ts[i].tv_sec = tv.tv_sec;
++		tss.ts[i].tv_nsec = tv.tv_nsec;
+ 	}
+ 
+ 	put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMPING_OLD, sizeof(tss), &tss);
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 1790d2fa75ade77cda8d0a593e689ea4432734dd..3d77d90c14fe13777d17563e17596066c44c66bd 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1871,20 +1871,6 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
+ }
+ EXPORT_IPV6_MOD(tcp_set_rcvlowat);
+ 
+-void tcp_update_recv_tstamps(struct sk_buff *skb,
+-			     struct scm_timestamping_internal *tss)
+-{
+-	if (skb->tstamp)
+-		tss->ts[0] = ktime_to_timespec64(skb->tstamp);
+-	else
+-		tss->ts[0] = (struct timespec64) {0};
 -
-+		size = min_t(size_t, rest_of_page(ptr), len - patched);
- 		waddr = patch_map(ptr, FIX_TEXT_POKE0);
- 		func(waddr, src, patched, size);
- 		patch_unmap(FIX_TEXT_POKE0);
-diff --git a/arch/powerpc/lib/code-patching.c b/arch/powerpc/lib/code-patching.c
-index f84e0337cc02..186a9cb79ee3 100644
---- a/arch/powerpc/lib/code-patching.c
-+++ b/arch/powerpc/lib/code-patching.c
-@@ -463,7 +463,7 @@ static int __patch_instructions(u32 *patch_addr, u32 *code, size_t len, bool rep
- 
- /*
-  * A page is mapped and instructions that fit the page are patched.
-- * Assumes 'len' to be (PAGE_SIZE - offset_in_page(addr)) or below.
-+ * Assumes 'len' to be rest_of_page(addr) or below.
-  */
- static int __do_patch_instructions_mm(u32 *addr, u32 *code, size_t len, bool repeat_instr)
+-	if (skb_hwtstamps(skb)->hwtstamp)
+-		tss->ts[2] = ktime_to_timespec64(skb_hwtstamps(skb)->hwtstamp);
+-	else
+-		tss->ts[2] = (struct timespec64) {0};
+-}
+-
+ #ifdef CONFIG_MMU
+ static const struct vm_operations_struct tcp_vm_ops = {
+ };
+@@ -2376,22 +2362,23 @@ void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
  {
-@@ -514,7 +514,7 @@ static int __do_patch_instructions_mm(u32 *addr, u32 *code, size_t len, bool rep
+ 	int new_tstamp = sock_flag(sk, SOCK_TSTAMP_NEW);
+ 	u32 tsflags = READ_ONCE(sk->sk_tsflags);
+-	bool has_timestamping = false;
  
- /*
-  * A page is mapped and instructions that fit the page are patched.
-- * Assumes 'len' to be (PAGE_SIZE - offset_in_page(addr)) or below.
-+ * Assumes 'len' to be rest_of_page(addr) or below.
-  */
- static int __do_patch_instructions(u32 *addr, u32 *code, size_t len, bool repeat_instr)
+-	if (tss->ts[0].tv_sec || tss->ts[0].tv_nsec) {
++	if (tss->ts[0]) {
+ 		if (sock_flag(sk, SOCK_RCVTSTAMP)) {
++			struct timespec64 tv = ktime_to_timespec64(tss->ts[0]);
++
+ 			if (sock_flag(sk, SOCK_RCVTSTAMPNS)) {
+ 				if (new_tstamp) {
+ 					struct __kernel_timespec kts = {
+-						.tv_sec = tss->ts[0].tv_sec,
+-						.tv_nsec = tss->ts[0].tv_nsec,
++						.tv_sec = tv.tv_sec,
++						.tv_nsec = tv.tv_nsec,
+ 					};
+ 					put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMPNS_NEW,
+ 						 sizeof(kts), &kts);
+ 				} else {
+ 					struct __kernel_old_timespec ts_old = {
+-						.tv_sec = tss->ts[0].tv_sec,
+-						.tv_nsec = tss->ts[0].tv_nsec,
++						.tv_sec = tv.tv_sec,
++						.tv_nsec = tv.tv_nsec,
+ 					};
+ 					put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMPNS_OLD,
+ 						 sizeof(ts_old), &ts_old);
+@@ -2399,41 +2386,37 @@ void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
+ 			} else {
+ 				if (new_tstamp) {
+ 					struct __kernel_sock_timeval stv = {
+-						.tv_sec = tss->ts[0].tv_sec,
+-						.tv_usec = tss->ts[0].tv_nsec / 1000,
++						.tv_sec = tv.tv_sec,
++						.tv_usec = tv.tv_nsec / 1000,
+ 					};
+ 					put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMP_NEW,
+ 						 sizeof(stv), &stv);
+ 				} else {
+-					struct __kernel_old_timeval tv = {
+-						.tv_sec = tss->ts[0].tv_sec,
+-						.tv_usec = tss->ts[0].tv_nsec / 1000,
++					struct __kernel_old_timeval otv = {
++						.tv_sec = tv.tv_sec,
++						.tv_usec = tv.tv_nsec / 1000,
+ 					};
+ 					put_cmsg(msg, SOL_SOCKET, SO_TIMESTAMP_OLD,
+-						 sizeof(tv), &tv);
++						 sizeof(otv), &otv);
+ 				}
+ 			}
+ 		}
+ 
+-		if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
++		if (!(tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+ 		    (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+-		     !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER)))
+-			has_timestamping = true;
+-		else
+-			tss->ts[0] = (struct timespec64) {0};
++		     !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))))
++			tss->ts[0] = 0;
+ 	}
+ 
+-	if (tss->ts[2].tv_sec || tss->ts[2].tv_nsec) {
+-		if (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
++	if (tss->ts[2]) {
++		if (!(tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
+ 		    (tsflags & SOF_TIMESTAMPING_RX_HARDWARE ||
+-		     !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER)))
+-			has_timestamping = true;
+-		else
+-			tss->ts[2] = (struct timespec64) {0};
++		     !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))))
++			tss->ts[2] = 0;
+ 	}
+ 
+-	if (has_timestamping) {
+-		tss->ts[1] = (struct timespec64) {0};
++	if (tss->ts[0] | tss->ts[2]) {
++		tss->ts[1] = 0;
+ 		if (sock_flag(sk, SOCK_TSTAMP_NEW))
+ 			put_cmsg_scm_timestamping64(msg, tss);
+ 		else
+diff --git a/net/socket.c b/net/socket.c
+index 05952188127f5bce41494e99e86418249e9022f2..68829d09bcf1468dee49864c5e4ea52362c3c6c7 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -912,11 +912,10 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
  {
-@@ -554,7 +554,7 @@ int patch_instructions(u32 *addr, u32 *code, size_t len, bool repeat_instr)
- 		size_t plen;
- 		int err;
+ 	int need_software_tstamp = sock_flag(sk, SOCK_RCVTSTAMP);
+ 	int new_tstamp = sock_flag(sk, SOCK_TSTAMP_NEW);
+-	struct scm_timestamping_internal tss;
+-	int empty = 1, false_tstamp = 0;
+ 	struct skb_shared_hwtstamps *shhwtstamps =
+ 		skb_hwtstamps(skb);
+-	int if_index;
++	struct scm_timestamping_internal tss;
++	int if_index, false_tstamp = 0;
+ 	ktime_t hwtstamp;
+ 	u32 tsflags;
  
--		plen = min_t(size_t, PAGE_SIZE - offset_in_page(addr), len);
-+		plen = min_t(size_t, rest_of_page(addr), len);
+@@ -961,12 +960,12 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
  
- 		local_irq_save(flags);
- 		if (mm_patch_enabled())
-diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
-index c443337056ab..9a2f656f776f 100644
---- a/arch/riscv/kernel/sbi.c
-+++ b/arch/riscv/kernel/sbi.c
-@@ -602,7 +602,7 @@ int sbi_debug_console_write(const char *bytes, unsigned int num_bytes)
- 	else
- 		base_addr = __pa(bytes);
- 	if (PAGE_SIZE < (offset_in_page(bytes) + num_bytes))
--		num_bytes = PAGE_SIZE - offset_in_page(bytes);
-+		num_bytes = rest_of_page(bytes);
+ 	memset(&tss, 0, sizeof(tss));
+ 	tsflags = READ_ONCE(sk->sk_tsflags);
+-	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+-	     (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+-	      skb_is_err_queue(skb) ||
+-	      !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+-	    ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+-		empty = 0;
++	if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
++	    (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
++	    skb_is_err_queue(skb) ||
++	    !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER)))
++		tss.ts[0] = skb->tstamp;
++
+ 	if (shhwtstamps &&
+ 	    (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
+ 	     (tsflags & SOF_TIMESTAMPING_RX_HARDWARE ||
+@@ -983,15 +982,15 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+ 			hwtstamp = ptp_convert_timestamp(&hwtstamp,
+ 							 READ_ONCE(sk->sk_bind_phc));
  
- 	if (IS_ENABLED(CONFIG_32BIT))
- 		ret = sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE,
-@@ -631,7 +631,7 @@ int sbi_debug_console_read(char *bytes, unsigned int num_bytes)
- 	else
- 		base_addr = __pa(bytes);
- 	if (PAGE_SIZE < (offset_in_page(bytes) + num_bytes))
--		num_bytes = PAGE_SIZE - offset_in_page(bytes);
-+		num_bytes = rest_of_page(bytes);
+-		if (ktime_to_timespec64_cond(hwtstamp, tss.ts + 2)) {
+-			empty = 0;
++		if (hwtstamp) {
++			tss.ts[2] = hwtstamp;
  
- 	if (IS_ENABLED(CONFIG_32BIT))
- 		ret = sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_READ,
+ 			if ((tsflags & SOF_TIMESTAMPING_OPT_PKTINFO) &&
+ 			    !skb_is_err_queue(skb))
+ 				put_ts_pktinfo(msg, skb, if_index);
+ 		}
+ 	}
+-	if (!empty) {
++	if (tss.ts[0] | tss.ts[2]) {
+ 		if (sock_flag(sk, SOCK_TSTAMP_NEW))
+ 			put_cmsg_scm_timestamping64(msg, &tss);
+ 		else
 -- 
-2.43.0
+2.53.0.473.g4a7958ca14-goog
 
 
