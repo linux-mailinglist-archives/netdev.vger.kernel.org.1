@@ -1,188 +1,246 @@
-Return-Path: <netdev+bounces-263897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263899-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDtZHOBcqGmZtgAAu9opvQ
-	(envelope-from <netdev+bounces-263897-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:04 +0100
+	id wHqwD+9cqGmQtwAAu9opvQ
+	(envelope-from <netdev+bounces-263899-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99352042D4
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF15D2042E2
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09E6031D1765
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:00:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 01E6A32FBC56
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF04E199FBA;
-	Wed,  4 Mar 2026 16:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19EB34D938;
+	Wed,  4 Mar 2026 16:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VaD8vMyF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IGxS4qVu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C9230FC26
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772640015; cv=pass; b=VwjgLv5gQzDQgLb7tQG5gQaPvS0y81KLndAj6nHDXEqQuOUyh0Zo4MmS6X/NOarHg0DuqmWSZQ+84AEHiJw/jB+PkWEEhxvARCE+BHJOPPiFVF14ihOlrSS40l0RalOMlhMGV15Balp0c6QFAwabRqTL1ciR1h6LcytIc1BUir8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772640015; c=relaxed/simple;
-	bh=rI1GyFyPrXzA+/a7clGqi3FniatUTe9TjanGamzeT1c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+JUB8XPGTjZoCXqGwhHWqIh1GeUTNwCDgGeu3hXY7aNZ85XPTW9RtDBBm6LSQowW1i7AQjHMNZMy5tD5wUZB3+rMXA/URyrwCQl46hw7H73xUQmkKzPztTdRWiuzSnrI+oEVVF7clRbL5ll2juQo+U2K/ja6piQAK4de1csqp4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VaD8vMyF; arc=pass smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8cb3825b0fbso677793085a.0
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:00:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772640013; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X9BcHdeAh1Xy5Z0DpgqAcx+ANGX2znoQbla2WM7BgJeY/f9NuOZbxo211qmZqVWpfo
-         uuMP5dAqicjakdUSXECJh7167JDQZyHusxrNxuMu2eTzpvzd5n+E2j6ac4uSQPpbUBZ+
-         thDyRD2ZXRfRlmtBHUoDGmrVclEyW5/szcUrlz5+K5nuyWtZVRwfVbIGi9Cml7DhChzL
-         Rf6stzh7iWJJLVBICpcpEvG4X3vYUpa/1xtM9DVLIFhLy2RzHmRmMJcexxi2cXCAKb3y
-         5by3xliWHsLqxZFaYPsQBlPAsF4uMcqbFn8bq7y1YYOSMVN6OHZIhmGnGF3FYMAeNDQ4
-         rjyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
-        fh=GDCqGVd+gGKqSibXF3Hjf6G6XtLT97S7PZsiYhvbiM8=;
-        b=ejeZ0ggQRJcquonkGhgyYzBJPocOSkWIlljf/uOhkux+efEMm2Txk7UfpBy7bys7BJ
-         BrHhvsdnw3a+m3QljNMc/dXxni2rUXXo5h7lbCahQ921Ut7L/043vlJYEVT3Q9Mqrq56
-         BJKDLXBwZBoglkUCb+1WNxjB8abW3rFMOsokzFKl9FvzVPKoqGNffUtRWujCdjzSRQBY
-         lgCC3Sd/OQqtLyHa1sMgTPQYKLgNWpTVM8QYsDr81qMtXya8sB92PCweKLLnJbXiClw8
-         DXDvH0qfnATfyNi5hw2MpDEQHhry+lJfUts8cTXGtHYc20whfMG7eoIH73GfrR5RH56Z
-         OVtg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFD734B40E
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772640030; cv=none; b=ieiM8Mmw92UuH6YtHQNfhcNAsfDyG43fgusv0Xq11KO05MVmtQOp0LZpHHRpPsz6gGo2vqLeGgate18CShoriPqKCFc5WyvuQPh4gb0tlk9AvRrq0mGBCx+0tfY2YJCB5wVVgAF+PJ4S7W7Aaeo66NoGP7U0MHj9az2Mh7+IrSE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772640030; c=relaxed/simple;
+	bh=KEeOkJm0EmRV6jqNyOAEXWp0ZZ6RYVxsvyRyrfSxNkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KFoalhqsoOhbcQySWJvsA/8V+yIGSFA+GtzAgYjy4BBH2Al3UkdaxpWvYN7+FCbGJnD/sCoc71t0FCxMt5quIdE4JAvnLrLZdQAEbsxcCtVg2m2g1ULtUbA7mIQaNzmhXfGs9usLqurXSVg0OlyOfjm0eOMDKddKmFYF3Qxr3Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=IGxS4qVu; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-439b7a87fb5so2208644f8f.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:00:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772640013; x=1773244813; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
-        b=VaD8vMyFfWiS2jJefwjzWOs62wvDFgQISEIzqVg98BoRYTfxyfS1mrqa7IUc5G6LEJ
-         GugpYDaqKG06z3uo49+HEqRvOmLWXf7mhLYAaeLKi6HSSoRH9X7I6tLBJ9dGeZozdao8
-         wfYiREDMMZ8SvQ9d3TIiy8fcWculAIc1U8YKw9kUB63OmGZU/lIIEWnV1/7q9fQWQnou
-         Ydr9n5c0i+mLpjXG1kbdVJIg8boY4dNy7Wy2PqBZTaHAakcUDruEOzy40LQlr7rlvqmk
-         gb0KSWPh9OMBihXgGPhkBSCUHw10oaebg91nUAeP9DhEPd1Cm9GwlR+WyD9uW76EYa+h
-         0Qww==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772640025; x=1773244825; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OU95bHZuJNtP/VAPwIGit/Pa+QghFNKlhnRH3cB9CJ4=;
+        b=IGxS4qVuGVB6ooSFrgfLPbkfALb0ex4ep8cdG7ROwi1Hg+ZbwYXU6KMOfoW6Xd+Ehk
+         QTv5gwAKX4qmvsXMcu1w84NJvl/2i/46rktxrKqu5BY7LvGd/MhO8cnWicAa7wLsoEVl
+         6qCG/RgEMQPYUdyWvSN3wxY1l37FC+grgQKIlDI/MwiRh5Uxu6aqG9mnAKw4gCmTQHwf
+         x0KlDbch2jXuHkGQyd5VQGMQsgdugtR718PY2w/NODfxNvtRp7uF2ZZgSXuWrGRq/o33
+         4wBLaBCQKJ4J4BzSXhWLpLNd1tRUC4FGhyli0YXa7QAhn3+Ym7bvxh+2sFiGZfMFvns4
+         w5rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772640013; x=1773244813;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uG4YJPkl73/42Js8FL99JMSYDUN35hlIqmqUUwK5i+o=;
-        b=Co8bpg9J7KlwesUo721lf2ysAexwXRpIVQ6aoY1XVZJn7EoF3khS53NJ/TqcUzYgLp
-         3Ku7tSByxsiMK4y6tvYgCBAgyxGqA3ImOZA8erSo/zOeKwhw2aKgJPL6j++uYDMwFKAj
-         q+XjPffvOrVz6ruqUJbFwjtEsfHnR5ydZqPwlqjiHojAY5ecgeTGZ5PNgWGMyz9/nx1K
-         zLY68v1b3hJkh4yYQz5V8NgIR2I4S6Fu9XETV8wHB02sK81OJdaavAilFD2X/nHX2VKd
-         rfByeSM84VXM1frKaDDgjydEpeX+arSFyGOXxJsXyrHl/U7assvxAK91oQmT7u0vZrmX
-         ymhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTzejQXt5InRdqyQLXPxbGo3s8/0pqKMhv2SmvgQDdQy6CUd+0xU2K8UQIbSpBXhm8/FmYaz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz08egoL8LuTm+Y9n58alpT1XU7H9PAN4MJB+VQO0DQjcl0kpi
-	oGBvr2CpsDzDJTVgbGHILhPOyANS/Czl/T2i+q0zbfMLkwGI+i8M+AhRSNywO9gRC9xssMjtnFG
-	3Q2Y1Aj2BVZP9gEYdkifWxPAv6bsfHh2/v97aLdg7
-X-Gm-Gg: ATEYQzwIMfYDBpVYSKavdWMBhhDfAW+7TUAB7NQzTf1/Grj+jz66QQBajhGP5vQ+2BH
-	iHmqii9iNWI41Abm535NyYJfxLw6832/sQg2nFXOmUKxZt4+mFv+rRjrfdmrQnX9nLQJH6l5fIx
-	oOMzXC/lC8s0lzvMdEnjhofb69otcC+ssl09tY1js4STbro2EipVbDpFR5IkuoDRrjHm9U0eAG2
-	D/qCq09XsRM7DeClPA5vPsKeAI+/F5QOD29JJma8w8OSiDupxKHKLeW77PJloXckKdwkVTuQrjV
-	p+AGHbZL
-X-Received: by 2002:a05:622a:1998:b0:501:4730:fbe1 with SMTP id
- d75a77b69052e-508db2a7ab9mr33833311cf.22.1772640011899; Wed, 04 Mar 2026
- 08:00:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772640025; x=1773244825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OU95bHZuJNtP/VAPwIGit/Pa+QghFNKlhnRH3cB9CJ4=;
+        b=M8lg/BXgQWGPcL6KpNWIntNrBsEYQCxme9MjUUaoGxlNzDrbZkwTtVfogBBR3jZsVv
+         dbnc6NPy6WCq1ZGyi4+EYFRDMs23CKkqG4cKERGcX4DkmlU5yTJHopsdS89VqiMGoGes
+         drPMdsRo7ARSEM4x8pqNrkUK3CxQYQnguOqEZx3ukH1rFB2yak6ioHWlAaC1FZDJyzrZ
+         iHMnq/kpSA+RL8htCWY+hTjSwAM8E4LLdzpVc6vSeGhIzQq+K/juwkEHDrYg5YjXsja6
+         sfCR8TEOW5SyVKthL+un+bbjc/nFvaj1OvAU7p99/xmTfeAqUeCbz7vvzSawKrREEcQF
+         EAMw==
+X-Gm-Message-State: AOJu0YzbXxUs2VrMwyILz+VtYU2+P064je4Vgj2TagCVdeYV+zMFIVgz
+	Gm8oRbTXNUciLx2rkBaNBg5PlX2ifZjko9H5I/9TqGHe4tQL5thyrJiMTvtzaESwe4IN12D4dYP
+	00s2OAq0=
+X-Gm-Gg: ATEYQzxS9ZyBSHy3hqXB9W9j5wQQY5rR6sSlgPZ3iXEMQMgGGj6uEOE96gZ97MMQsM0
+	6u70cgPZcLFaUw6Y4tEM/Oqqq8duPQ8bOrQt0U2QcwDgicD/CFQVuTDQidm9N3GGQQ4o9oVTYkp
+	po5QgwbDe9S1rdI0z1nnmQCdIeJkCuIIlEF2xhuunP7qn/Hl3BR15jnSERlwU5piSp5bve3Ouzo
+	uNamSiwntHAvDwbaFw4vvI4Ern9JwWCMjZizC246fJxkvZsXEt0off/2VM3KX+pu7+ocBXT+Fah
+	Mm0l/JW5VwISkZ6stM9eUdPkWwFlGBqrv1+hzlSj+XsZTmgxfKwdvOPORcI+BLsw5yE+QGNBGMZ
+	XgcVyO0WXvyq2OcrJ6kEo4ovCbTs/bzvJIIT464T7IJaLiqYZ4Cz+DOYTrztnIVSPkIwWgd0owi
+	dR39ujmcIGS31lzU5qqzTzEj9axsnz+aRjQEmSjVGUZN2gmA==
+X-Received: by 2002:a05:6000:1acf:b0:439:b3ff:9ab9 with SMTP id ffacd0b85a97d-439c7ffcb29mr5150381f8f.48.1772640024040;
+        Wed, 04 Mar 2026 08:00:24 -0800 (PST)
+Received: from localhost (46-13-72-179.customers.tmcz.cz. [46.13.72.179])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b59723fesm25578351f8f.38.2026.03.04.08.00.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2026 08:00:23 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	przemyslaw.kitszel@intel.com,
+	mschmidt@redhat.com,
+	andrew+netdev@lunn.ch,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	chuck.lever@oracle.com,
+	matttbe@kernel.org,
+	cjubran@nvidia.com,
+	daniel.zahka@gmail.com,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 00/13] devlink: introduce shared devlink instance for PFs on same chip
+Date: Wed,  4 Mar 2026 17:00:09 +0100
+Message-ID: <20260304160022.6114-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304094318.1769536-1-edumazet@google.com> <93b5fb6d-7aa0-481f-823f-995ed8ab0e52@kernel.org>
-In-Reply-To: <93b5fb6d-7aa0-481f-823f-995ed8ab0e52@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Mar 2026 17:00:00 +0100
-X-Gm-Features: AaiRm50I60QlYPJhewzIEKmMOkyfI19MLdtQwUrLgqb-LpW56f69_ysZ6MKpDwo
-Message-ID: <CANn89i+SQd4H7q=ELJp7-aaN5PyZ-Oakoy9MHZpbuX1iGKV1ag@mail.gmail.com>
-Subject: Re: [PATCH net-next] inet_diag: report delayed ack timer information
-To: David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D99352042D4
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: CF15D2042E2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-263897-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[resnulli.us];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263899-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli.us:mid,resnulli-us.20230601.gappssmtp.com:dkim,nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Mar 4, 2026 at 4:48=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 3/4/26 2:43 AM, Eric Dumazet wrote:
-> > inet_sk_diag_fill() populates r->idiag_timer with the following
-> > precedence order:
-> >
-> > 1 - Retransmit timer.
-> > 4 - Probe0 timer.
-> > 2 - Keepalive timer.
-> >
-> > This patch adds a new value, last in the list, if other timers
-> > are not active.
-> >
-> > 5 - Delayed ACK timer.
-> >
-> > A corresponding iproute2 patch is needed to replace "unknown"
-> > with "delack":
->
-> ...
->
-> > diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-> > index 9d215485b5c7e7ba29dd53c924f0245439d74af5..e4cb18061aefcc22df04644=
-c00bf5c7db4e150d2 100644
-> > --- a/net/ipv4/inet_diag.c
-> > +++ b/net/ipv4/inet_diag.c
-> > @@ -298,6 +298,10 @@ int inet_sk_diag_fill(struct sock *sk, struct inet=
-_connection_sock *icsk,
-> >               r->idiag_retrans =3D READ_ONCE(icsk->icsk_probes_out);
-> >               r->idiag_expires =3D
-> >                       jiffies_delta_to_msecs(icsk->icsk_keepalive_timer=
-.expires - jiffies);
-> > +     } else if (timer_pending(&icsk->icsk_delack_timer)) {
-> > +             r->idiag_timer =3D 5;
->
-> How come the idiag_timer values an enum in
-> include/uapi/linux/inet_diag.h since this is a uapi?
+From: Jiri Pirko <jiri@nvidia.com>
 
-Yes, this can be done, although we survived all these years without it.
+Multiple PFs on a network adapter often reside on the same physical
+chip, running a single firmware. Some resources and configurations
+are inherently shared among these PFs - PTP clocks, VF group rates,
+firmware parameters, and others. Today there is no good object in
+the devlink model to attach these chip-wide configuration knobs to.
+Drivers resort to workarounds like pinning shared state to PF0 or
+maintaining ad-hoc internal structures (e.g., ice_adapter) that are
+invisible to userspace.
 
-Do you want to send a patch or should I implement this idea ?
+This problem was discussed extensively starting with Przemek Kitszel's
+"whole device devlink instance" RFC for the ice driver [1]. Several
+approaches for representing the parent instance were considered:
+using a partial PCI BDF as the dev_name (breaks when PFs have different
+BDFs in VMs), creating a per-driver bus, using auxiliary devices, or
+using faux devices. All of these required a backing struct device for
+the parent devlink instance, which does not naturally exist - there is
+no PCI device that represents the chip as a whole.
+
+This patchset takes a different approach: allow devlink instances to
+exist without any backing struct device. The instance is identified
+purely by its internal index, exposed over devlin netlink. This avoids
+fabricating fake devices and keeps the devlink handle semantics clean.
+
+The first ten patches prepare the devlink core for device-less
+instances by decoupling the handle from the parent device. The last
+three introduce the shared devlink infrastructure and its first user
+in the mlx5 driver.
+
+Example output showing the shared instance and nesting:
+
+  pci/0000:08:00.0: index 0
+    nested_devlink:
+      auxiliary/mlx5_core.eth.0
+  devlink_index/1: index 1
+    nested_devlink:
+      pci/0000:08:00.0
+      pci/0000:08:00.1
+  auxiliary/mlx5_core.eth.0: index 2
+  pci/0000:08:00.1: index 3
+    nested_devlink:
+      auxiliary/mlx5_core.eth.1
+  auxiliary/mlx5_core.eth.1: index 4
+
+[1] https://lore.kernel.org/netdev/20250219164410.35665-1-przemyslaw.kitszel@intel.com/
+
+---
+Decoupled from "devlink and mlx5: Support cross-function rate scheduling"
+patchset to maintain 15-patches limit.
+
+See individual patches for changelog.
+
+Jiri Pirko (13):
+  devlink: expose devlink instance index over netlink
+  devlink: add helpers to get bus_name/dev_name
+  devlink: avoid extra iterations when found devlink is not registered
+  devlink: allow to use devlink index as a command handle
+  devlink: support index-based lookup via bus_name/dev_name handle
+  devlink: support index-based notification filtering
+  devlink: introduce __devlink_alloc() with dev driver pointer
+  devlink: add devlink_dev_driver_name() helper and use it in trace
+    events
+  devlink: add devl_warn() helper and use it in port warnings
+  devlink: allow devlink instance allocation without a backing device
+  devlink: introduce shared devlink instance for PFs on same chip
+  documentation: networking: add shared devlink documentation
+  net/mlx5: Add a shared devlink instance for PFs on same chip
+
+ Documentation/netlink/specs/devlink.yaml      |  56 +++
+ .../networking/devlink/devlink-shared.rst     |  97 +++++
+ Documentation/networking/devlink/index.rst    |   1 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  17 +
+ .../ethernet/mellanox/mlx5/core/sh_devlink.c  |  61 +++
+ .../ethernet/mellanox/mlx5/core/sh_devlink.h  |  12 +
+ include/linux/mlx5/driver.h                   |   1 +
+ include/net/devlink.h                         |  10 +
+ include/trace/events/devlink.h                |  36 +-
+ include/uapi/linux/devlink.h                  |   4 +
+ net/devlink/Makefile                          |   2 +-
+ net/devlink/core.c                            |  91 ++++-
+ net/devlink/dev.c                             |   8 +-
+ net/devlink/devl_internal.h                   |  34 +-
+ net/devlink/netlink.c                         |  57 ++-
+ net/devlink/netlink_gen.c                     | 350 +++++++++++-------
+ net/devlink/port.c                            |  19 +-
+ net/devlink/sh_dev.c                          | 161 ++++++++
+ 19 files changed, 813 insertions(+), 209 deletions(-)
+ create mode 100644 Documentation/networking/devlink/devlink-shared.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
+ create mode 100644 net/devlink/sh_dev.c
+
+-- 
+2.51.1
+
 
