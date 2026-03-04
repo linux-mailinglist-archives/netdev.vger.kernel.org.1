@@ -1,160 +1,330 @@
-Return-Path: <netdev+bounces-263770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AK+SCXoZqGmgnwAAu9opvQ
-	(envelope-from <netdev+bounces-263770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:37:30 +0100
+	id sJnGOsoZqGmgnwAAu9opvQ
+	(envelope-from <netdev+bounces-263771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:38:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 964111FF188
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:37:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CC41FF1E0
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 12:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C00B3047BFD
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:37:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6D9DB3037C19
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 11:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8DF377EB9;
-	Wed,  4 Mar 2026 11:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B463C36D515;
+	Wed,  4 Mar 2026 11:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X29muQLL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVGaupro"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EAE372B5F
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 11:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772624241; cv=none; b=uS9Dt2Z9agZnRByU1RiuzfDeOUgDAJLujWL/11TvYS5AFHYkC3y5xZBwlqHHpEvOHhJ1hvtbKd1ylB9MyytSwT66fwUAIfgB7eSy/SIQoxQb/nQdCuh8T/BxAJHtnQzgsu13GfKuEfI/sBMWF1zxxx8Pm3SrnrMN0aubsvHO/7w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772624241; c=relaxed/simple;
-	bh=M3NVCfYA5yhhYewPJ2qtXjjufLcb/RCqjtOxWVebdNk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1929F35CB70
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 11:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772624272; cv=pass; b=YthqO2I0/wgruTs14g2kUYjbt+DtVJEAbJcOsEa6LbO11Fq8iZrg87iS+33HlR8XtweMGlk9HspHDh2x5uAA0rQK0bSnjCHQ+zdksGLLsSb0Vg/TOYQXrWmRe4vqHG6ZWjx05TxOSZKpmmIA2fDTXCGGr76dchSl6mlIDtw8JvY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772624272; c=relaxed/simple;
+	bh=ZaTX/5xZCLp8jX/BNqqW109CaVTKhBe9/NvQKJFvKx0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lqXiXnbvwLG7HkhjePZ/tm4CtRDJVb/qRmTwdE1obju65eWJmqTrV5GJe67GvGt8qHSWZC2P60WYIQzMdBKYjxfjnF00DC86y8tS5MsA3Wy5iTcrrZbfIKICoRjQ5T1L6iwMLIzU8Tr12h9N91SLO5HCxa0BlKfBKt4FNvetHgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X29muQLL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551A5C2BC87
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 11:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772624241;
-	bh=M3NVCfYA5yhhYewPJ2qtXjjufLcb/RCqjtOxWVebdNk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=X29muQLLYAcKPag+S9O/ERhDSBhLieOqDd0RBXr2CTRAPC6YPZSp0WO1yZg1OCm5V
-	 jFASpHmllAzL1qxKrFREPpvoRaTADA8q5vkmKl/eS76WEyvWgTG3Ntuyh18qWYHjjW
-	 ptmxatKAjSLs/UrmCE5DT6f00i703+wboozrTf2xYkZk8AsErK0LCbxVPcsgSzmfKe
-	 WrQyc+ZJXolBqjmQSQRhAWrgEbufK0IUUacnXB8jdGJt8gSbzzNHQ77Vzcr7TQBBx5
-	 ugvirD+m2zihIZM5Rvz7Mg8nFJkiTI4L+LQq8VShXYF/CPqrCxwelCxyf8hTIlNevY
-	 AsLB8qGc8wEsQ==
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-89a15b9a556so12919196d6.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 03:37:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVDOMcA3aFOM6TA/DjDo2tZRRLsnAgCGBqDPhnpnqqDI3inDb11QM90h9QyJP88ljRY/St++HQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQkVgUIcGDjEWbgteUzhUkGcbGXmF0dsjN2apokBNvsG+lguzh
-	47mU/Ykv+GyXxeXTnaGhEdlAHfyCAjbP2OJHp+sylWlHoJhaOm31s6ejEly8VaRSTR2Kl8dlUPv
-	ust8eusiD7dIz+/CReONbOL0yiZs2HvI=
-X-Received: by 2002:a05:6214:400c:b0:89a:c0d:46ef with SMTP id
- 6a1803df08f44-89a1999d519mr18681266d6.20.1772624240392; Wed, 04 Mar 2026
- 03:37:20 -0800 (PST)
+	 To:Cc:Content-Type; b=V2IvrLA5k4ejQbGeGpwROd71pgibCUcVQ7iTid+XVtqab+Q1iDBl52CjLy5z7TFctBm5VFRUCHWJ8MFnWUcCyJfaVAW+ud2QaWNULXwbBIpmQAnLWOaCKDzQxQ5F0LG0ZWUhiC3HMSb9ZLr8bBVxVNl8of8VQrBXBV8pJl19fpQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVGaupro; arc=pass smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-660d2e48383so1840119a12.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 03:37:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772624269; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YK3h5eL73UigdDEr7UwVvX9XdSpCtBulZjJQn4xmxWHm1HjC19kiKoKUhm+doG7eT8
+         eJYsyjOdgH1Mv4LxQTW78sJILTlc/3kDmKUoa+lS8Exsta05PukAO2oI4QL6lIfzQ4xz
+         d9ijnrBu0cEKXtvSgkpMYdFE9wmaHJGzelmsM7ziD0Vn5GeAkPXBkNCTmbhpc23LW40F
+         Wvj78p9+LLlH40ZGb2mE+TvfPJL1aRjdYuWTdzJZ/pBenFDWrn84aVIOFupe7bssYZYY
+         2yUhSLdmTkBk1xUkFOiSz1lHm/4GesjuX7OlNf1PtzusVaAPZscOTxlgGv1CV/K5gXzf
+         zBgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lDZKotLArOoGPbmGkSbdB3knGUn3d/x5zVLs33GH6ak=;
+        fh=yVU4gYIuNM8um1uH8poOGGLBP/5f3PKaSqvgZvD6r7A=;
+        b=eXFOl15gQU7BEGaa3fzS06snY5KjaD1BohGOpKwV30ktVnZtwGMBTCHtKztSOUpoKa
+         cPc03tlH96smpZbAX3pxpsO0eUNUTEqHz5XXbp1yoKVxEMTHynw4apyxqu9xlIGqfYR9
+         NTFicUqrRKv7jyoNoMXmZzCxD7ne3gimipuTNtCIrAjH+P6/tWyDeyLVKY4SA+8NLUPn
+         q+kmD7QF2MBAJHFjG/k4XneLIiCX6w6SazlDirerDBspINvmWLpdM6ij2iXGKMSCanne
+         laXnIw3xQ4KrQCMTXXYf9IXcWSTDMdl6nW7KhH8nklNCyMPYU3Oy5RB65iT42l14b/L9
+         yoPA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772624269; x=1773229069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lDZKotLArOoGPbmGkSbdB3knGUn3d/x5zVLs33GH6ak=;
+        b=OVGauproHypGOuNaPR4sbb7gMQz4b1SFekKespaRJM3CRKzZ5wDpjl9VcSmTNijB17
+         HYzRwCwrxM02w6PpJY0avjq9T5RUK/SaITtesRZ/OXsXSWefzqGpKn5/rTOL/mNJtGtK
+         w1rOaUqpTSF87SBq/f4VoI5dMBgulFqI/wOs8YIffJke3fXGHpJsA8vgidX02iEPVSfZ
+         qSG6vuwGt7kkvEAD9cuEUUrakiyhqUC+hOj8cNCQ+OkcoxnlaSD/9Pzzv5P57v37I4P3
+         mJ+56HSwbL0ECPFYU5L5uTZh7XogrIZZSRxziYmKAbC1IQsMkT5ZI2TMytFNiGavcNUo
+         Cv0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772624269; x=1773229069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lDZKotLArOoGPbmGkSbdB3knGUn3d/x5zVLs33GH6ak=;
+        b=OoDXawqECFAm9REavALjDf+FHrXmoqKBKRDZoAz6mlJ/DOjZZORXMi31FES2v+N9V/
+         0xE7TNxFLAxoaxLwzrDP5QdJrWlc2W8pvjL9EEcPPCZSuDeBgLW1q43inyW/2qr8s8k4
+         q7mPPfhi659TiVYw+lsfCa3m8CJyp1tznOJUtATLgi2kUoQRYHazCecVQfQTye4d2/c0
+         yNLRXVAS8vqW0lOA03sRKsFECt7s7N/qtu+baLiG9znTjEwHQe4ARtV1bJPjgbTVhMo8
+         erjZof/PPhRFlhDIEyrH+Kf0bVI8otFdV8pB3oXPWdqwBdltGMaolsY4vhgoDYbXzbK4
+         xCSw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4RXL3GL5RIJlurYkld0JwGId7aXV1CvASmz1ABX52QNJd2rwqC+k52FCq824/WyCk3j+tdTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbCAsDp6IU+ywRfnwHRiOhahBb2ZejMxvpB+LAnV2WBupAydLh
+	nuPyJDmdVPYFxYWStaEOw9M7DT51MMfTjz+TfYQSdMuTsoTFMa40bTu4HLwGg4szRh28DJC2xzN
+	cYJFOiBt5JZPIYjCkjPooslh4oPkm2Db9J9Td
+X-Gm-Gg: ATEYQzxYknAxAaSz48lNTDnewlgveoBJame0sjV7c7Aeck0rWH1QmgqAFPHoyXt228x
+	/JzknIrv8UVQ9pOGSxPmIPWQZ5AjIJRjSNnExJl1xCaJmuPBApcWi4P18UX/hPrWEZp2/vCQA/j
+	+9OzT8dEIP9u84LeR8lwCSWGlfIPbQH5JLeFBAS1wy/LZUm8VM53uOaeATHjqVfDHCtAULAVN3v
+	ejD8L8xx5Pbr5JAhEHvfxwTQVwe/7kvPR9xTSrmmBw0b24aRvfE1/irZHLzNJpRnqd7KUJt2MpJ
+	LR4iGdfGaNFMuxlSbCs9kChsscSbFPqYRAGYGQ==
+X-Received: by 2002:a05:6402:34c9:b0:65f:80cc:a47a with SMTP id
+ 4fb4d7f45d1cf-660ef7797f6mr858539a12.1.1772624269071; Wed, 04 Mar 2026
+ 03:37:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260303181535.2671734-1-bjorn@kernel.org> <20260303181535.2671734-2-bjorn@kernel.org>
- <20260303160334.39276d7f@kernel.org>
-In-Reply-To: <20260303160334.39276d7f@kernel.org>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Date: Wed, 4 Mar 2026 12:37:09 +0100
-X-Gmail-Original-Message-ID: <CAJ+HfNj9Z61aE1ydoKZBUqeWJsPOBC4J4ZgMd6JjSfC6J89-9w@mail.gmail.com>
-X-Gm-Features: AaiRm50PaU6vmpgo6TMDnc4Y5lcmZiUObj2ifMPxsUxsp8sN5mOwInVklJroYwg
-Message-ID: <CAJ+HfNj9Z61aE1ydoKZBUqeWJsPOBC4J4ZgMd6JjSfC6J89-9w@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/5] ethtool: Add RSS indirection table resize helpers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+References: <20260304053500.590630-1-alistair.francis@wdc.com>
+ <20260304053500.590630-5-alistair.francis@wdc.com> <103c958f-d5f9-47d3-9be8-dd7225368fd5@suse.de>
+In-Reply-To: <103c958f-d5f9-47d3-9be8-dd7225368fd5@suse.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 4 Mar 2026 21:37:22 +1000
+X-Gm-Features: AaiRm53Rc8hKqaLsyJSSxrm4evktnm3D1AOZXCuqV_7q51qatQHTgMljJH9bALQ
+Message-ID: <CAKmqyKPdJ2bgT2JaXi_38obyFTjRQ_rR5EdGmP81so8MEJNRVw@mail.gmail.com>
+Subject: Re: [PATCH v7 4/5] nvme-tcp: Support KeyUpdate
+To: Hannes Reinecke <hare@suse.de>
+Cc: chuck.lever@oracle.com, hare@kernel.org, 
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, kbusch@kernel.org, 
+	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
+	Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 964111FF188
+X-Rspamd-Queue-Id: A7CC41FF1E0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.63)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263770-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-263771-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alistair23@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,wdc.com:email,ietf.org:url,mail.gmail.com:mid,suse.de:email]
 X-Rspamd-Action: no action
 
-On Wed, 4 Mar 2026 at 01:03, Jakub Kicinski <kuba@kernel.org> wrote:
+On Wed, Mar 4, 2026 at 5:40=E2=80=AFPM Hannes Reinecke <hare@suse.de> wrote=
+:
 >
-> On Tue,  3 Mar 2026 19:15:29 +0100 Bj=C3=B6rn T=C3=B6pel wrote:
-
-...
-
-Thanks for hacking a look! I'll address all of the above in the
-follow-up.
-
-> > +             return -EINVAL;
+> On 3/4/26 06:34, alistair23@gmail.com wrote:
+> > From: Alistair Francis <alistair.francis@wdc.com>
+> >
+> > If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
+> > EKEYEXPIRED then the underlying TLS keys need to be updated. This occur=
+s
+> > on an KeyUpdate event as described in RFC8446
+> > https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3.
+> >
+> > If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
+> > allow the NVMe layer to process the KeyUpdate request and forward the
+> > request to userspace. Userspace must then update the key to keep the
+> > connection alive.
+> >
+> > This patch allows us to handle the NVMe target sending a KeyUpdate
+> > request without aborting the connection. At this time we don't support
+> > initiating a KeyUpdate.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> > v7:
+> >   - Use read_sock_cmsg instead of recvmsg() to handle KeyUpdate
+> > v6:
+> >   - Don't use `struct nvme_tcp_hdr` to determine TLS_HANDSHAKE_KEYUPDAT=
+E,
+> >     instead look at the cmsg fields.
+> >   - Don't flush async_event_work
+> > v5:
+> >   - Cleanup code flow
+> >   - Check for MSG_CTRUNC in the msg_flags return from recvmsg
+> >     and use that to determine if it's a control message
+> > v4:
+> >   - Remove all support for initiating KeyUpdate
+> >   - Don't call cancel_work() when updating keys
+> > v3:
+> >   - Don't cancel existing handshake requests
+> > v2:
+> >   - Don't change the state
+> >   - Use a helper function for KeyUpdates
+> >   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
+> >   - Remove command message using recvmsg
+> >
+> >   drivers/nvme/host/tcp.c | 59 ++++++++++++++++++++++++++++++++++++++++=
+-
+> >   1 file changed, 58 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> > index 8b6172dd1c0f..ade11d2ac9ef 100644
+> > --- a/drivers/nvme/host/tcp.c
+> > +++ b/drivers/nvme/host/tcp.c
+> > @@ -171,6 +171,7 @@ struct nvme_tcp_queue {
+> >       bool                    tls_enabled;
+> >       u32                     rcv_crc;
+> >       u32                     snd_crc;
+> > +     key_serial_t            handshake_session_id;
+> >       __le32                  exp_ddgst;
+> >       __le32                  recv_ddgst;
+> >       struct completion       tls_complete;
+> > @@ -1361,6 +1362,59 @@ static int nvme_tcp_try_send(struct nvme_tcp_que=
+ue *queue)
+> >       return ret;
+> >   }
+> >
+> > +static void update_tls_keys(struct nvme_tcp_queue *queue)
+> > +{
+> > +     int qid =3D nvme_tcp_queue_id(queue);
+> > +     int ret;
 > > +
-> > +     scoped_guard(mutex, &dev->ethtool->rss_lock) {
-> > +             xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
-> > +                     ret =3D ethtool_rxfh_indir_can_resize(ethtool_rxf=
-h_context_indir(ctx),
->
-> 80 char limit width limit is still king in netdev
-> please shrink the length of the helpers you're adding?
-> And/or take the locks in a normal way..
-
-Hmm, is guard() and friends discouraged in netdev, or ethtool
-specific? I'll fix the 100 chars lines (sad face)!
-
->
-> > +                                                         ctx->indir_si=
-ze, new_indir_size);
-> > +                     if (ret)
-> > +                             return ret;
-> > +             }
+> > +     dev_dbg(queue->ctrl->ctrl.device,
+> > +             "updating key for queue %d\n", qid);
 > > +
-> > +             xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
-> > +                     __ethtool_rxfh_indir_resize(ethtool_rxfh_context_=
-indir(ctx),
-> > +                                                 ctx->indir_size, new_=
-indir_size);
-> > +                     ctx->indir_size =3D new_indir_size;
-> > +             }
+> > +     ret =3D nvme_tcp_start_tls(&(queue->ctrl->ctrl),
+> > +                              queue, queue->ctrl->ctrl.tls_pskid,
+> > +                              HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
+> > +
+> > +     if (ret < 0) {
+> > +             dev_err(queue->ctrl->ctrl.device,
+> > +                     "failed to update the keys %d\n", ret);
+> > +             nvme_tcp_fail_request(queue->request);
 > > +     }
+> > +}
 > > +
-> > +     xa_for_each(&dev->ethtool->rss_ctx, context, ctx)
-> > +             ethtool_rss_notify(dev, ETHTOOL_MSG_RSS_NTF, context);
+> > +static int nvme_tcp_recv_cmsg(read_descriptor_t *desc,
+> > +                           struct sk_buff *skb,
+> > +                           unsigned int offset, size_t len,
+> > +                           u8 content_type)
+> > +{
+> > +     struct nvme_tcp_queue *queue =3D desc->arg.data;
+> > +     struct socket *sock =3D queue->sock;
+> > +     struct sock *sk =3D sock->sk;
+> > +
+> > +     switch (content_type) {
+> > +     case TLS_RECORD_TYPE_HANDSHAKE:
+> > +             if (len =3D=3D 5) {
+> > +                     u8 header[5];
+> > +
+> > +                     if (!skb_copy_bits(skb, offset, header,
+> > +                                        sizeof(header))) {
+> > +                             if (header[0] =3D=3D TLS_HANDSHAKE_KEYUPD=
+ATE) {
+> > +                                     dev_err(queue->ctrl->ctrl.device,=
+ "KeyUpdate message\n");
+> > +                                     release_sock(sk);
+> > +                                     update_tls_keys(queue);
+> > +                                     lock_sock(sk);
+> > +                                     return 0;
+> > +                             }
+> > +                     }
+> > +             }
+> > +
+> > +             break;
+> > +     default:
+> > +             break;
+> > +     }
 >
-> Why a separate loop ?
+> I think a simple 'if' condition would be sufficient here, or do you have
+> handling of other TLS record types queued somewhere?
+> And we should log unhandled TLS records.
 
-We can't hold the rss_lock for the notify;
-ethnl_default_notify->rss_prepare->... deadlock.
+I like this approach as it makes it really easy to handle more types
+in the future. I don't have any more record types queued anywhere so I
+can change it to an if statement.
 
+Good point about logging unhandled records
 
-Bj=C3=B6rn
+Alistair
+
+>
+> > +
+> > +     return -EAGAIN;
+> > +}
+> > +
+> >   static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+> >   {
+> >       struct socket *sock =3D queue->sock;
+> > @@ -1372,7 +1426,8 @@ static int nvme_tcp_try_recv(struct nvme_tcp_queu=
+e *queue)
+> >       rd_desc.count =3D 1;
+> >       lock_sock(sk);
+> >       queue->nr_cqe =3D 0;
+> > -     consumed =3D sock->ops->read_sock(sk, &rd_desc, nvme_tcp_recv_skb=
+);
+> > +     consumed =3D sock->ops->read_sock_cmsg(sk, &rd_desc, nvme_tcp_rec=
+v_skb,
+> > +                                          nvme_tcp_recv_cmsg);
+> >       release_sock(sk);
+> >       return consumed =3D=3D -EAGAIN ? 0 : consumed;
+> >   }
+> > @@ -1708,6 +1763,7 @@ static void nvme_tcp_tls_done(void *data, int sta=
+tus, key_serial_t pskid,
+> >                       ctrl->ctrl.tls_pskid =3D key_serial(tls_key);
+> >               key_put(tls_key);
+> >               queue->tls_err =3D 0;
+> > +             queue->handshake_session_id =3D handshake_session_id;
+> >       }
+> >
+> >   out_complete:
+> > @@ -1737,6 +1793,7 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *n=
+ctrl,
+> >               keyring =3D key_serial(nctrl->opts->keyring);
+> >       args.ta_keyring =3D keyring;
+> >       args.ta_timeout_ms =3D tls_handshake_timeout * 1000;
+> > +     args.ta_handshake_session_id =3D queue->handshake_session_id;
+> >       queue->tls_err =3D -EOPNOTSUPP;
+> >       init_completion(&queue->tls_complete);
+> >       if (keyupdate =3D=3D HANDSHAKE_KEY_UPDATE_TYPE_UNSPEC)
+>
+> Otherwise looks good.
+>
+> Cheers,
+>
+> Hannes
+> --
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 N=C3=BCrnberg
+> HRB 36809 (AG N=C3=BCrnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
