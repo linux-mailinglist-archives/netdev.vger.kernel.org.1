@@ -1,294 +1,131 @@
-Return-Path: <netdev+bounces-264004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +P0OHg97qGmHuwAAu9opvQ
-	(envelope-from <netdev+bounces-264004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:33:51 +0100
+	id iM6iBv99qGluvAAAu9opvQ
+	(envelope-from <netdev+bounces-264005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:46:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E487720668B
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:33:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B67F20694F
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7604306907C
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 18:26:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B99B63079095
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 18:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A333E3DAD;
-	Wed,  4 Mar 2026 18:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6624C3D5664;
+	Wed,  4 Mar 2026 18:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CH56vEt7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V12EhCeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFE73E3D8D
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 18:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4134E351C1F;
+	Wed,  4 Mar 2026 18:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772648702; cv=none; b=iLgxt9OnbOTBVfCZN2ySllXGjoS8iYeOrj9fflT/4DA0r3Y0taKGmh9wTN9/sAQ+hjDeKWLh7pihLPA446u8TaQAquRc2K0vq2+Df0e6tjcQMWx7p215r6JlEPj2rb2y/ABN/fd9mKpPPAsBhHsJXvqsCk4XAi8cFh7ounC8Ez0=
+	t=1772649134; cv=none; b=s/S7UIPBp9b6u+n1hDDwqP7rIoxJ/6pHccoYzT0++6rlxJRheAS4G7Y46O2QQHJm2s6jnm0Sez/m4fSPnjenv/1v5fXIZLn1fy0gDatxVj/VaOLxAQMC3ZWTOWtJXEnIe8E1yefCLE84eHmZSJsI7Z7x35h8TXgAI5X+aBFMUDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772648702; c=relaxed/simple;
-	bh=vibvuKxVooPBJkXJkyFwoq08DAa9glaCCQBQpNxwfCg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GJn9TRUfyJvKwwBCJIcpb72CjqyBG7StR/ZJgXAoLNL3TmbFfbIrNzJttk+YIb7R/48cVTYIi5qtOvnmMTfr+ROKdvpB08pRbd1+uHyThd1CjulaRUI07dnWeiMTlr9yaq2G9fyxpriZ0FUR1thtGqHwHBv67bxAkSGuGjGHHYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CH56vEt7; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 7CE9B1A2C8D;
-	Wed,  4 Mar 2026 18:24:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 533FA5FF5C;
-	Wed,  4 Mar 2026 18:24:59 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A89561036960A;
-	Wed,  4 Mar 2026 19:24:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772648698; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=s+cOyZ8u3T068fgeZVGs8jhtYZwKXq49c7tRInBCtPo=;
-	b=CH56vEt7PpVL01KzdTpGssEy+FyW9dM1gqNqhUzRH9mM26f4fLsMwvUhzvzEW+TKeq+nVZ
-	kdfRjfyj2q9nf2they9fVzl8dqNOGF5jkCz+HaxKLFzIalBifmgSbLooyow3m4Fbdcz5B1
-	ASLPyhqAFIvybKh9OwIZ+xoeWxHAsj/I4rhRuC0JSyX9KMK4cy30QNe9goQxwtZYWH/L6H
-	VKuSfMOBWaXHjcCtWB1y2K3Abvm1GeDIwhh0SoHQf4kFtDglXainz5fYE225PhrNAuGjcC
-	Ju0+LISdEDrnrnKdoJTTe3LIZcWMwonM6IPVB1k/n/iOcXtWbaKm/RyJPX/mYg==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 04 Mar 2026 19:24:31 +0100
-Subject: [PATCH net-next 8/8] net: macb: add Tx zero-copy AF_XDP support
+	s=arc-20240116; t=1772649134; c=relaxed/simple;
+	bh=RbTFD17uNGJoi0qLc1s2/l/+pUKnq4Xf6a4LHXhhb88=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AX5LI/uhnbvOx5QEvsh+WXH8Ad+09NHUHYz56drVw9P6tFbmnJBoxRVE/MaMeEJq5dw6mqofbu3xSR6d1KUYxzTcCtuf53hfbCNtmUFV3T9n6PRg5RON9gTgkLxKmzAYCa+euVjQXV9XMzJS3kZylTaTkPsb4bDjhhwUdo6XzVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V12EhCeI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE60FC4CEF7;
+	Wed,  4 Mar 2026 18:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772649134;
+	bh=RbTFD17uNGJoi0qLc1s2/l/+pUKnq4Xf6a4LHXhhb88=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V12EhCeIPQjXKXsqXb1GBq/QE+6tHLLuXIH5t2gPgqbl6kYOHKclG60IMqvUhN5sW
+	 li6IqWvB+fJlJsFHRx8kXX/oCw/1jkLuuqEdmk2VMsSpwVaBGCwfV2BxDdKMYXCnIw
+	 b+RFbYlxJpxIc1essfJn4QbwGTAwaKN15BExcjpp3yWHB5w5rwhbIl5Lb3V15LjRfh
+	 tYcH5MnUf/hC05zmaWQQSh58qV7w5DwfqOaXQAfMtikNqyNddKPFuo5V7OS71AlmUL
+	 lCuQptInWE8xz3iZ5qKgLrn29G+H2Hp9KnX3Tg2DRS3m6ly5INHVCwcUaFR2QIuaI4
+	 DbP84QuaK9Uow==
+Date: Wed, 4 Mar 2026 10:32:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Allison Henderson <allison.henderson@oracle.com>
+Cc: "achender@kernel.org" <achender@kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>, "horms@kernel.org"
+ <horms@kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 0/2] selftests: rds: refactor and expand rds
+ selftests test
+Message-ID: <20260304103212.2e7a58ba@kernel.org>
+In-Reply-To: <18aa553886ee12855c28d9498b12d2fdaeee9b3c.camel@oracle.com>
+References: <20260302055518.301620-1-achender@kernel.org>
+	<20260302173302.4d1634be@kernel.org>
+	<18aa553886ee12855c28d9498b12d2fdaeee9b3c.camel@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260304-macb-xsk-v1-8-ba2ebe2bdaa3@bootlin.com>
-References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
-In-Reply-To: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: E487720668B
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 5B67F20694F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264004-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264005-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lib.sh:url]
 X-Rspamd-Action: no action
 
-Add a new buffer type (to `enum macb_tx_buff_type`). Near the end of
-macb_tx_complete(), we go and read the XSK buffers using
-xsk_tx_peek_release_desc_batch() and append those buffers to our Tx
-ring.
+On Wed, 4 Mar 2026 02:50:34 +0000 Allison Henderson wrote:
+> I didnt know it was causing you grief, but I am happy to work with
+> you to adapt it.  RDS is a little unique in that the network topology
+> defines the underlying transport it uses.  If you were to run it with
+> just a pair of veth interfaces on a single host or vm, then you will
+> only be using the loop back transport in rds.ko.  In order to get it
+> to load and test rds_tcp.ko, we need the endpoints to be in separate
+> network namespaces so that the destination IP isn't seen as local. So
+> the test case does this by forking server/client processes across
+> name spaces.  There really isnt a rush on this series, so if you
+> think we should do some refactoring/cleanup for ksft first that is
+> fine.  Let me know your thoughts.
 
-Additionally, in macb_tx_complete(), we signal to the XSK subsystem
-number of bytes completed and conditionally mark the need_wakeup
-flag.
+IIUC the need to set up a veth + 2 name spaces topology is very common.
+We have bash "libraries" / helpers in various lib.sh files to do it.
+Python libs also have some support (tho the default linking there is
+by pairing two netdevsim devices).
 
-Lastly, we update XSK wakeup by writing the TCOMP bit in the per-queue
-IMR register, to ensure NAPI scheduling will take place.
+Well, maybe to be clear I should say that we _even_ have support in
+libraries for this. Not really strongly opposed to you rolling your own
+way of setting up the namespaces at this point. I primarily care about
+us being able to execute all your tests in our CI, with standard ksft
+commands. Maybe I did something wrong but
 
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- drivers/net/ethernet/cadence/macb.h      |  1 +
- drivers/net/ethernet/cadence/macb_main.c | 91 +++++++++++++++++++++++++++++---
- 2 files changed, 86 insertions(+), 6 deletions(-)
+ make -C tools/testing/selftests TARGETS=net/rds run_tests
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index a9e6f0289ecb..5700a285c08a 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -963,6 +963,7 @@ enum macb_tx_buff_type {
- 	MACB_TYPE_SKB,
- 	MACB_TYPE_XDP_TX,
- 	MACB_TYPE_XDP_NDO,
-+	MACB_TYPE_XSK,
- };
- 
- /* struct macb_tx_buff - data about an skb or xdp frame which is being
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ea1b0b8c4fab..fee1ebadcf20 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -986,21 +986,30 @@ static int macb_halt_tx(struct macb *bp)
- 
- static void macb_tx_release_buff(void *buff, enum macb_tx_buff_type type, int budget)
- {
--	if (type == MACB_TYPE_SKB) {
-+	switch (type) {
-+	case MACB_TYPE_SKB:
- 		napi_consume_skb(buff, budget);
--	} else if (type == MACB_TYPE_XDP_TX) {
--		if (!budget)
--			xdp_return_frame(buff);
--		else
-+		break;
-+	case MACB_TYPE_XDP_TX:
-+		if (budget)
- 			xdp_return_frame_rx_napi(buff);
--	} else {
-+		else
-+			xdp_return_frame(buff);
-+		break;
-+	case MACB_TYPE_XDP_NDO:
- 		xdp_return_frame(buff);
-+		break;
-+	case MACB_TYPE_XSK:
-+		break;
- 	}
- }
- 
- static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
- 			  int budget)
- {
-+	if (tx_buff->type == MACB_TYPE_XSK)
-+		return;
-+
- 	if (tx_buff->mapping) {
- 		if (tx_buff->mapped_as_page)
- 			dma_unmap_page(&bp->pdev->dev, tx_buff->mapping,
-@@ -1255,6 +1264,57 @@ static void macb_xdp_submit_buff(struct macb *bp, unsigned int queue_index,
- 		netif_stop_subqueue(netdev, queue_index);
- }
- 
-+static void macb_xdp_xmit_zc(struct macb *bp, unsigned int queue_index, int budget)
-+{
-+	struct macb_queue *queue = &bp->queues[queue_index];
-+	struct xsk_buff_pool *xsk = queue->xsk_pool;
-+	dma_addr_t mapping;
-+	u32 slot_available;
-+	size_t bytes = 0;
-+	u32 batch;
-+
-+	guard(spinlock_irqsave)(&queue->tx_ptr_lock);
-+
-+	/* This is a hard error, log it. */
-+	slot_available = CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size);
-+	if (slot_available < 1) {
-+		netif_stop_subqueue(bp->dev, queue_index);
-+		netdev_dbg(bp->dev, "tx_head = %u, tx_tail = %u\n",
-+			   queue->tx_head, queue->tx_tail);
-+		return;
-+	}
-+
-+	batch = min_t(u32, slot_available, budget);
-+	batch = xsk_tx_peek_release_desc_batch(xsk, batch);
-+	if (!batch)
-+		return;
-+
-+	for (u32 i = 0; i < batch; i++) {
-+		struct xdp_desc *desc = &xsk->tx_descs[i];
-+
-+		mapping = xsk_buff_raw_get_dma(xsk, desc->addr);
-+		xsk_buff_raw_dma_sync_for_device(xsk, mapping, desc->len);
-+
-+		macb_xdp_submit_buff(bp, queue_index, (struct macb_tx_buff){
-+			.ptr = NULL,
-+			.mapping = mapping,
-+			.size = desc->len,
-+			.mapped_as_page = false,
-+			.type = MACB_TYPE_XSK,
-+		});
-+
-+		bytes += desc->len;
-+	}
-+
-+	/* Make newly initialized descriptor visible to hardware */
-+	wmb();
-+	spin_lock(&bp->lock);
-+	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
-+	spin_unlock(&bp->lock);
-+
-+	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index), bytes);
-+}
-+
- static int macb_tx_complete(struct macb_queue *queue, int budget)
- {
- 	struct macb *bp = queue->bp;
-@@ -1316,6 +1376,11 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 		case MACB_TYPE_XDP_NDO:
- 			bytes += tx_buff->size;
- 			break;
-+
-+		case MACB_TYPE_XSK:
-+			bytes += tx_buff->size;
-+			xsk_frames++;
-+			break;
- 		}
- 
- 		packets++;
-@@ -1337,6 +1402,16 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 		netif_wake_subqueue(bp->dev, queue_index);
- 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
- 
-+	if (queue->xsk_pool) {
-+		if (xsk_frames)
-+			xsk_tx_completed(queue->xsk_pool, xsk_frames);
-+
-+		if (xsk_uses_need_wakeup(queue->xsk_pool))
-+			xsk_set_tx_need_wakeup(queue->xsk_pool);
-+
-+		macb_xdp_xmit_zc(bp, queue_index, budget);
-+	}
-+
- 	return packets;
- }
- 
-@@ -1616,6 +1691,10 @@ static int gem_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
- 	    !napi_if_scheduled_mark_missed(&queue->napi_rx))
- 		irqs |= MACB_BIT(RCOMP);
- 
-+	if ((flags & XDP_WAKEUP_TX) &&
-+	    !napi_if_scheduled_mark_missed(&queue->napi_tx))
-+		irqs |= MACB_BIT(TCOMP);
-+
- 	if (irqs)
- 		queue_writel(queue, IMR, irqs);
- 
-
--- 
-2.53.0
-
+did not work for me.
 
