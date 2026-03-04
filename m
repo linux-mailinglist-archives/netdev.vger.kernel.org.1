@@ -1,243 +1,198 @@
-Return-Path: <netdev+bounces-263919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4K4wLEViqGk3uQAAu9opvQ
-	(envelope-from <netdev+bounces-263919-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:05 +0100
+	id yJgWOFNiqGmduAAAu9opvQ
+	(envelope-from <netdev+bounces-263920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2394420490C
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583B120491D
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F7093094CE9
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:17:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E93093132EAB
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408BC35E93B;
-	Wed,  4 Mar 2026 16:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9EE51EB5CE;
+	Wed,  4 Mar 2026 16:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ThfwijaM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXjZZcfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE7235E939;
-	Wed,  4 Mar 2026 16:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA1E35F166
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772641044; cv=none; b=FFunSPzt6iCSMzvPo2PWHrQ26YMhKNmXAs4O2sGVfnJQKzmstGTg7rY7osZb5DuY/OeOJjCv6MXlrvYS+fq4+IMfBOJ/5FY6KlAJtUbD17ioeRM6COc9pyx4Nb7ZMYVo7guGvywuVg64cSRCvXchk+n8x4q/q7mSVGTmw0VQtpw=
+	t=1772641053; cv=none; b=AV9TzuGMwC2Ayx1RHVMPI4azQlsvCcb+qSoC8Iuj+WrBeugi1axFLOPw0HbnJaIGeoTfeTHxoxExDyH68ndr3Pe3DPWm+HWEn9aJ0nPXL6qWX0um0ZPaoUbiWtKB2A7ke7T7ISUqxVmRj3HK/kr11nveH5vAPsCktxtoA+jPGeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772641044; c=relaxed/simple;
-	bh=ywYiMsYTtAz4vCZZhs0h0CIWMYzBUX8EGn5ktDgQ6cs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JNMvZ2TSEBEEV1qWXXH128DbnQexrmE0EnsK356xK61oY+RtqIxdplV89HMHrCXyXjfBobfNSykVQb76lQchSulptCabDa6VEze92T8W8uuPBW+AClykFQwDwuqeH1m1AevVVT01oCKU1YO5tXR6WTswt34+WQ6MckWmnqUJYQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ThfwijaM; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 624FrXkL3032201;
-	Wed, 4 Mar 2026 16:17:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=IFixIG4h0jJ5QA8kMpukNjAsR7RsB
-	CMOlOf0xpOGZns=; b=ThfwijaMmOnsIkLusTuEfQQi2/cfb+J4P7wVkcy0rZUvk
-	tjnnzblkOHPRM2ZZkyHWtmbneQWAC7xLqJBhfCXz79/JzfLle0rKDPrG8h1tv9IY
-	zRXUt0CtfX+ZKKPK6rZ+TLhBHxci/AK7oQRvytoMND6K3mpJRUzhSbTqfxtN+xK7
-	e4DdBuxSdcWCBkXqu3P+0oEoVAlNH4RX1DONSnIwgtLq94GUJZ6JaSpsDne9WQ8N
-	5dL2LobXMl5YUq+TkkZ06v39PyFMCs8dj/v1K+CtwvlqsA4GP18d7LVmAJAxmRMZ
-	eflDEqKLuhaL8dEyOPNFyHYmLChiFxZImCBXcWpfA==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cpqsbr2ft-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 04 Mar 2026 16:17:12 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 624FAD0w034716;
-	Wed, 4 Mar 2026 16:17:11 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptg1ba6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 04 Mar 2026 16:17:11 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 624GHB2e005768;
-	Wed, 4 Mar 2026 16:17:11 GMT
-Received: from pkannoju-dev-build.osdevelopmeniad.oraclevcn.com (pkannoju-dev-build.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.252.59])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4ckptg1b9g-1;
-	Wed, 04 Mar 2026 16:17:10 +0000
-From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-To: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com,
-        anand.a.khoje@oracle.com,
-        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Date: Wed,  4 Mar 2026 16:17:04 +0000
-Message-ID: <20260304161704.910564-1-praveen.kannoju@oracle.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1772641053; c=relaxed/simple;
+	bh=Jvb1rVCOM6U/ZqwMEdVq2XIa/Y++7Mt5uVCXqrWQMRs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Lxk9XvBdEUg09i/ESnlDdnn2l5nK+cORKSpvYDt1O1WDjJMAPvUnFu3GhKv3QifftO3dg55byi6qwRmdLhZZaRKwF/VbE0RlwnNCJBzDO+NU144zwcfonOSQa6KccV1tjGwH5t6YP3HG3zQHq3DnlzphMPo6yYkvkt0utK6vkpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXjZZcfO; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-89a1347051aso26613536d6.2
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:17:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772641051; x=1773245851; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yRJEH4pR8LqfPxQHnyHrv9zCGvjvaxYgR3oxj/WbAzE=;
+        b=KXjZZcfOxzwN+IvLAEEd19+K4v97MiKyGS8LeI3d1J4IdPtVZUcfYb1kJNJOxZ1xIB
+         8aCaAAgoSsFZNxWF58xxuriktBm6bEybXbNokt4rPxmF0OZ0IZbNgsGCvN9FYavY+9vW
+         97C1tlh17ZkZbshuWhz2LQMlo1M7Xl7MJt0WTytvjGLbVEt/rfDos49+ZktrFlrncavB
+         J+l7KEhXInhH1fxsfu5pQ97HItUFTTYwKNs76MbG8Ik50G24hfCoOtMSqigt0qEh3OCg
+         PUgmfwslr+V0yNzLLjssIyZYNMyR0AXHpmBFmV/ChoN/GUhtnQJGgX1wzAEUn2sDaa0A
+         ZGKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772641051; x=1773245851;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yRJEH4pR8LqfPxQHnyHrv9zCGvjvaxYgR3oxj/WbAzE=;
+        b=hTjIu5Gddik3sETxIdnG83G7ZfxjOo2J96fKrHQ882HYdUScc31uJfdSQNc5qTIHWE
+         pTWPnoN6LVH/zeoJ8aSUjqdTk4wQjlovRE/UDTEsxPzDL6+jyUFZ0LmgEv4owQRnb3gV
+         9NC4rPgiCo3T1PetICcqGVo96Xi0kWaZqrLw6ObhERzszJjNOBQ0fDn6ROzBXPKnSafr
+         GGU0Z5VYk1F25WvSM8EembmuxZe6TkwmLlUcXFRXyblXepGhJEPPfQo/mba9zUb7UHcY
+         S7QJU5fjF39sbCWDojcLxPRjWhVRXQstsArpsW8ijsHPCxDZLsHJz0MEPeanBVJKQIWb
+         zzfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzVbcuvY8qFPnG9VBzTBzZihGhwvtcd7/Lg1mlWjaB5RgSyBSoKk79DMqUYAFT0FYlzFTBwHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLrw7ShrYQh9wT51Tb/UrTemlsit7YDwQyf8BG7V4nNL+/CX03
+	sytCL6kqUm4MeoMsQFNMMbIa8gBubJdy7p452fWZQ+rpfpM943qqBzyt
+X-Gm-Gg: ATEYQzxPgSAOjoBAvxaUUxgy3EbpqUYWpKrPF1QKG0wC15FtKb4WcESC9RXCYQkfSlI
+	DIAcgCAM1oHROEYGcrXrMarH/hGXwA3XNFJqL/ocI0+cN78vBf6leVgplnywoUMrFMs+L7WEcrl
+	XKSL/wxUYjezJGAhChDzX7oCHhDdP4WXCclX3ii4qfTUwWSwBydChfr2lrvWMqPiVLFtmQ6uWk8
+	QVihzKSSrtwdS2ayD/wGv/FFXVHWE5mhSKkcySQw/XO0tcnmPfG57SbWcv8Y3xl+IeKiFXaRUOr
+	g7850TmQUg08DfiWAB/MYZdrge/YKyKJIZte2OTV69Jla8ICxxVIZCssdxUBpduYffk2+V/T2dp
+	Q33CtKfIi4UQWAwhrhke9jAXiZlBvkmFIYPLpYY+dks632TkrtyUpfSicGg/7c/DILzcV5stPjB
+	+1dURlzI19OV2zqRa5Yf3XB+yZOJUR0A1akXrJj/RT01EWKBgtk/sl
+X-Received: by 2002:a05:6214:ac1:b0:899:e9bf:3747 with SMTP id 6a1803df08f44-89a19e41cc0mr32643356d6.53.1772641051153;
+        Wed, 04 Mar 2026 08:17:31 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1145:4:d19b:d485:ed5f:e15b? ([2620:10d:c091:500::3418])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899f8f4c165sm77628776d6.39.2026.03.04.08.17.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Mar 2026 08:17:30 -0800 (PST)
+Message-ID: <316b1fdd-f495-4a12-acd8-669ba5f2bf26@gmail.com>
+Date: Wed, 4 Mar 2026 11:17:29 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-04_07,2026-03-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- malwarescore=0 mlxscore=0 phishscore=0 mlxlogscore=999 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2602130000 definitions=main-2603040131
-X-Proofpoint-GUID: uC45aMbQRRe8T4wocvcXgYbjO1QV8Bjp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDEzMiBTYWx0ZWRfX3Tfd/wNhDnOa
- i1F1HjJP2hYOohLYbINbVkzsbF0OJpYaCqC/sdVp1YTadhrZL2Z3atwkSeXyRpfJPLnkWfu65r7
- mfZm8X0jGvFYPKxMusj8FVdMSo8EtO//3Wb06CFbzhubSGNqC7/5O+afEvppSpLrEkZNsUSkiOw
- hgz1jG/aM5josd3/Wf6MoiLDlmT5rJHSmxPujhlSqv8QjbpV5LGBM7r1ant+mMrpv4RXuYibaOB
- 4vy8w6ljmQx1zb1ngp7iZ9knxrrt9j/GuX5TN/ud8lF5fJdP3UwIzQKnD++NwLSDmosgLid1To2
- 6sOSjp8En6OcQ1oO2v85GqGfLn9pSAG1GX0/TN1b4fBhHuDbR7NG5JxJFzpuKXKIuAzNAZeB1Zq
- KQux7I53vfQwyEPY/SBDxN0PeDMOFFSV8I5GIU8JYnSqsAfSBPCQ1Mw8Lu0J6rp/PE+O+hdGEs3
- YMVjLqb6nGr13gGfjHUHqU6dHIvaHB2EP93oHkmc=
-X-Proofpoint-ORIG-GUID: uC45aMbQRRe8T4wocvcXgYbjO1QV8Bjp
-X-Authority-Analysis: v=2.4 cv=EOELElZC c=1 sm=1 tr=0 ts=69a85b08 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=x4eqshVgHu-cdnggieHk:22 a=yPCof4ZbAAAA:8 a=tFMKXHgGLOdB1ZkV82YA:9 cc=ntf
- awl=host:12266
-X-Rspamd-Queue-Id: 2394420490C
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 6/9] psp: Add new netlink cmd for dev-assoc
+ and dev-disassoc
+To: Wei Wang <weibunny@fb.com>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+References: <20260304000050.3366381-1-weibunny@fb.com>
+ <20260304000050.3366381-7-weibunny@fb.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <20260304000050.3366381-7-weibunny@fb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 583B120491D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263920-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263919-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[praveen.kannoju@oracle.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:dkim,oracle.com:email,oracle.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_TO(0.00)[fb.com,vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Interrupt lost scenario has been observed in multiple issues during IRQ
-migration due to cpu scaling activity. This further led to the presence of
-unhandled EQE's causing corresponding Mellanox transmission queues to
-become full and get timedout. This patch overcomes this situation by
-polling the EQ associated with the IRQ which undergoes migration, to
-recover any unhandled EQE's and keep the transmission uninterrupted from
-the corresponding queue.
 
-Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 41 +++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/lib/eq.h  |  1 +
- 2 files changed, 42 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index 25499da177bc..4f0653305f46 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -22,6 +22,10 @@
- #include "devlink.h"
- #include "en_accel/ipsec.h"
- 
-+unsigned int mlx5_reap_eq_irq_aff_change;
-+module_param(mlx5_reap_eq_irq_aff_change, int, 0644);
-+MODULE_PARM_DESC(mlx5_reap_eq_irq_aff_change, "mlx5_reap_eq_irq_aff_change: 0 = Disable MLX5 EQ Reap upon IRQ affinity change, \
-+		 1 = Enable MLX5 EQ Reap upon IRQ affinity change. Default=0");
- enum {
- 	MLX5_EQE_OWNER_INIT_VAL	= 0x1,
- };
-@@ -951,10 +955,36 @@ static int alloc_rmap(struct mlx5_core_dev *mdev) { return 0; }
- static void free_rmap(struct mlx5_core_dev *mdev) {}
- #endif
- 
-+void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-+{
-+	u32 eqe_count;
-+	struct mlx5_eq_comp *eq = container_of(notify, struct mlx5_eq_comp, notify);
-+
-+	if (mlx5_reap_eq_irq_aff_change) {
-+		mlx5_core_warn(eq->core.dev, "irqn = 0x%x migration notified, EQ 0x%x: Cons = 0x%x\n",
-+			       eq->core.irqn, eq->core.eqn, eq->core.cons_index);
-+
-+		while (!rtnl_trylock())
-+			msleep(20);
-+
-+		eqe_count = mlx5_eq_poll_irq_disabled(eq);
-+		if (eqe_count)
-+			mlx5_core_warn(eq->core.dev, "Recovered %d eqes on EQ 0x%x\n",
-+				       eqe_count, eq->core.eqn);
-+		rtnl_unlock();
-+	}
-+}
-+
-+void mlx5_eq_reap_irq_release(struct kref *ref) {}
-+
- static void destroy_comp_eq(struct mlx5_core_dev *dev, struct mlx5_eq_comp *eq, u16 vecidx)
- {
- 	struct mlx5_eq_table *table = dev->priv.eq_table;
- 
-+	if (irq_set_affinity_notifier(eq->core.irqn, NULL))
-+		mlx5_core_warn(dev, "failed to unset EQ 0x%x to irq 0x%x affinty\n",
-+			       eq->core.eqn, eq->core.irqn);
-+
- 	xa_erase(&table->comp_eqs, vecidx);
- 	mlx5_eq_disable(dev, &eq->core, &eq->irq_nb);
- 	if (destroy_unmap_eq(dev, &eq->core))
-@@ -990,6 +1020,7 @@ static int create_comp_eq(struct mlx5_core_dev *dev, u16 vecidx)
- 	struct mlx5_irq *irq;
- 	int nent;
- 	int err;
-+	int ret;
- 
- 	lockdep_assert_held(&table->comp_lock);
- 	if (table->curr_comp_eqs == table->max_comp_eqs) {
-@@ -1036,6 +1067,16 @@ static int create_comp_eq(struct mlx5_core_dev *dev, u16 vecidx)
- 	if (err)
- 		goto disable_eq;
- 
-+	eq->notify.notify = mlx5_eq_reap_irq_notify;
-+	eq->notify.release = mlx5_eq_reap_irq_release;
-+	ret = irq_set_affinity_notifier(eq->core.irqn, &eq->notify);
-+	if (ret) {
-+		mlx5_core_warn(dev, "mlx5_eq_reap_irq_nofifier: EQ 0x%x irqn = 0x%x irq_set_affinity_notifier failed: %d\n",
-+			       eq->core.eqn, eq->core.irqn, ret);
-+	}
-+	mlx5_core_dbg(dev, "mlx5_eq_reap_irq_nofifier: EQ 0x%x irqn = 0x%x irq_set_affinity_notifier set.\n",
-+		      eq->core.eqn, eq->core.irqn);
-+
- 	table->curr_comp_eqs++;
- 	return eq->core.eqn;
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-index b1edc71ffc6d..669bacb9e390 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-@@ -46,6 +46,7 @@ struct mlx5_eq_comp {
- 	struct notifier_block   irq_nb;
- 	struct mlx5_eq_tasklet  tasklet_ctx;
- 	struct list_head        list;
-+	struct irq_affinity_notify notify;
- };
- 
- static inline u32 eq_get_size(struct mlx5_eq *eq)
--- 
-2.43.7
+On 3/3/26 7:00 PM, Wei Wang wrote:
+> +int psp_nl_dev_disassoc_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct psp_assoc_dev *entry, *found = NULL;
+> +	struct psp_dev *psd = info->user_ptr[0];
+> +	u32 assoc_ifindex;
+> +	struct sk_buff *rsp;
+> +	struct net *net;
+> +	int nsid;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX) ||
+> +	    GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_NSID))
+> +		return -EINVAL;
+> +
+> +	nsid = nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
+> +	net = get_net_ns_by_id(genl_info_net(info), nsid);
+> +	if (!net) {
+> +		NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_NSID]);
+> +		return -EINVAL;
+> +	}
+> +
+> +	assoc_ifindex = nla_get_u32(info->attrs[PSP_A_DEV_IFINDEX]);
+> +
+> +	/* Search the association list by ifindex and netns */
+> +	list_for_each_entry(entry, &psd->assoc_dev_list, dev_list) {
+> +		if (entry->assoc_dev->ifindex == assoc_ifindex &&
+> +		    dev_net(entry->assoc_dev) == net) {
+> +			found = entry;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!found) {
+> +		put_net(net);
+> +		NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_IFINDEX]);
+> +		return -ENODEV;
+> +	}
+> +
+> +	rsp = psp_nl_reply_new(info);
+> +	if (!rsp) {
+> +		put_net(net);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* Remove from the association list */
+> +	list_del(&found->dev_list);
+> +	rcu_assign_pointer(found->assoc_dev->psp_dev, NULL);
+> +	netdev_put(found->assoc_dev, &found->dev_tracker);
+> +	kfree(found);
+
+in the case where found was the last associated device in its netns in 
+psd->assoc_dev_list, listeners in that netns will not receive any 
+notification that a psp device has gone away.
+
+> +
+> +	put_net(net);
+> +
+> +	psp_nl_notify_dev(psd, PSP_CMD_DEV_CHANGE_NTF);
+
 
 
