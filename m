@@ -1,171 +1,236 @@
-Return-Path: <netdev+bounces-263654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eP8DJdPwp2mWlwAAu9opvQ
-	(envelope-from <netdev+bounces-263654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:44:03 +0100
+	id EuV2D77wp2mGmgAAu9opvQ
+	(envelope-from <netdev+bounces-263653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:43:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B681FCC9F
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:44:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF371FCC7C
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 09:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 55266301BEF3
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:43:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B6A4E3008683
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 08:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10913932D4;
-	Wed,  4 Mar 2026 08:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5213F39182D;
+	Wed,  4 Mar 2026 08:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLVQiFvT"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="EWKmy0JW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.61.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6293932C8
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 08:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810B3390C98;
+	Wed,  4 Mar 2026 08:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.61.103
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772613831; cv=none; b=lZsWmTnoFxZ0MEFFeF23fhyXhH1V6YqRFfoOErUJ5Ga/RTWRscutfnB1EM/NDhfhDNYamyjSG/bTu2CMwA1MOy0WHYDuaGVobX4YkIHpUEM4OXebenCDlTcYNOuu4DOfZDGbcq+pz79QzNiICg6LwLycJIs+uwFvIxgRAMPLgO8=
+	t=1772613813; cv=none; b=JeyRldJRcDSkF6SKigovb9NnKk9GL4piWMjMokFWYlqVTIlyL0LuwuFaw3Nnl3DXRZ/Bav3RULyHO5ud6mD8KWo0u5LKKDztzh9+e0Js3oz4/cBvo3jYG7y4MF6ITO31lQz7SewUjZlDvF9jHzlZOnuuhwP2POxobbj4D+/6VBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772613831; c=relaxed/simple;
-	bh=VIJxBhv7XGCFbPbdOeAB7Qdcmzlygb76zrm9jwwzsOA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LrD+YMZItpuhI0Ru8XvmpIbRfJMNaO0hqRoLUP7wKRueTQh2GazFxf6xmtn9dpgAN/PooLf6EvEgjv29arDlzhv0APGgqD1HseP26lDU1BkussHBcevSVxYZA0MUdrfMOddlUKX+gReO30GO4zAsiPlDgwDhm0rdYzRr0pTTgoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLVQiFvT; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-824b5cae336so2623297b3a.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 00:43:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772613830; x=1773218630; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E3vMQO/IQoYaKESJWlFHP+qMU8qosPwTVj93SXFE13Y=;
-        b=RLVQiFvT6sJ/P5I+bpFCEWEUsXmIpCPKMODFKfSa3ClISRLGGNP6+WXqe2hnZ7pee9
-         br/024vPcTglhUKNbgy2Bkqrp03LeVZexAZc5L3RACLr9gdMbh7lMAuq8q9ZpxgnZxM3
-         9qRi2vY9FueJKRiw9ajtI5oBYwWQoufnbMYyKDB3gluqBSfmKQIratAvyqIVc5gs4LTE
-         RWUTVPKySt3coo+6Npmf/rw0TcUi0W/+pDsYmQRchRZ8HK2nLTAlegDvGMzx5lUOUcfx
-         6r358bsGfwwvy7fjFuf4a3HkEUs9J6ATTcOCL4tOPWNZRVYPKUCf1tmSvk80JdrUiL4x
-         wsGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772613830; x=1773218630;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E3vMQO/IQoYaKESJWlFHP+qMU8qosPwTVj93SXFE13Y=;
-        b=ObDiQyA88UrkCyHHKKfGf1V5KiKSHZbQ2sf2TLKakQJyS9fKTd8GGOJp+Gkem4A0YV
-         wSN4jJ+toknYtlTwyauxRVpQAipseUPE+vxy2P0xpdZF/bY0H/ADyliWEflSldyXJw0Z
-         mxmpbkTeDixA/L77vCZW5Rmt5B8XHzHaEkJHBB0VAV84SBoiSABqGs1d2GFBCaT1xLIY
-         DGK3RQjApmbIyK+Qp/WFce61NPJRVFvzI9tdpJ40kv+yg9viX5c+xOb9Y/10S5DmmvYc
-         2SPPe3EjBPsGW6KwvTaqZyT4irGNa55hhx1Sll7yu6A2B4zQ7d3wjG/rBp5UR8fqPrw+
-         NHmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXiotWrFzV4KhEYF4oP3pIg2afQZbRjIEJ1WZ5QDsh1ro8/xVoVt8xjBitvx5BbfyN3d0iXSig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ6lKFqppvZ5Fd2fUZhDhkNd5Gb3DuaNIXAEPuky+aEdGjr5CG
-	1tw4u/xv6iX2Y+kancUN9dKBdBQFCNmiQSXDSi1eqJNnCFW64w8xAPkMuiqnxwoSsrTWZPrII4X
-	b3NnK9A==
-X-Received: from pfbbj10.prod.google.com ([2002:a05:6a00:318a:b0:7cf:2dad:ff87])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:438f:b0:827:2ee0:411f
- with SMTP id d2e1a72fcca58-82972b61332mr1138758b3a.4.1772613829535; Wed, 04
- Mar 2026 00:43:49 -0800 (PST)
-Date: Wed,  4 Mar 2026 08:42:57 +0000
-In-Reply-To: <20260304-br-nd-suppress-ipv6-null-fix-v1-1-084356ba8257@gmail.com>
+	s=arc-20240116; t=1772613813; c=relaxed/simple;
+	bh=KsdkQrCVwXharfWSfthTCrBeLRAtyjE1nS2WAo2eSIA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h/Bf9tSE30SuhCR15JahAYxZI3Tt/fGlYva3Xr6OJh7K1ZeC1/yDFdOztR+r88BVGRloVdMTQgU13uambXMKoZoM5SoIhPTz2+Ixtz0WuFBlQctyutRPMyNt3WS8HKQ5OVF/U9W2Zhkh6yh4q9YTG1/I0v77yO9STpgry2M6cMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=EWKmy0JW; arc=none smtp.client-ip=188.68.61.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from mors-relay-8403.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4fQmQy6sGYz83x5;
+	Wed,  4 Mar 2026 09:43:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1772613803;
+	bh=KsdkQrCVwXharfWSfthTCrBeLRAtyjE1nS2WAo2eSIA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EWKmy0JWIFw5FU3NKL072hPKMSSM4jwf22Wy1QryEyniF6CXwx7Gxa47c+rU9mk5P
+	 pnN40LQEzhgH938xSxEz+ZoPhBFPrP7oobtvzfxRAD9r4ew2N/KlNL33+L75klaA0V
+	 KfR7PQqumPvMscA0xjFuO7S+mJrcsDAXXTnsVv7HR1K1V5igHhgyXZzQzUJ+sO98Is
+	 aurn690+ODjh0nluY2RR+s36pYGudVtzKNuqlC5BkZZk7ez5E0D+iI261vdKRfbi23
+	 5KBa0s/UHir0HQTkFaZi079ndUCsbzYIrsGDIVvSjEoACDUwzrzOED4pDqP623oPT6
+	 3vxY05p1ZsgTw==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4fQmQy68Rrz83rY;
+	Wed,  4 Mar 2026 09:43:22 +0100 (CET)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fQmQy10lZz8svF;
+	Wed,  4 Mar 2026 09:43:22 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id E7AB65F74A;
+	Wed,  4 Mar 2026 09:43:20 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <4c851eb9-b990-41c0-928e-ce5a1e597722@leemhuis.info>
+Date: Wed, 4 Mar 2026 09:43:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260304-br-nd-suppress-ipv6-null-fix-v1-1-084356ba8257@gmail.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260304084348.1075022-1-kuniyu@google.com>
-Subject: Re: [PATCH] net: bridge: fix NULL dereference in br_do_suppress_nd
- when ipv6.disable=1
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: devnull+maximilianpezzullo.gmail.com@kernel.org
-Cc: bridge@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
-	gurucp2005@bugzilla.kernel.org, horms@kernel.org, idosch@nvidia.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, maximilianpezzullo@gmail.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, razor@blackwall.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 08B681FCC9F
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] qmi_wwan: allow max_mtu above hard_mtu to control
+ rx_urb_size
+To: Laurent Vivier <lvivier@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Daniele Palmas <dnlplm@gmail.com>,
+ Stefano Brivio <sbrivio@redhat.com>,
+ Koen Vandeputte <koen.vandeputte@citymesh.com>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20260302102825.274385-1-lvivier@redhat.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <20260302102825.274385-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: 
+ <177261380148.3365887.14307366214397269586@mxe9fb.netcup.net>
+X-NC-CID: w2sXJKrhjkjeFdA3LQxPiJsv/+koD6twakGv08sma2Mp8/rzY9o=
+X-Rspamd-Queue-Id: 9DF371FCC7C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,bugzilla.kernel.org,kernel.org,nvidia.com,vger.kernel.org,gmail.com,redhat.com,blackwall.org];
-	TAGGED_FROM(0.00)[bounces-263654-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,redhat.com,citymesh.com,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-263653-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	DMARC_NA(0.00)[leemhuis.info];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,maximilianpezzullo.gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-From: Maximilian Pezzullo via B4 Relay <devnull+maximilianpezzullo.gmail.com@kernel.org>
-Date: Wed, 04 Mar 2026 09:20:23 +0100
-> From: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
+On 3/2/26 11:28, Laurent Vivier wrote:
+> Commit c7159e960f14 ("usbnet: limit max_mtu based on device's hard_mtu")
+> capped net->max_mtu to the device's hard_mtu in usbnet_probe(). While
+> this correctly prevents oversized packets on standard USB network
+> devices, it breaks the qmi_wwan driver.
 > 
-> When the kernel is booted with ipv6.disable=1, the IPv6 module loads
-> but skips full initialization, leaving ipv6_stub as NULL. If the bridge
-> neigh_suppress feature is enabled on a port and an ICMPv6 Neighbor
-> Solicitation arrives, br_do_suppress_nd() calls neigh_lookup() via
-> ipv6_stub->nd_tbl without first checking whether ipv6_stub is valid,
-> causing a kernel panic.
+> qmi_wwan relies on userspace (e.g. ModemManager) setting a large MTU on
+> the wwan0 interface to configure rx_urb_size via usbnet_change_mtu().
+> QMI modems negotiate USB transfer sizes of 16,383 or 32,767 bytes, and
+> the USB receive buffers must be sized accordingly. With max_mtu capped
+> to hard_mtu (~1500 bytes), userspace can no longer raise the MTU, the
+> receive buffers remain small, and download speeds drop from >300 Mbps
+> to ~0.8 Mbps.
 > 
-> Fix this by returning early if ipv6_stub or its nd_tbl pointer is NULL.
+> Introduce a FLAG_NOMAXMTU driver flag that allows individual usbnet
+> drivers to opt out of the max_mtu cap. Set this flag in qmi_wwan's
+> driver_info structures to restore the previous behavior for QMI devices,
+> while keeping the safety fix in place for all other usbnet drivers.
 > 
-> Reported-by: Guruprasad C P <gurucp2005@bugzilla.kernel.org>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221143
-> Signed-off-by: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
+> Fixes: c7159e960f14 ("usbnet: limit max_mtu based on device's hard_mtu")
+
+[disclaimer: I'm not a reviewer, just someone that keeps and eye on
+regressions]
+
+Given that the regression afaics was found in a stable series with that
+commit backported, would you maybe we willing to add a stable tag to
+ensure fast backporting to all affected series? See
+Documentation/process/stable-kernel-rules.rst for all details, but
+normally this will do:
+
+ Cc: stable@vger.kernel.org
+
+> Reported-by: Koen Vandeputte <koen.vandeputte@citymesh.com>
+
+While at it: please considered linking to the report using a Link or
+Closes tag like this
+
+ Link:
+https://lore.kernel.org/lkml/CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com/
+
+That is something Linus really wants[1] and actually something that
+Documentation/process/submitting-patches.rst and
+Documentation/process/5.Posting.rst asks for.
+
+[1] see here:
+https://lore.kernel.org/all/CAHk-=wj2kJRPWx8B09AAtzj+_g+T6UBX11TP0ebs1WJdTtv=WQ@mail.gmail.com/
+https://lore.kernel.org/all/CAHk-=wjMmSZzMJ3Xnskdg4+GGz=5p5p+GSYyFBTh0f-DgvdBWg@mail.gmail.com/
+https://lore.kernel.org/all/CAHk-=wjxzafG-=J8oT30s7upn4RhBs6TX-uVFZ5rME+L5_DoJA@mail.gmail.com/
+
+Ciao, Thorsten
+
+> Tested-by: Daniele Palmas <dnlplm@gmail.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  net/bridge/br_arp_nd_proxy.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  drivers/net/usb/qmi_wwan.c | 4 ++--
+>  drivers/net/usb/usbnet.c   | 7 ++++---
+>  include/linux/usb/usbnet.h | 1 +
+>  3 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
-> index 1e2b51769eec..0b1b9ba29b7d 100644
-> --- a/net/bridge/br_arp_nd_proxy.c
-> +++ b/net/bridge/br_arp_nd_proxy.c
-> @@ -455,6 +455,9 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
->  		return;
->  	}
+> diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+> index 3a4985b582cb..05acac10cd2b 100644
+> --- a/drivers/net/usb/qmi_wwan.c
+> +++ b/drivers/net/usb/qmi_wwan.c
+> @@ -928,7 +928,7 @@ static int qmi_wwan_resume(struct usb_interface *intf)
 >  
-> +	if (!ipv6_stub || !ipv6_stub->nd_tbl)
-> +		return;
+>  static const struct driver_info	qmi_wwan_info = {
+>  	.description	= "WWAN/QMI device",
+> -	.flags		= FLAG_WWAN | FLAG_SEND_ZLP,
+> +	.flags		= FLAG_WWAN | FLAG_NOMAXMTU | FLAG_SEND_ZLP,
+>  	.bind		= qmi_wwan_bind,
+>  	.unbind		= qmi_wwan_unbind,
+>  	.manage_power	= qmi_wwan_manage_power,
+> @@ -937,7 +937,7 @@ static const struct driver_info	qmi_wwan_info = {
+>  
+>  static const struct driver_info	qmi_wwan_info_quirk_dtr = {
+>  	.description	= "WWAN/QMI device",
+> -	.flags		= FLAG_WWAN | FLAG_SEND_ZLP,
+> +	.flags		= FLAG_WWAN | FLAG_NOMAXMTU | FLAG_SEND_ZLP,
+>  	.bind		= qmi_wwan_bind,
+>  	.unbind		= qmi_wwan_unbind,
+>  	.manage_power	= qmi_wwan_manage_power,
+> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+> index ed86ba87ca4e..b72ba0803392 100644
+> --- a/drivers/net/usb/usbnet.c
+> +++ b/drivers/net/usb/usbnet.c
+> @@ -1829,11 +1829,12 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
+>  		if ((dev->driver_info->flags & FLAG_NOARP) != 0)
+>  			net->flags |= IFF_NOARP;
+>  
+> -		if (net->max_mtu > (dev->hard_mtu - net->hard_header_len))
+> +		if ((dev->driver_info->flags & FLAG_NOMAXMTU) == 0 &&
+> +		    net->max_mtu > (dev->hard_mtu - net->hard_header_len))
+>  			net->max_mtu = dev->hard_mtu - net->hard_header_len;
+>  
+> -		if (net->mtu > net->max_mtu)
+> -			net->mtu = net->max_mtu;
+> +		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
+> +			net->mtu = dev->hard_mtu - net->hard_header_len;
+>  
+>  	} else if (!info->in || !info->out)
+>  		status = usbnet_get_endpoints(dev, udev);
+> diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
+> index b0e84896e6ac..bbf799ccf3b3 100644
+> --- a/include/linux/usb/usbnet.h
+> +++ b/include/linux/usb/usbnet.h
+> @@ -132,6 +132,7 @@ struct driver_info {
+>  #define FLAG_MULTI_PACKET	0x2000
+>  #define FLAG_RX_ASSEMBLE	0x4000	/* rx packets may span >1 frames */
+>  #define FLAG_NOARP		0x8000	/* device can't do ARP */
+> +#define FLAG_NOMAXMTU		0x10000	/* allow max_mtu above hard_mtu */
+>  
+>  	/* init device ... can sleep, or cause probe() failure */
+>  	int	(*bind)(struct usbnet *, struct usb_interface *);
 
-ipv6_stub is never be NULL.
-
-Also, Fernando is already working on the fix.
-https://lore.kernel.org/netdev/20260226234059.19402-1-fmancera@suse.de/
-https://lore.kernel.org/netdev/20260302140847.5941-1-fmancera@suse.de/
-
-
-> +
->  	n = neigh_lookup(ipv6_stub->nd_tbl, &msg->target, vlandev);
->  	if (n) {
->  		struct net_bridge_fdb_entry *f;
-> 
-> ---
-> base-commit: af4e9ef3d78420feb8fe58cd9a1ab80c501b3c08
-> change-id: 20260304-br-nd-suppress-ipv6-null-fix-0a516fc27f1a
-> 
-> Best regards,
-> -- 
-> Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 
