@@ -1,152 +1,150 @@
-Return-Path: <netdev+bounces-263888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEp0G5hdqGmZtgAAu9opvQ
-	(envelope-from <netdev+bounces-263888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:28:08 +0100
+	id iBqIORRXqGlutQAAu9opvQ
+	(envelope-from <netdev+bounces-263889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:00:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E40C6204405
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:28:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A316920389C
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:00:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 605743360DD3
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 15:52:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DCC523088506
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 15:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B2934F251;
-	Wed,  4 Mar 2026 15:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A0635AC1F;
+	Wed,  4 Mar 2026 15:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="gYtAH7jQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtwpgYt7"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0717334DCC7;
-	Wed,  4 Mar 2026 15:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFDF34E761
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 15:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772639514; cv=none; b=VDTZQbTF2o+e7PMMsJEUYPNCJPU61+bTzpBXfMeqRs9G+c1EsD74fL+VqeJW15nZkRpDoPCuUEiv3BNYUj4tjp0muiCZ9Fy16XcK7MloPH3Bsc1zo0sf7T3U0HuQSDr76VoMgr7aVncU02XG/Njdq/QiR7rxvYPcwxSuRwbqmYw=
+	t=1772639584; cv=none; b=mNWZjuwQwm2DwGKI3JZ+w0bMdTKT8F+ZfRk6dEsNlSqL/xKSw6RTPPIW0n0FEab4S1kXgWBFsl/bYRBKESuRcBb4rXoQ2fy0TJFGFprMr4bcbPvUBrBwIIlAyO95rwgmQoWyhphouhiMVJjJioR3DzQ+Cc5LRPVuKXAgkyCrvrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772639514; c=relaxed/simple;
-	bh=wCvFJq9Lq2vO2torbTJLZMXCQnEtJhovSJOdtjbZSKg=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N98MhAd3GOUm2fHDSnd70GaULysNX/lwjEWDnHrHAZ4cEiWWVzuTcEXgOxGGiJKXONkht9fTaSfKM+BcoUUVujc/Zhph1ediDNn3o9IxbR7n1e/xkiAfYp3dv6b36k1hhZryz0qTyN+2Rmehs7cOCE8NnlrMREZ30y6m7eDZSKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=gYtAH7jQ; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772639513; x=1804175513;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=wCvFJq9Lq2vO2torbTJLZMXCQnEtJhovSJOdtjbZSKg=;
-  b=gYtAH7jQAVLxMzOSO594YlgyA72vsNZ8AQxMrvZM/5O70W7DsPvAsaQF
-   qt0CtmwDQBo/p/Rs/xVNImiwgGHXPecQbynLrIRegFB7GCEHipLoiMHLJ
-   22lnHdwaIRXXw2kI9WnK0E80T+e0Ff/kB67rQVQZ75pTBlnA1m9ZUh87m
-   Kxjc1G52rzU/IC8NXGQbssU2X1K/aeyxXmJK1VI2xaWIAKnTbL0m7q1tX
-   1/6MMkimk7q20a6agbfVvD7GY1GNBfSs6S+Zj1LiSvxubsYMTIPu3W1yM
-   A0OhyToYQgCKosi6DFLgsLKBoWG+cHO8b3Ze63nJ9MOVvB74CYAJTPrhd
-   g==;
-X-CSE-ConnectionGUID: wxutpbsLTX+yxXic6b+o+A==
-X-CSE-MsgGUID: DIr10+/gQTWgcWiYnOCNgw==
-X-IronPort-AV: E=Sophos;i="6.21,324,1763449200"; 
-   d="scan'208";a="285599112"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 08:51:52 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Wed, 4 Mar 2026 08:51:21 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Wed, 4 Mar 2026 08:51:18 -0700
-Message-ID: <ec77ccb286cfd4227da52a11a5720bfd51404a96.camel@microchip.com>
-Subject: Re: [PATCH net-next 8/8] net: dsa: lan9645x: add port statistics
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-CC: <UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, "Russell
- King" <linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Wed, 4 Mar 2026 16:51:18 +0100
-In-Reply-To: <c327cdb9-ce0c-41dd-917a-429b2b52bc26@lunn.ch>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-8-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-8-bff8ca1396f5@microchip.com>
-	 <20260303160159.efjtqzpa2w4awxht@skbuf>
-	 <c327cdb9-ce0c-41dd-917a-429b2b52bc26@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1772639584; c=relaxed/simple;
+	bh=334tEHtpzTsjNn4fKZ4gXzbtG7NKcj8PNnMMfG8RYA8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jgNmi5Aty/0oNM8uVkzEikAlwfbGBkU843Q73HRYPVqqqUHNLnWhOSQ/EzYBjyOlxSccKaUmMClShgQleSYB3gDDh9tgFAHjgdSVkq7PKInTbHqzsb5Wmkj3ZFxrLJoFS5K0Ro+DJa7u9lM3yRaDCDivIW7vKBc9ahA/0jqxFXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtwpgYt7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 508F3C2BCB3
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 15:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772639584;
+	bh=334tEHtpzTsjNn4fKZ4gXzbtG7NKcj8PNnMMfG8RYA8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=WtwpgYt7kx6ZUNaahNpKGQENg27BHo6OMjPgZoVdoqcJkRF+VMljQD/Kho+IVCjry
+	 FRTVd3DZ85qSbF0o0IbrfDl+/1yd93wbHxbsr2NXvRTHNC4OxeSd4KLizQss6S/HCL
+	 aX0fObxujM5mbldJvHyKuqdFz+VO6ekNGBqHWSrbtxX3FLev9I/RAJtwBelCJZP3O7
+	 fKaz7Ifui+wOqZRUPhvDxKVutTbAGUZLao99IgbiC1liap8bjjy9AAW4U6+/+hPkKb
+	 nWFWrFNasx5XXDnCTfJlcWqzLC/6UR0p1XkTUmdOb+f92iKsgXEsINncZqkg/KMr3G
+	 QJMdhr5p+FmPw==
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-899e87b04d8so68606676d6.3
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 07:53:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWpwYsLNIh8fpF9OjkjlmqYhRU6YGs0y589C/c0QJWDVoj2PTGvk+j/Ab3QfDB1vXCnaycefO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2zj9bjyIhZl9DwGBkwqALuRbzLClhAEt0HKq32FybFiXzb9py
+	hI41zh/6XR+g81S0Xkxm70IhoNyia3Pirlx5GGZWxl1FTghSZxGiZ+sqNINbJX0xosBsbDAnZgF
+	Kgru+fy+5jJ0BWeBgvKwu7pKzNZPBoiQ=
+X-Received: by 2002:a05:6214:4018:b0:89a:1536:2528 with SMTP id
+ 6a1803df08f44-89a19af13c1mr31908246d6.26.1772639583202; Wed, 04 Mar 2026
+ 07:53:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: E40C6204405
+References: <20260219130050.2390226-1-bjorn@kernel.org> <415c4922-cc8d-4e35-bbac-3a532f44d238@lunn.ch>
+ <20260219160519.323041bf@kernel.org> <3b0949fa-0b05-4bce-86c0-2a7a058865a5@lunn.ch>
+ <20260220131254.03874c4c@kernel.org> <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
+ <20260223150401.7993b11a@kernel.org> <CAJ+HfNjmRjr6VtRijmN9=4zPwxstw9B8D-_XVn3hwJzNHka1Jw@mail.gmail.com>
+ <363527d6-1f29-4399-83a7-978785d1e11f@lunn.ch> <CAJ+HfNhwM82H-sgbz0+WJGRjXJc8Ww0aCnp_YTNi-CB4aBMi=w@mail.gmail.com>
+ <4c51f18c-5eb1-4a9e-93b9-70cf7a4fd387@lunn.ch> <f2ce4c3b-407e-4c01-b117-c646feed877f@bootlin.com>
+In-Reply-To: <f2ce4c3b-407e-4c01-b117-c646feed877f@bootlin.com>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Wed, 4 Mar 2026 16:52:51 +0100
+X-Gmail-Original-Message-ID: <CAJ+HfNga2510HrgpDH==H7CpmKBAEsoQkEmhFBMPxqM296p2eA@mail.gmail.com>
+X-Gm-Features: AaiRm52PnREObziBwzeRIt2WgiHFaYqMJM-YPVE8rJunw0jQZna9BfkdQ_0a7iM
+Message-ID: <CAJ+HfNga2510HrgpDH==H7CpmKBAEsoQkEmhFBMPxqM296p2eA@mail.gmail.com>
+Subject: Re: [RFC net-next 0/4] ethtool: CMIS module diagnostic loopback support
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan <michael.chan@broadcom.com>, 
+	Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A316920389C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.01 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MIXED_CHARSET(0.67)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263888-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,broadcom.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-263889-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bootlin.com:email]
 X-Rspamd-Action: no action
 
-On Tue, 2026-03-03 at 21:21 +0100, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> > > +void lan9645x_stats_get_stats64(struct lan9645x *lan9645x, int port,
-> > > +                           struct rtnl_link_stats64 *stats)
-> > > +{
-> > > +   u64 *port_cnt;
-> > > +
-> > > +   /* Avoid stats update, as this is called very often by DSA. */
-> > > +   mutex_lock(&lan9645x->stats->hw_lock);
-> >=20
-> > This is atomic context, you can't acquire a mutex which may be held by =
-a
-> > process which sleeps, which also puts you to sleep for it.
->=20
-> Which suggests no testing has been done with kernel configuration
-> options enabled which does checks for this, deadlock detection, etc.
->=20
-> I would suggest PROVE_LOCKING, DEBUG_SPINLOCK, DEBUG_MUTEXES,
-> DEBUG_ATOMIC_SLEEP.
->=20
->         Andrew
+Hey!
 
-I will run our testsuite with those options enabled.
+On Mon, 2 Mar 2026 at 10:01, Maxime Chevallier
+<maxime.chevallier@bootlin.com> wrote:
 
-Thanks,
-Emil
+> The overall approach after all these discussions sounds fine to me, I do
+> think that the index of the component that does the loopback needs to be
+> there somewhere, when relevant.
+>
+> Either through a name string, or a combo of an enum indicating the
+> component type (MAC/PHY/Module/etc.) + its index. I think it's safe to
+> assume that indices will fit in u32 ?
+>
+> something like :
+>
+> # MAC PCS loopback
+> ethtool --set-loopback eth0 loc mac name pcs
+>
+> # PHY id 2 PMA loopback (I'm making things up here)
+> ethtool --set-loopback eth0 loc phy id 2 name pma
+>
+> That way we can extend that fairly easily for, say, combo-port devices
+> where we could select which of the port we want to loopback :)
+
+Ok! I'll spin a new version with this in mind. To improve my mental
+model, could you give an example how you would use a combo-port from a
+userland perspective?
+
+
+Cheers,
+Bj=C3=B6rn
 
