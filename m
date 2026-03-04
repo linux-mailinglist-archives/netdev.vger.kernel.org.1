@@ -1,228 +1,153 @@
-Return-Path: <netdev+bounces-263511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LU8HTmKp2nliAAAu9opvQ
-	(envelope-from <netdev+bounces-263511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:26:17 +0100
+	id sDXRNH+Kp2nliAAAu9opvQ
+	(envelope-from <netdev+bounces-263512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:27:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB311F9349
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:26:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BB1F1F936F
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 02:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2429F3036385
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:26:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F793301F9BC
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 01:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95143093C3;
-	Wed,  4 Mar 2026 01:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C091D2FA0C6;
+	Wed,  4 Mar 2026 01:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPLs/puc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlB/6TJb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B642FA0C6;
-	Wed,  4 Mar 2026 01:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CF330648A
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 01:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772587574; cv=none; b=KR+e9CTTjUAtD3QxxfeDbBhUFY95J2qW6NeWyFJgMx6RIMzZM3e0FMiXEcNEmmSmI4U+W9uDgxQtSSD9xkO/T0CDC39J8+aIxtU6JthqmovSl0qzMHSMxjM6eQiK1hcx10YPrvDIfRrtHP6D17Ouih2qe9k3NZLo3pFONGlsxhQ=
+	t=1772587606; cv=none; b=fFjp/Owt39ONl7OmXLPd58TVRhES3LnOXvUgNOnF2XPW2fLCixqS/Ox6TtfZ7afjMxrvo6tJIbuZ5TuD7eHmxx4Zr8YatUfusfapVMiOtyntHIskcxyNi7p8PyISjSQxarALC9djpEquXHk4yzNbMc44/kxGCZHttQNbXzawDSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772587574; c=relaxed/simple;
-	bh=/GzBSdollLP1oWlbirW3cObED2Mti3E2VhxF9n4062g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hk45eamosnBAJDm8Rhz/Cly6zOPqETdOIgNznJcLMWHedQr7z/UEzAxESc9C41+7Ovrr1TgoQ5UeqN4EXeX375n5cO5BuVsf3MK+wEyjatXRYWbgWTH2UQm0zYoj3NGixGL2UZga62OwbiGI8JHXM0+YXY0lJpF7nKGR8Vahcho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPLs/puc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4989C116C6;
-	Wed,  4 Mar 2026 01:26:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772587574;
-	bh=/GzBSdollLP1oWlbirW3cObED2Mti3E2VhxF9n4062g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nPLs/puc0eofNR6Zb9n8ISui3nCYsj5pbcSGS9n79ziK/iAeE5oBDtQ51emrWEkiz
-	 U3TtwyOCKIpnX1JdOzDbPMNpC76P0WF3NfHu8kcscI1vzi00datHkKf7SEV4n+Iv4x
-	 UCLQ5tUmSEixG1WQ2UphsDB4atqZuWZ9u/zFtJ1g4qNDaKw1Cx0d2itc2x3J+d8Msx
-	 zwcwMJR9YXK+zT8uAkd6IsR8rhWqC6pPvngIlTb5iUVKrtWLybq5NbMkPvIuMuZj/q
-	 FLApbiaNv45AsWG7ceHdGoepd2n5tSCO8U0QzP4g8A8oKLwgvj75Izfux8xKv83Qld
-	 CU65NPgkGU6fA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: shuangpeng.kernel@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	horms@kernel.org,
-	jiayuan.chen@shopee.com,
-	jirislaby@kernel.org,
-	andrew+netdev@lunn.ch,
-	gregkh@linuxfoundation.org,
-	shaojijie@huawei.com
-Subject: Re: [net,v4] serial: caif: hold tty->link reference in ldisc_open and ser_release
-Date: Tue,  3 Mar 2026 17:26:12 -0800
-Message-ID: <20260304012612.2592839-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260301220525.1546355-1-shuangpeng.kernel@gmail.com>
-References: <20260301220525.1546355-1-shuangpeng.kernel@gmail.com>
+	s=arc-20240116; t=1772587606; c=relaxed/simple;
+	bh=MKXffcBlhdsmLowCe0Cbj2NjLTgcMZg9V7RP83H1teI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NAS2FV7pIJDLahfwD3BCvObSxxTKs/jOYQ52Qfhq0R2SaE+hn/snuezxgF957F3iprzagZn4mrquFXd7lgi0OjmPwyEFBlJ2MoXkANdL3nNhRF0ug/siDwEVIM9Y2I83o9Jd1PIkqnmgWKEdYesLH4GQobs7bGWWZgXVLbkGFPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlB/6TJb; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-35995cb33a8so1393504a91.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 17:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772587605; x=1773192405; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6TvL4T82lJ0Z3eFNaUzcI2Uhgdhk5xNvX1HDYLocZBk=;
+        b=XlB/6TJbx7pAv7APjKuDD8+UQH1uV3/ACOinG+K7PAV6L1Y/WG0F0J8QQq4ZjsBPQ4
+         Zw/CeJfp26CDdwTpn57Sq9D+O+XUo0uvGccHZuz6ToTlKpgE6FapLtBE9TevzWQglnyn
+         j6J4v81UZChE9sKrt76CzezYNgbXVXvvJm84Dr6oXSY+XrEcybbqfcwr/HmQYIeDq2eA
+         GpP2EC8pvlW1A4lnE56mCYUXrhAgRvbvS7s1FA53wi53zMWc7cTR9ovOkGvnHx7RArlf
+         UsFy7x4hwjtyRVkVVFnx7i5u8J0hSytzcY/3V88VZDXDd7XYGrNRgV6bRMUf1+NLjNON
+         PE3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772587605; x=1773192405;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6TvL4T82lJ0Z3eFNaUzcI2Uhgdhk5xNvX1HDYLocZBk=;
+        b=ePh+hTSAo0mhld5mrTc5tNh+pAeVMEZr7EcDe03FZPy8y673F7AaIVGPIKTBPOQJY5
+         rz6yll0VNQGjrJrrY9MVF4BOD6D2Q51t+zZQkfV6o0bOGmfNHC7AdnDsr+z52/AJuUQs
+         MYafmhuJGAM8qH4Wgky+2s6YNZLA1dptXG0sF4slUcrYxek/a7v2QqAtCvLOFZHdGOp0
+         6pqFzT0Kx5qPJiYgBEQ+Tp8XvRHhDuV/F80t6uSBu+bHQD+ZtHWq+Ss9PLnZxFmOzlmq
+         qkFFODDin29rlnWaiyJ1IX5vrXzG5q40iC56PkDfy6JetRIoWJIjLn9N33ty45mbbL+u
+         66bg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3FvP6w3wN01m02sxYsxf0f/WH49tBLk0tW1EcvxaXyHJ31Ga9JcMw6nqpdwrmkpe9eOWsXzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynwESrxgqE/sp3vS0lun6JOhV5+NxgSJTDjFcT5VTavnVg82Nm
+	bq8cf9toDmmUNbw2Y4mCnO52UJ2IzXPYU71JMbM2PkAm1rR0cKHvg3wV
+X-Gm-Gg: ATEYQzx8qYGwBbcxFtTgm1vbuS7t3nLsr7b212hQc3i5sU7VD4UApcOm2bIGXvXt2WJ
+	P0u6jqbpYPd2SxRABehAjuGJOTHPIeKyXQ0yP/zhGKHMCK+75XR6k+FbJvtyWtRaxjf74073MDJ
+	oGsRhB0mCvBkoYfpiYbJLXeAK7Pu70n3Srly+6yTTQbUlkVHcVvpfgdY0iSaInIeq/7hHBus7dD
+	IZ7Wbvk+JqHIRVNFrzwFaNonTKn73mdrV8+2rnWfD4jbYsXdZK1yVoQICOKmau6in5KCgeYAN6O
+	BljZl8tn3uGLmm8GJUp6bLgs6X6tVVuT1ZBzpVwkHtk5qCcldx3yZKOSmKJVPdLNSCkK4RU5wzy
+	lwR8MbPgSiZMoqev5D41KfQugGxnbVSqmgsUWn428EoiwtG5mlyjVUiF6f3Sewea/qZ1drNICvl
+	R0CgCDXpz97LeIXpPeyxC+vkTCXnM=
+X-Received: by 2002:a17:90b:48ce:b0:359:86f4:bc7a with SMTP id 98e67ed59e1d1-3599ce32c37mr3380587a91.5.1772587604950;
+        Tue, 03 Mar 2026 17:26:44 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb6bb5b2sm183907475ad.69.2026.03.03.17.26.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 17:26:44 -0800 (PST)
+Date: Wed, 4 Mar 2026 01:26:38 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	matttbe@kernel.org, donald.hunter@gmail.com
+Subject: Re: [PATCH net-next 0/4] tools: ynl: tests: adjust Makefile to mimic
+ ksft
+Message-ID: <aaeKTktO3Q1jiHSG@fedora>
+References: <20260303163504.2084981-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CAB311F9349
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260303163504.2084981-1-kuba@kernel.org>
+X-Rspamd-Queue-Id: 7BB1F1F936F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263511-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263512-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Tue, Mar 03, 2026 at 08:35:00AM -0800, Jakub Kicinski wrote:
+> Make a few minor adjustments to tools/net/ynl/tests/Makefile
+> to align its behavior more with how real kselftests behave.
+> This series allows running the YNL tests in NIPA with little
+> extra integration effort.
+> 
+> If anyone already integrated these tests into their CI minor
+> adjustments to the integration may be needed (due to patch 2).
+> 
+> Jakub Kicinski (4):
+>   tools: ynl: rename TESTS variable to TEST_PROGS
+>   tools: ynl: don't install tests in /usr/bin/
+>   tools: ynl: support INSTALL_PATH in the tests Makefile
+>   tools: ynl: produce kselftest-list.txt from tests
+> 
+>  tools/net/ynl/tests/Makefile | 30 +++++++++++++++++-------------
+>  1 file changed, 17 insertions(+), 13 deletions(-)
+> 
+> -- 
+> 2.53.0
+> 
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-serial: caif: hold tty->link reference in ldisc_open and ser_release
-
-This commit addresses a KASAN slab-use-after-free in pty_write_room()
-triggered when caif_serial's TX path calls tty_write_room(). The fix
-holds an extra reference on tty->link throughout the lifetime of the
-caif_serial line discipline.
-
-Link: https://lore.kernel.org/all/20260228094741.1e248271@kernel.org/
-Link: https://gist.github.com/shuangpengbai/c898debad6bdf170a84be7e6b3d8707f
-
-The Fixes tag points to commit 308e7e4d0a84 ("serial: caif: fix
-use-after-free in caif_serial ldisc_close()"), but the regression was
-actually introduced by commit e31d5a05948e ("caif: tty's are kref
-objects so take a reference"). That commit added tty_kref_get(tty) to
-hold a reference on the tty, but failed to also hold a reference on
-tty->link, which is accessed via tty_write_room() in handle_tx().
-
-Commit 308e7e4d0a84 merely exposed this existing regression by changing
-the timing.
-
-Should the Fixes tag be updated to:
-
-    Fixes: e31d5a05948e ("caif: tty's are kref objects so take a reference")
-
-> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> index b90890030751..1873d8287bb9 100644
-> --- a/drivers/net/caif/caif_serial.c
-> +++ b/drivers/net/caif/caif_serial.c
-> @@ -297,6 +297,7 @@ static void ser_release(struct work_struct *work)
->  			dev_close(ser->dev);
->  			unregister_netdevice(ser->dev);
->  			debugfs_deinit(ser);
-> +			tty_kref_put(tty->link);
-                        ^^^^^^^^^^^^^^^^^^^^
-
-Can this dereference NULL? The tty->link field is only set for PTY
-(pseudo-terminal) pairs. For regular serial ports and other non-PTY
-devices, tty->link is NULL.
-
-The CAIF line discipline can be attached to any TTY device via the
-TIOCSETD ioctl. When ser_release() is called to clean up a ser_device
-that was created for a non-PTY TTY device, tty->link would be NULL.
-
-Should this check for NULL before calling tty_kref_put()?
-
->  			tty_kref_put(tty);
->  		}
->  		rtnl_unlock();
-> @@ -331,6 +332,7 @@ static int ldisc_open(struct tty_struct *tty)
->
->  	ser = netdev_priv(dev);
->  	ser->tty = tty_kref_get(tty);
-> +	tty_kref_get(tty->link);
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-
-Can this dereference NULL? When a user attaches the CAIF line discipline
-to a non-PTY TTY device via TIOCSETD, ldisc_open() is called with a tty
-where tty->link is NULL.
-
-While ldisc_open() performs capability checks (CAP_SYS_ADMIN), there is
-no code restricting this to PTY devices only.
-
-Should this check for NULL before calling tty_kref_get()?
-
->  	ser->dev = dev;
->  	debugfs_init(ser, tty);
->  	tty->receive_room = 4096;
-> @@ -339,6 +341,7 @@ static int ldisc_open(struct tty_struct *tty)
->  	rtnl_lock();
->  	result = register_netdevice(dev);
->  	if (result) {
-> +		tty_kref_put(tty->link);
-                ^^^^^^^^^^^^^^^^^^^^^^^^
-
-Can this dereference NULL in the error path? If register_netdevice()
-fails after the CAIF line discipline was attached to a non-PTY TTY
-device, the error path would attempt to release a reference on
-tty->link when it is NULL.
-
-Should this check for NULL before calling tty_kref_put()?
-
->  		tty_kref_put(tty);
->  		rtnl_unlock();
->  		free_netdev(dev);
-
-Simon Horman raised a concern in v2 about a NULL pointer dereference in
-update_tty_status(). The v4 patch does not use the spinlock approach
-from v2, and does not address this race condition.
-
-After ser_release() sets ser->tty = NULL, a concurrent handle_tx() that
-already passed the NULL check can reach update_tty_status(ser).
-
-Looking at update_tty_status():
-
-drivers/net/caif/caif_serial.c:update_tty_status() {
-    inline_decode(ser->common.flowctrl,
-        ser->tty->flow.stopped << 5 |
-        ser->tty->flow.tco_stopped << 3 |
-        ser->tty->ctrl.packet << 2);
-}
-
-It dereferences ser->tty directly (ser->tty->flow.stopped,
-ser->tty->flow.tco_stopped, ser->tty->ctrl.packet).
-
-Can this cause a NULL pointer dereference?
-
-Simon also raised a concern about potential deadlock with spinlock usage
-in v2. The v4 patch removes the spinlock approach entirely.
-
-handle_tx() is called from caif_xmit(), which is the ndo_start_xmit
-handler. This can run in softirq context (NET_TX softirq). ser_release()
-runs in process context (workqueue).
-
-How does the current synchronization between handle_tx() and
-ser_release() prevent races?
--- 
-pw-bot: cr
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
