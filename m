@@ -1,480 +1,295 @@
-Return-Path: <netdev+bounces-263942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id HT1yCV5rqGn9uQAAu9opvQ
-	(envelope-from <netdev+bounces-263942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:26:54 +0100
+	id aHXnIQNsqGn9uQAAu9opvQ
+	(envelope-from <netdev+bounces-263944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:29:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF99205204
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:26:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D1520526F
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 18:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE13D3025736
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 17:26:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76A403068D9E
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 17:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE913AE702;
-	Wed,  4 Mar 2026 17:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5513B894E;
+	Wed,  4 Mar 2026 17:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNKckF98";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvyJw5S0"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="QnC36x3Q";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ts0Q+CyL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C27256D
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 17:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0F73BA22A;
+	Wed,  4 Mar 2026 17:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772645191; cv=none; b=BajNlYVYfOHKavO54GMHoOxBUOidFBua4WZ5D9Hr60qi54iZ2BC/cNxcPozL7gXoSYCuIwxKj1SQimY6Wgxs4GYTXGeWJrFRrTYd69FV/iWVG3ooZbBPLcXO+zv4A2/cJ3ypHjko80wjwnnzyYnHSdhueY4TbCJ0alquQZ7AERI=
+	t=1772645261; cv=none; b=Uh1k72MYujx5gvo9IRNA0l9cOjwXP8FAZsMaE5RF27TRXOsD61yI4nJ9AE1nrfake0OYIRkT+QKhSp4NBV5ef2poNctnox+Y2TgY38Niv4IPxjQvHQFGqDm8U1x2ft86vq1i3KZrvH4FiRC6aYeXYXtLluUba/uiEzuQGdiG3dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772645191; c=relaxed/simple;
-	bh=wxfzCjlPbqtpzxBhJEG0z4XAx/4LsMgepxfFOOGEjkQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lZ1i8h+KKR45jTlbbNbdr/iHwUcQN3y1BEL9mYkPk6laNyllgQuWI71kax9d6HKeSX05LDGd0lgt1Cs4uPdBOGM0Md4amBckKIMD2oqBqlIgGq3Di3E9jg1+K6BJJp2obSAAtalfAHTROQFvhOl2FJnC4UZUsJHWAUzvziWc8VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gNKckF98; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EvyJw5S0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772645184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=85kgFNh7a8akSjl1hmjKjQyP7rsitUvp+G+d7OlEtL4=;
-	b=gNKckF982+HtGY1M1A6UXxITIgKDOHHLa+Nmld6IVjy7ge2SawXHiv/an/2thCHmQxq8Kq
-	lkfce7h8uySF5Y/KuoclSAHPlKztD+dqDqK0yQbrOtZ2kbbjxew2SVfQKJU9+WbdLvy6Nf
-	02g+acnVGAaQZK1mdSoNoqxLuc9RtKQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-30-SuWhPOz2Lh-cI6sbIGw-1; Wed, 04 Mar 2026 12:26:22 -0500
-X-MC-Unique: 30-SuWhPOz2Lh-cI6sbIGw-1
-X-Mimecast-MFC-AGG-ID: 30-SuWhPOz2Lh-cI6sbIGw_1772645181
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439cbc5fb4fso419100f8f.0
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 09:26:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772645181; x=1773249981; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=85kgFNh7a8akSjl1hmjKjQyP7rsitUvp+G+d7OlEtL4=;
-        b=EvyJw5S0SqOhphKtRLaxH6HKBjMfGgf+l2ujVGV6zrCzqEBEqnJz8VOsEgq5TTrRML
-         rlTCc7kgmny8YiPoxH1Olopi5S+B+lxag/BjapmaRcv5A4+v68uZqGVGBFY+Wi73sJdK
-         IYHOLGGifVnnbazIhIAHQVhnK/zxMgx/fM1Bwml/Wq6XplRpNxRkIpcjl+n+hfhWq7ko
-         FafKfmDLu5m6+79QI04aGVA/2LR1/v8UUgBe8GVwtjR8Y60c639mfwwuhRkOoeJpb1Ht
-         CiW1LJgo6yT23OroD+ao4ZhEKuXBmhdEX5+7l/jnML+6mj475yQDqlKPy/Qb4SaC4mUW
-         lveQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772645181; x=1773249981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=85kgFNh7a8akSjl1hmjKjQyP7rsitUvp+G+d7OlEtL4=;
-        b=jg9WPLA6b/pbNoobLXAvI7eKg4K6K6MPGNj6l2qxRRnvmWMesP909SCKGmRDCjEe8U
-         qvI9S1pgpjLbKiWE3xMbcmp1klWa4Xy9sLCm6x8NMBTXeE1g2pSmxpFd0d+9eZLdQcu9
-         xDcnl4qHzyKW8K8ozCMIKYhfPbkfcV6v6aC8lB8G9LiU0jRz5XDoKfQOPycIkS6+rR/R
-         vNaVptWsoPvmXqKKWH9RClh1nXhzAuAcfloLleMxHSYDgxzBrDA5CwL+AQHHYqHzSOkV
-         aAreQvelREakl+/tndIOt+XryMoBOsSuUmHCi+Nvz4sf3DG9lMY7AGpE4sgnOh6SKVFU
-         57Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6gB1EiuRmCnQNGyX6wPqlTNi0aI21EofitD+XfaBKWsuleRhi3Cz2+chgi+GXxf1TxBpYpRA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxlTmFr9oVcyNgXK8fAd8QzMuzreiRBcacwJl46aLRyGaSS/12
-	Bbke+Qr1J/d8kvnRKWydDHoXazm9GgmPm/Ny9ftUTtvcnZsk5+SuW41GeAHouZa2WgkttPsTJaS
-	5F0A85HzUC2UmX+NOmjjw4Gcd2wfZwxk6fWeBR2XHJbgbZZRZVtGS7OhQnw==
-X-Gm-Gg: ATEYQzxhQNLrR7uRiTGZq5rkPfnrKj55aPEDFbLqhPwySUaw4diMOPfvOfAsmTRm4dr
-	QnwxvyHVD9qiZLrL8KoNx1notdunAYrP27LXqrNGftWByTmb5FAnN2GNQzo5m7PkB24B45k0N2N
-	N8hQty7RR9FWijK3vQN3wLjwbT0okqGmu1EcrTYV5wi/R/4ekO2JBcLRtbeG/IR6HX0ZpoW8wSE
-	2xZkt7CVcgdq+lUQTlZnwRKGDG5lLgNynC1s9XhS+/mNyG29l8N0Bw21xZheXtNyh6ANAHtFs8f
-	skoOxn3rM4s6Mj+UayZ0xMjTQEcrKhGerPPqD1VkOrnPi6VhYY+rUhczR0geTb/yd9Nt/5+GtnC
-	vouUWvfBtLp3inrKsHXeSDShcrMG4x7ZiQUUCbK4q2WO+AJzGcW6xTOmsnygtaNpP7PfAcRs=
-X-Received: by 2002:a05:6000:1a87:b0:439:c6d9:7fc with SMTP id ffacd0b85a97d-439c7fc619bmr5459662f8f.25.1772645180646;
-        Wed, 04 Mar 2026 09:26:20 -0800 (PST)
-X-Received: by 2002:a05:6000:1a87:b0:439:c6d9:7fc with SMTP id ffacd0b85a97d-439c7fc619bmr5459580f8f.25.1772645180001;
-        Wed, 04 Mar 2026 09:26:20 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b59723fesm26176557f8f.38.2026.03.04.09.26.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 09:26:19 -0800 (PST)
-Date: Wed, 4 Mar 2026 18:26:16 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>, mst@redhat.com, pabeni@redhat.com, 
-	kuba@kernel.org
-Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
-	Jason Wang <jasowang@redhat.com>, mst@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, 
-	bcm-kernel-feedback-list@broadcom.com, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	nh-open-source@amazon.com, syzbot@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3] vsock: add G2H fallback for CIDs not owned by H2G
- transport
-Message-ID: <aahRzq5vS76rPI28@sgarzare-redhat>
-References: <20260303214329.71711-1-graf@amazon.com>
+	s=arc-20240116; t=1772645261; c=relaxed/simple;
+	bh=ChRoXIr9yvc9qsnA8M/lFeW4TR0ctexLkYbNu6N5U84=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fC1MkkZ5bkQwHVpMOW0NbK3sM6paNKxB5ySeg2E0CQPnO9rEnGS2e2dWIWtd2OKyNt5ZF5pZetoFpjW8NEX68jrtrE/2G7/+P7sQ7a9amKknt7b6I+sdTl5HCf1LtNrJjWrLZzCf+/cek5LSU1yGAq53wciFjrJgDML3ImG83kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=QnC36x3Q; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ts0Q+CyL; arc=none smtp.client-ip=202.12.124.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.stl.internal (Postfix) with ESMTP id CF9111300F11;
+	Wed,  4 Mar 2026 12:27:30 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 04 Mar 2026 12:27:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm2; t=1772645250; x=1772652450; bh=3hZ85nMdNhByeQ6ZYVQXq
+	B9xKZH1h7PxqhN6Br3f/2c=; b=QnC36x3Q0L6xqckhgTvg0RhzwLtbHJl1LbZae
+	lQOEj5vSYUTnSoVlsVUeyWZ7BFVXvRbadXEoFjlwbuFmtCNoNr5g6QgGwQhny6EB
+	9+TJ1YY5NzwaPEddpx8Dz91sG6J7yavVO6pwgw7K00XnTGDS3NLW2t2kWbKXI/bD
+	ktlVMvv3lLGzjkrFKztKz/lOnCzXc+uBHh8LxWeqUrV0j7rKVCgZlB2ojJtQt8z2
+	d7rwxR8364Xlmf3EIgKF8a79qS4pel2lSzv450kjZmMyfz6Kcgo0Cj+C0la1LVuH
+	RAJl6zvwMmHvuMMDz0X1SnfPo/FXLXgNoyXC5a03JJIhH9prw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1772645250; x=1772652450; bh=3hZ85nMdNhByeQ6ZYVQXqB9xKZH1h7PxqhN
+	6Br3f/2c=; b=Ts0Q+CyLeHtsjZa2qIsBBXYiazEhphTAUGF1UbKa8iFCnzq+F9Z
+	tpFVd3j1u8YHNdSWNkE7XrsA0j2gJqzVSc26ea5hkpBzUPp7HikTyqU8MgT8d5Sn
+	K0S/PEf75ZeANH4LYctWTja3+fzREQSau8D4BOrSKlCjqv4jAtKAsgd+2liZrw/f
+	yhpkISLwza5cFE2y/otsnbshQlvQPvvhAHgC8Dayj8qkRqyYJdVOppxQqZ7baCCe
+	Pxahyc9I55JrrKXD3ZrmWi+grgHLziieNuHHwJ8NTIf08TcgkC3sqeG12qJdllH4
+	f8R65rPiQnwJBvcMCC8Z9E2rZ0jDMdrZtnA==
+X-ME-Sender: <xms:gWuoaXqk14uE5s0m_TuMf6ts7a1i3iGW40jvSu4pR9Zi_ZfP5HqcrA>
+    <xme:gWuoaU0B4tFrUIaiHcZUah8p0Kqq7oYK-qlT7K3Nw0nygkSEH7vmRwyVXFm5slPvH
+    sPby8Kgy7liPCAcsrsEpztcXNBGkn-rFcEqJbZ-r4oFfA__sHHhYWDA>
+X-ME-Received: <xmr:gWuoabDRjtyrY32qaPOz5eDHSWtQ4mJweZH9YQJ7da5hObUf-gDGexKT6ARICdu4PKP5Iw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieeguddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepueffvedvvdefudejfeeuudfgtdfgudettdevfeeileffhffghfdtjeekhfeitdek
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgs
+    pghrtghpthhtohepfedvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrrgiioh
+    hrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopehsughfsehfohhmihgthhgvvhdrmhgvpdhrtghpth
+    htohepvgguugihiiekjeesghhmrghilhdrtghomhdprhgtphhtthhopehjohgrmhgrkhhi
+    sehgmhgrihhlrdgtohhmpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmh
+    grihhlrdgtohhmpdhrtghpthhtoheprhhoshhtvgguthesghhoohgumhhishdrohhrghdp
+    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephh
+    grohhluhhosehgohhoghhlvgdrtghomh
+X-ME-Proxy: <xmx:gWuoaf-EBMU6swfd3wz5-LiaJoCG7pZXDIGa3MJHvemjMva_eYZK7g>
+    <xmx:gWuoaZNqTd9KN2XDAKETzPj03As7PqG8KycivG-2S4CbXR-oS_YByA>
+    <xmx:gWuoaZGIr2ULQaYIa6nntoUlP4dambGdZS1-5PMwloSv7uFI8a5YCQ>
+    <xmx:gWuoaYtTjEINoFXqZu29syBRqZDb08iZ_8KL2A4Cw1Mle9DtJKzvVQ>
+    <xmx:gmuoaQPXxPfDAFDGHFskgUiH2pt0TXhr7IpjI4TKmlobe_WeiAlZ6uUc>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 4 Mar 2026 12:27:29 -0500 (EST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 0A4769FCB4; Wed,  4 Mar 2026 09:27:28 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 08F399FC67;
+	Wed,  4 Mar 2026 09:27:28 -0800 (PST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+cc: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
+    jiayuan.chen@shopee.com,
+    syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+    Daniel Borkmann <daniel@iogearbox.net>,
+    Jesper Dangaard Brouer <hawk@kernel.org>,
+    John Fastabend <john.fastabend@gmail.com>,
+    Stanislav Fomichev <sdf@fomichev.me>,
+    Andrii Nakryiko <andrii@kernel.org>,
+    Martin KaFai Lau <martin.lau@linux.dev>,
+    Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+    Yonghong Song <yonghong.song@linux.dev>,
+    KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+    Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+    Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+    Clark Williams <clrkwllms@kernel.org>,
+    Steven Rostedt <rostedt@goodmis.org>, Jussi Maki <joamaki@gmail.com>,
+    linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+    linux-kselftest@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
+ bond_rr_gen_slave_id()
+In-reply-to: <aahWymAi_CtRG0gJ@penguin>
+References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
+ <20260304074301.35482-2-jiayuan.chen@linux.dev> <aahWymAi_CtRG0gJ@penguin>
+Comments: In-reply-to Nikolay Aleksandrov <razor@blackwall.org>
+   message dated "Wed, 04 Mar 2026 17:59:06 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260303214329.71711-1-graf@amazon.com>
-X-Rspamd-Queue-Id: 6AF99205204
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1293119.1772645247.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Mar 2026 09:27:28 -0800
+Message-ID: <1293120.1772645248@famine>
+X-Rspamd-Queue-Id: D5D1520526F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263942-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263944-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linutronix.de,goodmis.org,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[jvosburgh.net:dkim,jvosburgh.net:email,shopee.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,blackwall.org:email,appspotmail.com:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
+Nikolay Aleksandrov <razor@blackwall.org> wrote:
 
-nit: `net-next` tag...
+>On Wed, Mar 04, 2026 at 03:42:57PM +0800, Jiayuan Chen wrote:
+>> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>> =
 
-On Tue, Mar 03, 2026 at 09:43:29PM +0000, Alexander Graf wrote:
->When no H2G transport is loaded, vsock currently routes all CIDs to the
->G2H transport (commit 65b422d9b61b, "vsock: forward all packets to the
->host when no H2G is registered"). Extend that existing behavior: when
->an H2G transport is loaded but does not claim a given CID, the
->connection falls back to G2H in the same way.
->
->This matters in environments like Nitro Enclaves, where an instance may
->run nested VMs via vhost-vsock (H2G) while also needing to reach sibling
->enclaves at higher CIDs through virtio-vsock-pci (G2H). With the old
->code, any CID > 2 was unconditionally routed to H2G when vhost was
->loaded, making those enclaves unreachable without setting
->VMADDR_FLAG_TO_HOST explicitly on every connect.
->
->Requiring every application to set VMADDR_FLAG_TO_HOST creates friction:
->tools like socat, iperf, and others would all need to learn about it.
->The flag was introduced 6 years ago and I am still not aware of any tool
->that supports it. Even if there was support, it would be cumbersome to
->use. The most natural experience is a single CID address space where H2G
->only wins for CIDs it actually owns, and everything else falls through to
->G2H, extending the behavior that already exists when H2G is absent.
->
->To give user space at least a hint that the kernel applied this logic,
->automatically set the VMADDR_FLAG_TO_HOST on the remote address so it
->can determine the path taken via getpeername().
->
->Add a per-network namespace sysctl net.vsock.g2h_fallback (default 1).
->At 0 it forces strict routing: H2G always wins for CID > VMADDR_CID_HOST,
->or ENODEV if H2G is not loaded.
->
->Signed-off-by: Alexander Graf <graf@amazon.com>
->Tested-by: syzbot@syzkaller.appspotmail.com
->
->---
->
->v1 -> v2:
->
->  - Rebase on 7.0, include namespace support
->  - Add net.vsock.g2h_fallback sysctl
->  - Rework description
->  - Set VMADDR_FLAG_TO_HOST automatically
->  - Add VMCI support
->  - Update vsock_assign_transport() comment
->
->v2 -> v3:
->
->  - Use has_remote_cid() on G2H transport to gate the fallback. This is
->    used by VMCI to indicate that it never takes G2H CIDs > 2.
->  - Move g2h_fallback into struct netns_vsock to enable namespaces
->    and fix syzbot warning
->  - Gate the !transport_h2g case on g2h_fallback as well, folding the
->    pre-existing no-H2G fallback into the new logic
->  - Remove has_remote_cid() from VMCI again. Instead implement it in
->    virtio.
->---
-> Documentation/admin-guide/sysctl/net.rst | 28 +++++++++++++++++++
-> drivers/vhost/vsock.c                    | 13 +++++++++
-> include/net/af_vsock.h                   |  9 +++++++
-> include/net/netns/vsock.h                |  2 ++
-> net/vmw_vsock/af_vsock.c                 | 34 ++++++++++++++++++++----
-> net/vmw_vsock/virtio_transport.c         |  7 +++++
-> 6 files changed, 88 insertions(+), 5 deletions(-)
+>> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
+>> check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
+>> when the bond mode is round-robin. If the bond device was never brought
+>> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
+>> =
 
-Checkpatch reports something:
+>> The XDP redirect path can reach this code even when the bond is not up:
+>> bpf_master_redirect_enabled_key is a global static key, so when any bon=
+d
+>> device has native XDP attached, the XDP_TX -> xdp_master_redirect()
+>> interception is enabled for all bond slaves system-wide. This allows th=
+e
+>> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+>> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
+>> reached on a bond that was never opened.
+>> =
 
-     $ ./scripts/checkpatch.pl --strict -g master..HEAD --codespell
-     ERROR: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit 65b422d9b61b ("vsock: forward all packets to the host when no H2G is registered")'
-     #9:
-     G2H transport (commit 65b422d9b61b, "vsock: forward all packets to the
+>> Fix this by allocating rr_tx_counter unconditionally in bond_init()
+>> (ndo_init), which is called by register_netdevice() and covers both
+>> device creation paths (bond_create() and bond_newlink()). This also
+>> handles the case where bond mode is changed to round-robin after device
+>> creation. The conditional allocation in bond_open() is removed. Since
+>> bond_destructor() already unconditionally calls
+>> free_percpu(bond->rr_tx_counter), the lifecycle is clean: allocate at
+>> ndo_init, free at destructor.
+>> =
 
-     CHECK: Comparison to NULL could be written "vhost_vsock_get"
-     #131: FILE: drivers/vhost/vsock.c:101:
-     +	found = vhost_vsock_get(cid, net) != NULL;
+>> Note: rr_tx_counter is only used by round-robin mode, so this
+>> deliberately allocates a per-cpu u32 that goes unused for other modes.
+>> Conditional allocation (e.g., in bond_option_mode_set) was considered
+>> but rejected: the XDP path can race with mode changes on a downed bond,
+>> and adding memory barriers to the XDP hot path is not justified for
+>> saving 4 bytes per CPU.
+>> =
 
-     CHECK: Unbalanced braces around else statement
-     #186: FILE: net/vmw_vsock/af_vsock.c:600:
-     +		} else
-
-     WARNING: The commit message has 'syzkaller', perhaps it also needs a 'Fixes:' tag?
-
-     total: 1 errors, 1 warnings, 2 checks, 162 lines checked
-
-     NOTE: For some of the reported defects, checkpatch may be able to
-           mechanically convert to the typical style using --fix or --fix-inplace.
-
-     Commit 728a7b66be31 ("vsock: add G2H fallback for CIDs not owned by H2G transport") has style problems, please review.
-
-     NOTE: If any of the errors are false positives, please report
-           them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-Not strong opinion on them, maybe the ERROR one fixed could help some
-tools.
-
-Also from https://patchwork.kernel.org/project/netdevbpf/patch/20260303214329.71711-1-graf@amazon.com/
-it seems several maintainers (especially from net) are missing.
+>> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to sla=
+ve device")
+>> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
+>> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@g=
+oogle.com/T/
+>> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+>> ---
+>>  drivers/net/bonding/bond_main.c | 19 +++++++++++++------
+>>  1 file changed, 13 insertions(+), 6 deletions(-)
+>> =
 
 >
->diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
->index 3b2ad61995d4..98b9eaa9cb9e 100644
->--- a/Documentation/admin-guide/sysctl/net.rst
->+++ b/Documentation/admin-guide/sysctl/net.rst
->@@ -602,3 +602,31 @@ it does not modify the current namespace or any existing children.
->
-> A namespace with ``ns_mode`` set to ``local`` cannot change
-> ``child_ns_mode`` to ``global`` (returns ``-EPERM``).
->+
->+g2h_fallback
->+------------
->+
->+Controls whether connections to CIDs not owned by the host-to-guest (H2G)
->+transport automatically fall back to the guest-to-host (G2H) transport.
->+
->+When enabled, if a connect targets a CID that the H2G transport (e.g.
->+vhost-vsock) does not serve, or if no H2G transport is loaded at all, the
->+connection is routed via the G2H transport (e.g. virtio-vsock) instead. This
->+allows a host running both nested VMs (via vhost-vsock) and sibling VMs
->+reachable through the hypervisor (e.g. Nitro Enclaves) to address both using
->+a single CID space, without requiring applications to set
->+``VMADDR_FLAG_TO_HOST``.
->+
->+When the fallback is taken, ``VMADDR_FLAG_TO_HOST`` is automatically set on
->+the remote address so that userspace can determine the path via
->+``getpeername()``.
->+
->+Note: With this sysctl enabled, user space that attempts to talk to a guest
->+CID which is not implemented by vhost will create host vsock traffic.
+>IMO it's not worth it to waste memory in all modes, for an unpopular mode=
+.
+>I think it'd be better to add a null check in bond_rr_gen_slave_id(),
+>READ/WRITE_ONCE() should be enough since it is allocated only once, and
+>freed when the xmit code cannot be reachable anymore (otherwise we'd have
+>more bugs now). The branch will be successfully predicted practically alw=
+ays,
+>and you can also mark the ptr being null as unlikely. That way only RR ta=
+kes
+>a very minimal hit, if any.
 
-nit: IMO we should avoid to use `vhost` here but be a bit more generic
-using H2G.
+	Is what you're suggesting different from Jiayuan's proposal[0],
+in the sense of needing barriers in the XDP hot path to insure ordering?
 
->+Environments that rely on H2G-only isolation should set it to 0.
->+
->+Values:
->+
->+	- 0 - Connections to CIDs <= 2 or with VMADDR_FLAG_TO_HOST use G2H;
->+	  all others use H2G (or fail with ENODEV if H2G is not loaded).
->+	- 1 - Connections to CIDs not owned by H2G fall back to G2H. (default)
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 054f7a718f50..319e3a690108 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -91,6 +91,18 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net)
-> 	return NULL;
-> }
->
->+static bool vhost_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
->+{
->+	struct sock *sk = sk_vsock(vsk);
->+	struct net *net = sock_net(sk);
->+	bool found;
->+
->+	rcu_read_lock();
->+	found = vhost_vsock_get(cid, net) != NULL;
->+	rcu_read_unlock();
->+	return found;
->+}
->+
-> static void
-> vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			    struct vhost_virtqueue *vq)
->@@ -424,6 +436,7 @@ static struct virtio_transport vhost_transport = {
-> 		.module                   = THIS_MODULE,
->
-> 		.get_local_cid            = vhost_transport_get_local_cid,
->+		.has_remote_cid           = vhost_transport_has_remote_cid,
->
-> 		.init                     = virtio_transport_do_socket_init,
-> 		.destruct                 = virtio_transport_destruct,
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 533d8e75f7bb..4e40063adab4 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -179,6 +179,15 @@ struct vsock_transport {
-> 	/* Addressing. */
-> 	u32 (*get_local_cid)(void);
->
->+	/* Check if this transport serves a specific remote CID.
->+	 * For H2G transports: return true if the CID belongs to a registered
->+	 * guest. If not implemented, all CIDs > VMADDR_CID_HOST go to H2G.
->+	 * For G2H transports: return true if the transport can reach arbitrary
->+	 * CIDs via the hypervisor (i.e. supports the fallback overlay). VMCI
->+	 * does not implement this as it only serves CIDs 0 and 2.
->+	 */
->+	bool (*has_remote_cid)(struct vsock_sock *vsk, u32 remote_cid);
->+
-> 	/* Read a single skb */
-> 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
->
->diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
->index dc8cbe45f406..7f84aad92f57 100644
->--- a/include/net/netns/vsock.h
->+++ b/include/net/netns/vsock.h
->@@ -20,5 +20,7 @@ struct netns_vsock {
->
-> 	/* 0 = unlocked, 1 = locked to global, 2 = locked to local */
-> 	int child_ns_mode_locked;
->+
->+	int g2h_fallback;
-> };
-> #endif /* __NET_NET_NAMESPACE_VSOCK_H */
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 2f7d94d682cb..0cdc3df9b63c 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -545,9 +545,13 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
->  * The vsk->remote_addr is used to decide which transport to use:
->  *  - remote CID == VMADDR_CID_LOCAL or g2h->local_cid or VMADDR_CID_HOST if
->  *    g2h is not loaded, will use local transport;
->- *  - remote CID <= VMADDR_CID_HOST or h2g is not loaded or remote flags field
->- *    includes VMADDR_FLAG_TO_HOST flag value, will use guest->host transport;
->- *  - remote CID > VMADDR_CID_HOST will use host->guest transport;
->+ *  - remote CID <= VMADDR_CID_HOST or remote flags field includes
->+ *    VMADDR_FLAG_TO_HOST, will use guest->host transport;
->+ *  - remote CID > VMADDR_CID_HOST and h2g is loaded and h2g claims that CID,
->+ *    will use host->guest transport;
->+ *  - h2g not loaded or h2g does not claim that CID and g2h claims the CID via
->+ *    has_remote_cid, will use guest->host transport (when g2h_fallback=1)
->+ *  - anything else goes to h2g or returns -ENODEV if no h2g is available
->  */
-> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> {
->@@ -581,10 +585,19 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 	case SOCK_SEQPACKET:
-> 		if (vsock_use_local_transport(remote_cid))
-> 			new_transport = transport_local;
->-		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
->+		else if (remote_cid <= VMADDR_CID_HOST ||
-> 			 (remote_flags & VMADDR_FLAG_TO_HOST))
-> 			new_transport = transport_g2h;
->-		else
->+		else if (transport_h2g &&
->+			 (!transport_h2g->has_remote_cid ||
->+			  transport_h2g->has_remote_cid(vsk, remote_cid)))
->+			new_transport = transport_h2g;
->+		else if (sock_net(sk)->vsock.g2h_fallback &&
->+			 transport_g2h && transport_g2h->has_remote_cid &&
->+			 transport_g2h->has_remote_cid(vsk, remote_cid)) {
->+			vsk->remote_addr.svm_flags |= VMADDR_FLAG_TO_HOST;
->+			new_transport = transport_g2h;
->+		} else
-> 			new_transport = transport_h2g;
-> 		break;
-> 	default:
->@@ -2879,6 +2892,15 @@ static struct ctl_table vsock_table[] = {
-> 		.mode		= 0644,
-> 		.proc_handler	= vsock_net_child_mode_string
-> 	},
->+	{
->+		.procname	= "g2h_fallback",
->+		.data		= &init_net.vsock.g2h_fallback,
->+		.maxlen		= sizeof(int),
->+		.mode		= 0644,
->+		.proc_handler	= proc_dointvec_minmax,
->+		.extra1		= SYSCTL_ZERO,
->+		.extra2		= SYSCTL_ONE,
->+	},
-> };
->
-> static int __net_init vsock_sysctl_register(struct net *net)
->@@ -2894,6 +2916,7 @@ static int __net_init vsock_sysctl_register(struct net *net)
->
-> 		table[0].data = &net->vsock.mode;
-> 		table[1].data = &net->vsock.child_ns_mode;
->+		table[2].data = &net->vsock.g2h_fallback;
-> 	}
->
-> 	net->vsock.sysctl_hdr = register_net_sysctl_sz(net, "net/vsock", table,
->@@ -2928,6 +2951,7 @@ static void vsock_net_init(struct net *net)
-> 		net->vsock.mode = vsock_net_child_mode(current->nsproxy->net_ns);
->
-> 	net->vsock.child_ns_mode = net->vsock.mode;
->+	net->vsock.g2h_fallback = 1;
+	If I understand correctly, your suggestion is something like
+(totally untested):
 
-@Michael @Paolo @Jakub
-I don't know what the sysctl policy is in general in net or virtio.
-Is this fine or should we inherit this from the parent and set the
-default only for init_ns?
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
+in.c
+index eb27cacc26d7..ac2a4fc0aad0 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -4273,13 +4273,17 @@ void bond_work_cancel_all(struct bonding *bond)
+ static int bond_open(struct net_device *bond_dev)
+ {
+ 	struct bonding *bond =3D netdev_priv(bond_dev);
++	u32 __percpu *rr_tx_tmp;
+ 	struct list_head *iter;
+ 	struct slave *slave;
+ =
 
-The rest LGTM.
+-	if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN && !bond->rr_tx_counter)=
+ {
+-		bond->rr_tx_counter =3D alloc_percpu(u32);
+-		if (!bond->rr_tx_counter)
++	if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN &&
++	    !READ_ONCE(bond->rr_tx_counter)) {
++		rr_tx_tmp =3D alloc_percpu(u32);
++		if (!rr_tx_tmp)
+ 			return -ENOMEM;
++		WRITE_ONCE(bond->rr_tx_counter, rr_tx_tmp);
++
+ 	}
+ =
 
-Thanks,
-Stefano
+ 	/* reset slave->backup and slave->inactive */
+@@ -4866,6 +4870,9 @@ static u32 bond_rr_gen_slave_id(struct bonding *bond=
+)
+ 	struct reciprocal_value reciprocal_packets_per_slave;
+ 	int packets_per_slave =3D bond->params.packets_per_slave;
+ =
 
-> }
->
-> static __net_init int vsock_sysctl_init_net(struct net *net)
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 77fe5b7b066c..57f2d6ec3ffc 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -547,11 +547,18 @@ bool virtio_transport_stream_allow(struct vsock_sock *vsk, u32 cid, u32 port)
-> static bool virtio_transport_seqpacket_allow(struct vsock_sock *vsk,
-> 					     u32 remote_cid);
->
->+static bool virtio_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
->+{
->+	/* The CID could be implemented by the host. Always assume it is. */
->+	return true;
->+}
->+
-> static struct virtio_transport virtio_transport = {
-> 	.transport = {
-> 		.module                   = THIS_MODULE,
->
-> 		.get_local_cid            = virtio_transport_get_local_cid,
->+		.has_remote_cid           = virtio_transport_has_remote_cid,
->
-> 		.init                     = virtio_transport_do_socket_init,
-> 		.destruct                 = virtio_transport_destruct,
->-- 
->2.47.1
->
->
->
->
->Amazon Web Services Development Center Germany GmbH
->Tamara-Danz-Str. 13
->10243 Berlin
->Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
->Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
->Sitz: Berlin
->Ust-ID: DE 365 538 597
->
->
++	if (!READ_ONCE(bond->rr_tx_counter))
++		packets_per_slave =3D 0;
++
+ 	switch (packets_per_slave) {
+ 	case 0:
+ 		slave_id =3D get_random_u32();
 
+	-J
+
+
+[0] https://lore.kernel.org/netdev/e4a2a652784ec206728eb3a929a9892238c61f0=
+6@linux.dev/
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
