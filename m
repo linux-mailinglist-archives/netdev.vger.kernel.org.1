@@ -1,245 +1,165 @@
-Return-Path: <netdev+bounces-263699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WE8aFjcAqGnynAAAu9opvQ
-	(envelope-from <netdev+bounces-263699-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:49:43 +0100
+	id wNE0Al7/p2nynAAAu9opvQ
+	(envelope-from <netdev+bounces-263700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:46:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F9D1FDE2C
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:49:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0011FDD40
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D99131BDDDB
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:44:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 526EE30475B3
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A39539EF13;
-	Wed,  4 Mar 2026 09:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604CE39EF36;
+	Wed,  4 Mar 2026 09:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="E/7isdWF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcfiT+Cb"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF1239D6E1;
-	Wed,  4 Mar 2026 09:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE7C39D6D9
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 09:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772617436; cv=none; b=GHB5ZI37RaY+R0rtBufJlZusw/xAK0sTTBVrycuwkuIj/SHUBDT4PjRigyHzXiDLOSqGic1dIII+JLcmrv5OX2vgQkMGGApODg//TtO3qYCeQFDnbGIvUQnCUrjRx4BRfK1S5KFXHhfI/p4yev6C9L09JuONz4yApJm0mjRB+G8=
+	t=1772617441; cv=none; b=BsAyyKJ1+xRbIPI+EmKyxV9jSOBXcypWxyAgPCeuzAHt5BNTdo9BxEWk6AhX/ZkAA/+H5SgKvEot8e90hXwgtedkH4AXDDqNDH6crS6o7LlJI4PYqRXy35cdkcztLVyn2uQnMSdzj/wzGIulpE2OH+0Mugq0u/IQ1iylbnxsO20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772617436; c=relaxed/simple;
-	bh=8QAbcKpW3UIEG2eOsNkcXnIzeUIAlSoCzuCV10kZeLw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YoHIodwIZjjRGDKYK/HqYFYvyJSpoND3U9b9IO4LtRwpWzIF/ZUnMHRfgTsC1XyH559Tr0O1XblXwz8KWqvw0JB5h9NKGomAEDDYF93MZwh5kKCJLLTdQQuemcuBEN2bzKYnx2JKvplfVeyZJqXRnyJCCCsxODH7DeT9CUv4ZmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=E/7isdWF; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6249hMpC53072469, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1772617402;
-	bh=8QAbcKpW3UIEG2eOsNkcXnIzeUIAlSoCzuCV10kZeLw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=E/7isdWFBjbWgFzz621c+/HQFwfDMWtcppeQ7kCoDvjNmK2o8zVcWWyq3lfkNzhqc
-	 PDJ4IE+fknY/WQWpC0xXd5/vAsX5gZXpS6aFPgNTTAHIgchr2HOB8tX4fbmAGdUMVl
-	 bJSgyN+0BxDbOKtH+nvH3BLI3iHyrcfwtIdNsrkjt+brW1NQUrlPTO+UjvipDZqupE
-	 GIKnNhSkBgRwKtw8lshZuPkm5DumL1vULqfGoJZO618HAOwDPXJ5cCozcsodzYrL2g
-	 ffbUZoKGgIkHdHA8AWkz0pQrpxRtZztrBzQx1KJxiIJjm9C1pD20f7KIKxe89309Ub
-	 UXj58iniNN09w==
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 6249hMpC53072469
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 4 Mar 2026 17:43:22 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 4 Mar 2026 17:43:22 +0800
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
- RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.1748.039; Wed,
- 4 Mar 2026 17:43:22 +0800
-From: =?utf-8?B?6K645L+K5Lyf?= <javen_xu@realsil.com.cn>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-        "nic_swsd@realtek.com"
-	<nic_swsd@realtek.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org"
-	<horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v1 4/4] r8169: enable system enter c10 with
- RTL8116af
-Thread-Topic: [PATCH net-next v1 4/4] r8169: enable system enter c10 with
- RTL8116af
-Thread-Index: AQHcqg5agfaJnCS8+0OnqQrVxYsUrbWbQ6kAgALQoYA=
-Date: Wed, 4 Mar 2026 09:43:22 +0000
-Message-ID: <f1912e8588604b9b86646a86eac05c6c@realsil.com.cn>
-References: <20260302063215.1790-1-javen_xu@realsil.com.cn>
- <20260302063215.1790-5-javen_xu@realsil.com.cn>
- <9b6aeead-4e60-4df4-8aaf-b07ab2c99d46@gmail.com>
-In-Reply-To: <9b6aeead-4e60-4df4-8aaf-b07ab2c99d46@gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1772617441; c=relaxed/simple;
+	bh=8+rSrSJcs/fP61bPdboLaJ6pJ7+GkOXQuVKywbc0GCk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ctaOemt0Q/lz6gDK3wWUOPtYkzlFazMDl+47X3x43jasVvd7pRIRanMxKe9LmXbtCiSXECSpJtFoNFdUg16FIhVb++O5ZiKHzycTazFv3XCokjimm7Hl9hGuQ5D7u4evI9G6aNsqcy1toJKZs4GSszgqgQhh3ciglRNxV1YEFIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcfiT+Cb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4912C2BCAF
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 09:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772617440;
+	bh=8+rSrSJcs/fP61bPdboLaJ6pJ7+GkOXQuVKywbc0GCk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RcfiT+CbhA5N32spmPfxrEhljqGZBQ60fAlClkBvvhst/61qltnhlydaOXRe56LAC
+	 Fep900wxE57RKIQ/G4UB18SmNywGMgpqEaHtbEfTdTZ+fU+MKsOnGvM7eLWJ07qCOr
+	 cUwHXvrodPLmsufV/2VNR7tELRFonlmGhgrnfO/kb/PYTy2GKfU8rsiFigieE/3bVs
+	 2Xvmd4uU5AsZ0QVkAEz9TeJoK3rPtQVIJscvJ8R5pS5Gzrzg8N2BcC2hq0lqG/GQzH
+	 MWU/JLfXQ1bWzeZaZT1dlO40zEqrydOa/PP0F/7HK9HR8DIuXqL9ZRvYaX06rJ0lWv
+	 +pv2gvJYCD1CQ==
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64ae222d978so6271078d50.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 01:44:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV2ByXKWXfL00ouUp7St6XbP+uy2fZDJxbnw4natZ23o/NRDBzEqpJea1ej8wFQSQy3T0wa2Ug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzmJ8eC0EJKCbu9g7JIBWyySC5Wa3HZIGnjHEstOk5sZicZRMB
+	ho44jh2nblgd4mIMb8MLyxYhiH+bi9byPk4qDg/QvggVqGxagHxymiMUPXNsdxD62RjeVmyhuMt
+	l2MmzQiBr76/9KuEVhniqXNPl/ADJhD4=
+X-Received: by 2002:a05:690e:e26:b0:64c:a5f9:9b2d with SMTP id
+ 956f58d0204a3-64cf9b4dfaamr883263d50.21.1772617440138; Wed, 04 Mar 2026
+ 01:44:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: B1F9D1FDE2C
+References: <20260304084808.440955-1-xujialu@vimux.org> <7D8A09EB5A988115+20260304084808.440955-2-xujialu@vimux.org>
+In-Reply-To: <7D8A09EB5A988115+20260304084808.440955-2-xujialu@vimux.org>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 4 Mar 2026 10:43:48 +0100
+X-Gmail-Original-Message-ID: <CAD++jL=FCRvj_mz_E-JVnyUBV3SOidQQ7zp=ogcRqirjvphpTg@mail.gmail.com>
+X-Gm-Features: AaiRm522NQIq2xqWFZ06jce3apy8wKQbz7KFc_V7_Vt72Ls_gfhCHo5PLgJpfYk
+Message-ID: <CAD++jL=FCRvj_mz_E-JVnyUBV3SOidQQ7zp=ogcRqirjvphpTg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] nfc: s3fwrn5: convert to gpio descriptors
+To: Jialu Xu <xujialu@vimux.org>
+Cc: linux-gpio@vger.kernel.org, netdev@vger.kernel.org, brgl@kernel.org, 
+	krzk@kernel.org, kees@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 0D0011FDD40
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263699-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263700-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,vimux.org:email]
 X-Rspamd-Action: no action
 
-Pk9uIDAyLjAzLjIwMjYgMDc6MzIsIGphdmVuIHdyb3RlOg0KPj4gRnJvbTogSmF2ZW4gWHUgPGph
-dmVuX3h1QHJlYWxzaWwuY29tLmNuPg0KPj4NCj4+IFJUTDgxMTZhZiBpcyBhIG11bHRpIGZ1bmN0
-aW9uIGNoaXAuIEZ1bmN0aW9uIDEgaXMgbG9hZCB3aXRoIHI4MTY5DQo+PiBkcml2ZXIuIEZ1bmN0
-aW9uIDAgaXMgYm1jIHZpcnVhbCBkcml2ZXIgd2hpY2ggaXMgdXNlZCBmb3IgcG93ZXINCj4+IG1h
-bmFnZW1lbnQuIFRoaXMgcGF0Y2ggc2V0IEZ1bmN0aW9uIDIgdG8gNyBpbnRvIGQzIHN0YXRlIHdo
-ZW4gY29uZmlnDQo+PiBod19jb25maWcuIFRoaXMgaGVscHMgdGhlIHdob2xlIHN5c3RlbSBlbnRl
-ciBjMTAuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogSmF2ZW4gWHUgPGphdmVuX3h1QHJlYWxzaWwu
-Y29tLmNuPg0KPj4gLS0tDQo+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9t
-YWluLmMgfCA5NQ0KPj4gKysrKysrKysrKysrKysrKysrKysrKysNCj4+ICAxIGZpbGUgY2hhbmdl
-ZCwgOTUgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhl
-cm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPj4gYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFs
-dGVrL3I4MTY5X21haW4uYw0KPj4gaW5kZXggNzg3ODU5YjBhYjY4Li5kOGZmYzc2MTg2YjIgMTAw
-NjQ0DQo+PiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0K
-Pj4gKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMNCj4+IEBA
-IC0xMTIxLDYgKzExMjEsMTAwIEBAIERFQ0xBUkVfUlRMX0NPTkQocnRsX29jcF9ncGh5X2NvbmQp
-DQo+PiAgICAgICByZXR1cm4gUlRMX1IzMih0cCwgR1BIWV9PQ1ApICYgT0NQQVJfRkxBRzsgIH0N
-Cj4+DQo+PiArc3RhdGljIHUzMiBydGxfb3RoZXJfY3NpX3JlYWQoc3RydWN0IHJ0bDgxNjlfcHJp
-dmF0ZSAqdHAsIHU4DQo+PiArbXVsdGlfZnVuX3NlbF9iaXQsIGludCBhZGRyKSB7DQo+PiArICAg
-ICBSVExfVzMyKHRwLCBDU0lBUiwgKGFkZHIgJiBDU0lBUl9BRERSX01BU0spIHwgbXVsdGlfZnVu
-X3NlbF9iaXQNCj48PCAxNiB8DQo+PiArICAgICAgICAgICAgIENTSUFSX0JZVEVfRU5BQkxFKTsN
-Cj4+ICsNCj4+ICsgICAgIHJldHVybiBydGxfbG9vcF93YWl0X2hpZ2godHAsICZydGxfY3NpYXJf
-Y29uZCwgMTAsIDEwMCkgPw0KPj4gKyAgICAgICAgICAgICBSVExfUjMyKHRwLCBDU0lEUikgOiB+
-MDsgfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lkIHJ0bF9vdGhlcl9jc2lfd3JpdGUoc3RydWN0IHJ0
-bDgxNjlfcHJpdmF0ZSAqdHAsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1OCBt
-dWx0aV9mdW5fc2VsX2JpdCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCBh
-ZGRyLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50IHZhbHVlKSB7DQo+PiAr
-ICAgICBSVExfVzMyKHRwLCBDU0lEUiwgdmFsdWUpOw0KPj4gKyAgICAgUlRMX1czMih0cCwgQ1NJ
-QVIsIENTSUFSX1dSSVRFX0NNRCB8IChhZGRyICYgQ1NJQVJfQUREUl9NQVNLKQ0KPnwNCj4+ICsg
-ICAgICAgICAgICAgQ1NJQVJfQllURV9FTkFCTEUgfCBtdWx0aV9mdW5fc2VsX2JpdCA8PCAxNik7
-DQo+PiArDQo+PiArICAgICBydGxfbG9vcF93YWl0X2xvdyh0cCwgJnJ0bF9jc2lhcl9jb25kLCAx
-MCwgMTAwKTsgfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lkIHJ0bDgxNjhfY2xlYXJfYW5kX3NldF9v
-dGhlcl9mdW5fcGNpX2JpdChzdHJ1Y3QgcnRsODE2OV9wcml2YXRlDQo+KnRwLA0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1OCBtdWx0aV9mdW5f
-c2VsX2JpdCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdTMyIGFkZHIsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHUzMiBjbGVhcm1hc2ssDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHUzMiBzZXRtYXNrKSB7DQo+PiArICAgICB1MzIgdmFs
-Ow0KPj4gKw0KPj4gKyAgICAgdmFsID0gcnRsX290aGVyX2NzaV9yZWFkKHRwLCBtdWx0aV9mdW5f
-c2VsX2JpdCwgYWRkcik7DQo+PiArICAgICB2YWwgJj0gfmNsZWFybWFzazsNCj4+ICsgICAgIHZh
-bCB8PSBzZXRtYXNrOw0KPj4gKyAgICAgcnRsX290aGVyX2NzaV93cml0ZSh0cCwgbXVsdGlfZnVu
-X3NlbF9iaXQsIGFkZHIsIHZhbCk7IH0NCj4+ICsNCj4+ICtzdGF0aWMgdm9pZCBydGw4MTY4X290
-aGVyX2Z1bl9kZXZfcGNpX3NldHRpbmcoc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHAsDQo+PiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHUzMiBhZGRyLA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1MzIgY2xlYXJtYXNr
-LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1MzIgc2V0
-bWFzaywNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdTgg
-bXVsdGlfZnVuX3NlbF9iaXQpIHsNCj4+ICsgICAgIHUzMiB2YWw7DQo+PiArICAgICB1OCBpOw0K
-Pj4gKyAgICAgdTggRnVuQml0Ow0KPj4gKyAgICAgLyogMDogQk1DLCAxOiBOSUMsIDI6IFRDUiwg
-MzogVkdBL1BDSUVfVE9fVVNCLCA0OiBFSENJLCA1OiBXSUZJLCA2OiBXSUZJLA0KPjc6IEtDUyAq
-Lw0KPj4gKyAgICAgZm9yIChpID0gMDsgaSA8IDg7IGkrKykgew0KPj4gKyAgICAgICAgICAgICBG
-dW5CaXQgPSAoMSA8PCBpKTsNCj4+ICsgICAgICAgICAgICAgaWYgKEZ1bkJpdCAmIG11bHRpX2Z1
-bl9zZWxfYml0KSB7DQo+PiArICAgICAgICAgICAgICAgICAgICAgdTggc2V0X290aGVyX2Z1biA9
-IHRydWU7DQo+PiArDQo+PiArICAgICAgICAgICAgICAgICAgICAgaWYgKGkgPT0gMCkgew0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0X290aGVyX2Z1biA9IHRydWU7DQo+PiAr
-ICAgICAgICAgICAgICAgICAgICAgfSBlbHNlIGlmIChpID09IDUgfHwgaSA9PSA2KSB7DQo+PiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAodHAtPmRhc2hfZW5hYmxlZCkgew0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWwgPSBydGxfZXJpX3JlYWQo
-dHAsIDB4MTg0KTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaWYg
-KHZhbCAmIEJJVCgyNikpDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgc2V0X290aGVyX2Z1biA9IGZhbHNlOw0KPj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBlbHNlDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgc2V0X290aGVyX2Z1biA9IHRydWU7DQo+PiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB9DQo+PiArICAgICAgICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbCA9IHJ0bF9vdGhlcl9jc2lfcmVhZCh0cCwg
-aSwgMHgwMCk7DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAodmFsID09IDB4
-ZmZmZmZmZmYpDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNldF9v
-dGhlcl9mdW4gPSB0cnVlOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZWxzZQ0K
-Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXRfb3RoZXJfZnVuID0g
-ZmFsc2U7DQo+PiArICAgICAgICAgICAgICAgICAgICAgfQ0KPj4gKyAgICAgICAgICAgICAgICAg
-ICAgIGlmIChzZXRfb3RoZXJfZnVuKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-cnRsODE2OF9jbGVhcl9hbmRfc2V0X290aGVyX2Z1bl9wY2lfYml0KHRwLCBpLCBhZGRyLA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGNsZWFybWFzaywgc2V0bWFzayk7DQo+PiArICAgICAgICAgICAgIH0NCj4+
-ICsgICAgIH0NCj4+ICt9DQo+PiArDQo+PiArc3RhdGljIHZvaWQgcnRsODE2OF9zZXRfZGFzaF9v
-dGhlcl9mdW5fZGV2X3N0YXRlX2NoYW5nZShzdHJ1Y3QNCj5ydGw4MTY5X3ByaXZhdGUgKnRwLA0K
-Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-dTggZGV2X3N0YXRlLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdTgNCj4+ICttdWx0aV9mdW5fc2VsX2JpdCkgew0KPj4gKyAgICAgdTMy
-IGNsZWFybWFzazsNCj4+ICsgICAgIHUzMiBzZXRtYXNrOw0KPj4gKw0KPj4gKyAgICAgaWYgKGRl
-dl9zdGF0ZSA9PSAwKSB7DQo+PiArICAgICAgICAgICAgIGNsZWFybWFzayA9IChCSVQoMCkgfCBC
-SVQoMSkpOw0KPj4gKyAgICAgICAgICAgICBzZXRtYXNrID0gMDsNCj4+ICsgICAgICAgICAgICAg
-cnRsODE2OF9vdGhlcl9mdW5fZGV2X3BjaV9zZXR0aW5nKHRwLCAweDQ0LCBjbGVhcm1hc2ssDQo+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXRtYXNr
-LCBtdWx0aV9mdW5fc2VsX2JpdCk7DQo+PiArICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAgICAg
-ICBjbGVhcm1hc2sgPSAwOw0KPj4gKyAgICAgICAgICAgICBzZXRtYXNrID0gKEJJVCgwKSB8IEJJ
-VCgxKSk7DQo+PiArICAgICAgICAgICAgIHJ0bDgxNjhfb3RoZXJfZnVuX2Rldl9wY2lfc2V0dGlu
-Zyh0cCwgMHg0NCwgY2xlYXJtYXNrLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgc2V0bWFzaywgbXVsdGlfZnVuX3NlbF9iaXQpOw0KPj4gKyAgICAg
-fQ0KPj4gK30NCj4+ICsNCj4+ICBzdGF0aWMgdm9pZCByODE2OF9waHlfb2NwX3dyaXRlKHN0cnVj
-dCBydGw4MTY5X3ByaXZhdGUgKnRwLCB1MzIgcmVnLA0KPj4gdTMyIGRhdGEpICB7DQo+PiAgICAg
-ICBpZiAocnRsX29jcF9yZWdfZmFpbHVyZShyZWcpKQ0KPj4gQEAgLTM3ODUsNiArMzg3OSw3IEBA
-IHN0YXRpYyB2b2lkIHJ0bF9od19zdGFydF84MTE3KHN0cnVjdA0KPnJ0bDgxNjlfcHJpdmF0ZSAq
-dHApDQo+PiAgICAgICByODE2OF9tYWNfb2NwX3dyaXRlKHRwLCAweGMwOTQsIDB4MDAwMCk7DQo+
-PiAgICAgICByODE2OF9tYWNfb2NwX3dyaXRlKHRwLCAweGMwOWUsIDB4MDAwMCk7DQo+Pg0KPj4g
-KyAgICAgcnRsODE2OF9zZXRfZGFzaF9vdGhlcl9mdW5fZGV2X3N0YXRlX2NoYW5nZSh0cCwgMywg
-MHhmYyk7DQo+PiAgICAgICAvKiBmaXJtd2FyZSBpcyBmb3IgTUFDIG9ubHkgKi8NCj4+ICAgICAg
-IHI4MTY5X2FwcGx5X2Zpcm13YXJlKHRwKTsNCj4+ICB9DQo+DQo+VGhpcyBpcyB0aGUgdHlwZSBv
-ZiBjb2RlIHRoYXQgd291bGQgbWFrZSByODE2OSBiZWNvbWUgYW4gdW5tYWludGFpbmFibGUNCj5t
-ZXNzIGxpa2UgdGhlIHZlbmRvciBkcml2ZXJzLiBXaHkgbm90IHVzZSBzdGFuZGFyZCBtZWFucyBs
-aWtlDQo+cGNpX2J1c19yZWFkX2NvbmZpZ193b3JkKCkgZXQgYWw/DQoNClRoYW5rcyBmb3IgdGhl
-IHN1Z2dlc3Rpb24uDQpJIGZpcnN0IHRyaWVkIHRvIHVzZSBsc3BjaSwgYnV0IEkgY2FuJ3QgZmlu
-ZCBmdW5jdGlvbiAyLTcgaW4gcGNpIHN5c3RlbS4gVGhlbiBJIHRyaWVkIHRvDQp1c2UgcGNpX2J1
-c19yZWFkX2NvbmZpZ193b3JkKCkgdG8gYWNjZXNzIEZ1bmN0aW9uIDItNyBhbmQgZ2V0IHJlc3Vs
-dCBhcyBiZWxvdy4NCg0KWzIxMjU0Ljk4NDk4M10gUlRMODE2OF9ERUJVRzogU2xvdCAwLCBGdW5j
-dGlvbiAyLCBSZWFkIFZlbmRvciBJRDogMHhmZmZmZmZmZg0KDQpUaGlzIGNvbmZpcm1zIHRoYXQg
-dGhlc2UgZnVuY2l0b25zIGFyZSBwaHlzaWNhbGx5IGhpZGRlbiBmcm9tIHRoZSBQQ0kgYnVzLiBU
-aGV5IGRvDQpub3QgcmVzcG9uZCB0byBzdGFuZGFyZCBQQ0kgY29uZmlndXJhdGlvbiBjeWNsZXMs
-IHRoaXMgbWF5YmUgdGhlIHJlYXNvbiB3aHkgc3RhbmRhcmQNClBDSSBBUElzIGNhbm5vdCBiZSB1
-c2VkIGhlcmUuDQpUaGVzZSBmdW5jdGlvbnMgYXJlIGltcG9ydGFudCBmb3IgcG93ZXIgc3RhdGUg
-aXNzdWUuIFdoZW4gc3lzdGVtIHN1c3BlbmRzLCBsaW51eCBQQ0kNCmNvcmUgYXV0b21hdGljYWxs
-eSBoYW5kbGVzIHRoZSBwb3dlciB0cmFuc2l0aW9uIGZvciB0aGUgdmlzaWJsZSBmdW5jdGlvbnMu
-IEJ1dCBzaW5jZQ0KZnVuY3Rpb24gMi03IGlzIGludmlzaWJsZSwgdGhlIGtlcm5lbCBjYW5ub3Qg
-bWFuYWdlIGl0LiBBcyBhIHJlc3VsdCwgd2UgaGF2ZSBubyBjaG9pY2UgYnV0DQp0byB1c2UgdGhl
-IHZlbmRvci1zcGVjaWZpYyBpbmRpcmVjdCBhY2Nlc3MgbWVjaGFuaXNtKHZpYSBDU0lBUiByZWdp
-c3RlcikuDQoNClRoYW5rcywNCkphdmVuIFh1DQoNCg==
+Hi Jialu,
+
+thanks for your patch!
+
+It's *very* appreciated that you are driving this work forward!
+
+On Wed, Mar 4, 2026 at 9:48=E2=80=AFAM Jialu Xu <xujialu@vimux.org> wrote:
+
+> Use <linux/gpio/consumer.h> instead of <linux/of_gpio.h>.
+>
+> Signed-off-by: Jialu Xu <xujialu@vimux.org>
+(...)
+
+> -       phy->common.gpio_en =3D of_get_named_gpio(np, "en-gpios", 0);
+> -       if (!gpio_is_valid(phy->common.gpio_en)) {
+> -               /* Support also deprecated property */
+> -               phy->common.gpio_en =3D of_get_named_gpio(np,
+> -                                                       "s3fwrn5,en-gpios=
+",
+(...)
+
+> -       phy->common.gpio_fw_wake =3D of_get_named_gpio(np, "wake-gpios", =
+0);
+> -       if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
+> -               /* Support also deprecated property */
+> -               phy->common.gpio_fw_wake =3D of_get_named_gpio(np,
+> -                                                            "s3fwrn5,fw-=
+gpios",
+(...)
+
+old code supports the deprecated property too...
+
+> -       ret =3D devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpi=
+o_en,
+> -                                   GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
+> -       if (ret < 0)
+> -               return ret;
+> +       phy->common.gpio_en =3D devm_gpiod_get(&client->dev, "en", GPIOD_=
+OUT_HIGH);
+> +       if (IS_ERR(phy->common.gpio_en))
+> +               return PTR_ERR(phy->common.gpio_en);
+
+Maybe make a second try with
+devm_gpiod_get(&client->dev, "s3fwrn5,en", GPIOD_OUT_HIGH);
+so we don't change the semantics?
+
+> +       phy->common.gpio_fw_wake =3D devm_gpiod_get(&client->dev, "wake",
+> +                                                  GPIOD_OUT_LOW);
+> +       if (IS_ERR(phy->common.gpio_fw_wake))
+> +               return PTR_ERR(phy->common.gpio_fw_wake);
+
+Dito.
+
+Other than that it looks pretty straight-forward and correct!
+
+So +/- the fallback properties:
+Reviewed-by: Linus Walleij <linusw@kernel.org>
+
+Yours,
+Linus Walleij
 
