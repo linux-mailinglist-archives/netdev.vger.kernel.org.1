@@ -1,97 +1,62 @@
-Return-Path: <netdev+bounces-264033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264034-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLHZME2SqGkLvwAAu9opvQ
-	(envelope-from <netdev+bounces-264033-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:01 +0100
+	id AEbsMYWSqGkLvwAAu9opvQ
+	(envelope-from <netdev+bounces-264034-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2048C207782
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 231B720779F
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A25C301B925
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 20:11:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6EFA301DE35
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 20:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B582382F2C;
-	Wed,  4 Mar 2026 20:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F1A38423F;
+	Wed,  4 Mar 2026 20:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hkxLvpfh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B9QPp6Qk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6734382F06
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 20:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55293822AD
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 20:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772655115; cv=none; b=qEoR6fm4DL4AcT6TKUUP/DrmB9FDKRl6WVas8OgIqh5o35AXPzdJPhnQzgsGEnFb3/mhP+U5f1eYtaR5Fe27k5tbSQu+s4gfQ8zghKAD5LMQUytSYWX4M/A7O6YyiZvocKJ2uRnub8amy21DEUJcqe9D89lSMe5L7W8neR8djxQ=
+	t=1772655235; cv=none; b=jqyQkBCBVe/ZxyCMvauQCQJecHdZkxCzOpyj0gVpaIvDPh4Iw7b2zOv7O/BOiA1snmhz8lPqekBgfpYzCIubDspNGbYHXMRO5MTFSpuUZpuulqd4E4ql1HpO/MW6n1Or1acj1pR6Mkw6z2b6G3CfyvHyLQKAD11TFDZuyax2lZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772655115; c=relaxed/simple;
-	bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
+	s=arc-20240116; t=1772655235; c=relaxed/simple;
+	bh=7isN0xhrJkk47PegGus9LY1Urm2aH5STsiDXwCBNBRQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TieJsTEjb30+ywvy+x7xUT9MOB6RsNgG62ltnw1YxF6AZCP5l1YHMAmaGYLPS+gMCY7XOtvZ8dnsYZ7y5xXO+EJg/CM/BcedryJFYBaQXq1MxHcA3rQuwYpPwpL4cJUjb84eF8BLkexhm4bmgLiqFm1jecw/xHhFRkGtSo7/YK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hkxLvpfh; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb4097794dso712268785a.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 12:11:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1772655112; x=1773259912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
-        b=hkxLvpfhuH/fIqBn1y2+H7WYWeGmjn3p9329bc9ZMQEXlqajhD8zjcsPy/UbEEEXIP
-         5+O+c1OtvN6whhfIhVJBtBJFrODqfNdG/gBFoFYEGbGXCfyvF3sbSJGBv4j++qCeu+yP
-         CMQiAg8s5OYSiu6SGa8X7c0zwhTQtB4o6WV8EyUuHFMMZLAySlLLxlnq7Ct/wo4R82BR
-         4UJ74ejLrfBUdGSisY9oSwWkKvtO3yApB9SBPRliJuB2XwLAtNT5LTjpFrdL6Fn+eLez
-         W9pyKyeoQQdqvJKlGAM+qpS1OaRG1zlkrWVmyVLb5QaZAvS0oFd7ZJZbTiQmdImrswgk
-         YRUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772655112; x=1773259912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Ny4QP+mfSTD9TfzS6LP717MbExjZQzaWip2PzBx8Rw=;
-        b=RbJeyOwyMkXxGA7ZXpAdfvRamhnZcYjIkqZum1PczjsS5WzRNvCcNA5uG+9Dev7jqU
-         FYhaQ4eaRxRAt94XBLtmchNPgbhjo7gFKsu7f4XrH+oLviupL6vHrzlqh3PbhjeXbIc2
-         ZbVcRF579CpzypLY7GJyrORXSe28TQNij0/YiD/FOwSs2C1FUQ5IOIKenhK7tfcPEm0E
-         johRdbPn9ubURcmwxeTQlPeEndUtmH8evVVFY2qARImA5jQsXP9D5GaEeAq8AH6aRQqO
-         9UqNXDnplBNgo5hSSKXB6eHpvmcvXVlS4PyhGEoHEKsH6qpRnWzic3wdFqKiAx48o49m
-         O8jg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIRRo9gyJJnpx/KmNETyD+5fglTrlnwjkWILa4wYsUypHWsoSnDMd+9hJjdOFe+4hHFGkd27o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcHmgtxKn4niOV61gOh1EUJbNg1rCWSPYxJDsTEtTkga8zd9Zl
-	I/xDwy8e0J2l6vULZIv+hNrRn63ShMiqK3uRoL38p+yCJh+wOYAND6kYaZvq640tPX8=
-X-Gm-Gg: ATEYQzz1y9DPY3NnwG65KO9ty7Zkq1Wanf6t0udbARveHUGHCaGtxPmIpc0NWPLkYto
-	aClyWDoMZ30Ke98FchX+xvIhwf8KCkAW0K1htTeMSP7gAi7GS0gHNaH7zWYIDZrMpvBHuwnYmln
-	BJDxJOFkKXucfwANzuQwnWNFd9moxLEDXBSdx/LtOgM68YIzMokgVC8ZBnK4aFo044hR2wE2CVk
-	eG+rmCrlrYVY1Ozgb/pn1ju2U4UEdlxLnsL6l2IDXPOe8syrPcNtEwEaZSH+rpr9CmyxGGcxojw
-	LfiWLWsY0yKFIPPNu5j/y8U0tVH6/tSDcOixejOvmeKA2IZkjb2RabScDlMxxFdzmyv6d3DPtgE
-	BV8JOTOIuTS16gDWA27AraPAp8wNUKgYjoTY5MNplWGxvY3tdgYFLPuT6448Zpydausxn+9eJGC
-	OLXpC6RN5+2LgfGGdSJr2UrYHffnm9oOwDxBhlSvxA3UYOciTzwHGewdxUiZ9j+w2txgeK/Wzoj
-	z2pmtUR
-X-Received: by 2002:ac8:5f90:0:b0:504:3c8f:f9bf with SMTP id d75a77b69052e-508db413ccfmr43341111cf.74.1772655112470;
-        Wed, 04 Mar 2026 12:11:52 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5075feb4db9sm110731301cf.22.2026.03.04.12.11.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 12:11:52 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vxsZT-00000005OXj-1UJX;
-	Wed, 04 Mar 2026 16:11:51 -0400
-Date: Wed, 4 Mar 2026 16:11:51 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
-	mbloch@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rama.nichanamatlu@oracle.com,
-	manjunath.b.patil@oracle.com, anand.a.khoje@oracle.com
-Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Message-ID: <20260304201151.GI964116@ziepe.ca>
-References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oYvS/XJvt6sjZ+wUVK7O4LdytPs4U9DPDjtTtRvCJihjHbGN6alTWfCegiPNbCy7YINOlWCjLaeQBLJ2K/bRDaRUmzJ44Fso/6XL9cFgeeRyEJCW6jpEojfEXdvOSR4F+HQjJi9RvZ9y6VP8DVePWqpgPZHtqIVyOat5RdA3Ftw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B9QPp6Qk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZYpCnuhrUQxVvNjT6K7a+BBoT+f8MufvgTAJ3dQzlp0=; b=B9QPp6QkMWDTSxdkj4rOXky+S5
+	U7IsorNFmVM/GZXVAruWBbQqKkf31vCGRWwITXj9P7oMLCMMX94HSaWGD2zxAHRoMMxu/NkI44p04
+	+5vZJF7BIh1+Kkum4OdixwipjcNnNRDEgzQFxGop6AIce44JxMqCae9jGcuz72PdxgvU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vxsbD-00AAdx-1k; Wed, 04 Mar 2026 21:13:39 +0100
+Date: Wed, 4 Mar 2026 21:13:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk,
+	quan@os.amperecomputing.com, keyur@os.amperecomputing.com,
+	iyappan@os.amperecomputing.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, alok.a.tiwarilinux@gmail.com
+Subject: Re: [PATCH net-next] net: mdio: xgene: Fix misleading err message in
+ xgene mdio read
+Message-ID: <837d37e3-b68b-43d5-b325-235fe9c83f65@lunn.ch>
+References: <20260304195755.2468204-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,61 +65,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
-X-Rspamd-Queue-Id: 2048C207782
+In-Reply-To: <20260304195755.2468204-1-alok.a.tiwari@oracle.com>
+X-Rspamd-Queue-Id: 231B720779F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264033-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
+	TAGGED_FROM(0.00)[bounces-264034-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,os.amperecomputing.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ziepe.ca:dkim,ziepe.ca:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,oracle.com:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 04:17:04PM +0000, Praveen Kumar Kannoju wrote:
-> Interrupt lost scenario has been observed in multiple issues during IRQ
-> migration due to cpu scaling activity. This further led to the presence of
-> unhandled EQE's causing corresponding Mellanox transmission queues to
-> become full and get timedout. This patch overcomes this situation by
-> polling the EQ associated with the IRQ which undergoes migration, to
-> recover any unhandled EQE's and keep the transmission uninterrupted from
-> the corresponding queue.
+On Wed, Mar 04, 2026 at 11:57:36AM -0800, Alok Tiwari wrote:
+> xgene_xfi_mdio_read() prints "write failed" when the MDIO management
+> interface remains busy and the read times out. Update the message to
+> "read failed" to match the operation.
+> 
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  drivers/net/mdio/mdio-xgene.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/mdio/mdio-xgene.c b/drivers/net/mdio/mdio-xgene.c
+> index a8f91a4b7fed..ede6b9ddc426 100644
+> --- a/drivers/net/mdio/mdio-xgene.c
+> +++ b/drivers/net/mdio/mdio-xgene.c
+> @@ -250,7 +250,7 @@ static int xgene_xfi_mdio_read(struct mii_bus *bus, int phy_id, int reg)
+>  	} while ((status & BUSY_MASK) && timeout--);
+>  
+>  	if (status & BUSY_MASK) {
+> -		pr_err("XGENET_MII_MGMT write failed\n");
+> +		pr_err("XGENET_MII_MGMT read failed\n");
 
-What? This does not seem like something we should do like this.
+It is not even a plain cut/paste error. xgene_xfi_mdio_write() does
+not print an error message!
 
-IRQ migration is not supposed to loose interrupts, this seems like a
-IRQ layer bug to me. If it is buggy and loosing interrupts it should
-probably inject a spurious interrupt around these events so all
-devices can be enjoy the bug fix.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Basically you need to explain with alot more detail why the IRQ was
-lost, not just some hand wavey "migration something something"..
-
-BTW there are known bugs in things like qemu that can loose interrupts
-around changes to the MSI (and worse than that too), but I thought
-they were all fixed now?
-
-Jason
+    Andrew
 
