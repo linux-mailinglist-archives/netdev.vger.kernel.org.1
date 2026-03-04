@@ -1,128 +1,186 @@
-Return-Path: <netdev+bounces-264042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKBHErGgqGmZwAAAu9opvQ
-	(envelope-from <netdev+bounces-264042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:14:25 +0100
+	id cP9aMLuiqGnKwAAAu9opvQ
+	(envelope-from <netdev+bounces-264043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:23:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1DF207D86
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:14:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B3E207ECC
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 22:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1E4F3038AE7
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 21:14:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5E06303FAC6
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 21:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9724C383C67;
-	Wed,  4 Mar 2026 21:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C2E384244;
+	Wed,  4 Mar 2026 21:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="I26utYhD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yrq6Z+fD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E3B385536
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 21:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C86313550
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 21:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772658861; cv=none; b=d6MGqCoDZZEp2rjMpummeyrcjlPVjt+lgZrg5OXkKGBRpujnpH3pkVVFWyRshrJ3Jzot1aHxLPe3vYGY7GP6K5JJZhDGwGiOHYUNVfBBKddS8mBV6JYdJ5vjSByfJqWXyZi/Nj8xFkoZotnMWMDmJbUE1M03L6FDWmKHC46unWw=
+	t=1772659292; cv=none; b=rE+rLwcKCcMjcXPZow8+j29qm/sVhgjeN4loPXHSEYaVV8XNP0isg5mCLCW0NveAGbA1uqC10A+ltbuzRjl7fy2p+/ECZuM03VwtXFkZMwuJ3jbm814oh059bllKKek82MchVQBcysj3mo8mxM2x6itNfaowBW6j9Zzh6dc+MjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772658861; c=relaxed/simple;
-	bh=QeHdo4PzDoIW+7yC/XUa+IEZtrrNchtYbV0uMClETaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j4V2H3XCeedEXaqQKnmOSRBrw9slrVlbZOb6GLjlpwdwKTv1jnAHKTT9npT1etNuE3AhAWsHhq59kt9Lv8Mc9Vmx9NxoihJeJVuddoO/nuudXknhgtfPLCbwUzpkLLEy2mMJqKKuOPHVl/PE3rK3YZJKbvnIz0fax/Lc6MCvrNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=I26utYhD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DIqHp97e1+CNKtjbRZfd1Zm1V5xs1TXHOVWIpIgd7Xk=; b=I26utYhDQhoVCdDCkLyX+G0OT4
-	4gvbuVpvKfse9rvRAtYMzGw3bXSexcVFbHpvOFmQCAX15N3uBBJ9onDismXb8F7NuVbHkOhjO7Jt8
-	FDrxkszxiDzYbbxQ/I6mD4Dw3WQlttxBMsz5BpO+JyDZ1FfXoIdSOG/OVkUAUNizml64qpogk/tkf
-	cENDzVab02X3l5KZYcwZ+gAd0D+rvygE58vJbvQaxwUVmM3hhX2/AX08cThsosjMtbmBqWvLOkKrq
-	qjCPME3UwGAKc271G64T2hGDB+S4pj+fg048XGqWJbCPmIOfjYsrxsDQuVGlruL57a2e9CTfZi3xN
-	DrntY01g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32980)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vxtXj-00000000732-1iAG;
-	Wed, 04 Mar 2026 21:14:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vxtXf-000000008FR-3YlI;
-	Wed, 04 Mar 2026 21:14:03 +0000
-Date: Wed, 4 Mar 2026 21:14:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: hkallweit1@gmail.com, quan@os.amperecomputing.com,
-	keyur@os.amperecomputing.com, iyappan@os.amperecomputing.com,
-	andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	alok.a.tiwarilinux@gmail.com
-Subject: Re: [PATCH net-next] net: mdio: xgene: Fix misleading err message in
- xgene mdio read
-Message-ID: <aaigm4iqgf6fSaZu@shell.armlinux.org.uk>
-References: <20260304195755.2468204-1-alok.a.tiwari@oracle.com>
+	s=arc-20240116; t=1772659292; c=relaxed/simple;
+	bh=8/0BGGAqYQUjeK0d4hFg5aiF0xhSvfaKJmVrjkPdSgM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=j8qLpew4AEZR6amMGw3xSR4dE5hNE/hYnApqYK+Go6BlgQE9LVmtwRzlBioIVXXS0L1BQYTdcK2P1OD/Jha4ileuBkLdVSI7/rXv5VngZ3oki/9/pyayEfe4TnIqb/RucGO95L9QGfMXXvk0Hma0V45zpGK7H/At5aQakVrkUmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yrq6Z+fD; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae4e9577ceso165139935ad.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 13:21:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772659290; x=1773264090; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uoobhABnId/ABnpFfMX/36VvKKNGMl1cV4RO+RLbNuA=;
+        b=Yrq6Z+fDcySVUbYBs/Qcp9ZO53hp8q4/GMnGiAWb8CtffJScUfid476K98Td1/dUvv
+         nUWsgQoXW7wW57+MZQdUctwC5hnM3ncN6aSH7z5Y/7uj/wIm0VjaGLgAeFycoWM9k4qA
+         y87ZdBQzqum2Zlwo7+6ixqAkExPxcYG7G3P6IOYOt7vBy6VDiGoHei91wfR3JP9XZNO7
+         mjNZ70gVCkdhunV86WcWKtakIuSDrVXiUpldCffZZY3Y5RSAgleywbriKu+/Y2xknIn0
+         /3HqZl2eYU4Pwpj4MntATnHKqD8y7kIjEvsJ6wscXe+w9F7khHYdI0UHpzgZ3jpb2yYM
+         w/QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772659290; x=1773264090;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uoobhABnId/ABnpFfMX/36VvKKNGMl1cV4RO+RLbNuA=;
+        b=DPSgsj/57JsS7a7iafvpfB13oZWlnqifoOTBIuMsgk86Mklk4MUM5JkwZUspKvCNim
+         rJLYlQihhzRCcubb8OQCn2BBC4hSkCJXcOnP9/uIuA7YzMruBYb/8dyIlcrTyjk7jX+R
+         qvbbuymqkVp0eOahQLU9F/NF54bK+44ACRqvyfHPAibW6lgPD3POwuhhZPz9CNrgBnVW
+         jl5FdG6qs4QvBSk1GyaX8I9yMUfKgKlrTzsNqPDUuGxnDSaUxCdvS8jisI2DLA4sQQ0J
+         E9ppyOxWoIpdUayRDcfEarDpY7Q9LXjmzW2XNQWsTAUp/Z54xyhjDuxnKPPEnSgCz1n1
+         0iIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWGVhge89TAHQ6J27j4P5OZSOzGCWa7XHc2OnmLjH216hHGfeNQBMHyuTQoSTCRlXmq6JP1Sg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbiDruLwFK1S0mjM2X7FGqb6/OaDOe3hzZ2v6I9aDgr1tYbxRK
+	dfZL2zps51LjA9nJS9QpUiHaucfoXVolKcCCewttBidsmeUUQ+9NJlMXHFCbGK9m/ieQTjB/RVm
+	6NyPc+g==
+X-Received: from pllo14.prod.google.com ([2002:a17:902:778e:b0:2ae:3e55:f044])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2f8c:b0:2ab:3cba:42fa
+ with SMTP id d9443c01a7336-2ae6ab2519bmr32290315ad.46.1772659290127; Wed, 04
+ Mar 2026 13:21:30 -0800 (PST)
+Date: Wed,  4 Mar 2026 21:21:03 +0000
+In-Reply-To: <20260303170106.129698-2-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304195755.2468204-1-alok.a.tiwari@oracle.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: 9A1DF207D86
+Mime-Version: 1.0
+References: <20260303170106.129698-2-jrife@google.com>
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260304212128.1943568-1-kuniyu@google.com>
+Subject: Re: [PATCH net-next v2 1/2] udp: Preserve UDP socket addresses on abort
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: jrife@google.com
+Cc: andrii@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	edumazet@google.com, kuba@kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@fomichev.me, willemdebruijn.kernel@gmail.com, 
+	yusuke.suzuki@isovalent.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 47B3E207ECC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264042-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,os.amperecomputing.com,lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,google.com,linux.dev,fomichev.me,gmail.com,isovalent.com];
+	TAGGED_FROM(0.00)[bounces-264043-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.204];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:url,armlinux.org.uk:email,shell.armlinux.org.uk:mid]
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 11:57:36AM -0800, Alok Tiwari wrote:
-> xgene_xfi_mdio_read() prints "write failed" when the MDIO management
-> interface remains busy and the read times out. Update the message to
-> "read failed" to match the operation.
+From: Jordan Rife <jrife@google.com>
+Date: Tue,  3 Mar 2026 17:01:02 +0000
+> Currently, udp_abort() invokes __udp_disconnect() which clears out
+> socket fields like inet_daddr and inet_dport. This makes fields like
+> dst_ip4, dst_ip6, and dst_port useless inside cgroup/sock_release BPF
+> hooks following an abort on a connected UDP socket, since they'll always
+> equal zero. This differs from the behavior for TCP sockets where a
+> cgroup/sock_release hook will see the address and port that the socket
+> was connected to at the time it was aborted. This causes issues in
+> Cilium where a sock_release hook is used to perform map maintenance when
+> sockets are released, since Cilium actively destroys connected UDP
+> sockets in some cases.
+
+Just curious why Cilium does not unregister the socket just
+after aborting it ?
+
+At least Cilium should know the key at that moment.
+
+
 > 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> Make the behavior consistent between TCP and UDP sockets by not clearing
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+This patch makes another inconsistency with TCP.
 
-Thanks!
+As you mentioned in the cover letter, before the patch, even if
+aborted, a bound socket still reserves a port, but it does not now.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This might be surprising for non-reuseaddr/port sockets.
+
+
+> out these fields in udp_abort(). Instead, just unhash the socket, mark
+> its state as TCP_CLOSE, and preserve the state of the other fields.
+> 
+> Fixes: f5836749c9c0 ("bpf: Add BPF_CGROUP_INET_SOCK_RELEASE hook")
+> Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
+> Signed-off-by: Jordan Rife <jrife@google.com>
+> ---
+>  net/ipv4/udp.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index b96e47f1c8a2..01a0a0fbcd56 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -3247,7 +3247,9 @@ int udp_abort(struct sock *sk, int err)
+>  
+>  	sk->sk_err = err;
+>  	sk_error_report(sk);
+> -	__udp_disconnect(sk, 0);
+
+How about passing another flag and avoid unwanted init only for
+bpf iterator ?  This will need another layer of __udp_disconnect()
+like ____udp_disconnect() (I'm not good at naming), or must make
+sure the flag is never used in uAPI.
+
+
+
+> +	sk->sk_state = TCP_CLOSE;
+> +	sk->sk_prot->unhash(sk);
+> +	sk_dst_reset(sk);
+>  
+>  out:
+>  	if (!has_current_bpf_ctx())
+> -- 
+> 2.53.0.473.g4a7958ca14-goog
+> 
 
