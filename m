@@ -1,179 +1,243 @@
-Return-Path: <netdev+bounces-263918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HKVO9phqGmduAAAu9opvQ
-	(envelope-from <netdev+bounces-263918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:46:19 +0100
+	id 4K4wLEViqGk3uQAAu9opvQ
+	(envelope-from <netdev+bounces-263919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590AB2048B7
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:46:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2394420490C
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 17:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 932A730FBEC8
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:15:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3F7093094CE9
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 16:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A9A35AC23;
-	Wed,  4 Mar 2026 16:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408BC35E93B;
+	Wed,  4 Mar 2026 16:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DkQaVkAT"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ThfwijaM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80154352F9B
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 16:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE7235E939;
+	Wed,  4 Mar 2026 16:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772640903; cv=none; b=fE0ng8spbcUujAq0QGheZaMbpZlzgpLSrhbOVP2KNHXrQ3s/U6G2J/JE0Tugvdrgf6eao10tZ6Apt7FH6VQGf/oo5IujlaXZP+xVlT8BQi7y1kCKVy333Rj17fSc2qwqaRmHqqGAc4PuWW8J8zLkW10vIc3NY+mQEawOjhM/w7I=
+	t=1772641044; cv=none; b=FFunSPzt6iCSMzvPo2PWHrQ26YMhKNmXAs4O2sGVfnJQKzmstGTg7rY7osZb5DuY/OeOJjCv6MXlrvYS+fq4+IMfBOJ/5FY6KlAJtUbD17ioeRM6COc9pyx4Nb7ZMYVo7guGvywuVg64cSRCvXchk+n8x4q/q7mSVGTmw0VQtpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772640903; c=relaxed/simple;
-	bh=jwbDEATg8fW9vDaRDhRzDHXH7o9vAPHP/aATjZNU17s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2lu1My0H5bVR4775il6KkxuotqMKOTzhPpnaZjye3mk1U8+SO2naDjhMK4m76YkYbjdkr0OF/7d/QTSx9CtOacDWfo/3bhy+nBlAfiT36mu+y9Mx4JnDaJsUltqZxnWl4t+6idHArDToCLTLWFaw0ILJrqjqL96HyJDHbSPKAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DkQaVkAT; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-439b7d4a843so249938f8f.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 08:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772640901; x=1773245701; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=te21XJbMFTrGPZV/E8Xfa+RlFYp/4cGGtQTDWYMXpZ0=;
-        b=DkQaVkAT/r90BXfqvwqwNKmpWcaLeOG31JWL1M/jmsr3PHdR++GKGnP/fXoiI3s/cY
-         BEehehNkrNmAcLUeKxYWqcHe3wXfDoWN2VmM3MY6iemaaG6cwpb7/3XikFcME8NtNYGR
-         9Ws5LB1MqehvegXpmDSpmZ2rvug1frJOBp7FOQx3hA9BhAXGIPCtj+it+pqgpplGlIZL
-         VhE8EoYyriwEIsgRnUS66Z/YLW0LQnkyvOBSVx4DR/dRFsxKnL7Vxcu6y8+frV6cDCi+
-         d4lGoDdFkFkX3wxOk+9NmaX+ZBvgk1QF5bWaN9CMZJ96dSI+E7ArWpNhBlwdKiJHVgkm
-         C7BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772640901; x=1773245701;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=te21XJbMFTrGPZV/E8Xfa+RlFYp/4cGGtQTDWYMXpZ0=;
-        b=NR/b+Ug567yR6vY18n97B7NeI7Tu6PSlsaNG4qkIfIPyO7aC7+3lm4RuYq+2CZI80C
-         G1qt7+nodsipZ6OK9ByyoEh8Yx+OPXr56B8/aP3Cr919qxmL5zCJKf9cLf/nMPwpooBI
-         uivM7ZXzG5nPTC2mz/oMhEKKimAN+iIcnIYN4G6/qoRfLys2WqPuJVADtz3HPLgYGof9
-         MfP2Et/MlXkYoN00+pWlGCigG8/SOif/5hSm9ccM/s08NWYjaJS9g2u1pzy5QPKOqEjO
-         2Zh45BhvMr4O3xg3UP5SZoEvmkKqbfzbUzrfV4FGW/82DxuwsDbeNIWucagDOss1R+h7
-         W3Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFw01U2GX7gDuIDpSzfDg2SCVqU9iPrG+FmukDt1JiXDaHDzhVCRJqEtvkjgZmF7NVIp/UBfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvmn7virvF8+Qugj//Km6Ps+NGM99VnAL/KMzr7RwpSWb9QQci
-	UhAlTaPywIV+zyOpcn29WPPOvQoabeyjFeRWExF4hBg1GJzJcGVkO23/
-X-Gm-Gg: ATEYQzw4lGGeeaB/uk7QJuCEpZPrNneBlyZ53eR5GOxz4TaX5elN9F9P2XhVbKBsaTY
-	SVj9ZHaGFq9rdqIv7nAV+fV/uqUlGygrFkVc25mVF+6fOBkgJNuacPl0MDpATsomHa0Kt7/mpbk
-	hHybtkHrpVSukIkxX6ainuppeS/OqtVXQDjmgovi6AMyl3EdScTdBB9Ye8NjUMFfaEJGiSjPTAD
-	ffI9JkpOCiuY9wdjDYxaEU/+0rmPdQdFnHNcHtWZdpldRQbRKsvUM6GInU9os/ZzuXhL37sBaFB
-	MYWgf0N1RTbOHqMC/xGQzSPs0yNeZjyndt5Q3/JtHU9ntojFLng6VwyTFq8nRHuJZmpKD8YVsWX
-	l7c59FihcRqrdbOZGNopqYYgggmwl2+S7U1eM6UzsXh8KirjZtAoYIOufAB0JXg5ksbpBWu7pIK
-	B5AHZiZvH+sJ4MZ9I=
-X-Received: by 2002:a05:600c:a07:b0:477:7bd8:8f2d with SMTP id 5b1f17b1804b1-4851988f040mr29274045e9.8.1772640900632;
-        Wed, 04 Mar 2026 08:15:00 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d00e:3600:3896:e6f1:29a3:961b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851881264fsm56343555e9.14.2026.03.04.08.14.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 08:15:00 -0800 (PST)
-Date: Wed, 4 Mar 2026 18:14:57 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-Cc: Conor Dooley <conor@kernel.org>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
- switch bindings
-Message-ID: <20260304161457.l6tkxix6sgube3qc@skbuf>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
- <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
- <20260303-disperser-clone-512efa99f26c@spud>
- <65fd5f46f1f996dd5f4df2de2efb52c8fa3575b3.camel@microchip.com>
+	s=arc-20240116; t=1772641044; c=relaxed/simple;
+	bh=ywYiMsYTtAz4vCZZhs0h0CIWMYzBUX8EGn5ktDgQ6cs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JNMvZ2TSEBEEV1qWXXH128DbnQexrmE0EnsK356xK61oY+RtqIxdplV89HMHrCXyXjfBobfNSykVQb76lQchSulptCabDa6VEze92T8W8uuPBW+AClykFQwDwuqeH1m1AevVVT01oCKU1YO5tXR6WTswt34+WQ6MckWmnqUJYQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ThfwijaM; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 624FrXkL3032201;
+	Wed, 4 Mar 2026 16:17:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=IFixIG4h0jJ5QA8kMpukNjAsR7RsB
+	CMOlOf0xpOGZns=; b=ThfwijaMmOnsIkLusTuEfQQi2/cfb+J4P7wVkcy0rZUvk
+	tjnnzblkOHPRM2ZZkyHWtmbneQWAC7xLqJBhfCXz79/JzfLle0rKDPrG8h1tv9IY
+	zRXUt0CtfX+ZKKPK6rZ+TLhBHxci/AK7oQRvytoMND6K3mpJRUzhSbTqfxtN+xK7
+	e4DdBuxSdcWCBkXqu3P+0oEoVAlNH4RX1DONSnIwgtLq94GUJZ6JaSpsDne9WQ8N
+	5dL2LobXMl5YUq+TkkZ06v39PyFMCs8dj/v1K+CtwvlqsA4GP18d7LVmAJAxmRMZ
+	eflDEqKLuhaL8dEyOPNFyHYmLChiFxZImCBXcWpfA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cpqsbr2ft-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 04 Mar 2026 16:17:12 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 624FAD0w034716;
+	Wed, 4 Mar 2026 16:17:11 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptg1ba6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 04 Mar 2026 16:17:11 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 624GHB2e005768;
+	Wed, 4 Mar 2026 16:17:11 GMT
+Received: from pkannoju-dev-build.osdevelopmeniad.oraclevcn.com (pkannoju-dev-build.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.252.59])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4ckptg1b9g-1;
+	Wed, 04 Mar 2026 16:17:10 +0000
+From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+To: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com,
+        anand.a.khoje@oracle.com,
+        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
+Date: Wed,  4 Mar 2026 16:17:04 +0000
+Message-ID: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <65fd5f46f1f996dd5f4df2de2efb52c8fa3575b3.camel@microchip.com>
-X-Rspamd-Queue-Id: 590AB2048B7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-04_07,2026-03-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2602130000 definitions=main-2603040131
+X-Proofpoint-GUID: uC45aMbQRRe8T4wocvcXgYbjO1QV8Bjp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDEzMiBTYWx0ZWRfX3Tfd/wNhDnOa
+ i1F1HjJP2hYOohLYbINbVkzsbF0OJpYaCqC/sdVp1YTadhrZL2Z3atwkSeXyRpfJPLnkWfu65r7
+ mfZm8X0jGvFYPKxMusj8FVdMSo8EtO//3Wb06CFbzhubSGNqC7/5O+afEvppSpLrEkZNsUSkiOw
+ hgz1jG/aM5josd3/Wf6MoiLDlmT5rJHSmxPujhlSqv8QjbpV5LGBM7r1ant+mMrpv4RXuYibaOB
+ 4vy8w6ljmQx1zb1ngp7iZ9knxrrt9j/GuX5TN/ud8lF5fJdP3UwIzQKnD++NwLSDmosgLid1To2
+ 6sOSjp8En6OcQ1oO2v85GqGfLn9pSAG1GX0/TN1b4fBhHuDbR7NG5JxJFzpuKXKIuAzNAZeB1Zq
+ KQux7I53vfQwyEPY/SBDxN0PeDMOFFSV8I5GIU8JYnSqsAfSBPCQ1Mw8Lu0J6rp/PE+O+hdGEs3
+ YMVjLqb6nGr13gGfjHUHqU6dHIvaHB2EP93oHkmc=
+X-Proofpoint-ORIG-GUID: uC45aMbQRRe8T4wocvcXgYbjO1QV8Bjp
+X-Authority-Analysis: v=2.4 cv=EOELElZC c=1 sm=1 tr=0 ts=69a85b08 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=x4eqshVgHu-cdnggieHk:22 a=yPCof4ZbAAAA:8 a=tFMKXHgGLOdB1ZkV82YA:9 cc=ntf
+ awl=host:12266
+X-Rspamd-Queue-Id: 2394420490C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263918-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263919-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[praveen.kannoju@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:dkim,oracle.com:email,oracle.com:mid];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 05:10:11PM +0100, Jens Emil Schulz Ostergaard wrote:
-> On Tue, 2026-03-03 at 18:56 +0000, Conor Dooley wrote:
-> > On Tue, Mar 03, 2026 at 01:22:28PM +0100, Jens Emil Schulz Østergaard wrote:
-> > > +examples:
-> > > +  - |
-> > > +    soc {
-> > > +        #address-cells = <1>;
-> > > +        #size-cells = <0>;
-> > > +
-> > > +      ethernet-switch@0 {
-> > > +        reg = <0>;
-> > 
-> > Also, this is an odd example, why are you at address 0 on a "soc" bus,
-> > which usually means that this device on an AXI/AHB bus, and 0 is very
-> > unusual for that. Obviously the example doesn't have to match the real
-> > user, but this stands out.
-> > I may have some follow up questions I think depending on your answer.
-> 
-> The intended way to bind this driver is via a parent MFD driver which sets
-> up the SPI register protocol, initiates regmaps and distributes them to child
-> devices (like this DSA driver).
-> 
-> Similar to mscc,vsc7512 in drivers/mfd/ocelot-spi.c.
-> 
-> This MFD would be the soc node. All child nodes perform register IO over
-> spi, using the regmaps requested from this parent so I think the addresses
-> on the bus are purely ornamental. Should I write the smallest register
-> address in all regions used by the DSA driver instead?
+Interrupt lost scenario has been observed in multiple issues during IRQ
+migration due to cpu scaling activity. This further led to the presence of
+unhandled EQE's causing corresponding Mellanox transmission queues to
+become full and get timedout. This patch overcomes this situation by
+polling the EQ associated with the IRQ which undergoes migration, to
+recover any unhandled EQE's and keep the transmission uninterrupted from
+the corresponding queue.
 
-They are not ornamental, they should be the same addresses you'd put if
-Linux had direct access to the SoC interconnect for MMIO, rather than to
-an SPI bridge to the SoC interconnect. Or at least I don't see why it
-wouldn't be that way.
+Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 41 +++++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/lib/eq.h  |  1 +
+ 2 files changed, 42 insertions(+)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 25499da177bc..4f0653305f46 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -22,6 +22,10 @@
+ #include "devlink.h"
+ #include "en_accel/ipsec.h"
+ 
++unsigned int mlx5_reap_eq_irq_aff_change;
++module_param(mlx5_reap_eq_irq_aff_change, int, 0644);
++MODULE_PARM_DESC(mlx5_reap_eq_irq_aff_change, "mlx5_reap_eq_irq_aff_change: 0 = Disable MLX5 EQ Reap upon IRQ affinity change, \
++		 1 = Enable MLX5 EQ Reap upon IRQ affinity change. Default=0");
+ enum {
+ 	MLX5_EQE_OWNER_INIT_VAL	= 0x1,
+ };
+@@ -951,10 +955,36 @@ static int alloc_rmap(struct mlx5_core_dev *mdev) { return 0; }
+ static void free_rmap(struct mlx5_core_dev *mdev) {}
+ #endif
+ 
++void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
++{
++	u32 eqe_count;
++	struct mlx5_eq_comp *eq = container_of(notify, struct mlx5_eq_comp, notify);
++
++	if (mlx5_reap_eq_irq_aff_change) {
++		mlx5_core_warn(eq->core.dev, "irqn = 0x%x migration notified, EQ 0x%x: Cons = 0x%x\n",
++			       eq->core.irqn, eq->core.eqn, eq->core.cons_index);
++
++		while (!rtnl_trylock())
++			msleep(20);
++
++		eqe_count = mlx5_eq_poll_irq_disabled(eq);
++		if (eqe_count)
++			mlx5_core_warn(eq->core.dev, "Recovered %d eqes on EQ 0x%x\n",
++				       eqe_count, eq->core.eqn);
++		rtnl_unlock();
++	}
++}
++
++void mlx5_eq_reap_irq_release(struct kref *ref) {}
++
+ static void destroy_comp_eq(struct mlx5_core_dev *dev, struct mlx5_eq_comp *eq, u16 vecidx)
+ {
+ 	struct mlx5_eq_table *table = dev->priv.eq_table;
+ 
++	if (irq_set_affinity_notifier(eq->core.irqn, NULL))
++		mlx5_core_warn(dev, "failed to unset EQ 0x%x to irq 0x%x affinty\n",
++			       eq->core.eqn, eq->core.irqn);
++
+ 	xa_erase(&table->comp_eqs, vecidx);
+ 	mlx5_eq_disable(dev, &eq->core, &eq->irq_nb);
+ 	if (destroy_unmap_eq(dev, &eq->core))
+@@ -990,6 +1020,7 @@ static int create_comp_eq(struct mlx5_core_dev *dev, u16 vecidx)
+ 	struct mlx5_irq *irq;
+ 	int nent;
+ 	int err;
++	int ret;
+ 
+ 	lockdep_assert_held(&table->comp_lock);
+ 	if (table->curr_comp_eqs == table->max_comp_eqs) {
+@@ -1036,6 +1067,16 @@ static int create_comp_eq(struct mlx5_core_dev *dev, u16 vecidx)
+ 	if (err)
+ 		goto disable_eq;
+ 
++	eq->notify.notify = mlx5_eq_reap_irq_notify;
++	eq->notify.release = mlx5_eq_reap_irq_release;
++	ret = irq_set_affinity_notifier(eq->core.irqn, &eq->notify);
++	if (ret) {
++		mlx5_core_warn(dev, "mlx5_eq_reap_irq_nofifier: EQ 0x%x irqn = 0x%x irq_set_affinity_notifier failed: %d\n",
++			       eq->core.eqn, eq->core.irqn, ret);
++	}
++	mlx5_core_dbg(dev, "mlx5_eq_reap_irq_nofifier: EQ 0x%x irqn = 0x%x irq_set_affinity_notifier set.\n",
++		      eq->core.eqn, eq->core.irqn);
++
+ 	table->curr_comp_eqs++;
+ 	return eq->core.eqn;
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
+index b1edc71ffc6d..669bacb9e390 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
+@@ -46,6 +46,7 @@ struct mlx5_eq_comp {
+ 	struct notifier_block   irq_nb;
+ 	struct mlx5_eq_tasklet  tasklet_ctx;
+ 	struct list_head        list;
++	struct irq_affinity_notify notify;
+ };
+ 
+ static inline u32 eq_get_size(struct mlx5_eq *eq)
+-- 
+2.43.7
+
 
