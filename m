@@ -1,51 +1,58 @@
-Return-Path: <netdev+bounces-263689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263690-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OIsIlT6p2mtmwAAu9opvQ
-	(envelope-from <netdev+bounces-263689-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:24:36 +0100
+	id EGtdO5v6p2mtmwAAu9opvQ
+	(envelope-from <netdev+bounces-263690-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:25:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D2D1FD863
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:24:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 549781FD8A6
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3E3E1309E771
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:22:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D662F3025D2F
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7DF37EFEE;
-	Wed,  4 Mar 2026 09:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52E13932F1;
+	Wed,  4 Mar 2026 09:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jotPM3cx"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="i7x4nBGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673E5372675;
-	Wed,  4 Mar 2026 09:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAAC21773F;
+	Wed,  4 Mar 2026 09:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616147; cv=none; b=MCCZhwz79frlkYjY8Vpvd+Jq4zTT57sMBpByixL46LSwO0rwCqbQ/ChZRSS0HJ+y3NqZUuwO9cPZ2/tyBG+BxWlnfdDIjLcAimC87hW+Uww36apEJbT91+FAChGno4FsQSrvfQcMsKlmbiY9wpCowLIHP//BCJwIHqGPDxPqbLA=
+	t=1772616296; cv=none; b=uhPr/7bm/s0UzPZR/waY6heSUvAgn5HeHO8CJwkEdQ2k8hv4SHjetcuBXpK+4RN714ReYF1R6EggkJ+fa/91x2BAqbj8+AlTXQCQhR6WuorZnVeKbn/oMs95iV1rczCyx1LoTq2wzAyDloTiHW4zZVduaikUqAzT3w09A1I2V0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616147; c=relaxed/simple;
-	bh=l0lWwdxWORqLXsJM6tbxvmdK9uvSDQhvLoF0Kob8MYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dmt/uiKgjDJPL9Yn0hjn97RFNYYHLhrxOGvmE8qvx7tKZRfaqUBbwBjRMpEKWYMxjLRduFstZxocPPO1Mq5q/dshkyzgTJuQ+cOyeUy11RiHoRYQYeQvi5pEu8P02uvmYaVvmqd6QEp5epPBKz0KSiIPihuQMDCHHrxDDLMpNF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jotPM3cx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82230C19423;
-	Wed,  4 Mar 2026 09:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772616147;
-	bh=l0lWwdxWORqLXsJM6tbxvmdK9uvSDQhvLoF0Kob8MYE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jotPM3cx/9O4URnSkY8s/5fK1deaT6YQ5CqP+kM9WZUdfTXfXoZPM1fAfxobUk9wu
-	 lekW0CvG1MyBE9imhkba0vcjYml+XHqe5kJ0CyU5nUs2oN0JQJ2LDWCaxC06Zdqow1
-	 uKeWQEyhN2wZdM7KhOXrVu03yqa7pSud0YBxX/2AsIxcT1qu3Xiphok2omuQ1E8OUl
-	 adpzL3pT2Y6kDAyerLt7CO6kGf3ySVP9WirmQqg5z7kS45V/srf51GTX7Fi436QPea
-	 VqYXvCoe5/mBsPsMKn1g2Lpr1gT8xSRTyjPODe3dDN/pcR5zUPS/QZGADNlGGMxYJx
-	 dXdciIMH8y0Dg==
-Message-ID: <af805e55-4372-4c76-8afa-e78c623d50eb@kernel.org>
-Date: Wed, 4 Mar 2026 10:22:21 +0100
+	s=arc-20240116; t=1772616296; c=relaxed/simple;
+	bh=MVQhcGBn6YW7ExDvSL0VET30MB3SKZt+vNQgsoR9ju0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JwGVdewmtMGNA0Ohm7a2dEluYUQkTfmEQqbhwFHfb6iXZJRsACKbjy2Aay8btYYTpnfn2NJE2Fp5+4r1oeVVGd03YVJKi8KUq94Cls88RHHFtBX+8W+UKI80MWrTA1bRx4KqJHn2ur3iR6Ccd1gOVD3UMZInLiQWQG7xNWDOZWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=i7x4nBGo; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=JNYzYS3a/7M1z++lKGXx05x1L7768oI/UUytgZ80oNY=;
+	b=i7x4nBGoHTL9c2BCZecME8ZeikLulrQT3xjh3bT0NQwYhQ8SdEWlryY8lXA8GdqGG8PEiDKsy
+	sfkxlISK07oo+K/+46AqSBdzsvZhkTBU6KSrChkLYpHLsJb2FOj9Cz6XFwAu+x4PtlUDwxz6tSt
+	ze9MUoy5uny1MILtoag1cig=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4fQnFC633KzRhT3;
+	Wed,  4 Mar 2026 17:19:59 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3C4C240569;
+	Wed,  4 Mar 2026 17:24:50 +0800 (CST)
+Received: from [10.174.178.79] (10.174.178.79) by
+ kwepemj500018.china.huawei.com (7.202.194.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 4 Mar 2026 17:24:49 +0800
+Message-ID: <e91bf909-bf4d-4f90-a370-688a9424478b@huawei.com>
+Date: Wed, 4 Mar 2026 17:24:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,133 +60,344 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 4/5] mptcp: pm: in-kernel: always mark signal+subflow
- endp as used
-Content-Language: en-GB, fr-BE
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260303-net-mptcp-misc-fixes-7-0-rc2-v1-0-4b5462b6f016@kernel.org>
- <20260303-net-mptcp-misc-fixes-7-0-rc2-v1-4-4b5462b6f016@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260303-net-mptcp-misc-fixes-7-0-rc2-v1-4-4b5462b6f016@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 02D2D1FD863
+Subject: Re: [PATCH net] mptcp: fix soft lockup in mptcp_recvmsg()
+To: Matthieu Baerts <matttbe@kernel.org>
+CC: <geliang@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<martineau@kernel.org>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
+References: <20260302052651.1466983-1-lixiasong1@huawei.com>
+ <57061768-a136-49b8-b020-609016f217ed@kernel.org>
+From: Li Xiasong <lixiasong1@huawei.com>
+In-Reply-To: <57061768-a136-49b8-b020-609016f217ed@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Rspamd-Queue-Id: 549781FD8A6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263689-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-263690-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[3.run:url,1.save:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello,
+Hi Matt,
 
-On 03/03/2026 11:56, Matthieu Baerts (NGI0) wrote:
-> Syzkaller managed to find a combination of actions that was generating
-> this warning:
-(...)
+On 3/4/2026 2:06 AM, Matthieu Baerts wrote:
+> Hi Li,
+> 
+> On 02/03/2026 06:26, Li Xiasong wrote:
+>> syzbot reported a soft lockup in mptcp_recvmsg() [0].
+>>
+>> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
+>> removed from the sk_receive_queue. This causes sk_wait_data() to always
+>> find available data and never perform actual waiting, leading to a soft
+>> lockup.
+>>
+>> Fix this by adding a 'last' parameter to track the last peeked skb.
+>> This allows sk_wait_data() to make informed waiting decisions and prevent
+>> infinite loops when MSG_PEEK is used.
+> 
+> (...)
+> 
+>> Fixes: 612f71d7328c ("mptcp: fix possible stall on recvmsg()")
+>> Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+>> ---
+>>  net/mptcp/protocol.c | 10 +++++++---
+>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+>> index cf1852b99963..7a65c2101f63 100644
+>> --- a/net/mptcp/protocol.c
+>> +++ b/net/mptcp/protocol.c
+>> @@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+>>  static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+>>  				size_t len, int flags, int copied_total,
+>>  				struct scm_timestamping_internal *tss,
+>> -				int *cmsg_flags)
+>> +				int *cmsg_flags, struct sk_buff **last)
+>>  {
+>>  	struct mptcp_sock *msk = mptcp_sk(sk);
+>>  	struct sk_buff *skb, *tmp;
+>> @@ -2058,6 +2058,8 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+>>  			}
+>>  
+>>  			mptcp_eat_recv_skb(sk, skb);
+>> +		} else {
+>> +			*last = skb;
+> 
+> Out of curiosity, why only setting *last for MSG_PEEK? Is it not better
+> to always call sk_wait_data() later with the last skb, even when
+> MSG_PEEK is not used?
+> 
+> Or will this cause other troubles?
 
-> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-> index b5316a6c7d1b..b2b9df43960e 100644
-> --- a/net/mptcp/pm_kernel.c
-> +++ b/net/mptcp/pm_kernel.c
-> @@ -418,6 +418,15 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
->  	}
->  
->  exit:
-> +	/* If an endpoint has both the signal and subflow flags, but it is not
-> +	 * possible to create subflows -- the 'while' loop body above never
-> +	 * executed --  then still mark the endp as used, which is somehow the
-> +	 * case. This avoids issues later when removing the endpoint and calling
-> +	 * __mark_subflow_endp_available(), which expects the increment here.
-> +	 */
 
-Regarding the AI review [1], I don't think the comment should be more
-precise by stating each case where the 'while' loop body is not
-executed: such comment would easily get outdated when the conditions are
-modified, and we forget to update it. The commit message explains the
-conditions which are used today, but might change later. Also, the
-endpoint is considered as used, not to create a subflow, but to signal
-it in this strange specific case that probably only syzbot will use.
+Yes, unconditionally updating last (like tcp_recvmsg_locked) makes
+sense. The current hesitation is due to mptcp_eat_recv_skb releasing the
+skb in non-MSG_PEEK cases—if the address is reused, keeping a last
+pointer could lead to misjudgment.
 
-[1]
-https://netdev-ai.bots.linux.dev/ai-review.html?id=addc1ffd-bcde-4ce7-80a5-306564dde16f
+> 
+>>  		}
+>>  
+>>  		if (copied >= len)
+>> @@ -2263,6 +2265,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>>  {
+>>  	struct mptcp_sock *msk = mptcp_sk(sk);
+>>  	struct scm_timestamping_internal tss;
+>> +	struct sk_buff *last = NULL;
+> 
+> Detail: the scope of this variable could eventually be reduced by moving
+> it inside the while-loop. This should hopefully help to reduce conflicts
+> during backports.
+> 
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+
+You're right. My initial thought was to move `last` into the while loop,
+but in practice, to retain the last MSG_PEEK skb, `last` must be updated
+very early in __mptcp_recvmsg_mskq as we begin traversing
+&sk->sk_receive_queue. The issue is that if a subsequent step fails—such
+as skb_copy_datagram_msg—we'd then need to roll `last` back to the
+previous skb, which adds significant complexity. This suggests the
+current approach may be the safer trade-off.
+
+>>  	int copied = 0, cmsg_flags = 0;
+>>  	int target;
+>>  	long timeo;
+>> @@ -2291,7 +2294,8 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>>  		int err, bytes_read;
+>>  
+>>  		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
+>> -						  copied, &tss, &cmsg_flags);
+>> +						  copied, &tss, &cmsg_flags,
+>> +						  &last);
+>>  		if (unlikely(bytes_read < 0)) {
+>>  			if (!copied)
+>>  				copied = bytes_read;
+>> @@ -2343,7 +2347,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>>  
+>>  		pr_debug("block timeout %ld\n", timeo);
+>>  		mptcp_cleanup_rbuf(msk, copied);
+>> -		err = sk_wait_data(sk, &timeo, NULL);
+>> +		err = sk_wait_data(sk, &timeo, last);
+>>  		if (err < 0) {
+>>  			err = copied ? : err;
+>>  			goto out_err;
+> Cheers,
+> Matt
+
+
+As requested, here are the two minimal test programs.
+
+Steps to reproduce
+1.Save as client.c and server.c.
+
+2.Compile:
+    gcc client.c -o client
+    gcc server.c -o server
+
+3.Run ./server, then ./client in another terminal.
+
+--- client.c ---
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <time.h>
+#include <errno.h>
+
+#ifndef IPPROTO_MPTCP
+#define IPPROTO_MPTCP 262
+#endif
+
+#define PORT 8888
+
+int main() {
+    int sock_fd;
+    struct sockaddr_in server_addr;
+    int enable = 1;
+
+    if ((sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP)) < 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+    printf("Created MPTCP socket\n");
+
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &enable,
+sizeof(enable)) < 0) {
+        perror("Setsockopt SO_REUSEADDR failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    printf("Connecting to 127.0.0.1:%d...\n", PORT);
+    if (connect(sock_fd, (struct sockaddr*)&server_addr,
+sizeof(server_addr)) < 0) {
+        perror("Connection failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Connected successfully\n");
+
+    sleep(3);
+    printf("\nStarting data transmission test...\n");
+
+    send(sock_fd, "A", 1, 0);
+
+    while (1) {
+        sleep(1); // wait
+    }
+
+    close(sock_fd);
+
+    printf("Bye!\n");
+    return 0;
+}
+
+--- client.c ends ---
+
+--- server.c ---
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <errno.h>
+#include <signal.h>
+
+#define PORT 8888
+#define BUFFER_SIZE 1024
+#define BACKLOG 5
+
+#ifndef IPPROTO_MPTCP
+#define IPPROTO_MPTCP 262
+#endif
+
+int sock_fd = -1;
+int client_fd = -1;
+
+void handle_signal(int sig) {
+    printf("\nSignal %d received, cleaning up...\n", sig);
+    if (client_fd > 0) close(client_fd);
+    if (sock_fd > 0) close(sock_fd);
+    exit(0);
+}
+
+int main() {
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    char buffer[BUFFER_SIZE];
+    int enable = 1;
+    long total_received = 0;
+    long long start_time = 0;
+
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+
+    if ((sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP)) < 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+    printf("Created MPTCP socket\n");
+
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &enable,
+sizeof(enable)) < 0) {
+        perror("Setsockopt SO_REUSEADDR failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(sock_fd, (struct sockaddr*)&server_addr,
+sizeof(server_addr)) < 0) {
+        perror("Bind failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Bound to port %d\n", PORT);
+
+    if (listen(sock_fd, BACKLOG) < 0) {
+        perror("Listen failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Listening for MPTCP connections...\n");
+
+    client_fd = accept(sock_fd, (struct sockaddr*)&client_addr,
+&client_len);
+    if (client_fd < 0) {
+        perror("Accept failed");
+        close(sock_fd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Client connected from %s:%d\n",
+           inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+    printf("\nWaiting for data...\n");
+
+    while (1) {
+        int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1,
+MSG_PEEK | MSG_WAITALL);
+        if (bytes_received <= 0) {
+            // Just break out
+            break;
+        }
+        printf("Receive bytes size %d\n", bytes_received);
+    }
+
+    close(client_fd);
+    close(sock_fd);
+    return 0;
+}
+
+--- server.c ends ---
+
+Best regards,
+Li Xiasong
+
+
+
 
 
