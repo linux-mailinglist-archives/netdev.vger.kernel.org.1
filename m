@@ -1,126 +1,141 @@
-Return-Path: <netdev+bounces-263705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263706-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oBszDCIAqGnynAAAu9opvQ
-	(envelope-from <netdev+bounces-263705-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:49:22 +0100
+	id QCU+NKYAqGnynAAAu9opvQ
+	(envelope-from <netdev+bounces-263706-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:51:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9756B1FDE14
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:49:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 677271FDE69
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 10:51:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 32FB4301F482
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:49:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B97E6302E13B
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 09:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5D039F16C;
-	Wed,  4 Mar 2026 09:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412473822AC;
+	Wed,  4 Mar 2026 09:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PoFzSPLZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="csEKBYBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859C41C84AB
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 09:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B90F349B16;
+	Wed,  4 Mar 2026 09:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772617754; cv=none; b=uIaUQXN4LIAzogcoftTYZhcGix7rquQYLetwehwdTumiUKfmmGxl0AY8PNVFIDX3UlWH1y0574i45LTNNbmhc4L0HCmOIOx3rvPM8JgnrUCodukMt8L7W9FbkO9Le+f6tGZp84VM0OhnE6XHJ+Sr5twW7tl8E9g/fERnw9hwwps=
+	t=1772617890; cv=none; b=kP1xRk/XSQX7EY2tOsp5Yq+h1mSXVYd3BaqnPS06KypHpeholGyBS4T7q2crQNsAgAJ3qtpdNPfWgmGKDQ1OfxrWff59YjjFzV5tzPMV5nSKihl3xYGBQtKJB0MhCneDMj5rT+hYmSkl2NxHjDGOCUn7rgbk3Erx3PDyMIaIpIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772617754; c=relaxed/simple;
-	bh=yu3Ohj5106ejuArJ0T+/SYvwZDLiNDKZYAtfRj9AIuc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HiGl7S74xV5ADcq5Nvv5B0JQp0nzUSn8hyASpM/UvsznWELbPhY91GbGRrSY0GfdIt5SeWrb0fiVzB6M+wKB+d2MHxLuTqoE/gO3aE+7oKNhY3/ovCF32sVTcQon7xjIY61FZ6OxqrOVc5CjbyOqhb9K7sElcK/LkNz1vs9KTeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PoFzSPLZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FE0AC2BCB1
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 09:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772617754;
-	bh=yu3Ohj5106ejuArJ0T+/SYvwZDLiNDKZYAtfRj9AIuc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=PoFzSPLZDU1yPTkitoUdCLIvZMReO4WU6KkFENlQGQ5KSAkC8BXiSnyss74+eSyYU
-	 IAsB7bVSvsS0J71vPSsQpKbfqgzCDtOFTnpiHPVUMhlqWNcfVnnjg0kkniMJ2TtArl
-	 GA6gg10RbXvjSa0zSMQ8zBoAZZLo8TAvQwe303poC2ZeYDWMnagBCo+pNDN9atMPuo
-	 tJAorZla81hEtbM61a13auTIwNE+sfa1qla0C3fSPz0dm6fWEf9NHoUQS2iKSAPFxy
-	 RK4Jgn+Gfij4O6QeipXbRg7O0GanoLNhLHJoskQYgNWLGWICbtRq9I0/c0sb7dzr/O
-	 RHWFcAWZRvJJQ==
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64ae222d87dso6050114d50.2
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 01:49:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV1qitmuJtv/EsSdRXdoJ0uCG9lFhB1rcwv4Ktm540gaxQOIbLM88j7YZ1UHoyO48EhOYK7BOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7XnSWNslGX/4rieHzEa213ckGByuBmz5i/X7rq46LRw5kTyUH
-	Ybas6HQsaBdzLzLLlYisAdfXGCol78s2tNpA2iP3l9ec3MapQrSiVeVJ50XObwLsHNWfA1heWHj
-	asquHLPpFqDQWj5nHXKk9KvVMWKPk36M=
-X-Received: by 2002:a05:690e:e8c:b0:64c:a1b9:ff9d with SMTP id
- 956f58d0204a3-64cf9b5f174mr1114523d50.9.1772617753524; Wed, 04 Mar 2026
- 01:49:13 -0800 (PST)
+	s=arc-20240116; t=1772617890; c=relaxed/simple;
+	bh=hOx8/u7ut1L3MguJoU5B49CkW48rFlxVpSD60jdidy0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=A7T6zLxzH5VuJgOLNz8l9w9hunTjc8hsxEfo2HvOUh2oDDdtqH0GtxQNSR+/+TbxhNhQp8qcJJPSP6Iai5Yu3+Kq6LXi9zAKF7ZVeRoJRzv7r8F1AlrOKoqZL/D4WOeQqUg0Mz/nn9oxpox2kB7XNshme9IIagMGdL9WHgqVocM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=csEKBYBu; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772617887; x=1804153887;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=hOx8/u7ut1L3MguJoU5B49CkW48rFlxVpSD60jdidy0=;
+  b=csEKBYBuAX//Y2+Brl6PPI6zqp5CBjVFW7BFFZD8ozMomJaKA1v+9Ptl
+   WerKnqd/YnuevJ1WL5jOMawfpLcK9tO9zDqFb7JHNgpwZYi9pwC62da79
+   hrLymL/xCj38pN7AY5ahvsHMfEG4SDWOBlT6wE0I1eZK1H3bjgnqlQ5Md
+   wxcrkEqFAfv7ZKYiwjYasAKr8ULQm12XqPXmyICvk43ulKODGvFndg3D3
+   XqoyMCRIk2yrDsNTSY1ro4cNlJTt7x0wG5soBA7v5nDEdrco8A/6tUpID
+   boK3tgTWB1fmEtqjrk8TwTsszS/KfGKaHXj7JI8v842kYe2GiVtCrpa6g
+   w==;
+X-CSE-ConnectionGUID: BRSQMSytQgGfiP79giFJNw==
+X-CSE-MsgGUID: ojRkMuIgSWuQ8FdSBb0TPw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="73374994"
+X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
+   d="scan'208";a="73374994"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 01:51:26 -0800
+X-CSE-ConnectionGUID: 1Ea7458+RDWErlLELTBiWg==
+X-CSE-MsgGUID: 4l180kpJQLGqACFXzt6ovw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
+   d="scan'208";a="217531444"
+Received: from krybak-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.84])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 01:51:22 -0800
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Jonathan Corbet
+ <corbet@lwn.net>, Kees Cook <kees@kernel.org>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, intel-wired-lan@lists.osuosl.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH 00/38] docs: several improvements to kernel-doc
+In-Reply-To: <20260303155310.5235b367@localhost>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <cover.1771408406.git.mchehab+huawei@kernel.org>
+ <33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+ <20260303155310.5235b367@localhost>
+Date: Wed, 04 Mar 2026 11:51:18 +0200
+Message-ID: <b345179eb9c440c597f6618697b7272a8e383eff@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304084808.440955-1-xujialu@vimux.org> <4C2D1422EF70337D+20260304084808.440955-3-xujialu@vimux.org>
-In-Reply-To: <4C2D1422EF70337D+20260304084808.440955-3-xujialu@vimux.org>
-From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 4 Mar 2026 10:49:02 +0100
-X-Gmail-Original-Message-ID: <CAD++jLmWt0Z=Bb1z0BSwMY-1KDzF=HXR6zudWCzouWDQqdotVw@mail.gmail.com>
-X-Gm-Features: AaiRm51UtuYv9UvdVNDDFXnK1E5LWVdQ5W4i_Q3gUoYOTbFETcfV_ORzij7CO8M
-Message-ID: <CAD++jLmWt0Z=Bb1z0BSwMY-1KDzF=HXR6zudWCzouWDQqdotVw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] nfc: nfcmrvl: convert to gpio descriptors
-To: Jialu Xu <xujialu@vimux.org>
-Cc: linux-gpio@vger.kernel.org, netdev@vger.kernel.org, brgl@kernel.org, 
-	krzk@kernel.org, kees@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 9756B1FDE14
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 677271FDE69
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263705-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263706-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	HAS_ORG_HEADER(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[jani.nikula@linux.intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,vimux.org:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-Hi Jialu,
+On Tue, 03 Mar 2026, Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+> On Mon, 23 Feb 2026 15:47:00 +0200
+> Jani Nikula <jani.nikula@linux.intel.com> wrote:
+>> There's always the question, if you're putting a lot of effort into
+>> making kernel-doc closer to an actual C parser, why not put all that
+>> effort into using and adapting to, you know, an actual C parser?
+>
+> Playing with this idea, it is not that hard to write an actual C
+> parser - or at least a tokenizer.
 
-thanks for your patch!
+Just for the record, I suggested using an existing parser, not going all
+NIH and writing your own.
 
-On Wed, Mar 4, 2026 at 9:48=E2=80=AFAM Jialu Xu <xujialu@vimux.org> wrote:
+BR,
+Jani.
 
-> +               priv->config.reset_gpio =3D
-> +                       devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_L=
-OW);
-(...)
-> -       reset_n_io =3D of_get_named_gpio(node, "reset-n-io", 0);
-
-This isn't gonna work, sadly. The property is named  "reset-n-io"
-in the device tree, not "reset-gpios".
-
-To handle this, add code to drivers/gpio/gpiolib-of.c in the
-of_find_gpio_rename() function to make it pretend this
-custom property is handled as "reset-gpios".
-
-Yours,
-Linus Walleij
+-- 
+Jani Nikula, Intel
 
