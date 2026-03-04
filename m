@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-263754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKSiHIsPqGk8ngAAu9opvQ
-	(envelope-from <netdev+bounces-263754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:55:07 +0100
+	id IGcuCYwPqGk8ngAAu9opvQ
+	(envelope-from <netdev+bounces-263752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:55:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F771FE98A
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CC21FE989
 	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D3F5B30367DF
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 10:55:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 32583300BC7E
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 10:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C0A3A874A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455E93A8727;
 	Wed,  4 Mar 2026 10:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="l7XhXlJH"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="VU+Zajno"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBAF3A5E85
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 10:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496093A6F07
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 10:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772621702; cv=none; b=B8oxdaWwSRyPqfGrcLKl7FLIA9y1m3g/8a0GOULzEwb3w6h90eoh3Lzu9S3LW/VpM01ZGyfK0G3kAZYVOemeWDcxuP3B1IADz7iau2PMEiGcUg38iriOr57iUJP7BlOluCGm/Yg4e+7j6o7EiHZr349Pmr/fuGKbjS+RmWJwi3w=
+	t=1772621702; cv=none; b=agcOwArXFu3oRd+fxjIw6xODMcV/9zOwT844fwvF+x4Pm1p+Rovaa/BrQxype9+ScGXVQNXRf83NIZ3fFg7Pyz5CmgpC+slgQRjIb07VvW0gqC5dtRtNB00c6Va3iEfgGmJ3Hn8u8BlFbTevwHmASMK9jbeb2Ckx+rFjzK0w8Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772621702; c=relaxed/simple;
-	bh=jle0//CPgaZZSpU7Sj81jHdi7KzC/zh1LRpp0CnlhxI=;
+	bh=s2sMlXCo09q0wnNPoYMRu6IYT7j/QPtOWVpGKp2cJKY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kVYlylMso1jzMOFCcOlc3gtjwLH099eWNVLFkuHV0rVFYzRdTpn+OnhsZpCDOp9vOcv/SsVHMFYLAwgZSn0JIwk9zAyExpEkTXTFmP+YToyBz/MTxpjLgBbMI/bDmblgoni9DlRA/OJddDMIUT3qN7yEOIzBcAkPbCGPJZcAnyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=l7XhXlJH; arc=none smtp.client-ip=194.13.80.246
+	 MIME-Version:Content-Type; b=JZ5C6mBmT10c2PfetqJVVLL96KUhmGg0TrljK1b37ze3k7jFDKkcaN30BAB/unGVlmURgvBK+26zk3+ZN97x7lIyoRRompU6wcBErsY0bbw3a76M4F/le2zqPXIF2xedgBQjs69k1Fq8SvEYJ5ii+nRokLb7cRfCQskeadHL2Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=VU+Zajno; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 99324A560C;
-	Wed,  4 Mar 2026 11:54:57 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 293EEA5614;
+	Wed,  4 Mar 2026 11:54:58 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
 	t=1772621698; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=C+OSoJkkLylk67QnDQo/K1NBa87FYzkv0EdcOg13ar4=;
-	b=l7XhXlJHLTmw+MzwBOjlUB8ppw59tSTetvSm3oE8oEqCfd7HO+I02UrRpPCFrPXKYzVxNc
-	WnUXB7+Fr1pHzL6SMumqXlTTo+uLraMVOTAAauHa3eFUJ45si66Jns5LgUcljllXpUWlJl
-	t/HmeIrYWvFSKd+W0o2zIXAeOTAymEH953Hl89ulE9wG6gbOzvVU1qxw7o3uoEcPbaC4zi
-	kAwYof+BdgZxzqv0W3/SaXwbHYRutIP1gqBrs4vQwJmsMOY+gcQR57w1e2LQP+RtSo49hi
-	yFhbo9w2vIjnnO2s8eJri86YGPTonfSQygB1v3lFtDeyxSXLWeU+Ivr76F6gmQ==
+	bh=Tt3o0l0xlwVxpNes4Rnb5PwdXYOdDusGhM53d+eKqpY=;
+	b=VU+ZajnodlcxoNHkzq+C3EwEw3ZGDMuFgV03aXn4A6KtgXiQZQp9/slHjHqMaUadBwXEMD
+	ynxvUiTUTUEhupPK/GCfM56gP5j3r7gXwzh5JJqLJZk2emtZWjYmcbPZCaawHcUUb93lK9
+	xkHJ28vCYFinePAvV4HSNFJ1bgYxEFllC2nI5dmyR9VEX7mMs7wu9B4i0gDG0Mjd2U/2G6
+	8xeS35Cu3NrJ77G96+LqycY0OneMf4WuEuppfw+xqs8kdeyIl59iWyX4Xz6mK9YCVmSZdD
+	QueifliEDHjJ0Mji6fy/jMcvjDAZP+6vKhByR9avLI9AIONFjQ71EdzkgzmCrg==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
@@ -57,9 +57,9 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	phil@raspberrypi.com,
 	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next v6 3/5] net: cadence: macb: add ethtool EEE support
-Date: Wed,  4 Mar 2026 11:54:30 +0100
-Message-ID: <20260304105432.631186-4-nb@tipi-net.de>
+Subject: [PATCH net-next v6 4/5] net: cadence: macb: enable EEE for Raspberry Pi RP1
+Date: Wed,  4 Mar 2026 11:54:31 +0100
+Message-ID: <20260304105432.631186-5-nb@tipi-net.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260304105432.631186-1-nb@tipi-net.de>
 References: <20260304105432.631186-1-nb@tipi-net.de>
@@ -72,19 +72,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 58F771FE98A
+X-Rspamd-Queue-Id: 21CC21FE989
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263754-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263752-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DMARC_NA(0.00)[tipi-net.de];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -100,60 +100,43 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,tuxon.dev:email,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tuxon.dev:email,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Implement get_eee and set_eee ethtool ops for GEM as simple passthroughs
-to phylink_ethtool_get_eee() and phylink_ethtool_set_eee().
+Set MACB_CAPS_EEE for the Raspberry Pi 5 RP1 southbridge
+(Cadence GEM_GXL rev 0x00070109 paired with BCM54213PE PHY).
 
-No MACB_CAPS_EEE guard is needed: phylink returns -EOPNOTSUPP from both
-ops when mac_supports_eee is false, which is the case when
-lpi_capabilities and lpi_interfaces are not populated. Those fields are
-only set when MACB_CAPS_EEE is present (previous patch), so phylink
-already handles the unsupported case correctly.
+EEE has been verified on RP1 hardware: the LPI counter registers
+at 0x270-0x27c return valid data, the TXLPIEN bit in NCR (bit 19)
+controls LPI transmission correctly, and ethtool --show-eee reports
+the negotiated state after link-up.
+
+Other GEM variants that share the same LPI register layout (SAMA5D2,
+SAME70, PIC32CZ) can be enabled by adding MACB_CAPS_EEE to their
+respective config entries once tested.
 
 Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com>
 Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 4e776c67f408..f01366394cff 100644
+index f01366394cff..5933a5042bc8 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4058,6 +4058,20 @@ static const struct ethtool_ops macb_ethtool_ops = {
- 	.set_ringparam		= macb_set_ringparam,
- };
- 
-+static int macb_get_eee(struct net_device *dev, struct ethtool_keee *eee)
-+{
-+	struct macb *bp = netdev_priv(dev);
-+
-+	return phylink_ethtool_get_eee(bp->phylink, eee);
-+}
-+
-+static int macb_set_eee(struct net_device *dev, struct ethtool_keee *eee)
-+{
-+	struct macb *bp = netdev_priv(dev);
-+
-+	return phylink_ethtool_set_eee(bp->phylink, eee);
-+}
-+
- static const struct ethtool_ops gem_ethtool_ops = {
- 	.get_regs_len		= macb_get_regs_len,
- 	.get_regs		= macb_get_regs,
-@@ -4080,6 +4094,8 @@ static const struct ethtool_ops gem_ethtool_ops = {
- 	.set_rxnfc			= gem_set_rxnfc,
- 	.get_rx_ring_count		= gem_get_rx_ring_count,
- 	.nway_reset			= phy_ethtool_nway_reset,
-+	.get_eee		= macb_get_eee,
-+	.set_eee		= macb_set_eee,
- };
- 
- static int macb_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+@@ -5537,7 +5537,8 @@ static const struct macb_config eyeq5_config = {
+ static const struct macb_config raspberrypi_rp1_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
+ 		MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP,
++		MACB_CAPS_GEM_HAS_PTP |
++		MACB_CAPS_EEE,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = macb_init,
 -- 
 2.51.0
 
