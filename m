@@ -1,91 +1,126 @@
-Return-Path: <netdev+bounces-264094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264095-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLY2J8LFqGlaxAAAu9opvQ
-	(envelope-from <netdev+bounces-264094-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:52:34 +0100
+	id mHXUHUHGqGlaxAAAu9opvQ
+	(envelope-from <netdev+bounces-264095-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:54:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BBA209292
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:52:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D4120931E
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:54:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A18C4301E9A6
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 23:52:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 166C8302C936
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 23:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CAB370D62;
-	Wed,  4 Mar 2026 23:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042173914FC;
+	Wed,  4 Mar 2026 23:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oK3evLd9"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bHnTZhnF";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BsK7qQ8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CF335F5EE
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 23:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D8A38642F
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 23:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772668349; cv=none; b=agwmKdPcgH/6GGGkvLOPnKCCtYLVnvme2hmoS5HnNU+E+/EoExJJ+dM4EpwuTuhDjAH3z+ju4SBfTRFz9pZZWgR/sql9tGgKkisJSURmfk1phrBP/aLCEJU/5OeFvGmudy8myItzu7Y0GWwno0oTkb4GxF14zflo8MtWr0ujINw=
+	t=1772668420; cv=none; b=LAlTfYOdCcc20AchXG3ouGfIhGkijfWmIiWi+FKTgKoW/3LYtAk9/74D5g0PnHasXw2vZVmSGsk6mfc6i4eTeZ3Yqnn4XwUSjjGeijsmi0Q0ViziTZhIySLrEL/Wg/ENAUMZl7aI3FWOsVePPguQIz5ZK2VtKz8ivRJ/Lqta3MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772668349; c=relaxed/simple;
-	bh=oMO2lmI6jl8bfWRtrbTzUfsP4kK3JhJ9nHuZIHroJso=;
+	s=arc-20240116; t=1772668420; c=relaxed/simple;
+	bh=hM0fx+PufUG+eR0kIJ1dr4h1ANr/zb80CpZtG5LPG3A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mMscvjBmHWoVfHzqf0wim+rgTuO6c+YoS0bHaH/nNxl1BriHJC6MF2Y+Fwr7RfBhWpo1X8UbmXF/qmjiKIJ9myPJmgAXMafFSdAAJ4M7WaknwhkEDno4SVkGlwxiy5IpDZXAeAaALYBC7ljpm56TMHMfwVarMJrm8TrZE8aUlPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oK3evLd9; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ae523d54d2so14175ad.1
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 15:52:27 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DH6DjdPSSLf7v4BoX/3WDAwj6JOA0YI0WN50x1MXbhk3r5xajl2fmuFFuhiDPxEtN28MQfozOd1nSO5LoVzC1ZY1xvZ17dKlaSE+qgxKd55xKSfHs9FE2xXqCDr49gJHIB27g3RcBlxoJ+bEajSnoBcjZDZNrUZYNYLuDNYdzAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bHnTZhnF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BsK7qQ8l; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 624L1ZP31203570
+	for <netdev@vger.kernel.org>; Wed, 4 Mar 2026 23:53:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=V50tlCURGOSWEpUNVC/f5JBG
+	lAu9WVw1+uCs3+cXy8Q=; b=bHnTZhnFYn/tiIi8J4ULThpsgbab7UrmgW5OOJJi
+	m7XwaAv8gzL5i/PPJCFmKWpARNfKhBWcj2eQ98Jty0ias+PktBjqdKCkXAPaELNj
+	a0Gl+BUEEowrMPAKllx/ORmbxKvdbnv06gsWNMRC4vNwMWDRsN+/Umbybcd+e88B
+	r/+5sfU/Jr5rGByjhLIWV29LUZnpLgy3RQf4wS6C8MkG2aHm4Hpng0Hc/lXMymq8
+	+xAymHfPQW0I/zSIuwudwEu/Xyt9EGrksONWTgra0NIIeQgGca3xHZntcQ/B1uyx
+	S9yybI9F7OtwJgszxO8ID4FgfjHXJVcqqpvfDRNL7lu1yA==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cpf9c36wx-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 23:53:38 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8cb3a2eb984so5209125585a.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 15:53:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772668347; x=1773273147; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1772668417; x=1773273217; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cJXWQ/ytiNmgn7oJt5ZgR0qUZMF+nTZXMyr1U431JSU=;
-        b=oK3evLd9/s19oYVpWqqUGHjQ8ssniPbGyQi0Zl+AX6le9o9dHF7wNslguOvO1ZF/rS
-         9kvUXr3RrZZjqSA5O3DSykB3F15zD3zxTAeFdVqZ/Bd32UbBVwjUAzGrElTfS29xhQJl
-         XkceJQcY/7aqK7zScI/QwmwxxhMLUl+3iy2Wp9bjagl9yaCltwg1s3flTXliJ7FksLJJ
-         oZkODv0KpmNoWn5+t2qMlr6SSnuAePfV2sFey4ueUjCoPdP/yJ9pmN5bMs3K+O+7lZ4C
-         MRqanKV8TDjxwzcYOuj7nO0mj02IAx654ZPxljymcPmdlQABjZm1MxCyKUc0DMa8NQPj
-         Fccg==
+        bh=V50tlCURGOSWEpUNVC/f5JBGlAu9WVw1+uCs3+cXy8Q=;
+        b=BsK7qQ8lpgf4MccOs8W7P4/DhshR1Te1sl3mDVTFek6FHBU+SP+YnG91rAsMrSiBqI
+         9ZI/l49Go+6X2HLBzEJuQUMqPhS0X21IMF5frdw7o6p9+WiUwihLtOucPB4UwcVB7gR1
+         /TDtEKV+6eRrKNTjJVjUEslUBQ5NnWU/e9vVl9ATl97WjFl5qiYxpUVMnoDmE3yXf8Fl
+         yGu1qjp72SH1jaPwdnfGvB4t6p8C23m19vvnRxN28ms3opiktg9gf7H+SBz7N5rm2EmS
+         oZFO6InnfnmC0OlubIJXakoZV9aFBjmrxoeKGbrYw3Fk8nbvhs8RM2xp5cTA7BfjB0Ug
+         XpVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772668347; x=1773273147;
+        d=1e100.net; s=20230601; t=1772668417; x=1773273217;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cJXWQ/ytiNmgn7oJt5ZgR0qUZMF+nTZXMyr1U431JSU=;
-        b=otThnuR8ySaxcjOWYq2z4jJCvjyZzas0zzm2kru6qXwuURD3Ley9wu2+Jr2ZB39+H8
-         3podTUePHZNMPVg4nFzZTcfb5i6AAydXdVe1+3U0zy3ogIlCynG3xApjNR/xLI8DIejx
-         nb8MCSF+MaQr2UE5qAKk5DiFqurvNuugZTpKn+Y3OwdT1iRVrRFaw6KdfOGUGyAq7cSk
-         FshlFefOx/Tom4TkWe8fYwAi/re5P5IZCLRhUYo6UzypjZLaXnryhPLi0SKy4T9NA4dl
-         GUhOt3Ar2n+12ZZ7gxCs8ALnO7YvNWTdCD9s3mBdGi63b1dEBhq714BJUVT1Uw65P5sf
-         xf8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVPM8w2AvwOrJ5VUmj9aupG7VBHH5t2UEVyo8K/sRZTbg8dkukjHlw7xlyyr7t34S4VMurW9k4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY1XAFHHPJvQSTMluJbvg6jPR9isXAkq8opPSWEWEuitqeTDOf
-	7gmCORXIsLcnR8JbLPTSmwz2sk74k+bf1QoLlP/pYDWaQDQ0zhY2fN83BRElgOKnjw==
-X-Gm-Gg: ATEYQzwpsplYhxJqhwGoozGA6bpPfaaQGP4P1+c/v/iptaz+fAXYXQ8Cspgj9hreWZF
-	v4EF22nLLNq97ncX/hUIwNeY1qaGiTI4OFNfk5v3k2xD1QECeDVk46Gdpu+Clh0MHZWMcj2AV5Q
-	a7UELlLkGlj76AIqT3VZ+naxSIu18lpZVBRSkh3bVymfbebP8lRYPyT4XPjkbtObfZjG+7Kd7wQ
-	GATSFx3xXm2Dw+uqM5L9YYwrsjZRJTqDmVG7D2DJG66O7dLgRmJQG4GBMB6c3tH/cV3KBXGNh6r
-	1YjsphBwHqR2h29k+rPr67114E6aN7oIPYWsp/ZY7PIsvJ+ZSLCjfouB2RKOLCT82GISBpsUvxf
-	2PFaKu8Zv8vlaOBXTHo8OTN2tT4aSqjp5bpKOjnCH/bPYT7/plnl24JIRQ5DEOLHoeVUBBpE3JB
-	AdxEMBRpNMrr/8Rsaa2qd1T4qHNQGOI6oKA3JslTsCWpRTGP8TYqD925AEhg==
-X-Received: by 2002:a17:902:e5ce:b0:2ae:5a44:ea91 with SMTP id d9443c01a7336-2ae750e2726mr647625ad.22.1772668346686;
-        Wed, 04 Mar 2026 15:52:26 -0800 (PST)
-Received: from google.com (127.200.82.34.bc.googleusercontent.com. [34.82.200.127])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa8059bcsm17879218a12.18.2026.03.04.15.52.25
+        bh=V50tlCURGOSWEpUNVC/f5JBGlAu9WVw1+uCs3+cXy8Q=;
+        b=b6EcmX8Zt91Sjz3Gw6YwF03xy79OpiQMFi9MYN+ZgpUfWiZ69AWFX1FBh30lA9S342
+         QsIyMVFG2X5ymV9Q2L0Lsjj8LqnK8H5QK4pgFVv0Le/xGouoS7iIj2Q44O5+9EbOzxio
+         90v0/MUWPbNg59P6gMxivKgmVsq2LOhfqt+ZlyMy5x9H01gpEKqI5DUrOrXe8oAwtL4d
+         RZzvLglxbBbhrfQ9eAXSu2Kroc6FbcGSXuiogLLzi2g0fbd4AtCABOmOrxPOZW6R0cyY
+         2yMn+I/57wtHZ/o/PUA+3J+Fy+ANJcVFVwICSxq3F27P9EyAV6wcYk2bPdp2gNZ+9JXR
+         /6lA==
+X-Forwarded-Encrypted: i=1; AJvYcCVERu6AoLuB/2TubTPTZQsSVdYmFAbkl3mzRpKoGNXCbIkVKba5zzkmmnXVvgIrwwpRxmBICsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeNLSN3C9B4JksBNb4ojLzIEMGcFom7LJqk/WRk2x+pm1PxgmJ
+	xTzFBfBnuQeZCxQJdl1uKIf+b3hLtoxcrOBHI95qDuMwZdS3nWJsF7Pz6Iga+M6f5f0unwIyzUG
+	z8NqRoTodmL8X5yF14nBncgR1jhPQGeX4akmFHCJbBuZJxi0xAjnU6MgL+qs=
+X-Gm-Gg: ATEYQzxwrWrJRrccWg54926i1pdfqFjugZwMGOSTRWyvkee7f+Kp1O05fIo0METB00M
+	Tx7tRma+d+eKqEN5Y7LwJZ6sDhGKMnybN18mhiYPaJnE3K7F5JOGQ3hMJnj8Dr6WUiy1TsE2aZh
+	3JCyAeepycgYBvRULP3BO/VM2P9Z7I8WwXsoG8HjixVf4JQOac6Rb9DhkwMuz89BHge7jlYBzgX
+	P2Z0sP6fuRVcO+EmQvHUMWcli3c5NoF1P6ecJiHMFY1MiDKZtytgYz0Sdm86R6SFZUTXWJRZEsA
+	xPsx7N23qitwjfME1igOw/GPBH2l1VkAMUd4RkAysYbw7kwEdQQT97xawi+VJ9fFGZf1Ojos70q
+	TVcbeGfrnCIDO5dz4IHGOKxEg5mK7niN0Ersd9LOGXtKdL+ATCaL5tHQJNqKZ+xDSUjmG6K3fJ+
+	sfN1TDX/oS7eLAJRp9JiAUdgR2xKvlkjXnUKw=
+X-Received: by 2002:a05:620a:3727:b0:8c7:c25:9e53 with SMTP id af79cd13be357-8cd5afa6707mr498608485a.59.1772668417057;
+        Wed, 04 Mar 2026 15:53:37 -0800 (PST)
+X-Received: by 2002:a05:620a:3727:b0:8c7:c25:9e53 with SMTP id af79cd13be357-8cd5afa6707mr498604985a.59.1772668416537;
+        Wed, 04 Mar 2026 15:53:36 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a1296993a0sm933837e87.31.2026.03.04.15.53.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 15:52:26 -0800 (PST)
-Date: Wed, 4 Mar 2026 23:52:22 +0000
-From: Jordan Rife <jrife@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: andrii@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	edumazet@google.com, kuba@kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, willemdebruijn.kernel@gmail.com, yusuke.suzuki@isovalent.com
-Subject: Re: [PATCH net-next v2 1/2] udp: Preserve UDP socket addresses on
- abort
-Message-ID: <skxd6uimyxzi4x5nfmz24ez3d45qiubdnwkqawtbomjfzy5qrs@yb724ykvvkec>
-References: <20260303170106.129698-2-jrife@google.com>
- <20260304212128.1943568-1-kuniyu@google.com>
+        Wed, 04 Mar 2026 15:53:35 -0800 (PST)
+Date: Thu, 5 Mar 2026 01:53:34 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com,
+        Rob Clark <robin.clark@oss.qualcomm.com>,
+        Dmitry Baryshkov <lumag@kernel.org>,
+        Abhinav Kumar <abhinav.kumar@linux.dev>,
+        Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+        Marijn Suijten <marijn.suijten@somainline.org>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+Subject: Re: [PATCH phy-next 11/22] drm/msm/dp: remove debugging prints with
+ internal struct phy state
+Message-ID: <esbforcln7bi4e5enmgwqj7d63usdyoobxyo3hwd4paou56aoc@kjlizz3ubksd>
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-12-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,148 +129,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260304212128.1943568-1-kuniyu@google.com>
-X-Rspamd-Queue-Id: 81BBA209292
+In-Reply-To: <20260304175735.2660419-12-vladimir.oltean@nxp.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDE5NiBTYWx0ZWRfX4yNFl6d5wZ4q
+ HkjOGVb6a8UKI3oKI4uottgzU3ZT1gAx4XER/kFrfR8u6SRnyO7Fl+2R2FlrrZ3PTWTfM2ReMGO
+ kjtmu9jAx3Egpp7DzClVkpAeZDIw8AhgLlcX+9OsAoWjYkAERrDpp5nf1rJqcc3xY31MC75gXBN
+ LjIPbQmCzEPhD8GtNJrYMy7Ks8fpTvle+K1cqNGE8cKEE9EzIMKMw/E16pCY8/+wjLt6WxjaqgK
+ ok7/0sEWqwFAUSsrEcXNfSaihedRFkfNP/eOcUsnjxGbow9qkHnOxL26QO3Ruzoz50kng82Zr6e
+ 8T1YfhRdPUmmjr63FlzvFh8n4DfDLuAxMo5w9M+Bdu6pXkzvGNT4T7kvJrn0V3UtKk7XtRYRF8c
+ smHe7bgO82PXEOzgRNCmtcFnfdir8PfQ5eUEGZ3DFKeIZx2jofV4nHyvLvoEUuqHsxbetabu3/i
+ qtCuCtAaTr8EQTkU4ZQ==
+X-Proofpoint-GUID: U2QbA3reYSgglEQtSY-Hs2z0NQUBNW0c
+X-Authority-Analysis: v=2.4 cv=S4LUAYsP c=1 sm=1 tr=0 ts=69a8c602 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=8AirrxEcAAAA:8
+ a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=tVI0ZWmoAAAA:8
+ a=3ogKHO_BN1K2bhpmqR8A:9 a=CjuIK1q_8ugA:10 a=PEH46H7Ffwr30OY-TuGO:22
+ a=ST-jHhOKWsTCqRlWije3:22 a=-BPWgnxRz2uhmvdm1NTO:22
+X-Proofpoint-ORIG-GUID: U2QbA3reYSgglEQtSY-Hs2z0NQUBNW0c
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-04_09,2026-03-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 adultscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 clxscore=1011 phishscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603040196
+X-Rspamd-Queue-Id: 17D4120931E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,google.com,linux.dev,fomichev.me,gmail.com,isovalent.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264095-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.infradead.org,kernel.org,linaro.org,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,microchip.com,oss.qualcomm.com,linux.dev,gmail.com,poorly.run,somainline.org,ffwll.ch];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264094-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,poorly.run:email,nxp.com:email,oss.qualcomm.com:dkim,somainline.org:email,ffwll.ch:email,linux.dev:email];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[isovalent.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 09:21:03PM +0000, Kuniyuki Iwashima wrote:
-> From: Jordan Rife <jrife@google.com>
-> Date: Tue,  3 Mar 2026 17:01:02 +0000
-> > Currently, udp_abort() invokes __udp_disconnect() which clears out
-> > socket fields like inet_daddr and inet_dport. This makes fields like
-> > dst_ip4, dst_ip6, and dst_port useless inside cgroup/sock_release BPF
-> > hooks following an abort on a connected UDP socket, since they'll always
-> > equal zero. This differs from the behavior for TCP sockets where a
-> > cgroup/sock_release hook will see the address and port that the socket
-> > was connected to at the time it was aborted. This causes issues in
-> > Cilium where a sock_release hook is used to perform map maintenance when
-> > sockets are released, since Cilium actively destroys connected UDP
-> > sockets in some cases.
+On Wed, Mar 04, 2026 at 07:57:24PM +0200, Vladimir Oltean wrote:
+> These do not provide much value, and will become hard to maintain once
+> the Generic PHY framework starts hiding the contents of struct phy from
+> consumers.
 > 
-> Just curious why Cilium does not unregister the socket just
-> after aborting it ?
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> Cc: Rob Clark <robin.clark@oss.qualcomm.com>
+> Cc: Dmitry Baryshkov <lumag@kernel.org>
+> Cc: Abhinav Kumar <abhinav.kumar@linux.dev>
+> Cc: Jessica Zhang <jesszhan0024@gmail.com>
+> Cc: Sean Paul <sean@poorly.run>
+> Cc: Marijn Suijten <marijn.suijten@somainline.org>
+> Cc: David Airlie <airlied@gmail.com>
+> Cc: Simona Vetter <simona@ffwll.ch>
+> ---
+>  drivers/gpu/drm/msm/dp/dp_ctrl.c | 18 ------------------
+>  1 file changed, 18 deletions(-)
 > 
-> At least Cilium should know the key at that moment.
 
-Originally, socket aborts in Cilium were handled with sock_diag (and
-still are on older kernels), so you'd need to do some map maintenance in
-userspace directly before or after aborting the socket. I suppose it was
-just cleaner to put common cleanup code in a sock_release hook.
+Acked-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 
-> > 
-> > Make the behavior consistent between TCP and UDP sockets by not clearing
-> 
-> This patch makes another inconsistency with TCP.
-> 
-> As you mentioned in the cover letter, before the patch, even if
-> aborted, a bound socket still reserves a port, but it does not now.
-> 
-> This might be surprising for non-reuseaddr/port sockets.
 
-Yeah, true. I'm curious if this behavior is something that is useful at
-all or simply an accident of the current implementation? If I'm
-aborting/destroying a socket, why should it hold onto bound ports until
-the socket is closed? I wasn't quite sure about this.
-
-> > out these fields in udp_abort(). Instead, just unhash the socket, mark
-> > its state as TCP_CLOSE, and preserve the state of the other fields.
-> > 
-> > Fixes: f5836749c9c0 ("bpf: Add BPF_CGROUP_INET_SOCK_RELEASE hook")
-> > Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
-> > Signed-off-by: Jordan Rife <jrife@google.com>
-> > ---
-> >  net/ipv4/udp.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index b96e47f1c8a2..01a0a0fbcd56 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -3247,7 +3247,9 @@ int udp_abort(struct sock *sk, int err)
-> >  
-> >  	sk->sk_err = err;
-> >  	sk_error_report(sk);
-> > -	__udp_disconnect(sk, 0);
-> 
-> How about passing another flag and avoid unwanted init only for
-> bpf iterator ?  This will need another layer of __udp_disconnect()
-> like ____udp_disconnect() (I'm not good at naming), or must make
-> sure the flag is never used in uAPI.
-
-To make sure we're on the same page about what you're describing, I'm
-imagining:
-
-static int ___udp_disconnect(struct sock *sk, int flags, bool reinit)
-{                                                 
-	same as before, but if reinit == false then avoid reinitializing
-	fields like daddr/dport while holding onto reserved ports
-}
-
-int __udp_disconnect(struct sock *sk, int flags)
-{
-	___udp_disconnect(sk, flags, true);
-}
-
-...
-
-int udp_abort(struct sock *sk, int err)
-{
-	...
-	___udp_disconnect(sk, flags, false); <--- set reinit arg to false
-	...
-}
-
-This would have the same behavior with regards to reserved ports
-following udp_abort() while preserving fields like daddr. I was
-considering something like this initially, but it wasn't clear to me why
-you'd want to hold onto reserved ports if the socket was destroyed as I
-mentioned above. If it's important to maintain that aspect of the
-behavior, then I'm OK with this approach.
-
-> 
-> 
-> 
-> > +	sk->sk_state = TCP_CLOSE;
-> > +	sk->sk_prot->unhash(sk);
-> > +	sk_dst_reset(sk);
-> >  
-> >  out:
-> >  	if (!has_current_bpf_ctx())
-> > -- 
-> > 2.53.0.473.g4a7958ca14-goog
-> > 
-
-Thanks!
-
-Jordan
+-- 
+With best wishes
+Dmitry
 
