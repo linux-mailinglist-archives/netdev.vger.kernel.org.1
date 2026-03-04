@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-263492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLomKQh6p2kshwAAu9opvQ
-	(envelope-from <netdev+bounces-263492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 01:17:12 +0100
+	id qLYXIEh6p2kshwAAu9opvQ
+	(envelope-from <netdev+bounces-263496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 01:18:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2101F1F8CB9
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 01:17:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4251F8CF4
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 01:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A612D313646E
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 00:14:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9781330398B2
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 00:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6BB17BEBF;
-	Wed,  4 Mar 2026 00:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73315291864;
+	Wed,  4 Mar 2026 00:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="Zo40B+Ua"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="KHOypqXU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC911A275
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 00:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED36C288C2C
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 00:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772583293; cv=none; b=a/vAaM/N6dCRLFN+TLGaIF53DODV0M+LfE78eTEPN82wX9yL2b5ehFdr0orC9IHgzBPscMR8R8MAUFKYs3sY3mXc0KshnZd05fPB+nPh7tkgt2LmexBEZ4ZxFO6PZrx0GwXKNnTXkc5SDhFIlwDQ9ApPWyq6Bo+PaSfSRKmIkXo=
+	t=1772583338; cv=none; b=tZjzkkxQBuYUm6HoujP1XW0QixbCMDukNzTxO7wZCr8C0FV7Lcm6t2d1p2zbMxncG9Y90TL/rm4NQ15Nj8NrbD98M/fXDybWfQFnIcVHo5B8mWS6DEW7IBuuPq/K8FcB2C8tlKonEYiMVA1zafOZHDOM4wKyAXStwL2VcIrXEkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772583293; c=relaxed/simple;
-	bh=ELcsbryDbW1HsUGFekMMsczRqrv1wUaUYax+w3zo4G4=;
+	s=arc-20240116; t=1772583338; c=relaxed/simple;
+	bh=oI/vGu36wfkM1nmzE96a7ohou5yqGigIgG8quRlCS5k=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rnRjnTNmVvyGeaFjIIXLa+xHrgmBBlmGm4btAj5z7e5ubS3tQ0J1sq6AmEnwBMj0ql7YQGLelzSppvdvRKCT48YJp3P9d32smlO0dbwkOLeHIfbYlfbLUKIwOd6V6FXNqgOMv24XZn3sE+6x/vVdD676euoBF/wnSrYfmaEQisU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=Zo40B+Ua; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=jje29TQg0oHj5oCAD4W8reTyTE8hPl2jNabESAe6I7nM87EN0eNn1he5daba5q32zbPbH7QqLylu0zoLZFF0MXJU3CSpbIH1/vNtCJFOvR752uCJKA9/4Q+ai55BkOne+RnfjPrSpgPdavynpJTSN00QWfNH+FiObBoBiB4zn3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=KHOypqXU; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 623Ltx7q2473256
-	for <netdev@vger.kernel.org>; Tue, 3 Mar 2026 16:14:51 -0800
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 623K69E72733908
+	for <netdev@vger.kernel.org>; Tue, 3 Mar 2026 16:15:36 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=Z8Y108rJi+kI1qIutqeJm2bhlYAVj7MCxl/J9CbtwP4=; b=Zo40B+UaVVgC
-	3l/MPDqOr49XGgBqejMCsJoDKiOgLrB1c6pgfZjGw5MSVAjN67eOXOTgyGAQleny
-	j27L+meAVgXmUVnzGJBaIPMrArlkdegMnj+HEm+u+rMlkGrCPCnnWV5I4UuoeyKr
-	0s+tjXYtBXMxSh4QLzGJ/HHLfz7BThJvMvoWUmqtvVydw1wF6zI29rfgldtFaerc
-	dAto9u0lCz6ergxgtlVvFLs9QJnWq5c0dQMhI7z4DXxCsMZwsmpvJvurzdGHWSWC
-	RNq42NkL0+CdGP1KvTv4oEGQP/JTBH0s/Agti4Ep1uTbgOsBGWTChhbhk8d+uaDn
-	puHXu7XTOQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4cp80b317m-8
+	 bh=h53iYLfeYq7JFFSt0lCT1fiqn0WJe2A9Pnv+RsinQ3c=; b=KHOypqXUIYSL
+	I/HsCohSd1pRHMFj3gRR2Oqhvw5HmyGUUkH2Ce8P/r1uy5VLoJ1mlj8tKB5SFsQQ
+	4zFAHSTp5f4J1FP1v1pO10jRXUfkScqWvGhoiAyEFp1k1+85uSPzyWW2tw+WOfof
+	bGtPspjdubcBK1LkdiSvqaVxxseRwVG6kJrtbVtsa9dnLq/NWUmBfkK6SIuHoqX1
+	Mh+r0u2Kod51yrBQOKQvx12r0HCoXhCOYDbw6sgm5DdwE9izC7/pjRrpmUtIzJCu
+	PEJTCMOmItRKbKHN+MqS5FiBVJrLPWpGAdtJjHVltgYBeORcbc4k8xvpUfdsgywR
+	4sJqXrde6A==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4cnmun6djq-6
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 16:14:50 -0800 (PST)
-Received: from twshared18080.32.frc3.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+	for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 16:15:36 -0800 (PST)
+Received: from twshared108583.15.frc2.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Wed, 4 Mar 2026 00:14:47 +0000
+ 15.2.2562.35; Wed, 4 Mar 2026 00:15:01 +0000
 Received: by devbig1867.frc2.facebook.com (Postfix, from userid 708122)
-	id 6301375994A6; Tue,  3 Mar 2026 16:14:42 -0800 (PST)
+	id 544DB7599537; Tue,  3 Mar 2026 16:14:50 -0800 (PST)
 From: Wei Wang <weibunny@fb.com>
 To: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
         Daniel Zahka
@@ -66,10 +66,10 @@ To: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
         "David S.
  Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>
-CC: Wei Wang <weibunny@fb.com>
-Subject: [PATCH v2 net-next 7/9] psp: add a new netdev event for dev unregister
-Date: Tue, 3 Mar 2026 16:00:47 -0800
-Message-ID: <20260304000050.3366381-8-weibunny@fb.com>
+CC: Wei Wang <weibunny@fb.com>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: [PATCH v2 net-next 8/9] selftests/net: Add bpf skb forwarding program
+Date: Tue, 3 Mar 2026 16:00:48 -0800
+Message-ID: <20260304000050.3366381-9-weibunny@fb.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260304000050.3366381-1-weibunny@fb.com>
 References: <20260304000050.3366381-1-weibunny@fb.com>
@@ -82,24 +82,25 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: BB7tpZzchSabf3vHqFXZ2WPVnj817jq-
-X-Authority-Analysis: v=2.4 cv=PriergM3 c=1 sm=1 tr=0 ts=69a7797a cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDAwMCBTYWx0ZWRfXyFiHjvu3LBmc
+ vkMl0gOUaIoaIZ4COOfTUCDSukEc0toFyWl1MiIa3rWHUS5ORZUHREe9uxXQA1jUGikfVfqSr+1
+ Zb4sy14BzGrZi8fmwphVigYNwO/s6c6UOp12DPx0EBBELXJMdL4w9ZGuFxkpgVJiWmdxyP9eXX3
+ kdbNMED8KKDU4LC/i0lwQl73W5hD1HKesJecwxayLit48oxKTTaFBMCclXjc0YIkAT5MC4mTR/l
+ moJHi1nTtlmgb1gQ9qFFCIcXnOj0X9jtHaScWRV3GewsXLmVvMH6YWBZG39IftfTw9N2EJzMU+e
+ 5i7SLKQOhjjDUX/u6cK9On7FStglkwlf1n+Ezt/5e26hX6WGJUWW6x+X7GqGCJ3BfRKq43Q4Pvl
+ cO2YVUkpWptZrTvfAV5FKIzJI/cx01EuyMYWrbZHSYvkKrje3a5nYzDZW8oLBv0sO9cspjHkekC
+ ioPcdIFxiJbvfSDO9dg==
+X-Proofpoint-ORIG-GUID: CQNEw0aW5xHUX_dO8pcRJ5hAI5pWknSK
+X-Proofpoint-GUID: CQNEw0aW5xHUX_dO8pcRJ5hAI5pWknSK
+X-Authority-Analysis: v=2.4 cv=BrGQAIX5 c=1 sm=1 tr=0 ts=69a779a8 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
  a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=xtH7KyWI9dI7BmFOsl-x:22 a=FOH2dFAWAAAA:8 a=-RvZIenZIDdK7zbSOTYA:9
-X-Proofpoint-ORIG-GUID: BB7tpZzchSabf3vHqFXZ2WPVnj817jq-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDAwMCBTYWx0ZWRfXxdxOGCeOdCLp
- gN3Ufv3wDMSxvBvpv34nEBnouzxXrqXlmeFyjALW5HwrTQFy4tXzkMey9Rkb4osJq8oF1Eo005M
- VjrELtfgBCtW1z3ngc/SlhFjxf6Ec2qGQQDRLxuGDbeko+SkA2G895yXACGFmHnKTsd5tU3DJNj
- WsRUDjzmONdXO9cxa+4ZveqXLgwUt4MDcKDio8oS62web7/+GL9elzGG9Kb0ZDUgx9N7bTcwBIq
- 34mgJJdxvD5rPTC9lywkMiSv6XJoGs9O//jPzxFqHUK1KbMrrTvoDktxVoRUclgKhO76m69hODN
- yLDbJdxp8rA0A+nBGUvwf+aQ+gQxR9HQ0NIZzVKwAb/xI+T5zfRUxB5BbNS7SXXQsuZBZrrjJcq
- Rej8VbTvYPk5vxbv+gG99f94nBjp6bigjrbZmN706ByBOW/dy3TTDcTNDcqf+azf8eKiqzurSEQ
- CeptRxflzVViQ8k+bog==
+ a=crHB47gyY4rKiduisYu9:22 a=FOH2dFAWAAAA:8 a=VabnemYjAAAA:8
+ a=lP32a40L5JUvlfaZ6LoA:9 a=gKebqoRLp9LExxC7YDUY:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-03_03,2026-03-03_01,2025-10-01_01
-X-Rspamd-Queue-Id: 2101F1F8CB9
+X-Rspamd-Queue-Id: DE4251F8CF4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -116,7 +117,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
-	TAGGED_FROM(0.00)[bounces-263492-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263496-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -125,100 +126,95 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[fb.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Add a new netdev event for dev unregister and handle the removal of this
-dev from psp->assoc_dev_list.
+Add nk_redirect.bpf.c, a BPF program that forwards skbs matching some IPv=
+6
+prefix received on eth0 ifindex to a specified dev ifindex.
+bpf_redirect_neigh() is used to make sure neighbor lookup is performed
+and proper MAC addr is being used.
 
 Signed-off-by: Wei Wang <weibunny@fb.com>
+Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Tested-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
- net/psp/psp_main.c | 64 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
+ .../drivers/net/hw/nk_redirect.bpf.c          | 60 +++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_redirect.bp=
+f.c
 
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index a7635cae0d83..83b2b3abbe6f 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -371,10 +371,72 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8=
- generation, bool strip_icv)
- }
- EXPORT_SYMBOL(psp_dev_rcv);
-=20
-+static void psp_dev_disassoc_one(struct psp_dev *psd, struct net_device =
-*dev)
-+{
-+	struct psp_assoc_dev *entry, *tmp;
+diff --git a/tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c b/t=
+ools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+new file mode 100644
+index 000000000000..7ac9ffd50f15
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * BPF program for redirecting traffic using bpf_redirect_neigh().
++ * Unlike bpf_redirect() which preserves L2 headers, bpf_redirect_neigh(=
+)
++ * performs neighbor lookup and fills in the correct L2 addresses for th=
+e
++ * target interface. This is necessary when redirecting across different
++ * device types (e.g., from netdevsim to netkit).
++ */
++#include <linux/bpf.h>
++#include <linux/pkt_cls.h>
++#include <linux/if_ether.h>
++#include <linux/ipv6.h>
++#include <linux/in6.h>
++#include <bpf/bpf_endian.h>
++#include <bpf/bpf_helpers.h>
 +
-+	list_for_each_entry_safe(entry, tmp, &psd->assoc_dev_list, dev_list) {
-+		if (entry->assoc_dev =3D=3D dev) {
-+			list_del(&entry->dev_list);
-+			rcu_assign_pointer(entry->assoc_dev->psp_dev, NULL);
-+			netdev_put(entry->assoc_dev, &entry->dev_tracker);
-+			kfree(entry);
-+			return;
-+		}
-+	}
++#define TC_ACT_OK 0
++#define ETH_P_IPV6 0x86DD
++
++#define ctx_ptr(field)		((void *)(long)(field))
++
++#define v6_p64_equal(a, b)	(a.s6_addr32[0] =3D=3D b.s6_addr32[0] && \
++				 a.s6_addr32[1] =3D=3D b.s6_addr32[1])
++
++volatile __u32 redirect_ifindex;
++volatile __u8 ipv6_prefix[16];
++
++SEC("tc/ingress")
++int tc_redirect(struct __sk_buff *skb)
++{
++	void *data_end =3D ctx_ptr(skb->data_end);
++	void *data =3D ctx_ptr(skb->data);
++	struct in6_addr *match_prefix;
++	struct ipv6hdr *ip6h;
++	struct ethhdr *eth;
++
++	match_prefix =3D (struct in6_addr *)ipv6_prefix;
++
++	if (skb->protocol !=3D bpf_htons(ETH_P_IPV6))
++		return TC_ACT_OK;
++
++	eth =3D data;
++	if ((void *)(eth + 1) > data_end)
++		return TC_ACT_OK;
++
++	ip6h =3D data + sizeof(struct ethhdr);
++	if ((void *)(ip6h + 1) > data_end)
++		return TC_ACT_OK;
++
++	if (!v6_p64_equal(ip6h->daddr, (*match_prefix)))
++		return TC_ACT_OK;
++
++	/*
++	 * Use bpf_redirect_neigh() to perform neighbor lookup and fill in
++	 * correct L2 addresses for the target interface.
++	 */
++	return bpf_redirect_neigh(redirect_ifindex, NULL, 0, 0);
 +}
 +
-+static int psp_netdev_event(struct notifier_block *nb, unsigned long eve=
-nt,
-+			    void *ptr)
-+{
-+	struct net_device *dev =3D netdev_notifier_info_to_dev(ptr);
-+	struct psp_dev *psd;
-+
-+	if (event !=3D NETDEV_UNREGISTER)
-+		return NOTIFY_DONE;
-+
-+	rcu_read_lock();
-+	psd =3D rcu_dereference(dev->psp_dev);
-+	if (psd && psp_dev_tryget(psd)) {
-+		rcu_read_unlock();
-+		mutex_lock(&psd->lock);
-+		psp_dev_disassoc_one(psd, dev);
-+		mutex_unlock(&psd->lock);
-+		psp_dev_put(psd);
-+	} else {
-+		rcu_read_unlock();
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block psp_netdev_notifier =3D {
-+	.notifier_call =3D psp_netdev_event,
-+};
-+
- static int __init psp_init(void)
- {
-+	int err;
-+
- 	mutex_init(&psp_devs_lock);
-+	err =3D register_netdevice_notifier(&psp_netdev_notifier);
-+	if (err)
-+		return err;
-+
-+	err =3D genl_register_family(&psp_nl_family);
-+	if (err) {
-+		unregister_netdevice_notifier(&psp_netdev_notifier);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-=20
--	return genl_register_family(&psp_nl_family);
-+static void __exit psp_exit(void)
-+{
-+	genl_unregister_family(&psp_nl_family);
-+	unregister_netdevice_notifier(&psp_netdev_notifier);
- }
-+
- subsys_initcall(psp_init);
-+module_exit(psp_exit);
++char __license[] SEC("license") =3D "GPL";
 --=20
 2.47.3
 
