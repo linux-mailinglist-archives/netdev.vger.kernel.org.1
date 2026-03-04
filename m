@@ -1,161 +1,254 @@
-Return-Path: <netdev+bounces-264030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEoHGPiOqGmzvgAAu9opvQ
-	(envelope-from <netdev+bounces-264030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 20:58:48 +0100
+	id CP2LLX+QqGnZvgAAu9opvQ
+	(envelope-from <netdev+bounces-264031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:05:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3AE207521
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 20:58:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742E7207632
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 21:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41BC43053B00
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 19:58:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1324830217CC
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 20:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77C9373C0B;
-	Wed,  4 Mar 2026 19:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B16537E31F;
+	Wed,  4 Mar 2026 20:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kudnqVDN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uU7eZEMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A277384233
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 19:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9030E382F39
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 20:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772654298; cv=none; b=RuYufMlEAHqoOGWM+KKrmbAZzxwOod7uY2AuBcjQzohdFtf/8Utlw+OhCmfSVxJW1C9C26GRwQG9XPgBrBeZR2y2tuW9LFzg1shk/7iTFguHfeTBRxGPrUGzb6AE5kXvd4hENnyOLHQI3ZgVU8phlI1j/UXObILdOSt3swesRK8=
+	t=1772654712; cv=none; b=sGBh2auBbByI67bjJJ26naleRoGJesOBYbIpbBX7n/un4mPWLZaVLsf+uN3sw6WmpGpKEtWOXpqX+AefE//aTCiR2DMzAQdIDi2ZzX4dv/lifVUHluwav0thqM7/i/dJyQFb0Z/zcuXrR57ZLwDFqdbK46zXCM2D+sf8Xed7E1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772654298; c=relaxed/simple;
-	bh=kFO/B4e/IaVbaY9CcGM2YUXt0C8zsScv36IYi5un9Pc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nzS0oGcVVFWjKZI4FgjdlTaLlU0VbXMsvFVr94aXsEKQfoD1yV7m8CM+VkrDspF2WRKnD0Rl1YvJ6nz44oT8g2FxcnlZel+ll0gHGsEI/dXh9M6w/l9oixTcavqXmeAUW1gs6DOFdzP9ei1U501N1wKdBzWmtorRXDJlQzIY/WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kudnqVDN; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 624JIZQG562163;
-	Wed, 4 Mar 2026 19:58:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=NK0wdBVWOMqSOx9D4namXKrlO7gOV
-	+RASLmvXZgC8v0=; b=kudnqVDNp1J/shFqQ07YY3dZY1609st3X4Cz3MI8oZejq
-	Y/jb6lQZUvOlf38AxG4cAYJ95fmpbmdVW7KqJx9Stv1r/JynFfdhlflBmYSB8NWo
-	lU384ldwK5JXX4S6aFh0hAhFOk2SJw71jtIG6y9hBn/B6cz0e+0ei/zCiMMG0VQM
-	s0ef6kr421xnS2faCg57/JnRni3w6xpj9l9Q78g+xt+AdU6cPv5cTBKa12CBpWoq
-	TdOsO/MqyyJs0oyLnTu+x8P19z8qFGeGdvQiQnHi63BocNpsrf6hWrEl6ePjsHxx
-	mxOFpg5TEMU8rc0Nb24za+gt5XK6O2XOUBPmb+W5A==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cpts9r2nb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 04 Mar 2026 19:57:59 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 624JarnE036974;
-	Wed, 4 Mar 2026 19:57:59 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptc0b4b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 04 Mar 2026 19:57:58 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 624JkHBw009565;
-	Wed, 4 Mar 2026 19:57:58 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4ckptc0b3y-1;
-	Wed, 04 Mar 2026 19:57:58 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: hkallweit1@gmail.com, linux@armlinux.org.uk, quan@os.amperecomputing.com,
-        keyur@os.amperecomputing.com, iyappan@os.amperecomputing.com,
-        andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] net: mdio: xgene: Fix misleading err message in xgene mdio read
-Date: Wed,  4 Mar 2026 11:57:36 -0800
-Message-ID: <20260304195755.2468204-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1772654712; c=relaxed/simple;
+	bh=NpUFwyUgSuYBQmeGkwy9kAbvF8zBjoX3KWebaPZvTc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ijFDwB56AZycTyH4TTAXQGDwAEdJLxA3SDKxsUYIsZvI2mJzlyHbW8sRXCW4bvjE5d2EJYjVckUzr/7nPIwDHOKe7t3rjM1phtfb5qER+OabL2ZIF5N0N12bn1DTpDIEW76feNEwmDjcm3uDZlqrcHktnehbPvxCUgz0I6F6Qjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uU7eZEMj; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <88077a77-8b9e-4372-bb39-c7a638cfa3d4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772654698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qrx1k+j6Hc0CcsusWUFwKbAbMSjAEfYagm73wYyu458=;
+	b=uU7eZEMjOirHuwe8RA/VBPljv7YfOgd2P9hVm+SVTvVCjbFOwfWsLaFRZgQdzH+SR96DAj
+	1/AKaMZBaVOoIkrJmAgMCWjyMzi5FnMOEer4R8IW4aO1zCsIJvCCOLimbMz2+Elwz4v6kY
+	bMW01zJK4Xc5+B5XAUyAM9WtF6Y1Qdg=
+Date: Wed, 4 Mar 2026 12:04:50 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-04_07,2026-03-04_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 suspectscore=0
- spamscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
- definitions=main-2603040163
-X-Authority-Analysis: v=2.4 cv=AsvjHe9P c=1 sm=1 tr=0 ts=69a88ec8 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=BqU2WV_vvsyTyxaotp0D:22 a=yPCof4ZbAAAA:8 a=8tFowhmXnpZRbm--SGgA:9
-X-Proofpoint-GUID: BCpuMIulLLtWD6BeajtbYWWitWmPIeD2
-X-Proofpoint-ORIG-GUID: BCpuMIulLLtWD6BeajtbYWWitWmPIeD2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDE2MyBTYWx0ZWRfX2wL+fGrlRxs1
- C0KYIg/IY0wLWmruomRGRWCYkoEEai52mBRSKJ6CUoTUM9l7Snn+r5xUeDkAgjL85HCSkdKKmaF
- iqJmJufWdtFLMKBt5jUSD7vAywXcpsDa1blVDelk023KVXKftc10lc4FBq9vVRdOMlxPZ1sOXk/
- XpBWW+4YLzYCtY2fBmlKO5lJPTCgh3R7aW4O6k7sOx7HMt8spRF7c1U7FYqlkTvRCkcltYS+PUO
- OdTWV07VwSXSR2icgb/NbNxyrWfw3jbDgLYoLitI35oLybf6Gs2AHThGXi3wMzxrF3YArTtLp3r
- yPg2ocldplATCLIHpxHDwY4vk2lv4s2uzd51P8GbSyWH0AWJN78dsyDVOd7RTLL3xB+G1ZnTQnJ
- tZm6OhjFusVEcl7sYpch7EkthSJoAiJvn4PEBJ29fpSqNp+/yx5lGzjwtKtPM6WRArW51s8/Xnu
- E50saGOgJo3lox5K5zA==
-X-Rspamd-Queue-Id: DC3AE207521
+Subject: Re: [PATCH v4 bpf/net 6/6] sockmap: Fix broken memory accounting for
+ UDP.
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jiayuan Chen
+ <jiayuan.chen@linux.dev>, Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
+References: <20260221233234.3814768-1-kuniyu@google.com>
+ <20260221233234.3814768-7-kuniyu@google.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20260221233234.3814768-7-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 742E7207632
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,os.amperecomputing.com,lunn.ch,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,oracle.com];
-	TAGGED_FROM(0.00)[bounces-264030-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264031-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,cloudflare.com,linux.dev];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:dkim,oracle.com:email,oracle.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-xgene_xfi_mdio_read() prints "write failed" when the MDIO management
-interface remains busy and the read times out. Update the message to
-"read failed" to match the operation.
+On 2/21/26 3:30 PM, Kuniyuki Iwashima wrote:
+> syzbot reported imbalanced sk->sk_forward_alloc [0] and
+> demonstrated that UDP memory accounting by SOCKMAP is broken.
+> 
+> The repro put a UDP sk into SOCKMAP and redirected skb to itself,
+> where skb->truesize was 4240.
+> 
+> First, udp_rmem_schedule() set sk->sk_forward_alloc to 8192
+> (2 * PAGE_SIZE), and skb->truesize was charged:
+> 
+>    sk->sk_forward_alloc = 0 + 8192 - 4240;  // => 3952
+> 
+> Then, udp_read_skb() dequeued the skb by skb_recv_udp(), which finally
+> calls udp_rmem_release() and _partially_ reclaims sk->sk_forward_alloc
+> because skb->truesize was larger than PAGE_SIZE:
+> 
+>    sk->sk_forward_alloc += 4240;  // => 8192 (PAGE_SIZE is reclaimable)
+>    sk->sk_forward_alloc -= 4096;  // => 4096
+> 
+> Later, sk_psock_skb_ingress_self() called skb_set_owner_r() to
+> charge the skb again, triggering an sk->sk_forward_alloc underflow:
+> 
+>    sk->sk_forward_alloc -= 4240   // => -144
+> 
+> Another problem is that UDP memory accounting is not performed
+> under spin_lock_bh(&sk->sk_receive_queue.lock).
+> 
+> skb_set_owner_r() and sock_rfree() are called locklessly and
+> corrupt sk->sk_forward_alloc, leading to the splat.
+> 
+> Let's not skip memory accounting for UDP and ensure the proper
+> lock is held.
+> 
+> Note that UDP does not need msg->sk assignment, which is for TCP.
+> 
+> [0]:
+> WARNING: net/ipv4/af_inet.c:157 at inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157, CPU#0: ksoftirqd/0/15
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
+> RIP: 0010:inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157
+> Code: 0f 0b 90 e9 58 fe ff ff e8 40 55 b3 f7 90 0f 0b 90 e9 8b fe ff ff e8 32 55 b3 f7 90 0f 0b 90 e9 b1 fe ff ff e8 24 55 b3 f7 90 <0f> 0b 90 e9 d7 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 95 fc
+> RSP: 0018:ffffc90000147a48 EFLAGS: 00010246
+> RAX: ffffffff8a1121dc RBX: dffffc0000000000 RCX: ffff88801d2c3d00
+> RDX: 0000000000000100 RSI: 0000000000000f70 RDI: 0000000000000000
+> RBP: 0000000000000f70 R08: ffff888030ce1327 R09: 1ffff1100619c264
+> R10: dffffc0000000000 R11: ffffed100619c265 R12: ffff888030ce1080
+> R13: dffffc0000000000 R14: ffff888030ce130c R15: ffffffff8fa87e00
+> FS:  0000000000000000(0000) GS:ffff8881256f8000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000200000000700 CR3: 000000007200c000 CR4: 00000000003526f0
+> Call Trace:
+>   <TASK>
+>   __sk_destruct+0x85/0x880 net/core/sock.c:2350
+>   rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+>   rcu_core+0xc9e/0x1750 kernel/rcu/tree.c:2857
+>   handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
+>   run_ksoftirqd+0x36/0x60 kernel/softirq.c:1063
+>   smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+>   kthread+0x726/0x8b0 kernel/kthread.c:463
+>   ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+>   </TASK>
+> 
+> Fixes: d7f571188ecf ("udp: Implement ->read_sock() for sockmap")
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/mdio/mdio-xgene.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cc: Cong Wang, who is the author of the quoted commit and also the 
+author of the full UDP support in sockmap.
 
-diff --git a/drivers/net/mdio/mdio-xgene.c b/drivers/net/mdio/mdio-xgene.c
-index a8f91a4b7fed..ede6b9ddc426 100644
---- a/drivers/net/mdio/mdio-xgene.c
-+++ b/drivers/net/mdio/mdio-xgene.c
-@@ -250,7 +250,7 @@ static int xgene_xfi_mdio_read(struct mii_bus *bus, int phy_id, int reg)
- 	} while ((status & BUSY_MASK) && timeout--);
- 
- 	if (status & BUSY_MASK) {
--		pr_err("XGENET_MII_MGMT write failed\n");
-+		pr_err("XGENET_MII_MGMT read failed\n");
- 		return -EBUSY;
- 	}
- 
--- 
-2.50.1
+JakubS and JohnF who are the maintainers of sockmap and skmsg. Please 
+take a look also.
 
+Jiayuan Chen, you had submitted patches(/fixes) for sockmap/skmsg. It is 
+a good chance to gain review credit.
+
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 96f43e0dbb17..dd9134a45663 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -7,6 +7,7 @@
+>   
+>   #include <net/sock.h>
+>   #include <net/tcp.h>
+> +#include <net/udp.h>
+>   #include <net/tls.h>
+>   #include <trace/events/sock.h>
+>   
+> @@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>   				u32 off, u32 len, bool take_ref)
+>   {
+>   	struct sock *sk = psock->sk;
+> +	bool is_udp = sk_is_udp(sk);
+>   	struct sk_msg *msg;
+>   	int err = -EAGAIN;
+>   
+> @@ -583,13 +585,20 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>   	if (!msg)
+>   		goto out;
+>   
+> -	if (skb->sk != sk && take_ref) {
+> +	if (is_udp) {
+> +		if (unlikely(skb->destructor == udp_sock_rfree))
+
+A quick question. This case happens when the earlier 
+sk_psock_skb_ingress_enqueue() failed?
+
+> +			goto enqueue;
+> +
+> +		spin_lock_bh(&sk->sk_receive_queue.lock);
+> +	}
+> +
+> +	if (is_udp || (skb->sk != sk && take_ref)) {
+>   		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> -			goto free;
+> +			goto unlock;
+>   
+>   		if (!sk_rmem_schedule(sk, skb, skb->truesize))
+> -			goto free;
+> -	} else {
+> +			goto unlock;
+> +	} else if (skb->sk == sk || !take_ref) {
+>   		/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
+>   		 * data originates from the socket's own protocol stack. No need to
+>   		 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
+> @@ -604,11 +613,23 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>   	 * into user buffers.
+>   	 */
+>   	skb_set_owner_r(skb, sk);
+> +
+> +	if (is_udp) {
+> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
+> +
+> +		skb->destructor = udp_sock_rfree;
+> +	}
+> +
+> +enqueue:
+>   	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
+>   	if (err < 0)
+>   		goto free;
+>   out:
+>   	return err;
+> +
+> +unlock:
+> +	if (is_udp)
+> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
+>   free:
+>   	kfree(msg);
+>   	goto out;
 
