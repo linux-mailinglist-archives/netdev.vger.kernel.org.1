@@ -1,77 +1,74 @@
-Return-Path: <netdev+bounces-264009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264010-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJf+HJd/qGmYvAAAu9opvQ
-	(envelope-from <netdev+bounces-264009-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:53:11 +0100
+	id CDH7ILWDqGmgvQAAu9opvQ
+	(envelope-from <netdev+bounces-264010-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 20:10:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E39D1206A9B
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 19:53:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECC7206F04
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 20:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C80A6300D606
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 18:53:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1CB34301F78B
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 19:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9871F3D75A2;
-	Wed,  4 Mar 2026 18:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502F43D3CFD;
+	Wed,  4 Mar 2026 19:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZFpD/nr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xy35ToS3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DC23CE480;
-	Wed,  4 Mar 2026 18:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0CA358D27;
+	Wed,  4 Mar 2026 19:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772650386; cv=none; b=NpF8YfBCFTB8wvZtFLzTvnesLhDd4UH1o1uCCr/lk6O8GOEXgNrWU/DiibBHpr1Ca4ljnltQvJS53hVZYR7xNxazYD8CVtj0OJFc7DH+b8NWj538WrnRisK3oI4XOqiHNm61KfPl1TWPK+JFCAnIGHFUbUQ7hhgkZnLVdL3l3gU=
+	t=1772651212; cv=none; b=bC+JEodoy4PO6VwZYu7NSgfe4x2CIllz3nUBN4meWBReWjPKlUybEg579cZXWd1DMFeDWblFlv5g1bPxPSLKF7Sgq2jzuf5ExfEo8pfbREhrczRUzMMzGwB3KmH8qUmjdKcmOQ3FWgZh7zEeItzIeFSBESK8PtdUa6bW2GB00B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772650386; c=relaxed/simple;
-	bh=TpogHSI6BcOdK+qKwsFW1zNTYQiLpATLKXEGKvxL/xg=;
+	s=arc-20240116; t=1772651212; c=relaxed/simple;
+	bh=ZBbz/4pMl66VuJ7NOaXWlWQQszEhPGX6Web3VLQthbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UXopHgpbXb84y3U8dykNfEfs8lBV89CmTX3VOsBIuYeJ/HaYiwX+BeIWD+qmRsg0Ljyb3yl/AIQA+nPlgdWmrdHF2V5NaI8hdWJ15JAk72gqBU+AAIRSILb8CW3pKnbmkvgXzCWuPDJIk+hZrXMfiNGv9dqxp3+E8y1iBAZKRc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZFpD/nr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCF4CC4CEF7;
-	Wed,  4 Mar 2026 18:53:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlsceU82PzdU43TvM4k12YGKxfvIVrbC8TfH+Z4Dg+jqG2WjRdcSB4/5u49mUSQycNnxykf1ScNW8zOvtCV+ygftxPQLGUU9BI9KIbAT1BbnbR5FCtGoeW+CVuqc6WAmu16cjSk9wnRP1iOm0nAb5tlnP6xnfYQy++z424G0/0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xy35ToS3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43513C4CEF7;
+	Wed,  4 Mar 2026 19:06:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772650386;
-	bh=TpogHSI6BcOdK+qKwsFW1zNTYQiLpATLKXEGKvxL/xg=;
+	s=k20201202; t=1772651211;
+	bh=ZBbz/4pMl66VuJ7NOaXWlWQQszEhPGX6Web3VLQthbo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cZFpD/nrDZcQASVw6AJGSdVacyhbfwgsxtiC+9WXGN+fceQhzqJzXZwRXUOVZen/6
-	 8yZg4u/kkoIQGdPatD02YtopuwEI4DM/1N51yTmXlhRP6g3tKN84hRaZkEi72IkJum
-	 0YQPpDI9mHsn26XkErcXt9YJizfd9Gmd7WSyQGnpbaEIgFNH3xj2VnqSVdCN/Q2afa
-	 o1M5qzZlaL1thHt2Mkl1AAx2SGRdGkkKIYDDccZBSxGxEo0n6HM917CufdlLEi6p8A
-	 rinoUBfTI+/gnJWM8crnt+P+Eu+taYdaohQj29+oPPTmbFbJtoF4VJjBZTm/l9qjqS
-	 fqEfpiXwgNy7Q==
-Date: Wed, 4 Mar 2026 18:52:58 +0000
+	b=Xy35ToS3hhHn6tWBb2KpO0CcsE4iZ1ttiQDkmVr/Qz/bFh8s2d6TAk6Vt0HTF7EXe
+	 kMXRhxJj6tGEI8vdrpPoleKeXsv2YFccT6gPZpivEoaqBjgxzHCq7NQJ5lpTd1FXg3
+	 hoXiO/zDk7lKjfz9BSqbS7WfSDoKb+2I9mxCn2XmxU2KB9DzVhMym1rV4G+WsdVpAd
+	 Ztve3mRG6zsd+JCAYljlWaZ8TEfJUb88SE+b/cm86OIIGzsCvxTYVPADvIioEl58CJ
+	 UtUGKgaZjcMWR5OhioYLAcwfdDmr/xXlKsznTgEjH45X/YURlMXeqQyqLffr8ga5K9
+	 ayzBoa3ZBzM7Q==
+Date: Wed, 4 Mar 2026 19:06:46 +0000
 From: Conor Dooley <conor@kernel.org>
-To: Ryan Wanner <ryan.wanner@microchip.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, andrew+netdev@lunn.ch,
-	richardcochran@gmail.com, abin.joseph@amd.com, robh@kernel.org,
-	edumazet@google.com, netdev@vger.kernel.org,
-	theo.lebrun@bootlin.com, pjw@kernel.org,
-	Valentina.FernandezAlanis@microchip.com, krzk+dt@kernel.org,
-	sean.anderson@linux.dev, aou@eecs.berkeley.edu,
-	linux-kernel@vger.kernel.org, alex@ghiti.fr,
-	devicetree@vger.kernel.org, palmer@dabbelt.com,
-	nicolas.ferre@microchip.com, vineeth.karumanchi@amd.com,
-	claudiu.beznea@tuxon.dev, samuel.holland@sifive.com,
-	daire.mcnamara@microchip.com, conor+dt@kernel.org,
-	dave.stevenson@raspberrypi.com, linux-riscv@lists.infradead.org,
-	davem@davemloft.net, conor.dooley@microchip.com,
-	narmstrong@baylibre.com, pabeni@redhat.com
-Subject: Re: [net-next,v2,2/8] net: macb: rename macb_default_usrio to
- at91_default_usrio as not all platforms have mii mode control in usrio
-Message-ID: <20260304-stardust-blade-c9ed766b041a@spud>
-References: <20260226-enjoyer-shock-e17f9dc7cbdb@spud>
- <20260228232600.4187398-1-kuba@kernel.org>
- <20260228-shopping-april-a8c4d2481cbe@spud>
- <a1e36563-0e74-48b2-ae02-813cb28fc931@microchip.com>
- <20260303-stardust-shaky-c8a757ec149d@spud>
- <1d35173d-b364-4c4a-a083-388d3bd27ce5@microchip.com>
- <20260303-speech-reversing-b3fdf4817798@spud>
- <cb782e55-29f9-46c5-8213-397202b326ec@microchip.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
+ switch bindings
+Message-ID: <20260304-capture-kissable-3bdfe389864b@spud>
+References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+ <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
+ <20260303-disperser-clone-512efa99f26c@spud>
+ <65fd5f46f1f996dd5f4df2de2efb52c8fa3575b3.camel@microchip.com>
+ <20260304161457.l6tkxix6sgube3qc@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,10 +76,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="9f74gDXlIrnBN4fp"
+	protocol="application/pgp-signature"; boundary="b6bV6EY6NMjXdDw4"
 Content-Disposition: inline
-In-Reply-To: <cb782e55-29f9-46c5-8213-397202b326ec@microchip.com>
-X-Rspamd-Queue-Id: E39D1206A9B
+In-Reply-To: <20260304161457.l6tkxix6sgube3qc@skbuf>
+X-Rspamd-Queue-Id: EECC7206F04
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.26 / 15.00];
 	SIGNED_PGP(-2.00)[];
@@ -90,119 +87,108 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-264010-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264009-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,amd.com,google.com,vger.kernel.org,bootlin.com,microchip.com,linux.dev,eecs.berkeley.edu,ghiti.fr,dabbelt.com,tuxon.dev,sifive.com,raspberrypi.com,lists.infradead.org,davemloft.net,baylibre.com,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,0.0.0.0:email,0.61.9.0:email]
 X-Rspamd-Action: no action
 
 
---9f74gDXlIrnBN4fp
-Content-Type: text/plain; charset=us-ascii
+--b6bV6EY6NMjXdDw4
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 04, 2026 at 09:13:39AM -0700, Ryan Wanner wrote:
-> > No, I don't think this is what I am suggesting. I am suggesting adding
-> > USRIO_HAS_CLKEN to the gem configs, and then modifying the usrio struct
-> > to have a member called something like "refclk_default_enable" and sett=
-ing
-> > it to true for emacs and false for gems. Then in init code somewhere, we
-> > would do:
+On Wed, Mar 04, 2026 at 06:14:57PM +0200, Vladimir Oltean wrote:
+> On Wed, Mar 04, 2026 at 05:10:11PM +0100, Jens Emil Schulz Ostergaard wro=
+te:
+> > On Tue, 2026-03-03 at 18:56 +0000, Conor Dooley wrote:
+> > > On Tue, Mar 03, 2026 at 01:22:28PM +0100, Jens Emil Schulz =D8stergaa=
+rd wrote:
+> > > > +examples:
+> > > > +  - |
+> > > > +    soc {
+> > > > +        #address-cells =3D <1>;
+> > > > +        #size-cells =3D <0>;
+> > > > +
+> > > > +      ethernet-switch@0 {
+> > > > +        reg =3D <0>;
+> > >=20
+> > > Also, this is an odd example, why are you at address 0 on a "soc" bus,
+> > > which usually means that this device on an AXI/AHB bus, and 0 is very
+> > > unusual for that. Obviously the example doesn't have to match the real
+> > > user, but this stands out.
+> > > I may have some follow up questions I think depending on your answer.
 > >=20
-> > 	if (property_present(refclk-source))
-> > 		if (property_read_string(refclk-source) =3D=3D "external"
-> > 			refclk_enable =3D true
-> > 		else
-> > 			refclk_enable =3D false
-> > 	else if (property_present(refclk-ext))
-> > 		refclk_enable =3D true
-> > 	else
-> > 		refclk_enable =3D usrio.refclk_default_enable
+> > The intended way to bind this driver is via a parent MFD driver which s=
+ets
+> > up the SPI register protocol, initiates regmaps and distributes them to=
+ child
+> > devices (like this DSA driver).
 > >=20
-> > Then later on in init, when configuring the caps, we would do:
+> > Similar to mscc,vsc7512 in drivers/mfd/ocelot-spi.c.
 > >=20
-> > 	if (!(bp->caps & MACB_CAPS_USRIO_DISABLED)) {
-> >=20
-> > 		if (bp->caps & MACB_CAPS_USRIO_HAS_CLKEN)
-> > 			val |=3D refclk_enable;
-> >=20
-> > 		macb_or_gem_writel(bp, USRIO, val);
-> > 	}
-> >=20
-> > Or maybe we just roll all that up together inside the !USRIO_DISABLED
-> > code.=20
-> >=20
-> > The code currently in macb_configure_caps() about refclks would be
-> > deleted.
-> >=20
-> > This would produce one property that works for both emacs and gems, not
-> > change any defaults for existing devices and retain support for whatever
-> > devicetrees made it into the wild with your property.
-> >=20
-> > Does that make sense?
+> > This MFD would be the soc node. All child nodes perform register IO over
+> > spi, using the regmaps requested from this parent so I think the addres=
+ses
+> > on the bus are purely ornamental. Should I write the smallest register
+> > address in all regions used by the DSA driver instead?
 >=20
-> If we are set to have an external and internal clock dt property than I
-> think we should just keep those if statements inside the !USRIO_DISABLED
-> code block just to keep it more organized and clean and keeping the
-> current HAS_CLKEN if statement be the fallback default case to set the
-> register bit value. Some thing like this:
->=20
-> if (!(bp->caps & MACB_CAPS_USRIO_DISABLED)) {
-> 		if (property_present(refclk-source)) {
-> 			if (property_read_string =3D=3D "external")
-> 				val |=3D true;
-> 			else
-> 				val |=3D false;
-> 		}
-> 		else if (bp->caps & MACB_CAPS_USRIO_HAS_CLKEN)
-> 			val |=3D bp->usrio->refclk;
->=20
-> 		macb_or_gem_writel(bp, USRIO, val);
-> }
->=20
-> Would this be a good middle ground?
+> They are not ornamental, they should be the same addresses you'd put if
+> Linux had direct access to the SoC interconnect for MMIO, rather than to
+> an SPI bridge to the SoC interconnect. Or at least I don't see why it
+> wouldn't be that way.
 
-I explicitly would like to make HAS_CLKEN represent the USRIO having the
-bit, and not ascribe behaviour to it, so that it is actually a
-capability. This is why I want to make the default a member of the usrio
-struct in match data.
-Also, the bit position depends on the usrio struct, which we both
-omitted from our pseudo code, which means that even knowing how to
-modify val depends on having HAS_CLKEN/usrio.refclk being set, so your
-fallback doesn't sit right with me - I am trying to avoid things writing
-to USRIO without specifically being told what it is writing to is valid.
+I don't mind if they're made up addresses, but the example should be
+realistic. 0 is likely not realistic, but if it was 0x4000_0000 when the
+real thing is 0x8123_1234 then I don't really care. Since the parent is
+not actually a soc bus, can't you just remove this fake parent entirely,
+like the ocelot switch example does? Or insert something more genuine,
+like:
+spi {
+  #address-cells =3D <1>;
+  #size-cells =3D <0>;
 
---9f74gDXlIrnBN4fp
+  soc@0 {
+    compatible =3D "microchip,lan96455s";
+    reg =3D <0>;
+    #address-cells =3D <1>;
+    #size-cells =3D <1>;
+
+    ethernet-switch@4000000 {
+      reg =3D <4000000 44>;
+
+
+--b6bV6EY6NMjXdDw4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaah/igAKCRB4tDGHoIJi
-0u9rAQCBHamX+ZXo+ry/A8L1d4Wrf/HBb6wst95AlTZw5drewAEAk+Vt8RuqH3cj
-W3p74jc+/pi4WgO9M0TeCoSpNnl1Kgs=
-=JNVT
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaaiCxQAKCRB4tDGHoIJi
+0pNbAP9uGOb02KpKec1SzZegVdL/v1K3XiSjnA1dmjqNkh21gwEAz6KT6TLUzASJ
+fKWAfv4fQQ8yAChtiSlXCOIuW3RZkwU=
+=MGus
 -----END PGP SIGNATURE-----
 
---9f74gDXlIrnBN4fp--
+--b6bV6EY6NMjXdDw4--
 
