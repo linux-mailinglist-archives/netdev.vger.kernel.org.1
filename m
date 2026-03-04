@@ -1,259 +1,216 @@
-Return-Path: <netdev+bounces-263749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDAFIFkPqGk8ngAAu9opvQ
-	(envelope-from <netdev+bounces-263749-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:54:17 +0100
+	id AFN8K4gPqGk8ngAAu9opvQ
+	(envelope-from <netdev+bounces-263751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:55:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841521FE957
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:54:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 546EF1FE982
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 11:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6B52F3041ED2
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 10:53:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B3FDC301135E
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 10:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBEA3A8721;
-	Wed,  4 Mar 2026 10:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE11C3A8734;
+	Wed,  4 Mar 2026 10:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="uaPvPuCp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684283A873D;
-	Wed,  4 Mar 2026 10:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B063A451F
+	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 10:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772621592; cv=none; b=eqI14mYW17rs3dOvglwLb0tcsoRdeZeL/MzEyMVQkNCX3RlVp7mEIkNNIqfbo3KKWJaXwJiIV58jG0l7cM9tIndT+NQrKxjonCMpntQlkRGJr7T914G0/uF/aY8rxQbVoVybKXKRD6GcZgIoHIkyVvz3lOBLXtFsBTASTyEE4DM=
+	t=1772621701; cv=none; b=e9dS5hB3QWZmhmDVFIgvrPdc3k9D+pWoKtypFa3vLSiCcFzRSx9CoO7w1QwrhQCQQuXFM0rn1zGeqOjS948dZG1fq6jkpmE/AQVlePXKtk1Jb07aMfbhreOZld21SdOmYRZ3iC2OTo0hhPMYGcL0S22G+conQLeLpNSLExLlrgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772621592; c=relaxed/simple;
-	bh=seolZAi9wS9AkLegqxuIIYBfkjQgFK23TvsRT6jiP70=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b00PyQHTKYo6H1TjO0oAi1IXjCvOjwdZrIM6l+84DKLgxdG57+e83jYQvLv/RD9iZpGepHVY+r2IOE2byO9SRNFg3Quyy46aX4XDIRFn+Z/KixltJB2guGxGDp6+J5e1OTRB/8fQykD4rAJ/XlfudRv6Q5Y/pO2Yr2iJK8VRFgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
-X-QQ-mid: esmtpgz13t1772621579t2dcbf07d
-X-QQ-Originating-IP: 1bKHHpPITr/E07eNJX+HyNCDOkzeK3cYeCwu8yiSK4s=
-Received: from localhost.localdomain ( [219.147.0.82])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 04 Mar 2026 18:52:55 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 73543249924356061
-EX-QQ-RecipientCnt: 8
-From: Jialu Xu <xujialu@vimux.org>
-To: xujialu@vimux.org
-Cc: brgl@kernel.org,
-	kees@kernel.org,
-	krzk@kernel.org,
-	linusw@kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
-Date: Wed,  4 Mar 2026 18:52:15 +0800
-Message-ID: <DBC78F9A5471852F+20260304105215.536399-4-xujialu@vimux.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260304105215.536399-1-xujialu@vimux.org>
-References: <7187C401290C256B+20260304084808.440955-1-xujialu@vimux.org>
- <20260304105215.536399-1-xujialu@vimux.org>
+	s=arc-20240116; t=1772621701; c=relaxed/simple;
+	bh=wDy7lwFKEmxDMoxtDsk2M2wdV9BvNz6hH7XPQGFhta4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZTw2vmpuNFX+8NZavqPoSFSNVdGThEbjZzr03/3mwTJpQOTzV2c0LrOUNkwIB93PUfMiuG5T0/MXNbC4AVkvKU7KsDfpyyG1mo3zzgHw6E/7j2l5bA6qSeM5ngjn1Nt/JZv+xB5dWCro25zwBriyTYQ7x9dxJty5YbzV9xqCsTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=uaPvPuCp; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7A166A0042;
+	Wed,  4 Mar 2026 11:54:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1772621695; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=4b9fzcnuJ5ddgbvup+eksWHf93kQSgMRpetZAz6W3xs=;
+	b=uaPvPuCpSA272XD6nS9FebqZROU28DFkJhfLu+5ISNguZ/yW0F5o0DJkiOk1QPjlUOFAez
+	dH957J95U9+cVPD4To2vHMzRaGqPbX/7D+yLxlKl30tCByIs6vgYtkfKU1ZP7hITkM4uf0
+	up1d2/6y+Nw7NwQXvebVKFNXy4WRWPURwZuJM0hmmLHghBUAjfcvfJ2D8MmDncVOYJb0vN
+	7RGqwqYfs+wIAE5xzi21z2GhgjVsFTCqfxyKoAmAwMkxU7RgY/phYq0eHekBnythkt0CyP
+	F5nDcJKQ4Xnb/jDtFGO6vbLQHWOzPgayt47Yu2Fg2FGtrIJs1uLRvc0q1GzTww==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
+	phil@raspberrypi.com,
+	Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net-next v6 0/5] net: cadence: macb: add IEEE 802.3az EEE support
+Date: Wed,  4 Mar 2026 11:54:27 +0100
+Message-ID: <20260304105432.631186-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: N5OohOZOOOruGsFhU/Ute3kVn3GNPmzuY4pkD53RhJBcjHjCLai8ByXt
-	8KjpzEOlVmoROrNrn16p7yGCtPskgNjXJLP026f/ZVnQAi/JBTIijW2hHjbZupR2UlLa0K7
-	qAuRxGoULubNcMMD24FYipGjjyFH21lh+dxgzAPg1Sg23vSCXT5JMGqxCcaalslDU4a8ape
-	IEqOzhtg+Bg8l1rrjHgyHqcEoBIZuFeDQPuNyb15y3RKy/srnhbSv2f20ODG2YjjXWWNKA9
-	TXtCi1it5imoTX4TFC4vBUvAH31EEB87nHmZC1Q8cmLE5rMweF9wG1nenM9aMXrEHE5oQJc
-	Ll25Z49H07dL79c8zrYsRqzAE8OnOVXOpSYWvsMX0jz9FUMloM6f/d3zFNo1Kvdz6vm8SuL
-	HTmmObcRkQfkvff/QDOxb3qo5xkaBnikOjQhkWHFfF6mbF8AosAqjXzUUXkUiFatJz2nEt8
-	ZhZvfy6IXcZK2MDa3IT+z21jm8Tu0QMayBCgA/JaOfQzrfgtLtvwpEfI0i+VMbpsyxih/xX
-	KlgIShMWte8LsM8wqbWqPBwzkiWOo1HzmT5c2Y81aM85K774LsyXHRK6rWo+opGFBS5EYhP
-	Uq5CWY81kCVEEhp7PFmG7cAeM+ULfYuRjZ486chLJsr/aZn4ipShSCDoHyO1rDq5O7BChHZ
-	nRdiWgvsW8mUVmkWimi0A5n1OjoHnPP0phW4UtYURnmjaxK36xN4p59wt9CiHAd9Y6XyyRn
-	2AIjllAkhZEQmOzMElwE/TqLOn0DA+DjB29DqpxUanClKqyvozvowt18e6oR8lYfrdoeuFI
-	BjS6ORk+Ab/XRwaYDltRKO/Tk1wmE7czn5W5g7xyvsCMjp1TlJaQwsJle0OIoJcjaVUKDUZ
-	LAtU+/hbetx8ciZQkxu8b4V/1thWTuYzDewSSazF1dnlHNiY/C1mvbBbcoAJwxZy771bmEy
-	BZglCLnn30pnUWy8wFq1usFl4I63pr/Gwq8jp0bieHuHPVD2bW4VsRDuWLW2M3eFOBDkvuK
-	ZxgbZU4ueHEwvVJMIP6yx/tbabrTSX5BXU+8xEkIZHMRCUWJJoOXaQ7a4kN14=
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 841521FE957
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 546EF1FE982
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263749-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263751-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vimux.org:mid,vimux.org:email,mvista.com:email]
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,tuxon.dev:email,tipi-net.de:dkim,tipi-net.de:mid]
 X-Rspamd-Action: no action
 
-All in-tree consumers have been converted to the descriptor-based API.
-Remove the deprecated of_get_named_gpio() helper and delete the
-<linux/of_gpio.h> header.
+Add Energy Efficient Ethernet (IEEE 802.3az) support to the Cadence GEM
+(macb) driver using phylink's managed EEE framework. The GEM MAC has
+hardware LPI registers but no built-in idle timer, so the driver
+implements software-managed TX LPI using a delayed_work timer while
+delegating EEE negotiation and ethtool state to phylink.
 
-Signed-off-by: Jialu Xu <xujialu@vimux.org>
----
- drivers/gpio/TODO         | 28 ----------------------------
- drivers/gpio/gpiolib-of.c | 27 ---------------------------
- include/linux/of_gpio.h   | 38 --------------------------------------
- 3 files changed, 93 deletions(-)
- delete mode 100644 include/linux/of_gpio.h
+Changes from v5:
+  - macb_tx_lpi_set() no longer manages its own spinlock; it now
+    requires bp->lock to be held by the caller and asserts this with
+    lockdep_assert_held(). All callers (macb_tx_lpi_work_fn,
+    macb_mac_enable_tx_lpi, macb_mac_disable_tx_lpi) take bp->lock
+    explicitly. Based on feedback from Jakub Kicinski.
+  - macb_tx_lpi_wake() is now called under the existing bp->lock in
+    macb_start_xmit(), eliminating the redundant lock acquire/release.
+    An eee_active check at the top of macb_tx_lpi_wake() short-circuits
+    the register read on the common (EEE-disabled) path. Based on
+    feedback from Jakub Kicinski.
+  - macb_tx_all_queues_idle() uses READ_ONCE for tx_head/tx_tail
+    (called under bp->lock; taking tx_ptr_lock here would invert the
+    established lock order). Loop rewritten to match the driver
+    convention: for (q = 0, queue = bp->queues; ...; ++q, ++queue).
+    Based on feedback from Jakub Kicinski and Claudiu Beznea.
+  - Added Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev> to
+    patches 1-4.
 
-diff --git a/drivers/gpio/TODO b/drivers/gpio/TODO
-index 5acaeab029ec6..7ce80fde1f17e 100644
---- a/drivers/gpio/TODO
-+++ b/drivers/gpio/TODO
-@@ -58,34 +58,6 @@ Work items:
- 
- -------------------------------------------------------------------------------
- 
--Get rid of <linux/of_gpio.h>
--
--This header and helpers appeared at one point when there was no proper
--driver infrastructure for doing simpler MMIO GPIO devices and there was
--no core support for parsing device tree GPIOs from the core library with
--the [devm_]gpiod_get() calls we have today that will implicitly go into
--the device tree back-end. It is legacy and should not be used in new code.
--
--Work items:
--
--- Change all consumer drivers that #include <linux/of_gpio.h> to
--  #include <linux/gpio/consumer.h> and stop doing custom parsing of the
--  GPIO lines from the device tree. This can be tricky and often involves
--  changing board files, etc.
--
--- Pull semantics for legacy device tree (OF) GPIO lookups into
--  gpiolib-of.c: in some cases subsystems are doing custom flags and
--  lookups for polarity inversion, open drain and what not. As we now
--  handle this with generic OF bindings, pull all legacy handling into
--  gpiolib so the library API becomes narrow and deep and handle all
--  legacy bindings internally. (See e.g. commits 6953c57ab172,
--  6a537d48461d etc)
--
--- Delete <linux/of_gpio.h> when all the above is complete and everything
--  uses <linux/gpio/consumer.h> or <linux/gpio/driver.h> instead.
--
---------------------------------------------------------------------------------
--
- Collect drivers
- 
- Collect GPIO drivers from arch/* and other places that should be placed
-diff --git a/drivers/gpio/gpiolib-of.c b/drivers/gpio/gpiolib-of.c
-index 3bdd9af674474..c512d735e85ff 100644
---- a/drivers/gpio/gpiolib-of.c
-+++ b/drivers/gpio/gpiolib-of.c
-@@ -14,7 +14,6 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_gpio.h>
- #include <linux/pinctrl/pinctrl.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-@@ -446,32 +445,6 @@ static struct gpio_desc *of_get_named_gpiod_flags(const struct device_node *np,
- 	return desc;
- }
- 
--/**
-- * of_get_named_gpio() - Get a GPIO number to use with GPIO API
-- * @np:		device node to get GPIO from
-- * @propname:	Name of property containing gpio specifier(s)
-- * @index:	index of the GPIO
-- *
-- * **DEPRECATED** This function is deprecated and must not be used in new code.
-- *
-- * Returns:
-- * GPIO number to use with Linux generic GPIO API, or one of the errno
-- * value on the error condition.
-- */
--int of_get_named_gpio(const struct device_node *np, const char *propname,
--		      int index)
--{
--	struct gpio_desc *desc;
--
--	desc = of_get_named_gpiod_flags(np, propname, index, NULL);
--
--	if (IS_ERR(desc))
--		return PTR_ERR(desc);
--	else
--		return desc_to_gpio(desc);
--}
--EXPORT_SYMBOL_GPL(of_get_named_gpio);
--
- /* Converts gpio_lookup_flags into bitmask of GPIO_* values */
- static unsigned long of_convert_gpio_flags(enum of_gpio_flags flags)
- {
-diff --git a/include/linux/of_gpio.h b/include/linux/of_gpio.h
-deleted file mode 100644
-index d0f66a5e1b2a7..0000000000000
---- a/include/linux/of_gpio.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0+ */
--/*
-- * OF helpers for the GPIO API
-- *
-- * Copyright (c) 2007-2008  MontaVista Software, Inc.
-- *
-- * Author: Anton Vorontsov <avorontsov@ru.mvista.com>
-- */
--
--#ifndef __LINUX_OF_GPIO_H
--#define __LINUX_OF_GPIO_H
--
--#include <linux/compiler.h>
--#include <linux/gpio/driver.h>
--#include <linux/gpio.h>		/* FIXME: Shouldn't be here */
--#include <linux/of.h>
--
--struct device_node;
--
--#ifdef CONFIG_OF_GPIO
--
--extern int of_get_named_gpio(const struct device_node *np,
--			     const char *list_name, int index);
--
--#else /* CONFIG_OF_GPIO */
--
--#include <linux/errno.h>
--
--/* Drivers may not strictly depend on the GPIO support, so let them link. */
--static inline int of_get_named_gpio(const struct device_node *np,
--                                   const char *propname, int index)
--{
--	return -ENOSYS;
--}
--
--#endif /* CONFIG_OF_GPIO */
--
--#endif /* __LINUX_OF_GPIO_H */
--- 
-2.47.3
+Changes from v4:
+  - Removed redundant MACB_CAPS_EEE guards from macb_get_eee/set_eee;
+    phylink already returns -EOPNOTSUPP when lpi_capabilities and
+    lpi_interfaces are not populated. Based on feedback from Russell King.
+  - Added patch 5 enabling EEE for Mobileye EyeQ5, tested by Théo Lebrun
+    using a hardware loopback.
+
+Changes from v3:
+  - Dropped the register-definitions-only patch; LPI counter offsets
+    (GEM_RXLPI/RXLPITIME/TXLPI/TXLPITIME) now land in the statistics
+    patch, and TXLPIEN + MACB_CAPS_EEE are introduced alongside the TX
+    LPI implementation where they are first used. Series is now 4 patches.
+  - Add Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com> to all patches.
+  - Split chained assignment in macb_tx_lpi_set() (suggested by
+    checkpatch).
+
+Changes from v2:
+  - macb_tx_lpi_set() now returns bool indicating whether the register
+    value actually changed, avoiding redundant writes.
+  - Removed tx_lpi_enabled field from struct macb; LPI state is tracked
+    entirely within the spinlock-protected register read/modify/write.
+  - macb_tx_lpi_wake() uses the return value of macb_tx_lpi_set() to
+    skip the cancel/udelay when TXLPIEN was already clear.
+  All changes based on feedback from Russell King.
+
+Changes from v1:
+  - Rewrote to use phylink managed EEE (mac_enable_tx_lpi /
+    mac_disable_tx_lpi callbacks) instead of the obsolete
+    phy_init_eee() approach, as recommended by Russell King.
+  - ethtool get_eee/set_eee are now pure phylink passthroughs.
+  - Removed all manual EEE state tracking from mac_link_up/down;
+    phylink handles the lifecycle.
+
+The series is structured as follows:
+
+  1. LPI statistics: Expose the four hardware EEE counters (RX/TX LPI
+     transitions and time) through ethtool -S, accumulated in software
+     since they are clear-on-read. Adds register offset definitions
+     GEM_RXLPI/RXLPITIME/TXLPI/TXLPITIME (0x270-0x27c).
+
+  2. TX LPI engine: Introduces GEM_TXLPIEN (NCR bit 19) and
+     MACB_CAPS_EEE alongside the implementation that uses them.
+     phylink mac_enable_tx_lpi / mac_disable_tx_lpi callbacks with a
+     delayed_work-based idle timer. LPI entry is deferred 1 second
+     after link-up per IEEE 802.3az. Wake before transmit with a
+     conservative 50us PHY wake delay (IEEE 802.3az Tw_sys_tx).
+
+  3. ethtool EEE ops: get_eee/set_eee delegating to phylink for PHY
+     negotiation and timer management.
+
+  4. RP1 enablement: Set MACB_CAPS_EEE for the Raspberry Pi 5's RP1
+     southbridge (Cadence GEM_GXL rev 0x00070109 + BCM54213PE PHY).
+
+  5. EyeQ5 enablement: Set MACB_CAPS_EEE for the Mobileye EyeQ5 GEM
+     instance, verified with a hardware loopback by Théo Lebrun.
+
+Tested on Raspberry Pi 5 (1000BASE-T, BCM54213PE PHY, 250ms LPI timer):
+
+  iperf3 throughput (no regression):
+    TCP TX: 937.8 Mbit/s (EEE on) vs 937.0 Mbit/s (EEE off)
+    TCP RX: 936.5 Mbit/s both
+
+  Latency (ping RTT, small expected increase from LPI wake):
+    1s interval:  0.273 ms (EEE on) vs 0.181 ms (EEE off)
+    10ms interval: 0.206 ms (EEE on) vs 0.168 ms (EEE off)
+    flood ping:   0.200 ms (EEE on) vs 0.156 ms (EEE off)
+
+  LPI counters (ethtool -S, 1s-interval ping, EEE on):
+    tx_lpi_transitions: 112
+    tx_lpi_time: 15574651
+
+  Zero packet loss across all tests. Also verified with
+  ethtool --show-eee / --set-eee and cable unplug/replug cycling.
+
+Nicolai Buchwitz (5):
+  net: cadence: macb: add EEE LPI statistics counters
+  net: cadence: macb: implement EEE TX LPI support
+  net: cadence: macb: add ethtool EEE support
+  net: cadence: macb: enable EEE for Raspberry Pi RP1
+  net: cadence: macb: enable EEE for Mobileye EyeQ5
+
+ drivers/net/ethernet/cadence/macb.h      |  20 +++++
+ drivers/net/ethernet/cadence/macb_main.c | 145 ++++++++++++++++++++++++++++++-
+ 2 files changed, 163 insertions(+), 2 deletions(-)
+
+--
+2.51.0
 
 
