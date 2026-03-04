@@ -1,191 +1,404 @@
-Return-Path: <netdev+bounces-264074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +6aVIpW2qGmlwgAAu9opvQ
-	(envelope-from <netdev+bounces-264074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:47:49 +0100
+	id QCgkGZq5qGngwgAAu9opvQ
+	(envelope-from <netdev+bounces-264075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:00:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA7B208C14
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 23:47:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B1F208D17
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 00:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28F5330080A7
-	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 22:47:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F24E302A68B
+	for <lists+netdev@lfdr.de>; Wed,  4 Mar 2026 23:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB27735CB71;
-	Wed,  4 Mar 2026 22:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D942325714;
+	Wed,  4 Mar 2026 23:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmvfrLt0"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="OxMUXlQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC3733E7
-	for <netdev@vger.kernel.org>; Wed,  4 Mar 2026 22:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12C73B2A0;
+	Wed,  4 Mar 2026 23:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772664463; cv=none; b=j5c6U/N2KBJ8JzIwPSGbT/yZnE8530ZRvLFcORHw8TzYCUkAopM13i3Aghage3FeN8AyG0JYKfQE3VWm5XeuZL9u+2b4a4MsBHuQrcdDSqFHykuffVRznuRStj8FxIZVeL9gi9wdXnRPw2AuZXHlQM/IhkpxJPTHzs4eQWrPg0E=
+	t=1772665238; cv=none; b=cxDFRG7BznsWtBP5NmblcagNcYGQCYCIJB0sdqvN5UFZbQDtDBcfCqkRykdzSLnAPVNwwSs9ukID6txnq+642L3IHbWnG6jnrNS3hKV8NUKBCFqx4kqaT3rPl8Kd7UtJglqkav6fv2TgNh8K1uXRsYA2XkGJcuiKfB0noZFBxvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772664463; c=relaxed/simple;
-	bh=RtRZ4mJB+nwPC7VInmYlSfqnFozHJxGBkcC8/+L0z04=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=D57nhI0EXIneg7wMi3uYIbYx7jdCQeUtxcARl+huEJ3v3hTQUbR8Ieyu6a3nEVaj4UPDY8XKih52Rfi3Kj9XCKCcsyXIEv8XXP14RM5Vd72PhF7A693byYyXMc9jojXeNJ3+MFPUg5ffatcAU5OAltxMryUOdBgcHjiYzhzu7+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmvfrLt0; arc=none smtp.client-ip=74.125.224.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64c9a6d68e5so5581375d50.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 14:47:42 -0800 (PST)
+	s=arc-20240116; t=1772665238; c=relaxed/simple;
+	bh=OJLHspxDaCHBYs5KK3dbE/030e6mt4kOaKuDX5a2O94=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rN/aWRH3wjdh9izcdrzJfppv8wRHQZl4PnmC9P2CW1HLNWi5zd1I33t5TrBDxUqSkMSp2hfjHAo93CcSslEOdv1fmCpvywcONSX+ruFRUHzBgTN9zXgNAoNtQJ2t7azzs8CMJdOkrNZb4qatQueNQRQd00WT6dcaStseVQcwdGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=OxMUXlQL; arc=none smtp.client-ip=52.26.1.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772664461; x=1773269261; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6PLHSOewuwH1PngbXys7NFtiqO5ObC1B7LLLEYe4qtU=;
-        b=ZmvfrLt0iwmENXsPTVFjVt7GG0/O5vmGfzSIBagab3cndpv+DmfbfOJ0mWP8z685lJ
-         NLERUSV7qvgTgZoTS3i5SvPyWMw9P6qfefyFPW1bjTJPIi5idQoCxMpQfQKK/KWEUiB4
-         o6S2SASnqYf8lp3x2CqG2f4p+sYLxg6AixlkqsP0Np2nfXT56nm0qJ9jKmM0znWb/pNV
-         88vRYosYuXHTKwSTmaPmUhHBE0SzfURKqADFklqUwg22ty2hPsE/Cd7h8zvZTqR+J4Nf
-         Iqd0ShE89h+Iu+RSCYsPGm5+RScIE4UNa79SNSb+3UD3i8Cvr/VWzSEGdz2LSF60lwE2
-         6RXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772664461; x=1773269261;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6PLHSOewuwH1PngbXys7NFtiqO5ObC1B7LLLEYe4qtU=;
-        b=S9t62YGCA+fF8yM1n/ENqaQG+kxATp4+Iks7tgT7dVbDYVg5ODiBhjjeseCLKV0CSV
-         R+4luaCAaJRomkW8feq9GNrJnc+YJqykjt5+AWVXujl98o7umIt7DFGudrXaojf3jPKp
-         fmLOzKCxyG7pILJ5mrMz0aRSETPQS8JPJdkZnAb8FY8hWlBWd+gG2905tGFc8aB20+17
-         PBrW+qRpa2BlSvYZpNTXifdAO7IF3tpnEmcaX4JTHiXpyaY0KWV/gXHL6xdH0GyUXhzj
-         hPp1zxjBApYx1v86qhPFgqZbivjklVxYvuWKF5cMyGfO7Qr4x1oalKwfteRjAy2buBvi
-         InMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnpbJZMLLmGob0JjIQywLkqQxrwTQZItvLPwHJeQdd5WOgr2Y9RgzzVEZInlBj7OSGU+c3xzM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIw4IrpnWGHnAed97Xw49KH1z4vGiEe74/mbjOkfgP4mNt477G
-	GgvINIHPcuAMZCfvITkSoS4LUzgWktZoI9tlUMiFGwmV0PnyY7c0J3RY
-X-Gm-Gg: ATEYQzz9uChbAJAnXxg2WfID5o2Gb2CQdzNFZkmk5gRzSrXbVnwZ4+917fdhE0CA55d
-	kfZhHQsKxihyY6VsO1/bEWnnXFErmrFUCp1NvxF5nCzA4sfAuhE/p7c9AKeZExD0jiSfRcc1oa/
-	cNOqmg4ld9gBcJP0M2RGfvfkumrazC1PdWjiqaGzJFtSMZEE7Eub2SrTz6dXFVX+WEKbvb8XLpv
-	hW81+bCVc3VMs8Fdp0Q6KzBPPRq8An6Ffqgar8dXtaOdt8cERH8QumHmjSrffq3WikhMVYua/Se
-	73Lx4Gu1T7zJScNii0wLSnuSTTVN8/kbg9CT0OdCl4nrw5BIUeuk9AoIKFy5VkO2DlRnv2JQA6A
-	z8nXGXHEm7LlAZfER5T5zaanwcoHO75BjlEaeMdTAvfz1oouG2vundANOFXj1SzuX8Yx9Xz2MiA
-	aI8Z7TkBDMp/tvBqhO4vT8Xrn2te6c2eyJ+QEGp8pHHZQPJEakL44LNghq8q4MLz7iFWZzIgw=
-X-Received: by 2002:a05:690e:1c1c:b0:649:e4eb:cc6e with SMTP id 956f58d0204a3-64cf9b6324fmr2971183d50.34.1772664461412;
-        Wed, 04 Mar 2026 14:47:41 -0800 (PST)
-Received: from gmail.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64cec30a69esm2439891d50.2.2026.03.04.14.47.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 14:47:40 -0800 (PST)
-Date: Wed, 04 Mar 2026 17:47:40 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- David Ahern <dsahern@kernel.org>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1aabccf28abf0@gmail.com>
-In-Reply-To: <20260304193034.1870586-10-kuniyu@google.com>
-References: <20260304193034.1870586-1-kuniyu@google.com>
- <20260304193034.1870586-10-kuniyu@google.com>
-Subject: Re: [PATCH v1 net-next 09/15] udp: Remove UDPLITE_SEND_CSCOV and
- UDPLITE_RECV_CSCOV.
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772665235; x=1804201235;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=n1Dpe5TmK29EQVyKEDfDqgSERzQvqQSV4rMdg8wwLgs=;
+  b=OxMUXlQL9cPhJwnRSe1Ds1IPHDehqlthUU2bmkWD6IalEOfwkkagC0pq
+   4dtO+B9E11D8IwG/CynSCETdW2sKfEV5gfMriCMjbBEy+hHi7e6n1FTB8
+   4pUNGyoFvPWWgZHCUwQQCtGx3xOQRQSBiRBNLt8Ny+voMh8unfqiNtN+c
+   O7kgrQOqI7Ax01ccQVEE4OepVkCXhTUSwGnPArnjG1kKywOts2+fNiGpy
+   WUIBKz7Emwi0SHME67rCr/ZRyUVOLT6HNeJwrZyLgMgwBozQ4pXCGdAPZ
+   MANXix0lq6oIvWaHZtp9lhoVOF+Wd8f9jH6EskegBWRM/AXforwxAicB4
+   Q==;
+X-CSE-ConnectionGUID: UcCQtfQST0m1OrdgB13lEA==
+X-CSE-MsgGUID: r9a6X+fFT2OJiKHQI7sNXg==
+X-IronPort-AV: E=Sophos;i="6.21,324,1763424000"; 
+   d="scan'208";a="14335168"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 23:00:33 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:6200]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.162:2525] with esmtp (Farcaster)
+ id 72d9fe61-1ca0-42bb-954e-81bc1c3650cb; Wed, 4 Mar 2026 23:00:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 72d9fe61-1ca0-42bb-954e-81bc1c3650cb
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 4 Mar 2026 23:00:32 +0000
+Received: from ip-10-253-83-51.amazon.com (172.19.99.218) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 4 Mar 2026 23:00:29 +0000
+From: Alexander Graf <graf@amazon.com>
+To: <virtualization@lists.linux.dev>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, <mst@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	<bcm-kernel-feedback-list@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, Jonathan Corbet
+	<corbet@lwn.net>, Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa
+	<vishnu.dasa@broadcom.com>, <nh-open-source@amazon.com>,
+	<syzbot@syzkaller.appspotmail.com>
+Subject: [PATCH net-next v4] vsock: add G2H fallback for CIDs not owned by H2G transport
+Date: Wed, 4 Mar 2026 23:00:27 +0000
+Message-ID: <20260304230027.59857-1-graf@amazon.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 7DA7B208C14
+X-Rspamd-Queue-Id: C7B1F208D17
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-8.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264074-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,gmail.com,kernel.org,davemloft.net,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-264075-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.995];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Kuniyuki Iwashima wrote:
-> UDP-Lite supports variable-length checksum and has two socket
-> options, UDPLITE_SEND_CSCOV and UDPLITE_RECV_CSCOV, to control
-> the checksum coverage.
-> 
-> Let's remove the support.
-> 
-> setsockopt(UDPLITE_SEND_CSCOV / UDPLITE_RECV_CSCOV) was only
-> available for UDP-Lite and returned -ENOPROTOOPT for UDP.
-> 
-> Now, the options are handled in ip_setsockopt() and
-> ipv6_setsockopt(), which still return the same error.
-> 
-> getsockopt(UDPLITE_SEND_CSCOV / UDPLITE_RECV_CSCOV) was available
-> for UDP and always returned 0, meaning full checksum, but now
-> -ENOPROTOOPT is returned.
-> 
-> Given that getsockopt() is meaningless for UDP and even the options
-> are not defined under include/uapi/, this should not be a problem.
-> 
->   $ man 7 udplite
->   ...
->   BUGS
->        Where glibc support is missing, the following definitions
->        are needed:
-> 
->            #define IPPROTO_UDPLITE     136
->            #define UDPLITE_SEND_CSCOV  10
->            #define UDPLITE_RECV_CSCOV  11
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+When no H2G transport is loaded, vsock currently routes all CIDs to the
+G2H transport (commit 65b422d9b61b ("vsock: forward all packets to the
+host when no H2G is registered"). Extend that existing behavior: when
+an H2G transport is loaded but does not claim a given CID, the
+connection falls back to G2H in the same way.
 
-> diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
-> index edca3e430305..195041ffb7d8 100644
-> --- a/include/uapi/linux/udp.h
-> +++ b/include/uapi/linux/udp.h
-> @@ -29,6 +29,7 @@ struct udphdr {
->  
->  /* UDP socket options */
->  #define UDP_CORK	1	/* Never send partially complete segments */
-> +/* Don't use 10 and 11 */
+This matters in environments like Nitro Enclaves, where an instance may
+run nested VMs via vhost-vsock (H2G) while also needing to reach sibling
+enclaves at higher CIDs through virtio-vsock-pci (G2H). With the old
+code, any CID > 2 was unconditionally routed to H2G when vhost was
+loaded, making those enclaves unreachable without setting
+VMADDR_FLAG_TO_HOST explicitly on every connect.
 
-Could use a bit more detail. Something like:
+Requiring every application to set VMADDR_FLAG_TO_HOST creates friction:
+tools like socat, iperf, and others would all need to learn about it.
+The flag was introduced 6 years ago and I am still not aware of any tool
+that supports it. Even if there was support, it would be cumbersome to
+use. The most natural experience is a single CID address space where H2G
+only wins for CIDs it actually owns, and everything else falls through to
+G2H, extending the behavior that already exists when H2G is absent.
 
-/* Deprecated, reserved for UDPLITE_SEND_CSCOV 10 */
+To give user space at least a hint that the kernel applied this logic,
+automatically set the VMADDR_FLAG_TO_HOST on the remote address so it
+can determine the path taken via getpeername().
 
->  #define UDP_ENCAP	100	/* Set the socket to accept encapsulated packets */
->  #define UDP_NO_CHECK6_TX 101	/* Disable sending checksum for UDP6X */
->  #define UDP_NO_CHECK6_RX 102	/* Disable accepting checksum for UDP6 */
+Add a per-network namespace sysctl net.vsock.g2h_fallback (default 1).
+At 0 it forces strict routing: H2G always wins for CID > VMADDR_CID_HOST,
+or ENODEV if H2G is not loaded.
+
+Signed-off-by: Alexander Graf <graf@amazon.com>
+Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+
+v1 -> v2:
+
+  - Rebase on 7.0, include namespace support
+  - Add net.vsock.g2h_fallback sysctl
+  - Rework description
+  - Set VMADDR_FLAG_TO_HOST automatically
+  - Add VMCI support
+  - Update vsock_assign_transport() comment
+
+v2 -> v3:
+
+  - Use has_remote_cid() on G2H transport to gate the fallback. This is
+    used by VMCI to indicate that it never takes G2H CIDs > 2.
+  - Move g2h_fallback into struct netns_vsock to enable namespaces
+    and fix syzbot warning
+  - Gate the !transport_h2g case on g2h_fallback as well, folding the
+    pre-existing no-H2G fallback into the new logic
+  - Remove has_remote_cid() from VMCI again. Instead implement it in
+    virtio.
+
+v3 -> v4:
+
+  - Fix commit reference format (checkpatch)
+  - vhost: use !!vhost_vsock_get() instead of != NULL (checkpatch)
+  - Add braces around final else branch (checkpatch)
+  - Replace 'vhost' with 'H2G transport' (Stefano)
+---
+ Documentation/admin-guide/sysctl/net.rst | 28 +++++++++++++++++++
+ drivers/vhost/vsock.c                    | 13 +++++++++
+ include/net/af_vsock.h                   |  9 ++++++
+ include/net/netns/vsock.h                |  2 ++
+ net/vmw_vsock/af_vsock.c                 | 35 ++++++++++++++++++++----
+ net/vmw_vsock/virtio_transport.c         |  7 +++++
+ 6 files changed, 89 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
+index 3b2ad61995d4..0724a793798f 100644
+--- a/Documentation/admin-guide/sysctl/net.rst
++++ b/Documentation/admin-guide/sysctl/net.rst
+@@ -602,3 +602,31 @@ it does not modify the current namespace or any existing children.
+ 
+ A namespace with ``ns_mode`` set to ``local`` cannot change
+ ``child_ns_mode`` to ``global`` (returns ``-EPERM``).
++
++g2h_fallback
++------------
++
++Controls whether connections to CIDs not owned by the host-to-guest (H2G)
++transport automatically fall back to the guest-to-host (G2H) transport.
++
++When enabled, if a connect targets a CID that the H2G transport (e.g.
++vhost-vsock) does not serve, or if no H2G transport is loaded at all, the
++connection is routed via the G2H transport (e.g. virtio-vsock) instead. This
++allows a host running both nested VMs (via vhost-vsock) and sibling VMs
++reachable through the hypervisor (e.g. Nitro Enclaves) to address both using
++a single CID space, without requiring applications to set
++``VMADDR_FLAG_TO_HOST``.
++
++When the fallback is taken, ``VMADDR_FLAG_TO_HOST`` is automatically set on
++the remote address so that userspace can determine the path via
++``getpeername()``.
++
++Note: With this sysctl enabled, user space that attempts to talk to a guest
++CID which is not implemented by the H2G transport will create host vsock
++traffic. Environments that rely on H2G-only isolation should set it to 0.
++
++Values:
++
++	- 0 - Connections to CIDs <= 2 or with VMADDR_FLAG_TO_HOST use G2H;
++	  all others use H2G (or fail with ENODEV if H2G is not loaded).
++	- 1 - Connections to CIDs not owned by H2G fall back to G2H. (default)
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 054f7a718f50..1d8ec6bed53e 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -91,6 +91,18 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net)
+ 	return NULL;
+ }
+ 
++static bool vhost_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
++{
++	struct sock *sk = sk_vsock(vsk);
++	struct net *net = sock_net(sk);
++	bool found;
++
++	rcu_read_lock();
++	found = !!vhost_vsock_get(cid, net);
++	rcu_read_unlock();
++	return found;
++}
++
+ static void
+ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 			    struct vhost_virtqueue *vq)
+@@ -424,6 +436,7 @@ static struct virtio_transport vhost_transport = {
+ 		.module                   = THIS_MODULE,
+ 
+ 		.get_local_cid            = vhost_transport_get_local_cid,
++		.has_remote_cid           = vhost_transport_has_remote_cid,
+ 
+ 		.init                     = virtio_transport_do_socket_init,
+ 		.destruct                 = virtio_transport_destruct,
+diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+index 533d8e75f7bb..4e40063adab4 100644
+--- a/include/net/af_vsock.h
++++ b/include/net/af_vsock.h
+@@ -179,6 +179,15 @@ struct vsock_transport {
+ 	/* Addressing. */
+ 	u32 (*get_local_cid)(void);
+ 
++	/* Check if this transport serves a specific remote CID.
++	 * For H2G transports: return true if the CID belongs to a registered
++	 * guest. If not implemented, all CIDs > VMADDR_CID_HOST go to H2G.
++	 * For G2H transports: return true if the transport can reach arbitrary
++	 * CIDs via the hypervisor (i.e. supports the fallback overlay). VMCI
++	 * does not implement this as it only serves CIDs 0 and 2.
++	 */
++	bool (*has_remote_cid)(struct vsock_sock *vsk, u32 remote_cid);
++
+ 	/* Read a single skb */
+ 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+ 
+diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
+index dc8cbe45f406..7f84aad92f57 100644
+--- a/include/net/netns/vsock.h
++++ b/include/net/netns/vsock.h
+@@ -20,5 +20,7 @@ struct netns_vsock {
+ 
+ 	/* 0 = unlocked, 1 = locked to global, 2 = locked to local */
+ 	int child_ns_mode_locked;
++
++	int g2h_fallback;
+ };
+ #endif /* __NET_NET_NAMESPACE_VSOCK_H */
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 2f7d94d682cb..50843a977878 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -545,9 +545,13 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
+  * The vsk->remote_addr is used to decide which transport to use:
+  *  - remote CID == VMADDR_CID_LOCAL or g2h->local_cid or VMADDR_CID_HOST if
+  *    g2h is not loaded, will use local transport;
+- *  - remote CID <= VMADDR_CID_HOST or h2g is not loaded or remote flags field
+- *    includes VMADDR_FLAG_TO_HOST flag value, will use guest->host transport;
+- *  - remote CID > VMADDR_CID_HOST will use host->guest transport;
++ *  - remote CID <= VMADDR_CID_HOST or remote flags field includes
++ *    VMADDR_FLAG_TO_HOST, will use guest->host transport;
++ *  - remote CID > VMADDR_CID_HOST and h2g is loaded and h2g claims that CID,
++ *    will use host->guest transport;
++ *  - h2g not loaded or h2g does not claim that CID and g2h claims the CID via
++ *    has_remote_cid, will use guest->host transport (when g2h_fallback=1)
++ *  - anything else goes to h2g or returns -ENODEV if no h2g is available
+  */
+ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ {
+@@ -581,11 +585,21 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ 	case SOCK_SEQPACKET:
+ 		if (vsock_use_local_transport(remote_cid))
+ 			new_transport = transport_local;
+-		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
++		else if (remote_cid <= VMADDR_CID_HOST ||
+ 			 (remote_flags & VMADDR_FLAG_TO_HOST))
+ 			new_transport = transport_g2h;
+-		else
++		else if (transport_h2g &&
++			 (!transport_h2g->has_remote_cid ||
++			  transport_h2g->has_remote_cid(vsk, remote_cid)))
++			new_transport = transport_h2g;
++		else if (sock_net(sk)->vsock.g2h_fallback &&
++			 transport_g2h && transport_g2h->has_remote_cid &&
++			 transport_g2h->has_remote_cid(vsk, remote_cid)) {
++			vsk->remote_addr.svm_flags |= VMADDR_FLAG_TO_HOST;
++			new_transport = transport_g2h;
++		} else {
+ 			new_transport = transport_h2g;
++		}
+ 		break;
+ 	default:
+ 		ret = -ESOCKTNOSUPPORT;
+@@ -2879,6 +2893,15 @@ static struct ctl_table vsock_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= vsock_net_child_mode_string
+ 	},
++	{
++		.procname	= "g2h_fallback",
++		.data		= &init_net.vsock.g2h_fallback,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE,
++	},
+ };
+ 
+ static int __net_init vsock_sysctl_register(struct net *net)
+@@ -2894,6 +2917,7 @@ static int __net_init vsock_sysctl_register(struct net *net)
+ 
+ 		table[0].data = &net->vsock.mode;
+ 		table[1].data = &net->vsock.child_ns_mode;
++		table[2].data = &net->vsock.g2h_fallback;
+ 	}
+ 
+ 	net->vsock.sysctl_hdr = register_net_sysctl_sz(net, "net/vsock", table,
+@@ -2928,6 +2952,7 @@ static void vsock_net_init(struct net *net)
+ 		net->vsock.mode = vsock_net_child_mode(current->nsproxy->net_ns);
+ 
+ 	net->vsock.child_ns_mode = net->vsock.mode;
++	net->vsock.g2h_fallback = 1;
+ }
+ 
+ static __net_init int vsock_sysctl_init_net(struct net *net)
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 77fe5b7b066c..57f2d6ec3ffc 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -547,11 +547,18 @@ bool virtio_transport_stream_allow(struct vsock_sock *vsk, u32 cid, u32 port)
+ static bool virtio_transport_seqpacket_allow(struct vsock_sock *vsk,
+ 					     u32 remote_cid);
+ 
++static bool virtio_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
++{
++	/* The CID could be implemented by the host. Always assume it is. */
++	return true;
++}
++
+ static struct virtio_transport virtio_transport = {
+ 	.transport = {
+ 		.module                   = THIS_MODULE,
+ 
+ 		.get_local_cid            = virtio_transport_get_local_cid,
++		.has_remote_cid           = virtio_transport_has_remote_cid,
+ 
+ 		.init                     = virtio_transport_do_socket_init,
+ 		.destruct                 = virtio_transport_destruct,
+-- 
+2.47.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
