@@ -1,405 +1,181 @@
-Return-Path: <netdev+bounces-264488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEYzEZe4qWlEDAEAu9opvQ
-	(envelope-from <netdev+bounces-264488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:08:39 +0100
+	id 2P8TFMK4qWlEDAEAu9opvQ
+	(envelope-from <netdev+bounces-264489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:09:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59998215DE9
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:08:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D89B215E32
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:09:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2101A3010768
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:08:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 051F2301F148
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3397619DF62;
-	Thu,  5 Mar 2026 17:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0973DFC82;
+	Thu,  5 Mar 2026 17:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xorf6xqy"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="eH8YCyaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from sonic311-30.consmr.mail.ne1.yahoo.com (sonic311-30.consmr.mail.ne1.yahoo.com [66.163.188.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFDF3DFC82
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 17:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E733DBD6F
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 17:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.188.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730503; cv=none; b=jeQSGp6ukZNvIrehHj/RhCsTFwVg0wd5WyS2aB3CZpRd1YGjSNVSbB2iPETe3dn357PfnqERfznB7pPSOmzF9g6KguE7mCx1YABHC8ZdLvje1rC2Tl8NPE6MrG8S8e0d2KDjZBWrbRHNEWhVuldhd1sIfBR3UicaG4eVsvtUm0w=
+	t=1772730546; cv=none; b=ObnMMrRsAuANi0NEVeiux7F0Ldj7zQBKiQ+BUhIDK5js+LY1Ws97oMvnbGWaAkx2427mxqHJhL8Uc5ODIv+8nHrPRuHpOR+JlHYQWXQb93B0oqwv7kKgCnR0KTgHXYPnecD0Fn3B3pxIyzpIj/zwd30Xx7VX5OpHryNwIxOHIZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730503; c=relaxed/simple;
-	bh=kjeVjeRwXeGFVkUrVv/LkTvYdN2U0CODM2NGAPyvKTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YP+pkgxeLCceGKWVKdwmPp8OR42DOn/xkVY/8ouYA22oK8x4NBmgkCUoaRAWYXJCWeJq02bKUpU785yAhVi2qkUgu0fpfcXFL0mzI8aFxPYoQEssoMXrXZ0+7yvsTkmzcNn0zPmYzD1XnAt+lbpcSml8IC3TASgilVG/pWWnUmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xorf6xqy; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82748095963so4318408b3a.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 09:08:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772730501; x=1773335301; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QLViSdk5aS+N5/R156GzEYrFhdlvCCHhERFbqQ2qqPA=;
-        b=Xorf6xqy1kV74lz9pIwEJRIwAlCRJpNj+eRJ1/IOhHjQG/lqmUKMwIZWQX3eSimdQ1
-         SbU0gQOS4jSedAFUTPk66J8PYwIif3vQMRQtIMMJGi47BjIXcWoxGg8/2ydXIiKOTqeE
-         Ozz66MK2UznlFn9W2Wbm+sSZTCUu9ZpZZynGxt3zh4NavDSjjdDJCbqvnz9i4ev+ZfVY
-         4QlB2cYZc0sCHuxJ7HdiXGAl2Bq82YduPFkq2On+uCU0lfUsS4WQYrHvlqZ7R9jkh260
-         80/ajmqgTybb+p+QUaF/FV5bIZ6TWtGRLRvmBPuElcPn0x2iPlaAZDNxQzmRdl6eTK4P
-         NGZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730501; x=1773335301;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QLViSdk5aS+N5/R156GzEYrFhdlvCCHhERFbqQ2qqPA=;
-        b=kVtWkSgygLLEjsrR6bXCED25WUG5A3o+1jb+qHUGxa7lIuH1HlSUermLCTS6KSu6oK
-         Ei5w/gCdpyXgwJapzT11igjSC8JX12OcqmIaNZcr3AQbOy7YJELZuSg/Sv2YiXoxyq8D
-         o1z7L/eD4jLpg35LxYgQ4CwXQGlPQXLyCJn22ltmlgCsHAzk+QlEOF25eU3ls7271Tub
-         6qrX5bocWpxCsvexhnlsz6UMaX8RyLp+oAXkuKAMf2WDYW/R+v4PYK9RwElZvMwEyqaY
-         ximBxogDBgBv6TkGq2Aa7ESJxGzG6PVREtQ2ZU1q8uH0eXbuM9Q2MYEJRSaabWRhevJo
-         ALpA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5IxjpaweJTvWvQmwjaGyt7/ZVCcrFaG2ZF1bqbpstzyW0+L7ZsNa+6zTYKIYRb29hkWjVt30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXu15f7PG/uMN+dOy7ugsjyzyKawf2p5dufOk6GOiKHYOfwYbr
-	F5E4gVG7RAqrzXZJ5Mm0mUjyEvMc/cseZtGrllnNOeb2YdN2f+TsZYsS
-X-Gm-Gg: ATEYQzwW+cW0VXFwvD8PjMo6Fp4zExA0IqE2Uor7h+sRH9lTcgTFmETpXnpZaarOGIH
-	lt7BfDVomOdkD+H1ORJ4Sllp2XYhMBfl57kdcWZI0q4QxWA+64dyzcUewFpFQV2b7bPn6qQveG2
-	82Rr6dx8vhDSiadPs91fXKqTfRlvFo/g31psd7AiS0B/RDEFuyW3bSW7BznqEP1qiHLDgPCjrV+
-	WEbnL0isrJXBkEbN0hwcULrJVCdu5P0o63cgXFxy91Lp3GG2SRJ48UbVcDhPR9SDRwaQC81HbGL
-	Yqns9vY29mHiNj1CKHjEpvC57m9Sbi6pplsjU/e0K3ymVJcvsM1ypzbyKdgxd5jQ+mowO0IduqZ
-	V6eWHeUqP6jJKTsAFRsJjALn3jJRnJt5Q/kTxL5CcX6WYOtzi0ZWlESXurNmCl4XkhqxyGEWMJJ
-	E68qhSB16Ou8TzTS2Tch41gp5xexGrXhTqGZPFLsumD0Z30wNmkQwxHkkCYsQ=
-X-Received: by 2002:a05:6a00:1782:b0:829:8b1f:a3e1 with SMTP id d2e1a72fcca58-8298b1fabd3mr2212916b3a.63.1772730500879;
-        Thu, 05 Mar 2026 09:08:20 -0800 (PST)
-Received: from SLSGDTSWING002 ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d87e78sm26075521b3a.17.2026.03.05.09.08.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 09:08:20 -0800 (PST)
-Date: Fri, 6 Mar 2026 01:08:16 +0800
-From: Weiming Shi <bestswngs@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: security@kernel.org, edumazet@google.com, davem@davemloft.net,
-	kuba@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xmei5@asu.edu
-Subject: Re: [PATCH net v2] net: add xmit recursion limit to tunnel drivers
-Message-ID: <aam4gAw4D782kDsE@SLSGDTSWING002>
-References: <20260303164326.1803916-2-bestswngs@gmail.com>
- <a8a81818-459f-4c09-8448-31a191f7b2bb@redhat.com>
+	s=arc-20240116; t=1772730546; c=relaxed/simple;
+	bh=WicKWTXtBDYjOUd/R2/CWWN64WSplHTWnfjTydxsBRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j6Ugj4grOKzYbO7RgThnqI2qa7P1iY2L5AaIiobmNsw5SYKKUsF59xX36AuL7TsBI0UfXywChjTQ6N0cmt2B9ZdRHAfbjMAq+lLfbKT+joXBbfTyHRQG3uoCLi6Y+7Q+XzZpWGEiS3b4LYzhJ54oMug1kvpuLzBeS9e3xQlkyPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=eH8YCyaY; arc=none smtp.client-ip=66.163.188.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1772730537; bh=80Z7B8uDAmt79h8yXL8xjNd6uSj+eKjWfFvR9JtAjg4=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=eH8YCyaYo9Bf/5EaT9fFKpu/0H77lZP8/dS02c8d7kJnL18mYQZx5xU10KFVqtZa4mJMdWEMb7U9GyvSLJz+PWnX6o+zSk2yQu5U0RaEfQxQprC+RH3cNAkkugyxz/a0QuabxjSJ5XKiEMiNA0135QYAJIt3nUP/gVFIMooVgG0TzgAfX4aQk8C34M2ctu2rITJTD3GcQaGQatsOtPld9FiFO+Hu5qyhZcUzKE1EclK8fRaFWH8NgRx0SJHa5v/KQ5ygI+uIo1kllBzXYkDutoN11/T62CTzfIaSbmHzJgUG2vld+yaw5k3u5yURd//YD8+vmZSkuBuDZwytXFNRFQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1772730537; bh=wU8vKE9prUqjFew4X+uefKJys+HtrEyhdWSJRWSsi34=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=j4G/COvED2A2ZjEOMqvZnP6KVkM8G6si2W/ZpmSVNtTWYHv5Bztmag5fICppuoN2iZ3lGl2N/K7Ig+LnKXFoYM6kopzHsbOGpa8sTjp8KyZp5vltykPf+ymnU0k2yvKsq9xzwys2iPrnpQvQcTGzSSOQ5eMVd2zQgIXAXTRBGoOP6TE1fPJLuHAEf9UM44ebxnlFiA4jzRvZXwqlGA+oiWlo17ROyyto25Tedbm/4dIgtglKlV18S+oI6bQKZcEH703GvL1PZ9tE1g7E7beP9y6yo2RW+/GlwIW0r/GlCmpWnh0pqohAbtn2on/bXqXClHW45Qa83JBdqZsQomyp9A==
+X-YMail-OSG: 58zR03cVM1mhiFOtwGiz3EYeHLl.c.enYHUsDym.4QSxSgv0TQOZyd58FLaQe0X
+ BZ1bjzfD7svfuQ1mm0W1tRv1BwvPYQtBqsvlCvatqlKSOG6nDtqWVa9dyy1CgJ5E3DUBhl.84k2p
+ 5M6a.bu.QC7u4maxYla9tOneYi7Qe7e7C9w8lB8lVuYPe6sQtxiR_U26FZoWkLEzZAqHQ1JT2QCK
+ hKecjgAGhpqPUkYHF0SIEvh3CpOAVQI5PFrHYoy4SrtZjrl6UsuhnqV4YmBPLCNMQJUnQUZo1O73
+ D1SWxMhYeROrDXLiwM3l390mkV6HEDKGGBrEMFpUZO.rASrIRSDP_beeTSnP.gEUK71PHutN6Vh3
+ TAsd9NB4r8UvUg4h0M06Q9iICSqM9VDb42EaacYm9sMyTGwZAQzL3j4fXZ7iHnKWrX8stxTOXURT
+ GvCG38vzvhkHkU_qj25yyCoxCWMkZ7voBRpZslOQHlB.nAdcwRNhIKwA2NbCrKXGROiV_SDVSCeT
+ .iCV0dOeWX7N5N77WOAcwWrVWt1oE1FcDhXrjMNub6yIHlcMDAvumGKoc5Ly9Od1gsww52LZoQxf
+ 82h6.TEvnNUIvGJ_dKfMyeWZiDqxY0HV3ou.zUIcTweeLz4.a_IIvPfamMWTwGoXKzjaZcqS_WAi
+ k6hrJqOr9lNKspvaBchjJINK15n1wuBvS..3mqi2YSrYFAj8X7v1Y_z5GILu03MrtgOhosOc..Cu
+ hNfUwlM4.BQxjJZcMNuaEOmQWjx0yn205lMErHXvkzU2oGpn4leEO215Or2gQgra583Hng_mRFBC
+ LhN3F7Ix5imGXHR6vTSnBt._8_Rdz6vkGYZNK2MRlQI0.V2.IrXVBEsK8lJoHS8vfjHYFh7lbF2P
+ CXqqRoA_gnQroakiq2_BB0PEvDPc6ah6GkDIcO0V22KkJBeNpN3FmDOnj.46Bo9K6qivbEWwK8wv
+ 9_wEJF5pZwR1.S0volPiDReHb7Wmvvrj_07b2DxQys._R5Bs1QADus5yOqWJ.FCIuD9cCfSBOjGF
+ Fl.ZQMrDvarRDa7e_whv7lhFMI1OeJ_vSE7hcBFv4mem23J.oPjQJJfqZmEZtJDZbKXZFIb9rrDz
+ ygu._hUxWfzQxjJZ84FBKJZqGnh28XqltAD9bZcRhh_FCXFIVKkc1YSox8xSIdRQSdc0q3k3WFVq
+ EutdRoQUi.HfVyqy_0bM31AB7NqUHKRtupXmPFsejnJd73LG_0RMemVe8h3UFBQRFisBw_rQDH3U
+ 5NMGgIhtHNvpVx8y6_NxnLfYo4ZsMsh4URZ0mxCFq43vQkigVKmVeiysZjEJxv9o_ytq.7o3QrAZ
+ gkQGFlV1Jv_lauvTQ84I8ZBjbpw419Y1bPJTXSYyOC7DaVu5yS1DbPdYkfNwHazbozTGeWNPmhfa
+ wKoS1m2bCWQkF9sGcVxis6uERm0zKyuTsgD3JuASktFPCMqbUM9ZXZgB8RvOvD26bCPSrbUSryip
+ PiBKOZSjtJJPNPHHZcgs.fNfQg5WTIbkh_B2T2VQITz4YZfkIGi4tLBQ2OX1MMkCoFKUmv9xLvBz
+ PIPQUGSKnKp0Y9YYslgSyakx5R0KbCiuLVJQ4jpvATsec5cC8sP6ITKkJ6D_n8LVNaQMozdIpO6Y
+ D9zW._dEQKp97cxExeVddQ4ubD9jB00Z71xsiMfoX55mQmlMOMvacCf1YMS9s9zbIbDnJfEejqNp
+ YoIAQhsHV37HSoqp8x7V5RcNrf70ZcBD_P4mz5.5vpH98hI8.G3HeLmx6Mh6zIHKy3w.cBa01IP6
+ .JLdBbFV6Y.F8pslbEUkQ5WLSE.HJepXl8rS6HBGWBtOWCV5vr6ngF1tNkNfFv2PGO_8k06meepf
+ 3mbRWjAntU2JM9nsMRW5EaQKvJJh8opySOq970kwy2VvHSenDw3heEagCWirIAbFFY3J7cFJKjWt
+ c1KP1QEcKk2GTfYC9eZEEdfuXZuQEZKh0yYU0c2rqlTXFD0et12z00_YqhSoQkkkarYTFr136VBv
+ MiMXciSAMBZT.V9kDvf_IUi_JmkpeFZJE3hNMcWYKLp66XAPunC6OlsVK7Lm9KuLRhdoDgjyZkuD
+ QblWCVWSP775fKKFxxWW0gq8VtL0VynsOVdQcGSxDsfrfF2DUEjKhYMWG9WnW8AOi9xXGigJM6Ax
+ B.dUV7I2klO4b4ow6IQgQRcMvXiX4955KH08752fKjdXfvFdSoNF8LYt_H34onAWshH.E7XuQFZg
+ N.6U42yDnvRLO8dKKa3vi.0emWz8xgkozf4hEEkeywSCtNL7IpriOuBFSpwTpa9KfgjbHIcEY8HM
+ cUHXly2A9TM0qK6M-
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 47e21ffe-a30f-4249-aaa2-8dbbfa7300a8
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Thu, 5 Mar 2026 17:08:57 +0000
+Received: by hermes--production-gq1-6dfcf9f8b-gxljn (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 8c0ce0e2307669a8df6950dc02d52ef1;
+          Thu, 05 Mar 2026 17:08:51 +0000 (UTC)
+Message-ID: <5cdf6bdb-1387-4d31-9dc1-b84a210b5902@schaufler-ca.com>
+Date: Thu, 5 Mar 2026 09:08:49 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8a81818-459f-4c09-8448-31a191f7b2bb@redhat.com>
-X-Rspamd-Queue-Id: 59998215DE9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 06/15] smack: Remove IPPROTO_UDPLITE support
+ in security_sock_rcv_skb().
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ linux-security-module@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20260304193034.1870586-1-kuniyu@google.com>
+ <20260304193034.1870586-7-kuniyu@google.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20260304193034.1870586-7-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.25198 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Rspamd-Queue-Id: 0D89B215E32
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264488-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264489-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,kernel.org,davemloft.net,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[schaufler-ca.com: no valid DMARC record];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,paul-moore.com,namei.org,hallyn.com,schaufler-ca.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[casey@schaufler-ca.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yahoo.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[hallyn.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 26-03-05 15:34, Paolo Abeni wrote:
-> On 3/3/26 5:43 PM, bestswngs@gmail.com wrote:
-> > From: Weiming Shi <bestswngs@gmail.com>
-> > 
-> > __dev_queue_xmit() has two transmit code paths depending on whether the
-> > device has a qdisc attached:
-> > 
-> >  1. Qdisc path (q->enqueue): calls __dev_xmit_skb()
-> >  2. No-qdisc path: calls dev_hard_start_xmit() directly
-> > 
-> > Commit 745e20f1b626 ("net: add a recursion limit in xmit path") added
-> > recursion protection to the no-qdisc path via dev_xmit_recursion()
-> > check and dev_xmit_recursion_inc()/dec() tracking. However, the qdisc
-> > path performs no recursion depth checking at all.
-> > 
-> > This allows unbounded recursion through qdisc-attached devices. For
-> > example, a bond interface in broadcast mode with gretap slaves whose
-> > remote endpoints route back through the bond creates an infinite
-> > transmit loop that exhausts the kernel stack:
-> > 
-> >  BUG: KASAN: stack-out-of-bounds in blake2s.constprop.0+0xe7/0x160
-> >  Write of size 32 at addr ffff88810033fed0 by task kworker/0:1/11
-> >  Workqueue: mld mld_ifc_work
-> >  Call Trace:
-> >   <TASK>
-> >   __build_flow_key.constprop.0 (net/ipv4/route.c:515)
-> >   ip_rt_update_pmtu (net/ipv4/route.c:1073)
-> >   iptunnel_xmit (net/ipv4/ip_tunnel_core.c:84)
-> >   ip_tunnel_xmit (net/ipv4/ip_tunnel.c:847)
-> >   gre_tap_xmit (net/ipv4/ip_gre.c:779)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   sch_direct_xmit (net/sched/sch_generic.c:347)
-> >   __dev_queue_xmit (net/core/dev.c:4802)
-> >   bond_dev_queue_xmit (drivers/net/bonding/bond_main.c:312)
-> >   bond_xmit_broadcast (drivers/net/bonding/bond_main.c:5279)
-> >   bond_start_xmit (drivers/net/bonding/bond_main.c:5530)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   __dev_queue_xmit (net/core/dev.c:4841)
-> >   ip_finish_output2 (net/ipv4/ip_output.c:237)
-> >   ip_output (net/ipv4/ip_output.c:438)
-> >   iptunnel_xmit (net/ipv4/ip_tunnel_core.c:86)
-> >   gre_tap_xmit (net/ipv4/ip_gre.c:779)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   sch_direct_xmit (net/sched/sch_generic.c:347)
-> >   __dev_queue_xmit (net/core/dev.c:4802)
-> >   bond_dev_queue_xmit (drivers/net/bonding/bond_main.c:312)
-> >   bond_xmit_broadcast (drivers/net/bonding/bond_main.c:5279)
-> >   bond_start_xmit (drivers/net/bonding/bond_main.c:5530)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   __dev_queue_xmit (net/core/dev.c:4841)
-> >   ip_finish_output2 (net/ipv4/ip_output.c:237)
-> >   ip_output (net/ipv4/ip_output.c:438)
-> >   iptunnel_xmit (net/ipv4/ip_tunnel_core.c:86)
-> >   ip_tunnel_xmit (net/ipv4/ip_tunnel.c:847)
-> >   gre_tap_xmit (net/ipv4/ip_gre.c:779)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   sch_direct_xmit (net/sched/sch_generic.c:347)
-> >   __dev_queue_xmit (net/core/dev.c:4802)
-> >   bond_dev_queue_xmit (drivers/net/bonding/bond_main.c:312)
-> >   bond_xmit_broadcast (drivers/net/bonding/bond_main.c:5279)
-> >   bond_start_xmit (drivers/net/bonding/bond_main.c:5530)
-> >   dev_hard_start_xmit (net/core/dev.c:3887)
-> >   __dev_queue_xmit (net/core/dev.c:4841)
-> >   mld_sendpack
-> >   mld_ifc_work
-> >   process_one_work
-> >   worker_thread
-> >   </TASK>
-> > 
-> > Rather than adding an expensive recursion check to the common qdisc
-> > fast path, add recursion detection directly in tunnel drivers where
-> > route lookups can create these loops, as suggested by Eric Dumazet.
-> > 
-> > Use a lower limit (IP_TUNNEL_RECURSION_LIMIT=4) than XMIT_RECURSION_LIMIT
-> > (8) because each tunnel recursion level involves route lookups and full
-> > IP output processing, consuming significantly more stack per level.
-> > 
-> > Move dev_xmit_recursion helpers from the private net/core/dev.h header
-> > to the public include/linux/netdevice.h so tunnel drivers can use them.
-> > 
-> > Fixes: 745e20f1b626 ("net: add a recursion limit in xmit path")
-> > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> > ---
-> > v2:
-> >   - Move recursion check from qdisc path to tunnel drivers (Eric Dumazet)
-> >   - Add IPv6 tunnel (ip6_tunnel) coverage
-> >   - Use lower recursion limit (4) for tunnel-specific stack consumption
-> > 
-> >  include/linux/netdevice.h | 32 ++++++++++++++++++++++++++++++++
-> >  include/net/ip_tunnels.h  |  7 +++++++
-> >  net/core/dev.h            | 34 ----------------------------------
-> >  net/ipv4/ip_tunnel.c      | 10 ++++++++++
-> >  net/ipv6/ip6_tunnel.c     | 10 ++++++++++
-> >  5 files changed, 59 insertions(+), 34 deletions(-)
-> > 
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index d4e6e00bb90a..1a4d2542dbab 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -3576,17 +3576,49 @@ struct page_pool_bh {
-> >  };
-> >  DECLARE_PER_CPU(struct page_pool_bh, system_page_pool);
-> >  
-> > +#define XMIT_RECURSION_LIMIT	8
-> > +
-> >  #ifndef CONFIG_PREEMPT_RT
-> >  static inline int dev_recursion_level(void)
-> >  {
-> >  	return this_cpu_read(softnet_data.xmit.recursion);
-> >  }
-> > +
-> > +static inline bool dev_xmit_recursion(void)
-> > +{
-> > +	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
-> > +			XMIT_RECURSION_LIMIT);
-> > +}
-> > +
-> > +static inline void dev_xmit_recursion_inc(void)
-> > +{
-> > +	__this_cpu_inc(softnet_data.xmit.recursion);
-> > +}
-> > +
-> > +static inline void dev_xmit_recursion_dec(void)
-> > +{
-> > +	__this_cpu_dec(softnet_data.xmit.recursion);
-> > +}
-> >  #else
-> >  static inline int dev_recursion_level(void)
-> >  {
-> >  	return current->net_xmit.recursion;
-> >  }
-> >  
-> > +static inline bool dev_xmit_recursion(void)
-> > +{
-> > +	return unlikely(current->net_xmit.recursion > XMIT_RECURSION_LIMIT);
-> > +}
-> > +
-> > +static inline void dev_xmit_recursion_inc(void)
-> > +{
-> > +	current->net_xmit.recursion++;
-> > +}
-> > +
-> > +static inline void dev_xmit_recursion_dec(void)
-> > +{
-> > +	current->net_xmit.recursion--;
-> > +}
-> >  #endif
-> >  
-> >  void __netif_schedule(struct Qdisc *q);
-> > diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-> > index 4021e6a73e32..80662f812080 100644
-> > --- a/include/net/ip_tunnels.h
-> > +++ b/include/net/ip_tunnels.h
-> > @@ -27,6 +27,13 @@
-> >  #include <net/ip6_route.h>
-> >  #endif
-> >  
-> > +/* Recursion limit for tunnel xmit to detect routing loops.
-> > + * Unlike XMIT_RECURSION_LIMIT (8) used in the no-qdisc path, tunnel
-> > + * recursion involves route lookups and full IP output, consuming much
-> > + * more stack per level, so a lower limit is needed.
-> > + */
-> > +#define IP_TUNNEL_RECURSION_LIMIT	4
-> > +
-> >  /* Keep error state on tunnel for 30 sec */
-> >  #define IPTUNNEL_ERR_TIMEO	(30*HZ)
-> >  
-> > diff --git a/net/core/dev.h b/net/core/dev.h
-> > index 98793a738f43..ec974b3c42d9 100644
-> > --- a/net/core/dev.h
-> > +++ b/net/core/dev.h
-> > @@ -366,40 +366,6 @@ static inline void napi_assert_will_not_race(const struct napi_struct *napi)
-> >  
-> >  void kick_defer_list_purge(unsigned int cpu);
-> >  
-> > -#define XMIT_RECURSION_LIMIT	8
-> > -
-> > -#ifndef CONFIG_PREEMPT_RT
-> > -static inline bool dev_xmit_recursion(void)
-> > -{
-> > -	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
-> > -			XMIT_RECURSION_LIMIT);
-> > -}
-> > -
-> > -static inline void dev_xmit_recursion_inc(void)
-> > -{
-> > -	__this_cpu_inc(softnet_data.xmit.recursion);
-> > -}
-> > -
-> > -static inline void dev_xmit_recursion_dec(void)
-> > -{
-> > -	__this_cpu_dec(softnet_data.xmit.recursion);
-> > -}
-> > -#else
-> > -static inline bool dev_xmit_recursion(void)
-> > -{
-> > -	return unlikely(current->net_xmit.recursion > XMIT_RECURSION_LIMIT);
-> > -}
-> > -
-> > -static inline void dev_xmit_recursion_inc(void)
-> > -{
-> > -	current->net_xmit.recursion++;
-> > -}
-> > -
-> > -static inline void dev_xmit_recursion_dec(void)
-> > -{
-> > -	current->net_xmit.recursion--;
-> > -}
-> > -#endif
-> >  
-> >  int dev_set_hwtstamp_phylib(struct net_device *dev,
-> >  			    struct kernel_hwtstamp_config *cfg,
-> > diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-> > index 50d0f5fe4e4c..39822e845a06 100644
-> > --- a/net/ipv4/ip_tunnel.c
-> > +++ b/net/ipv4/ip_tunnel.c
-> > @@ -683,6 +683,14 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
-> >  	__be32 dst;
-> >  	__be16 df;
-> >  
-> > +	if (dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT) {
-> > +		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
-> > +				     dev->name);
-> > +		DEV_STATS_INC(dev, tx_errors);
-> > +		kfree_skb(skb);
-> > +		return;
-> > +	}
-> > +
-> >  	inner_iph = (const struct iphdr *)skb_inner_network_header(skb);
-> >  	connected = (tunnel->parms.iph.daddr != 0);
-> >  	payload_protocol = skb_protocol(skb, true);
-> > @@ -842,8 +850,10 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
-> >  
-> >  	ip_tunnel_adj_headroom(dev, max_headroom);
-> >  
-> > +	dev_xmit_recursion_inc();
-> >  	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, protocol, tos, ttl,
-> >  		      df, !net_eq(tunnel->net, dev_net(dev)), 0);
-> 
-> I think this check should go in iptunnel_xmit(), or UDP tunnels will
-> remain unprotected.
-> 
-> Same thing for the IPv6 case.
-> 
-> > +	dev_xmit_recursion_dec();
-> >  	return;
-> >  
-> >  #if IS_ENABLED(CONFIG_IPV6)
-> > diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-> > index 4c29aa94e86e..55bedd5cd656 100644
-> > --- a/net/ipv6/ip6_tunnel.c
-> > +++ b/net/ipv6/ip6_tunnel.c
-> > @@ -1101,6 +1101,14 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
-> >  	u8 hop_limit;
-> >  	int err = -1;
-> >  
-> > +	if (dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT) {
-> > +		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
-> > +				     dev->name);
-> > +		DEV_STATS_INC(dev, tx_errors);
-> > +		kfree_skb(skb);
-> > +		return -1;
-> 
-> I think an standard error code is expected here. Possibly -ELOOP?
-> 
-> /P
-> 
-Hi Paolo,
+On 3/4/2026 11:28 AM, Kuniyuki Iwashima wrote:
+> smack_socket_sock_rcv_skb() is registered as socket_sock_rcv_skb,
+> which is called as security_sock_rcv_skb() in sk_filter_trim_cap().
+>
+> Now that UDP-Lite is gone, let's remove the IPPROTO_UDPLITE support
+> in smack_socket_sock_rcv_skb().
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-Thanks for the review.
-I agree that moving the check into iptunnel_xmit() / ip6tunnel_xmit()
-is better, as it also covers UDP tunnels. Will do in v3.
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
 
-Thanks,
-Weiming Shi
+> ---
+> Cc: Casey Schaufler <casey@schaufler-ca.com>
+> Cc: Paul Moore <paul@paul-moore.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: linux-security-module@vger.kernel.org
+> ---
+>  security/smack/smack_lsm.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+> index 98af9d7b9434..e581d6465946 100644
+> --- a/security/smack/smack_lsm.c
+> +++ b/security/smack/smack_lsm.c
+> @@ -4176,7 +4176,6 @@ static int smk_skb_to_addr_ipv6(struct sk_buff *skb, struct sockaddr_in6 *sip)
+>  			sip->sin6_port = th->source;
+>  		break;
+>  	case IPPROTO_UDP:
+> -	case IPPROTO_UDPLITE:
+>  		uh = skb_header_pointer(skb, offset, sizeof(_udph), &_udph);
+>  		if (uh != NULL)
+>  			sip->sin6_port = uh->source;
+> @@ -4301,8 +4300,7 @@ static int smack_socket_sock_rcv_skb(struct sock *sk, struct sk_buff *skb)
+>  #if IS_ENABLED(CONFIG_IPV6)
+>  	case PF_INET6:
+>  		proto = smk_skb_to_addr_ipv6(skb, &sadd);
+> -		if (proto != IPPROTO_UDP && proto != IPPROTO_UDPLITE &&
+> -		    proto != IPPROTO_TCP)
+> +		if (proto != IPPROTO_UDP && proto != IPPROTO_TCP)
+>  			break;
+>  #ifdef SMACK_IPV6_SECMARK_LABELING
+>  		skp = smack_from_skb(skb);
 
