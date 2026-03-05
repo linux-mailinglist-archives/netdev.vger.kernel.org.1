@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-264601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264602-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Ei4CEolqmkPMAEAu9opvQ
-	(envelope-from <netdev+bounces-264601-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:52:26 +0100
+	id ODo2L3slqmkPMAEAu9opvQ
+	(envelope-from <netdev+bounces-264602-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:53:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE3B421A07A
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:52:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21B7C21A098
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DEAC53094636
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 00:51:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CF8F30C0758
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 00:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC47D2EBB9E;
-	Fri,  6 Mar 2026 00:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59662F2914;
+	Fri,  6 Mar 2026 00:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZcvEYh3g"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="U7IjsFI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C6B2F745C
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 00:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815602F9D83
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 00:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772758282; cv=none; b=MheHcZAsFLZemEcEn3GbNrkcQgiQjdjEly47/n+gFLvoDLRcjr92WjTOO5G/A1val7KOfq7gRf4wTbIPMs3qF/d48I5duxtHOei1nYzzQNz3qSaOAzUQoEVwbiN3FEe4Zta9Rt3rfIVyqbFknCDtdjgaxlaiN9eD5ISMv7fI5ac=
+	t=1772758289; cv=none; b=uOh2T4bs3cg2Pqmlwqu9McsqNsLqTS8zOsGs1V7jRdxmHgzxEyArNWT0IfUbzXVkad8uGS57vR+u1YNywN4SuHrQEFFF5ndXqOZ8gBS7S0YTEdzetqr0FgLfKClX5CIa/hDUAJ2CSJHRnEbp8edBUFBst2kcKez9HxJTuPSbcwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772758282; c=relaxed/simple;
-	bh=rEUuZZA4ANDMcvCg6pyW/UJTRU9oRAre4nZ6TiKNFLg=;
+	s=arc-20240116; t=1772758289; c=relaxed/simple;
+	bh=uY/cmt2Sth4SxjohY5zGzx4ELvftPGuex3rlN1K/nqM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eOAHBNzzqihTmRBIEzqVJGaP5aF8VYxcWcS1DYfDCOyo7iR9LKTlIxzxrCk5iJb4dhRuBywlFmAMn7nqxJAcy7D0dVQEx32Q/nFas9CMDbr2Xbi/72vFbhgg6l2TNEe/OtxF7waVfP4TscMfB/H6toSFs1XWeP2q/8QsDbr9R94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZcvEYh3g; arc=none smtp.client-ip=209.85.128.42
+	 In-Reply-To:To:Cc; b=tWjcEYpps46y6uxvS4hyDv97ZYUh2MN4BhkVCK0pTQPnWhg7p3tdqQmnYBpgINR/3aHRFz7qu+/785sDbEjrf4kfwW59Ud6IYQ2spV7TTf/BGLsiZ/DGw14ii47lZ3tK02lfI9wOIEQmm3KYf+So7XCH8HW6mGr8q9zmclLCHAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=U7IjsFI6; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4806cc07ce7so98956915e9.1
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 16:51:19 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-483770e0b25so73607965e9.0
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 16:51:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1772758278; x=1773363078; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1772758282; x=1773363082; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8d5hpiYB7XUuEuXpz7M550s7MAxfMslNPphPrHEEiTQ=;
-        b=ZcvEYh3gLKjlx654lRrOER6D8AZGEZ+xNWN4PakhPqieRawNzRQg8FOHhKmmMwosQq
-         dSXHQWv2yc/banmAyts3YxUSTXf5uqiVG/LXhT/kBFwv0SJxYEDwrAy3SI8gHco0eGgU
-         0tr0KeJwG1odZHj6MYl6EfpuWsv6C3yuabiA7mJs08jlkR8gjpYJpxgRidZXPlvumyeq
-         i5QeFAal8l2mdopOCzU0sbHMsf7NfSxzXVtO7JDIxtmSlcJvVhAblch+hnXshQfJzNCy
-         CN99e5x/54TYxs/6Lh+nSEzVry+3mEPkUYu5yLSI1R3oNLYQP4mUcA1NzP7TZPNSWZXB
-         tYfw==
+        bh=Cj+T9d3Zgf3+ritNDiK94fhxI8rgFwWgGmiNKUx6cEs=;
+        b=U7IjsFI6ZVhXKXQSlulUJAniGOY6cfVExehoDjuQI5Yc/glgmnzQRFqgGA81U9jmFr
+         I4L8908AT0JDZckZDWklLZgH7mhn0OZjQiSkar0FqeA1h4sH5yrX1jy3tYgP5MJyT+XP
+         KILxkoy/qcQUkxAV5JI/wmyTui/8HUAbHap7Zvv3cNmm0OXoreWRZOGZG1SLC/xhY4Cv
+         h6n/HenZeto74K4ui47fN+pnU/v8MAjBNt2hrN69G2NbIcJVuYRefQoJwh9LglkOdble
+         x28WyLjmIt3AMKRzL9jjmP9CqAMW13b5dXiMm7iR9MAbCZkMxydBtXPg7dpDMJKBvBiL
+         OmSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772758278; x=1773363078;
+        d=1e100.net; s=20230601; t=1772758282; x=1773363082;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=8d5hpiYB7XUuEuXpz7M550s7MAxfMslNPphPrHEEiTQ=;
-        b=dZ+cz6dRzJMbx9xv/svs+ob8AQnysrjGLc91i9uaDwkGhnV3cXNDNsT04L4mVBP8VQ
-         b+Qo8sTIS3OiN1G4fhIMJHZDG+4k6dtyxqol9KVUJYXFlUnSs6wd39E1xpksXPkxEaTa
-         N/1nJ2FWGz22VbtoC5BgSVSZF2YIg0zP9DTzz5e3eBthQh8djvFQtc1E730R7d395ej+
-         x+NXG1iP7MIP98avRKd4tq7o39zppZJXbZl2Ot/pAAR/gT9ChwpFSx9rqnZXzo/WHWfI
-         qb+etEOYZ8YyAdYlgThyqcdXqZdMD8sfXA9xjb5PuIzFFC9rvNeUVfJHDwur7NrT+N7S
-         4vkw==
-X-Forwarded-Encrypted: i=1; AJvYcCVI56lo012dGI9rVJ8rec+1rDeIl98HmB93zfzYR2MAgKd9bFahPLzVTvDvdOPt982t8bU5x1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwtguXprGb6tpzvNeqmkIpA+q3A6ApW/qDUW66pkW8ypOyRQ0P
-	ma0Rsv/QtbPmXXBHRa2e3ld2+OICAVfuGfBpEBcuuLtX8qVWtlC8+AfYs0LQYJo7CYk=
-X-Gm-Gg: ATEYQzyvxQdLolRP29Trs+jbp+GzRJ0FvAwPXt9FJG8dJyHPgdepufm8JyLDB6U6ywF
-	VS3IVEyXjgQDMrbMXyvipVU2BMTMxnMOUdHahYzf9MQRWtDbIzm1euulDtHUJ2BNGJDNGM3txjh
-	fvVqRymm7ZgrnNfqNIPGKUEGOITfeY8c1kUKs5jXAtoDlwmfsnSK/FHeH7ao7a9HzkAAB/PQPhv
-	CVsKmUnRnTqU7ZvUzcD0TiscnWPIkmZfgNac6/NAG2D0FQLN+7pZygdG8PVHiGSn+ICx9ZYXwHb
-	GrQjvPDVzRvlIAx7/f8jrKeewCYGvmZiZUOH9goqwKnKa2/NNp1mjVTJqHySWnnvxgZRHoyGtBQ
-	CjyBJZHhcN7NV6qg5AfkN+x4g7RUMRm79CwEg67zO2d0bFfRnR/rDL2+NF0pJUjEGeFrqFbFyIU
-	3rgBFbf0m6sqwGoF5kN6ff
-X-Received: by 2002:a05:600c:19d4:b0:477:9eb8:97d2 with SMTP id 5b1f17b1804b1-48526923b15mr3594985e9.8.1772758278421;
-        Thu, 05 Mar 2026 16:51:18 -0800 (PST)
+        bh=Cj+T9d3Zgf3+ritNDiK94fhxI8rgFwWgGmiNKUx6cEs=;
+        b=vaVPHvTf79klaQtTEq+g3fUVBcEJRubrml6LYpZxgc11n34jdo2NUDIDy4CthnCcr7
+         r9XMECUX4Qpuh1BmzECu6Oc2wxA7so5Y0+d7NTMjrdFwje67GrfKPcBPwmcB+nieAjsV
+         QpMGPEN2f2xZ/II1RQP6hGIMOTnBmvn3DGmhs3oDv9/JmdurT6vOBoPiYP8DyFTo7If4
+         etBlbw4Sbkkp4epHblCW805VcqNPHd4YbVoQIHVb9eItW6vvsvSCxE2AyWeZgZTJik76
+         8xVM0t2bQWPcHRtXzhghADsl9JMfYXgYpbS04Zmg/5egmnzi1qwGF9Gr0qcSrVkFXYxC
+         qZkg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+e7apsa+yJa9gFRh/G3xd36Iu4snUOAsggjixLwrDA9m6TBvZDSwo0EfywfTfpoyhROlSzag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyghzuqESSFx9zsFsWCkTOj16Zjtu9FItBqZQYNj7dOdYXLrLlF
+	yteaXLiAKMO81WbvSLSbA684SGgcp3Ws9YLxCfmEXw1unbJsEyFlDp6bQrV3I1MNT0E=
+X-Gm-Gg: ATEYQzzz1jqqmnjwUN1+qxHmBF79rmxwG+bYt8WipMsVkedEMd5232V1yaTuqZ4LrO7
+	FqJ++SYoZxUTm6DNXTWPw6J80tTlX+bV5LfbTn4e1GT5xB4jqJaartHybI4P55/pffhUcAZjjKu
+	nuk6jHdX2ZXrZmqHBPo/DUWhgPorEof2pFD2tp0KGJ5RgGTGZWOpPyILj/vZTo192J2ihnC9JpF
+	d716SJ13M4Iumqbax3rYkqutkxnKeVCKVPB0NCGWdM/JU3+SXsrzxYd6CQnN/Qy5a4AKFrmp/Z5
+	n/7BCjRNa2SPPei4rk7qrMV0rWxmDW1xDMuDhu+yjKdt4NDib1HcFSMlYymROzfdQV5HKoN9YNs
+	WuehFP+mgVLG7ltGInaWiK5dn55+n8y0n4jcBp4CfCB2/XF92sSaV7PJs5R/AsupkNA4ySONS1d
+	epnmzAKRV9ng==
+X-Received: by 2002:a05:600c:8115:b0:480:52fd:d2e4 with SMTP id 5b1f17b1804b1-485268bcfb4mr4040065e9.0.1772758281849;
+        Thu, 05 Mar 2026 16:51:21 -0800 (PST)
 Received: from localhost ([189.99.238.164])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56b087d9e69sm24485e0c.15.2026.03.05.16.51.17
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56b0865825asm51909e0c.9.2026.03.05.16.51.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 16:51:17 -0800 (PST)
+        Thu, 05 Mar 2026 16:51:21 -0800 (PST)
 From: =?utf-8?q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>
-Date: Thu, 05 Mar 2026 18:29:55 -0300
-Subject: [PATCH net v3 1/3] bpf: bpf_out_neigh_v4: Fix nd_tbl NULL
+Date: Thu, 05 Mar 2026 18:29:56 -0300
+Subject: [PATCH net v3 2/3] bpf: bpf_out_neigh_v6: Fix nd_tbl NULL
  dereference when IPv6 is disabled
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260305-net-nd_tbl_fixes-v3-1-fde28b30a744@suse.com>
+Message-Id: <20260305-net-nd_tbl_fixes-v3-2-fde28b30a744@suse.com>
 References: <20260305-net-nd_tbl_fixes-v3-0-fde28b30a744@suse.com>
 In-Reply-To: <20260305-net-nd_tbl_fixes-v3-0-fde28b30a744@suse.com>
 To: Martin KaFai Lau <martin.lau@linux.dev>, 
@@ -108,35 +108,35 @@ Cc: Fernando Fernandez Mancera <fmancera@suse.de>, bpf@vger.kernel.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  =?utf-8?q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openssh-sha256; t=1772758271; l=2192;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1772758271; l=1999;
  i=rbm@suse.com; h=from:subject:message-id;
- bh=rEUuZZA4ANDMcvCg6pyW/UJTRU9oRAre4nZ6TiKNFLg=;
+ bh=uY/cmt2Sth4SxjohY5zGzx4ELvftPGuex3rlN1K/nqM=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgguRCc5X8/UX9M40lkMnr//aFGOhce
  x5ezt8MFNUFlqYAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QAqX5xIX1fDdNVLySfgqcNpq8zzpqBUX1kZwOhKrciL3jWWx4RUwsRhbdPvWDdjqg/5lFkWHs9/
- RWswQa5VhTQg=
+ QF1Q1aDL07UnscOXXDba/eBfS/TWj0GNuavW/i1D9zrky1fKqHpr6myU7MaBBl1bEnmCjHaihP4
+ uj5GNpCcc8QA=
 X-Developer-Key: i=rbm@suse.com; a=openssh;
  fpr=SHA256:pzhe0fJpYLz+3cZ33FFPhIfaUElk9CXPFFXmalIH+1g
-X-Rspamd-Queue-Id: BE3B421A07A
+X-Rspamd-Queue-Id: 21B7C21A098
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264601-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264602-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[27];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -152,13 +152,14 @@ X-Rspamd-Action: no action
 
 When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
 initialized because inet6_init() exits before ndisc_init() is called which
-initializes it. If bpf_redirect_neigh() is called from tc with an explicit
-nexthop of nh_family == AF_INET6, bpf_out_neigh_v4() takes the AF_INET6
-branch and calls ip_neigh_gw6(), which relies on ipv6_stub->nd_tbl.
+initializes it. If bpf_redirect_neigh() is called with explicit AF_INET6
+nexthop parameters, __bpf_redirect_neigh_v6() can skip the IPv6 FIB lookup
+and call bpf_out_neigh_v6() directly. bpf_out_neigh_v6() then calls
+ip_neigh_gw6(), which uses ipv6_stub->nd_tbl.
 
  BUG: kernel NULL pointer dereference, address: 0000000000000248
  Oops: Oops: 0000 [#1] SMP NOPTI
- RIP: 0010:skb_do_redirect+0xb93/0xf00
+ RIP: 0010:skb_do_redirect+0x44f/0xf40
  Call Trace:
   <TASK>
   ? srso_alias_return_thunk+0x5/0xfbef5
@@ -170,8 +171,6 @@ branch and calls ip_neigh_gw6(), which relies on ipv6_stub->nd_tbl.
   ? srso_alias_return_thunk+0x5/0xfbef5
   __dev_queue_xmit+0x6fa/0x1000
   ? srso_alias_return_thunk+0x5/0xfbef5
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? alloc_skb_with_frags+0x58/0x200
   packet_sendmsg+0x10da/0x1700
   ? srso_alias_return_thunk+0x5/0xfbef5
   __sys_sendto+0x1f3/0x220
@@ -182,32 +181,30 @@ branch and calls ip_neigh_gw6(), which relies on ipv6_stub->nd_tbl.
   entry_SYSCALL_64_after_hwframe+0x77/0x7f
   </TASK>
 
-Fix this by adding an early check in the AF_INET6 branch of
-bpf_out_neigh_v4(). If ipv6_stub->nd_tbl is NULL, unlock RCU and drop the
-packet.
+Fix this by adding an early check in bpf_out_neigh_v6(). If
+ipv6_stub->nd_tbl is NULL, drop the packet before neighbor lookup.
 
 Suggested-by: Fernando Fernandez Mancera <fmancera@suse.de>
 Fixes: ba452c9e996d ("bpf: Fix bpf_redirect_neigh helper api to support supplying nexthop")
 Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
 ---
- net/core/filter.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/core/filter.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 0d5d5a17acb2..4f8ff05c4ec4 100644
+index 4f8ff05c4ec4..3be669347e62 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -2335,6 +2335,10 @@ static int bpf_out_neigh_v4(struct net *net, struct sk_buff *skb,
+@@ -2228,6 +2228,9 @@ static int bpf_out_neigh_v6(struct net *net, struct sk_buff *skb,
+ 			return -ENOMEM;
+ 	}
  
- 		neigh = ip_neigh_for_gw(rt, skb, &is_v6gw);
- 	} else if (nh->nh_family == AF_INET6) {
-+		if (unlikely(!ipv6_stub->nd_tbl)) {
-+			rcu_read_unlock();
-+			goto out_drop;
-+		}
- 		neigh = ip_neigh_gw6(dev, &nh->ipv6_nh);
- 		is_v6gw = true;
- 	} else if (nh->nh_family == AF_INET) {
++	if (unlikely(!ipv6_stub->nd_tbl))
++		goto out_drop;
++
+ 	rcu_read_lock();
+ 	if (!nh) {
+ 		dst = skb_dst(skb);
 
 -- 
 2.53.0
