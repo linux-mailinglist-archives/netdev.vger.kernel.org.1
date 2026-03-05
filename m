@@ -1,176 +1,173 @@
-Return-Path: <netdev+bounces-264496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264497-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6G6LE9W9qWnNDQEAu9opvQ
-	(envelope-from <netdev+bounces-264496-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:31:01 +0100
+	id OI2FI16+qWnNDQEAu9opvQ
+	(envelope-from <netdev+bounces-264497-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:33:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0402163F5
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:31:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C6B2164B0
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E91CC3019801
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:30:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ADE67301739D
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8324D3E3D90;
-	Thu,  5 Mar 2026 17:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E083803F4;
+	Thu,  5 Mar 2026 17:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbEF/unD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AEfji6Fg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6993E3D87;
-	Thu,  5 Mar 2026 17:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77CE3E3DA6;
+	Thu,  5 Mar 2026 17:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731818; cv=none; b=BqQJnleh6XkjFWNjPtjw2ZNIopSv47DNlb1q6x7PN1ow1aiVZuiDbFPvYdigcdxjoULG4nKMRWmydKxij7gKszXFX3ZUWXeejClYWSeSdTeKJnzWiPqZoNm6rzEwzEQ8T9s9UwsPwNfADiqlRIZ8g1AzTDZM5UpU/N3qF8FtwDw=
+	t=1772731955; cv=none; b=Jd1axcif+kYLss8HNXiPr8oG/y6uTkzWKp55PlbF0qk9jT+Tc+2qxmHSlUMoo8bPoKVsYjnYzKdCUCH7KxHqZjjd5LTP0aajafHGGCeAjImcRb9ivnoc8t/7pkl7qBWyrVSoP/DvZqa7Mm0X7Ag6YbgzPW0PqaoH95Qlt05rDN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731818; c=relaxed/simple;
-	bh=9VAMGww3cPjNYjf+swpv5BLTEK9Wb70v7QtphgnjGJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pf8t26y/Y9mw3usFnc3Nqv+K8v0+X/xnELZ6bdUnJUl56UzLDNKhrhTQAaVkrEbGNeHdSHiCvmRihSHciMiauFtyutd5hLw1+0azU3aJqj+4jpfpXwyryhEVHS3wGQAIP6/MdFkehRWhQ3bpnSdbRPFkwtm5//sUxXT4HP9AcWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbEF/unD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E15C116C6;
-	Thu,  5 Mar 2026 17:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772731818;
-	bh=9VAMGww3cPjNYjf+swpv5BLTEK9Wb70v7QtphgnjGJI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lbEF/unDQJUyG9zaIaRG4FKvu7YvgxKMnxLYBIk11ptoINSAlyppJ8hbcQYEwrq1g
-	 1W2Jsfevl8LUgePldqoNZaONPa7hhXINWu84t1Os++EaN9RE5mmviH6UnjY81PcUVm
-	 geiXCevWRFEBirdEgAiKL/4DcE4tjGaOUL5Awoug2bOHX9o6qk8JV0cojZTjaej2Qi
-	 VwBxGJ2XOltvGD9d4WWm/6s4himJpeP126pjQw1J/+tMkIxkVFLP/KRVkkMAq7+2O3
-	 3b2ETT1we2SlP5Kyi9zjNF/S3LI/dq6hQWZdggEI4G05h+GFQdkxtXOmgU3FSxDe1T
-	 XBya5afbfalqQ==
-Date: Thu, 5 Mar 2026 09:30:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [GIT PULL] Networking for v7.0-rc3
-Message-ID: <20260305093016.2e70e0bc@kernel.org>
-In-Reply-To: <20260305092348.1ef6a546@kernel.org>
-References: <20260305171004.322683-1-kuba@kernel.org>
-	<20260305092348.1ef6a546@kernel.org>
+	s=arc-20240116; t=1772731955; c=relaxed/simple;
+	bh=OwBg/kW4vt7rbdvcyOoXXe7LO1tL88nVOrqAblD7CcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kr3YVGJ2PtwrhAvGTbvaRsg3ccVGLPmVqoCJ303hEHvVx01dPW5W52ETqdlK1DDmO8gv1wTEVj4DXVglJhQbmGaq+FTJEO+pMmeJoXBwdKa2JGehcrqTjk3gdSOsJfA7ce0Qmr8c9b49xsWanOUHUUbSTAFT/l9eX7XBgzUFbB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AEfji6Fg; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772731954; x=1804267954;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OwBg/kW4vt7rbdvcyOoXXe7LO1tL88nVOrqAblD7CcM=;
+  b=AEfji6Fgh2P/egdC2n9LdeNUK73UAkEOaI+8kSdAQVc3CfmNU2i8LITN
+   iujo67V3W1ojmxJ+mhmnSTbMJC0V9FxZ3zT9q50kF7QAZWIHzC7xCLRjc
+   Xh3+se3xpShX9h5nMRMjyT2e4YJcVm6yJxLFxJlUeMrF11frQZNhHVqux
+   taEXGXioFoxxu3g/Y25x1InTruu/5Jl7b5cQjzwW3fimHPrLUx4RjpzQa
+   UPyhckc64iUOJXJeMz9acRy4KFVsDC2SzhCNWJ0jrJEDpR1WIek2eC+gF
+   j6W5wFIjFmCUP7PQ5P332JHq6D4lRWr2gyKvSa9UMS+Tq+m0MY6U/yBwV
+   Q==;
+X-CSE-ConnectionGUID: 94DpPeEmQLScs0JKK/zfBw==
+X-CSE-MsgGUID: PPaik9UgQ3mbTKrD0LFtlg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="85300876"
+X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
+   d="scan'208";a="85300876"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:32:34 -0800
+X-CSE-ConnectionGUID: 1IPqnN6YQMqtfgaV70qVRA==
+X-CSE-MsgGUID: 6/pvUyiES3qKupucgADS9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
+   d="scan'208";a="222893923"
+Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.109.20]) ([10.125.109.20])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:32:34 -0800
+Message-ID: <f5f1ff05-7656-477e-9bed-09fd2e148638@intel.com>
+Date: Thu, 5 Mar 2026 09:32:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] MAINTAINERS: Remove bouncing T7XX reviewer
+To: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org
+Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+ Liu Haijun <haijun.liu@mediatek.com>,
+ Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+ Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20260305172806.3118806-1-dave.hansen@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260305172806.3118806-1-dave.hansen@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: DE0402163F5
+X-Rspamd-Queue-Id: 21C6B2164B0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264496-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264497-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,mediatek.com,linux.intel.com,oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-On Thu, 5 Mar 2026 09:23:48 -0800 Jakub Kicinski wrote:
-> On Thu,  5 Mar 2026 09:10:04 -0800 Jakub Kicinski wrote:
-> > A few PRs here narrowly missed the previous rc, but I'm not sure
-> > if that explains why this PR is almost 2x the usual size.
-> > I had a feeling that AI tools are helping people investigate
-> > and send fixes for issues which would previously be waved off
-> > as one-off / not worth the time. But the data doesn't necessarily
-> > bear that out.  
-> 
-> FWIW when I say data this is supposedly breakdown of how many people
-> who contributed fixes to networking have only been known to git for
-> 3, 6 or 12 months:
-> 
-> Commits     Date        Avg Age     Med Age   <3mo   <3mo%   <6mo   <6mo%  <12mo   <12m%
-> ------------------------------------------------------------------------------------------
->     100  2024-09-04       9.9yr      10.5yr     10   10.0%     13   13.0%     15   15.0%
+On 3/5/26 09:28, Dave Hansen wrote:
+> This reviewer's email no longer works. Remove it from MAINTAINERS.
 
-I realized after hitting 'send' that I should probably de-duplicate 
-the humans. Same tables but percentage based on distinct authors not
-commits:
+... and I'm a doofus. I'm not sending things via my normal workflow and
+I missed:
 
-Commits  Authors     Date        Avg Age     Med Age   <3mo   <3mo%   <6mo   <6mo%  <12mo   <12m%
-----------------------------------------------------------------------------------------------------
-    100       65  2024-09-04       8.5yr       6.9yr     10   15.4%     12   18.5%     14   21.5%
-    100       57  2024-10-01       7.3yr       5.5yr      4    7.0%      4    7.0%      7   12.3%
-    100       62  2024-10-13       9.1yr       9.5yr      8   12.9%      8   12.9%     10   16.1%
-    100       63  2024-10-24       7.1yr       5.6yr      5    7.9%      6    9.5%     11   17.5%
-    100       55  2024-11-06       6.2yr       5.0yr     12   21.8%     12   21.8%     15   27.3%
-    100       59  2024-11-22       7.3yr       6.2yr      7   11.9%      9   15.3%      9   15.3%
-    100       51  2024-12-08       9.5yr       9.7yr      4    7.8%      7   13.7%      7   13.7%
-    100       57  2024-12-20       6.2yr       2.5yr      8   14.0%     11   19.3%     16   28.1%
-    100       55  2025-01-10       7.7yr       6.5yr      7   12.7%      7   12.7%     11   20.0%
-    100       42  2025-01-26       8.1yr       8.4yr      4    9.5%      6   14.3%      7   16.7%
-    100       55  2025-02-07       8.2yr       6.3yr      7   12.7%      9   16.4%     10   18.2%
-    100       61  2025-02-24       7.0yr       5.2yr      6    9.8%     10   16.4%     11   18.0%
-    100       68  2025-03-07       7.9yr       6.9yr      6    8.8%      7   10.3%     10   14.7%
-    100       50  2025-03-24       8.0yr       7.7yr      7   14.0%      8   16.0%      8   16.0%
-    100       41  2025-04-07       8.3yr       7.5yr      3    7.3%      4    9.8%      5   12.2%
-    100       65  2025-04-18       6.9yr       4.8yr     11   16.9%     15   23.1%     18   27.7%
-    100       56  2025-04-30       8.2yr       7.0yr      6   10.7%      7   12.5%      8   14.3%
-    100       74  2025-05-14       7.9yr       6.6yr      6    8.1%      8   10.8%     11   14.9%
-    100       50  2025-06-02       7.0yr       5.3yr      5   10.0%      6   12.0%      9   18.0%
-    100       49  2025-06-11       8.9yr       6.8yr      7   14.3%      7   14.3%      9   18.4%
-    100       52  2025-06-24       7.5yr       6.3yr      7   13.5%      8   15.4%     11   21.2%
-    100       58  2025-06-12       7.6yr       5.6yr     10   17.2%     11   19.0%     13   22.4%
-    100       62  2025-07-17       8.6yr       7.8yr      6    9.7%      7   11.3%     14   22.6%
-    100       60  2025-08-06       7.5yr       4.9yr      5    8.3%      6   10.0%      8   13.3%
-    100       60  2025-08-19       7.4yr       6.0yr      9   15.0%     11   18.3%     14   23.3%
-    100       56  2025-08-18       8.3yr       7.1yr      2    3.6%      3    5.4%      6   10.7%
-    100       52  2025-09-08       9.0yr       9.7yr      7   13.5%      9   17.3%     12   23.1%
-    100       55  2025-08-13       7.8yr       6.5yr     10   18.2%     12   21.8%     14   25.5%
-    100       58  2025-10-09       8.3yr       6.6yr      9   15.5%     13   22.4%     14   24.1%
-    100       52  2025-11-05       7.1yr       5.5yr      9   17.3%     12   23.1%     13   25.0%
-    100       71  2025-11-18       8.3yr       7.1yr      8   11.3%     12   16.9%     13   18.3%
-    100       71  2025-12-09       8.1yr       6.7yr     12   16.9%     13   18.3%     18   25.4%
-    100       63  2025-12-21       6.5yr       4.9yr     15   23.8%     16   25.4%     20   31.7%
-    100       62  2026-01-09       8.6yr       7.0yr      5    8.1%      6    9.7%      8   12.9%
-    100       65  2026-01-12       7.3yr       6.3yr      9   13.8%     12   18.5%     18   27.7%
-     95       44  2026-02-27       9.3yr       8.1yr      7   15.9%      7   15.9%      7   15.9%
+Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
 
-in the core:
-
-Commits  Authors     Date        Avg Age     Med Age   <3mo   <3mo%   <6mo   <6mo%  <12mo   <12m%
-----------------------------------------------------------------------------------------------------
-     24       14  2024-09-11      12.0yr      12.9yr      0    0.0%      0    0.0%      0    0.0%
-     24       16  2024-10-15       8.4yr       9.1yr      1    6.2%      1    6.2%      1    6.2%
-     24       14  2024-11-28       7.6yr       6.6yr      3   21.4%      3   21.4%      3   21.4%
-     24       17  2024-12-19       9.3yr       8.3yr      1    5.9%      1    5.9%      2   11.8%
-     24        9  2025-01-27      11.7yr      12.9yr      0    0.0%      0    0.0%      0    0.0%
-     24       14  2025-02-07       8.3yr       9.4yr      1    7.1%      1    7.1%      2   14.3%
-     24       15  2025-02-25       9.3yr      10.1yr      1    6.7%      1    6.7%      1    6.7%
-     24       12  2025-03-28      10.3yr      11.0yr      1    8.3%      1    8.3%      1    8.3%
-     24       10  2025-04-03       9.8yr      11.1yr      0    0.0%      0    0.0%      0    0.0%
-     24       18  2025-04-26       9.0yr      10.3yr      2   11.1%      2   11.1%      3   16.7%
-     24       14  2025-06-04       7.6yr       5.5yr      1    7.1%      1    7.1%      3   21.4%
-     24       15  2025-07-09       8.8yr       6.9yr      2   13.3%      2   13.3%      4   26.7%
-     24       19  2025-08-08       9.2yr       9.1yr      2   10.5%      3   15.8%      3   15.8%
-     24       16  2025-09-10       9.4yr      10.1yr      2   12.5%      3   18.8%      4   25.0%
-     24       17  2025-10-28       7.7yr       5.4yr      3   17.6%      5   29.4%      5   29.4%
-     24       10  2026-01-05       9.0yr       7.7yr      0    0.0%      0    0.0%      2   20.0%
-     20       14  2026-02-23       7.9yr       6.2yr      3   21.4%      3   21.4%      3   21.4%
 
