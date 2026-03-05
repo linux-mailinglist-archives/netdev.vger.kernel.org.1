@@ -1,381 +1,347 @@
-Return-Path: <netdev+bounces-264251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJO8MU5QqWmd4gAAu9opvQ
-	(envelope-from <netdev+bounces-264251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:43:42 +0100
+	id MAO4I8FQqWkj4wAAu9opvQ
+	(envelope-from <netdev+bounces-264252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:45:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A0220EC32
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:43:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CBA20ED36
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5530C304797C
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:36:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A21E2305DBA7
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C4C379EE8;
-	Thu,  5 Mar 2026 09:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2F4379964;
+	Thu,  5 Mar 2026 09:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="r8n3aZlu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U3gUvHqS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50142377EC5
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772703391; cv=none; b=IqJDEJ1AjJP1BkKaK24ezcUnGmg7Gk+xuMzKzwj+6ztpxo2y3GJlH5MvQHBLw/SuYmRzR7088JQO+VTnRNys+rI4gOTWpZgoZLRSKVGcpT5fDaBTdspdwaqQn6JyUZ7Do1GuvQbGiq47t2gl8IJQ+087g6XKN+g9mm9sB8u7kT4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772703391; c=relaxed/simple;
-	bh=CMgXM6u7309Wn3e+oqvoc7hX9vYREWTZOtF5JH1MCY8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=VnyyLruCCXQcZgL0A+Lc5CayIMi9uBjyg7zHMnI/Zc5ymc3R0Wl0NUr3PRrsVLXK1qO/t4aH/mhB6VrcRhsknbTzmuJ7vs/aN411PoiMkYs4phbEljtK8sDt5PGZrB6igJ0BwYA9ztqGHfSs6iS0DE7UGLsiwQHKnCG2Kzarg3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=r8n3aZlu; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-439c92a193bso1573182f8f.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:36:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617A233BBAF
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772703466; cv=pass; b=aE/BB8Y0Y/uzptC5BABX82+4PboOdOhrr8PTWJ+RY0Iygws4SMDZhkbGmpxH4fNL1RHse4IDxVVHP/weVEbpfu5zJqz2yvkzmPzvRzqZZX2v4dsEwAsCXLfIw+E/FMOG2yqb1ls/c9kObSYLu/FA9uIXF8vOoHtFFlPISv9LYSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772703466; c=relaxed/simple;
+	bh=h5eoV1IeSL0UsSKft1SpRtMCq7Z2FCkrGpM+M7P/+dI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=shClBltDV6hyg3vOoUJg1zRroSpR6z1UCHXkfo8IToTWf3fTKIHTUBjGsFLTRJ/FRr4s9wZfwdi7IQcV8BAiz7ZL4KSKj0s4lJQnmI+Hrye/M8wAgZC/9tPRT1p5blq82PYWoBAA1ws5hv/5etFceomumLhHH+0+eUZk5/nw+Ns=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U3gUvHqS; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-899e87b04d8so81963796d6.3
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:37:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772703464; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZEn0vIiL4s2+PUPWApz4kulDabPJaZNzeFH2EMJrMzXg641tZ4ynFw+SBIRMBGlr0s
+         u3sgFA/wHRRQ5cKOqVzOlvxjGOlFr8TU9xu8eepJoz5W4/AJw/jg0UD5Oi2yeScUMq0a
+         6o8fDOxe6LpfrSM5JINjO4gNupkI31uHjjlgCpk/xWZStR6y2FmaAwE0OvmgwiihRwin
+         FfULwNFU/L2KIZx1+t1thltahfylmeWruGPqwZV1DSNwRrkdCFdPdvQZwzbylqks4ckf
+         6FyNu2eMKue0fM7LaLW/omAim/qUdkPQNS54v6b8P3p8oYY2fYs7eYkT9RLUX+ARO87B
+         2QJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PkbpS8Iq4rbgggDhjCdFbCKFLCFB7mJRjs8FQj7ZSYU=;
+        fh=2EXqOvXa2/k+ikN8aut+i+1p7Y+YHHvRruQfJQzDbRE=;
+        b=IAai8r8u/X5o2rKMIFjwHx/jHraZwES5Va1kVatAd6T520evMas/5FQAVTh9BA/7Ft
+         qneCNGM2Nfsc8xxdCLAJ5T37m63EvnrhYgwceYzuAVer7webOqLPfgv2kXXFlUcX2ZqZ
+         Md7odDwidtNcr4Jogc20AUFBMxzNSlM3C0wYK3sDukcN06E7VNzLaf/c8uxE+RvphsyM
+         5D1K23a/K8Y2FqPlKVS2mvDIG0g90005hlMMebuZYk/mUDRVK62s7ezeLsfg8LfOVf+G
+         I0EgQm5w4KISgptZelL9KkO6hVZU4lVc0oJPbq3IbX5QUxfMLtwEW8afdfDJ2LlBW2Eo
+         Wh6Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1772703385; x=1773308185; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mbidr/A9XxccdAFsJsVKLL2bBtmGRz8XUrt7LUMLgOs=;
-        b=r8n3aZluVhBTCfb7BQuBR7rtMDtwMt/hhUveTeZDZQAO4wJxkqYdVnWInamwTvoasd
-         njRsc4y1mlFqY6e8h+MrxsQmTwUtFPEr4bGcC2jwn78y+TT5X2hBUAy+EkXK3GfkPnMc
-         efI7YRWZmXX4iWMH3mdtVwJdLQgh9b+NgkxQAUiokU1kYqlHFgrFqn8X6Kh54oqNRJvL
-         W9KF9PgfXi06d+0sZ2isvDvqnFTaI47uFjf39desDXwhsR9fNqaB6S1RhpTym+6cBpi7
-         37SVpkS6dpjv/ggxoqRfyQPvFp9lVwc3QY78bUWB4dZgVEV/oWO3UY/ChIwfz5zMSHTu
-         wMIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772703385; x=1773308185;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1772703464; x=1773308264; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mbidr/A9XxccdAFsJsVKLL2bBtmGRz8XUrt7LUMLgOs=;
-        b=QAJzi8C6qDvlXK0UXb9cy2plTghxXJHZMoR8tIz7NEfLHrJVhEB4wGRJJm5L3JtpLh
-         fws+wNqfDFYJArzdzsbP8YTdHFUnU+zLurxn/eY+xE9a64SpQHMu9bXTAmI/rbc4mUdr
-         M4FCG6zhE4qiENN4dFz6WfgfaDmswzfDVb5Ia3tEuL7WGncPILcJ/ikF+o5FMPNDmNw+
-         xebL2S82wcXGzTt1yZalbEJm+poetEL9f2Q7W3hUjuLIMlQDAH1dbH5DIVfz2r4aA3mp
-         VaKoPYd7x6+dSXkzD/sCo6SAyAUojUOu4BrMOluqkLxA2sTbEm4RgmhSNJdNa2t6QkvL
-         Abew==
-X-Forwarded-Encrypted: i=1; AJvYcCWZdo676d2taRMAjukh7h6XM9y2Ao9Zr8cpgn4fNADFl+HJzTj0ahEujJPGwQ/LWO8aOk1DMVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLr/ZsZ617GMXodrz6Q8Zz1D7T9hOoHWbcRz75Fx0v96bTqn9W
-	Zy9+byEIxgpYlLkr93rHOWWUKejsxqm1L1SsenX5hLTjGJ29h463OXZSXCVVQK2JRX0=
-X-Gm-Gg: ATEYQzy6g8rf56QS+ZKPW96iLC45+z0cHIm7BBViFMCM3E3GSQMTfYC/pLxnlYbiQxy
-	8NAYW7EfuK/+b0mxce0M9Lxa2I+ecGI1SO79CXImdCmVDqbK5dZJxaJ+ejYH28PyL/vzFpzW1Qw
-	HNniPQt+gc9g1RRGyLNH9U5IjRiqzJA0Q7R+esu+BS0WSy2rh6PxbZ/XthkzQ/93e+sFUttJnLv
-	RfCNDTEg3R6So0l6iWIxM9RMUbHVwuUco90Dph24JlvTpIEZJJnC9RZnsc//PocBvK3i8k/qqmH
-	/OZfXIzOnzeIFL0qwaR0WOuO9ybcuoMiFsl3vl9rIelpwpvFc1luMYYmjLkpAmTqy9oBgjIMDHn
-	rOe/94/qgNTPn/PgsXo7q+xA+Troj8dp3EFpJQupLTeDu+ycuAZcTGNrvofPtCLeujYeHYjCWLG
-	KfjEr8ezhXADN16EU=
-X-Received: by 2002:a05:6000:144f:b0:439:b564:7a6c with SMTP id ffacd0b85a97d-439c7f6a2c9mr9158913f8f.4.1772703384539;
-        Thu, 05 Mar 2026 01:36:24 -0800 (PST)
-Received: from localhost ([195.52.25.213])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439c2f7eca1sm14966458f8f.11.2026.03.05.01.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 01:36:22 -0800 (PST)
+        bh=PkbpS8Iq4rbgggDhjCdFbCKFLCFB7mJRjs8FQj7ZSYU=;
+        b=U3gUvHqSBhzqNdmlZviD1dZD/dsFUNZC+890FzFRGWopJwNoCncwdLhqyMDxBubHDw
+         16JUDPWOT4r8u0XeTN4GKGn8qbyJ5+DS9iVv4+XQ+SH5scya8tkGoILOTL0WdCKxEhxr
+         6PXc9cwXTQZ4eNt0KoxQVkYBfIIfyPPkR0CJYr5+0Aw9M+5SchGzcGeDjFC7NpqmvzEK
+         Ll08zDb3H4z6P8vKmv1Twthc1Zf5eIeQDCIkzK1hsAm36n+Vkq4Kf0IdVQjCdVxU7c/Y
+         TjKtXJ04vVDnoe2329pp8/Xf+pZnmgBRkrRrkjL+lkGURpv+iaxUDnrmpzchEK7uyKYN
+         Cq8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772703464; x=1773308264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PkbpS8Iq4rbgggDhjCdFbCKFLCFB7mJRjs8FQj7ZSYU=;
+        b=VcfTKB2KDSBGm32lrdWU7ZKYbbETxmVcK0BEXh6p8CAWNvUd1pq91zpWZIKix21/qd
+         2UzuyZsh642GWMQ3Dw6LYS4qX5jevZ2EwL7i29mLbltovLM3DT8gqagKc7q30FqVqXQk
+         29QZ867xaJKt2WkPZhxXLEccKcIgzvuDDEY5GQ0s2CNsz96HaDew3IzRdUJfmf5EkpPe
+         l3pQNrQ+rMxdiYz7xLK1UCzRPFrjRw7fV0WQdO8G54ZmDa/iUIx0OopJcw9Nf/FQ5x7C
+         aoSUQmFDvhE7hpyDcAtW505gyZv5OrmkYcd0JvFk1KE8Ff8aSOiZEoWlkh+fBGAG2kgW
+         DAmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzXhjXa8jJ0tz5nh1Z3zg2088eXMgF9kp2ybQ7LK/ocujIU10Ykfw3rpHaFbm5C+uYtPWKnZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz38Knmof9GZUCkva8CmPV6NwUlVhupyaXZ8hHlhikmukKlgZKZ
+	Eq9goDMz+gs+LCV8tZSQiV3HKS4Y4dxaJbrkfTmCBgKrwf9yP5LO4WG65Yo/BCYDMKQTVfOcYv4
+	L4+p22fbN8UD5xmujeM0mXWDrloIV9QCimwU/jY6c6KqCFKHDzS8wIbBye4s=
+X-Gm-Gg: ATEYQzye6lA0twpZbeh5jqGf27fNV8doU+ln+T1sRyqHyL/BKzvpBKxygFi5HaaQg0A
+	FAfvIKEUeozSzqSN6JKzrxuEDG8TgrGlCrEujVhCc/cTDIOeUAn07dblt+gcV061JhbQDqpGbO+
+	Kn3cLAZFF8N2evZGRIGobCrCx5ILF7wg5TT8oYlbn1ufrxyAHGduFn6leH1cVkrcSQo2OJo1PCA
+	oNQtHiPqEiT8kSdKNgpxuTRqcSbeuaA0WLLQViisitjNduN1tZGseI1ulv4CFAYBIz1VWmAnxrk
+	FExL6Zg=
+X-Received: by 2002:ad4:4ea6:0:b0:899:f2ba:9d7e with SMTP id
+ 6a1803df08f44-89a19d21b73mr75406456d6.38.1772703463816; Thu, 05 Mar 2026
+ 01:37:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Thu, 05 Mar 2026 10:36:14 +0100
-Message-Id: <DGUQWFYCPRQZ.17SO07GXW2DYA@baylibre.com>
-From: "Markus Schneider-Pargmann" <msp@baylibre.com>
-To: "Vladimir Oltean" <vladimir.oltean@nxp.com>,
- <linux-phy@lists.infradead.org>
-Cc: "Vinod Koul" <vkoul@kernel.org>, "Neil Armstrong"
- <neil.armstrong@linaro.org>, <dri-devel@lists.freedesktop.org>,
- <freedreno@lists.freedesktop.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-arm-msm@vger.kernel.org>, <linux-can@vger.kernel.org>,
- <linux-gpio@vger.kernel.org>, <linux-ide@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
- <linux-pci@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
- <linux-riscv@lists.infradead.org>, <linux-rockchip@lists.infradead.org>,
- <linux-samsung-soc@vger.kernel.org>, <linux-sunxi@lists.linux.dev>,
- <linux-tegra@vger.kernel.org>, <linux-usb@vger.kernel.org>,
- <netdev@vger.kernel.org>, <spacemit@lists.linux.dev>,
- <UNGLinuxDriver@microchip.com>, "Andrzej Hajda" <andrzej.hajda@intel.com>,
- "Robert Foss" <rfoss@kernel.org>, "Laurent Pinchart"
- <Laurent.pinchart@ideasonboard.com>, "Jonas Karlman" <jonas@kwiboo.se>,
- "Jernej Skrabec" <jernej.skrabec@gmail.com>, "Maarten Lankhorst"
- <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
- "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
- <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Andy Yan"
- <andy.yan@rock-chips.com>, "Marc Kleine-Budde" <mkl@pengutronix.de>,
- "Vincent Mailhol" <mailhol@kernel.org>, "Nicolas Ferre"
- <nicolas.ferre@microchip.com>, "Alexandre Belloni"
- <alexandre.belloni@bootlin.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Markus Schneider-Pargmann" <msp@baylibre.com>,
- "Geert Uytterhoeven" <geert+renesas@glider.be>, "Magnus Damm"
- <magnus.damm@gmail.com>
-Subject: Re: [PATCH phy-next 13/22] phy: introduce phy_get_max_link_rate()
- helper for consumers
-X-Mailer: aerc 0.21.0
-References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
- <20260304175735.2660419-14-vladimir.oltean@nxp.com>
-In-Reply-To: <20260304175735.2660419-14-vladimir.oltean@nxp.com>
-X-Rspamd-Queue-Id: C7A0220EC32
+MIME-Version: 1.0
+References: <20260305092706.145085-1-kota.toda@gmo-cybersecurity.com> <20260305092706.145085-3-kota.toda@gmo-cybersecurity.com>
+In-Reply-To: <20260305092706.145085-3-kota.toda@gmo-cybersecurity.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 5 Mar 2026 10:37:32 +0100
+X-Gm-Features: AaiRm53Vdi26l9lPKD76G6HoI6f1DRss96jaPlzjG_Zyxqxv7PCKBasLiGDqdXY
+Message-ID: <CANn89iJtpHAXZevL4b3X2CaEJvcM-fVJRQe2wUYfDrLzbuSKAg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] net: add READ_ONCE for header_ops callbacks
+To: Kota Toda <kota.toda@gmo-cybersecurity.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Alexander Aring <alex.aring@gmail.com>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Yuki Koike <yuki.koike@gmo-cybersecurity.com>, linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 90CBA20ED36
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[43];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264251-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_CC(0.00)[kernel.org,linaro.org,lists.freedesktop.org,lists.infradead.org,vger.kernel.org,lists.linux.dev,microchip.com,intel.com,ideasonboard.com,kwiboo.se,gmail.com,linux.intel.com,suse.de,ffwll.ch,rock-chips.com,pengutronix.de,bootlin.com,tuxon.dev,baylibre.com,glider.be];
-	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-264252-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[msp@baylibre.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lunn.ch,gmail.com,datenfreihafen.org,bootlin.com,vger.kernel.org,gmo-cybersecurity.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gmo-cybersecurity.com:email,mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
---b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+On Thu, Mar 5, 2026 at 10:27=E2=80=AFAM Kota Toda
+<kota.toda@gmo-cybersecurity.com> wrote:
+>
+> Use READ_ONCE when loading header_ops callbacks
+> to avoid races with concurrent updates.
+>
 
-Hi,
 
-On Wed Mar 4, 2026 at 6:57 PM CET, Vladimir Oltean wrote:
-> Consumer drivers shouldn't dereference struct phy, not even to get to
-> its attributes.
->
-> We have phy_get_bus_width() as a precedent for getting the bus_width
-> attribute, so let's add phy_get_max_link_rate() and use it in DRM and
-> CAN drivers.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Same remark than patch 1/2.
+
+Add a Fixes: tag, or explain why you chose to not add one.
+
+One line changelog are ok for really trivial patches.
+
+Here it is unclear why we have either of these pointers being
+dynamically changed.
+
+I left further comments, please read them carefully.
+
+> Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+> Co-developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+> Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
 > ---
-> Cc: Andrzej Hajda <andrzej.hajda@intel.com>
-> Cc: Neil Armstrong <neil.armstrong@linaro.org>
-> Cc: Robert Foss <rfoss@kernel.org>
-> Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>
-> Cc: Jonas Karlman <jonas@kwiboo.se>
-> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
-> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> Cc: Maxime Ripard <mripard@kernel.org>
-> Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> Cc: David Airlie <airlied@gmail.com>
-> Cc: Simona Vetter <simona@ffwll.ch>
-> Cc: Andy Yan <andy.yan@rock-chips.com>
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: Vincent Mailhol <mailhol@kernel.org>
-> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-> Cc: Markus Schneider-Pargmann <msp@baylibre.com>
-> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> ---
->  drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c | 4 ++--
->  drivers/gpu/drm/bridge/synopsys/dw-dp.c             | 2 +-
->  drivers/net/can/at91_can.c                          | 2 +-
->  drivers/net/can/flexcan/flexcan-core.c              | 2 +-
->  drivers/net/can/m_can/m_can_platform.c              | 2 +-
->  drivers/net/can/rcar/rcar_canfd.c                   | 2 +-
->  drivers/phy/phy-core.c                              | 6 ++++++
->  include/linux/phy/phy.h                             | 6 ++++++
->  8 files changed, 19 insertions(+), 7 deletions(-)
+>  include/linux/netdevice.h | 28 +++++++++++++++++++---------
+>  include/net/cfg802154.h   |  2 +-
+>  net/core/neighbour.c      |  6 +++---
+>  net/ipv4/arp.c            |  2 +-
+>  net/ipv6/ndisc.c          |  2 +-
+>  5 files changed, 25 insertions(+), 15 deletions(-)
 >
-> diff --git a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c b/driver=
-s/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
-> index a8b6ae58cb0a..ed7ed82ddb64 100644
-> --- a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
-> +++ b/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
-> @@ -1300,7 +1300,7 @@ static u32 cdns_mhdp_get_training_interval_us(struc=
-t cdns_mhdp_device *mhdp,
-> =20
->  static void cdns_mhdp_fill_host_caps(struct cdns_mhdp_device *mhdp)
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 77a99c8ab..f50b0a4e8 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3150,35 +3150,44 @@ static inline int dev_hard_header(struct sk_buff =
+*skb, struct net_device *dev,
+>                                   const void *daddr, const void *saddr,
+>                                   unsigned int len)
 >  {
-> -	unsigned int link_rate;
-> +	u32 link_rate;
-> =20
->  	/* Get source capabilities based on PHY attributes */
-> =20
-> @@ -1308,7 +1308,7 @@ static void cdns_mhdp_fill_host_caps(struct cdns_mh=
-dp_device *mhdp)
->  	if (!mhdp->host.lanes_cnt)
->  		mhdp->host.lanes_cnt =3D 4;
-> =20
-> -	link_rate =3D mhdp->phy->attrs.max_link_rate;
-> +	link_rate =3D phy_get_max_link_rate(mhdp->phy);
->  	if (!link_rate)
->  		link_rate =3D drm_dp_bw_code_to_link_rate(DP_LINK_BW_8_1);
->  	else
-> diff --git a/drivers/gpu/drm/bridge/synopsys/dw-dp.c b/drivers/gpu/drm/br=
-idge/synopsys/dw-dp.c
-> index 4ab6922dd79c..79c72ee8e263 100644
-> --- a/drivers/gpu/drm/bridge/synopsys/dw-dp.c
-> +++ b/drivers/gpu/drm/bridge/synopsys/dw-dp.c
-> @@ -536,7 +536,7 @@ static int dw_dp_link_parse(struct dw_dp *dp, struct =
-drm_connector *connector)
-> =20
->  	link->revision =3D link->dpcd[DP_DPCD_REV];
->  	link->rate =3D min_t(u32, min(dp->plat_data.max_link_rate,
-> -				    dp->phy->attrs.max_link_rate * 100),
-> +				    phy_get_max_link_rate(dp->phy) * 100),
->  			   drm_dp_max_link_rate(link->dpcd));
->  	link->lanes =3D min_t(u8, phy_get_bus_width(dp->phy),
->  			    drm_dp_max_lane_count(link->dpcd));
-> diff --git a/drivers/net/can/at91_can.c b/drivers/net/can/at91_can.c
-> index 58da323f14d7..b56db253f02d 100644
-> --- a/drivers/net/can/at91_can.c
-> +++ b/drivers/net/can/at91_can.c
-> @@ -1126,7 +1126,7 @@ static int at91_can_probe(struct platform_device *p=
-dev)
->  	can_rx_offload_add_timestamp(dev, &priv->offload);
-> =20
->  	if (transceiver)
-> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
-> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
-> =20
->  	if (at91_is_sam9263(priv))
->  		dev->sysfs_groups[0] =3D &at91_sysfs_attr_group;
-> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
-xcan/flexcan-core.c
-> index f5d22c61503f..3a4307bc1d61 100644
-> --- a/drivers/net/can/flexcan/flexcan-core.c
-> +++ b/drivers/net/can/flexcan/flexcan-core.c
-> @@ -2211,7 +2211,7 @@ static int flexcan_probe(struct platform_device *pd=
-ev)
->  	priv->transceiver =3D transceiver;
-> =20
->  	if (transceiver)
-> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
-> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
-> =20
->  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
->  		priv->irq_boff =3D platform_get_irq(pdev, 1);
-> diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_c=
-an/m_can_platform.c
-> index 56da411878af..73525be6566b 100644
-> --- a/drivers/net/can/m_can/m_can_platform.c
-> +++ b/drivers/net/can/m_can/m_can_platform.c
-> @@ -132,7 +132,7 @@ static int m_can_plat_probe(struct platform_device *p=
-dev)
->  	}
-> =20
->  	if (transceiver)
-> -		mcan_class->can.bitrate_max =3D transceiver->attrs.max_link_rate;
-> +		mcan_class->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
-> =20
->  	priv->base =3D addr;
->  	priv->mram_base =3D mram_addr;
-> diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rca=
-r_canfd.c
-> index eaf8cac78038..645d5671705d 100644
-> --- a/drivers/net/can/rcar/rcar_canfd.c
-> +++ b/drivers/net/can/rcar/rcar_canfd.c
-> @@ -1885,7 +1885,7 @@ static int rcar_canfd_channel_probe(struct rcar_can=
-fd_global *gpriv, u32 ch,
->  	priv->channel =3D ch;
->  	priv->gpriv =3D gpriv;
->  	if (transceiver)
-> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
-> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
->  	priv->can.clock.freq =3D fcan_freq;
->  	dev_info(dev, "can_clk rate is %u\n", priv->can.clock.freq);
-> =20
-> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
-> index a1aff00fba7c..89f7410241aa 100644
-> --- a/drivers/phy/phy-core.c
-> +++ b/drivers/phy/phy-core.c
-> @@ -640,6 +640,12 @@ void phy_set_bus_width(struct phy *phy, int bus_widt=
-h)
+> -       if (!dev->header_ops || !dev->header_ops->create)
+> +       int (*create)(struct sk_buff *skb, struct net_device *dev,
+> +                     unsigned short type, const void *daddr,
+> +                     const void *saddr, unsigned int len);
+> +       create =3D READ_ONCE(dev->header_ops->create);
+
+If dev->header_ops is NULL, we will crash in the above READ_ONCE()
+
+> +       if (!dev->header_ops || !create)
+>                 return 0;
+>
+> -       return dev->header_ops->create(skb, dev, type, daddr, saddr, len)=
+;
+> +       return create(skb, dev, type, daddr, saddr, len);
 >  }
->  EXPORT_SYMBOL_GPL(phy_set_bus_width);
-> =20
-> +u32 phy_get_max_link_rate(struct phy *phy)
-> +{
+>
+>  static inline int dev_parse_header(const struct sk_buff *skb,
+>                                    unsigned char *haddr)
+>  {
+> +       int (*parse)(const struct sk_buff *skb, unsigned char *haddr);
+>         const struct net_device *dev =3D skb->dev;
+>
+> -       if (!dev->header_ops || !dev->header_ops->parse)
+> +       parse =3D READ_ONCE(dev->header_ops->parse);
 
-All of the can drivers that would use this function are checking phy
-before assigning the max_link_rate:
+Same error here.
 
-  if (transceiver)
-          priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
-
-Would it be reasonable to have
-
-  if (!phy)
-          return 0;
-
-in this function to be able to drop these individual checks of the
-drivers? This would be similar to clk_get_rate() which does the same
-check and return 0 for convenience.
-
-Best
-Markus
-
-> +	return phy->attrs.max_link_rate;
-> +}
-> +EXPORT_SYMBOL_GPL(phy_get_max_link_rate);
-> +
->  /**
->   * _of_phy_get() - lookup and obtain a reference to a phy by phandle
->   * @np: device_node for which to get the phy
-> diff --git a/include/linux/phy/phy.h b/include/linux/phy/phy.h
-> index 36307e47760d..af9c3e795786 100644
-> --- a/include/linux/phy/phy.h
-> +++ b/include/linux/phy/phy.h
-> @@ -57,6 +57,7 @@ int phy_notify_disconnect(struct phy *phy, int port);
->  int phy_notify_state(struct phy *phy, union phy_notify state);
->  int phy_get_bus_width(struct phy *phy);
->  void phy_set_bus_width(struct phy *phy, int bus_width);
-> +u32 phy_get_max_link_rate(struct phy *phy);
->  #else
->  static inline struct phy *phy_get(struct device *dev, const char *string=
+> +       if (!dev->header_ops || !parse)
+>                 return 0;
+> -       return dev->header_ops->parse(skb, haddr);
+> +       return parse(skb, haddr);
+>  }
+>
+>  static inline __be16 dev_parse_header_protocol(const struct sk_buff *skb=
 )
 >  {
-> @@ -256,6 +257,11 @@ static inline int phy_get_bus_width(struct phy *phy)
->  static inline void phy_set_bus_width(struct phy *phy, int bus_width)
->  {
+> +       __be16  (*parse_protocol)(const struct sk_buff *skb);
+>         const struct net_device *dev =3D skb->dev;
+>
+> -       if (!dev->header_ops || !dev->header_ops->parse_protocol)
+> +       parse_protocol =3D READ_ONCE(dev->header_ops->parse_protocol);
+
+Same error here.
+
+> +       if (!dev->header_ops || !parse_protocol)
+>                 return 0;
+> -       return dev->header_ops->parse_protocol(skb);
+> +       return parse_protocol(skb);
 >  }
-> +
-> +static inline u32 phy_get_max_link_rate(struct phy *phy)
-> +{
-> +	return 0;
-> +}
->  #endif /* IS_ENABLED(CONFIG_GENERIC_PHY) */
-> =20
->  #endif /* __PHY_CONSUMER_H */
-
-
---b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iKMEABYKAEsWIQSJYVVm/x+5xmOiprOFwVZpkBVKUwUCaalOjxsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMSwyLDIRHG1zcEBiYXlsaWJyZS5jb20ACgkQhcFWaZAVSlPc
-SwEAt3Fg0ly9qnS+HJQv96JGhcc9ssPHPspnN0LcoiUH76oBAJJ1UWuuXcnIsBb3
-namewJQN1U0nDnFUFRtJbSq49LcK
-=6g8b
------END PGP SIGNATURE-----
-
---b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430--
+>
+>  /* ll_header must have at least hard_header_len allocated */
+>  static inline bool dev_validate_header(const struct net_device *dev,
+>                                        char *ll_header, int len)
+>  {
+> +       bool    (*validate)(const char *ll_header, unsigned int len);
+>         if (likely(len >=3D dev->hard_header_len))
+>                 return true;
+>         if (len < dev->min_header_len)
+> @@ -3189,15 +3198,16 @@ static inline bool dev_validate_header(const stru=
+ct net_device *dev,
+>                 return true;
+>         }
+>
+> -       if (dev->header_ops && dev->header_ops->validate)
+> -               return dev->header_ops->validate(ll_header, len);
+> +       validate =3D READ_ONCE(dev->header_ops->validate);
+> +       if (dev->header_ops && validate)
+> +               return validate(ll_header, len);
+>
+>         return false;
+>  }
+>
+>  static inline bool dev_has_header(const struct net_device *dev)
+>  {
+> -       return dev->header_ops && dev->header_ops->create;
+> +       return dev->header_ops && READ_ONCE(dev->header_ops->create);
+>  }
+>
+>  /*
+> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> index 76d2cd2e2..dec638763 100644
+> --- a/include/net/cfg802154.h
+> +++ b/include/net/cfg802154.h
+> @@ -522,7 +522,7 @@ wpan_dev_hard_header(struct sk_buff *skb, struct net_=
+device *dev,
+>  {
+>         struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
+>
+> -       return wpan_dev->header_ops->create(skb, dev, daddr, saddr, len);
+> +       return READ_ONCE(wpan_dev->header_ops->create)(skb, dev, daddr, s=
+addr, len);
+>  }
+>  #endif
+>
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 96786016d..ff948e35e 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -1270,7 +1270,7 @@ static void neigh_update_hhs(struct neighbour *neig=
+h)
+>                 =3D NULL;
+>
+>         if (neigh->dev->header_ops)
+> -               update =3D neigh->dev->header_ops->cache_update;
+> +               update =3D READ_ONCE(neigh->dev->header_ops->cache_update=
+);
+>
+>         if (update) {
+>                 hh =3D &neigh->hh;
+> @@ -1540,7 +1540,7 @@ static void neigh_hh_init(struct neighbour *n)
+>          * hh_cache entry.
+>          */
+>         if (!hh->hh_len)
+> -               dev->header_ops->cache(n, hh, prot);
+> +               READ_ONCE(dev->header_ops->cache)(n, hh, prot);
+>
+>         write_unlock_bh(&n->lock);
+>  }
+> @@ -1556,7 +1556,7 @@ int neigh_resolve_output(struct neighbour *neigh, s=
+truct sk_buff *skb)
+>                 struct net_device *dev =3D neigh->dev;
+>                 unsigned int seq;
+>
+> -               if (dev->header_ops->cache && !READ_ONCE(neigh->hh.hh_len=
+))
+> +               if (READ_ONCE(dev->header_ops->cache) && !READ_ONCE(neigh=
+->hh.hh_len))
+>                         neigh_hh_init(neigh);
+>
+>                 do {
+> diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
+> index 7822b2144..421bea6eb 100644
+> --- a/net/ipv4/arp.c
+> +++ b/net/ipv4/arp.c
+> @@ -278,7 +278,7 @@ static int arp_constructor(struct neighbour *neigh)
+>                         memcpy(neigh->ha, dev->broadcast, dev->addr_len);
+>                 }
+>
+> -               if (dev->header_ops->cache)
+> +               if (READ_ONCE(dev->header_ops->cache))
+>                         neigh->ops =3D &arp_hh_ops;
+>                 else
+>                         neigh->ops =3D &arp_generic_ops;
+> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> index d961e6c2d..d81f509ec 100644
+> --- a/net/ipv6/ndisc.c
+> +++ b/net/ipv6/ndisc.c
+> @@ -361,7 +361,7 @@ static int ndisc_constructor(struct neighbour *neigh)
+>                         neigh->nud_state =3D NUD_NOARP;
+>                         memcpy(neigh->ha, dev->broadcast, dev->addr_len);
+>                 }
+> -               if (dev->header_ops->cache)
+> +               if (READ_ONCE(dev->header_ops->cache))
+>                         neigh->ops =3D &ndisc_hh_ops;
+>                 else
+>                         neigh->ops =3D &ndisc_generic_ops;
+> --
+> 2.53.0
+>
 
