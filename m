@@ -1,132 +1,190 @@
-Return-Path: <netdev+bounces-264480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264481-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIXILQKrqWlSBwEAu9opvQ
-	(envelope-from <netdev+bounces-264480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:10:42 +0100
+	id MOS/JpWtqWn+CAEAu9opvQ
+	(envelope-from <netdev+bounces-264481-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:21:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945582152D7
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:10:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3662155DC
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BC047302A788
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 16:10:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B36A30F57C5
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 16:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8613CE4A6;
-	Thu,  5 Mar 2026 16:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E9C3CE4A5;
+	Thu,  5 Mar 2026 16:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YnzfeAhK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUxpHcxi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489A43CE481;
-	Thu,  5 Mar 2026 16:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED1C3ACA50;
+	Thu,  5 Mar 2026 16:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772727032; cv=none; b=UIMHvglgaQBE0290VWWqb32wFoIzgvxUtTn1Z/nGf6IHVgVtRf6VBkQCCfpQBnPWftWDuLP42uV0Osp9W/U4GbMGHSRsAskvnhM0lApVo0Bz5hOsuxvkbeVwZLssNMoCVUKOohgybbURTF81yoIZzRfKQYMjnomsH2bvy2XlWF0=
+	t=1772727408; cv=none; b=mi6X+YuShstigWkfQj1Gq40tAQjKy/6LDji0mQ5Cde/6yikbyOBWD1aTqNts7uFlU9h8OCitgHmKWSVTgSpFL/HzKgsW3dSacxMSoqSThNNPxl3dtpNb6pHBHF0WqEN5ddXQ0KkaXy2pc+lccq9CYStAE7n1BqYSJv/GmcV5xbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772727032; c=relaxed/simple;
-	bh=JbkmzA5NT9w481WQQZ9L9xGW0U2u7zXu0ubWo2eH7ys=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NB+FUbJ53BvTTrbR0twjISstRscQLRrZ3zJQTZo8rfWwesKf3+WTZ2LnbOdGn4NpG3AuhSRpvcJSln0mjsYv3fqOtutKX8GgbXvMjRVJjN7BlauFGwNqBNrZMo/m0QsKsrwIU8XwA+6BaQIRIfAiDiDztvR/Y258xjBQ46SMSF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YnzfeAhK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01279C2BC87;
-	Thu,  5 Mar 2026 16:10:32 +0000 (UTC)
+	s=arc-20240116; t=1772727408; c=relaxed/simple;
+	bh=tYWAoI05j+Zw9plPeywTp7SD38iDFKoJN5mm6OLALGM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lf34R9BzPm4FHdFHq5SqO92wvsqG7M/lVrMm5XOleys2HSaMt+zWUJYPrtnEdTvUlbpT9H0SrFBc7PbFMZRXdZZIbvFX4h4mPtMgg/ZqAPR964gMQQneqJXk1r8n1hDwiOvjI2wnYDeXFiWWucnN/ljTqvCvcswfG4GTrulzyag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qUxpHcxi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03C6FC2BCB8;
+	Thu,  5 Mar 2026 16:16:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772727032;
-	bh=JbkmzA5NT9w481WQQZ9L9xGW0U2u7zXu0ubWo2eH7ys=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YnzfeAhKgKqi4R76z34Xc8KyKzRfL2ehp7SFrgFlKZ6HAZR92RBPjFTgjhIhiysmC
-	 +prNjc0KIu2yYV3+SWfIMfVzLtPk4+gWBNxHOHTqjNa8qehpAHuyjv8itwpM/FycmF
-	 HokPk+m0kgVYvNFlGrTrgnsltiYiLyrToZQvwnX8Rl/zwLWSlpy/whvR1NdX/ppLv+
-	 dC5PgSg6GR2Bdx/ZqRet1uPrmNfELT9fgvgB2QwM/STGZT1wH0AmsFOp3z1BkBauZn
-	 Mg3GdDUufFsmyV+Z7Rb1V0VvDir8yYhrDfNR3OCRAv5WKG0KVPuy0k4QUH3Te5GNOH
-	 ivfh9M1E906Mg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE603808200;
-	Thu,  5 Mar 2026 16:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1772727407;
+	bh=tYWAoI05j+Zw9plPeywTp7SD38iDFKoJN5mm6OLALGM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=qUxpHcxiwuU1FjD2FXdRDAjZTZjaYHF88cK0F5UhX3xZwuf63NxjXxDB8vKxq7BHc
+	 J2Chs1Yspuu0jJ2scThI3oU82p81H1OUyJs1rqbHH1PhfShQs29ErDwkow8ugZYLBD
+	 5Z5nDIsSoFLwZP5f9CL+aKgckGOt+PRHSMdtAyF5uyGZ7afiV+Ecs5akWwCKn/2Qvm
+	 a79hbm5iKNL0g5Wvi84Ij2zlMfClG51rwp6mxnnvLhPPjMHWFwuBQGXUCn6TgPJltu
+	 +a+L4w0OZt8rsQDE2UuXIClWXyBY2kwHTAU0RG3orJINfW2x9UeZwjaWVUNY5dHSOn
+	 Wy80FaOdiAnvw==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Jiri Slaby <jirislaby@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, Netdev
+ <netdev@vger.kernel.org>, rcu@vger.kernel.org, MPTCP Linux
+ <mptcp@lists.linux.dev>, Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "luto@kernel.org" <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
+ <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
+ RCU stalls, timeout
+In-Reply-To: <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org>
+Date: Thu, 05 Mar 2026 17:16:43 +0100
+Message-ID: <87zf4m2qvo.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2 net v3] net: bridge: fix nd_tbl NULL dereference when
- IPv6
- is disabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177272703204.3188128.4802292927759859112.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Mar 2026 16:10:32 +0000
-References: <20260304120357.9778-1-fmancera@suse.de>
-In-Reply-To: <20260304120357.9778-1-fmancera@suse.de>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, roopa@cumulusnetworks.com,
- sdf@fomichev.me, petrm@nvidia.com, horms@kernel.org, idosch@nvidia.com,
- razor@blackwall.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, gurucp2005@gmail.com
-X-Rspamd-Queue-Id: 945582152D7
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3F3662155DC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264480-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,cumulusnetworks.com,fomichev.me,nvidia.com,kernel.org,blackwall.org,redhat.com,google.com,davemloft.net,lunn.ch,gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264481-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello:
+On Thu, Mar 05 2026 at 13:20, Jiri Slaby wrote:
+> On 05. 03. 26, 12:53, Jiri Slaby wrote:
+>> owner_cpu is 1, owner is:
+>> PID: 7508=C2=A0=C2=A0=C2=A0=C2=A0 TASK: ffff8cc4038b8000=C2=A0 CPU: 1=C2=
+=A0=C2=A0=C2=A0 COMMAND: "compile"
+>>=20
+>> But as you can see above, CPU1 is occupied with a different task:
+>> crash> bt -sxc 1
+>> PID: 7680=C2=A0=C2=A0=C2=A0=C2=A0 TASK: ffff8cc4038525c0=C2=A0 CPU: 1=C2=
+=A0=C2=A0=C2=A0 COMMAND: "asm"
+>>=20
+>> spinning in mm_get_cid() as I wrote. See the objdump of mm_get_cid below.
+>
+> You might be interested in mm_cid dumps:
+>
+> =3D=3D=3D=3D=3D=3D PID 7508 (sleeping, holding the rq lock) =3D=3D=3D=3D=
+=3D=3D
+>
+> crash> task -R mm_cid -x 7508
+> PID: 7508     TASK: ffff8cc4038b8000  CPU: 1    COMMAND: "compile"
+>    mm_cid =3D {
+>      active =3D 0x1,
+>      cid =3D 0x40000003
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+CID 3 owned by CPU 1
 
-On Wed,  4 Mar 2026 13:03:56 +0100 you wrote:
-> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
-> initialized because inet6_init() exits before ndisc_init() is called
-> which initializes it. Then, if neigh_suppress is enabled and an ICMPv6
-> Neighbor Discovery packet reaches the bridge, br_do_suppress_nd() will
-> dereference ipv6_stub->nd_tbl which is NULL, passing it to
-> neigh_lookup(). This causes a kernel NULL pointer dereference.
-> 
-> [...]
+>    },
+>
+> crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
+> $6 =3D {
+>    pcpu =3D 0x66222619df40,
+>    mode =3D 1073741824,
 
-Here is the summary with links:
-  - [1/2,net,v3] net: bridge: fix nd_tbl NULL dereference when IPv6 is disabled
-    https://git.kernel.org/netdev/net/c/e5e890630533
-  - [2/2,net,v3] net: vxlan: fix nd_tbl NULL dereference when IPv6 is disabled
-    https://git.kernel.org/netdev/net/c/168ff39e4758
+mode =3D per CPU mode
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>    max_cids =3D 4,
+>
+>
+> =3D=3D=3D=3D=3D=3D PID 7680 (spinning in mm_get_cid()) =3D=3D=3D=3D=3D=3D
+>
+> crash> task -R mm_cid -x 7680
+> PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
+>    mm_cid =3D {
+>      active =3D 0x1,
+>      cid =3D 0x80000000
 
+CID is unset
 
+>    },
+>
+> crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
+> $8 =3D {
+>    pcpu =3D 0x66222619df40,
+>    mode =3D 1073741824,
+
+That's per CPU mode too
+
+>    max_cids =3D 4,
+>
+>
+> =3D=3D=3D=3D=3D=3D per-cpu for CPU1 =3D=3D=3D=3D=3D=3D
+>
+> crash> struct mm_cid_pcpu -x fffff2e9bfc89f40
+> struct mm_cid_pcpu {
+>    cid =3D 0x40000003
+
+That's the one owned by CPU 1
+
+> }
+>
+> Dump of any other's mm_cids needed?
+
+It would be helpful to see the content of all PCPU CIDs and
+tsk::mm_cid::* for all tasks which belong to that process.
+
+Thanks,
+
+        tglx
 
