@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-264434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264436-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBrYLGSWqWnYAQEAu9opvQ
-	(envelope-from <netdev+bounces-264434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:44 +0100
+	id OOHdEvaYqWm7AgEAu9opvQ
+	(envelope-from <netdev+bounces-264436-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:53:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2910E213B26
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F1B213E63
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 88EAE3078F86
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:40:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9E0AC3054133
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F593A9636;
-	Thu,  5 Mar 2026 14:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4857E3A9605;
+	Thu,  5 Mar 2026 14:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Qled2l47"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="P39tM6Gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A925D3A901C
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 14:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A323E3A7F52
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 14:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721625; cv=none; b=YbYDtV2hzoTPDiXMasWsOmxOjVbgIa4WfSW0mp5pQ8hxclffayYcRyFEfFTUPPO9s1eFZrQNkKXEqvahvEFd87PU1+4p9NKqFWXNX94BTdVyeeK/511JfGBIZT1ENNfz8nG4BINFSP+W2WJqtns2XhOikUktoA0zS2SUdcMS30I=
+	t=1772721676; cv=none; b=gCXh7CHzapbd/gUjtd3Gq9qIDgEk1G7ajAN0KC02xLRRB9vqkIhQRkJSKMgT5XletLQZ28LHB9E6BfuQTFuXyKKoHBpBRwFmftqX+4x+sXqFfmTpAgcFOUHoPjplfn3J1AQUe4TcNheDBktwhUKOt9trpiprUA7rppPgQZCgUrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721625; c=relaxed/simple;
-	bh=GzdrRV3jSJ/zZ1e738PNQWyueoRMAomGpWpecK6fHpQ=;
+	s=arc-20240116; t=1772721676; c=relaxed/simple;
+	bh=jJpxs4uW9tmn1sVa7vXlYtBN8USiETjByVpeTdSNuoY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mv2NLpPl00QtR4RCaCyi6kdXRb1DjHnm84VSi41KaqyHS3yffpBQQ7+VZOb3JYsE/mmQyaw8YrdwYnkkHYNKd2UMH0k0d3+WiFLTjNRnpyH2xFAdO/SKuE321kX0ABaDRJs1XP/V7jwCOS4Ys8diIZx65cze7JKrPBWqDWVBKgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Qled2l47; arc=none smtp.client-ip=209.85.214.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=MCItqlK1bV8daNrueH/BTC99tUF7nfM0IPRlwdFZCjUVKVJ5eYhBwr4M6gbGaDLGN3QbrLe8RlH6BJYTRA2K8H3j1sq4NZw8NK/1q23Vc1N5AB88R7PMqWBQ2RTuVHfadHc7OXxSpA4pMtUY9q0AV0ePv0i+JIQwwsgNuIC0kSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=P39tM6Gw; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ae527552acso16680225ad.0
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 06:40:23 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-82746ed8cb1so4551813b3a.3
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 06:41:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772721623; x=1773326423; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772721673; x=1773326473; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hzvwSp+J/sXpJ4omuzbLYqwo/49PuBoozjtLvyBYlac=;
-        b=Qled2l47a8dDRYISNpcH1AzPWVT9/dTXT854dOUDtnGL0j+z+2U7izspzskx0DKsw+
-         fZsuMa3FZynXRNKz6e2aRK/HNu3IAGfs+WOYzWlBCmHVatUl+hgQW9TqcPTMjU26EpPs
-         aVg+vDVygcPH7fygMFlfYGl0NavWX5d+5DBEFuH12PatyOZhoy3stZBxPyBPtJWei+p/
-         1XuGQOQbniXcXWYbxpR/SahFilBDcZEnnAIVTeJsvKF1IUEjrE8O12dvlx9jGlTadcQT
-         M8FUlBbQPEcLFvWsIb4Ay+FPib9xBz5Fo+MhmrW5cNxxvE9zdSZyRiANIkn4ewuQAn4+
-         8VOg==
+        bh=v8KIfrmAXO/kTH2qN+MDY/bFTmG66xWFxB/HbEpX9xQ=;
+        b=P39tM6GwriTWovmysC5Im56EAgopeF0wz6ZtvA02M7C+G7svNUR+jJC2E8AUXIz8iJ
+         uG1WXZ7g4zeHuTAzPk5mPjlMap5TAzXlwFdMT4YxdValwKap0mg4BqD2/P/CHqzepwji
+         fPIuaR9FW5PIDo6ggAXVim8yEtDvAyqGhaXSZbWWU6ejqdsnw87PusiCMS0lHv3yu+G0
+         UeePquYj0z9bjtNhuRojIBQZPxbZGGC6beiGUmdkC55Y5qiTL+j0gw33RAxoy/QBi6S/
+         BdIknXkDXsZbbjJ0EXsmrpPOsZ6TpYS87+6+tiI0sLtf04yumwVXl7Zca+fhu1yoNVLQ
+         EYqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772721623; x=1773326423;
+        d=1e100.net; s=20230601; t=1772721673; x=1773326473;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hzvwSp+J/sXpJ4omuzbLYqwo/49PuBoozjtLvyBYlac=;
-        b=osTin4P8QTDFuW9cQF5XB9emaZ3L1fgqYi5CqSWSPUKAfbs23ig6t2qkFjOXgXb/ri
-         XuZxInJ9TkTjNfevbYxCio4QVNc4aVKXMuh05aWnaFcnH6/ERjkKjMjLvT2lXxg+1kO5
-         DSPo1Pa30okgW9vG1ypjTS9bjL3JwuOiHzP5WKO2hQeYs4AzeSClJuuYWe7OrwSq97qa
-         Zum39z5TqhSgodpk4EgTnCidKE13lPIoERSKjPDs5nl3kcRW2rvzU+XzLDL9BAOxg5gb
-         OVG8OBIC4jFvAjaizBoYHSqTTKvpyicgzgAMbtawsipWKXfk/u+mVhss+EVNxvwo5f/5
-         nsgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFoHzrACh/QChkQHivUioprH6DuREVg5KrGEmvynyPw54C9kzRfrXFdxzjFEmT2m4KEH4eDi8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxnSMiv4g+u6ueFbggNj1lKc2rMEjL3dLWN0tTtD6qm7/mAd3o
-	seekHhp4p4t+4uiQ5gHlzP6BPWYZyDVSnpEVA6ApOhhJ6O6Rl8B2iD/wpoWAwKW89O4=
-X-Gm-Gg: ATEYQzxgCnH9GyDFeev1Ade/45vBHwgLqh+JQv9L9Kdhj+ZZC5h+Ug/XNDzWNEwsZc9
-	bnhVgLAaVQTK8/wNByhVv3rlVPdwsFc+zESKJEG1JHDB2McUO5O27zBof8obmFAa5V6VWvz6A8+
-	w5sWOKyV21l78+mL7ompyf5rKtvwyrVsLmTVqN8s0bq2cp5QSUCGTl3yZs9mXn4noIDUzuMerZg
-	iVq7jSz5EIty8DvH9eZKoj0/4j0U93lrMJeFFKNdggGnu5s3ZFapiRnloNjzcOJf7lCPj2SAUkr
-	Yg++PNAZE1rLqvhgaWnmesMxcgVQ64/Xwe/T5WzRK1eEQQ7gzWgi/+LfZKpPN56r4MZlsGfV4VH
-	wUcaXa6A2MQiVzeAfGSTiYLHxBPMFoLYB+jtFmBxqjKKclFvyVGgeIO0227ZO/2W2F7nfBSW957
-	QsR8eEu30rG/F9KQ==
-X-Received: by 2002:a17:902:f64d:b0:2ae:5598:1da8 with SMTP id d9443c01a7336-2ae6ab80a25mr57121095ad.57.1772721622971;
-        Thu, 05 Mar 2026 06:40:22 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:1::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb5c183bsm234187105ad.24.2026.03.05.06.40.22
+        bh=v8KIfrmAXO/kTH2qN+MDY/bFTmG66xWFxB/HbEpX9xQ=;
+        b=j5L3Hwf0TjAsCa1xs6JwiGKMjn1B0rve4d9Rv6zeDr6OsoEr38koXbahaav6OuH+JP
+         sPS4CT7Aq7S4y+RnAh1KI7gSRVfFxWPUQ9znZMLRI26SNZxcr6jnTT0RAYh6zDGmmx6V
+         o1gX470Uj265zszIaB3u9pEEBSzqjOCiU0e/7myiIIDWvH4eJQ3FTEn+DpdCixMvhs3K
+         06Ulig+AA0KeTYi39KjRO9bxnyHE554uHmGcnZwNm4vFlmipgLy4eyqcKdtxbWvNfBUy
+         sgcD5/0JoauT6Rrx2jb8JFA3jhemLo/zRjxBd15Px7QsIL2ri0sgLMQCLwVSh9upts5/
+         JvrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5O3HRWe7+WSvYNM5CNhDkwSjx4fTOVCFqRH/H+8CppoFnwr7L6dvEte3YRxbY1oLDk3NovUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG6ZVuy4LTIYH+efpFX0cAi5g/DCYv8CBQceprCf4QHcdBZrnl
+	29sYu/i1zExaRk4kmEZLVLW9dR1uq7MDakn1hSLXnYFqkurSU82Pgp9UDJQtSX6TuQo=
+X-Gm-Gg: ATEYQzyroh0+lh5l3bYDelgtGfezOnb8E1KuhVjnz2fTbs9bVgi9/oGF/pkzjSWvcss
+	2WZu9OFudBb2OZNtVrBTCB/lbKxUy/Gz82QfFOT5QbE/bJ3GRxPW86Axrvb6kVMPbRySLgP7/UD
+	5Nt6p8iA8CCFxwco1LVxDve3JbWM3TX/PYKuzlv2uHzVaRkt1o/A25QbtEPMh2E+GqZJVt9yMCS
+	L48QQl5cwJaYwQFOupD0ts+6r/aoi4xt9Uuw3gUdyyRh2JcuuntfPnzJQSmR0iiPcm7Acn+WI4r
+	oWkyJaD72g0i8wM76NAnAdC2mBT/YRZIgLmldZj6VGmhRUzWk5lB24Ovuu6Qx/v+Dp4xzKGWpNm
+	uyycNOTjfd3IzFxYhXDHfN3kDwMGL+5GtqxpNHLqIU82UcLoCfNiF+ee8TJeDJA6efJ3sTYjQ/D
+	teisWa
+X-Received: by 2002:a05:6a00:114e:b0:823:c59:9cb0 with SMTP id d2e1a72fcca58-82972b6fed7mr4994038b3a.1.1772721673040;
+        Thu, 05 Mar 2026 06:41:13 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:74::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8299a6938a7sm37440b3a.7.2026.03.05.06.41.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 06:40:22 -0800 (PST)
-Date: Thu, 5 Mar 2026 06:40:21 -0800
+        Thu, 05 Mar 2026 06:41:12 -0800 (PST)
+Date: Thu, 5 Mar 2026 06:41:11 -0800
 From: Joe Damato <joe@dama.to>
 To: maximilianpezzullo@gmail.com
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -87,8 +87,8 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] igb: fix typos in comments
-Message-ID: <aamV1aAG1TKPKqkN@devvm20253.cco0.facebook.com>
+Subject: Re: [PATCH v2 2/2] igc: fix typos in comments
+Message-ID: <aamWB4kGq8hRLjdN@devvm20253.cco0.facebook.com>
 Mail-Followup-To: Joe Damato <joe@dama.to>, maximilianpezzullo@gmail.com,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -99,7 +99,7 @@ Mail-Followup-To: Joe Damato <joe@dama.to>, maximilianpezzullo@gmail.com,
 	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 References: <20260304-fix-typos-in-comments-in-intel-ethernet-drivers-igb-igc-v2-0-b6a9f1d336ff@gmail.com>
- <20260304-fix-typos-in-comments-in-intel-ethernet-drivers-igb-igc-v2-1-b6a9f1d336ff@gmail.com>
+ <20260304-fix-typos-in-comments-in-intel-ethernet-drivers-igb-igc-v2-2-b6a9f1d336ff@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,55 +108,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260304-fix-typos-in-comments-in-intel-ethernet-drivers-igb-igc-v2-1-b6a9f1d336ff@gmail.com>
-X-Rspamd-Queue-Id: 2910E213B26
+In-Reply-To: <20260304-fix-typos-in-comments-in-intel-ethernet-drivers-igb-igc-v2-2-b6a9f1d336ff@gmail.com>
+X-Rspamd-Queue-Id: B0F1B213E63
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264434-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264436-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DMARC_NA(0.00)[dama.to];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,dama.to:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 08:21:19AM +0100, Maximilian Pezzullo via B4 Relay wrote:
+On Wed, Mar 04, 2026 at 08:21:20AM +0100, Maximilian Pezzullo via B4 Relay wrote:
 > From: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 > 
 > Fix spelling errors in code comments:
->  - e1000_nvm.c: 'likley' -> 'likely'
->  - e1000_mac.c: 'auto-negotitation' -> 'auto-negotiation'
->  - e1000_mbx.h: 'exra' -> 'extra'
->  - e1000_defines.h: 'Aserted' -> 'Asserted'
+>  - igc_diag.c: 'autonegotioation' -> 'autonegotiation'
+>  - igc_main.c: 'revisons' -> 'revisions' (two occurrences)
 > 
 > Signed-off-by: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 > ---
->  drivers/net/ethernet/intel/igb/e1000_defines.h | 2 +-
->  drivers/net/ethernet/intel/igb/e1000_mac.c     | 2 +-
->  drivers/net/ethernet/intel/igb/e1000_mbx.h     | 2 +-
->  drivers/net/ethernet/intel/igb/e1000_nvm.c     | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
+>  drivers/net/ethernet/intel/igc/igc_diag.c | 2 +-
+>  drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
