@@ -1,202 +1,269 @@
-Return-Path: <netdev+bounces-264389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264390-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFq5H3CBqWkd9gAAu9opvQ
-	(envelope-from <netdev+bounces-264389-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:13:20 +0100
+	id EIBAID2BqWkd9gAAu9opvQ
+	(envelope-from <netdev+bounces-264390-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:12:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FA42127C4
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:13:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10F3212789
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D562C302D5D0
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:09:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DC9D301E985
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E8339EF18;
-	Thu,  5 Mar 2026 13:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FBF3A1CEC;
+	Thu,  5 Mar 2026 13:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fVvxrm1M"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="fkXeXFLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010032.outbound.protection.outlook.com [52.101.84.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D95248F66;
-	Thu,  5 Mar 2026 13:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772716142; cv=none; b=IRbyh2nvffkXCyB6lCmbnRkVelbqDrRQcuzwGDq2GhHLqINb6UbkfLyrk+GVN1lO+zAXWZ9xcDCkd7mpkJclq+5ofW/q9zQJG27l0PKWspFhdjhvUj8vP9Vtvm3sJQBRpdP2PPTt0KedLnrT7YY7ATKPU0qwXW7viFvSj0knwRs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772716142; c=relaxed/simple;
-	bh=LhhZwf9t0k8G63cUsWJ0P1P7EJ98uOM6BnXeuDdOXNc=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=u/HHhvn1RjYuXQudfIoNsHdTAsoOCm3bu1dOC37TDxSfs4xJ4Gw6K2pLdK/KqJqoTfFRPzqOrYil8S2LbdSgbDsLeARX1XMIaHIKBphTaTaMCNQ6Ldhj5061PDjKrcomGB1aFIMlKCR0EvBfVhbLDY6Rl2wt6U/Ew8A5yYOPGww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fVvxrm1M; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772716141; x=1804252141;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=LhhZwf9t0k8G63cUsWJ0P1P7EJ98uOM6BnXeuDdOXNc=;
-  b=fVvxrm1MiP/kqQRzFTJGqt7G3YAKSa76jCmUvDe0vt4JFPSqcQAMXg2t
-   5EcMfDRXDk/lsN28TjuXrLl2IFLPKEtZlohT3Rqv0brum4pxQRGMAqNuY
-   zwH5h/w5IufoUZA1HWNHOZRB5ND2/nXAJrAxxpMqfjEcwONkJ5VvEzhcU
-   yzHqKicsSPm76EzoDrcoCq4oasENCqoZdS0KjNbOuNfaaiOJUOsZrYDt2
-   XiEg2YK9gkePVGYz5ys4xnHTRETygxcxLkeDSmqoogTwG7gdRWscbE0ns
-   oRkUdA4AaMLpgTUgRhgsjc738LlH0RRlCWa1hmnZnHELz0eAQcfwjF45k
-   A==;
-X-CSE-ConnectionGUID: gXs77xUDTlKJZhU07oQylw==
-X-CSE-MsgGUID: u9erEe3fRBmR6w68ScAt2g==
-X-IronPort-AV: E=Sophos;i="6.23,103,1770620400"; 
-   d="scan'208";a="54262739"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 06:09:00 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Thu, 5 Mar 2026 06:08:19 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 06:08:16 -0700
-Message-ID: <f34815255c6d94194e3c0f01990a1fa650d623c2.camel@microchip.com>
-Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
- switch bindings
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Conor Dooley <conor@kernel.org>, Vladimir Oltean <olteanv@gmail.com>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung Huh
-	<woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Thu, 5 Mar 2026 14:08:15 +0100
-In-Reply-To: <20260304-capture-kissable-3bdfe389864b@spud>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
-	 <20260303-disperser-clone-512efa99f26c@spud>
-	 <65fd5f46f1f996dd5f4df2de2efb52c8fa3575b3.camel@microchip.com>
-	 <20260304161457.l6tkxix6sgube3qc@skbuf>
-	 <20260304-capture-kissable-3bdfe389864b@spud>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198A23A0B10;
+	Thu,  5 Mar 2026 13:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772716314; cv=fail; b=lqbQcCBJlcwqq8xqn+qtEEmxDxoP4a+qBkRO2uCUEFQztCrwgx5AFZzTGBAHs6CnNRpn/DMwRDi/bbIGxAc0Iwb9M17pm9p0Ls2QYA8e3vQr+Xp+H7fw2EW6sECGdPLkkUNMfEEHiqEROAIZ9XlUD9Jf5pv3xMlabrAou3eU8Wc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772716314; c=relaxed/simple;
+	bh=XQ1hXihHqFUxMg33CfK/BwWi9UvA5h/jgMXKnLVMKVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Vg/DNJGB7WpYzPZL2lJEMHc9CrKcySO7sz3w2NbSuli2qpJ/48O8Yrc1bA0G8RJ4DSzvCVyv/1fQGOiVFHVcnNrwZBICBxY3baKgugDWjKVhaThDqFDi7Jjwdc63/e42BZMM+Df0xdcwBQs5a4uUYaXaqBaewtq0GFQZE6HfcrY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fkXeXFLY; arc=fail smtp.client-ip=52.101.84.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lmebUp+NSg43P6DrMnWPOtkJ+NVm4CE5rLlAyevCbsoF51fOGJpgvpMX+6hYdIXWHI56aUmgzdy9RTQADPgKjSnJnYebhV9mS+l0koNj1yybjPwkUp0pjFsF+ZsXunA51aUn8vhVp/RPEvad2bmS8XzVEiU5a7f1ARONaXKU1t5a5oOQ6mFqVBP2itJ9KY5Cxs4wyEH3d3CdQtyRgu/u3oRwSU3IodKsTu3N6DIBzuwyKbkXw85lwah0E1XUn6o6ac4aI3OhJDnFZccaScJTMn9f8nj5GRD/wuySh8mz3s9ZQHX7rV+zZPP4hJj53Zv3Qnwx3DTc+cPCMv812dHvcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4hSMkVlElClTBfYcUftvSmxqMPWogkjljPOeeXcMdXM=;
+ b=Eb98H7+xicR0fPOEvFkwucV/95bKRVuV8xg6oBgREjRvSvjhRMg3p499vE8rlgTnyrruwvCbnbBjBwWlDCNCdtUq8zTncwlO7cXFH2rkS+BI7lbDth4ywPcmlP6zcZB8i9UBF/VLO5BPig5t98RNJQ16TvA1reQF+/79KJZzGN/MJmtGQ0P4SOLPYDJhrhKuiyaOEMOuKyv6TsKXW0myp9d7PlzAA7dJk/5j8Mwc1rUWl514PJVeG/WmgtEfyJexhU6ktoIeNWpxwitR7Zzo6ddfIbjMfnpNc/WUZcwKpaQ2JiFCDnMu7gZOaMVTE3nz0dL4if5+Di/IpuV+qr9mxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4hSMkVlElClTBfYcUftvSmxqMPWogkjljPOeeXcMdXM=;
+ b=fkXeXFLYwibbaMffWdJVXYF0OpM67RbtwceJfGliKf0rGTeU5UEaQVfaHoGxl1bQ2PkIryyWYDt3iBXJS+tvu14P7W9YO35w98B39Y65loJpwQV2H7vRRYy+R9AZHL0InIFoSB3wOQtMr91aD1YC5p5doR+FmICR5jsuzqX96JQmbUGePk6l8xd+0/nHMdP9NgN1i5gnVunjfeuPStKJj5UJQNTNzOLCYcVbjlkRHEPalT0QxG2eI8YWtwNXBEto06SQRhE4ODNtK66OfDs9IUiNAO/ucSHuJThfhjsSs8FpghnttGKP7GsE+KVnDgQll0knSejdmstRq6vMl7n1pA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by PAXPR04MB8079.eurprd04.prod.outlook.com (2603:10a6:102:1cc::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.18; Thu, 5 Mar
+ 2026 13:11:49 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9678.016; Thu, 5 Mar 2026
+ 13:11:49 +0000
+Date: Thu, 5 Mar 2026 15:11:45 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+Cc: Joe Perches <joe@perches.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, spacemit@lists.linux.dev,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
+Message-ID: <20260305131145.zvi5eor5kj4n3fu3@skbuf>
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-23-vladimir.oltean@nxp.com>
+ <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
+ <20260305085148.7cwo3yflp7vcfldf@skbuf>
+ <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
+ <20260305114352.2f7btqixg4tu5bzl@skbuf>
+ <20260305121532.GA1649635@rocinante>
+ <20260305123843.i47asdrjychwlgdt@skbuf>
+ <20260305130609.GB1659133@rocinante>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260305130609.GB1659133@rocinante>
+X-ClientProxiedBy: BE1P281CA0187.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:8d::6) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: D0FA42127C4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PAXPR04MB8079:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b571484-1da2-468e-505d-08de7ab8c2a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|7416014|366016|1800799024|19092799006|376014;
+X-Microsoft-Antispam-Message-Info:
+	2ljAm+k1rZ25I3N9CRhbmc7ttnAAErjLH/n/Ezqn/ICGIDT5mR229+H7KOi/Ch4IFO9csUA9KGhQoWdLrHOgEK2g+46wIUzR2r8ppFF+LUwyJpSYvOhdo55MTE3xNgDcOOPjhNKDKqgyyLaEZY94xyaTzloxmjPXfTimNa9gb3uGun+/R9gvpCrpeIExnDru5iAGeQRxK49a6ZPCi3FjP/iG7aLkRVPifB63M3m1P3vR6Mf0ohGa9lOntJRytJHE0qQSqEKLabnW1u4peybvoXkMd7VsbgZF2BEC5YpkkN9eubPzJJx2fUqhRuHsYjjJSXImCu5/uV3m7QaqnxxbKh/Q+vIfg/NVCI8me3Ehe7kYP7guYgaGs4iSOoZu2kfxwo2Fpwb+hn6xnppJ0nG/BGjuIYWXJN6C54PRne/EmsJYsycwzTonZXaj4Em/zGHEl4NleISmmmVO6N3VsWCb4EMJojnCQQopOeUPmudlKblmFbGWG/Txh+9p/IpMIycjQsJkfPWEBhpTMLajewl4ijspdte8zcUiDNuwAV/DNNCd45n8LGHnz6xlJ9rEPKud5E4ustL7tLedX5fwfoyUWJ8YTl3agyH+3fqR6OxAmQb0p4FlmkK43vL0ZskwOxGpYoZASK+9Db21u7sfkTBf3ehIJtZ2Yw49AUuyObrwYxPpkdyH+2vkanKjSNfkJSKu0TndKz3s+PpksKSVa5l5cfRnDEbWw/bBY8IbEza9Ke0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(7416014)(366016)(1800799024)(19092799006)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eDNCVVJ4bHdJeWRjR0hpa3c5WU5xU0ZxMmZpOWFFWm1mQkswNTdUU3lUM0hq?=
+ =?utf-8?B?VitCZDlEMlYyazVJVzRWTEhjL08xeG10SlJ3aTlkMDhlVU52ckE3Z3grSkt0?=
+ =?utf-8?B?UjRSbHlVK0w1azJaRUY0R0Fyb0hESnVYSU94RXRuejVESi9xZ1puUUhVc2Vp?=
+ =?utf-8?B?REt2MW04Y0hSQ3BSZFdUSm1vYnZFTUgxQktqZUlvZ2hTS2cvcCtMTnVMd2ZN?=
+ =?utf-8?B?M2xhNG1IU2oxallRaDBPcU9OZHY4eGNTVFhYTjVyNFNUU25yZWNZMDdQUGM4?=
+ =?utf-8?B?UUdPTXZRSFJibG1pUVE1dVBwZ1JPZ09lM2hCblBCVXJQSGw2ODJKVU1NdTZz?=
+ =?utf-8?B?R0MrWjM0ZXVNclJpdlU5bjhjNjkzVGNNa3E0aWoyakJzbS9QdEZlR3AzdWRk?=
+ =?utf-8?B?MTdpL3U3M2s4bmN1Q2VvaVlCUDh5UHFQWDZqNDM5VVRJdHZMVVhrWjB2UGNm?=
+ =?utf-8?B?WnlkTkxWM3piMTUxemlpczhpL2ZCeEZSRTlFb1RtNU9jU2pTa0dSNnk2dXlU?=
+ =?utf-8?B?VkhkTXlSZ3BZS2Q1VldZM2wrb3BnUmpDd0syTjVycW54UDl4am5QSEdubWMz?=
+ =?utf-8?B?Q0pOU2VUQTV1UjJmcFZLRllDTlJTcTExRnUzSnJTYVpLM2ZnVVI4VUZxUnFy?=
+ =?utf-8?B?R3YyNVRWelNwSG9wU2lVbVdFQzNNTTVLMFBUMm5INDNxbFErT0lncWJvVW1U?=
+ =?utf-8?B?VkJMOWIybkxNaGFtUFZoZ3hMYTk5RFJ1azN5Znp2d2tDNWU3bFBZTjZoNDhV?=
+ =?utf-8?B?MWlDdnp0WUNocFdDckNiWTRLVFp3bWtwcXBreEI3VXZoTlFoekQ2aU5VQkJJ?=
+ =?utf-8?B?SThkby9FNnZ3KzQwRmpZZW1nY3R6TGpMK296WWtRWFNhNmdaVjQydG5BdUJl?=
+ =?utf-8?B?b0lVQ1hrc1hoTkNFZzYrMms5RjlrK3NzVktvd2ErYWZHU0FQUmFGczUwUHJn?=
+ =?utf-8?B?R0pnVG1kK2duZndnTEVhRlIwUGViSkFaclRUSlJqNWpjeUVOTGxKb0pvbEtL?=
+ =?utf-8?B?MjVuQ2pqT3NwR0xyTklGTy8vbnhyNVhJZmZnc2JNREhBaks4NFpVUmt3MlNN?=
+ =?utf-8?B?T3dFMmZRRE5HcWZXTmx1em1vV2ZsTzNMQnRrMnk3SC9XRWZRbSsyRTRIYTk5?=
+ =?utf-8?B?OVhTTTFsY0FEK0UzZm9TQnpTd09MdGoySEJaNzdFZFAySGVmazdYTFdhZUpk?=
+ =?utf-8?B?RnlUcWFjbktVSzg5L0VrQ091a2FwU1d4S3pwRC92VjNZM0dkenR6MzF1N25h?=
+ =?utf-8?B?bkE3bm9vcmZIMCt5ak5mUnNIR05pVXY4RlJDL3lZQWpNZTUreVpBYkFvSnFD?=
+ =?utf-8?B?eXFSa3RLcmNvelNsRzVLaERPaEQ5c0c5c2JLWkI0dG5oL0FEbFlsVEtFY2Qy?=
+ =?utf-8?B?cTFGb1B0Sjg0VG44cnNtcjU0V2xKUEVEbUtYOEpEcm40ZEc3KzArSlR6UExw?=
+ =?utf-8?B?TlRlS2FkZ3dpZTJ4OG00VjAyK1hFS3dFcFhvbFZQVTJ2dXNUWUgwUUxtMXhT?=
+ =?utf-8?B?MVlUS2xBRVhtamJoc2pPOGJSSHdDN040ZXpyNFdUOTU1L213ZmFpVmhUV1kw?=
+ =?utf-8?B?UUt1NHlvbXpDQ01EM21icysxRFcvaG1xZEdacVVsaEt5V2k0NVpoYkpYK24z?=
+ =?utf-8?B?Z1dxby9FbWNhMnVya0pUNlVadjZTbm9oRFA3Tlk2Yy9kbzFDYWxMY1FEZ3BI?=
+ =?utf-8?B?cmJaVlBBbEIxenZHZDluOWxNS1lQVkkrdVppMXRHTmFGRU9Ua1ltZGxNTHM2?=
+ =?utf-8?B?cDdTWld5NUM1OE9aR0xYU0pLUFlpQW94bjNSUS9TQXQzUG01b25Ma3NxcmJh?=
+ =?utf-8?B?VXdiZWh2VnNQM1JxV1dWMnZFTjVuSCtGT3hvZEt0WDV6L3pYZ0ZxUk1SOXh5?=
+ =?utf-8?B?OWREOFhEdjRVZTd1RVMwbUhKZEFlMU1MVjlNV2Z3azR6MzhJYmh2VkVwd1NO?=
+ =?utf-8?B?ZGRKcFdiZFFhdERpZDhaSkFqbTYwOUd4eFc1cUpRdUcrK2t2MzFyRjZOYnU2?=
+ =?utf-8?B?UlFDdjBldHlCQklOeGNra3FRQi9NTVJ2QmErenNFTW01dERkZzIvNmNnZ1FV?=
+ =?utf-8?B?MzRUU1VPV0dJVEVxOGJsS2o1TjhIeUg2U212OUZGZC9sdktiUG9jRXlWbk01?=
+ =?utf-8?B?SHRub3RNN0g1QVFHTjIzeW9UOE1OSEVjY2t4WmRScGlRU0p2aCtxbnZDNC92?=
+ =?utf-8?B?TXY1L2FUN3kzUmxRV01wUHlsVUthS090SHA2K1RDa1FSckFoTU82L2Vndy9I?=
+ =?utf-8?B?R2docFBrQ056ZThSWjl1dVJPN2xTVHlwcFdEODFyV29MZXJ1S3ArTTNNbk41?=
+ =?utf-8?B?VjdZOE51ZGNsb3JlaDVKdHMwUDZyek5YV2UvZHNNcHh4Y1NvRmd3YXNDc1Fq?=
+ =?utf-8?Q?vbS1ruZ+oVkRNBxyDydtWxDDelbsI6sN2iBS81ZOdRbgB?=
+X-MS-Exchange-AntiSpam-MessageData-1: aX3NTqYZlXUn3bTkuzVnmLUBxD0md3Dkmvs=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b571484-1da2-468e-505d-08de7ab8c2a8
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 13:11:49.3216
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HrDkPt3rE/6HF4ol/kT/cCP8SJf++cKC9ty6FSnzt32w8+isdUX6uZ8cGubVG6CLj25Tso/9WkTlBciN7mL9Gg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8079
+X-Rspamd-Queue-Id: F10F3212789
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264389-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264390-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,0.61.9.0:email]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-On Wed, 2026-03-04 at 19:06 +0000, Conor Dooley wrote:
-> On Wed, Mar 04, 2026 at 06:14:57PM +0200, Vladimir Oltean wrote:
-> > On Wed, Mar 04, 2026 at 05:10:11PM +0100, Jens Emil Schulz Ostergaard w=
-rote:
-> > > On Tue, 2026-03-03 at 18:56 +0000, Conor Dooley wrote:
-> > > > On Tue, Mar 03, 2026 at 01:22:28PM +0100, Jens Emil Schulz =C3=98st=
-ergaard wrote:
-> > > > > +examples:
-> > > > > +  - |
-> > > > > +    soc {
-> > > > > +        #address-cells =3D <1>;
-> > > > > +        #size-cells =3D <0>;
-> > > > > +
-> > > > > +      ethernet-switch@0 {
-> > > > > +        reg =3D <0>;
-> > > >=20
-> > > > Also, this is an odd example, why are you at address 0 on a "soc" b=
-us,
-> > > > which usually means that this device on an AXI/AHB bus, and 0 is ve=
-ry
-> > > > unusual for that. Obviously the example doesn't have to match the r=
-eal
-> > > > user, but this stands out.
-> > > > I may have some follow up questions I think depending on your answe=
-r.
-> > >=20
-> > > The intended way to bind this driver is via a parent MFD driver which=
- sets
-> > > up the SPI register protocol, initiates regmaps and distributes them =
-to child
-> > > devices (like this DSA driver).
-> > >=20
-> > > Similar to mscc,vsc7512 in drivers/mfd/ocelot-spi.c.
-> > >=20
-> > > This MFD would be the soc node. All child nodes perform register IO o=
-ver
-> > > spi, using the regmaps requested from this parent so I think the addr=
-esses
-> > > on the bus are purely ornamental. Should I write the smallest registe=
-r
-> > > address in all regions used by the DSA driver instead?
-> >=20
-> > They are not ornamental, they should be the same addresses you'd put if
-> > Linux had direct access to the SoC interconnect for MMIO, rather than t=
-o
-> > an SPI bridge to the SoC interconnect. Or at least I don't see why it
-> > wouldn't be that way.
->=20
-> I don't mind if they're made up addresses, but the example should be
-> realistic. 0 is likely not realistic, but if it was 0x4000_0000 when the
-> real thing is 0x8123_1234 then I don't really care. Since the parent is
-> not actually a soc bus, can't you just remove this fake parent entirely,
-> like the ocelot switch example does? Or insert something more genuine,
-> like:
-> spi {
->   #address-cells =3D <1>;
->   #size-cells =3D <0>;
->=20
->   soc@0 {
->     compatible =3D "microchip,lan96455s";
->     reg =3D <0>;
->     #address-cells =3D <1>;
->     #size-cells =3D <1>;
->=20
->     ethernet-switch@4000000 {
->       reg =3D <4000000 44>;
->=20
+On Thu, Mar 05, 2026 at 10:06:09PM +0900, Krzysztof Wilczyński wrote:
+> > > What about
+> > > 
+> > >   F:    drivers/*/*phy*
+> > > 
+> > > or something along these lines.
+> > > 
+> > >         Krzysztof
+> > 
+> > I don't understand your suggestion. Is it meant as a replacement for the
+> > keyword regexes? Your file pattern matches on:
+> 
+> I was thinking more along the lines of using wildcards, the F: was just an
+> example.
+> 
+> [...]
+> 
+> > There are a lot of false positives, and a lot of false negatives.
+> 
+> Yeah, the "catch-all", for lack of better word, will not work here.
 
+But assume it did, for a second. The intention of the patch, stated in
+the commit message, is to match on PHY consumers, to review their API
+use.
 
-I will go with the genuine example. I was not sure if it was appropriate=C2=
-=A0
-to mention the spi node from here. But this is what it would look like with
-the mfd driver. I will also fix the addresses.
+$ grep -l -r '\bphy_power_on\b' drivers/ | sort | uniq
+drivers/ata/ahci_ceva.c
+drivers/ata/ahci_imx.c
+drivers/ata/libahci_platform.c
+drivers/ata/sata_dwc_460ex.c
+drivers/ata/sata_mv.c
+drivers/gpu/drm/bridge/analogix/analogix_dp_core.c
+drivers/gpu/drm/bridge/cadence/cdns-dsi-core.c
+drivers/gpu/drm/bridge/imx/imx8qm-ldb.c
+drivers/gpu/drm/bridge/imx/imx8qxp-ldb.c
+drivers/gpu/drm/bridge/nwl-dsi.c
+drivers/gpu/drm/bridge/samsung-dsim.c
+drivers/gpu/drm/bridge/synopsys/dw-dp.c
+drivers/gpu/drm/bridge/synopsys/dw-mipi-dsi2.c
+drivers/gpu/drm/mediatek/mtk_dsi.c
+drivers/gpu/drm/mediatek/mtk_hdmi.c
+drivers/gpu/drm/mediatek/mtk_hdmi_v2.c
+drivers/gpu/drm/meson/meson_dw_mipi_dsi.c
+drivers/gpu/drm/msm/dp/dp_ctrl.c
+drivers/gpu/drm/rockchip/cdn-dp-core.c
+drivers/gpu/drm/rockchip/dw_hdmi_qp-rockchip.c
+drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
+drivers/gpu/drm/rockchip/dw-mipi-dsi2-rockchip.c
+drivers/gpu/drm/rockchip/dw-mipi-dsi-rockchip.c
+drivers/gpu/drm/rockchip/rockchip_lvds.c
+drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+drivers/gpu/drm/xlnx/zynqmp_dp.c
+drivers/media/platform/cadence/cdns-csi2rx.c
+drivers/media/platform/rockchip/rkisp1/rkisp1-csi.c
+drivers/media/platform/samsung/exynos4-is/mipi-csis.c
+drivers/media/platform/sunxi/sun6i-mipi-csi2/sun6i_mipi_csi2.c
+drivers/media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t_mipi_csi2.c
+drivers/media/platform/synopsys/dw-mipi-csi2rx.c
+drivers/mmc/host/sdhci-of-arasan.c
+drivers/net/can/at91_can.c
+drivers/net/can/flexcan/flexcan-core.c
+drivers/net/can/m_can/m_can.c
+drivers/net/can/rcar/rcar_canfd.c
+drivers/net/can/xilinx_can.c
+drivers/net/ethernet/cadence/macb_main.c
+drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
+...
 
-Thanks,
-Emil
+How can it find the above? I think you've severely oversimplified what I
+am trying to do.
 
