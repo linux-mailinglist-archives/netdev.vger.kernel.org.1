@@ -1,169 +1,202 @@
-Return-Path: <netdev+bounces-264388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI4TIs1/qWlB9QAAu9opvQ
-	(envelope-from <netdev+bounces-264388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:06:21 +0100
+	id aFq5H3CBqWkd9gAAu9opvQ
+	(envelope-from <netdev+bounces-264389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:13:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F27802125E4
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:06:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FA42127C4
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:13:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E26F7300D9D5
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:06:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D562C302D5D0
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782E53A1CE5;
-	Thu,  5 Mar 2026 13:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E8339EF18;
+	Thu,  5 Mar 2026 13:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fVvxrm1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0193A0EB6
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 13:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D95248F66;
+	Thu,  5 Mar 2026 13:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772715976; cv=none; b=KLMz0SKil05dDEyRTxoT4Ep9PFvEbBlUevrzFw4AbDBdX/kkB20vtHzxkJyBhE2glkzzRyU54rtUjJKzFYm9nXfE0wxHBo3lLbR3yT+sG7oleb7bKaBlxsB2WDvbcVdjBLDnH/KKjc9cEF9R2Py2NX9ifIEswTVRKnLxdgTGLWU=
+	t=1772716142; cv=none; b=IRbyh2nvffkXCyB6lCmbnRkVelbqDrRQcuzwGDq2GhHLqINb6UbkfLyrk+GVN1lO+zAXWZ9xcDCkd7mpkJclq+5ofW/q9zQJG27l0PKWspFhdjhvUj8vP9Vtvm3sJQBRpdP2PPTt0KedLnrT7YY7ATKPU0qwXW7viFvSj0knwRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772715976; c=relaxed/simple;
-	bh=An6z6pGF00+43VUaOecTwb49LKqdBH2wGqINr17mp5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyvwrTHj2NyMnhu4zelE5Rw3QrdKSo3D0KxHnbmwyyupEXRx9oagO2m4graLX1qV5jKRM1QnxMnOLnWCtrdKd4N5k3ZQP/eTZOtG4/O72UjR9K9urlgfHtnlNvEzw1Mv9i4S6o/5ldu/dfIKQWB+AGCY66VGlXBLUxtd3sCu4oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-bde0f62464cso2849855a12.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 05:06:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772715972; x=1773320772;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z/3ao61LTSp6jCCF+e+2SF+gp23jwVu9a+x2K0Dcxpg=;
-        b=n9bM3VFaOInctOHaSegiQKsaaZkxXP0ssRPHmuFsjiX0esap7F3iHMXayKYqDffoDI
-         Ab5DGkhOcxtRBV/Wou+kCD4SkjoG/Cs2uxtj6WChJmI6xHAqHwqIVE2M6v5nOUMx61r7
-         BzlqAcOErd3vJkeQPiN/pTpmCCyOQ2C9ZXTx1zAKdnqb9DxoDQJsk+pFu7n34x6CPY3p
-         +fTwIJiH5yRcLY+F4qoQzW1w4kXOw7X7U9biG6t01e5wSyQv6iSQyMGX2tlKLQvVjucV
-         VxavE33ZkYPt0B06iKTuJsjHWu10xqg2xmxrqrJg1bEEgjQ9t44OcMA92xqHSHhOh4xw
-         JijA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAviZwlQ4He66c31278LHos3rkF30cDgQRuCbXly8zu0W5zmkXGn9TE2vPWhZTM8uUAYYjf28=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg0dY3J68vkaRW9WzPqy4vvTIp1RZAfimv9HHX51Je1iusV6j0
-	y4qo8gKzgXcdUL29rIoTy1NhL5SezXEDKc9Wa9TewkeUW+QaYIKF02Lv
-X-Gm-Gg: ATEYQzzEdkRHVmmYlAIhuJfagrb0TG+VCtthl49VyBGuzM3UaHQLkMkHraEvREyQU+A
-	T2WpgtzZMz0TH+iYNZz/xKY0kwJ3dyE4JcTgayNucFRKJR64wm+4vWnQ+7hF8iLOdtbGSpdD/dU
-	anm6SXY9l76moSjcNWFZ7SImiod6QQBB0e1XvQQJHDBTpM+KtAOiTV/IpEsZG1nmBdMmYdHwY+k
-	6nBvklEJteO6AB8qpQN3+5hgnV72AyKRzR+kZcM6zA3q1qEJV/ynE/IGk1FzC1PsBJX+phplm0s
-	E88wZ1bZVexwCSkz+/ASXzuzHSi7SVkRuUs2QH2YocAtz/DqwICL/FA7JgJRXJgCaBbkBOGLK4e
-	cx1fOVs+l7Jh8vqwIjh2lNgLIpTmy+xpz1xxwFr2GR0Sn7DRxVuFRynh/nC0jpX+fgZcf3XkkEs
-	c9r6FaeKpzxEHbLJ3Dbngmo4z4CVzkKgK1SAPl/UGGT2l4qONiuAeZEtxJdB+ox8dX73wa++HDx
-	yRcNjjn/0Jaw5wxNSBxM0NBALtq4oPSECvW1JoQa+IB912XX3U=
-X-Received: by 2002:a17:902:f68a:b0:295:560a:e499 with SMTP id d9443c01a7336-2ae6a9cd41cmr53596975ad.5.1772715971749;
-        Thu, 05 Mar 2026 05:06:11 -0800 (PST)
-Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae3d19559csm154128355ad.5.2026.03.05.05.06.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 05:06:10 -0800 (PST)
-Date: Thu, 5 Mar 2026 22:06:09 +0900
-From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Joe Perches <joe@perches.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, spacemit@lists.linux.dev,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
-Message-ID: <20260305130609.GB1659133@rocinante>
-References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
- <20260304175735.2660419-23-vladimir.oltean@nxp.com>
- <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
- <20260305085148.7cwo3yflp7vcfldf@skbuf>
- <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
- <20260305114352.2f7btqixg4tu5bzl@skbuf>
- <20260305121532.GA1649635@rocinante>
- <20260305123843.i47asdrjychwlgdt@skbuf>
+	s=arc-20240116; t=1772716142; c=relaxed/simple;
+	bh=LhhZwf9t0k8G63cUsWJ0P1P7EJ98uOM6BnXeuDdOXNc=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=u/HHhvn1RjYuXQudfIoNsHdTAsoOCm3bu1dOC37TDxSfs4xJ4Gw6K2pLdK/KqJqoTfFRPzqOrYil8S2LbdSgbDsLeARX1XMIaHIKBphTaTaMCNQ6Ldhj5061PDjKrcomGB1aFIMlKCR0EvBfVhbLDY6Rl2wt6U/Ew8A5yYOPGww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fVvxrm1M; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1772716141; x=1804252141;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=LhhZwf9t0k8G63cUsWJ0P1P7EJ98uOM6BnXeuDdOXNc=;
+  b=fVvxrm1MiP/kqQRzFTJGqt7G3YAKSa76jCmUvDe0vt4JFPSqcQAMXg2t
+   5EcMfDRXDk/lsN28TjuXrLl2IFLPKEtZlohT3Rqv0brum4pxQRGMAqNuY
+   zwH5h/w5IufoUZA1HWNHOZRB5ND2/nXAJrAxxpMqfjEcwONkJ5VvEzhcU
+   yzHqKicsSPm76EzoDrcoCq4oasENCqoZdS0KjNbOuNfaaiOJUOsZrYDt2
+   XiEg2YK9gkePVGYz5ys4xnHTRETygxcxLkeDSmqoogTwG7gdRWscbE0ns
+   oRkUdA4AaMLpgTUgRhgsjc738LlH0RRlCWa1hmnZnHELz0eAQcfwjF45k
+   A==;
+X-CSE-ConnectionGUID: gXs77xUDTlKJZhU07oQylw==
+X-CSE-MsgGUID: u9erEe3fRBmR6w68ScAt2g==
+X-IronPort-AV: E=Sophos;i="6.23,103,1770620400"; 
+   d="scan'208";a="54262739"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 06:09:00 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Thu, 5 Mar 2026 06:08:19 -0700
+Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 06:08:16 -0700
+Message-ID: <f34815255c6d94194e3c0f01990a1fa650d623c2.camel@microchip.com>
+Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
+ switch bindings
+From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+To: Conor Dooley <conor@kernel.org>, Vladimir Oltean <olteanv@gmail.com>
+CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung Huh
+	<woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
+	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
+Date: Thu, 5 Mar 2026 14:08:15 +0100
+In-Reply-To: <20260304-capture-kissable-3bdfe389864b@spud>
+References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+	 <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
+	 <20260303-disperser-clone-512efa99f26c@spud>
+	 <65fd5f46f1f996dd5f4df2de2efb52c8fa3575b3.camel@microchip.com>
+	 <20260304161457.l6tkxix6sgube3qc@skbuf>
+	 <20260304-capture-kissable-3bdfe389864b@spud>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260305123843.i47asdrjychwlgdt@skbuf>
-X-Rspamd-Queue-Id: F27802125E4
+X-Rspamd-Queue-Id: D0FA42127C4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.86 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-264389-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264388-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kw@linux.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,0.61.9.0:email]
 X-Rspamd-Action: no action
 
-Hello,
+On Wed, 2026-03-04 at 19:06 +0000, Conor Dooley wrote:
+> On Wed, Mar 04, 2026 at 06:14:57PM +0200, Vladimir Oltean wrote:
+> > On Wed, Mar 04, 2026 at 05:10:11PM +0100, Jens Emil Schulz Ostergaard w=
+rote:
+> > > On Tue, 2026-03-03 at 18:56 +0000, Conor Dooley wrote:
+> > > > On Tue, Mar 03, 2026 at 01:22:28PM +0100, Jens Emil Schulz =C3=98st=
+ergaard wrote:
+> > > > > +examples:
+> > > > > +  - |
+> > > > > +    soc {
+> > > > > +        #address-cells =3D <1>;
+> > > > > +        #size-cells =3D <0>;
+> > > > > +
+> > > > > +      ethernet-switch@0 {
+> > > > > +        reg =3D <0>;
+> > > >=20
+> > > > Also, this is an odd example, why are you at address 0 on a "soc" b=
+us,
+> > > > which usually means that this device on an AXI/AHB bus, and 0 is ve=
+ry
+> > > > unusual for that. Obviously the example doesn't have to match the r=
+eal
+> > > > user, but this stands out.
+> > > > I may have some follow up questions I think depending on your answe=
+r.
+> > >=20
+> > > The intended way to bind this driver is via a parent MFD driver which=
+ sets
+> > > up the SPI register protocol, initiates regmaps and distributes them =
+to child
+> > > devices (like this DSA driver).
+> > >=20
+> > > Similar to mscc,vsc7512 in drivers/mfd/ocelot-spi.c.
+> > >=20
+> > > This MFD would be the soc node. All child nodes perform register IO o=
+ver
+> > > spi, using the regmaps requested from this parent so I think the addr=
+esses
+> > > on the bus are purely ornamental. Should I write the smallest registe=
+r
+> > > address in all regions used by the DSA driver instead?
+> >=20
+> > They are not ornamental, they should be the same addresses you'd put if
+> > Linux had direct access to the SoC interconnect for MMIO, rather than t=
+o
+> > an SPI bridge to the SoC interconnect. Or at least I don't see why it
+> > wouldn't be that way.
+>=20
+> I don't mind if they're made up addresses, but the example should be
+> realistic. 0 is likely not realistic, but if it was 0x4000_0000 when the
+> real thing is 0x8123_1234 then I don't really care. Since the parent is
+> not actually a soc bus, can't you just remove this fake parent entirely,
+> like the ocelot switch example does? Or insert something more genuine,
+> like:
+> spi {
+>   #address-cells =3D <1>;
+>   #size-cells =3D <0>;
+>=20
+>   soc@0 {
+>     compatible =3D "microchip,lan96455s";
+>     reg =3D <0>;
+>     #address-cells =3D <1>;
+>     #size-cells =3D <1>;
+>=20
+>     ethernet-switch@4000000 {
+>       reg =3D <4000000 44>;
+>=20
 
-> > > K:    \b(?:__)?(?:devm_)?(?:of_)?phy_(?:create|destroy|provider_(?:un)?register)\b
-> > > K:    \bphy_(?:create|remove)_lookup\b
-> > > K:    \bphy_(?:get|set)?_drvdata\b
-> > > K:    \b(?:devm_)?(?:of_)?phy_(?:optional_)?(?:get|put)(?:_by_index)?\b
-> > > K:    \bphy_pm_runtime_(?:get|put)(?:_sync)?\b
-> > > K:    \bphy_(?:init|exit|power_(?:on|off))\b
-> > > K:    \bphy_|(?:get|set)_(?:mode(?:_ext)?|media|speed|bus_width|max_link_rate)\b
-> > > K:    \bphy_(?:reset|configure|validate|calibrate)\b
-> > > K:    \bphy_notify_(?:connect|disconnect|state)\b
-> > > K:    (?:struct\s+)?phy(?:_ops|_attrs|_lookup|_provider)?\b
-> > > K:    (?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)
-> > 
-> > What about
-> > 
-> >   F:    drivers/*/*phy*
-> > 
-> > or something along these lines.
-> > 
-> >         Krzysztof
-> 
-> I don't understand your suggestion. Is it meant as a replacement for the
-> keyword regexes? Your file pattern matches on:
 
-I was thinking more along the lines of using wildcards, the F: was just an
-example.
+I will go with the genuine example. I was not sure if it was appropriate=C2=
+=A0
+to mention the spi node from here. But this is what it would look like with
+the mfd driver. I will also fix the addresses.
 
-[...]
-
-> There are a lot of false positives, and a lot of false negatives.
-
-Yeah, the "catch-all", for lack of better word, will not work here.
-
-	Krzysztof
+Thanks,
+Emil
 
