@@ -1,176 +1,147 @@
-Return-Path: <netdev+bounces-264318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMPZAyZpqWlN6wAAu9opvQ
-	(envelope-from <netdev+bounces-264318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:29:42 +0100
+	id yFuyOHFpqWlN6wAAu9opvQ
+	(envelope-from <netdev+bounces-264319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:30:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F73210956
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:29:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48B89210984
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DD123013D72
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:29:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D499309801E
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FBE37B014;
-	Thu,  5 Mar 2026 11:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FAB386C01;
+	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="iaQYZEYI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6AoRiQX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29607317141
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 11:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772710158; cv=pass; b=nIbtSaak3qa6JhVLXDVE+/EhPyiTCnYuQNmzSWRoV1FcNuxOFXNWrbdHDE/OWGnHhVNpVhunSh/Z2lgS6XnjZcjG8CzCa2BqsW7sk3+8pG3g3Dvrdq/jFLtTQlhjTmO2wOCvLCPM6BMiP3lAmb5UIAQxwFMYSSjgehim78ZqLQQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772710158; c=relaxed/simple;
-	bh=Nys8raayuVlcxVzOcXi84kM39y7/W/YKbDErQB+LHiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d1Uutu+ukis1B2KXaaezSrYEb93uqJUD+97tvOqM8t7lRPNPYh0CATxNRf59DDPEg/q7e0d8lGQEtnNx7QOYnxrSuWhpAlox4XOja1doxSBDBrkaDEMl2vsclE8MNOiP054WBPpivVYNWb8nKLHYFWAAmzyccHgX0rWIB9A48RU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=iaQYZEYI; arc=pass smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4834826e5a0so90145395e9.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 03:29:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772710155; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FHyHuJZw5SKL26xe572i4HCoyGWWZItsasVDLk+MqHXenSOvK1cXLPkJYvHw/bGYXT
-         rV3sZrdhOu2YTN7dv/PY2kWu+DwwmG30RYy3iRHFEu2teT283DE/vTdNH6nh/P/01ec/
-         AjhykM8u+u2lE8aYk3batkFS9WkBqSSmxmLO3dUUqmsqMQ5TjhB8hMzV7Nt7hCw0SET0
-         C/XtwmGyT7w+qEStEE7iAtoyx/ncEx6Lilg9xd0PHs07g57egxLfgfkc9r/wdW9ubo2L
-         FjPNP/eYMRtPs47Xp1jrxyjxMI159Gq74kmQgi6qWhSxzM8cPvOEhXiZpbYQ9MULFquo
-         /lbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Nys8raayuVlcxVzOcXi84kM39y7/W/YKbDErQB+LHiQ=;
-        fh=kro+c5z375bDk4XWbyWVf+sf16huHOXPkLW+L3efB5g=;
-        b=VB5ECWIP9M2c1OdXWfHwOSbNkkWVRFn8VGeS583XUSFO0pA3EBd+jJ57PyEPqFLW3a
-         W1TjrEJ7kTRZNdiUjiBN+reMrAeUx5L/Dbs0RjbmMtSj+PU8x6Yorn+xSGg4grgjhZe8
-         vpRL7BGHPa23fNcVkEixANCgai4BSnGqOmTi1C0OTwVE3P6lTL4hyBnAZvyPZSvfpsCi
-         jDB2o1x3qEA7Rm68yTfVnzyRmOJorGVd9H0WjBL/5laD8a8ePfGUQGLg8clPohYXpPnY
-         L5djLDHDd4p+JbyQBNGrPtBs/YA3P3NzDNUpsZhN0GCAOr6ECbVx8SwK8tKQdHwaWZKg
-         Jf8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmo-cybersecurity.com; s=google; t=1772710155; x=1773314955; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nys8raayuVlcxVzOcXi84kM39y7/W/YKbDErQB+LHiQ=;
-        b=iaQYZEYIAutXzqwpfNDuyTxY4Lok985hU2ea5hYXt//QRV1EI844EeJX6j46E1Os8B
-         1QU8v4N0kAXyMQZfwLRtM2jx/o5G0Dl+8N1fW0CSPkMAAgoR7n/OvYk7OX2V7Nggtydn
-         3St0uBXNRAMaEa4PvM+k2LeJmStQZeNvwecjVK8BBf3aOZSj/aHR9mS2sEGUhnZOJ3Dl
-         03sHSfp2YNiKM/QLtRAz+/okOp8OOEnA3KywmTtzwkNdGhji1yer3RsC9B65moINH6JC
-         1XxRMTlfl+Q3oh8Ysx86B5nfh/aIA9bqgCVrkz34MOV614UpFnvq2D1O5PPJV2gzVLGi
-         VNlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772710155; x=1773314955;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Nys8raayuVlcxVzOcXi84kM39y7/W/YKbDErQB+LHiQ=;
-        b=t2drYs2c3iUxz0VYqr87B9ZU1KAxgLj+8Wfu7r2t+i1T+CiQV9MzkV+2KZUyI5AUQ3
-         XoIkxw1PU+G6s0SnLihTP3yl6aaa4qSuBcUW14b0pkfvpAFIb2ojIgHf3/vSEgT8bXXa
-         V4R9/h9042yNlbwTxT3Ieht7wXR+QKK1zbbYb3GwwHkDoAQFthSlOBYD5Sa3YMUzLMsc
-         XOXM9Y8kBw+/i1uemBixXHvDL/Guz9fk7oESUfWSnbMH8a0I5j1q3XLs6XhK0ETYA/dm
-         SJZ8xC1AM6sg+kAOdnTqLRZfNpAPR5p0QUCzK/sOFErJNWmc1SzC2do41dZOHllzzMjt
-         JeTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsqTw/Y1dwGFZHVVeYKqezQC4I/LP8iKebbIUKXovwSahIktYO9eD7EArWe37nAXjkuNkoN2s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5TTqoHxXO2S9ywvB06auqT2s6YGCkylQsjl4ZOuxu6eY43TUP
-	u7q2MR5HNbFlCaOPUscyNc6ze3fGItsgZJ+g3e8Xa5CqBRnGFeqvD3oBlP0xWgzTckLwmSfnwFr
-	EPTROgnm9d/FwuI9JN8Bh164jfS00kTjoUpAwrKPjxw==
-X-Gm-Gg: ATEYQzxSWrcGTJigu3vGsry+7JH1fbFUi4jvQtatO2xhAO3xS/csS/XlZwIBR8z9/4w
-	wPabLBLWRMa7PNQ0tHkQhJzHxciNe7uCQn9W4lbxeVivYFg+6XEXKJPBCeMQpBtKlwSVZdgdkQZ
-	BB/8YvajH6IGlNFcMc0xMIHzB7j6Jyg2H54t1ZDeglg6pCKOrKomvVK8AVG6nEWKoDhlwwrAUK4
-	SbQsIah7DUC35lT7yuslBkh56zJdnNZHH9vt+fWOH+Uug/sjd+v0BPX1k73QDH9d3FKqH7VIpaC
-	dGY3/FhhVA==
-X-Received: by 2002:a05:600c:4ed0:b0:483:6bb1:117 with SMTP id
- 5b1f17b1804b1-485198a5a49mr72430015e9.32.1772710154892; Thu, 05 Mar 2026
- 03:29:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCD438656B;
+	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772710205; cv=none; b=k9khZ5ROpcDjX0ZFODbmOp6ygGYbMw0UBhvLhtwdDXh2imox6n+/8zzctO85tDhd+/z1zT05QbpUJrA5ksu10f5PsOvNRVdPvbxsljRtYg2zfdNcb4wHzhD4zm8TpQ/jJBHf6bhf8nY5xYmsQDaQwJRkSMO5lSk1knTehe+TabU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772710205; c=relaxed/simple;
+	bh=VDZd9/nOYubZ5tkV6Llnck70B4t8D+CSC4x2/AAjA3g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=os7zYOXpGVcHV6k3w9MaE9R4QvMonQ46UzVX1ucNrSugiA+uTNYQtnhmWoUHJ6LAKImr7QeS4UVfyz7gil64uI/1WFPWSj2tmcnanMhtzsLAs9wY1B3GJo0dJeAmSbYM3OS3HZNL2Wm34VQT32ZrEayBIPpxEXvaq8K+RwVbfH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6AoRiQX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C9AC116C6;
+	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772710205;
+	bh=VDZd9/nOYubZ5tkV6Llnck70B4t8D+CSC4x2/AAjA3g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=D6AoRiQXaudzEpnAD4YUw9nAIRfyUySdNHcRDCwQw/yHOiVRvSxPQ7UZOnLL0fC7K
+	 2qBGiYmhDzzK18IJnBnXHkdoPgrRsP4iZprkt2DEaghHvTR4DjJIpxLGRu5PrCGrBr
+	 g3tAtyO0oXT19FNBekwyoOjJsCMBGyBi7k7IIVSHfcBAMilr7TofWrK/54KvmlGL59
+	 955maexvh7xXEqbWX4rO9q3tJSACCpJ9VUQSSD/+3eM90GkQFe77nvycpi44wkUZhs
+	 vSdV/BiLI1H9/0lyaGYmng4EFTUJicii162XRV/icHXjWEouh3sGcuYlMhRgwjwa4D
+	 sIvatxKGvgwSg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF013808200;
+	Thu,  5 Mar 2026 11:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260305092706.145085-1-kota.toda@gmo-cybersecurity.com>
- <20260305092706.145085-2-kota.toda@gmo-cybersecurity.com> <CANn89iJ_NGSQkSZHNh_vuk9ftex4YCXJ0TMEooHMk4c7ejsjtg@mail.gmail.com>
-In-Reply-To: <CANn89iJ_NGSQkSZHNh_vuk9ftex4YCXJ0TMEooHMk4c7ejsjtg@mail.gmail.com>
-From: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
-Date: Thu, 5 Mar 2026 20:29:04 +0900
-X-Gm-Features: AaiRm51aHTV5Md68Iqa1exMpOoPPRKpn9cxzRkAqu0c0U--SDGHWDyLfioMBDUw
-Message-ID: <CAA3_Gnp9y5eHP1MPk=jR3V8Fs_vhsQUb_T-BjLFTH8HOHjBQvA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net: bonding: fix type-confusion in bonding header_ops
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 65F73210956
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5] net: mana: Add MAC address to vPort logs and
+ clarify error messages
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177271020530.2660688.10448426333343148786.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Mar 2026 11:30:05 +0000
+References: <20260302174204.234837-1-ernis@linux.microsoft.com>
+In-Reply-To: <20260302174204.234837-1-ernis@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com, kees@kernel.org,
+ shradhagupta@linux.microsoft.com, gargaditya@linux.microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: 48B89210984
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmo-cybersecurity.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmo-cybersecurity.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264318-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-264319-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmo-cybersecurity.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kota.toda@gmo-cybersecurity.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gmo-cybersecurity.com:dkim,gmo-cybersecurity.com:email,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Thank you for the suggestion and for taking the time to review this.
+Hello:
 
-I have sent the patch series as [PATCH v4 2/2] net: bonding: fix
-type-confusion in bonding header_ops, and I expanded the changelog in
-patch 1/2 as well (not only in the cover letter).
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-I would appreciate it if you could take a look.
+On Mon,  2 Mar 2026 09:41:52 -0800 you wrote:
+> Add MAC address to vPort configuration success message and update error
+> message to be more specific about HWC message errors in
+> mana_send_request.
+> 
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> ---
+> Changes in v5:
+> * Remove __func__ and __LINE__ from error logs in hw_channel.c
+> Changes in v4:
+> * Remove logs that do not add value in hw_channel.c.
+> Changes in v3:
+> * Remove the changes from v2 and Update commit message.
+> * Use "Enabled vPort ..." instead of "Configured vPort" in
+>   mana_cfg_vport.
+> * Update error logs in mana_hwc_send_request.
+> Changes in v2:
+> * Update commit message.
+> * Use "Enabled vPort ..." instead of "Configured vPort" in
+>   mana_cfg_vport.
+> * Add info log in mana_uncfg_vport, mana_gd_verify_vf_version,
+>   mana_gd_query_max_resources, mana_query_device_cfg and
+>   mana_query_vport_cfg.
+> 
+> [...]
 
-2026=E5=B9=B43=E6=9C=885=E6=97=A5(=E6=9C=A8) 18:32 Eric Dumazet <edumazet@g=
-oogle.com>:
+Here is the summary with links:
+  - [net-next,v5] net: mana: Add MAC address to vPort logs and clarify error messages
+    https://git.kernel.org/netdev/net-next/c/0172f8d80220
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->
-> On Thu, Mar 5, 2026 at 10:27=E2=80=AFAM Kota Toda
-> <kota.toda@gmo-cybersecurity.com> wrote:
-> >
-> > Add two members to struct bonding, bond_header_ops and
-> > header_slave_dev, to avoid type-confusion while keeping track of the
-> > slave's header_ops.
->
-> I suggest you write a detailed changelog.
-> Perhaps get help from various LLM.
-> Do not assume we have the context now.
-> We receive hundreds of patches per week, do not assume we have
-> infinite time for each of them.
-> Help us.
-> Please ?
-> Thank you.
 
