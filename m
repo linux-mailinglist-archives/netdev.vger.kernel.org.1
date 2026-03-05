@@ -1,137 +1,162 @@
-Return-Path: <netdev+bounces-264248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WB1FLFdNqWk14AAAu9opvQ
-	(envelope-from <netdev+bounces-264248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:31:03 +0100
+	id wHYgNS9OqWlp4QAAu9opvQ
+	(envelope-from <netdev+bounces-264250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:34:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE7C20E6CE
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:31:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C71120E846
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A240300BE06
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:30:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 94FC630351E5
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449AD346AFB;
-	Thu,  5 Mar 2026 09:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F29377EAF;
+	Thu,  5 Mar 2026 09:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqvccO2V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PIbbReyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2266A18A92F
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772703056; cv=none; b=MMUUzWvb3fg5Ww5keqGidteI6+zJJunK7CynLF0Bv0jVt0MGqooFp3MjZKlymrRYL6PkDRalY5RTL6bmfjSkblxIe5bygERKPxVG2aOTNa6sMLfUWfPfVZ7kISeryNkbB+P/CA2L/FdM33BkHfqzYuzI6df3cLxd7eYWMWGIRzc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772703056; c=relaxed/simple;
-	bh=2b1eWPC49WnzEkK2zp9nESZ7FeyXoj/88zwhNB7MJhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GF3TLl87z1UHWrH0+Xeg3+wttTFRV73PbahPUrNyWedYf9+EfWtf4KzzAvA+7T9HbVDRLh03BroEnjkvhvaVr3gliPlzZerKcNgKSVr/qAp4jffnCfxldZQYPos210FsxOrab41wwOkOVA+a4VcpAAm/BuqkoDz8f2eByTQ84N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cqvccO2V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E3F0C116C6;
-	Thu,  5 Mar 2026 09:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772703055;
-	bh=2b1eWPC49WnzEkK2zp9nESZ7FeyXoj/88zwhNB7MJhs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cqvccO2V4yW8Qla55RUDyFGDyZ4LlRg1amcoSpYDapttyd8FJxEJRoe9pyT/IXm2C
-	 bEGzA/cfV9lI3JdP9jIn8H1RihSY9YtyWCZUdxINykMUk7peDOxtuvDo8IRHJtZMVL
-	 bwwbgKLw10BL9JsqKjxeC400LG4ZScDj2zz0fm0xWNwDFk2VUK7HQsHWjFdLSBokNx
-	 BzB/3oJ96sNFv4jpI/3DjJHnfi6ETBPfPzWxZ3u7kG8gYcwU966sVL+1WjojKAQyVY
-	 TgFTXaRq4/1+rqpdqOo4IRZfdvT81XYItsU2nCJIEHuyUT4VNbW7O/1zOHWYxjFKR7
-	 dfS9Ras3aHQYQ==
-Date: Thu, 5 Mar 2026 09:30:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Joshua Hay <joshua.a.hay@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: clear stale cdev_info ptr
-Message-ID: <20260305093051.GB90938@kernel.org>
-References: <20260303012831.662492-1-joshua.a.hay@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27E378D9B
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772703138; cv=pass; b=XN5ltThF1NwjrthyRWCDjENHAlLOsP1fyzq5+P2lLIcSPue8lxkOt5XxfkQ1NaVchCkexl+8b2Hg+vAy0qZSTlGZDFb/Zga2NeQ0UHN7vW4IfenoqS4n/1Ehl6dy0VlWf/GtZMe98+5ScZOF9YQmmRWol0m2R51lYPtJhggTR6A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772703138; c=relaxed/simple;
+	bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ttNURfCnk2Q2giGpPtGcqAFxUyjto1QmetaVuLYFdKz4j7yPtfNf9MLWqX/54nFdYcHYeeMv/bAU26dUDAv2HXdWJ7adI+NDMi1Re2TduN/5HVh0+yVbgbAiNWUA3QuP32xhpDLwecC1azU9axsnVGd8b3EISPX4gG2JQN4JzzE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PIbbReyH; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506cb1b63d0so92672711cf.2
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:32:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772703136; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AO/5ZfwdvWo6922nlH0IOedt8zac4i77heB9c/ftAD5FtzXYgEqrmGkKjxfTT4tMx4
+         VAqgfGyobOtyhM26W7yXHs9nzXnaquJRprdG+K3RxK0sUBW6VxH0/R19Rhw0E2Iiv/th
+         0RwwXtmg7u5nuxnbwnWyM1m9u1xOw6c0vSiFc5Ii2t+J4kcC97O17px6583ogkCuziky
+         +WlupzO+HNsoByE9v9lNmpqSw56seKP0cSErsXFdC3IX2jL1L6ysBrH2cOGybUUqnrpg
+         nrgf6gAw5XOemDnpHv7BgoE7av9ylKcduvTZT4tIn/0EERPHByzSd07k6uutlh+8AoZ0
+         xz1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
+        fh=wqrg6giIczbfaT9oNaFkQWVPzER64Mky8ZpVAYZi7oA=;
+        b=YFNzq326QJkp7/ZYfs1Zhj+kZyy802W4yJOSkHVXH9YJB90yBXjaZLYCbX2MAhg9NZ
+         nzV8iAcVqim6YkMnQ82XIX8iKggXN7LIcZXTA2zFA+0RYkegNECd0dAM564z8wct5t9D
+         VZheHFsXei8m6cymVD4/qzuuvHKtWIJzHDhtx9GQNqLRlVOq0Imz+Z91c4MzWjEJDs3J
+         T8PUHmh39iyAkZKwjUeVg9aRNf+ew1X8DPfTk7lAtibWGZl366ceVTf+C97kTaiuT2BI
+         maKuVRdoObobtL4+252M3QSTY2ph3l+oDZ7efjlkeDO8em2Xtfek1yBnPcQQpximgM7h
+         xwdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772703136; x=1773307936; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
+        b=PIbbReyHnFs5LQyjsWBImSzyB5LyKdYwPuTNghDzKpHTHI6afhGldzSoTOJz9bvXUC
+         +AnS0ConZ3NAhiVc5DSmzEz+olRBgMwY4Bra8mO1mS8RyZFwigY9yWIDcyZPTxoN5+yl
+         vN5h00AS+3dErYSFydodZxx7hX5KNIhfqzQS0OoTaH/nLLidmdkOe8tBcFTWFDbG8rsj
+         enHknUt73zMGmoa1r/jF3UViBXtZah/S60pxxqy8hZd1cIw/MDm91NQTeQSt0WqXRghO
+         ePrmZ5fmI7qly5XLmLcswl4Q6SpCQmPfpuCHa/YNn1xPt00dA0x5lvuO8jsd9+2yK/0L
+         Ghnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772703136; x=1773307936;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
+        b=hS6cvS99YwpBjbpLDOQrBTpOym7sPz9zY1e4QgcFxQhujexamd1N0HMxDbPUZIx0DO
+         MzSRBZra1PCAf6gZxqnFXipNeWRbyR3z0429n3zKzKs0GafaA9zvmekjmbEnH/CIL+Uw
+         /4va0/isfuNSGgHfeVKCz0mrNikftekULLEumJs1Yflurf7UBBhJSRFqQoBanqelmQJs
+         jZ4UGpyfEOEM+ECzvFbgn8HktITZ0EM7cSJwogfWVjklyOKFak4bDyySmABrqtQn38rP
+         pywURiPsoLzfYuvLWo5iMh6TkWqGPZxY4cEmvUeciLVAadsi7vvs75UUEe/SNopOe4aQ
+         lSWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXlOo2TXUwvkjFaxSd4IQMeXLHLHwj1AS+Ip0RYb7FcJ0OGuyTpIOjB42ua8+LpfG/lChqYhbU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU3FDbO4/7tRXdrvIBkc+HyhxkneTaITmjV88qT7PP0GbE7Ufy
+	yiGLOoYBjx6go7jOyofRTHMGfGQU7Ug/5+R9IuY7BlevaXsyWo2j1gPEHyvUahPjJZj1i85Ff6U
+	p1GvVXYkU1HJCIFhRrzpRT1N2TF2VoaMoLYPvgSeE
+X-Gm-Gg: ATEYQzxBVgPSvaPBi93yC7BylWtBugwyay5kONqVW/rSaTgQMQByhHk0ZAJ1F82XPyW
+	CM2jm+u4/cYtWpMacHpTW/pu3SBKYQsvM7o4ns6yIHWUA3luP6RUsRgn4IeUMsIVPJu1AbJziaC
+	1wNTHFkja1CZfJ/Ekg6c3WxkvOJiQTefr8pb7ZhVQI5sJTe6HjaIwYGHIlJmovjLN99LPfBIoXX
+	PnviYM24NzQLXcjiDda46a4s3barLB65/29hqUb82y5VExdyh4n8Hi31zPC9Hz0sETtI/1D5wvl
+	tXpTW8Y=
+X-Received: by 2002:ac8:5d8a:0:b0:502:9b1f:ca3f with SMTP id
+ d75a77b69052e-508db391c51mr64064341cf.56.1772703135817; Thu, 05 Mar 2026
+ 01:32:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303012831.662492-1-joshua.a.hay@intel.com>
-X-Rspamd-Queue-Id: 6CE7C20E6CE
+References: <20260305092706.145085-1-kota.toda@gmo-cybersecurity.com> <20260305092706.145085-2-kota.toda@gmo-cybersecurity.com>
+In-Reply-To: <20260305092706.145085-2-kota.toda@gmo-cybersecurity.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 5 Mar 2026 10:32:04 +0100
+X-Gm-Features: AaiRm51hMAh932PzghSpv3LqrFjvhdQNyVEVu4x_YV8hRnYFAdJINXNtp3IvDMY
+Message-ID: <CANn89iJ_NGSQkSZHNh_vuk9ftex4YCXJ0TMEooHMk4c7ejsjtg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net: bonding: fix type-confusion in bonding header_ops
+To: Kota Toda <kota.toda@gmo-cybersecurity.com>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7C71120E846
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264248-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264250-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DKIM_TRACE(0.00)[google.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,gmo-cybersecurity.com:email]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 05:28:31PM -0800, Joshua Hay wrote:
-> Deinit calls idpf_idc_deinit_core_aux_device to free the cdev_info
-> memory, but leaves the adapter->cdev_info field with a stale pointer
-> value. This will bypass subsequent "if (!cdev_info)" checks if cdev_info
-> is not reallocated. For example, if idc_init fails after a reset,
-> cdev_info will already have been freed during the reset handling, but it
-> will not have been reallocated. The next reset or rmmod will result in a
-> crash.
-> 
-> [  +0.000008] BUG: kernel NULL pointer dereference, address: 00000000000000d0
-> [  +0.000033] #PF: supervisor read access in kernel mode
-> [  +0.000020] #PF: error_code(0x0000) - not-present page
-> [  +0.000017] PGD 2097dfa067 P4D 0
-> [  +0.000017] Oops: Oops: 0000 [#1] SMP NOPTI
-> ...
-> [  +0.000018] RIP: 0010:device_del+0x3e/0x3d0
-> [  +0.000010] Call Trace:
-> [  +0.000010]  <TASK>
-> [  +0.000012]  idpf_idc_deinit_core_aux_device+0x36/0x70 [idpf]
-> [  +0.000034]  idpf_vc_core_deinit+0x3e/0x180 [idpf]
-> [  +0.000035]  idpf_remove+0x40/0x1d0 [idpf]
-> [  +0.000035]  pci_device_remove+0x42/0xb0
-> [  +0.000020]  device_release_driver_internal+0x19c/0x200
-> [  +0.000024]  driver_detach+0x48/0x90
-> [  +0.000018]  bus_remove_driver+0x6d/0x100
-> [  +0.000023]  pci_unregister_driver+0x2e/0xb0
-> [  +0.000022]  __do_sys_delete_module.isra.0+0x18c/0x2b0
-> [  +0.000025]  ? kmem_cache_free+0x2c2/0x390
-> [  +0.000023]  do_syscall_64+0x107/0x7d0
-> [  +0.000023]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Pass the adapter struct into idpf_idc_deinit_core_aux_device instead and
-> clear the cdev_info ptr.
-> 
-> Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+On Thu, Mar 5, 2026 at 10:27=E2=80=AFAM Kota Toda
+<kota.toda@gmo-cybersecurity.com> wrote:
+>
+> Add two members to struct bonding, bond_header_ops and
+> header_slave_dev, to avoid type-confusion while keeping track of the
+> slave's header_ops.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+I suggest you write a detailed changelog.
+Perhaps get help from various LLM.
+Do not assume we have the context now.
+We receive hundreds of patches per week, do not assume we have
+infinite time for each of them.
+Help us.
+Please ?
+Thank you.
 
