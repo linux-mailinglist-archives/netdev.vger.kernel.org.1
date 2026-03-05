@@ -1,198 +1,295 @@
-Return-Path: <netdev+bounces-264222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKhJO39BqWkZ3gAAu9opvQ
-	(envelope-from <netdev+bounces-264222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:40:31 +0100
+	id QM93Ciw/qWnK3QAAu9opvQ
+	(envelope-from <netdev+bounces-264220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:30:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DF520D965
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:40:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6811620D7B0
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A545C307F0AE
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:36:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 554C3300DA5E
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1267E366572;
-	Thu,  5 Mar 2026 08:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A821D36607E;
+	Thu,  5 Mar 2026 08:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="koBmt4j2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F9B2405EB
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7AE1D47B4
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772699813; cv=none; b=F4n9dAC7h1hp4C7Y+M7EJ7AQV4Fnq6n19LYnC06sYbFlAwh7euU+pOmCvz3VHvdmEAAPG33IOyUeHirC6X+EvsvUxbyQkXqHIG7ISMSYN/V0b/OS9jiK0SFModcKivF9DE6hGoue4AnDNNI9/chnewvrazuWRYYpZDexnU0txgk=
+	t=1772699425; cv=none; b=i/7fAGZ8WNxO44wIkJYXQ+3WBxy86Cn5bXETs5lrZ8k+tpsCGaCGYbfWGWDnna9ZSIACvn+9zeHqIoOp4ZcSDUJvyviHoXY8vTWf2SHOsyPAaVnIc5pskqnR2h7q67s41obCW8k/0S0guTzLTrV+b5Ni1HyTsVLjX4ZJyhyxkCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772699813; c=relaxed/simple;
-	bh=CSh/OPgCewZMrxAGotXGAjNREHTmD2ri4RotS2E+6yc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Go/NuDMjLiPj9TgTkxGVLfIqEJUnMlTUpdte+JdTrOt4mg39OEM6uMErW1YeXqYwDkniOcovoIpcDK50UeKy71wPXQiWI/Z3Rn57xcJeXGBWro0QNm+3bQE2pVRVfBHfDk11jZWko3vQqSPon1YZN02b1aw8Srn7usHW9AgUv8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-463f00cda04so5028495b6e.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 00:36:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772699811; x=1773304611;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Ymdw+XC/6Jy9fN+NX35+E/o8bLZmtxZBZ4e3pQeTxE=;
-        b=NNKAeIDxERGw0ajRfypkjwgwt+EegiP06/GFyHlLE+FUY/r3Etj1vt6RCToYnjLFn7
-         4Qw0tEbAJTF+9KryIuY1JsNy/yERV/zC7qycPxHbadLRvy4+xu/gKLB5Z+9DNZjo6J6R
-         hT/uqVoq3XIUXxD7Q8ue1SN+bVCO/GCoIfmKLIEkOaBCZs+Cah/MWJxDNhH8VnMiF7kV
-         xHo+rt2dFnIqaYCBbsXlM00191tCUji2AwssMbEu07nsrdvhFPXbIB9HOPweR9YkJIol
-         6nmT692t5XVMkxKohHUPw7QvTbXZsFobdAk2IB9FMUOe1GL/F5UBSc4ycu/10MaOmEPs
-         nwsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOT5zIa4SNAqKggRshkTuzE2Q+CAHAPOCAKn0slZv/U53gBztfQcs7ZXSh6mleeVBMD2Dkc0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg5EPE+E1xHji93CRNk4lVRdMe15sGKVZYl8hLyGEnyOg4IgoA
-	JM0Wn//CDY3wBhxqWQex3/1jxdSlM5GCng7yCMRLPx8nJ9s7S0Smr7IZyi1c3pUM
-X-Gm-Gg: ATEYQzwX3lrmgRMg9J6bGkWd6SivUdOntxqRVcmsJBjGtoDbXYpuYgi2g5BsOEIt5O5
-	8vaoxk+R+2nhY9TVVO26n3sMvRCD/MqrkjvoveCr7Fkm7L6b0ZIqzusXm3mgByitowS4QgHcBNT
-	byG/q21O8tNd2zb8N2XN6oNpjkwGM0xrXFN0281wPRK7dL2+vug1yShVeMGtGz4Ok0txXoNPYaN
-	Bpi6aKd5kz/3+MiN17HtfFgmo2bUcUONyl4P6U6NlZTMmbEUm0U6rAG6kffD2F9wDQfRdR/KCMj
-	zCW4f1Ci7ip/C4hcw/qNnRzEROGi+fHwiCtvoLjNj4/uyrJjXchwgZXtFQ961gNvXL+dkYNlh6W
-	VWVEdmu/faifipCj7tT09oHYUcuODC15v9yZMctHgrrYP5jBv8t9BhdI/PORwD4Lwh6RkWkqHGD
-	pUT9LMhzLSlI08ugPOTSTZliV3B4NpZD/OknltV71OKplm2oQIGcq0lAnRr7Ip
-X-Received: by 2002:a05:6808:c3ea:b0:451:4cc3:912f with SMTP id 5614622812f47-4651ab4e09fmr2585235b6e.7.1772699810611;
-        Thu, 05 Mar 2026 00:36:50 -0800 (PST)
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com. [209.85.161.43])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-464bb605f15sm13280859b6e.20.2026.03.05.00.36.50
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2026 00:36:50 -0800 (PST)
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-679f980a239so3647489eaf.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 00:36:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWJqqDl4CamU06TGbAA24E36s0SDEkYOTCrQv4ct0snmQ8bIq9Opx05sNraQ+gVQC06lq7GWTA=@vger.kernel.org
-X-Received: by 2002:a05:6102:2ac9:b0:5f7:24dc:3ac3 with SMTP id
- ada2fe7eead31-5ffaaa86250mr1899404137.7.1772699399463; Thu, 05 Mar 2026
- 00:29:59 -0800 (PST)
+	s=arc-20240116; t=1772699425; c=relaxed/simple;
+	bh=bk4CWLSeuQ6mjpe96PCMGeN48K7oGKZe90b5+bitDIM=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=sR0sYIvKaOIWyjP9YXjSDvF9wo4PG0gPsu7Y5pxv9Kv6wRhJV53Pw1T7323u/fwW+Om2dnZcIXCGy203m3oRItXh3K9TFBj79ZUZGwcRGMKHXou1qaPEHY6WMi2lG8FQRVUkAwMpxO0wYbippokJygNPbysqM5E8xCijQ66kwio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=koBmt4j2; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304175735.2660419-1-vladimir.oltean@nxp.com> <20260304175735.2660419-18-vladimir.oltean@nxp.com>
-In-Reply-To: <20260304175735.2660419-18-vladimir.oltean@nxp.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 5 Mar 2026 09:29:48 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXUBhpnFEnnTfyPdECWqNmKLweupX=FY2SedYA3bapG2g@mail.gmail.com>
-X-Gm-Features: AaiRm53mHozL13yvxji6rv0MKzaGvWxuhr7SWHD2SjBJ0VWNhqppZZeXezGpDhg
-Message-ID: <CAMuHMdXUBhpnFEnnTfyPdECWqNmKLweupX=FY2SedYA3bapG2g@mail.gmail.com>
-Subject: Re: [PATCH phy-next 17/22] net: renesas: rswitch: include PHY
- provider header
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, 
-	freedreno@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, spacemit@lists.linux.dev, 
-	UNGLinuxDriver@microchip.com, 
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Michael Dege <michael.dege@renesas.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 50DF520D965
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772699421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IvZIDRgtoD/419tfvEtathiz8iW6q2GdF93J7LSIDCw=;
+	b=koBmt4j2OdHYlMoYuweA+Stsh1TEQ3mu1fwvEd23ny2e1c0PEMGAyCUg1Q4k+GRfL86opO
+	UHrGo+1T1XdjoygrjxoYrkC3QXi4k4SzQQs7WyBOWrE5JmkR9qop0k/L1LW+mkAXDAPdWZ
+	Cvl9yw92uFbpE0Bk7OYvixLq34g60fU=
+Date: Thu, 05 Mar 2026 08:30:15 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <389162b2e117d8a5675b02286c7bafcc342086b6@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH v4 bpf/net 6/6] sockmap: Fix broken memory accounting for
+ UDP.
+To: "Kuniyuki Iwashima" <kuniyu@google.com>
+Cc: "John Fastabend" <john.fastabend@gmail.com>, "Jakub Sitnicki"
+ <jakub@cloudflare.com>, "Willem de Bruijn"
+ <willemdebruijn.kernel@gmail.com>, "Kuniyuki Iwashima"
+ <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
+In-Reply-To: <CAAVpQUAGSzypVhT8V-qjhUfZeEQhXQtS1z+iQC7vrzZCHEr9=A@mail.gmail.com>
+References: <20260221233234.3814768-1-kuniyu@google.com>
+ <20260221233234.3814768-7-kuniyu@google.com>
+ <r7csevb4yonphmfhfpkj7jpc4yvjkdwrp566zxhueaf6vgjfak@stnfyjkqid6o>
+ <CAAVpQUAGSzypVhT8V-qjhUfZeEQhXQtS1z+iQC7vrzZCHEr9=A@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 6811620D7B0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TAGGED_FROM(0.00)[bounces-264222-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,vger.kernel.org,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-264220-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.958];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,glider.be:email,mail.gmail.com:mid,nxp.com:email]
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-On Wed, 4 Mar 2026 at 19:00, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
-> As a PHY consumer driver, the Renesas rswitch dereferences internal
-> fields of struct phy, something which shouldn't be done, as that is
-> going to be made an opaque pointer.
->
-> It is quite clearly visible that the driver is tightly coupled with the
-> drivers/phy/renesas/r8a779f0-ether-serdes.c, which puts heavy pressure
-> on the Generic PHY subsystem.
->
-> This was discussed before here:
-> https://lore.kernel.org/linux-phy/20260211194541.cdmibrpfn6ej6e74@skbuf/
->
-> but to summarize, it is generally expected that when a Generic PHY
-> function is called, it takes effect immediately. When this doesn't
-> happen, the PHY provider driver must change its implementation rather
-> than the consumer be made to work around it. PHY providers which rely on
-> a hardcoded call sequence in the consumer are just lazy and wrong.
->
-> The most obvious example is commit 5cb630925b49 ("net: renesas: rswitch:
-> Add phy_power_{on,off}() calling"). Problem description:
-> - Ethernet PHYs may change phydev->interface. When this happens, the
->   SerDes must learn of the new phydev->interface using phy_set_mode_ext().
-> - drivers/phy/renesas/r8a779f0-ether-serdes.c implements phy_set_mode_ext(),
->   but this only caches the mode and submode into channel->phy_interface
->   and applies this to hardware during phy_power_on().
->
-> The commit author decided to work around this at the consumer site, by
-> power cycling the PHY for the configuration to take effect.
->
-> This had a worse implication from an API perspective in subsequent
-> commit 053f13f67be6 ("rswitch: Fix imbalance phy_power_off() calling").
-> It was observed that phy_power_on() and phy_power_off() calls need to be
-> balanced, and so, the consumer decided to start looking at the struct
-> phy :: power_count (the technical reason why I'm making this change).
->
-> This is also wrong from an API perspective because
-> - a consumer should only care about its own vote on the PHY power state.
->   If this is a multi-port submode like QSGMII, a single phy_power_off()
->   call will not actually turn the PHY off (nor should it).
-> - the power_count is written under the &phy->mutex, but read unlocked
->   here.
->
-> The rswitch and r8a779f0-ether-serdes drivers both need to be completely
-> rethought in terms of Generic PHY API call sequence. There is no quick
-> fix to apply. Just include the PHY provider API along with the consumer
-> one, to keep working as before when struct phy will be made an opaque
-> pointer to normal PHY consumers. But this is a bad offender (and it's
-> not even a provider) so add a FIXME.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+March 5, 2026 at 15:48, "Kuniyuki Iwashima" <kuniyu@google.com mailto:kun=
+iyu@google.com?to=3D%22Kuniyuki%20Iwashima%22%20%3Ckuniyu%40google.com%3E=
+ > wrote:
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Gr{oetje,eeting}s,
+>=20
+>=20On Wed, Mar 4, 2026 at 10:37 PM Jiayuan Chen <jiayuan.chen@linux.dev>=
+ wrote:
+>=20
+>=20>=20
+>=20> On Sat, Feb 21, 2026 at 11:30:53PM +0800, Kuniyuki Iwashima wrote:
+> >  [...]
+> >  </TASK>
+> >=20
+>=20>  Fixes: d7f571188ecf ("udp: Implement ->read_sock() for sockmap")
+> >  Reported-by: syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
+> >  Closes: https://lore.kernel.org/netdev/698f84c6.a70a0220.2c38d7.00cb=
+.GAE@google.com/
+> >  Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >  ---
+> >  v4: Fix deadlock when requeued
+> >  v2: Fix build failure when CONFIG_INET=3Dn
+> >  ---
+> >  include/net/udp.h | 9 +++++++++
+> >  net/core/skmsg.c | 29 +++++++++++++++++++++++++----
+> >  net/ipv4/udp.c | 9 +++++++++
+> >  3 files changed, 43 insertions(+), 4 deletions(-)
+> >=20
+>=20>  diff --git a/include/net/udp.h b/include/net/udp.h
+> >  index 700dbedcb15f..ae38a4da9388 100644
+> >  --- a/include/net/udp.h
+> >  +++ b/include/net/udp.h
+> >  @@ -455,6 +455,15 @@ struct sock *__udp6_lib_lookup(const struct net=
+ *net,
+> >  struct sk_buff *skb);
+> >  struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+> >  __be16 sport, __be16 dport);
+> >  +
+> >  +#ifdef CONFIG_INET
+> >  +void udp_sock_rfree(struct sk_buff *skb);
+> >  +#else
+> >  +static inline void udp_sock_rfree(struct sk_buff *skb)
+> >  +{
+> >  +}
+> >  +#endif
+> >  +
+> >  int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
+> >=20
+>=20>  /* UDP uses skb->dev_scratch to cache as much information as possi=
+ble and avoid
+> >  diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> >  index 96f43e0dbb17..dd9134a45663 100644
+> >  --- a/net/core/skmsg.c
+> >  +++ b/net/core/skmsg.c
+> >  @@ -7,6 +7,7 @@
+> >=20
+>=20>  #include <net/sock.h>
+> >  #include <net/tcp.h>
+> >  +#include <net/udp.h>
+> >  #include <net/tls.h>
+> >  #include <trace/events/sock.h>
+> >=20
+>=20>  @@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psoc=
+k *psock, struct sk_buff *skb,
+> >  u32 off, u32 len, bool take_ref)
+> >  {
+> >  struct sock *sk =3D psock->sk;
+> >  + bool is_udp =3D sk_is_udp(sk);
+> >  struct sk_msg *msg;
+> >  int err =3D -EAGAIN;
+> >=20
+>=20>  @@ -583,13 +585,20 @@ static int sk_psock_skb_ingress(struct sk_ps=
+ock *psock, struct sk_buff *skb,
+> >  if (!msg)
+> >  goto out;
+> >=20
+>=20>  - if (skb->sk !=3D sk && take_ref) {
+> >  + if (is_udp) {
+> >  + if (unlikely(skb->destructor =3D=3D udp_sock_rfree))
+> >  + goto enqueue;
+> >  +
+> >  + spin_lock_bh(&sk->sk_receive_queue.lock);
+> >  + }
+> >  +
+> >  + if (is_udp || (skb->sk !=3D sk && take_ref)) {
+> >  if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> >  - goto free;
+> >  + goto unlock;
+> >=20
+>=20>  if (!sk_rmem_schedule(sk, skb, skb->truesize))
+> >  - goto free;
+> >  - } else {
+> >  + goto unlock;
+> >  + } else if (skb->sk =3D=3D sk || !take_ref) {
+> >  /* This is used in tcp_bpf_recvmsg_parser() to determine whether the
+> >  * data originates from the socket's own protocol stack. No need to
+> >  * refcount sk because msg's lifetime is bound to sk via the ingress_=
+msg.
+> >  @@ -604,11 +613,23 @@ static int sk_psock_skb_ingress(struct sk_psoc=
+k *psock, struct sk_buff *skb,
+> >  * into user buffers.
+> >  */
+> >  skb_set_owner_r(skb, sk);
+> >  +
+> >  + if (is_udp) {
+> >  + spin_unlock_bh(&sk->sk_receive_queue.lock);
+> >  +
+> >  + skb->destructor =3D udp_sock_rfree;
+> >  + }
+> >  +
+> >  +enqueue:
+> >  err =3D sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, =
+take_ref);
+> >  if (err < 0)
+> >  goto free;
+> >  out:
+> >  return err;
+> >  +
+> >  +unlock:
+> >  + if (is_udp)
+> >  + spin_unlock_bh(&sk->sk_receive_queue.lock);
+> >  free:
+> >  kfree(msg);
+> >  goto out;
+> >  diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> >  index 422c96fea249..831d26748a90 100644
+> >  --- a/net/ipv4/udp.c
+> >  +++ b/net/ipv4/udp.c
+> >  @@ -2039,6 +2039,15 @@ struct sk_buff *__skb_recv_udp(struct sock *s=
+k, unsigned int flags,
+> >  }
+> >  EXPORT_SYMBOL(__skb_recv_udp);
+> >=20
+>=20>  +void udp_sock_rfree(struct sk_buff *skb)
+> >  +{
+> >  + struct sock *sk =3D skb->sk;
+> >  +
+> >  + spin_lock_bh(&sk->sk_receive_queue.lock);
+> >  + sock_rfree(skb);
+> >  + spin_unlock_bh(&sk->sk_receive_queue.lock);
+> >  +}
+> >  +
+> >  int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+> >  {
+> >  struct sk_buff *skb;
+> >  --
+> >  2.53.0.371.g1d285c8824-goog
+> >=20
+>=20>  There are too many protocol-specific checks in the generic skmsg c=
+ode
+> >  here. This should be abstracted out.
+> >=20
+>=20>  Also TCP also has a similar issue with sk_forward_alloc concurrenc=
+y
+> >  between the backlog charge and recvmsg uncharge paths so the abstrac=
+tion
+> >  is necessary.
+> >=20
+>=20>  I've put together a simple diff based on your patch for reference.
+> >  I haven't tested it thoroughly, but it at least handles TCP and UDP
+> >  separately through a callback, keeping the generic code clean.
+> >=20
+>=20I can follow up on TCP, but TCP needs another fix, which
+> cannot be factored out.
+>=20
+>=20Some wrong assumptions in your patch:
+>=20
+>=201) tcp_psock_ingress_charge() uses psock->ingress_lock,
+>  but it does not protect any tcp_sock fields, especially
+>  sk->sk_forwad_alloc.
+>=20
+>=202) TCP memory accounting happens under bh_lock_sock()
+>  _or_ lock_sock(). sendmsg()/recvmsg() works under
+>  lock_sock() and TCP fast path puts skb to backlog if
+>  lock_sock() is held by userspace. This means even
+>  a simple bh_lock_sock() in tcp_psock_ingress_charge()
+>  race with memory accounting happening under lock_sock().
+>=20
+>=20Since sk_psock_skb_ingress() is called from both GFP_KERNEL
+> and GFP_ATOMIC context, the simplest fix would be to put
+> lock_sock() in sk_psock_backlog() for TCP, which is ugly though.
+>
 
-                        Geert
+OK, thanks.=20
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Now=20my only concern is keeping UDP-specific logic
+out of skmsg.c. We could use a function pointer so that UDP
+implements its own ingress charge in udp_bpf.c, while other
+protocols just use a default no-op or even NULL.
 
