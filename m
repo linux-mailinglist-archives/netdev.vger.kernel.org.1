@@ -1,1064 +1,189 @@
-Return-Path: <netdev+bounces-264264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264261-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uEDoBRNUqWkj4wAAu9opvQ
-	(envelope-from <netdev+bounces-264264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:59:47 +0100
+	id oHycHpFTqWmG5QAAu9opvQ
+	(envelope-from <netdev+bounces-264261-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:57:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE2B20F2BF
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:59:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2001620F23A
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BDF93063D57
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:57:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DBFE030065E7
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEA737AA98;
-	Thu,  5 Mar 2026 09:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0C63793C2;
+	Thu,  5 Mar 2026 09:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZt/2Y0c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZ8o35VZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283CC3793C2;
-	Thu,  5 Mar 2026 09:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B08419DFAB
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772704630; cv=none; b=l7GLepG2RGAS1FJ5rc0nChv1uklQ4NAUGQVqnxjx51SHCROjUBWA4+ToXUCBevpI24qFfovOv+9HJ4MO3Wh4N8bj/wt7iPMZZvK2QHZ+KHwHb7Da6XQfZEZ4Q4v1l2lnuwTNwLS/JSs0+qH6zVosb6mm4zOYDTmLQjg+4FPLTvQ=
+	t=1772704622; cv=none; b=Gv4f+MTHpcL5RdiyKL+xQoeTfgOpS7hOLR4BhZMmazS45BTXgq6YxCpAAhZM/j18hn8qvKqr2IhOkVlOBmVHWPqLZsPOneOEuGoDqRjsQBQ9WHwe3J7Z/jLmu2ZYKBAyyoLro8kPp5U4kM85ZcbKuW3ErJxYgrclPEewNO3/fsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772704630; c=relaxed/simple;
-	bh=dCKz14c+E2S0eMxsHIggfuXZM0qnyRtTVEJmgpCHndo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eKSo/GwvubpD7VSMqYylk5EyLm57p1kAsjPok2rSVQ+Jv3Si8Sl7l3JOZ2HQ9/4EyJ9J7FSmsvgSLQAEd4j6qdx+oP++BlLbH/tuWpuVrT8v4k8TPpVBh0LSE7SlMAB7sov1lARGEi6m/qFBdsUHtPHNjVlg4CEDCb/1bpqOW/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZt/2Y0c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D94E5C2BC9E;
-	Thu,  5 Mar 2026 09:57:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772704629;
-	bh=dCKz14c+E2S0eMxsHIggfuXZM0qnyRtTVEJmgpCHndo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=AZt/2Y0cQSUYyLXKoUr2vc6am5wgm1/BnFWMjpbQcivT13gGNUozPyhW+PKahDF4T
-	 VFxtSTuNL4cPgZPbhmdfU1JGT9SArDYp+F2ByZtDpIXWGx88rcdLElcEFJxIDXSnWR
-	 BTxnjLDSIQU53Q51TG2IktAs/wBm+rEQWQqFcJ7JtWRK9sQI0hLYSQo/KFWf3X7WXV
-	 9YF26JQFT9zFsdqgBqNGkFmxYwrCz3p24xGTPkMKQ764zTlKLx9vYphQiqzkasxRyO
-	 8AO40v7e/NGzHEOj7NSjrD2fNVKbEUnOhp3adDr/aGFECjhssTOMlwAayuE2UrCeSF
-	 bNW5IKbFaES1A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD168F30924;
-	Thu,  5 Mar 2026 09:57:09 +0000 (UTC)
-From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
-Date: Thu, 05 Mar 2026 10:56:55 +0100
-Subject: [PATCH net-next v6 2/2] net: dsa: mv88e6xxx: Add partial support
- for TCAM entries
+	s=arc-20240116; t=1772704622; c=relaxed/simple;
+	bh=R4o8LmzUXpzex1d7EeK2gX5l1LpwQHAZjoxay6bMrc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DvMizcuVrecG+hxCx2Lhi4oHcY15SA1rZ2oqsm5vLnqh7j4SKloUGrXYezr+SCJV+nt+8I8d3YUI0Coz5xb0bTzkueDOnFkMnVA6iGRLUAvhtpUsx0AqdQHJnc72yW/xEqF8wGGQWR6yDNXRj8Tv0H4u6X1JrhXSrCzFSwbwyrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZ8o35VZ; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4830f029407so14276715e9.2
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:57:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772704620; x=1773309420; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MbmCDjNl+TQje26CyVv5dT/rLJSPHA1oxjNl1owywyI=;
+        b=HZ8o35VZfypQLkgCDw3gwCiy70LVEnyFTeGq7JLW6ZLivv17i/JEnlRaYFFRlfNGvX
+         TzL4SO+hj9WuHsMGBrG8RCdymH1Vrcq3lg2HdkgvkSuZNZkUktlWcwSUxo2Wyp9i6LVD
+         j8AvCdoERa9gkMO2NthaGUoMl28h6I0oUT/pzEJAbIYC0OYnc9aT1fXyzzPEeootCmtD
+         NhvGmVprRyZ31tSmYLUxNtDPyqVDOWZvRf/IXLE5dQhMhAzERCSizyvBMI6vnHdCz2NW
+         LlHcvE+ZRr5XKVNoe/tiUfD838Z5yIPvfDr0reTcCFLAEEP7mCosmHB7ARf5HtR5Wmaf
+         FPGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772704620; x=1773309420;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MbmCDjNl+TQje26CyVv5dT/rLJSPHA1oxjNl1owywyI=;
+        b=Wavq56LVmSTtgGqi3Es1/0UeDoZEUvF6kWVr5jqU1iYgbkcl2IffEOrZT1q39QPy3r
+         l35k0hd873WVEHTPvGBk+goh/uFxGPeU4KrZKNG59ozRrMW8OryWHyJHK3aNGJjXmRgv
+         EGlz5dXVfCGTmIJ44rklcflZySYQRGBEjN/0RcYKpOkAXFR5bxsANlk1SHfnv+DTidM+
+         vui0LwMk5xyHW07lIBi9lAxrYOYm8wXGiuBpEpIvxsqsxBvj6SdbFIfWA3uClWQ+7+eJ
+         qPBAdmDw8+gMQk9VbJJIiKueu79ClpH3OPcx1i6GTiuEbaKRRi78peNMp3tK9OpNyLm2
+         HRHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhkAZ27csqS/BaVJbd9AdQ8857d0Moe6X6J8HU+Hux0okXWZhE2ApKUoB8POmcxOWNrP5yGZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeNyP7qpf0Buv2N7SBb44hE8dROfdte87V8UhuDbMR11q+sCGg
+	k4rNKrc3G1XLpr6m8tmlBFAGgEcL2lg/POyRHIaE27hH+DYLkj4ZfmLX
+X-Gm-Gg: ATEYQzwjnvWJp4pTbmGXN4DDwPduqHYcNN7i8nFUg6skyrNmHuioQeOV2SPZrYbpljU
+	rpcpVwAIbSgCR82fE4pIUqJuMKJ7lRGGeWH7fCJU9VKuhG7gcs8IKQ39ezNp8nCyIZHUtAkzjeM
+	godJ7Q7objKF7CqOA5BUk/zHM7CC6K+cekh/mj7IXV/ueH7mf80jAYRuOVfTfMLpBZfxmfm60JA
+	Lc+QwKTzYwYqI35JZEmXx2idce4m7thdpbX9zQjdpWpaFuXlM5iz6kkzPUczUHl5hhUdgOSvPLK
+	YbgzwZ/PB3qw/uxcf1Xrk2pEDC19z1eYlRoAgJnFEIfk6iL6/pUlbG4BtU4SxIxc2GkvTdKsFok
+	W4yp6V19Ts2OSEAs1Q5CmIjZ08b8DVdBVcRLeqcIkSkgH+zCWWr9Js3Fyq6jivkDZrIb3rGlUBa
+	3PoRS6jFfM3BsBN9oT9ljYhvnUKQ==
+X-Received: by 2002:a05:600c:81c8:b0:477:9fa8:bc99 with SMTP id 5b1f17b1804b1-48519863aebmr48569575e9.4.1772704619462;
+        Thu, 05 Mar 2026 01:56:59 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d00e:3600:16aa:c9ad:4288:9dcc])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b41831easm33366173f8f.12.2026.03.05.01.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 01:56:58 -0800 (PST)
+Date: Thu, 5 Mar 2026 11:56:56 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	=?utf-8?Q?Miqu=C3=A8l?= Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
+ KSZ8463 global irq
+Message-ID: <20260305095656.vlyaztv6nbdqrmil@skbuf>
+References: <20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com>
+ <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260305-net-next-mv88e6xxx-tcam-v6-2-32c7fbac129d@luminex.be>
-References: <20260305-net-next-mv88e6xxx-tcam-v6-0-32c7fbac129d@luminex.be>
-In-Reply-To: <20260305-net-next-mv88e6xxx-tcam-v6-0-32c7fbac129d@luminex.be>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, Jamal Hadi Salim <jhs@mojatatu.com>, 
- Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Cedric Jehasse <cedric.jehasse@luminex.be>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772704628; l=27665;
- i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
- bh=+EPcIgOIlbcwR+B/dvKheFwt2PZeEjN3TMMyfKzdhLk=;
- b=/S4+Qesg+auXXAbvzYzR1gFrjZ+Etmas4ugGPJdgEH7El/MwLJ6y2JnxSHGQVGrBmjKzAJuCI
- 39vm8z4LVZOCss7ghjm+1+5tIchyITTTKUIJLDPoH7khSRgghrMvMJP
-X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
- pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
-X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
- with auth_id=638
-X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
-Reply-To: cedric.jehasse@luminex.be
-X-Rspamd-Queue-Id: 4AE2B20F2BF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
+X-Rspamd-Queue-Id: 2001620F23A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264264-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264261-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,luminex.be:replyto,luminex.be:email,luminex.be:mid]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-From: Cedric Jehasse <cedric.jehasse@luminex.be>
+On Wed, Mar 04, 2026 at 11:18:52AM +0100, Bastien Curutchet (Schneider Electric) wrote:
+> @@ -2890,14 +2899,18 @@ static irqreturn_t ksz_irq_thread_fn(int irq, void *dev_id)
+>  	unsigned int nhandled = 0;
+>  	struct ksz_device *dev;
+>  	unsigned int sub_irq;
+> -	u8 data;
+> +	u16 data;
+>  	int ret;
+>  	u8 n;
+>  
+>  	dev = kirq->dev;
+>  
+> -	/* Read interrupt status register */
+> -	ret = ksz_read8(dev, kirq->reg_status, &data);
+> +	/*
+> +	 * Most of the KSZ switches have a 8-bits long interrupt status
+> +	 * register, but the KSZ8463 has a 16-bits long one. The overread here
+> +	 * is safe because we only iterate over kirq->nirqs in the below loop.
 
-This patch adds partial Ternary Content Addressable Memory (TCAM) for
-the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
-switch to match the first 48 or 96 bytes of a frame and take actions on
-matched frames.
+FWIW, this isn't the only thing making an overread "safe".
+If the adjacent register also has "clear on read" semantics, that's not
+good.
 
-This patch introduces a subset of the available TCAM functionality.
-Matching on ip addresses/protocol and trapping to the cpu.
+I can't tell whether that's the case here, though. There are just too
+many hardware variations to check for. I just wanted to point out that
+the reasoning is incomplete.
 
-Eg. to trap traffic with destination ip 224.0.1.129 to the cpu:
+> +	 */
+> +	ret = ksz_read16(dev, kirq->reg_status, &data);
 
-tc qdisc add dev p1 clsact
-tc filter add dev p1 ingress protocol ip flower skip_sw \
-    dst_ip 224.0.1.129 action trap
+I guess I don't fully understand the KSZ_REGMAP_TABLE() layer, but I
+have a concern here.
 
-Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
----
- drivers/net/dsa/mv88e6xxx/Makefile   |   2 +
- drivers/net/dsa/mv88e6xxx/chip.c     |  34 ++++
- drivers/net/dsa/mv88e6xxx/chip.h     |  52 ++++++
- drivers/net/dsa/mv88e6xxx/port.c     |  27 ++-
- drivers/net/dsa/mv88e6xxx/port.h     |   7 +-
- drivers/net/dsa/mv88e6xxx/tcam.c     | 332 +++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/tcam.h     |  41 +++++
- drivers/net/dsa/mv88e6xxx/tcflower.c | 157 +++++++++++++++++
- drivers/net/dsa/mv88e6xxx/tcflower.h |  13 ++
- 9 files changed, 663 insertions(+), 2 deletions(-)
+Take the normal ksz_girq_setup() case for example, where we set
+kirq->reg_status = REG_SW_PORT_INT_STATUS__1.
 
-diff --git a/drivers/net/dsa/mv88e6xxx/Makefile b/drivers/net/dsa/mv88e6xxx/Makefile
-index dd961081d631..b0b08c6f159c 100644
---- a/drivers/net/dsa/mv88e6xxx/Makefile
-+++ b/drivers/net/dsa/mv88e6xxx/Makefile
-@@ -21,6 +21,8 @@ mv88e6xxx-objs += serdes.o
- mv88e6xxx-objs += smi.o
- mv88e6xxx-objs += switchdev.o
- mv88e6xxx-objs += trace.o
-+mv88e6xxx-objs += tcflower.o
-+mv88e6xxx-objs += tcam.o
- 
- # for tracing framework to find trace.h
- CFLAGS_trace.o := -I$(src)
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 09002c853b78..b5a4ded428fa 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -43,6 +43,8 @@
- #include "ptp.h"
- #include "serdes.h"
- #include "smi.h"
-+#include "tcam.h"
-+#include "tcflower.h"
- 
- static void assert_reg_lock(struct mv88e6xxx_chip *chip)
- {
-@@ -3560,6 +3562,11 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
- 		if (err)
- 			return err;
- 	}
-+	if (chip->info->ops->port_enable_tcam) {
-+		err = chip->info->ops->port_enable_tcam(chip, port);
-+		if (err)
-+			return err;
-+	}
- 
- 	if (chip->info->ops->port_tag_remap) {
- 		err = chip->info->ops->port_tag_remap(chip, port);
-@@ -3938,6 +3945,14 @@ static int mv88e6xxx_mdios_register(struct mv88e6xxx_chip *chip)
- 	return 0;
- }
- 
-+static int mv88e6xxx_tcam_setup(struct mv88e6xxx_chip *chip)
-+{
-+	if (!mv88e6xxx_has_tcam(chip))
-+		return 0;
-+
-+	return chip->info->ops->tcam_ops->flush_tcam(chip);
-+}
-+
- static void mv88e6xxx_teardown(struct dsa_switch *ds)
- {
- 	struct mv88e6xxx_chip *chip = ds->priv;
-@@ -4083,6 +4098,10 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
- 	if (err)
- 		goto unlock;
- 
-+	err = mv88e6xxx_tcam_setup(chip);
-+	if (err)
-+		goto unlock;
-+
- unlock:
- 	mv88e6xxx_reg_unlock(chip);
- 
-@@ -5134,6 +5153,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
- 	.ptp_ops = &mv88e6390_ptp_ops,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.tcam_ops = &mv88e6390_tcam_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6320_ops = {
-@@ -5525,6 +5545,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
- 	.serdes_get_regs = mv88e6390_serdes_get_regs,
- 	.phylink_get_caps = mv88e6390_phylink_get_caps,
- 	.pcs_ops = &mv88e6390_pcs_ops,
-+	.tcam_ops = &mv88e6390_tcam_ops,
- };
- 
- static const struct mv88e6xxx_ops mv88e6390x_ops = {
-@@ -5621,6 +5642,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	.port_set_cmode = mv88e6393x_port_set_cmode,
- 	.port_setup_message_port = mv88e6xxx_setup_message_port,
- 	.port_set_upstream_port = mv88e6393x_port_set_upstream_port,
-+	.port_enable_tcam = mv88e6xxx_port_enable_tcam,
- 	.stats_snapshot = mv88e6390_g1_stats_snapshot,
- 	.stats_set_histogram = mv88e6390_g1_stats_set_histogram,
- 	.stats_get_sset_count = mv88e6320_stats_get_sset_count,
-@@ -5652,6 +5674,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6393x_phylink_get_caps,
- 	.pcs_ops = &mv88e6393x_pcs_ops,
-+	.tcam_ops = &mv88e6393_tcam_ops,
- };
- 
- static const struct mv88e6xxx_info mv88e6xxx_table[] = {
-@@ -6125,6 +6148,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_databases = 4096,
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 8,
-+		.num_tcam_entries = 256,
- 		.internal_phys_offset = 1,
- 		.max_vid = 8191,
- 		.max_sid = 63,
-@@ -6132,6 +6156,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.phy_base_addr = 0x0,
- 		.global1_addr = 0x1b,
- 		.global2_addr = 0x1c,
-+		.tcam_addr = 0x1f,
- 		.age_time_coeff = 3750,
- 		.g1_irqs = 10,
- 		.g2_irqs = 14,
-@@ -6227,12 +6252,14 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
-+		.num_tcam_entries = 256,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
- 		.phy_base_addr = 0x0,
- 		.global1_addr = 0x1b,
- 		.global2_addr = 0x1c,
-+		.tcam_addr = 0x1f,
- 		.age_time_coeff = 3750,
- 		.g1_irqs = 9,
- 		.g2_irqs = 14,
-@@ -6439,12 +6466,14 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
-+		.num_tcam_entries = 256,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
- 		.phy_base_addr = 0x0,
- 		.global1_addr = 0x1b,
- 		.global2_addr = 0x1c,
-+		.tcam_addr = 0x1f,
- 		.age_time_coeff = 3750,
- 		.g1_irqs = 9,
- 		.g2_irqs = 14,
-@@ -6490,6 +6519,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_databases = 4096,
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 8,
-+		.num_tcam_entries = 256,
- 		.internal_phys_offset = 1,
- 		.max_vid = 8191,
- 		.max_sid = 63,
-@@ -6497,6 +6527,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.phy_base_addr = 0x0,
- 		.global1_addr = 0x1b,
- 		.global2_addr = 0x1c,
-+		.tcam_addr = 0x1f,
- 		.age_time_coeff = 3750,
- 		.g1_irqs = 10,
- 		.g2_irqs = 14,
-@@ -6589,6 +6620,7 @@ static struct mv88e6xxx_chip *mv88e6xxx_alloc_chip(struct device *dev)
- 	INIT_LIST_HEAD(&chip->mdios);
- 	idr_init(&chip->policies);
- 	INIT_LIST_HEAD(&chip->msts);
-+	INIT_LIST_HEAD(&chip->tcam.entries);
- 
- 	return chip;
- }
-@@ -7184,6 +7216,8 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.port_hwtstamp_get	= mv88e6xxx_port_hwtstamp_get,
- 	.port_txtstamp		= mv88e6xxx_port_txtstamp,
- 	.port_rxtstamp		= mv88e6xxx_port_rxtstamp,
-+	.cls_flower_add		= mv88e6xxx_cls_flower_add,
-+	.cls_flower_del         = mv88e6xxx_cls_flower_del,
- 	.get_ts_info		= mv88e6xxx_get_ts_info,
- 	.devlink_param_get	= mv88e6xxx_devlink_param_get,
- 	.devlink_param_set	= mv88e6xxx_devlink_param_set,
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index e073446ee7d0..2b235ac2c5df 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -135,12 +135,14 @@ struct mv88e6xxx_info {
- 	unsigned int num_ports;
- 	unsigned int num_internal_phys;
- 	unsigned int num_gpio;
-+	unsigned int num_tcam_entries;
- 	unsigned int max_vid;
- 	unsigned int max_sid;
- 	unsigned int port_base_addr;
- 	unsigned int phy_base_addr;
- 	unsigned int global1_addr;
- 	unsigned int global2_addr;
-+	unsigned int tcam_addr;
- 	unsigned int age_time_coeff;
- 	unsigned int g1_irqs;
- 	unsigned int g2_irqs;
-@@ -210,6 +212,7 @@ struct mv88e6xxx_avb_ops;
- struct mv88e6xxx_ptp_ops;
- struct mv88e6xxx_pcs_ops;
- struct mv88e6xxx_cc_coeffs;
-+struct mv88e6xxx_tcam_ops;
- 
- struct mv88e6xxx_irq {
- 	u16 masked;
-@@ -339,6 +342,10 @@ struct mv88e6xxx_hw_stat {
- 	int type;
- };
- 
-+struct mv88e6xxx_tcam {
-+	struct list_head entries;
-+};
-+
- struct mv88e6xxx_chip {
- 	const struct mv88e6xxx_info *info;
- 
-@@ -444,6 +451,35 @@ struct mv88e6xxx_chip {
- 
- 	/* FID map */
- 	DECLARE_BITMAP(fid_bitmap, MV88E6XXX_N_FID);
-+
-+	/* TCAM entries */
-+	struct mv88e6xxx_tcam tcam;
-+};
-+
-+#define TCAM_MATCH_SIZE 96
-+
-+struct mv88e6xxx_tcam_key {
-+	u16 spv;
-+	u16 spv_mask;
-+
-+	u8 frame_data[TCAM_MATCH_SIZE];
-+	u8 frame_mask[TCAM_MATCH_SIZE];
-+};
-+
-+struct mv88e6xxx_tcam_action {
-+	u8 dpv_mode;
-+	u16 dpv;
-+};
-+
-+struct mv88e6xxx_tcam_entry {
-+	struct list_head list;
-+	unsigned long cookie;
-+	u32 prio;
-+	u8 hw_idx;
-+
-+	struct mv88e6xxx_tcam_key key;
-+	struct mv88e6xxx_tcam_action action;
-+
- };
- 
- struct mv88e6xxx_bus_ops {
-@@ -678,6 +714,11 @@ struct mv88e6xxx_ops {
- 
- 	/* Max Frame Size */
- 	int (*set_max_frame_size)(struct mv88e6xxx_chip *chip, int mtu);
-+
-+	int (*port_enable_tcam)(struct mv88e6xxx_chip *chip, int port);
-+
-+	/* Ternary Content Addressable Memory operations */
-+	const struct mv88e6xxx_tcam_ops *tcam_ops;
- };
- 
- struct mv88e6xxx_irq_ops {
-@@ -752,6 +793,12 @@ struct mv88e6xxx_pcs_ops {
- 
- };
- 
-+struct mv88e6xxx_tcam_ops {
-+	int (*entry_add)(struct mv88e6xxx_chip *chip,
-+			 struct mv88e6xxx_tcam_entry *entry, u8 idx);
-+	int (*flush_tcam)(struct mv88e6xxx_chip *chip);
-+};
-+
- static inline bool mv88e6xxx_has_stu(struct mv88e6xxx_chip *chip)
- {
- 	return chip->info->max_sid > 0 &&
-@@ -769,6 +816,11 @@ static inline bool mv88e6xxx_has_lag(struct mv88e6xxx_chip *chip)
- 	return !!chip->info->global2_addr;
- }
- 
-+static inline bool mv88e6xxx_has_tcam(struct mv88e6xxx_chip *chip)
-+{
-+	return !!chip->info->tcam_addr;
-+}
-+
- static inline unsigned int mv88e6xxx_num_databases(struct mv88e6xxx_chip *chip)
- {
- 	return chip->info->num_databases;
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index 66b1b7277281..38616a2f8de3 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -1380,7 +1380,32 @@ int mv88e6xxx_port_disable_learn_limit(struct mv88e6xxx_chip *chip, int port)
- 
- int mv88e6xxx_port_disable_pri_override(struct mv88e6xxx_chip *chip, int port)
- {
--	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE, 0);
-+	u16 reg;
-+	int err;
-+
-+	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
-+				  &reg);
-+	if (err)
-+		return err;
-+
-+	reg &= MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_MASK;
-+	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
-+				    reg);
-+}
-+
-+int mv88e6xxx_port_enable_tcam(struct mv88e6xxx_chip *chip, int port)
-+{
-+	u16 reg;
-+	int err;
-+
-+	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
-+				  &reg);
-+	if (err)
-+		return err;
-+
-+	reg |= MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_96_BYTE;
-+	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
-+				    reg);
- }
- 
- /* Offset 0x0E: Policy & MGMT Control Register for FAMILY 6191X 6193X 6393X */
-diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
-index c1d2f99efb1c..a2492cf4d920 100644
---- a/drivers/net/dsa/mv88e6xxx/port.h
-+++ b/drivers/net/dsa/mv88e6xxx/port.h
-@@ -254,7 +254,10 @@
- #define MV88E6XXX_PORT_ATU_CTL		0x0c
- 
- /* Offset 0x0D: Priority Override Register */
--#define MV88E6XXX_PORT_PRI_OVERRIDE	0x0d
-+#define MV88E6XXX_PORT_PRI_OVERRIDE			0x0d
-+#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_MASK	0x0003
-+#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_48_BYTE	0x0001
-+#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_96_BYTE	0x0002
- 
- /* Offset 0x0E: Policy Control Register */
- #define MV88E6XXX_PORT_POLICY_CTL		0x0e
-@@ -608,4 +611,6 @@ int mv88e6xxx_port_hidden_wait(struct mv88e6xxx_chip *chip);
- int mv88e6xxx_port_hidden_read(struct mv88e6xxx_chip *chip, int block, int port,
- 			       int reg, u16 *val);
- 
-+int mv88e6xxx_port_enable_tcam(struct mv88e6xxx_chip *chip, int port);
-+
- #endif /* _MV88E6XXX_PORT_H */
-diff --git a/drivers/net/dsa/mv88e6xxx/tcam.c b/drivers/net/dsa/mv88e6xxx/tcam.c
-new file mode 100644
-index 000000000000..cd250530e07e
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/tcam.c
-@@ -0,0 +1,332 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Marvell 88E6xxx Switch TCAM support
-+ *
-+ * Copyright (c) 2026 Luminex Network Intelligence
-+ */
-+
-+#include "linux/list.h"
-+
-+#include "chip.h"
-+#include "tcam.h"
-+
-+/* TCAM operatation register */
-+#define MV88E6XXX_TCAM_OP			0x00
-+#define MV88E6XXX_TCAM_OP_BUSY			0x8000
-+#define MV88E6XXX_TCAM_OP_OP_MASK		0x7000
-+#define MV88E6XXX_TCAM_OP_OP_FLUSH_ALL		0x1000
-+#define MV88E6XXX_TCAM_OP_OP_FLUSH		0x2000
-+#define MV88E6XXX_TCAM_OP_OP_LOAD		0x3000
-+#define MV88E6XXX_TCAM_OP_OP_GET_NEXT		0x4000
-+#define MV88E6XXX_TCAM_OP_OP_READ		0x5000
-+
-+/* TCAM extension register */
-+#define MV88E6XXX_TCAM_EXTENSION		0x01
-+
-+/* TCAM keys register 1 */
-+#define MV88E6XXX_TCAM_KEYS1			0x02
-+#define MV88E6XXX_TCAM_KEYS1_FT_MASK		0xC000
-+#define MV88E6XXX_TCAM_KEYS1_SPV_MASK		0x0007
-+
-+/* TCAM keys register 2 */
-+#define MV88E6XXX_TCAM_KEYS2			0x03
-+#define MV88E6XXX_TCAM_KEYS2_SPV_MASK		0x00ff
-+
-+#define MV88E6XXX_TCAM_ING_ACT3			0x04
-+#define MV88E6XXX_TCAM_ING_ACT3_SF		0x0800
-+#define MV88E6XXX_TCAM_ING_ACT3_DPV_MASK	0x07ff
-+
-+#define MV88E6XXX_TCAM_ING_ACT5			0x06
-+#define MV88E6XXX_TCAM_ING_ACT5_DPV_MODE_MASK	0xc000
-+
-+static int mv88e6xxx_tcam_write(struct mv88e6xxx_chip *chip, int reg, u16 val)
-+{
-+	return mv88e6xxx_write(chip, chip->info->tcam_addr, reg, val);
-+}
-+
-+static int mv88e6xxx_tcam_wait(struct mv88e6xxx_chip *chip)
-+{
-+	int bit = __bf_shf(MV88E6XXX_TCAM_OP_BUSY);
-+
-+	return mv88e6xxx_wait_bit(chip, chip->info->tcam_addr,
-+				  MV88E6XXX_TCAM_OP, bit, 0);
-+}
-+
-+static int mv88e6xxx_tcam_read_page(struct mv88e6xxx_chip *chip, u8 page,
-+				    u8 entry)
-+
-+{
-+	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_READ |
-+		  (page & 0x3) << 10 | entry;
-+	int err;
-+
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
-+	if (err)
-+		return err;
-+
-+	return mv88e6xxx_tcam_wait(chip);
-+}
-+
-+static int mv88e6xxx_tcam_load_page(struct mv88e6xxx_chip *chip, u8 page,
-+				    u8 entry)
-+{
-+	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_LOAD |
-+		  (page & 0x3) << 10 | entry;
-+	int err;
-+
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
-+	if (err)
-+		return err;
-+
-+	return mv88e6xxx_tcam_wait(chip);
-+}
-+
-+static int mv88e6xxx_tcam_flush_entry(struct mv88e6xxx_chip *chip, u8 entry)
-+{
-+	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_FLUSH | entry;
-+	int err;
-+
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
-+	if (err)
-+		return err;
-+
-+	return mv88e6xxx_tcam_wait(chip);
-+}
-+
-+static int mv88e6xxx_tcam_flush_all(struct mv88e6xxx_chip *chip)
-+{
-+	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_FLUSH_ALL;
-+	int err;
-+
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
-+	if (err)
-+		return err;
-+
-+	return mv88e6xxx_tcam_wait(chip);
-+}
-+
-+struct mv88e6xxx_tcam_entry *
-+mv88e6xxx_tcam_entry_find(struct mv88e6xxx_chip *chip, unsigned long cookie)
-+{
-+	struct mv88e6xxx_tcam_entry *entry;
-+
-+	list_for_each_entry(entry, &chip->tcam.entries, list)
-+		if (entry->cookie == cookie)
-+			return entry;
-+
-+	return NULL;
-+}
-+
-+/* insert tcam entry in ordered list and move existing entries if necessary */
-+static int mv88e6xxx_tcam_insert_entry(struct mv88e6xxx_chip *chip,
-+				       struct mv88e6xxx_tcam_entry *entry)
-+{
-+	struct mv88e6xxx_tcam_entry *elem;
-+	struct list_head *hpos;
-+	int err;
-+
-+	list_for_each_prev(hpos, &chip->tcam.entries) {
-+		u8 move_idx;
-+
-+		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
-+		if (entry->prio >= elem->prio)
-+			break;
-+
-+		move_idx = elem->hw_idx + 1;
-+
-+		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
-+		if (err)
-+			return err;
-+
-+		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
-+							   move_idx);
-+		if (err)
-+			return err;
-+
-+		elem->hw_idx = move_idx;
-+	}
-+
-+	if (list_is_head(hpos, &chip->tcam.entries)) {
-+		entry->hw_idx = 0;
-+	} else {
-+		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
-+		entry->hw_idx = elem->hw_idx + 1;
-+	}
-+	list_add(&entry->list, hpos);
-+	return 0;
-+}
-+
-+int mv88e6xxx_tcam_entry_add(struct mv88e6xxx_chip *chip,
-+			     struct mv88e6xxx_tcam_entry *entry)
-+{
-+	int err;
-+	struct mv88e6xxx_tcam_entry *last;
-+
-+	last = list_last_entry_or_null(&chip->tcam.entries,
-+				       struct mv88e6xxx_tcam_entry, list);
-+	if (last && last->hw_idx == chip->info->num_tcam_entries - 1)
-+		return -ENOSPC;
-+
-+	err = mv88e6xxx_tcam_insert_entry(chip, entry);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_tcam_flush_entry(chip, entry->hw_idx);
-+	if (err)
-+		goto unlink_out;
-+
-+	err = chip->info->ops->tcam_ops->entry_add(chip, entry, entry->hw_idx);
-+	if (err)
-+		goto unlink_out;
-+
-+	return 0;
-+
-+unlink_out:
-+	list_del(&entry->list);
-+	return err;
-+}
-+
-+int mv88e6xxx_tcam_entry_del(struct mv88e6xxx_chip *chip,
-+			     struct mv88e6xxx_tcam_entry *entry)
-+{
-+	struct mv88e6xxx_tcam_entry *elem = entry;
-+	u8 move_idx = entry->hw_idx;
-+	int err;
-+
-+	err = mv88e6xxx_tcam_flush_entry(chip, entry->hw_idx);
-+	if (err)
-+		return err;
-+
-+	/* move entries that come after the deleted entry forward */
-+	list_for_each_entry_continue(elem, &chip->tcam.entries, list) {
-+		u8 tmp_idx = elem->hw_idx;
-+
-+		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
-+		if (err)
-+			break;
-+
-+		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
-+							   move_idx);
-+		if (err)
-+			break;
-+
-+		elem->hw_idx =  move_idx;
-+		move_idx = tmp_idx;
-+
-+		/* flush the last entry after moving entries */
-+		if (list_is_last(&elem->list, &chip->tcam.entries))
-+			err = mv88e6xxx_tcam_flush_entry(chip, tmp_idx);
-+	}
-+
-+	list_del(&entry->list);
-+	kfree(entry);
-+	return err;
-+}
-+
-+static int mv88e6390_tcam_entry_add(struct mv88e6xxx_chip *chip,
-+				    struct mv88e6xxx_tcam_entry *entry, u8 idx)
-+{
-+	int err = 0;
-+	int i;
-+
-+	err = mv88e6xxx_tcam_read_page(chip, 2, idx);
-+	if (err)
-+		return err;
-+	if (entry->action.dpv_mode != 0) {
-+		u16 val = MV88E6XXX_TCAM_ING_ACT3_SF |
-+			 (entry->action.dpv & MV88E6XXX_TCAM_ING_ACT3_DPV_MASK);
-+
-+		err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_ING_ACT3, val);
-+		if (err)
-+			return err;
-+
-+		val = entry->action.dpv_mode << 14;
-+		err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_ING_ACT5, val);
-+		if (err)
-+			return err;
-+	}
-+	err = mv88e6xxx_tcam_load_page(chip, 2, idx);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_tcam_read_page(chip, 1, idx);
-+	if (err)
-+		return err;
-+
-+	for (i = PAGE0_MATCH_SIZE;
-+	     i < PAGE0_MATCH_SIZE + PAGE1_MATCH_SIZE; i++) {
-+		if (entry->key.frame_mask[i]) {
-+			u16 val = entry->key.frame_mask[i] << 8 |
-+				  entry->key.frame_data[i];
-+
-+			err = mv88e6xxx_tcam_write(chip,
-+						   i - PAGE0_MATCH_SIZE + 2,
-+						   val);
-+			if (err)
-+				return err;
-+		}
-+	}
-+	err = mv88e6xxx_tcam_load_page(chip, 1, idx);
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_tcam_read_page(chip, 0, idx);
-+	if (err)
-+		return err;
-+
-+	for (i = 0; i < PAGE0_MATCH_SIZE; i++) {
-+		if (entry->key.frame_mask[i]) {
-+			u16 val = entry->key.frame_mask[i] << 8 |
-+				  entry->key.frame_data[i];
-+
-+			err = mv88e6xxx_tcam_write(chip, i + 6, val);
-+			if (err)
-+				return err;
-+		}
-+	}
-+	u16 spv_mask = entry->key.spv_mask & mv88e6xxx_port_mask(chip);
-+	u16 spv = entry->key.spv & mv88e6xxx_port_mask(chip);
-+	/* frame type mask bits must be set for a valid entry */
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_KEYS1,
-+				   MV88E6XXX_TCAM_KEYS1_FT_MASK |
-+				   (spv_mask & 0x0700) | (spv >> 8));
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_KEYS2,
-+				   (spv_mask << 8) | (spv & 0x00ff));
-+	if (err)
-+		return err;
-+
-+	err = mv88e6xxx_tcam_load_page(chip, 0, idx);
-+	if (err)
-+		return err;
-+
-+	entry->hw_idx = idx;
-+	return 0;
-+}
-+
-+static int mv88e6393_tcam_entry_add(struct mv88e6xxx_chip *chip,
-+				    struct mv88e6xxx_tcam_entry *entry, u8 idx)
-+{
-+	int err;
-+
-+	/* select block 0 port 0, then adding an entry is the same as 6390 as
-+	 * other blocks aren't used at the moment
-+	 */
-+	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_EXTENSION, 0x00);
-+	if (err)
-+		return err;
-+
-+	return mv88e6390_tcam_entry_add(chip, entry, idx);
-+}
-+
-+const struct mv88e6xxx_tcam_ops mv88e6390_tcam_ops = {
-+	.entry_add = mv88e6390_tcam_entry_add,
-+	.flush_tcam = mv88e6xxx_tcam_flush_all,
-+};
-+
-+const struct mv88e6xxx_tcam_ops mv88e6393_tcam_ops = {
-+	.entry_add = mv88e6393_tcam_entry_add,
-+	.flush_tcam = mv88e6xxx_tcam_flush_all,
-+};
-diff --git a/drivers/net/dsa/mv88e6xxx/tcam.h b/drivers/net/dsa/mv88e6xxx/tcam.h
-new file mode 100644
-index 000000000000..d82bc9bc0768
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/tcam.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+/*
-+ * Copyright (c) 2026 Luminex Network Intelligence
-+ */
-+#ifndef _MV88E6XXX_TCAM_H_
-+#define _MV88E6XXX_TCAM_H_
-+
-+#define PAGE0_MATCH_SIZE 22
-+#define PAGE1_MATCH_SIZE 26
-+
-+#define DPV_MODE_NOP		0x0
-+#define DPV_MODE_AND		0x1
-+#define DPV_MODE_OR		0x2
-+#define DPV_MODE_REPLACE	0x3
-+
-+int mv88e6xxx_tcam_entry_add(struct mv88e6xxx_chip *chip,
-+			     struct mv88e6xxx_tcam_entry *entry);
-+int mv88e6xxx_tcam_entry_del(struct mv88e6xxx_chip *chip,
-+			     struct mv88e6xxx_tcam_entry *entry);
-+struct mv88e6xxx_tcam_entry *
-+mv88e6xxx_tcam_entry_find(struct mv88e6xxx_chip *chip, unsigned long cookie);
-+#define mv88e6xxx_tcam_match_set(key, _offset, data, mask) \
-+	do { \
-+		typeof(_offset) (offset) = (_offset); \
-+		BUILD_BUG_ON((offset) + sizeof((data)) > TCAM_MATCH_SIZE); \
-+		__mv88e6xxx_tcam_match_set(key, offset, sizeof(data), \
-+					   (u8 *)&(data), (u8 *)&(mask)); \
-+	} while (0)
-+
-+static inline void __mv88e6xxx_tcam_match_set(struct mv88e6xxx_tcam_key *key,
-+					      unsigned int offset, size_t size,
-+					      u8 *data, u8 *mask)
-+{
-+	memcpy(&key->frame_data[offset], data, size);
-+	memcpy(&key->frame_mask[offset], mask, size);
-+}
-+
-+extern const struct mv88e6xxx_tcam_ops mv88e6390_tcam_ops;
-+extern const struct mv88e6xxx_tcam_ops mv88e6393_tcam_ops;
-+#endif
-diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.c b/drivers/net/dsa/mv88e6xxx/tcflower.c
-new file mode 100644
-index 000000000000..c28282ead486
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/tcflower.c
-@@ -0,0 +1,157 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Marvell 88E6xxx Switch flower support
-+ *
-+ * Copyright (c) 2026 Luminex Network Intelligence
-+ */
-+
-+#include "chip.h"
-+#include "tcflower.h"
-+#include "tcam.h"
-+
-+#define MV88E6XXX_ETHTYPE_OFFSET 16
-+#define MV88E6XXX_IP_PROTO_OFFSET 27
-+#define MV88E6XXX_IPV4_SRC_OFFSET 30
-+#define MV88E6XXX_IPV4_DST_OFFSET 34
-+
-+static int mv88e6xx_flower_parse_key(struct mv88e6xxx_chip *chip,
-+				     struct netlink_ext_ack *extack,
-+				     struct flow_cls_offload *cls,
-+				     struct mv88e6xxx_tcam_key *key)
-+{
-+	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-+	struct flow_dissector *dissector = rule->match.dissector;
-+	u16 addr_type = 0;
-+
-+	if (dissector->used_keys &
-+	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS))) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unsupported keys used");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
-+		struct flow_match_control match;
-+
-+		flow_rule_match_control(rule, &match);
-+		addr_type = match.key->addr_type;
-+
-+		if (flow_rule_has_control_flags(match.mask->flags,
-+						cls->common.extack))
-+			return -EOPNOTSUPP;
-+	}
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
-+		struct flow_match_basic match;
-+
-+		flow_rule_match_basic(rule, &match);
-+		mv88e6xxx_tcam_match_set(key, MV88E6XXX_ETHTYPE_OFFSET,
-+					 match.key->n_proto,
-+					 match.mask->n_proto);
-+		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IP_PROTO_OFFSET,
-+					 match.key->ip_proto,
-+					 match.mask->ip_proto);
-+	}
-+
-+	if (addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
-+		struct flow_match_ipv4_addrs match;
-+
-+		flow_rule_match_ipv4_addrs(cls->rule, &match);
-+		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_SRC_OFFSET,
-+					 match.key->src,
-+					 match.mask->src);
-+		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_DST_OFFSET,
-+					 match.key->dst,
-+					 match.mask->dst);
-+	}
-+
-+	return 0;
-+}
-+
-+int mv88e6xxx_cls_flower_add(struct dsa_switch *ds, int port,
-+			     struct flow_cls_offload *cls, bool ingress)
-+{
-+	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-+	struct netlink_ext_ack *extack = cls->common.extack;
-+	struct mv88e6xxx_chip *chip = ds->priv;
-+	struct mv88e6xxx_tcam_key key = { 0 };
-+	const struct flow_action_entry *act;
-+	unsigned long cookie = cls->cookie;
-+	struct mv88e6xxx_tcam_entry *entry;
-+	int err, i;
-+
-+	if (!mv88e6xxx_has_tcam(chip)) {
-+		NL_SET_ERR_MSG_MOD(extack, "hardware offload not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	err = mv88e6xx_flower_parse_key(chip, extack, cls, &key);
-+	if (err)
-+		return err;
-+
-+	mv88e6xxx_reg_lock(chip);
-+	entry = mv88e6xxx_tcam_entry_find(chip, cookie);
-+	if (entry) {
-+		err = -EEXIST;
-+		goto err_unlock;
-+	}
-+
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry) {
-+		err = -ENOMEM;
-+		goto err_unlock;
-+	}
-+
-+	entry->cookie = cookie;
-+	entry->prio = cls->common.prio;
-+	entry->key = key;
-+
-+	flow_action_for_each(i, act, &rule->action) {
-+		switch (act->id) {
-+		case FLOW_ACTION_TRAP: {
-+			int cpu = dsa_upstream_port(ds, port);
-+
-+			entry->action.dpv_mode = DPV_MODE_REPLACE;
-+			entry->action.dpv = BIT(cpu);
-+			break;
-+		}
-+		default:
-+			NL_SET_ERR_MSG_MOD(extack, "action not supported");
-+			err = -EOPNOTSUPP;
-+			goto err_free_entry;
-+		}
-+	}
-+
-+	entry->key.spv = BIT(port);
-+	entry->key.spv_mask = mv88e6xxx_port_mask(chip);
-+
-+	err = mv88e6xxx_tcam_entry_add(chip, entry);
-+	if (err)
-+		goto err_free_entry;
-+
-+	mv88e6xxx_reg_unlock(chip);
-+	return  0;
-+
-+err_free_entry:
-+	kfree(entry);
-+err_unlock:
-+	mv88e6xxx_reg_unlock(chip);
-+	return err;
-+}
-+
-+int mv88e6xxx_cls_flower_del(struct dsa_switch *ds, int port,
-+			     struct flow_cls_offload *cls, bool ingress)
-+{
-+	struct mv88e6xxx_chip *chip = ds->priv;
-+	struct mv88e6xxx_tcam_entry *entry;
-+	int err = 0;
-+
-+	mv88e6xxx_reg_lock(chip);
-+	entry = mv88e6xxx_tcam_entry_find(chip, cls->cookie);
-+
-+	if (entry)
-+		err = mv88e6xxx_tcam_entry_del(chip, entry);
-+	mv88e6xxx_reg_unlock(chip);
-+	return  err;
-+}
-diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.h b/drivers/net/dsa/mv88e6xxx/tcflower.h
-new file mode 100644
-index 000000000000..96bb8da80bec
---- /dev/null
-+++ b/drivers/net/dsa/mv88e6xxx/tcflower.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+/*
-+ * Copyright (c) 2026 Luminex Network Intelligence
-+ */
-+#ifndef _MV88E6XXX_TCFLOWER_H_
-+#define _MV88E6XXX_TCFLOWER_H_
-+
-+int mv88e6xxx_cls_flower_add(struct dsa_switch *ds, int port,
-+			     struct flow_cls_offload *cls, bool ingress);
-+int mv88e6xxx_cls_flower_del(struct dsa_switch *ds, int port,
-+			     struct flow_cls_offload *cls, bool ingress);
-+#endif
+With ksz_read8(), we read u8 data from address REG_SW_PORT_INT_STATUS__1.
+With ksz_read16(), how do we read u16 data? Don't we read
+data[15:8] from REG_SW_PORT_INT_STATUS__1 and
+data[7:0] from REG_SW_PORT_INT_STATUS__1 + 1?
+But then we still look at the 0..kirq->nirq bits, effectively from address
+REG_SW_PORT_INT_STATUS__1 + 1 now?
 
--- 
-2.43.0
+Or are the registers at address i 16-bits wide without spilling over
+into address i+1? Because if that's the case, I don't understand the
+comment/concern about overreading.
 
-
+>  	if (ret)
+>  		goto out;
 
