@@ -1,210 +1,181 @@
-Return-Path: <netdev+bounces-264230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yN4dJzJHqWm33gAAu9opvQ
-	(envelope-from <netdev+bounces-264230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:04:50 +0100
+	id yGVZDzBIqWnw3gAAu9opvQ
+	(envelope-from <netdev+bounces-264231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:09:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15ACB20DE7F
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:04:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A8B20E062
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E4BD30A7823
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:00:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AC37309EE94
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB6F361DCE;
-	Thu,  5 Mar 2026 09:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E748372EF8;
+	Thu,  5 Mar 2026 09:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="e0UEYfXB"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="p5KLTeKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CBE3242B0;
-	Thu,  5 Mar 2026 09:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772701243; cv=pass; b=YA+rQ29gZJL/x5671zJ28fUyGbzfeg7fCd2Zuhhb1rCF2cfLnzpumJybthDYviHDjJB2bNRfY4gXZ0upUUBhu5KgxxNqz6Et8ch3zi7Dp1lUVacmIVJnNR3fqDAe82Aybyh11x9PX/OmEWAOqwElOXSauu7NjxwHe2a3DHXksSg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772701243; c=relaxed/simple;
-	bh=pey75eEThoEnHQjSmZ+IVIhI1hTMvdMzabhpITD61Sw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=etOEwNX7sboCq9fbcvlKzgRXLv8YH3RC5Xhv0iJpFsNvLcqM9fjp0DaaDmKyE8WG4PW4h2icwv9eYJPq3MbHBLX5MqNaOnO/pPu9giQQrQIqiISTn4lDBh6dCWtWz/bR6iC/u5QNTeCWoxLZxD33nbrPjCiWjQRsF7N5O7PIyw4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=e0UEYfXB; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1772701198; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=lZfdoF0se+mb5+rKW3KIqtNlypck4va7ch7J6QBw6dUuT9PG7Mg2DtmmnmSOZcJBGJCQeujXNJMd9/j2iapWzg/H0MpTIrtOzXpbWBYZdiB10UQuZ22YyE/K9vgHdonXDaThW1s0jZcBfNhUa/WjYgVB/FLjYVYbdA/BHbtG8BE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1772701198; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=pey75eEThoEnHQjSmZ+IVIhI1hTMvdMzabhpITD61Sw=; 
-	b=bWxyTbb1c9KT/sVbuLa54G5M3uZaF3ilAlI5btjv7vp3TFNx9U6g7NjWJR0micoyjac6ydlvSj/z6jzQrdzH5eWuICh3Jm/0C79xbpitClcnt676RAn0RVoY8ASkpCnSUwsDZ6RHYrdbcwl6eQGWwCiPZrccNzTEdNGCH+Zc/wE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
-	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772701198;
-	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=pey75eEThoEnHQjSmZ+IVIhI1hTMvdMzabhpITD61Sw=;
-	b=e0UEYfXBhyAFq0y9vrEVYrrtrDV+uEf53upMxDmuKue8e4yinFtsSbdw123xNaeg
-	Lsuk0z/ghpooX4ZF8vY7jCIUDwf9AvIkwX67N6LwDGWZQMVmRJLuDZSgB3oTrUzZ3ti
-	kpeJCU/HB3t4SxItxDjqa+Z6fpEDS/0AnHpj47k4=
-Received: by mx.zohomail.com with SMTPS id 1772701196666782.1404033627674;
-	Thu, 5 Mar 2026 00:59:56 -0800 (PST)
-Message-ID: <cb788f76740e88418d55ce9345e54d482969ff5a.camel@collabora.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: Add support for Airoha
- AN8801/R GbE PHY
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, Andrew Lunn	
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni	 <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski	 <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit	 <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: kevin-kw.huang@airoha.com, macpaul.lin@mediatek.com,
- matthias.bgg@gmail.com, 	kernel@collabora.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, 	linux-kernel@vger.kernel.org
-Date: Thu, 05 Mar 2026 09:59:50 +0100
-In-Reply-To: <4a073736-9caf-4973-b7ad-a482d63bb672@bootlin.com>
-References: 
-	<20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
-	 <20260304-add-airoha-an8801-support-v1-1-0ae4ee5a2f9d@collabora.com>
-	 <4a073736-9caf-4973-b7ad-a482d63bb672@bootlin.com>
-Organization: Collabora Ltd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E144679DA;
+	Thu,  5 Mar 2026 09:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772701475; cv=none; b=pE+CE6WD0Ods9ruvwx4wCZV4Z4WLocJfpDra9IW0Bmcj+NZq3NFbv41rACmKb1pFXcOJeQv2ySF+tK8tDrP9B7oCBx2wLdKLotGEdGXWOaUYFuYwvSOAnYrKq1OUIrOsvr/R86ldyaFc4TPcXVahUy1I+nniyJKDb1YCcNpMp90=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772701475; c=relaxed/simple;
+	bh=7L05pmouAdsIHTPLUff5zr8N11GEkqPxdNtol80JoeU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nm44TCQI3apD5gpEViKwRHIZaNYBH5MdPZosy2Z51VNTxqx40i4wSQr89xNpnNG58tlOk1ssrUXqj2fx2BE4R5PEXV8K3uwD9yR89IkfQfr2OEA0QTfd46JpkrUnNlsJ9Rg2y4EuwUxjU14eO9VknZeIDMqM3H6qKJ6kLRd0d48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=p5KLTeKx; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1772701473; x=1804237473;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7L05pmouAdsIHTPLUff5zr8N11GEkqPxdNtol80JoeU=;
+  b=p5KLTeKxAl2+ElyTb2cxgyPkZMfGP9Z5jDCOl0CnxXmX6v6yXVLLmUTO
+   Q9eZ6Wqc7G9ldCoHMINE9v0h4k8CYU1sRVZsUjlBD13Djxk0QihQPnHso
+   tGHQiESEPzrt9/Uug+nB8TWUOWCw6h9T9Rq3GSmMG6eqh/wLTc7WfSllO
+   n17BulV49YR7znSe8zwt0As8+YEZpm+2vtXjptRAMYTEOXNZvW7pxC/Uf
+   HLMQh21XlL3qCo705UQ38YHknsvpvvQSx1YbQ68H/aBwyUJsWXAjdeer4
+   QiEywA3IBGhqbBBVW1qZbKPFQiDWTIz4oZMOy0lH8HNOCbVVPq9tnHMpl
+   A==;
+X-CSE-ConnectionGUID: bPfqscjNRrKHYC/Fbqf2CA==
+X-CSE-MsgGUID: 52xUsO9hSieLzThzvp1Vkg==
+X-IronPort-AV: E=Sophos;i="6.23,325,1770620400"; 
+   d="scan'208";a="61752234"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 02:04:32 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Thu, 5 Mar 2026 02:04:02 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 02:03:59 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: lan743x: fix SGMII detection on PCI1xxxx B0+ during warm reset
+Date: Thu, 5 Mar 2026 14:33:55 +0530
+Message-ID: <20260305090355.4946-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
-X-Rspamd-Queue-Id: 15ACB20DE7F
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 97A8B20E062
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264230-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_TO(0.00)[bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[airoha.com,mediatek.com,gmail.com,collabora.com,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devicetree.org:url]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-264231-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim,microchip.com:email,microchip.com:mid]
 X-Rspamd-Action: no action
 
-Hi Maxime,
+A warm reset on boards using an EEPROM-only strap configuration (where
+no MAC address is set in the image) can cause the driver to incorrectly
+revert to RGMII mode. This occurs because the ENET_CONFIG_LOAD_STARTED
+bit may not persist or behave as expected.
 
-On Wed, 2026-03-04 at 11:14 +0100, Maxime Chevallier wrote:
-> Hi Louis-Alexis,
->=20
-> On 04/03/2026 10:35, Louis-Alexis Eyraud wrote:
-> > From: AngeloGioacchino Del Regno
-> > <angelogioacchino.delregno@collabora.com>
-> >=20
-> > Add a new binding to support the Airoha AN8801R Series Gigabit
-> > Ethernet PHY.
-> >=20
-> > Signed-off-by: AngeloGioacchino Del Regno
-> > <angelogioacchino.delregno@collabora.com>
-> > Signed-off-by: Louis-Alexis Eyraud
-> > <louisalexis.eyraud@collabora.com>
-> > ---
-> > =C2=A0.../devicetree/bindings/net/airoha,an8801.yaml=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 81
-> > ++++++++++++++++++++++
-> > =C2=A01 file changed, 81 insertions(+)
-> >=20
-> > diff --git
-> > a/Documentation/devicetree/bindings/net/airoha,an8801.yaml
-> > b/Documentation/devicetree/bindings/net/airoha,an8801.yaml
-> > new file mode 100644
-> > index
-> > 0000000000000000000000000000000000000000..f251c9d2fbbed3675c9fd7ff2
-> > 2174049a13a7b5e
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/airoha,an8801.yaml
-> > @@ -0,0 +1,81 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/airoha,an8801.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Airoha AN8801R Series PHY
-> > +
-> > +maintainers:
-> > +=C2=A0 - AngeloGioacchino Del Regno
-> > <angelogioacchino.delregno@collabora.com>
-> > +
-> > +description:
-> > +=C2=A0 The Airoha AN8801R is a low power single-port Ethernet PHY
-> > Transceiver
-> > +=C2=A0 with Single-port serdes interface for 1000Base-X/RGMII; this
-> > chip is
-> > +=C2=A0 compliant with 10Base-T, 100Base-TX and 1000Base-T IEEE
-> > 802.3(u,ab)
-> > +=C2=A0 and supports Energy Efficient Ethernet (802.3az), Full Duplex
-> > Control
-> > +=C2=A0 Flow (802.3x), auto-negotiation, crossover detect and
-> > autocorrection,
-> > +=C2=A0 Wake-on-LAN with Magic Packet, and Jumbo Frame up to 9
-> > Kilobytes.
-> > +=C2=A0 This PHY also supports up to three user-configurable LEDs, whic=
-h
-> > are
-> > +=C2=A0 usually used for LAN Activity, 100M, 1000M indication.
-> > +
-> > +allOf:
-> > +=C2=A0 - $ref: ethernet-phy.yaml#
-> > +
-> > +properties:
-> > +=C2=A0 compatible:
-> > +=C2=A0=C2=A0=C2=A0 enum:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - ethernet-phy-idc0ff.0421
-> > +
-> > +=C2=A0 reg:
-> > +=C2=A0=C2=A0=C2=A0 maxItems: 1
-> > +
-> > +=C2=A0 leds: true
-> > +
-> > +required:
-> > +=C2=A0 - reg
-> > +=C2=A0 - leds
->=20
-> Seems odd to me that leds are required. Any reason for that ?
->=20
-> Maxime
-I agree having the leds as required property is unneeded.
-I'll change it in v2.
+Update pci11x1x_strap_get_status() to use revision-specific validation:
 
-Regards,
-Louis-Alexis
+- For PCI11x1x A0: Continue using the legacy check (config load started
+  or reset protection) to validate the SGMII strap.
+- For PCI11x1x B0 and later: Use the newly available
+  STRAP_READ_USE_SGMII_EN_ bit in the upper strap register to validate
+  the lower SGMII_EN bit.
+
+This ensures the SGMII interface is correctly identified even after a
+warm reboot.
+
+Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 11 +++++++----
+ drivers/net/ethernet/microchip/lan743x_main.h |  1 +
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index a3845edf0e48..866f6a3da0d9 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -32,10 +32,12 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ {
+ 	u32 chip_rev;
+ 	u32 cfg_load;
++	u32 dev_rev;
+ 	u32 hw_cfg;
+ 	u32 strap;
+ 	int ret;
+ 
++	dev_rev = adapter->csr.id_rev & ID_REV_CHIP_REV_MASK_;
+ 	/* Timeout = 100 (i.e. 1 sec (10 msce * 100)) */
+ 	ret = lan743x_hs_syslock_acquire(adapter, 100);
+ 	if (ret < 0) {
+@@ -47,10 +49,11 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 	cfg_load = lan743x_csr_read(adapter, ETH_SYS_CONFIG_LOAD_STARTED_REG);
+ 	lan743x_hs_syslock_release(adapter);
+ 	hw_cfg = lan743x_csr_read(adapter, HW_CFG);
+-
+-	if (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
+-	    hw_cfg & HW_CFG_RST_PROTECT_) {
+-		strap = lan743x_csr_read(adapter, STRAP_READ);
++	strap = lan743x_csr_read(adapter, STRAP_READ);
++	if ((dev_rev == ID_REV_CHIP_REV_PCI11X1X_A0_  &&
++	     (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
++	     hw_cfg & HW_CFG_RST_PROTECT_)) ||
++	     (strap & STRAP_READ_USE_SGMII_EN_)) {
+ 		if (strap & STRAP_READ_SGMII_EN_)
+ 			adapter->is_sgmii_en = true;
+ 		else
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 02a28b709163..160d94a7cee6 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -27,6 +27,7 @@
+ #define ID_REV_CHIP_REV_MASK_		(0x0000FFFF)
+ #define ID_REV_CHIP_REV_A0_		(0x00000000)
+ #define ID_REV_CHIP_REV_B0_		(0x00000010)
++#define ID_REV_CHIP_REV_PCI11X1X_A0_	(0x000000A0)
+ #define ID_REV_CHIP_REV_PCI11X1X_B0_	(0x000000B0)
+ 
+ #define FPGA_REV			(0x04)
+-- 
+2.34.1
+
 
