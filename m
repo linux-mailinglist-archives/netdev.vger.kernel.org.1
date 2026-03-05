@@ -1,183 +1,198 @@
-Return-Path: <netdev+bounces-264172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DLTEjUEqWlW0QAAu9opvQ
-	(envelope-from <netdev+bounces-264172-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:19:01 +0100
+	id CJKmKBLZqWl5GAEAu9opvQ
+	(envelope-from <netdev+bounces-264518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:27:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A811C20ABB0
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:19:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4606A217849
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:27:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 045A7305B959
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 04:17:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6C1413006B78
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 19:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349F11F0995;
-	Thu,  5 Mar 2026 04:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99BD33509E;
+	Thu,  5 Mar 2026 19:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Iy1qf1p8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Qg+qnD8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0082F1A6828;
-	Thu,  5 Mar 2026 04:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FAD378829
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 19:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772684268; cv=none; b=o4O8eZpGglYgcqePoKt3MLIna+uwBlAoA3XrC4tXdxRYdUch8xal30j0lfiVODhhf9+cJ4bl1/kplypI+FYSLzDs+0pHCznTmyI4nZ3tj5TWUiKY0xE6Yy0Vz3fBN+zSA3Om2lZLmNZotqX9jWeQfjm10pGkNeABUbiNb6tNTZg=
+	t=1772738824; cv=none; b=D2MG7nqWq7RRYGjA2RpsW3dBAQQ2jbpxtBgaq6DDBa8623oWzC/g2RUZ8FCiMaLmoyvTd+DV+eKGBecPaV2uyF1O79pKWeRGaBbKGvsbx+NniQFMM0g8XvBNErVcWyQbgJpfY9wd1DWZxmnpkaSS6XwjJzvL/ufD3jk0rnF32CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772684268; c=relaxed/simple;
-	bh=ju0G5UZ2rCJU+V3SLjPep3HnbLt/EM2wPBSuA/6zSAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+uzJXOjA+sgv1VUBGl0/f7vqncxnAvtUYzYz3jbWNPNn1KkSYpGleUHWFKEwlWFtCxWQH/Omfm8vNf68D9o2BBiQxBeyEI9D4ArSXaM5eRXaWe3fHiB36tUoT8hR2ot4LjMrU+GzbKj9riLNnQjR5KU0eL4XhUbXG6mRzuzuY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Iy1qf1p8; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772684265; x=1804220265;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ju0G5UZ2rCJU+V3SLjPep3HnbLt/EM2wPBSuA/6zSAY=;
-  b=Iy1qf1p8aSKL8u7NrTInlMeyrr6g2HqHsDdjTRkuW+Gshi3tRodlLgcC
-   Vw9vXKuGUmLLLJXTT/eO92Q0gVv2vNq1Qj5Z1rzNLki+ysqSMK1uY4tRJ
-   9a61016JzDP895N+5yG2tpkER+VhBM4wzlsUmSPy046QqOwRr0j1Gi10m
-   bt9TMg6bgvDkr2ehaiDqnpQvLLMi1/UHHwrm+TX0DHcsKfYugJrQMfG37
-   sNu4GEar1nX3uEFbZ9K+ozdKHQGMw8T7KWoWviQhbljdjZ7bKgBhKUaHS
-   Y0Q5pqQ0aBi/reIHblbiL0n7e83Lhy8c3tdZwMZe6Ks2rqQPjlr1T2mmZ
-   g==;
-X-CSE-ConnectionGUID: 0+Aq+1nqS/2v1sVQc7qUmg==
-X-CSE-MsgGUID: mHQGN7gLQf6og7hlPi12TA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="84095132"
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="84095132"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 20:17:45 -0800
-X-CSE-ConnectionGUID: Z0Ncu36vSUSh/gW40dxtLQ==
-X-CSE-MsgGUID: ZfeOJtbTQ7u/NXImdFn6Zg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="218675068"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by orviesa007.jf.intel.com with ESMTP; 04 Mar 2026 20:17:42 -0800
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vy09a-000000001wb-1w88;
-	Thu, 05 Mar 2026 04:17:38 +0000
-Date: Thu, 5 Mar 2026 05:17:13 +0100
-From: kernel test robot <lkp@intel.com>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>, saeedm@nvidia.com,
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, rama.nichanamatlu@oracle.com,
-	manjunath.b.patil@oracle.com, anand.a.khoje@oracle.com,
-	Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Message-ID: <202603050528.5JWnahEr-lkp@intel.com>
-References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+	s=arc-20240116; t=1772738824; c=relaxed/simple;
+	bh=CYYKmhUtg90PFt9VCmUypY1dgNUEpZWlq4p9vDQbEDU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WPzTMT9ngNvfcQQAARDd6Rkz+RE/idnBHZYhfk6SyILQx3R7qX+prHW+3VmfwJpYJoxay0WjE7zIL+dYMWFbAbryfNlnHiRBKdUgUSDBUYGwpN2jc5ZxRiDgjFcRVhFJRuUhQLX+hOoNetsuI1GpGgV5a/TA6dkQUAFroh3pQfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Qg+qnD8o; arc=none smtp.client-ip=35.89.44.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5002b.ext.cloudfilter.net ([10.0.29.226])
+	by cmsmtp with ESMTPS
+	id yCzTvhLICVCBNyELYv51AQ; Thu, 05 Mar 2026 19:26:57 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id yELKvMyMUN3K1yELLvW2xY; Thu, 05 Mar 2026 19:26:43 +0000
+X-Authority-Analysis: v=2.4 cv=UdRRSLSN c=1 sm=1 tr=0 ts=69a9d900
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=edf1wS77AAAA:8
+ a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=J2gJbEVsAAAA:8 a=hSkVLCK3AAAA:8
+ a=C9xVZAldh4BiXX6lDm0A:9 a=QEXdDO2ut3YA:10 a=DcSpbTIhAlouE1Uv7lRv:22
+ a=Bt_igOxda4ASFyQEjNxY:22 a=cQPPKAXgyycSBL8etih5:22 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PSPKeTGGopkm3YY/++r6DnAI0CLkMITuqPkvzJJH0FM=; b=Qg+qnD8ouUAuA6RGGUJgM28p1v
+	ZxxsZLYKunuqaPFONqBQ92GwS5fZPUd2CHiMH/I35qcktGB65563hbMB6tU8mRVvbxaFC3sU/XdUM
+	Kgz0lNMdig32sSLAWapa8amPKlvBhV6RA2ww5qauDcoxKYkZd0KDifyG8SiZrDs1xWcR7RPrFO/SO
+	QtOqdx941S1EWGRBosT+Rw/UKqwr2a+GfVOSs3KjFiZMXxVW5ptw8tyg2I4WgvFAoE/7QFRtRNCKh
+	/Gdmx09ACFzrjuL0BwYAqKH0hpCO1A6WvqU2o4OEATjmtqDB4S1r5rZmIOGj61HKFZan5Dg7FxT+K
+	tP0gETCw==;
+Received: from [177.238.16.13] (port=52146 helo=[192.168.0.21])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vyELJ-00000000MfN-3cSS;
+	Thu, 05 Mar 2026 13:26:41 -0600
+Message-ID: <5c8bab4f-5821-428b-adcf-b2c0631da415@embeddedor.com>
+Date: Thu, 5 Mar 2026 13:26:08 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
-X-Rspamd-Queue-Id: A811C20ABB0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] net: sched: cls_u32: Avoid memcpy()
+ false-positive warning in u32_init_knode()
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+ syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260305073343.250702-1-jiayuan.chen@linux.dev>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20260305073343.250702-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.16.13
+X-Source-L: No
+X-Exim-ID: 1vyELJ-00000000MfN-3cSS
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.21]) [177.238.16.13]:52146
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 27
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfNG+yeq2ExKMjnPK49bJ8wRUvwOMt11Cuys35KnQpqP/x5Dq4/tQ6nDT9TNR1AMbDSss/RieOIvuCpt6DfzJg4HdITRSs/ZbuLQxZ8z0OO3+RKjjojd3
+ AJ5sw4amfm5ZAVp3KV/ONuRfD7co0CXbtphwV/frvXIMN70ogUOIfdzn5ljFbo2LWj2J/uYpf/tPz5DLG5pvppzfkqmEnG0Ix0Q=
+X-Rspamd-Queue-Id: 4606A217849
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264172-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264518-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[embeddedor.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_SOURCE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	HAS_X_ANTIABUSE(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
+	NEURAL_HAM(-0.00)[-0.980];
+	TAGGED_RCPT(0.00)[netdev,d5ace703ed883df56e42];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,git-scm.com:url,01.org:url]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,appspotmail.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,embeddedor.com:mid]
 X-Rspamd-Action: no action
 
-Hi Praveen,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v6.16-rc1 next-20260304]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Praveen-Kumar-Kannoju/net-mlx5-poll-mlx5-eq-during-irq-migration/20260305-003505
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260304161704.910564-1-praveen.kannoju%40oracle.com
-patch subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260305/202603050528.5JWnahEr-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603050528.5JWnahEr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603050528.5JWnahEr-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:6: warning: no previous prototype for 'mlx5_eq_reap_irq_notify' [-Wmissing-prototypes]
-     958 | void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:6: warning: no previous prototype for 'mlx5_eq_reap_irq_release' [-Wmissing-prototypes]
-     978 | void mlx5_eq_reap_irq_release(struct kref *ref) {}
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~
 
 
-vim +/mlx5_eq_reap_irq_notify +958 drivers/net/ethernet/mellanox/mlx5/core/eq.c
+On 3/5/26 16:33, Jiayuan Chen wrote:
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> 
+> Syzbot reported a warning in u32_init_knode() [1].
+> 
+> Similar to commit 7cba18332e36 ("net: sched: cls_u32: Avoid memcpy()
+> false-positive warning") which addressed the same issue in u32_change(),
+> use unsafe_memcpy() in u32_init_knode() to work around the compiler's
+> inability to see into composite flexible array structs.
+> 
+> This silences the false-positive reported by syzbot:
+> 
+>    memcpy: detected field-spanning write (size 32) of single field
+>    "&new->sel" at net/sched/cls_u32.c:855 (size 16)
+> 
+> Since the memory is correctly allocated with kzalloc_flex() using
+> s->nkeys, this is purely a false positive and does not need a Fixes tag.
+> 
+> [1] https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42
+> 
+> Reported-by: syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/69a811b9.a70a0220.b118c.0019.GAE@google.com/T/
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-   957	
- > 958	void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-   959	{
-   960		u32 eqe_count;
-   961		struct mlx5_eq_comp *eq = container_of(notify, struct mlx5_eq_comp, notify);
-   962	
-   963		if (mlx5_reap_eq_irq_aff_change) {
-   964			mlx5_core_warn(eq->core.dev, "irqn = 0x%x migration notified, EQ 0x%x: Cons = 0x%x\n",
-   965				       eq->core.irqn, eq->core.eqn, eq->core.cons_index);
-   966	
-   967			while (!rtnl_trylock())
-   968				msleep(20);
-   969	
-   970			eqe_count = mlx5_eq_poll_irq_disabled(eq);
-   971			if (eqe_count)
-   972				mlx5_core_warn(eq->core.dev, "Recovered %d eqes on EQ 0x%x\n",
-   973					       eqe_count, eq->core.eqn);
-   974			rtnl_unlock();
-   975		}
-   976	}
-   977	
- > 978	void mlx5_eq_reap_irq_release(struct kref *ref) {}
-   979	
+Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks
+-Gustavo
+
+> Made-with: Cursor
+> ---
+>   net/sched/cls_u32.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index 9241c025aa74..8f30cc82181d 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -852,7 +852,10 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
+>   	/* Similarly success statistics must be moved as pointers */
+>   	new->pcpu_success = n->pcpu_success;
+>   #endif
+> -	memcpy(&new->sel, s, struct_size(s, keys, s->nkeys));
+> +	unsafe_memcpy(&new->sel, s, struct_size(s, keys, s->nkeys),
+> +		      /* A composite flex-array structure destination,
+> +		       * which was correctly sized with kzalloc_flex(),
+> +		       * above. */);
+>   
+>   	if (tcf_exts_init(&new->exts, net, TCA_U32_ACT, TCA_U32_POLICE)) {
+>   		kfree(new);
+
 
