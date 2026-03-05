@@ -1,71 +1,70 @@
-Return-Path: <netdev+bounces-264384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264385-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDd8MOl9qWkg8gAAu9opvQ
-	(envelope-from <netdev+bounces-264384-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:58:17 +0100
+	id dbeoMSp/qWnA9QAAu9opvQ
+	(envelope-from <netdev+bounces-264385-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:03:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC565212368
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:58:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2450921255D
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 652B93006038
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:58:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E4A913148E37
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D6539FCD4;
-	Thu,  5 Mar 2026 12:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252BF3A0E95;
+	Thu,  5 Mar 2026 12:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="xJAILD6E"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1WZnTp+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C048A27A133;
-	Thu,  5 Mar 2026 12:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C58378D8E;
+	Thu,  5 Mar 2026 12:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772715492; cv=none; b=FKPlp27xI+Fdm/8MxIXu7SdKDpVVaMKGwdLIzACCcqVqo3pIUA56UfF6XOKYMj9kpCd0BSuw8pO+yrOAe0mws20Trja7n5UeIpjLHoz88zrhJ2S6VRG2MTVMaFRVIT6z1mze6AGVPt4T3OQV7aeYgE8/s1w+LS6YjMRfeRXyPh8=
+	t=1772715593; cv=none; b=lQznCMc9pYioIqJauLgTMOQXCIvbWTUPVEEsHSoIc2Lodr2dmkR8c+Q1TlBGE/WfQzmufOWNk5F4LGNjE48oG1DTpkJD6bcq8kCMsjHet608JeUCKxXOyi8Qje9BQcTYLX/pl92PXfyyysur3jiokT7Wn6IsNr7vFkX4+5N2yNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772715492; c=relaxed/simple;
-	bh=gUMw0bsomQGguuQoy5ja6PU2K1ToYQQzpr6OG5I1jD4=;
+	s=arc-20240116; t=1772715593; c=relaxed/simple;
+	bh=bOcAwKTNzkTznQVg72/ZDsD5vBxH2i0CoWWm5WnJStU=;
 	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jZvxhWT3L1piZb/Ase8ZaNnyLPq3/1zimKikR7749R8PiFcVGiPE7UXU+UepmKFawgwCE+DAQiaYWtOm2L7iXnLW2iYFOcl602iXyEraYlsxS8WhQZpT8wYPJbIFFtqYAiVTrUrHRL05SKw7pz59x9gAsQYowv03hAdTEHfsCoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=xJAILD6E; arc=none smtp.client-ip=68.232.153.233
+	 Content-Type:MIME-Version; b=AdauWe4sXNH0FL7F4ODqAa8xrlmkZXDX4YWJWFkdGjQDLdX74PFEDNqiJ2gVYRGSoYspbJFz4nCIBj4MvZJNV/an8iQ3bgqrQSrXpalLUk/VWfQuDgKd+ve6KFnsKh+gCXtqy4p9aec81bXSXSojzw7cb5MzcGbx5SViJd0psBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1WZnTp+N; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772715491; x=1804251491;
+  t=1772715592; x=1804251592;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=gUMw0bsomQGguuQoy5ja6PU2K1ToYQQzpr6OG5I1jD4=;
-  b=xJAILD6EFSBnqRP1mFB7rJhITjV0i19hLtuDJKIJWtuIC5Ya8sggnJZq
-   4UzjdhVlJDnlTMRXMaKBSjNKN1hbLe/ZMkSSBEzQpinp37buTN0t7/O4+
-   zBQIJQ8UmuRPEtMdf9RW+lDkDDnRWWNG3Q3up6bQOfUGyjqr9Wou5vRPd
-   Jjio4hUToYWN8dlGPk1JhGCbsIn3r8qgls2Fj3SSc8ykgQzm9sTWkYZ0z
-   2A4LgboF44tKAex1VbHu6F/6d5Cbh7nNWf1QdmrATbSb2Jo7DSCGOMX+L
-   TzgAYvRVRsmFpz2TEZwKVje/LENxQ0zP7fvadb2MzaHxFLazwHhv9+wro
-   w==;
-X-CSE-ConnectionGUID: 4Xb2lvBgRsyARSuCBKYbiw==
-X-CSE-MsgGUID: F+cfBPhfTZGO4+LwlI77sg==
+  bh=bOcAwKTNzkTznQVg72/ZDsD5vBxH2i0CoWWm5WnJStU=;
+  b=1WZnTp+NeRwgQSwbxnrLGdsiF/wQrmzel7tU9QiNAofQU8UoGuSLogWh
+   964m+KxnoagXoBsGvDbBiLRLrz+wRZEc6IZq4lx2yKvx66MFBtg3jBZVu
+   20Hmpj8ds70o1L2+/Hygo3toBhw1mEgWqwTHlGmkMg3pZC8zcOedqRkXd
+   Sq0HqUeNcwaGB38GUVsivB0CqSTFTpxHulpYNvUDLd9Dk3UMdnRzj8Yq1
+   NZI2t+vMdC4rJ2SRj7NrQYaJpnwqSPSA4PJ4UXGWUazXMzYhPg3CCE/ji
+   jm7rnokZx5AdHsNbk35DiVAPQRS/TUzW40Rh9GNkCe+l6j9ISkiXvsM9m
+   g==;
+X-CSE-ConnectionGUID: Sf8rCq1BRVywokuql48qeQ==
+X-CSE-MsgGUID: y2T0iinuQUqoYmzJDoHe9A==
 X-IronPort-AV: E=Sophos;i="6.23,103,1770620400"; 
-   d="scan'208";a="285647998"
+   d="scan'208";a="221534946"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 05:58:10 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Mar 2026 05:59:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Thu, 5 Mar 2026 05:57:41 -0700
+ 15.1.2507.58; Thu, 5 Mar 2026 05:59:30 -0700
 Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 05:57:38 -0700
-Message-ID: <1db45715a3a12b76b838d20c0e5904c3222053e7.camel@microchip.com>
-Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
- switch bindings
+ 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 05:59:27 -0700
+Message-ID: <5a24fedf4d65cfa467490951b3323e0b2507be86.camel@microchip.com>
+Subject: Re: [PATCH net-next 1/8] net: dsa: add tag driver for LAN9645X
 From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Conor Dooley <conor@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
 CC: <UNGLinuxDriver@microchip.com>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
@@ -75,12 +74,13 @@ CC: <UNGLinuxDriver@microchip.com>, Vladimir Oltean <olteanv@gmail.com>,
  Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
 	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Thu, 5 Mar 2026 13:57:37 +0100
-In-Reply-To: <20260303-mosaic-debate-90cf8c8bbb33@spud>
+Date: Thu, 5 Mar 2026 13:59:26 +0100
+In-Reply-To: <8ce78efd-2304-43d2-a755-4189fcbffb25@lunn.ch>
 References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
-	 <4088b0ff-b718-4137-8518-4c9b9764d56d@lunn.ch>
-	 <20260303-mosaic-debate-90cf8c8bbb33@spud>
+	 <20260303-dsa_lan9645x_switch_driver_base-v1-1-bff8ca1396f5@microchip.com>
+	 <c0213890-ef36-435c-aa73-869ee5e849d5@lunn.ch>
+	 <1ceeb7fb0abc89f4b384c9d73b7d29c73bb8d53b.camel@microchip.com>
+	 <8ce78efd-2304-43d2-a755-4189fcbffb25@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.4-0ubuntu2.1 
@@ -90,25 +90,25 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: BC565212368
+X-Rspamd-Queue-Id: 2450921255D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264384-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264385-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -118,51 +118,47 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid]
 X-Rspamd-Action: no action
 
-On Tue, 2026-03-03 at 19:04 +0000, Conor Dooley wrote:
-> On Tue, Mar 03, 2026 at 03:18:45PM +0100, Andrew Lunn wrote:
-> > > +        properties:
-> > > +          microchip,led-drive-mode:
-> > > +            $ref: /schemas/types.yaml#/definitions/uint32
-> > > +            description: |
-> > > +              Set the LED drive mode for the copper PHY associated w=
-ith
-> > > +              this port.
-> > > +
-> > > +                0 - LED1 and LED2 in open-drain mode
-> > > +                1 - LED1 in active drive mode (can be used for singl=
-e-LED
-> > > +                    configurations requiring active drive)
-> > > +                2 - Reserved
-> > > +                3 - LED1 and LED2 in active drive mode
-> > > +            minimum: 0
-> > > +            maximum: 3
-> >=20
-> > I doubt the DT Maintainers will accept that. This looks a lot like a
-> > value you write into a register. How are active drive and open-drain
-> > described in other DT bindings? Is there something you can reuse?
+On Wed, 2026-03-04 at 16:14 +0100, Andrew Lunn wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content is safe
 >=20
-> I had a quick look and I didn't see anything really that stood out to me
-> that would be a drop-in replacement.
-> I also tried looking in the datasheet for more information on these
-> modes, but I couldn't see anything obvious. For example, there were zero
-> hits for "drain" in either LAN9645xS or LAN9645xF datasheets.
->=20
-> That said, yea you're right about DT maintainer feelings about it.
-> There's a couple things I could suggest, but I'd like to know about what
-> mode 1 means for LED2 first. If there's actually nothing similar, what
-> about representing each led with a child node and having open-drain be
-> the default with a property in the child for active-drive?
->=20
+> > > These functions are big enough i would place them into the .c file.
+> > > Then, normally, i would say, please don't use inline in a C file. But
+> > > here we are in the fast path. Have you tried this with and without th=
+e
+> > > inline? How does it change the object size and performance?
+> > >=20
 > >=20
-> > For 1, what happens to LED2? Not used at all?
-> >=20
-> >     Andrew
+> > I did test performance back when I first implemented this. I had some i=
+ssues
+> > getting gcc to inline the functions, and that hurt performance quite a =
+bit.
+> > But I did not look at object size though. I moved them to the header so=
+ I could
+> > add the inline. I can move them to the .c file in the next version.
+>=20
+> Developers often get inline wrong:
+>=20
+> It is used on the slow path, so all it achieves is bloating the object
+> size.
+>=20
+> It is used on tiny functions, which the compiler is likely to inline
+> anyway.
+>=20
+> Your use case is different. This is fast path, and it is not a small
+> function. You also have a good justification, you know not using
+> inline really does hurt performance.
+>=20
+> So, please move this into the .c file, and use inline. And add a
+> comment to the commit message adding your justification for inline.
+> If something is justified, we will accept it.
+>=20
+>         Andrew
 
-In mode 1 LED2 will be open-drain. This mode only makes sense if you have
-just 1 LED. With two LEDs mode 0 or mode 3 should be used.
+I will do this in the next version.
 
 Thanks,
 Emil
