@@ -1,443 +1,1197 @@
-Return-Path: <netdev+bounces-264519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PMaAz/aqWneGQEAu9opvQ
-	(envelope-from <netdev+bounces-264519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:32:15 +0100
+	id sA6/BA7cqWneGQEAu9opvQ
+	(envelope-from <netdev+bounces-264520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:39:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D1F21791F
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 426ED217A63
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FD7A304D94B
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 19:32:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 717A93010D8F
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 19:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04353C6A59;
-	Thu,  5 Mar 2026 19:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5E93033DA;
+	Thu,  5 Mar 2026 19:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g9KdzAVi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="laqqbCPd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B5B3DEAE6
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 19:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97CF2C15A2
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 19:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772739123; cv=none; b=nEcoYxDyyAknIkc3+8RpIQ5xHdekPPIBSiv3J4fkN18y7nfwIHRnDjG6z7iHqN7hBs1SA/tRwh7qX9dDpIDTBdW+MzemE7n6NovBwqLzT5ZcXbDVQLuCn3DKAhVOWTxzdcDwep9IDm2/zqB7cW1DL7PvqNVJRinHGqO2CJSd3+8=
+	t=1772739453; cv=none; b=dnZUZC3pjT0eiBnuhcYwojafuEAjjsjVbGiqqeRDDlMo8PbQFWsjc/t+ImSnRhs7IO340R0p6EcU3nFo9ShHUr50aqWu9BNojHiyS0Ie9q4BqZSzkSH3pgcYWhHYTv2dELGtfC2ta0Y9qmMhZE2snzF/iOP4jiqM4BRioJ2ZdBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772739123; c=relaxed/simple;
-	bh=fmVo32Y6qEf2zjliM2QnM9WkNYCbhNQO2I6BnX6wKi4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bNCIMAr03uVb8POyYoXtDUrNl+ycats7m5zu4EL51eO82IEd/G7LAFBLcGIWlYfSNi7P36jt/AvWrYd6tM/G/QIHszCpDziEE/wMMjOBoBfhNLibwiajqjSoQbeL3ESxaWUi2aLsCigdjnIJJY/FZ04bXOfLGicScpcTNgciHhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g9KdzAVi; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3598f4fbb13so4568997a91.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 11:31:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772739119; x=1773343919; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=140dbthf4pEWp2/OJGaZqhekf7x6lqYSy/9YhPsqZmc=;
-        b=g9KdzAViHoTby0q+8Iy3lmd2wkl+j3nUzMU79UWTqQYsHz+ikg5SMI6ndR8GZpfa8E
-         OWfuM8Xyrccl2p9pVxmqgBvsET3vLdJJvxUSFQVZb6EhlNIW06MytCrJKv8VBcN8htux
-         WQUjxAJm0hN/9N6P4fXIhZmUq48jxgjhWYzFWW3tcfYrzJbNg1weo0EgqG+GmMm+8HLG
-         Ep+SnLgchpoBx9Kxyh/btPbobxJ/zMNRuEu8fW9yhQSSA1m1XCyPWDbD3D12VnE5QXK5
-         0LPlz2TZkKFo3SBTtXQsNw6hs0UI+DqB47SjB5fchtf9qkzEpNZ0lOxnnMW0FbyXXdqv
-         6+Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772739119; x=1773343919;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=140dbthf4pEWp2/OJGaZqhekf7x6lqYSy/9YhPsqZmc=;
-        b=eYRAN5iwRo5RqgETGaUnmgDikuLTQnH+kiZYhikxNTRUZM5nNZbSMbfSmoS2s6ig2S
-         b3/4M9r8zVJFhIJAeQVwruFKB/S+u/GOy+iUdoAmvaCT99KoIcDRFERk55V74beMTOpk
-         a+78d8OekOlKEviggOrxAAYYFtj1sQ1a5T38GGkGq7fanC5zqQCahshRDmosLdq5xTJd
-         XezpbbpVt2mwhC69rvLKZwX3gWqohqbDBntfnjIYRAk8gQuaAIXe/ya5kK3oTP/yQyVu
-         tUaKoC7V2pxnyn/lxtQr9rXuBhyx+qcgwql61O641R22aqBSxkzNrwUG6Rf6RZiKmGdp
-         w4qw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyBcGCn8hh5b7kYULLvg4hQGxsPRnOjEfnG2wnRsmtNF/Ilq0loeyzIhJCq3BTVDKuw4llSd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2KdqkuCjp7/+b2+HZeBl6c4NmmJyMKdAT8VLrXi8dss6bR3Fw
-	S2A7FefPJgWTRa+v5/G4LF0aBAxRwGuVBs+kjmpRX4Cyg2PnstDS6B5AsJyf4GRuzJrJWMErnn2
-	VYhnNEw==
-X-Received: from pjwo3.prod.google.com ([2002:a17:90a:d243:b0:359:8c13:8588])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3910:b0:359:97d3:5c5b
- with SMTP id 98e67ed59e1d1-359a6a4a348mr5157178a91.20.1772739118562; Thu, 05
- Mar 2026 11:31:58 -0800 (PST)
-Date: Thu,  5 Mar 2026 19:31:45 +0000
-In-Reply-To: <md5mulclwk56nxxdqn4zwgiouwfdi7ydfn3g5hka434ov3ygax@qrw2b3h7ho4f>
+	s=arc-20240116; t=1772739453; c=relaxed/simple;
+	bh=MX+b1H0SvyQ8zJOQd1J9/phI+sreOmqvzj+kzMMn+jo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cWkiI5N8G7bOpW4IO7ocAlxzS4TItcd6shy3rnY4OAbfQivWfK3TqgnX8WKF/c8D1j39pSpFW/OvSfJD+f/RNQtzTIbyUPLznHnXi3bRLoxi4GcwPvSMr4f5ChC+577G4Fr4r1coFCVgTdPOLrmeT8mUhCnOPul1qdjq6Qps75s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=laqqbCPd; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772739450; x=1804275450;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MX+b1H0SvyQ8zJOQd1J9/phI+sreOmqvzj+kzMMn+jo=;
+  b=laqqbCPdiYzWVh0KQMGQUpM1ayl8XstMUJC705KhOWDUwMv/pKvycv5/
+   E1r9liq6Us8SwJrG37ArxR/dqbe8DcKIZ3UhXP0oNK8+QkvHo1S/omI5/
+   M+57JKhTtjC2AzRvD65I0okAT5GCm1ODrWOI96L9MqcgaDqZ1G47uRZ7p
+   N38g5ujSNP6DQtL3AgVt0Jzd79LBkyAWhTJ6FMK9i/wLrPriXsth5L3Oo
+   NEKX4uoR1rKFCLQ/xknYu635y0e8ZDDRVzoEZk3dIK+pTC6COamD9VP93
+   w7MwwJjcjSssABlk6OMwn3FlRfrm4hu94U/1OxENNFFpc4DOKIODdW0+6
+   g==;
+X-CSE-ConnectionGUID: op2CadtXRG+ODlkT3+Yeww==
+X-CSE-MsgGUID: AT/TD0HzRlq1J1971OziQg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="84923270"
+X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
+   d="scan'208";a="84923270"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 11:37:29 -0800
+X-CSE-ConnectionGUID: EnvUW0+aQA2Ku9Z0dty6vg==
+X-CSE-MsgGUID: cVETx7hYTZe651XWgBqL2w==
+X-ExtLoop1: 1
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO [10.245.244.97]) ([10.245.244.97])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 11:37:25 -0800
+Message-ID: <0da7256d-4d29-4670-9984-9a56cebee11e@linux.intel.com>
+Date: Thu, 5 Mar 2026 20:37:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <md5mulclwk56nxxdqn4zwgiouwfdi7ydfn3g5hka434ov3ygax@qrw2b3h7ho4f>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260305193157.2889096-1-kuniyu@google.com>
-Subject: Re: [PATCH net-next v2 1/2] udp: Preserve UDP socket addresses on abort
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: jrife@google.com
-Cc: andrii@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	edumazet@google.com, kuba@kernel.org, kuniyu@google.com, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, willemdebruijn.kernel@gmail.com, 
-	yusuke.suzuki@isovalent.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 71D1F21791F
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 1/5] drm/ras: Introduce the DRM RAS infrastructure
+ over generic netlink
+To: Riana Tauro <riana.tauro@intel.com>, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org
+Cc: aravind.iddamsetty@linux.intel.com, anshuman.gupta@intel.com,
+ rodrigo.vivi@intel.com, joonas.lahtinen@linux.intel.com,
+ simona.vetter@ffwll.ch, airlied@gmail.com, pratik.bari@intel.com,
+ joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
+ shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
+ raag.jadav@intel.com, anvesh.bakwad@intel.com,
+ Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
+ Lijo Lazar <lijo.lazar@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org
+References: <20260304074412.464435-7-riana.tauro@intel.com>
+ <20260304074412.464435-8-riana.tauro@intel.com>
+Content-Language: en-US
+From: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+In-Reply-To: <20260304074412.464435-8-riana.tauro@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 426ED217A63
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,google.com,linux.dev,fomichev.me,gmail.com,isovalent.com];
-	TAGGED_FROM(0.00)[bounces-264519-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264520-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[maarten.lankhorst@linux.intel.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-From: Jordan Rife <jrife@google.com>
-Date: Thu, 5 Mar 2026 18:03:09 +0000
-> On Thu, Mar 05, 2026 at 03:25:21AM +0000, Kuniyuki Iwashima wrote:
-> > From: Jordan Rife <jrife@google.com>
-> > Date: Wed, 4 Mar 2026 23:52:22 +0000
-> > > On Wed, Mar 04, 2026 at 09:21:03PM +0000, Kuniyuki Iwashima wrote:
-> > > > From: Jordan Rife <jrife@google.com>
-> > > > Date: Tue,  3 Mar 2026 17:01:02 +0000
-> > > > > Currently, udp_abort() invokes __udp_disconnect() which clears out
-> > > > > socket fields like inet_daddr and inet_dport. This makes fields like
-> > > > > dst_ip4, dst_ip6, and dst_port useless inside cgroup/sock_release BPF
-> > > > > hooks following an abort on a connected UDP socket, since they'll always
-> > > > > equal zero. This differs from the behavior for TCP sockets where a
-> > > > > cgroup/sock_release hook will see the address and port that the socket
-> > > > > was connected to at the time it was aborted. This causes issues in
-> > > > > Cilium where a sock_release hook is used to perform map maintenance when
-> > > > > sockets are released, since Cilium actively destroys connected UDP
-> > > > > sockets in some cases.
-> > > > 
-> > > > Just curious why Cilium does not unregister the socket just
-> > > > after aborting it ?
-> > > > 
-> > > > At least Cilium should know the key at that moment.
-> > > 
-> > > Originally, socket aborts in Cilium were handled with sock_diag (and
-> > > still are on older kernels), so you'd need to do some map maintenance in
-> > > userspace directly before or after aborting the socket. I suppose it was
-> > > just cleaner to put common cleanup code in a sock_release hook.
-> > > 
-> > > > > 
-> > > > > Make the behavior consistent between TCP and UDP sockets by not clearing
-> > > > 
-> > > > This patch makes another inconsistency with TCP.
-> > > > 
-> > > > As you mentioned in the cover letter, before the patch, even if
-> > > > aborted, a bound socket still reserves a port, but it does not now.
-> > > > 
-> > > > This might be surprising for non-reuseaddr/port sockets.
-> > > 
-> > > Yeah, true. I'm curious if this behavior is something that is useful at
-> > > all or simply an accident of the current implementation? If I'm
-> > > aborting/destroying a socket, why should it hold onto bound ports until
-> > > the socket is closed? I wasn't quite sure about this.
-> > 
-> > Digging into the first (long) thread of SOCK_DESTROY (TCP),
-> > the motivation was to kill sockets bound to an IP address
-> > that Android/laptop removes when it switches networks.
-> > https://lore.kernel.org/netdev/1447811024-8553-1-git-send-email-lorenzo@google.com/
-> > 
-> > In that sense, holding a port seems unnecessary.
-> > 
-> > But there are a few concerns like
-> > 
-> >   * someone could use the feature for server and reuse port
-> >     too quickly.
-> >     https://lore.kernel.org/netdev/1447879416.562854.443622857.62708268@webmail.messagingengine.com/
-> > 
-> >   * it's a bit worrisome if this feature is viewed as a way for
-> >     resouce management.
-> >     https://lore.kernel.org/netdev/CALx6S35Q_pc-vBNpA0hipn5K-vSmPDsV-V=D13sODESNO7Htdw@mail.gmail.com/
-> > 
-> > Considering these, it seems fair to only notify an error
-> > via epoll or blocked syscall and let the application to
-> > close() sockets.
-> > 
-> > In a thread, the author mentioned this :
-> > 
-> > ---8<---
-> > Its purpose is to interrupt
-> > blocked userspace socket calls, not to release resources.
-> > ---8<---
-> > https://lore.kernel.org/netdev/CAKD1Yr0Gpr6Ex2i1TXEWyETn48P4g5vBvFZ9=_g+Lz_7-PqBDQ@mail.gmail.com/
-> > 
-> > Also, there was an assumption that a sane application will
-> > close() sockets after receiving errors.
-> > https://lore.kernel.org/netdev/1447972381.22599.278.camel@edumazet-glaptop2.roam.corp.google.com/
-> > 
-> > And yes, this does not apply to UDP, and sadly UDP patch's
-> > thread has no such context nor discussion.
-> > https://lore.kernel.org/netdev/?q=udp_abort&o=-1
-> > 
-> 
-> Interesting, thanks for taking the time to dig into this.
-> 
-> > But anyway, now I think we can solve your problem more
-> > easily, see below.
-> > 
-> > 
-> > > 
-> > > > > out these fields in udp_abort(). Instead, just unhash the socket, mark
-> > > > > its state as TCP_CLOSE, and preserve the state of the other fields.
-> > > > > 
-> > > > > Fixes: f5836749c9c0 ("bpf: Add BPF_CGROUP_INET_SOCK_RELEASE hook")
-> > > > > Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
-> > > > > Signed-off-by: Jordan Rife <jrife@google.com>
-> > > > > ---
-> > > > >  net/ipv4/udp.c | 4 +++-
-> > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > > > index b96e47f1c8a2..01a0a0fbcd56 100644
-> > > > > --- a/net/ipv4/udp.c
-> > > > > +++ b/net/ipv4/udp.c
-> > > > > @@ -3247,7 +3247,9 @@ int udp_abort(struct sock *sk, int err)
-> > > > >  
-> > > > >  	sk->sk_err = err;
-> > > > >  	sk_error_report(sk);
-> > > > > -	__udp_disconnect(sk, 0);
-> > > > 
-> > > > How about passing another flag and avoid unwanted init only for
-> > > > bpf iterator ?  This will need another layer of __udp_disconnect()
-> > > > like ____udp_disconnect() (I'm not good at naming), or must make
-> > > > sure the flag is never used in uAPI.
-> > > 
-> > > To make sure we're on the same page about what you're describing, I'm
-> > > imagining:
-> > > 
-> > > static int ___udp_disconnect(struct sock *sk, int flags, bool reinit)
-> > > {                                                 
-> > > 	same as before, but if reinit == false then avoid reinitializing
-> > > 	fields like daddr/dport while holding onto reserved ports
-> > > }
-> > > 
-> > > int __udp_disconnect(struct sock *sk, int flags)
-> > > {
-> > > 	___udp_disconnect(sk, flags, true);
-> > > }
-> > > 
-> > > ...
-> > > 
-> > > int udp_abort(struct sock *sk, int err)
-> > > {
-> > > 	...
-> > > 	___udp_disconnect(sk, flags, false); <--- set reinit arg to false
-> > > 	...
-> > > }
-> > > 
-> > > This would have the same behavior with regards to reserved ports
-> > > following udp_abort() while preserving fields like daddr. I was
-> > > considering something like this initially, but it wasn't clear to me why
-> > > you'd want to hold onto reserved ports if the socket was destroyed as I
-> > > mentioned above. If it's important to maintain that aspect of the
-> > > behavior, then I'm OK with this approach.
-> > 
-> > This was what's in my mind, but probably we could just avoid
-> > the initialisation:
-> > 
-> > ---8<---
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index ce49ed2bd36f..d44be0020446 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -2213,21 +2213,21 @@ int __udp_disconnect(struct sock *sk, int flags)
-> >  	 */
-> >  
-> >  	sk->sk_state = TCP_CLOSE;
-> > -	inet->inet_daddr = 0;
-> > -	inet->inet_dport = 0;
-> >  	sock_rps_reset_rxhash(sk);
-> >  	sk->sk_bound_dev_if = 0;
-> > -	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
-> > -		inet_reset_saddr(sk);
-> > -		if (sk->sk_prot->rehash &&
-> > -		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK))
-> > -			sk->sk_prot->rehash(sk);
-> > -	}
-> >  
-> >  	if (!(sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
-> >  		sk->sk_prot->unhash(sk);
-> > -		inet->inet_sport = 0;
-> > +	} else if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
-> > +		if (sk->sk_prot->rehash &&
-> > +		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
-> > +			inet_reset_saddr(sk);
-> > +			inet->inet_daddr = 0;
-> > +			inet->inet_dport = 0;
-> > +			sk->sk_prot->rehash(sk);
-> > +		}
-> >  	}
-> > +
-> >  	sk_dst_reset(sk);
-> >  	return 0;
-> >  }
-> > ---8<---
-> > 
-> > When we need to rehash(), of course we have to clear
-> > saddr/daddr/dport, but otherwise, we don't, even sport.
-> 
-> What about the case where you bind to a port and use connect?
-> 
-> 1. socket bind() to 0.0.0.0:10000
-> 2. socket connect() to 1.2.3.4:20000
-> 3. diag_destroy -> udp_abort()
-> 4. socket close()
-> 5. sock_release hook runs and daddr/dport have been cleared
-> 
-> compared to just connect:
-> 
-> 1. socket connect() to 1.2.3.4:20000
-> 2. diag_destroy -> udp_abort()
-> 3. socket close()
-> 4. sock_release hook runs and daddr/dport remain intact
-> 
-> It seems confusing that these two sequences would behave differently.
+Hey,
 
-I assumed from "a connected UDP socket" that your use case
-is a client without explicit bind(), but if it's not, yes,
-this will not work.
+Since development is still ongoing for xe, and other drivers
+are not yet going to use RAS, it's fine with me to merge through
+the drm-xe tree.
 
+Acked-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
 
+Den 2026-03-04 kl. 08:44, skrev Riana Tauro:
+> From: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> 
+> Introduces the DRM RAS infrastructure over generic netlink.
+> 
+> The new interface allows drivers to expose RAS nodes and their
+> associated error counters to userspace in a structured and extensible
+> way. Each drm_ras node can register its own set of error counters, which
+> are then discoverable and queryable through netlink operations. This
+> lays the groundwork for reporting and managing hardware error states
+> in a unified manner across different DRM drivers.
+> 
+> Currently it only supports error-counter nodes. But it can be
+> extended later.
+> 
+> The registration is also not tied to any drm node, so it can be
+> used by accel devices as well.
+> 
+> It uses the new and mandatory YAML description format stored in
+> Documentation/netlink/specs/. This forces a single generic netlink
+> family namespace for the entire drm: "drm-ras".
+> But multiple-endpoints are supported within the single family.
+> 
+> Any modification to this API needs to be applied to
+> Documentation/netlink/specs/drm_ras.yaml before regenerating the
+> code:
+> 
+> $ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
+>  Documentation/netlink/specs/drm_ras.yaml --mode uapi --header \
+>  -o include/uapi/drm/drm_ras.h
+> 
+> $ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
+>   Documentation/netlink/specs/drm_ras.yaml --mode kernel \
+>   --header -o drivers/gpu/drm/drm_ras_nl.h
+> 
+> $ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
+>   Documentation/netlink/specs/drm_ras.yaml \
+>   --mode kernel --source -o drivers/gpu/drm/drm_ras_nl.c
+> 
+> Cc: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
+> Cc: Lijo Lazar <lijo.lazar@amd.com>
+> Cc: Hawking Zhang <Hawking.Zhang@amd.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: netdev@vger.kernel.org
+> Co-developed-by: Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>
+> Signed-off-by: Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>
+> Signed-off-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> Signed-off-by: Riana Tauro <riana.tauro@intel.com>
+> Reviewed-by: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2: fix doc and memory leak
+>     use xe_for_each_start
+>     use standard genlmsg_iput (Jakub Kicinski)
+> 
+> v3: add documentation to index
+>     modify documentation to mention uAPI requirements (Rodrigo)
+> 
+> v4: fix typo (Zack)
+> 
+> v5: fix kernel-robot reported htmldocs error
+>     fix kernel-robot reported build error on csky arch
+> 
+> v6: regenerate files
+>     fix yamllint warnings
+>     use get-error-counter for both do/dump function calls
+>     fix kernel-doc (Jakub)
+> 
+> v7: Fix ynl-regen.sh reported issue
+>     move drm_ras_nl.h from include/ to drm/
+>     use -o to generate files and fix commit message (Jakub)
+> 
+> v8: use GENL_REQ_ATTR_CHECK (Jakub) 
+> ---
+>  Documentation/gpu/drm-ras.rst            | 103 +++++++
+>  Documentation/gpu/index.rst              |   1 +
+>  Documentation/netlink/specs/drm_ras.yaml | 115 ++++++++
+>  drivers/gpu/drm/Kconfig                  |  10 +
+>  drivers/gpu/drm/Makefile                 |   1 +
+>  drivers/gpu/drm/drm_drv.c                |   6 +
+>  drivers/gpu/drm/drm_ras.c                | 354 +++++++++++++++++++++++
+>  drivers/gpu/drm/drm_ras_genl_family.c    |  42 +++
+>  drivers/gpu/drm/drm_ras_nl.c             |  56 ++++
+>  drivers/gpu/drm/drm_ras_nl.h             |  24 ++
+>  include/drm/drm_ras.h                    |  75 +++++
+>  include/drm/drm_ras_genl_family.h        |  17 ++
+>  include/uapi/drm/drm_ras.h               |  49 ++++
+>  13 files changed, 853 insertions(+)
+>  create mode 100644 Documentation/gpu/drm-ras.rst
+>  create mode 100644 Documentation/netlink/specs/drm_ras.yaml
+>  create mode 100644 drivers/gpu/drm/drm_ras.c
+>  create mode 100644 drivers/gpu/drm/drm_ras_genl_family.c
+>  create mode 100644 drivers/gpu/drm/drm_ras_nl.c
+>  create mode 100644 drivers/gpu/drm/drm_ras_nl.h
+>  create mode 100644 include/drm/drm_ras.h
+>  create mode 100644 include/drm/drm_ras_genl_family.h
+>  create mode 100644 include/uapi/drm/drm_ras.h
+> 
+> diff --git a/Documentation/gpu/drm-ras.rst b/Documentation/gpu/drm-ras.rst
+> new file mode 100644
+> index 000000000000..70b246a78fc8
+> --- /dev/null
+> +++ b/Documentation/gpu/drm-ras.rst
+> @@ -0,0 +1,103 @@
+> +.. SPDX-License-Identifier: GPL-2.0+
+> +
+> +============================
+> +DRM RAS over Generic Netlink
+> +============================
+> +
+> +The DRM RAS (Reliability, Availability, Serviceability) interface provides a
+> +standardized way for GPU/accelerator drivers to expose error counters and
+> +other reliability nodes to user space via Generic Netlink. This allows
+> +diagnostic tools, monitoring daemons, or test infrastructure to query hardware
+> +health in a uniform way across different DRM drivers.
+> +
+> +Key Goals:
+> +
+> +* Provide a standardized RAS solution for GPU and accelerator drivers, enabling
+> +  data center monitoring and reliability operations.
+> +* Implement a single drm-ras Generic Netlink family to meet modern Netlink YAML
+> +  specifications and centralize all RAS-related communication in one namespace.
+> +* Support a basic error counter interface, addressing the immediate, essential
+> +  monitoring needs.
+> +* Offer a flexible, future-proof interface that can be extended to support
+> +  additional types of RAS data in the future.
+> +* Allow multiple nodes per driver, enabling drivers to register separate
+> +  nodes for different IP blocks, sub-blocks, or other logical subdivisions
+> +  as applicable.
+> +
+> +Nodes
+> +=====
+> +
+> +Nodes are logical abstractions representing an error type or error source within
+> +the device. Currently, only error counter nodes is supported.
+> +
+> +Drivers are responsible for registering and unregistering nodes via the
+> +`drm_ras_node_register()` and `drm_ras_node_unregister()` APIs.
+> +
+> +Node Management
+> +-------------------
+> +
+> +.. kernel-doc:: drivers/gpu/drm/drm_ras.c
+> +   :doc: DRM RAS Node Management
+> +.. kernel-doc:: drivers/gpu/drm/drm_ras.c
+> +   :internal:
+> +
+> +Generic Netlink Usage
+> +=====================
+> +
+> +The interface is implemented as a Generic Netlink family named ``drm-ras``.
+> +User space tools can:
+> +
+> +* List registered nodes with the ``list-nodes`` command.
+> +* List all error counters in an node with the ``get-error-counter`` command with ``node-id``
+> +  as a parameter.
+> +* Query specific error counter values with the ``get-error-counter`` command, using both
+> +  ``node-id`` and ``error-id`` as parameters.
+> +
+> +YAML-based Interface
+> +--------------------
+> +
+> +The interface is described in a YAML specification ``Documentation/netlink/specs/drm_ras.yaml``
+> +
+> +This YAML is used to auto-generate user space bindings via
+> +``tools/net/ynl/pyynl/ynl_gen_c.py``, and drives the structure of netlink
+> +attributes and operations.
+> +
+> +Usage Notes
+> +-----------
+> +
+> +* User space must first enumerate nodes to obtain their IDs.
+> +* Node IDs or Node names can be used for all further queries, such as error counters.
+> +* Error counters can be queried by either the Error ID or Error name.
+> +* Query Parameters should be defined as part of the uAPI to ensure user interface stability.
+> +* The interface supports future extension by adding new node types and
+> +  additional attributes.
+> +
+> +Example: List nodes using ynl
+> +
+> +.. code-block:: bash
+> +
+> +    sudo ynl --family drm_ras --dump list-nodes
+> +    [{'device-name': '0000:03:00.0',
+> +    'node-id': 0,
+> +    'node-name': 'correctable-errors',
+> +    'node-type': 'error-counter'},
+> +    {'device-name': '0000:03:00.0',
+> +     'node-id': 1,
+> +     'node-name': 'uncorrectable-errors',
+> +     'node-type': 'error-counter'}]
+> +
+> +Example: List all error counters using ynl
+> +
+> +.. code-block:: bash
+> +
+> +    sudo ynl --family drm_ras --dump get-error-counter --json '{"node-id":0}'
+> +    [{'error-id': 1, 'error-name': 'error_name1', 'error-value': 0},
+> +    {'error-id': 2, 'error-name': 'error_name2', 'error-value': 0}]
+> +
+> +Example: Query an error counter for a given node
+> +
+> +.. code-block:: bash
+> +
+> +    sudo ynl --family drm_ras --do get-error-counter --json '{"node-id":0, "error-id":1}'
+> +    {'error-id': 1, 'error-name': 'error_name1', 'error-value': 0}
+> +
+> diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
+> index 2fafa1f35ef3..5d708a106b3f 100644
+> --- a/Documentation/gpu/index.rst
+> +++ b/Documentation/gpu/index.rst
+> @@ -9,6 +9,7 @@ GPU Driver Developer's Guide
+>     drm-mm
+>     drm-kms
+>     drm-kms-helpers
+> +   drm-ras
+>     drm-uapi
+>     drm-usage-stats
+>     driver-uapi
+> diff --git a/Documentation/netlink/specs/drm_ras.yaml b/Documentation/netlink/specs/drm_ras.yaml
+> new file mode 100644
+> index 000000000000..79af25dac3c5
+> --- /dev/null
+> +++ b/Documentation/netlink/specs/drm_ras.yaml
+> @@ -0,0 +1,115 @@
+> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> +---
+> +name: drm-ras
+> +protocol: genetlink
+> +uapi-header: drm/drm_ras.h
+> +
+> +doc: >-
+> +  DRM RAS (Reliability, Availability, Serviceability) over Generic Netlink.
+> +  Provides a standardized mechanism for DRM drivers to register "nodes"
+> +  representing hardware/software components capable of reporting error counters.
+> +  Userspace tools can query the list of nodes or individual error counters
+> +  via the Generic Netlink interface.
+> +
+> +definitions:
+> +  -
+> +    type: enum
+> +    name: node-type
+> +    value-start: 1
+> +    entries: [error-counter]
+> +    doc: >-
+> +         Type of the node. Currently, only error-counter nodes are
+> +         supported, which expose reliability counters for a hardware/software
+> +         component.
+> +
+> +attribute-sets:
+> +  -
+> +    name: node-attrs
+> +    attributes:
+> +      -
+> +        name: node-id
+> +        type: u32
+> +        doc: >-
+> +             Unique identifier for the node.
+> +             Assigned dynamically by the DRM RAS core upon registration.
+> +      -
+> +        name: device-name
+> +        type: string
+> +        doc: >-
+> +             Device name chosen by the driver at registration.
+> +             Can be a PCI BDF, UUID, or module name if unique.
+> +      -
+> +        name: node-name
+> +        type: string
+> +        doc: >-
+> +             Node name chosen by the driver at registration.
+> +             Can be an IP block name, or any name that identifies the
+> +             RAS node inside the device.
+> +      -
+> +        name: node-type
+> +        type: u32
+> +        doc: Type of this node, identifying its function.
+> +        enum: node-type
+> +  -
+> +    name: error-counter-attrs
+> +    attributes:
+> +      -
+> +        name: node-id
+> +        type: u32
+> +        doc: Node ID targeted by this error counter operation.
+> +      -
+> +        name: error-id
+> +        type: u32
+> +        doc: Unique identifier for a specific error counter within an node.
+> +      -
+> +        name: error-name
+> +        type: string
+> +        doc: Name of the error.
+> +      -
+> +        name: error-value
+> +        type: u32
+> +        doc: Current value of the requested error counter.
+> +
+> +operations:
+> +  list:
+> +    -
+> +      name: list-nodes
+> +      doc: >-
+> +           Retrieve the full list of currently registered DRM RAS nodes.
+> +           Each node includes its dynamically assigned ID, name, and type.
+> +           **Important:** User space must call this operation first to obtain
+> +           the node IDs. These IDs are required for all subsequent
+> +           operations on nodes, such as querying error counters.
+> +      attribute-set: node-attrs
+> +      flags: [admin-perm]
+> +      dump:
+> +        reply:
+> +          attributes:
+> +            - node-id
+> +            - device-name
+> +            - node-name
+> +            - node-type
+> +    -
+> +      name: get-error-counter
+> +      doc: >-
+> +           Retrieve error counter for a given node.
+> +           The response includes the id, the name, and even the current
+> +           value of each counter.
+> +      attribute-set: error-counter-attrs
+> +      flags: [admin-perm]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - node-id
+> +            - error-id
+> +        reply:
+> +          attributes: &errorinfo
+> +            - error-id
+> +            - error-name
+> +            - error-value
+> +      dump:
+> +        request:
+> +          attributes:
+> +            - node-id
+> +        reply:
+> +          attributes: *errorinfo
+> diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
+> index 0d0657dd1b41..5386248e75b6 100644
+> --- a/drivers/gpu/drm/Kconfig
+> +++ b/drivers/gpu/drm/Kconfig
+> @@ -130,6 +130,16 @@ config DRM_PANIC_SCREEN_QR_VERSION
+>  	  Smaller QR code are easier to read, but will contain less debugging
+>  	  data. Default is 40.
 >  
-> > When ->unhash()ed, only thing we need to do is to clear
-> > inet_sk(sk)->inet_num.
-> > 
-> > Then, even if bind() and connect() are called later, it
-> > works because each syscall does not care about the old
-> > saddr/sport/daddr/dport and just assign a new value if
-> > inet->inet_num == 0.
-> > 
-> > This seems a bit fragile, but TCP already relies on it and
-> > it's unlikely that we change the behaviour in __inet_bind(),
-> > inet_autobind(), and inet_dgram_connect().
-> > 
-> > And all the other users of __udp_disconnect() are also
-> > AF_INET or AF_INET6, l2tp, ping, raw.
-> 
-> Taking another look at tcp_abort() to compare how it behaves, I saw the
-> following:
-> 
-> tcp_abort(sk, err)
->   maybe send active rst
->   tcp_done_with_error(sk, err)
->     tcp_done(sk)
->       tcp_set_state(sk, TCP_CLOSE)
->         sk->sk_prot->unhash(sk) if state == TCP_CLOSE
-> 	  inet_unhash(sk)
-> 	    removes sk from lhash/ehash
-> 
-> I don't see a scenario where diag_destroy (tcp_abort) doesn't lead to
-> the socket getting immediately unhashed, even if bound to a specific
-> port (SOCK_BINDPORT_LOCK).
+> +config DRM_RAS
+> +	bool "DRM RAS support"
+> +	depends on DRM
+> +	depends on NET
+> +	help
+> +	  Enables the DRM RAS (Reliability, Availability and Serviceability)
+> +	  support for DRM drivers. This provides a Generic Netlink interface
+> +	  for error reporting and queries.
+> +	  If in doubt, say "N".
+> +
+>  config DRM_DEBUG_DP_MST_TOPOLOGY_REFS
+>          bool "Enable refcount backtrace history in the DP MST helpers"
+>  	depends on STACKTRACE_SUPPORT
+> diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
+> index aba4bf542a35..e97faabcd783 100644
+> --- a/drivers/gpu/drm/Makefile
+> +++ b/drivers/gpu/drm/Makefile
+> @@ -93,6 +93,7 @@ drm-$(CONFIG_DRM_ACCEL) += ../../accel/drm_accel.o
+>  drm-$(CONFIG_DRM_PANIC) += drm_panic.o
+>  drm-$(CONFIG_DRM_DRAW) += drm_draw.o
+>  drm-$(CONFIG_DRM_PANIC_SCREEN_QR_CODE) += drm_panic_qr.o
+> +drm-$(CONFIG_DRM_RAS) += drm_ras.o drm_ras_nl.o drm_ras_genl_family.o
+>  obj-$(CONFIG_DRM)	+= drm.o
+>  
+>  obj-$(CONFIG_DRM_PANEL_ORIENTATION_QUIRKS) += drm_panel_orientation_quirks.o
+> diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
+> index 2915118436ce..6b965c3d3307 100644
+> --- a/drivers/gpu/drm/drm_drv.c
+> +++ b/drivers/gpu/drm/drm_drv.c
+> @@ -53,6 +53,7 @@
+>  #include <drm/drm_panic.h>
+>  #include <drm/drm_print.h>
+>  #include <drm/drm_privacy_screen_machine.h>
+> +#include <drm/drm_ras_genl_family.h>
+>  
+>  #include "drm_crtc_internal.h"
+>  #include "drm_internal.h"
+> @@ -1223,6 +1224,7 @@ static const struct file_operations drm_stub_fops = {
+>  
+>  static void drm_core_exit(void)
+>  {
+> +	drm_ras_genl_family_unregister();
+>  	drm_privacy_screen_lookup_exit();
+>  	drm_panic_exit();
+>  	accel_core_exit();
+> @@ -1261,6 +1263,10 @@ static int __init drm_core_init(void)
+>  
+>  	drm_privacy_screen_lookup_init();
+>  
+> +	ret = drm_ras_genl_family_register();
+> +	if (ret < 0)
+> +		goto error;
+> +
+>  	drm_core_init_complete = true;
+>  
+>  	DRM_DEBUG("Initialized\n");
+> diff --git a/drivers/gpu/drm/drm_ras.c b/drivers/gpu/drm/drm_ras.c
+> new file mode 100644
+> index 000000000000..b2fa5ab86d87
+> --- /dev/null
+> +++ b/drivers/gpu/drm/drm_ras.c
+> @@ -0,0 +1,354 @@
+> +// SPDX-License-Identifier: MIT
+> +/*
+> + * Copyright © 2026 Intel Corporation
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/xarray.h>
+> +#include <net/genetlink.h>
+> +
+> +#include <drm/drm_ras.h>
+> +
+> +#include "drm_ras_nl.h"
+> +
+> +/**
+> + * DOC: DRM RAS Node Management
+> + *
+> + * This module provides the infrastructure to manage RAS (Reliability,
+> + * Availability, and Serviceability) nodes for DRM drivers. Each
+> + * DRM driver may register one or more RAS nodes, which represent
+> + * logical components capable of reporting error counters and other
+> + * reliability metrics.
+> + *
+> + * The nodes are stored in a global xarray `drm_ras_xa` to allow
+> + * efficient lookup by ID. Nodes can be registered or unregistered
+> + * dynamically at runtime.
+> + *
+> + * A Generic Netlink family `drm_ras` exposes two main operations to
+> + * userspace:
+> + *
+> + * 1. LIST_NODES: Dump all currently registered RAS nodes.
+> + *    The user receives an array of node IDs, names, and types.
+> + *
+> + * 2. GET_ERROR_COUNTER: Get error counters of a given node.
+> + *    Userspace must provide Node ID, Error ID (Optional for specific counter).
+> + *    Returns all counters of a node if only Node ID is provided or specific
+> + *    error counters.
+> + *
+> + * Node registration:
+> + *
+> + * - drm_ras_node_register(): Registers a new node and assigns
+> + *   it a unique ID in the xarray.
+> + * - drm_ras_node_unregister(): Removes a previously registered
+> + *   node from the xarray.
+> + *
+> + * Node type:
+> + *
+> + * - ERROR_COUNTER:
+> + *     + Currently, only error counters are supported.
+> + *     + The driver must implement the query_error_counter() callback to provide
+> + *       the name and the value of the error counter.
+> + *     + The driver must provide a error_counter_range.last value informing the
+> + *       last valid error ID.
+> + *     + The driver can provide a error_counter_range.first value informing the
+> + *       first valid error ID.
+> + *     + The error counters in the driver doesn't need to be contiguous, but the
+> + *       driver must return -ENOENT to the query_error_counter as an indication
+> + *       that the ID should be skipped and not listed in the netlink API.
+> + *
+> + * Netlink handlers:
+> + *
+> + * - drm_ras_nl_list_nodes_dumpit(): Implements the LIST_NODES
+> + *   operation, iterating over the xarray.
+> + * - drm_ras_nl_get_error_counter_dumpit(): Implements the GET_ERROR_COUNTER dumpit
+> + *   operation, fetching all counters from a specific node.
+> + * - drm_ras_nl_get_error_counter_doit(): Implements the GET_ERROR_COUNTER doit
+> + *   operation, fetching a counter value from a specific node.
+> + */
+> +
+> +static DEFINE_XARRAY_ALLOC(drm_ras_xa);
+> +
+> +/*
+> + * The netlink callback context carries dump state across multiple dumpit calls
+> + */
+> +struct drm_ras_ctx {
+> +	/* Which xarray id to restart the dump from */
+> +	unsigned long restart;
+> +};
+> +
+> +/**
+> + * drm_ras_nl_list_nodes_dumpit() - Dump all registered RAS nodes
+> + * @skb: Netlink message buffer
+> + * @cb: Callback context for multi-part dumps
+> + *
+> + * Iterates over all registered RAS nodes in the global xarray and appends
+> + * their attributes (ID, name, type) to the given netlink message buffer.
+> + * Uses @cb->ctx to track progress in case the message buffer fills up, allowing
+> + * multi-part dump support. On buffer overflow, updates the context to resume
+> + * from the last node on the next invocation.
+> + *
+> + * Return: 0 if all nodes fit in @skb, number of bytes added to @skb if
+> + *          the buffer filled up (requires multi-part continuation), or
+> + *          a negative error code on failure.
+> + */
+> +int drm_ras_nl_list_nodes_dumpit(struct sk_buff *skb,
+> +				 struct netlink_callback *cb)
+> +{
+> +	const struct genl_info *info = genl_info_dump(cb);
+> +	struct drm_ras_ctx *ctx = (void *)cb->ctx;
+> +	struct drm_ras_node *node;
+> +	struct nlattr *hdr;
+> +	unsigned long id;
+> +	int ret;
+> +
+> +	xa_for_each_start(&drm_ras_xa, id, node, ctx->restart) {
+> +		hdr = genlmsg_iput(skb, info);
+> +		if (!hdr) {
+> +			ret = -EMSGSIZE;
+> +			break;
+> +		}
+> +
+> +		ret = nla_put_u32(skb, DRM_RAS_A_NODE_ATTRS_NODE_ID, node->id);
+> +		if (ret) {
+> +			genlmsg_cancel(skb, hdr);
+> +			break;
+> +		}
+> +
+> +		ret = nla_put_string(skb, DRM_RAS_A_NODE_ATTRS_DEVICE_NAME,
+> +				     node->device_name);
+> +		if (ret) {
+> +			genlmsg_cancel(skb, hdr);
+> +			break;
+> +		}
+> +
+> +		ret = nla_put_string(skb, DRM_RAS_A_NODE_ATTRS_NODE_NAME,
+> +				     node->node_name);
+> +		if (ret) {
+> +			genlmsg_cancel(skb, hdr);
+> +			break;
+> +		}
+> +
+> +		ret = nla_put_u32(skb, DRM_RAS_A_NODE_ATTRS_NODE_TYPE,
+> +				  node->type);
+> +		if (ret) {
+> +			genlmsg_cancel(skb, hdr);
+> +			break;
+> +		}
+> +
+> +		genlmsg_end(skb, hdr);
+> +	}
+> +
+> +	if (ret == -EMSGSIZE)
+> +		ctx->restart = id;
+> +
+> +	return ret;
+> +}
+> +
+> +static int get_node_error_counter(u32 node_id, u32 error_id,
+> +				  const char **name, u32 *value)
+> +{
+> +	struct drm_ras_node *node;
+> +
+> +	node = xa_load(&drm_ras_xa, node_id);
+> +	if (!node || !node->query_error_counter)
+> +		return -ENOENT;
+> +
+> +	if (error_id < node->error_counter_range.first ||
+> +	    error_id > node->error_counter_range.last)
+> +		return -EINVAL;
+> +
+> +	return node->query_error_counter(node, error_id, name, value);
+> +}
+> +
+> +static int msg_reply_value(struct sk_buff *msg, u32 error_id,
+> +			   const char *error_name, u32 value)
+> +{
+> +	int ret;
+> +
+> +	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID, error_id);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_NAME,
+> +			     error_name);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return nla_put_u32(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_VALUE,
+> +			   value);
+> +}
+> +
+> +static int doit_reply_value(struct genl_info *info, u32 node_id,
+> +			    u32 error_id)
+> +{
+> +	struct sk_buff *msg;
+> +	struct nlattr *hdr;
+> +	const char *error_name;
+> +	u32 value;
+> +	int ret;
+> +
+> +	msg = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
+> +	if (!msg)
+> +		return -ENOMEM;
+> +
+> +	hdr = genlmsg_iput(msg, info);
+> +	if (!hdr) {
+> +		nlmsg_free(msg);
+> +		return -EMSGSIZE;
+> +	}
+> +
+> +	ret = get_node_error_counter(node_id, error_id,
+> +				     &error_name, &value);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = msg_reply_value(msg, error_id, error_name, value);
+> +	if (ret) {
+> +		genlmsg_cancel(msg, hdr);
+> +		nlmsg_free(msg);
+> +		return ret;
+> +	}
+> +
+> +	genlmsg_end(msg, hdr);
+> +
+> +	return genlmsg_reply(msg, info);
+> +}
+> +
+> +/**
+> + * drm_ras_nl_get_error_counter_dumpit() - Dump all Error Counters
+> + * @skb: Netlink message buffer
+> + * @cb: Callback context for multi-part dumps
+> + *
+> + * Iterates over all error counters in a given Node and appends
+> + * their attributes (ID, name, value) to the given netlink message buffer.
+> + * Uses @cb->ctx to track progress in case the message buffer fills up, allowing
+> + * multi-part dump support. On buffer overflow, updates the context to resume
+> + * from the last node on the next invocation.
+> + *
+> + * Return: 0 if all errors fit in @skb, number of bytes added to @skb if
+> + *          the buffer filled up (requires multi-part continuation), or
+> + *          a negative error code on failure.
+> + */
+> +int drm_ras_nl_get_error_counter_dumpit(struct sk_buff *skb,
+> +					struct netlink_callback *cb)
+> +{
+> +	const struct genl_info *info = genl_info_dump(cb);
+> +	struct drm_ras_ctx *ctx = (void *)cb->ctx;
+> +	struct drm_ras_node *node;
+> +	struct nlattr *hdr;
+> +	const char *error_name;
+> +	u32 node_id, error_id, value;
+> +	int ret;
+> +
+> +	if (!info->attrs || GENL_REQ_ATTR_CHECK(info, DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID))
+> +		return -EINVAL;
+> +
+> +	node_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID]);
+> +
+> +	node = xa_load(&drm_ras_xa, node_id);
+> +	if (!node)
+> +		return -ENOENT;
+> +
+> +	for (error_id = max(node->error_counter_range.first, ctx->restart);
+> +	     error_id <= node->error_counter_range.last;
+> +	     error_id++) {
+> +		ret = get_node_error_counter(node_id, error_id,
+> +					     &error_name, &value);
+> +		/*
+> +		 * For non-contiguous range, driver return -ENOENT as indication
+> +		 * to skip this ID when listing all errors.
+> +		 */
+> +		if (ret == -ENOENT)
+> +			continue;
+> +		if (ret)
+> +			return ret;
+> +
+> +		hdr = genlmsg_iput(skb, info);
+> +
+> +		if (!hdr) {
+> +			ret = -EMSGSIZE;
+> +			break;
+> +		}
+> +
+> +		ret = msg_reply_value(skb, error_id, error_name, value);
+> +		if (ret) {
+> +			genlmsg_cancel(skb, hdr);
+> +			break;
+> +		}
+> +
+> +		genlmsg_end(skb, hdr);
+> +	}
+> +
+> +	if (ret == -EMSGSIZE)
+> +		ctx->restart = error_id;
+> +
+> +	return ret;
+> +}
+> +
+> +/**
+> + * drm_ras_nl_get_error_counter_doit() - Query an error counter of an node
+> + * @skb: Netlink message buffer
+> + * @info: Generic Netlink info containing attributes of the request
+> + *
+> + * Extracts the node ID and error ID from the netlink attributes and
+> + * retrieves the current value of the corresponding error counter. Sends the
+> + * result back to the requesting user via the standard Genl reply.
+> + *
+> + * Return: 0 on success, or negative errno on failure.
+> + */
+> +int drm_ras_nl_get_error_counter_doit(struct sk_buff *skb,
+> +				      struct genl_info *info)
+> +{
+> +	u32 node_id, error_id;
+> +
+> +	if (!info->attrs ||
+> +	    GENL_REQ_ATTR_CHECK(info, DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID) ||
+> +	    GENL_REQ_ATTR_CHECK(info, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID))
+> +		return -EINVAL;
+> +
+> +	node_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID]);
+> +	error_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID]);
+> +
+> +	return doit_reply_value(info, node_id, error_id);
+> +}
+> +
+> +/**
+> + * drm_ras_node_register() - Register a new RAS node
+> + * @node: Node structure to register
+> + *
+> + * Adds the given RAS node to the global node xarray and assigns it
+> + * a unique ID. Both @node->name and @node->type must be valid.
+> + *
+> + * Return: 0 on success, or negative errno on failure:
+> + */
+> +int drm_ras_node_register(struct drm_ras_node *node)
+> +{
+> +	if (!node->device_name || !node->node_name)
+> +		return -EINVAL;
+> +
+> +	/* Currently, only Error Counter Endpoints are supported */
+> +	if (node->type != DRM_RAS_NODE_TYPE_ERROR_COUNTER)
+> +		return -EINVAL;
+> +
+> +	/* Mandatory entries for Error Counter Node */
+> +	if (node->type == DRM_RAS_NODE_TYPE_ERROR_COUNTER &&
+> +	    (!node->error_counter_range.last || !node->query_error_counter))
+> +		return -EINVAL;
+> +
+> +	return xa_alloc(&drm_ras_xa, &node->id, node, xa_limit_32b, GFP_KERNEL);
+> +}
+> +EXPORT_SYMBOL(drm_ras_node_register);
+> +
+> +/**
+> + * drm_ras_node_unregister() - Unregister a previously registered node
+> + * @node: Node structure to unregister
+> + *
+> + * Removes the given node from the global node xarray using its ID.
+> + */
+> +void drm_ras_node_unregister(struct drm_ras_node *node)
+> +{
+> +	xa_erase(&drm_ras_xa, node->id);
+> +}
+> +EXPORT_SYMBOL(drm_ras_node_unregister);
+> diff --git a/drivers/gpu/drm/drm_ras_genl_family.c b/drivers/gpu/drm/drm_ras_genl_family.c
+> new file mode 100644
+> index 000000000000..6f406d3d48c5
+> --- /dev/null
+> +++ b/drivers/gpu/drm/drm_ras_genl_family.c
+> @@ -0,0 +1,42 @@
+> +// SPDX-License-Identifier: MIT
+> +/*
+> + * Copyright © 2026 Intel Corporation
+> + */
+> +
+> +#include <drm/drm_ras_genl_family.h>
+> +#include "drm_ras_nl.h"
+> +
+> +/* Track family registration so the drm_exit can be called at any time */
+> +static bool registered;
+> +
+> +/**
+> + * drm_ras_genl_family_register() - Register drm-ras genl family
+> + *
+> + * Only to be called one at drm_drv_init()
+> + */
+> +int drm_ras_genl_family_register(void)
+> +{
+> +	int ret;
+> +
+> +	registered = false;
+> +
+> +	ret = genl_register_family(&drm_ras_nl_family);
+> +	if (ret)
+> +		return ret;
+> +
+> +	registered = true;
+> +	return 0;
+> +}
+> +
+> +/**
+> + * drm_ras_genl_family_unregister() - Unregister drm-ras genl family
+> + *
+> + * To be called one at drm_drv_exit() at any moment, but only once.
+> + */
+> +void drm_ras_genl_family_unregister(void)
+> +{
+> +	if (registered) {
+> +		genl_unregister_family(&drm_ras_nl_family);
+> +		registered = false;
+> +	}
+> +}
+> diff --git a/drivers/gpu/drm/drm_ras_nl.c b/drivers/gpu/drm/drm_ras_nl.c
+> new file mode 100644
+> index 000000000000..16803d0c4a44
+> --- /dev/null
+> +++ b/drivers/gpu/drm/drm_ras_nl.c
+> @@ -0,0 +1,56 @@
+> +// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> +/* Do not edit directly, auto-generated from: */
+> +/*	Documentation/netlink/specs/drm_ras.yaml */
+> +/* YNL-GEN kernel source */
+> +/* To regenerate run: tools/net/ynl/ynl-regen.sh */
+> +
+> +#include <net/netlink.h>
+> +#include <net/genetlink.h>
+> +
+> +#include "drm_ras_nl.h"
+> +
+> +#include <uapi/drm/drm_ras.h>
+> +
+> +/* DRM_RAS_CMD_GET_ERROR_COUNTER - do */
+> +static const struct nla_policy drm_ras_get_error_counter_do_nl_policy[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID + 1] = {
+> +	[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID] = { .type = NLA_U32, },
+> +	[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID] = { .type = NLA_U32, },
+> +};
+> +
+> +/* DRM_RAS_CMD_GET_ERROR_COUNTER - dump */
+> +static const struct nla_policy drm_ras_get_error_counter_dump_nl_policy[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID + 1] = {
+> +	[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID] = { .type = NLA_U32, },
+> +};
+> +
+> +/* Ops table for drm_ras */
+> +static const struct genl_split_ops drm_ras_nl_ops[] = {
+> +	{
+> +		.cmd	= DRM_RAS_CMD_LIST_NODES,
+> +		.dumpit	= drm_ras_nl_list_nodes_dumpit,
+> +		.flags	= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+> +	},
+> +	{
+> +		.cmd		= DRM_RAS_CMD_GET_ERROR_COUNTER,
+> +		.doit		= drm_ras_nl_get_error_counter_doit,
+> +		.policy		= drm_ras_get_error_counter_do_nl_policy,
+> +		.maxattr	= DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID,
+> +		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> +	},
+> +	{
+> +		.cmd		= DRM_RAS_CMD_GET_ERROR_COUNTER,
+> +		.dumpit		= drm_ras_nl_get_error_counter_dumpit,
+> +		.policy		= drm_ras_get_error_counter_dump_nl_policy,
+> +		.maxattr	= DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID,
+> +		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+> +	},
+> +};
+> +
+> +struct genl_family drm_ras_nl_family __ro_after_init = {
+> +	.name		= DRM_RAS_FAMILY_NAME,
+> +	.version	= DRM_RAS_FAMILY_VERSION,
+> +	.netnsok	= true,
+> +	.parallel_ops	= true,
+> +	.module		= THIS_MODULE,
+> +	.split_ops	= drm_ras_nl_ops,
+> +	.n_split_ops	= ARRAY_SIZE(drm_ras_nl_ops),
+> +};
+> diff --git a/drivers/gpu/drm/drm_ras_nl.h b/drivers/gpu/drm/drm_ras_nl.h
+> new file mode 100644
+> index 000000000000..06ccd9342773
+> --- /dev/null
+> +++ b/drivers/gpu/drm/drm_ras_nl.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
+> +/* Do not edit directly, auto-generated from: */
+> +/*	Documentation/netlink/specs/drm_ras.yaml */
+> +/* YNL-GEN kernel header */
+> +/* To regenerate run: tools/net/ynl/ynl-regen.sh */
+> +
+> +#ifndef _LINUX_DRM_RAS_GEN_H
+> +#define _LINUX_DRM_RAS_GEN_H
+> +
+> +#include <net/netlink.h>
+> +#include <net/genetlink.h>
+> +
+> +#include <uapi/drm/drm_ras.h>
+> +
+> +int drm_ras_nl_list_nodes_dumpit(struct sk_buff *skb,
+> +				 struct netlink_callback *cb);
+> +int drm_ras_nl_get_error_counter_doit(struct sk_buff *skb,
+> +				      struct genl_info *info);
+> +int drm_ras_nl_get_error_counter_dumpit(struct sk_buff *skb,
+> +					struct netlink_callback *cb);
+> +
+> +extern struct genl_family drm_ras_nl_family;
+> +
+> +#endif /* _LINUX_DRM_RAS_GEN_H */
+> diff --git a/include/drm/drm_ras.h b/include/drm/drm_ras.h
+> new file mode 100644
+> index 000000000000..5d50209e51db
+> --- /dev/null
+> +++ b/include/drm/drm_ras.h
+> @@ -0,0 +1,75 @@
+> +/* SPDX-License-Identifier: MIT */
+> +/*
+> + * Copyright © 2026 Intel Corporation
+> + */
+> +
+> +#ifndef __DRM_RAS_H__
+> +#define __DRM_RAS_H__
+> +
+> +#include <uapi/drm/drm_ras.h>
+> +
+> +/**
+> + * struct drm_ras_node - A DRM RAS Node
+> + */
+> +struct drm_ras_node {
+> +	/** @id: Unique identifier for the node. Dynamically assigned. */
+> +	u32 id;
+> +	/**
+> +	 * @device_name: Human-readable name of the device. Given by the driver.
+> +	 */
+> +	const char *device_name;
+> +	/** @node_name: Human-readable name of the node. Given by the driver. */
+> +	const char *node_name;
+> +	/** @type: Type of the node (enum drm_ras_node_type). */
+> +	enum drm_ras_node_type type;
+> +
+> +	/* Error-Counter Related Callback and Variables */
+> +
+> +	/** @error_counter_range: Range of valid Error IDs for this node. */
+> +	struct {
+> +		/** @first: First valid Error ID. */
+> +		u32 first;
+> +		/** @last: Last valid Error ID. Mandatory entry. */
+> +		u32 last;
+> +	} error_counter_range;
+> +
+> +	/**
+> +	 * @query_error_counter:
+> +	 *
+> +	 * This callback is used by drm-ras to query a specific error counter.
+> +	 * Used for input check and to iterate all error counters in a node.
+> +	 *
+> +	 * Driver should expect query_error_counter() to be called with
+> +	 * error_id from `error_counter_range.first` to
+> +	 * `error_counter_range.last`.
+> +	 *
+> +	 * The @query_error_counter is a mandatory callback for
+> +	 * error_counter_node.
+> +	 *
+> +	 * Returns: 0 on success,
+> +	 *          -ENOENT when error_id is not supported as an indication that
+> +	 *                  drm_ras should silently skip this entry. Used for
+> +	 *                  supporting non-contiguous error ranges.
+> +	 *                  Driver is responsible for maintaining the list of
+> +	 *                  supported error IDs in the range of first to last.
+> +	 *          Other negative values on errors that should terminate the
+> +	 *          netlink query.
+> +	 */
+> +	int (*query_error_counter)(struct drm_ras_node *node, u32 error_id,
+> +				   const char **name, u32 *val);
+> +
+> +	/** @priv: Driver private data */
+> +	void *priv;
+> +};
+> +
+> +struct drm_device;
+> +
+> +#if IS_ENABLED(CONFIG_DRM_RAS)
+> +int drm_ras_node_register(struct drm_ras_node *node);
+> +void drm_ras_node_unregister(struct drm_ras_node *node);
+> +#else
+> +static inline int drm_ras_node_register(struct drm_ras_node *node) { return 0; }
+> +static inline void drm_ras_node_unregister(struct drm_ras_node *node) { }
+> +#endif
+> +
+> +#endif
+> diff --git a/include/drm/drm_ras_genl_family.h b/include/drm/drm_ras_genl_family.h
+> new file mode 100644
+> index 000000000000..910fb3943a75
+> --- /dev/null
+> +++ b/include/drm/drm_ras_genl_family.h
+> @@ -0,0 +1,17 @@
+> +/* SPDX-License-Identifier: MIT */
+> +/*
+> + * Copyright © 2026 Intel Corporation
+> + */
+> +
+> +#ifndef __DRM_RAS_GENL_FAMILY_H__
+> +#define __DRM_RAS_GENL_FAMILY_H__
+> +
+> +#if IS_ENABLED(CONFIG_DRM_RAS)
+> +int drm_ras_genl_family_register(void);
+> +void drm_ras_genl_family_unregister(void);
+> +#else
+> +static inline int drm_ras_genl_family_register(void) { return 0; }
+> +static inline void drm_ras_genl_family_unregister(void) { }
+> +#endif
+> +
+> +#endif
+> diff --git a/include/uapi/drm/drm_ras.h b/include/uapi/drm/drm_ras.h
+> new file mode 100644
+> index 000000000000..5f40fa5b869d
+> --- /dev/null
+> +++ b/include/uapi/drm/drm_ras.h
+> @@ -0,0 +1,49 @@
+> +/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
+> +/* Do not edit directly, auto-generated from: */
+> +/*	Documentation/netlink/specs/drm_ras.yaml */
+> +/* YNL-GEN uapi header */
+> +/* To regenerate run: tools/net/ynl/ynl-regen.sh */
+> +
+> +#ifndef _UAPI_LINUX_DRM_RAS_H
+> +#define _UAPI_LINUX_DRM_RAS_H
+> +
+> +#define DRM_RAS_FAMILY_NAME	"drm-ras"
+> +#define DRM_RAS_FAMILY_VERSION	1
+> +
+> +/*
+> + * Type of the node. Currently, only error-counter nodes are supported, which
+> + * expose reliability counters for a hardware/software component.
+> + */
+> +enum drm_ras_node_type {
+> +	DRM_RAS_NODE_TYPE_ERROR_COUNTER = 1,
+> +};
+> +
+> +enum {
+> +	DRM_RAS_A_NODE_ATTRS_NODE_ID = 1,
+> +	DRM_RAS_A_NODE_ATTRS_DEVICE_NAME,
+> +	DRM_RAS_A_NODE_ATTRS_NODE_NAME,
+> +	DRM_RAS_A_NODE_ATTRS_NODE_TYPE,
+> +
+> +	__DRM_RAS_A_NODE_ATTRS_MAX,
+> +	DRM_RAS_A_NODE_ATTRS_MAX = (__DRM_RAS_A_NODE_ATTRS_MAX - 1)
+> +};
+> +
+> +enum {
+> +	DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID = 1,
+> +	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID,
+> +	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_NAME,
+> +	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_VALUE,
+> +
+> +	__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX,
+> +	DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX = (__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX - 1)
+> +};
+> +
+> +enum {
+> +	DRM_RAS_CMD_LIST_NODES = 1,
+> +	DRM_RAS_CMD_GET_ERROR_COUNTER,
+> +
+> +	__DRM_RAS_CMD_MAX,
+> +	DRM_RAS_CMD_MAX = (__DRM_RAS_CMD_MAX - 1)
+> +};
+> +
+> +#endif /* _UAPI_LINUX_DRM_RAS_H */
 
-TCP has 3 hash tables, lhash for TCP_LISTEN, ehash for other
-states except for TCP_CLOSE, and bhash is for all sockets bound
-to a port regardless of explicit/implicit bind().
-
-If the socket is explicitly bind()ed and has SOCK_BINDPORT_LOCK,
-inet_put_port() is not called, which does not unhash it from bhash,
-meaning the socket still reserves a port.
-
-
-> This seems consistent with my observations
-> in [1] where I used diag_destroy to immediately remove TCP sockets from
-> the ehash while testing socket iterators.
-
-BPF iter only iterates over ehash and lhash that have sockets
-with real work.  This behaviour derives from /proc/net/tcp, which
-cannot catch TCP_CLOSE sockets.
-
-Recently INET_DIAG dump (not destroy) started to support
-bhash though, see 91051f0039484.
-
-
-> In contrast, I remember in [2]
-> encountering this rehash behavior with UDP sockets leading to seeing the
-> same socket twice during iteration if you bpf_sock_destroy()ed the
-> socket. This wasn't inherently a problem at the time, but it was a bit
-> surprising.
-
-Right, this happens because UDP combines bhash/ehash/lhash
-into a single hash table (technically it has 1-tuple/2-tuple/4-tuple
-hash tables but they are not separated in terms of resource
-management).
-
-
-> 
-> > This patch makes another inconsistency with TCP.
-> 
-> All this is to say, I'm still not sure why preserving how rehash works
-> in the case of udp_abort() is necessary, and doing so can result in some
-> unexpected behavior both in the case of socket iteration and
-> sock_release as in the example above. To keep things consistent with
-> TCP, doesn't it make more sense to just unhash instead of sometimes
-> keeping the socket in the UDP hash under certain conditions? Am I just
-> not seeing the place where a TCP socket would hold onto a port after you
-> destroy it?
-
-As mentioned, that's bhash, and you can see TCP does
-not do "just unhash" behaviour even with tcp_abort().
-
----8<---
-# python3
->>> from socket import *
->>> 
->>> s1 = socket()
->>> s1.bind(('', 80))
->>> s1.listen()
->>> 
->>> import subprocess
->>> subprocess.run("ss -K -t state listening sport :80".split(' '))
-Recv-Q                Send-Q                                Local Address:Port                                 Peer Address:Port
-0                     128                                         0.0.0.0:http                                      0.0.0.0:*
-CompletedProcess(args=['ss', '-K', '-t', 'state', 'listening', 'sport', ':80'], returncode=0)
->>> subprocess.run("ss -tB".split(' '))
-Recv-Q                Send-Q                                Local Address:Port                                 Peer Address:Port
-0                     0                                           0.0.0.0:http                                      0.0.0.0:*
-CompletedProcess(args=['ss', '-tB'], returncode=0)
->>> 
->>> s2 = socket()
->>> s2.bind(s1.getsockname())
-Traceback (most recent call last):
-  File "<python-input-12>", line 1, in <module>
-    s2.bind(s1.getsockname())
-    ~~~~~~~^^^^^^^^^^^^^^^^^^
-OSError: [Errno 98] Address already in use
----8<---
-
-
-
-> 
-> [1]: https://lore.kernel.org/netdev/20250714180919.127192-13-jordan@jrife.io/
-> [2]: https://lore.kernel.org/bpf/CADKFtnQyiz_r_vfyYfTvzi3MvNpRt62mDrNyEvp9tm82UcSFjQ@mail.gmail.com/
-> 
 
