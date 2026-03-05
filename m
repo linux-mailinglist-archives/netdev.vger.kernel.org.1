@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-264567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBZVFh/7qWk7JAEAu9opvQ
-	(envelope-from <netdev+bounces-264567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:52:31 +0100
+	id KOYMAyr7qWlcJAEAu9opvQ
+	(envelope-from <netdev+bounces-264568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:52:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F927218AE0
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:52:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77732218AF7
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:52:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 23DAD3072FC9
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 21:50:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BEE1C30764B2
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 21:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0666435F8B2;
-	Thu,  5 Mar 2026 21:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1641035F19A;
+	Thu,  5 Mar 2026 21:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LN0Wzy/E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hfxjYC28"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B50B36164A
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 21:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C68A3612E7
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 21:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772747443; cv=none; b=GsUo5jnjdGRTdNtwNCB2ZCTN1nfNnMBbkLye0PXYnFHkKwMuICvvkSpViVaOl0Js6wGA8jNeD1En2T7qezF3pMkK5+gFmRC5PDmwSY98aEBu6TzOwPaawiY5eG79NuG+FeeHLdJNWayUhQagQ9XQ1KleIY50ZdXzqz3zCAH2iCE=
+	t=1772747446; cv=none; b=Kf4l+DaYXRrMUOklCo4/Y71QEGkgeHyKO50q9eYuwx8xuRfwMKMwudcRlKjbcJ7PFjzImE4TZSInhPtqDCu0C2vyU5+bnoHOgAOVUoqm202c1q2p9msGAZM2dMLqPqwUspP7hQVT7+pj3tILI6zduqmM13aLyosdepCVsoxrbAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772747443; c=relaxed/simple;
-	bh=Ls2LRs6lW24MR1puqw312t5wAmOKItmDS8foVzWhbRY=;
+	s=arc-20240116; t=1772747446; c=relaxed/simple;
+	bh=G4vlUtBYtq6lNK+WtiZuR04mb7H6aFdJnqU5HrXJNBI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=alo5ODmV9eHKIYcW/LTsF5JVzUT9X45ABzpxcgXwtbL2A6N4wmsFTfxiWqhh8bi0WEeKm0hGBN8YDC3qBJBWIXTVgE39gNeR3j8DyDMYMegVTjrwAD8lQM1ui/cH8/b4K2zhbsGNw5xHylR5gbFRJohq4YHQzwu/GZ43DsLWpoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LN0Wzy/E; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=YzloCQ4MN9zUlmWJh4XyIhOsEkTkhSOOzaDL5FZaxIG7UoDPY/fFLGhD13P7FU7l024/hA3bQOQhuD08Zj+NlfoM8PYoqFWqVuQ6zV8/N9O4amAJG4uwzumfUNRzlZjAYs+OgCWoLQthuJNDUgVacHRWACvPSqA35mN5kFr5x4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hfxjYC28; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae4cdfc468so49488645ad.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 13:50:42 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35845fcf0f5so9641524a91.0
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 13:50:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772747442; x=1773352242; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772747444; x=1773352244; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTiADG5xBgHZVwPrpBdT3a96stemz4pHRU/EPTgQjxQ=;
-        b=LN0Wzy/Edmopzq26TZRIM+N64eRBp9BaVyhOOujWrj86HtlXDdYAcMbZVgMfhj2Nks
-         770i0BepMMQvczyDddmOMEqddtzrKO4QkVe/R74XIguxii4/3DosSc5CpjSOsUYt25Gf
-         v8+lzwBAsMRTXHYlC8FK3rQKVrHPDlVPd/sPmHE+LRkSFQ/qjFvE24EmGHkFncAnTOsP
-         /nm7tvF32zALjce5oZfTKTQ8xjmJ+ihkrrPKr/CMnfHTzlg9cF3wrXdbhAoR13y1GvSo
-         GqMEaS9k9uRl/LEdDSKwMCvTbADyLB3ZLeW6s0ThS0UGe1YJbUlnFghM9fxsdmk+3AHh
-         APZg==
+        bh=zVU1DOJqXxriXt0Te7xmOwXIrsXIioAyDKbLXzbVAGg=;
+        b=hfxjYC28udTwBMsQpCjWaJ4l114oT+Y06mcB8kfB/uHJKayFUIvgdZz0AQwnsbXi7e
+         WIwbjvERCEE829ypWJSFvQsR4oG6V8su4yK30GqCkcn8HnXtBPLf2PlvPO5qdP49M+eS
+         xv27Qba2j4dTiXSPfpDr9Iw5Ns4PNDcJt1oe5PQl/uHc1Y/8c+CrP5zyHRST3SgB9jy2
+         +stGqU44+HqDn48CEIshBLsesmI9ChGDDOBVxv1I2ig+4sfeCrQGaYWo40S605d7Du1T
+         pKVHwNE/3LCtuDCH9mIn4PJ8SSgvbRdRm64MOu/tAQ6QYc6auY8850FIOphYcLtRb3ey
+         7vRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772747442; x=1773352242;
+        d=1e100.net; s=20230601; t=1772747444; x=1773352244;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTiADG5xBgHZVwPrpBdT3a96stemz4pHRU/EPTgQjxQ=;
-        b=pTP68K7ScIe6dimd6R8c4aoeGwpThYOXzYG78LfBPedy+SFEiBpzmUaK7+10y5I2lp
-         /2NMybEdnTrGwxzCiFC6ZCVLidWCOew2HVEC8JRRk9U+yJ3OkYxcdjBSs1sVZnWrfGwo
-         3L8x+Bq9flyoRJ6E70KwIKti2mm5PjPlELBdO7xzcWQ7mCbqWw2M6XiwvfWWE69NMkln
-         tloMBqHxTXibU0HrXkr/jxi0VoV4adBXPA4iEEhJZxYATs4M8Ru4QnKYTAWtZ0UGN+Te
-         SVt+9a6gyOL7w3oLXRaUddKNS21J9rezBudnBm0LOQ/bznA8C6pvho7ojHBC+mFZXJhg
-         4nrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGe94u6rJWpT45ZYWBYkOz/ANgRTVlI3+1g0dXqXufDPGO9ZmEtShxb8oTOxTXewBdILLQyUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWeer0KCD+MKN3ER5StTi2u2f84Y29dcXY6CHVaoSspTF4agP3
-	jcBfUke0AyK8Am9bddA908gcb7bM1RdAkydQR0p0TuqKNRbDgC+IycCPprXh9F+CfzqNT712rT7
-	HfTPdgw==
-X-Received: from plka14.prod.google.com ([2002:a17:903:f8e:b0:2a0:c21d:f768])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:690:b0:2ae:6457:30b4
- with SMTP id d9443c01a7336-2ae8243295cmr214645ad.36.1772747441579; Thu, 05
- Mar 2026 13:50:41 -0800 (PST)
-Date: Thu,  5 Mar 2026 21:49:59 +0000
+        bh=zVU1DOJqXxriXt0Te7xmOwXIrsXIioAyDKbLXzbVAGg=;
+        b=Wxu8YVvc4UBfCh9YQ9KGOJMdTtW5cHR+YfyaTrlWiZ86n0rzKgpqaS5mH3t9dGEN6J
+         oUGFDF17sqXhWrlKQki5yoA5zMj/pLjyOiYUSGwFOUgbAFXeT5QRgIUCoAYWoAh3VJVP
+         tWYbCj96oBXC6FT2JUz+BcD5jTL4PvxT1T0VzsW+BfCjwjnNXVXgoTbY+OApq7EP2TFb
+         8k9QabLdG+SbMrEmOWOC475gytxeosX2dOn/yg0+eMhahcpTwubTdvmCVCqhVkxtcBTU
+         owK0yQ9reUAZWby53xMfposZ2jSansHxhku0TiIuYdQYNh8OhbPselde6vBpJVzlWQ+n
+         VWmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQeyQUPJLoOoJ4cqf0ToPguZnNndbJhfHwltkkvKm93zSEOcRs/jAJcSH44VaTHYboxYWDbMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9WGB3dP0mNtRH7QbSSllDe159nIwtJOfy8N4+eZfIZA10VR4m
+	bFMo5G7QSLcUZ2//XLRI9+OXjG3IJWGVOd1GA6XOYzNuYgtBTu9plnWn3V3iUenSiEAZYD84JYZ
+	IUfZ8Zw==
+X-Received: from pjbpi8.prod.google.com ([2002:a17:90b:1e48:b0:359:9c50:6a4c])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:55c8:b0:356:24c8:2291
+ with SMTP id 98e67ed59e1d1-359b1ac4e05mr3144220a91.0.1772747443592; Thu, 05
+ Mar 2026 13:50:43 -0800 (PST)
+Date: Thu,  5 Mar 2026 21:50:00 +0000
 In-Reply-To: <20260305215013.2984628-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260305215013.2984628-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260305215013.2984628-14-kuniyu@google.com>
-Subject: [PATCH v2 net-next 13/15] udp: Don't pass udptable to IPv6 socket
+Message-ID: <20260305215013.2984628-15-kuniyu@google.com>
+Subject: [PATCH v2 net-next 14/15] udp: Don't pass udptable to IPv4 socket
  lookup functions.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
@@ -87,7 +87,7 @@ Cc: Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
 	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
 	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 0F927218AE0
+X-Rspamd-Queue-Id: 77732218AF7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264567-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264568-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -114,7 +114,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[kernel.org,strlen.de,google.com,gmail.com,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
@@ -126,261 +126,202 @@ lookup functions.
 
 UDP-Lite gone, and we do not need to do that.
 
-Let's fetch net->ipv4.udp_table only where needed in IPv6
-stack: __udp6_lib_lookup() and __udp6_lib_mcast_deliver().
+Let's fetch net->ipv4.udp_table only where needed in IPv4
+stack: __udp4_lib_lookup(), __udp4_lib_mcast_deliver(),
+and udp_diag_dump().
 
-__udp6_lib_err() is renamed to udpv6_err() as its wrapper
-is no longer needed.
+Some functions are renamed as the wrapper functions are no
+longer needed.
+
+  __udp4_lib_err()     -> udp_err()
+  __udp_diag_destroy() -> udp_diag_destroy()
+  udp_dump_one()       -> udp_diag_dump_one()
+  udp_dump()           -> udp_diag_dump()
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- include/net/ipv6_stubs.h |  7 ++--
- include/net/udp.h        |  3 +-
- net/core/filter.c        |  3 +-
- net/ipv4/udp_diag.c      | 20 +++++-----
- net/ipv6/udp.c           | 82 ++++++++++++++++++----------------------
- net/ipv6/udp_offload.c   |  3 +-
- 6 files changed, 53 insertions(+), 65 deletions(-)
+ include/net/udp.h      |  5 ++-
+ net/core/filter.c      |  2 +-
+ net/ipv4/udp.c         | 75 +++++++++++++++++++-----------------------
+ net/ipv4/udp_diag.c    | 61 ++++++++++++----------------------
+ net/ipv4/udp_offload.c |  3 +-
+ 5 files changed, 59 insertions(+), 87 deletions(-)
 
-diff --git a/include/net/ipv6_stubs.h b/include/net/ipv6_stubs.h
-index d3013e721b14..907681cecde8 100644
---- a/include/net/ipv6_stubs.h
-+++ b/include/net/ipv6_stubs.h
-@@ -83,10 +83,9 @@ struct ipv6_bpf_stub {
- 	int (*inet6_bind)(struct sock *sk, struct sockaddr_unsized *uaddr, int addr_len,
- 			  u32 flags);
- 	struct sock *(*udp6_lib_lookup)(const struct net *net,
--				     const struct in6_addr *saddr, __be16 sport,
--				     const struct in6_addr *daddr, __be16 dport,
--				     int dif, int sdif, struct udp_table *tbl,
--				     struct sk_buff *skb);
-+					const struct in6_addr *saddr, __be16 sport,
-+					const struct in6_addr *daddr, __be16 dport,
-+					int dif, int sdif, struct sk_buff *skb);
- 	int (*ipv6_setsockopt)(struct sock *sk, int level, int optname,
- 			       sockptr_t optval, unsigned int optlen);
- 	int (*ipv6_getsockopt)(struct sock *sk, int level, int optname,
 diff --git a/include/net/udp.h b/include/net/udp.h
-index 76f401988353..adec74531ee1 100644
+index adec74531ee1..8262e2b215b4 100644
 --- a/include/net/udp.h
 +++ b/include/net/udp.h
-@@ -449,8 +449,7 @@ struct sock *udp6_lib_lookup(const struct net *net,
- struct sock *__udp6_lib_lookup(const struct net *net,
- 			       const struct in6_addr *saddr, __be16 sport,
- 			       const struct in6_addr *daddr, __be16 dport,
--			       int dif, int sdif, struct udp_table *tbl,
--			       struct sk_buff *skb);
+@@ -437,9 +437,8 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+ struct sock *udp4_lib_lookup(const struct net *net, __be32 saddr, __be16 sport,
+ 			     __be32 daddr, __be16 dport, int dif);
+ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
+-			       __be16 sport,
+-			       __be32 daddr, __be16 dport, int dif, int sdif,
+-			       struct udp_table *tbl, struct sk_buff *skb);
++			       __be16 sport, __be32 daddr, __be16 dport,
 +			       int dif, int sdif, struct sk_buff *skb);
- struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
  				 __be16 sport, __be16 dport);
- int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
+ struct sock *udp6_lib_lookup(const struct net *net,
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 0d5d5a17acb2..7a3440d009a8 100644
+index 7a3440d009a8..de6ef1915af3 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -6895,8 +6895,7 @@ static struct sock *sk_lookup(struct net *net, struct bpf_sock_tuple *tuple,
- 			sk = ipv6_bpf_stub->udp6_lib_lookup(net,
- 							    src6, tuple->ipv6.sport,
- 							    dst6, tuple->ipv6.dport,
--							    dif, sdif,
--							    net->ipv4.udp_table, NULL);
-+							    dif, sdif, NULL);
- #endif
- 	}
- 
-diff --git a/net/ipv4/udp_diag.c b/net/ipv4/udp_diag.c
-index a010d05062a0..0899c60cce53 100644
---- a/net/ipv4/udp_diag.c
-+++ b/net/ipv4/udp_diag.c
-@@ -44,11 +44,11 @@ static int udp_dump_one(struct udp_table *tbl,
- #if IS_ENABLED(CONFIG_IPV6)
- 	else if (req->sdiag_family == AF_INET6)
- 		sk = __udp6_lib_lookup(net,
--				(struct in6_addr *)req->id.idiag_src,
--				req->id.idiag_sport,
--				(struct in6_addr *)req->id.idiag_dst,
--				req->id.idiag_dport,
--				req->id.idiag_if, 0, tbl, NULL);
-+				       (struct in6_addr *)req->id.idiag_src,
-+				       req->id.idiag_sport,
-+				       (struct in6_addr *)req->id.idiag_dst,
-+				       req->id.idiag_dport,
-+				       req->id.idiag_if, 0, NULL);
- #endif
- 	if (sk && !refcount_inc_not_zero(&sk->sk_refcnt))
- 		sk = NULL;
-@@ -185,11 +185,11 @@ static int __udp_diag_destroy(struct sk_buff *in_skb,
- 
+@@ -6880,7 +6880,7 @@ static struct sock *sk_lookup(struct net *net, struct bpf_sock_tuple *tuple,
  		else
- 			sk = __udp6_lib_lookup(net,
--					(struct in6_addr *)req->id.idiag_dst,
--					req->id.idiag_dport,
--					(struct in6_addr *)req->id.idiag_src,
--					req->id.idiag_sport,
--					req->id.idiag_if, 0, tbl, NULL);
-+					       (struct in6_addr *)req->id.idiag_dst,
-+					       req->id.idiag_dport,
-+					       (struct in6_addr *)req->id.idiag_src,
-+					       req->id.idiag_sport,
-+					       req->id.idiag_if, 0, NULL);
- 	}
- #endif
- 	else {
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index fb50dcf8a384..0de28cbfe793 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -344,9 +344,9 @@ static void udp6_hash4(struct sock *sk)
- struct sock *__udp6_lib_lookup(const struct net *net,
- 			       const struct in6_addr *saddr, __be16 sport,
- 			       const struct in6_addr *daddr, __be16 dport,
--			       int dif, int sdif, struct udp_table *udptable,
--			       struct sk_buff *skb)
+ 			sk = __udp4_lib_lookup(net, src4, tuple->ipv4.sport,
+ 					       dst4, tuple->ipv4.dport,
+-					       dif, sdif, net->ipv4.udp_table, NULL);
++					       dif, sdif, NULL);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	} else {
+ 		struct in6_addr *src6 = (struct in6_addr *)&tuple->ipv6.saddr;
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 86765a17de67..0436462cb9fd 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -673,9 +673,10 @@ EXPORT_IPV6_MOD(udp4_hash4);
+  * harder than this. -DaveM
+  */
+ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
+-		__be16 sport, __be32 daddr, __be16 dport, int dif,
+-		int sdif, struct udp_table *udptable, struct sk_buff *skb)
++			       __be16 sport, __be32 daddr, __be16 dport,
 +			       int dif, int sdif, struct sk_buff *skb)
  {
 +	struct udp_table *udptable = net->ipv4.udp_table;
  	unsigned short hnum = ntohs(dport);
  	struct udp_hslot *hslot2;
  	struct sock *result, *sk;
-@@ -406,14 +406,13 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- EXPORT_SYMBOL_GPL(__udp6_lib_lookup);
+@@ -741,14 +742,13 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
+ EXPORT_SYMBOL_GPL(__udp4_lib_lookup);
  
- static struct sock *__udp6_lib_lookup_skb(struct sk_buff *skb,
--					  __be16 sport, __be16 dport,
--					  struct udp_table *udptable)
-+					  __be16 sport, __be16 dport)
+ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
+-						 __be16 sport, __be16 dport,
+-						 struct udp_table *udptable)
++						 __be16 sport, __be16 dport)
  {
- 	const struct ipv6hdr *iph = ipv6_hdr(skb);
+ 	const struct iphdr *iph = ip_hdr(skb);
  
- 	return __udp6_lib_lookup(dev_net(skb->dev), &iph->saddr, sport,
- 				 &iph->daddr, dport, inet6_iif(skb),
--				 inet6_sdif(skb), udptable, skb);
-+				 inet6_sdif(skb), skb);
+ 	return __udp4_lib_lookup(dev_net(skb->dev), iph->saddr, sport,
+ 				 iph->daddr, dport, inet_iif(skb),
+-				 inet_sdif(skb), udptable, skb);
++				 inet_sdif(skb), skb);
  }
  
- struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
-@@ -421,14 +420,12 @@ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
+@@ -756,14 +756,12 @@ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
  {
  	const u16 offset = NAPI_GRO_CB(skb)->network_offsets[skb->encapsulation];
- 	const struct ipv6hdr *iph = (struct ipv6hdr *)(skb->data + offset);
+ 	const struct iphdr *iph = (struct iphdr *)(skb->data + offset);
 -	struct net *net = dev_net(skb->dev);
  	int iif, sdif;
  
- 	inet6_get_iif_sdif(skb, &iif, &sdif);
+ 	inet_get_iif_sdif(skb, &iif, &sdif);
  
--	return __udp6_lib_lookup(net, &iph->saddr, sport,
--				 &iph->daddr, dport, iif,
+-	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, iif,
 -				 sdif, net->ipv4.udp_table, NULL);
-+	return __udp6_lib_lookup(dev_net(skb->dev), &iph->saddr, sport,
-+				 &iph->daddr, dport, iif, sdif, NULL);
++	return __udp4_lib_lookup(dev_net(skb->dev), iph->saddr, sport,
++				 iph->daddr, dport, iif, sdif, NULL);
  }
  
  /* Must be called under rcu_read_lock().
-@@ -440,8 +437,7 @@ struct sock *udp6_lib_lookup(const struct net *net, const struct in6_addr *saddr
+@@ -775,8 +773,7 @@ struct sock *udp4_lib_lookup(const struct net *net, __be32 saddr, __be16 sport,
  {
  	struct sock *sk;
  
--	sk =  __udp6_lib_lookup(net, saddr, sport, daddr, dport,
--				dif, 0, net->ipv4.udp_table, NULL);
-+	sk =  __udp6_lib_lookup(net, saddr, sport, daddr, dport, dif, 0, NULL);
+-	sk = __udp4_lib_lookup(net, saddr, sport, daddr, dport,
+-			       dif, 0, net->ipv4.udp_table, NULL);
++	sk = __udp4_lib_lookup(net, saddr, sport, daddr, dport, dif, 0, NULL);
  	if (sk && !refcount_inc_not_zero(&sk->sk_refcnt))
  		sk = NULL;
  	return sk;
-@@ -642,7 +638,6 @@ static int __udp6_lib_err_encap_no_sk(struct sk_buff *skb,
- static struct sock *__udp6_lib_err_encap(struct net *net,
- 					 const struct ipv6hdr *hdr, int offset,
+@@ -866,7 +863,6 @@ static int __udp4_lib_err_encap_no_sk(struct sk_buff *skb, u32 info)
+ static struct sock *__udp4_lib_err_encap(struct net *net,
+ 					 const struct iphdr *iph,
  					 struct udphdr *uh,
 -					 struct udp_table *udptable,
  					 struct sock *sk,
- 					 struct sk_buff *skb,
- 					 struct inet6_skb_parm *opt,
-@@ -673,7 +668,7 @@ static struct sock *__udp6_lib_err_encap(struct net *net,
+ 					 struct sk_buff *skb, u32 info)
+ {
+@@ -894,8 +890,7 @@ static struct sock *__udp4_lib_err_encap(struct net *net,
+ 	}
  
- 	sk = __udp6_lib_lookup(net, &hdr->daddr, uh->source,
- 			       &hdr->saddr, uh->dest,
--			       inet6_iif(skb), 0, udptable, skb);
-+			       inet6_iif(skb), 0, skb);
+ 	sk = __udp4_lib_lookup(net, iph->daddr, uh->source,
+-			       iph->saddr, uh->dest, skb->dev->ifindex, 0,
+-			       udptable, NULL);
++			       iph->saddr, uh->dest, skb->dev->ifindex, 0, NULL);
  	if (sk) {
  		up = udp_sk(sk);
  
-@@ -694,29 +689,28 @@ static struct sock *__udp6_lib_err_encap(struct net *net,
- 	return sk;
- }
- 
--static int __udp6_lib_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
--			  u8 type, u8 code, int offset, __be32 info,
--			  struct udp_table *udptable)
-+static int udpv6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
-+		     u8 type, u8 code, int offset, __be32 info)
+@@ -924,29 +919,28 @@ static struct sock *__udp4_lib_err_encap(struct net *net,
+  * header points to the first 8 bytes of the udp header.  We need
+  * to find the appropriate port.
+  */
+-
+-static int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udptable)
++int udp_err(struct sk_buff *skb, u32 info)
  {
--	struct ipv6_pinfo *np;
- 	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
--	const struct in6_addr *saddr = &hdr->saddr;
--	const struct in6_addr *daddr = seg6_get_daddr(skb, opt) ? : &hdr->daddr;
--	struct udphdr *uh = (struct udphdr *)(skb->data+offset);
-+	struct udphdr *uh = (struct udphdr *)(skb->data + offset);
-+	const struct in6_addr *saddr, *daddr;
+-	struct inet_sock *inet;
+ 	const struct iphdr *iph = (const struct iphdr *)skb->data;
+-	struct udphdr *uh = (struct udphdr *)(skb->data+(iph->ihl<<2));
+ 	const int type = icmp_hdr(skb)->type;
+ 	const int code = icmp_hdr(skb)->code;
 +	struct net *net = dev_net(skb->dev);
-+	struct ipv6_pinfo *np;
++	struct inet_sock *inet;
  	bool tunnel = false;
++	struct udphdr *uh;
  	struct sock *sk;
  	int harderr;
  	int err;
 -	struct net *net = dev_net(skb->dev);
  
-+	daddr = seg6_get_daddr(skb, opt) ? : &hdr->daddr;
-+	saddr = &hdr->saddr;
- 	sk = __udp6_lib_lookup(net, daddr, uh->dest, saddr, uh->source,
--			       inet6_iif(skb), inet6_sdif(skb), udptable, NULL);
-+			       inet6_iif(skb), inet6_sdif(skb), NULL);
++	uh = (struct udphdr *)(skb->data + (iph->ihl << 2));
+ 	sk = __udp4_lib_lookup(net, iph->daddr, uh->dest,
+ 			       iph->saddr, uh->source, skb->dev->ifindex,
+-			       inet_sdif(skb), udptable, NULL);
++			       inet_sdif(skb), NULL);
  
  	if (!sk || READ_ONCE(udp_sk(sk)->encap_type)) {
  		/* No socket for error: try tunnels before discarding */
- 		if (static_branch_unlikely(&udpv6_encap_needed_key)) {
--			sk = __udp6_lib_err_encap(net, hdr, offset, uh,
--						  udptable, sk, skb,
-+			sk = __udp6_lib_err_encap(net, hdr, offset, uh, sk, skb,
- 						  opt, type, code, info);
+ 		if (static_branch_unlikely(&udp_encap_needed_key)) {
+-			sk = __udp4_lib_err_encap(net, iph, uh, udptable, sk, skb,
+-						  info);
++			sk = __udp4_lib_err_encap(net, iph, uh, sk, skb, info);
  			if (!sk)
  				return 0;
-@@ -808,14 +802,6 @@ static int __udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 		} else
+@@ -1019,11 +1013,6 @@ static int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udpta
  	return 0;
  }
  
--static __inline__ int udpv6_err(struct sk_buff *skb,
--				struct inet6_skb_parm *opt, u8 type,
--				u8 code, int offset, __be32 info)
+-int udp_err(struct sk_buff *skb, u32 info)
 -{
--	return __udp6_lib_err(skb, opt, type, code, offset, info,
--			      dev_net(skb->dev)->ipv4.udp_table);
+-	return __udp4_lib_err(skb, info, dev_net(skb->dev)->ipv4.udp_table);
 -}
 -
- static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- {
- 	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
-@@ -947,19 +933,27 @@ static void udp6_csum_zero_error(struct sk_buff *skb)
-  * so we don't need to lock the hashes.
+ /*
+  * Throw away all pending data and cancel the corking. Socket is locked.
   */
- static int __udp6_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
--		const struct in6_addr *saddr, const struct in6_addr *daddr,
--		struct udp_table *udptable, int proto)
-+				    const struct in6_addr *saddr,
-+				    const struct in6_addr *daddr,
-+				    int proto)
+@@ -2486,18 +2475,24 @@ EXPORT_IPV6_MOD(udp_sk_rx_dst_set);
+ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
+ 				    struct udphdr  *uh,
+ 				    __be32 saddr, __be32 daddr,
+-				    struct udp_table *udptable,
+ 				    int proto)
  {
 -	struct sock *sk, *first = NULL;
 +	struct udp_table *udptable = net->ipv4.udp_table;
- 	const struct udphdr *uh = udp_hdr(skb);
 +	unsigned int hash2, hash2_any, offset;
  	unsigned short hnum = ntohs(uh->dest);
 -	struct udp_hslot *hslot = udp_hashslot(udptable, net, hnum);
--	unsigned int offset = offsetof(typeof(*sk), sk_node);
 -	unsigned int hash2 = 0, hash2_any = 0, use_hash2 = (hslot->count > 10);
--	int dif = inet6_iif(skb);
+-	unsigned int offset = offsetof(typeof(*sk), sk_node);
 +	struct sock *sk, *first = NULL;
- 	int sdif = inet6_sdif(skb);
-+	int dif = inet6_iif(skb);
+ 	int dif = skb->dev->ifindex;
+ 	int sdif = inet_sdif(skb);
  	struct hlist_node *node;
 +	struct udp_hslot *hslot;
  	struct sk_buff *nskb;
@@ -393,54 +334,189 @@ index fb50dcf8a384..0de28cbfe793 100644
 +	offset = offsetof(typeof(*sk), sk_node);
  
  	if (use_hash2) {
- 		hash2_any = ipv6_portaddr_hash(net, &in6addr_any, hnum) &
-@@ -1069,8 +1063,7 @@ static int udp6_csum_init(struct sk_buff *skb, struct udphdr *uh)
- 	return 0;
- }
+ 		hash2_any = ipv4_portaddr_hash(net, htonl(INADDR_ANY), hnum) &
+@@ -2602,15 +2597,14 @@ static int udp_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
+  *	All we need to do is get the socket, and then do a checksum.
+  */
  
--static int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
+-static int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 -			  int proto)
-+static int __udp6_lib_rcv(struct sk_buff *skb, int proto)
++static int __udp4_lib_rcv(struct sk_buff *skb, int proto)
  {
- 	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	const struct in6_addr *saddr, *daddr;
-@@ -1140,11 +1133,10 @@ static int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- 	 *	Multicast receive code
- 	 */
- 	if (ipv6_addr_is_multicast(daddr))
--		return __udp6_lib_mcast_deliver(net, skb,
--				saddr, daddr, udptable, proto);
-+		return __udp6_lib_mcast_deliver(net, skb, saddr, daddr, proto);
++	struct rtable *rt = skb_rtable(skb);
++	struct net *net = dev_net(skb->dev);
+ 	struct sock *sk = NULL;
+-	struct udphdr *uh;
+ 	unsigned short ulen;
+-	struct rtable *rt = skb_rtable(skb);
+ 	__be32 saddr, daddr;
+-	struct net *net = dev_net(skb->dev);
++	struct udphdr *uh;
+ 	bool refcounted;
+ 	int drop_reason;
  
- 	/* Unicast */
--	sk = __udp6_lib_lookup_skb(skb, uh->source, uh->dest, udptable);
-+	sk = __udp6_lib_lookup_skb(skb, uh->source, uh->dest);
- 	if (sk) {
- 		if (!uh->check && !udp_get_no_check6_rx(sk))
- 			goto report_csum_error;
-@@ -1262,7 +1254,7 @@ void udp_v6_early_demux(struct sk_buff *skb)
+@@ -2660,10 +2654,9 @@ static int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
+ 	}
  
- INDIRECT_CALLABLE_SCOPE int udpv6_rcv(struct sk_buff *skb)
+ 	if (rt->rt_flags & (RTCF_BROADCAST|RTCF_MULTICAST))
+-		return __udp4_lib_mcast_deliver(net, skb, uh,
+-						saddr, daddr, udptable, proto);
++		return __udp4_lib_mcast_deliver(net, skb, uh, saddr, daddr, proto);
+ 
+-	sk = __udp4_lib_lookup_skb(skb, uh->source, uh->dest, udptable);
++	sk = __udp4_lib_lookup_skb(skb, uh->source, uh->dest);
+ 	if (sk)
+ 		return udp_unicast_rcv_skb(sk, skb, uh);
+ no_sk:
+@@ -2847,7 +2840,7 @@ enum skb_drop_reason udp_v4_early_demux(struct sk_buff *skb)
+ 
+ int udp_rcv(struct sk_buff *skb)
  {
--	return __udp6_lib_rcv(skb, dev_net(skb->dev)->ipv4.udp_table, IPPROTO_UDP);
-+	return __udp6_lib_rcv(skb, IPPROTO_UDP);
+-	return __udp4_lib_rcv(skb, dev_net(skb->dev)->ipv4.udp_table, IPPROTO_UDP);
++	return __udp4_lib_rcv(skb, IPPROTO_UDP);
  }
  
- /*
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index e003b8494dc0..778afc7453ce 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -128,8 +128,7 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- 	inet6_get_iif_sdif(skb, &iif, &sdif);
+ static void udp_destroy_sock(struct sock *sk)
+diff --git a/net/ipv4/udp_diag.c b/net/ipv4/udp_diag.c
+index 0899c60cce53..f4b24e628cf8 100644
+--- a/net/ipv4/udp_diag.c
++++ b/net/ipv4/udp_diag.c
+@@ -24,23 +24,24 @@ static int sk_diag_dump(struct sock *sk, struct sk_buff *skb,
+ 				 net_admin);
+ }
  
- 	return __udp6_lib_lookup(net, &iph->saddr, sport,
--				 &iph->daddr, dport, iif,
+-static int udp_dump_one(struct udp_table *tbl,
+-			struct netlink_callback *cb,
+-			const struct inet_diag_req_v2 *req)
++static int udp_diag_dump_one(struct netlink_callback *cb,
++			     const struct inet_diag_req_v2 *req)
+ {
+ 	struct sk_buff *in_skb = cb->skb;
+-	int err;
+ 	struct sock *sk = NULL;
+ 	struct sk_buff *rep;
+-	struct net *net = sock_net(in_skb->sk);
++	struct net *net;
++	int err;
++
++	net = sock_net(in_skb->sk);
+ 
+ 	rcu_read_lock();
+ 	if (req->sdiag_family == AF_INET)
+ 		/* src and dst are swapped for historical reasons */
+ 		sk = __udp4_lib_lookup(net,
+-				req->id.idiag_src[0], req->id.idiag_sport,
+-				req->id.idiag_dst[0], req->id.idiag_dport,
+-				req->id.idiag_if, 0, tbl, NULL);
++				       req->id.idiag_src[0], req->id.idiag_sport,
++				       req->id.idiag_dst[0], req->id.idiag_dport,
++				       req->id.idiag_if, 0, NULL);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	else if (req->sdiag_family == AF_INET6)
+ 		sk = __udp6_lib_lookup(net,
+@@ -85,14 +86,15 @@ static int udp_dump_one(struct udp_table *tbl,
+ 	return err;
+ }
+ 
+-static void udp_dump(struct udp_table *table, struct sk_buff *skb,
+-		     struct netlink_callback *cb,
+-		     const struct inet_diag_req_v2 *r)
++static void udp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
++			  const struct inet_diag_req_v2 *r)
+ {
+ 	bool net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN);
+ 	struct net *net = sock_net(skb->sk);
+ 	int num, s_num, slot, s_slot;
++	struct udp_table *table;
+ 
++	table = net->ipv4.udp_table;
+ 	s_slot = cb->args[0];
+ 	num = s_num = cb->args[1];
+ 
+@@ -139,18 +141,6 @@ static void udp_dump(struct udp_table *table, struct sk_buff *skb,
+ 	cb->args[1] = num;
+ }
+ 
+-static void udp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+-			  const struct inet_diag_req_v2 *r)
+-{
+-	udp_dump(sock_net(cb->skb->sk)->ipv4.udp_table, skb, cb, r);
+-}
+-
+-static int udp_diag_dump_one(struct netlink_callback *cb,
+-			     const struct inet_diag_req_v2 *req)
+-{
+-	return udp_dump_one(sock_net(cb->skb->sk)->ipv4.udp_table, cb, req);
+-}
+-
+ static void udp_diag_get_info(struct sock *sk, struct inet_diag_msg *r,
+ 		void *info)
+ {
+@@ -159,9 +149,8 @@ static void udp_diag_get_info(struct sock *sk, struct inet_diag_msg *r,
+ }
+ 
+ #ifdef CONFIG_INET_DIAG_DESTROY
+-static int __udp_diag_destroy(struct sk_buff *in_skb,
+-			      const struct inet_diag_req_v2 *req,
+-			      struct udp_table *tbl)
++static int udp_diag_destroy(struct sk_buff *in_skb,
++			    const struct inet_diag_req_v2 *req)
+ {
+ 	struct net *net = sock_net(in_skb->sk);
+ 	struct sock *sk;
+@@ -171,18 +160,17 @@ static int __udp_diag_destroy(struct sk_buff *in_skb,
+ 
+ 	if (req->sdiag_family == AF_INET)
+ 		sk = __udp4_lib_lookup(net,
+-				req->id.idiag_dst[0], req->id.idiag_dport,
+-				req->id.idiag_src[0], req->id.idiag_sport,
+-				req->id.idiag_if, 0, tbl, NULL);
++				       req->id.idiag_dst[0], req->id.idiag_dport,
++				       req->id.idiag_src[0], req->id.idiag_sport,
++				       req->id.idiag_if, 0, NULL);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	else if (req->sdiag_family == AF_INET6) {
+ 		if (ipv6_addr_v4mapped((struct in6_addr *)req->id.idiag_dst) &&
+ 		    ipv6_addr_v4mapped((struct in6_addr *)req->id.idiag_src))
+ 			sk = __udp4_lib_lookup(net,
+-					req->id.idiag_dst[3], req->id.idiag_dport,
+-					req->id.idiag_src[3], req->id.idiag_sport,
+-					req->id.idiag_if, 0, tbl, NULL);
+-
++					       req->id.idiag_dst[3], req->id.idiag_dport,
++					       req->id.idiag_src[3], req->id.idiag_sport,
++					       req->id.idiag_if, 0, NULL);
+ 		else
+ 			sk = __udp6_lib_lookup(net,
+ 					       (struct in6_addr *)req->id.idiag_dst,
+@@ -216,13 +204,6 @@ static int __udp_diag_destroy(struct sk_buff *in_skb,
+ 
+ 	return err;
+ }
+-
+-static int udp_diag_destroy(struct sk_buff *in_skb,
+-			    const struct inet_diag_req_v2 *req)
+-{
+-	return __udp_diag_destroy(in_skb, req, sock_net(in_skb->sk)->ipv4.udp_table);
+-}
+-
+ #endif
+ 
+ static const struct inet_diag_handler udp_diag_handler = {
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 6b1654c1ad4a..98e92da726b5 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -869,8 +869,7 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ 	inet_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, iif,
 -				 sdif, net->ipv4.udp_table, NULL);
-+				 &iph->daddr, dport, iif, sdif, NULL);
++				 iph->daddr, dport, iif, sdif, NULL);
  }
  
- struct sk_buff *udp6_gro_receive(struct list_head *head, struct sk_buff *skb)
+ INDIRECT_CALLABLE_SCOPE
 -- 
 2.53.0.473.g4a7958ca14-goog
 
