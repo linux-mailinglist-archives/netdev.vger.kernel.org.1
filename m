@@ -1,148 +1,238 @@
-Return-Path: <netdev+bounces-264315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264316-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id tl3CI/hnqWkp7AAAu9opvQ
-	(envelope-from <netdev+bounces-264315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:24:40 +0100
+	id KMI7EWBoqWlN6wAAu9opvQ
+	(envelope-from <netdev+bounces-264316-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:26:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6AE82108A5
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:24:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999902108DB
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CAEE302571F
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:24:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5C93028EE5
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A2737186A;
-	Thu,  5 Mar 2026 11:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F4034887B;
+	Thu,  5 Mar 2026 11:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QRQGFCYu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NurZ0woV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0nBvH0v"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102C3347FEE;
-	Thu,  5 Mar 2026 11:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04F623D7E3
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 11:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772709877; cv=none; b=BVDbbiAhhQ+lg3iv299pczRBkj6ujJCgFSLiG4a2w6WJzZHJYuyfUSSveqMsAfqebF3PpropJfJ8n9j6Sh+xpxLkfOjGCtJsTz5QSqeWP+maC99X6Pz1tLz193jf9pgeu7XlErBUPj/lGfh2gkKORQRREvB073WAs/B/3nDyzn0=
+	t=1772709981; cv=none; b=Xjb9aBljvyAYEj6nBMK9p81Dwn6oLZXfxipitI3tBe55GB40+JiG7GXxCBq0I2gFFmm/eHI5IpIE6cCatRtX0BvUAgEZ68a+9tbsBRMv5kcDXabBEIowHhKCE2FG0KgfbGZkU95mkFCmCViJYPL302iVyAur4dTHFKRq0VtntHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772709877; c=relaxed/simple;
-	bh=DMNhvzrgXP9OiLu4K7KpyXETlnZrSn3rv2sewPh6MLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gjk9g01HcEFMIzoSIYUK/1ZrhE3HdaosdQpUZV5ZP1MVj6myxc2l498yem5AUanPA3IYcyi8hxe7xIk8c7PUrrK2W4htmO3p4ou9IznPNw5MQfgAlvL3CNfSc1s1h1U6pAbwSCtZqN1bNWZ6wDSgUkgZfTlDBSb4SBNpVdbVLo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QRQGFCYu; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772709869; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=vvTlZrXhHafuL5ISIBMXPqy33iMyPkUxCrG6mnIfRsg=;
-	b=QRQGFCYuNGn211kL0Sn5tJvqQVaEmBoqZC3IMPPhSaXz/PTbX4QlUzo8tgobCExstuuEMPvy6HtpNbmcjDhZYiJV9uxHKeuq9mLR/ly0Vsburf4BA3TXjNbV6UZC7+SCYis3kL9itEoxLlDTTSi4L81le4N+uSWUsOaS1DFJxMo=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X-K9U76_1772709868 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 05 Mar 2026 19:24:29 +0800
-Date: Thu, 5 Mar 2026 19:24:28 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: sawara04.o@gmail.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	skhan@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net/smc: Add documentation for limit_smc_hs
- and hs_ctrl
-Message-ID: <20260305112428.GA57792@j66a10360.sqa.eu95>
-References: <20260305092226.27379-1-sawara04.o@gmail.com>
- <20260305092226.27379-3-sawara04.o@gmail.com>
+	s=arc-20240116; t=1772709981; c=relaxed/simple;
+	bh=YZF2+qbA9NLMDI3/4YuPpkKbozBNwPhHAlMxMzTX1vQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mk0nb6FI+zGTlE6mM7s9UNOEYY2kQM31Olve6e9o79VMqh5Sj0gshmyYwXduSjZhYO0/OrXE0AI4BKrqlPEMWNCH6yOvGFSaszeXe7/yqIB0n1aU0MPPtkamTO5LWzaWP555X28wXlmMu2g2kPMFW7wYVGBnu63RUUH//1Qfa3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NurZ0woV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R0nBvH0v; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772709978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/PDdJdydDAqY2r+QCid29LNFFApkwhWkx5ohf3cC8Sw=;
+	b=NurZ0woVECpXwpvbQ69lV1CW7qOwRCSRwSn8vGtLRi8DhgII6kgr5lLv2k7qXpYC8HVlPD
+	LvJmNBbfGv6VK1fcQaABoMzMy/ife/Bsqvsidf58RWzBS+BFkrFR+kDqnYvrvRHEOx5PUc
+	bvb+qUDLbnELjvrylIXndbV3lZZwZKk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-gedcwN_gOoOzvPVLeh9vSg-1; Thu, 05 Mar 2026 06:26:17 -0500
+X-MC-Unique: gedcwN_gOoOzvPVLeh9vSg-1
+X-Mimecast-MFC-AGG-ID: gedcwN_gOoOzvPVLeh9vSg_1772709977
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48071615686so62389725e9.1
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 03:26:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772709976; x=1773314776; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/PDdJdydDAqY2r+QCid29LNFFApkwhWkx5ohf3cC8Sw=;
+        b=R0nBvH0vfPoKjFStHsWmrF7ByCS8PIlSpNc/EBNc+slFn6qstCth5x4TKFQ/LrCPD8
+         +nrcBe2j6facHyAMqm8o+RVkuEuqKtT1QdGqCI/l0aLROfv82OU7ZjfviQn2+T7Ooirh
+         2kSgh3pz92aVr5GWR2lgjCsH+SN1u4pj+eMV04uzLtKfMx51i5JiIRfIl7wVt8hz8JBQ
+         A+DQM+htL8dVz0ZGj5eOf3InlTmRlPSJB6AVVRlruptvixsXGv5Acy5arB26nqIaOnWJ
+         bZl7C6mZ379mlKAS/aLKQ8mXaEfZeqlzotf5HDwPhvHF2x2r40v082NrScZCLHNiL/mA
+         KT2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772709976; x=1773314776;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/PDdJdydDAqY2r+QCid29LNFFApkwhWkx5ohf3cC8Sw=;
+        b=SjK4p3mvKBo9II42Cks3FuONFaudBH4puk2hT4ZpA3kOscrzb4LvmX7cSfPBYRbTFa
+         n4oTS0hPbCHK7cYi9Uo98/AU+QWer6/uzwAP5/lNfCMuw1taHLOPkqa7CgroJEQxv9te
+         41jV9iEugW2dN6Em47K6sW6hiOcZTFllkkJ2/KgBtIEhJ4SW1bNPkhIhkLvnKCGa9wK6
+         HsI7SEZHSiUNTXhk9Sygll89HIApAiGDGLAxhX/e7WUDGWeUimh02hgy35l4hcb/kQUi
+         xLsulg5vSeazi7T6VIMvhhCEPLcr3EUEqXvSPVJ2wYtCFarTRJMzokC9/kasfPXLc1Xn
+         6/Vg==
+X-Gm-Message-State: AOJu0YzqHu+SEiWr7QVSXGT+DTCRCZ01MskPgtoJlsusCQjwXXzJ9Bct
+	v6hpBUipj1j1A3UtRIHGdfffqi/aX/DJtO0/2Gjo7cJmV+8KOTK2zv3KGXMrNjNoXGq0FMWy8fK
+	Q/JZaRkUARmvmsW99AgB2tdHNGNwZnX/LdMBs73wlJXQhh9JunortHYhZLdOaqwP/L3CGDbDnTb
+	Q7yk00qWdfk1xd5l4QGD9TuZ9ZwD7bjFEo7xq1Z20=
+X-Gm-Gg: ATEYQzybDQV0YZy9ILweZCWa95srywRl7sXaWwNEQGS2wibgwh2CfrLarQUIDwHk2VT
+	ZWYgGKk7B1It8gaHhDTNi4AC5/8jbj3ZSGNPIiEJ66D4JCTpA+JmGL7K57Xw07a2m5Xk1L2SZZ/
+	HtfkxszBLa/oQnyJ+bFxceoKYk0G637EGieiAafmlabBPlx+ikhU7s1X9IXelDdVe0NKZVi8Lil
+	8wMI+aSqpxbuQlNMT3Srx6VIJDLu7CkvXEWRwuvdmEIdfNSN0ffp/oek2MsYxpnrK80ButrsgcD
+	oIPmZnkI2mP0cRFNPOWELyEbPum/v3r/fAHPxLJjBS88JhZIOLaNb2b6A0mIlAJGgqbZ3NRA1R0
+	TuCJvbK/AuLdY+8MdDvfamvTv1g==
+X-Received: by 2002:a05:600c:6305:b0:483:b505:9db7 with SMTP id 5b1f17b1804b1-485198c1d1fmr86121445e9.32.1772709976274;
+        Thu, 05 Mar 2026 03:26:16 -0800 (PST)
+X-Received: by 2002:a05:600c:6305:b0:483:b505:9db7 with SMTP id 5b1f17b1804b1-485198c1d1fmr86120825e9.32.1772709975788;
+        Thu, 05 Mar 2026 03:26:15 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.149.216])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851d8ecb09sm38337535e9.2.2026.03.05.03.26.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2026 03:26:15 -0800 (PST)
+Message-ID: <f9fef510-09bb-44b5-8340-c472f3b95deb@redhat.com>
+Date: Thu, 5 Mar 2026 12:26:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260305092226.27379-3-sawara04.o@gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Rspamd-Queue-Id: B6AE82108A5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next V4 5/5] eth: mlx5: Move pause storm errors to pause
+ stats
+To: netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com,
+ mbloch@nvidia.com, gal@nvidia.com, leon@kernel.org, idosch@nvidia.com
+Cc: alexanderduyck@fb.com, alok.a.tiwari@oracle.com, andrew+netdev@lunn.ch,
+ andrew@lunn.ch, davem@davemloft.net, dg573847474@gmail.com,
+ donald.hunter@gmail.com, edumazet@google.com, horms@kernel.org,
+ jacob.e.keller@intel.com, kernel-team@meta.com, kory.maincent@bootlin.com,
+ kuba@kernel.org, lee@trager.us, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux@armlinux.org.uk,
+ mike.marciniszyn@gmail.com, o.rempel@pengutronix.de,
+ vadim.fedorenko@linux.dev, Mohsin Bashir <mohsin.bashr@gmail.com>
+References: <20260302230149.1580195-1-mohsin.bashr@gmail.com>
+ <20260302230149.1580195-6-mohsin.bashr@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260302230149.1580195-6-mohsin.bashr@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 999902108DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264315-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FREEMAIL_CC(0.00)[fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,vger.kernel.org,armlinux.org.uk,pengutronix.de,linux.dev];
+	TAGGED_FROM(0.00)[bounces-264316-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05, 2026 at 06:22:24PM +0900, sawara04.o@gmail.com wrote:
-> From: Kyoji Ogasawara <sawara04.o@gmail.com>
+On 3/3/26 12:01 AM, Mohsin Bashir wrote:
+> Report device_stall_critical_watermark_cnt as tx_pause_storm_events in
+> the ethtool_pause_stats struct. This counter tracks pause storm error
+> events which indicate the NIC has been sending pause frames for an
+> extended period due to a stall.
 > 
-> Document missing SMC sysctl parameters limit_smc_hs and hs_ctrl
+> The ethtool_pause_stats struct reports these stalls as a single value,
+> whereas the device supports tracking them per priority. Aggregate the
+> counter across all priority classes to capture stalls on all priorities.
+> Note that the stats are fetched from the device for each priority via
+> mlx5_core_access_reg().
 > 
-> Signed-off-by: Kyoji Ogasawara <sawara04.o@gmail.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 > ---
->  Documentation/networking/smc-sysctl.rst | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+>  .../ethernet/mellanox/mlx5/core/en_stats.c    | 30 +++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 > 
-> diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-> index 17b8314c0e5e..67c2bdc533d7 100644
-> --- a/Documentation/networking/smc-sysctl.rst
-> +++ b/Documentation/networking/smc-sysctl.rst
-> @@ -111,3 +111,27 @@ smcr_max_recv_wr - INTEGER
->  	like before having this control.
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> index a8af84fc9763..1a3ecf073913 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> @@ -916,11 +916,30 @@ static int mlx5e_stats_get_ieee(struct mlx5_core_dev *mdev,
+>  				    sz, MLX5_REG_PPCNT, 0, 0);
+>  }
 >  
->  	Default: 48
+> +static int mlx5e_stats_get_per_prio(struct mlx5_core_dev *mdev,
+> +				    u32 *ppcnt_per_prio, int prio)
+> +{
+> +	u32 in[MLX5_ST_SZ_DW(ppcnt_reg)] = {};
+> +	int sz = MLX5_ST_SZ_BYTES(ppcnt_reg);
 > +
-> +limit_smc_hs - INTEGER
-> +	Whether to limit SMC handshake for newly created sockets.
+> +	if (!(MLX5_CAP_PCAM_FEATURE(mdev, pfcc_mask) &&
+> +	      MLX5_CAP_DEBUG(mdev, stall_detect)))
+> +		return -EOPNOTSUPP;
 > +
-> +	When enabled, SMC listen path applies handshake limitation based on
-> +	handshake worker congestion and queued SMC handshake load.
+> +	MLX5_SET(ppcnt_reg, in, local_port, 1);
+> +	MLX5_SET(ppcnt_reg, in, grp, MLX5_PER_PRIORITY_COUNTERS_GROUP);
+> +	MLX5_SET(ppcnt_reg, in, prio_tc, prio);
+> +	return mlx5_core_access_reg(mdev, in, sz, ppcnt_per_prio, sz,
+> +				    MLX5_REG_PPCNT, 0, 0);
+> +}
 > +
-> +	Possible values:
+>  void mlx5e_stats_pause_get(struct mlx5e_priv *priv,
+>  			   struct ethtool_pause_stats *pause_stats)
+>  {
+>  	u32 ppcnt_ieee_802_3[MLX5_ST_SZ_DW(ppcnt_reg)];
+>  	struct mlx5_core_dev *mdev = priv->mdev;
+> +	u64 ps_stats = 0;
+> +	int prio;
+>  
+>  	if (mlx5e_stats_get_ieee(mdev, ppcnt_ieee_802_3))
+>  		return;
+> @@ -933,6 +952,17 @@ void mlx5e_stats_pause_get(struct mlx5e_priv *priv,
+>  		MLX5E_READ_CTR64_BE_F(ppcnt_ieee_802_3,
+>  				      eth_802_3_cntrs_grp_data_layout,
+>  				      a_pause_mac_ctrl_frames_received);
 > +
-> +	- 0 - Disable handshake limitation
-> +	- 1 - Enable handshake limitation
+> +	for (prio = 0; prio < NUM_PPORT_PRIO; prio++) {
+> +		if (mlx5e_stats_get_per_prio(mdev, ppcnt_ieee_802_3, prio))
+> +			return;
 > +
-> +	Default: 0 (disable)
+> +		ps_stats += MLX5E_READ_CTR64_BE_F(ppcnt_ieee_802_3,
+> +						  eth_per_prio_grp_data_layout,
+> +						  device_stall_critical_watermark_cnt);
+> +	}
 > +
-> +hs_ctrl - STRING
-> +	Select the SMC handshake control profile by name.
-> +
-> +	The selected profile controls whether SMC options are advertised
-> +	during TCP SYN/SYN-ACK handshake.
-> +
-> +	Only available when CONFIG_SMC_HS_CTRL_BPF is enabled.
-> +	Write an empty string to clear the current profile.
+> +	pause_stats->tx_pause_storm_events = ps_stats;
+>  }
+>  
+>  void mlx5e_stats_eth_phy_get(struct mlx5e_priv *priv,
 
-It would be better to clarify that this string refers to the name of a
-BPF struct_ops (type smc_hs_ctrl) implemented by the user.
+It would be nice if someone at nVidia could have a look at the mlx bits
+here. Waiting a little longer for that.
 
-> +
-> +	Default: empty string
-> \ No newline at end of file
-> -- 
-> 2.43.0
-> 
+Thanks,
+
+Paolo
+
 
