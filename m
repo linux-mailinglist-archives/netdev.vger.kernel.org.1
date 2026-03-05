@@ -1,198 +1,187 @@
-Return-Path: <netdev+bounces-264518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264173-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJKmKBLZqWl5GAEAu9opvQ
-	(envelope-from <netdev+bounces-264518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:27:14 +0100
+	id YNoBIxkHqWlW0QAAu9opvQ
+	(envelope-from <netdev+bounces-264173-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:31:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4606A217849
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:27:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED27420AD15
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:31:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6C1413006B78
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 19:27:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBE27303799E
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 04:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99BD33509E;
-	Thu,  5 Mar 2026 19:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA3A1CAA78;
+	Thu,  5 Mar 2026 04:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Qg+qnD8o"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2L1dGC4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012067.outbound.protection.outlook.com [40.93.195.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FAD378829
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 19:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.35
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772738824; cv=none; b=D2MG7nqWq7RRYGjA2RpsW3dBAQQ2jbpxtBgaq6DDBa8623oWzC/g2RUZ8FCiMaLmoyvTd+DV+eKGBecPaV2uyF1O79pKWeRGaBbKGvsbx+NniQFMM0g8XvBNErVcWyQbgJpfY9wd1DWZxmnpkaSS6XwjJzvL/ufD3jk0rnF32CY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772738824; c=relaxed/simple;
-	bh=CYYKmhUtg90PFt9VCmUypY1dgNUEpZWlq4p9vDQbEDU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WPzTMT9ngNvfcQQAARDd6Rkz+RE/idnBHZYhfk6SyILQx3R7qX+prHW+3VmfwJpYJoxay0WjE7zIL+dYMWFbAbryfNlnHiRBKdUgUSDBUYGwpN2jc5ZxRiDgjFcRVhFJRuUhQLX+hOoNetsuI1GpGgV5a/TA6dkQUAFroh3pQfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Qg+qnD8o; arc=none smtp.client-ip=35.89.44.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5002b.ext.cloudfilter.net ([10.0.29.226])
-	by cmsmtp with ESMTPS
-	id yCzTvhLICVCBNyELYv51AQ; Thu, 05 Mar 2026 19:26:57 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id yELKvMyMUN3K1yELLvW2xY; Thu, 05 Mar 2026 19:26:43 +0000
-X-Authority-Analysis: v=2.4 cv=UdRRSLSN c=1 sm=1 tr=0 ts=69a9d900
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=edf1wS77AAAA:8
- a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=J2gJbEVsAAAA:8 a=hSkVLCK3AAAA:8
- a=C9xVZAldh4BiXX6lDm0A:9 a=QEXdDO2ut3YA:10 a=DcSpbTIhAlouE1Uv7lRv:22
- a=Bt_igOxda4ASFyQEjNxY:22 a=cQPPKAXgyycSBL8etih5:22 a=2aFnImwKRvkU0tJ3nQRT:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PSPKeTGGopkm3YY/++r6DnAI0CLkMITuqPkvzJJH0FM=; b=Qg+qnD8ouUAuA6RGGUJgM28p1v
-	ZxxsZLYKunuqaPFONqBQ92GwS5fZPUd2CHiMH/I35qcktGB65563hbMB6tU8mRVvbxaFC3sU/XdUM
-	Kgz0lNMdig32sSLAWapa8amPKlvBhV6RA2ww5qauDcoxKYkZd0KDifyG8SiZrDs1xWcR7RPrFO/SO
-	QtOqdx941S1EWGRBosT+Rw/UKqwr2a+GfVOSs3KjFiZMXxVW5ptw8tyg2I4WgvFAoE/7QFRtRNCKh
-	/Gdmx09ACFzrjuL0BwYAqKH0hpCO1A6WvqU2o4OEATjmtqDB4S1r5rZmIOGj61HKFZan5Dg7FxT+K
-	tP0gETCw==;
-Received: from [177.238.16.13] (port=52146 helo=[192.168.0.21])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.99.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1vyELJ-00000000MfN-3cSS;
-	Thu, 05 Mar 2026 13:26:41 -0600
-Message-ID: <5c8bab4f-5821-428b-adcf-b2c0631da415@embeddedor.com>
-Date: Thu, 5 Mar 2026 13:26:08 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA941F936;
+	Thu,  5 Mar 2026 04:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772685018; cv=fail; b=PwMRB24GRIb0GKbp7aRUlXVkHGIYfiKhekymAstlOG1wLGYva1Ub9A7yozgt5Hx4yiLdpIc15q3v4djDw7sq1um+1lppYPRTyPn/iQdOLVzXVsXDgJaxUheOIhZndbvWqrAr43V5RDp44bI8KGkjfm0kuLE5RIzWPeQmowJmIfg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772685018; c=relaxed/simple;
+	bh=sgegkmXb0yHT8ND5bdjlRLGThy6DMt1tF8UROmi2wr0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m/eKkDD0fx+sKPm8QOswjb/A74e+SbDzJZ0aa56KXChKT0bu9I4xi7tui82ibq+ZuyFRM2ZJgY5DsroyQqgSp1vGNi4BnrGYv4nVN+bpSmN7zVIv8XkaGRyx/zres0NUVUYABzqolJTnBiW/OFQ0Rb2Ygu/qRFw3sSxk09yUoBQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2L1dGC4B; arc=fail smtp.client-ip=40.93.195.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MOh5mDCtncLpz2R0o5fqx9vkhHnDYVeVJT9Gayc4/HgCrXigymuoLtc/QZVQI8fMtmnZkNbZNHVstLxtv6PqC2f8zIcZOfIBb/X/CdZbIxCJt5Fv+oJHcAkZVzTcizXdrSy0pnOZuOMK9ODtUoLyp894/4N8hCqUlnJ3SMqaYfO5ux5FqsMUT9wRUZpKnEBJSdH+qBeYMLZKWNqVyNBaHBixeRVrfpajr4P3nFDvpj87iB540f7sBY88V+QkYYDuAwo0Hpir0CED7CxtBJCybibkw7cDTKmad2pWefuAVyjcuABRjwDgORyDwyQFIrraeZkm8pe76fZS0xbsaam5ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VXb4plizlz37km1P4ZykraA5xiD9Tfc0SxFGmXBXICg=;
+ b=saAVu2+A73Jhhw7Pt7JW0tbUL21ZD8CdvO4mjIEF0zCe8M0j8oNS7zUJWuOxajaou2qyLrvydCX2C3FAPm+tymu/MCv8L6FzfYrBY1W/ukdM9mrcpToIk+V9IX0ic9YgPwdr9EnAp4IGpwAEVNFRnrtm1dd9ST25od9o9//IClIL8ISs9vEY2w7JFPoBLlXmusb07BSR898Go0dQSm3xCXMYFbNH79WpYAbir4FRXRCXsluIcB0YcrsViNuN+00t/jietvkpRNMXbY8KU+FwEhFBgmL8/DOPuZuQM809JKDSGlppH5sYIy0qkg8XdAieMmp3AGykhiIriWCe8v4EWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VXb4plizlz37km1P4ZykraA5xiD9Tfc0SxFGmXBXICg=;
+ b=2L1dGC4Bk52NMSoXiwblwTCx3JtkcPUw42deb2a+6R5ArNw/kCnjxNlSJnPX6kCdwlcH9rXSiZ8f8q+JZeimvJqtaMP6soGAz0AMaHYjxQm57Ev24pYtGFJqbHQyrUC2D+Op+MNSnKm5rHo0R3Lm5VAFgAQ6AcOVsmTYTc6KeeE=
+Received: from BL1PR13CA0135.namprd13.prod.outlook.com (2603:10b6:208:2bb::20)
+ by IA0PPF0C93AC97B.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bc7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Thu, 5 Mar
+ 2026 04:30:14 +0000
+Received: from BL02EPF00021F68.namprd02.prod.outlook.com
+ (2603:10b6:208:2bb:cafe::b3) by BL1PR13CA0135.outlook.office365.com
+ (2603:10b6:208:2bb::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.13 via Frontend Transport; Thu,
+ 5 Mar 2026 04:30:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL02EPF00021F68.mail.protection.outlook.com (10.167.249.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Thu, 5 Mar 2026 04:30:14 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 4 Mar
+ 2026 22:30:11 -0600
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
+	<Raju.Rangoju@amd.com>
+Subject: [PATCH v2 net 0/3] amd-xgbe: RX adaptation and PHY handling fixes
+Date: Thu, 5 Mar 2026 09:59:49 +0530
+Message-ID: <20260305042952.835926-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: sched: cls_u32: Avoid memcpy()
- false-positive warning in u32_init_knode()
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
- syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com,
- Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20260305073343.250702-1-jiayuan.chen@linux.dev>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20260305073343.250702-1-jiayuan.chen@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 177.238.16.13
-X-Source-L: No
-X-Exim-ID: 1vyELJ-00000000MfN-3cSS
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.0.21]) [177.238.16.13]:52146
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 27
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfNG+yeq2ExKMjnPK49bJ8wRUvwOMt11Cuys35KnQpqP/x5Dq4/tQ6nDT9TNR1AMbDSss/RieOIvuCpt6DfzJg4HdITRSs/ZbuLQxZ8z0OO3+RKjjojd3
- AJ5sw4amfm5ZAVp3KV/ONuRfD7co0CXbtphwV/frvXIMN70ogUOIfdzn5ljFbo2LWj2J/uYpf/tPz5DLG5pvppzfkqmEnG0Ix0Q=
-X-Rspamd-Queue-Id: 4606A217849
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F68:EE_|IA0PPF0C93AC97B:EE_
+X-MS-Office365-Filtering-Correlation-Id: 334a3b7d-4ab7-4285-76b2-08de7a6fe586
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700016;
+X-Microsoft-Antispam-Message-Info:
+	YOGuXUpj1HMasH3TS+6o0rlg/UlDx3x7TGLxiKzMfb8q10eu+u4xeU1URY8oboc+aSLN6mpkzRcYPZFYX7YkVgJ39lTZSYObvg6gZHMYxMGnG2JOUBN4XQe0YdSlzwlj137zUKeYuD4uF0lRkDTMC1DoKLOTbMBbcDeXgw9fUSsuLlz3PPT5GH0ntJ2zR7AEarkxKs5O66wzSKy9Ar3H2CSRWA4Z6QFWS9QWkRfvmjuIZcVMNlqWuZvy5HQJYOyGUVcWBNB7BHBAsVWX3W0oirDVqwJEagandr+MUhPId3zJ7BAdZTnEvVOhJ6ubYb/d2HSmHp6ZPSSIyoAAdCnZHtIioSv+egF6EltWsMgM2R2TMdrfdNNFCCNdxzXmFM/zuu9UMtvzjvbkSiJt9kkZZSSl7O/UeScYAxTJynVHuizzc3D+JmHxYqMQ1c+U4r1L8IzuzJPVWj7n9/+dGjaQKdim3VkqdyjcHF+r6xmkQrHtzt1qZiwd9qaF1SQLBlLBNmBzkfhydbpD+iPVCMl0VH8etmv4DB6S+O72qW0jjd42oZRAQILXjTa7yuHmx7iEW62crzMSiFaOCt1KB2LNbcVKWJpY6VmOGEkCktk+ytW9usBLj7Pah2PCH6vbkEQvqS7LXbd4/L6Lafzv2gjFeRuv9ESZelhgP01qE9N2GUCoITE+PbgngnNEoLuUv5w6h0R1FwOxsFhO9iY2acjHe0FTNbjDCqn/ltqHI3KKACl/uYYTbPPJmMylVRw+Y7U5iq/AynYMszsPi76IT7rNsw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	8+N+4hm1QfvSOM0C+/DZFwKZEBgxbsLK+PSji2VHoyN/AY/yOpnu5mm0WB17k7UJQdPIzEAWpFBwb6/76fBFjtzYthD1AfdG/7hQeuTpS0nR09HFXTMvtYi1G3DPt7aj+SGd205oYDN414qExLx+UUF9c9OQi7X1RtNOtUbnk274mTGLo+USO10+la4nMvWUeGMHnUBZK2gVULS8dVbGlBvgFWKhPI+n1N05hORKaeHIT/+b6+Xxhs2KYD7jfdjj9Qw38JzXmX/bqc6XxnAtmCdhpaRiieVXQ/3V00kj6rR0iuhMLoyLu7naQv6avkNAxxiKVG3Rgp4JQDqYKvGmYND/+kpiNj6wqWc3S9BzJq5r9oGqRwU09I6TeVTS3MsKUomGlR2whVU/Pv35C+njwmzBRQQrhfyGj5dd7zfl275bkDQOm5wpVvdM7od97Caj
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 04:30:14.3579
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 334a3b7d-4ab7-4285-76b2-08de7a6fe586
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F68.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF0C93AC97B
+X-Rspamd-Queue-Id: ED27420AD15
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264518-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[embeddedor.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_SOURCE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	HAS_X_ANTIABUSE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264173-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[embeddedor.com:-];
-	NEURAL_HAM(-0.00)[-0.980];
-	TAGGED_RCPT(0.00)[netdev,d5ace703ed883df56e42];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,appspotmail.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,embeddedor.com:mid]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
+This series fixes several issues in the amd-xgbe driver related to RX
+adaptation and PHY handling in 10GBASE-KR mode, particularly when
+auto-negotiation is disabled.
 
+Patch 1 fixes link status handling during RX adaptation by correctly
+reading the latched link status bit so transient link drops are
+detected without losing the current state.
 
-On 3/5/26 16:33, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> Syzbot reported a warning in u32_init_knode() [1].
-> 
-> Similar to commit 7cba18332e36 ("net: sched: cls_u32: Avoid memcpy()
-> false-positive warning") which addressed the same issue in u32_change(),
-> use unsafe_memcpy() in u32_init_knode() to work around the compiler's
-> inability to see into composite flexible array structs.
-> 
-> This silences the false-positive reported by syzbot:
-> 
->    memcpy: detected field-spanning write (size 32) of single field
->    "&new->sel" at net/sched/cls_u32.c:855 (size 16)
-> 
-> Since the memory is correctly allocated with kzalloc_flex() using
-> s->nkeys, this is purely a false positive and does not need a Fixes tag.
-> 
-> [1] https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42
-> 
-> Reported-by: syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/69a811b9.a70a0220.b118c.0019.GAE@google.com/T/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Patch 2 prevents CRC errors that can occur when performing RX
+adaptation with auto-negotiation turned off. The driver now stops
+TX/RX before re-triggering RX adaptation and only re-enables traffic
+once adaptation completes and the link is confirmed up, ensuring
+packets are not corrupted during the adaptation window.
 
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Patch 3 restores the intended ordering of PHY reset relative to
+phy_start(), making sure PHY settings are reset before the PHY is
+started instead of afterwards.
 
-Thanks
--Gustavo
+Changes since v1:
+ - Patch 2: change the rx_adapt_data_path_stopped flag to boolean type
+   as it is only used as a true/false indicator.
 
-> Made-with: Cursor
-> ---
->   net/sched/cls_u32.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-> index 9241c025aa74..8f30cc82181d 100644
-> --- a/net/sched/cls_u32.c
-> +++ b/net/sched/cls_u32.c
-> @@ -852,7 +852,10 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
->   	/* Similarly success statistics must be moved as pointers */
->   	new->pcpu_success = n->pcpu_success;
->   #endif
-> -	memcpy(&new->sel, s, struct_size(s, keys, s->nkeys));
-> +	unsafe_memcpy(&new->sel, s, struct_size(s, keys, s->nkeys),
-> +		      /* A composite flex-array structure destination,
-> +		       * which was correctly sized with kzalloc_flex(),
-> +		       * above. */);
->   
->   	if (tcf_exts_init(&new->exts, net, TCA_U32_ACT, TCA_U32_POLICE)) {
->   		kfree(new);
+Raju Rangoju (3):
+  amd-xgbe: fix link status handling in xgbe_rx_adaptation
+  amd-xgbe: prevent CRC errors during RX adaptation with AN disabled
+  amd-xgbe: reset PHY settings before starting PHY
+
+ drivers/net/ethernet/amd/xgbe/xgbe-drv.c    | 15 ++--
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 78 +++++++++++++++++++--
+ drivers/net/ethernet/amd/xgbe/xgbe.h        |  4 ++
+ 3 files changed, 83 insertions(+), 14 deletions(-)
+
+-- 
+2.34.1
 
 
