@@ -1,202 +1,158 @@
-Return-Path: <netdev+bounces-264422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIa3NSaWqWkWAgEAu9opvQ
-	(envelope-from <netdev+bounces-264422-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:41:42 +0100
+	id GJKLOOWWqWlKAgEAu9opvQ
+	(envelope-from <netdev+bounces-264424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:44:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4F16213AC7
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:41:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E0D213BD3
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:44:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 34E87304B1FE
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:28:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 752A830CD5B1
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799F53A6F09;
-	Thu,  5 Mar 2026 14:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BD225F96D;
+	Thu,  5 Mar 2026 14:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JGqXuBHH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+JtgRqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFB2255F52;
-	Thu,  5 Mar 2026 14:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFA6248896
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 14:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772720898; cv=none; b=GFBboWcrNVW0pdmM4UbRWvmvjQ+X17UBK7uVvqJY1vmkQKLRQTuHpRGJt6SQTlXZ2C++sJ5JtX6EtmDe1z1z/v9CbsM+x9DaU+xhZvVtFQOGonu0cHGU4/d5ojJ8WLzZiFNdF1ICxR/5ZiuNNMDiAiYuo64B0MXRjauytZhtGnA=
+	t=1772721054; cv=none; b=aylzzK5MwEzhQLGRE2rZN9nOXl3+YrpOAiK9WJhsJcOo/SJvteNeetNfzkaCcFBNriuxXTKgLO3R9YqzfCbYSFqRYpsJKTbaWgZWYTE+jBzFzvjXvRHMzSpHVm6zMMGaD2iVhH9zz/qIgjXALWfL/r3EINJeXk/xiCZN1TeI52k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772720898; c=relaxed/simple;
-	bh=yDGQFixdGwIAuZshTQfOrUx1W3Quwwxo//sKNrAOTJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ry+LKNhfGUX1LqOGkBKBUBimiWMIcV9Ses0ER0omZ59KxBNX2KNffI1ZxsshtcjInfEpObNMAfCbMudMYx2+5s1mM3u8775ikDf1cLgr+3q3fA6AcTTwpO4RnUw/DhfChFxxwz1snMjbPUdks3ANL5s4R7b2YYapzibBtdHppUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JGqXuBHH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZVjWw9aHtjTv3+Y0O4eTVRQ9xNnsxDsQ+ZtOU7v5c/g=; b=JGqXuBHHTNoj8pWkBHya0USRvS
-	YkLJFGTuQmt228M+UU6aoyoE2miwBjvaOFIb5z4ZxXRtu5RgW3iql3ge14f3TM+SLavDVec/9mNgB
-	/FCHOjeTgYsFyh/sWMoGdYYuE5ZA+42GfLxTVU5tXkvxXmGxF+r7bx+ef3Aj9Y20klYS7ZzcWkwK8
-	wQEKK8Dr/qnDIm5iAkUYqtW/tzNOJWQzWP8RSeu2CnPD5W7AxoOTf24m5sq6c9DcGRbU5Q3r/Uj/z
-	nEbNIQ+/Tb3bTuTAWX4MRo62iYNH7qp/HJ2Bw5mFQDKLIrs+MIBJAWLcHUClJy0FCs1R9s8kaUiDH
-	sdJZ60dA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38684)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vy9gR-00000000865-0aK6;
-	Thu, 05 Mar 2026 14:28:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vy9gO-000000000WV-1nV6;
-	Thu, 05 Mar 2026 14:28:08 +0000
-Date: Thu, 5 Mar 2026 14:28:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Conor Dooley <conor@kernel.org>
-Cc: Charles Perry <charles.perry@microchip.com>, netdev@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
- disabled
-Message-ID: <aamS-LPZaOfamwQC@shell.armlinux.org.uk>
-References: <20260224202854.112813-1-charles.perry@microchip.com>
- <20260224202854.112813-2-charles.perry@microchip.com>
- <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
- <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
- <20260304-unvented-crinkle-37f0bfd03541@spud>
- <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
- <20260305-backlit-epilogue-62139ae694a6@spud>
- <aamLf63OfJ5RH69v@bby-cbu-swbuild03.eng.microchip.com>
- <20260305-fantasy-useable-40ca04f0266e@spud>
+	s=arc-20240116; t=1772721054; c=relaxed/simple;
+	bh=+B28Mk98IiXMRJvCIsBq5jBBZBywgoYag7pWNkeFnSg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=E0JgcG3eRmuCAQl1VklJ+Odrm1jFGydGgnI0Qj24GpF1WicUk6SRZVt3pi0g8xD25Xi77VjSCxzrtPMW5kPuERdLMJ9dd+d+i57oNnboqoy83mSGHpjHE7zPVGxoION+Sf2nE1mHU+l3ztXY+G/c7AVeMde6N2WD2OoJRl6Fblk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+JtgRqy; arc=none smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-64ad019bbd4so7347303d50.0
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 06:30:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772721053; x=1773325853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SOWKOOJcU3ZrlEEcZWwpRZhg97M/c78tnAB8RTkJgLQ=;
+        b=W+JtgRqyAtj5nwMciTgo8koDLzVkU88gleJfCFNSUfFvG4diJ8QHHs7m7nBrYGv6cz
+         HA4RgPqV0LzkIeiWIXyzSp77ZVYrrs01TCgJ3kVoMTkY8eH/HHkfMwNReEljviWrbtiy
+         IHmKplBNBePf5RzfS7wYLyD8PXJLJUghoIHPxjFXuvJrna7Vc6CGGxym4E/1dAq0DDww
+         UQ/kdcgXBsj+SkYXA5v2dP4GSJXqupWCUP3B2ZSp8dhpxK1WSpsf6KFScD2PmjyT5a2L
+         aNuotQmhDlT3Z+rl6rbcjjPRPM6CxlXJtmM8ufE2NC+BC+Q0j1lDtQPr4+U2m9n7DoG0
+         2PkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772721053; x=1773325853;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SOWKOOJcU3ZrlEEcZWwpRZhg97M/c78tnAB8RTkJgLQ=;
+        b=XFUuGUI6GU/nSEmYjgUNhBLDf1GvVCV3SOnb3ToGRSfmncvKCUpzEUvOXmhydcHv5q
+         Gp1xaqT0al0RaskJRYR3e9ciJNfUJSVH2S2i+VxT4lvauBjiQhOu8TA8mQJo6jm+f4gl
+         idoSsevmC1ZRQ9QF6cvaRgAUMbvn2nz7XNTvNXU8Ydg9QrXmJqdE808/tr8V9ByoTcyq
+         2Z08V2ENkKKkhyt7CJFLxWFTbwyfiZ8/bLtW1VnngOl+a+Odu8EMwQA5B5ufVH4dbND8
+         NoTPAtSsLyGGdS/SiezHP5Cz/7pMkUZst8FrsoUC9mGyqWESubYhZ+M+/nvxCaToG9Mm
+         8jnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAYZYHn9/rWsZkzmFqH3tHRGQl8mG2hiit3Nj7BifUGlzFHg7WJlgtRUbkydCrJScrVt8HTfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwrbJFtOVLpOv25ZJS1rK8K8mDLZOlJjRQAFjTtAx4Wc4bzNFC
+	a5nvn4EE4UZPlYs8MK6X0SDkUATDS5PX6Sx+Jw4wrVjD7SFRt0Baoh/r
+X-Gm-Gg: ATEYQzz++SYTioyIucm80tftUVq6xqcM9WAE36BW/xSJhBLfYLxwj5tgd8KhnJ8Gm2H
+	u05JgSE1CRH0UQzCqymq73UYggS4pPX8aLO9NVaxiKUlnHr787h/C7Ei6HM0xvjQAMDXnPtRH8s
+	I7+W0VOBvE7V5E7lg/tfGPeptcWNKdvyPqjM68S3n3XAeFT+ngm/NvWo9wrutPkgdKoY3Rv7x0X
+	cQNw99mkIZlKtk+6+Q24+PUrLaQCcshSM6dxDrWrnUrikKJvbW1egvEzeryTvHu2VebKZisD43s
+	DXIdYZIspc+DiZqTGvVy6MlYsXbcVG2F0G1QF5157e/Ud+/7WULRVD6K6KFPUR0iC9Ne03y22Lg
+	SnRLmkQwwol3W0f2IgFm1LH2dF8WfFrtJTjjMhesqFpxIqEtrt/Bcc8p56ZaK/7Z9K7LT6U3Qfe
+	CNthsv75KCIIfbxZ+EEhKWxLcDrG+oh+Ux64+Ca7RCc6i3H2qdIYJNvqsDb9v9Z03Rlt5UQRQ=
+X-Received: by 2002:a05:690e:449a:b0:649:b943:2ca9 with SMTP id 956f58d0204a3-64cf9b5aec5mr3711413d50.33.1772721052486;
+        Thu, 05 Mar 2026 06:30:52 -0800 (PST)
+Received: from gmail.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64cb75ae57esm8948537d50.9.2026.03.05.06.30.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 06:30:51 -0800 (PST)
+Date: Thu, 05 Mar 2026 09:30:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Soichiro Ueda <the.latticeheart@gmail.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ netdev@vger.kernel.org
+Cc: Soichiro Ueda <the.latticeheart@gmail.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Miao Wang <shankerwangmiao@gmail.com>
+Message-ID: <willemdebruijn.kernel.38f5ed88e59df@gmail.com>
+In-Reply-To: <20260305070525.184945-1-the.latticeheart@gmail.com>
+References: <20260305070525.184945-1-the.latticeheart@gmail.com>
+Subject: Re: [PATCH net-next v2] selftests: af_unix: validate SO_PEEK_OFF
+ advancement and reset
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260305-fantasy-useable-40ca04f0266e@spud>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: D4F16213AC7
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 47E0D213BD3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-264424-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,google.com,davemloft.net,kernel.org,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	TAGGED_FROM(0.00)[bounces-264422-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.390];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05, 2026 at 02:13:24PM +0000, Conor Dooley wrote:
-> On Thu, Mar 05, 2026 at 05:56:15AM -0800, Charles Perry wrote:
-> > On Thu, Mar 05, 2026 at 09:42:19AM +0000, Conor Dooley wrote:
-> > > On Wed, Mar 04, 2026 at 09:37:23AM -0800, Charles Perry wrote:
-> > > > On Wed, Mar 04, 2026 at 04:23:30PM +0000, Conor Dooley wrote:
-> > > > 
-> > > > Are you able to check register 23, bit 13 of your PHY by any chance? Maybe
-> > > > with the mdio/mii commands in U-Boot if you have that.
-> > > 
-> > > "mii read addr 23" returns 0660 for both PHYs in U-Boot.
-> > 
-> > Oh, I think you fell into a trap of U-Boot's mii command.
-> > 
-> > The arguments are always in hex even if you dont prepend "0x".
+Soichiro Ueda wrote:
+> Extend the so_peek_off selftest to ensure the socket peek offset is handled
+> correctly after both MSG_PEEK and actual data consumption.
 > 
-> Eh no, actually I thought that you meant register 0x23. I'm not used to
-> register addresses being given in decimal.
+> Verify that the peek offset advances by the same amount as the number of
+> bytes read when performing a read with MSG_PEEK.
 > 
-> > What "mii read 8 23" did is most likely read register 0x23, masked with
-> > 0x1f because clause 22 has only 32 registers. So it read register 0x3 which
-> > is the device identifier 2 register: 0x0660.
-> > 
-> > The exact command should be "mii read 8 0x17", "mii read 9 0x17".
+> After exercising SO_PEEK_OFF via MSG_PEEK, drain the receive queue with a
+> non-peek recv() and verify that it can receive all the content in the
+> buffer and SO_PEEK_OFF returns back to 0.
 > 
-> Both read back 2004
+> The verification after actual data consumption was suggested by Miao Wang
+> when the original so_peek_off selftest was introduced.
+> 
+> Link: https://lore.kernel.org/all/7B657CC7-B5CA-46D2-8A4B-8AB5FB83C6DA@gmail.com/
+> Suggested-by: Miao Wang <shankerwangmiao@gmail.com>
+> Signed-off-by: Soichiro Ueda <the.latticeheart@gmail.com>
 
-It would would be good to see the content of 0x1b, specifically bit 13.
-The PHY supports AN bypass, and I suspect bit 13 is zero, which means
-in combination with bit 13 set in 0x17, the PHY must complete the SGMII
-exchange with the MAC.
-
-I suggest something like the following in vitesse.c for this PHY:
-
-#define VSC8662_EXT_CON1		0x17
-#define VSC8662_EXT_CON_MAC_AN		BIT(13)
-
-#define VSC8662_MAC_AN			0x1b
-#define VSC8662_MAC_AN_BYPASS		BIT(13)
-
-static unsigned int vsc8662_inband_caps(struct phy_device *phydev,
-					phy_interface_t interface)
-{
-	if (interface == PHY_INTERFACE_MODE_SGMII)
-		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE |
-		       LINK_INBAND_BYPASS;
-
-	return 0;
-}
-
-static int vsc8662_config_inband(struct phy_device *phydev, unsigned int modes)
-{
-	bool changed = false;
-	u16 mask;
-	int ret;
-
-	mask = VSC8662_EXT_CON_MAC_AN;
-	ret = phy_modify_changed(phydev, VSC8662_EXT_CON1, mask,
-				 modes & (LINK_INBAND_ENABLE |
-				 	  LINK_INBAND_BYPASS) ? mask : 0);
-	if (ret > 0)
-		changed = true;
-	else if (ret < 0)
-		return ret;
-
-	mask = VSC8662_MAC_AN_BYPASS;
-	ret = phy_modify(phydev, VSC8662_MAC_AN, mask,
-			 modes & LINK_INBAND_BYPASS ? mask : 0);
-	if (ret < 0)
-		return ret;
-
-	return genphy_soft_reset(phydev);
-}
-
-and the appropriate initialisers in the phy_driver struct.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
