@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-264335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOOHEF5tqWnH7AAAu9opvQ
-	(envelope-from <netdev+bounces-264335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:47:42 +0100
+	id kNzKHSduqWnH7AAAu9opvQ
+	(envelope-from <netdev+bounces-264336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:51:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D2F210D01
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:47:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C614210DF7
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 631D130502BE
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:45:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B8893307C9F5
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD1C39A7E9;
-	Thu,  5 Mar 2026 11:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A41C39B963;
+	Thu,  5 Mar 2026 11:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="df2yRFPL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NtzyNnST"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5459639A7F9;
-	Thu,  5 Mar 2026 11:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A261239B4BE;
+	Thu,  5 Mar 2026 11:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772711109; cv=none; b=ppuU5+Agg386ZdYYYPZulM9t5kCkokBZvCvlNaVYVRVw1y6NeSZD3hNMFj7Vwj9BlqcqHNsh2eh/gZxwhYC1DBcbbDxw8C6SrF3kojpk1XUel355xl/tLzmvBE2wNUInGWZZD41EZx1xdLhkCH3B9uIQDvzXak1ry1dF8MtYyDY=
+	t=1772711112; cv=none; b=VW4p9Eg2dH73Iu5iOeu0xPErnf6IkYILGXMUHDneRkW3PX1t6zquunyGy/0bu5JGXR3mSEO5HvctWtTihAFPE/ZBTqrazrN+tI0kBXrMKeQrzBBMuJDjuQHoN+LrXSlhnbhBJnxUnXKeDUGVUNcP1uAqhL5ud32p7MdVjZOs31k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772711109; c=relaxed/simple;
-	bh=9wTIp1x5WSk6XX2PmKcF5e64V/V7XDxXyXJ3y5rE4oA=;
+	s=arc-20240116; t=1772711112; c=relaxed/simple;
+	bh=QZnBS+qmrmi51xJs79L1cMcmbHuLtljcJwErz4IFufA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mq02+FIb12RxHXm/+HGH7Ko86Si2BfMhYksHf+cXDKzRUfIDYI3QW1LTt93z7cfs/uYtadWBoLGkGy47VwAS8+Hl+62XF8OuZnbEqUz5Yl3PdefggTpUWytubWKDqrWpVApDNbtissiHXvs6feckR31uMX8Q2YOo0Zv0NY5S8Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=df2yRFPL; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=Eq8sQXS4CmWPs78Z/CHkAZj4QNklKefwZeJMKzSenG8+J52Qef16GgYRKxttUg4Oxm1X2uVFGITct2F1WAL0H+Kv8wxBEQopJhe1IauXWjiTlG6tBkWsB84hVz8yfHZvArOsVqmtpWjsjfCYyrcMt4v7X6sC8jGEgyqEeH1JZBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NtzyNnST; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772711109; x=1804247109;
+  t=1772711111; x=1804247111;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9wTIp1x5WSk6XX2PmKcF5e64V/V7XDxXyXJ3y5rE4oA=;
-  b=df2yRFPLSn4KblpdOFIQxYFe9t4omlZk6F0Dblrz6rwGpm1P0ZR7HqZy
-   dYCwRGYuoUpNRe+qkz8mzdGeevZaLqBWdiUsvloS6vL978XkYF+4BT+LI
-   Zpbu0QC5CQG0nKVRJgX2paiJDPhC/sXPVx6wmho9vEAQETu0PaSRN6I3w
-   dg/4srhhNV4v9I7qJhdszFuK4XScA4AFIbybHkuRT4FvoKw5KDnzNvQqT
-   fM05FZWatpaGhK5XP/alORnqijOGagRfVH6G9taUmKQIPpHZhXlMbIjiy
-   84e+YzsCk8F3VZpP8FN2rJVw5Hbp/vDZjrR8OI5FLa54ck47oRK/1C0GS
+  bh=QZnBS+qmrmi51xJs79L1cMcmbHuLtljcJwErz4IFufA=;
+  b=NtzyNnSTFV0JO1t0qnK50+okfeM4JOSLY8ymJdgRaGUfImI2cxnnpH9Z
+   8uftK3egRmvqkBlsmYv5PGQ6HGbOUnjMVVtKcV593DyOhseUJJCmZWkkx
+   nTRDfSDTUYc9Wfxn2OX6kwvOZWKR+YjS3AOBeaUQPJjRbZzDOkP6aUoam
+   dY99thCY3CXA+xEdlYRkef4vkD6naZTxscCZV5PiPeje7cypwu2/z3upr
+   dqX+JsRdpublWZD0OWHwx7FUZIvdueXL1ueIQQnQju/e4xRfxSUIcpnZb
+   YjGizY2Y+xD9dR25nme+UECPzYxclJ9F9htm+rdjKbIDn2DNJcj+ct3/8
    Q==;
-X-CSE-ConnectionGUID: P6KFu9s9SLmMHPZaA09fQg==
-X-CSE-MsgGUID: /huci7kVSDSQ9DLzsWI/TA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="84428692"
+X-CSE-ConnectionGUID: E463JmNtRKKPLQf1PBs67g==
+X-CSE-MsgGUID: vAUYt1PXRc+pQsIbP0ndvg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="84428714"
 X-IronPort-AV: E=Sophos;i="6.23,102,1770624000"; 
-   d="scan'208";a="84428692"
+   d="scan'208";a="84428714"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 03:45:08 -0800
-X-CSE-ConnectionGUID: ShaaaoKUSFixo8BKjnXGBw==
-X-CSE-MsgGUID: mVRqesneS1GOZ+2f6eZgrw==
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 03:45:10 -0800
+X-CSE-ConnectionGUID: tHpznJqTQMmjyVyi+Rjxsw==
+X-CSE-MsgGUID: znWldmvMT9OkCd0+4vCsEQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,102,1770624000"; 
-   d="scan'208";a="223345346"
+   d="scan'208";a="223345383"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa005.fm.intel.com with ESMTP; 05 Mar 2026 03:44:59 -0800
+  by fmviesa005.fm.intel.com with ESMTP; 05 Mar 2026 03:45:02 -0800
 Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id E426F2876D;
-	Thu,  5 Mar 2026 11:44:55 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2174E28772;
+	Thu,  5 Mar 2026 11:44:59 +0000 (GMT)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
@@ -110,9 +110,9 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>,
 	Magnus Karlsson <magnus.karlsson@intel.com>
-Subject: [PATCH net v5 5/9] i40e: fix registering XDP RxQ info
-Date: Thu,  5 Mar 2026 12:12:46 +0100
-Message-ID: <20260305111253.2317394-6-larysa.zaremba@intel.com>
+Subject: [PATCH net v5 6/9] i40e: use xdp.frame_sz as XDP RxQ info frag_size
+Date: Thu,  5 Mar 2026 12:12:47 +0100
+Message-ID: <20260305111253.2317394-7-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260305111253.2317394-1-larysa.zaremba@intel.com>
 References: <20260305111253.2317394-1-larysa.zaremba@intel.com>
@@ -123,7 +123,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 45D2F210D01
+X-Rspamd-Queue-Id: 2C614210DF7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -131,7 +131,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -139,7 +139,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com];
 	RCPT_COUNT_TWELVE(0.00)[45];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264335-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264336-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -151,139 +151,77 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Current way of handling XDP RxQ info in i40e has a problem, where frag_size
-is not updated when xsk_buff_pool is detached or when MTU is changed, this
-leads to growing tail always failing for multi-buffer packets.
+The only user of frag_size field in XDP RxQ info is
+bpf_xdp_frags_increase_tail(). It clearly expects whole buffer size instead
+of DMA write size. Different assumptions in i40e driver configuration lead
+to negative tailroom.
 
-Couple XDP RxQ info registering with buffer allocations and unregistering
-with cleaning the ring.
+Set frag_size to the same value as frame_sz in shared pages mode, use new
+helper to set frag_size when AF_XDP ZC is active.
 
 Fixes: a045d2f2d03d ("i40e: set xdp_rxq_info::frag_size")
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 34 ++++++++++++---------
- drivers/net/ethernet/intel/i40e/i40e_txrx.c |  5 +--
- 2 files changed, 22 insertions(+), 17 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 7b9e147d7365..781ec5aa814b 100644
+index 781ec5aa814b..926d001b2150 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -3583,18 +3583,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 	if (ring->vsi->type != I40E_VSI_MAIN)
- 		goto skip;
+@@ -3569,6 +3569,7 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+ 	u16 pf_q = vsi->base_queue + ring->queue_index;
+ 	struct i40e_hw *hw = &vsi->back->hw;
+ 	struct i40e_hmc_obj_rxq rx_ctx;
++	u32 xdp_frame_sz;
+ 	int err = 0;
+ 	bool ok;
  
--	if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
--		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
--					 ring->queue_index,
--					 ring->q_vector->napi.napi_id,
--					 ring->rx_buf_len);
--		if (err)
--			return err;
--	}
--
+@@ -3578,6 +3579,7 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+ 	memset(&rx_ctx, 0, sizeof(rx_ctx));
+ 
+ 	ring->rx_buf_len = vsi->rx_buf_len;
++	xdp_frame_sz = i40e_rx_pg_size(ring) / 2;
+ 
+ 	/* XDP RX-queue info only needed for RX rings exposed to XDP */
+ 	if (ring->vsi->type != I40E_VSI_MAIN)
+@@ -3585,11 +3587,12 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+ 
  	ring->xsk_pool = i40e_xsk_pool(ring);
  	if (ring->xsk_pool) {
--		xdp_rxq_info_unreg(&ring->xdp_rxq);
++		xdp_frame_sz = xsk_pool_get_rx_frag_step(ring->xsk_pool);
  		ring->rx_buf_len = xsk_pool_get_rx_frame_size(ring->xsk_pool);
  		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
  					 ring->queue_index,
-@@ -3606,17 +3596,23 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 						 MEM_TYPE_XSK_BUFF_POOL,
- 						 NULL);
+ 					 ring->q_vector->napi.napi_id,
+-					 ring->rx_buf_len);
++					 xdp_frame_sz);
  		if (err)
--			return err;
-+			goto unreg_xdp;
- 		dev_info(&vsi->back->pdev->dev,
- 			 "Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring %d\n",
- 			 ring->queue_index);
- 
- 	} else {
-+		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-+					 ring->queue_index,
-+					 ring->q_vector->napi.napi_id,
-+					 ring->rx_buf_len);
-+		if (err)
-+			return err;
+ 			return err;
  		err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
- 						 MEM_TYPE_PAGE_SHARED,
- 						 NULL);
+@@ -3605,7 +3608,7 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+ 		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+ 					 ring->queue_index,
+ 					 ring->q_vector->napi.napi_id,
+-					 ring->rx_buf_len);
++					 xdp_frame_sz);
  		if (err)
--			return err;
-+			goto unreg_xdp;
+ 			return err;
+ 		err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
+@@ -3616,7 +3619,7 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
  	}
  
  skip:
-@@ -3654,7 +3650,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 		dev_info(&vsi->back->pdev->dev,
- 			 "Failed to clear LAN Rx queue context on Rx ring %d (pf_q %d), error: %d\n",
- 			 ring->queue_index, pf_q, err);
--		return -ENOMEM;
-+		err = -ENOMEM;
-+		goto unreg_xdp;
- 	}
+-	xdp_init_buff(&ring->xdp, i40e_rx_pg_size(ring) / 2, &ring->xdp_rxq);
++	xdp_init_buff(&ring->xdp, xdp_frame_sz, &ring->xdp_rxq);
  
- 	/* set the context in the HMC */
-@@ -3663,7 +3660,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 		dev_info(&vsi->back->pdev->dev,
- 			 "Failed to set LAN Rx queue context on Rx ring %d (pf_q %d), error: %d\n",
- 			 ring->queue_index, pf_q, err);
--		return -ENOMEM;
-+		err = -ENOMEM;
-+		goto unreg_xdp;
- 	}
- 
- 	/* configure Rx buffer alignment */
-@@ -3671,7 +3669,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 		if (I40E_2K_TOO_SMALL_WITH_PADDING) {
- 			dev_info(&vsi->back->pdev->dev,
- 				 "2k Rx buffer is too small to fit standard MTU and skb_shared_info\n");
--			return -EOPNOTSUPP;
-+			err = -EOPNOTSUPP;
-+			goto unreg_xdp;
- 		}
- 		clear_ring_build_skb_enabled(ring);
- 	} else {
-@@ -3701,6 +3700,11 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 	}
- 
- 	return 0;
-+unreg_xdp:
-+	if (ring->vsi->type == I40E_VSI_MAIN)
-+		xdp_rxq_info_unreg(&ring->xdp_rxq);
-+
-+	return err;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-index 34db7d8866b0..894f2d06d39d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-@@ -1470,6 +1470,9 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
- 	if (!rx_ring->rx_bi)
- 		return;
- 
-+	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
-+		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-+
- 	if (rx_ring->xsk_pool) {
- 		i40e_xsk_clean_rx_ring(rx_ring);
- 		goto skip_free;
-@@ -1527,8 +1530,6 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
- void i40e_free_rx_resources(struct i40e_ring *rx_ring)
- {
- 	i40e_clean_rx_ring(rx_ring);
--	if (rx_ring->vsi->type == I40E_VSI_MAIN)
--		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
- 	rx_ring->xdp_prog = NULL;
- 	kfree(rx_ring->rx_bi);
- 	rx_ring->rx_bi = NULL;
+ 	rx_ctx.dbuff = DIV_ROUND_UP(ring->rx_buf_len,
+ 				    BIT_ULL(I40E_RXQ_CTX_DBUFF_SHIFT));
 -- 
 2.52.0
 
