@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-264580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264582-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LuZN7gUqmnFKgEAu9opvQ
-	(envelope-from <netdev+bounces-264580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 00:41:44 +0100
+	id IDH0KEwTqmnFKgEAu9opvQ
+	(envelope-from <netdev+bounces-264582-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 00:35:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89CDA2196CE
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 00:41:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28869219596
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 00:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E60D31A7AC5
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 23:33:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68DF7306AEC8
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 23:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B9136997A;
-	Thu,  5 Mar 2026 23:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FF636B043;
+	Thu,  5 Mar 2026 23:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="vRFIZhJJ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="S++1oYfX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1671D36920F
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 23:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3E3366DA1;
+	Thu,  5 Mar 2026 23:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772753527; cv=none; b=WvLSxWWA+nQ5O3EvIkVC5GTjhrfD+7LxPCev1wI2UKjGDtRlnd69doOrwtDGfDaOczWAlS8N5SkyW2Syn7NDMpnN0mVKEzgLhvvyv1YbjeOQvoGZoG2LlbBDolxQvqVWhLD1hxaEjzqfqDG0A872mhDBDuyKphuqaUrki++RQB4=
+	t=1772753548; cv=none; b=qycNqE9yx6o1yVvX93ef2CndYFTSqTiY2doRJVfvPYc56Zsad5D6g7M6D6dGNunkA+Mb63Q3zqcOaqNAVTgeY3l0owJWyVP4c+RG9Ik3WxJTZPk6i3DILuLzplU2p6SuXkfM1hfAp1I3NqQ3Mg0U3fdta0GgcvAdK7RrRi6Cpvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772753527; c=relaxed/simple;
-	bh=ZQr+WTwSnte7ugmiliHwL9asahOJBYvUnHt5xYlz2Is=;
+	s=arc-20240116; t=1772753548; c=relaxed/simple;
+	bh=oNnL6PgF9i8BYLmz2dLn/HEJ+dwNCEs6Wzi0I8A2pHc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cmyh517kNz2T/IxSuLyNT81mHqxV6YQwzlVKKADiBH4eLriUCzW2YNzFSzUGPhKQOntsD/z5rzbvfcgT4wkA+QdPwjzVrhG92ZswFpsLJ8r8GeRuFtULqlmNYej8dFIm79xGr5NbXf80kTwy5VqEBXGmommf3QlSVVdHVwzKBvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=vRFIZhJJ; arc=none smtp.client-ip=185.226.149.38
+	 In-Reply-To:To:Cc; b=J26TRuM/UljIu9UbQe2DwztkTLiMLyx9bYl0PkTd80L3liZHLw5Qx8Z1MhMRgQxOnaN7KqO5wakbeQ1SX8Ak38oBGrKxJZesW2X5fSq4KEDQrw5mGCYIncqmaMDzEFz8a2HY/GYRJAzvQYRlFCeZIDTqzPUVUPYGG0qscWKwOAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=S++1oYfX; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1vyIAg-00EUer-Tt; Fri, 06 Mar 2026 00:31:58 +0100
+	id 1vyIB4-00130B-Uy; Fri, 06 Mar 2026 00:32:22 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=sSLGc2cwazj/BaeN56d1lulum1UQWYpoeFSBe7HE8yA=; b=vRFIZhJJcAGnOJWZcaWpLMUK3U
-	s7g9UQCDGwOLLGkT1dnmH0FT7D7mFULlJ3yOf6Aa7NgkQWetTYzR+r3abBqx3lAJILtcQaaXg1u3z
-	kYj0X9ooz8MLrgo29U9M3MsKVISHyjRYm9tJV5+YuAQVuGEHx9M/SCKuUq3jiVuLGfjKFI93ogi+6
-	7zjjjSavw8dZvTVvJduKT5NS8uqQ1cjZr6aENxdEDFP/zT56ZOEXmzaYfg/GFFLEXT1244EGOXoRU
-	3GfvUCLQSr9bR2vbvOGYoXb1mREQxvsXpfp3qRI3V8fVeZgpB1Cm19wl/ndCsOSU2TCbjaiAb14bp
-	AyDWWEyw==;
+	bh=KABCYR0VsFTXAqyXXhibjrexgB3N0ErIAHc1B1FNe3A=; b=S++1oYfXbyWS8Se+zDTggLJ7B1
+	0PtFtJ5xZIKHqqjwxPBxKrxTf/uW6/DI9JOb2IpkrEosZVGngQLoHkV3opIuPyYVi0/l13hHx/smh
+	tZod1zSOj9kR9R+TZlo77KvkoW+StF9dMiWbsYG2Ph/2PixYtDTONl8zSjIS/Gn7VY+1pxQ3fUfkQ
+	hjr3xPBbjq4V2Am7mNhKMQnizmnVRVpL3hkZSsKswxPvsnH9fY2rB7btl6PZitlCbxwLuIo7gB5cL
+	yoCVDP6N9IPI3EX8T6uE/rNucfs/jN1aYYR+ULgxbbHvT2an9lglEfyHv06MvWwCDZ5SmCo/QFCq8
+	UFM835ew==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1vyIAg-00024o-AK; Fri, 06 Mar 2026 00:31:58 +0100
+	id 1vyIAu-0004DA-EG; Fri, 06 Mar 2026 00:32:12 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vyIAJ-00141B-1j; Fri, 06 Mar 2026 00:31:35 +0100
+	id 1vyIAK-00141B-Fy; Fri, 06 Mar 2026 00:31:36 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 06 Mar 2026 00:30:56 +0100
-Subject: [PATCH bpf v3 2/5] bpf, sockmap: Use
- sock_map_sk_{acquire,release}() where open-coded
+Date: Fri, 06 Mar 2026 00:30:57 +0100
+Subject: [PATCH bpf v3 3/5] bpf, sockmap: Fix af_unix iter deadlock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260306-unix-proto-update-null-ptr-deref-v3-2-2f0c7410c523@rbox.co>
+Message-Id: <20260306-unix-proto-update-null-ptr-deref-v3-3-2f0c7410c523@rbox.co>
 References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
 In-Reply-To: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
 To: John Fastabend <john.fastabend@gmail.com>, 
@@ -88,18 +87,18 @@ Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 89CDA2196CE
+X-Rspamd-Queue-Id: 28869219596
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
 	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264580-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264582-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,7 +106,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[rbox.co:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -117,79 +116,93 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rbox.co:dkim,rbox.co:email,rbox.co:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,rbox.co:dkim,rbox.co:email,rbox.co:mid]
 X-Rspamd-Action: no action
 
-Instead of repeating the same (un)locking pattern, reuse
-sock_map_sk_{acquire,release}(). This centralizes the code and makes it
-easier to adapt sockmap to af_unix-specific locking.
+bpf_iter_unix_seq_show() may deadlock when lock_sock_fast() takes the fast
+path and the iter prog attempts to update a sockmap. Which ends up spinning
+at sock_map_update_elem()'s bh_lock_sock():
 
+WARNING: possible recursive locking detected
+test_progs/1393 is trying to acquire lock:
+ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: sock_map_update_elem+0xdb/0x1f0
+
+but task is already holding lock:
+ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: __lock_sock_fast+0x37/0xe0
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(slock-AF_UNIX);
+  lock(slock-AF_UNIX);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+4 locks held by test_progs/1393:
+ #0: ffff88814b59c790 (&p->lock){+.+.}-{4:4}, at: bpf_seq_read+0x59/0x10d0
+ #1: ffff88811ec25fd8 (sk_lock-AF_UNIX){+.+.}-{0:0}, at: bpf_seq_read+0x42c/0x10d0
+ #2: ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: __lock_sock_fast+0x37/0xe0
+ #3: ffffffff85a6a7c0 (rcu_read_lock){....}-{1:3}, at: bpf_iter_run_prog+0x51d/0xb00
+
+Call Trace:
+ dump_stack_lvl+0x5d/0x80
+ print_deadlock_bug.cold+0xc0/0xce
+ __lock_acquire+0x130f/0x2590
+ lock_acquire+0x14e/0x2b0
+ _raw_spin_lock+0x30/0x40
+ sock_map_update_elem+0xdb/0x1f0
+ bpf_prog_2d0075e5d9b721cd_dump_unix+0x55/0x4f4
+ bpf_iter_run_prog+0x5b9/0xb00
+ bpf_iter_unix_seq_show+0x1f7/0x2e0
+ bpf_seq_read+0x42c/0x10d0
+ vfs_read+0x171/0xb20
+ ksys_read+0xff/0x200
+ do_syscall_64+0x6b/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+Fixes: 2c860a43dd77 ("bpf: af_unix: Implement BPF iterator for UNIX domain socket.")
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/core/sock_map.c | 21 +++++++--------------
- 1 file changed, 7 insertions(+), 14 deletions(-)
+ net/unix/af_unix.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 02a68be3002a..7ba6a7f24ccd 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -353,11 +353,9 @@ static void sock_map_free(struct bpf_map *map)
- 		sk = xchg(psk, NULL);
- 		if (sk) {
- 			sock_hold(sk);
--			lock_sock(sk);
--			rcu_read_lock();
-+			sock_map_sk_acquire(sk);
- 			sock_map_unref(sk, psk);
--			rcu_read_unlock();
--			release_sock(sk);
-+			sock_map_sk_release(sk);
- 			sock_put(sk);
- 		}
- 	}
-@@ -1176,11 +1174,9 @@ static void sock_hash_free(struct bpf_map *map)
- 		 */
- 		hlist_for_each_entry_safe(elem, node, &unlink_list, node) {
- 			hlist_del(&elem->node);
--			lock_sock(elem->sk);
--			rcu_read_lock();
-+			sock_map_sk_acquire(elem->sk);
- 			sock_map_unref(elem->sk, elem);
--			rcu_read_unlock();
--			release_sock(elem->sk);
-+			sock_map_sk_release(elem->sk);
- 			sock_put(elem->sk);
- 			sock_hash_free_elem(htab, elem);
- 		}
-@@ -1676,8 +1672,7 @@ void sock_map_close(struct sock *sk, long timeout)
- 	void (*saved_close)(struct sock *sk, long timeout);
- 	struct sk_psock *psock;
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 3756a93dc63a..3d2cfb4ecbcd 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -3729,15 +3729,14 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
+ 	struct bpf_prog *prog;
+ 	struct sock *sk = v;
+ 	uid_t uid;
+-	bool slow;
+ 	int ret;
  
--	lock_sock(sk);
--	rcu_read_lock();
-+	sock_map_sk_acquire(sk);
- 	psock = sk_psock(sk);
- 	if (likely(psock)) {
- 		saved_close = psock->saved_close;
-@@ -1685,16 +1680,14 @@ void sock_map_close(struct sock *sk, long timeout)
- 		psock = sk_psock_get(sk);
- 		if (unlikely(!psock))
- 			goto no_psock;
--		rcu_read_unlock();
- 		sk_psock_stop(psock);
--		release_sock(sk);
-+		sock_map_sk_release(sk);
- 		cancel_delayed_work_sync(&psock->work);
- 		sk_psock_put(sk, psock);
- 	} else {
- 		saved_close = READ_ONCE(sk->sk_prot)->close;
- no_psock:
--		rcu_read_unlock();
--		release_sock(sk);
-+		sock_map_sk_release(sk);
- 	}
+ 	if (v == SEQ_START_TOKEN)
+ 		return 0;
  
- 	/* Make sure we do not recurse. This is a bug.
+-	slow = lock_sock_fast(sk);
++	lock_sock(sk);
+ 
+-	if (unlikely(sk_unhashed(sk))) {
++	if (unlikely(sock_flag(sk, SOCK_DEAD))) {
+ 		ret = SEQ_SKIP;
+ 		goto unlock;
+ 	}
+@@ -3747,7 +3746,7 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
+ 	prog = bpf_iter_get_info(&meta, false);
+ 	ret = unix_prog_seq_show(prog, &meta, v, uid);
+ unlock:
+-	unlock_sock_fast(sk, slow);
++	release_sock(sk);
+ 	return ret;
+ }
+ 
 
 -- 
 2.52.0
