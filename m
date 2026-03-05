@@ -1,162 +1,381 @@
-Return-Path: <netdev+bounces-264250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHYgNS9OqWlp4QAAu9opvQ
-	(envelope-from <netdev+bounces-264250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:34:39 +0100
+	id EJO8MU5QqWmd4gAAu9opvQ
+	(envelope-from <netdev+bounces-264251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:43:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C71120E846
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:34:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A0220EC32
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:43:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 94FC630351E5
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:33:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5530C304797C
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F29377EAF;
-	Thu,  5 Mar 2026 09:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C4C379EE8;
+	Thu,  5 Mar 2026 09:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PIbbReyH"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="r8n3aZlu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27E378D9B
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772703138; cv=pass; b=XN5ltThF1NwjrthyRWCDjENHAlLOsP1fyzq5+P2lLIcSPue8lxkOt5XxfkQ1NaVchCkexl+8b2Hg+vAy0qZSTlGZDFb/Zga2NeQ0UHN7vW4IfenoqS4n/1Ehl6dy0VlWf/GtZMe98+5ScZOF9YQmmRWol0m2R51lYPtJhggTR6A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772703138; c=relaxed/simple;
-	bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ttNURfCnk2Q2giGpPtGcqAFxUyjto1QmetaVuLYFdKz4j7yPtfNf9MLWqX/54nFdYcHYeeMv/bAU26dUDAv2HXdWJ7adI+NDMi1Re2TduN/5HVh0+yVbgbAiNWUA3QuP32xhpDLwecC1azU9axsnVGd8b3EISPX4gG2JQN4JzzE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PIbbReyH; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506cb1b63d0so92672711cf.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:32:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772703136; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AO/5ZfwdvWo6922nlH0IOedt8zac4i77heB9c/ftAD5FtzXYgEqrmGkKjxfTT4tMx4
-         VAqgfGyobOtyhM26W7yXHs9nzXnaquJRprdG+K3RxK0sUBW6VxH0/R19Rhw0E2Iiv/th
-         0RwwXtmg7u5nuxnbwnWyM1m9u1xOw6c0vSiFc5Ii2t+J4kcC97O17px6583ogkCuziky
-         +WlupzO+HNsoByE9v9lNmpqSw56seKP0cSErsXFdC3IX2jL1L6ysBrH2cOGybUUqnrpg
-         nrgf6gAw5XOemDnpHv7BgoE7av9ylKcduvTZT4tIn/0EERPHByzSd07k6uutlh+8AoZ0
-         xz1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
-        fh=wqrg6giIczbfaT9oNaFkQWVPzER64Mky8ZpVAYZi7oA=;
-        b=YFNzq326QJkp7/ZYfs1Zhj+kZyy802W4yJOSkHVXH9YJB90yBXjaZLYCbX2MAhg9NZ
-         nzV8iAcVqim6YkMnQ82XIX8iKggXN7LIcZXTA2zFA+0RYkegNECd0dAM564z8wct5t9D
-         VZheHFsXei8m6cymVD4/qzuuvHKtWIJzHDhtx9GQNqLRlVOq0Imz+Z91c4MzWjEJDs3J
-         T8PUHmh39iyAkZKwjUeVg9aRNf+ew1X8DPfTk7lAtibWGZl366ceVTf+C97kTaiuT2BI
-         maKuVRdoObobtL4+252M3QSTY2ph3l+oDZ7efjlkeDO8em2Xtfek1yBnPcQQpximgM7h
-         xwdw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50142377EC5
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 09:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772703391; cv=none; b=IqJDEJ1AjJP1BkKaK24ezcUnGmg7Gk+xuMzKzwj+6ztpxo2y3GJlH5MvQHBLw/SuYmRzR7088JQO+VTnRNys+rI4gOTWpZgoZLRSKVGcpT5fDaBTdspdwaqQn6JyUZ7Do1GuvQbGiq47t2gl8IJQ+087g6XKN+g9mm9sB8u7kT4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772703391; c=relaxed/simple;
+	bh=CMgXM6u7309Wn3e+oqvoc7hX9vYREWTZOtF5JH1MCY8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=VnyyLruCCXQcZgL0A+Lc5CayIMi9uBjyg7zHMnI/Zc5ymc3R0Wl0NUr3PRrsVLXK1qO/t4aH/mhB6VrcRhsknbTzmuJ7vs/aN411PoiMkYs4phbEljtK8sDt5PGZrB6igJ0BwYA9ztqGHfSs6iS0DE7UGLsiwQHKnCG2Kzarg3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=r8n3aZlu; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-439c92a193bso1573182f8f.2
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 01:36:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772703136; x=1773307936; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
-        b=PIbbReyHnFs5LQyjsWBImSzyB5LyKdYwPuTNghDzKpHTHI6afhGldzSoTOJz9bvXUC
-         +AnS0ConZ3NAhiVc5DSmzEz+olRBgMwY4Bra8mO1mS8RyZFwigY9yWIDcyZPTxoN5+yl
-         vN5h00AS+3dErYSFydodZxx7hX5KNIhfqzQS0OoTaH/nLLidmdkOe8tBcFTWFDbG8rsj
-         enHknUt73zMGmoa1r/jF3UViBXtZah/S60pxxqy8hZd1cIw/MDm91NQTeQSt0WqXRghO
-         ePrmZ5fmI7qly5XLmLcswl4Q6SpCQmPfpuCHa/YNn1xPt00dA0x5lvuO8jsd9+2yK/0L
-         Ghnw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1772703385; x=1773308185; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mbidr/A9XxccdAFsJsVKLL2bBtmGRz8XUrt7LUMLgOs=;
+        b=r8n3aZluVhBTCfb7BQuBR7rtMDtwMt/hhUveTeZDZQAO4wJxkqYdVnWInamwTvoasd
+         njRsc4y1mlFqY6e8h+MrxsQmTwUtFPEr4bGcC2jwn78y+TT5X2hBUAy+EkXK3GfkPnMc
+         efI7YRWZmXX4iWMH3mdtVwJdLQgh9b+NgkxQAUiokU1kYqlHFgrFqn8X6Kh54oqNRJvL
+         W9KF9PgfXi06d+0sZ2isvDvqnFTaI47uFjf39desDXwhsR9fNqaB6S1RhpTym+6cBpi7
+         37SVpkS6dpjv/ggxoqRfyQPvFp9lVwc3QY78bUWB4dZgVEV/oWO3UY/ChIwfz5zMSHTu
+         wMIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772703136; x=1773307936;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RENmnJM1StFeVcBlQEiftazQO5J3oL+VTPbg5x9EsMo=;
-        b=hS6cvS99YwpBjbpLDOQrBTpOym7sPz9zY1e4QgcFxQhujexamd1N0HMxDbPUZIx0DO
-         MzSRBZra1PCAf6gZxqnFXipNeWRbyR3z0429n3zKzKs0GafaA9zvmekjmbEnH/CIL+Uw
-         /4va0/isfuNSGgHfeVKCz0mrNikftekULLEumJs1Yflurf7UBBhJSRFqQoBanqelmQJs
-         jZ4UGpyfEOEM+ECzvFbgn8HktITZ0EM7cSJwogfWVjklyOKFak4bDyySmABrqtQn38rP
-         pywURiPsoLzfYuvLWo5iMh6TkWqGPZxY4cEmvUeciLVAadsi7vvs75UUEe/SNopOe4aQ
-         lSWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlOo2TXUwvkjFaxSd4IQMeXLHLHwj1AS+Ip0RYb7FcJ0OGuyTpIOjB42ua8+LpfG/lChqYhbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU3FDbO4/7tRXdrvIBkc+HyhxkneTaITmjV88qT7PP0GbE7Ufy
-	yiGLOoYBjx6go7jOyofRTHMGfGQU7Ug/5+R9IuY7BlevaXsyWo2j1gPEHyvUahPjJZj1i85Ff6U
-	p1GvVXYkU1HJCIFhRrzpRT1N2TF2VoaMoLYPvgSeE
-X-Gm-Gg: ATEYQzxBVgPSvaPBi93yC7BylWtBugwyay5kONqVW/rSaTgQMQByhHk0ZAJ1F82XPyW
-	CM2jm+u4/cYtWpMacHpTW/pu3SBKYQsvM7o4ns6yIHWUA3luP6RUsRgn4IeUMsIVPJu1AbJziaC
-	1wNTHFkja1CZfJ/Ekg6c3WxkvOJiQTefr8pb7ZhVQI5sJTe6HjaIwYGHIlJmovjLN99LPfBIoXX
-	PnviYM24NzQLXcjiDda46a4s3barLB65/29hqUb82y5VExdyh4n8Hi31zPC9Hz0sETtI/1D5wvl
-	tXpTW8Y=
-X-Received: by 2002:ac8:5d8a:0:b0:502:9b1f:ca3f with SMTP id
- d75a77b69052e-508db391c51mr64064341cf.56.1772703135817; Thu, 05 Mar 2026
- 01:32:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772703385; x=1773308185;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mbidr/A9XxccdAFsJsVKLL2bBtmGRz8XUrt7LUMLgOs=;
+        b=QAJzi8C6qDvlXK0UXb9cy2plTghxXJHZMoR8tIz7NEfLHrJVhEB4wGRJJm5L3JtpLh
+         fws+wNqfDFYJArzdzsbP8YTdHFUnU+zLurxn/eY+xE9a64SpQHMu9bXTAmI/rbc4mUdr
+         M4FCG6zhE4qiENN4dFz6WfgfaDmswzfDVb5Ia3tEuL7WGncPILcJ/ikF+o5FMPNDmNw+
+         xebL2S82wcXGzTt1yZalbEJm+poetEL9f2Q7W3hUjuLIMlQDAH1dbH5DIVfz2r4aA3mp
+         VaKoPYd7x6+dSXkzD/sCo6SAyAUojUOu4BrMOluqkLxA2sTbEm4RgmhSNJdNa2t6QkvL
+         Abew==
+X-Forwarded-Encrypted: i=1; AJvYcCWZdo676d2taRMAjukh7h6XM9y2Ao9Zr8cpgn4fNADFl+HJzTj0ahEujJPGwQ/LWO8aOk1DMVg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLr/ZsZ617GMXodrz6Q8Zz1D7T9hOoHWbcRz75Fx0v96bTqn9W
+	Zy9+byEIxgpYlLkr93rHOWWUKejsxqm1L1SsenX5hLTjGJ29h463OXZSXCVVQK2JRX0=
+X-Gm-Gg: ATEYQzy6g8rf56QS+ZKPW96iLC45+z0cHIm7BBViFMCM3E3GSQMTfYC/pLxnlYbiQxy
+	8NAYW7EfuK/+b0mxce0M9Lxa2I+ecGI1SO79CXImdCmVDqbK5dZJxaJ+ejYH28PyL/vzFpzW1Qw
+	HNniPQt+gc9g1RRGyLNH9U5IjRiqzJA0Q7R+esu+BS0WSy2rh6PxbZ/XthkzQ/93e+sFUttJnLv
+	RfCNDTEg3R6So0l6iWIxM9RMUbHVwuUco90Dph24JlvTpIEZJJnC9RZnsc//PocBvK3i8k/qqmH
+	/OZfXIzOnzeIFL0qwaR0WOuO9ybcuoMiFsl3vl9rIelpwpvFc1luMYYmjLkpAmTqy9oBgjIMDHn
+	rOe/94/qgNTPn/PgsXo7q+xA+Troj8dp3EFpJQupLTeDu+ycuAZcTGNrvofPtCLeujYeHYjCWLG
+	KfjEr8ezhXADN16EU=
+X-Received: by 2002:a05:6000:144f:b0:439:b564:7a6c with SMTP id ffacd0b85a97d-439c7f6a2c9mr9158913f8f.4.1772703384539;
+        Thu, 05 Mar 2026 01:36:24 -0800 (PST)
+Received: from localhost ([195.52.25.213])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439c2f7eca1sm14966458f8f.11.2026.03.05.01.36.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 01:36:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260305092706.145085-1-kota.toda@gmo-cybersecurity.com> <20260305092706.145085-2-kota.toda@gmo-cybersecurity.com>
-In-Reply-To: <20260305092706.145085-2-kota.toda@gmo-cybersecurity.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 5 Mar 2026 10:32:04 +0100
-X-Gm-Features: AaiRm51hMAh932PzghSpv3LqrFjvhdQNyVEVu4x_YV8hRnYFAdJINXNtp3IvDMY
-Message-ID: <CANn89iJ_NGSQkSZHNh_vuk9ftex4YCXJ0TMEooHMk4c7ejsjtg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net: bonding: fix type-confusion in bonding header_ops
-To: Kota Toda <kota.toda@gmo-cybersecurity.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7C71120E846
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Thu, 05 Mar 2026 10:36:14 +0100
+Message-Id: <DGUQWFYCPRQZ.17SO07GXW2DYA@baylibre.com>
+From: "Markus Schneider-Pargmann" <msp@baylibre.com>
+To: "Vladimir Oltean" <vladimir.oltean@nxp.com>,
+ <linux-phy@lists.infradead.org>
+Cc: "Vinod Koul" <vkoul@kernel.org>, "Neil Armstrong"
+ <neil.armstrong@linaro.org>, <dri-devel@lists.freedesktop.org>,
+ <freedreno@lists.freedesktop.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-can@vger.kernel.org>,
+ <linux-gpio@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-rockchip@lists.infradead.org>,
+ <linux-samsung-soc@vger.kernel.org>, <linux-sunxi@lists.linux.dev>,
+ <linux-tegra@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <spacemit@lists.linux.dev>,
+ <UNGLinuxDriver@microchip.com>, "Andrzej Hajda" <andrzej.hajda@intel.com>,
+ "Robert Foss" <rfoss@kernel.org>, "Laurent Pinchart"
+ <Laurent.pinchart@ideasonboard.com>, "Jonas Karlman" <jonas@kwiboo.se>,
+ "Jernej Skrabec" <jernej.skrabec@gmail.com>, "Maarten Lankhorst"
+ <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
+ <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Andy Yan"
+ <andy.yan@rock-chips.com>, "Marc Kleine-Budde" <mkl@pengutronix.de>,
+ "Vincent Mailhol" <mailhol@kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Alexandre Belloni"
+ <alexandre.belloni@bootlin.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Markus Schneider-Pargmann" <msp@baylibre.com>,
+ "Geert Uytterhoeven" <geert+renesas@glider.be>, "Magnus Damm"
+ <magnus.damm@gmail.com>
+Subject: Re: [PATCH phy-next 13/22] phy: introduce phy_get_max_link_rate()
+ helper for consumers
+X-Mailer: aerc 0.21.0
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-14-vladimir.oltean@nxp.com>
+In-Reply-To: <20260304175735.2660419-14-vladimir.oltean@nxp.com>
+X-Rspamd-Queue-Id: C7A0220EC32
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264250-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264251-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[kernel.org,linaro.org,lists.freedesktop.org,lists.infradead.org,vger.kernel.org,lists.linux.dev,microchip.com,intel.com,ideasonboard.com,kwiboo.se,gmail.com,linux.intel.com,suse.de,ffwll.ch,rock-chips.com,pengutronix.de,bootlin.com,tuxon.dev,baylibre.com,glider.be];
+	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[msp@baylibre.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,gmo-cybersecurity.com:email]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Mar 5, 2026 at 10:27=E2=80=AFAM Kota Toda
-<kota.toda@gmo-cybersecurity.com> wrote:
->
-> Add two members to struct bonding, bond_header_ops and
-> header_slave_dev, to avoid type-confusion while keeping track of the
-> slave's header_ops.
+--b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-I suggest you write a detailed changelog.
-Perhaps get help from various LLM.
-Do not assume we have the context now.
-We receive hundreds of patches per week, do not assume we have
-infinite time for each of them.
-Help us.
-Please ?
-Thank you.
+Hi,
+
+On Wed Mar 4, 2026 at 6:57 PM CET, Vladimir Oltean wrote:
+> Consumer drivers shouldn't dereference struct phy, not even to get to
+> its attributes.
+>
+> We have phy_get_bus_width() as a precedent for getting the bus_width
+> attribute, so let's add phy_get_max_link_rate() and use it in DRM and
+> CAN drivers.
+>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> Cc: Andrzej Hajda <andrzej.hajda@intel.com>
+> Cc: Neil Armstrong <neil.armstrong@linaro.org>
+> Cc: Robert Foss <rfoss@kernel.org>
+> Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>
+> Cc: Jonas Karlman <jonas@kwiboo.se>
+> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
+> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Cc: David Airlie <airlied@gmail.com>
+> Cc: Simona Vetter <simona@ffwll.ch>
+> Cc: Andy Yan <andy.yan@rock-chips.com>
+> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+> Cc: Vincent Mailhol <mailhol@kernel.org>
+> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Cc: Markus Schneider-Pargmann <msp@baylibre.com>
+> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> ---
+>  drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c | 4 ++--
+>  drivers/gpu/drm/bridge/synopsys/dw-dp.c             | 2 +-
+>  drivers/net/can/at91_can.c                          | 2 +-
+>  drivers/net/can/flexcan/flexcan-core.c              | 2 +-
+>  drivers/net/can/m_can/m_can_platform.c              | 2 +-
+>  drivers/net/can/rcar/rcar_canfd.c                   | 2 +-
+>  drivers/phy/phy-core.c                              | 6 ++++++
+>  include/linux/phy/phy.h                             | 6 ++++++
+>  8 files changed, 19 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c b/driver=
+s/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> index a8b6ae58cb0a..ed7ed82ddb64 100644
+> --- a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> +++ b/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> @@ -1300,7 +1300,7 @@ static u32 cdns_mhdp_get_training_interval_us(struc=
+t cdns_mhdp_device *mhdp,
+> =20
+>  static void cdns_mhdp_fill_host_caps(struct cdns_mhdp_device *mhdp)
+>  {
+> -	unsigned int link_rate;
+> +	u32 link_rate;
+> =20
+>  	/* Get source capabilities based on PHY attributes */
+> =20
+> @@ -1308,7 +1308,7 @@ static void cdns_mhdp_fill_host_caps(struct cdns_mh=
+dp_device *mhdp)
+>  	if (!mhdp->host.lanes_cnt)
+>  		mhdp->host.lanes_cnt =3D 4;
+> =20
+> -	link_rate =3D mhdp->phy->attrs.max_link_rate;
+> +	link_rate =3D phy_get_max_link_rate(mhdp->phy);
+>  	if (!link_rate)
+>  		link_rate =3D drm_dp_bw_code_to_link_rate(DP_LINK_BW_8_1);
+>  	else
+> diff --git a/drivers/gpu/drm/bridge/synopsys/dw-dp.c b/drivers/gpu/drm/br=
+idge/synopsys/dw-dp.c
+> index 4ab6922dd79c..79c72ee8e263 100644
+> --- a/drivers/gpu/drm/bridge/synopsys/dw-dp.c
+> +++ b/drivers/gpu/drm/bridge/synopsys/dw-dp.c
+> @@ -536,7 +536,7 @@ static int dw_dp_link_parse(struct dw_dp *dp, struct =
+drm_connector *connector)
+> =20
+>  	link->revision =3D link->dpcd[DP_DPCD_REV];
+>  	link->rate =3D min_t(u32, min(dp->plat_data.max_link_rate,
+> -				    dp->phy->attrs.max_link_rate * 100),
+> +				    phy_get_max_link_rate(dp->phy) * 100),
+>  			   drm_dp_max_link_rate(link->dpcd));
+>  	link->lanes =3D min_t(u8, phy_get_bus_width(dp->phy),
+>  			    drm_dp_max_lane_count(link->dpcd));
+> diff --git a/drivers/net/can/at91_can.c b/drivers/net/can/at91_can.c
+> index 58da323f14d7..b56db253f02d 100644
+> --- a/drivers/net/can/at91_can.c
+> +++ b/drivers/net/can/at91_can.c
+> @@ -1126,7 +1126,7 @@ static int at91_can_probe(struct platform_device *p=
+dev)
+>  	can_rx_offload_add_timestamp(dev, &priv->offload);
+> =20
+>  	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	if (at91_is_sam9263(priv))
+>  		dev->sysfs_groups[0] =3D &at91_sysfs_attr_group;
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
+xcan/flexcan-core.c
+> index f5d22c61503f..3a4307bc1d61 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -2211,7 +2211,7 @@ static int flexcan_probe(struct platform_device *pd=
+ev)
+>  	priv->transceiver =3D transceiver;
+> =20
+>  	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
+>  		priv->irq_boff =3D platform_get_irq(pdev, 1);
+> diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_c=
+an/m_can_platform.c
+> index 56da411878af..73525be6566b 100644
+> --- a/drivers/net/can/m_can/m_can_platform.c
+> +++ b/drivers/net/can/m_can/m_can_platform.c
+> @@ -132,7 +132,7 @@ static int m_can_plat_probe(struct platform_device *p=
+dev)
+>  	}
+> =20
+>  	if (transceiver)
+> -		mcan_class->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +		mcan_class->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	priv->base =3D addr;
+>  	priv->mram_base =3D mram_addr;
+> diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rca=
+r_canfd.c
+> index eaf8cac78038..645d5671705d 100644
+> --- a/drivers/net/can/rcar/rcar_canfd.c
+> +++ b/drivers/net/can/rcar/rcar_canfd.c
+> @@ -1885,7 +1885,7 @@ static int rcar_canfd_channel_probe(struct rcar_can=
+fd_global *gpriv, u32 ch,
+>  	priv->channel =3D ch;
+>  	priv->gpriv =3D gpriv;
+>  	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +		priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+>  	priv->can.clock.freq =3D fcan_freq;
+>  	dev_info(dev, "can_clk rate is %u\n", priv->can.clock.freq);
+> =20
+> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
+> index a1aff00fba7c..89f7410241aa 100644
+> --- a/drivers/phy/phy-core.c
+> +++ b/drivers/phy/phy-core.c
+> @@ -640,6 +640,12 @@ void phy_set_bus_width(struct phy *phy, int bus_widt=
+h)
+>  }
+>  EXPORT_SYMBOL_GPL(phy_set_bus_width);
+> =20
+> +u32 phy_get_max_link_rate(struct phy *phy)
+> +{
+
+All of the can drivers that would use this function are checking phy
+before assigning the max_link_rate:
+
+  if (transceiver)
+          priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+
+Would it be reasonable to have
+
+  if (!phy)
+          return 0;
+
+in this function to be able to drop these individual checks of the
+drivers? This would be similar to clk_get_rate() which does the same
+check and return 0 for convenience.
+
+Best
+Markus
+
+> +	return phy->attrs.max_link_rate;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_get_max_link_rate);
+> +
+>  /**
+>   * _of_phy_get() - lookup and obtain a reference to a phy by phandle
+>   * @np: device_node for which to get the phy
+> diff --git a/include/linux/phy/phy.h b/include/linux/phy/phy.h
+> index 36307e47760d..af9c3e795786 100644
+> --- a/include/linux/phy/phy.h
+> +++ b/include/linux/phy/phy.h
+> @@ -57,6 +57,7 @@ int phy_notify_disconnect(struct phy *phy, int port);
+>  int phy_notify_state(struct phy *phy, union phy_notify state);
+>  int phy_get_bus_width(struct phy *phy);
+>  void phy_set_bus_width(struct phy *phy, int bus_width);
+> +u32 phy_get_max_link_rate(struct phy *phy);
+>  #else
+>  static inline struct phy *phy_get(struct device *dev, const char *string=
+)
+>  {
+> @@ -256,6 +257,11 @@ static inline int phy_get_bus_width(struct phy *phy)
+>  static inline void phy_set_bus_width(struct phy *phy, int bus_width)
+>  {
+>  }
+> +
+> +static inline u32 phy_get_max_link_rate(struct phy *phy)
+> +{
+> +	return 0;
+> +}
+>  #endif /* IS_ENABLED(CONFIG_GENERIC_PHY) */
+> =20
+>  #endif /* __PHY_CONSUMER_H */
+
+
+--b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iKMEABYKAEsWIQSJYVVm/x+5xmOiprOFwVZpkBVKUwUCaalOjxsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIRHG1zcEBiYXlsaWJyZS5jb20ACgkQhcFWaZAVSlPc
+SwEAt3Fg0ly9qnS+HJQv96JGhcc9ssPHPspnN0LcoiUH76oBAJJ1UWuuXcnIsBb3
+namewJQN1U0nDnFUFRtJbSq49LcK
+=6g8b
+-----END PGP SIGNATURE-----
+
+--b895f1e89350da7f8491f35b99d431866030fe6df54b62358155e9918430--
 
