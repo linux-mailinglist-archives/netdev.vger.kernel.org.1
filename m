@@ -1,243 +1,215 @@
-Return-Path: <netdev+bounces-264171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONbsNtj7qGnVzwAAu9opvQ
-	(envelope-from <netdev+bounces-264171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:43:20 +0100
+	id cEIlCh3WqWnbFwEAu9opvQ
+	(envelope-from <netdev+bounces-264516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:14:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1846020AA5C
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:43:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FCCE21752A
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 20:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1F68300C007
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 03:43:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 636ED3018744
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 19:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D4B27A133;
-	Thu,  5 Mar 2026 03:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFF23033E2;
+	Thu,  5 Mar 2026 19:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRmVE107"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="hYrt5u4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4921DF27D
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 03:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772682198; cv=pass; b=Uwga53cJaQTZdiJp+FtItbO9LAnEKsFZOrptpDRDSpAW+/GjvYsCaOrNR7obBtZDSmiflEVPuP0WruZTx1ezt5z1vF5Tq5KO1Tkin07cjsNgvjBOh5ASwi1eF3pY84AyNxM/TgKDh9YMOFL3vF1cjcU4+appYv+T+rUQCqWBgSU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772682198; c=relaxed/simple;
-	bh=ootrVtgPccogVZf5ithD1dZ0iHB8qkN6uJMW91uTino=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ODGcGmznUNzrWnoSMnPQXxmtMBuCBnrZojKC72xyeFVD8WoVb/93riUBa1YyX8usu97f4H42Pc3d5nL9w3snZA1p2GiYjjKhMhXbnLWg3XE9gxKWIyjSoaFbTt6cz8qeGNpeYqHjFtK/rT0goKhJ9me1PoP4rx52Z1NdNaCD2YU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mRmVE107; arc=pass smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-12732e6a123so1814908c88.1
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 19:43:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772682196; cv=none;
-        d=google.com; s=arc-20240605;
-        b=E3pj7rHKg3VwHUYfGBP+PBxlLf+sqrYX8V452nHcTIxL5ShglJY7qdCkQdk0osOGkY
-         W8XIeXleEY+Ztdm/uAi0336QFxYq6G6gYr0dbm9qRJIkvcfMI8ot8ZZM4zjzwUFbxjeM
-         qiyYcf4gs6oTPP0EemdsifhZoWHcq49UFXDST8Tiwq2EQetfbeJcLunESkdjFdoNPMH5
-         u+sukuiH0eUG+Q0VtC4lebpsXcgBCVQ8KcmwmbNaoW+EsPmDwxIp0q/3+EUkXK390TVm
-         sGQqq+l8qcoPeq4v4PvJnziqvO663Gn39sk9fgiNaSvBE9BD15G0aOcUsvtUWJdooaww
-         DZQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=laZackGfUZPohc8rpn7q9sGIcb8hpmuUOav/5ISxzRQ=;
-        fh=e7/mHBQODT+kO+xqK2mD9awXw2OxcDlemkLy5ZCGuDI=;
-        b=bqvWdZWeOCoeDfUYmkoLUbZR0hknkMZXny4ZKWdu/qYd4AAkJZvpB457un6cRK9Pv/
-         o0AKLzQKHe0Q+IOTIuM9cShdqpC8NTWJMKam2hEtlBTKnxbKq0mWOpbUvSM7FvqCGvZH
-         Yhql0fmKH+J1+dWjhjqu5k0rT3sCHUMwucP/dccXnB7TczmFdG277ZCK6LZAaByfJzmE
-         Od+aX/HPCV8zJl8Rv7YWmfFW0G6eEaNNf5bgXBDA/WgQ/ZsQa3JPUty9JNypwnpCyUY0
-         RbOXk7IgcDui9nwgFXxAJGra8oWt5ZW1Bsu6QN9mtYA5QU3kNd+LDTmVEgxek9SaQvOQ
-         MUXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772682196; x=1773286996; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=laZackGfUZPohc8rpn7q9sGIcb8hpmuUOav/5ISxzRQ=;
-        b=mRmVE107dCyuLGH2mESEAOazzRcz4uvYuqX+lfD0ghIDG9UADSgGgdmQM/eUEoKotD
-         gecv2+iQgRXiukDqX9Cusx+MmVnTCItW3vVo32Rjmxk0J4HSUY07zXZ8A9JxeO+eYJbc
-         I1KA3zhNi+Tdi+arTWjpbD/6a5ZJL2atrX+gl5CIPtW00N8WpNc0YNXoDyanpR9McASV
-         9TEnfNX2f25k2x5c+vxYLnL+6qsH5O5dH/ytrrJsByaIJWsFH7m6AoL5NzqgKzfW/Q23
-         OEEJ9Q5i2KUCkuknj2wqyUVofIl2mNj5Zi23Utkd83OYGgMhKrmib+RBXZQA/9pFoj/O
-         9lpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772682196; x=1773286996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=laZackGfUZPohc8rpn7q9sGIcb8hpmuUOav/5ISxzRQ=;
-        b=HkC9i24artrSYyGX9xyjurXjklVO+bs0a5OziT5IwSAh9sjINBMFFQZOsNsbfEjCA+
-         yl+QGPCYG04ItkUQWS5RcWZFOC4QXZfwpRObE2eCS3kL7SQpUVYuuOLS1frIY1hnmjtm
-         bruAPs1er0ZYuVOSPHOySKBJe7aYSgL6tFf6vvnL9qP+uVK+ZwdC0SwJ49ER5Z3SnJ9e
-         VSVHEmmQ+zrr873QbHiFMLYH6LODpzN7gCSUsGPQWLJt0wsGcI484Uosx79dciOGaU6j
-         bCkf9b+3SzUiBQ1pLg5KEBcFIxpw3Or5gFSfYlvuV0QSZMo2c6Wbn4qwBhX2nI/4iWZE
-         f9pA==
-X-Forwarded-Encrypted: i=1; AJvYcCUloTB8bvt8x6b4d5q1DIOwse6fMiJKiCsx5t1aMirH7UTJjGqYHAMt5e6De+/z0+7q/RvDvnk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzlOfidWDVYqPjhJg0FOl4LXvvKZUCbFxbgbb/RyFWlCHxRN2y
-	nBfBZVkPVxsyTYO/KE8T9lr8Ogbb+9sSIScHSmOn9WXeLitjEYtbIq9IpWqlhGE4Cmza6Tqp6k4
-	aoPq8XllruodKIyEyXvz/wbZrAbTo2lv8E4mDXZfK
-X-Gm-Gg: ATEYQzxBnwFsAAWdELAF8nJjJ4lhAjZEXK6I9tW0AFt+YVVka8NjjOJhlowi03rb9bq
-	DJ69QISiqG5GaC/DPCSb02V3X3G/Z9PF8NC90E4gxUblwKOYkAsZfqnBrBjey7zddHwtWCocsME
-	pY8zGWbw7Z33JuCTksk8zDtlvvlgKr2MIU5YZ2DzhNkkPQkDgFcF6qkIkWor48IQEkPRXT6dRMx
-	tKoT5+lhRrPgBnEhoB0Gprq7kx4eNywBMJLJRDmaRbRUhJR8GP6J085ztDdgY62lAMCh3GAv+Eq
-	C0LUK4ypXmkr9PvYIoI7e6BFyc9gj4BcGchiz8Irv7lrhWwsJCkn0/8gSRb9h3ThwLZzCcrA
-X-Received: by 2002:a05:7022:611:b0:127:3440:e5d5 with SMTP id
- a92af1059eb24-128b70d1277mr2482271c88.21.1772682195309; Wed, 04 Mar 2026
- 19:43:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE3E1F1534
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 19:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772738073; cv=none; b=UL538leI4RFV5xGqB3UwIZAa24QiPK56NwrY/5xb5unc3mM+majxUiOHxBxseeFgZh3pRxwAeAns4bcVGTWqxKNp7W0Z2JWAsDDsaACc88yhhvvgfXQ/8YuTQ1fen0c9mBfZo4pHlLszQXPbgiAeeOel2vlglFK+rMeXMb/2L74=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772738073; c=relaxed/simple;
+	bh=qRdDrBna4a6872YMyXijGc872wYwYrXblTPPs70KtTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AGcuJ4QvI274n4XR9T72KvKZWawmdslKAbR4BYk/ztjWvCRYnbwSqLvUaQ3/7NgRf2vBMwM6eFyIr2rter4vTxQeXrvgo0QfkINIR09UO7WFkY93evdvBCT7++VThpcs8M1yWG+GzUzbvg69IEnfC+LCagT214nj0YVQoChpLH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=hYrt5u4P; arc=none smtp.client-ip=35.89.44.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6007b.ext.cloudfilter.net ([10.0.30.166])
+	by cmsmtp with ESMTPS
+	id yC3OvLLQcaPqLyE9Xv225x; Thu, 05 Mar 2026 19:14:31 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id yE9Xv2DEnh8QWyE9XvgKj0; Thu, 05 Mar 2026 19:14:31 +0000
+X-Authority-Analysis: v=2.4 cv=Mcdsu4/f c=1 sm=1 tr=0 ts=69a9d617
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=edf1wS77AAAA:8
+ a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=J2gJbEVsAAAA:8 a=hSkVLCK3AAAA:8
+ a=Yx1WBRiMjIbWHXwVVgIA:9 a=QEXdDO2ut3YA:10 a=DcSpbTIhAlouE1Uv7lRv:22
+ a=Bt_igOxda4ASFyQEjNxY:22 a=cQPPKAXgyycSBL8etih5:22 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sZMfNUjL8QEWNequUGC+4j4wQXCEXyFRudo0qIRAqyA=; b=hYrt5u4PV4omYCa9x78WfqR6GG
+	nMIcpVmxrwAIQIqFlVCIF6Myd7FsXCaFpgFsxw72PGhka6kdfBfdb4c3Lq87pgsACnCc+Z/e0+jkf
+	FhLPozGFY9dJ2dQSe9RGerkKYEfGkuiIL1AKEPI1T6vK0SUugSamrcBfd3UG8h1omGzxsBrCVv4Ml
+	m1MszpCwWogM/232Q3SUNi90/NbawmKq2Ij5n9KqKn3FqL42u3ePiDtfDGDhRNF9sBRiXGN47ME33
+	Y8+6Ge+JeM8ho90m+SFgxqeDOIGzOB2ihBhAkE6vShjDT04foSkZCte7WzyF9rkkqLdLRf07g6/yR
+	zmdQFlSA==;
+Received: from [177.238.16.13] (port=41596 helo=[192.168.0.21])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vyE9V-000000008gQ-2btz;
+	Thu, 05 Mar 2026 13:14:30 -0600
+Message-ID: <7c33220b-df94-429c-9cd5-fd2b7d7d1add@embeddedor.com>
+Date: Thu, 5 Mar 2026 13:13:45 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260221233234.3814768-1-kuniyu@google.com> <20260221233234.3814768-3-kuniyu@google.com>
- <fjt7fesjnzwuzeuiouv6rpvoxebounjqv3jlc34tvmzh252zep@hizdvwr2qwe4>
-In-Reply-To: <fjt7fesjnzwuzeuiouv6rpvoxebounjqv3jlc34tvmzh252zep@hizdvwr2qwe4>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 4 Mar 2026 19:43:04 -0800
-X-Gm-Features: AaiRm50tdKTJcrkl2TV6ugHeYrljxXQn_6A_T7cC2LyOcuGXEOHGEE6Yysg1wcY
-Message-ID: <CAAVpQUAJgFtcJGtuMufS9mhaShs7OQDxx7jTGOSbG9wCdeCN7Q@mail.gmail.com>
-Subject: Re: [PATCH v4 bpf/net 2/6] sockmap: Annotate sk->sk_write_space() for UDP.
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1846020AA5C
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] net: sched: cls_u32: Avoid memcpy()
+ false-positive warning in u32_init_knode()
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+ syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20260305073343.250702-1-jiayuan.chen@linux.dev>
+ <fef6bae161f319a188b5b6f157b33498a463e3e6@linux.dev>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <fef6bae161f319a188b5b6f157b33498a463e3e6@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.16.13
+X-Source-L: No
+X-Exim-ID: 1vyE9V-000000008gQ-2btz
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.21]) [177.238.16.13]:41596
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 13
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfGj2/TIGCvSdVv5KKyptqfEcJCIoAH2LM3Fn736aAhZTrTZCZOPSmIaxVaopREeWTpdLwHCXIa11Ua/e/h8qcnDlGCdZ2YNIH9yLzg1kS9m7KV21pnth
+ Tn2DlQdGOJ8AlheJ3pWKXTFIxmtT7F8/HNy5S/GaTV0kWsZpR+BiIojthc/94HIurvZ8+7zAMdkqofLW6qJxF8er3RVt2O9+VyY=
+X-Rspamd-Queue-Id: 0FCCE21752A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264171-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264516-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[embeddedor.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_SOURCE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	HAS_X_ANTIABUSE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
+	NEURAL_HAM(-0.00)[-0.989];
+	TAGGED_RCPT(0.00)[netdev,d5ace703ed883df56e42];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 4, 2026 at 5:48=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.dev=
-> wrote:
->
-> On Sat, Feb 21, 2026 at 11:30:49PM +0800, Kuniyuki Iwashima wrote:
-> > UDP TX skb->destructor() is sock_wfree(), and UDP only
-> > holds lock_sock() for UDP_CORK / MSG_MORE sendmsg().
-> >
-> > Otherwise, sk->sk_write_space() is read locklessly.
-> >
-> > Let's use WRITE_ONCE() and READ_ONCE() for sk->sk_write_space().
-> >
-> > Fixes: 7b98cd42b049 ("bpf: sockmap: Add UDP support")
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > ---
-> > v3: Use WRITE_ONCE() in udp_bpf_update_proto()
-> > v2: Cache sk->sk_write_space in sock_wfree()
-> > ---
-> >  net/core/skmsg.c   | 2 +-
-> >  net/core/sock.c    | 8 ++++++--
-> >  net/ipv4/udp_bpf.c | 2 +-
-> >  3 files changed, 8 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> > index 75fa94217e1e..3d7eb2f4ac98 100644
-> > --- a/net/core/skmsg.c
-> > +++ b/net/core/skmsg.c
-> > @@ -1297,7 +1297,7 @@ void sk_psock_start_verdict(struct sock *sk, stru=
-ct sk_psock *psock)
-> >
-> >       psock->saved_data_ready =3D sk->sk_data_ready;
-> >       WRITE_ONCE(sk->sk_data_ready, sk_psock_verdict_data_ready);
-> > -     sk->sk_write_space =3D sk_psock_write_space;
-> > +     WRITE_ONCE(sk->sk_write_space, sk_psock_write_space);
-> >  }
->
-> I noticed that Patch 1 and 2 were submitted earlier and are on bpf tree.
-> Given that Eric's commit (which you reviewed) is now in net.git, these tw=
-o patches
-> should probably be dropped in the next version, right? Just confirming.
-
-I was thinking git can just handle them well, and even the
-patch 2 has a delta in sock_wfree().
 
 
->
-> https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit=
-/?id=3D2ef2b20cf4e04ac8a6ba68493f8780776ff84300
->
-> >  void sk_psock_stop_verdict(struct sock *sk, struct sk_psock *psock)
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 693e6d80f501..710f57ff3768 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -2673,8 +2673,12 @@ void sock_wfree(struct sk_buff *skb)
-> >       int old;
-> >
-> >       if (!sock_flag(sk, SOCK_USE_WRITE_QUEUE)) {
-> > +             void (*sk_write_space)(struct sock *sk);
-> > +
-> > +             sk_write_space =3D READ_ONCE(sk->sk_write_space);
-> > +
-> >               if (sock_flag(sk, SOCK_RCU_FREE) &&
-> > -                 sk->sk_write_space =3D=3D sock_def_write_space) {
-> > +                 sk_write_space =3D=3D sock_def_write_space) {
-> >                       rcu_read_lock();
-> >                       free =3D __refcount_sub_and_test(len, &sk->sk_wme=
-m_alloc,
-> >                                                      &old);
-> > @@ -2690,7 +2694,7 @@ void sock_wfree(struct sk_buff *skb)
-> >                * after sk_write_space() call
-> >                */
-> >               WARN_ON(refcount_sub_and_test(len - 1, &sk->sk_wmem_alloc=
-));
-> > -             sk->sk_write_space(sk);
-> > +             sk_write_space(sk);
-> >               len =3D 1;
-> >       }
-> >       /*
-> > diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
-> > index 91233e37cd97..779a3a03762f 100644
-> > --- a/net/ipv4/udp_bpf.c
-> > +++ b/net/ipv4/udp_bpf.c
-> > @@ -158,7 +158,7 @@ int udp_bpf_update_proto(struct sock *sk, struct sk=
-_psock *psock, bool restore)
-> >       int family =3D sk->sk_family =3D=3D AF_INET ? UDP_BPF_IPV4 : UDP_=
-BPF_IPV6;
-> >
-> >       if (restore) {
-> > -             sk->sk_write_space =3D psock->saved_write_space;
-> > +             WRITE_ONCE(sk->sk_write_space, psock->saved_write_space);
-> >               sock_replace_proto(sk, psock->sk_proto);
-> >               return 0;
-> >       }
-> > --
-> > 2.53.0.371.g1d285c8824-goog
-> >
+On 3/5/26 17:09, Jiayuan Chen wrote:
+> March 5, 2026 at 15:33, "Jiayuan Chen" <jiayuan.chen@linux.dev mailto:jiayuan.chen@linux.dev?to=%22Jiayuan%20Chen%22%20%3Cjiayuan.chen%40linux.dev%3E > wrote:
+> 
+> 
+>>
+>> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>>
+>> Syzbot reported a warning in u32_init_knode() [1].
+>>
+>> Similar to commit 7cba18332e36 ("net: sched: cls_u32: Avoid memcpy()
+>> false-positive warning") which addressed the same issue in u32_change(),
+>> use unsafe_memcpy() in u32_init_knode() to work around the compiler's
+>> inability to see into composite flexible array structs.
+>>
+>> This silences the false-positive reported by syzbot:
+>>
+>>   memcpy: detected field-spanning write (size 32) of single field
+>>   "&new->sel" at net/sched/cls_u32.c:855 (size 16)
+>>
+>> Since the memory is correctly allocated with kzalloc_flex() using
+>> s->nkeys, this is purely a false positive and does not need a Fixes tag.
+>>
+>> [1] https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42
+>>
+>> Reported-by: syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com
+>> Closes: https://lore.kernel.org/all/69a811b9.a70a0220.b118c.0019.GAE@google.com/T/
+>> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+>> Made-with: Cursor
+>> ---
+>>   net/sched/cls_u32.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+>> index 9241c025aa74..8f30cc82181d 100644
+>> --- a/net/sched/cls_u32.c
+>> +++ b/net/sched/cls_u32.c
+>> @@ -852,7 +852,10 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
+>>   /* Similarly success statistics must be moved as pointers */
+>>   new->pcpu_success = n->pcpu_success;
+>>   #endif
+>> - memcpy(&new->sel, s, struct_size(s, keys, s->nkeys));
+>> + unsafe_memcpy(&new->sel, s, struct_size(s, keys, s->nkeys),
+>> + /* A composite flex-array structure destination,
+>> + * which was correctly sized with kzalloc_flex(),
+>> + * above. */);
+> 
+> 
+> 
+> I'm thinking whether it's more appropriate:
+> 
+> new->sel.hdr = s->hdr;
+> memcpy(new->sel.keys, s->keys, flex_array_size(s, keys, s->nkeys));
+
+I think unsafe_memcpy() is "better" in this case, as it will mark code
+that could be updated/reviewed once the compiler can correctly see into
+composite flexible structures in the future.
+
+-Gustavo
+
+> 
+>>   if (tcf_exts_init(&new->exts, net, TCA_U32_ACT, TCA_U32_POLICE)) {
+>>   kfree(new);
+>> -- 
+>> 2.43.0
+>>
+> 
+
 
