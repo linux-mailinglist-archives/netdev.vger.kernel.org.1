@@ -1,213 +1,156 @@
-Return-Path: <netdev+bounces-264176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIeaCBoHqWlW0QAAu9opvQ
-	(envelope-from <netdev+bounces-264176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:31:22 +0100
+	id 0AEjJP0IqWlc0gAAu9opvQ
+	(envelope-from <netdev+bounces-264177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:39:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C66920AD16
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:31:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E897420ADCB
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 05:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3AF6B304945C
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 04:30:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 199813037E49
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 04:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B0C238166;
-	Thu,  5 Mar 2026 04:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0B4283C9D;
+	Thu,  5 Mar 2026 04:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="i1C+Auk2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eN3/GMzh"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010001.outbound.protection.outlook.com [40.93.198.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F3B21CA03;
-	Thu,  5 Mar 2026 04:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406871DF987
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 04:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772685052; cv=fail; b=bmPWLFQ31fiNZfw19INd/s6W6loBDnH4hE9sbyebGPAH1dzKJB4Tcl+VGchbX/URwQBH72Y0MMczmEVUXcbkNfWmHfFbUgrpq3jqRmpNBg2bEeQUiE9vp4a/3LznJ2BJDDvsoL0VX9MT9yzhiC8MA0D4zDxHM6Ihq2ocE26jKy0=
+	t=1772685454; cv=pass; b=lT/t4cb/SdMzq6i7f7+GD9+DSklLZ5CzGohZga+/2hoCFUGSy6kQe6uxlRm3OQzR6vHEsdgXEzIqMyZjMYEl4ckEEB55iLxQu5l1GPH8lEsQogHiT0HuZLAXYSJeOHKIsoOnWpnFXyRyuYGtJVc5n1UAf72MoOP3SDcKQhP5s4E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772685052; c=relaxed/simple;
-	bh=MDoh9XorZwXNQ9Z8MdYsn+6HL8ATvFbUSWeJRhub+Bk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZykJlXYmPOzJ0YwazqZEwDDxAIAqPT6gJD2HioQ8zUScIAAbeKPtOZAirzqQX3q8aozN7MR0pT9YffAkttXTnUd653+jFz7viCZDgQchUJ0rAEQfkyBfK6q9kQBSi/6Csf6cYZU7tC7AyPbaJvHPo78UNm77OkBLxVBgGCPcGXU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=i1C+Auk2; arc=fail smtp.client-ip=40.93.198.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d7Ws42tC1Y3S/Bn+wnryXI+sSE9DI6LFoJda+UvoZUhjz1nitOj/ONWiotUSWGGNrxC6S4tqFyvG0BqwpiiFFGZeNfzaAV3DDejdQadxmLf7HSxPYx1eL/W9aeKF7DuF+SwsLtp83HOwCuaxayfdeo6Bdu58LPAGM2pvXuu62Ivcr+OCOTKiEeifI7Q97TCF8xrrLBwFYiTtXJi5RfckWeaYxoBzfM2nM0Oa6jnPCUp2fXr16w457Zy01vjMfJWsreWSF/n5K70OyBHh83aYgUNJMZ1kjiwpRFkzfqpCFiRaViDDVzabSEFCKTNQYE1x/Q0y7vvqNEeu+kUVR1nWWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RgiOldHZF8acyCanz7c4xusYDK52DN3aidndYtKD70I=;
- b=eaQyGIJR+PmdfpkyOmlsltiZuLwYqCm6L41ZJWIRXdG4ba4g9u1BvEmObz4CDHmFFjxvQ7xNtS6/HGxpKAqGToY2mTjD3d2JIZbgAQLOG6V9h69GYfkzX2uxxD8GynruTYBvNw5SZxO+oNvyzzqIs6hD8clZh6zGzAaaMYz3Arfw0PPYJ6V7TN74uHraMQDwaDgp/GEaN5gmd0XVd+bnG5WrmcSjj3pgwryv8OB4/xXT9A20nEIaQQnLseV2Ksi8YiSi+6KA9zORvX1pU5q/fRLuanZymB3Nf4d60teOzZ6HwKBjj28Rw2m2KfBJm9G9PBI6bV62hUPDJ+P7UWF00Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RgiOldHZF8acyCanz7c4xusYDK52DN3aidndYtKD70I=;
- b=i1C+Auk2nJ8zqCzkEZkR4gKKhweQFtbRqIK+MfFXWS7oDzj27DDJO4Z8ubHbehnnRhDd7+vlvV9M2ahVn/xcwMYmrFRz6C4zSNjloGFS6YFurh2438i013CCCvSbqq2TISDTDECYAofer1Fdsnvoce/ZdXIXNKEX2fpm0ZB803E=
-Received: from MN2PR15CA0058.namprd15.prod.outlook.com (2603:10b6:208:237::27)
- by PH0PR12MB5632.namprd12.prod.outlook.com (2603:10b6:510:14c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.17; Thu, 5 Mar
- 2026 04:30:48 +0000
-Received: from BL02EPF00021F6E.namprd02.prod.outlook.com
- (2603:10b6:208:237:cafe::3) by MN2PR15CA0058.outlook.office365.com
- (2603:10b6:208:237::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.23 via Frontend Transport; Thu,
- 5 Mar 2026 04:30:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL02EPF00021F6E.mail.protection.outlook.com (10.167.249.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Thu, 5 Mar 2026 04:30:47 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 4 Mar
- 2026 22:30:44 -0600
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
-	<Raju.Rangoju@amd.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH v2 net 3/3] amd-xgbe: reset PHY settings before starting PHY
-Date: Thu, 5 Mar 2026 09:59:52 +0530
-Message-ID: <20260305042952.835926-4-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260305042952.835926-1-Raju.Rangoju@amd.com>
-References: <20260305042952.835926-1-Raju.Rangoju@amd.com>
+	s=arc-20240116; t=1772685454; c=relaxed/simple;
+	bh=vfU/Bhh9KsRHxheqhISjS+BA7M3c+qz1IrFFIpi1qZM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M+/4uiWzp8OWdTvG1iy8Gu7rZV8XyFv7LLtTak63i7zbfxdzqNPbXeCguSU+oTjZKwHBk9YL2bInszS5GGYPwzFij56tlxke2bhBT4wdJncJqVRE0lAfoBuTKVrnXMCmMIrPqn1+CGFF8Bn1O3EELcdhai94N3nueBObFP2/jSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eN3/GMzh; arc=pass smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1270adc5121so9546241c88.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 20:37:32 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772685451; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UP3PAGFudxG6MhfIS53OQC725xhOa2c1VPs3RrbjXimfqQ6ompIUj9BRorSnuU34xI
+         fr2uQi5WA3gw/yCnqLdqmMJ5Eplv25usxt0f7awl/8Ac6QM5ruzYBLt3oJkAFNuxq0oE
+         x6zkxKojjJ5tXvqGjK+Xi+HeicXJl+BLKkA9eLnTVoe/uqaPbSREqYjlt7jSkB+w1jIA
+         yaLY59Z7bfCncOppNnhg6aTyzUCC9eC2WW4bRNjKRwLP4aeGZSfy8Aksm1Ge1kEyJeYD
+         1bNsASeNhkIh2iApjy4tOsIp8RcH3waVEYhqrB41VufexXJsAIDceB5cT8Pxc81uDhtH
+         IryQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vfU/Bhh9KsRHxheqhISjS+BA7M3c+qz1IrFFIpi1qZM=;
+        fh=euZ2mVvNhqZse93jYSZeSfEmlBQeh0UptLpSu4qvZkI=;
+        b=DyHNJ8xf2DZyKHOAYkC3Jy9GtwqynuIxiA2hChHhsYfVDm360/7XjXNhNObQiwIyDH
+         Ztx0241u9dZt+va208X1VXJEMgDcYlIoR7JjpkIb03tzbKWMje650XPlBIpOOWqn/ZiB
+         RbrF9LAaAZtJYpJyWhxK0NcmzH0jqTORE7/7sTB6XExlQQFES2ybvcelViGc6dHIgpS/
+         OFphB/gECNN17icqK0Oa6MtsSE9TPKejnAnjgOxIklT6N8wUywdz7h31oretgkoRqa1R
+         ZnE3xwtMUYYnd8NC6+G0Wi9Fgqe0rX3RkWQIx5iQUqcT8UCtU3JfoYfDmPZcZOpjtOPB
+         rPKA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772685451; x=1773290251; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vfU/Bhh9KsRHxheqhISjS+BA7M3c+qz1IrFFIpi1qZM=;
+        b=eN3/GMzhGzEeqzXQftDxlV+zBvzqC8xlkNvPynD3ePKSPuSEexkvCKjaa38qqB9wX6
+         ToX57vCGuCRxpIfijYIcPST/wm8oTyf7Pd9xQdQ9Ij+IVjJt9LeV+2Ero+ntNLaYIQEw
+         X3Yap0EH143Kjgsi1gzzeipWQa5exu5aArNWvoOaNxfxa/dTYQq+txuVM9gvk8rnTFJM
+         kjN3j8+sWYunj2l8cW1lBM+Wa0n+kD/5MTkQkSkLKaRNbqFM+DF/xoNqb8csrs2oIT7B
+         JkhQeJS2QkSY/HzvD6iTz8VP+Ahvkdoi1S3uUrwNSQgEeKxnf7CXNwyNzqSCh/Nif/Zk
+         HDYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772685451; x=1773290251;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vfU/Bhh9KsRHxheqhISjS+BA7M3c+qz1IrFFIpi1qZM=;
+        b=WcmqmxzcQdqk5X+IvkFg+ATBLwMo3jcQ8Gn7KE7A59I2meqmlh8w44f3lupdzQwynz
+         R6vxG8atYiwC9HiSZ3nQfp+saPBE0pVAJoUhUjmr/AiruO8LGxDiehn7nJk06R41Bu8Z
+         nJBpMuuloRYmaFIIqDEHjVMHz+6I4nXeNxwFSI9WTXLTRBnI296K90b3iZySknLQ51M2
+         nVcrXkls/caVFDKGd+TswMmsuRdiZKLiUGJfJ7psp8n1Eq7eQ5GZk9yy3dg7PbraLb2d
+         Mtu0tw53iJ580DARVEkkBXaaVJXO5rw/KnddbNGFXukXGn/WbNQaUrxrtboIA9P4xNBv
+         cF2g==
+X-Forwarded-Encrypted: i=1; AJvYcCUw1Q3XyhRBLlU1zricVpay2vMHMrxBaR/0mPX+FQNik+3PHC4UGUnfCWQn+D5PMxLT2zZBoMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEYmF9tfDwcLJ13j23lFiyfig4+ZSZcQEhLmQM1lHnR/QVIAFW
+	qOo4VLt0kUpoMNzOIlTbI6pl9DKyzzxJTWSRQBsb9icBUxlZ7AXVJQFT6UEqNHRMpzUhg8+CKUG
+	CdEF2tFYvz+SCSn5WPInyxjiQetK1gu+tqe3+ah+7GeANVV1bLwBUCc6+
+X-Gm-Gg: ATEYQzxwq28iPjjdAHQ/0ZP1UCU8+F9VYQ3PEn8fC5neZTr+ny/n49NrLWIqIO4/XL/
+	P6SjTIxZEgUtAkgYCdKEFPmbYWFx+F/XNiDDkF8GG7+3riVeF6DLVWlNcIJ68BE9slfM6nVVYXO
+	scwYqdWSnDw0toe/WV88GVWpPj1PwoZz4zxVAkh1TiyuxqdaUzqOUk+K8IsSskMlTVr5FwoTecR
+	L5ewl18n0zJNDbKLru/0EDGM69J/MkhrfMuOOzDxEvdftnfZwy6zyEBgLedBRDHqSFqDPwqvBio
+	EMqrpRhPRQqhEryrM3GES4ow7g6OUCGy/W4YA5dUCczUrLy3DufvFvm+DQgc5w/XYH0mjJzf
+X-Received: by 2002:a05:7022:6999:b0:123:3364:2ca8 with SMTP id
+ a92af1059eb24-128b70f83d6mr1636311c88.39.1772685450830; Wed, 04 Mar 2026
+ 20:37:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6E:EE_|PH0PR12MB5632:EE_
-X-MS-Office365-Filtering-Correlation-Id: d28fcdff-d5c1-4a0f-e845-08de7a6ff97b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700016|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	nzjfIfFtbKf6DYnDyjCOA3Y8eYNaMeoYOsDNh9pVnn6M6mQ5HGp7zkc8N+eLEVf6D0HKeQUbQRziCOtDs+7xG2FfVJVZrbXuYRdNYmBObbrNzwi99B8zwrj9wnh09ycGo88wqU90WkYEfe87WOvpl4OPuQCOn3Zc/qBDRucv5sT4LkycYWREtkfPHVIZmdglapuckVdfjBBrqpS3Xj7YXF5+ayoEm39OoEBc41Z52Y0izgdk4csYTow2QlLElIXYMuKmb5xXfM7lEcH2YSrrEQpPqAjTuTV9UYunCiuCqNkYZIORjHq5gnPsvQFekmn9yMsSRISrWNcTWV/iJIIXOnzjcvOAT3CjWLU3DFRleECr1TBkrm52/f0nq3B6EgHlDpFgQvgHz98epHx26HDatpOShmhJwF6lS3fj/5Q+7NjRulDswVs/u2dfXYliCVilQ4I12RrDeCZ67wTkSqkwtldS5euMWZBidYI8DiG7ZjhzEVvW4hpnNjC6Cf4ntMk6xv1WgF63R44pIZKd/1j3bgAS06pOInmvmFyRmsr0Hu1IB1wXOQ8LbqIkstyiS17A6hNEqZvSJuUGgJNAyNC9QCEKXKNMIXRx2SrDMySgyhLNGRXtb/lck6jGKFYWVj2RzJR5gGbo+axR+7DAoD8ghkgr4gdEQqPlKZWtcCmLGlYc7xZ02c0346ZDAylhu+hv/ObcvMq/9CPoyqpI/9Uql2LhQsDO7MLbu8A+rbK7aPcfofVU4HnPkzgslI43Wzjq32xS+TUFSvPaWEVFTKzsnw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700016)(82310400026);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	9e8C7DsatOporEYQQSSH46UySeu3mMS9XwnGI874Y/oMTTwbNK3ELpAjkYn1kzZf8NSd0wUTg5d4Mgv6E9UedbZpSMestKAmer6P6Mv650xLjJgylm49PJN+B0YQLaOW7yz++2v+airBQUIxnoT+utZCf6rraU441HrKRvAEg4qxfOdKjW/B2rvgeufdR0kswA7iWvLk4DXxlk+wwoxDiCyBy27JPLrGLu0qvtbRlrqAlqJcHJfskxRMQfc7NOCcPNaWlcvqAD0M1Ng1myQyYxfXeX4FvCxeIyydi6aIr1XChe75xSg1xRf2RZ0pzj05h5P4QnZDwN6H67FdSkbp+l89aU29mwqPEgOnEy/UZ+1fycrAwsiYfRyUHqbZgBEuyXE2tf/ppTPfZx714fsmx1YEAMNiV7VVcBSyhJBnyYx5W7h28vR/OQAje5VijhDB
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 04:30:47.8359
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d28fcdff-d5c1-4a0f-e845-08de7a6ff97b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5632
-X-Rspamd-Queue-Id: 8C66920AD16
+References: <20260305022703.3946470-1-kmta1236@gmail.com>
+In-Reply-To: <20260305022703.3946470-1-kmta1236@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 4 Mar 2026 20:37:19 -0800
+X-Gm-Features: AaiRm50Po2nsFsFpf1PT478fE4wiji5kkRYCFOmAbdXu_Z7Csu9829kIMrwk7tQ
+Message-ID: <CAAVpQUC8Oiy53MG08tR1OXGgJSWse1nSLFhUdJtVzSvc-qsB-w@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: remove unused hash_size from struct tcp_out_options
+To: Keita Morisaki <kmta1236@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: E897420ADCB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264176-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:dkim,amd.com:email,amd.com:mid];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264177-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-commit f93505f35745 ("amd-xgbe: let the MAC manage PHY PM") moved
-xgbe_phy_reset() from xgbe_open() to xgbe_start(), placing it after
-phy_start(). As a result, the PHY settings were being reset after the
-PHY had already started.
+On Wed, Mar 4, 2026 at 6:27=E2=80=AFPM Keita Morisaki <kmta1236@gmail.com> =
+wrote:
+>
+> hash_size is declared but never read. The MD5 path always uses a
+> fixed size of 16, and the TCP-AO path uses tcp_ao_maclen().
+>
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Signed-off-by: Keita Morisaki <kmta1236@gmail.com>
 
-Reorder the calls so that the PHY settings are reset before
-phy_start() is invoked.
-
-Fixes: f93505f35745 ("amd-xgbe: let the MAC manage PHY PM")
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 8b79d88480db..fd4f451efcb2 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -1271,6 +1271,12 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 	if (ret)
- 		goto err_napi;
- 
-+	/* Reset the phy settings */
-+	ret = xgbe_phy_reset(pdata);
-+	if (ret)
-+		goto err_irqs;
-+
-+	/* Start the phy */
- 	ret = phy_if->phy_start(pdata);
- 	if (ret)
- 		goto err_irqs;
-@@ -1280,11 +1286,6 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 
- 	udp_tunnel_nic_reset_ntf(netdev);
- 
--	/* Reset the phy settings */
--	ret = xgbe_phy_reset(pdata);
--	if (ret)
--		goto err_txrx;
--
- 	netif_tx_start_all_queues(netdev);
- 
- 	xgbe_start_timers(pdata);
-@@ -1294,10 +1295,6 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 
- 	return 0;
- 
--err_txrx:
--	hw_if->disable_rx(pdata);
--	hw_if->disable_tx(pdata);
--
- err_irqs:
- 	xgbe_free_irqs(pdata);
- 
--- 
-2.34.1
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
