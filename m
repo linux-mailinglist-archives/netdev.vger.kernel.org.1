@@ -1,190 +1,222 @@
-Return-Path: <netdev+bounces-264481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOS/JpWtqWn+CAEAu9opvQ
-	(envelope-from <netdev+bounces-264481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:21:41 +0100
+	id UJSkIfawqWlXCgEAu9opvQ
+	(envelope-from <netdev+bounces-264482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:36:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3662155DC
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:21:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2926215762
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 17:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B36A30F57C5
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 16:16:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89295301BA7B
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 16:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E9C3CE4A5;
-	Thu,  5 Mar 2026 16:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C623D5247;
+	Thu,  5 Mar 2026 16:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUxpHcxi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HYsHjkGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED1C3ACA50;
-	Thu,  5 Mar 2026 16:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607533C6A59;
+	Thu,  5 Mar 2026 16:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772727408; cv=none; b=mi6X+YuShstigWkfQj1Gq40tAQjKy/6LDji0mQ5Cde/6yikbyOBWD1aTqNts7uFlU9h8OCitgHmKWSVTgSpFL/HzKgsW3dSacxMSoqSThNNPxl3dtpNb6pHBHF0WqEN5ddXQ0KkaXy2pc+lccq9CYStAE7n1BqYSJv/GmcV5xbQ=
+	t=1772728562; cv=none; b=RV4neW8lksaLm+B/T4oXxCQqPihXIVJiyjjFPheKmpPx65wbqCpPJ/uE79HJ4mi7dlMWukT3S5kh5Dd3W3MyMSAwET5kBPidGnyHgwlRThdX7dWE2b/N+mxRihbZn5vZELZzLxlDzMqxJ8R6xoMUcWqecmSiAj48Xg149jfVhWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772727408; c=relaxed/simple;
-	bh=tYWAoI05j+Zw9plPeywTp7SD38iDFKoJN5mm6OLALGM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lf34R9BzPm4FHdFHq5SqO92wvsqG7M/lVrMm5XOleys2HSaMt+zWUJYPrtnEdTvUlbpT9H0SrFBc7PbFMZRXdZZIbvFX4h4mPtMgg/ZqAPR964gMQQneqJXk1r8n1hDwiOvjI2wnYDeXFiWWucnN/ljTqvCvcswfG4GTrulzyag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qUxpHcxi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03C6FC2BCB8;
-	Thu,  5 Mar 2026 16:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772727407;
-	bh=tYWAoI05j+Zw9plPeywTp7SD38iDFKoJN5mm6OLALGM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=qUxpHcxiwuU1FjD2FXdRDAjZTZjaYHF88cK0F5UhX3xZwuf63NxjXxDB8vKxq7BHc
-	 J2Chs1Yspuu0jJ2scThI3oU82p81H1OUyJs1rqbHH1PhfShQs29ErDwkow8ugZYLBD
-	 5Z5nDIsSoFLwZP5f9CL+aKgckGOt+PRHSMdtAyF5uyGZ7afiV+Ecs5akWwCKn/2Qvm
-	 a79hbm5iKNL0g5Wvi84Ij2zlMfClG51rwp6mxnnvLhPPjMHWFwuBQGXUCn6TgPJltu
-	 +a+L4w0OZt8rsQDE2UuXIClWXyBY2kwHTAU0RG3orJINfW2x9UeZwjaWVUNY5dHSOn
-	 Wy80FaOdiAnvw==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Jiri Slaby <jirislaby@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, Netdev
- <netdev@vger.kernel.org>, rcu@vger.kernel.org, MPTCP Linux
- <mptcp@lists.linux.dev>, Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- "luto@kernel.org" <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
- <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org>
-Date: Thu, 05 Mar 2026 17:16:43 +0100
-Message-ID: <87zf4m2qvo.ffs@tglx>
+	s=arc-20240116; t=1772728562; c=relaxed/simple;
+	bh=9Pilo2yniHGaelgdzcmw0lQrsgOHGBzjKjSdHmYMUcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f9etFnNT2q/NfwT00Ife9vDcFLDYZQ/pDy2ggIkEy1g8nX8sio3kaGHRV5Tt7O5zNskLavq8dcfB6VkGRil+HZ9EbQGTm02RT1585010tSjCqUNcuRgehYj3u91AmkHNbI5eCQL6EGEbLmLWI0AQXeIYX1f4922n9B7ZZrJ6csY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HYsHjkGd; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id B83A21A2CE8;
+	Thu,  5 Mar 2026 16:35:56 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8C3A95FF89;
+	Thu,  5 Mar 2026 16:35:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4614E103696FE;
+	Thu,  5 Mar 2026 17:35:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772728555; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=15Zb7kxTviDLCqrwzjiGkkoGHFZBevdkVCcEYyh/Ufs=;
+	b=HYsHjkGdcUotWQtQCj+NSKBKNXJO1Jl+PkEnuYnC2CrhCzfixRKZkIwOC4NlxfO3VSz8oS
+	F9F+zug5k03aFSDBCcpESHwwzEs6vW02uBZSCLpQgQsqopYBjwE8KhFj5GAHh0y2yQAJlO
+	4/sai+w69VoUVvayR01t8dEDmtZeQDG8KaGYpuP1fZeHUcznX6P640htQXC/TVQRRftJPd
+	J5SR3fgPjgivUiwTmxif9U8qzgWGvqWExdjlznwh1Ldr3CWenr/Wh+oFgVaKsvXSF+W5ch
+	ef1thgPXcBRrIq1GGUBTRNQmHwAh4PBB/BNxF8sCNejT3pw4jQPyQbZNXHVTJg==
+Message-ID: <c4a5edee-4920-4ce3-aba1-913a0facc9f8@bootlin.com>
+Date: Thu, 5 Mar 2026 17:35:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 3F3662155DC
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/6] net: phylink: Allow more interfaces in SFP
+ interface selection
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jonas Jelonek <jelonek.jonas@gmail.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, bcm-kernel-feedback-list@broadcom.com
+References: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
+ <20260114225731.811993-3-maxime.chevallier@bootlin.com>
+ <aWgnHo01j38TF3lp@shell.armlinux.org.uk>
+ <18657687-343f-4197-bdab-0eb0bed96964@bootlin.com>
+ <aambsExznAN9YIPJ@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aambsExznAN9YIPJ@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: F2926215762
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264481-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264482-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org,bootlin.com,broadcom.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05 2026 at 13:20, Jiri Slaby wrote:
-> On 05. 03. 26, 12:53, Jiri Slaby wrote:
->> owner_cpu is 1, owner is:
->> PID: 7508=C2=A0=C2=A0=C2=A0=C2=A0 TASK: ffff8cc4038b8000=C2=A0 CPU: 1=C2=
-=A0=C2=A0=C2=A0 COMMAND: "compile"
->>=20
->> But as you can see above, CPU1 is occupied with a different task:
->> crash> bt -sxc 1
->> PID: 7680=C2=A0=C2=A0=C2=A0=C2=A0 TASK: ffff8cc4038525c0=C2=A0 CPU: 1=C2=
-=A0=C2=A0=C2=A0 COMMAND: "asm"
->>=20
->> spinning in mm_get_cid() as I wrote. See the objdump of mm_get_cid below.
->
-> You might be interested in mm_cid dumps:
->
-> =3D=3D=3D=3D=3D=3D PID 7508 (sleeping, holding the rq lock) =3D=3D=3D=3D=
-=3D=3D
->
-> crash> task -R mm_cid -x 7508
-> PID: 7508     TASK: ffff8cc4038b8000  CPU: 1    COMMAND: "compile"
->    mm_cid =3D {
->      active =3D 0x1,
->      cid =3D 0x40000003
+Hi Russell,
 
-CID 3 owned by CPU 1
+On 05/03/2026 16:05, Russell King (Oracle) wrote:
+> On Fri, Feb 13, 2026 at 09:41:43AM +0100, Maxime Chevallier wrote:
+>> Hi Russell,
+>>
+>> On 15/01/2026 00:30, Russell King (Oracle) wrote:
+>>> On Wed, Jan 14, 2026 at 11:57:24PM +0100, Maxime Chevallier wrote:
+>>>> When phylink handles an SFP module that contains a PHY, it selects a
+>>>> phy_interface to use to communicate with it. This selection ensures that
+>>>> the highest speed gets achieved, based on the linkmodes we want to
+>>>> support in the module.
+>>>>
+>>>> This approach doesn't take into account the supported interfaces
+>>>> reported by the module
+>>>
+>>> This is intentional by design, because the capabilities of the PHY
+>>> override in this case. Unfortunately, as I've said previously, the
+>>> rush to throw in a regurgitated version of my obsoleted
+>>> "host_interfaces" rather messed up my replacement patch set which
+>>> had the PHY driver advertising the interface capabilities of the
+>>> PHY, which were then going to be used to make the PHY interface
+>>> selection when attaching the PHY.
+>>>
+>>> I've still got the code, but I can't now push it into mainline
+>>> because, with the obsolete host_interfaces stuff merged, we will end
+>>> up with two competing solutions.
+>>>
+>>> In any case, I really would appreciate people looking through
+>>> http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
+>>>
+>>> before doing development on SFP and phylink to see whether I've
+>>> already something that solves their issue. Quite simply, I don't have
+>>> the time to push every patch out that I have, especially as I'm up to
+>>> my eyeballs with the crappy stmmac driver now, but also because I
+>>> have work items from Oracle that reduce the time I can work on
+>>> mainline.
+>>
+>> net-next being closed, I was going through my backlog and I was thinking
+>> about giving this series another go after net-next re-opens, I'd like to
+>> sync with you about the way forward.
+>>
+>> In your tree there's :
+>>
+>> net: phylink: use phy interface mode bitmaps for SFP PHYs	
+>> net: phy: add supported_interfaces to Aquantia AQR113C
+>> net: phy: add supported_interfaces to marvell10g PHYs
+>> net: phy: add supported_interfaces to marvell PHYs
+>> net: phy: add supported_interfaces to bcm84881
+>> net: phy: add supported_interfaces to phylib
+>>
+>> These would be pre-requisites for the 100FX-SGMII SFP support, as the
+>> interface resolution currently doesn't elect SGMII for 100FX modules.
+>>
+>> That would require some changes to the current host_interfaces API as
+>> well, potentially replacing it altogether.
+>>
+>> Is this something you can do, or can I get your permission to submit
+>> these (ofc maybe with more stuff to deal with host_interfaces)
+> 
+> One of the issues that will need to be solved is how to tell
+> 100FX-SGMII (e.g. https://www.fs.com/uk/products/37770.html) which need
+> SGMII apart from 100FX modules that don't (e.g.
+> https://www.fs.com/uk/products/37324.html)
+> 
+> host_interfaces don't satisfy that, because this has nothing to do with
+> what the host can do. Either the module has a PHY and uses SGMII on
+> the host side, or it doesn't have a PHY in which case 100BASE-X needs
+> to be used. If we have a PHY, then we will work out using what we
+> already have.
+> 
+> Given that 100FX-SGMII, the PHY _should_ be coming up in SGMII mode,
+> so that's what we need to use to talk to them.
 
->    },
->
-> crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
-> $6 =3D {
->    pcpu =3D 0x66222619df40,
->    mode =3D 1073741824,
+_should_ indeed. All modules I got required some level of configuration
+of the internal PHY for it to work, and without Florian's help [1] on
+how to setup the broadcom PHY in SGMII to 100FX mode, all the modules I
+tried were just fancy paperweights :(
 
-mode =3D per CPU mode
+[1] : https://lore.kernel.org/netdev/24146e10-5e9c-42f5-9bbe-fe69ddb01d95@broadcom.com/
 
->    max_cids =3D 4,
->
->
-> =3D=3D=3D=3D=3D=3D PID 7680 (spinning in mm_get_cid()) =3D=3D=3D=3D=3D=3D
->
-> crash> task -R mm_cid -x 7680
-> PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
->    mm_cid =3D {
->      active =3D 0x1,
->      cid =3D 0x80000000
+> If we change the PHY's
+> mode to something else, we get into the horrid problems that is rate
+> matching, which gives us the problem that we don't have very good
+> support for that (e.g. PHYs that require the MAC to pace the transmit
+> rate.)
+> 
+> I suspect there is no way to tell these SFPs apart using the EEPROM,
+> which means we're left with the "does this module that looks like a
+> optical module have a PHY?" problem that we already use for copper
+> SFPs. If there's no detectable PHY, then we'd likely have to assume
+> that the SFP requires 100BASE-X.
+> 
 
-CID is unset
+I agree with that completely. From the few such modules I have, we don't
+have much to work with in the eeprom to come-up with a proper generic
+support for these.
 
->    },
->
-> crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
-> $8 =3D {
->    pcpu =3D 0x66222619df40,
->    mode =3D 1073741824,
+I see no way around that other than probing for a PHY for every 100FX
+module, and see what we get. Alternatively, we could rely on fixups
+and have that internal hardcoded database of supported modules ?
 
-That's per CPU mode too
-
->    max_cids =3D 4,
->
->
-> =3D=3D=3D=3D=3D=3D per-cpu for CPU1 =3D=3D=3D=3D=3D=3D
->
-> crash> struct mm_cid_pcpu -x fffff2e9bfc89f40
-> struct mm_cid_pcpu {
->    cid =3D 0x40000003
-
-That's the one owned by CPU 1
-
-> }
->
-> Dump of any other's mm_cids needed?
-
-It would be helpful to see the content of all PCPU CIDs and
-tsk::mm_cid::* for all tasks which belong to that process.
-
-Thanks,
-
-        tglx
+Maxime
 
