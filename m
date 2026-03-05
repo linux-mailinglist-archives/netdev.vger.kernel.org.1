@@ -1,335 +1,276 @@
-Return-Path: <netdev+bounces-264169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GNhSCKv3qGktzwAAu9opvQ
-	(envelope-from <netdev+bounces-264169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:25:31 +0100
+	id kP1dD6X7qGnVzwAAu9opvQ
+	(envelope-from <netdev+bounces-264170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:42:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C2520A818
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:25:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7E620AA4D
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 04:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F1843044BA8
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 03:25:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 946D53007C8E
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 03:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3182741A0;
-	Thu,  5 Mar 2026 03:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F6727A133;
+	Thu,  5 Mar 2026 03:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vtuOuPXp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qeBM1Lw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4943E270540
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 03:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772681127; cv=none; b=htyy+5xDKaTO0avjJYbQwpOTMa2gzrpNVQIRZIRa0GyWGYI6IXHyz86acaKSitk2mTEJfDtpRD5tmPcf2hLtQMgdAxyMmVxW7jVWUGTe7r3CtGb69f6vaMgAP3fLlK/XAwJLHnOH2dUNalQnOGpcN9akhXYvB69a3HgEfKrOGJ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772681127; c=relaxed/simple;
-	bh=8cdCwzcIZiM0RhwEFVpTwVIxqlCZ8nO9R/03FJa2cw8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZFiNCW0GmJnLFEjRFmpvbPYdh+94X2N9YVKmKEZASK5i+/M/5htmviqETbImLsFzCVy/WZfBZzRWdeDDQ+BNGhKwxZKyCIszxgA0TBTehpb3ZSdI7AEATybwue68Pf41GPWqPTN+KsYOm2bERolhfjy9pXd2W5F+ugkOkUeKQtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vtuOuPXp; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D534E26E142
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 03:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772682128; cv=pass; b=cdhtQs3qTczPp9LadFaXPs6zmyBhbhj7SFGlYTBlWmc4NIvyehslAo1zzhdchYmAJ5wt/J7LiPiJlIOBcKP85mU2XeDjZjN8bDKFhSc+FiGcf3EUJ6QCObv3yhGpS8flkfY85xkKY5q37ZyZV3FI+//kK4nx8x846WQQriH51Ng=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772682128; c=relaxed/simple;
+	bh=Q7K9Jo92G86BmPJUCWpH8Ckm6Y5l4M+EkxUH8NVeFfY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lTN8KlvMwhUY2qPpL7qJDvHACt+D+dMBIOoaIGEuCwKlQQwdbDO9xNUonsUpQ59xvs9OpzQ320gT934a3wKpEROm6nN6ppQEb0uOWVYomSur38pnEC+zfJtdqWPSQzkdKArck3IPzmuIxwXEkqFAIuq5TNtn+maAtWlZWyjl2qc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qeBM1Lw8; arc=pass smtp.client-ip=74.125.82.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae3badc00dso52499895ad.3
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 19:25:26 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-12732165d1eso8211623c88.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 19:42:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772682126; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KvOJAcfaCaU7Hx5NNZLwQCuNxYPzYK0YlVI8dncvVQex6Cn5BD8bS2ryDp2n7D/G/i
+         tMKLN8eJGqN71xGq04mvyelMSNjkEq2TL2PwfQ9SWK9FdHpapu6QovqBKbYzIyv92YnA
+         bFV1kYFr9pHMtkJ2DwsSia5xAv+WCfn++OBtua8VIiAHeKwPJFWiB75D/udOos1TXpuv
+         +sKltBjmcWn408YDt/a3MI3Iy6XoCF3GN3wkpZSYy2sjn1gN8/kVfhvPKmt0ZFtuHPOS
+         r16haXATY9YKPsZ8NAcYNCY2nBe/wD9/NmN3Pmf4osV2icOIQmrzBenrc0hHsWoM84Qy
+         bfIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mBGQ9q/f7RVTwv8w49bqqAP4bXxzaJpilNMvfYhqnZ0=;
+        fh=ogs4swrAxTiciwEHNSiAMM8JY4Tf5UbX7zQY8Jb5+4U=;
+        b=JEh/mpRuTd1nNLAnLCFSJtUKLKvUb18SRrFxkDRpzP2ZSv29colMHjtl70u8thI9lD
+         D0OifrJAFQht/b0wweQmXdRr3hjlilH0iRVYNMnzCptikRCT34Pk/z1JbHpFFujEAbbG
+         jJGmFPsIqI7uqEyoxRiIbGwMSnuvLJnd55l9FhwrovkYKORZGNUX4SlJ4rWy+zb35YmG
+         tmWhuY4AcRnirayWju8gC/y+CWDVpzKGkKCMdxBLQXoe1Bb48MZC23U0ru9sHwUWo1Yc
+         VejZK1mznWps4n0KG1BbkJzRLKGsK6NXscuGdt16KhvJXlWRTgX+84XqSE5ZEBfVzJfO
+         Q1YQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772681126; x=1773285926; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRSnHe4WXc8o31JrOkZ13HKREi6iZmJPPXA9ncj7Loc=;
-        b=vtuOuPXp9/KvI5vE4BXBAGeKX7uuCoJSerZydzG+3003sGmR3yI3cqnWR2NuJAgekl
-         airMPJ2FFweSNFK1Kf32qMsj65ThvwDdHP9Txjj6/UeOPh0KxE3QBkiyuZ/KPp7b73W8
-         C0daqXfkVo9d4Ux7SJ32mKCbghgcsRXyZWfiBkiVmLTC2oz7Ac3pGT1cr4ic/gvzDvHf
-         Kn8Un8Lop54RZoksfV9aTeO1xaSp23oTBxGPmEQ8T2/OMnHMGSqtNYpLo1CAwKO+SsXq
-         C0UuhhXbsAm8XUDZpsmCob0n3GKG7h/Rx+fQL05TrsD8PeDEnPozbx8hw7zEFhuUr67p
-         Q9qw==
+        d=google.com; s=20230601; t=1772682126; x=1773286926; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mBGQ9q/f7RVTwv8w49bqqAP4bXxzaJpilNMvfYhqnZ0=;
+        b=qeBM1Lw8TbVIW9HtBKQZGUg3uAeBvcYHB9hYWbq39GRcrvYXzNoykT1wsU2RHqHDg/
+         jpn9Ry5ZtbdFI8LI8u2wKe4OmhbFpoZYIRs8ZzcpDoybHv+Uys20s9dPP4m7xJ/jUGoo
+         rs7a92psf9XMSiIpoVoa9r3Se4ymdtreIXFkGY+ll+iJiQQtTth7K/LMUkjpLyXB/eBQ
+         LovUNOnqcrvIaTsKMG4Wb/LtdKNB//Xyb0N3Co71FiNEwiDyGYx+3pv6v4RNP+gK1lOU
+         ThokUUO7K6KP/aX9NvADwJk5+pFjp+OKnOXguDMS7I3T6hcimidlI2UqiXgFnhHQJaND
+         fhqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772681126; x=1773285926;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRSnHe4WXc8o31JrOkZ13HKREi6iZmJPPXA9ncj7Loc=;
-        b=kDj6HaomjzK9lYubp2adds6u5nUh5fqDoLMx4cc/E1DFriHe65M04Zdd+W3lHnEJGE
-         wXx0RCEufl+HLP2x2aGEQBr9O85aXVaUlAtwTWO/W/CYGW9DYLod+DkyzIr0BN7dg1dq
-         QcA+Sr420zs/4mVnvB3FL83jdWjD1SbntsWjzELtKC9L+TBhS+N0mlvAT0Np6uezEOav
-         FSrIbLL+4CtbKjV7yNtGgg0Aa8HhfP3WKk7E0rbmhBCWGNwpQbxWtn27CDsLJbD9WNaO
-         fw7//7wnQjsVhhhX+bqNJZPcz3VIZJk1CPJT74BLgfu6Z8X9z5KIi5qfMRisauS9OsmT
-         537A==
-X-Forwarded-Encrypted: i=1; AJvYcCVhuxnXjxoShO0boJ2w8pCGiqMSeGcEtq9CU8XiXdJaMxuhm0r0FeKY6byGtfHqAOKI8X/tzkw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDkEKLnNY1OpMssSR7t76w/gC/s/rAMIJLlsbJOOffthdQyllT
-	3Ed+7yxh++C+G1L7GrS4rxTEqZ7UzHxtLzFxW4ERDqsFeKiv+aNkl/KIhxt4qkbWAxnB6+f6EF7
-	DxcCHEw==
-X-Received: from pgc6.prod.google.com ([2002:a05:6a02:2f86:b0:c73:7d8e:b5d6])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf07:b0:2ae:6192:8da4
- with SMTP id d9443c01a7336-2ae6aa0fd9bmr46707585ad.2.1772681125409; Wed, 04
- Mar 2026 19:25:25 -0800 (PST)
-Date: Thu,  5 Mar 2026 03:25:21 +0000
-In-Reply-To: <skxd6uimyxzi4x5nfmz24ez3d45qiubdnwkqawtbomjfzy5qrs@yb724ykvvkec>
+        d=1e100.net; s=20230601; t=1772682126; x=1773286926;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mBGQ9q/f7RVTwv8w49bqqAP4bXxzaJpilNMvfYhqnZ0=;
+        b=wGL5kH00Cv2Gv2I2LS4X2nOkRvP4Be3P3LIKPa+Mva266wfkwWMd8yvxhoFEw+Vw6w
+         A5UYqu3uYO8y0qreNciEGVYLgDKeYrq2tEImaqLnjAs3YcuB1nBR/FhY8uAlFakAwuVe
+         NMxJ3yNbLDt7HXFuIlU+V/eRi21bhHg5S1crmY7auRqp3FA5kD4nq+rLWPsFG9bM6aXT
+         kqlCt859B+NIDTzi7d2K0dfNEbqWtkwcLaXixu06gpVKEr+W9LzBVfAjaI9dby1sY4Kl
+         E3K9qZ+L867GItil/T0xJpq4xawi5byykqAM4yOiwLaTN2w07VM77V8fGjXz1DTW2HQ/
+         wxeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqctUcPbigkFMychOq6zGk/MvwKkBEM7pHWz9qP41RW9STUuyxfEPGPj1Bnus51QBFr5FkfH8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygzTUevsJOLm/Llf5iBsVgXUxrLDdxC+6GduzO12fdF7evOarw
+	IkQnEHSDAUde/NWg9zLek4Mb4c6o/enbJ3pCWypzojPqvusvFfUedzengT6W7vxt3Eis0niNWPt
+	EccJ/KEsrINn1wHazux4H0rroBUnZ9wCxM+qA7M3x
+X-Gm-Gg: ATEYQzwCbeTbyV5OwaAmB9nipKT6ng3c4tW1Et5768Pw07i1dlPRnSn2k1sa2xlwLtk
+	BqeOf1I8DD9EeDB5YCQByawwV8HM4wutQ4boQHHZsOk8utF4iU8aqeESpYfphrhERD4ezmyyLSp
+	V1fDJdlDMAz0e4GGUFTsv26389ZzB6cMvbzgw+zAKh6NDne1gF3Fqq7OW6ZMAgFOUage333+rKz
+	FsY1De4eIoV3WpdXpOvtDYYWu1wBzMgTYpvvtie9oqoYWAC16zid/6NdKyrT+jayfc1A3fFGrPk
+	RbEDtHJxcoBXA+GhTPd2WA7DNx6XZTAyqAmcQ1v2l1O2Niq5mv/feUQCRs0/bJlVI8bOfX37
+X-Received: by 2002:a05:7022:238e:b0:11b:ceee:a46d with SMTP id
+ a92af1059eb24-128b70a403cmr1467046c88.15.1772682125291; Wed, 04 Mar 2026
+ 19:42:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <skxd6uimyxzi4x5nfmz24ez3d45qiubdnwkqawtbomjfzy5qrs@yb724ykvvkec>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260305032524.2176479-1-kuniyu@google.com>
-Subject: Re: [PATCH net-next v2 1/2] udp: Preserve UDP socket addresses on abort
+MIME-Version: 1.0
+References: <20260221233234.3814768-1-kuniyu@google.com> <20260221233234.3814768-4-kuniyu@google.com>
+ <g7ap5glmwfoyskarflvmuiurlm7atfbospmqp4hifumv2f4thc@bgb6vsmszzpf>
+In-Reply-To: <g7ap5glmwfoyskarflvmuiurlm7atfbospmqp4hifumv2f4thc@bgb6vsmszzpf>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: jrife@google.com
-Cc: andrii@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	edumazet@google.com, kuba@kernel.org, kuniyu@google.com, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, willemdebruijn.kernel@gmail.com, 
-	yusuke.suzuki@isovalent.com
+Date: Wed, 4 Mar 2026 19:41:54 -0800
+X-Gm-Features: AaiRm52HICgRVA9yBp1pMCjIA_v984tORy1UIdfq4YvFSooO0AOUW58dJWgIa4I
+Message-ID: <CAAVpQUD1NrXM9kRQgSOFFM4j73gg7aE7Yba6XDkdL42ZQMQESg@mail.gmail.com>
+Subject: Re: [PATCH v4 bpf/net 3/6] sockmap: Fix use-after-free in udp_bpf_recvmsg().
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 74C2520A818
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9B7E620AA4D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,google.com,linux.dev,fomichev.me,gmail.com,isovalent.com];
-	TAGGED_FROM(0.00)[bounces-264169-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,vger.kernel.org,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-264170-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,isovalent.com:email]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,9307c991a6d07ce6e6d8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-From: Jordan Rife <jrife@google.com>
-Date: Wed, 4 Mar 2026 23:52:22 +0000
-> On Wed, Mar 04, 2026 at 09:21:03PM +0000, Kuniyuki Iwashima wrote:
-> > From: Jordan Rife <jrife@google.com>
-> > Date: Tue,  3 Mar 2026 17:01:02 +0000
-> > > Currently, udp_abort() invokes __udp_disconnect() which clears out
-> > > socket fields like inet_daddr and inet_dport. This makes fields like
-> > > dst_ip4, dst_ip6, and dst_port useless inside cgroup/sock_release BPF
-> > > hooks following an abort on a connected UDP socket, since they'll always
-> > > equal zero. This differs from the behavior for TCP sockets where a
-> > > cgroup/sock_release hook will see the address and port that the socket
-> > > was connected to at the time it was aborted. This causes issues in
-> > > Cilium where a sock_release hook is used to perform map maintenance when
-> > > sockets are released, since Cilium actively destroys connected UDP
-> > > sockets in some cases.
-> > 
-> > Just curious why Cilium does not unregister the socket just
-> > after aborting it ?
-> > 
-> > At least Cilium should know the key at that moment.
-> 
-> Originally, socket aborts in Cilium were handled with sock_diag (and
-> still are on older kernels), so you'd need to do some map maintenance in
-> userspace directly before or after aborting the socket. I suppose it was
-> just cleaner to put common cleanup code in a sock_release hook.
-> 
-> > > 
-> > > Make the behavior consistent between TCP and UDP sockets by not clearing
-> > 
-> > This patch makes another inconsistency with TCP.
-> > 
-> > As you mentioned in the cover letter, before the patch, even if
-> > aborted, a bound socket still reserves a port, but it does not now.
-> > 
-> > This might be surprising for non-reuseaddr/port sockets.
-> 
-> Yeah, true. I'm curious if this behavior is something that is useful at
-> all or simply an accident of the current implementation? If I'm
-> aborting/destroying a socket, why should it hold onto bound ports until
-> the socket is closed? I wasn't quite sure about this.
+On Wed, Mar 4, 2026 at 6:30=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.dev=
+> wrote:
+>
+> On Sat, Feb 21, 2026 at 11:30:50PM +0800, Kuniyuki Iwashima wrote:
+> > syzbot reported use-after-free of struct sk_msg in sk_msg_recvmsg(). [0=
+]
+> >
+> > sk_msg_recvmsg() peeks sk_msg from psock->ingress_msg under a lock,
+> > but its processing is lockless.
+> >
+> > Thus, sk_msg_recvmsg() must be serialised by callers, otherwise
+> > multiple threads could touch the same sk_msg.
+> >
+> > For example, TCP uses lock_sock(), and AF_UNIX uses unix_sk(sk)->iolock=
+.
+> >
+> > Initially, udp_bpf_recvmsg() had used lock_sock(), but the cited
+> > commit accidentally removed it.
+> >
+> > Let's serialise sk_msg_recvmsg() with lock_sock() in udp_bpf_recvmsg().
+> >
+> > Note that holding spin_lock_bh(&sk->sk_receive_queue.lock) is not
+> > an option due to copy_page_to_iter() in sk_msg_recvmsg().
+> >
+> > [0]:
+> > BUG: KASAN: slab-use-after-free in sk_msg_recvmsg+0xb54/0xc30 net/core/=
+skmsg.c:428
+> > Read of size 4 at addr ffff88814cdcf000 by task syz.0.24/6020
+> >
+> > CPU: 1 UID: 0 PID: 6020 Comm: syz.0.24 Not tainted syzkaller #0 PREEMPT=
+(full)
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
+ Google 01/13/2026
+> > Call Trace:
+> >  <TASK>
+> >  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+> >  print_address_description mm/kasan/report.c:378 [inline]
+> >  do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+>
+> [...]
+> > Fixes: 9f2470fbc4cb ("skmsg: Improve udp_bpf_recvmsg() accuracy")
+> > Reported-by: syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/netdev/69922ac9.a70a0220.2c38d7.00e0.GA=
+E@google.com/
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > ---
+> >  net/ipv4/udp_bpf.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+> > index 779a3a03762f..b07774034a91 100644
+> > --- a/net/ipv4/udp_bpf.c
+> > +++ b/net/ipv4/udp_bpf.c
+> > @@ -52,7 +52,9 @@ static int udp_msg_wait_data(struct sock *sk, struct =
+sk_psock *psock,
+> >       sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+> >       ret =3D udp_msg_has_data(sk, psock);
+> >       if (!ret) {
+> > +             release_sock(sk);
+> >               wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
+> > +             lock_sock(sk);
+> >               ret =3D udp_msg_has_data(sk, psock);
+> >       }
+> >       sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+> > @@ -81,6 +83,7 @@ static int udp_bpf_recvmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len,
+> >               goto out;
+> >       }
+> >
+> > +     lock_sock(sk);
+> >  msg_bytes_ready:
+> >       copied =3D sk_msg_recvmsg(sk, psock, msg, len, flags);
+> >       if (!copied) {
+> > @@ -92,11 +95,17 @@ static int udp_bpf_recvmsg(struct sock *sk, struct =
+msghdr *msg, size_t len,
+> >               if (data) {
+> >                       if (psock_has_data(psock))
+> >                               goto msg_bytes_ready;
+> > +
+> > +                     release_sock(sk);
+> > +
+> >                       ret =3D sk_udp_recvmsg(sk, msg, len, flags, addr_=
+len);
+> >                       goto out;
+> >               }
+> >               copied =3D -EAGAIN;
+> >       }
+> > +
+> > +     release_sock(sk);
+> > +
+> >       ret =3D copied;
+> >  out:
+> >       sk_psock_put(sk, psock);
+> > --
+> > 2.53.0.371.g1d285c8824-goog
+> >
+>
+> LGTM.
+>
+> One minor observation for a possible follow-up:
+> psock_has_data() is checked before lock_sock(), which leaves a TOCTOU win=
+dow.
 
-Digging into the first (long) thread of SOCK_DESTROY (TCP),
-the motivation was to kill sockets bound to an IP address
-that Android/laptop removes when it switches networks.
-https://lore.kernel.org/netdev/1447811024-8553-1-git-send-email-lorenzo@google.com/
-
-In that sense, holding a port seems unnecessary.
-
-But there are a few concerns like
-
-  * someone could use the feature for server and reuse port
-    too quickly.
-    https://lore.kernel.org/netdev/1447879416.562854.443622857.62708268@webmail.messagingengine.com/
-
-  * it's a bit worrisome if this feature is viewed as a way for
-    resouce management.
-    https://lore.kernel.org/netdev/CALx6S35Q_pc-vBNpA0hipn5K-vSmPDsV-V=D13sODESNO7Htdw@mail.gmail.com/
-
-Considering these, it seems fair to only notify an error
-via epoll or blocked syscall and let the application to
-close() sockets.
-
-In a thread, the author mentioned this :
-
----8<---
-Its purpose is to interrupt
-blocked userspace socket calls, not to release resources.
----8<---
-https://lore.kernel.org/netdev/CAKD1Yr0Gpr6Ex2i1TXEWyETn48P4g5vBvFZ9=_g+Lz_7-PqBDQ@mail.gmail.com/
-
-Also, there was an assumption that a sane application will
-close() sockets after receiving errors.
-https://lore.kernel.org/netdev/1447972381.22599.278.camel@edumazet-glaptop2.roam.corp.google.com/
-
-And yes, this does not apply to UDP, and sadly UDP patch's
-thread has no such context nor discussion.
-https://lore.kernel.org/netdev/?q=udp_abort&o=-1
-
-But anyway, now I think we can solve your problem more
-easily, see below.
-
-
-> 
-> > > out these fields in udp_abort(). Instead, just unhash the socket, mark
-> > > its state as TCP_CLOSE, and preserve the state of the other fields.
-> > > 
-> > > Fixes: f5836749c9c0 ("bpf: Add BPF_CGROUP_INET_SOCK_RELEASE hook")
-> > > Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
-> > > Signed-off-by: Jordan Rife <jrife@google.com>
-> > > ---
-> > >  net/ipv4/udp.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > index b96e47f1c8a2..01a0a0fbcd56 100644
-> > > --- a/net/ipv4/udp.c
-> > > +++ b/net/ipv4/udp.c
-> > > @@ -3247,7 +3247,9 @@ int udp_abort(struct sock *sk, int err)
-> > >  
-> > >  	sk->sk_err = err;
-> > >  	sk_error_report(sk);
-> > > -	__udp_disconnect(sk, 0);
-> > 
-> > How about passing another flag and avoid unwanted init only for
-> > bpf iterator ?  This will need another layer of __udp_disconnect()
-> > like ____udp_disconnect() (I'm not good at naming), or must make
-> > sure the flag is never used in uAPI.
-> 
-> To make sure we're on the same page about what you're describing, I'm
-> imagining:
-> 
-> static int ___udp_disconnect(struct sock *sk, int flags, bool reinit)
-> {                                                 
-> 	same as before, but if reinit == false then avoid reinitializing
-> 	fields like daddr/dport while holding onto reserved ports
-> }
-> 
-> int __udp_disconnect(struct sock *sk, int flags)
-> {
-> 	___udp_disconnect(sk, flags, true);
-> }
-> 
-> ...
-> 
-> int udp_abort(struct sock *sk, int err)
-> {
-> 	...
-> 	___udp_disconnect(sk, flags, false); <--- set reinit arg to false
-> 	...
-> }
-> 
-> This would have the same behavior with regards to reserved ports
-> following udp_abort() while preserving fields like daddr. I was
-> considering something like this initially, but it wasn't clear to me why
-> you'd want to hold onto reserved ports if the socket was destroyed as I
-> mentioned above. If it's important to maintain that aspect of the
-> behavior, then I'm OK with this approach.
-
-This was what's in my mind, but probably we could just avoid
-the initialisation:
-
----8<---
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ce49ed2bd36f..d44be0020446 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2213,21 +2213,21 @@ int __udp_disconnect(struct sock *sk, int flags)
- 	 */
- 
- 	sk->sk_state = TCP_CLOSE;
--	inet->inet_daddr = 0;
--	inet->inet_dport = 0;
- 	sock_rps_reset_rxhash(sk);
- 	sk->sk_bound_dev_if = 0;
--	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
--		inet_reset_saddr(sk);
--		if (sk->sk_prot->rehash &&
--		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK))
--			sk->sk_prot->rehash(sk);
--	}
- 
- 	if (!(sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
- 		sk->sk_prot->unhash(sk);
--		inet->inet_sport = 0;
-+	} else if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
-+		if (sk->sk_prot->rehash &&
-+		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
-+			inet_reset_saddr(sk);
-+			inet->inet_daddr = 0;
-+			inet->inet_dport = 0;
-+			sk->sk_prot->rehash(sk);
-+		}
- 	}
-+
- 	sk_dst_reset(sk);
- 	return 0;
- }
----8<---
-
-When we need to rehash(), of course we have to clear
-saddr/daddr/dport, but otherwise, we don't, even sport.
-
-When ->unhash()ed, only thing we need to do is to clear
-inet_sk(sk)->inet_num.
-
-Then, even if bind() and connect() are called later, it
-works because each syscall does not care about the old
-saddr/sport/daddr/dport and just assign a new value if
-inet->inet_num == 0.
-
-This seems a bit fragile, but TCP already relies on it and
-it's unlikely that we change the behaviour in __inet_bind(),
-inet_autobind(), and inet_dgram_connect().
-
-And all the other users of __udp_disconnect() are also
-AF_INET or AF_INET6, l2tp, ping, raw.
+This is intentional.  We don't want to hold lock_sock()
+just to check if the queue is empty, which can be done locklessly.
+Otherwise, you will introduce an unnecessary lock dance
+for every sk_udp_recvmsg() in case the psock queue is empty,
+which is too bad.
 
 
-> 
-> > 
-> > 
-> > 
-> > > +	sk->sk_state = TCP_CLOSE;
-> > > +	sk->sk_prot->unhash(sk);
-> > > +	sk_dst_reset(sk);
-> > >  
-> > >  out:
-> > >  	if (!has_current_bpf_ctx())
-> > > -- 
-> > > 2.53.0.473.g4a7958ca14-goog
-> > > 
-> 
-> Thanks!
-> 
-> Jordan
+>
+> If the BPF verdict path consumes the skb from the UDP receive queue and r=
+edirects it to
+> psock->ingress_msg between the check and sk_udp_recvmsg(), the thread may=
+ block in
+> __skb_recv_udp() while data is already available in the psock.
+
+And this is just a matter of timing.  If it's already empty before
+the first check, the thread is anyway blocked in sk_udp_recvmsg().
+
+>
+> Moving lock_sock() before the psock_has_data() check (as the original cod=
+e
+> did before 9f2470fbc4cb) would narrow this window, similar to how
+> __tcp_bpf_recvmsg() acquires lock_sock() upfront. But that can be a
+> separate patch.
 
