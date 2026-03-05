@@ -1,260 +1,218 @@
-Return-Path: <netdev+bounces-264541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHHvIFDtqWm7IAEAu9opvQ
-	(envelope-from <netdev+bounces-264541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 21:53:36 +0100
+	id kGiKHbbuqWkBIQEAu9opvQ
+	(envelope-from <netdev+bounces-264542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 21:59:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237AF2184FD
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 21:53:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB5F2185AF
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 21:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7E591301A2F4
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 20:53:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28CC730804DD
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 20:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8339B347FF4;
-	Thu,  5 Mar 2026 20:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D31734844C;
+	Thu,  5 Mar 2026 20:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ntONq8im"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="X0kSa3lg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="34hUGAwn"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C612BD587;
-	Thu,  5 Mar 2026 20:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E2D2F1FE4;
+	Thu,  5 Mar 2026 20:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772744013; cv=none; b=l9EZLGLOSmSU05qA7agwvrlj+B1kZacymmKv1xZR/4k4W0V0nNIySe3btGQTz+z+vxssYYxiP17lYRot0ZVnBl/lvueboj0Z6g9WS59juHRoXYz0b95nxdkqDphlqS45b9EkbwUn/x/9Y3WBIPVOBOrEQar5UladCu+7iVFj7Sg=
+	t=1772744355; cv=none; b=SEC/zsM3wiVrgSRQ2l+Fk68tYy46Gfxmi3PYc4vthdEdpXVuq3c4KR7nGMSsIXcTd3En2MK0rq1LThbAWV1IA3dzoDJx7mai4+KaZPbfzzuzOKPZwSQvtw3RvOcKPjnMfs6X1+Bc4WKUVPga8SjPBmdTc49T63bqQZBvYFku6ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772744013; c=relaxed/simple;
-	bh=oNZlJ3Mw1Msk7wT/dnaky+PJUNff5MaDBxB7UaS8nTw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=qeX+JsjI8pXPn6rBXMsnjwJlBgcclgpkaqJ3uZOAL4BTROkdMCzOxXKYSGtXnXkZOTj0x916qWhW5MxF+i0VxYIsPVgGl4n2FdDGTAd3QYitpyTuAroeQ4/wieXEiDYzJ2nyP5JNtdtYU+/TVq+Nsuo9HUtOffc/h+5vP8WUoC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ntONq8im; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 7A7D420B6F02; Thu,  5 Mar 2026 12:53:26 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7A7D420B6F02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1772744006;
-	bh=2MY91EkhhZj+9+e/zU397N5SGWS5fOlEBgxPK104L4w=;
-	h=From:To:Subject:Date:From;
-	b=ntONq8imgaGjpWipnVi8duM3X1uOPXU0LHbTrjdScYgkxSTjM8plGngN664DHrd3m
-	 QcdldcLcaLTlzM8dlG75NZkhJ3C9JSFLD8adsob1pDqW6syIZ/U0Oji+zRX53mAG9n
-	 v31qaBt67kAjHQ10M9iLB/IjJHaFu22BCdOlZ7LA=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	yury.norov@gmail.com,
-	kees@kernel.org,
-	ernis@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next] net: mana: Expose hardware diagnostic info via debugfs
-Date: Thu,  5 Mar 2026 12:52:40 -0800
-Message-ID: <20260305205252.470089-1-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1772744355; c=relaxed/simple;
+	bh=6IVix00z9EdNlGw/WT7RRubw9kMatkjDqVKBuva5bEs=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CW4l2iY1c05pfs2KUjC14pmPDar+OT15eK/elvEAbA+teeHIMwoB1HlDEn9XCdGvxfO2ZpsttfbDBSOsKHOvI0WwNxxe/htSRqEW69nwjkXmr+Ls+N7CPP1rEJoaleDyUdjOqBbp516VBXnyL+7m1mK74Er4pSEE/abGB7qXSI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=X0kSa3lg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=34hUGAwn; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.stl.internal (Postfix) with ESMTP id 94BF01D00125;
+	Thu,  5 Mar 2026 15:59:12 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Thu, 05 Mar 2026 15:59:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1772744352; x=1772830752; bh=J7QXco/i5BBMP/veHf0Vgy3zY/Tn161n
+	DkiE45qpcdM=; b=X0kSa3lgjSNUIPLLxbhhhpUOgU7d8dUNgxkgxDo5fvXsTdcU
+	YTHCdHBkPQsA/5MbcU6PAnKlAjt3dcLyemSD2TKuLIoPJB2vhlidjhNp0Q90lBeF
+	WnWcYE/icT5usv3cNR8sWgYe886/ZoHbnF8ONaJiCKwDnrawYEYtd0mnaZBaW5S0
+	9ANyokAAq2U8FPpu+foDQWmvmpBJnQfGH2itfhSpjbazWTLaPL/Lkb19Oue9JytJ
+	iG7MyduOHp03o8E97Mmx7mjqHiAptvCXE9xNWav6RVf0dlZjy5GoUXNXdlm4FRw0
+	AWH86azgyyHxHwFpM8/tkRNPF/ak8NcOYQXatA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772744352; x=
+	1772830752; bh=J7QXco/i5BBMP/veHf0Vgy3zY/Tn161nDkiE45qpcdM=; b=3
+	4hUGAwnrL4ksQn737kFqsk9i9iL/x/gwJoBlGv40wOO1ikfd+1hiMkvj7liOipyh
+	cKL2pKo/y848BcRv+2yF9c5OYh1WgxT6Kc3ew2eWza8BKRyZKy0tuXx/yV0gqi9f
+	B/Y25jaNveNSnrQbDlaKKcF/R4Di9WTbg+p//rpaqr4Soi0cx6AhvNUD5xmsBI9T
+	WxzzI3hJiM1y8rN1IfnJd0LuBKKEvravGGkkM7Z9i+2G7f6SJwhM3rFVEGfHFwJn
+	dKlGvrveem1hwD/RMqr8EfvDGEybPU2ADwPaQBWuVC6YszP+2O76sUWAJP95o6iI
+	McIWwBywSyZShYvVlu4Qg==
+X-ME-Sender: <xms:m-6paYgjvfIE1OORShBiPPgir9H-Z4SGMVtKlgfifaJtKYfFa3V5WA>
+    <xme:m-6paaXAwd1PVL9EOFXHnZ9x1c9o33nudeSI4hvZ9g8c9fk0FL6lcQ-tAsCk-5mCt
+    kpOyFFoBQarQGNQ0rCnz1C0BpR-wBKt4na15Ki29e9zlqetXG3pYVg>
+X-ME-Received: <xmr:m-6paXUTJZPuX5O_TNHAeGp7rDViiXKQeftfbv-K8WQnjzWabWlMvEGsffi2hhxdtqp1qg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieejgeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertdejnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepteelgfekhfekudetkeffgeehhfeggfekvddvvdeitdfgfeevueetteegteejgfev
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgs
+    pghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhgvfhhfse
+    hgrghriihikhdrohhrghdprhgtphhtthhopehkohhtrgdrthhouggrsehgmhhoqdgthigs
+    vghrshgvtghurhhithihrdgtohhmpdhrtghpthhtohephihukhhirdhkohhikhgvsehgmh
+    hoqdgthigsvghrshgvtghurhhithihrdgtohhmpdhrtghpthhtohepjhhirgihuhgrnhdr
+    tghhvghnsehlihhnuhigrdguvghvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:m-6paaiFUOvEuDye9iJwFV-HUHOefTq-GwL4bKtQgFo8__NDDlo43A>
+    <xmx:m-6paSZPRn6--sSk46nZQxfE7TVtA21C3GsTs1zYVRrABZh8fZdB0w>
+    <xmx:m-6paXrb4dhBkPcdb0PhJcRjkiiX87oReG43WAZHtCrHttV0mnRmLg>
+    <xmx:m-6pafPqFU-bgydXr5NtgnY8iwU6gsQI37X-WatFQyDikCE_njdyAQ>
+    <xmx:oO6paV1wM98rUO4IMya0b3-KxF6rZuUUlDnq_fqkZQ7rxYk40LOGMHuy>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 5 Mar 2026 15:59:06 -0500 (EST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id D9A459FCB4; Thu,  5 Mar 2026 12:59:05 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id D8ADF9FC39;
+	Thu,  5 Mar 2026 12:59:05 -0800 (PST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Kota Toda <kota.toda@gmo-cybersecurity.com>
+cc: Jeff Garzik <jeff@garzik.org>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    Yuki Koike <yuki.koike@gmo-cybersecurity.com>,
+    Jiayuan Chen <jiayuan.chen@linux.dev>
+Subject: Re: [PATCH v4 0/2] net: bonding: fix type-confusion in bonding header_ops
+In-reply-to: <20260305110751.167489-1-kota.toda@gmo-cybersecurity.com>
+References: <20260305110751.167489-1-kota.toda@gmo-cybersecurity.com>
+Comments: In-reply-to Kota Toda <kota.toda@gmo-cybersecurity.com>
+   message dated "Thu, 05 Mar 2026 20:07:47 +0900."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 237AF2184FD
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Mar 2026 12:59:05 -0800
+Message-ID: <1356396.1772744345@famine>
+X-Rspamd-Queue-Id: CAB5F2185AF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264541-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264542-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,gmo-cybersecurity.com:email];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-Add debugfs entries to expose hardware configuration and diagnostic
-information that aids in debugging driver initialization and runtime
-operations without adding noise to dmesg.
+Kota Toda <kota.toda@gmo-cybersecurity.com> wrote:
 
-Device-level entries (under /sys/kernel/debug/mana/<slot>/):
-  - num_msix_usable, max_num_queues: Max resources from hardware
-  - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
-  - num_vports, bm_hostmode: Device configuration
+>In bond_setup_by_slave(), the slave=E2=80=99s header_ops are unconditional=
+ly
+>copied into the bonding device. As a result, the bonding device may invoke
+>the slave-specific header operations on itself, causing
+>netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpreted
+>as the slave's private-data type.
+>
+>This type-confusion bug can lead to out-of-bounds writes into the skb,
+>resulting in memory corruption.
 
-  - port_handle: Hardware vPort handle
-  - max_sq, max_rq: Max queues from vPort config
-  - indir_table_sz: Indirection table size
-  - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
-    Last applied steering configuration parameters
+	A few days ago, Jiayuan Chen <jiayuan.chen@linux.dev> posted a
+fix for what sounds like the same problem[0].  Their solution appears to
+be much less complicated.
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+	I also wonder how this bug was discovered.  The code in question
+hasn't changed in many years, and now there are two independent fixes
+within a week.
+
+[0] https://lore.kernel.org/netdev/20260228095854.391093-1-jiayuan.chen@lin=
+ux.dev/
+
+>Patch 1 stores the slave's header_ops in struct bonding and sets
+>wrapper callbacks in bond_In bond_setup_by_slave(), the slave=E2=80=99s
+>header_ops are unconditionally
+>copied into the bonding device. As a result, the bonding device may invoke
+>the slave-specific header operations on itself, causing
+>netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpreted
+>as the slave's private-data type.
+>
+>Patch 2 uses READ_ONCE when loading header_ops callbacks
+>to avoid races with concurrent updates.
+
+	With the READ_ONCE changes in a separate patch, does that mean
+that patch 1 by itself is subject to race conditions that would result
+in errors?  If so, that's not acceptable, every patch must stand alone
+and not break the kernel.
+
+	-J
+
+>Fixes: 1284cd3a2b74 ("bonding: two small fixes for IPoIB support")
+>Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+>Co-developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+>Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+>
+>Kota Toda (2):
+>  net: bonding: fix type-confusion in bonding header_ops
+>  net: add READ_ONCE for header_ops callbacks
+>
+> drivers/net/bonding/bond_main.c | 67 ++++++++++++++++++++++++++++++++-
+> include/linux/netdevice.h       | 41 ++++++++++++++------
+> include/net/bonding.h           |  5 +++
+> include/net/cfg802154.h         |  2 +-
+> net/core/neighbour.c            |  6 +--
+> net/ipv4/arp.c                  |  2 +-
+> net/ipv6/ndisc.c                |  2 +-
+> 7 files changed, 106 insertions(+), 19 deletions(-)
+>
+>--=20
+>2.53.0
+>
+>
+
 ---
- .../net/ethernet/microsoft/mana/gdma_main.c   | 12 +++++++
- drivers/net/ethernet/microsoft/mana/mana_en.c | 31 +++++++++++++++++++
- include/net/mana/gdma.h                       |  1 +
- include/net/mana/mana.h                       |  8 +++++
- 4 files changed, 52 insertions(+)
+	-Jay Vosburgh, jv@jvosburgh.net
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 0055c231acf6..2ba8d224fd26 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -152,6 +152,11 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	if (gc->max_num_queues > gc->num_msix_usable - 1)
- 		gc->max_num_queues = gc->num_msix_usable - 1;
- 
-+	debugfs_create_u32("num_msix_usable", 0400, gc->mana_pci_debugfs,
-+			   &gc->num_msix_usable);
-+	debugfs_create_u32("max_num_queues", 0400, gc->mana_pci_debugfs,
-+			   &gc->max_num_queues);
-+
- 	return 0;
- }
- 
-@@ -1221,6 +1226,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 		return err ? err : -EPROTO;
- 	}
- 	gc->pf_cap_flags1 = resp.pf_cap_flags1;
-+	gc->gdma_protocol_ver = resp.gdma_protocol_ver;
-+
-+	debugfs_create_x64("gdma_protocol_ver", 0400, gc->mana_pci_debugfs,
-+			   &gc->gdma_protocol_ver);
-+	debugfs_create_x64("pf_cap_flags1", 0400, gc->mana_pci_debugfs,
-+			   &gc->pf_cap_flags1);
-+
- 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
- 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
- 		if (err) {
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 53f24244de75..25ce81283e92 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1265,6 +1265,9 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
- 	apc->port_handle = resp.vport;
- 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
- 
-+	apc->vport_max_sq = *max_sq;
-+	apc->vport_max_rq = *max_rq;
-+
- 	return 0;
- }
- 
-@@ -1411,6 +1414,11 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 
- 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
- 		    apc->port_handle, apc->indir_table_sz);
-+
-+	apc->steer_rx = rx;
-+	apc->steer_rss = apc->rss_state;
-+	apc->steer_update_tab = update_tab;
-+	apc->steer_cqe_coalescing = req->cqe_coalescing_enable;
- out:
- 	kfree(req);
- 	return err;
-@@ -3102,6 +3110,24 @@ static int mana_init_port(struct net_device *ndev)
- 	eth_hw_addr_set(ndev, apc->mac_addr);
- 	sprintf(vport, "vport%d", port_idx);
- 	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-+
-+	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
-+			   &apc->port_handle);
-+	debugfs_create_u32("max_sq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_sq);
-+	debugfs_create_u32("max_rq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_rq);
-+	debugfs_create_u32("indir_table_sz", 0400, apc->mana_port_debugfs,
-+			   &apc->indir_table_sz);
-+	debugfs_create_u32("steer_rx", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rx);
-+	debugfs_create_u32("steer_rss", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rss);
-+	debugfs_create_u32("steer_update_tab", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_update_tab);
-+	debugfs_create_u32("steer_cqe_coalescing", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_cqe_coalescing);
-+
- 	return 0;
- 
- reset_apc:
-@@ -3587,6 +3613,11 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 		ac->num_ports = num_ports;
- 
- 		INIT_WORK(&ac->link_change_work, mana_link_state_handle);
-+
-+		debugfs_create_u16("num_vports", 0400, gc->mana_pci_debugfs,
-+				   &ac->num_ports);
-+		debugfs_create_u8("bm_hostmode", 0400, gc->mana_pci_debugfs,
-+				  &ac->bm_hostmode);
- 	} else {
- 		if (ac->num_ports != num_ports) {
- 			dev_err(dev, "The number of vPorts changed: %d->%d\n",
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 766f4fb25e26..9bbb7fb0c964 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -434,6 +434,7 @@ struct gdma_context {
- 	struct gdma_dev		mana_ib;
- 
- 	u64 pf_cap_flags1;
-+	u64 gdma_protocol_ver;
- 
- 	struct workqueue_struct *service_wq;
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index a078af283bdd..83f6de67c0cc 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -563,6 +563,14 @@ struct mana_port_context {
- 
- 	/* Debugfs */
- 	struct dentry *mana_port_debugfs;
-+
-+	/* Cached vport/steering config for debugfs */
-+	u32 vport_max_sq;
-+	u32 vport_max_rq;
-+	u32 steer_rx;
-+	u32 steer_rss;
-+	u32 steer_update_tab;
-+	u32 steer_cqe_coalescing;
- };
- 
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
--- 
-2.34.1
 
