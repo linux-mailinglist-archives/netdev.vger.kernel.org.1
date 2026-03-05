@@ -1,147 +1,125 @@
-Return-Path: <netdev+bounces-264319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264320-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFuyOHFpqWlN6wAAu9opvQ
-	(envelope-from <netdev+bounces-264319-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:30:57 +0100
+	id 8H7FIL1qqWnH7AAAu9opvQ
+	(envelope-from <netdev+bounces-264320-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:36:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B89210984
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:30:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7711210A4B
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:36:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D499309801E
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:30:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D2783034E3A
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FAB386C01;
-	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DA43783A2;
+	Thu,  5 Mar 2026 11:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6AoRiQX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AaAvIJj6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCD438656B;
-	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0232EC0B4;
+	Thu,  5 Mar 2026 11:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772710205; cv=none; b=k9khZ5ROpcDjX0ZFODbmOp6ygGYbMw0UBhvLhtwdDXh2imox6n+/8zzctO85tDhd+/z1zT05QbpUJrA5ksu10f5PsOvNRVdPvbxsljRtYg2zfdNcb4wHzhD4zm8TpQ/jJBHf6bhf8nY5xYmsQDaQwJRkSMO5lSk1knTehe+TabU=
+	t=1772710544; cv=none; b=U2CljUub4NqZuxPBEkB7qMvklmDlyWOAtDhBvdyH7aza5lHerNZtpjJvLaN5Bs2KkzVOiFwBeaEkVuLADcr6fUQNxrho1bEXWF31kNe6Fqz+h0DbI8uCfj0tZG8+OoymDVEm41PZFXa1gzh16T3wiRPVr8mfxOe/OmUGRoQngJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772710205; c=relaxed/simple;
-	bh=VDZd9/nOYubZ5tkV6Llnck70B4t8D+CSC4x2/AAjA3g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=os7zYOXpGVcHV6k3w9MaE9R4QvMonQ46UzVX1ucNrSugiA+uTNYQtnhmWoUHJ6LAKImr7QeS4UVfyz7gil64uI/1WFPWSj2tmcnanMhtzsLAs9wY1B3GJo0dJeAmSbYM3OS3HZNL2Wm34VQT32ZrEayBIPpxEXvaq8K+RwVbfH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6AoRiQX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C9AC116C6;
-	Thu,  5 Mar 2026 11:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772710205;
-	bh=VDZd9/nOYubZ5tkV6Llnck70B4t8D+CSC4x2/AAjA3g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D6AoRiQXaudzEpnAD4YUw9nAIRfyUySdNHcRDCwQw/yHOiVRvSxPQ7UZOnLL0fC7K
-	 2qBGiYmhDzzK18IJnBnXHkdoPgrRsP4iZprkt2DEaghHvTR4DjJIpxLGRu5PrCGrBr
-	 g3tAtyO0oXT19FNBekwyoOjJsCMBGyBi7k7IIVSHfcBAMilr7TofWrK/54KvmlGL59
-	 955maexvh7xXEqbWX4rO9q3tJSACCpJ9VUQSSD/+3eM90GkQFe77nvycpi44wkUZhs
-	 vSdV/BiLI1H9/0lyaGYmng4EFTUJicii162XRV/icHXjWEouh3sGcuYlMhRgwjwa4D
-	 sIvatxKGvgwSg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF013808200;
-	Thu,  5 Mar 2026 11:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772710544; c=relaxed/simple;
+	bh=bBAuEFjQoy1Sqf5HpXr5h2QBD4XftTaYD0olVeE+nFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQliPqMNNr/VWbN/yWST7nzz32fOCa/HcrYSZC9ULeWAqFa5Y8/AJ3n5Mkft73HSMtVT1RhLdqypR7/4ggUyZnGkXJ8RtQIwuxSW5uA4l+FQlRqMi+xSbTit00LYanuLrI/HQDL2flSghqLiyii9vsqN1QVkszbfLTtyLzGmVDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AaAvIJj6; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 5 Mar 2026 19:35:34 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772710541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BZsu2QiRBa937NrqSnequfmiO5HgVbDE/h3Cjf8XHDg=;
+	b=AaAvIJj6BVI0lswBS6a/RsMpASqQ1qjc6oGJv/xIANIHwNiSf3+tDOSRHaEy7czVjAlcqZ
+	negyQl+wWswkdD4shsUZdf9SGSzuAU/2uuL9OB+WHdhAXFVr2CFFICunKnZR6c1+RetfJQ
+	eYfKE+0A1f9DmMggXn2N0aMK4/wyfLE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Sitnicki <jakub@cloudflare.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 bpf/net 2/6] sockmap: Annotate sk->sk_write_space()
+ for UDP.
+Message-ID: <jy77n43h6kvpaz3wk6rhdfogxmpaixmjf2p277qjvcvnynhh2f@d7atem5igamx>
+References: <20260221233234.3814768-1-kuniyu@google.com>
+ <20260221233234.3814768-3-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5] net: mana: Add MAC address to vPort logs and
- clarify error messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177271020530.2660688.10448426333343148786.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Mar 2026 11:30:05 +0000
-References: <20260302174204.234837-1-ernis@linux.microsoft.com>
-In-Reply-To: <20260302174204.234837-1-ernis@linux.microsoft.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com, kees@kernel.org,
- shradhagupta@linux.microsoft.com, gargaditya@linux.microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-X-Rspamd-Queue-Id: 48B89210984
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260221233234.3814768-3-kuniyu@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: D7711210A4B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264319-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264320-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email]
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon,  2 Mar 2026 09:41:52 -0800 you wrote:
-> Add MAC address to vPort configuration success message and update error
-> message to be more specific about HWC message errors in
-> mana_send_request.
+On Sat, Feb 21, 2026 at 11:30:49PM +0800, Kuniyuki Iwashima wrote:
+> UDP TX skb->destructor() is sock_wfree(), and UDP only
+> holds lock_sock() for UDP_CORK / MSG_MORE sendmsg().
 > 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Otherwise, sk->sk_write_space() is read locklessly.
+> 
+> Let's use WRITE_ONCE() and READ_ONCE() for sk->sk_write_space().
+> 
+> Fixes: 7b98cd42b049 ("bpf: sockmap: Add UDP support")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
 > ---
-> Changes in v5:
-> * Remove __func__ and __LINE__ from error logs in hw_channel.c
-> Changes in v4:
-> * Remove logs that do not add value in hw_channel.c.
-> Changes in v3:
-> * Remove the changes from v2 and Update commit message.
-> * Use "Enabled vPort ..." instead of "Configured vPort" in
->   mana_cfg_vport.
-> * Update error logs in mana_hwc_send_request.
-> Changes in v2:
-> * Update commit message.
-> * Use "Enabled vPort ..." instead of "Configured vPort" in
->   mana_cfg_vport.
-> * Add info log in mana_uncfg_vport, mana_gd_verify_vf_version,
->   mana_gd_query_max_resources, mana_query_device_cfg and
->   mana_query_vport_cfg.
+> v3: Use WRITE_ONCE() in udp_bpf_update_proto()
+> v2: Cache sk->sk_write_space in sock_wfree()
+> ---
+>  net/core/skmsg.c   | 2 +-
+>  net/core/sock.c    | 8 ++++++--
+>  net/ipv4/udp_bpf.c | 2 +-
+>  3 files changed, 8 insertions(+), 4 deletions(-)
 > 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v5] net: mana: Add MAC address to vPort logs and clarify error messages
-    https://git.kernel.org/netdev/net-next/c/0172f8d80220
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 75fa94217e1e..3d7eb2f4ac98 100644
+[...]
 
