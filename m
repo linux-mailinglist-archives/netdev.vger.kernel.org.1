@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-264145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264146-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uD9+LzvtqGnnygAAu9opvQ
-	(envelope-from <netdev+bounces-264145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 03:40:59 +0100
+	id cMziOmTtqGnnygAAu9opvQ
+	(envelope-from <netdev+bounces-264146-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 03:41:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2140E20A446
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 03:40:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8493D20A45C
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 03:41:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E465307B1A0
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 02:40:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0A503062964
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 02:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F692690C0;
-	Thu,  5 Mar 2026 02:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06616267B89;
+	Thu,  5 Mar 2026 02:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="biClM33R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toM3WnRZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8B9265606;
-	Thu,  5 Mar 2026 02:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D461F265606
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 02:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772678430; cv=none; b=KyKV00aEwDhCLgNejhcbVB2AC4La7hVURfkMwbuwUfYCWxC45faFkoeEsFFmUMtRJvnULnuqPt6Hs/mmWlGmSy5fw/gDKqQxkV0Eq3HoEUoAuP9BMHIWOAr7tiVpUh446dwMcsT6ISkflpIZv4nWx9QHG0hHzpU8clq7MYCWZHw=
+	t=1772678437; cv=none; b=cRDz+7DTs7/dfNYsziN2DpoE5D4LIWfVSx48KNaprU71IakE62WxbcVkVOgXBv/l6rdWiU14uNAQR77gIliTV/N7J+SgSpIiCt7b1GfclojPqVIkjWdAE+ICZPOuC2bFDDoHxfH3XbZe3sgDEpnTjFN+gdFSyfNd8nQCQRC2i9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772678430; c=relaxed/simple;
-	bh=nl0dpc9m3TCYaVW1rx0nWk4+O3u2mDH42AihvgONVkQ=;
+	s=arc-20240116; t=1772678437; c=relaxed/simple;
+	bh=nebmuNBlQfivwWr2vXL7zALhKYqUnWIfNHixePoUBFk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qZxHvixy4565OzCLqLAcMTQWV71qSIXTvWYcHbKnszVJbbGcYUU0FnwhOwONEXU8+yuEegYAe5oax0FNpz6Dj0+JJvehIvDRHtXU7L4YmkL5f9lo3rJdkFxA7Fd7AE0SM5FSKiCzmWPzj1ewI0PAc1zGoxaAE1+Q7MhNRd6E+Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=biClM33R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BC70C2BC86;
-	Thu,  5 Mar 2026 02:40:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZkObYbRE9lJn/UFlTBms5wj2Ikzh5oSCv6F8iXrSn18WP+sutf05bwEI43kL82dsefJTUtoBUZmCXmDKhRHINrdbBYGOlkzGIOVrLOy9LNH/cHJ73ySZs5ONSaNeJ7BXv93vGqQ0IucDDMQ/h0E+0kPGQ2wwhLLzoWlspr4nBoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toM3WnRZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BEBC4CEF7;
+	Thu,  5 Mar 2026 02:40:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772678430;
-	bh=nl0dpc9m3TCYaVW1rx0nWk4+O3u2mDH42AihvgONVkQ=;
+	s=k20201202; t=1772678437;
+	bh=nebmuNBlQfivwWr2vXL7zALhKYqUnWIfNHixePoUBFk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=biClM33RByMZAAvt5U5RBOE6tmb+6LBUDw0SFlzfjrbuuu811p7PgOBQH+2qo2RTu
-	 +6RUcAw9lIg207TLb+9m3zBo2VCekuMYA/0CBcSWDlGmOuohY3SzouHDIlBPw5OkrN
-	 FVAUsg+kPyar4Tw6EoP+B69+hDBN++YJfSkU/1LtZyRuQiBxayh55ACclsY2aFHfH8
-	 g7/mXV8C/ZUGMaU1aLYbVOhXN71fGnCvKFyRDdgJrVZHhXtKwEI1GFKEH2TjsV6nou
-	 FoHs9sALZZQBvpD6kDtT+vTyJFV12dHvxRQQ91F04Nf3gM00CUtW0EQP8b0LnJ2Q8h
-	 H5A164ftZ8sjA==
+	b=toM3WnRZqmzSXoewL5zceJmJamZB8JsbCT/MQ3Ku7pcjh058hrbrjXpb/CW306J6U
+	 qhWmMzMAd4kHZ8On5KYJz+8t55uUQzel5i50Ah33oW2wA/Y440+XAdWOzb1ovO+NPa
+	 kHwhCKzEPTCLwRbOsgxTYUQyZuFvKGdTEaKIP2tjHLp01YDhxq85bxUZxwiQUgs3sK
+	 R+aK18B37r3GKeSDG5iVwgLhSjmAsBzjRYFEx/HuoySj0VHXyJG/Rn8tSQulcH46Lf
+	 e29QSVOyYx2FRgLbVWn1cQs5vUnS5S+ryjLm7Es5z9KEOHA9nrK3X/MoqXb3PCmCGR
+	 yeRNE+b44ydKw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE973808200;
-	Thu,  5 Mar 2026 02:40:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DA83808200;
+	Thu,  5 Mar 2026 02:40:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,80 +55,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] mptcp: misc fixes for v7.0-rc2
+Subject: Re: [PATCH net-next v5] net: openvswitch: clean up some kernel-doc
+ warnings
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177267843079.2487871.6512624751988502884.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Mar 2026 02:40:30 +0000
-References: 
- <20260303-net-mptcp-misc-fixes-7-0-rc2-v1-0-4b5462b6f016@kernel.org>
-In-Reply-To: 
- <20260303-net-mptcp-misc-fixes-7-0-rc2-v1-0-4b5462b6f016@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, lorenz-frank@web.de
-X-Rspamd-Queue-Id: 2140E20A446
+ <177267843754.2487871.12321677190144402614.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Mar 2026 02:40:37 +0000
+References: <20260304012437.469151-1-rdunlap@infradead.org>
+In-Reply-To: <20260304012437.469151-1-rdunlap@infradead.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+ i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dev@openvswitch.org
+X-Rspamd-Queue-Id: 8493D20A45C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,lists.linux.dev,web.de];
-	TAGGED_FROM(0.00)[bounces-264145-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264146-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 03 Mar 2026 11:56:01 +0100 you wrote:
-> Here are various unrelated fixes:
+On Tue,  3 Mar 2026 17:24:37 -0800 you wrote:
+> Fix some kernel-doc warnings in openvswitch.h:
 > 
-> - Patch 1: avoid bufferbloat in simult_flows selftest which can cause
->   instabilities. A fix for v5.10.
+> Mark enum placeholders that are not used as "private" so that kernel-doc
+> comments are not needed for them.
 > 
-> - Patches 2-3: reduce RM_ADDR lost by not sending it over the same
->   subflow as the one being removed, if possible. A fix for v5.13.
+> Correct names for 2 enum values:
+> Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+>  '@OVS_VPORT_UPCALL_SUCCESS' description in 'ovs_vport_upcall_attr'
+> Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+>  '@OVS_VPORT_UPCALL_FAIL' description in 'ovs_vport_upcall_attr'
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] selftests: mptcp: more stable simult_flows tests
-    https://git.kernel.org/netdev/net/c/8c09412e584d
-  - [net,2/5] mptcp: pm: avoid sending RM_ADDR over same subflow
-    https://git.kernel.org/netdev/net/c/fb8d0bccb221
-  - [net,3/5] selftests: mptcp: join: check RM_ADDR not sent over same subflow
-    https://git.kernel.org/netdev/net/c/560edd99b5f5
-  - [net,4/5] mptcp: pm: in-kernel: always mark signal+subflow endp as used
-    https://git.kernel.org/netdev/net/c/579a752464a6
-  - [net,5/5] selftests: mptcp: join: check removing signal+subflow endp
-    https://git.kernel.org/netdev/net/c/1777f349ff41
+  - [net-next,v5] net: openvswitch: clean up some kernel-doc warnings
+    https://git.kernel.org/netdev/net-next/c/39ae83b0f557
 
 You are awesome, thank you!
 -- 
