@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-264561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264562-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIjjB8P6qWk7JAEAu9opvQ
-	(envelope-from <netdev+bounces-264561-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:50:59 +0100
+	id EDe7Ecn6qWncIwEAu9opvQ
+	(envelope-from <netdev+bounces-264562-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:51:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FB3218A7D
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:50:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2802E218A8C
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 22:51:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B6F6E3030FCF
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 21:50:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E40530390B4
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 21:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC47A3603DD;
-	Thu,  5 Mar 2026 21:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8419F3612D7;
+	Thu,  5 Mar 2026 21:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j8lH4XhJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JXuhnbRQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544DA35F5F9
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 21:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D10A35F5FE
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 21:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772747432; cv=none; b=T2CVy9suvEr3IFkw8+8Rf7AJXIfjY+iAxsNq3bFWLP65YJubNhXjUNNUapYH+YskAD9+XSPar25lCUvcTW6NQwWxVkgoYR83NXmKe7zTDMfENkc4BjnDEqp4AaXUoYSX4C/q4ccqQmZWqOnR3wcnoYizzEQ0uxlEMtFct/FTDJI=
+	t=1772747434; cv=none; b=q4FaK5UoT8pAAffhYTYAh4i/YLlb/N4eMo0D77JPzsQjpl4TeFlymcBieAjUrV9H8qjEPnYQ2J9oe1XNrKFE9UOjhcPPko6EfSA4vqPuQuFSYxbRViMo0EhHmcrVK+euuXe9/7s1uuX7Sk+V2PIFvgsfyFcRTSGWiceLgN9Usjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772747432; c=relaxed/simple;
-	bh=LbfqhkyIjSD96r6zvNMmWBsCPtWbaotlOFq3RNNZmEQ=;
+	s=arc-20240116; t=1772747434; c=relaxed/simple;
+	bh=wlQd6krDjzcLBn2YP0rHnxH+3AF+G7CCkiYFb/aJ8xo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Kxdak63nUslOspiLaI/qNYAMgIREJoVwAQsVvdQKFOIJXXI4gsApWsshpxpfG/paA+C/SW3IYBU5ZkZ1pXxmWSHtf3S2bnNgGXhujvvbKXNqnTZUDwns/eyFWn0FgOAnpuB7hY4SQWUyq8SjRJV1rOBSuWHUg81xzZhkOIBj5lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j8lH4XhJ; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=i/7KjcU2MgXs9GXGD0Jz/D18zZdr5LeM9BGuiKCQ6+jYVhwOGVqf1Co8CIOmO2Kgf1xh+ZNiiBr74VXecfXs3MN411H+cv0t5soooe7CCW1hc1oJ8kap/qc2yg7P9dGgZiYL2/xGmP2ogcvNVKn24U11eYjr4HktiUiBW4Gn+BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JXuhnbRQ; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae3f446ccfso53093665ad.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 13:50:31 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c737b6686ddso1311445a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 13:50:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772747431; x=1773352231; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772747432; x=1773352232; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9y9/YcJaBMGqGTgmQjeiJTFrQ5BMS1nyXfY+BJq8fw=;
-        b=j8lH4XhJ+3HS61TNHzD8+EnEYYukjy+zziRBTWFdBwz/AFdZITA6xa0scJ9WN9slYp
-         DJcfpL8hNNHavaIXtNl1azr8Uq/tr5h663VmEE9A3jlVoNk+503JgcN07noO0AlcUxW7
-         DiwEd3DtR0dlZ5LdRbY6ayCNARlcGKbTpfvz0unNse1PgQPkTdYTBeHuDa7tl5hcKk+B
-         d7he0ZzpPSs/vWmseu34Jbtd/1NrGse/8nuYi0FKbWBebh821J8+lbQ88dl2pxh9i9t2
-         GD0/aIH135ZRnEBtPOzSMsHSkya8uOD+B5vqSK7mo1pZBgD+7LU3CC8IFGKa/2BeNsCk
-         dQYg==
+        bh=a+2PaH7WouXSU7Nxnshd86swVTl/hiAOIEUvdyoPU08=;
+        b=JXuhnbRQqjXT33WKbaHqe/+5q/JlG1kOtDAHTXu0tW+K5IFwXy4voNMB4qLGcLr0KY
+         +YfcgTcn79lcWuzRvjXkhhJ3lMHJB3As3exfK+6bwraqsat1h3UOtwLtzgPzjMfJJIiV
+         1qTu2PjsW6IH5US+/qePVhgetWmUaKSOpzVwn2PTZrisLBpVDHhtR/3UYkhvZ2WFCqHU
+         M0db5AvhDGQHYBbVd+Pz94NKOlTx//uW/xYCWmKgICA17rXZqJabtH9k5utYYd8mZMF0
+         +q9MR9+rPWj40qRkv1/4i5rquG+kD3LTXbNe9q5Z+qcH2lwmj09VIylGN0C7ca7E6f7x
+         GTZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772747431; x=1773352231;
+        d=1e100.net; s=20230601; t=1772747432; x=1773352232;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9y9/YcJaBMGqGTgmQjeiJTFrQ5BMS1nyXfY+BJq8fw=;
-        b=KcIThNXECS2NgXvvkCcbC4h2nVx3TrQ91BjNU9pigl+/7s4mf5ePMgZHgyq3M9Zg6b
-         Pg1RMRWTxORGWVSeTRtxI7a+jKsr5wsjkWnjf/xu8gkIgj+gdrRkmXClL7Mc7MxAv9I6
-         FzKiEITmY9tOnA536Oz7MNZ1gcC8tkk/E5YARrYXvEZ4kCVA33gAHRFuIMjPSeomRTIv
-         aVKF572EFcX/psB0veiAuyEKd36MKDfr7HrVb9HCDnjy/JybG/PuWO60WtSHod3MtYsO
-         9EMNh0mmts6r0gau0iwdXZ9YHr3Pl2iXjHhrawz5KuC5HNBMwupuvFZ0zY638OhyfFhj
-         N+ow==
-X-Forwarded-Encrypted: i=1; AJvYcCX8cAE8/r7ShrkjiUz4o1KC6dCykLtBMmKT01otJizb8c0HRiclByFSNN94lEeGxOKKvrEtoYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaQcMtPkoAn5hM86CWFttb077l19XPbLoz3wESIjcL9iMh2n/8
-	Fft3ZTY1gzcnvxgWamTTri6ivz9WAFluJed7Mh9izJC+1ZvWRNj9nyLGi5NtLCSAydkxn+yG1DG
-	q9gdcUQ==
-X-Received: from plly23.prod.google.com ([2002:a17:902:7c97:b0:2ad:ca86:4f])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c40d:b0:2ae:5b64:12d2
- with SMTP id d9443c01a7336-2ae82458878mr326805ad.40.1772747430402; Thu, 05
- Mar 2026 13:50:30 -0800 (PST)
-Date: Thu,  5 Mar 2026 21:49:53 +0000
+        bh=a+2PaH7WouXSU7Nxnshd86swVTl/hiAOIEUvdyoPU08=;
+        b=g5YBzjPNTHuQgd8FXVD8YJ+VyDlw7ceiJjqScCEuGlTL3V7qWnRdjYKfz05Waz/8Od
+         clQb+xpcJXXxYAglfmNdZ3kykWC3kKS3cCctVCzb63Rm52nU/vWKoHi7JhcscrmK+ldP
+         1wW/e3XeYHTvvFSy6v2/yFEwQQrqC3swOKpPoQwgG2N+IYr7v0J5LGrP7Fhi7WZBx2F4
+         ++4ryk+VdpXxAioUdeB3t+xmacHpaOXtr4drxAJ/c0ZlAO2wLSEBclETX2w3TjTu9+ju
+         nNdSXojERx7VhaaYxWWOwuQ3baPH5sxewOaJH0xnjbnu+M2aOmX1H4VHanp6nD9jryyk
+         rLng==
+X-Forwarded-Encrypted: i=1; AJvYcCUdUDB4gLgMSb1wh3xpNlRTOUjxM1WTJDzzMJ0xWDwK8JUgKYX7h8OtMVpoe+jUMINz4a4WR9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj65b56EUpJ+Jx5jt4O0doQc2ryXY9ViuMzZAeF8g1qaVmwtlT
+	oo28nnHayQNg1Be1BZCI4bSi3QIr6Fb/XprZ9hHE1mKyJfTz7bpPjroBaR+ELYA6SyIu3ktWLrt
+	yGMPZZA==
+X-Received: from pgbcn9.prod.google.com ([2002:a05:6a02:a89:b0:c73:9c66:99b])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748c:b0:36a:d3c9:efa5
+ with SMTP id adf61e73a8af0-398590b65ecmr25029637.52.1772747432072; Thu, 05
+ Mar 2026 13:50:32 -0800 (PST)
+Date: Thu,  5 Mar 2026 21:49:54 +0000
 In-Reply-To: <20260305215013.2984628-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260305215013.2984628-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260305215013.2984628-8-kuniyu@google.com>
-Subject: [PATCH v2 net-next 07/15] udp: Remove partial csum code in RX.
+Message-ID: <20260305215013.2984628-9-kuniyu@google.com>
+Subject: [PATCH v2 net-next 08/15] udp: Remove partial csum code in TX.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -86,7 +86,7 @@ Cc: Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
 	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
 	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: B9FB3218A7D
+X-Rspamd-Queue-Id: 2802E218A8C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264561-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264562-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -119,440 +119,345 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-UDP-Lite supports the partial checksum and the coverage is
-stored in the position of the length field of struct udphdr.
+UDP TX paths also have some code for UDP-Lite partial
+checksum:
 
-In RX paths, udp4_csum_init() / udp6_csum_init() save the value
-in UDP_SKB_CB(skb)->cscov and set UDP_SKB_CB(skb)->partial_cov
-to 1 if the coverage is not full.
+  * udplite_csum() in udp_send_skb() and udp_v6_send_skb()
+  * udplite_getfrag() in udp_sendmsg() and udpv6_sendmsg()
 
-The subsequent processing diverges depending on the value,
-but such paths are now dead.
+Let's remove such code.
 
-Also, these functions have some code guarded for UDP:
-
-  * udp_unicast_rcv_skb / udp6_unicast_rcv_skb
-  * __udp4_lib_rcv() and __udp6_lib_rcv().
-
-Let's remove the partial csum code and the unnecessary
-guard for UDP-Lite in RX.
+Now, we can use IPPROTO_UDP directly instead of sk->sk_protocol
+or fl6->flowi6_proto for csum_tcpudp_magic() and csum_ipv6_magic().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- include/net/udp.h     | 17 ++-------
- include/net/udplite.h | 34 ------------------
- net/ipv4/udp.c        | 83 ++++++++-----------------------------------
- net/ipv6/udp.c        | 83 +++++++++++--------------------------------
- 4 files changed, 38 insertions(+), 179 deletions(-)
+ include/net/udplite.h | 35 --------------------------
+ net/ipv4/udp.c        | 58 ++++++++++++++++---------------------------
+ net/ipv6/udp.c        | 54 +++++++++++++++++++---------------------
+ 3 files changed, 47 insertions(+), 100 deletions(-)
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 264c10607d2e..bc275cda9f8c 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -32,11 +32,9 @@
- #include <linux/math.h>
- 
- /**
-- *	struct udp_skb_cb  -  UDP(-Lite) private variables
-+ *	struct udp_skb_cb  -  UDP private variables
-  *
-  *	@header:      private variables used by IPv4/IPv6
-- *	@cscov:       checksum coverage length (UDP-Lite only)
-- *	@partial_cov: if set indicates partial csum coverage
-  */
- struct udp_skb_cb {
- 	union {
-@@ -45,8 +43,6 @@ struct udp_skb_cb {
- 		struct inet6_skb_parm	h6;
- #endif
- 	} header;
--	__u16		cscov;
--	__u8		partial_cov;
- };
- #define UDP_SKB_CB(__skb)	((struct udp_skb_cb *)((__skb)->cb))
- 
-@@ -216,13 +212,11 @@ extern int sysctl_udp_wmem_min;
- struct sk_buff;
- 
- /*
-- *	Generic checksumming routines for UDP(-Lite) v4 and v6
-+ *	Generic checksumming routines for UDP v4 and v6
-  */
- static inline __sum16 __udp_lib_checksum_complete(struct sk_buff *skb)
- {
--	return (UDP_SKB_CB(skb)->cscov == skb->len ?
--		__skb_checksum_complete(skb) :
--		__skb_checksum_complete_head(skb, UDP_SKB_CB(skb)->cscov));
-+	return __skb_checksum_complete(skb);
- }
- 
- static inline int udp_lib_checksum_complete(struct sk_buff *skb)
-@@ -273,7 +267,6 @@ static inline void udp_csum_pull_header(struct sk_buff *skb)
- 		skb->csum = csum_partial(skb->data, sizeof(struct udphdr),
- 					 skb->csum);
- 	skb_pull_rcsum(skb, sizeof(struct udphdr));
--	UDP_SKB_CB(skb)->cscov -= sizeof(struct udphdr);
- }
- 
- typedef struct sock *(*udp_lookup_t)(const struct sk_buff *skb, __be16 sport,
-@@ -641,9 +634,6 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
- 
- static inline void udp_post_segment_fix_csum(struct sk_buff *skb)
- {
--	/* UDP-lite can't land here - no GRO */
--	WARN_ON_ONCE(UDP_SKB_CB(skb)->partial_cov);
--
- 	/* UDP packets generated with UDP_SEGMENT and traversing:
- 	 *
- 	 * UDP tunnel(xmit) -> veth (segmentation) -> veth (gro) -> UDP tunnel (rx)
-@@ -657,7 +647,6 @@ static inline void udp_post_segment_fix_csum(struct sk_buff *skb)
- 	 * a valid csum after the segmentation.
- 	 * Additionally fixup the UDP CB.
- 	 */
--	UDP_SKB_CB(skb)->cscov = skb->len;
- 	if (skb->ip_summed == CHECKSUM_NONE && !skb->csum_valid)
- 		skb->csum_valid = 1;
- }
 diff --git a/include/net/udplite.h b/include/net/udplite.h
-index fdd769745ac4..0456a14c993b 100644
+index 0456a14c993b..6bfa1d6833d1 100644
 --- a/include/net/udplite.h
 +++ b/include/net/udplite.h
-@@ -25,40 +25,6 @@ static __inline__ int udplite_getfrag(void *from, char *to, int  offset,
- /*
-  * 	Checksumming routines
-  */
--static inline int udplite_checksum_init(struct sk_buff *skb, struct udphdr *uh)
--{
--	u16 cscov;
--
--        /* In UDPv4 a zero checksum means that the transmitter generated no
--         * checksum. UDP-Lite (like IPv6) mandates checksums, hence packets
--         * with a zero checksum field are illegal.                            */
--	if (uh->check == 0) {
--		net_dbg_ratelimited("UDPLite: zeroed checksum field\n");
--		return 1;
--	}
--
--	cscov = ntohs(uh->len);
--
--	if (cscov == 0)		 /* Indicates that full coverage is required. */
--		;
--	else if (cscov < 8  || cscov > skb->len) {
--		/*
--		 * Coverage length violates RFC 3828: log and discard silently.
--		 */
--		net_dbg_ratelimited("UDPLite: bad csum coverage %d/%d\n",
--				    cscov, skb->len);
--		return 1;
--
--	} else if (cscov < skb->len) {
--        	UDP_SKB_CB(skb)->partial_cov = 1;
--		UDP_SKB_CB(skb)->cscov = cscov;
--		if (skb->ip_summed == CHECKSUM_COMPLETE)
--			skb->ip_summed = CHECKSUM_NONE;
--		skb->csum_valid = 0;
--        }
--
--	return 0;
--}
+@@ -12,39 +12,4 @@
+ #define UDPLITE_SEND_CSCOV   10 /* sender partial coverage (as sent)      */
+ #define UDPLITE_RECV_CSCOV   11 /* receiver partial coverage (threshold ) */
  
- /* Fast-path computation of checksum. Socket may not be locked. */
- static inline __wsum udplite_csum(struct sk_buff *skb)
+-/*
+- *	Checksum computation is all in software, hence simpler getfrag.
+- */
+-static __inline__ int udplite_getfrag(void *from, char *to, int  offset,
+-				      int len, int odd, struct sk_buff *skb)
+-{
+-	struct msghdr *msg = from;
+-	return copy_from_iter_full(to, len, &msg->msg_iter) ? 0 : -EFAULT;
+-}
+-
+-/*
+- * 	Checksumming routines
+- */
+-
+-/* Fast-path computation of checksum. Socket may not be locked. */
+-static inline __wsum udplite_csum(struct sk_buff *skb)
+-{
+-	const int off = skb_transport_offset(skb);
+-	const struct sock *sk = skb->sk;
+-	int len = skb->len - off;
+-
+-	if (udp_test_bit(UDPLITE_SEND_CC, sk)) {
+-		u16 pcslen = READ_ONCE(udp_sk(sk)->pcslen);
+-
+-		if (pcslen < len) {
+-			if (pcslen > 0)
+-				len = pcslen;
+-			udp_hdr(skb)->len = htons(pcslen);
+-		}
+-	}
+-	skb->ip_summed = CHECKSUM_NONE;     /* no HW support for checksumming */
+-
+-	return skb_checksum(skb, off, len, 0);
+-}
+-
+ #endif	/* _UDPLITE_H */
 diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 38ce5d887878..51a3e3d3d4a9 100644
+index 51a3e3d3d4a9..7d83e694115c 100644
 --- a/net/ipv4/udp.c
 +++ b/net/ipv4/udp.c
-@@ -2072,14 +2072,13 @@ EXPORT_IPV6_MOD(udp_read_skb);
- INDIRECT_CALLABLE_SCOPE
- int udp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags)
+@@ -1120,20 +1120,19 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+ 			struct inet_cork *cork)
  {
+ 	struct sock *sk = skb->sk;
 -	struct inet_sock *inet = inet_sk(sk);
- 	DECLARE_SOCKADDR(struct sockaddr_in *, sin, msg->msg_name);
--	struct sk_buff *skb;
--	unsigned int ulen, copied;
- 	int off, err, peeking = flags & MSG_PEEK;
--	int is_udplite = IS_UDPLITE(sk);
-+	struct inet_sock *inet = inet_sk(sk);
- 	struct net *net = sock_net(sk);
- 	bool checksum_valid = false;
-+	unsigned int ulen, copied;
-+	struct sk_buff *skb;
- 
- 	if (flags & MSG_ERRQUEUE)
- 		return ip_recv_error(sk, msg, len);
-@@ -2097,14 +2096,10 @@ int udp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags)
- 	else if (copied < ulen)
- 		msg->msg_flags |= MSG_TRUNC;
- 
--	/*
--	 * If checksum is needed at all, try to do it while copying the
--	 * data.  If the data is truncated, or if we only want a partial
--	 * coverage checksum (UDP-Lite), do it before the copy.
-+	/* If checksum is needed at all, try to do it while copying the
-+	 * data.  If the data is truncated, do it before the copy.
- 	 */
--
--	if (copied < ulen || peeking ||
--	    (is_udplite && UDP_SKB_CB(skb)->partial_cov)) {
-+	if (copied < ulen || peeking) {
- 		checksum_valid = udp_skb_csum_unnecessary(skb) ||
- 				!__udp_lib_checksum_complete(skb);
- 		if (!checksum_valid)
-@@ -2439,42 +2434,6 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- 		/* FALLTHROUGH -- it's a UDP Packet */
- 	}
- 
--	/*
--	 * 	UDP-Lite specific tests, ignored on UDP sockets
--	 */
--	if (unlikely(udp_test_bit(UDPLITE_RECV_CC, sk) &&
--		     UDP_SKB_CB(skb)->partial_cov)) {
--		u16 pcrlen = READ_ONCE(up->pcrlen);
--
--		/*
--		 * MIB statistics other than incrementing the error count are
--		 * disabled for the following two types of errors: these depend
--		 * on the application settings, not on the functioning of the
--		 * protocol stack as such.
--		 *
--		 * RFC 3828 here recommends (sec 3.3): "There should also be a
--		 * way ... to ... at least let the receiving application block
--		 * delivery of packets with coverage values less than a value
--		 * provided by the application."
--		 */
--		if (pcrlen == 0) {          /* full coverage was set  */
--			net_dbg_ratelimited("UDPLite: partial coverage %d while full coverage %d requested\n",
--					    UDP_SKB_CB(skb)->cscov, skb->len);
--			goto drop;
--		}
--		/* The next case involves violating the min. coverage requested
--		 * by the receiver. This is subtle: if receiver wants x and x is
--		 * greater than the buffersize/MTU then receiver will complain
--		 * that it wants x while sender emits packets of smaller size y.
--		 * Therefore the above ...()->partial_cov statement is essential.
--		 */
--		if (UDP_SKB_CB(skb)->cscov < pcrlen) {
--			net_dbg_ratelimited("UDPLite: coverage %d too small, need min %d\n",
--					    UDP_SKB_CB(skb)->cscov, pcrlen);
--			goto drop;
--		}
--	}
--
- 	prefetch(&sk->sk_rmem_alloc);
- 	if (rcu_access_pointer(sk->sk_filter) &&
- 	    udp_lib_checksum_complete(skb))
-@@ -2608,29 +2567,14 @@ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
-  * Otherwise, csum completion requires checksumming packet body,
-  * including udp header and folding it to skb->csum.
-  */
--static inline int udp4_csum_init(struct sk_buff *skb, struct udphdr *uh,
--				 int proto)
-+static inline int udp4_csum_init(struct sk_buff *skb, struct udphdr *uh)
- {
++	int offset, len, datalen;
+ 	struct udphdr *uh;
  	int err;
- 
--	UDP_SKB_CB(skb)->partial_cov = 0;
--	UDP_SKB_CB(skb)->cscov = skb->len;
--
--	if (proto == IPPROTO_UDPLITE) {
--		err = udplite_checksum_init(skb, uh);
--		if (err)
--			return err;
--
--		if (UDP_SKB_CB(skb)->partial_cov) {
--			skb->csum = inet_compute_pseudo(skb, proto);
--			return 0;
--		}
--	}
--
- 	/* Note, we are only interested in != 0 or == 0, thus the
- 	 * force to int.
- 	 */
--	err = (__force int)skb_checksum_init_zero_check(skb, proto, uh->check,
-+	err = (__force int)skb_checksum_init_zero_check(skb, IPPROTO_UDP, uh->check,
- 							inet_compute_pseudo);
- 	if (err)
- 		return err;
-@@ -2658,7 +2602,7 @@ static int udp_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
- {
- 	int ret;
- 
--	if (inet_get_convert_csum(sk) && uh->check && !IS_UDPLITE(sk))
-+	if (inet_get_convert_csum(sk) && uh->check)
- 		skb_checksum_try_convert(skb, IPPROTO_UDP, inet_compute_pseudo);
- 
- 	ret = udp_queue_rcv_skb(sk, skb);
-@@ -2703,14 +2647,15 @@ static int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- 	if (ulen > skb->len)
- 		goto short_packet;
- 
--	if (proto == IPPROTO_UDP) {
--		/* UDP validates ulen. */
--		if (ulen < sizeof(*uh) || pskb_trim_rcsum(skb, ulen))
-+	/* UDP validates ulen. */
-+	if (ulen < sizeof(*uh)) {
-+		if (pskb_trim_rcsum(skb, ulen))
- 			goto short_packet;
+-	int is_udplite = IS_UDPLITE(sk);
+-	int offset = skb_transport_offset(skb);
+-	int len = skb->len - offset;
+-	int datalen = len - sizeof(*uh);
+-	__wsum csum = 0;
 +
- 		uh = udp_hdr(skb);
++	offset = skb_transport_offset(skb);
++	len = skb->len - offset;
++	datalen = len - sizeof(*uh);
+ 
+ 	/*
+ 	 * Create a UDP header
+ 	 */
+ 	uh = udp_hdr(skb);
+-	uh->source = inet->inet_sport;
++	uh->source = inet_sk(sk)->inet_sport;
+ 	uh->dest = fl4->fl4_dport;
+ 	uh->len = htons(len);
+ 	uh->check = 0;
+@@ -1154,7 +1153,7 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+ 			kfree_skb(skb);
+ 			return -EINVAL;
+ 		}
+-		if (is_udplite || dst_xfrm(skb_dst(skb))) {
++		if (dst_xfrm(skb_dst(skb))) {
+ 			kfree_skb(skb);
+ 			return -EIO;
+ 		}
+@@ -1170,26 +1169,18 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+ 		}
  	}
  
--	if (udp4_csum_init(skb, uh, proto))
-+	if (udp4_csum_init(skb, uh))
- 		goto csum_error;
+-	if (is_udplite)  				 /*     UDP-Lite      */
+-		csum = udplite_csum(skb);
+-
+-	else if (sk->sk_no_check_tx) {			 /* UDP csum off */
+-
++	if (sk->sk_no_check_tx) {			 /* UDP csum off */
+ 		skb->ip_summed = CHECKSUM_NONE;
+ 		goto send;
+-
+ 	} else if (skb->ip_summed == CHECKSUM_PARTIAL) { /* UDP hardware csum */
+ csum_partial:
+-
+ 		udp4_hwcsum(skb, fl4->saddr, fl4->daddr);
+ 		goto send;
+-
+-	} else
+-		csum = udp_csum(skb);
++	}
  
- 	sk = inet_steal_sock(net, skb, sizeof(struct udphdr), saddr, uh->source, daddr, uh->dest,
+ 	/* add protocol-dependent pseudo-header */
+ 	uh->check = csum_tcpudp_magic(fl4->saddr, fl4->daddr, len,
+-				      sk->sk_protocol, csum);
++				      IPPROTO_UDP, udp_csum(skb));
+ 	if (uh->check == 0)
+ 		uh->check = CSUM_MANGLED_0;
+ 
+@@ -1270,26 +1261,23 @@ EXPORT_IPV6_MOD_GPL(udp_cmsg_send);
+ 
+ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ {
++	int corkreq = udp_test_bit(CORK, sk) || msg->msg_flags & MSG_MORE;
+ 	DEFINE_RAW_FLEX(struct ip_options_rcu, opt_copy, opt.__data,
+ 			IP_OPTIONS_DATA_FIXED_SIZE);
++	DECLARE_SOCKADDR(struct sockaddr_in *, usin, msg->msg_name);
++	int ulen = len, free = 0, connected = 0;
+ 	struct inet_sock *inet = inet_sk(sk);
+ 	struct udp_sock *up = udp_sk(sk);
+-	DECLARE_SOCKADDR(struct sockaddr_in *, usin, msg->msg_name);
++	__be32 daddr, faddr, saddr;
++	struct rtable *rt = NULL;
+ 	struct flowi4 fl4_stack;
+-	struct flowi4 *fl4;
+-	int ulen = len;
+ 	struct ipcm_cookie ipc;
+-	struct rtable *rt = NULL;
+-	int free = 0;
+-	int connected = 0;
+-	__be32 daddr, faddr, saddr;
+-	u8 scope;
+-	__be16 dport;
+-	int err, is_udplite = IS_UDPLITE(sk);
+-	int corkreq = udp_test_bit(CORK, sk) || msg->msg_flags & MSG_MORE;
+-	int (*getfrag)(void *, char *, int, int, int, struct sk_buff *);
+ 	struct sk_buff *skb;
++	struct flowi4 *fl4;
++	__be16 dport;
+ 	int uc_index;
++	u8 scope;
++	int err;
+ 
+ 	if (len > 0xFFFF)
+ 		return -EMSGSIZE;
+@@ -1301,8 +1289,6 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (msg->msg_flags & MSG_OOB) /* Mirror BSD error message compatibility */
+ 		return -EOPNOTSUPP;
+ 
+-	getfrag = is_udplite ? udplite_getfrag : ip_generic_getfrag;
+-
+ 	fl4 = &inet->cork.fl.u.ip4;
+ 	if (READ_ONCE(up->pending)) {
+ 		/*
+@@ -1444,7 +1430,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ 		flowi4_init_output(fl4, ipc.oif, ipc.sockc.mark,
+ 				   ipc.tos & INET_DSCP_MASK, scope,
+-				   sk->sk_protocol, flow_flags, faddr, saddr,
++				   IPPROTO_UDP, flow_flags, faddr, saddr,
+ 				   dport, inet->inet_sport,
+ 				   sk_uid(sk));
+ 
+@@ -1478,7 +1464,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (!corkreq) {
+ 		struct inet_cork cork;
+ 
+-		skb = ip_make_skb(sk, fl4, getfrag, msg, ulen,
++		skb = ip_make_skb(sk, fl4, ip_generic_getfrag, msg, ulen,
+ 				  sizeof(struct udphdr), &ipc, &rt,
+ 				  &cork, msg->msg_flags);
+ 		err = PTR_ERR(skb);
+@@ -1509,7 +1495,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ do_append_data:
+ 	up->len += ulen;
+-	err = ip_append_data(sk, fl4, getfrag, msg, ulen,
++	err = ip_append_data(sk, fl4, ip_generic_getfrag, msg, ulen,
+ 			     sizeof(struct udphdr), &ipc, &rt,
+ 			     corkreq ? msg->msg_flags|MSG_MORE : msg->msg_flags);
+ 	if (err)
 diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 07308b7156a6..49100b9e78cd 100644
+index 49100b9e78cd..402b3b821480 100644
 --- a/net/ipv6/udp.c
 +++ b/net/ipv6/udp.c
-@@ -469,15 +469,13 @@ INDIRECT_CALLABLE_SCOPE
- int udpv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		  int flags)
+@@ -1371,13 +1371,13 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+ 			   struct inet_cork *cork)
  {
-+	int off, is_udp4, err, peeking = flags & MSG_PEEK;
- 	struct ipv6_pinfo *np = inet6_sk(sk);
- 	struct inet_sock *inet = inet_sk(sk);
--	struct sk_buff *skb;
--	unsigned int ulen, copied;
--	int off, err, peeking = flags & MSG_PEEK;
+ 	struct sock *sk = skb->sk;
++	int offset, len, datalen;
+ 	struct udphdr *uh;
+ 	int err = 0;
 -	int is_udplite = IS_UDPLITE(sk);
- 	struct udp_mib __percpu *mib;
- 	bool checksum_valid = false;
--	int is_udp4;
-+	unsigned int ulen, copied;
-+	struct sk_buff *skb;
+-	__wsum csum = 0;
+-	int offset = skb_transport_offset(skb);
+-	int len = skb->len - offset;
+-	int datalen = len - sizeof(*uh);
++
++	offset = skb_transport_offset(skb);
++	len = skb->len - offset;
++	datalen = len - sizeof(*uh);
  
- 	if (flags & MSG_ERRQUEUE)
- 		return ipv6_recv_error(sk, msg, len);
-@@ -501,14 +499,10 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	is_udp4 = (skb->protocol == htons(ETH_P_IP));
- 	mib = __UDPX_MIB(sk, is_udp4);
- 
--	/*
--	 * If checksum is needed at all, try to do it while copying the
--	 * data.  If the data is truncated, or if we only want a partial
--	 * coverage checksum (UDP-Lite), do it before the copy.
-+	/* If checksum is needed at all, try to do it while copying the
-+	 * data.  If the data is truncated, do it before the copy.
- 	 */
--
--	if (copied < ulen || peeking ||
--	    (is_udplite && UDP_SKB_CB(skb)->partial_cov)) {
-+	if (copied < ulen || peeking) {
- 		checksum_valid = udp_skb_csum_unnecessary(skb) ||
- 				!__udp_lib_checksum_complete(skb);
- 		if (!checksum_valid)
-@@ -870,25 +864,6 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- 		/* FALLTHROUGH -- it's a UDP Packet */
+ 	/*
+ 	 * Create a UDP header
+@@ -1404,7 +1404,7 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+ 			kfree_skb(skb);
+ 			return -EINVAL;
+ 		}
+-		if (is_udplite || dst_xfrm(skb_dst(skb))) {
++		if (dst_xfrm(skb_dst(skb))) {
+ 			kfree_skb(skb);
+ 			return -EIO;
+ 		}
+@@ -1420,21 +1420,18 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+ 		}
  	}
  
--	/*
--	 * UDP-Lite specific tests, ignored on UDP sockets (see net/ipv4/udp.c).
--	 */
--	if (unlikely(udp_test_bit(UDPLITE_RECV_CC, sk) &&
--		     UDP_SKB_CB(skb)->partial_cov)) {
--		u16 pcrlen = READ_ONCE(up->pcrlen);
--
--		if (pcrlen == 0) {          /* full coverage was set  */
--			net_dbg_ratelimited("UDPLITE6: partial coverage %d while full coverage %d requested\n",
--					    UDP_SKB_CB(skb)->cscov, skb->len);
--			goto drop;
--		}
--		if (UDP_SKB_CB(skb)->cscov < pcrlen) {
--			net_dbg_ratelimited("UDPLITE6: coverage %d too small, need min %d\n",
--					    UDP_SKB_CB(skb)->cscov, pcrlen);
--			goto drop;
--		}
--	}
--
- 	prefetch(&sk->sk_rmem_alloc);
- 	if (rcu_access_pointer(sk->sk_filter) &&
- 	    udp_lib_checksum_complete(skb))
-@@ -1053,7 +1028,7 @@ static int udp6_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
+-	if (is_udplite)
+-		csum = udplite_csum(skb);
+-	else if (udp_get_no_check6_tx(sk)) {   /* UDP csum disabled */
++	if (udp_get_no_check6_tx(sk)) {   /* UDP csum disabled */
+ 		skb->ip_summed = CHECKSUM_NONE;
+ 		goto send;
+ 	} else if (skb->ip_summed == CHECKSUM_PARTIAL) { /* UDP hardware csum */
+ csum_partial:
+ 		udp6_hwcsum_outgoing(sk, skb, &fl6->saddr, &fl6->daddr, len);
+ 		goto send;
+-	} else
+-		csum = udp_csum(skb);
++	}
+ 
+ 	/* add protocol-dependent pseudo-header */
+ 	uh->check = csum_ipv6_magic(&fl6->saddr, &fl6->daddr,
+-				    len, fl6->flowi6_proto, csum);
++				    len, IPPROTO_UDP, udp_csum(skb));
+ 	if (uh->check == 0)
+ 		uh->check = CSUM_MANGLED_0;
+ 
+@@ -1474,27 +1471,26 @@ static int udp_v6_push_pending_frames(struct sock *sk)
+ 
+ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
  {
- 	int ret;
- 
--	if (inet_get_convert_csum(sk) && uh->check && !IS_UDPLITE(sk))
-+	if (inet_get_convert_csum(sk) && uh->check)
- 		skb_checksum_try_convert(skb, IPPROTO_UDP, ip6_compute_pseudo);
- 
- 	ret = udpv6_queue_rcv_skb(sk, skb);
-@@ -1064,24 +1039,10 @@ static int udp6_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
- 	return 0;
- }
- 
--static int udp6_csum_init(struct sk_buff *skb, struct udphdr *uh, int proto)
-+static int udp6_csum_init(struct sk_buff *skb, struct udphdr *uh)
- {
+-	struct ipv6_txoptions opt_space;
+-	struct udp_sock *up = udp_sk(sk);
+-	struct inet_sock *inet = inet_sk(sk);
+-	struct ipv6_pinfo *np = inet6_sk(sk);
++	int corkreq = udp_test_bit(CORK, sk) || msg->msg_flags & MSG_MORE;
+ 	DECLARE_SOCKADDR(struct sockaddr_in6 *, sin6, msg->msg_name);
+-	struct in6_addr *daddr, *final_p, final;
+-	struct ipv6_txoptions *opt = NULL;
+ 	struct ipv6_txoptions *opt_to_free = NULL;
++	struct in6_addr *daddr, *final_p, final;
+ 	struct ip6_flowlabel *flowlabel = NULL;
++	struct inet_sock *inet = inet_sk(sk);
++	struct ipv6_pinfo *np = inet6_sk(sk);
++	struct ipv6_txoptions *opt = NULL;
++	struct udp_sock *up = udp_sk(sk);
++	struct ipv6_txoptions opt_space;
++	int addr_len = msg->msg_namelen;
+ 	struct inet_cork_full cork;
+-	struct flowi6 *fl6 = &cork.fl.u.ip6;
+-	struct dst_entry *dst;
+ 	struct ipcm6_cookie ipc6;
+-	int addr_len = msg->msg_namelen;
+ 	bool connected = false;
++	struct dst_entry *dst;
++	struct flowi6 *fl6;
+ 	int ulen = len;
+-	int corkreq = udp_test_bit(CORK, sk) || msg->msg_flags & MSG_MORE;
  	int err;
+-	int is_udplite = IS_UDPLITE(sk);
+-	int (*getfrag)(void *, char *, int, int, int, struct sk_buff *);
  
--	UDP_SKB_CB(skb)->partial_cov = 0;
--	UDP_SKB_CB(skb)->cscov = skb->len;
--
--	if (proto == IPPROTO_UDPLITE) {
--		err = udplite_checksum_init(skb, uh);
--		if (err)
--			return err;
--
--		if (UDP_SKB_CB(skb)->partial_cov) {
--			skb->csum = ip6_compute_pseudo(skb, proto);
--			return 0;
--		}
--	}
--
- 	/* To support RFC 6936 (allow zero checksum in UDP/IPV6 for tunnels)
- 	 * we accept a checksum of zero here. When we find the socket
- 	 * for the UDP packet we'll check if that socket allows zero checksum
-@@ -1090,7 +1051,7 @@ static int udp6_csum_init(struct sk_buff *skb, struct udphdr *uh, int proto)
- 	 * Note, we are only interested in != 0 or == 0, thus the
- 	 * force to int.
- 	 */
--	err = (__force int)skb_checksum_init_zero_check(skb, proto, uh->check,
-+	err = (__force int)skb_checksum_init_zero_check(skb, IPPROTO_UDP, uh->check,
- 							ip6_compute_pseudo);
++	fl6 = &cork.fl.u.ip6;
+ 	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.gso_size = READ_ONCE(up->gso_size);
+ 
+@@ -1553,7 +1549,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (len > INT_MAX - sizeof(struct udphdr))
+ 		return -EMSGSIZE;
+ 
+-	getfrag  =  is_udplite ?  udplite_getfrag : ip_generic_getfrag;
+ 	if (READ_ONCE(up->pending)) {
+ 		if (READ_ONCE(up->pending) == AF_INET)
+ 			return udp_sendmsg(sk, msg, len);
+@@ -1655,7 +1650,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	opt = ipv6_fixup_options(&opt_space, opt);
+ 	ipc6.opt = opt;
+ 
+-	fl6->flowi6_proto = sk->sk_protocol;
++	fl6->flowi6_proto = IPPROTO_UDP;
+ 	fl6->flowi6_mark = ipc6.sockc.mark;
+ 	fl6->daddr = *daddr;
+ 	if (ipv6_addr_any(&fl6->saddr) && !ipv6_addr_any(&np->saddr))
+@@ -1722,7 +1717,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (!corkreq) {
+ 		struct sk_buff *skb;
+ 
+-		skb = ip6_make_skb(sk, getfrag, msg, ulen,
++		skb = ip6_make_skb(sk, ip_generic_getfrag, msg, ulen,
+ 				   sizeof(struct udphdr), &ipc6,
+ 				   dst_rt6_info(dst),
+ 				   msg->msg_flags, &cork);
+@@ -1748,8 +1743,9 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ do_append_data:
+ 	up->len += ulen;
+-	err = ip6_append_data(sk, getfrag, msg, ulen, sizeof(struct udphdr),
+-			      &ipc6, fl6, dst_rt6_info(dst),
++	err = ip6_append_data(sk, ip_generic_getfrag, msg, ulen,
++			      sizeof(struct udphdr), &ipc6, fl6,
++			      dst_rt6_info(dst),
+ 			      corkreq ? msg->msg_flags|MSG_MORE : msg->msg_flags);
  	if (err)
- 		return err;
-@@ -1132,26 +1093,24 @@ static int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- 	if (ulen > skb->len)
- 		goto short_packet;
- 
--	if (proto == IPPROTO_UDP) {
--		/* UDP validates ulen. */
-+	/* Check for jumbo payload */
-+	if (ulen == 0)
-+		ulen = skb->len;
- 
--		/* Check for jumbo payload */
--		if (ulen == 0)
--			ulen = skb->len;
-+	/* UDP validates ulen. */
-+	if (ulen < sizeof(*uh))
-+		goto short_packet;
- 
--		if (ulen < sizeof(*uh))
-+	if (ulen < skb->len) {
-+		if (pskb_trim_rcsum(skb, ulen))
- 			goto short_packet;
- 
--		if (ulen < skb->len) {
--			if (pskb_trim_rcsum(skb, ulen))
--				goto short_packet;
--			saddr = &ipv6_hdr(skb)->saddr;
--			daddr = &ipv6_hdr(skb)->daddr;
--			uh = udp_hdr(skb);
--		}
-+		saddr = &ipv6_hdr(skb)->saddr;
-+		daddr = &ipv6_hdr(skb)->daddr;
-+		uh = udp_hdr(skb);
- 	}
- 
--	if (udp6_csum_init(skb, uh, proto))
-+	if (udp6_csum_init(skb, uh))
- 		goto csum_error;
- 
- 	/* Check if the socket is already available, e.g. due to early demux */
+ 		udp_v6_flush_pending_frames(sk);
 -- 
 2.53.0.473.g4a7958ca14-goog
 
