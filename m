@@ -1,193 +1,183 @@
-Return-Path: <netdev+bounces-264225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJCDKQ1DqWkt3gAAu9opvQ
-	(envelope-from <netdev+bounces-264225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:47:09 +0100
+	id CF/dAelDqWlV3gAAu9opvQ
+	(envelope-from <netdev+bounces-264226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:50:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18F5B20DAD2
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:47:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CAE20DBEA
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A07793023A6A
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:46:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 442BF301589D
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6CFA374E6B;
-	Thu,  5 Mar 2026 08:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96339372EE7;
+	Thu,  5 Mar 2026 08:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0f9HTvs"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="poexKRG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527B63264C6
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D44921CC5C;
+	Thu,  5 Mar 2026 08:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772700408; cv=none; b=iC7d45GN0F1Qg+bSnpndVciChiufOY51EQr6Tv5kwzR8sURJ9z3VSO8W//Mn1YT1kIgimDYFzt0Eg5LJ1HZfqrF7b6a175exZfZB+1SmmB9h8F7dX0Bea9vowiI5hUbzJfG4Ew18cHbq2m8jCpHvTfgw485iKx1pfPTL6hTnKIM=
+	t=1772700645; cv=none; b=oSCZtiAd58DFVfF4O1/9TMuBXDabaB6KItgxcXnT26U+pM0kJcDQAojTzzXDzbgbLRVv26P3nC5ggYf7xzok4x5vWwLHnwGtHy/wBb5zsgZr3yZaFM0wxXtcz3U0wihRkqztudqupaFzb0BkZW7fqPpjwC1WQbRg/lYnbafP6ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772700408; c=relaxed/simple;
-	bh=mdoprt5pfQiawnNQf+PVIE40bn4zUw1G1O5KgSH6WgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tRQEfxd+PgGFPoxPlJeAnsXGEhCRnV+ehiDz5wuXEsAN9E5o6Uwaq13EDayqnaJYun4gAoZqyZBNp3M97ndeWOHEhoDlE9Vah4I2WGhWNiVka2gbcDXp9vxZ/a+tMHMDHQ/ZY3LxgRify31S+1CBJ+RBEVrTxztBgEbFbDfp/BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f0f9HTvs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772700406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kcDhn5Pj+q46p8oVnRAtNQqN8KEvJ5Nk8v4t22oVPvw=;
-	b=f0f9HTvs778MXxphhPy5rzFFH208A3RkY+zXpDBSzmV1/649SUVDhrxFcQ+Px+p22dbBzx
-	pyjgf9cfV+LJhDB7FCrz1avDIrwFJEmeTuB1BJwe+NuWkEyAvCd+BXNC12lsCNQul+rhcm
-	dQiYTPkoFvCkdYJFvNShc532ukS+HpM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-xdt8xs7lOW24P8dr1tLnAA-1; Thu,
- 05 Mar 2026 03:46:43 -0500
-X-MC-Unique: xdt8xs7lOW24P8dr1tLnAA-1
-X-Mimecast-MFC-AGG-ID: xdt8xs7lOW24P8dr1tLnAA_1772700401
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 735AD19560A5;
-	Thu,  5 Mar 2026 08:46:41 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.173])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0FE8E180049D;
-	Thu,  5 Mar 2026 08:46:37 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: sun.jian.kdev@gmail.com
-Cc: kuba@kernel.org,
-	shuah@kernel.org,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	kees@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [v3,v3,1/2] selftests/harness: order TEST_F and XFAIL_ADD constructors
-Date: Thu,  5 Mar 2026 09:46:24 +0100
-Message-ID: <20260305084624.242751-1-pabeni@redhat.com>
-In-Reply-To: <20260225111451.347923-1-sun.jian.kdev@gmail.com>
-References: <20260225111451.347923-1-sun.jian.kdev@gmail.com>
+	s=arc-20240116; t=1772700645; c=relaxed/simple;
+	bh=fV+VzNFckG3w8s6jy0MEr3wY6mBu0Nx9mbIq7VnsKdI=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=dmz1KNstRjzyyLSNULCWPBFAWo4AkO7Wivy74RsaifWsljl2m/2hYYe793i2d1K9HVDIWA6dka8i+p1lpsF0fI0+ZyyTirrog+VRao6DJGdL8tM2hDANE2Aq/wk+TuYULUC5WfFTYud9Udmty4B0h+E9SGl8LqiGGWJFv7qBGQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=poexKRG7; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E20CEA0042;
+	Thu,  5 Mar 2026 09:50:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1772700633; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=a/5JcWPNdGt8uGTnqWElVMvY4k4brDzQwiKTZGQpZl8=;
+	b=poexKRG7jjpRYBSLAMzk1TNo1T/jVSRx9ywDOX/5+ibbPlNqXMjH49qspxVDgnfnvei+U5
+	pVlh+lK27qNfw1b50ZFoK0JVH3cpw3ql8i8PgCTo2+gE9/nD8MGhGFAPAROUVnDpINLrfU
+	Vk2KExmz7stalHpSODNReWp9t3X+pHbLmobhRTKtxOswr1NkLab5ERUqPWPraCrb3akQJQ
+	Od/J7/1ZeKdaFr/vgXw9nkI7wxKgr2HGwPleb59L9CeUDZMflBDxMpas05Jdd7tYc0Agb8
+	ata3E/T5hjqiEoLxDkeQn/QOsQcCJ+hhwQnorD+ICp7MH3iPHw2IP1qUiA7L6w==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Thu, 05 Mar 2026 09:50:29 +0100
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: bcmgenet: fix bcmgenet_get_eee() clobbered by
+ phy_ethtool_get_eee()
+In-Reply-To: <fd675389-b044-4783-be16-c5ba34163ef2@lunn.ch>
+References: <20260303153918.538902-1-nb@tipi-net.de>
+ <fd675389-b044-4783-be16-c5ba34163ef2@lunn.ch>
+Message-ID: <a899e5a0addb1e58d47fb7f41e4d8a55@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Rspamd-Queue-Id: 18F5B20DAD2
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 52CAE20DBEA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264225-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264226-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.997];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tipi-net.de:dkim,tipi-net.de:mid]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 4.3.2026 22:57, Andrew Lunn wrote:
+> On Tue, Mar 03, 2026 at 04:39:18PM +0100, Nicolai Buchwitz wrote:
+>> bcmgenet_get_eee() sets the MAC-managed tx_lpi_enabled and 
+>> tx_lpi_timer
+>> fields, then calls phy_ethtool_get_eee() which internally calls
+>> eeecfg_to_eee() — overwriting eee_enabled, tx_lpi_enabled and
+>> tx_lpi_timer with the PHY's eee_cfg values.  For non-phylink MACs like
+>> GENET, these PHY-level fields are never initialized (they are only set
+>> by phylink via phy_support_eee()), so the ethtool report always shows
+>> eee_enabled=false and tx_lpi_enabled=false regardless of the actual 
+>> MAC
+>> state.
+> 
+> I think the MAC driver is missing a call to phy_support_eee() to let
+> phylib know the MAC supports EEE. Have you tried that.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-selftests/harness: order TEST_F and XFAIL_ADD constructors
+Thanks for the suggestion. I've incorporated phy_support_eee() and 
+tested it
+with a Raspberry CM4.
 
-This commit fixes a constructor ordering race where XFAIL_ADD() could run
-before TEST_F() and read a NULL _##fixture_##test##_object pointer. The
-fix uses constructor priorities to ensure TEST_F runs first.
+After applying the patch, the PHY correctly advertises EEE, negotiates 
+it with
+the link partner, and ethtool reports:
 
-> TEST_F() allocates and registers its struct __test_metadata via mmap()
-> inside its constructor, and only then assigns the
-> _##fixture_##test##_object pointer.
->
-> XFAIL_ADD() runs in a constructor too and reads
-> _##fixture_##test##_object to initialize xfail->test. If XFAIL_ADD runs
-> first, xfail->test can be NULL and the expected failure will be reported
-> as FAIL.
->
-> Use constructor priorities to ensure TEST_F registration runs before
-> XFAIL_ADD, without adding extra state or runtime lookups.
->
-> Fixes: 2709473c9386 ("selftests: kselftest_harness: support using xfail")
+   EEE status: enabled - active
 
-Should the Fixes: tag point to commit 24cf65a62266 instead?
+However, reading UMAC_EEE_CTRL directly:
 
-The existing tag points to 2709473c9386 ("selftests: kselftest_harness:
-support using xfail"), but that commit used static initialization
-(.test = &object) which had no race condition.
+   UMAC_EEE_CTRL      = 0x00000040  (DIS_EEE_10M set, EEE_EN = 0)
+   UMAC_EEE_LPI_TIMER = 0x00000022  (34 us, hardware reset default)
 
-The race was actually introduced by commit 24cf65a62266
-("selftests/harness: Share _metadata between forked processes"), which
-changed TEST_F to use constructor-based allocation and also changed
-XFAIL_ADD to read the pointer value in its constructor. This created the
-race where XFAIL_ADD could run before TEST_F and read NULL.
+EEE_EN (bit 3) is never set - the MAC does not actually enter LPI.
+priv->eee.eee_enabled stays false at init, so bcmgenet_mac_config()
+never calls bcmgenet_eee_enable_set(). The result is ethtool advertising
+"enabled - active" while zero power savings happen, which is worse than
+the original bug.
 
-> Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+Likely root cause: phy_support_eee() sets eee_cfg.eee_enabled=true, 
+which
+phy_ethtool_get_eee() -> eeecfg_to_eee() then reflects back as
+eee_enabled=true - but that is PHY eee_cfg state, not MAC state. The
+fix should override eee_enabled and tx_lpi_enabled from priv->eee after
+calling phy_ethtool_get_eee(), since those fields are MAC-managed:
 
-> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-> index 16a119a4656c..4afaef01c22e 100644
-> --- a/tools/testing/selftests/kselftest_harness.h
-> +++ b/tools/testing/selftests/kselftest_harness.h
-> @@ -76,6 +76,9 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
->  		memset(s, c, n);
->  }
->
-> +#define KSELFTEST_PRIO_TEST_F  20000
-> +#define KSELFTEST_PRIO_XFAIL   20001
-> +
->  #define TEST_TIMEOUT_DEFAULT 30
->
->  /* Utilities exposed to the test definitions */
-> @@ -465,7 +468,7 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
->  			fixture_name##_teardown(_metadata, self, variant); \
->  	} \
->  	static struct __test_metadata *_##fixture_name##_##test_name##_object; \
-> -	static void __attribute__((constructor)) \
-> +	static void __attribute__((constructor(KSELFTEST_PRIO_TEST_F))) \
->  			_register_##fixture_name##_##test_name(void) \
->  	{ \
->  		struct __test_metadata *object = mmap(NULL, sizeof(*object), \
-> @@ -880,7 +883,7 @@ struct __test_xfail {
->  		.fixture = &_##fixture_name##_fixture_object, \
->  		.variant = &_##fixture_name##_##variant_name##_object, \
->  	}; \
-> -	static void __attribute__((constructor)) \
-> +	static void __attribute__((constructor(KSELFTEST_PRIO_XFAIL))) \
->  		_register_##fixture_name##_##variant_name##_##test_name##_xfail(void) \
->  	{ \
->  		_##fixture_name##_##variant_name##_##test_name##_xfail.test = \
+   ret = phy_ethtool_get_eee(dev->phydev, e);
+   if (ret)
+     return ret;
 
+   e->eee_enabled    = priv->eee.eee_enabled;
+   e->tx_lpi_enabled = priv->eee.tx_lpi_enabled;
+   e->tx_lpi_timer   = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
+
+This correctly separates what the PHY negotiated (eee_active, link 
+modes)
+from what the MAC is configured to do.
+
+The deeper problem - that the MAC never enables LPI even when EEE is
+successfully negotiated - was submitted separately to net-next [1]. It
+initializes priv->eee.eee_enabled=true in bcmgenet_open() for GENET v2+,
+matching what mvneta, mvpp2 and others do.
+
+Given how the two patches interact, I think they should go through net
+as a 2-patch fix series - if there is consensus on that approach. 
+Sending
+the fix alone would ship the misleading "enabled - active, no actual 
+LPI"
+state.
+
+> 
+>        Andrew
+
+Nicolai
+
+[1] 
+https://lore.kernel.org/netdev/20260303160225.542613-1-nb@tipi-net.de/
 
