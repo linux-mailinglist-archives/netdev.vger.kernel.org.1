@@ -1,254 +1,149 @@
-Return-Path: <netdev+bounces-264400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264401-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8J0LEWiLqWl3/AAAu9opvQ
-	(envelope-from <netdev+bounces-264400-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:55:52 +0100
+	id SKr9Mp+LqWl3/AAAu9opvQ
+	(envelope-from <netdev+bounces-264401-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:56:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8512212DBC
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:55:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C3E212DDB
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:56:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8D6E30BFA93
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:54:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E415B30200DB
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771A23A5E88;
-	Thu,  5 Mar 2026 13:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBB33A5E7D;
+	Thu,  5 Mar 2026 13:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vhjkxXVN"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="dQ0rhJnC"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9D83793AF;
-	Thu,  5 Mar 2026 13:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B21396B6E;
+	Thu,  5 Mar 2026 13:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772718846; cv=none; b=PmezVK93ht3qfzpdJc0Z8PnPCZd6q/MlHBwgvzpcvTIAg34/7i9+bfsdLy6S6cgIwRIfdQfQ8M890fax070kYuUuDuVHtFDw+LkDpLRs+sUkfC2xSfWWiv8aLvobBsDzgsGENQ9UNGGkFdRgCn2O9qSvASST3NHFON9QlDsXfnc=
+	t=1772719002; cv=none; b=fqS/AXMtWYKIuuIifqfYKe98qSGlD1H/I6jCay3WFwbDoFCz3GyajK7dxHBxDolViGFVUj+HJP3hafIrKd8C6VBI6fd+0uTs4J1bwEnxjdL834GhFhnfg0+YLzO4niiFTWy84sRlF9yjytcd66ZfCE7I8Qmm3MmzIaKSRX7dCi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772718846; c=relaxed/simple;
-	bh=tCl6/GMKmQ3BxAmgEOZu6/xM8rVKQDzWssWhsDrZvc4=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=H8S9QSPlXdw5IkYPhvm+p/WOV9AUdJCLZQ1QiS5q1BOs6lZEOiSsYkl/dUqTfGXqjcwYBojUwzVYC+JY3FBPbfM5Rl4nQDeM5alSxEbKSX2sxEl73gIlAszI7o/GHWHXkFkWdxUVt7ViAn/Zh7Hj67LeHxeyZwoJ//tr+cDf+Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vhjkxXVN; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1772719002; c=relaxed/simple;
+	bh=4UwnXqz+hYh+BC00sFH7WQ8UZ8eB34WeTo3IcRW6h0I=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hvmag9ZKucTyo0pS/9IyRvl2kyDj8Ev4tDY3VawkUjcj2xUfTigzUotGoq/F45zEGtrDbsjiSZ5HlPBdIEDLTvfRfO00W4eQagaeC8dBY9BYmqC8EQzhkRiIZjqbcOGb5Op0wobTao2i/sH/lAPrqmzOECB8mxxw4jYz+bDrSqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=dQ0rhJnC; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772718845; x=1804254845;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=tCl6/GMKmQ3BxAmgEOZu6/xM8rVKQDzWssWhsDrZvc4=;
-  b=vhjkxXVN+/8N8ZRBTVelvn3AB+5ReXdmntzesgQ5g6TMuMmSukUaHhWi
-   eGz9U1eiBuPWCVwvAChgaKrQnjo8bWfvvvxTNMF5lIXape0Riq0Sgjc5h
-   MmJgxBV39ug1YicyaVveNqF5hB5dpaPBoYhvKwsmP3blorAkwT/qlfDBg
-   /fcL7uSt8Uu32SiSZrPPvPpQj+Ze/F25ObO2VlwxnXRvB35bf55dYabI7
-   27jnypsigqGpM/Iv+ZTMqVAOOEp4nJPQ6EYIucPqKjxRJCh+vWhITtUBv
-   crLEO9qBXpBdDInjhOld0IDnGKv7OLM/GE2CuOR8YvGKDYU+1XtiRLx/t
-   A==;
-X-CSE-ConnectionGUID: 53Fw462UR1+dIo39tzfrSg==
-X-CSE-MsgGUID: x9GW6meWQA6aIc7I/EugbA==
+  t=1772719001; x=1804255001;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4UwnXqz+hYh+BC00sFH7WQ8UZ8eB34WeTo3IcRW6h0I=;
+  b=dQ0rhJnC1SotISorLlS3Mt5vQXRFMsn2dU+OQbWZ6gfqnBnOJqKQaFZO
+   JrB6JyC26Vx1gDiyepnoF8PLS9aYD8b5An1Tfb06IL2ZKwdHqhN5KSwaT
+   fL0/065bzDcF4VYoulgvFbzsduPCh4Gp3ifLsSi2FroSVje3arrdbYrGJ
+   Yprhv0FAoFyJmu2iewydtHyKomtzhYI8gvAeXkMqOB7+3Kx/MnWTtcdtm
+   TVGBMpjutE3fPXrxmbnf8Azq0fj/d1L1h9iydWEcsUM4M3HQpupcrLRzO
+   eX7fEKdsRHBKVBeMHnRRZmA1sxjrQ/CFQFW+QruOVPlRCjTVoCTz0MP5k
+   w==;
+X-CSE-ConnectionGUID: o2R6k7DETgy+YK0hkUQ4eg==
+X-CSE-MsgGUID: 7Pt58m7bQOyqO/xFDF+kbQ==
 X-IronPort-AV: E=Sophos;i="6.23,103,1770620400"; 
-   d="scan'208";a="54264246"
+   d="scan'208";a="221537042"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Mar 2026 06:54:04 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 06:56:40 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Thu, 5 Mar 2026 06:56:17 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 5 Mar 2026 06:53:50 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 06:53:47 -0700
-Message-ID: <3811e2284c284a3260cf7f746e97fd28426b8ef1.camel@microchip.com>
-Subject: Re: [PATCH net-next 1/8] net: dsa: add tag driver for LAN9645X
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
+ 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 06:56:17 -0700
+Date: Thu, 5 Mar 2026 05:56:15 -0800
+From: Charles Perry <charles.perry@microchip.com>
+To: Conor Dooley <conor@kernel.org>
+CC: <netdev@vger.kernel.org>, Sean Anderson <sean.anderson@linux.dev>,
+	"Nicolas Ferre" <nicolas.ferre@microchip.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
  Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung Huh
-	<woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Thu, 5 Mar 2026 14:53:46 +0100
-In-Reply-To: <20260303161147.bgbltslwrl2gtd7p@skbuf>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-1-bff8ca1396f5@microchip.com>
-	 <20260303161147.bgbltslwrl2gtd7p@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King
+	<linux@armlinux.org.uk>, <linux-kernel@vger.kernel.org>,
+	<charles.perry@microchip.com>
+Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <aamLf63OfJ5RH69v@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260224202854.112813-1-charles.perry@microchip.com>
+ <20260224202854.112813-2-charles.perry@microchip.com>
+ <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
+ <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
+ <20260304-unvented-crinkle-37f0bfd03541@spud>
+ <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
+ <20260305-backlit-epilogue-62139ae694a6@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: B8512212DBC
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260305-backlit-epilogue-62139ae694a6@spud>
+X-Rspamd-Queue-Id: D2C3E212DDB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264400-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-264401-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:dkim,bby-cbu-swbuild03.eng.microchip.com:mid]
 X-Rspamd-Action: no action
 
-On Tue, 2026-03-03 at 18:11 +0200, Vladimir Oltean wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> On Tue, Mar 03, 2026 at 01:22:27PM +0100, Jens Emil Schulz =C3=98stergaar=
-d wrote:
-> > Use long prefix on extraction (RX) and no prefix on injection (TX). A
-> > long prefix on extraction helps get through the conduit port on host
-> > side, since it will see a broadcast MAC.
-> (...)
-> > The format can be configured asymmetrically on RX and TX.
->=20
-> Do you foresee a need to configure the prefix length? It would be
-> possible to do that by changing the tagging protocol. But it implies
-> that the "lan9645x" string as found in /sys/class/net/.../dsa/tagging
-> becomes user ABI that is set in stone. It will mean long extraction
-> prefix and no injection prefix. Otherwise user space will get very
-> confused (libpcap, XDP, whatever else might get written).
->=20
+On Thu, Mar 05, 2026 at 09:42:19AM +0000, Conor Dooley wrote:
+> On Wed, Mar 04, 2026 at 09:37:23AM -0800, Charles Perry wrote:
+> > On Wed, Mar 04, 2026 at 04:23:30PM +0000, Conor Dooley wrote:
+> > 
+> > Are you able to check register 23, bit 13 of your PHY by any chance? Maybe
+> > with the mdio/mii commands in U-Boot if you have that.
+> 
+> "mii read addr 23" returns 0660 for both PHYs in U-Boot.
 
-That is a good point, so the prefix choice could be baked into the name lik=
-e
-lan9645x-long? I do not forsee a need to configure the prefix. I wanted to
-mention it because it is a difference with the ocelot driver.
+Oh, I think you fell into a trap of U-Boot's mii command.
 
-> > +static inline u32 lan9645x_ifh_get(const u8 *ifh, size_t pos, size_t l=
-ength)
-> > +{
-> > +     size_t end =3D (pos + length) - 1;
-> > +     size_t start_u8 =3D pos >> 3;
-> > +     size_t end_u8 =3D end >> 3;
-> > +     size_t end_rem =3D end & 0x7;
-> > +     size_t pos_rem =3D pos & 0x7;
-> > +     u8 end_mask, start_mask;
-> > +     const u8 *ptr;
-> > +     u32 val;
-> > +
-> > +     end_mask =3D BTM_MSK(end_rem);
-> > +     start_mask =3D TOP_MSK(pos_rem);
-> > +
-> > +     ptr =3D &ifh[LAN9645X_IFH_LEN - 1 - end_u8];
-> > +
-> > +     if (end_u8 =3D=3D start_u8)
-> > +             return (*ptr & end_mask & start_mask) >> pos_rem;
-> > +
-> > +     val =3D *ptr++ & end_mask;
-> > +
-> > +     for (size_t j =3D 1; j < end_u8 - start_u8; j++)
-> > +             val =3D val << 8 | *ptr++;
-> > +
-> > +     return val << (8 - pos_rem) | (*ptr & start_mask) >> pos_rem;
-> > +}
->=20
-> If performance isn't a huge concern, pack() and unpack() certainly seem
-> simpler than having your own implementation.
->=20
+The arguments are always in hex even if you dont prepend "0x".
 
-I did see pack/unpack, but I had some trouble getting gcc to inline them.
-The performance on the CPU port with our development hosts is less than=C2=
-=A0
-expected, so I tried to make this reasonably fast.
+What "mii read 8 23" did is most likely read register 0x23, masked with
+0x1f because clause 22 has only 32 registers. So it read register 0x3 which
+is the device identifier 2 register: 0x0660.
 
-> > +
-> > +static inline void lan9645x_xmit_get_vlan_info(struct sk_buff *skb,
-> > +                                            struct net_device *br,
-> > +                                            u32 *vlan_tci, u32 *tag_ty=
-pe)
-> > +{
-> > +     struct vlan_ethhdr *hdr;
-> > +     u16 proto, tci;
-> > +
-> > +     if (!br || !br_vlan_enabled(br)) {
-> > +             *vlan_tci =3D 0;
-> > +             *tag_type =3D LAN9645X_IFH_TAG_TYPE_C;
-> > +             return;
-> > +     }
-> > +
-> > +     hdr =3D (struct vlan_ethhdr *)skb_mac_header(skb);
-> > +     br_vlan_get_proto(br, &proto);
-> > +
-> > +     if (ntohs(hdr->h_vlan_proto) =3D=3D proto) {
-> > +             vlan_remove_tag(skb, &tci);
-> > +             *vlan_tci =3D tci;
-> > +     } else {
-> > +             rcu_read_lock();
-> > +             br_vlan_get_pvid_rcu(br, &tci);
-> > +             rcu_read_unlock();
-> > +             *vlan_tci =3D tci;
-> > +     }
-> > +
-> > +     *tag_type =3D (proto !=3D ETH_P_8021Q) ? LAN9645X_IFH_TAG_TYPE_S =
-:
-> > +                                          LAN9645X_IFH_TAG_TYPE_C;
-> > +}
-> > +
-> > +#endif /* _NET_DSA_TAG_LAN9645X_H_ */
->=20
-> Why do these need to live in a separate include file? Who else needs
-> access to them other than the tagger?
->=20
+The exact command should be "mii read 8 0x17", "mii read 9 0x17".
 
-You are right I will move them to the .c file.
-
-> > +static const struct dsa_device_ops lan9645x_netdev_ops =3D {
-> > +     .name =3D LAN9645X_NAME,
-> > +     .proto =3D DSA_TAG_PROTO_LAN9645X,
-> > +     .xmit =3D lan9645x_xmit,
-> > +     .rcv =3D lan9645x_rcv,
-> > +     .needed_headroom =3D LAN9645X_TOTAL_TAG_LEN,
-> > +     .promisc_on_conduit =3D false,
->=20
-> Initializing with false is unnecessary.
-
-I will remove it in the next version.
-
->=20
-> > +};
-> > +
-> > +MODULE_DESCRIPTION("DSA tag driver for LAN9645x family of switches, us=
-ing NPI port");
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_LAN9645X, LAN9645X_NAME);
-> > +
-> > +module_dsa_tag_driver(lan9645x_netdev_ops);
-> >=20
-> > --
-> > 2.52.0
-> >=20
+Sorry for that.
 
 Thanks,
-Emil
+Charles
 
 
