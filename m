@@ -1,306 +1,207 @@
-Return-Path: <netdev+bounces-264117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264118-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADu2IhvbqGnGxwAAu9opvQ
-	(envelope-from <netdev+bounces-264117-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:23:39 +0100
+	id cJ/JNe7dqGlmyAAAu9opvQ
+	(envelope-from <netdev+bounces-264118-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:35:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C68209C72
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:23:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50DFD209E50
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E2DF43032DFD
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 01:23:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A3BC303A4A9
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 01:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D34237A4F;
-	Thu,  5 Mar 2026 01:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D285323EAA3;
+	Thu,  5 Mar 2026 01:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="genOpp6H"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="CUfFxA6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384F2224AF0
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 01:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B593221767D;
+	Thu,  5 Mar 2026 01:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772673815; cv=none; b=PTQoyhPfsFVh2p6Lw+7TkPfSQtsZMbnwQ2GED5EXD3YoeAKoeRRaCTP6FkYU4TOOnrF1p/5OFxA7OnhCmVsvS40vZxh0DDfbVir2iJ8LLkpMFFKiJLHeTL7OlkRvRr78CIlWHin2RJHerzB9zudKAdczmoB4/tPkpOQ9IVFNe5I=
+	t=1772674462; cv=none; b=ZoYzQukiO8HU2bRKb4r9m3fsGCVwvIZzkJlwIe1fRzaRy9uRGbcfmUrOd7DsUIj7BkvUBfi4apGbQx/dyyNrTDWRWWiFHv35W7pd6kpOkb/e/oKq+bhqX+M9+mQqNDo6JLEgmmRaMM2yr3XQkv3+1E6e+AyyIMjupVlyuMqiDrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772673815; c=relaxed/simple;
-	bh=eAwSSZq1S1cECE8QcOcMkGFl4cUHJ5fde3/Pck+E77w=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=eaR2URLPec8O5ofNbhCisMBGp9Z2IL94ykCqsnEm6mBlxOTTip7zhqJb//1TLaMyCrqI5HXX3vCf/a0GiszIWvjWxyEEHbIF0i+1qrKXM+piX9hW9BNjU9au7L5N9Br0yuKGPC6sio0nQWDc+GnlIa7/s02mk9Qr+yuv/AFE4Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=genOpp6H; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8cb39f64348so746688985a.0
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 17:23:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772673813; x=1773278613; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KVDQr6tFhw7bVZIKcmDc7TpYHkRddX5knAKFPdYV8I4=;
-        b=genOpp6HYOixq52VJFtEvcq7oH3ctMlJB1Khu2dlyAlFhT/prXCnldB4gf7NuU2lqa
-         QkfUAzSrH+JKolExfhSh9GHwcdLRpm8kCoCXnARnSnimTSEjbom5/fwY+8lhtT5daJyT
-         4j/9qWz6HPIJmmeADfcJBykshz8cEjq1FG0biOZEA0Mu6VrUghi2Pao7wmwhRPKuhxNA
-         oyXrSE2rMZxlD00MSELF0dl2ugscR8hvkl/lvaW5pNx/rc9Rc0R14x6BB0hKpiDwUhh8
-         d93vR3jYDm73r0PBFfRAE3VsYohbR7IF75dqErXjiwD3m3/4njTSuCUtRrmC7lLGLCTH
-         1wYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772673813; x=1773278613;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KVDQr6tFhw7bVZIKcmDc7TpYHkRddX5knAKFPdYV8I4=;
-        b=iApyRA2mGtjZhdHQTJb8/yrUhxUW3T1CUUF+W5Z8ejHq6cnB3wm/Zw9OEvAunKvhKm
-         mPQV8ueEwbqsW+Os7X0JbqauH7U5LXFi2HiLEEqq0QcIYT7yppr31v8h+u6V2j99XxHZ
-         BxZoHHj4hSGJWuuw0Cy75ZqM1SwfUjMPV7tlvL9DJtxGiWYC98lWyfEFl+Vtx5WSrKEc
-         O3pj4rZF7KLcqIHIxmAUDq/Phtg2DUi2ChRHGTOk/v6c1Wz1W6f69ZDvA+bZST7qWsDX
-         +baeEgzXnv2wE7YTFEBUyna8X7eixpUZCIvebNZjE7/gyTmI6t3LyOxLeclkSdhcAw44
-         I9CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxFrmAUSS0May2bo96evsL0n4kH7jt++21uUX8p0PPU0mT9E6KtR78xAs1LfBYAa86HxyECzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywuntxwdwj6vRK5ZirvNywMBJ/QXzFkuJCSx/G4R9I/LKLXFSuo
-	BAVSYVGiomxBIvPHt0pP6kTYIMPRoTl1l8/RWHohpMlaKnHm7u2Ggbj7
-X-Gm-Gg: ATEYQzylSLu3Y/qkbg3Ypj93rbEgp27W5d3o3It97S2tdTofpqBkEYLEt29xjqNF1kG
-	+3sk8HNpSkdEVTiySiKzK7DxHe816BJDNNhgPYmZpS7LbMPyO/Fj2EhdkzYW56kbxbTUqkKj1XR
-	V+v6z1Qx0hWtIC3iSjwHoVLPcDjd9vNuuuGqUL5xjPs1olMaHUf6f9TNLJpMAQRt+UoYraXYG31
-	sLJeZRACE/Dk1InBFpssLlqfI7c7Dk2YWG2QZktKajczcQu/og/pL3dEGNTDe5rsT9B2MtPcpQ1
-	EQMXodGAkH9PlGvvRFDMwg9V9gjgaTTRKyuRhfanys5jb74spPn5Iu90GEPUlFVrfJJGFWy6t2a
-	z487R5hx877txN4QvybyLgWAgwFpPIXIqsxca5ajrCsWYQPfFKlgQKMdqJHhPt1cfd3Xg+9xaUj
-	53cXWrwu/WGsdZi6wzJnFhCvhYYqHzBm3SO+ks8pMaM5dhpSy7gtl+BHCqipKk0ut3shIQNLDC/
-	A==
-X-Received: by 2002:a05:620a:4096:b0:8b2:74e5:b36 with SMTP id af79cd13be357-8cd5afa5ad6mr506658385a.68.1772673813061;
-        Wed, 04 Mar 2026 17:23:33 -0800 (PST)
-Received: from smtpclient.apple ([2601:985:4601:5df0:a9a5:c58:6f6a:6267])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf67814bsm2026745585a.17.2026.03.04.17.23.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Mar 2026 17:23:32 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1772674462; c=relaxed/simple;
+	bh=aMYArM3wUrHeJLKp8SWUzOqMDGiQhbwctNABT1AZ9EA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CeP7ErsgjgoCHVrefpsUKBqcR0Q8jbh2zCLwbwmMp8KyLR1Rrzwc1yDJMR/XeHAmJWKJiOGCyV8Vy/wtMjZme+5/NUIxmV89cKvbbJ+6zw/G4bQi1p9ObZBQwsAO+QrYubFytLCQJSxODC020ALF/scA+Ws0SXA0+YuMyVxwMxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=CUfFxA6J; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=lJnJYDr6bYaboKBefh84q3RkL2P5+oQDO0Dj0RFHaHI=; b=CUfFxA6JYUULdXWfLqMI3SwjlD
+	O6mJ8K21nPXUty5nJdGQuzB7uPwhLngias97vcMbxcgZF02su5TyWn8oHGc+l4jUMxc2XtY/Uhk/g
+	ToITGz7jF8MoANY8kRLz7+QFlNJ5kbV18a3civH8jSxgUWzN0ZST4KPzSWuqrBbLSfmJSuvCeMiwz
+	7gW0GzpGGG/bpHAb5pATQY+kHqJ4NTodrh+4xTuZi4JUokN/zwsqTdyBcfis9+HJuPxa3/uYVwNCq
+	e4JbI5/7w4MBk98ugsVDAEweuGfyavXVT1sLkBkNyK98Mah0uieWvpNcOj1xX0x5ADqf14+doSTsC
+	E3pC9DoQ==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vxxbR-0003aV-1w;
+	Thu, 05 Mar 2026 02:34:13 +0100
+Received: from localhost ([127.0.0.1])
+	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vxxbP-000DWr-1w;
+	Thu, 05 Mar 2026 02:34:11 +0100
+Message-ID: <525dab04-4e64-49cf-94d9-12084e146b80@iogearbox.net>
+Date: Thu, 5 Mar 2026 02:34:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
-Subject: Re: [net,v4] serial: caif: hold tty->link reference in ldisc_open and
- ser_release
-From: Shuangpeng <shuangpeng.kernel@gmail.com>
-In-Reply-To: <20260304012612.2592839-1-kuba@kernel.org>
-Date: Wed, 4 Mar 2026 20:23:20 -0500
-Cc: davem@davemloft.net,
- edumazet@google.com,
- linux-kernel@vger.kernel.org,
- pabeni@redhat.com,
- netdev@vger.kernel.org,
- horms@kernel.org,
- jiayuan.chen@shopee.com,
- jirislaby@kernel.org,
- andrew+netdev@lunn.ch,
- gregkh@linuxfoundation.org,
- shaojijie@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CC580D33-FC23-4271-ADEF-A0DEAE6BE9ED@gmail.com>
-References: <20260301220525.1546355-1-shuangpeng.kernel@gmail.com>
- <20260304012612.2592839-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3864.400.21)
-X-Rspamd-Queue-Id: 06C68209C72
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] bpf: bpf_out_neigh_v4: Fix nd_tbl NULL
+ dereference when IPv6 is disabled
+To: Fernando Fernandez Mancera <fmancera@suse.de>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Hangbin Liu <liuhangbin@gmail.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260228-net-nd_tbl_fixes-v1-0-2b2a274df9bb@suse.com>
+ <20260228-net-nd_tbl_fixes-v1-1-2b2a274df9bb@suse.com>
+ <0b52257d-d557-4f26-9931-34c81ab621bc@iogearbox.net>
+ <20260302171131.28373ccb@kernel.org>
+ <0d7bb5c5-4122-4dc9-b52b-c305591207d1@suse.de>
+ <bbee1ce1-0615-4be2-b7b1-a14eaf2afe26@iogearbox.net>
+ <ba665193-bb6f-4293-b8ca-bbb267e92eb3@kernel.org>
+ <ba35fa2c-0085-43c9-afe0-3b2e0351ca3c@suse.de>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <ba35fa2c-0085-43c9-afe0-3b2e0351ca3c@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27930/Wed Mar  4 08:24:08 2026)
+X-Rspamd-Queue-Id: 50DFD209E50
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264117-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264118-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[suse.com,linux.dev,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:mid]
 X-Rspamd-Action: no action
 
+On 3/4/26 5:13 PM, Fernando Fernandez Mancera wrote:
+> On 3/4/26 4:49 PM, David Ahern wrote:
+>> On 3/3/26 9:49 PM, Daniel Borkmann wrote:
+>>> Maybe the "fix" could be to just switch IPV6 from tristate to bool in
+>>> the Kconfig, and then once net merges into net-next we could deconstruct
+>>> all the helper cruft which makes the late on-demand module loading of
+>>> IPv6 work.
+>>
+>> +1
+> 
+> Maybe I am missing something here, but I believe this won't solve the problem. Even if ipv6 is built-in, it should be possible to pass ipv6.disable=1 during boot and therefore nd_tbl would still be uninitialized, not NULL tho.
+I presume you mean disable_ipv6_mod which then bails out during the module
+load process without error, right? It could be deprecated with a warning so
+that it turns into a no-op:
 
-
-> On Mar 3, 2026, at 20:26, Jakub Kicinski <kuba@kernel.org> wrote:
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see =
-https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> serial: caif: hold tty->link reference in ldisc_open and ser_release
->=20
-> This commit addresses a KASAN slab-use-after-free in pty_write_room()
-> triggered when caif_serial's TX path calls tty_write_room(). The fix
-> holds an extra reference on tty->link throughout the lifetime of the
-> caif_serial line discipline.
->=20
-> Link: https://lore.kernel.org/all/20260228094741.1e248271@kernel.org/
-> Link: =
-https://gist.github.com/shuangpengbai/c898debad6bdf170a84be7e6b3d8707f
->=20
-> The Fixes tag points to commit 308e7e4d0a84 ("serial: caif: fix
-> use-after-free in caif_serial ldisc_close()"), but the regression was
-> actually introduced by commit e31d5a05948e ("caif: tty's are kref
-> objects so take a reference"). That commit added tty_kref_get(tty) to
-> hold a reference on the tty, but failed to also hold a reference on
-> tty->link, which is accessed via tty_write_room() in handle_tx().
->=20
-> Commit 308e7e4d0a84 merely exposed this existing regression by =
-changing
-> the timing.
->=20
-> Should the Fixes tag be updated to:
->=20
->    Fixes: e31d5a05948e ("caif: tty's are kref objects so take a =
-reference")
->=20
-
-Thanks for confirming the correct Fixes commit. I will update the Fixes
-tag in the next revision.
-
->> diff --git a/drivers/net/caif/caif_serial.c =
-b/drivers/net/caif/caif_serial.c
->> index b90890030751..1873d8287bb9 100644
->> --- a/drivers/net/caif/caif_serial.c
->> +++ b/drivers/net/caif/caif_serial.c
->> @@ -297,6 +297,7 @@ static void ser_release(struct work_struct *work)
->> dev_close(ser->dev);
->> unregister_netdevice(ser->dev);
->> debugfs_deinit(ser);
->> + tty_kref_put(tty->link);
->                        ^^^^^^^^^^^^^^^^^^^^
->=20
-> Can this dereference NULL? The tty->link field is only set for PTY
-> (pseudo-terminal) pairs. For regular serial ports and other non-PTY
-> devices, tty->link is NULL.
->=20
-> The CAIF line discipline can be attached to any TTY device via the
-> TIOCSETD ioctl. When ser_release() is called to clean up a ser_device
-> that was created for a non-PTY TTY device, tty->link would be NULL.
->=20
-> Should this check for NULL before calling tty_kref_put()?
->=20
-
-tty_kref_get() / tty_kref_put() are NULL-safe, so calling them with
-tty->link =3D=3D NULL is not a functional issue.
-
-I can add explicit if (tty->link) guards to improve readability if you =
-prefer.=20
-Please let me know if you would like me to include those checks.=20
-This also applies to the other concerns in the patch where tty->link may
-be NULL.
-
-
->> tty_kref_put(tty);
->> }
->> rtnl_unlock();
->> @@ -331,6 +332,7 @@ static int ldisc_open(struct tty_struct *tty)
->>=20
->> ser =3D netdev_priv(dev);
->> ser->tty =3D tty_kref_get(tty);
->> + tty_kref_get(tty->link);
->        ^^^^^^^^^^^^^^^^^^^^^^^^
->=20
-> Can this dereference NULL? When a user attaches the CAIF line =
-discipline
-> to a non-PTY TTY device via TIOCSETD, ldisc_open() is called with a =
-tty
-> where tty->link is NULL.
->=20
-> While ldisc_open() performs capability checks (CAP_SYS_ADMIN), there =
-is
-> no code restricting this to PTY devices only.
->=20
-> Should this check for NULL before calling tty_kref_get()?
->=20
->> ser->dev =3D dev;
->> debugfs_init(ser, tty);
->> tty->receive_room =3D 4096;
->> @@ -339,6 +341,7 @@ static int ldisc_open(struct tty_struct *tty)
->> rtnl_lock();
->> result =3D register_netdevice(dev);
->> if (result) {
->> + tty_kref_put(tty->link);
->                ^^^^^^^^^^^^^^^^^^^^^^^^
->=20
-> Can this dereference NULL in the error path? If register_netdevice()
-> fails after the CAIF line discipline was attached to a non-PTY TTY
-> device, the error path would attempt to release a reference on
-> tty->link when it is NULL.
->=20
-> Should this check for NULL before calling tty_kref_put()?
->=20
->> tty_kref_put(tty);
->> rtnl_unlock();
->> free_netdev(dev);
->=20
-> Simon Horman raised a concern in v2 about a NULL pointer dereference =
-in
-> update_tty_status(). The v4 patch does not use the spinlock approach
-> from v2, and does not address this race condition.
->=20
-> After ser_release() sets ser->tty =3D NULL, a concurrent handle_tx() =
-that
-> already passed the NULL check can reach update_tty_status(ser).
->=20
-> Looking at update_tty_status():
->=20
-> drivers/net/caif/caif_serial.c:update_tty_status() {
->    inline_decode(ser->common.flowctrl,
->        ser->tty->flow.stopped << 5 |
->        ser->tty->flow.tco_stopped << 3 |
->        ser->tty->ctrl.packet << 2);
-> }
->=20
-> It dereferences ser->tty directly (ser->tty->flow.stopped,
-> ser->tty->flow.tco_stopped, ser->tty->ctrl.packet).
->=20
-> Can this cause a NULL pointer dereference?
->=20
-> Simon also raised a concern about potential deadlock with spinlock =
-usage
-> in v2. The v4 patch removes the spinlock approach entirely.
->=20
-> handle_tx() is called from caif_xmit(), which is the ndo_start_xmit
-> handler. This can run in softirq context (NET_TX softirq). =
-ser_release()
-> runs in process context (workqueue).
->=20
-> How does the current synchronization between handle_tx() and
-> ser_release() prevent races?
-
-We keep an extra reference to tty->link for the lifetime of the CAIF
-ser_device, until ser_release() unregisters the netdevice. We believe
-this can cover all the usages in handle_tx(), but please feel free to =
-let
-us know if there are uncaught issues by us.
-
-
-
-> --=20
-> pw-bot: cr
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 31ba677d0442..fdb8648647fd 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -1082,8 +1082,8 @@ static int __init inet6_init(void)
+         raw_hashinfo_init(&raw_v6_hashinfo);
+  
+         if (disable_ipv6_mod) {
+-               pr_info("Loaded, but administratively disabled, reboot required to enable\n");
+-               goto out;
++               pr_warn("The ipv6.disable module parameter has been deprecated and will be removed in future kernels.\n");
++               disable_ipv6_mod = 0;
+         }
+  
+         err = proto_register(&tcpv6_prot, 1);
 
 
