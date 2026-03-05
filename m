@@ -1,83 +1,66 @@
-Return-Path: <netdev+bounces-264313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFaHOotmqWmc6wAAu9opvQ
-	(envelope-from <netdev+bounces-264313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:18:35 +0100
+	id yC1EG5tnqWlN6wAAu9opvQ
+	(envelope-from <netdev+bounces-264312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:23:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394862107B9
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:18:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0614210885
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 41C2E3034C70
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:17:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A9EF30D50B8
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0C038836D;
-	Thu,  5 Mar 2026 11:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB8836F40E;
+	Thu,  5 Mar 2026 11:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BuTWdpfO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIAwlwOz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9279D38735D;
-	Thu,  5 Mar 2026 11:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BDE388364;
+	Thu,  5 Mar 2026 11:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772709418; cv=none; b=FUkRU8oc04U6gXJyIYJJBjfEvRu5eWCZeXgB3eNPo17VNNoKdWjeh/MW+Gk45JzbkOk+5/U3sxD9nstfv1L7OUl8LjmCihJYtOJX+nb08dRZCAVaWuLeTY3+qJZnSmmgEgq7gGi74oY8Lfp8TjrVebg6PjSZIzQ/RigChQGIsOo=
+	t=1772709416; cv=none; b=bl2TViaOVD8IjIZ2SC2dkU8QuL45N56Lrp3gv2JlI4D80leiqMvMvbJTTKneGXfKybUDtKevG8c/WonGcbGP1DxkGYDPzUt68gQ0cnDeIovb+MFfYgCP76Uy0fb7VKeY3YQkqkFGYxXAPjiMVOe1xrnhpDG2vinxQmsN4l6ftOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772709418; c=relaxed/simple;
-	bh=FIdCqi/37xP+b14PjxcZIAV+eBP/n6AMX/DfdPGJS/w=;
+	s=arc-20240116; t=1772709416; c=relaxed/simple;
+	bh=wffDf4FT3dOwIOmwn2q6s5EPtLmLJobTvyH563mzxZo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPhyuloUlaUUODwsZ58bXWI6/zd2iS09bbF/gxqWB5kJ8uqbgmCXRX0C7xzfP82fMcuwISQudCNpnyDdkUGxHlzMC8SRGI3rBYUWnQ82AbO0YjziHTOvRVU5o9rT6PbpiFgLRo6rYVC0zH77aYIcPKxMxyTE3hfcZgqqmVA3hh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BuTWdpfO; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772709416; x=1804245416;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FIdCqi/37xP+b14PjxcZIAV+eBP/n6AMX/DfdPGJS/w=;
-  b=BuTWdpfOmtV+BEEnFRF8s/flCW5sLEgKVlsctEf+TDhvykzwVtH0Pak0
-   QnQDemv0Nremsq3Yf5Q3rBO2z0ICPvsfmfMuL8EukTW/JLzUYRnjmxddJ
-   IbuhibMFW2IOZRIuzqazJc+HnDZTeRzwyvLNjI0fJdIqBusnTtUNzV+/S
-   skjpDkoGAmTL1vJRnVsivRv5NWVR+BteOcx7XENe8EYT0Ud3kXyDM1Py5
-   Ix6PmgnVFjC6xQtw6zvL49djiHEk/nD6HOgEzpkWbmUfESJf58ok8g8tQ
-   VARiv5Iwcy9eplg52SuiSEUyIkDhkSfNL/5ZacnMq6WJvw/VB/CSZ8d+Z
-   g==;
-X-CSE-ConnectionGUID: T0EX/3vVRJqSXtMgHcdyIQ==
-X-CSE-MsgGUID: WhueYYYjTe6ocDEXr0/pPg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="91185313"
-X-IronPort-AV: E=Sophos;i="6.23,102,1770624000"; 
-   d="scan'208";a="91185313"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 03:16:55 -0800
-X-CSE-ConnectionGUID: QukI1M3TQN+YJ8EolXxXmQ==
-X-CSE-MsgGUID: G1dgtvoXTRiIcZexrcCvfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,102,1770624000"; 
-   d="scan'208";a="217792854"
-Received: from lkp-server01.sh.intel.com (HELO cadc4577a874) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 05 Mar 2026 03:16:51 -0800
-Received: from kbuild by cadc4577a874 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vy6hE-000000000Ws-06uN;
-	Thu, 05 Mar 2026 11:16:48 +0000
-Date: Thu, 5 Mar 2026 19:16:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>, saeedm@nvidia.com,
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, rama.nichanamatlu@oracle.com,
-	manjunath.b.patil@oracle.com, anand.a.khoje@oracle.com,
-	Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Message-ID: <202603051910.7oo8wCfc-lkp@intel.com>
-References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=idW0N/XWwIb0bKldaBVfnkznGrHzYRfGCo+VyQcmwc6HFXkME4YbDiHCuzpoUfqkwdLhizzV7ijNyCT9Stf8aH1f/UyqKsmBInrgX3lTU9ONQXNPw5u+H/obCpKfAHFsgMBcFK3mie+L1EXWpYYrqxnVP1snOR+eUoPnBup1Co8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIAwlwOz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4BAC116C6;
+	Thu,  5 Mar 2026 11:16:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772709416;
+	bh=wffDf4FT3dOwIOmwn2q6s5EPtLmLJobTvyH563mzxZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KIAwlwOzmCYtZ3+VBU8vWrcD8bFqr1zYRlW3e7wDQKt5kmrbtb+hEmj/gWp/05WOj
+	 lB0C33AgUEwkDFEjjdbB5ABDKBExpJOJDpv+y2+0oXVUXZom2FnO3zvZLuwy22pZh4
+	 Iphcd/jQuBcykpMl/LvLB4jokqPs804F9B1db6xNbo1X+0l4Kdb2R99GclkWejKzot
+	 rwAaaHhksYAoHzn/FKgbM0HgRevhqklvCcxevn7bUDNBn7zNAeqAzeCzDDjq9Iqd9x
+	 ohaEGzE1LfC427KPqlK3Kvr9ravqbcLuEbXfIwgk3ADbRVjO8Z/Kew4jg6XZpC9Se2
+	 13sF3RxHFZtYw==
+Date: Thu, 5 Mar 2026 11:16:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Linus Walleij <linusw@kernel.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Michael Rasmussen <mir@bang-olufsen.dk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Subject: Re: [PATCH net-next] net: dsa: realtek: rtl8365mb: remove
+ ifOutDiscards from rx_packets
+Message-ID: <20260305111651.GC90938@kernel.org>
+References: <20260303-realtek_namiltd_fix2-v1-1-bfa433d3401e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,80 +69,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
-X-Rspamd-Queue-Id: 394862107B9
+In-Reply-To: <20260303-realtek_namiltd_fix2-v1-1-bfa433d3401e@gmail.com>
+X-Rspamd-Queue-Id: F0614210885
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:?];
-	TAGGED_FROM(0.00)[bounces-264313-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-264312-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org,yahoo.com];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.997];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DMARC_DNSFAIL(0.00)[intel.com : SPF/DKIM temp error,none];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.830];
-	R_DKIM_TEMPFAIL(0.00)[intel.com:s=Intel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:mid,intel.com:email,git-scm.com:url]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Praveen,
+On Tue, Mar 03, 2026 at 05:25:12PM -0300, Luiz Angelo Daros de Luca wrote:
+> From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> 
+> rx_packets should report the number of frames successfully received:
+> unicast + multicast + broadcast. Subtracting ifOutDiscards (a TX
+> counter) is incorrect and can undercount RX packets. RX drops are
+> already reported via rx_dropped (e.g. etherStatsDropEvents), so
+> there is no need to adjust rx_packets.
+> 
+> This patch removes the subtraction of ifOutDiscards from rx_packets
+> in rtl8365mb_stats_update().
+> 
+> Link: https://lore.kernel.org/netdev/878777925.105015.1763423928520@mail.yahoo.com/
+> Fixes: 4af2950c50c8 ("net: dsa: realtek-smi: add rtl8365mb subdriver for RTL8365MB-VC")
+> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> ---
+> I'm taking over the original patch submitted by Mieczyslaw Nalewaj
+> (with his authorization). The original message is referenced in the
+> Link tag.
 
-kernel test robot noticed the following build warnings:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v7.0-rc2 next-20260304]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Praveen-Kumar-Kannoju/net-mlx5-poll-mlx5-eq-during-irq-migration/20260305-003505
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260304161704.910564-1-praveen.kannoju%40oracle.com
-patch subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-config: loongarch-randconfig-r121-20260305 (https://download.01.org/0day-ci/archive/20260305/202603051910.7oo8wCfc-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 15.2.0
-sparse: v0.6.5-rc1
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603051910.7oo8wCfc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603051910.7oo8wCfc-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:25:14: sparse: sparse: symbol 'mlx5_reap_eq_irq_aff_change' was not declared. Should it be static?
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:6: sparse: sparse: symbol 'mlx5_eq_reap_irq_notify' was not declared. Should it be static?
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:6: sparse: sparse: symbol 'mlx5_eq_reap_irq_release' was not declared. Should it be static?
-
-vim +/mlx5_reap_eq_irq_aff_change +25 drivers/net/ethernet/mellanox/mlx5/core/eq.c
-
-    24	
-  > 25	unsigned int mlx5_reap_eq_irq_aff_change;
-    26	module_param(mlx5_reap_eq_irq_aff_change, int, 0644);
-    27	MODULE_PARM_DESC(mlx5_reap_eq_irq_aff_change, "mlx5_reap_eq_irq_aff_change: 0 = Disable MLX5 EQ Reap upon IRQ affinity change, \
-    28			 1 = Enable MLX5 EQ Reap upon IRQ affinity change. Default=0");
-    29	enum {
-    30		MLX5_EQE_OWNER_INIT_VAL	= 0x1,
-    31	};
-    32	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
