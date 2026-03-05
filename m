@@ -1,138 +1,153 @@
-Return-Path: <netdev+bounces-264351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264353-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJ11OIlzqWnH7AAAu9opvQ
-	(envelope-from <netdev+bounces-264351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:14:01 +0100
+	id mMPlGPpzqWl77wAAu9opvQ
+	(envelope-from <netdev+bounces-264353-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:15:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3EE21164E
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:14:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3A9A2116F8
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3AA73059A8B
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:13:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96A593064F31
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21864397697;
-	Thu,  5 Mar 2026 12:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwFj8wHa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800F339B4A2;
+	Thu,  5 Mar 2026 12:15:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F315F334C28
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C513988EE
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772712799; cv=none; b=BK6nZLok9DRZDhXZi0HZxg+V7G0EedqiB0TJt4P72t86yYme0oSOAAua3AnBNR8MpxZX7N3oFTYI4f0R744Wjs/BwzVwn9uYi/mhC06caCN1+HO6EBCA0u64OfTZ5REQphSIQUCVJMMOZI1fCB1S7sJiYw2RBof4EihcomMpGjY=
+	t=1772712939; cv=none; b=pL/L0gEJ+qdfMP++rHoifgkthm4vp05qmRpfiHJiltRWnn+ge9PE+joi2mBbuHFcK7+WtPo4534Ni+omHKzMUVmFO8rRss3JZ2Mbbh7bRtQ5YEnexKG16sURD1bKwYBibv2puQCsRvh5DEniKNfGa6G0b/zI9+sk38ewml7c/XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772712799; c=relaxed/simple;
-	bh=QEEz7bKrTbaIdtntnCFjm16TbQ6yV67W+dRNaUrpuGQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gq5wAXoKTokrarucg6jmCjPQ9yTV6RXGedUlJ20qvWRo/tvRxXfEbi30o6gn76mRAk9nJ5b44mkkileIk0+zkGe5Qv2VU9d2tj6fB5eRexvcG1vNYNVuZHO/Ftxp6KxfpYNAuuo7jmW+hNO9Nx/R3VJXvftNOl+Ajh3eF9NHWvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwFj8wHa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE720C2BC9E
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:13:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772712798;
-	bh=QEEz7bKrTbaIdtntnCFjm16TbQ6yV67W+dRNaUrpuGQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=KwFj8wHaP1ZKLGkPdRDxKwD5C5ZQeR1wz4ZDZeN3/Jd0AcAWvOo/5s2bR4/hAe0yD
-	 LrIlQzzcrA2+AscZGZCeip52ikXi7Ac+mUMatonfwDUlRQHvhUXQHQAMdMuQrqjrYV
-	 gmIUBezSpHmv2fjOJkeeam1vdneYP0h40mA3zqhB27a0GKBrbR7DLUxdUlbrKdLdxK
-	 pEZboCbol+8KNiZ9WiOfxXjsWUgYfXOp9l0wXzaj+b90NDh1VBYrz9ouTLGsa7e0w1
-	 tZ4akV29jClHbg7Viz38MHr/rkuFYyEd0lNTuRWgfRjDfGmGRd3GMnbALyIElBYJ9a
-	 RufoIGv66Mx3w==
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64aedd812baso7040507d50.3
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 04:13:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUIM48UMdJxqOJVctCglpN5GYcEOoqKnGLe4cLF2IE0reUag7218iRae5GJJtSu9Q1yVYyG0Vk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcaKZ4Tk+PLK3b+G7i9VdTjovbY6zpEl+vCLQSCdx7hOKc87xW
-	K4neCI18eF0yN6sbrdvqdbCcL7+DgGoTqEIZ8InaMKLFzSlrHS/WjGCcY4yG/RvWfUKQb0OVvOo
-	41ExPqFnUXyvyS74KH0GQZAsc+leQUbs=
-X-Received: by 2002:a05:690e:4107:b0:63f:b4ee:7920 with SMTP id
- 956f58d0204a3-64cf9b22cdamr4209918d50.11.1772712798000; Thu, 05 Mar 2026
- 04:13:18 -0800 (PST)
+	s=arc-20240116; t=1772712939; c=relaxed/simple;
+	bh=1N9rpptCfEGuKF24I3MO+ctQKVCjB9J9sj4YNN7+SI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mz3BZ1S6BQsKtKBjr0e0OAJ+c53wVxHBJBybQVY2aetxDMKMGinEcU46HnCVQPcVCj6IirpreWTHPAdbMbSJX6ezmZDEz8AqeYTwn2zRdV9PF6fcDjFKcUhWaT2bUywKqyf2wQD0jbT/f8ib3Zbtd63FDSvqp+hbtx0H3Y/2FQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-35982fd8910so2115877a91.1
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 04:15:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772712934; x=1773317734;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yS764krKV6WfB8kOxjvP29bXooB1nm1bNBDNiujlO4g=;
+        b=OK+0Vq4TOPE7T0SJ0BDyBpaEh19OsvdcGU9uSem6BBRyPYXw/fVdjM5I97IPWgBYhE
+         kRyqm3NWzd1VWAm+Bb4B04IGQC4TO/77qXdme0EyC5OM2oF0WKzMcXyiJfuOvCQ1SyZs
+         Y4rFO990929CfTsWjNf8fzAl+AWi6UyY7LIqiqw3rCck9857zpjgXwuGpiLabsdZI+sY
+         LT0bYOB89yNtDAkvUXFejXO19Gw2HIKj7D5NuXz2h0C7Y4dk4MJYJY8jWDvCcBWwN7tX
+         ND7aMCEB78q1D44++Pa9grHkJ9Joo+k99CFfcEtDdpk2IVUXlqHFmw4ZUZJ4V+NXfC1C
+         7iFA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDSgz4jcswyOQb3sGwXMZ0s/+7N75Hz5GhYr9wFwklIZHKlZPntwX9NdpsEOCyyRpocI43icI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywoq/gZvoV+e4YftFhSh5riJ+OmN79A7wVtIhtZkDyBW87UL0Pv
+	eZGniCF+6ZICkwehb+nYJ6VXZCQTBtb+Ump95sJaxV6oZhnF1UNHOiLb
+X-Gm-Gg: ATEYQzxkRgbcaxgQ3UUkukXUWq7dIjr5P3iUQqFL/5InIoUCDX+DRPkkr3XF1jplEDd
+	CPjETe48ypOI+t2w2Czetd7OnEOyHUMp9xEorrXMJcmmyVzsXjxqSTwmmD0OR7lNTopBrTR5kcx
+	N9MPC1wPzs9COKsiQwicWlNuQml2YXlgkPLLe7vl3hmb3Wka9KOd4UfRRrI0z46oSOciOWAVcsf
+	+odkd1/Vsu2nY8sA8yA68R1gJnYNJPbn6mXDJqS+cX94Cmyiw8XvAhZtyTQeriOu/jBzzinaRr1
+	o3cM1dz8GhMG3H02+nzvjdKjuuBkDuOurOFW3oSsROylFbDrEFRkQ2cA4M3ei8Rit55HdUNm5PH
+	dYO5xX5aEfM3n4mDJaFcJxYDaVk62rv9gmGqTssN8ryMVpgGZVAq1qzAakYbnZthA03oAOzogCd
+	AI6aOLbgN1xuzzAZHtE6sxpfdKvPeAkqVEJ/BZ4LqBPrgFrlBqsX/DeyfZqNxeVj6Ibf0Hg/I+X
+	q/TlarfSJGRhonKODnwIGreqGFchlXdSuVCpObP7TrQERjvMO/MZzCLr1QM9g==
+X-Received: by 2002:a17:90a:d44b:b0:34e:630c:616c with SMTP id 98e67ed59e1d1-359a6a92750mr4210979a91.31.1772712934483;
+        Thu, 05 Mar 2026 04:15:34 -0800 (PST)
+Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359b2c1daa6sm2391359a91.0.2026.03.05.04.15.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 04:15:33 -0800 (PST)
+Date: Thu, 5 Mar 2026 21:15:32 +0900
+From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Joe Perches <joe@perches.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, spacemit@lists.linux.dev,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
+Message-ID: <20260305121532.GA1649635@rocinante>
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-23-vladimir.oltean@nxp.com>
+ <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
+ <20260305085148.7cwo3yflp7vcfldf@skbuf>
+ <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
+ <20260305114352.2f7btqixg4tu5bzl@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260303-realtek_namiltd_fix2-v1-1-bfa433d3401e@gmail.com>
-In-Reply-To: <20260303-realtek_namiltd_fix2-v1-1-bfa433d3401e@gmail.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Thu, 5 Mar 2026 13:13:07 +0100
-X-Gmail-Original-Message-ID: <CAD++jLmAT7cQudGp0n1QcnZZLMSd1j4kc7ojEfta8Egaze6yuA@mail.gmail.com>
-X-Gm-Features: AaiRm52PEY6bStl9YYAIz4Tc_KcH2BFsUxAmecwE1hn6bFFyXDIQSzuAbuitX_4
-Message-ID: <CAD++jLmAT7cQudGp0n1QcnZZLMSd1j4kc7ojEfta8Egaze6yuA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: dsa: realtek: rtl8365mb: remove
- ifOutDiscards from rx_packets
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Michael Rasmussen <mir@bang-olufsen.dk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1D3EE21164E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260305114352.2f7btqixg4tu5bzl@skbuf>
+X-Rspamd-Queue-Id: D3A9A2116F8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264351-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-264353-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,yahoo.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kw@linux.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	NEURAL_HAM(-0.00)[-0.997];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 3, 2026 at 9:25=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+Hello,
 
-> From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
->
-> rx_packets should report the number of frames successfully received:
-> unicast + multicast + broadcast. Subtracting ifOutDiscards (a TX
-> counter) is incorrect and can undercount RX packets. RX drops are
-> already reported via rx_dropped (e.g. etherStatsDropEvents), so
-> there is no need to adjust rx_packets.
->
-> This patch removes the subtraction of ifOutDiscards from rx_packets
-> in rtl8365mb_stats_update().
->
-> Link: https://lore.kernel.org/netdev/878777925.105015.1763423928520@mail.=
-yahoo.com/
-> Fixes: 4af2950c50c8 ("net: dsa: realtek-smi: add rtl8365mb subdriver for =
-RTL8365MB-VC")
-> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> K:	\b(?:__)?(?:devm_)?(?:of_)?phy_(?:create|destroy|provider_(?:un)?register)\b
+> K:	\bphy_(?:create|remove)_lookup\b
+> K:	\bphy_(?:get|set)?_drvdata\b
+> K:	\b(?:devm_)?(?:of_)?phy_(?:optional_)?(?:get|put)(?:_by_index)?\b
+> K:	\bphy_pm_runtime_(?:get|put)(?:_sync)?\b
+> K:	\bphy_(?:init|exit|power_(?:on|off))\b
+> K:	\bphy_|(?:get|set)_(?:mode(?:_ext)?|media|speed|bus_width|max_link_rate)\b
+> K:	\bphy_(?:reset|configure|validate|calibrate)\b
+> K:	\bphy_notify_(?:connect|disconnect|state)\b
+> K:	(?:struct\s+)?phy(?:_ops|_attrs|_lookup|_provider)?\b
+> K:	(?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)
 
-Acked-by: Linus Walleij <linusw@kernel.org>
+What about
 
-Yours,
-Linus Walleij
+  F:	drivers/*/*phy*
+
+or something along these lines.
+
+	Krzysztof
 
