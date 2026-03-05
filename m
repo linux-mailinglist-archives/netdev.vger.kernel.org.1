@@ -1,232 +1,225 @@
-Return-Path: <netdev+bounces-264221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIQZDYA/qWnK3QAAu9opvQ
-	(envelope-from <netdev+bounces-264221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:32:00 +0100
+	id 6PxaM1ZBqWkZ3gAAu9opvQ
+	(envelope-from <netdev+bounces-264223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:39:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9593820D7D5
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:31:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D77E20D916
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E60EF300AB3D
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:31:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 612D23023304
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA8A30EF7E;
-	Thu,  5 Mar 2026 08:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6607E374754;
+	Thu,  5 Mar 2026 08:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XcYAexqa"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Zhs1szgR";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jftXYqSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E6E288514
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAAC37186B
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772699509; cv=none; b=q8SCPe8Ly6tASV8hcdM4MFgGalRP8ITGx3zxEhk5++ClYPKQYisR/A98TDtPIPf0Bt75aAxpkQq0YWRwAFl27EVJ885DvFkoWkSSXKHQYWjnz0hlkA/kZnFii/AtsizVgIrKr63Tv1CvYRogX0LV3dzegvBIixUPNVTNGdR2R/E=
+	t=1772699983; cv=none; b=dwb9f1EZ5B8X1sdqiTcYLzpUu6/76outUFsoJx+bIHCchr4su8a1HVOjMDOzemaxfNbvJkG2bfYCRrSojh0JAg4oLDny93PsT5nuvZzVZgyOngculCIB1tX1OyluN8GTYVcIE/hg+O3lw+Qvsh+TKNerCuNuKu6S5oftE1kDwJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772699509; c=relaxed/simple;
-	bh=5+PlJJMPZ01x4qhZ6DWfcD7AXC6l2dIoTVqF0OGJTYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=UbS4PRklRfHpu0aWcIfmYSLATugcJfx1SjihV0T0itVAGU4z/ZfCc8S2TQqHns0xoyVMfJ7sHX10HLBpA2i0EuGDwiB4UrPEDdPtg2vzG0JC1r89GTnQqu4X6odVKWm4SdEQjICMqrGJzNSPvuUna2JvUJEo2TnNItM10rvTX2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=XcYAexqa; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260305083138euoutp01d6e0936816b6155743235c0c9297e3a4~Z5M03gVz41133511335euoutp01j
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:31:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260305083138euoutp01d6e0936816b6155743235c0c9297e3a4~Z5M03gVz41133511335euoutp01j
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1772699498;
-	bh=v7F1z746S5jKq3OMET0fWLruAhJ0LQTk08cIJ/i5TEU=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=XcYAexqafDCu8WqbE2PsmLHF97TAlqYY6oeG7fvljTlwMvgKnsWxnKDORsSFsfliK
-	 G7hYH0pol2rF/Vb79dV1fguUIU4TKFvIYD+MEqvaU5mV6tLffdxMdDBKS3Lq8ZcNId
-	 ji3qfEf73moCuGh+OSacjeBH2Qmc+Bhn8kFgO2TE=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260305083138eucas1p19943c4dec735b06f536525de26252f03~Z5M0nRDVP0267702677eucas1p1v;
-	Thu,  5 Mar 2026 08:31:38 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260305083137eusmtip2f9125fbc0b8da7f324d26a91ccd0cdac~Z5M0K2OZU1523515235eusmtip2h;
-	Thu,  5 Mar 2026 08:31:37 +0000 (GMT)
-Message-ID: <9433de15-8675-4645-a6aa-85458e833d2d@samsung.com>
-Date: Thu, 5 Mar 2026 09:31:37 +0100
+	s=arc-20240116; t=1772699983; c=relaxed/simple;
+	bh=6xaS693NEPvMsmPDTvB8J6q5UsLGM4wm4qipY7xfOGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cgTe0q7m7j1NKTtYNv139E66TgtaQLNyzLwI9EWXMHh2i5HZdkNqFBlpffJraGOur7YSh4NPQRfTikfPvWH32TQv/zeoihfDPPODDJrfiZG6/btGPrNkNkrqkz8gGd/0k5FZcdnAjuyWiuWvd1v9QAz4bQiJZnNdF7OXpFi3NnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Zhs1szgR; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jftXYqSq; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6251BxWU3160422
+	for <netdev@vger.kernel.org>; Thu, 5 Mar 2026 08:39:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=; b=Zhs1szgRs6PvG6yC
+	/K6l0Og7co3C6ED8icQT7ngtsI9G5Zp17IaIYa/MOFJSyTxAUHo39qtMLOBGQhpj
+	JO9fE/F/E4F4LvhAKnAlFKn+fH9sEpkGqfNT9M43WTCJkjqaFeUzfOGpTrDAGNtC
+	tA5poP4iW9oFEFa2er9A5XyBDJ8CedmbmCYM1jjJmOXgrD4UqsM96/EbUTiVA/x+
+	+Hq4ib0d4uJFejDRNFTAYPM9OxAzG41cfjw0IJBJVDWkmbFbGS1eLwFkvUDxUI+x
+	i9yGzbk3U3z2KxBfUGbK5GoyOmpZPSUHhrYGJ9ek999ywA1Q/YTR3XTo5MWWFrPw
+	1lqwYw==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cpjh5uv3c-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 08:39:40 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb50dfd542so577163185a.0
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 00:39:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1772699980; x=1773304780; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=;
+        b=jftXYqSqtrokdujho1rSZ8RV2+df0VSJJ/M8ZUZxSfL+guycXk5e5Oa+/kyiYv6qq7
+         wDt7pgwE82GoCanbnE56n+QEoFdpyD0IDJAXa2uedcbQvZQWJRRzpQWeE+FA2evLbImb
+         HHx25k81XwtVs8AYIfGmGN1Heris1W4EH+3TjG9IsAQO2tfFNcYJFHacx8H5ixGQjhjp
+         YhLkHjONVRBKpyl+EoAHQo2i8UAnKVr+iozz53JeeF4uhO8r6lRrGpcB/0Hhik80AyD3
+         +bPbUwPZDvHgZwinc1JyJ5+XebVWXjYBrsXBjFQwXL48HKIXO1qH/SWx+i+izxWR3tKA
+         fXjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772699980; x=1773304780;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=;
+        b=n58vvh8H6Cq8NJ5hITrvVE72rHRTvzJXjf6uLbwvT/UBbZPZ38/qFnuhE97lgQXIGk
+         mlFgKRWaIuqyIjL9PMdD3mtEcH0FYlXh8R2EWyVL6hMuccj9z6jHbwXqNyF+W0CGhySO
+         ZiuFZOt2TkKGMFH/8NTqYKPr9Ho3/CxqWnfY0RGA0N/O3q4iXH4OjzLYs9Y+jpZ3YboT
+         +Lj6RfX2Cok9823r0FvfXdi+h6MiwNAv0xGAYwxGus98yNL+DiUQtQJKRWCujUkvyYws
+         E7XPMLTRGxjWh3p5I+2U2A02qchVe9nW5OZR19Njo+fqHjw9Pmy9Wk9mGZNgzKx/UweL
+         vh2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVy1hekh23lAue8+lcitnPp9FJAoPXWQnVDHhpMMbXeiaHN1Bx8sHnahW7naSAdp5jnJ4gEiqc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVvppnRLaI8UC3nLGrblxrpuyCDJ1cL139Wlbx8G49d0frzrvo
+	G7i4bHeO3PYbOQq0C/J4BRvKJ9yR/OsIbJYmcj2/X6hupHyWG4JRfIFzfOus1J8U+e0act195dt
+	vSeJBexLFmlm9DwtAAeKzTOm8pGl78Pj5o4OBpuyPVd2DsltL6febH5hvCOg=
+X-Gm-Gg: ATEYQzwRWZCy9mJm7DBZTW4fl2GG36zBXwgmXjjonzr5qH6R3DjPK9MXyIaUT1hGHGx
+	yL3EkXAU5nvBFawm3ILJsB0ARrLLLXJlFHB1HXObNBXtLFFrmy6N2EVoQuXcexkM5eWKph9LuhY
+	nn4wjrubO2Scb5WpvhAw5+dnU49pH+ntU78YzXV6VY4qcAyw/xsNRhnIo1w5fE9pqnfIaw+bFjx
+	DKLvPRr6gZLv8lIda2ZkLZzHqfh0/fr/519xCpz7J98U1kt75GM3XKQDfW1gtvo3ulhEjOO7LKQ
+	IagjcrQc1tGdvOKSsNBLwjfdEzlvSdIP/F1qffElQ/rd8oNmzfDVsEbB5NfH2XRd1giv8kY3TM9
+	TsVvftnWGz7Y1eDr/MvVaiUTcF8MxarPbYr7gbsjvhZGV6lL8CEWOYwsJRYNtfrFJ8whyYdt9NC
+	Z8cv0=
+X-Received: by 2002:a05:620a:404c:b0:8c7:1b40:d096 with SMTP id af79cd13be357-8cd5afcdcfbmr452358485a.9.1772699980143;
+        Thu, 05 Mar 2026 00:39:40 -0800 (PST)
+X-Received: by 2002:a05:620a:404c:b0:8c7:1b40:d096 with SMTP id af79cd13be357-8cd5afcdcfbmr452356985a.9.1772699979710;
+        Thu, 05 Mar 2026 00:39:39 -0800 (PST)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65fac06e3fasm6657504a12.25.2026.03.05.00.39.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2026 00:39:38 -0800 (PST)
+Message-ID: <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
+Date: Thu, 5 Mar 2026 09:39:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH net-next 8/8] net: phy: improve mdiobus_stats_acct
-To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Russell King - ARM Linux
-	<linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, David Miller <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, linux-phy@lists.infradead.org
+Cc: Vinod Koul <vkoul@kernel.org>, Neil Armstrong
+ <neil.armstrong@linaro.org>,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-23-vladimir.oltean@nxp.com>
 Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <2ceeb542-986a-404e-ad0f-62e0a938ce7c@gmail.com>
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260305083138eucas1p19943c4dec735b06f536525de26252f03
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260305083138eucas1p19943c4dec735b06f536525de26252f03
-X-EPHeader: CA
-X-CMS-RootMailID: 20260305083138eucas1p19943c4dec735b06f536525de26252f03
-References: <799114be-1456-442b-b479-142e7ee9d254@gmail.com>
-	<2ceeb542-986a-404e-ad0f-62e0a938ce7c@gmail.com>
-	<CGME20260305083138eucas1p19943c4dec735b06f536525de26252f03@eucas1p1.samsung.com>
-X-Rspamd-Queue-Id: 9593820D7D5
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260304175735.2660419-23-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: 3QsCZuzdxX0kwTYwNSWr7ECurHvB9yVG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA1MDA2OCBTYWx0ZWRfX1XorN1wrNvOf
+ 4y3sbGDzApNutY2EPvxTyt3fM3xj/r+zySu/QkISqST29bt2KKCnxnxI6hKduEFOYoorWI54Thh
+ uSghReTeK6ol3lkZnF2dD1oEOHtDA+vHbmsBTn4Y462vY8TT1kPcoumtAJjwpCoAGE/VH4SgW0r
+ u4LtTBDeGgCx7XyA5Gzd+qyzh8FbEGeAQCmQkOkiWAq48qdfFRDblKeNZMKZewKalSSMQHAj/sk
+ 3SFOI7mTYGLiNuT7j74WUJZ7H9TN+NV6NAI8MZiq1pr9E9os1Sg7T3dRA3Fg5nzZORMH01rrxU+
+ IAXV74UmXQIe9278SJuos7UYgythqk31ZZxxvrX2xCdk3kG2w5idWWLHPc7yn2gfgmSbVXStorQ
+ 3gp6gA8r4nJMz6c49kzA2tmqknofj2FmWfn/rndgcirlUZwJti8ydPiIkwsroXwb+0SbU1t1cK7
+ SvciWJHJ6VpZYhw/Fog==
+X-Authority-Analysis: v=2.4 cv=JK82csKb c=1 sm=1 tr=0 ts=69a9414c cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=8AirrxEcAAAA:8 a=GJStlgXwfe-SXQdWLvAA:9 a=QEXdDO2ut3YA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22 a=ST-jHhOKWsTCqRlWije3:22
+X-Proofpoint-ORIG-GUID: 3QsCZuzdxX0kwTYwNSWr7ECurHvB9yVG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-05_02,2026-03-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
+ clxscore=1015 bulkscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603050068
+X-Rspamd-Queue-Id: 4D77E20D916
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-264221-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,redhat.com,google.com,davemloft.net,kernel.org];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-264223-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m.szyprowski@samsung.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,nxp.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qualcomm.com:dkim];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,samsung.com:dkim,samsung.com:mid]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On 27.02.2026 23:11, Heiner Kallweit wrote:
-> - Remove duplicated preempt disable. Disabling preemption has been added
->    to functions like u64_stats_update_begin() in the meantime.
-> - Simplify branch structure
->
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-
-This patch has been merged to yesterday's linux-next as commit 
-1afccc5a201e ("net: phy: improve mdiobus_stats_acct"). In my tests I 
-found that it introduces the following warning on 32bit machines with 
-USB ethernet adapters, so the preempt disable was there for a good reason:
-
-------------[ cut here ]------------
-WARNING: ./include/linux/u64_stats_sync.h:171 at 
-mdiobus_stats_acct+0x288/0x2b4, CPU#0: kworker/0:3/50
-Loading compiled-in X.509 certificates
-Modules linked in:
-CPU: 0 UID: 0 PID: 50 Comm: kworker/0:3 Not tainted 
-7.0.0-rc2-next-20260304 #12283 PREEMPT
-Hardware name: Samsung Exynos (Flattened Device Tree)
-Workqueue: usb_hub_wq hub_event
-Call trace:
-  unwind_backtrace from show_stack+0x10/0x14
-  show_stack from dump_stack_lvl+0x68/0x88
-  dump_stack_lvl from __warn+0x94/0x210
-  __warn from warn_slowpath_fmt+0x1b0/0x1bc
-  warn_slowpath_fmt from mdiobus_stats_acct+0x288/0x2b4
-  mdiobus_stats_acct from __mdiobus_read+0x84/0xf0
-  __mdiobus_read from mdiobus_read+0x30/0x44
-  mdiobus_read from get_phy_device+0xac/0x140
-  get_phy_device from mdiobus_scan+0x24/0x104
-  mdiobus_scan from __mdiobus_register+0x21c/0x478
-  __mdiobus_register from smsc95xx_bind+0x3f4/0x5f0
-  smsc95xx_bind from usbnet_probe+0x330/0x928
-  usbnet_probe from usb_probe_interface+0xec/0x318
-  usb_probe_interface from really_probe+0xe0/0x424
-  really_probe from __driver_probe_device+0x9c/0x1f4
-  __driver_probe_device from driver_probe_device+0x30/0xc0
-  driver_probe_device from __device_attach_driver+0xa8/0x140
-  __device_attach_driver from bus_for_each_drv+0x84/0xdc
-  bus_for_each_drv from __device_attach+0xb0/0x214
-  __device_attach from device_initial_probe+0x3c/0x48
-  device_initial_probe from bus_probe_device+0x24/0x80
-  bus_probe_device from device_add+0x5c0/0x810
-  device_add from usb_set_configuration+0x4e4/0x974
-  usb_set_configuration from usb_generic_driver_probe+0x3c/0x78
-  usb_generic_driver_probe from usb_probe_device+0x4c/0x14c
-  usb_probe_device from really_probe+0xe0/0x424
-  really_probe from __driver_probe_device+0x9c/0x1f4
-  __driver_probe_device from driver_probe_device+0x30/0xc0
-  driver_probe_device from __device_attach_driver+0xa8/0x140
-  __device_attach_driver from bus_for_each_drv+0x84/0xdc
-  bus_for_each_drv from __device_attach+0xb0/0x214
-  __device_attach from device_initial_probe+0x3c/0x48
-  device_initial_probe from bus_probe_device+0x24/0x80
-  bus_probe_device from device_add+0x5c0/0x810
-  device_add from usb_new_device+0x23c/0x4f8
-  usb_new_device from hub_event+0x11dc/0x1ca4
-  hub_event from process_one_work+0x24c/0x7b8
-  process_one_work from worker_thread+0x1b8/0x3bc
-  worker_thread from kthread+0x128/0x168
-  kthread from ret_from_fork+0x14/0x28
-Exception stack(0xf0a15fb0 to 0xf0a15ff8)
-...
-irq event stamp: 5711
-hardirqs last  enabled at (5911): [<c01c6c54>] 
-console_flush_one_record+0x424/0x570
-hardirqs last disabled at (5943): [<c013ce4c>] handle_softirqs+0x53c/0x5c0
-softirqs last  enabled at (5944): [<c013cc3c>] handle_softirqs+0x32c/0x5c0
-softirqs last disabled at (6157): [<c013d07c>] __irq_exit_rcu+0x144/0x1f0
----[ end trace 0000000000000000 ]---
-
-
+On 3/4/26 6:57 PM, Vladimir Oltean wrote:
+> Some pragmatic shortcuts are being taken by PHY consumer driver authors,
+> which put a burden on the framework. A lot of these can be caught during
+> review.
+> 
+> Make sure the linux-phy list is copied on as many keywords that a regex
+> can reasonably catch.
+> 
+> For simplicity sake this is not perfect (devm_ and of_ are not valid
+> prefixes for all function names), but I tried to pay attention on
+> avoiding false matches on things like:
+> - drivers/net/vendor/device/phy.h
+> - include/linux/phy.h - network PHY, not generic PHY
+> 
+> So I used \b to try to match on actual word boundaries and be explicit
+> about what is matched on.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > ---
->   drivers/net/phy/mdio_bus.c | 11 +++--------
->   1 file changed, 3 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-> index 48c0447e6a8..b32a369cd25 100644
-> --- a/drivers/net/phy/mdio_bus.c
-> +++ b/drivers/net/phy/mdio_bus.c
-> @@ -358,22 +358,17 @@ EXPORT_SYMBOL(of_mdio_find_bus);
->   
->   static void mdiobus_stats_acct(struct mdio_bus_stats *stats, bool op, int ret)
->   {
-> -	preempt_disable();
->   	u64_stats_update_begin(&stats->syncp);
->   
->   	u64_stats_inc(&stats->transfers);
-> -	if (ret < 0) {
-> +	if (ret < 0)
->   		u64_stats_inc(&stats->errors);
-> -		goto out;
-> -	}
-> -
-> -	if (op)
-> +	else if (op)
->   		u64_stats_inc(&stats->reads);
->   	else
->   		u64_stats_inc(&stats->writes);
-> -out:
-> +
->   	u64_stats_update_end(&stats->syncp);
-> -	preempt_enable();
->   }
->   
->   /**
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 55af015174a5..bdfa47d9c774 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10713,6 +10713,7 @@ F:	Documentation/devicetree/bindings/phy/
+>  F:	drivers/phy/
+>  F:	include/dt-bindings/phy/
+>  F:	include/linux/phy/
+> +K:	\b(devm_)?(of_)?phy_(create|destroy|init|exit|reset|power_(on|off)|configure|validate|calibrate|(get|set)_(mode|media|speed|bus_width|drvdata)|get_max_link_rate|pm_runtime_(get|put)|notify_(connect|disconnect|state)|get|put|optional_get|provider_(un)?register|simple_xlate|(create|remove)_lookup)\b|(struct\s+)?phy(_ops|_attrs|_lookup|_provider)?\b|linux/phy/phy\.h|phy-props\.h|phy-provider\.h
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+Would looking for the devm/of_phy_ prefix followed by an open parentheses
+not suffice for the 'has function call' case, instead of listing all
+currently present exported functions?
 
+My worry is that this approach is overbuilt and absolutely no one will
+remember to update it
+
+Konrad
 
