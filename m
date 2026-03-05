@@ -1,113 +1,510 @@
-Return-Path: <netdev+bounces-264101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCoNOFLSqGmlxgAAu9opvQ
-	(envelope-from <netdev+bounces-264101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 01:46:10 +0100
+	id SKPkJcPSqGmlxgAAu9opvQ
+	(envelope-from <netdev+bounces-264103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 01:48:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA532098F2
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 01:46:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025E020995C
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 01:48:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B34A304A5B1
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 00:45:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0D2230484EE
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 00:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769731632C8;
-	Thu,  5 Mar 2026 00:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLDy2DaY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA29F1F4615;
+	Thu,  5 Mar 2026 00:47:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E2C33985;
-	Thu,  5 Mar 2026 00:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7868418DB26
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 00:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772671557; cv=none; b=KuKkKbHGhzCJUMX0gGYNUv22LO2BLe/XM7TxmPQQixNZ9u5ByUHIpQ6vltq9i3v3+reyIJ6CC4ZTR1hISlyuE9MdDNp9sg9Yqo3SeeF76H7PbzDrPRZ3RrZ6Y8qnUtYAUl5Zc9cd2cyJOSdZJSVBUxtD3aTvKzCJT9DGa4SUXpk=
+	t=1772671676; cv=none; b=pyz94U01ok0/G/ywiA1K2d1wLuRtTJe6IwNrGq5uFdjZ3T0v5yuHMN+FcWggoh9yW16Kz3KfM1w7WExTgYQj9bIx1AbjLkzfFt1Dcav3H7YRrz0S7iJI9hQq5HKjNEoJ3bfhguIZwLNZiy7bvQUl0FysS09eQCoVmOBvRLCRlEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772671557; c=relaxed/simple;
-	bh=Vs4wXaEJ5isRbpaM5gDufAuQu/lZt97ZRSo2jtArV1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fIIYiktBCp5ObE8rDqyuL3MMO5M3KE8ROcb6lIxIyRQjvZGGzcuDik8+btf0DnZ5rlWKT7d2N2LWOl7dQDGexdtvJtEzSvfuqvRP7mDO8NGRrobZVyn5Lz25Y5/eXEqzGoxP1g9KaeZnHYOUyEf7er78/58cVG/Q0lHVmaAUaKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLDy2DaY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7853DC4CEF7;
-	Thu,  5 Mar 2026 00:45:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772671557;
-	bh=Vs4wXaEJ5isRbpaM5gDufAuQu/lZt97ZRSo2jtArV1w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bLDy2DaYJwZwbTmr2Sp/4KaHhVREX2EgSi6WF3hGOSC0sdySKkSV129oxRWv7uV7a
-	 bSxL0uxcwNGi0qHOqQttNVsYWEgC4flNGhQjEHEmVYLUgl9Zz6zKra3Jl1r/v3qmyO
-	 KlZyItHf0ekiZEcpzvgbUwA0DndrwnEb+mT/3XLqtic8eun03uIXfKnBPwBEc9KA3e
-	 6Rl+TQ+fJh4E7RyqGxJDxpXCGlA3VRXBLgQWVi0XYdVDfYvvzrRBA+bxyNOtgYtpz2
-	 7zaTNySO4o7ltE9HPqocHO0dhJW88zuwPedAiUh2CIIuvuToSEqcXMH94s3H4OipIS
-	 LXruFzJN9Sptg==
-Date: Wed, 4 Mar 2026 16:45:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Jian Zhang" <zhangjian.3032@bytedance.com>
-Cc: "Samuel Mendoza-Jonas" <sam@mendozajonas.com>, "Paul Fertser"
- <fercerpav@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: ncsi: fix skb leak in error paths
-Message-ID: <20260304164555.6253faf3@kernel.org>
-In-Reply-To: <20260302054629.1347119-1-zhangjian.3032@bytedance.com>
-References: <20260302054629.1347119-1-zhangjian.3032@bytedance.com>
+	s=arc-20240116; t=1772671676; c=relaxed/simple;
+	bh=seD+juHBFQ8ZcewZJhwsfMFcSDGnYqkGphUYzEp1lEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ibVa5c+knGPYRB8KmPWaQS/6RvnpovbPNq0worXKgrSoUc+tcJjOi8t5R8jjaJmsdtigH8HqxggQyKvRkUffL+huHM5me5UazMAzDbghC+rATLkE+ebcZGIj2NjYnAHouH6kaNq6f8hCOlrtebaz2BvAb7I8G9qD8vhFGlk1rKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sony.com; spf=fail smtp.mailfrom=sony.com; arc=none smtp.client-ip=35.89.44.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=sony.com
+Received: from eig-obgw-5003b.ext.cloudfilter.net ([10.0.29.155])
+	by cmsmtp with ESMTPS
+	id xmYKvDUUYaPqLxwsWvttbS; Thu, 05 Mar 2026 00:47:48 +0000
+Received: from host2044.hostmonster.com ([67.20.76.238])
+	by cmsmtp with ESMTPS
+	id xwsUvP9BM2l0kxwsUvZYQs; Thu, 05 Mar 2026 00:47:47 +0000
+X-Authority-Analysis: v=2.4 cv=UfRRSLSN c=1 sm=1 tr=0 ts=69a8d2b3
+ a=O1AQXT3IpLm5MaED65xONQ==:117 a=uc9KWs4yn0V/JYYSH7YHpg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=mDV3o1hIAAAA:8 a=RT0onXadAAAA:8
+ a=Aziwk6T4AAAA:8 a=z6gsHLkEAAAA:8 a=VnNF1IyMAAAA:8 a=pGLkceISAAAA:8
+ a=20KFwNOVAAAA:8 a=tOO0nKmCAAAA:8 a=BXCyXuAxAAAA:8 a=Tty9oNO6AAAA:8
+ a=joG0BDkuKpNYsG9LMrcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=RVmHIydaz68A:10 a=mYB3vj3COWURRnkzEGRi:22 a=mtcElmGe8wx6H7Xd9tIj:22
+ a=Gz67Kf0DkuxJ4rqyVRET:22 a=PwRmQJGe9grQJPGacnFL:22 a=Bts-Es6F1CBXvF7u4C_G:22
+ a=iekntanDnrheIxGr1pkv:22
+Received: from [66.118.46.62] (port=42014 helo=timdesk..)
+	by host2044.hostmonster.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <tim.bird@sony.com>)
+	id 1vxwsS-00000001qOB-0b4H;
+	Wed, 04 Mar 2026 17:47:44 -0700
+From: Tim Bird <tim.bird@sony.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.kernel.org,
+	kuniyu@google.com,
+	mubashirq@google.com,
+	willemb@google.com,
+	dsahern@kernel.org,
+	pablo@netfilter.org,
+	laforge@netfilter.org,
+	fw@strlen.de,
+	ncardwell@google.com,
+	ycheng@google.com,
+	xemul@parallels.com,
+	idosch@mellanox.com
+Cc: tim.bird@sony.com,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-spdx@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: Add SPDX ids to some source files
+Date: Wed,  4 Mar 2026 17:47:22 -0700
+Message-ID: <20260305004724.87469-1-tim.bird@sony.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6DA532098F2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - host2044.hostmonster.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - sony.com
+X-BWhitelist: no
+X-Source-IP: 66.118.46.62
+X-Source-L: No
+X-Exim-ID: 1vxwsS-00000001qOB-0b4H
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: (timdesk..) [66.118.46.62]:42014
+X-Source-Auth: tim@bird.org
+X-Email-Count: 5
+X-Org: HG=bhshared_hm;ORG=bluehost;
+X-Source-Cap: YmlyZG9yZztiaXJkb3JnO2hvc3QyMDQ0Lmhvc3Rtb25zdGVyLmNvbQ==
+X-Local-Domain: no
+X-CMAE-Envelope: MS4xfKS7W7ooE+3QbVkZCv9N9XCedZlh7oLeThLoT82zAP53fqYZYtaqPPvqtDQ0UPOlrNBbjNb223QxyB9msXfrYegtt61bpmK7wBtBjJZoCNJ3bFyCtSrw
+ /930x4Ey1yts7wNI5jJ1WW5SOKJh4QyKPGKrEG24rdzMHlyHYsx0cxjpaLXQqpk2GclD4+RwztwmaqWknsAzJbD3ar+mjA4kqNY=
+X-Rspamd-Queue-Id: 025E020995C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[sony.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mendozajonas.com,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264101-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	HAS_X_SOURCE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264103-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_X_ANTIABUSE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tim.bird@sony.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[astaro.com:url,gnu.org:url,rustcorp.com.au:email,sony.com:mid,sony.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon,  2 Mar 2026 13:46:29 +0800 Jian Zhang wrote:
-> +bail:
+Add SPDX-License-Identifier lines to several source
+files under the network sub-directory.  Work on files
+in the core, dns_resolver, ipv4, ipv6 and
+netfilter sub-dirs.  Remove boilerplate
+and license reference text to avoid ambiguity.
 
-please give meaningful names to the labels, eg:
+Rusty Russell has expressed that his contributions
+were intended to be GPL-2.0-or-later.
 
-err_free_skb:
+Signed-off-by: Tim Bird <tim.bird@sony.com>
+---
+---
+ net/core/fib_notifier.c               |  1 +
+ net/core/sock_diag.c                  |  3 +--
+ net/dns_resolver/dns_key.c            | 14 +-------------
+ net/dns_resolver/dns_query.c          | 14 +-------------
+ net/dns_resolver/internal.h           | 14 +-------------
+ net/ipv4/inetpeer.c                   |  3 +--
+ net/ipv4/ipmr_base.c                  |  1 +
+ net/ipv4/netfilter.c                  |  3 ++-
+ net/ipv4/tcp_bbr.c                    |  1 +
+ net/ipv4/tcp_dctcp.h                  |  1 +
+ net/ipv4/tcp_plb.c                    |  1 +
+ net/ipv6/fib6_notifier.c              |  1 +
+ net/ipv6/ila/ila_common.c             |  1 +
+ net/ipv6/netfilter.c                  |  3 ++-
+ net/netfilter/core.c                  |  3 +--
+ net/netfilter/nf_conntrack_netlink.c  |  4 +---
+ net/netfilter/nf_flow_table_offload.c |  1 +
+ net/netfilter/nf_queue.c              |  1 +
+ net/netfilter/nfnetlink.c             |  4 +---
+ net/netfilter/nft_chain_filter.c      |  1 +
+ net/netfilter/xt_connbytes.c          |  3 ++-
+ net/netfilter/xt_connlimit.c          |  3 ++-
+ net/netfilter/xt_time.c               |  3 +--
+ 23 files changed, 27 insertions(+), 57 deletions(-)
 
-> +	consume_skb(skb);
-
-since this is a drop condition kfree_skb() seems more appropriate.
-
-> +	return ret;
+diff --git a/net/core/fib_notifier.c b/net/core/fib_notifier.c
+index 5cdca49b1d7c..6bb2cc7e88ca 100644
+--- a/net/core/fib_notifier.c
++++ b/net/core/fib_notifier.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/rtnetlink.h>
+ #include <linux/notifier.h>
+ #include <linux/rcupdate.h>
+diff --git a/net/core/sock_diag.c b/net/core/sock_diag.c
+index c83335c62360..f67accd60675 100644
+--- a/net/core/sock_diag.c
++++ b/net/core/sock_diag.c
+@@ -1,5 +1,4 @@
+-/* License: GPL */
+-
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/filter.h>
+ #include <linux/mutex.h>
+ #include <linux/socket.h>
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index c42ddd85ff1f..9d998e267f5f 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /* Key type used to cache DNS lookups made by the kernel
+  *
+  * See Documentation/networking/dns_resolver.rst
+@@ -7,19 +8,6 @@
+  *              Steve French (sfrench@us.ibm.com)
+  *              Wang Lei (wang840925@gmail.com)
+  *		David Howells (dhowells@redhat.com)
+- *
+- *   This library is free software; you can redistribute it and/or modify
+- *   it under the terms of the GNU Lesser General Public License as published
+- *   by the Free Software Foundation; either version 2.1 of the License, or
+- *   (at your option) any later version.
+- *
+- *   This library is distributed in the hope that it will be useful,
+- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+- *   the GNU Lesser General Public License for more details.
+- *
+- *   You should have received a copy of the GNU Lesser General Public License
+- *   along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
+diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+index 53da62984447..e1c09d7b8200 100644
+--- a/net/dns_resolver/dns_query.c
++++ b/net/dns_resolver/dns_query.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /* Upcall routine, designed to work as a key type and working through
+  * /sbin/request-key to contact userspace when handling DNS queries.
+  *
+@@ -20,19 +21,6 @@
+  *   For example to use this module to query AFSDB RR:
+  *
+  *	create dns_resolver afsdb:* * /sbin/dns.afsdb %k
+- *
+- *   This library is free software; you can redistribute it and/or modify
+- *   it under the terms of the GNU Lesser General Public License as published
+- *   by the Free Software Foundation; either version 2.1 of the License, or
+- *   (at your option) any later version.
+- *
+- *   This library is distributed in the hope that it will be useful,
+- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+- *   the GNU Lesser General Public License for more details.
+- *
+- *   You should have received a copy of the GNU Lesser General Public License
+- *   along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #include <linux/module.h>
+diff --git a/net/dns_resolver/internal.h b/net/dns_resolver/internal.h
+index 0c570d40e4d6..d0d8edcea092 100644
+--- a/net/dns_resolver/internal.h
++++ b/net/dns_resolver/internal.h
+@@ -1,21 +1,9 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *   Copyright (c) 2010 Wang Lei
+  *   Author(s): Wang Lei (wang840925@gmail.com). All Rights Reserved.
+  *
+  *   Internal DNS Rsolver stuff
+- *
+- *   This library is free software; you can redistribute it and/or modify
+- *   it under the terms of the GNU Lesser General Public License as published
+- *   by the Free Software Foundation; either version 2.1 of the License, or
+- *   (at your option) any later version.
+- *
+- *   This library is distributed in the hope that it will be useful,
+- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+- *   the GNU Lesser General Public License for more details.
+- *
+- *   You should have received a copy of the GNU Lesser General Public License
+- *   along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #include <linux/compiler.h>
+diff --git a/net/ipv4/inetpeer.c b/net/ipv4/inetpeer.c
+index 7b1e0a2d6906..9fa396d5f09f 100644
+--- a/net/ipv4/inetpeer.c
++++ b/net/ipv4/inetpeer.c
+@@ -1,8 +1,7 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  *		INETPEER - A storage for permanent information about peers
+  *
+- *  This source is covered by the GNU GPL, the same as all kernel sources.
+- *
+  *  Authors:	Andrey V. Savochkin <saw@msu.ru>
+  */
+ 
+diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
+index 2d62526406ca..57721827a61a 100644
+--- a/net/ipv4/ipmr_base.c
++++ b/net/ipv4/ipmr_base.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Linux multicast routing support
+  * Common logic shared by IPv4 [ipmr] and IPv6 [ip6mr] implementation
+  */
+diff --git a/net/ipv4/netfilter.c b/net/ipv4/netfilter.c
+index ce310eb779e0..ce9e1bfa4259 100644
+--- a/net/ipv4/netfilter.c
++++ b/net/ipv4/netfilter.c
+@@ -1,7 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * IPv4 specific functions of netfilter core
+  *
+- * Rusty Russell (C) 2000 -- This code is GPL.
++ * Rusty Russell (C) 2000
+  * Patrick McHardy (C) 2006-2012
+  */
+ #include <linux/kernel.h>
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index 760941e55153..05d52372ca8f 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Bottleneck Bandwidth and RTT (BBR) congestion control
+  *
+  * BBR congestion control computes the sending rate based on the delivery
+diff --git a/net/ipv4/tcp_dctcp.h b/net/ipv4/tcp_dctcp.h
+index 4b0259111d81..f13f8d770576 100644
+--- a/net/ipv4/tcp_dctcp.h
++++ b/net/ipv4/tcp_dctcp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 */
+ #ifndef _TCP_DCTCP_H
+ #define _TCP_DCTCP_H
+ 
+diff --git a/net/ipv4/tcp_plb.c b/net/ipv4/tcp_plb.c
+index 4bcf7eff95e3..68ccdb9a5412 100644
+--- a/net/ipv4/tcp_plb.c
++++ b/net/ipv4/tcp_plb.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Protective Load Balancing (PLB)
+  *
+  * PLB was designed to reduce link load imbalance across datacenter
+diff --git a/net/ipv6/fib6_notifier.c b/net/ipv6/fib6_notifier.c
+index 949b72610df7..64cd4ed8864c 100644
+--- a/net/ipv6/fib6_notifier.c
++++ b/net/ipv6/fib6_notifier.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/notifier.h>
+ #include <linux/socket.h>
+ #include <linux/kernel.h>
+diff --git a/net/ipv6/ila/ila_common.c b/net/ipv6/ila/ila_common.c
+index b8d43ed4689d..e71571455c8a 100644
+--- a/net/ipv6/ila/ila_common.c
++++ b/net/ipv6/ila/ila_common.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/errno.h>
+ #include <linux/ip.h>
+ #include <linux/kernel.h>
+diff --git a/net/ipv6/netfilter.c b/net/ipv6/netfilter.c
+index 46540a5a4331..c3dc90dfab80 100644
+--- a/net/ipv6/netfilter.c
++++ b/net/ipv6/netfilter.c
+@@ -1,7 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * IPv6 specific functions of netfilter core
+  *
+- * Rusty Russell (C) 2000 -- This code is GPL.
++ * Rusty Russell (C) 2000
+  * Patrick McHardy (C) 2006-2012
+  */
+ #include <linux/kernel.h>
+diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+index 11a702065bab..d5df44ea9e7b 100644
+--- a/net/netfilter/core.c
++++ b/net/netfilter/core.c
+@@ -1,10 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* netfilter.c: look after the filters for various protocols.
+  * Heavily influenced by the old firewall.c by David Bonn and Alan Cox.
+  *
+  * Thanks to Rob `CmdrTaco' Malda for not influencing this code in any
+  * way.
+- *
+- * This code is GPL.
+  */
+ #include <linux/kernel.h>
+ #include <linux/netfilter.h>
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index c9d725fc2d71..9b295867a105 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Connection tracking via netlink socket. Allows for user space
+  * protocol helpers and general trouble making from userspace.
+  *
+@@ -10,9 +11,6 @@
+  * generally made possible by Network Robots, Inc. (www.networkrobots.com)
+  *
+  * Further development of this code funded by Astaro AG (http://www.astaro.com)
+- *
+- * This software may be used and distributed according to the terms
+- * of the GNU General Public License, incorporated herein by reference.
+  */
+ 
+ #include <linux/init.h>
+diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
+index 9b677e116487..b2e4fb6fa011 100644
+--- a/net/netfilter/nf_flow_table_offload.c
++++ b/net/netfilter/nf_flow_table_offload.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+diff --git a/net/netfilter/nf_queue.c b/net/netfilter/nf_queue.c
+index 7f12e56e6e52..a6c81c04b3a5 100644
+--- a/net/netfilter/nf_queue.c
++++ b/net/netfilter/nf_queue.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * Rusty Russell (C)2000 -- This code is GPL.
+  * Patrick McHardy (c) 2006-2012
+diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+index e62a0dea24ea..47f3ed441f64 100644
+--- a/net/netfilter/nfnetlink.c
++++ b/net/netfilter/nfnetlink.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Netfilter messages via netlink socket. Allows for user space
+  * protocol helpers and general trouble making from userspace.
+  *
+@@ -9,9 +10,6 @@
+  * generally made possible by Network Robots, Inc. (www.networkrobots.com)
+  *
+  * Further development of this code funded by Astaro AG (http://www.astaro.com)
+- *
+- * This software may be used and distributed according to the terms
+- * of the GNU General Public License, incorporated herein by reference.
+  */
+ 
+ #include <linux/module.h>
+diff --git a/net/netfilter/nft_chain_filter.c b/net/netfilter/nft_chain_filter.c
+index b16185e9a6dd..14b14c46c314 100644
+--- a/net/netfilter/nft_chain_filter.c
++++ b/net/netfilter/nft_chain_filter.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/netdevice.h>
+diff --git a/net/netfilter/xt_connbytes.c b/net/netfilter/xt_connbytes.c
+index 2aabdcea8707..1c6ffc7f1622 100644
+--- a/net/netfilter/xt_connbytes.c
++++ b/net/netfilter/xt_connbytes.c
+@@ -1,5 +1,6 @@
++// SPDX-License-Identifier: GPL-2.0
+ /* Kernel module to match connection tracking byte counter.
+- * GPL (C) 2002 Martin Devera (devik@cdi.cz).
++ *  (C) 2002 Martin Devera (devik@cdi.cz).
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ #include <linux/module.h>
+diff --git a/net/netfilter/xt_connlimit.c b/net/netfilter/xt_connlimit.c
+index 848287ab79cf..42df9e175aff 100644
+--- a/net/netfilter/xt_connlimit.c
++++ b/net/netfilter/xt_connlimit.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * netfilter module to limit the number of parallel tcp
+  * connections per IP address.
+@@ -9,7 +10,7 @@
+  * based on ...
+  *
+  * Kernel module to match connection tracking information.
+- * GPL (C) 1999  Rusty Russell (rusty@rustcorp.com.au).
++ *   (C) 1999  Rusty Russell (rusty@rustcorp.com.au).
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+diff --git a/net/netfilter/xt_time.c b/net/netfilter/xt_time.c
+index 00319d2a54da..9068cf88ec30 100644
+--- a/net/netfilter/xt_time.c
++++ b/net/netfilter/xt_time.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  *	xt_time
+  *	Copyright © CC Computer Consultants GmbH, 2007
+@@ -6,8 +7,6 @@
+  *	This is a module which is used for time matching
+  *	It is using some modified code from dietlibc (localtime() function)
+  *	that you can find at https://www.fefe.de/dietlibc/
+- *	This file is distributed under the terms of the GNU General Public
+- *	License (GPL). Copies of the GPL can be obtained from gnu.org/gpl.
+  */
+ 
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 -- 
-pw-bot: cr
+2.43.0
+
 
