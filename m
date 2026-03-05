@@ -1,68 +1,51 @@
-Return-Path: <netdev+bounces-264497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OI2FI16+qWnNDQEAu9opvQ
-	(envelope-from <netdev+bounces-264497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:33:18 +0100
+	id MJaXGtG+qWnNDQEAu9opvQ
+	(envelope-from <netdev+bounces-264498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:35:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C6B2164B0
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:33:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EACB2216525
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 18:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ADE67301739D
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:32:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EF1D7306E62E
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 17:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E083803F4;
-	Thu,  5 Mar 2026 17:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B013E5562;
+	Thu,  5 Mar 2026 17:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AEfji6Fg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EuCQX55b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77CE3E3DA6;
-	Thu,  5 Mar 2026 17:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8383DEAC8;
+	Thu,  5 Mar 2026 17:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731955; cv=none; b=Jd1axcif+kYLss8HNXiPr8oG/y6uTkzWKp55PlbF0qk9jT+Tc+2qxmHSlUMoo8bPoKVsYjnYzKdCUCH7KxHqZjjd5LTP0aajafHGGCeAjImcRb9ivnoc8t/7pkl7qBWyrVSoP/DvZqa7Mm0X7Ag6YbgzPW0PqaoH95Qlt05rDN8=
+	t=1772731997; cv=none; b=rKg40l2Z8SDvDfYlRiui9hG5zRyA7A30UWGSYtDWMs+7Fg4KmjXsVmIbnRF9VxlvtomEXaLYp7T0CWCt+C8Pyc8KDP31v2jwt2wxHuTCucuEAe/Efg36pdXWc7jI1fdRUNOjRRJyb5k/dIwQNTQxwWcBM2ZAdvHKUR5wiIwb94E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731955; c=relaxed/simple;
-	bh=OwBg/kW4vt7rbdvcyOoXXe7LO1tL88nVOrqAblD7CcM=;
+	s=arc-20240116; t=1772731997; c=relaxed/simple;
+	bh=RWKTVFa+wFyx1ZZEtkA2KeKOOuvsRai5l3vU2SyuRvk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kr3YVGJ2PtwrhAvGTbvaRsg3ccVGLPmVqoCJ303hEHvVx01dPW5W52ETqdlK1DDmO8gv1wTEVj4DXVglJhQbmGaq+FTJEO+pMmeJoXBwdKa2JGehcrqTjk3gdSOsJfA7ce0Qmr8c9b49xsWanOUHUUbSTAFT/l9eX7XBgzUFbB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AEfji6Fg; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772731954; x=1804267954;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OwBg/kW4vt7rbdvcyOoXXe7LO1tL88nVOrqAblD7CcM=;
-  b=AEfji6Fgh2P/egdC2n9LdeNUK73UAkEOaI+8kSdAQVc3CfmNU2i8LITN
-   iujo67V3W1ojmxJ+mhmnSTbMJC0V9FxZ3zT9q50kF7QAZWIHzC7xCLRjc
-   Xh3+se3xpShX9h5nMRMjyT2e4YJcVm6yJxLFxJlUeMrF11frQZNhHVqux
-   taEXGXioFoxxu3g/Y25x1InTruu/5Jl7b5cQjzwW3fimHPrLUx4RjpzQa
-   UPyhckc64iUOJXJeMz9acRy4KFVsDC2SzhCNWJ0jrJEDpR1WIek2eC+gF
-   j6W5wFIjFmCUP7PQ5P332JHq6D4lRWr2gyKvSa9UMS+Tq+m0MY6U/yBwV
-   Q==;
-X-CSE-ConnectionGUID: 94DpPeEmQLScs0JKK/zfBw==
-X-CSE-MsgGUID: PPaik9UgQ3mbTKrD0LFtlg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="85300876"
-X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="85300876"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:32:34 -0800
-X-CSE-ConnectionGUID: 1IPqnN6YQMqtfgaV70qVRA==
-X-CSE-MsgGUID: 6/pvUyiES3qKupucgADS9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="222893923"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.109.20]) ([10.125.109.20])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:32:34 -0800
-Message-ID: <f5f1ff05-7656-477e-9bed-09fd2e148638@intel.com>
-Date: Thu, 5 Mar 2026 09:32:41 -0800
+	 In-Reply-To:Content-Type; b=ReuiD4lh7lhbFO/Yo+5JvNv/eh1l6xxhnNUmK3r7kNwU99Wv9VDVYMUPW3FZydm2+frJWY/V/jVc5i3UbeCvKtpdU0hDGEMQmdtDhDSEeYMz1Ka0DuIaakbQiaFHu97WlH+TZ4B4U7mlSRMK0nyJm01xdOJK1YzG4K+IGovPNLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EuCQX55b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE7EC116C6;
+	Thu,  5 Mar 2026 17:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772731997;
+	bh=RWKTVFa+wFyx1ZZEtkA2KeKOOuvsRai5l3vU2SyuRvk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EuCQX55bmlspqiXIbARTqKZnNKh+8NhAPrRZ4bvVvUdaTOXhYZ49AAabbbykqpZb+
+	 xd/ggMFRCHchu0PxWBeS20GEiK7c+TmBgs3aW4nMlonHY88l88wp8U0+UEcCnJyM3O
+	 qtvIhfQIY42ARtOyOZqpj3/ZzvhSPhoSLeIrsN+uJE5gIe5EXn33Rxd4NKNeCoCbSN
+	 BL72/9kqgmg4xSb7YzANZEXBwiISoXNQ25QhzlakOFmSzuw4yyIZeSuJ/3ufenae8w
+	 GrH/2DOy0jnaxIcXPe3Nk+o2NLtQoLwLVmvVhtot/YEff0rAw6+mE6Nd2aJ6bUGIVO
+	 I3FCkWHNDXyUA==
+Message-ID: <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org>
+Date: Thu, 5 Mar 2026 18:33:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,104 +53,238 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: Remove bouncing T7XX reviewer
-To: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org
-Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Liu Haijun <haijun.liu@mediatek.com>,
- Ricardo Martinez <ricardo.martinez@linux.intel.com>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20260305172806.3118806-1-dave.hansen@linux.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+To: Thomas Gleixner <tglx@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
+ <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260305172806.3118806-1-dave.hansen@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <87zf4m2qvo.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 21C6B2164B0
+X-Rspamd-Queue-Id: EACB2216525
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264497-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,mediatek.com,linux.intel.com,oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264498-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/5/26 09:28, Dave Hansen wrote:
-> This reviewer's email no longer works. Remove it from MAINTAINERS.
+On 05. 03. 26, 17:16, Thomas Gleixner wrote:
+>> Dump of any other's mm_cids needed?
+> 
+> It would be helpful to see the content of all PCPU CIDs and
+> tsk::mm_cid::* for all tasks which belong to that process.
 
-... and I'm a doofus. I'm not sending things via my normal workflow and
-I missed:
+Not sure which of the two processes. So both:
 
-Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+crash> rd __per_cpu_offset 4
+ffffffff94c38160:  ffff8cc799a6c000 ffff8cc799aec000   ................
+ffffffff94c38170:  ffff8cc799b6c000 ffff8cc799bec000   ................
 
+
+
+====== PID 7680 (spinning in mm_get_cid()) ======
+4 tasks with
+   mm = 0xffff8cc406824680
+     mm_cid.pcpu = 0x66222619df00,
+
+
+crash> task -x -R mm_cid ffff8cc4038525c0 ffff8cc40ad40000 
+ffff8cc40683cb80 ffff8cc418424b80
+PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x80000000
+   },
+
+PID: 7681     TASK: ffff8cc40ad40000  CPU: 3    COMMAND: "asm"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000000
+   },
+
+PID: 7682     TASK: ffff8cc40683cb80  CPU: 0    COMMAND: "asm"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000002
+   },
+
+PID: 7684     TASK: ffff8cc418424b80  CPU: 2    COMMAND: "asm"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000001
+   },
+
+
+
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfc09f00
+struct mm_cid_pcpu {
+   cid = 0x40000002
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfc89f00
+struct mm_cid_pcpu {
+   cid = 0x0
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfd09f00
+struct mm_cid_pcpu {
+   cid = 0x40000001
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfd89f00
+struct mm_cid_pcpu {
+   cid = 0x40000000
+}
+
+
+
+
+====== PID 7508 (sleeping, holding the rq lock) ======
+6 tasks with
+   mm = 0xffff8cc407222340
+     mm_cid.pcpu = 0x66222619df40,
+
+crash> task -x -R mm_cid ffff8cc43d090000 ffff8cc43d094b80 
+ffff8cc494a00000 ffff8cc494a04b80 ffff8cc4038b8000 ffff8cc4038bcb80
+PID: 7504     TASK: ffff8cc43d090000  CPU: 0    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000001
+   },
+
+PID: 7505     TASK: ffff8cc43d094b80  CPU: 1    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000003
+   },
+
+PID: 7506     TASK: ffff8cc494a00000  CPU: 3    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000000
+   },
+
+PID: 7507     TASK: ffff8cc494a04b80  CPU: 2    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000002
+   },
+
+PID: 7508     TASK: ffff8cc4038b8000  CPU: 1    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000003
+   },
+
+PID: 7630     TASK: ffff8cc4038bcb80  CPU: 2    COMMAND: "compile"
+   mm_cid = {
+     active = 0x1,
+     cid = 0x40000002
+   },
+
+
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfc09f40
+struct mm_cid_pcpu {
+   cid = 0x40000001
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfc89f40
+struct mm_cid_pcpu {
+   cid = 0x40000003
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfd09f40
+struct mm_cid_pcpu {
+   cid = 0x40000002
+}
+crash> struct mm_cid_pcpu -x 0xfffff2e9bfd89f40
+struct mm_cid_pcpu {
+   cid = 0x40000000
+}
+
+
+Anything else :)?
+
+-- 
+js
+suse labs
 
