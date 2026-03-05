@@ -1,316 +1,131 @@
-Return-Path: <netdev+bounces-264425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMoBCEiUqWmKAQEAu9opvQ
-	(envelope-from <netdev+bounces-264425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:33:44 +0100
+	id mPtwIzSYqWm7AgEAu9opvQ
+	(envelope-from <netdev+bounces-264426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:50:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AFE213884
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:33:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19665213D9F
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B93123020FDF
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:33:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2757631CD7B7
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E213A5E7D;
-	Thu,  5 Mar 2026 14:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DD93859E8;
+	Thu,  5 Mar 2026 14:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eCBZ3zRu"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="VMU+cQtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536795B5AB
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 14:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F0B13C918;
+	Thu,  5 Mar 2026 14:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721220; cv=none; b=j/X6rLfg8y7dgoDFta5BzP2VL79vX3z+3+qcQ/usjIwAiMRfahTlsYoKK6HApEAbOy98dk+/yE8ptsR4d67sU7dRab+teFPt9sp8M7P76OxzyQXeDYFFlEN+IIoDBVl+lGIcn8lsGgJE4A/LD+VnoRXGIsLWEF4fvliExJaSjJ8=
+	t=1772721252; cv=none; b=OVCZMjvrC4qP3CCzYY5WLKwoqVyMiKAG6LW7Diou+sBxyJflyiBIhVyOlDNarTKnMZphnCdSLoGBFAyeKw7vZ0e/Ryw6zAxfLEpcOOT9qPmaOszAKvYa1FXhQnhiv8bqZsGV8UVS199F1u9c3P1iLYqYwMjOW3bwnGo7H/RYGMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721220; c=relaxed/simple;
-	bh=4eT3D3g80FssQI0tnFYVQ3K8PF/PCF8oq0EsRcjm9Vk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fa0DtvZabc/yd9mtE3GDsLie42p4z0QSwL6d73HIOemVvt4/UfWQpCPNNdCbh1/1AT5FtrFHmbluLEKdn2ou2H5Fmhjgjcb+DF8Jrel/EN10IbLyLq8CJ/W2dggITCoLSxj4rB+nnZFX6TNeviq1mWBR6D3BrjLz/gnTy+qDCZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eCBZ3zRu; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-503347e8715so97090271cf.2
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 06:33:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772721218; x=1773326018; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ar9RsVFxBZUWUg9Rgu1+EQpRr9zNJUYue1v36pHePqE=;
-        b=eCBZ3zRuBRDAwwjOr9SF6tlg/4ISvqp+ELeKSlP/qhznCz46G+zO8jPNj2Y4bqyEi3
-         NobWUsmHNo9dE8j1VnrfeRmdf4ibuFA+gpx7X/1b7LoUCiAFDMsxeEEl2lRp1P4k2Wtw
-         mV5OOs9yOx71ysXONl8XjD9caJ1nrygHxKvpRe4iMzkH4jxu5tJmfNSPhFfmZFQGYcDo
-         oqBfNgE32xjTi3my7SmU1J9U0Ec/5pHZX7zlqqv9G7JRBvS0w9183LA0nrJuQ43V9JXP
-         Eg8hirdOZjoK2c/ayBAQfAV3cHhdan5eVoha14ZEgsq2PcEjATm2z7+Oncm5am4xvbUC
-         +CPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772721218; x=1773326018;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ar9RsVFxBZUWUg9Rgu1+EQpRr9zNJUYue1v36pHePqE=;
-        b=ijqL9Q8C5pgjjdE3atSLq4Xc10P0LyQWzeR+Kf8/gMYt/cYwKgC4AIHRqDlYCqyrfO
-         Qn+hIIOBCRTI/siQatHe8i/XkPdPvsRFvNJqNEKC/H5pXCDqKz50dkejTqui/JwML3Jn
-         MJKW1ZjYZZnQpVlVhdWf9ExIW2sv1HEosKcxnBdQLl3BtWwpOFJe25YNJ1Fk9K7LkvWs
-         3qA5Ty1p5F26RBDa1j9wg4/ZXoM9+Y8dIktS7TQfTLS88YpPq+OMoSFmK8Md2Rfn8UG7
-         mmVP0lDciARowjtuFkoe9QGJ9bEIn9x2hG1uLNcmx1zkyc2JNDl6ohw5f637llp87yDY
-         vzMA==
-X-Gm-Message-State: AOJu0Ywg1rAZtV7FUulFWQj6Co+n+0Xj4rcv8ka6+UOa/fMsd/FuUYyB
-	FtkA6tAzXZYbrT3Iv2Wopd+VKXfyiZbqDNGGOTjEpCC98zveHyQPEW/BPp1wY9NeKKA=
-X-Gm-Gg: ATEYQzwsJoHereJV8bm4uPuXTewEle9gL7t8CBfOXtDVZAyuVJQKnjl3BE7xsETwHAi
-	VLiq1xALEvOMmwowj0t/B7TwAHXI4N9JkybN0P/WlpIbGMdDpng4kX3epSgYon2+4kGineehjxk
-	+y/axDsNdy8bCmzTsudTg4G9VKtO4ot2ZftcnXVcc6xB/RI3Ry94jd+Sgcfk1UlFlKJr6hJroEj
-	JM1496xzqmDFjtPOQT2DAu9zKi8eR4QAfa0BXF8STlWYevddDUA4Z/rEstgi3/LMW7Nm+NP23Lf
-	mzgfdvNMDjqJQS6wS3xC1lpbEhmVUq9Xoc4zUMRj/XObkyUO/FLUraN3LOEZ9DsQYnR3yMVTrrm
-	5rAGSvuxxNx7bXr6zhdUFMSc9B/Tyw3tse6+j3xPI4ilZ9Bq8hkarOuR2L8ojvEGSZFVHa5sdIy
-	pMBykSozIuhJmHYKUqUjrMMj7pTSciUuwpdA0N5Pnxd0E=
-X-Received: by 2002:ac8:590d:0:b0:506:9d3e:67e3 with SMTP id d75a77b69052e-508db3ad17cmr73909121cf.70.1772721218001;
-        Thu, 05 Mar 2026 06:33:38 -0800 (PST)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-507512559b2sm155794251cf.17.2026.03.05.06.33.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 06:33:37 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Thu, 05 Mar 2026 22:32:29 +0800
-Subject: [PATCH net] net: macb: Shuffle the tx ring before enabling tx
+	s=arc-20240116; t=1772721252; c=relaxed/simple;
+	bh=B/uoFr7e+E9czrHLs6e1HK6yXKRUVQ3wD5Ax7QruoB8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rKxMq8fX8NSi3RboY0GnpyLTT2qMrOk4Ib2SZMEEUoIoaVIj6gbAe+p+fGu50fwo8PT5BYbnZu2j1kEbZEbnig/IgHpAfmi3UC5NfyAWqRsL+GpeiEWV7eKL5xFneczJoRjkE3k/86Ot5BvaqUVXoCzUmc8uG82rrGNu3KTlAfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=VMU+cQtd; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=El
+	SmX4CRrGKvpQmuZstPGJWNTIkFLRA9/2KHspzpcc4=; b=VMU+cQtd/bUiesAKbS
+	j+EKwXfid+rvP+5OtwndvnMOQRNPTcpEhP+YyNP5VA6jR88/0BI7fSDNuRkf+BtK
+	b1TwWOYwu7LKUphluissoRNr8c9Ki/SXUxPxTlrL16fv4dnXCyBkWg0GUQ0sTuKg
+	O+JsMld1QBaYyPiz7mBjV7yNw=
+Received: from haiyue-pc.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wCnZWUIlKlpoF6ROw--.52848S2;
+	Thu, 05 Mar 2026 22:32:42 +0800 (CST)
+From: Haiyue Wang <haiyuewa@163.com>
+To: netdev@vger.kernel.org
+Cc: Haiyue Wang <haiyuewa@163.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Wolfram Sang <wsa@kernel.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v1] mctp: i2c: fix skb memory leak in receive path
+Date: Thu,  5 Mar 2026 22:32:34 +0800
+Message-ID: <20260305143240.97592-1-haiyuewa@163.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260305-zynqmp-v1-1-5de72254d56b@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAPyTqWkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDI0MT3arKvMLcAl1zkxRj0zRjCzOjNAsloOKCotS0zAqwQdFKeaklSrG
- 1tQBN2duEXQAAAA==
-X-Change-ID: 20260214-zynqmp-74d35f3862f8
-To: netdev@vger.kernel.org
-Cc: Kevin Hao <haokexin@gmail.com>, 
- Quanyang Wang <quanyang.wang@windriver.com>, stable@vger.kernel.org, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: 79AFE213884
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wCnZWUIlKlpoF6ROw--.52848S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Gw47Gw4rKF4DJw18urWrGrg_yoW3JFg_u3
+	42grZrJrWjgF4Yk3ySkws0v34Fyr1Yqa4vgFZ3tF9xZ3s8tFnrWrW8Zr13Gr18uw48AayD
+	GrnxtryIy3y7tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRC0PSUUUUUU==
+X-CM-SenderInfo: 5kdl53xhzdqiywtou0bp/xtbC8ArrV2mplArizAAA32
+X-Rspamd-Queue-Id: 19665213D9F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,windriver.com,vger.kernel.org,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-264425-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[163.com,codeconstruct.com.au,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264426-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haiyuewa@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[163.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Quanyang observed that when using an NFS rootfs on an AMD ZynqMp board,
-the rootfs may take an extended time to recover after a suspend.
-Upon investigation, it was determined that the issue originates from a
-problem in the macb driver.
+When 'midev->allow_rx' is false, the newly allocated skb isn't consumed
+by netif_rx(), it needs to free the skb directly.
 
-According to the Zynq UltraScale TRM [1], when transmit is disabled,
-the transmit buffer queue pointer resets to point to the address
-specified by the transmit buffer queue base address register.
-
-In the current implementation, the code merely resets `queue->tx_head`
-and `queue->tx_tail` to '0'. This approach presents several issues:
-
-- Packets already queued in the tx ring are silently lost,
-  leading to memory leaks since the associated skbs cannot be released.
-
-- Concurrent write access to `queue->tx_head` and `queue->tx_tail` may
-  occur from `macb_tx_poll()` or `macb_start_xmit()` when these values
-  are reset to '0'.
-
-- The transmission may become stuck on a packet that has already been sent
-  out, with its 'TX_USED' bit set, but has not yet been processed. However,
-  due to the manipulation of 'queue->tx_head' and 'queue->tx_tail',
-  `macb_tx_poll()` incorrectly assumes there are no packets to handle
-  because `queue->tx_head == queue->tx_tail`. This issue is only resolved
-  when a new packet is placed at this position. This is the root cause of
-  the prolonged recovery time observed for the NFS root filesystem.
-
-To resolve this issue, shuffle the tx ring and tx skb array so that
-the first unsent packet is positioned at the start of the tx ring.
-Additionally, ensure that updates to `queue->tx_head` and
-`queue->tx_tail` are properly protected with the appropriate lock.
-
-[1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
-
-Fixes: bf9cf80cab81 ("net: macb: Fix tx/rx malfunction after phy link down and up")
-Reported-by: Quanyang Wang <quanyang.wang@windriver.com>
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
-Cc: stable@vger.kernel.org
+Fixes: f5b8abf9fc3d ("mctp i2c: MCTP I2C binding driver")
+Signed-off-by: Haiyue Wang <haiyuewa@163.com>
 ---
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <linux@armlinux.org.uk>
----
- drivers/net/ethernet/cadence/macb_main.c | 89 ++++++++++++++++++++++++++++++--
- 1 file changed, 86 insertions(+), 3 deletions(-)
+ drivers/net/mctp/mctp-i2c.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 17f0ad3d7a0924a7dc2fc0a13505aff7d2499ffa..fce144a1830823da9821ad3245784e62fed97e33 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -36,6 +36,7 @@
- #include <linux/tcp.h>
- #include <linux/types.h>
- #include <linux/udp.h>
-+#include <linux/gcd.h>
- #include <net/pkt_sched.h>
- #include "macb.h"
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index de6bc1736734..15fe4d1163c1 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -343,6 +343,7 @@ static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
+ 	} else {
+ 		status = NET_RX_DROP;
+ 		spin_unlock_irqrestore(&midev->lock, flags);
++		kfree_skb(skb);
+ 	}
  
-@@ -684,6 +685,88 @@ static void macb_mac_link_down(struct phylink_config *config, unsigned int mode,
- 	netif_tx_stop_all_queues(ndev);
- }
- 
-+/* Use juggling algorithm to left rotate tx ring and tx skb array */
-+static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
-+{
-+	unsigned int i, head, tail, count, size, cycles, shift, curr, next;
-+	struct macb_dma_desc desc, *desc_curr, *desc_next;
-+	struct macb_tx_skb tx_skb, *skb_curr, *skb_next;
-+	struct macb *bp = queue->bp;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
-+	head = queue->tx_head;
-+	tail = queue->tx_tail;
-+	size = bp->tx_ring_size;
-+	count = CIRC_CNT(head, tail, size);
-+
-+	if (!(tail % size))
-+		goto unlock;
-+
-+	if (!count) {
-+		queue->tx_head = 0;
-+		queue->tx_tail = 0;
-+		goto unlock;
-+	}
-+
-+	shift = tail % size;
-+	cycles = gcd(size, shift);
-+
-+	for (i = 0; i < cycles; i++) {
-+		memcpy(&desc, macb_tx_desc(queue, i), sizeof(struct macb_dma_desc));
-+		memcpy(&tx_skb, macb_tx_skb(queue, i), sizeof(struct macb_tx_skb));
-+
-+		curr = i;
-+		next = (curr + shift) % size;
-+
-+		while (next != i) {
-+			desc_curr = macb_tx_desc(queue, curr);
-+			desc_next = macb_tx_desc(queue, next);
-+
-+			memcpy(desc_curr, desc_next, sizeof(struct macb_dma_desc));
-+
-+			if (next == bp->tx_ring_size - 1)
-+				desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-+			if (curr == bp->tx_ring_size - 1)
-+				desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-+
-+			skb_curr = macb_tx_skb(queue, curr);
-+			skb_next = macb_tx_skb(queue, next);
-+			memcpy(skb_curr, skb_next, sizeof(struct macb_tx_skb));
-+
-+			curr = next;
-+			next = (curr + shift) % size;
-+		}
-+
-+		desc_curr = macb_tx_desc(queue, curr);
-+		memcpy(desc_curr, &desc, sizeof(struct macb_dma_desc));
-+		if (i == bp->tx_ring_size - 1)
-+			desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-+		if (curr == bp->tx_ring_size - 1)
-+			desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-+		memcpy(macb_tx_skb(queue, curr), &tx_skb, sizeof(struct macb_tx_skb));
-+	}
-+
-+	queue->tx_head = count;
-+	queue->tx_tail = 0;
-+
-+	/* Make descriptor updates visible to hardware */
-+	wmb();
-+
-+unlock:
-+	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
-+}
-+
-+/* Rotate the queue so that the tail is at index 0 */
-+static void gem_shuffle_tx_rings(struct macb *bp)
-+{
-+	struct macb_queue *queue;
-+	int q;
-+
-+	for (q = 0, queue = bp->queues; q < bp->num_queues; q++, queue++)
-+		gem_shuffle_tx_one_ring(queue);
-+}
-+
- static void macb_mac_link_up(struct phylink_config *config,
- 			     struct phy_device *phy,
- 			     unsigned int mode, phy_interface_t interface,
-@@ -722,8 +805,6 @@ static void macb_mac_link_up(struct phylink_config *config,
- 			ctrl |= MACB_BIT(PAE);
- 
- 		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--			queue->tx_head = 0;
--			queue->tx_tail = 0;
- 			queue_writel(queue, IER,
- 				     bp->rx_intr_mask | MACB_TX_INT_FLAGS | MACB_BIT(HRESP));
- 		}
-@@ -737,8 +818,10 @@ static void macb_mac_link_up(struct phylink_config *config,
- 
- 	spin_unlock_irqrestore(&bp->lock, flags);
- 
--	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC))
-+	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
- 		macb_set_tx_clk(bp, speed);
-+		gem_shuffle_tx_rings(bp);
-+	}
- 
- 	/* Enable Rx and Tx; Enable PTP unicast */
- 	ctrl = macb_readl(bp, NCR);
-
----
-base-commit: fc7b1a72c6cd5cbbd989c6c32a6486e3e4e3594d
-change-id: 20260214-zynqmp-74d35f3862f8
-
-Best regards,
+ 	if (status == NET_RX_SUCCESS) {
 -- 
-Kevin Hao <haokexin@gmail.com>
+2.53.0
 
 
