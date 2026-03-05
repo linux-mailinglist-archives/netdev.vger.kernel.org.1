@@ -1,201 +1,141 @@
-Return-Path: <netdev+bounces-264432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKf6OFaWqWnYAQEAu9opvQ
-	(envelope-from <netdev+bounces-264432-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:30 +0100
+	id eOnkDm+WqWnYAQEAu9opvQ
+	(envelope-from <netdev+bounces-264433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CEFB213B10
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D28DF213B2E
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:42:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 06DC43088A44
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:35:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CD80D3046AB7
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7677F3A9DA7;
-	Thu,  5 Mar 2026 14:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A383A2559;
+	Thu,  5 Mar 2026 14:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KrN7lwbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183773A9D82
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 14:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD71223702;
+	Thu,  5 Mar 2026 14:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721284; cv=none; b=eockgv2XBITQAcp5oJDR1Pguj/9lXa2zosw0O3iPWk4dttt1GcX5a1MQ77gVoHAtmxcdQ2m/8lDz26Z0Uai73D78caCuyjwWLK4o8exOXFiiWkhRTnmphobUvwTp9gJGdruYD641ZgdDIgXQcNf1TyO2OKTVUFcq5erF3xWXym0=
+	t=1772721452; cv=none; b=ePMypGe3UpqdAM+7nap1KBxYQq6nKBYfp92nA/cHMkugJyThwywL/PXQ//cyEPer9o9sbmh75x+G9fmHjXNKZSp+vDxlfCax5vYtvYrgh3Jhtn8jM7xgQs2ff8jN9VuJlMEspJ4GfQ849+07e12F4sGHmIEM22ixMAMC/gFhXlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721284; c=relaxed/simple;
-	bh=1fnU0MUKwFDu+HuPm2g0JEOYCoHt7uKd2I73uTFW9+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N2DQYDrqhWeyA56CkCyi0OPse4TkPYageYYUgQzkE+YEyN80Mt/jQJRRc61IDTAfSO/n4KJ8AQpDb+iCsmmiYCdz64QbGGcuVhJMpXtGejrBd7Se7SuoeJ1f1EfzFJYjd0TNLQuvDFnnya/CmHnuCjmGv0i1Shj5VGhF5nwGd+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vy9mZ-000464-Pm; Thu, 05 Mar 2026 15:34:31 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac] helo=dude04)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vy9mX-003two-2B;
-	Thu, 05 Mar 2026 15:34:31 +0100
-Received: from ore by dude04 with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vy9mY-00000002E8c-3zeM;
-	Thu, 05 Mar 2026 15:34:30 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	stable@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net v1 4/4] net: usb: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
-Date: Thu,  5 Mar 2026 15:34:29 +0100
-Message-ID: <20260305143429.530909-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260305143429.530909-1-o.rempel@pengutronix.de>
-References: <20260305143429.530909-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1772721452; c=relaxed/simple;
+	bh=hydBV9IBNGLgutex0pxGm+Z79BQWju5lSIVQ6eQRkwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Uihdmy08RQQmRVa9nwGEKaPrkBIChTyLf6DVfUaLvwr9UUFjIh+ZrWB0/WGl2ZkSifULJxVh5EuVDBOZxuBfpD5Vu2pMB7bbOB/J5PD9RCCaPiF6EO7nS/FuQ5FsWf5v8gtPQsY4WGbjhqanEbRpDibrlPun5wHuGFV97S1TLpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KrN7lwbL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5B77C116C6;
+	Thu,  5 Mar 2026 14:37:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772721451;
+	bh=hydBV9IBNGLgutex0pxGm+Z79BQWju5lSIVQ6eQRkwE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KrN7lwbLfNoQJYzuLMdjDvbZCrS7+wvGBPeA8mSxwxcUWfbiE0ZFxkmJ0TcZiFx5U
+	 NXGS5NKsjAQ+2Y+68yEaKFbUIz/S7ZyPIL2yoDhR6TEYK8JYon1J6g4pouBsbyACEa
+	 SpCwTbqeE3JPJbSbYKlt9Jmk2g484JJ60TB2i9Wc7d+EkKw3xGyHOtLFWoqYGZGdW6
+	 vAuw5HgG7G5Gk4FGDGeMsca4kRHPO+u8HFvLCYDw9zql57cgKEB4oily6bfc8SEgLC
+	 N9+q/TmYoQnXZ7DFJYcGPqO3NzeZh6l9asdYodxLz371jzw64QHk9fFTx1n6uQi9qc
+	 FqRfFORCV3GSg==
+Date: Thu, 5 Mar 2026 06:37:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org, Gal Pressman
+ <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Shay Drory
+ <shayd@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Moshe Shemesh
+ <moshe@nvidia.com>
+Subject: Re: [PATCH net-next V3 00/10] devlink: add per-port resource
+ support
+Message-ID: <20260305063729.7e40775d@kernel.org>
+In-Reply-To: <np44uzfn6jea56uht4yq4te5clapgj7pk6ygyvkl22wxumwnvt@nrpvzjqzxenq>
+References: <20260226221916.1800227-1-tariqt@nvidia.com>
+	<20260302192640.49af074f@kernel.org>
+	<pmxkihhtsskkwsvdia4z2ss4wxpfc4a4kqxkjv5wk3mwdmpzii@6go7pizk2nst>
+	<jssifysprwuafkinc3dguspngxmplrngqxvotp76vhvu4e5lp6@e7mdrjqc5rme>
+	<20260304101522.09da1f58@kernel.org>
+	<np44uzfn6jea56uht4yq4te5clapgj7pk6ygyvkl22wxumwnvt@nrpvzjqzxenq>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 8CEFB213B10
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: D28DF213B2E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-264433-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264432-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Remove redundant netif_napi_del() call from disconnect path.
+On Thu, 5 Mar 2026 08:56:42 +0100 Jiri Pirko wrote:
+> Wed, Mar 04, 2026 at 07:15:22PM +0100, kuba@kernel.org wrote:
+> >On Wed, 4 Mar 2026 11:34:13 +0100 Jiri Pirko wrote:  
+> >> On a second thought, if we merge multiple objects into one dump, how
+> >> does this extend? I mean, the userspace has to check there are no extra
+> >> attributes, as they may be used as a handle to another new object
+> >> introduced in the future... Idk, it's a bit odd.  
+> >
+> >That's true, the user space must be able to interpret the object
+> >identifier. So if we extend the command to add more identifiers
+> >we will have to add the bitmask to the dump request, and have
+> >the user space tell the kernel which objects it can recognize.
+> >I was just saying that we don't have to add such attribute now,
+> >maybe leave a comment in a strategic place for our future selves?  
+> 
+> Or, alternatively, we can have per-object dumps as we have for all
+> objects and command right now and leave things simple and
+> straightforward? I mean, I don't really see a benefit of a single dump
+> for more objects :/
 
-A WARN may be triggered in __netif_napi_del_locked() during USB device
-disconnect:
+What do you mean by straightforward, exactly?
 
-  WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
+User will most likely want to see all resources of a device in a single
+dump / command.
 
-This happens because netif_napi_del() is called in the disconnect path while
-NAPI is still enabled. However, it is not necessary to call netif_napi_del()
-explicitly, since unregister_netdev() will handle NAPI teardown automatically
-and safely. Removing the redundant call avoids triggering the warning.
+The objects themselves are identical, they only differ by the handle,
+and yet we'd have two separate commands to access them.
 
-Full trace:
- lan78xx 1-1:1.0 enu1: Failed to read register index 0x000000c4. ret = -ENODEV
- lan78xx 1-1:1.0 enu1: Failed to set MAC down with error -ENODEV
- lan78xx 1-1:1.0 enu1: Link is Down
- lan78xx 1-1:1.0 enu1: Failed to read register index 0x00000120. ret = -ENODEV
- ------------[ cut here ]------------
- WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
- Modules linked in: flexcan can_dev fuse
- CPU: 0 UID: 0 PID: 11 Comm: kworker/0:1 Not tainted 6.16.0-rc2-00624-ge926949dab03 #9 PREEMPT
- Hardware name: SKOV IMX8MP CPU revC - bd500 (DT)
- Workqueue: usb_hub_wq hub_event
- pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : __netif_napi_del_locked+0x2b4/0x350
- lr : __netif_napi_del_locked+0x7c/0x350
- sp : ffffffc085b673c0
- x29: ffffffc085b673c0 x28: ffffff800b7f2000 x27: ffffff800b7f20d8
- x26: ffffff80110bcf58 x25: ffffff80110bd978 x24: 1ffffff0022179eb
- x23: ffffff80110bc000 x22: ffffff800b7f5000 x21: ffffff80110bc000
- x20: ffffff80110bcf38 x19: ffffff80110bcf28 x18: dfffffc000000000
- x17: ffffffc081578940 x16: ffffffc08284cee0 x15: 0000000000000028
- x14: 0000000000000006 x13: 0000000000040000 x12: ffffffb0022179e8
- x11: 1ffffff0022179e7 x10: ffffffb0022179e7 x9 : dfffffc000000000
- x8 : 0000004ffdde8619 x7 : ffffff80110bcf3f x6 : 0000000000000001
- x5 : ffffff80110bcf38 x4 : ffffff80110bcf38 x3 : 0000000000000000
- x2 : 0000000000000000 x1 : 1ffffff0022179e7 x0 : 0000000000000000
- Call trace:
-  __netif_napi_del_locked+0x2b4/0x350 (P)
-  lan78xx_disconnect+0xf4/0x360
-  usb_unbind_interface+0x158/0x718
-  device_remove+0x100/0x150
-  device_release_driver_internal+0x308/0x478
-  device_release_driver+0x1c/0x30
-  bus_remove_device+0x1a8/0x368
-  device_del+0x2e0/0x7b0
-  usb_disable_device+0x244/0x540
-  usb_disconnect+0x220/0x758
-  hub_event+0x105c/0x35e0
-  process_one_work+0x760/0x17b0
-  worker_thread+0x768/0xce8
-  kthread+0x3bc/0x690
-  ret_from_fork+0x10/0x20
- irq event stamp: 211604
- hardirqs last  enabled at (211603): [<ffffffc0828cc9ec>] _raw_spin_unlock_irqrestore+0x84/0x98
- hardirqs last disabled at (211604): [<ffffffc0828a9a84>] el1_dbg+0x24/0x80
- softirqs last  enabled at (211296): [<ffffffc080095f10>] handle_softirqs+0x820/0xbc8
- softirqs last disabled at (210993): [<ffffffc080010288>] __do_softirq+0x18/0x20
- ---[ end trace 0000000000000000 ]---
- lan78xx 1-1:1.0 enu1: failed to kill vid 0081/0
-
-Fixes: e110bc825897 ("net: usb: lan78xx: Convert to PHYLINK for improved PHY and MAC management")
-Cc: stable@vger.kernel.org
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- Do not move NAPI enable/disable to link up/down callbacks.
-- Remove redundant netif_napi_del() call from disconnect path.
-- Update commit message to accurately describe the root cause and solution,
-  following feedback from maintainer.
----
- drivers/net/usb/lan78xx.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index f8558b87eaec..19cdf69fa589 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -4552,8 +4552,6 @@ static void lan78xx_disconnect(struct usb_interface *intf)
- 	phylink_disconnect_phy(dev->phylink);
- 	rtnl_unlock();
- 
--	netif_napi_del(&dev->napi);
--
- 	unregister_netdev(net);
- 
- 	timer_shutdown_sync(&dev->stat_monitor);
--- 
-2.47.3
-
+It's as if we had separate GETLINK commands in rtnetlink for devices on
+the PCIe bus vs connected via USB.
 
