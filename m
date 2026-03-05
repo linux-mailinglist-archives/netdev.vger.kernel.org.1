@@ -1,161 +1,175 @@
-Return-Path: <netdev+bounces-264394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPwvE5iDqWkd9gAAu9opvQ
-	(envelope-from <netdev+bounces-264394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:22:32 +0100
+	id MIEtDVWFqWkd9gAAu9opvQ
+	(envelope-from <netdev+bounces-264395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:29:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21AA2128F1
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:22:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348502129A6
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:29:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8ACD301F9A5
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:18:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 40C62301807B
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2379A231827;
-	Thu,  5 Mar 2026 13:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC7E3A1E73;
+	Thu,  5 Mar 2026 13:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pOhzD+7T"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="MaxfacQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD8E225775;
-	Thu,  5 Mar 2026 13:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC4C334685
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 13:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772716683; cv=none; b=VtT289eEdRMTyHt2nhwFTDYRvQN1TYWv0Wo2du3IUQGPBT8AB3iP3yF2LfbVnmAjm0hNjM7vx48jDOTsXhmrZuV8H0E3+dwbzD8sulq4vsHoqlyus6SjUGEVjzPbuBS+w/jzdtoiXg19v+1jegu51wVmOgS2S0SbXWHz1B3Gc/w=
+	t=1772717389; cv=none; b=GBPHQMiL09JSVT8RjlaMxrkMCghQVpKGY5BmYl8I7ZjydIm0G90291zKhAU8Lv8e63OibasLybvqsDiHr9zGZcZeZC95UFA9550eg88qx+doS2/YE0ZUREJmenzOK72QBhr5VabaEp0N1j0LqEjJ1/wln76IU5K8bbe8fc0E1U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772716683; c=relaxed/simple;
-	bh=pRlHYaIuWKOt/AY7PrVqRWrifQrg94NcWB6EgwXGMeM=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qSjSwOe/MQ5dxX3sZ/YoO8aIICLBS+nr1BCFo5i301FYrqEcAWf5fZVh8tfD2nby5snjC1sWPrRwAiDTVb3XsIZdNNffGRgTXpn8JhXNaR4F9L7NpPQXVgQoI/pquYylrlMx9a9P82rffTRoJt01E2UlZXitetJViAiwR5LIcIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pOhzD+7T; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772716682; x=1804252682;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=pRlHYaIuWKOt/AY7PrVqRWrifQrg94NcWB6EgwXGMeM=;
-  b=pOhzD+7T1GX/AuzjSK1YFVxach3pIh4JlMzEkJcSmTIaNpqPGl+5Mr8a
-   KEelMp4x1NhMIzPJbShBit6WesyL1Y6GMkDsbe6AqXb0kMvkDPaCctMI3
-   pNEZeUMi5qJZrdyOkJsqav8CIdgiWHm4UHhpONgA+7/H+uZ3mVWrXBgE0
-   ea61xGDFxIXQeRdAZSXiIBMt8g8qEBsZEO3qfhI1YQm3hjxKosyIbKlrb
-   eLASvGk8rsjhXBbEyYhOBMuoJKadO+86mmfvJsOA01UzYatykkm19rDXr
-   R1hEO6nATDl84Rd9xcSPAjpY6R/9qVMPAcd3XRHLOXeCOsBVtAsdbFHqU
-   w==;
-X-CSE-ConnectionGUID: qvYQB2/bTLWgzctEAuslXg==
-X-CSE-MsgGUID: ASJayziXQkmbRE54OTJYBg==
-X-IronPort-AV: E=Sophos;i="6.23,103,1770620400"; 
-   d="scan'208";a="285649053"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Mar 2026 06:18:01 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 5 Mar 2026 06:17:40 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 5 Mar 2026 06:17:37 -0700
-Message-ID: <acb32c15be9625716a899c2b955ed0c8a59a4eed.camel@microchip.com>
-Subject: Re: [PATCH net-next 7/8] net: dsa: lan9645x: add mac table
- integration
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vladimir Oltean <olteanv@gmail.com>, <UNGLinuxDriver@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung
- Huh <woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Thu, 5 Mar 2026 14:17:36 +0100
-In-Reply-To: <8a08bb19-f565-4363-9617-a752c83a762e@lunn.ch>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-7-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-7-bff8ca1396f5@microchip.com>
-	 <20260303152709.nospd2qq3dju2tev@skbuf>
-	 <67a34d22b8f59964fd3bfaee99c8418a21526f3e.camel@microchip.com>
-	 <8a08bb19-f565-4363-9617-a752c83a762e@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1772717389; c=relaxed/simple;
+	bh=2O9r9LDXDJj803X3puSuwhl3cSUwWHVBg3YhINrdJqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMJuOl45CLLdstnWNkeh4qrlwFzZmkkycnUaaiFwZPit2fUQMtRptfYoqKsb8QoNGuHGnoDAAtZmiEGN4Wh8O+8Hwwwi7MqkT3yZ0X7FrogUHk6Nrt2oaTmy7ZOEdpV3XdPOkM/7kGM4S13N5ZOA3jETqjNmpZLe+rTA3grXnnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=MaxfacQn; arc=none smtp.client-ip=74.125.82.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2b4520f6b32so9193137eec.0
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 05:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1772717388; x=1773322188; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W2UUm8R+QueyEkOcuCPbcorlCWNYx0VuCk3zns3tCYI=;
+        b=MaxfacQnfqdoIx1iarKZnziKdw22HNLeA3zPFpRxCgU70yBkAyjOsrdl3Sbnee3wYg
+         V2muop6c1Zru0C1lZalypILaRiS1sY4uxX8L/hActIfpL/CPo7PFKR6Wwypqe7+/8O4b
+         ty7Md5iKC1uLEcmP3g99zppXzMOJO3EjGtXQI+c72qPdYFCSCuxWSxXpGVvJjvyIOvYF
+         pEkvMV/zRxQfVEaFt/oIWZEuCT0mPudMWRSobmb8718fW10T2DHoa4qtIcwYhiilTlcA
+         s2QD/i76vOPGfL7UCl94Cc2tByf0Su+2UWzMK6s9kF+RTUKu8JH1+o2gSqQEopHMYjtN
+         ba7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772717388; x=1773322188;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W2UUm8R+QueyEkOcuCPbcorlCWNYx0VuCk3zns3tCYI=;
+        b=PQS6PNnvOvMT/fOeZgxtZRxjz3EmGZ6sjj+eBw/Chiqr1n3A9qFRMtyu3vxsjT6Sqp
+         70fRR5LgOCaxM5O5H2JUc5oOXzANWuVb8OIaM+RPV8fMAi94I/WwZkJj2DZzXwIEti2s
+         wvmrKS0vCt4JnpZENmkHPtVlKo9DEie16SEpufJPz0LqajXoy3hzCoMELgyrA8gzUSFA
+         JnvIuvQQF67JKCjCw1ExBJmxdH83C0SyBZBwp/vKI+mkKz8JCsaRjf5F/Yio+d/69zDx
+         +KZpunYU8tDXhNCn/geDBNCicjV8hGk4LSGj9wuZ6mGpDTytiARu1H/LMcstld3C+rg+
+         RN/A==
+X-Gm-Message-State: AOJu0YxfjT7kUx7lK6EufFp03J9Lq8QwAJ/kIosLlhjmqF7rRASkbJfx
+	N3kT32261l9o4G/L9cmaFlOdhmZe1z+OrksUW/FExIC+9T2kwfvTcQuzCm7NQIaU17qhf1x/Krs
+	pyu58lEWWZZ2IT0E=
+X-Gm-Gg: ATEYQzx9F2+6pcpdSlOeVNZFs4x5KMeHNf0F6Hs2mqBzqjEUQwXY/9ElU4QVu9g4FMu
+	ChrU7TxwuBSh0ws9eKG/9F9PCo1VuulaSghK6nFaUkqYfQgvI9Mh4D3J0o/rxGskFoZfeFsM+2Z
+	p/SOewgtE5b3Lg3AgFRK8a9eZZyMM4bRyA9nx5Vzu9RjLiObh+PO5yDqMaEDWpfvbvCIEcIrekC
+	xad57QmaqVuBu8Sfzk4rOrz0J/JpSmuNER8v3AuWczjJnqClsdR+unaVzD1lPbHBGME5t2bOz1u
+	6awi8c1cRKghA/+RA+vNNuGTruRy6fmyJ4hmyqj2jMdQg9bwL/KAioJ2RUJCodZcpJVclPVSDwY
+	ILOIYX0lPD6LFmjg51vJU/+ipndiodNT3sicXOS0c+puEZ1usSnx7E+TDaagOjVP2S/iV1LCEJO
+	+1D01tnhpgBcOZumFZ0Rsy
+X-Received: by 2002:a05:7300:e12a:b0:2ba:9835:1113 with SMTP id 5a478bee46e88-2be311c7211mr2339685eec.36.1772717387580;
+        Thu, 05 Mar 2026 05:29:47 -0800 (PST)
+Received: from localhost ([216.228.127.129])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be1281ff70sm10108869eec.14.2026.03.05.05.29.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 05:29:46 -0800 (PST)
+Date: Thu, 5 Mar 2026 15:29:41 +0200
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
+	roopa@cumulusnetworks.com, sdf@fomichev.me, petrm@nvidia.com,
+	horms@kernel.org, idosch@nvidia.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	andrew+netdev@lunn.ch, Guruprasad C P <gurucp2005@gmail.com>
+Subject: Re: [PATCH 1/2 net v3] net: bridge: fix nd_tbl NULL dereference when
+ IPv6 is disabled
+Message-ID: <aamFRR3rfa1TlHEF@penguin>
+References: <20260304120357.9778-1-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: A21AA2128F1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304120357.9778-1-fmancera@suse.de>
+X-Rspamd-Queue-Id: 348502129A6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264394-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,microchip.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264395-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,cumulusnetworks.com,fomichev.me,nvidia.com,kernel.org,redhat.com,google.com,davemloft.net,lunn.ch,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, 2026-03-04 at 16:34 +0100, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> > > > @@ -6,3 +6,4 @@ mchp-lan9645x-objs :=3D lan9645x_main.o \
-> > > >       lan9645x_port.o \
-> > > >       lan9645x_phylink.o \
-> > > >       lan9645x_vlan.o \
-> > > > +     lan9645x_mac.o \
-> > >=20
-> > > Is there some particular ordering here? Because it's surely not
-> > > alphabetical.
-> > >=20
-> >=20
-> > I just add new files at the end, I thought that made the most sense. Sh=
-ould they be
-> > sorted by name?
->=20
-> This is part of the whole 'sorted' story of lists in Linux. By keeping
-> lists sorted, insertions are spread out across the list. That reduced
-> merge conflicts. Within one driver, conflicts are less likely, but
-> always adding to the end of Makefile, Kconfig, core code, etc will see
-> merge conflicts if we have two developers adding drivers at the same
-> time.
->=20
-> So if you have any sort of list of items, please try to keep it
-> sorted.
->=20
->         Andrew
+On Wed, Mar 04, 2026 at 01:03:56PM +0100, Fernando Fernandez Mancera wrote:
+> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
+> initialized because inet6_init() exits before ndisc_init() is called
+> which initializes it. Then, if neigh_suppress is enabled and an ICMPv6
+> Neighbor Discovery packet reaches the bridge, br_do_suppress_nd() will
+> dereference ipv6_stub->nd_tbl which is NULL, passing it to
+> neigh_lookup(). This causes a kernel NULL pointer dereference.
+> 
+>  BUG: kernel NULL pointer dereference, address: 0000000000000268
+>  Oops: 0000 [#1] PREEMPT SMP NOPTI
+>  [...]
+>  RIP: 0010:neigh_lookup+0x16/0xe0
+>  [...]
+>  Call Trace:
+>   <IRQ>
+>   ? neigh_lookup+0x16/0xe0
+>   br_do_suppress_nd+0x160/0x290 [bridge]
+>   br_handle_frame_finish+0x500/0x620 [bridge]
+>   br_handle_frame+0x353/0x440 [bridge]
+>   __netif_receive_skb_core.constprop.0+0x298/0x1110
+>   __netif_receive_skb_one_core+0x3d/0xa0
+>   process_backlog+0xa0/0x140
+>   __napi_poll+0x2c/0x170
+>   net_rx_action+0x2c4/0x3a0
+>   handle_softirqs+0xd0/0x270
+>   do_softirq+0x3f/0x60
+> 
+> Fix this by replacing IS_ENABLED(IPV6) call with ipv6_mod_enabled() in
+> the callers. This is in essence disabling NS/NA suppression when IPv6 is
+> disabled.
+> 
+> Fixes: ed842faeb2bd ("bridge: suppress nd pkts on BR_NEIGH_SUPPRESS ports")
+> Reported-by: Guruprasad C P <gurucp2005@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com/
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+> v2: use ipv6_mod_enabled() instead of a null check and replace the check
+> on the caller
+> v3: no changes
+> ---
 
-Ok that makes a lot of sense. I will make sure my lists are sorted.
-
-Thanks,
-Emil
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
