@@ -1,75 +1,83 @@
-Return-Path: <netdev+bounces-264207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANAqDxI2qWlk3AAAu9opvQ
-	(envelope-from <netdev+bounces-264207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:51:46 +0100
+	id 0IfpIqA2qWlk3AAAu9opvQ
+	(envelope-from <netdev+bounces-264209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:54:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7788320CF32
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:51:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D5F20CF9F
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9AE2A3006023
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:51:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55EAC3031CFC
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DEDB32C94B;
-	Thu,  5 Mar 2026 07:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3218F33557D;
+	Thu,  5 Mar 2026 07:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="R5IThJm5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ku4RhVWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D8532B981;
-	Thu,  5 Mar 2026 07:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B032335546;
+	Thu,  5 Mar 2026 07:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772697099; cv=none; b=EbtLZszRmV3AJw/Vz5N81uRuAy7CRrekdnjagEdort4wcTpdTDgMT50bTjdfcIqTyQ+J0cYoH0lf60m3/MAUNDBTTofziFrGv1GVB9055bCA5HnV4Mjox5RjnwYWEWpfe5gWpwOZ9CmYpjNN2dOQZU00L/3JHYzo/SOhez1vtIg=
+	t=1772697216; cv=none; b=PhWFqQbtpyW+qNXF9hNbRffZzs8cb7YHY0QVuxjgZXNOXIHRxTDqasPKIfEpt+O52emHJiculTPqfEiufMT0RYOSNW6nr6tW3kYs6TVv2ay5RmQX/cMw8/6OLETV9A2rMJc0B9xvikJJdPRhybEHQqtdDYKyxy1b/RYm/C0D8Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772697099; c=relaxed/simple;
-	bh=DXb6Q+j9M90TXOArdiNg5D427m8pr/vCLDYd9DVf+U4=;
+	s=arc-20240116; t=1772697216; c=relaxed/simple;
+	bh=0IRCN5orXpBlDp5bbe+hP/a4OpxCZ/kKP/mq46MHsUc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L00EQybSxN9B6yxuQTu+gaRLTAz5lrL/cDtnyfY0oQoEV84cA86vMURHnQEvh28K3e1lZta9Fcm1qkaN93ZQ7BfmxxXOGPEHKDuW/MF2VEVOas/CdZ1NwaUebp0WtWlYtu+p2kuxJ6BZt2guPx3d8OqqY9C2oBljBV8hnFCEoLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=R5IThJm5; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1772697095; x=1773561096; bh=DXb6
-	Q+j9M90TXOArdiNg5D427m8pr/vCLDYd9DVf+U4=; b=R5IThJm5qrA8YhhFrGyH
-	sWwdVZ0Bse+PmNyiOSB2Mghl2rvfqwrjH8IhL756vyzcFSoPjrD7MXpRbpXEXAz5
-	9+AFjS1gISBxsyU9OOqPdVvLpmBzDkpDhEdQJ01ZoaVfD3ivBJLifM61ENe2tSiU
-	pWoss9+x2cFomS/gBZJ6zEW+g0gvwS89W3PW3B2t8JALkkV1u8E6m2yDBjbQDRek
-	vbmNiWDll0vbe7tbpXls/ka876Q3iFg7plJmikpZSUXE8ajgYmDNJS/anFRvkKG6
-	LwlADYBAiQhKdbIS5OXVUENYAwkKG8e6xBoG28fYBELc3j80VOfrO9FrpD6qLywS
-	UA==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Thu, 05 Mar 2026 08:51:35 +0100 (CET)
-Date: Thu, 5 Mar 2026 08:51:33 +0100
-From: Antony Antony <antony@phenome.org>
-To: Yan Yan <evitayan@google.com>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org, Nathan Harold <nharold@google.com>
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 8/8] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <aak2BWlUbCCGbhp4@Antony2201.local>
-References: <cover.1769509130.git.antony.antony@secunet.com>
- <b7b1bee9456ac4ada8941c93c2cc17f07d0b1912.1769509131.git.antony.antony@secunet.com>
- <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JqouC96eiTfDcq6jUkRjXKH4BpgTV9aoPT0HkRlOzLFmwlvxiPe9AqlE54tSxFsDZAh+FNVZDQqdsNTN811ilkQmjzwl90magp3mg4aMZMXBUlSr8FoKH78zXOb0DfjMsguCsxiq7RejZ95B1AziUtq0ZGoGw+qNA17J6rgI8dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ku4RhVWj; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772697214; x=1804233214;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0IRCN5orXpBlDp5bbe+hP/a4OpxCZ/kKP/mq46MHsUc=;
+  b=ku4RhVWjH8Y7sbPrjrY2nOl8fKf5gE31ZDAIsoI4ljsRBHenNpCh8mBT
+   vc6QuuKPcgENAVqRadzecw3s3IYWNPcEUkzGmM00lyO+sovbyqb8I2mLe
+   icajiDrmvYFA8914q6AJZ1TOkwlgFI85sHg7VYTZ3v0hfcxE2mqWJu1b9
+   aRh32O4hzRi6KzXTB7aKzd0ty2cdVeZURRrvg/md3kKF6sN64Br5m+EGP
+   DPpx6UcGEnGfPJSJV5zwG2IJs56RU3Yp5WH6mYWlxDT50mSAHOxFCXH4S
+   3G70Ltyj+5DvehKeFJXA3DCQbRF2wJw0NSUMJkUc90i6ZYgBVcfJwv2CM
+   Q==;
+X-CSE-ConnectionGUID: Ob4yd1NeTt+W4FLMQq/VZw==
+X-CSE-MsgGUID: 9nBb3wlpQRyzRDAiY1Vq/w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="77646905"
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="77646905"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 23:53:32 -0800
+X-CSE-ConnectionGUID: w663kWYfQVa8o27u4O5rSw==
+X-CSE-MsgGUID: kwe5FhppRZ2RDxvcFi9xoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="221500100"
+Received: from lkp-server01.sh.intel.com (HELO cadc4577a874) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 04 Mar 2026 23:53:27 -0800
+Received: from kbuild by cadc4577a874 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vy3WF-000000000Du-3zCf;
+	Thu, 05 Mar 2026 07:53:15 +0000
+Date: Thu, 5 Mar 2026 15:52:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kbusch@kernel.org,
+	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+	hare@suse.de, alistair23@gmail.com,
+	Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v7 4/5] nvme-tcp: Support KeyUpdate
+Message-ID: <202603051502.9qxZ0noK-lkp@intel.com>
+References: <20260304053500.590630-5-alistair.francis@wdc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,65 +86,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
-X-Rspamd-Queue-Id: 7788320CF32
+In-Reply-To: <20260304053500.590630-5-alistair.francis@wdc.com>
+X-Rspamd-Queue-Id: E2D5F20CF9F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,kernel.dk,lst.de,grimberg.me,nvidia.com,suse.de,gmail.com,wdc.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-264209-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264207-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,phenome.org:dkim,Antony2201.local:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 05:44:51PM -0800, Yan Yan via Devel wrote:
-> Hi Antony,
-> 
-> May I request that we also support updating the XFRMA_SET_MARK as part
-> of the new XFRM_MSG_MIGRATE_STATE message?
+Hi,
 
-yes I can add that. I would add XFRMA_SET_MARK/XFRMA_SET_MARK_MASK together.  
-If you set only the SET_MARK mask will be 0xffffffff.
+kernel test robot noticed the following build errors:
 
-I am actually using xfrm_smark_init() which will accept both. 
+[auto build test ERROR on trondmy-nfs/linux-next]
+[also build test ERROR on net/main net-next/main linus/master v7.0-rc2 next-20260304]
+[cannot apply to linux-nvme/for-next horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> In Android, the primary use case for migration is switching the
-> underlying physical network for an IPsec tunnel (e.g. VPN, Wifi
-> calling). Currently, due to the limits of XFRM_MSG_MIGRATE, we are
-> forced to use a separate UPDSA call to update the set-mark. Supporting
-> XFRMA_SET_MARK within the migrate message would allow us to update the
-> addresses and the routing mark together in one atomic call.
->
-> Regarding the logic, I believe the set-mark can follow the same
-> omit-to-clear pattern as XFRMA_ENCAP and XFRMA_OFFLOAD_DEV.
->
->
-> What do you think?
+url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20260304-134148
+base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
+patch link:    https://lore.kernel.org/r/20260304053500.590630-5-alistair.francis%40wdc.com
+patch subject: [PATCH v7 4/5] nvme-tcp: Support KeyUpdate
+config: x86_64-buildonly-randconfig-006-20260305 (https://download.01.org/0day-ci/archive/20260305/202603051502.9qxZ0noK-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603051502.9qxZ0noK-lkp@intel.com/reproduce)
 
-good idea. I would try to test, otherwise please review/test this sepcific 
-part xfrm_smark_init() set 0/0 when there is no SET_MASK.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603051502.9qxZ0noK-lkp@intel.com/
 
-Thanks.
--antony
+All errors (new ones prefixed by >>):
+
+>> drivers/nvme/host/tcp.c:1429:24: error: no member named 'read_sock_cmsg' in 'struct proto_ops'
+    1429 |         consumed = sock->ops->read_sock_cmsg(sk, &rd_desc, nvme_tcp_recv_skb,
+         |                    ~~~~~~~~~  ^
+   1 error generated.
+
+
+vim +1429 drivers/nvme/host/tcp.c
+
+  1417	
+  1418	static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+  1419	{
+  1420		struct socket *sock = queue->sock;
+  1421		struct sock *sk = sock->sk;
+  1422		read_descriptor_t rd_desc;
+  1423		int consumed;
+  1424	
+  1425		rd_desc.arg.data = queue;
+  1426		rd_desc.count = 1;
+  1427		lock_sock(sk);
+  1428		queue->nr_cqe = 0;
+> 1429		consumed = sock->ops->read_sock_cmsg(sk, &rd_desc, nvme_tcp_recv_skb,
+  1430						     nvme_tcp_recv_cmsg);
+  1431		release_sock(sk);
+  1432		return consumed == -EAGAIN ? 0 : consumed;
+  1433	}
+  1434	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
