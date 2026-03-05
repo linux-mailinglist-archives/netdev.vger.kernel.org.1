@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-264386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IK7GBux+qWlB9QAAu9opvQ
-	(envelope-from <netdev+bounces-264386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:02:36 +0100
+	id eI4TIs1/qWlB9QAAu9opvQ
+	(envelope-from <netdev+bounces-264388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:06:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE7C2124CB
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:02:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27802125E4
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4D5863053C14
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:02:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E26F7300D9D5
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 13:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F543A1CEB;
-	Thu,  5 Mar 2026 13:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782E53A1CE5;
+	Thu,  5 Mar 2026 13:06:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8076839E6C5
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 13:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0193A0EB6
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 13:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772715714; cv=none; b=bcDly5ONJm2idy9HR1DsdC+z1Rw/NFwh9FgSGYNIrz5fIxpIGIkHDhQ6bJC0hOGrhMfMktl83hwuajUVUCQc/RlZsAhEELkbOdZbGnriIC8/0s98L+gaNzH/uqKKuWraYYU3YvmbpToAdZrC6Z7ajPNbPfR2hLj0N673MwibP4Y=
+	t=1772715976; cv=none; b=KLMz0SKil05dDEyRTxoT4Ep9PFvEbBlUevrzFw4AbDBdX/kkB20vtHzxkJyBhE2glkzzRyU54rtUjJKzFYm9nXfE0wxHBo3lLbR3yT+sG7oleb7bKaBlxsB2WDvbcVdjBLDnH/KKjc9cEF9R2Py2NX9ifIEswTVRKnLxdgTGLWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772715714; c=relaxed/simple;
-	bh=mzxuHFEBJ8rIbeR5gmZexUBLMULkEpRVqRmwwCFyU/8=;
+	s=arc-20240116; t=1772715976; c=relaxed/simple;
+	bh=An6z6pGF00+43VUaOecTwb49LKqdBH2wGqINr17mp5U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=htrkm7Rh2SjVBdpLtkUzohfD5uLM+ksyoLffbaPN8wlOJ0uFGnwa/M0RX5ajy9uFcq9Aok/6BYP9Eim3RF0gZnOPrBZfM3hVjwt/hrE/diL4hUeQ/6PgqdRym+MqoISxjzt6vZ7XDewDAcXcP3tBKwnoAaJEbjId5wNXUuR9w6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=uyvwrTHj2NyMnhu4zelE5Rw3QrdKSo3D0KxHnbmwyyupEXRx9oagO2m4graLX1qV5jKRM1QnxMnOLnWCtrdKd4N5k3ZQP/eTZOtG4/O72UjR9K9urlgfHtnlNvEzw1Mv9i4S6o/5ldu/dfIKQWB+AGCY66VGlXBLUxtd3sCu4oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ae43042ea7so53424935ad.0
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 05:01:52 -0800 (PST)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-bde0f62464cso2849855a12.2
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 05:06:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772715712; x=1773320512;
+        d=1e100.net; s=20230601; t=1772715972; x=1773320772;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7IxpxVkGnClS/pzWnTPcTEx+bl+pPZR21vGpLksfVXc=;
-        b=Z8/WSBVKM1Gz6N3PGexC3GMYP6GUx8jNqvMm8zS4ojHqKq5kW+B5Xnft4QZ+fd1vA0
-         AQkhPxfYY1Y5LQIc02ABj8GHoEQgf8UXyi7EuvTqbq6LIwkLfrAFpVHmtFSClSZ+75D6
-         0BnQ0962aroc0g98lkyRj4cbOeA0wQ/aR5cSykzmtuqdA7awdPIFoQeKUPtuwv8R0ODK
-         33FPGexmory0TyfXnPLAkPp9FHfv5N/rpfmefNnaxCrpuDx7eap1ky3D74X8k54/EamM
-         4I6QHsbS31n02GSgPAuK0+9f+Q9GpjaO+wZMmOVvMs6+raoUdzQManNdfyundoXYpsmT
-         m6EQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOoOCT77rK1voGeE62Or0JoZjtXgXZGK8xg5r+Og/mBgZo1f1LEgHCnakAEjEnWiubbhQ1TCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh1vVyM6V0epvLjfWs68ScsGif0Cu87h0fW6Y4S+E1GNsvdISk
-	q0fLmeJrf6mVaaLw7um4MCuR/s9ZB1jdaLkWmq9CxFUeczdOGyDJ1E0R
-X-Gm-Gg: ATEYQzwE9Nocj6yfc2uVWasdc3GFwgglEM688V3wVZpVFLjP1gkSZZkfxINLSrEsXaq
-	XdCzZr14Hsp5DVa2wp8lQ1nBFSj1269o2q876z5mSWjsEsR/YKjwHiwEDZohpXWLHyGebBSSsIA
-	8CPpHswDjieKiaA7IhGDXfv9OmutfzLPgRn3fvB+kqilr2nQJgZzMyk74rWY5kMumGAPSsPrQGa
-	uvFT15srAKcmH3ebgabWunzKFBVUsMsiZ42dqEFWbmRzBeLFaS986ga3DogT7hQwXEN4TxsScLg
-	U1RZ0igUNjyjB654debwkgmVZ3eQostWLRi2nzgAOMntB4KZpzIcLgNPtfawDYoaixl8Fufg/xT
-	BmGQYi6GWPE7RVlrFiQwh8iXoDoLir++sl5v3pvRy3vz6lrGup3Yij8bdO8bMHJlMTq9Prwpgyi
-	qHF/93FJx+g7/URGsYN2SZir3d/5K4TcO4OcYS3Lr9G4AsjqHAXhZlgyjBto7tdrQd6i8YYKijq
-	cAXhY95WqlsFNk3fuXItbyLx5483lHtB5SmpjbpYkcuCqQnzl1EeN9r+gkdQw==
-X-Received: by 2002:a17:902:ce03:b0:2ae:5b52:3818 with SMTP id d9443c01a7336-2ae6a9deb2amr60551085ad.8.1772715711782;
-        Thu, 05 Mar 2026 05:01:51 -0800 (PST)
+        bh=z/3ao61LTSp6jCCF+e+2SF+gp23jwVu9a+x2K0Dcxpg=;
+        b=n9bM3VFaOInctOHaSegiQKsaaZkxXP0ssRPHmuFsjiX0esap7F3iHMXayKYqDffoDI
+         Ab5DGkhOcxtRBV/Wou+kCD4SkjoG/Cs2uxtj6WChJmI6xHAqHwqIVE2M6v5nOUMx61r7
+         BzlqAcOErd3vJkeQPiN/pTpmCCyOQ2C9ZXTx1zAKdnqb9DxoDQJsk+pFu7n34x6CPY3p
+         +fTwIJiH5yRcLY+F4qoQzW1w4kXOw7X7U9biG6t01e5wSyQv6iSQyMGX2tlKLQvVjucV
+         VxavE33ZkYPt0B06iKTuJsjHWu10xqg2xmxrqrJg1bEEgjQ9t44OcMA92xqHSHhOh4xw
+         JijA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAviZwlQ4He66c31278LHos3rkF30cDgQRuCbXly8zu0W5zmkXGn9TE2vPWhZTM8uUAYYjf28=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzg0dY3J68vkaRW9WzPqy4vvTIp1RZAfimv9HHX51Je1iusV6j0
+	y4qo8gKzgXcdUL29rIoTy1NhL5SezXEDKc9Wa9TewkeUW+QaYIKF02Lv
+X-Gm-Gg: ATEYQzzEdkRHVmmYlAIhuJfagrb0TG+VCtthl49VyBGuzM3UaHQLkMkHraEvREyQU+A
+	T2WpgtzZMz0TH+iYNZz/xKY0kwJ3dyE4JcTgayNucFRKJR64wm+4vWnQ+7hF8iLOdtbGSpdD/dU
+	anm6SXY9l76moSjcNWFZ7SImiod6QQBB0e1XvQQJHDBTpM+KtAOiTV/IpEsZG1nmBdMmYdHwY+k
+	6nBvklEJteO6AB8qpQN3+5hgnV72AyKRzR+kZcM6zA3q1qEJV/ynE/IGk1FzC1PsBJX+phplm0s
+	E88wZ1bZVexwCSkz+/ASXzuzHSi7SVkRuUs2QH2YocAtz/DqwICL/FA7JgJRXJgCaBbkBOGLK4e
+	cx1fOVs+l7Jh8vqwIjh2lNgLIpTmy+xpz1xxwFr2GR0Sn7DRxVuFRynh/nC0jpX+fgZcf3XkkEs
+	c9r6FaeKpzxEHbLJ3Dbngmo4z4CVzkKgK1SAPl/UGGT2l4qONiuAeZEtxJdB+ox8dX73wa++HDx
+	yRcNjjn/0Jaw5wxNSBxM0NBALtq4oPSECvW1JoQa+IB912XX3U=
+X-Received: by 2002:a17:902:f68a:b0:295:560a:e499 with SMTP id d9443c01a7336-2ae6a9cd41cmr53596975ad.5.1772715971749;
+        Thu, 05 Mar 2026 05:06:11 -0800 (PST)
 Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae54136b28sm115696425ad.73.2026.03.05.05.01.50
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae3d19559csm154128355ad.5.2026.03.05.05.06.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 05:01:50 -0800 (PST)
-Date: Thu, 5 Mar 2026 22:01:49 +0900
+        Thu, 05 Mar 2026 05:06:10 -0800 (PST)
+Date: Thu, 5 Mar 2026 22:06:09 +0900
 From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Joe Perches <joe@perches.com>,
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Joe Perches <joe@perches.com>,
 	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
 	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
 	Neil Armstrong <neil.armstrong@linaro.org>,
@@ -83,7 +82,7 @@ Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
 	netdev@vger.kernel.org, spacemit@lists.linux.dev,
 	UNGLinuxDriver@microchip.com
 Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
-Message-ID: <20260305130149.GA1659133@rocinante>
+Message-ID: <20260305130609.GB1659133@rocinante>
 References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
  <20260304175735.2660419-23-vladimir.oltean@nxp.com>
  <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
@@ -91,9 +90,7 @@ References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
  <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
  <20260305114352.2f7btqixg4tu5bzl@skbuf>
  <20260305121532.GA1649635@rocinante>
- <20260305122957.GA1652563@rocinante>
- <20260305123956.ojkt4k3ly64xz7fu@skbuf>
- <aal6kWDx_3XRGB4K@shell.armlinux.org.uk>
+ <20260305123843.i47asdrjychwlgdt@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,53 +99,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aal6kWDx_3XRGB4K@shell.armlinux.org.uk>
-X-Rspamd-Queue-Id: 7CE7C2124CB
+In-Reply-To: <20260305123843.i47asdrjychwlgdt@skbuf>
+X-Rspamd-Queue-Id: F27802125E4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264388-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264386-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.7.a.0.0.1.0.0.e.9.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kw@linux.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 Hello,
 
-> > > For content match, it could also be:
-> > > 
-> > >   K:    phy
-> > > 
-> > > I believe this would match everything of interest?
+> > > K:    \b(?:__)?(?:devm_)?(?:of_)?phy_(?:create|destroy|provider_(?:un)?register)\b
+> > > K:    \bphy_(?:create|remove)_lookup\b
+> > > K:    \bphy_(?:get|set)?_drvdata\b
+> > > K:    \b(?:devm_)?(?:of_)?phy_(?:optional_)?(?:get|put)(?:_by_index)?\b
+> > > K:    \bphy_pm_runtime_(?:get|put)(?:_sync)?\b
+> > > K:    \bphy_(?:init|exit|power_(?:on|off))\b
+> > > K:    \bphy_|(?:get|set)_(?:mode(?:_ext)?|media|speed|bus_width|max_link_rate)\b
+> > > K:    \bphy_(?:reset|configure|validate|calibrate)\b
+> > > K:    \bphy_notify_(?:connect|disconnect|state)\b
+> > > K:    (?:struct\s+)?phy(?:_ops|_attrs|_lookup|_provider)?\b
+> > > K:    (?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)
 > > 
-> > Yeah, and way more. Think USB PHY, network PHY, etc. Don't want to drown
-> > the linux-phy mailing list in unrelated patches, either.
+> > What about
+> > 
+> >   F:    drivers/*/*phy*
+> > 
+> > or something along these lines.
+> > 
+> >         Krzysztof
 > 
-> Also phylink, any memory management / DMA stuff that happens to mention
-> "physical", and probably numerous other examples.
+> I don't understand your suggestion. Is it meant as a replacement for the
+> keyword regexes? Your file pattern matches on:
 
-Makes sense!  Sorry for the commotion here, then. :)
+I was thinking more along the lines of using wildcards, the F: was just an
+example.
+
+[...]
+
+> There are a lot of false positives, and a lot of false negatives.
+
+Yeah, the "catch-all", for lack of better word, will not work here.
 
 	Krzysztof
 
