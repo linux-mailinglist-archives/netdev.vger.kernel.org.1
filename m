@@ -1,242 +1,159 @@
-Return-Path: <netdev+bounces-264196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOykKAwqqWkL2gAAu9opvQ
-	(envelope-from <netdev+bounces-264196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:00:28 +0100
+	id KGZQFz8qqWkF2wAAu9opvQ
+	(envelope-from <netdev+bounces-264197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:01:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 381F020C08A
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:00:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C71F20C10D
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9F325302691B
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:00:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6456B303AB56
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FF130F52C;
-	Thu,  5 Mar 2026 07:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYNHKyUA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2062314D36;
+	Thu,  5 Mar 2026 07:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830F428CF5F;
-	Thu,  5 Mar 2026 07:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D156814EC73;
+	Thu,  5 Mar 2026 07:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772694021; cv=none; b=hERNo68e3UVTSyWMybdgOAEtLwF19JfRTe0eFQnOhbyCk1N7n+/j8VRUFY2sSQgzAqA5b+iIEuyvyikYe3v1qSTT6RJyzF12pgDBS+x2ik2GkZEnoGpemM6/z76TdyYRRORGx0oqhhMajHb1DAfjUmOqcN5qZqAt2adb3EpYEFM=
+	t=1772694045; cv=none; b=jqKM9rt8ycBMdlr/KJGsARirjXPZxs3iAv0w84Q/NUtIg54UFNV/V5mIVS5s9jigILrHyEv+xibhuOvnTeYa9YUFxUI4MjOTfAnDUfjpM6thfHYf8nYddDkQTlyC+20LxaGbBn5bo4iwczW0SqokVU05ZAO8oLQ6C5JkClccSQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772694021; c=relaxed/simple;
-	bh=wklQmiDw5CCs73RYai35MkA35VjVSDaJIlwRuRpjG9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c0L/ZOJ6b0VtxvlTKvvWzJMQ57UWjTQQD7VUBBk1kDaU1a5ZqtkrnGIy9WPb80cIr18g2AaZvKMKMGB5PRBc/X/WTRHHjMVreCyZDiB8hahpBGhyLq80462cuGJnVQ2JBlmXl1aA8kVGH7HAclPiTj8GujJq4hcxnSclByrwaIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYNHKyUA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 593A4C2BCB1;
-	Thu,  5 Mar 2026 07:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772694021;
-	bh=wklQmiDw5CCs73RYai35MkA35VjVSDaJIlwRuRpjG9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NYNHKyUAtG920Ngd6TvDbI6ECdHLkGbcajWVsB71IOOtBo4RYJwK7IkgSCivBbWU+
-	 8uLhD2CKryg8NBWLD5vTivFSZenIocXP7ahqqRVdtbeZRxgVtyEFxTW+aKPANGhYG0
-	 7tevgabtR2BJlDaAVP3Dwym5FyFfM4WSQn2bmQe7a2X9GHErSCJweemdLtAunlJcI7
-	 b9D04mHFO5UtXVqKnGokhdl/+foTByYMV6Z3xl0FcBglt6a8aSiujfc1/gcoUr/Iic
-	 zLuFrHGt4PpVX/PI2TY0bmVXQN9WkeIwHx6FlFbHvuRd2vZ3ny2Xz7Cy6u2fVCb4QK
-	 ti5sMUtc+FaeQ==
-Message-ID: <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
-Date: Thu, 5 Mar 2026 08:00:15 +0100
+	s=arc-20240116; t=1772694045; c=relaxed/simple;
+	bh=SGPg643gglqJv+UshT/T2/TXtVzvxYdKr5gxNyEmiXs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=k2vOOU7NaDV9u8MqqmEOODGPaDvoMw6KIW4hoTB9Lblrayk7iMe3sBt3SPOSBR3rkxw4ZrHvsMvbu419+iC3X38dlGL425eQP2EqXAxnvfjFd6nRntU3mCk7+Jxuz/95ZCOS6DhugaJNax3omObsYN1Qt37d5U4FQkAPrHsb5p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowAAXrA8RKqlpDu+uCQ--.18491S2;
+	Thu, 05 Mar 2026 15:00:34 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Date: Thu, 05 Mar 2026 15:00:29 +0800
+Subject: [PATCH net-next] net: spacemit: Remove unused buff_addr fields
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-To: Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20260302114636.GL606826@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 381F020C08A
+Message-Id: <20260305-k1-ethernet-cleanup-buff_addr-v1-1-e978ef119231@iscas.ac.cn>
+X-B4-Tracking: v=1; b=H4sIAAwqqWkC/y2N2w6CMBBEf4Xss2sKIhh+xaApZZBGLbgthITw7
+ 9bL4+TMnFnJQyw8VclKgtl6O7gY0l1CptfuBrZtzJSprFAHdeR7ygg9xCGweUC7aeRm6rqrblt
+ hXeb5qUAsoqDoGAWdXb7+M30mDkug+kcErykehj9utAeb4fm0oUrmcq9YTHpZN6q37Q2b0W8Nq
+ AAAAA==
+X-Change-ID: 20260305-k1-ethernet-cleanup-buff_addr-a74486e305e6
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Yixun Lan <dlan@kernel.org>
+Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ Vivian Wang <wangruikang@iscas.ac.cn>
+X-Mailer: b4 0.14.3
+X-CM-TRANSID:zQCowAAXrA8RKqlpDu+uCQ--.18491S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7GF1fZrW5GFyUGF4rCw1kuFg_yoW8JrWfp3
+	yDZas2grW3JF4YgwsrZw4xZw45Ca4rtryrua4ayw4Fvwn0y3WjgF95tF43Gr45ArWxGFWS
+	vrWUAw4rAF1kArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI4
+	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
+	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
+	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUj_b15UUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+X-Rspamd-Queue-Id: 5C71F20C10D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264196-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264197-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.973];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,suse.com:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,iscas.ac.cn:mid,iscas.ac.cn:email]
 X-Rspamd-Action: no action
 
-On 02. 03. 26, 12:46, Peter Zijlstra wrote:
-> On Mon, Mar 02, 2026 at 06:28:38AM +0100, Jiri Slaby wrote:
-> 
->> The state of the lock:
->>
->> crash> struct rq.__lock -x ffff8d1a6fd35dc0
->>    __lock = {
->>      raw_lock = {
->>        {
->>          val = {
->>            counter = 0x40003
->>          },
->>          {
->>            locked = 0x3,
->>            pending = 0x0
->>          },
->>          {
->>            locked_pending = 0x3,
->>            tail = 0x4
->>          }
->>        }
->>      }
->>    },
->>
-> 
-> 
-> That had me remember the below patch that never quite made it. I've
-> rebased it to something more recent so it applies.
-> 
-> If you stick that in, we might get a clue as to who is owning that lock.
-> Provided it all wants to reproduce well enough.
+These were never used. Just remove them.
 
-Thanks, I applied it, but to date it is still not accepted yet:
-https://build.opensuse.org/requests/1335893
+No functional change intended.
 
+Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+---
+Cleanup patch split out from:
 
-In the meantime, me and Michal K. did some digging into qemu dumps. 
-Details at (and a couple previous comments):
-https://bugzilla.suse.com/show_bug.cgi?id=1258936#c17
+  https://lore.kernel.org/r/20260303-k1-ethernet-more-fixes-v1-1-0ab0122fdd14@iscas.ac.cn/
+---
+ drivers/net/ethernet/spacemit/k1_emac.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-tl;dr:
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 338a2637b1da..af58eae6fcd8 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -57,7 +57,6 @@
+ 
+ struct desc_buf {
+ 	u64 dma_addr;
+-	void *buff_addr;
+ 	u16 dma_len;
+ 	u8 map_as_page;
+ };
+@@ -70,7 +69,6 @@ struct emac_tx_desc_buffer {
+ struct emac_rx_desc_buffer {
+ 	struct sk_buff *skb;
+ 	u64 dma_addr;
+-	void *buff_addr;
+ 	u16 dma_len;
+ 	u8 map_as_page;
+ };
+@@ -340,7 +338,6 @@ static void emac_free_tx_buf(struct emac_priv *priv, int i)
+ 
+ 		buf->dma_addr = 0;
+ 		buf->map_as_page = false;
+-		buf->buff_addr = NULL;
+ 	}
+ 
+ 	if (tx_buf->skb) {
 
-In one of the dumps, one process sits in
-   context_switch
-     -> mm_get_cid (before switch_to())
+---
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+change-id: 20260305-k1-ethernet-cleanup-buff_addr-a74486e305e6
 
- > 65 kworker/1:1 SP= 0xffffcf82c022fd98 -> __schedule+0x16ee 
-(ffffffff820f162e) -> call mm_get_cid
-
-Michal extracted the vCPU's RIP and it turned out:
- > Hm, I'd say the CPU could be spinning in mm_get_cid() waiting for a 
-free CID.
- > ...
- > ffff8a88458137c0:  000000000000000f 000000000000000f
- >                                                    ^
- > Hm, so indeed CIDs for all four CPUs are occupied.
-
-To me (I don't know what CID is either), this might point as a possible 
-culprit to Thomas' "sched/mmcid: Cure mode transition woes" [1].
-
-Funnily enough, 47ee94efccf6 ("sched/mmcid: Protect transition on weakly 
-ordered systems") spells:
- >     As a consequence the task will
- >     not drop the CID when scheduling out before the fixup is 
-completed, which
- >     means the CID space can be exhausted and the next task scheduling 
-in will
- >     loop in mm_get_cid() and the fixup thread can livelock on the 
-held runqueue
- >     lock as above.
-
-Which sounds like what exactly happens here. Except the patch is from 
-the series above, so is already in 6.19 obviously.
-
-
-I noticed there is also a 7.0-rc1 fix:
-   1e83ccd5921a sched/mmcid: Don't assume CID is CPU owned on mode switch
-But that got into 6.19.1 already (we are at 6.19.3). So does not improve 
-the situation.
-
-Any ideas?
-
-
-
-[1] https://lore.kernel.org/all/20260201192234.380608594@kernel.org/
-
-thanks,
+Best regards,
 -- 
-js
-suse labs
+Vivian "dramforever" Wang
+
 
