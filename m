@@ -1,225 +1,193 @@
-Return-Path: <netdev+bounces-264223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264224-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PxaM1ZBqWkZ3gAAu9opvQ
-	(envelope-from <netdev+bounces-264223-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:39:50 +0100
+	id gP3bLcBCqWkt3gAAu9opvQ
+	(envelope-from <netdev+bounces-264224-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:45:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D77E20D916
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:39:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EAA320DA72
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 612D23023304
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:39:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F235230088B1
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6607E374754;
-	Thu,  5 Mar 2026 08:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE38374E54;
+	Thu,  5 Mar 2026 08:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Zhs1szgR";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jftXYqSq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ei0UrF2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAAC37186B
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FEA30FC26;
+	Thu,  5 Mar 2026 08:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772699983; cv=none; b=dwb9f1EZ5B8X1sdqiTcYLzpUu6/76outUFsoJx+bIHCchr4su8a1HVOjMDOzemaxfNbvJkG2bfYCRrSojh0JAg4oLDny93PsT5nuvZzVZgyOngculCIB1tX1OyluN8GTYVcIE/hg+O3lw+Qvsh+TKNerCuNuKu6S5oftE1kDwJw=
+	t=1772700348; cv=none; b=RH4zBdO6ft6b2aP8SfwTv5MtFwobKP1x88lz9Ql3c06+1R+VJK3PSthNQRyY79vsb4sUp5RM6Ekh0SCaTUkQ2ng6jrtQ1DKaxuZ+C4WTL/o4yIK+Nj94ymvr9YBb0W7iIBR7V8UJ0z9Ifh9VxZaQsExtkJSK62meL0TmPDg+VMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772699983; c=relaxed/simple;
-	bh=6xaS693NEPvMsmPDTvB8J6q5UsLGM4wm4qipY7xfOGE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgTe0q7m7j1NKTtYNv139E66TgtaQLNyzLwI9EWXMHh2i5HZdkNqFBlpffJraGOur7YSh4NPQRfTikfPvWH32TQv/zeoihfDPPODDJrfiZG6/btGPrNkNkrqkz8gGd/0k5FZcdnAjuyWiuWvd1v9QAz4bQiJZnNdF7OXpFi3NnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Zhs1szgR; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jftXYqSq; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6251BxWU3160422
-	for <netdev@vger.kernel.org>; Thu, 5 Mar 2026 08:39:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=; b=Zhs1szgRs6PvG6yC
-	/K6l0Og7co3C6ED8icQT7ngtsI9G5Zp17IaIYa/MOFJSyTxAUHo39qtMLOBGQhpj
-	JO9fE/F/E4F4LvhAKnAlFKn+fH9sEpkGqfNT9M43WTCJkjqaFeUzfOGpTrDAGNtC
-	tA5poP4iW9oFEFa2er9A5XyBDJ8CedmbmCYM1jjJmOXgrD4UqsM96/EbUTiVA/x+
-	+Hq4ib0d4uJFejDRNFTAYPM9OxAzG41cfjw0IJBJVDWkmbFbGS1eLwFkvUDxUI+x
-	i9yGzbk3U3z2KxBfUGbK5GoyOmpZPSUHhrYGJ9ek999ywA1Q/YTR3XTo5MWWFrPw
-	1lqwYw==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cpjh5uv3c-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 08:39:40 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cb50dfd542so577163185a.0
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 00:39:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772699980; x=1773304780; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=;
-        b=jftXYqSqtrokdujho1rSZ8RV2+df0VSJJ/M8ZUZxSfL+guycXk5e5Oa+/kyiYv6qq7
-         wDt7pgwE82GoCanbnE56n+QEoFdpyD0IDJAXa2uedcbQvZQWJRRzpQWeE+FA2evLbImb
-         HHx25k81XwtVs8AYIfGmGN1Heris1W4EH+3TjG9IsAQO2tfFNcYJFHacx8H5ixGQjhjp
-         YhLkHjONVRBKpyl+EoAHQo2i8UAnKVr+iozz53JeeF4uhO8r6lRrGpcB/0Hhik80AyD3
-         +bPbUwPZDvHgZwinc1JyJ5+XebVWXjYBrsXBjFQwXL48HKIXO1qH/SWx+i+izxWR3tKA
-         fXjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772699980; x=1773304780;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kdWMwgc8nLSwvc7+zSIUZsTz2pEGRMvswxdPfflnvOo=;
-        b=n58vvh8H6Cq8NJ5hITrvVE72rHRTvzJXjf6uLbwvT/UBbZPZ38/qFnuhE97lgQXIGk
-         mlFgKRWaIuqyIjL9PMdD3mtEcH0FYlXh8R2EWyVL6hMuccj9z6jHbwXqNyF+W0CGhySO
-         ZiuFZOt2TkKGMFH/8NTqYKPr9Ho3/CxqWnfY0RGA0N/O3q4iXH4OjzLYs9Y+jpZ3YboT
-         +Lj6RfX2Cok9823r0FvfXdi+h6MiwNAv0xGAYwxGus98yNL+DiUQtQJKRWCujUkvyYws
-         E7XPMLTRGxjWh3p5I+2U2A02qchVe9nW5OZR19Njo+fqHjw9Pmy9Wk9mGZNgzKx/UweL
-         vh2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVy1hekh23lAue8+lcitnPp9FJAoPXWQnVDHhpMMbXeiaHN1Bx8sHnahW7naSAdp5jnJ4gEiqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVvppnRLaI8UC3nLGrblxrpuyCDJ1cL139Wlbx8G49d0frzrvo
-	G7i4bHeO3PYbOQq0C/J4BRvKJ9yR/OsIbJYmcj2/X6hupHyWG4JRfIFzfOus1J8U+e0act195dt
-	vSeJBexLFmlm9DwtAAeKzTOm8pGl78Pj5o4OBpuyPVd2DsltL6febH5hvCOg=
-X-Gm-Gg: ATEYQzwRWZCy9mJm7DBZTW4fl2GG36zBXwgmXjjonzr5qH6R3DjPK9MXyIaUT1hGHGx
-	yL3EkXAU5nvBFawm3ILJsB0ARrLLLXJlFHB1HXObNBXtLFFrmy6N2EVoQuXcexkM5eWKph9LuhY
-	nn4wjrubO2Scb5WpvhAw5+dnU49pH+ntU78YzXV6VY4qcAyw/xsNRhnIo1w5fE9pqnfIaw+bFjx
-	DKLvPRr6gZLv8lIda2ZkLZzHqfh0/fr/519xCpz7J98U1kt75GM3XKQDfW1gtvo3ulhEjOO7LKQ
-	IagjcrQc1tGdvOKSsNBLwjfdEzlvSdIP/F1qffElQ/rd8oNmzfDVsEbB5NfH2XRd1giv8kY3TM9
-	TsVvftnWGz7Y1eDr/MvVaiUTcF8MxarPbYr7gbsjvhZGV6lL8CEWOYwsJRYNtfrFJ8whyYdt9NC
-	Z8cv0=
-X-Received: by 2002:a05:620a:404c:b0:8c7:1b40:d096 with SMTP id af79cd13be357-8cd5afcdcfbmr452358485a.9.1772699980143;
-        Thu, 05 Mar 2026 00:39:40 -0800 (PST)
-X-Received: by 2002:a05:620a:404c:b0:8c7:1b40:d096 with SMTP id af79cd13be357-8cd5afcdcfbmr452356985a.9.1772699979710;
-        Thu, 05 Mar 2026 00:39:39 -0800 (PST)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65fac06e3fasm6657504a12.25.2026.03.05.00.39.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2026 00:39:38 -0800 (PST)
-Message-ID: <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
-Date: Thu, 5 Mar 2026 09:39:35 +0100
+	s=arc-20240116; t=1772700348; c=relaxed/simple;
+	bh=xNgtMPoKImoCYr8gJJARcB78RmcwRHpu3tklaVxZms4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iyUTlEnwrUdARgjaARhnJStaohO3MjSKd2ltuAa3PNFDLzfGaWek2/+Ui3tGqfj5NHEjwPkrl3Uq4g+gmD7F0LufiBRuBAm+Q/EjZQV7PKAu+gamAR7IAgWeQYkCqg9IpVyb7qam9y+iCC9KcoNtMRIs2OJw7HwF1nIOQD4KwYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ei0UrF2e; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772700347; x=1804236347;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xNgtMPoKImoCYr8gJJARcB78RmcwRHpu3tklaVxZms4=;
+  b=Ei0UrF2eLQuV/l5rZX0iu3sI1UW/HbiBjWNgucgmsXBz/CQ9Y20RvMBh
+   xoInW6LD3gZmwKIMlpt4UeF4z2f27RjML20kL7XKKAnNmsXICiz8nypcs
+   WBBwI8OoPYOZd7uUD9NRjod/hwwJgw2AGgfkavXYxmzR/YsA4nzGw+kYN
+   2YesdDSZugKNfQ/Qy1YtQxlSxqmd9eB+cpSnQqNpbBFPTNwUxyCwdTISn
+   8InIbRmp38pa44fvNfLILCiF9oyWs4pbc7omObe0PQONMx4qqMSUxDR4l
+   mriB7s24SsU430H7CrtOe2jY5ci3S4HBwp4wMjk1qyxT0Uk5zzuXYXMG7
+   A==;
+X-CSE-ConnectionGUID: FjkP8ey8RUWe//GP4klIVQ==
+X-CSE-MsgGUID: xAsD9KPpRvSs1lYvmyJkjg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="77650847"
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="77650847"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 00:45:46 -0800
+X-CSE-ConnectionGUID: FeFniaThThi3umX8U2hWSw==
+X-CSE-MsgGUID: j9ykGgsfSoaGhjA966yT4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="218749208"
+Received: from lkp-server01.sh.intel.com (HELO cadc4577a874) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 05 Mar 2026 00:45:41 -0800
+Received: from kbuild by cadc4577a874 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vy4Kw-000000000MU-2ojd;
+	Thu, 05 Mar 2026 08:45:38 +0000
+Date: Thu, 5 Mar 2026 16:45:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>, saeedm@nvidia.com,
+	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com,
+	anand.a.khoje@oracle.com,
+	Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
+Message-ID: <202603051647.fykhqQ3H-lkp@intel.com>
+References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, linux-phy@lists.infradead.org
-Cc: Vinod Koul <vkoul@kernel.org>, Neil Armstrong
- <neil.armstrong@linaro.org>,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
-        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-        spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com
-References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
- <20260304175735.2660419-23-vladimir.oltean@nxp.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260304175735.2660419-23-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 3QsCZuzdxX0kwTYwNSWr7ECurHvB9yVG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA1MDA2OCBTYWx0ZWRfX1XorN1wrNvOf
- 4y3sbGDzApNutY2EPvxTyt3fM3xj/r+zySu/QkISqST29bt2KKCnxnxI6hKduEFOYoorWI54Thh
- uSghReTeK6ol3lkZnF2dD1oEOHtDA+vHbmsBTn4Y462vY8TT1kPcoumtAJjwpCoAGE/VH4SgW0r
- u4LtTBDeGgCx7XyA5Gzd+qyzh8FbEGeAQCmQkOkiWAq48qdfFRDblKeNZMKZewKalSSMQHAj/sk
- 3SFOI7mTYGLiNuT7j74WUJZ7H9TN+NV6NAI8MZiq1pr9E9os1Sg7T3dRA3Fg5nzZORMH01rrxU+
- IAXV74UmXQIe9278SJuos7UYgythqk31ZZxxvrX2xCdk3kG2w5idWWLHPc7yn2gfgmSbVXStorQ
- 3gp6gA8r4nJMz6c49kzA2tmqknofj2FmWfn/rndgcirlUZwJti8ydPiIkwsroXwb+0SbU1t1cK7
- SvciWJHJ6VpZYhw/Fog==
-X-Authority-Analysis: v=2.4 cv=JK82csKb c=1 sm=1 tr=0 ts=69a9414c cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=8AirrxEcAAAA:8 a=GJStlgXwfe-SXQdWLvAA:9 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22 a=ST-jHhOKWsTCqRlWije3:22
-X-Proofpoint-ORIG-GUID: 3QsCZuzdxX0kwTYwNSWr7ECurHvB9yVG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-05_02,2026-03-04_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
- clxscore=1015 bulkscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603050068
-X-Rspamd-Queue-Id: 4D77E20D916
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+X-Rspamd-Queue-Id: 1EAA320DA72
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-264224-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-264223-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,nxp.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qualcomm.com:dkim];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,01.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/4/26 6:57 PM, Vladimir Oltean wrote:
-> Some pragmatic shortcuts are being taken by PHY consumer driver authors,
-> which put a burden on the framework. A lot of these can be caught during
-> review.
-> 
-> Make sure the linux-phy list is copied on as many keywords that a regex
-> can reasonably catch.
-> 
-> For simplicity sake this is not perfect (devm_ and of_ are not valid
-> prefixes for all function names), but I tried to pay attention on
-> avoiding false matches on things like:
-> - drivers/net/vendor/device/phy.h
-> - include/linux/phy.h - network PHY, not generic PHY
-> 
-> So I used \b to try to match on actual word boundaries and be explicit
-> about what is matched on.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 55af015174a5..bdfa47d9c774 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10713,6 +10713,7 @@ F:	Documentation/devicetree/bindings/phy/
->  F:	drivers/phy/
->  F:	include/dt-bindings/phy/
->  F:	include/linux/phy/
-> +K:	\b(devm_)?(of_)?phy_(create|destroy|init|exit|reset|power_(on|off)|configure|validate|calibrate|(get|set)_(mode|media|speed|bus_width|drvdata)|get_max_link_rate|pm_runtime_(get|put)|notify_(connect|disconnect|state)|get|put|optional_get|provider_(un)?register|simple_xlate|(create|remove)_lookup)\b|(struct\s+)?phy(_ops|_attrs|_lookup|_provider)?\b|linux/phy/phy\.h|phy-props\.h|phy-provider\.h
+Hi Praveen,
 
-Would looking for the devm/of_phy_ prefix followed by an open parentheses
-not suffice for the 'has function call' case, instead of listing all
-currently present exported functions?
+kernel test robot noticed the following build warnings:
 
-My worry is that this approach is overbuilt and absolutely no one will
-remember to update it
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v7.0-rc2 next-20260304]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Konrad
+url:    https://github.com/intel-lab-lkp/linux/commits/Praveen-Kumar-Kannoju/net-mlx5-poll-mlx5-eq-during-irq-migration/20260305-003505
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260304161704.910564-1-praveen.kannoju%40oracle.com
+patch subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
+config: x86_64-buildonly-randconfig-002-20260305 (https://download.01.org/0day-ci/archive/20260305/202603051647.fykhqQ3H-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603051647.fykhqQ3H-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603051647.fykhqQ3H-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:6: warning: no previous prototype for function 'mlx5_eq_reap_irq_notify' [-Wmissing-prototypes]
+     958 | void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
+         |      ^
+   drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     958 | void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
+         | ^
+         | static 
+>> drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:6: warning: no previous prototype for function 'mlx5_eq_reap_irq_release' [-Wmissing-prototypes]
+     978 | void mlx5_eq_reap_irq_release(struct kref *ref) {}
+         |      ^
+   drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     978 | void mlx5_eq_reap_irq_release(struct kref *ref) {}
+         | ^
+         | static 
+   2 warnings generated.
+
+
+vim +/mlx5_eq_reap_irq_notify +958 drivers/net/ethernet/mellanox/mlx5/core/eq.c
+
+   957	
+ > 958	void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
+   959	{
+   960		u32 eqe_count;
+   961		struct mlx5_eq_comp *eq = container_of(notify, struct mlx5_eq_comp, notify);
+   962	
+   963		if (mlx5_reap_eq_irq_aff_change) {
+   964			mlx5_core_warn(eq->core.dev, "irqn = 0x%x migration notified, EQ 0x%x: Cons = 0x%x\n",
+   965				       eq->core.irqn, eq->core.eqn, eq->core.cons_index);
+   966	
+   967			while (!rtnl_trylock())
+   968				msleep(20);
+   969	
+   970			eqe_count = mlx5_eq_poll_irq_disabled(eq);
+   971			if (eqe_count)
+   972				mlx5_core_warn(eq->core.dev, "Recovered %d eqes on EQ 0x%x\n",
+   973					       eqe_count, eq->core.eqn);
+   974			rtnl_unlock();
+   975		}
+   976	}
+   977	
+ > 978	void mlx5_eq_reap_irq_release(struct kref *ref) {}
+   979	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
