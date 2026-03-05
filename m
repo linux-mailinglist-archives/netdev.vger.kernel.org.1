@@ -1,84 +1,68 @@
-Return-Path: <netdev+bounces-264467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEhyHSmmqWnwBgEAu9opvQ
-	(envelope-from <netdev+bounces-264467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:50:01 +0100
+	id 4POkNi2nqWnwBgEAu9opvQ
+	(envelope-from <netdev+bounces-264468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:54:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A6CF214D7B
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:50:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFAB214EA0
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3110330AFF12
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 15:43:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 046303166498
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 15:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07AF3C6A5A;
-	Thu,  5 Mar 2026 15:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A41537F725;
+	Thu,  5 Mar 2026 15:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAB3pCoz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MAVN9DLV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793A43CB2E7
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 15:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5BD3C3BF5
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 15:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772725394; cv=none; b=OXmiUzmIj6pynRzRotj+3MrCkFKjWIJyZ5RmySJ8+F77h4lYfO8RVYlRLQ9JWX0dAXGGt8uL18fgRZZZfuppaXZPbuBex8y13wZR2jKg5xHvMC98IhOizE+StThhh9w0wYLdyIoUWj49GfSAvuYW1ZD4OjXu7oPfISlVJ9vuA8g=
+	t=1772725436; cv=none; b=NM7sQQXxkg+7pDvpYm+3KXzNwIZM2R3RVbKQ3XFmW6To5qOo/UYAt+VRsRHE39l5O53MYy1RQe/hGwEAYC6qiB8vl3V95CIaTSBDqob5+ArKPx9Q6zM7VSNljTaM1vna1dSj9BCRkKv/fF2QX1lOig7sycmOZQqv3VdFAxugqeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772725394; c=relaxed/simple;
-	bh=wZwLapQXxG7D+Qlav1XZFe2kQjdkfUMBUlFhr2GSoR8=;
+	s=arc-20240116; t=1772725436; c=relaxed/simple;
+	bh=mJHXW5OMt1s6DgVAsYKbJh6m5x0U0RhcE1Vtiy41emU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=haeODo3KMmv8gk3woa4w76PthbistlPeLQkBwwypcXGIc8ob0b+QlxZNczmunmxWSGdphXY7UUUvyA7F5zaOyr9K1clk1n1kA438IkqXHKMiItoEREcaitZcErWSY44AN0qlkZthZts+mjb0cUJRonz5eJspdnyBh+SHFWNSqA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hAB3pCoz; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2be1c918173so6771940eec.1
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 07:43:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772725391; x=1773330191; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9VHdXwqWfI2lXOxROY4OA5+qg4q5UeIXxvdk5YcxjXU=;
-        b=hAB3pCozekmvwYsigwsTkjeZQNv56bN7N0oC9Jo1oFHK+SIbx8uN8aRAimE6TWR0p9
-         QVP3yze9c/zWkcqPcgBo5fc6BGLkKrFcyqRgMZAMx2YXbWRetPeNXnyRHq9fv+VgeKp7
-         /P8VH02hP0Xu2dkOZehW9365tal2eyV2GIQU26EzqAaFI7YfDkKJdqJTTt/3lR3p1CaK
-         bLcrIlvTvaf+13RHASB2C0HabkFvvXhAKD9iioAmpI5gZru7U840QcGy5fcGTDjJLuhg
-         mHsyXK4e2ZBeX/GGHPY2z62wgsAp0+nLr8qdXT9xBW61h9zPuDW6bSifb4QgpleY5R0Y
-         brog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772725391; x=1773330191;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9VHdXwqWfI2lXOxROY4OA5+qg4q5UeIXxvdk5YcxjXU=;
-        b=G0LSXTtLbRfWXKhZYRdsumqEFsmG3dxiSO4wcizKiVafz1JRK0w7xLS3kykpWusPN7
-         vS62YlPGDWsddX+45x0mgJoo8YKkJfsyuPlYzCc1LbpufWthreNjZYNDvOkvK++36P6d
-         9DRhC9eI529Sp9+8gr8bvjl6vAh/vt7vBCPrm87jOplJ72iZlrPyFcsu675U14X1OF1I
-         eIQzt9tleuvHAxcOwo2TBPv1OMZ+JVGWtO4fQ5gA9Qr0QbkKE+OG9lKtlLrtfUAGGWyR
-         Ru9jMmce6kXMHF0nsjD66TVvoaVVh9oj8DQvsonrXO6osM6/McyqFWK+OU2jG0mHOuTm
-         patA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZs5MVAyOyqJyALq1b8dd0HUGEAsbch6m4VrhZQRkvwtDN6SvxM1gkIzhz7LGuKaqw9LhhBmk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxodyuMfPByvjKxsq0J3pnh+eN+1QkEmwZ4mxtSTVY90petfnT
-	ucTF0OajxzN7vBlO4+KiU11m1n5Fvh1HjRz+w7CwonGufldLBo20DV9z
-X-Gm-Gg: ATEYQzztDo48lQSnYHgLkCChpps7nwbyujpvEcy0Tv05R//l+BFgsGX1qM469sm2m+I
-	OacoUTLmUyiEEO9p6n6DYTOVR1kCK128XYfsZ6od3HQECbmyDhrU+Dr2sCY/KNawtYURwK74GzG
-	21vDKnkQfyfZEkQgJI7Z/WHG0U5XX+5PHRs3m45fHSuJB2bmlmbLtPArz3EeUIWeTk+BrUBxWyX
-	m+jklO4RCM+G2URTGcQSwhzm5lUD8VT0PtqyrPyHHyCU85pHGctVB7B44r66WpxNQX/PGbwJ6cC
-	SXxlJqTIjCLmdP4UcZczZeUGNVGEWbJWakAxmf8M1wmoJwU2aOJC7Kg+0jQnPi9Zn5aVOPMvZFR
-	g8F0LFlB22gPtieQZvSeTcy7azagOjhVxB+ztEQ64TAgOCXNXd2ccnZUlGz5Pg3e4xWm96Z1d41
-	al44P4pDAKzWQ9Pti49/e726Ihjw/rKJhZjGTpzLjrgpcQfkGmuO6ZDUJFOJ4yjtGl+uLj2vw=
-X-Received: by 2002:a05:7300:f18e:b0:2be:1dc7:99ae with SMTP id 5a478bee46e88-2be30fbcdbdmr2671438eec.6.1772725391326;
-        Thu, 05 Mar 2026 07:43:11 -0800 (PST)
-Received: from ?IPV6:2620:10d:c085:21d6::12ef? ([2620:10d:c090:400::5:3cc2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be2f5f1f4dsm3556315eec.25.2026.03.05.07.43.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2026 07:43:10 -0800 (PST)
-Message-ID: <43433a0f-f063-4b12-ad3a-16bd6aa9cc31@gmail.com>
-Date: Thu, 5 Mar 2026 07:43:08 -0800
+	 In-Reply-To:Content-Type; b=NQhDveMK6lqtNbeF3gVRP5l0UNylbqv+aQAaoMYmq03gU2kc5MzcFZIUiVVow/pUPCS+1bFaszHdQ/T3Qdv3mEPLSURPRT+pXQlf3kACXutEAzUXTYjFhZWimNJcGd65YNI1h96RTvIfHymgfjKlCOGspU2OkRf1QZGQQEZ4ZjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MAVN9DLV; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772725434; x=1804261434;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=mJHXW5OMt1s6DgVAsYKbJh6m5x0U0RhcE1Vtiy41emU=;
+  b=MAVN9DLVwv3jJy44KxI0da7QESOR3o8D0SZJgPL4WhsiZV2QSquuHwH4
+   H2gkhtSfFeStGa4/vpk95KMrqdPLSh0uhxUJbiZs3q5XlXf9lWD+HCCIJ
+   VFVqvDCvWe1qVY1C7JYwwVH3Uz3Kzet0BLlO1fum6um0EHW3UIpIzrPKi
+   NsGmr8t986g84tsGj/MQuN4jMGxnM/J3rMaxzt9RIqMlWBR+tYramuhwW
+   TiS70SX9osDcEoC739XsDABak8exRzjL/byTdZOPwqM/miOjickDEbxT/
+   E2VX3Wp8E0GdNNg+JnYUWb+D2PRig4O1OZRI+S6ZyEPqIA3U7yZi/nLkZ
+   w==;
+X-CSE-ConnectionGUID: zfsDEqP5TESQGxUVAIZt9A==
+X-CSE-MsgGUID: NHVmdgE9RfiqNir0Gki/gQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="85289899"
+X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
+   d="scan'208";a="85289899"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 07:43:54 -0800
+X-CSE-ConnectionGUID: wmSM/6+4Q/mgh0E+TBhVbg==
+X-CSE-MsgGUID: rAAgmY0XQL+PnQqCdIedew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
+   d="scan'208";a="249179382"
+Received: from soc-5cg4396xfb.clients.intel.com (HELO [172.28.180.183]) ([172.28.180.183])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 07:43:53 -0800
+Message-ID: <6e42658c-66cb-461f-bf41-7a1e1ceb7e3a@linux.intel.com>
+Date: Thu, 5 Mar 2026 16:43:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,67 +70,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next V4 5/5] eth: mlx5: Move pause storm errors to pause
- stats
-To: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com, alok.a.tiwari@oracle.com, andrew+netdev@lunn.ch,
- andrew@lunn.ch, davem@davemloft.net, dg573847474@gmail.com,
- donald.hunter@gmail.com, edumazet@google.com, gal@nvidia.com,
- horms@kernel.org, idosch@nvidia.com, jacob.e.keller@intel.com,
- kernel-team@meta.com, kory.maincent@bootlin.com, kuba@kernel.org,
- lee@trager.us, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux@armlinux.org.uk, mbloch@nvidia.com,
- mike.marciniszyn@gmail.com, o.rempel@pengutronix.de, pabeni@redhat.com,
- saeedm@nvidia.com, tariqt@nvidia.com, vadim.fedorenko@linux.dev
-References: <20260302230149.1580195-1-mohsin.bashr@gmail.com>
- <20260302230149.1580195-6-mohsin.bashr@gmail.com>
- <d02ac6b1-7322-49d9-881d-126b3a8d1d17@gmail.com>
-Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <d02ac6b1-7322-49d9-881d-126b3a8d1d17@gmail.com>
+Subject: Re: review scoring
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>
+References: <20260303180122.0929a864@kernel.org>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298
+ Gdansk - KRS 101882 - NIP 957-07-52-316
+In-Reply-To: <20260303180122.0929a864@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 1A6CF214D7B
+X-Rspamd-Queue-Id: 5CFAB214EA0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264467-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,vger.kernel.org,armlinux.org.uk,pengutronix.de,redhat.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-264468-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[dawid.osuchowski@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,intel.com:dkim]
 X-Rspamd-Action: no action
 
+On 2026-03-04 3:01 AM, Jakub Kicinski wrote:
+> Hi!
+> 
+> Alexei just sent an announcement to the BPF list describing
+> a new system of requiring review participation:
+> https://lore.kernel.org/all/CAADnVQ+TKKptnNB25V3=bcdybh5G6c2DyW2sYtXvyRaVnPN8MA@mail.gmail.com/
+> I'm very curious to see how this goes, it definitely feels like
+> a logical step.
+> 
+> On the netdev side I've been using a patch review queue which
+> takes into account
+>   - the reviewer score of the author
+>   - the reviewer socre of their employer (using the same logic
+>     I use for the periodic "developer statistics" email),
+>   - quality metrics like "is checkpatch clean"
+>   - whether someone already reviewed the patches on the list
+>     (reviews from the same company do not count)
+> 
+> I've been meaning to send an email to let folks know that I'm doing
+> this. Most large companies are getting a 2 day delay from this scoring
+> system. To be clear, I'm not intentionally waiting 2 days before
+> looking at code (at the cost of my sanity). It's just that with our
+> patch volume if something gets a 2 day delay there's plenty of patches
+...
+> that will jump earlier in the queue. And so far advancements in AI
+> failed to make the days any longer..
 
+Hey Kuba,
 
-On 3/5/26 6:12 AM, Tariq Toukan wrote:
-> If we return here, tx_pause_storm_events remains unset, while rx/ 
-> tx_pause_frames are already assigned.
-> Is that acceptable? I'm probably fine with it.
+I don't think that's possible, but it hopefully AI could make our 
+working days shorter by offloading some of our work or making it more 
+efficient ;) I just hope we will circumvent / prevent AI slop from 
+taking over.
 
-Right. Since we are aggregating across all prio and if we fail 
-mid-flight, IMO, we should not report partial sum which maybe inaccurate.
+> the queue: https://netdev.bots.linux.dev/suie.html?delegate=netdev
+
+In all seriousness, thanks for sharing this and maybe this will help get 
+some execs and other higher-ups across the broad corporate Linux kernel 
+world to give more time to engineers to perform reviews for other 
+company / community patches as well.
+
+Best regards,
+Dawid
 
