@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-264407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id U52hLg6SqWkqAQEAu9opvQ
-	(envelope-from <netdev+bounces-264407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:24:14 +0100
+	id 4NuYDxSTqWlCAQEAu9opvQ
+	(envelope-from <netdev+bounces-264408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:28:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C8D21346D
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:24:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 402F821362C
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0C692300B456
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:22:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53BD530F4DCA
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D763A874C;
-	Thu,  5 Mar 2026 14:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F1E3A9001;
+	Thu,  5 Mar 2026 14:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="b89yRSvG"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZB9WbBvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456273A0B05;
-	Thu,  5 Mar 2026 14:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A583A9616;
+	Thu,  5 Mar 2026 14:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772720537; cv=none; b=bhu7ovabHnjdK1rZTSOVffzliixiY4LUMI0MCXQDK4t7OUV4HYFXmNQvlzY64ed6WZzLLyRE6nQGXue3XqxSTcQWMMn4CH97mvzbsyoOCvVG65Oofkxwkiv8rJL1IJecoq8Rw4+eLdYTg1gSmYnfIB2bfFlVIIQNkhs5kQsjerI=
+	t=1772720544; cv=none; b=U1OaocN/3kjCGMiwMxS9Msxlza0N2g6Rc6njiNzVYkJOPkNYeZYgHqVTmXOQ92cR+In9ZHmnY7DtpUEAIWG6Z7iG3BD1uGz8kxeR5VlptqbyrgSF4gL6oi3AFHQVVZx41YNb7IpVl+x3lY7v62MnRlZ+bDZ8tznPy+buN2bcTF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772720537; c=relaxed/simple;
-	bh=hJIiuCinADs+F2K0CXoXYmOInua1H1sOGul+Z4K2VSs=;
+	s=arc-20240116; t=1772720544; c=relaxed/simple;
+	bh=O1XFFyAoaxKuZ+CVZRzqRWtI1lDMsZQl8WUrynlEDFM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eMWiwhrnP9yPVNbBmjwTv93AF8diZUq31xUaKPww6iHPb05NBoTggo1N2rBTgUcASpDCiDCaJgGfGF+mO0E4wYdwuasUjvOs4ba98L/703xa/Y7EHGUvI2RAOx2RRxeLi5QwoKSq8x9+Hk5+ZDTWcwcS1uUPGjeaxtjStqWzUSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=b89yRSvG; arc=none smtp.client-ip=113.46.200.218
+	 MIME-Version:Content-Type; b=cZXD/FqHkWFia6JlG0rrLVOC31S7XVBdUd1W7AiohR8EPI46O1gu1kOqCWQtwMxtJBAxgAUU6tuynO3JVyjlhwDvz3bsXHRRimfx0i3BiCos27W+0fxUc5CRthhpJl4Vi2134ej2KB2rhr+dju/IKJGqYcrbGldanf9DPsLcuBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZB9WbBvU; arc=none smtp.client-ip=113.46.200.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=A4OhSwwajnlbJjvs/Q79oC2Uvf5aCohLYBqTNgiZ5oo=;
-	b=b89yRSvGMrh+gtH8+5gf0Iva+IGYO7lLRUGf6akpxjCx1TehG07XJ+9wV6OjFn4vTMDoGicq3
-	MIxs/k06f3fLBHW/BxMYiTItmn2dvTNcNMV0XzYR1AkEWFLhU2QiC4wAQYllhG071pXWxP9ByYf
-	exr88Uptb7sEkm+bX939kOg=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fRWnb6BSGzpStZ;
-	Thu,  5 Mar 2026 22:17:07 +0800 (CST)
+	bh=bL4qp+lXFE2452QYi0P16NYT5Mi/5g2ecYZa0M3HDBY=;
+	b=ZB9WbBvU0zbRBB/enag3mhxp6gwAwDOX6TK4VVqY60OBXVzijK62V3ReAGITKZJddL8ihYVDf
+	36uX6834G1wIZA7lbY3S4JNkjbyt5/Tbt+SKw8+nZQhGJUkwcCDpECKb0B73X7zqfpfTUbw+1Iz
+	QTnSNHNY9GMsXkeJhS0Oj/I=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4fRWnp56nLzmV69;
+	Thu,  5 Mar 2026 22:17:18 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5BA1840569;
-	Thu,  5 Mar 2026 22:22:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 798CB4056E;
+	Thu,  5 Mar 2026 22:22:11 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 5 Mar 2026 22:22:08 +0800
+ 15.2.1544.36; Thu, 5 Mar 2026 22:22:10 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
 	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
@@ -61,9 +61,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
 	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
 	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
 	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>
-Subject: [PATCH net-next v02 1/4] hinic3: Fix code Style(remove empty lines between error handling)
-Date: Thu, 5 Mar 2026 22:21:58 +0800
-Message-ID: <a1d1dfe965fd293d00849ed9cf9b714d88ead572.1769142701.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v02 2/4] hinic3: Remove redundant defensive code
+Date: Thu, 5 Mar 2026 22:21:59 +0800
+Message-ID: <5f2f3eb262f83613d276aa95a3384370a936ca90.1769142701.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1769142701.git.zhuyikai1@h-partners.com>
 References: <cover.1769142701.git.zhuyikai1@h-partners.com>
@@ -77,7 +77,7 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemf100013.china.huawei.com (7.202.181.12)
-X-Rspamd-Queue-Id: A2C8D21346D
+X-Rspamd-Queue-Id: 402F821362C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -85,16 +85,16 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264407-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264408-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
@@ -106,148 +106,37 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Fix code style of removing empty lines between the actions on the
-error handling path.
+According to comment of patch 03, check codes that were merged and
+remove redundant defensive codes.
 
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
 ---
- drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c | 3 ---
- drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c  | 1 -
- drivers/net/ethernet/huawei/hinic3/hinic3_lld.c  | 5 -----
- drivers/net/ethernet/huawei/hinic3/hinic3_main.c | 4 ----
- drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c | 2 --
- drivers/net/ethernet/huawei/hinic3/hinic3_tx.c   | 1 -
- 6 files changed, 16 deletions(-)
+ drivers/net/ethernet/huawei/hinic3/hinic3_tx.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c
-index ef539d1b69a3..86720bb119e9 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c
-@@ -878,14 +878,11 @@ int hinic3_cmdqs_init(struct hinic3_hwdev *hwdev)
- 	}
- 
- 	hinic3_free_db_addr(hwdev, cmdqs->cmdqs_db_base);
--
- err_destroy_cmdq_wq:
- 	destroy_cmdq_wq(hwdev, cmdqs);
--
- err_free_cmdqs:
- 	dma_pool_destroy(cmdqs->cmd_buf_pool);
- 	kfree(cmdqs);
--
- err_out:
- 	return err;
- }
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c b/drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
-index 1ecc2aca1e35..a2c3962116d5 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
-@@ -686,7 +686,6 @@ int hinic3_aeqs_init(struct hinic3_hwdev *hwdev, u16 num_aeqs,
- 	}
- 
- 	destroy_workqueue(aeqs->workq);
--
- err_free_aeqs:
- 	kfree(aeqs);
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-index 2b77fea1e0b3..87413e192f10 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-@@ -230,7 +230,6 @@ static int hinic3_mapping_bar(struct pci_dev *pdev,
- 		iounmap(pci_adapter->mgmt_reg_base);
- err_unmap_intr_reg_base:
- 	iounmap(pci_adapter->intr_reg_base);
--
- err_unmap_cfg_reg_base:
- 	iounmap(pci_adapter->cfg_reg_base);
- 
-@@ -285,10 +284,8 @@ static int hinic3_pci_init(struct pci_dev *pdev)
- err_release_regions:
- 	pci_clear_master(pdev);
- 	pci_release_regions(pdev);
--
- err_disable_device:
- 	pci_disable_device(pdev);
--
- err_free_pci_adapter:
- 	pci_set_drvdata(pdev, NULL);
- 	mutex_destroy(&pci_adapter->pdev_mutex);
-@@ -382,7 +379,6 @@ static int hinic3_probe_func(struct hinic3_pcidev *pci_adapter)
- 	hinic3_func_uninit(pdev);
- err_unmap_bar:
- 	hinic3_unmapping_bar(pci_adapter);
--
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe function failed\n");
- 
-@@ -415,7 +411,6 @@ static int hinic3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- err_uninit_pci:
- 	hinic3_pci_uninit(pdev);
--
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe failed\n");
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index a33f86675954..6275d94dfefd 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -104,7 +104,6 @@ static int hinic3_alloc_txrxqs(struct net_device *netdev)
- 
- err_free_rxqs:
- 	hinic3_free_rxqs(netdev);
--
- err_free_txqs:
- 	hinic3_free_txqs(netdev);
- 
-@@ -475,17 +474,14 @@ static int hinic3_nic_probe(struct auxiliary_device *adev,
- 	disable_delayed_work_sync(&nic_dev->periodic_work);
- 	hinic3_update_nic_feature(nic_dev, 0);
- 	hinic3_set_nic_feature_to_hw(nic_dev);
--
- err_uninit_sw:
- 	hinic3_sw_uninit(netdev);
--
- err_free_nic_io:
- 	hinic3_free_nic_io(nic_dev);
- err_free_nic_dev:
- 	hinic3_free_nic_dev(nic_dev);
- err_free_netdev:
- 	free_netdev(netdev);
--
- err_unregister_adev_event:
- 	hinic3_adev_event_unregister(adev);
- 	dev_err(&pdev->dev, "NIC service probe failed\n");
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-index 6eb441d6a590..c871fd0fb109 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-@@ -446,10 +446,8 @@ int hinic3_init_mbox(struct hinic3_hwdev *hwdev)
- 		hinic3_uninit_func_mbox_msg_channel(hwdev);
- err_uninit_mgmt_msg_ch:
- 	uninit_mgmt_msg_channel(mbox);
--
- err_destroy_workqueue:
- 	destroy_workqueue(mbox->workq);
--
- err_free_mbox:
- 	kfree(mbox);
- 
 diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-index ef32aed7d761..4e361c9bd043 100644
+index 4e361c9bd043..6d3dc930ca97 100644
 --- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
 +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-@@ -609,7 +609,6 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
+@@ -44,16 +44,10 @@ static void hinic3_txq_stats_init(struct hinic3_txq *txq)
+ int hinic3_alloc_txqs(struct net_device *netdev)
+ {
+ 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+-	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+ 	u16 q_id, num_txqs = nic_dev->max_qps;
+ 	struct pci_dev *pdev = nic_dev->pdev;
+ 	struct hinic3_txq *txq;
  
- err_drop_pkt:
- 	dev_kfree_skb_any(skb);
+-	if (!num_txqs) {
+-		dev_err(hwdev->dev, "Cannot allocate zero size txqs\n");
+-		return -EINVAL;
+-	}
 -
- err_out:
- 	return NETDEV_TX_OK;
- }
+ 	nic_dev->txqs = kcalloc(num_txqs, sizeof(*nic_dev->txqs),  GFP_KERNEL);
+ 	if (!nic_dev->txqs)
+ 		return -ENOMEM;
 -- 
 2.43.0
 
