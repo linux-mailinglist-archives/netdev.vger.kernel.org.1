@@ -1,154 +1,219 @@
-Return-Path: <netdev+bounces-264193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264194-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UB9cEWYlqWkL2gAAu9opvQ
-	(envelope-from <netdev+bounces-264193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 07:40:38 +0100
+	id eBGuHbwmqWkL2gAAu9opvQ
+	(envelope-from <netdev+bounces-264194-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 07:46:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B97620BC19
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 07:40:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC5D20BD3B
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 07:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BCDD1303341D
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 06:40:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A48153025138
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 06:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A4D30BB83;
-	Thu,  5 Mar 2026 06:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C64296BDB;
+	Thu,  5 Mar 2026 06:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAM7LS/W"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3AD2E6CA8;
-	Thu,  5 Mar 2026 06:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC06336896;
+	Thu,  5 Mar 2026 06:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772692808; cv=none; b=TmgCgMiSuzWWlkEXD0ciUajOIjLuAjA7B0VgLJ3L3BxXToSip8Vr2DSxfqFg0L59uOG6aZdoIf1yE68iUADZytwSwV6WJBkfESMkkCXCoGR/OnaZxma/nYdRYPLAMxkZKT+qNQ2mnrZAf99BgVp26gbN3ho0MMh2xOmJKfM9v7Y=
+	t=1772693175; cv=none; b=RPUeDA15eJnUPtmA+OeTRzaP5VDChpYdFk4JkenbiTdTU0K3zPwinSygEoqZrmmirDaBzj/bAhX4J8cq5AM1Shlw3Yht0BF1zg7fEABdYq5zUBQ8Bya6kIFx6OwQMAyFDcv1Znoo2c3KF/oYlUQivH7i+TMxO0OYMhqHjRNbPkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772692808; c=relaxed/simple;
-	bh=3Ue4mlx+7WubogMeEZyw7v0xYB+TN18yMjJEKSvWYe0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PJafCPl65dVGLOsWZVeTU1UJ9GPruskQ2lRwJvsCGO2h1iHV25HEVBxbzaNqsZbk7qBfgdPwh+dAukiELKmR4NvbX8I7vJkIyiNd0RE+i1b5huGuaVHNDHXhd36VEQQ2/y7mYO3UqSyF8eEyPDEo6vqZ06iuKHS0rV0AiD3sAxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAAXqg01JalpW7+uCQ--.48975S4;
-	Thu, 05 Mar 2026 14:39:49 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Thu, 05 Mar 2026 14:39:39 +0800
-Subject: [PATCH net v2 2/2] net: spacemit: Fix error handling in
- emac_tx_mem_map()
+	s=arc-20240116; t=1772693175; c=relaxed/simple;
+	bh=3u19y1LrpGKmC+svD4K+yeZYEeMBLA1yE5PsHeNPx7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EnGg7AgDvY1/tyQAhMDgildwMq1weU0zQJWWj+DII2Z3li6GWxdmkhRAynGOBrwjL6+6m7pbZAKA3gLvi/4OUrv0t/evKfPHm2iuPsn8LuXHpp9BAd1Gtkcvwb54Dkof3lT4dYDapPSQJX4dXhKRwoeGgY3pAC4W67/nntaUhFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAM7LS/W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FB2AC116C6;
+	Thu,  5 Mar 2026 06:46:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772693174;
+	bh=3u19y1LrpGKmC+svD4K+yeZYEeMBLA1yE5PsHeNPx7U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XAM7LS/WUlquMoixMbwR0XTSL6kZMX6LZHlc5LDWZ9mQCwPxr+nANg3eJAQtw+awH
+	 z4iY+YSxW6OHZLZ8UMn3/8PPfPF4/JChTB5ximymU3jWo3QYuivWRJNIOU9aelrDNd
+	 pspCSSnpEfdv5s3QIYJmDjHpHeAEnvbsXub3pkorkUEEiCa+/crWxbQwnfuqpKdqQ+
+	 8fqsAV1giPwUTG5bfkxfCLHDJ17w6Shprq/Wamxi8kQqR1+kdDoG2MkgjVVr54QImS
+	 0n5/h8YFUp4AzuM9fJrKu8YHM0bK/vPrE9Nw8oZe6fcv1mly+bHLX0cfOjTIHqF6+v
+	 a2xDHkeQIH2cA==
+Message-ID: <0d7cc7d0-defc-40eb-8c0d-78888ff273bc@kernel.org>
+Date: Thu, 5 Mar 2026 07:46:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260305-k1-ethernet-more-fixes-v2-2-e4e434d65055@iscas.ac.cn>
-References: <20260305-k1-ethernet-more-fixes-v2-0-e4e434d65055@iscas.ac.cn>
-In-Reply-To: <20260305-k1-ethernet-more-fixes-v2-0-e4e434d65055@iscas.ac.cn>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Yixun Lan <dlan@kernel.org>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, 
- Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-CM-TRANSID:zQCowAAXqg01JalpW7+uCQ--.48975S4
-X-Coremail-Antispam: 1UD129KBjvJXoWruFyfCrW7Cw15uF1kAF1fZwb_yoW8JF1fpa
-	9rWa9xur18JF4agwsFkr4Iva90vay8try8Ca4Sv3yFqF9Ika1jgFy8tF17Jrn5ArZ5WryS
-	vw4qv345GF1DAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmC14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
-	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-	vE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
-	v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8AwCF04k20xvY0x0EwIxGrwCFx2Iq
-	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
-	106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
-	xVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7
-	xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_
-	Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUFkskUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
-X-Rspamd-Queue-Id: 4B97620BC19
+User-Agent: Mozilla Thunderbird
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ Netdev <netdev@vger.kernel.org>, rcu@vger.kernel.org,
+ MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "luto@kernel.org" <luto@kernel.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <29d38308-e8ae-42aa-8eeb-1c3b347c284b@kernel.org>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <29d38308-e8ae-42aa-8eeb-1c3b347c284b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7EC5D20BD3B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-264194-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264193-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.975];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,iscas.ac.cn:mid,iscas.ac.cn:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The DMA mappings were leaked on mapping error. Free them with the
-existing emac_free_tx_buf() function.
+Hi,
 
-Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
----
- drivers/net/ethernet/spacemit/k1_emac.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+On 03. 03. 26, 14:23, Matthieu Baerts wrote:
+> On 26/02/2026 11:37, Jiri Slaby wrote:
+>> On 06. 02. 26, 12:54, Matthieu Baerts wrote:
+>>> Our CI for the MPTCP subsystem is now regularly hitting various stalls
+>>> before even starting the MPTCP test suite. These issues are visible on
+>>> top of the latest net and net-next trees, which have been sync with
+>>> Linus' tree yesterday. All these issues have been seen on a "public CI"
+>>> using GitHub-hosted runners with KVM support, where the tested kernel is
+>>> launched in a nested (I suppose) VM. I can see the issue with or without
+>>> debug.config. According to the logs, it might have started around
+>>> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
+>>> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
+>>> and the CI doesn't currently have the ability to execute bisections.
+>>
+>> Hmm, after the switch of the qemu guest kernels to 6.19, our (opensuse)
+>> build service is stalling in smp_call_function_many_cond() randomly too:
+>> https://bugzilla.suse.com/show_bug.cgi?id=1258936
+>>
+>> The attachment from there contains sysrq-t logs too:
+>> https://bugzilla.suse.com/attachment.cgi?id=888612
+> 
+> I'm glad I'm not the only one with this issue :)
+> 
+> In your case, do you also have nested VMs with KVM support?
 
-diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-index 5a5cb61be08c..15d43e4a748b 100644
---- a/drivers/net/ethernet/spacemit/k1_emac.c
-+++ b/drivers/net/ethernet/spacemit/k1_emac.c
-@@ -733,7 +733,7 @@ static void emac_tx_mem_map(struct emac_priv *priv, struct sk_buff *skb)
- 	struct emac_desc tx_desc, *tx_desc_addr;
- 	struct device *dev = &priv->pdev->dev;
- 	struct emac_tx_desc_buffer *tx_buf;
--	u32 head, old_head, frag_num, f;
-+	u32 head, old_head, frag_num, f, i;
- 	bool buf_idx;
- 
- 	frag_num = skb_shinfo(skb)->nr_frags;
-@@ -801,6 +801,15 @@ static void emac_tx_mem_map(struct emac_priv *priv, struct sk_buff *skb)
- 
- err_free_skb:
- 	dev_dstats_tx_dropped(priv->ndev);
-+
-+	i = old_head;
-+	while (i != head) {
-+		emac_free_tx_buf(priv, i);
-+
-+		if (++i == tx_ring->total_cnt)
-+			i = 0;
-+	}
-+
- 	dev_kfree_skb_any(skb);
- }
- 
+No, it's KVM directly on bare metal.
+
+> Are you able to easily reproduce the issue and change the guest kernel
+> in your build service?
+
+Unfortunately no and no.
+
+> On my side, any debugging steps need to be automated. Lately, it looks
+> like the issue is more easily triggered on a stable 6.19 kernel, than on
+> the last RC.
+> 
+>>> The stalls happen before starting the MPTCP test suite. The init program
+>>> creates a VSOCK listening socket via socat [1], and different hangs are
+>>> then visible: RCU stalls followed by a soft lockup [2], only a soft
+>>> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
+>>> there is no RCU stalls or soft lockups detected after one minute, but VM
+>>> is stalled [6]. In the last case, the VM is stopped after having
+>>> launched GDB to get more details about what was being executed.
+>>>
+>>> It feels like the issue is not directly caused by the VSOCK listening
+>>> socket, but the stalls always happen after having started the socat
+>>> command [1] in the background.
+>>
+>> It fails randomly while building random packages (go, libreoffice,
+>> bayle, ...). I don't think it is VSOCK related in those cases, but who
+>> knows what the builds do...
+> 
+> Indeed, unlikely to be VSOCK then.
+> 
+>> I cannot reproduce locally either.
+>>
+>> I came across:
+>>    614da1d3d4cd x86: make page fault handling disable interrupts properly
+>> but I have no idea if it could have impact on this at all.
+> 
+> Did it help to revert it?
+
+We haven't tried, it is unlikely the cause.
 
 -- 
-2.53.0
-
+js
+suse labs
 
