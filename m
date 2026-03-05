@@ -1,193 +1,193 @@
-Return-Path: <netdev+bounces-264224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gP3bLcBCqWkt3gAAu9opvQ
-	(envelope-from <netdev+bounces-264224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:45:52 +0100
+	id QJCDKQ1DqWkt3gAAu9opvQ
+	(envelope-from <netdev+bounces-264225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:47:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EAA320DA72
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:45:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F5B20DAD2
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F235230088B1
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:45:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A07793023A6A
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE38374E54;
-	Thu,  5 Mar 2026 08:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6CFA374E6B;
+	Thu,  5 Mar 2026 08:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ei0UrF2e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0f9HTvs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FEA30FC26;
-	Thu,  5 Mar 2026 08:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527B63264C6
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 08:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772700348; cv=none; b=RH4zBdO6ft6b2aP8SfwTv5MtFwobKP1x88lz9Ql3c06+1R+VJK3PSthNQRyY79vsb4sUp5RM6Ekh0SCaTUkQ2ng6jrtQ1DKaxuZ+C4WTL/o4yIK+Nj94ymvr9YBb0W7iIBR7V8UJ0z9Ifh9VxZaQsExtkJSK62meL0TmPDg+VMA=
+	t=1772700408; cv=none; b=iC7d45GN0F1Qg+bSnpndVciChiufOY51EQr6Tv5kwzR8sURJ9z3VSO8W//Mn1YT1kIgimDYFzt0Eg5LJ1HZfqrF7b6a175exZfZB+1SmmB9h8F7dX0Bea9vowiI5hUbzJfG4Ew18cHbq2m8jCpHvTfgw485iKx1pfPTL6hTnKIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772700348; c=relaxed/simple;
-	bh=xNgtMPoKImoCYr8gJJARcB78RmcwRHpu3tklaVxZms4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iyUTlEnwrUdARgjaARhnJStaohO3MjSKd2ltuAa3PNFDLzfGaWek2/+Ui3tGqfj5NHEjwPkrl3Uq4g+gmD7F0LufiBRuBAm+Q/EjZQV7PKAu+gamAR7IAgWeQYkCqg9IpVyb7qam9y+iCC9KcoNtMRIs2OJw7HwF1nIOQD4KwYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ei0UrF2e; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772700347; x=1804236347;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xNgtMPoKImoCYr8gJJARcB78RmcwRHpu3tklaVxZms4=;
-  b=Ei0UrF2eLQuV/l5rZX0iu3sI1UW/HbiBjWNgucgmsXBz/CQ9Y20RvMBh
-   xoInW6LD3gZmwKIMlpt4UeF4z2f27RjML20kL7XKKAnNmsXICiz8nypcs
-   WBBwI8OoPYOZd7uUD9NRjod/hwwJgw2AGgfkavXYxmzR/YsA4nzGw+kYN
-   2YesdDSZugKNfQ/Qy1YtQxlSxqmd9eB+cpSnQqNpbBFPTNwUxyCwdTISn
-   8InIbRmp38pa44fvNfLILCiF9oyWs4pbc7omObe0PQONMx4qqMSUxDR4l
-   mriB7s24SsU430H7CrtOe2jY5ci3S4HBwp4wMjk1qyxT0Uk5zzuXYXMG7
-   A==;
-X-CSE-ConnectionGUID: FjkP8ey8RUWe//GP4klIVQ==
-X-CSE-MsgGUID: xAsD9KPpRvSs1lYvmyJkjg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="77650847"
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="77650847"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 00:45:46 -0800
-X-CSE-ConnectionGUID: FeFniaThThi3umX8U2hWSw==
-X-CSE-MsgGUID: j9ykGgsfSoaGhjA966yT4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="218749208"
-Received: from lkp-server01.sh.intel.com (HELO cadc4577a874) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 05 Mar 2026 00:45:41 -0800
-Received: from kbuild by cadc4577a874 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vy4Kw-000000000MU-2ojd;
-	Thu, 05 Mar 2026 08:45:38 +0000
-Date: Thu, 5 Mar 2026 16:45:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>, saeedm@nvidia.com,
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com,
-	anand.a.khoje@oracle.com,
-	Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Message-ID: <202603051647.fykhqQ3H-lkp@intel.com>
-References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
+	s=arc-20240116; t=1772700408; c=relaxed/simple;
+	bh=mdoprt5pfQiawnNQf+PVIE40bn4zUw1G1O5KgSH6WgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tRQEfxd+PgGFPoxPlJeAnsXGEhCRnV+ehiDz5wuXEsAN9E5o6Uwaq13EDayqnaJYun4gAoZqyZBNp3M97ndeWOHEhoDlE9Vah4I2WGhWNiVka2gbcDXp9vxZ/a+tMHMDHQ/ZY3LxgRify31S+1CBJ+RBEVrTxztBgEbFbDfp/BE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f0f9HTvs; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772700406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kcDhn5Pj+q46p8oVnRAtNQqN8KEvJ5Nk8v4t22oVPvw=;
+	b=f0f9HTvs778MXxphhPy5rzFFH208A3RkY+zXpDBSzmV1/649SUVDhrxFcQ+Px+p22dbBzx
+	pyjgf9cfV+LJhDB7FCrz1avDIrwFJEmeTuB1BJwe+NuWkEyAvCd+BXNC12lsCNQul+rhcm
+	dQiYTPkoFvCkdYJFvNShc532ukS+HpM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-xdt8xs7lOW24P8dr1tLnAA-1; Thu,
+ 05 Mar 2026 03:46:43 -0500
+X-MC-Unique: xdt8xs7lOW24P8dr1tLnAA-1
+X-Mimecast-MFC-AGG-ID: xdt8xs7lOW24P8dr1tLnAA_1772700401
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 735AD19560A5;
+	Thu,  5 Mar 2026 08:46:41 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.173])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0FE8E180049D;
+	Thu,  5 Mar 2026 08:46:37 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: sun.jian.kdev@gmail.com
+Cc: kuba@kernel.org,
+	shuah@kernel.org,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	kees@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [v3,v3,1/2] selftests/harness: order TEST_F and XFAIL_ADD constructors
+Date: Thu,  5 Mar 2026 09:46:24 +0100
+Message-ID: <20260305084624.242751-1-pabeni@redhat.com>
+In-Reply-To: <20260225111451.347923-1-sun.jian.kdev@gmail.com>
+References: <20260225111451.347923-1-sun.jian.kdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304161704.910564-1-praveen.kannoju@oracle.com>
-X-Rspamd-Queue-Id: 1EAA320DA72
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: 18F5B20DAD2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264224-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264225-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.997];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,01.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
 X-Rspamd-Action: no action
 
-Hi Praveen,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-kernel test robot noticed the following build warnings:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+selftests/harness: order TEST_F and XFAIL_ADD constructors
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v7.0-rc2 next-20260304]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This commit fixes a constructor ordering race where XFAIL_ADD() could run
+before TEST_F() and read a NULL _##fixture_##test##_object pointer. The
+fix uses constructor priorities to ensure TEST_F runs first.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Praveen-Kumar-Kannoju/net-mlx5-poll-mlx5-eq-during-irq-migration/20260305-003505
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260304161704.910564-1-praveen.kannoju%40oracle.com
-patch subject: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-config: x86_64-buildonly-randconfig-002-20260305 (https://download.01.org/0day-ci/archive/20260305/202603051647.fykhqQ3H-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603051647.fykhqQ3H-lkp@intel.com/reproduce)
+> TEST_F() allocates and registers its struct __test_metadata via mmap()
+> inside its constructor, and only then assigns the
+> _##fixture_##test##_object pointer.
+>
+> XFAIL_ADD() runs in a constructor too and reads
+> _##fixture_##test##_object to initialize xfail->test. If XFAIL_ADD runs
+> first, xfail->test can be NULL and the expected failure will be reported
+> as FAIL.
+>
+> Use constructor priorities to ensure TEST_F registration runs before
+> XFAIL_ADD, without adding extra state or runtime lookups.
+>
+> Fixes: 2709473c9386 ("selftests: kselftest_harness: support using xfail")
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603051647.fykhqQ3H-lkp@intel.com/
+Should the Fixes: tag point to commit 24cf65a62266 instead?
 
-All warnings (new ones prefixed by >>):
+The existing tag points to 2709473c9386 ("selftests: kselftest_harness:
+support using xfail"), but that commit used static initialization
+(.test = &object) which had no race condition.
 
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:6: warning: no previous prototype for function 'mlx5_eq_reap_irq_notify' [-Wmissing-prototypes]
-     958 | void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-         |      ^
-   drivers/net/ethernet/mellanox/mlx5/core/eq.c:958:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     958 | void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-         | ^
-         | static 
->> drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:6: warning: no previous prototype for function 'mlx5_eq_reap_irq_release' [-Wmissing-prototypes]
-     978 | void mlx5_eq_reap_irq_release(struct kref *ref) {}
-         |      ^
-   drivers/net/ethernet/mellanox/mlx5/core/eq.c:978:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     978 | void mlx5_eq_reap_irq_release(struct kref *ref) {}
-         | ^
-         | static 
-   2 warnings generated.
+The race was actually introduced by commit 24cf65a62266
+("selftests/harness: Share _metadata between forked processes"), which
+changed TEST_F to use constructor-based allocation and also changed
+XFAIL_ADD to read the pointer value in its constructor. This created the
+race where XFAIL_ADD could run before TEST_F and read NULL.
 
+> Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
 
-vim +/mlx5_eq_reap_irq_notify +958 drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+> index 16a119a4656c..4afaef01c22e 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -76,6 +76,9 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
+>  		memset(s, c, n);
+>  }
+>
+> +#define KSELFTEST_PRIO_TEST_F  20000
+> +#define KSELFTEST_PRIO_XFAIL   20001
+> +
+>  #define TEST_TIMEOUT_DEFAULT 30
+>
+>  /* Utilities exposed to the test definitions */
+> @@ -465,7 +468,7 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
+>  			fixture_name##_teardown(_metadata, self, variant); \
+>  	} \
+>  	static struct __test_metadata *_##fixture_name##_##test_name##_object; \
+> -	static void __attribute__((constructor)) \
+> +	static void __attribute__((constructor(KSELFTEST_PRIO_TEST_F))) \
+>  			_register_##fixture_name##_##test_name(void) \
+>  	{ \
+>  		struct __test_metadata *object = mmap(NULL, sizeof(*object), \
+> @@ -880,7 +883,7 @@ struct __test_xfail {
+>  		.fixture = &_##fixture_name##_fixture_object, \
+>  		.variant = &_##fixture_name##_##variant_name##_object, \
+>  	}; \
+> -	static void __attribute__((constructor)) \
+> +	static void __attribute__((constructor(KSELFTEST_PRIO_XFAIL))) \
+>  		_register_##fixture_name##_##variant_name##_##test_name##_xfail(void) \
+>  	{ \
+>  		_##fixture_name##_##variant_name##_##test_name##_xfail.test = \
 
-   957	
- > 958	void mlx5_eq_reap_irq_notify(struct irq_affinity_notify *notify, const cpumask_t *mask)
-   959	{
-   960		u32 eqe_count;
-   961		struct mlx5_eq_comp *eq = container_of(notify, struct mlx5_eq_comp, notify);
-   962	
-   963		if (mlx5_reap_eq_irq_aff_change) {
-   964			mlx5_core_warn(eq->core.dev, "irqn = 0x%x migration notified, EQ 0x%x: Cons = 0x%x\n",
-   965				       eq->core.irqn, eq->core.eqn, eq->core.cons_index);
-   966	
-   967			while (!rtnl_trylock())
-   968				msleep(20);
-   969	
-   970			eqe_count = mlx5_eq_poll_irq_disabled(eq);
-   971			if (eqe_count)
-   972				mlx5_core_warn(eq->core.dev, "Recovered %d eqes on EQ 0x%x\n",
-   973					       eqe_count, eq->core.eqn);
-   974			rtnl_unlock();
-   975		}
-   976	}
-   977	
- > 978	void mlx5_eq_reap_irq_release(struct kref *ref) {}
-   979	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
