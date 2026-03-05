@@ -1,230 +1,191 @@
-Return-Path: <netdev+bounces-264382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMTNMop9qWkg8gAAu9opvQ
-	(envelope-from <netdev+bounces-264382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:56:42 +0100
+	id CArmL3p+qWnA9AAAu9opvQ
+	(envelope-from <netdev+bounces-264383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:00:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352A9212307
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:56:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD56212446
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 14:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD86A3083015
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:54:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53403305BBE8
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD9939A7FD;
-	Thu,  5 Mar 2026 12:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C240639F18B;
+	Thu,  5 Mar 2026 12:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcK+iLwI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rvAfqYF/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WutLMnNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4184539E19D
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772715269; cv=none; b=GJAf3K6Ol7vywmeI9IblMPSJ2KwZg7y8tss2ckHVkcHbfneWe5a4wGSDkMv1MekIh+ckDBNBll5bNYlo23D0AmoHp+l8eq3jgmiChSpX/3lNYLgzk74/cKGRBvSbdTzV/oAXTk4V3W+Bc83k/y5BT14UZ+GdTIpA4yOifjRgGTo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772715269; c=relaxed/simple;
-	bh=ZkqqxNAsdLLOBBCCtVYLv2vL79nqgo/zs6NdcEtLMU0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t//oceWZKGoUd4P95sFc/Ng9n9RUyJylBnjkmHe63kbR8kKUDbOyWwoc4P5S6dDqrEY9l9crWgjpM4cAITUimH18JOR9LeguYv1brMqBg4C8dNV3dBvku8ccUHI4b5VjABig2zOMNzTNkk57/8yJgSu+MeNHAuHRq8EvWGYyLO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GcK+iLwI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rvAfqYF/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772715267;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2ozPyRLvFVo7RkDuja3Q6t/+2zK1nnxP+IcGjhg3LBE=;
-	b=GcK+iLwIq1CBzFFZzgleJYz5UClczGCjcMVBIyt5epHYgRVPqi7ufLPR+m4cQ95NErOMuu
-	ujtqAKfvDC2eKyRWwX9iAYV4XAugKRK7frC2Ohinde0aPHhPdOgGZWoiyb9hLIN/JPmKt6
-	KpPYKfJP+pYaWjz9INZXoidmVTh//os=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-0lHYQIvXOgGOqRvKG6Eb5g-1; Thu, 05 Mar 2026 07:54:26 -0500
-X-MC-Unique: 0lHYQIvXOgGOqRvKG6Eb5g-1
-X-Mimecast-MFC-AGG-ID: 0lHYQIvXOgGOqRvKG6Eb5g_1772715265
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-482d8e6e13aso65211385e9.3
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 04:54:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504CE3A0B22
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772715461; cv=pass; b=gAgZE2AT6vS+drslFMRC3XHnLtc9Gk40H+Z+Es0IzLMHZ+6wthfCZl2WSJVKxXXKVBohqKmXbdN0zrGgdNz7lmup3TKqucD48myn8I3ygK2gm/W0H+K46BSXYDWFhkkPOBPqhEtXksdwSOujPW+B7SOsi4eBOVXrjkG5BGdmrBc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772715461; c=relaxed/simple;
+	bh=hg3VybHGNM8B9fWAA0K4iklWWMcCpPnj8i/igGcKzqQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cNtA8LaxXw6uRWKyi1WbTtjd/5/ylSoLKKAoqoJfxbJNiioQwu9MYlExmunSGC6rrYdBcQca7ztzg3JOE92/vDN6ZnqYddsV2B1tKKixKFCMclMO1/x8IAF7QyuPCX9bSqMKGerebKhAh5P0sI/7UpT7rx3v0AuGyRYocviOQLQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WutLMnNe; arc=pass smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so1300889866b.2
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 04:57:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772715459; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EHGZDxUh9CB/8maCCTbw94U82WIh0oFfimb8DMlACQ7intVa7cxrqw0veAilJC62gq
+         EBDy88+AxScL1GjRgp5ZB0diGEHh4V7x7PlcM6pltUDnTHaqfMmmOmrX7dDx5YZvkIIJ
+         x8VKEz7dyoUd7YuGOWpzGdvo+8m4uEMYbBGGTYfyvOUrwpcmRvaFYsH7p+w2wZMMz7EG
+         N8TwRLLc+NzV/20tURxAv5gHXYB7QpnZonXN1mu0u2o3vGeh1LkBUailzrikxMZHSsnm
+         FDrt/MCquPHBwEhf3Ed5eGdbyNbA7yexn57RPZtjHSA7oFFC7TPBUhbxvG1uTe/RG6yO
+         UA0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TqgYiuwtjyV1UQCdDi018aQv3q0kpjTsempfm/GxWAc=;
+        fh=uIcBqKaB72bce4W+1xwYXO5s1YItcMh0skk5kkST6fY=;
+        b=CSxoizDqa5knx33ej/dlJaeCFAwgF8PISU1ToE8iKUc0bDOmNCN9Fa0OhssGjA1gEM
+         gtcoAvR/jErk9vEvOwxsLORwk9FqXLgn4zFvYkceAtI2I0RJSt6t8uzgKjYDtWBUbt0o
+         I1QLZycpczXcrF2NarKmMtcd6Cm0ZKG6xg3kTcSkkNp/ZEbhUpe9cVcShrDVCW3JMUHl
+         I+j0NRc4mBChUfsLjyq7rJ64KGdWQ2BlVVsnpimyJrhe4kK3h460pxExnJGnmamovwuF
+         umPcJTErEfPP1aOuU3p/IbolDOaXmKaSd9nRE/Wyk9zgko0OfaWVqGHgEY2l1+VU0RMq
+         vw9w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772715265; x=1773320065; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2ozPyRLvFVo7RkDuja3Q6t/+2zK1nnxP+IcGjhg3LBE=;
-        b=rvAfqYF/Lj4DuWyOMzjh86JFlV69QA/r88Io7Zaz1wPd8xLvvxqo+K69CRIAeYhibZ
-         G7Gf4BJxcD152VzZABSK3XsjYVXXqIpVBzegCczM04Zg3OIJReTSEJmBn/viPM4Abqwf
-         VN9xtFE739f7MLR9kAgc9m/wX+rkfViNepPdcskK3jKrvEHn6fm65StFD/nw1XI5rJJ8
-         g9qCRDyym5BMIh5F8mi9RuUjTfcNFMoEhZtRLjSp5qtk/piOAPnq8NI2lkR5BXcmY7ht
-         SDuIGQyr2VFf46w6yThy+t13/YqQ6ZAlFAjmxnBKv5LVP+qTxDzSfv0nOK6INwRKOaKT
-         E9Nw==
+        d=gmail.com; s=20230601; t=1772715459; x=1773320259; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TqgYiuwtjyV1UQCdDi018aQv3q0kpjTsempfm/GxWAc=;
+        b=WutLMnNe6cjggZkuJNRbsfipKN+sle821AniV/rIgO4dcGxtk3/Q9ws8EU/7N+1kdi
+         faom9xBT1SPQUxUSww72fcNhAdPSdNplLX6UrT+HvqYJz5gusQ0XY4MHNsiAtWMZnFlD
+         1Nq+D3m1Rk8z4CA+NmjTCRMLE961j1VZ12Nqe4x5dacL1WN2QLbNfimQzu+Q8RS8lIRa
+         3U9/v2Dsl82PmgciuXRrbW2/rL6SdJtncApj4ba5x0E8lI/F36RT/kbhswi+ZB5NWyAT
+         bhaNL1Ai5zz1IyJ0eLllOOfbmdzPbrHb3SdXXatcykTN/mrxSEdOGpM9rPME662aDRfO
+         xxGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772715265; x=1773320065;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2ozPyRLvFVo7RkDuja3Q6t/+2zK1nnxP+IcGjhg3LBE=;
-        b=UtuGUSWtvpc8LF22EfQ9lxif+513muexDmg1kRJhyq5wbIaCQBWBECJ0fOb2OcUXSf
-         zrUl8uVWeC2Mjf+MeUCI5TitTr2VZHlVkVASPnezqw2rmLp1OGdzD8buFtJa4T6hxAGm
-         ZfdYOaxr8JRAyub6PE6pU7PYp1oMc1mt0QMTK0Tp8JbMH/2Pvha30QdbNuwwoKeQPhnX
-         rpcc1HW0VT64TIvqrbBGmKHHMJ/912qbkqw9kfjuzu5evf/UkHA2J85r1IZgb+DY1f8j
-         2TiqmjdlZCQ5Syfs5usJ1HmgDgDp8ptWCj4+A6mdebJaSz+rrmZMH8Q4G+WDZnX3shwZ
-         T9fg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfXLTjjUrryE1CUghb2Kue5T5TcgkUQeQsby+Fb7QFSyR84Vf5PEuIk9js5EXwc0XIsmSLAkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz66FVpNMj7//NCCHqqlgLpGQXbuCxSsIZfwJXS5UaQ/TAQwvPj
-	WAxrYSN0pBJf/o0pqWBMQBWpNry544CVjTMYrHd6sLowKCo7Mwl7SEocaigPaYmOpYhjzUbt48E
-	dXxW+v1kWCbaL4plq7KG7leqDcYiLD+vIuRa0LuwxhnoCOKzYEFa+4xDelQ==
-X-Gm-Gg: ATEYQzzkhE/p04XVlSs4WVrZTX+M8qZzF//lZEI63S+7lyFZZ3y7lu/bxUw1ERr9u8N
-	HhyDpxZHhEqvW4HmZG5ZGomzGZ5IIN0NqaK2jlrnew9/gYSkeKYPRfTtvCFK/8oTgJTdc2vCFd2
-	mC4u4dER/6m78WyKoyU+hThhmMmzOIUMfaS2qMOvcU0IjZQhN9KuU4g+4F92xvHSARY0eydPtcJ
-	hU2+x1fmcnY+Hqy33imflExJz9r3UIeS2krVLEWc9J4h96YclDD4dPgGN0eDEOWrv+CGJwtvsdB
-	dfxIpwBNomd97SocDda3cQM0YoiFYj0oqs8zwvXr1AjK2mOeDUeKoq3+bFT2KT1nb8XZPqZIFC6
-	Z2moIAYHRDQhHBKuz0gS8kKHzkw==
-X-Received: by 2002:a05:600c:4e8a:b0:47e:e9c9:23bc with SMTP id 5b1f17b1804b1-4851989fb4cmr84510285e9.30.1772715264977;
-        Thu, 05 Mar 2026 04:54:24 -0800 (PST)
-X-Received: by 2002:a05:600c:4e8a:b0:47e:e9c9:23bc with SMTP id 5b1f17b1804b1-4851989fb4cmr84509955e9.30.1772715264550;
-        Thu, 05 Mar 2026 04:54:24 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.149.216])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b0549600sm36034668f8f.35.2026.03.05.04.54.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2026 04:54:24 -0800 (PST)
-Message-ID: <5d147ef5-8f46-473f-9c9a-455e52ce9541@redhat.com>
-Date: Thu, 5 Mar 2026 13:54:22 +0100
+        d=1e100.net; s=20230601; t=1772715459; x=1773320259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TqgYiuwtjyV1UQCdDi018aQv3q0kpjTsempfm/GxWAc=;
+        b=XAXzjnjs2wTCr7jz8FNp67sRsaLg2yGM3Np1bQZAy37xr33HBuJJpCC0qS6FHdz4FA
+         aZG1dtq68usko8AneNl1233Fnd1uVDa0iOvhU8pBM37t0D8HlebrIHsLEHHa4bUvH+Ji
+         XQcBViT6MlJgEPxVNZMQ8fi1FW08CWHjZI95h62omx/OImXERkaTtO+fsdsNXEg+cZu4
+         v4S6eHCqSYGeRvtkfQZvYCosk2cjwPTwn+iHlf+wepfsFt4gwtG6OsY9RfsahknyLAmg
+         /ZqEBQ60lR3EHZ97m/sGUk0fTfaHBIZCDF8EkUnaqnqcG55izfm6T7bKpjtTubPqeuOP
+         jUWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjMM3L4PXAXokjboy1u9In2AL0XslqiaHKwcF2oq2PZVX+z/MAUv4iGYXg/6+wFhBNM+fs584=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC7mwJ/Zc74ZwV1L5BuQpnI4hnAIfTDwiTVSWQ8t6fTjGJXoAa
+	uSTnTubbgcfsAirr4Cn08yLUnGTcZ5s21KG/GXPICQR3v1kwidT8+r6ZcKf5U3eF/ARb2nyrZHA
+	nuqFx0MygMybhnb9DneTK7gx5QL1Ktxo=
+X-Gm-Gg: ATEYQzyXPMGZ7kQRvfrNDfsrBCYYAL24hppPT1x5bXffynrJm6DzixhsE+WPBIb35mV
+	F96yBF83AbaU18A+NH8jmxUlKhoGrT9O88uKALoTmI6hZZqTmwSVRaeILQGAxUFB2nxjPBF3EQl
+	mvswWNbb7uoSzaRv57R+/lQvxfXss6fPVRxnLfgB8l+LBBgJKeEUjMJACWKj9n7W4gzGLLeTLUN
+	ifBBVMywWoTrGW2wfXPpuFZEHh8NCoQ/8D8EDGh2L+6ZN4qlxMgTr7jEYJmv/wSrci/oL/WoiTI
+	RJTU9S3poyEyMBsDwrURXfxFrewEu+XLmLOx1BKm8gXxu33XMcwoopdHpnGMizMQvLCqBLfKpuv
+	/8dM8HZHRRa7dnFOHc+fwXdrZ
+X-Received: by 2002:a17:907:3e1f:b0:b8a:f3c0:c09 with SMTP id
+ a640c23a62f3a-b93f162c9e7mr352403066b.59.1772715458473; Thu, 05 Mar 2026
+ 04:57:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmgenet: fix bcmgenet_get_eee() clobbered by
- phy_ethtool_get_eee()
-To: Nicolai Buchwitz <nb@tipi-net.de>, Andrew Lunn <andrew@lunn.ch>
-Cc: Doug Berger <opendmb@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, bcm-kernel-feedback-list@broadcom.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260303153918.538902-1-nb@tipi-net.de>
- <fd675389-b044-4783-be16-c5ba34163ef2@lunn.ch>
- <a899e5a0addb1e58d47fb7f41e4d8a55@tipi-net.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <a899e5a0addb1e58d47fb7f41e4d8a55@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 352A9212307
+References: <20241220073540.37631-1-wojciech.slenska@gmail.com>
+ <20241220073540.37631-2-wojciech.slenska@gmail.com> <5bba973b-73fd-4e54-a7c9-6166ab7ed1f0@kernel.org>
+ <939f55e9-3626-4643-ab3b-53557d1dc5a9@oss.qualcomm.com> <CAMYPSMr2JCQCX69PGUk1=7=-YfBcyFDpqQ6tMQzFP040srBA7w@mail.gmail.com>
+ <f141a098-efca-46f1-bc1a-433ff03915ca@oss.qualcomm.com>
+In-Reply-To: <f141a098-efca-46f1-bc1a-433ff03915ca@oss.qualcomm.com>
+From: =?UTF-8?Q?Wojciech_Sle=C5=84ska?= <wojciech.slenska@gmail.com>
+Date: Thu, 5 Mar 2026 13:57:27 +0100
+X-Gm-Features: AaiRm503EZ8xJfGcfxKhcFmT8KmQTYRl_tl6gGC1NdHevXlHzYa69ef8LksZEX4
+Message-ID: <CAMYPSMr=2WUvjh9+ZDRkgqq6B3=MB9xmwp4NkKnWpdnNiNXf6A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dt-bindings: net: qcom,ipa: document qcm2290 compatible
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7DD56212446
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264382-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264383-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wojciechslenska@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,qualcomm.com:email]
 X-Rspamd-Action: no action
 
-On 3/5/26 9:50 AM, Nicolai Buchwitz wrote:
-> On 4.3.2026 22:57, Andrew Lunn wrote:
->> On Tue, Mar 03, 2026 at 04:39:18PM +0100, Nicolai Buchwitz wrote:
->>> bcmgenet_get_eee() sets the MAC-managed tx_lpi_enabled and 
->>> tx_lpi_timer
->>> fields, then calls phy_ethtool_get_eee() which internally calls
->>> eeecfg_to_eee() — overwriting eee_enabled, tx_lpi_enabled and
->>> tx_lpi_timer with the PHY's eee_cfg values.  For non-phylink MACs like
->>> GENET, these PHY-level fields are never initialized (they are only set
->>> by phylink via phy_support_eee()), so the ethtool report always shows
->>> eee_enabled=false and tx_lpi_enabled=false regardless of the actual 
->>> MAC
->>> state.
->>
->> I think the MAC driver is missing a call to phy_support_eee() to let
->> phylib know the MAC supports EEE. Have you tried that.
-> 
-> Thanks for the suggestion. I've incorporated phy_support_eee() and 
-> tested it
-> with a Raspberry CM4.
-> 
-> After applying the patch, the PHY correctly advertises EEE, negotiates 
-> it with
-> the link partner, and ethtool reports:
-> 
->    EEE status: enabled - active
-> 
-> However, reading UMAC_EEE_CTRL directly:
-> 
->    UMAC_EEE_CTRL      = 0x00000040  (DIS_EEE_10M set, EEE_EN = 0)
->    UMAC_EEE_LPI_TIMER = 0x00000022  (34 us, hardware reset default)
-> 
-> EEE_EN (bit 3) is never set - the MAC does not actually enter LPI.
-> priv->eee.eee_enabled stays false at init, so bcmgenet_mac_config()
-> never calls bcmgenet_eee_enable_set(). The result is ethtool advertising
-> "enabled - active" while zero power savings happen, which is worse than
-> the original bug.
-> 
-> Likely root cause: phy_support_eee() sets eee_cfg.eee_enabled=true, 
-> which
-> phy_ethtool_get_eee() -> eeecfg_to_eee() then reflects back as
-> eee_enabled=true - but that is PHY eee_cfg state, not MAC state. The
-> fix should override eee_enabled and tx_lpi_enabled from priv->eee after
-> calling phy_ethtool_get_eee(), since those fields are MAC-managed:
-> 
->    ret = phy_ethtool_get_eee(dev->phydev, e);
->    if (ret)
->      return ret;
-> 
->    e->eee_enabled    = priv->eee.eee_enabled;
->    e->tx_lpi_enabled = priv->eee.tx_lpi_enabled;
->    e->tx_lpi_timer   = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
-> 
-> This correctly separates what the PHY negotiated (eee_active, link 
-> modes)
-> from what the MAC is configured to do.
-> 
-> The deeper problem - that the MAC never enables LPI even when EEE is
-> successfully negotiated - was submitted separately to net-next [1]. It
-> initializes priv->eee.eee_enabled=true in bcmgenet_open() for GENET v2+,
-> matching what mvneta, mvpp2 and others do.
-> 
-> Given how the two patches interact, I think they should go through net
-> as a 2-patch fix series - if there is consensus on that approach. 
-> Sending
-> the fix alone would ship the misleading "enabled - active, no actual 
-> LPI"
-> state.
+czw., 5 mar 2026 o 11:54 Konrad Dybcio
+<konrad.dybcio@oss.qualcomm.com> napisa=C5=82(a):
+>
+> On 5/26/25 9:39 PM, Wojciech Sle=C5=84ska wrote:
+> > pt., 23 maj 2025 o 01:30 Konrad Dybcio
+> > <konrad.dybcio@oss.qualcomm.com> napisa=C5=82(a):
+> >>
+> >> On 12/21/24 9:44 PM, Krzysztof Kozlowski wrote:
+> >>> On 20/12/2024 08:35, Wojciech Slenska wrote:
+> >>>> Document that ipa on qcm2290 uses version 4.2, the same
+> >>>> as sc7180.
+> >>>>
+> >>>> Signed-off-by: Wojciech Slenska <wojciech.slenska@gmail.com>
+> >>>> ---
+>
+> [...]
+>
+> > Once your changes have been integrated, I will resubmit my patches.
+>
+> That has now finally happened!
+>
+> Konrad
 
-Makes sense to me, but it's probably better if you wait for Andrew's ack
-before proceeding.
+Nice, almost there :)
+Please also submit this one:
+https://github.com/quic-kdybcio/linux/commit/cc20384c4484507fbd18b8a01c79b5=
+e7f5b6cf8a
 
-/P
+With this small correction.
++                       reg =3D <0 0x0c100000 0 0x2a000>;
++                       ranges =3D <0 0 0x0c100000 0x2a000>;
 
+When it is merged I will resend this one.
+
+BR
+Wojtek
 
