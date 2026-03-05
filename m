@@ -1,160 +1,277 @@
-Return-Path: <netdev+bounces-264267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gG81HDVXqWkh5wAAu9opvQ
-	(envelope-from <netdev+bounces-264267-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 11:13:09 +0100
+	id OHjkM4RXqWkh5wAAu9opvQ
+	(envelope-from <netdev+bounces-264268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 11:14:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB9020F7D0
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 11:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AF020F838
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 11:14:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B4B71306F997
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 10:03:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7A4FE30844BC
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 10:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CD037BE8B;
-	Thu,  5 Mar 2026 10:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB9B37BE77;
+	Thu,  5 Mar 2026 10:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cD4UFgoA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HAnZVrcP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9ED37EFF8
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 10:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD90347FC3;
+	Thu,  5 Mar 2026 10:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772704943; cv=none; b=ZiG2J0FS8ZldDcZ9lbaRyNSy+Oz3fyNrNkQkrNeWkDIv7bNTnGuTreHecIW3aJq3GX0fE50UwJk3jP5fZKU+jClcYwPg5HOPiO2A9Rs4MLXVWvXNUf/D85S4JNcJqCl5VEa8SAF47HxOvzZbYV3Vp0SGCg3yv/vlAajsW30x7Gw=
+	t=1772705025; cv=none; b=ad3nlXNEB0YxkQWqV2KpXEDn/LuKbSOwbEL1vuMityZZ3CwNskULmfl6pAl/YrfL2/wPtfSYwNlC4qCVJw5iRJmyXAZiUQBFyBQ5CKmTm0ThIxp6F/J9XdZnrK/u48cmS4p/gHoWmsTkKCZIHpwpK5jUka0uu46ed76OduaDn5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772704943; c=relaxed/simple;
-	bh=PLN3jU+WSp15lmHsKDg7F21c9tIpGoZokDbnzqxSsGE=;
+	s=arc-20240116; t=1772705025; c=relaxed/simple;
+	bh=TWlYUc7mRNr9CBnHv0bzv/zBCU20gFcmj87ErRbQvKg=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Qs8DZSKl9AcGifDwFOiz37rcfRsuTiwc6x4typyGeYD3fNXwgUNA8wgkcd9oy3p0dyhu86Kb1SBra6s7gKImeyzScnmyRoC0NT4R0cEQK71ijQE7h55tkKojESVyuG5d9wcdY0kq5B7a1yGiTElFssjq+VRm5y/7ebFR/He0kuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cD4UFgoA; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48371bb515eso116816465e9.1
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 02:02:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1772704940; x=1773309740; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PLN3jU+WSp15lmHsKDg7F21c9tIpGoZokDbnzqxSsGE=;
-        b=cD4UFgoAocJuZT5S6/FT4tLvo8eHic6win/PVVlM7THi42GfYkSi1TmQKp9oFjEvC9
-         4DuAmh8ioVJ3l0t9cfDz1F4uH57IMEgeY61EKqf0J4hgzotd10bzAWeqkIY3qxwq+gtt
-         KyD/BEhAcZymLIC+jEV+iqZhfRlSpIO7G5fxOWyrn6ZeoxUBzXJNaGNiXGXdwAwygc++
-         SJ3ShMbEL/2wC0WJ/VhDdOAftX90PfAz60BcupIG8OAGaPrCOCMIA27aaK++isLH44Iv
-         ENO8y4ePFW102JPN00G4qmjO8l3H2KXaQyAiU4DD52kTRmizIQUzeyakkq8kcPe749lH
-         0MxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772704940; x=1773309740;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLN3jU+WSp15lmHsKDg7F21c9tIpGoZokDbnzqxSsGE=;
-        b=u+Jfi9XGr0B2cEiATCbVludk5pQMCEBPqc1WUenJjckQbvkbtxF63BTNQzYl14LbMv
-         junN1dQn6IwYLqPIpu8tYDAABGuyqBOP7Y8+j4Tqto4gqe9amXOyfxkY5nL6aRxWcGyf
-         opNoJkfH7pYtE8QG21aKOLHDjXQIJ/afqXVxml6XHbpPkUYFjNbKIhGcen40Ys40oLZA
-         m3GjbunlyYDfscP5p155sdoyGqAqezynIHsXpwdS8c6zVNx3Ewv9h6ioCVjM0OUzE3xg
-         89YP+ox3ooJ597jxSbgBoT935GTyAlNiSetNpCBVfTDho4cAJZ+quS/dqlqFXfCxIvbp
-         ufQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzqmdzqTvG/fzmrGWOIaUUMYZIHgzQcfM+WgH/7Xc6h93/whN/r8uYbnP2pGY8RV3UMmSpQzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYl6SIsU/053MByxBRqbIH6279UgoQQwnZZJ+epbgfKy9s+Sz7
-	lRWa8H1C9lqnZiD8j1ee38bfFepXRIBQbLCyAcHAr+WWqzLZvNi2djMRsU0JObVp5q4=
-X-Gm-Gg: ATEYQzxQ9lSlrBi4P514IR1qHJSFpu9W5/dFlYKXJu0GL4NY9jpHbGmvnSyUOkTeCyO
-	ad1/S0GjKHT1toGtNQ92t+fqHcAZERCPx06+63GhxMzXYTHCkDB1Go5iQ2BB13tO1jZtxyz5CP1
-	s9kCpPOnQS6EoPo+E96c/62vJCpK/GbBC3RUTMIQ3rpJAwHUWKwElz9UbI0pTo9duCjLpeCU8X9
-	doWIj6BO3K1W5MHJn7+fdP4rQ656DnCEL514OR36hsau6fun5LqqFAi4xhzDDbfvMlkp9ikQmrE
-	xnrlSX8lUZCc/viqSoR4txYSQh28ts7Ohsf4mhl9Wu3wLvd615hGPTU3JqogFZx0bydBbbGYfb1
-	Gpco474dsNCejljWVo5CBFS9U6jcqFfg6x8FEmRqzgfUBalIrjeNc5tMXNWTzxsCp843u4DyQ0S
-	hGDkkBB0ghvasVv5TpdPeUgxyhya/W
-X-Received: by 2002:a05:600c:a07:b0:47f:b737:5ce0 with SMTP id 5b1f17b1804b1-4851988f31dmr86977045e9.23.1772704939633;
-        Thu, 05 Mar 2026 02:02:19 -0800 (PST)
-Received: from salami.lan ([212.129.84.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851fade9fdsm59453655e9.4.2026.03.05.02.02.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 02:02:19 -0800 (PST)
-Message-ID: <030737fd255a49288349f06e8c1217a126ea9081.camel@linaro.org>
-Subject: Re: [PATCH phy-next 05/22] phy: add <linux/pm_runtime.h> where
- missing
-From: =?ISO-8859-1?Q?Andr=E9?= Draszik <andre.draszik@linaro.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, linux-phy@lists.infradead.org
-Cc: Vinod Koul <vkoul@kernel.org>, Neil Armstrong
- <neil.armstrong@linaro.org>, 	dri-devel@lists.freedesktop.org,
- freedreno@lists.freedesktop.org, 	linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, 	linux-can@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, 	spacemit@lists.linux.dev,
- UNGLinuxDriver@microchip.com, Peter Griffin	 <peter.griffin@linaro.org>,
- Tudor Ambarus <tudor.ambarus@linaro.org>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Heiko
- Stuebner <heiko@sntech.de>
-Date: Thu, 05 Mar 2026 10:02:16 +0000
-In-Reply-To: <20260304175735.2660419-6-vladimir.oltean@nxp.com>
-References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
-	 <20260304175735.2660419-6-vladimir.oltean@nxp.com>
+	 Content-Type:MIME-Version; b=JsHK9B5tKEHGtKt8/OK3AJt4euP6rvo4nwxBv9iXTS8VQHk6aYXKGe/paMi/z0z2ubmvyDAcufM0vRo2wqe6wxeWzdd+3Z9KhDnN8aCp4xaHgITMSxfHWV0Pqex44SL0aM8VO+aJi4oDoaauSYX+lxq0g9eU2d61JUC4IZHe7IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HAnZVrcP; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6259YAgQ674109;
+	Thu, 5 Mar 2026 10:03:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=RioBjd
+	ZmCiggAVbnBuh806rY5aSJDVeG0sEVQPcCLDs=; b=HAnZVrcPTbkU1RDV0tRsw3
+	Rk5suQyKsbkurrXvLMVLYFueCA9KGMhF9+XQAX7KvWEzZ7xD+RbaIufTRMXVKmYS
+	y7fy9WVl4ndDqkRDXAcOft0Z0Xpf/r5ZCefSmun3iHLPaLFL7XmeQQBseEHGLqOF
+	yA4nkB/Bia/ltQxx753g7U+XdDQCoXeNqq17VYFO9Lq34EbJZGXkJD7dti8YhUHo
+	C7KgDVCuEheS3p/L5ArKTfdbezTThnGOvolD8r8GchKPJfVtaF7x/6Cy+GzmlNvM
+	sL0oOZCQtfJgdwnC6cNYLfrVq0iCgj4oG3FIQsJLTIy+L5zuxHBfCzTrt879fyGg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cksrjb60h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Mar 2026 10:03:32 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62592oWZ016408;
+	Thu, 5 Mar 2026 10:03:31 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmbpnas2u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Mar 2026 10:03:31 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 625A3RB946399766
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Mar 2026 10:03:27 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4DC1020076;
+	Thu,  5 Mar 2026 10:03:27 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F40C2005A;
+	Thu,  5 Mar 2026 10:03:27 +0000 (GMT)
+Received: from [9.52.210.163] (unknown [9.52.210.163])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  5 Mar 2026 10:03:27 +0000 (GMT)
+Message-ID: <f679f226162e1f987053cf0c088268398287200a.camel@linux.ibm.com>
+Subject: Re: [PATCH net-next] net/mlx5: Allow asynchronous probe
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>,
+        Saeed Mahameed
+ <saeedm@nvidia.com>,
+        Leon Romanovsky	 <leon@kernel.org>, Tariq Toukan
+ <tariqt@nvidia.com>,
+        Mark Bloch	 <mbloch@nvidia.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>,
+        "David S. Miller"	 <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+        Peter Oberparleiter	
+ <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Alexandra
+ Winter	 <wintera@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Date: Thu, 05 Mar 2026 11:03:26 +0100
+In-Reply-To: <d6fcf417-87b1-4bbe-9ec1-cabb2b2ed1a6@gmail.com>
+References: <20260303-parprobe_mlx5-v1-1-18194f2a1a3a@linux.ibm.com>
+	 <d6fcf417-87b1-4bbe-9ec1-cabb2b2ed1a6@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-8 
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 6EB9020F7D0
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=Rp/I7SmK c=1 sm=1 tr=0 ts=69a954f5 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=H7XoTaWE-anSZDuJziMA:9 a=QEXdDO2ut3YA:10
+ a=zY0JdQc1-4EAyPf5TuXT:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA1MDA3NyBTYWx0ZWRfXwIN8kTYLiooy
+ 18/J/NWXicqUTPqvueNfxEr1OBC1EVWUp7NmWT778BUm4kffs1xFfysvP3JyvLZaQnXZJ14VBPW
+ I3XR2wO+V70JllWsNKyLLhL6nv8ii5NWJPcBfz/u8C3AvTAbicjWKM2ZxSr8d6mww1PbOcncEuc
+ 8YbHzD2WOo5kHskqoqIZa7B0auC5j9wQ0lMzTdk4IuqMOdlh+Pv8rV4RHl73Msx3jNUe4Wt04FP
+ a3/YhpNwq115WWNCDo04IJFuUhL3dDfg1vZmDZYtmZ1WmD+fBFRJh7U+460OLK4nSnuR5+Vgsko
+ kOaaEnu6iGcY/yHICTMe7YyapY2eFBGHwhhEZdO1SioV0RhOr8GoKjDI36NK2yJx/kzBJRkdSkJ
+ r8aTr+D4P4MuSki0HaPVrG+9v3u8FYqxdXSQgs6yg/scqM+57GDTXHk42qD+PiCc4fDap4Sw54B
+ sWXlDyHfwdG/xQVBr3w==
+X-Proofpoint-GUID: vesfvqm0HlLXEPtlktGrblPjM5KyKIwm
+X-Proofpoint-ORIG-GUID: k0I49wQH8nF47e57fUCv6Tt-riC-HUtu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-05_02,2026-03-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 priorityscore=1501 spamscore=0 phishscore=0 adultscore=0
+ bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603050077
+X-Rspamd-Queue-Id: D2AF020F838
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,linaro.org,lists.freedesktop.org,lists.infradead.org,vger.kernel.org,lists.linux.dev,microchip.com,glider.be,gmail.com,sntech.de];
-	TAGGED_FROM(0.00)[bounces-264267-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264268-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_TO(0.00)[gmail.com,nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linaro.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.ibm.com:mid];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andre.draszik@linaro.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linaro.org:dkim,linaro.org:email,linaro.org:mid]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-On Wed, 2026-03-04 at 19:57 +0200, Vladimir Oltean wrote:
-> It appears that the phy-mapphone-mdm6600, phy-qcom-snps-femto-v2,
-> phy-rcar-gen3-pcie, r8a779f0-ether-serdes and phy-rockchip-typec drivers
-> call runtime PM operations without including the proper header.
+On Thu, 2026-03-05 at 09:56 +0200, Tariq Toukan wrote:
 >=20
-> This was provided by <linux/phy/phy.h> but no function exported by this
-> header directly needs it. So we need to drop it from there, and fix up
-> drivers that used to depend on that.
+> On 03/03/2026 12:33, Gerd Bayer wrote:
+> > Announce that mlx5_core supports asynchronous probing.
+> >=20
 >=20
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Hi Gerd,
+> Interesting patch.
+>=20
+> > Tests on s390 - where VFs can show up isolated from their PF in OS
+> > instances - showed symptoms of "mlx5_core: probe of 00e7:00:00.0 failed
+> > with error -12" when booting a system with a large number (> 250) of
+> > Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
+> > (15b3:101e) PCI functions.
+> >=20
+> > Turns out that this is due to systemd-udev's time-out supervision of
+> > "modprobe" killing the sequential initialization of additional function=
+s
+> > if probing exceeds a default of 180 seconds.
+> >=20
+> > According to [1] device drivers could (slow ones should!) opt-in to hav=
+e
+> > their probe step being executed asynchronously - and interleaved. With
+> > the mlx5_core device driver announcing PROBE_PREFER_ASYNCHRONOUS as
+> > proposed by this patch, we've measured 275 VFs being probed successfull=
+y
+> > in about 60 seconds.
+> >=20
+>=20
+> Nice.
+>=20
+> > [1] https://www.kernel.org/doc/html/latest/driver-api/infrastructure.ht=
+ml
+> >=20
+> > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> > ---
+> > Hi all,
+> >=20
+> > this patch helps to speed up boot times when there are a large numbers
+> > of Mellanox/NVidia VFs in a configuration. Although we've seens real
+> > issues, I'm hesitating to declare this a fix of commit 9603b61de1ee
+> > ("mlx5: Move pci device handling from mlx5_ib to mlx5_core") primarily
+> > because the concept of asynchronous probing with commit 765230b5f084
+> > ("driver-core: add asynchronous probing support for drivers") was
+> > introduced only later.
+> >=20
+> > Thanks,
+> > Gerd Bayer
+> > ---
+>=20
+> This is an interesting problem, and the proposed solution looks=20
+> reasonable. That said, this is a very sensitive area and there may still=
+=20
+> be hidden assumptions or corner cases we haven't considered. This needs=
+=20
+> thorough testing across a wide range of real-world scenarios and=20
+> different system topologies before we can be confident in it.
 
-> =C2=A0drivers/phy/phy-google-usb.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 +
+I agree that a change like this might expose concurrency issues lurking
+both in the driver instance controlling the VFs and the driver instance
+running the PF. I have to admit, that my testing so far was primarily
+focused on making large configurations work rather than "regression
+tests" with "household configurations" of 1..~10 VFs. I'll discuss in-
+house how we can increase coverage as well.
 
-For Google:
-Reviewed-by: Andr=C3=A9 Draszik <andre.draszik@linaro.org>
+>=20
+> We'll take this for testing and report back once we have results.
+
+Thank you for your consideration.
+
+>=20
+> BTW, as you probably know, a possible workaround is to increase the=20
+> systemd-udev timeout.
+> What timeout is required for it to succeed without this change?
+
+Yes, I did some very limited experiments with that, but I was measuring
+the uninterruptible duration of initializing a single VF instance to be
+close to one second. That would mean that for the 275 VFs I'd have to
+up the time-out value from 180 to ~300 seconds. That would be ~5
+minutes of boot latency (worst case)...=20
+
+>=20
+> >   drivers/net/ethernet/mellanox/mlx5/core/main.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/n=
+et/ethernet/mellanox/mlx5/core/main.c
+> > index fdc3ba20912e4fbc53c65825c62e868996eff56d..b53fc3f2566acf5a07cb8df=
+649124c4a87f3e043 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+> > @@ -2306,6 +2306,9 @@ static struct pci_driver mlx5_core_driver =3D {
+> >   	.sriov_configure   =3D mlx5_core_sriov_configure,
+> >   	.sriov_get_vf_total_msix =3D mlx5_sriov_get_vf_total_msix,
+> >   	.sriov_set_msix_vec_count =3D mlx5_core_sriov_set_msix_vec_count,
+> > +	.driver		=3D {
+> > +		.probe_type	=3D PROBE_PREFER_ASYNCHRONOUS,
+> > +	}
+> >   };
+> >  =20
+> >   /**
+> >=20
+> > ---
+> > base-commit: c69855ada28656fdd7e197b6e24cd40a04fe14d3
+> > change-id: 20260303-parprobe_mlx5-d10d2a746d3a
+> >=20
+> > Best regards,
+
+Thank you,
+Gerd
 
