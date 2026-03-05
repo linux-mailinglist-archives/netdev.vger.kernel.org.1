@@ -1,171 +1,136 @@
-Return-Path: <netdev+bounces-264254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGzdDeJRqWkj4wAAu9opvQ
-	(envelope-from <netdev+bounces-264254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:50:26 +0100
+	id mDimFVdSqWkj4wAAu9opvQ
+	(envelope-from <netdev+bounces-264255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:52:23 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC4C20EF2E
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:50:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6061F20EFD7
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 10:52:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 13B8F30927D2
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:41:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 12D45304E73D
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 09:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C5A375F62;
-	Thu,  5 Mar 2026 09:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7901245031;
+	Thu,  5 Mar 2026 09:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="f2ybZO9l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGReRi5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF58331E823;
-	Thu,  5 Mar 2026 09:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84429336885;
+	Thu,  5 Mar 2026 09:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772703626; cv=none; b=BifAoIk5Rdm5PVjblfqObwgAdCot/nJxnuS29Cd5IsJW/sWwzfurGBz2rf5g2Hw2rLPWYB9O29hu/BjHPvSCScpfbtsplzozAr6Uceio8KRgRI2K8Eb4zCUlK75nhjQ0DgVFiCBJaItQlRYg/yC8/XxJMFP1WTdC+HwJSOGA23g=
+	t=1772703744; cv=none; b=T7ROzEiSsmHQ1kp9XJGC5BATrarFRJMf2hX9VTGnM79tAgcduz8BI+KqmOv/cRuVjeGqiyyU1tcnh/qZui+vSCzrg9kOvVTszN9CfCSpKobKRWTcTKlxFO5bQcDTvXMKwNoYa1X5+JlPb23n1qraAWesFZHeoojGkltBGn2GJ50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772703626; c=relaxed/simple;
-	bh=p1mveXsa/Q4CbMNtiAOsXmS6tImykT4LjEd33iUB0k4=;
+	s=arc-20240116; t=1772703744; c=relaxed/simple;
+	bh=6nMtekn6cDS8/3gsRfHLyG1lS2JDMzRmAHUr4/sNaCY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g2axuq5MovB38ijIjkuCdQWmCKf6DRp6hWFZpkPpZhmttDxAEBGlB8MfheJuEdSgwkc1d73tkvQhJs6ZpNbdK0yySVWvT5N2TCfvIJmkPKGFfvxkxnLLU+INorCD5co1+UvHyxSx6eETiL3vfjj0KGnDgBKyWcQnEXaW30j7VmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=f2ybZO9l; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 23A12602CC;
-	Thu,  5 Mar 2026 10:40:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1772703616;
-	bh=9r4TFdWb4XBQbqmwMWxCH/5YNQ8V/9bxzevc4XttvHI=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=MPV8uGaRWx86dQuRuvHBxzR89i3ovZSeizt2i/Icoamfs5a+ZmEf7EQ14UW+CqrS0WvNErTAEdQNmvENRVWkM5ZfpwiR4pai4p3aoq5CaHPoMFwZJiKJ/VUmuw3KVLTLMTjtiUBRVkExKpuyFxXf0hQbeCio5YSiAWJhcWn/+hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGReRi5e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB74FC116C6;
+	Thu,  5 Mar 2026 09:42:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772703744;
+	bh=6nMtekn6cDS8/3gsRfHLyG1lS2JDMzRmAHUr4/sNaCY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f2ybZO9lncpSgXDyVnKNym5XDCpdwuBhd8bU108ZUkWVqp0ezVXh4lO1dTpWcdrPO
-	 pnxrq/SjCEVPGP2bLaK+bwbm+UIuWD/YAB0okfMaYOaJT/OTYK8mSHuwFqZSxfgYCn
-	 gm5UOf5lgzWf8QbtUaANo7erRe87mQrJ45+FvTRoD2Ow/6ai0sl7seXn6RQEt8FFES
-	 kxUO7FjmDv0NQKlPTHnKQy4YLVqX7kevw5Mhip3pKBmBMCtgowoz0f76L2lKEojLZZ
-	 Qje6pytATM8rAP6/KubZ8URJ487rBBsAgHFOWIQvjnrOINfyXZbLKFeEyEB8SiqEaU
-	 MJa1u+Be/0mbA==
-Date: Thu, 5 Mar 2026 10:40:14 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	b=aGReRi5ehY+g6wkFYKnSULGwTBrwNMMSoGe3LONnqNkBJ1j5la+s7JeweerB6ywsT
+	 hKEg70FGAkhjFt+x9pIQvhb1WgpiHAiig1DIYF+V+v8FbxCDxycQeZFanQDDU43GOv
+	 zQ1OFe+mPSFKxq6v0hs9EPmJehi15k5QmVTlAxgR0Sc0GX3QS72oxgcOZboqgeWwDG
+	 wpiVvAvMfb/sWZfqOlbgVAOXDfW3WnipXQPx6GMVS9hAM1Xp+Ch/uSAfxjU0cgZ8SJ
+	 HJ7SYONnSE+w78vhsHrYWjBxP7LyXfJddwHSl3hcwfut11y3/FFwmmKjLHOLc9sTpD
+	 +KHU4Cy/6OAnw==
+Date: Thu, 5 Mar 2026 09:42:19 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Charles Perry <charles.perry@microchip.com>
+Cc: netdev@vger.kernel.org, Sean Anderson <sean.anderson@linux.dev>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 0/4] netfilter: updates for net
-Message-ID: <aalPfgw5Ypsik8NY@chamomile>
-References: <20260304172940.24948-1-fw@strlen.de>
- <aaiqrFrus1syOmlT@chamomile>
- <aalHS6-11HUHy-Dd@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <20260305-backlit-epilogue-62139ae694a6@spud>
+References: <20260224202854.112813-1-charles.perry@microchip.com>
+ <20260224202854.112813-2-charles.perry@microchip.com>
+ <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
+ <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
+ <20260304-unvented-crinkle-37f0bfd03541@spud>
+ <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MBwEv1bNkPnDVrP4"
 Content-Disposition: inline
-In-Reply-To: <aalHS6-11HUHy-Dd@strlen.de>
-X-Rspamd-Queue-Id: 2AC4C20EF2E
+In-Reply-To: <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
+X-Rspamd-Queue-Id: 6061F20EFD7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264255-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-264254-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,netfilter.org:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05, 2026 at 10:05:15AM +0100, Florian Westphal wrote:
-> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > Hi Florian,
-> > 
-> > On Wed, Mar 04, 2026 at 06:29:36PM +0100, Florian Westphal wrote:
-> > > Hi,
-> > > 
-> > > The following patchset contains Netfilter fixes for *net*:
-> > > 
-> > > 1) Fix a bug with vlan headers in the flowtable infrastructure.
-> > >    Existing code uses skb_vlan_push() helper, but that helper
-> > >    requires skb->data to point to the MAC header, which isn't the
-> > >    case for flowtables.  Switch to a new helper, modeled on the
-> > >    existing PPPoE helper. From Eric Woudstra. This bug was added
-> > >    in v6.19-rc1.
-> > 
-> > In patch 1/4, why is this new function so different wrt. skb_vlan_push?
-> >  
-> 
-> I asked that to Eric when I reviewed this, and that was his reply:
-> --------------------------------------------------------------------
-> The code here for the inner header is an almost exact copy of
-> nf_flow_pppoe_push(), which was also implemented at the same time.
-> So handling pppoe and inner-vlan header is implemented in the same
-> manner, which keeps it simple and uniform. If one functions
-> (in)correctly, then so would the other.
-> 
-> I've been implementing handling the inner vlan header like this for a
-> half year now. My version of nf_flow_encap_push() was a bit different,
-> but after this patch it is quite similar.
-> --------------------------------------------------------------------
-> 
-> >                 skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
-> >         }
-> >         __vlan_hwaccel_put_tag(skb, vlan_proto, vlan_tci);
-> >  
-> >  
-> > In case there are two VLANs, the existing in hwaccel gets pushed into
-> > the VLAN header, and the outer VLAN becomes the one that is offloaded?
-> >  
-> > Is this reversed in this patch? The first VLAN tag is offloaded, then
-> > the next one coming is pushed as a VLAN header?
-> 
-> Yes, it looks broken.  I wonder why we have no tests for this stuff.
-> First a vlan push function that cannot have worked, ever, now this
-> seemingly reversing-headers variant:
 
-This used to work, I just accidentally broke it when using
-skb_vlan_push() in net-next.
+--MBwEv1bNkPnDVrP4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I will post fix.
+On Wed, Mar 04, 2026 at 09:37:23AM -0800, Charles Perry wrote:
+> On Wed, Mar 04, 2026 at 04:23:30PM +0000, Conor Dooley wrote:
+>=20
+> Are you able to check register 23, bit 13 of your PHY by any chance? Maybe
+> with the mdio/mii commands in U-Boot if you have that.
 
-> For PPPOE, its pushing the ppppe header to packet, so we get
-> strict ordering, later header coming in the stack gets placed on
-> top, before older one.
-> 
-> Here, first vlan push gets placed into hw tag in skb (which makes
-> sense, let HW take care of it).
->
-> But if 2nd comes along, then that gets placed in the packet
-> and the hwaccel tag remains?
->
-> What to do?  Should be nuke vlan offload support from flowtable?
-> It appears to be an unused feature.
->
-> I have low confidence in this code.
+"mii read addr 23" returns 0660 for both PHYs in U-Boot.
 
-Could you elaborate more precisely?
+--MBwEv1bNkPnDVrP4
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks.
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaalP+wAKCRB4tDGHoIJi
+0rvnAQCh2tlIYt2+GfA9dBCqmitWJE6fmJZX0wxuhjyvlHtc/wEAucEeKMzops28
+UHeZAknYQ6c5LPDLP2iX6GlrpHsuxAM=
+=S5Cu
+-----END PGP SIGNATURE-----
+
+--MBwEv1bNkPnDVrP4--
 
