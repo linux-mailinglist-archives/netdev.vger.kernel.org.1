@@ -1,293 +1,166 @@
-Return-Path: <netdev+bounces-264362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OUpL9h3qWl77wAAu9opvQ
-	(envelope-from <netdev+bounces-264362-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:32:24 +0100
+	id aFw9A4Z4qWl77wAAu9opvQ
+	(envelope-from <netdev+bounces-264363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:35:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE05211B7D
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:32:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B1B211C18
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 13:35:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D76B130D0F48
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:27:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D1FCA3025F6A
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 12:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D801839D6D9;
-	Thu,  5 Mar 2026 12:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D19639E6D1;
+	Thu,  5 Mar 2026 12:30:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF5939D6C0;
-	Thu,  5 Mar 2026 12:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1038396D15
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 12:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772713615; cv=none; b=c6HKYKJ7jQFoq3i9TV7tJRuwJRi+jF9uNjz1ZpPCy1v0gDoNoWH/E47JM5Oy1hAP/cXet3KASeS3/Cfr818Z38/Y2O5d7Jw8vRQD740vYui/rlXoPm7CatCT9/jSXy1WcdQwhQh35mrq8w5gBw1jVFwVGR4GMrLnT185qeJXW7s=
+	t=1772713801; cv=none; b=s9cq2rD4tm0xxldU9pV9ZeNneMuN0Ve5+HHIOVtGLFQ8qRh7O3R9POp9LnIjLdThFsDHPinOMNNHd7Ni7RuGrFPNTkh5zqBAnnQ8UI0VQ+dL2vKTDj2HjO9TZNFFs8e2+IdJ3oa5hECwoCOVbW0JmGUW8g+14xJnLNiYPnGTZuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772713615; c=relaxed/simple;
-	bh=rMNDoA8iYdbt5Qz5Y4MAxadc62r0RBUOrEOfJSSVz6E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GKvlzVg3pm2jajPpbyPl0n2rW7LDtFGQEgQLXRRLrovsr4qjFqrBhhQ2PmqVtQ2I0bWLsopHo471l4JHPck4Wtfh1kbiqol2sOEXrIuz79WWglPR+AKLA37YQ3iGP2+zuxTykE2u+FoIxI095iX8zJo/ynFBjpGiOASCKVAsI/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 0B9D36047A; Thu, 05 Mar 2026 13:26:53 +0100 (CET)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net v2 3/3] netfilter: nft_set_pipapo: split gc into unlink and reclaim phase
-Date: Thu,  5 Mar 2026 13:26:35 +0100
-Message-ID: <20260305122635.23525-4-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260305122635.23525-1-fw@strlen.de>
-References: <20260305122635.23525-1-fw@strlen.de>
+	s=arc-20240116; t=1772713801; c=relaxed/simple;
+	bh=4D2Q39ZrE8YmvazKvKW3aF1/g5Cpv43ee/MaVGKVTBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUh5rzlX8ktIwReC3FqDg6u4PcUSj6zPhtTzp0X1ifp7SXN1W1vQxv73sFaUx0kxlYiHZV7Y/k2v/0rioi1BKas3WFTTkRHfbfDEHpiUwFcGlohVFolDw0f+tXu9W61hvAJXkc9JsQXM5JS2QbFMygvoUoJJngobeIEgL3PwIM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ab232cc803so37696275ad.3
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 04:29:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772713799; x=1773318599;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QrCqdrr01xMGx/SCx6YPhCapPZnumyW3whTx771nk9I=;
+        b=L4157ohqBOeqYmMc5jgMsFDkpFsUDUZUYV05DDgYqpTOIXKsSqYtd3/wFCY/++e1Sp
+         gss5iQeuFOEPourqcJmOILRfCmUFcj3Xy8VKzThqo4Q8wsy8WbSEIkO+oPfxzLQhzb66
+         IMldSKW57EXc3cfBV1+x6yLBb2KShxAHJhSlXsfpWXigY3ov1pJWI09G1Lt0A3pt4Izg
+         UhgKRmaHWCeR/PSb0OtKpJimgYd1pZeQ/3oXmR5ck2FRgQbnyStAttcfp4mk7/YM4sFq
+         isS+8NnhDT+TgnNU1aduBr7KSUZbNKv7YsMvd5o+DAAz7v0O87UtBKHnYx3kDS1e4l3d
+         IyUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUW6jaOuZ0XUoJQ+fAYzQZ5odL0RjLBG8PIg2+20qebyV12fbAEHQLKnnYt3XF2jY5JcCZXLTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHyNLu36SWX075TRSsCjh+zb8auyU4k2JPT+HhoFKF5zcDvAam
+	tGGjHEUsqIYBMPu038hrdBE9Y12qOewP4zpaMTmP0qqr1JMmKmQuXgk6
+X-Gm-Gg: ATEYQzwQ1ygHISnCYJfcOkzKXR9KTOsYGOL39lkHrfA4XDU1c1PEwtxKyT6myMeZSr4
+	Ve6xD0T9tdn/i23ReiIGRaSeYGx+sNQrzeZvZh2Tth2dhVBY4eNp0zjiLYDijPh9HSSVHSJAz5s
+	XIIGwEJz/XQWPO6bJkAGW5/sHKbLK9nOSURz9hnG9w0415gn6Cl2+kbVMySN+/MfCfDBvsL6ZSs
+	tOC5W6yA838tigsvNLArp6itzHZSLyw3nWVYGqRCZJ2dlL9TEUAyZFz3MhjN608wut7fQGQ/Ccb
+	kjII8tzEwphAHhlPjYs9YcCB6RwBfqGnKYT5Dqutbq5+dDO3oIfxjUr3zTmWqhe1e7OYA4BGJo6
+	kkC7qlCUyGvqtpybgs/+gsgk8Z4Y7kH21uON8qkbwboHyRCkx6sGZxz+AbKSHax0MRTT5FvPjmS
+	02gMT7yIp58ghvLImdQOpAsPPz7XIIrbUYK5O7ZPF5EZDKr7+mfsKtPEAQrA0O1PPyBACMz8r5j
+	lqWjdtLplghE9QEHk/NlERXxuxgVxXyPIODwL6pgaoQz/W/XJw=
+X-Received: by 2002:a17:903:1a43:b0:2ae:4701:3c31 with SMTP id d9443c01a7336-2ae6a9cc1c0mr59976385ad.11.1772713799017;
+        Thu, 05 Mar 2026 04:29:59 -0800 (PST)
+Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69fa43sm225561035ad.46.2026.03.05.04.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 04:29:58 -0800 (PST)
+Date: Thu, 5 Mar 2026 21:29:57 +0900
+From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Joe Perches <joe@perches.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, spacemit@lists.linux.dev,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
+Message-ID: <20260305122957.GA1652563@rocinante>
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-23-vladimir.oltean@nxp.com>
+ <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
+ <20260305085148.7cwo3yflp7vcfldf@skbuf>
+ <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
+ <20260305114352.2f7btqixg4tu5bzl@skbuf>
+ <20260305121532.GA1649635@rocinante>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4EE05211B7D
+In-Reply-To: <20260305121532.GA1649635@rocinante>
+X-Rspamd-Queue-Id: 70B1B211C18
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linux.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264362-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-264363-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kw@linux.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,strlen.de:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Yiming Qian reports Use-after-free in the pipapo set type:
-  Under a large number of expired elements, commit-time GC can run for a very
-  long time in a non-preemptible context, triggering soft lockup warnings and
-  RCU stall reports (local denial of service).
+On 26-03-05 21:15:32, Krzysztof Wilczyński wrote:
+> Hello,
+> 
+> > K:	\b(?:__)?(?:devm_)?(?:of_)?phy_(?:create|destroy|provider_(?:un)?register)\b
+> > K:	\bphy_(?:create|remove)_lookup\b
+> > K:	\bphy_(?:get|set)?_drvdata\b
+> > K:	\b(?:devm_)?(?:of_)?phy_(?:optional_)?(?:get|put)(?:_by_index)?\b
+> > K:	\bphy_pm_runtime_(?:get|put)(?:_sync)?\b
+> > K:	\bphy_(?:init|exit|power_(?:on|off))\b
+> > K:	\bphy_|(?:get|set)_(?:mode(?:_ext)?|media|speed|bus_width|max_link_rate)\b
+> > K:	\bphy_(?:reset|configure|validate|calibrate)\b
+> > K:	\bphy_notify_(?:connect|disconnect|state)\b
+> > K:	(?:struct\s+)?phy(?:_ops|_attrs|_lookup|_provider)?\b
+> > K:	(?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)
+> 
+> What about
+> 
+>   F:	drivers/*/*phy*
+> 
+> or something along these lines.
 
-We must split GC in an unlink and a reclaim phase.
+For content match, it could also be:
 
-We cannot queue elements for freeing until pointers have been swapped.
-Expired elements are still exposed to both the packet path and userspace
-dumpers via the live copy of the data structure.
+  K:	phy
 
-call_rcu() does not protect us: dump operations or element lookups starting
-after call_rcu has fired can still observe the free'd element, unless the
-commit phase has made enough progress to swap the clone and live pointers
-before any new reader has picked up the old version.
+I believe this would match everything of interest?  Perhaps there is no
+need to have any of these complex regular expressions, would be my way of
+thinking here.  Makes it easier to maintain, too.
 
-This a similar approach as done recently for the rbtree backend in commit
-35f83a75529a ("netfilter: nft_set_rbtree: don't gc elements on insert").
+Just thinking out loud, really...
 
-Fixes: 3c4287f62044 ("nf_tables: Add set type for arbitrary concatenation of ranges")
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/net/netfilter/nf_tables.h |  5 +++
- net/netfilter/nf_tables_api.c     |  5 ---
- net/netfilter/nft_set_pipapo.c    | 51 ++++++++++++++++++++++++++-----
- net/netfilter/nft_set_pipapo.h    |  2 ++
- 4 files changed, 50 insertions(+), 13 deletions(-)
-
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index ea6f29ad7888..e2d2bfc1f989 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -1863,6 +1863,11 @@ struct nft_trans_gc {
- 	struct rcu_head		rcu;
- };
- 
-+static inline int nft_trans_gc_space(const struct nft_trans_gc *trans)
-+{
-+	return NFT_TRANS_GC_BATCHCOUNT - trans->count;
-+}
-+
- static inline void nft_ctx_update(struct nft_ctx *ctx,
- 				  const struct nft_trans *trans)
- {
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 058f7004cb2b..1862bd7fe804 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -10493,11 +10493,6 @@ static void nft_trans_gc_queue_work(struct nft_trans_gc *trans)
- 	schedule_work(&trans_gc_work);
- }
- 
--static int nft_trans_gc_space(struct nft_trans_gc *trans)
--{
--	return NFT_TRANS_GC_BATCHCOUNT - trans->count;
--}
--
- struct nft_trans_gc *nft_trans_gc_queue_async(struct nft_trans_gc *gc,
- 					      unsigned int gc_seq, gfp_t gfp)
- {
-diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
-index c091898df710..a34632ae6048 100644
---- a/net/netfilter/nft_set_pipapo.c
-+++ b/net/netfilter/nft_set_pipapo.c
-@@ -1680,11 +1680,11 @@ static void nft_pipapo_gc_deactivate(struct net *net, struct nft_set *set,
- }
- 
- /**
-- * pipapo_gc() - Drop expired entries from set, destroy start and end elements
-+ * pipapo_gc_scan() - Drop expired entries from set and link them to gc list
-  * @set:	nftables API set representation
-  * @m:		Matching data
-  */
--static void pipapo_gc(struct nft_set *set, struct nft_pipapo_match *m)
-+static void pipapo_gc_scan(struct nft_set *set, struct nft_pipapo_match *m)
- {
- 	struct nft_pipapo *priv = nft_set_priv(set);
- 	struct net *net = read_pnet(&set->net);
-@@ -1697,6 +1697,8 @@ static void pipapo_gc(struct nft_set *set, struct nft_pipapo_match *m)
- 	if (!gc)
- 		return;
- 
-+	list_add(&gc->list, &priv->gc_head);
-+
- 	while ((rules_f0 = pipapo_rules_same_key(m->f, first_rule))) {
- 		union nft_pipapo_map_bucket rulemap[NFT_PIPAPO_MAX_FIELDS];
- 		const struct nft_pipapo_field *f;
-@@ -1724,9 +1726,13 @@ static void pipapo_gc(struct nft_set *set, struct nft_pipapo_match *m)
- 		 * NFT_SET_ELEM_DEAD_BIT.
- 		 */
- 		if (__nft_set_elem_expired(&e->ext, tstamp)) {
--			gc = nft_trans_gc_queue_sync(gc, GFP_KERNEL);
--			if (!gc)
--				return;
-+			if (!nft_trans_gc_space(gc)) {
-+				gc = nft_trans_gc_alloc(set, 0, GFP_KERNEL);
-+				if (!gc)
-+					return;
-+
-+				list_add(&gc->list, &priv->gc_head);
-+			}
- 
- 			nft_pipapo_gc_deactivate(net, set, e);
- 			pipapo_drop(m, rulemap);
-@@ -1740,10 +1746,30 @@ static void pipapo_gc(struct nft_set *set, struct nft_pipapo_match *m)
- 		}
- 	}
- 
--	gc = nft_trans_gc_catchall_sync(gc);
-+	priv->last_gc = jiffies;
-+}
-+
-+/**
-+ * pipapo_gc_queue() - Free expired elements
-+ * @set:	nftables API set representation
-+ */
-+static void pipapo_gc_queue(struct nft_set *set)
-+{
-+	struct nft_pipapo *priv = nft_set_priv(set);
-+	struct nft_trans_gc *gc, *next;
-+
-+	/* always do a catchall cycle: */
-+	gc = nft_trans_gc_alloc(set, 0, GFP_KERNEL);
- 	if (gc) {
-+		gc = nft_trans_gc_catchall_sync(gc);
-+		if (gc)
-+			nft_trans_gc_queue_sync_done(gc);
-+	}
-+
-+	/* always purge queued gc elements. */
-+	list_for_each_entry_safe(gc, next, &priv->gc_head, list) {
-+		list_del(&gc->list);
- 		nft_trans_gc_queue_sync_done(gc);
--		priv->last_gc = jiffies;
- 	}
- }
- 
-@@ -1797,6 +1823,10 @@ static void pipapo_reclaim_match(struct rcu_head *rcu)
-  *
-  * We also need to create a new working copy for subsequent insertions and
-  * deletions.
-+ *
-+ * After the live copy has been replaced by the clone, we can safely queue
-+ * expired elements that have been collected by pipapo_gc_scan() for
-+ * memory reclaim.
-  */
- static void nft_pipapo_commit(struct nft_set *set)
- {
-@@ -1807,7 +1837,7 @@ static void nft_pipapo_commit(struct nft_set *set)
- 		return;
- 
- 	if (time_after_eq(jiffies, priv->last_gc + nft_set_gc_interval(set)))
--		pipapo_gc(set, priv->clone);
-+		pipapo_gc_scan(set, priv->clone);
- 
- 	old = rcu_replace_pointer(priv->match, priv->clone,
- 				  nft_pipapo_transaction_mutex_held(set));
-@@ -1815,6 +1845,8 @@ static void nft_pipapo_commit(struct nft_set *set)
- 
- 	if (old)
- 		call_rcu(&old->rcu, pipapo_reclaim_match);
-+
-+	pipapo_gc_queue(set);
- }
- 
- static void nft_pipapo_abort(const struct nft_set *set)
-@@ -2279,6 +2311,7 @@ static int nft_pipapo_init(const struct nft_set *set,
- 		f->mt = NULL;
- 	}
- 
-+	INIT_LIST_HEAD(&priv->gc_head);
- 	rcu_assign_pointer(priv->match, m);
- 
- 	return 0;
-@@ -2328,6 +2361,8 @@ static void nft_pipapo_destroy(const struct nft_ctx *ctx,
- 	struct nft_pipapo *priv = nft_set_priv(set);
- 	struct nft_pipapo_match *m;
- 
-+	WARN_ON_ONCE(!list_empty(&priv->gc_head));
-+
- 	m = rcu_dereference_protected(priv->match, true);
- 
- 	if (priv->clone) {
-diff --git a/net/netfilter/nft_set_pipapo.h b/net/netfilter/nft_set_pipapo.h
-index eaab422aa56a..9aee9a9eaeb7 100644
---- a/net/netfilter/nft_set_pipapo.h
-+++ b/net/netfilter/nft_set_pipapo.h
-@@ -156,12 +156,14 @@ struct nft_pipapo_match {
-  * @clone:	Copy where pending insertions and deletions are kept
-  * @width:	Total bytes to be matched for one packet, including padding
-  * @last_gc:	Timestamp of last garbage collection run, jiffies
-+ * @gc_head:	list of nft_trans_gc to queue up for mem reclaim
-  */
- struct nft_pipapo {
- 	struct nft_pipapo_match __rcu *match;
- 	struct nft_pipapo_match *clone;
- 	int width;
- 	unsigned long last_gc;
-+	struct list_head gc_head;
- };
- 
- struct nft_pipapo_elem;
--- 
-2.52.0
-
+	Krzysztof
 
