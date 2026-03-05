@@ -1,295 +1,215 @@
-Return-Path: <netdev+bounces-264327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOVOEF9sqWnH7AAAu9opvQ
-	(envelope-from <netdev+bounces-264327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:43:27 +0100
+	id qJPHFchsqWnH7AAAu9opvQ
+	(envelope-from <netdev+bounces-264328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:45:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA58E210BB6
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:43:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171FA210C5D
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 12:45:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F095130168BB
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:43:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2268303C81D
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 11:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177AF392811;
-	Thu,  5 Mar 2026 11:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2003947B1;
+	Thu,  5 Mar 2026 11:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jbQ7I0Un";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BckCzbH7";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jbQ7I0Un";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BckCzbH7"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PfWb550w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012015.outbound.protection.outlook.com [52.101.66.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6287137FF74
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 11:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772711001; cv=none; b=ss6eGYfXGtNN9COTvPOmKJ1qpX0J4RyE9gHJ1Isk0BrVeXpBilqx/di96+wXWqrxUVT+vGJjqFj9in2QLFPMCrFE5vKNB2WviyV1aYdqVktNNUi+YlUIvGYE806+jUnu/ux2RtOFbNyY4MbsA65i1guwwmhE1Vx9j7VHF4GCdTM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772711001; c=relaxed/simple;
-	bh=mu2BWbqg7C7djPHMpk1KEwnOCU6HSg4yCLHXL/v5V1Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PMYJjlrdknrfVHBhoOisDH/Uv72UL3p1Fh7SeOdRiE2QMhGnR7DY+delAffEHnhstEZIHq87CbeSURpwgXoR4u/5jBNFdPO0mtAdgt9vMyjtHyCulBofCthJrvdzmtOj4UpaUECmXTtQ4cDGDx2iyFCm0SH73pklmQf0gocrd5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jbQ7I0Un; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BckCzbH7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jbQ7I0Un; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BckCzbH7; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A712F5BCD5;
-	Thu,  5 Mar 2026 11:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772710996; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/cO57o76fPesWyAidaOu+qFZhUKADpjA63gFQ6riK8=;
-	b=jbQ7I0Un1hw0X73PCJ/MRDT+1euzR8g6JbO/XDKTgUFFLNU8OJLPBO7LmGjgK3vZvyrdm3
-	PMdOMu2qQ6NjJsCDX4DD07QH7uAb6lllSlJVsPMdTnPVnhXpHt0i6+6RJI8uBE3PXzDJaH
-	zfTiuZJlprI0thOcSlPfSvCg321ftGU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772710996;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/cO57o76fPesWyAidaOu+qFZhUKADpjA63gFQ6riK8=;
-	b=BckCzbH7WRQ/992pT44zMmVLdiInnEF2A5+rPqgvwBMl/nO39vQV65bcBnRHkNxwaxseBp
-	OKLHTgFgHq0656BQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jbQ7I0Un;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BckCzbH7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772710996; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/cO57o76fPesWyAidaOu+qFZhUKADpjA63gFQ6riK8=;
-	b=jbQ7I0Un1hw0X73PCJ/MRDT+1euzR8g6JbO/XDKTgUFFLNU8OJLPBO7LmGjgK3vZvyrdm3
-	PMdOMu2qQ6NjJsCDX4DD07QH7uAb6lllSlJVsPMdTnPVnhXpHt0i6+6RJI8uBE3PXzDJaH
-	zfTiuZJlprI0thOcSlPfSvCg321ftGU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772710996;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/cO57o76fPesWyAidaOu+qFZhUKADpjA63gFQ6riK8=;
-	b=BckCzbH7WRQ/992pT44zMmVLdiInnEF2A5+rPqgvwBMl/nO39vQV65bcBnRHkNxwaxseBp
-	OKLHTgFgHq0656BQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7810B3EA68;
-	Thu,  5 Mar 2026 11:43:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id opceHFRsqWmwQAAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 05 Mar 2026 11:43:16 +0000
-Message-ID: <f6e8f196-7bd0-4f94-86e0-cb27c7e69d0a@suse.de>
-Date: Thu, 5 Mar 2026 12:43:16 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F500378D92;
+	Thu,  5 Mar 2026 11:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772711040; cv=fail; b=pmYXjY2A2ClNAAqq0NvjgPnB7WQxn44UIXu5MQKLwMKtwraRi2UrYoydVVYPc8xaaZa8kXqCuR5aHEOiyfnlA0OUWS5KQJAHFuVKezwFmlVFWd7fhmBakhfeUO5+FV1+fAnMNH6KMLm9NtKk9ImrCnQZUmanG1Z0cgHbkJrdCFw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772711040; c=relaxed/simple;
+	bh=nk2kx/HuKRAJeF1347ng7okFmBPRjLWcKUj13sDG+qY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Hk4XAPZmg/W1FVQPLyx+omB5jDoXt2dQt+fR0tR+qp1YMoldjq014yHlLVsq1F+FjKi7rVosdJ5l6vIpsh1kNG/jszznqTMLzgvZ2NZHMGEoW3CS5RiFvJa2DFVd0hKHhMpywrpPA6Q1zedz9M1BiPPqQmkc/ZoR6O7yRYnSQ/I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PfWb550w; arc=fail smtp.client-ip=52.101.66.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oEIWMv2wNWIWw7+FLyhyfK1u6rM/R67FkekLSUd95LdyYWhusJWVPnKgB9Oz/Iyo2/BEqtb01x/z84iHqkgVtzL3An1Qhr/naQZUQGCwe4QjYD3GQXFZJm4Pk3tdpMh8JIpzNREtUk0iT2kUk1VXXszVJR+Y1Hs57Ke3Rl1ovPEHhjd/1jKtnlcEVQ9oJX3TbZIC4CZheofT4fPl4kI93YZD24/9YrfXQakriULwAnvOs9L8esgdLb4sed8sjV8BqXoZLxjed0m3way99MbWWsMZOevJaCmp1JlnM2Hztsz9EVKa58sdKX/03ZAIrRTIpzbBQ0oOvHvwvXXZwDjCRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KGS3r3GlRi239YQY4rTO/s7jOKeO++EFBB+W9oAfSFg=;
+ b=zRY1UEESsOk53/1xAn20HVLm/0CvB5SxuUBhgu4MSMXiHF93IE2mi9VtRt5w/IZzw8fP+iJxZPnSaL37FI8CZPkiQui8tT5ZohAMEouk3H6NwDbxYzcU1Ct6sD6qh0zDiHJCfiVh9zuJOoHzGK3VsgTk/lO3jxF77jQ/rpfYkBitfiOzEDFkWcFN3aAk3jQoUGYQf7ZoEa4K191gcX4HB3o7SfmP31X6V1KRbLcFq07SFVLII21oYbC4E1GYh9leqvEygLpwibOyNDJf24Rea2296Ff6k4336YuGOgFbcqswZ+Y+4b1QErwatSccZ7VvgQ3DK5wnWzqgAM9n4/oSAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KGS3r3GlRi239YQY4rTO/s7jOKeO++EFBB+W9oAfSFg=;
+ b=PfWb550w8BIJTUF40ftI9/08+ky93qIfy3mcCbhrdSitIfMeZ/wipMq9xu2mfT8gacwKYtAhFQeL2dBU/3G04rBE5J8mDdOSW1VanCPMkYNVPN/1+BfT1T4EbjbdhCSbxscabSnPYNvbdMUt+POERSPwIXLQOjHzHwxdYzvrpLkN5jP1d16SbMF+Wo1dgHuTvdO0Pz/GtUIyTJ5NjtOanm/1lPzOgLXRiUz9ZNsEtBmr+MUzHExTKJywsUfZudKzmTSChMRKsSL4AFCpXdKciaIT0kr1eaO2LlZWDt4i19Awh06zHLqi7vqjwsMmRv+d/QpOsfg7bKyT9Uj/tl9Eug==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by DU4PR04MB12348.eurprd04.prod.outlook.com (2603:10a6:10:62c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Thu, 5 Mar
+ 2026 11:43:56 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9678.016; Thu, 5 Mar 2026
+ 11:43:56 +0000
+Date: Thu, 5 Mar 2026 13:43:52 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Joe Perches <joe@perches.com>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, spacemit@lists.linux.dev,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH phy-next 22/22] MAINTAINERS: add regex for linux-phy
+Message-ID: <20260305114352.2f7btqixg4tu5bzl@skbuf>
+References: <20260304175735.2660419-1-vladimir.oltean@nxp.com>
+ <20260304175735.2660419-23-vladimir.oltean@nxp.com>
+ <a8fee1cd-1e69-4a9e-8533-c0988c480fb9@oss.qualcomm.com>
+ <20260305085148.7cwo3yflp7vcfldf@skbuf>
+ <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3a5aa3df78553ffc0fd0024f5fd36a4e2158c88.camel@perches.com>
+X-ClientProxiedBy: WA2P291CA0027.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::18) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 4/5] nvme-tcp: Support KeyUpdate
-To: Alistair Francis <alistair23@gmail.com>
-Cc: chuck.lever@oracle.com, hare@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
- kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
-References: <20260304053500.590630-1-alistair.francis@wdc.com>
- <20260304053500.590630-5-alistair.francis@wdc.com>
- <103c958f-d5f9-47d3-9be8-dd7225368fd5@suse.de>
- <CAKmqyKPdJ2bgT2JaXi_38obyFTjRQ_rR5EdGmP81so8MEJNRVw@mail.gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CAKmqyKPdJ2bgT2JaXi_38obyFTjRQ_rR5EdGmP81so8MEJNRVw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Queue-Id: DA58E210BB6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DU4PR04MB12348:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf133d4c-59e6-484a-ed90-08de7aac7be2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|19092799006|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	JuxnoTb1Jada82oBzvt49PrZL0JJqfGIYJbbIaruvjNEhtvSMIfNcv6cQlD6psNNSg7IGSngt3EYq6YqICGHBbfsMeUnJCf4vjYk0Z22dHaIgWVz40wJ38NuqRWo5dOGwyVQWUM08FHZh+F5duSUAAcTphp+PR2UYL2RjXMOuCeBgM0hBIIInxHN6TclKxoPSck1XoFi23uEB8HRrEpm20MmectQc1XgbG5PlzwlBXkVSnOfh7KcUp/NoXuwlcUqx/9p6ffmLyK1yjBJ2z8dcDWefBN9HCr4cmYIu0I/ZfVjotjB9lVU8NmLqMuPqsBI6l46oE2bNvs/td29InaoC8tD7d7TyBl6wBjb0B8Yvw4DXjROIzKvRPlXhiHOXoUKR1vlJGnmrlJhEXqThpXQ/SdIyuphkTmxE15DydozlCxna6c8h9rZZPWuiTJd7y7lCv26V1iJVGuTduvvMv9LO48+rprS45iEDoqBYsxrW7pt0OvaBcTnHass5/LXi8ul4M9+3yNArZQBw+iRLssPJEB8sEQQrVwm75J3b1HfTyPgsZ8/oY5msCODEDwz6fDhQ1yPSLTbmx7nYH621fTm0k6lFzn3ufe/V6RuoDVpwQBWCl0XlK7P8TtuaFqQY3zcNe8CJsWOG4/fWG1B70OzfFIjELsX1GTJ7Wa2gq3srR/3OtUZAom/6MKZO8OuO7v/Y/9JaM1yJZgVCyxNIGEWOgD1EGR6gz408Kn6K4vTQdI=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(19092799006)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lEyqRTZiplAbPPW5ER+AVlgKqOMxEGgAO1qjRbG/Zuz+BheO9Z2Ibsso0dxV?=
+ =?us-ascii?Q?E5eQnEPd/pAluqC8G33SDGYD+cmdnMxx0KiqnVn+iBWA0SND12TyPCWTMohL?=
+ =?us-ascii?Q?UzjbdmfCte0PuVfnc3tzC47n/cRTvPBoOJrXg/YqpnCf/B01U/pgevPMtrZv?=
+ =?us-ascii?Q?NE2wvU8IVLEKl02r3Q6fTBcFOMWlwndPQDpZIYiV7q3Za9DDPE9aOIOszdh4?=
+ =?us-ascii?Q?JAieXP5dyZYqFJR3wRdzzUiTLcuBHFJ+13TcT+b/9PU4zNZP231nPgtAtZKP?=
+ =?us-ascii?Q?oRbBxsTeAQ/cO1Oc7odlroHhnmd7uruWYoomPFl+21CLglQ0zmAZNRyuftZ2?=
+ =?us-ascii?Q?la9qDUxzU7s7Wel7vKA9vJDqLrGbh5tjhw+aFBNAvKZX1E7nGYiljahKE6Z2?=
+ =?us-ascii?Q?Aq5BBUpoaWl1/UVZiIVCO4Md4J10zRmw9/MNiIAnZSgET8/boTI3wqrENXUL?=
+ =?us-ascii?Q?tVDpaHlckTUEAwXDsSzqYmkvuwWQq5gEmRd/DcdNUb4bDj7pxTz9tLu7ieWr?=
+ =?us-ascii?Q?WT2JSHH2u9CGwo107tzH5sWTY8Omu1Zr6JTgOQvjFBI5i4sLYynWBx6/6tP3?=
+ =?us-ascii?Q?JGqN1OvB2ls/7wd3WE2DksMXZwF4/qN3t4wkpWD/c6ZTLOxD5aPt5tUv8RGF?=
+ =?us-ascii?Q?s//RQ/0DNOWi30r9kp+Ve+MUGBUsp7/5e13KCF+br5v14bgF9UChyXL+J3CY?=
+ =?us-ascii?Q?pwpWALlNdXy+IE9Q31WsA3TKAZ357MBX31C4WGwODzazJFhNNWA2ye1pZjb1?=
+ =?us-ascii?Q?kGlat+ipOhdUqrKcVfTLx7mGXFO085weTQMqlO6OrqDP0DIXiWzmsRJQ699w?=
+ =?us-ascii?Q?OJBaIqUG/kN2OJ501Fp/T7NnhSqXPwOO/1HQrz9BRlrHhUk2owaKWilz9W+Y?=
+ =?us-ascii?Q?WnR2WBw2zCtIohpxHSDzedQiQmMogTHJnjd+pnuXTLvgbyIXmkZMFO4B2o5q?=
+ =?us-ascii?Q?uFxSdlvqNcSQ1x/fesxYoocbt6zj3rjkx9uPO4LarhXXO5uzRoZfUf7yh8tM?=
+ =?us-ascii?Q?DtC3Ia0UA20xJ6B93RgjCqEJMUNgpkb+rUiZv6ITez4w9cuE5MuQrMMyrs9A?=
+ =?us-ascii?Q?EcACt/zoqkxdDthcpW59kkhWMV9YRNLsuqaP6bu1q2a1/PnP6bezPIKaw0eq?=
+ =?us-ascii?Q?OpspfvdMya5CVx8FYZSunb+QbLPMo19l6KPekJJcV3+htFEZ/Vp41pMamWmD?=
+ =?us-ascii?Q?rnf/FzlkZfa6Bh+AMMvOyfaygBLtt3HoksL6ihK01+ci2s7oG63sZw4SW2Rr?=
+ =?us-ascii?Q?yCXjz6zvciQlfmOO5NhlW/kgoRz8qhH4EQWmKXAW8qlXiTc5Nxjb9qDyhUrn?=
+ =?us-ascii?Q?qrd6hvwZlVYFjH2de6SLNV/8LD6TOFcxiu/SZlatHcMnyXZcZcC9dgggbKI4?=
+ =?us-ascii?Q?hBoOYiTQI3hJnr9IMzeGoeh1eZLw7UJH5jHTU2ICLnUpqE9QRhYV6nF9GVE9?=
+ =?us-ascii?Q?XGgxkhJ3bFxUXjgmb5Y9nXzfdFwZhfH2cgfDCsA1MozUpOvZkhGMqAh32vk7?=
+ =?us-ascii?Q?u6Y+e5xIDpq1n/fJZz7dybXRjWnvPiUQ0bXK1+H61KjrVpBz+B5lH24lV+t2?=
+ =?us-ascii?Q?/Yc+pFG0YtHV2w2kxBcbdYR3en+G8NV/jDNHzXtEt3s/myAy6kZN50okojo8?=
+ =?us-ascii?Q?bHJmCJB8oRBxVFNvkBTfjMsjkLHrCietWQDJUZEGCr3R0Wvv8mMiea7EYSTG?=
+ =?us-ascii?Q?N1PsfHUrz6/rQnQc4ND4x9My/mJmen2tdMudbU4EmMkLUwFzd+ewG9NHJyqa?=
+ =?us-ascii?Q?56AGjd3ztdHwjSypvlNX46fJRG8jKEo4l6WmeI9ajBBEO/T/3Wo1QXYaSskE?=
+X-MS-Exchange-AntiSpam-MessageData-1: 5KbcQYK56ar6KYw2fdjoYeMZswgIzy+j+jo=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf133d4c-59e6-484a-ed90-08de7aac7be2
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 11:43:56.6486
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GvtJ9tYfH2QuXfs69JzcXq2dkv+lV43Qg+NduLtI9615guCA9ILujQzljqpm7vpGLO79RmYfmXmkgYMU1dbcfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB12348
+X-Rspamd-Queue-Id: 171FA210C5D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264327-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-264328-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,suse.de:dkim,suse.de:email,suse.de:mid]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/4/26 12:37, Alistair Francis wrote:
-> On Wed, Mar 4, 2026 at 5:40 PM Hannes Reinecke <hare@suse.de> wrote:
->>
->> On 3/4/26 06:34, alistair23@gmail.com wrote:
->>> From: Alistair Francis <alistair.francis@wdc.com>
->>>
->>> If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
->>> EKEYEXPIRED then the underlying TLS keys need to be updated. This occurs
->>> on an KeyUpdate event as described in RFC8446
->>> https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3.
->>>
->>> If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
->>> allow the NVMe layer to process the KeyUpdate request and forward the
->>> request to userspace. Userspace must then update the key to keep the
->>> connection alive.
->>>
->>> This patch allows us to handle the NVMe target sending a KeyUpdate
->>> request without aborting the connection. At this time we don't support
->>> initiating a KeyUpdate.
->>>
->>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->>> ---
->>> v7:
->>>    - Use read_sock_cmsg instead of recvmsg() to handle KeyUpdate
->>> v6:
->>>    - Don't use `struct nvme_tcp_hdr` to determine TLS_HANDSHAKE_KEYUPDATE,
->>>      instead look at the cmsg fields.
->>>    - Don't flush async_event_work
->>> v5:
->>>    - Cleanup code flow
->>>    - Check for MSG_CTRUNC in the msg_flags return from recvmsg
->>>      and use that to determine if it's a control message
->>> v4:
->>>    - Remove all support for initiating KeyUpdate
->>>    - Don't call cancel_work() when updating keys
->>> v3:
->>>    - Don't cancel existing handshake requests
->>> v2:
->>>    - Don't change the state
->>>    - Use a helper function for KeyUpdates
->>>    - Continue sending in nvme_tcp_send_all() after a KeyUpdate
->>>    - Remove command message using recvmsg
->>>
->>>    drivers/nvme/host/tcp.c | 59 ++++++++++++++++++++++++++++++++++++++++-
->>>    1 file changed, 58 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
->>> index 8b6172dd1c0f..ade11d2ac9ef 100644
->>> --- a/drivers/nvme/host/tcp.c
->>> +++ b/drivers/nvme/host/tcp.c
->>> @@ -171,6 +171,7 @@ struct nvme_tcp_queue {
->>>        bool                    tls_enabled;
->>>        u32                     rcv_crc;
->>>        u32                     snd_crc;
->>> +     key_serial_t            handshake_session_id;
->>>        __le32                  exp_ddgst;
->>>        __le32                  recv_ddgst;
->>>        struct completion       tls_complete;
->>> @@ -1361,6 +1362,59 @@ static int nvme_tcp_try_send(struct nvme_tcp_queue *queue)
->>>        return ret;
->>>    }
->>>
->>> +static void update_tls_keys(struct nvme_tcp_queue *queue)
->>> +{
->>> +     int qid = nvme_tcp_queue_id(queue);
->>> +     int ret;
->>> +
->>> +     dev_dbg(queue->ctrl->ctrl.device,
->>> +             "updating key for queue %d\n", qid);
->>> +
->>> +     ret = nvme_tcp_start_tls(&(queue->ctrl->ctrl),
->>> +                              queue, queue->ctrl->ctrl.tls_pskid,
->>> +                              HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
->>> +
->>> +     if (ret < 0) {
->>> +             dev_err(queue->ctrl->ctrl.device,
->>> +                     "failed to update the keys %d\n", ret);
->>> +             nvme_tcp_fail_request(queue->request);
->>> +     }
->>> +}
->>> +
->>> +static int nvme_tcp_recv_cmsg(read_descriptor_t *desc,
->>> +                           struct sk_buff *skb,
->>> +                           unsigned int offset, size_t len,
->>> +                           u8 content_type)
->>> +{
->>> +     struct nvme_tcp_queue *queue = desc->arg.data;
->>> +     struct socket *sock = queue->sock;
->>> +     struct sock *sk = sock->sk;
->>> +
->>> +     switch (content_type) {
->>> +     case TLS_RECORD_TYPE_HANDSHAKE:
->>> +             if (len == 5) {
->>> +                     u8 header[5];
->>> +
->>> +                     if (!skb_copy_bits(skb, offset, header,
->>> +                                        sizeof(header))) {
->>> +                             if (header[0] == TLS_HANDSHAKE_KEYUPDATE) {
->>> +                                     dev_err(queue->ctrl->ctrl.device, "KeyUpdate message\n");
->>> +                                     release_sock(sk);
->>> +                                     update_tls_keys(queue);
->>> +                                     lock_sock(sk);
->>> +                                     return 0;
->>> +                             }
->>> +                     }
->>> +             }
->>> +
->>> +             break;
->>> +     default:
->>> +             break;
->>> +     }
->>
->> I think a simple 'if' condition would be sufficient here, or do you have
->> handling of other TLS record types queued somewhere?
->> And we should log unhandled TLS records.
+On Thu, Mar 05, 2026 at 01:30:40AM -0800, Joe Perches wrote:
+> On Thu, 2026-03-05 at 10:51 +0200, Vladimir Oltean wrote:
+> > On Thu, Mar 05, 2026 at 09:39:35AM +0100, Konrad Dybcio wrote:
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > index 55af015174a5..bdfa47d9c774 100644
+> > > > --- a/MAINTAINERS
+> > > > +++ b/MAINTAINERS
+> > > > @@ -10713,6 +10713,7 @@ F:    Documentation/devicetree/bindings/phy/
+> > > >  F:   drivers/phy/
+> > > >  F:   include/dt-bindings/phy/
+> > > >  F:   include/linux/phy/
+> > > > +K:   \b(devm_)?(of_)?phy_(create|destroy|init|exit|reset|power_(on|off)|configure|validate|calibrate|(get|set)_(mode|media|speed|bus_width|drvdata)|get_max_link_rate|pm_runtime_(get|put)|notify_(connect|disconnect|state)|get|put|optional_get|provider_(un)?register|simple_xlate|(create|remove)_lookup)\b|(struct\s+)?phy(_ops|_attrs|_lookup|_provider)?\b|linux/phy/phy\.h|phy-props\.h|phy-provider\.h
 > 
-> I like this approach as it makes it really easy to handle more types
-> in the future. I don't have any more record types queued anywhere so I
-> can change it to an if statement.
+> You could use multiple K: entries instead of this monster.
 > 
-> Good point about logging unhandled records
-> 
-Which reminds me:
-This is now a simple callback, and doesn't influence the main state machine.
-In particular, we do _not_ reset the connection (as we did with the
-original implementation) if we received an unhandled TLS record.
+> And please use (?:<foo>) to avoid capture groups too.
 
-I guess we should be doing that nevertheless, as unhandled TLS records
-also will include things like TLS Alert which really require us to
-reset the connection.
-Hmm?
+Thanks, I wasn't aware of either of those.
 
-Cheers,
+I am now working with this:
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+K:	\b(?:__)?(?:devm_)?(?:of_)?phy_(?:create|destroy|provider_(?:un)?register)\b
+K:	\bphy_(?:create|remove)_lookup\b
+K:	\bphy_(?:get|set)?_drvdata\b
+K:	\b(?:devm_)?(?:of_)?phy_(?:optional_)?(?:get|put)(?:_by_index)?\b
+K:	\bphy_pm_runtime_(?:get|put)(?:_sync)?\b
+K:	\bphy_(?:init|exit|power_(?:on|off))\b
+K:	\bphy_|(?:get|set)_(?:mode(?:_ext)?|media|speed|bus_width|max_link_rate)\b
+K:	\bphy_(?:reset|configure|validate|calibrate)\b
+K:	\bphy_notify_(?:connect|disconnect|state)\b
+K:	(?:struct\s+)?phy(?:_ops|_attrs|_lookup|_provider)?\b
+K:	(?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)
 
