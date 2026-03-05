@@ -1,195 +1,171 @@
-Return-Path: <netdev+bounces-264437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eP5tAgaaqWm7AgEAu9opvQ
-	(envelope-from <netdev+bounces-264437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:58:14 +0100
+	id 0GkLM4KcqWnGAwEAu9opvQ
+	(envelope-from <netdev+bounces-264438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:08:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74084214004
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 15:58:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F233E21431E
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 16:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B2C0305244C
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:47:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4C4533097D60
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 14:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609E23A9DA5;
-	Thu,  5 Mar 2026 14:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DED3A8FEA;
+	Thu,  5 Mar 2026 14:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iHj2nspi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KS2eLqxX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E772E3A961F;
-	Thu,  5 Mar 2026 14:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4983A5E6B;
+	Thu,  5 Mar 2026 14:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721969; cv=none; b=GmoasorIo61jzQLp682yqYFoMhpcb+yg3t1jc4ZljzACEP6HY4YOjUSE1x9aUnjhHb8ZdQeSdDiVoILXAid9W6yAKmkUkTWwkVEFJr8ipWJEUgdDDPGxW/+w/BwQyiMo3gXUWEkIGbcjIgfHduOW0mdfhKvytqlRIrNMsvzYcHM=
+	t=1772722175; cv=none; b=uLeW0zc0ff+T62dQ/40NEIPVEo2vp8dvwukrGO/C3NYFs9e3e/rHIcS5vTYHXFrhYtf1NoP1Er6pTZnFurTsWqVfZeD8AYrVWsjpJk+2OwI9KCC+jlDQEs9ZOaiju2j/aAG8nWie2zDcgQ/2NEMvFSOiLekQ151t19J8clO6skc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721969; c=relaxed/simple;
-	bh=7Fy8244GRUUip69C456QiN1ZM7elVxNq7hb0gn5Awbw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DFGfJJRFVeWQApPxAj+y+xF33/1ZalX08x4B7c050Y6secwfCMEwNPEfHrHtIzfnxeGCjcSzAoSDhRmHxgO69DZ/AdemR+xm+DtF/OcUxcB0obSZy2s84erT7VpO+/Wy/xegW9QYe6oXyof8KAG5eOHxc6gcVqZz4TGC9t2+8F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iHj2nspi; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 96F4FC4041B;
-	Thu,  5 Mar 2026 14:46:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CDD995FDEB;
-	Thu,  5 Mar 2026 14:46:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 44B3B103697B5;
-	Thu,  5 Mar 2026 15:45:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772721962; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=bIN4i+aSgD4SV8pfn3MjG18z5RHwGaMJsyLvyjMRK5M=;
-	b=iHj2nspiTCO247d5OrTLhEpv7bpCnCZMIkufvLZQ1uOIFX3Sejf1XhsEzd9AQy5Rh+S4sq
-	vpX4XzSjM5d+X6TLIciKp+2r89LzWv51RdJpv8WlXe83IadQaip58dFqgKkHn0tjhWc1zg
-	TlAAt7F6MUPkqBJzGsB6p/WmI8i/dmenWxouQn0QjGpF13yJF5wHiKR1YjuXZ5QYDAT3jX
-	qMcDXsYHnOUl032BTwrijiaO6ShqSrMttBSyAiX3VyFtaeRjuK6u6kHbCJmReusOT8C9lC
-	OEuCMCszO2dmkOvcwtM0PDqb4Xz62V1KiskmNL9rZ97v6Ti8hls9O8qBm3CDbA==
-Message-ID: <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
-Date: Thu, 5 Mar 2026 15:45:57 +0100
+	s=arc-20240116; t=1772722175; c=relaxed/simple;
+	bh=UfEb1q/l9qjlTMLq3/PTHwtJBl7Gqr49bdbx+RpR6VY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ipMXjmBfcQivrQHzo08DudSyrOWDDuF7oHKALkq4oW826ruHtsJBh/U6H2jFudgytXeMosgh3w2uN7/O7AZG8v/Bzy95+2VKc/C8tOEHV9zspK8tmWWnzkOJmAuxj+SAoqHtYXfCURulKWBXx93KEf8iGcb9jMW3SXscyrN5mFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KS2eLqxX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31AEDC116C6;
+	Thu,  5 Mar 2026 14:49:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772722174;
+	bh=UfEb1q/l9qjlTMLq3/PTHwtJBl7Gqr49bdbx+RpR6VY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KS2eLqxXOlPpKU+yB+wT49XqYD0qihxSkT2CzPsBqFM6Ff5GLyzH3cmUo24Y2F6p4
+	 k1ns9J/ZLOM8ax8pXyhZ71DNryyLbJ5mz20qop6ptoOCd8GYZ3OFQq+g5vj4SWpizl
+	 d854QFpQFq/RhJd0DJZHEaEAmB7juM3TlVbwWDb37hKqMwZTZVjy7z8X9jbpjuMLXp
+	 pbsZzdsM+T5CTJ+oK+kH7PN8NC3EMapKnudUnuJfWMUuyBjddjCWxPnpJ2RRsymh1G
+	 oNoo0zQOtW6PWLiTPthnPwlcYVblwetIdzQAfGl/iOhJtS2N1txM2ho7sHAfwukQQJ
+	 j2em+bppVvH5g==
+Date: Thu, 5 Mar 2026 14:49:30 +0000
+From: Conor Dooley <conor@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Charles Perry <charles.perry@microchip.com>, netdev@vger.kernel.org,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <20260305-kooky-refurnish-3ebbc964a8c0@spud>
+References: <20260224202854.112813-1-charles.perry@microchip.com>
+ <20260224202854.112813-2-charles.perry@microchip.com>
+ <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
+ <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
+ <20260304-unvented-crinkle-37f0bfd03541@spud>
+ <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
+ <20260305-backlit-epilogue-62139ae694a6@spud>
+ <aamLf63OfJ5RH69v@bby-cbu-swbuild03.eng.microchip.com>
+ <20260305-fantasy-useable-40ca04f0266e@spud>
+ <aamS-LPZaOfamwQC@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
- KSZ8463 global irq
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Simon Horman <horms@kernel.org>, Pascal Eberhard <pascal.eberhard@se.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, Tristram.Ha@microchip.com
-References: <20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com>
- <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
- <20260305095656.vlyaztv6nbdqrmil@skbuf>
- <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
- <20260305125149.ejju5ptrkviqi3sm@skbuf>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260305125149.ejju5ptrkviqi3sm@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 74084214004
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dfSx/xhs5e31zFL1"
+Content-Disposition: inline
+In-Reply-To: <aamS-LPZaOfamwQC@shell.armlinux.org.uk>
+X-Rspamd-Queue-Id: F233E21431E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264437-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264438-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 
+--dfSx/xhs5e31zFL1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 3/5/26 1:51 PM, Vladimir Oltean wrote:
-> On Thu, Mar 05, 2026 at 01:39:29PM +0100, Bastien Curutchet wrote:
->> Hi Vladimir,
->>
->> On 3/5/26 10:56 AM, Vladimir Oltean wrote:
->>> On Wed, Mar 04, 2026 at 11:18:52AM +0100, Bastien Curutchet (Schneider Electric) wrote:
->>>> @@ -2890,14 +2899,18 @@ static irqreturn_t ksz_irq_thread_fn(int irq, void *dev_id)
->>>>    	unsigned int nhandled = 0;
->>>>    	struct ksz_device *dev;
->>>>    	unsigned int sub_irq;
->>>> -	u8 data;
->>>> +	u16 data;
->>>>    	int ret;
->>>>    	u8 n;
->>>>    	dev = kirq->dev;
->>>> -	/* Read interrupt status register */
->>>> -	ret = ksz_read8(dev, kirq->reg_status, &data);
->>>> +	/*
->>>> +	 * Most of the KSZ switches have a 8-bits long interrupt status
->>>> +	 * register, but the KSZ8463 has a 16-bits long one. The overread here
->>>> +	 * is safe because we only iterate over kirq->nirqs in the below loop.
->>>
->>> FWIW, this isn't the only thing making an overread "safe".
->>> If the adjacent register also has "clear on read" semantics, that's not
->>> good.
->>>
->>> I can't tell whether that's the case here, though. There are just too
->>> many hardware variations to check for. I just wanted to point out that
->>> the reasoning is incomplete.
->>>
->> You're right, I hadn't thought about the 'clear on read' case.
->>
->> I'll use ksz_read16() only for the KSZ8463 to be 100% sure it won't break
->> anything for other switches.
-> 
-> I'm still on the fence on whether to say this or not, because I don't
-> really want to get so involved in internal driver bookkeeping, but...
-> this driver is just becoming a hell to review, even if I want to
-> concentrate exclusively on correct API use, like I try to do.
-> > Linus Walleij has added a new ks8995 driver, which has some overlap with
-> the common ksz driver for the KSZ8 family. Now he wants to remove the
-> overlapping device support:
-> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-0-a7fc63fe1916@kernel.org/
-> 
-> Maybe we should go the other way around, migrate KSZ8 support to the
-> ks8995 driver instead? The common ksz driver is becoming just extremely
-> convoluted to handle all hardware variations. Would it help in any way
-> to maintain cleaner code paths, what do you think?
+On Thu, Mar 05, 2026 at 02:28:08PM +0000, Russell King (Oracle) wrote:
+> On Thu, Mar 05, 2026 at 02:13:24PM +0000, Conor Dooley wrote:
+> > On Thu, Mar 05, 2026 at 05:56:15AM -0800, Charles Perry wrote:
+> > > On Thu, Mar 05, 2026 at 09:42:19AM +0000, Conor Dooley wrote:
+> > > > On Wed, Mar 04, 2026 at 09:37:23AM -0800, Charles Perry wrote:
+> > > > > On Wed, Mar 04, 2026 at 04:23:30PM +0000, Conor Dooley wrote:
+> > > > >=20
+> > > > > Are you able to check register 23, bit 13 of your PHY by any chan=
+ce? Maybe
+> > > > > with the mdio/mii commands in U-Boot if you have that.
+> > > >=20
+> > > > "mii read addr 23" returns 0660 for both PHYs in U-Boot.
+> > >=20
+> > > Oh, I think you fell into a trap of U-Boot's mii command.
+> > >=20
+> > > The arguments are always in hex even if you dont prepend "0x".
+> >=20
+> > Eh no, actually I thought that you meant register 0x23. I'm not used to
+> > register addresses being given in decimal.
+> >=20
+> > > What "mii read 8 23" did is most likely read register 0x23, masked wi=
+th
+> > > 0x1f because clause 22 has only 32 registers. So it read register 0x3=
+ which
+> > > is the device identifier 2 register: 0x0660.
+> > >=20
+> > > The exact command should be "mii read 8 0x17", "mii read 9 0x17".
+> >=20
+> > Both read back 2004
+>=20
+> It would would be good to see the content of 0x1b, specifically bit 13.
+> The PHY supports AN bypass, and I suspect bit 13 is zero, which means
+> in combination with bit 13 set in 0x17, the PHY must complete the SGMII
+> exchange with the MAC.
 
-I agree, this driver is extremely convoluted because of all the 
-different hardware it handles. It wasn't easy to fit PTP support for the 
-KSZ8463 into it. And I encountered the same kind of difficulties when 
-adding periodic output support (I have another series ready for this 
-once this PTP support will be merged).
+They're both 0401, so yea. I'll give the vitesse driver change a go
+later.
 
-Regarding migrating the KSZ8 support into the ksz8995, I think we would 
-quickly hit the same pain points than in ksz_common. Even inside the 
-KSZ8 family we can find a quite big amount of differences between the 
-switches. For instance, both KSZ8463 and KSZ8563 support PTP, they share 
-lots of common registers but their interrupt scheme is very different.
+--dfSx/xhs5e31zFL1
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I've added Tristram in Cc:, who works at Microchip. Maybe, Tristram, you 
-have some insights about which switches could share code if we decide to 
-split the big ksz_common into several drivers ?
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaamX+QAKCRB4tDGHoIJi
+0iVKAQDRUl3P6H2G7A6lkU7canECc7+AFn3uKOX0QtmkFjl21AEAlQC9heMF4J47
+GoPaVEQM4GUOsJFTB+sVElZeuMzHAAs=
+=AJGt
+-----END PGP SIGNATURE-----
 
-Best regards,
-Bastien
-
-
-
-
-
-
+--dfSx/xhs5e31zFL1--
 
