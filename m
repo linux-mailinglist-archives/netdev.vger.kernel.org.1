@@ -1,117 +1,172 @@
-Return-Path: <netdev+bounces-264126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KKVEIbiqGnzyAAAu9opvQ
-	(envelope-from <netdev+bounces-264126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:55:18 +0100
+	id oAbxIebiqGnzyAAAu9opvQ
+	(envelope-from <netdev+bounces-264127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:56:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FF120A08C
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:55:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F34B420A0DD
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 02:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E4453011C6C
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 01:55:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E4B9F3011C4C
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 01:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E3723D7E3;
-	Thu,  5 Mar 2026 01:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F038C241103;
+	Thu,  5 Mar 2026 01:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LlS2jUvD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnWaeW7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75B3223DD6;
-	Thu,  5 Mar 2026 01:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F061EA7F4
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 01:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772675712; cv=none; b=EwbNU9z/gdhEP6ZCZKjPju5vFwPAA3W8WpGH9uwH0GTevlA09vIcGCNMDuE3avcu7nFqUvxlvdO5LDiLF2byLVbZQGrICzK/VT0AcXqSdyFhRDTOVFnfDoZCdrP4tyhtfEQD0Lm+sNvaJkiElkSiHJ9p9tir9nCOeu6Q1TOLVqs=
+	t=1772675770; cv=none; b=mHNZ5zmN3l8osUUF/Q1HLDhTT+x3y0KMppHvCQUwsIHGuIgAAnF57eCy4u+pQB/aSOQJ37L8yRQ5L+qTSAOyLXdC/olaEj7Hv6ktC90qqU2J7hvZJdm+yFuIZsMsNb2WZBBBfN8+NseBISyGRNS8gvk02BoV7pd0VN+UP79A4+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772675712; c=relaxed/simple;
-	bh=ZQUBrWfctnJtFHe4bVSgO8ce0YU8Uwi9bPqt+uZ8vn8=;
+	s=arc-20240116; t=1772675770; c=relaxed/simple;
+	bh=IXGyvNUbtHNwWlO779yACClXsPwAOkeZHizYbHOl/5E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=teEN7w1/t4z/Czp4ZDmDZoTdIgI66Si/VK7zNVJIYxtAUv/blh/NdEP1muW9bYTYBEW8UcpGpduwvf1xGK4EaX6c3L3EER8AQX+WnFIYJjSebGcws5763MDqXKbLVKVGTKwiLll9Jap209FZCcttfAfGZVf79PS8gGtpo2h8uK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LlS2jUvD; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772675700; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=OHgAACH+q2DjfP6Ed0v+M5e+hsII+F/WPSAfjtq0GhM=;
-	b=LlS2jUvDcEGsaUd6m/erbPP1xpyHz08q97lR8kILz8ApzET3vsB/IfuNC/H6rIUZgWF0TShZw1iRnetJqb5GeztdG4sH6aQKHlMjlqOAnxODIhwkOxufygRaiEfL/4hT6uvpSJKSMiactT8zdQ+wlIA4MYtCIm/Ueq45bFRQprQ=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X-GievI_1772675699 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 05 Mar 2026 09:54:59 +0800
-Date: Thu, 5 Mar 2026 09:54:59 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH net-next v2] net/smc: transition to RDMA core CQ pooling
-Message-ID: <20260305015459.GA55554@j66a10360.sqa.eu95>
-References: <20260302063737.4393-1-alibuda@linux.alibaba.com>
- <20260303170908.64a5070f@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oYqjhXKmj7fqFZ3ZAmPoXAj1/IHW3OTWonlru4WcBrdVS5VJk+DBzEuXGWfoDY2r606b2t3UzOAOjji8dkObNFji3VxnYhlsVs6WlNrav70rrPolHsj7dSlPGXZkrQ52ju8B7vV2wreKcap9G+a9mIqSOIv4Db4lSPLs4zM9L7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnWaeW7f; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-358e3cc5e7eso3349429a91.0
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 17:56:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772675769; x=1773280569; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+qfkgX7v8ytZV4SKpMC2pGAv+ee613FIPLowmgLLAh8=;
+        b=cnWaeW7f1Q4ZpEv39mswZnkvAeoPDeYRl5fDf/TKmXmBpviXO54ki9PS9QTZwOMJu9
+         2rOZLAW95zhnwrWfICONt/2kqcVPEoFv0YW37pa9mqvdXFMj2IG9jZLxJFqKF3wq0yEs
+         bhnLcgEKo60TrPbpArmIfpUO+Mi8hlahhZED1mROUiTGULv9BFvRDLYAWPl7EP8ve6D9
+         c9+UnqDwsv8q/j0RKVBK6NyrQNF774SEKz790FYnd+Sq513QqWS791rxhMtMuw+bnwwh
+         u/PUo94kHKP4RhS3nQucFuD8q1/TBA8ooyiPkXZYT1yEY5DigGx/7g5d0N+asd+FUgrd
+         L1UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772675769; x=1773280569;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+qfkgX7v8ytZV4SKpMC2pGAv+ee613FIPLowmgLLAh8=;
+        b=tjgp/PTVWPLJKz15/a+Dj6vOSMdC3qkfRFlYG2L3iKHPL6HkDhE72smXs6fbI5Htb1
+         DEd4tTy0xzt57N1bqJihhphIKWT7hYe/SxbYrE3DEyvwS3jStET1vKAcudWUos4PtEQE
+         cQU+7MwKuOs781i84b9ye0HaSLTj61H/QGVP2t253bHjXHklnJgbiYbEl+kA+mZrjPhF
+         ViJGpmknwiSHXxhjPMaczv4BpmiHAiB5H5s4MLWGViLoBM4mIVMfPpnuKMh+ZWSESMQA
+         A/sy14wdUPUNXQs8bWd24z6xLWrky6HF2xBEOCkJuTCLfd6tbMZerB+6YUKpSeCj22JZ
+         24OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXg9ZQjeVU6XNbtblFTtHbzxEDGniDYVil5ieEmroIENGT9gyQa2gHymcyDvKpnnf+u8/RzxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHtuFlOH7kfRFFJyF6VNJcreqxClk1UjkOd858FAz62WKwqZDr
+	20cw9Xo664Q1ClVoat3tsR/1boJFYkvXW8rKk7KDS4Keyp311aoSzGjn
+X-Gm-Gg: ATEYQzzmuHCO6YFMWHKplb4tbnXX8dO3Yf2vvo/8KO63ehzKfrCk5azADOcsraXoHDp
+	M2ysXQmA3UVdN/Vuv+jZmACs6GNkCtfAmePfYGlLQlXIwVBZlIJHnBr8tbU13RT8jvHL7IyA6H/
+	tDFCH3vcXEzoNdZMatl0oVgmL31a7NhuVhiao7l7wQ6mYOiUU/LYeseCHLPVPURRd6LjBswiJEm
+	iHHuRiVupf40B5ts3pU4fPA3dlERGzPVsNi5IpTg4t51GAlb3G8Y5ohEQF/pe5iuyCbxQrCjO+s
+	5rioFag+7z59IgR6ujUsWak3r/bB7w6MBPO+hnbsmhcRDzWom39/bBV3+lXmduLOMcy0+/n6gLO
+	dwQODMHfHDKWTzsqaU4Kmgh/gSh4UERQrlObWp9ZsSshDe6DE+TSURSb43AkVR5EHWAPw8AUFEl
+	w7kX0iuIAMPWy93qNkh8TQvq+jRhY=
+X-Received: by 2002:a17:90b:2e45:b0:341:c964:126c with SMTP id 98e67ed59e1d1-359a6a9faa4mr3568604a91.34.1772675768978;
+        Wed, 04 Mar 2026 17:56:08 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359b2d6f0eesm199072a91.15.2026.03.04.17.56.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2026 17:56:07 -0800 (PST)
+Date: Thu, 5 Mar 2026 01:56:02 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, Brendan Jackman <jackmanb@google.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCHv3] selftests: Use ktap helpers for runner.sh
+Message-ID: <aajisr9n2pInS7jm@fedora>
+References: <20260225010833.11301-1-liuhangbin@gmail.com>
+ <DGO2DAIFY07Y.367VMZA7XGT4U@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260303170908.64a5070f@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Rspamd-Queue-Id: A0FF120A08C
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DGO2DAIFY07Y.367VMZA7XGT4U@google.com>
+X-Rspamd-Queue-Id: F34B420A0DD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264126-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-264127-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,j66a10360.sqa.eu95:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 05:09:08PM -0800, Jakub Kicinski wrote:
-> On Mon,  2 Mar 2026 14:37:37 +0800 D. Wythe wrote:
-> > The current SMC-R implementation relies on global per-device CQs
-> > and manual polling within tasklets, which introduces severe
-> > scalability bottlenecks due to global lock contention and tasklet
-> > scheduling overhead, resulting in poor performance as concurrency
-> > increases.
+Hi Shuah,
+
+Is there anything else I need to do to move this patch forward?
+
+Thanks
+Hangbin
+On Wed, Feb 25, 2026 at 01:06:47PM +0000, Brendan Jackman wrote:
+> On Wed Feb 25, 2026 at 1:08 AM UTC, Hangbin Liu wrote:
+> > Instead of manually writing ktap messages, we should use the formal
+> > ktap helpers in runner.sh. Brendan did some work in d9e6269e3303
+> > ("selftests/run_kselftest.sh: exit with error if tests fail") to make
+> > run_kselftest.sh exit with the correct return value. However, the output
+> > does not include the total results, such as how many tests passed or failed.
+> >
+> > Let’s convert all manually printed messages in runner.sh to use the
+> > formal ktap helpers. Here are what I changed:
+> >
+> >   1. Move TAP header from runner.sh to run_kselftest.sh, since run_kselftest.sh
+> >      is the only caller of run_many().
+> >   2. In run_kselftest.sh, call run_many() in main process to count the
+> >      pass/fail numbers.
+> >   3. In run_kselftest.sh, do not generate kselftest_failures_file. Just
+> >      use ktap_print_totals to report the result.
+> >   4. In runner.sh run_one(), get the return value and use ktap helpers for
+> >      all pass/fail reporting. This allows counting pass/fail numbers in the
+> >      main process.
+> >   5. In runner.sh run_in_netns(), also return the correct rc, so we can
+> >      count results during wait.
+> >
+> > After the change, the printed result looks like:
+> >
+> >   not ok 4 4 selftests: clone3: clone3_cap_checkpoint_restore # exit=1
+> >   # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
+> >
+> >   ]# echo $?
+> >   1
+> >
+> > Tested-by: Brendan Jackman <jackmanb@google.com>
 > 
-> does not apply, please rebase & repost
-
-Will rebase and send v3 to fix it. Thanks.
-
-> -- 
-> pw-bot: cr
+> Thanks,
+> 
+> Reviewed-by: Brendan Jackman <jackmanb@google.com>
 
