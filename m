@@ -1,311 +1,308 @@
-Return-Path: <netdev+bounces-264216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCoZDfg6qWlC3QAAu9opvQ
-	(envelope-from <netdev+bounces-264216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:12:40 +0100
+	id GAKqIrk7qWkd3QAAu9opvQ
+	(envelope-from <netdev+bounces-264217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:15:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B3F20D41D
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A6620D50C
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C061D300A74F
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:11:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC0FB30CF736
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 08:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C8D36655E;
-	Thu,  5 Mar 2026 08:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B05366DBD;
+	Thu,  5 Mar 2026 08:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gol/J4hD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LXygS9Pl"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013021.outbound.protection.outlook.com [40.107.201.21])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8172B30F932;
-	Thu,  5 Mar 2026 08:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772698268; cv=fail; b=a7W6wqPEk82x0JLDcO0pEj0jT1RAmuoOz0A8Co6jIIiuP2aUX7zsefi0IU9EW9CGoGWj118DH3k6MSmMeCAHMZMnhNc4WJm9q+pAd7WNDIIGnwRdsDIa/Wll6Csws9iTzn/rqD3DG6uqqg9IklDAHXUADvrT+d3E47G5exJQa3c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772698268; c=relaxed/simple;
-	bh=sGJo2aSvQmt7kUzR93A5I+nJj8vlMdnqR7tPoVy9N+k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tyWE83BnaiPJzjfowuX5eBI4sZ8qDdHBSh0fMJNcXXzj6VVFoGG+pVIljRmBvaViuFsrr+Pz+JoIBuX3hdxWaW/Swfolvwemzv2/eHXzH1aEE1B12q3jqC0Ngro8VGoMKwScfQEwmxi2kOF3c21vMbehmcQFLdRD6k05PU83KRQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gol/J4hD; arc=fail smtp.client-ip=40.107.201.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MUT5qLWj7aWf9RMA0VMTUjMnK+zKYgh/3RxxVXPSYxSUQpp1hWSwiSN28j22COkWb3Vkms1I1rPm1TnIy8PUR8Jeo3xxudb6/sXyU3s7JlO0HsoHimuKbB4mivDUz64DkNIezxGGt60ovRlxLCgCbhE7SDGQftlHukxnVAUyLiFoDk4wQa5arm3V6YDvm1uulISSzsR7+CmX1yrKQy4mUyDP0PwtNmsuf/ujTxUTXDHR34tRZ/SLDRQynd5/RQQSLvQx65sxD5P5D2HbQh8aUhqKE00wtoIXjI5FLefh6DAl0mxjFCtdZd2627x7mXeuxUobzdxsfwYhezRGJV0vfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bLn+GRp6M/EwjzFzEsDf7iVG5AUjmxcV9QYhhGuEkVc=;
- b=iQ+wf/YeVJkRXTXVGj3xQmwqHmUILmXh8jRX/o16M/wFg9WhrE6rXSAnVhoQhznxtlbOZhecpDjHJb75+x4R8M0KgHQ7qZLdtjpiw46UWTSUy/xRlBf7MVsN+pJvPCyxH3X4WqL8GnXS1NKBUvtONWDGvEYeSP0duj4jYrZId0Nzcss01s2JpRDkuZXJZ9TlnNADlq9ESG/+nedQZRbHTwN4LRZp0s00A1DmWQ5spCajdhoC6+VlPgS9rKWMgf6bQJUdMAHdM3Qeb5KM61UeCW9w6XJ2M2Om8g1ecL2EoOZnGpnpjZb25fpJE4paaxZk95zpY9bpRQyWC9cd+2T4lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bLn+GRp6M/EwjzFzEsDf7iVG5AUjmxcV9QYhhGuEkVc=;
- b=gol/J4hDAih7TdpGFjp8Vk5Ot4+0NiLPkfQlUqKEcG6bGtii9mh1KgQGB/mNAOdin7v1ucdmYJi3CFcbsj4J2NoK/YGv+XuNhHb6M7bpKZUrAtoUDm7HTe3zTWT899nXXeVuuCuID3GteoTPB9E4HiY6g0w3QU1JNpmuBPddarR4GW5ZpiF4EFilVwI83uL4bWYtNPOGA5t2JICeNLVCpQ/2oSFHVdoVZgF5tNhUphkhf4ws2egPKwMvzhf/ywBtxbYc1g6HMhBklB5HHsqV97C1AxMIvHosY37ydf4QSVsgzZPsWDz/ZrJ0JYWGPKSb5EUhUUEPwZjau0WZbuAkgQ==
-Received: from SN6PR05CA0014.namprd05.prod.outlook.com (2603:10b6:805:de::27)
- by SJ2PR12MB9210.namprd12.prod.outlook.com (2603:10b6:a03:561::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Thu, 5 Mar
- 2026 08:11:01 +0000
-Received: from SN1PEPF000252A4.namprd05.prod.outlook.com
- (2603:10b6:805:de:cafe::35) by SN6PR05CA0014.outlook.office365.com
- (2603:10b6:805:de::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.17 via Frontend Transport; Thu,
- 5 Mar 2026 08:11:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF000252A4.mail.protection.outlook.com (10.167.242.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Thu, 5 Mar 2026 08:11:00 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 5 Mar
- 2026 00:10:45 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 5 Mar
- 2026 00:10:44 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Thu, 5 Mar
- 2026 00:10:40 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Cosmin Ratiu
-	<cratiu@nvidia.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net V3] net/mlx5: Fix deadlock between devlink lock and esw->wq
-Date: Thu, 5 Mar 2026 10:10:19 +0200
-Message-ID: <20260305081019.1811100-1-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E57366828;
+	Thu,  5 Mar 2026 08:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772698306; cv=none; b=gppjvzImWXlekukQRniG+/14ME041e2OAez1D0A8NeJ/t+b92JetOx5oa5xQpBGgWX1fuHgq1d3zjAu0qT3Ecdsm5jYwTwNHFPsA8AMTmNT5HfTd9Mr6Rn1zbxXVT5s5VDznfLvYI2Ylt28ArXGwojEIypnKlAo2ZV00ukFF+ao=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772698306; c=relaxed/simple;
+	bh=c2OeupWlyxOBHDjwK27ZWns2H39A64Z/l1mt16Tsh1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FkEjsqZhUtakXLMGue+iO+H3rWMrK00Ulx9BsvKaM5mDnLnkgvczn/AZc5OdU4Xp4pz+RYxYorM8xk/x75gdvGEgPfyr3A5Xuwm+Q4dzYEa6ZnedkoQvjpJGRFUSosxtql8uPBFQkfCRUiNWkSsUrNoOYUi6/QjxrmH+LPliwlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LXygS9Pl; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772698303; x=1804234303;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=c2OeupWlyxOBHDjwK27ZWns2H39A64Z/l1mt16Tsh1o=;
+  b=LXygS9PlDwX1A0ErGKJ170VIs39lrMdg+5rFRr9X/vHOp8thjhjNamqo
+   C2GazwzhWlaC1o+cPQ3NcoRjUM5eVN16Lhaa3ndcyMIGkudizp53kKGbX
+   klYQLQV1VfM++cF0AZTRlvm+Z70PpfZh1cgasrdr75cXSSlWDrKJrBgGW
+   UZoiw/1sNiAIG35sf3E+bpYgJdfPCDrhqQFEdsElv3Eaoqb+UVN/L11S/
+   YhLrq/8g5YG+tqMA4aCI54ij9Ng0OmTh4raKjtUKiV+Vvtqz9gYBxFmGt
+   Efu73JdZl2jSZrFsLWrjHzj6/OeXt2UZTh/6MqjkyA/fx+JEvaAAYE9bo
+   g==;
+X-CSE-ConnectionGUID: Lxdj9YPIRdm6haSYFx2CBA==
+X-CSE-MsgGUID: e3yZJIMGQvytsnroEse4kw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="77621879"
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="77621879"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 00:11:42 -0800
+X-CSE-ConnectionGUID: I2lMTBllR9aUsEoqVrkuFg==
+X-CSE-MsgGUID: DP7NclihStmIZM3qvKQwJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="216418397"
+Received: from lkp-server01.sh.intel.com (HELO cadc4577a874) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 05 Mar 2026 00:11:35 -0800
+Received: from kbuild by cadc4577a874 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vy3nv-000000000Gq-3bdf;
+	Thu, 05 Mar 2026 08:11:31 +0000
+Date: Thu, 5 Mar 2026 16:10:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: lizhi2@eswincomputing.com, devicetree@vger.kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk, wens@kernel.org, pjw@kernel.org,
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	ningyu@eswincomputing.com, linmin@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
+	weishangjuan@eswincomputing.com, Zhi Li <lizhi2@eswincomputing.com>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: eic7700: enable clocks
+ before syscon access and correct RX sampling timing
+Message-ID: <202603051549.4Mb0ZZjM-lkp@intel.com>
+References: <20260303061711.895-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|SJ2PR12MB9210:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8d1b1107-f47f-4025-9f04-08de7a8ebd1c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|36860700016|82310400026|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	R2acKR2jXli0KBdrafn8P4STRxLa1yAJP5RUmkkGjAzsxa0ndONDhAy8mThdy8NyB6Ui6Uh1Qpx/v7Th5aCJPQIM5MtXCRb5urhvNy0EFrhiF/DfGTddGkIZrCZe3ugpgfbQduM1Z1RSbEaxlf0pHyiIxwDFH5hUdVmILpE+8CZoi2Jofh1t5W24VmrQgTXLpXPxHIIarHST15lHx1pkAcjN2SdtvxDOQMeTPl9VB9KFPG3w50p1kuQURpaNfvw4pTRQjFzG0IYOWLydZSDQNbLjoSJ9hPmcEcsAQvz/Bnf9BxI3Elezhpd1ktQXDJuRtvKEDhzisLeuRPC+xsQbi89VBfi6KU7ywHmLVeTS8LQXMead34cOJgc0yY+tI6wNWKRuD2+jDI0l8vGrkY4Mzyuj6CuFig4cLgwAcW1UEzsKTvAovoc99KawhJ03hsWrKAhJnf5EkMcdAQcfkPcTQCcYmmuQ15N03NcRtCIwIwiVrmzATmz2/uYGIccglW+fHsjIYfnjwhvCtdUxzkxFFzxjVjvAp8bpQMfycDPXrVmm+Mh1R3XN4s25c5ZMp7zGMw0feIwcfNo3H2ubKtDc6dFYWht7e/tTPzIVCz62SeUeZ16JKqbezH5QG/lLivLMbtgFVFozWXIAfA9Y/qwz1FnimN6dSoUULBtBEewh0gMVrDP5ozxKzBPGKMXtU2KtmoXgrGz6XaDp+/Jgwb/a4VeQMlRbGiB9lLsXQgzPjwFg5H1Ti5TXPkS9YTLqFDQBvVbJ+0cgPmtfbHTZ5KVjMw==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(36860700016)(82310400026)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	PcIQkEAN/Vt3U0mwxg/+84aZViRuRBx0W3MXD44fwiPaSKfFiMEAy8QRDRIlf8wuZoXf60m12HHbNKrVskwUS9X+estwsxWiORQKrMT0+JiLyjP5uvynYEBNtd/3P0F0gHUZ+PRydGEeWzWINw2iPi+O6dWHhDHdhuTU9iJgFgGmzMNF23PglIDDoVoMZJLcGM61OdI8d0nStyKNHXljQKPjYeFcYbteJymLVBaA3K3hmIBzhI34mSyadkbUJkapKgj9MgWotY+fzLOViy7OMC0TU4IV6l9f1t0nm6j5FI8PaJbi506SOw9RDRIcj4QE8cjA8dejZXi24rBoxDngv4jq7kquw9cNEtvJDJvaRcRF4naiRn01+0Xnn7oS/UyPF8nKqXcmYMRa+h8sj5NHHvGO85udWOMp06mDmbbwyYW9vfRG+SitgSgDcOjdL5ub
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 08:11:00.8352
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d1b1107-f47f-4025-9f04-08de7a8ebd1c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9210
-X-Rspamd-Queue-Id: 90B3F20D41D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260303061711.895-1-lizhi2@eswincomputing.com>
+X-Rspamd-Queue-Id: 00A6620D50C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-264217-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264216-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
 X-Rspamd-Action: no action
 
-From: Cosmin Ratiu <cratiu@nvidia.com>
+Hi,
 
-esw->work_queue executes esw_functions_changed_event_handler ->
-esw_vfs_changed_event_handler and acquires the devlink lock.
+kernel test robot noticed the following build errors:
 
-.eswitch_mode_set (acquires devlink lock in devlink_nl_pre_doit) ->
-mlx5_devlink_eswitch_mode_set -> mlx5_eswitch_disable_locked ->
-mlx5_eswitch_event_handler_unregister -> flush_workqueue deadlocks
-when esw_vfs_changed_event_handler executes.
+[auto build test ERROR on net-next/main]
 
-Fix that by no longer flushing the work to avoid the deadlock, and using
-a generation counter to keep track of work relevance. This avoids an old
-handler manipulating an esw that has undergone one or more mode changes:
-- the counter is incremented in mlx5_eswitch_event_handler_unregister.
-- the counter is read and passed to the ephemeral mlx5_host_work struct.
-- the work handler takes the devlink lock and bails out if the current
-  generation is different than the one it was scheduled to operate on.
-- mlx5_eswitch_cleanup does the final draining before destroying the wq.
+url:    https://github.com/intel-lab-lkp/linux/commits/lizhi2-eswincomputing-com/dt-bindings-ethernet-eswin-add-clock-sampling-control/20260303-142311
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260303061711.895-1-lizhi2%40eswincomputing.com
+patch subject: [PATCH net-next v3 2/3] net: stmmac: eic7700: enable clocks before syscon access and correct RX sampling timing
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260305/202603051549.4Mb0ZZjM-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260305/202603051549.4Mb0ZZjM-lkp@intel.com/reproduce)
 
-No longer flushing the workqueue has the side effect of maybe no longer
-cancelling pending vport_change_handler work items, but that's ok since
-those are disabled elsewhere:
-- mlx5_eswitch_disable_locked disables the vport eq notifier.
-- mlx5_esw_vport_disable disarms the HW EQ notification and marks
-  vport->enabled under state_lock to false to prevent pending vport
-  handler from doing anything.
-- mlx5_eswitch_cleanup destroys the workqueue and makes sure all events
-  are disabled/finished.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603051549.4Mb0ZZjM-lkp@intel.com/
 
-Fixes: f1bc646c9a06 ("net/mlx5: Use devl_ API in mlx5_esw_offloads_devlink_port_register")
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/eswitch.c  |  7 ++++---
- .../net/ethernet/mellanox/mlx5/core/eswitch.h  |  2 ++
- .../mellanox/mlx5/core/eswitch_offloads.c      | 18 +++++++++++++-----
- 3 files changed, 19 insertions(+), 8 deletions(-)
+All errors (new ones prefixed by >>):
 
-V3:
-- Use another approach to avoid trylock.
-- Link to V2: https://lore.kernel.org/all/1769503961-124173-3-git-send-email-tariqt@nvidia.com/
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c:290:26: error: incompatible function pointer types assigning to 'void (*)(void *, phy_interface_t, int, unsigned int)' from 'void (void *, int, unsigned int)' [-Wincompatible-function-pointer-types]
+     290 |         plat_dat->fix_mac_speed = eic7700_dwmac_fix_speed;
+         |                                 ^ ~~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index d3af87a94a18..123c96716a54 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -1072,10 +1072,11 @@ static void mlx5_eswitch_event_handler_register(struct mlx5_eswitch *esw)
- 
- static void mlx5_eswitch_event_handler_unregister(struct mlx5_eswitch *esw)
- {
--	if (esw->mode == MLX5_ESWITCH_OFFLOADS && mlx5_eswitch_is_funcs_handler(esw->dev))
-+	if (esw->mode == MLX5_ESWITCH_OFFLOADS &&
-+	    mlx5_eswitch_is_funcs_handler(esw->dev)) {
- 		mlx5_eq_notifier_unregister(esw->dev, &esw->esw_funcs.nb);
--
--	flush_workqueue(esw->work_queue);
-+		atomic_inc(&esw->esw_funcs.generation);
-+	}
- }
- 
- static void mlx5_eswitch_clear_vf_vports_info(struct mlx5_eswitch *esw)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index 6841caef02d1..c2563bee74df 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -335,10 +335,12 @@ struct esw_mc_addr { /* SRIOV only */
- struct mlx5_host_work {
- 	struct work_struct	work;
- 	struct mlx5_eswitch	*esw;
-+	int			work_gen;
- };
- 
- struct mlx5_esw_functions {
- 	struct mlx5_nb		nb;
-+	atomic_t		generation;
- 	bool			host_funcs_disabled;
- 	u16			num_vfs;
- 	u16			num_ec_vfs;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 1366f6e489bd..8c5e48d001be 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -3582,22 +3582,28 @@ static void esw_offloads_steering_cleanup(struct mlx5_eswitch *esw)
- }
- 
- static void
--esw_vfs_changed_event_handler(struct mlx5_eswitch *esw, const u32 *out)
-+esw_vfs_changed_event_handler(struct mlx5_eswitch *esw, int work_gen,
-+			      const u32 *out)
- {
- 	struct devlink *devlink;
- 	bool host_pf_disabled;
- 	u16 new_num_vfs;
- 
-+	devlink = priv_to_devlink(esw->dev);
-+	devl_lock(devlink);
-+
-+	/* Stale work from one or more mode changes ago. Bail out. */
-+	if (work_gen != atomic_read(&esw->esw_funcs.generation))
-+		goto unlock;
-+
- 	new_num_vfs = MLX5_GET(query_esw_functions_out, out,
- 			       host_params_context.host_num_of_vfs);
- 	host_pf_disabled = MLX5_GET(query_esw_functions_out, out,
- 				    host_params_context.host_pf_disabled);
- 
- 	if (new_num_vfs == esw->esw_funcs.num_vfs || host_pf_disabled)
--		return;
-+		goto unlock;
- 
--	devlink = priv_to_devlink(esw->dev);
--	devl_lock(devlink);
- 	/* Number of VFs can only change from "0 to x" or "x to 0". */
- 	if (esw->esw_funcs.num_vfs > 0) {
- 		mlx5_eswitch_unload_vf_vports(esw, esw->esw_funcs.num_vfs);
-@@ -3612,6 +3618,7 @@ esw_vfs_changed_event_handler(struct mlx5_eswitch *esw, const u32 *out)
- 		}
- 	}
- 	esw->esw_funcs.num_vfs = new_num_vfs;
-+unlock:
- 	devl_unlock(devlink);
- }
- 
-@@ -3628,7 +3635,7 @@ static void esw_functions_changed_event_handler(struct work_struct *work)
- 	if (IS_ERR(out))
- 		goto out;
- 
--	esw_vfs_changed_event_handler(esw, out);
-+	esw_vfs_changed_event_handler(esw, host_work->work_gen, out);
- 	kvfree(out);
- out:
- 	kfree(host_work);
-@@ -3648,6 +3655,7 @@ int mlx5_esw_funcs_changed_handler(struct notifier_block *nb, unsigned long type
- 	esw = container_of(esw_funcs, struct mlx5_eswitch, esw_funcs);
- 
- 	host_work->esw = esw;
-+	host_work->work_gen = atomic_read(&esw_funcs->generation);
- 
- 	INIT_WORK(&host_work->work, esw_functions_changed_event_handler);
- 	queue_work(esw->work_queue, &host_work->work);
 
-base-commit: ae779bcb18cb0ef0da1402b9dd837e2084e23e27
+vim +290 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+
+   149	
+   150	static int eic7700_dwmac_probe(struct platform_device *pdev)
+   151	{
+   152		const struct eic7700_dwmac_data *data;
+   153		struct plat_stmmacenet_data *plat_dat;
+   154		struct stmmac_resources stmmac_res;
+   155		struct eic7700_qos_priv *dwc_priv;
+   156		u32 delay_ps, val;
+   157		int i, ret;
+   158	
+   159		ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+   160		if (ret)
+   161			return dev_err_probe(&pdev->dev, ret,
+   162					"failed to get resources\n");
+   163	
+   164		plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+   165		if (IS_ERR(plat_dat))
+   166			return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat),
+   167					"dt configuration failed\n");
+   168	
+   169		dwc_priv = devm_kzalloc(&pdev->dev, sizeof(*dwc_priv), GFP_KERNEL);
+   170		if (!dwc_priv)
+   171			return -ENOMEM;
+   172	
+   173		dwc_priv->dev = &pdev->dev;
+   174	
+   175		data = device_get_match_data(&pdev->dev);
+   176		if (!data)
+   177			return dev_err_probe(&pdev->dev,
+   178					     -EINVAL, "no match data found\n");
+   179	
+   180		dwc_priv->eth_rx_clk_inv = data->rgmii_rx_clk_invert;
+   181	
+   182		/* Read rx-internal-delay-ps and update rx_clk delay */
+   183		if (!of_property_read_u32(pdev->dev.of_node,
+   184					  "rx-internal-delay-ps", &delay_ps)) {
+   185			if (delay_ps % EIC7700_DELAY_STEP_PS)
+   186				return dev_err_probe(&pdev->dev, -EINVAL,
+   187					"rx delay must be multiple of %dps\n",
+   188					EIC7700_DELAY_STEP_PS);
+   189	
+   190			if (delay_ps > EIC7700_MAX_DELAY_PS)
+   191				return dev_err_probe(&pdev->dev, -EINVAL,
+   192					"rx delay out of range\n");
+   193	
+   194			val = delay_ps / EIC7700_DELAY_STEP_PS;
+   195	
+   196			dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
+   197			dwc_priv->eth_clk_dly_param |=
+   198					 FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
+   199		}
+   200	
+   201		/* Read tx-internal-delay-ps and update tx_clk delay */
+   202		if (!of_property_read_u32(pdev->dev.of_node,
+   203					  "tx-internal-delay-ps", &delay_ps)) {
+   204			if (delay_ps % EIC7700_DELAY_STEP_PS)
+   205				return dev_err_probe(&pdev->dev, -EINVAL,
+   206					"tx delay must be multiple of %dps\n",
+   207					EIC7700_DELAY_STEP_PS);
+   208	
+   209			if (delay_ps > EIC7700_MAX_DELAY_PS)
+   210				return dev_err_probe(&pdev->dev, -EINVAL,
+   211					"tx delay out of range\n");
+   212	
+   213			val = delay_ps / EIC7700_DELAY_STEP_PS;
+   214	
+   215			dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
+   216			dwc_priv->eth_clk_dly_param |=
+   217					 FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
+   218		}
+   219	
+   220		dwc_priv->eic7700_hsp_regmap =
+   221				syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
+   222								"eswin,hsp-sp-csr");
+   223		if (IS_ERR(dwc_priv->eic7700_hsp_regmap))
+   224			return dev_err_probe(&pdev->dev,
+   225					PTR_ERR(dwc_priv->eic7700_hsp_regmap),
+   226					"Failed to get hsp-sp-csr regmap\n");
+   227	
+   228		ret = of_property_read_u32_index(pdev->dev.of_node,
+   229						 "eswin,hsp-sp-csr",
+   230						 1, &dwc_priv->eth_phy_ctrl_offset);
+   231		if (ret)
+   232			return dev_err_probe(&pdev->dev, ret,
+   233					     "can't get eth_phy_ctrl_offset\n");
+   234	
+   235		ret = of_property_read_u32_index(pdev->dev.of_node,
+   236						 "eswin,hsp-sp-csr",
+   237						 2, &dwc_priv->eth_axi_lp_ctrl_offset);
+   238		if (ret)
+   239			return dev_err_probe(&pdev->dev, ret,
+   240					     "can't get eth_axi_lp_ctrl_offset\n");
+   241	
+   242		ret = of_property_read_u32_index(pdev->dev.of_node,
+   243						 "eswin,hsp-sp-csr",
+   244						 3, &dwc_priv->eth_txd_offset);
+   245		if (ret)
+   246			return dev_err_probe(&pdev->dev, ret,
+   247					     "can't get eth_txd_offset\n");
+   248	
+   249		ret = of_property_read_u32_index(pdev->dev.of_node,
+   250						 "eswin,hsp-sp-csr",
+   251						 4, &dwc_priv->eth_clk_offset);
+   252		if (ret)
+   253			return dev_err_probe(&pdev->dev, ret,
+   254					     "can't get eth_clk_offset\n");
+   255	
+   256		ret = of_property_read_u32_index(pdev->dev.of_node,
+   257						 "eswin,hsp-sp-csr",
+   258						 5, &dwc_priv->eth_rxd_offset);
+   259		if (ret)
+   260			return dev_err_probe(&pdev->dev, ret,
+   261					     "can't get eth_rxd_offset\n");
+   262	
+   263		plat_dat->num_clks = ARRAY_SIZE(eic7700_clk_names);
+   264		plat_dat->clks = devm_kcalloc(&pdev->dev,
+   265					      plat_dat->num_clks,
+   266					      sizeof(*plat_dat->clks),
+   267					      GFP_KERNEL);
+   268		if (!plat_dat->clks)
+   269			return -ENOMEM;
+   270	
+   271		for (i = 0; i < ARRAY_SIZE(eic7700_clk_names); i++)
+   272			plat_dat->clks[i].id = eic7700_clk_names[i];
+   273	
+   274		ret = devm_clk_bulk_get_optional(&pdev->dev,
+   275						 plat_dat->num_clks,
+   276						 plat_dat->clks);
+   277		if (ret)
+   278			return dev_err_probe(&pdev->dev, ret,
+   279					     "Failed to get clocks\n");
+   280	
+   281		plat_dat->clk_tx_i = stmmac_pltfr_find_clk(plat_dat, "tx");
+   282		plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+   283		plat_dat->clks_config = eic7700_clks_config;
+   284		plat_dat->bsp_priv = dwc_priv;
+   285		dwc_priv->plat_dat = plat_dat;
+   286		plat_dat->init = eic7700_dwmac_init;
+   287		plat_dat->exit = eic7700_dwmac_exit;
+   288		plat_dat->suspend = eic7700_dwmac_suspend;
+   289		plat_dat->resume = eic7700_dwmac_resume;
+ > 290		plat_dat->fix_mac_speed = eic7700_dwmac_fix_speed;
+   291	
+   292		return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+   293	}
+   294	
+
 -- 
-2.44.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
