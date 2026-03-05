@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-264211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOCcEl83qWlk3AAAu9opvQ
-	(envelope-from <netdev+bounces-264211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:57:19 +0100
+	id EG1lCQw4qWlk3AAAu9opvQ
+	(envelope-from <netdev+bounces-264212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:00:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8D320D071
-	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 08:57:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6D320D115
+	for <lists+netdev@lfdr.de>; Thu, 05 Mar 2026 09:00:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 54EEB300AB13
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:57:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 66137302F226
+	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 07:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8B333AD87;
-	Thu,  5 Mar 2026 07:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A138A3431E9;
+	Thu,  5 Mar 2026 07:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bEHco10t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fnKUtjZq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjDiFHWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E4B33A9C9
-	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 07:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8921345CC9
+	for <netdev@vger.kernel.org>; Thu,  5 Mar 2026 07:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772697423; cv=none; b=KvfPF+LgyPxwB2vMZ6j8NLBoeLozCj1ufQ21sov9xD/e27LUvUo9ykhm1msFUIe9/Kw2jy/XhDsbaapcmhghBY6fVFodsN329qm8zMJcEDZVlmGBbl1/8jVB4t/P3OTayKnzJ5ESDRviOecROzsSeZ3Rfuku3t+UUMEEK0wunco=
+	t=1772697585; cv=none; b=HXb4EENEG095LAHp5ulZHbkdUUHglO9Ziw8G7kkez5BymTVjwu5ysnb7UQaeSNE1IKdc1VExFU7aM6jswwv06xZx792u9xiGCM8Q0kr9ZE0g/uYTA0vJyJZj7cq9M7MpZx5pqCMYu6BESEh4uSxE0AtF6bMMQtXCwuXz/FrG7co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772697423; c=relaxed/simple;
-	bh=4wIxeVTtUPRh42TWlTdhNgCgomVeyReKlBgjR5dJ2js=;
+	s=arc-20240116; t=1772697585; c=relaxed/simple;
+	bh=acjX8ZRXKxIh1g9U/ctZCZrkLhEdMfO/0JcbCEv+DBQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lHag92LmaAUjfWvAThNionq4yuwGgKD7A2+0fPImhh51CsPrml9lHavyKutwCOss8eArcL1zM2MihoCBE1o++AyCr5/kzw1UI2UqBSHYLL1TbDGM7JcJeTUJNfOq1PWxVToBBUlmzxHlyYHVN+pG5w0EUjW+GrnsHeYQOFly75c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bEHco10t; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-483487335c2so63652015e9.2
-        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 23:57:00 -0800 (PST)
+	 In-Reply-To:Content-Type; b=UGImErRX61KeT82oMMUis/s0uu4g/HBo97WvbaaZg9f9tNPSoWAAPhT2H8INbZ2wGuHTlw7JG72kX8ztZ2WdXCOkyvr9hrLGvdjzBfj41rWQOQG/Zc5Ums/xzrTkd8VN9AScNR4+vVsHac8iYoLt19zW51At4BZfosTykrkQG2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fnKUtjZq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjDiFHWp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772697577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EA7Rrf5P3Aj91zy1UVwm367bOMnz8VCNbYx+ojgcP34=;
+	b=fnKUtjZqRhjdNbeOj5Ke9q/qF37JJ7tBJTXub3LqWeXNJyzqEle/qUQcn/CuBLiH0MTOYj
+	ZUTH+LaNubGQWTQiE1962oIEGZXnGD+PY2ubAEQDo/LACQAm2dB5HpxDfhk0gSKv2ykJdf
+	CT7usl2MLC38WL09VueCwb44Osna2ek=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-H6bLOrKGNH2JL5pR_CH2kQ-1; Thu, 05 Mar 2026 02:59:36 -0500
+X-MC-Unique: H6bLOrKGNH2JL5pR_CH2kQ-1
+X-Mimecast-MFC-AGG-ID: H6bLOrKGNH2JL5pR_CH2kQ_1772697575
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-439c2a0d821so1798229f8f.1
+        for <netdev@vger.kernel.org>; Wed, 04 Mar 2026 23:59:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772697419; x=1773302219; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1772697575; x=1773302375; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VLoLFtQnBLuT+MV5dFOmu6NN10b/asgsiLccSm2U4ts=;
-        b=bEHco10taJSnYvPwnxuD+kIz+NYB6VxwovQeBraNNHDnrOVfgA9wI7t8wvQkHHZHua
-         W6jYrIvNdN4B1n3pNfcPVz9GtvzYvvTzfSl0Dgyh0rpzyizBAMe2ZjP5oN328a8I6aei
-         4iU97xIoe4rC/m63EL3WTFyDWEWPd6+jM/6O9GQvdE4DxA45rOtVcjYRHBEC2Ikx0Qel
-         2Zi1ZlVbh/kzKX6//yZHY1w0pTFB4isOPEPwg6v5ocaoKfPabKHMqeeVY/6xSUVSmHyy
-         3aZBtUD6mAbauP3kPhEcugYBEcma4Nl29Eb0m4Hro0TixXExEkWkMN9jH3C+43/I0RcR
-         3Thg==
+        bh=EA7Rrf5P3Aj91zy1UVwm367bOMnz8VCNbYx+ojgcP34=;
+        b=cjDiFHWpK7xUFdA6IPsXDW8HE71FEqFjMY52y/Nh6mvtV/cSiIdeja07MSL8/x8IEw
+         LJMMnhMGa/WLwtQEnWSu/w7pakL2ug5R+/EV+CjmAT4XxHNYnr0KcnM2BFnMLGbMrRXp
+         rLLd2Sox0cDqh4K8XA9jPz5GP8S06sg9uyoWgyI26isD9gHBQnAKXg+hd2pMhMbTarSe
+         99GwQ3qVoFJj7fEjUSZcGuZXOQGk2H7Zh0aZPugIj2sr/aef2+PBgdULWdWCKi+eSftQ
+         KngKwhn7Eqbb2IhNVKar2ZnqUhdAWQLMKKTChaalJIWZo0UBdhbppLw2H1uhg7iyvUol
+         dIlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772697419; x=1773302219;
+        d=1e100.net; s=20230601; t=1772697575; x=1773302375;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VLoLFtQnBLuT+MV5dFOmu6NN10b/asgsiLccSm2U4ts=;
-        b=n/7kqIQF5kl/YpKh1iB/BmC+aJLK2FPeaHIjj02aOsYHiLn7ZJeXiZGdOHgSgu2f2Z
-         iV1bcYBDCC5csgyfwQW68F+w/7n74sc4Zn+M6Cr5h2mBW86Dv09lP38a6Moiax7w/SYi
-         IvxGbJRfzMpYcOJxqGhdhK6DrbyUWBxICjXTyKJu/ZvYZZHFdvTxurW+OXg8UvGopdx/
-         GV44F1nPUMCtavrEENcdF93WSXbqJ1GzFH9dQbdirztPmNk0yTNbvAGCZ4nCfBKjwn4y
-         /fYtTQpKehSVgwycX+L0osibzKJ3vVRnyHhIQmn8sXVh2taanJTKdXVun9wzGGK1vm3E
-         DNwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWh0G45sp9BdmJkw36f277EZPCQXNkcqB+/ebjbZa8BQhZow6/kYdnSMChQWjlJRno2LWOnrw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwckOv0JvjrWW7DNuuXaRZEnHGOGXIfFu0TCwqaizfeZTOrb0mq
-	rIEzdpaawO3UJeJ5Xa+gQnnXBuyknoF6tjKmj733yObw48yM6Tjia3tD
-X-Gm-Gg: ATEYQzwh4zEcUG0RxatDVYEaaq89uHBknjI2703ZVx4cz6v2pHAWR8wN0HZHy3JyMa8
-	1tRvoXX14Vg+lsCh8P0s8Jba1S0VKXR2CIrT1DPZSCnAem0k3D3NchrSsnttNb9UC3Yc2AugQsB
-	bPX49LMaHCtSsN6FxY8nM0QaomSSZi9AUymr+HbvULSSINia5F/tt+bD0PfAMttrYN/7/mhC9mw
-	v2/rWqdgnfcelatIEWHIpHZ/lgL+6XDYWVhBKMCc6xRtyD8Af8IEir4Bna7i+KbmZ4St1ik7/AD
-	m9+EAaG5pCH7toRGeeVvCUFYoylYZ341pBFd7bd55te2lTarNkbT40HuGvp0UjhEgwqP8NA4on8
-	My3RuyL8PSeH8FBxNupSB+yC2TzzNqQS0WYKd+SwN5xPXKvl3DOEfJwHSsQX7XhBRErv7lVJ1e3
-	v71SxNKqFhDgDrehSJsdojDqu5/TcY2NpnbCsJ/5/d3/c21NxnuA==
-X-Received: by 2002:a05:600c:1d09:b0:483:6f37:1b51 with SMTP id 5b1f17b1804b1-4851988366bmr83224505e9.23.1772697418510;
-        Wed, 04 Mar 2026 23:56:58 -0800 (PST)
-Received: from [10.221.137.160] ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851fadf67bsm36856295e9.6.2026.03.04.23.56.56
+        bh=EA7Rrf5P3Aj91zy1UVwm367bOMnz8VCNbYx+ojgcP34=;
+        b=q9WawLovmjFXfGqDgwi1As9Vx3Q0pzICu29VQXoTrBnph7Sqx467a8QOnYz2iOuKU3
+         ItmnlctxX2Izl//owMUab2Aits6BbZtcoSa83A75kPumSVvgi4GtsUBI5td3NnFFdoJ3
+         lfsof7/SmHydAlR9duhiu1EdmB2BcV6WfpjI+IgxnDdFdzUjobAAGDfNp+py+N1M609B
+         M1zZINCu9dkuxa5ldJO6t4QU0/nlqemU+ZW94rvBsWAa1PocwV+QLBkdCkNNkxJhKuwL
+         XglrgYMvuHNKQP3q6Tdig3m0RgXUuccilI5z9wP6CDgXK3uQIqypSPtJ1xvC7MjefILd
+         u3og==
+X-Forwarded-Encrypted: i=1; AJvYcCVBUieS3MYDW24WoNtNUCLWYAWIH+KQ0I6nTXOWFRiw70sakl5w/yEQo9JoF5FMIzXD6xRWI28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysA/TRUixJ1BqD2aOqFq0oXGTiiXN46GxNyfsYSh8W8dXN84YX
+	Y+o6QC6yBS3UXwGLnnY6LFcr3KJid748wOqYbYzQtkZzaCMnqdoJKfUTW7pmBEASBLKEDNdQ4ro
+	h/LZ3uowxz9z2f/KKfVlJj6MBybi8+0PlbHSXaFCyM9721hwW8tTlRnDtDw==
+X-Gm-Gg: ATEYQzyQe/QiJvDkxqG0HiDtjSmlPQeY5VArLlErPXa9nVPI6+Iih3swvTc+Bi35qUH
+	fgqeMdb1oPzOR50EL2EJeMI5iEQ0H7s9D16NwBC15T65K70ZZaGaITIvhPyTlkocusQzmV+oXdA
+	Ixij28DUGuguCbud7Z3wz8u61yYnKTo7VUf/zthqMhy3N2UsW9y3+Du4AltkqvOcCsdAHJIKOV2
+	pj6ly89hycISGAUkPF8ZATpj1kMXQUOMmgJmofxAlboFU7eCkfhHERfqU2RDOF3kiNhPJzEyWCG
+	rkOPH6JYJpTlCXl1BM4Mx1xhK3udR7YK3jDUQhUjIgm1PHaYIZ40OmuSWVkbpiEUL2c8zveXaHO
+	dCs8ETrBcWGLGBmKtdNuWDO6A3Q==
+X-Received: by 2002:a05:6000:24c3:b0:439:ba57:5023 with SMTP id ffacd0b85a97d-439c7fd377cmr8342930f8f.36.1772697575114;
+        Wed, 04 Mar 2026 23:59:35 -0800 (PST)
+X-Received: by 2002:a05:6000:24c3:b0:439:ba57:5023 with SMTP id ffacd0b85a97d-439c7fd377cmr8342892f8f.36.1772697574661;
+        Wed, 04 Mar 2026 23:59:34 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.149.216])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439c6129017sm13041122f8f.31.2026.03.04.23.59.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Mar 2026 23:56:58 -0800 (PST)
-Message-ID: <d6fcf417-87b1-4bbe-9ec1-cabb2b2ed1a6@gmail.com>
-Date: Thu, 5 Mar 2026 09:56:55 +0200
+        Wed, 04 Mar 2026 23:59:34 -0800 (PST)
+Message-ID: <9e430669-7930-4902-ab7f-ed0b63def827@redhat.com>
+Date: Thu, 5 Mar 2026 08:59:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,135 +105,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5: Allow asynchronous probe
-To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
- Peter Oberparleiter <oberpar@linux.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>, Alexandra Winter <wintera@linux.ibm.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20260303-parprobe_mlx5-v1-1-18194f2a1a3a@linux.ibm.com>
+Subject: Re: [PATCH v2 net 1/3] amd-xgbe: fix link status handling in
+ xgbe_rx_adaptation
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch, horms@kernel.org,
+ Shyam-sundar.S-k@amd.com
+References: <20260305042952.835926-1-Raju.Rangoju@amd.com>
+ <20260305042952.835926-2-Raju.Rangoju@amd.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260303-parprobe_mlx5-v1-1-18194f2a1a3a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260305042952.835926-2-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: DE8D320D071
+X-Rspamd-Queue-Id: 0C6D320D115
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264211-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264212-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+On 3/5/26 5:29 AM, Raju Rangoju wrote:
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> index 1dbfa9d4360d..457d6049291f 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> @@ -1964,11 +1964,20 @@ static void xgbe_rx_adaptation(struct xgbe_prv_data *pdata)
+>  
+>  	/* Step 4: Check for Block lock */
+>  
+> -	/* Link status is latched low, so read once to clear
+> -	 * and then read again to get current state
+> -	 */
+> -	reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+>  	reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+> +	if (reg < 0)
 
+Coccinelle says:
 
-On 03/03/2026 12:33, Gerd Bayer wrote:
-> Announce that mlx5_core supports asynchronous probing.
-> 
+/srv/nipa-builds-contest/testing/wt-cocci/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c:1968:5-8:
+WARNING: Unsigned expression compared with zero: reg <
 
-Hi Gerd,
-Interesting patch.
+> +		goto set_mode;
+> +
+> +	/* Link status is latched low so that momentary link drops
+> +	 * can be detected. If link was already down read again
+> +	 * to get the latest state.
+> +	 */
+> +	if (!pdata->phy.link && !(reg & MDIO_STAT1_LSTATUS)) {
+> +		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+> +		if (reg < 0)
 
-> Tests on s390 - where VFs can show up isolated from their PF in OS
-> instances - showed symptoms of "mlx5_core: probe of 00e7:00:00.0 failed
-> with error -12" when booting a system with a large number (> 250) of
-> Mellanox Technologies ConnectX Family mlx5Gen Virtual Function
-> (15b3:101e) PCI functions.
-> 
-> Turns out that this is due to systemd-udev's time-out supervision of
-> "modprobe" killing the sequential initialization of additional functions
-> if probing exceeds a default of 180 seconds.
-> 
-> According to [1] device drivers could (slow ones should!) opt-in to have
-> their probe step being executed asynchronously - and interleaved. With
-> the mlx5_core device driver announcing PROBE_PREFER_ASYNCHRONOUS as
-> proposed by this patch, we've measured 275 VFs being probed successfully
-> in about 60 seconds.
-> 
+Same here.
 
-Nice.
-
-> [1] https://www.kernel.org/doc/html/latest/driver-api/infrastructure.html
-> 
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> ---
-> Hi all,
-> 
-> this patch helps to speed up boot times when there are a large numbers
-> of Mellanox/NVidia VFs in a configuration. Although we've seens real
-> issues, I'm hesitating to declare this a fix of commit 9603b61de1ee
-> ("mlx5: Move pci device handling from mlx5_ib to mlx5_core") primarily
-> because the concept of asynchronous probing with commit 765230b5f084
-> ("driver-core: add asynchronous probing support for drivers") was
-> introduced only later.
-> 
-> Thanks,
-> Gerd Bayer
-> ---
-
-This is an interesting problem, and the proposed solution looks 
-reasonable. That said, this is a very sensitive area and there may still 
-be hidden assumptions or corner cases we haven't considered. This needs 
-thorough testing across a wide range of real-world scenarios and 
-different system topologies before we can be confident in it.
-
-We'll take this for testing and report back once we have results.
-
-BTW, as you probably know, a possible workaround is to increase the 
-systemd-udev timeout.
-What timeout is required for it to succeed without this change?
-
->   drivers/net/ethernet/mellanox/mlx5/core/main.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> index fdc3ba20912e4fbc53c65825c62e868996eff56d..b53fc3f2566acf5a07cb8df649124c4a87f3e043 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> @@ -2306,6 +2306,9 @@ static struct pci_driver mlx5_core_driver = {
->   	.sriov_configure   = mlx5_core_sriov_configure,
->   	.sriov_get_vf_total_msix = mlx5_sriov_get_vf_total_msix,
->   	.sriov_set_msix_vec_count = mlx5_core_sriov_set_msix_vec_count,
-> +	.driver		= {
-> +		.probe_type	= PROBE_PREFER_ASYNCHRONOUS,
-> +	}
->   };
->   
->   /**
-> 
-> ---
-> base-commit: c69855ada28656fdd7e197b6e24cd40a04fe14d3
-> change-id: 20260303-parprobe_mlx5-d10d2a746d3a
-> 
-> Best regards,
+/P
 
 
