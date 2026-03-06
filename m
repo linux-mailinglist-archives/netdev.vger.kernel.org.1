@@ -1,204 +1,173 @@
-Return-Path: <netdev+bounces-264674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 1teSAKdlqmk1QwEAu9opvQ
-	(envelope-from <netdev+bounces-264674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:27:03 +0100
+	id SMu1CYVmqmlOQwEAu9opvQ
+	(envelope-from <netdev+bounces-264675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:30:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1D321BB33
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:27:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EF521BB83
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4D52303388D
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 05:27:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 770BA303353F
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 05:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473D633970F;
-	Fri,  6 Mar 2026 05:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B683B2641C6;
+	Fri,  6 Mar 2026 05:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cRmKxER9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n7rY+qlj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093E331AAA8
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 05:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D049F4F1
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 05:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772774819; cv=pass; b=iPVtSMy6JiGP4ekAE5p6tAgiIvUxGaw5US12QkQjfSwws6Kyjj76ii6uu0A8kzTAW/a+qYpwXhavyfOsKGdB5xW0Nz2Q/w0gs30IwxRQr8gMLjuFewUe/9+kvDlS9Ufriu9MoR4pT+w/cuO7VVO5ki4Qyk/iGv5KaGbwwfJBvGs=
+	t=1772775041; cv=pass; b=BmoITMx7nkQlyMZ61rhaG9oixDaIJAqaSxsuWrDpaSFKTxMr87LYt+izu8gNtNH8q9UPmhGPIfj8baC+1wcEqiGqT80TkWf1NmWbpz7J3ZuLVR4z5Fi4F7Sb07uN1Ig7Z84XnSk3FPsYCsPRiUuct/ZUeeZEIyhuson5PFl4yf0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772774819; c=relaxed/simple;
-	bh=OLXRZcfXVoihNfVSJB2QHt3BWRs5a9/iqX58YMJrWA4=;
+	s=arc-20240116; t=1772775041; c=relaxed/simple;
+	bh=AWGhhnxNa8/lqkUCLrnUcXuM6cvCw6BkFJLMfMuM34I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qHydzC1+MdJBIV6wOifuzX6nD5ewkXTXty9N/Kfa7Otfu/yj6yvKr061rvHNJXXY7WSMgo4Ul1wlm5fofdhOtbOxCKq8bnn151iQirxYTByfOQOI0VCjiim+SAtk/1QGVoEEu+p1paB1lWWEb0SWdrjwY7HXl22KZ3tRpYPxkY0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cRmKxER9; arc=pass smtp.client-ip=74.125.82.47
+	 To:Cc:Content-Type; b=mJ8LdI2M8W0hO/JV5sxZ60Tc9luz28D2iODf7O4qZneVhxsaxxpCTjS5a7qeHt0Qxw8YwcFAHispNbEJNmoWRCAzAPOrGfeIL2B354hibadPzD9S5pdA34u43yOBqRJs1dwyFwLLT6t7SRu476IDzLzMCPl4JhyZ2T80MxwWUrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n7rY+qlj; arc=pass smtp.client-ip=74.125.82.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12713e56abdso5502624c88.1
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 21:26:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772774817; cv=none;
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1277d379936so10440694c88.1
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 21:30:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772775040; cv=none;
         d=google.com; s=arc-20240605;
-        b=b2PY4K53Ea1gCqZAFtZY+1IQZN5DBqmX2OyOOkYGAX3vHIbsKD+JFQp8ytekRTGaUA
-         ty/KU9GEtpsrjwCsZWb2mwVkLRH+eB9UXMDb62M02jdp/kF4y7k690uVEoZ//u970PU3
-         WZPVdHqax2c6ndtyAuaNtRaejvTUF7X/9G6+OLa/dVTq7638nhXmZ3WvRoJN4FffHrLz
-         tKYqR+VlaMFbFEqyVYDLjuvJlJU85x8cE2l1m30JJMOIxK2Uzw0DLy3Hl2CbQKcMZcO6
-         81PJoUeC56Z0+5ww/7YpEAGKoWP/yxhL2AA1UmosAfXJC3SnDpboY2F7IIHnQ+jfJrH7
-         xWng==
+        b=Vk1uxLRafVKCsFSVyagmxk2IPXYUkSxz8crmti0t7t4KPmeBYGo8hdur8DsbZ0t6OZ
+         IVxzwpcXDXd1y0/AtLX+YU5HlAgHkCD8AfRstY34837GMiQcTbfB1pXIyjtkgCzqy3EL
+         J5cH20G/1oD6Fc67DCR6zqSTKt1PSM36dZkEifC2rGUKilcMnYOzM0+alCnkubtjCqDP
+         pEWgcGIAbFndMzAh8vKMZ1n5OLSKasTZamo2GXsaX16XI/GwxE8QP5G7ZLjgG7oF3Tkf
+         ONa4yl5/u+Zb0dBJMp5Shwi3Bsaf0iwWQ/BSsK0dcjsytPw3DAAb+Irtr8BPli+tFkSj
+         5tiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=uHqY2c9voLqeKgMRIxJI5b6z7T8BHVQmgzjnor5i9HA=;
-        fh=zh6YVX8ubJAUGiHZIeMW3aSul9QAN28GMN4VVv8sF7Q=;
-        b=kIc2utp35PFgM6NFVfj1X+V9grkNK0NBTeOFCOegQVRI4sXFVNes1lXpa4zGh6VDPX
-         v9Ng0SaKSP0lbdPhDM6tisi83jbhKIFNgEqgncWWTbOY7gXYtnG4ir4GnXcJLIgc6QDq
-         7NFBlWnhi1jBT/RxyhncWev5aZzaAJRpeUI0P91l3xY+epcbp9gaTsBoC+wWefOPAwHl
-         lAlPCrOofV8A8VTwspL6SaI391fsvLMOBfR8uk++ZQn3ppyXLyrpLKaYvQt+lqZTDtOI
-         jkf/DPf0npjs5iWVSuqUAVnDnXHxonYpoLLOEpKTCXJ9lM1zje3xPgjpqcu8MIViLoXc
-         huCg==;
+        bh=AWGhhnxNa8/lqkUCLrnUcXuM6cvCw6BkFJLMfMuM34I=;
+        fh=Cf5bWJGUz777me1MqYMWsLb7v7Eq0uN3qhknnQOb9Yc=;
+        b=j7cbTzkkA3fr0BXdntVPlbRenfMHQmllxtgO5gzXlxDSHBDmne6WMUBTYTseS0AuD2
+         x1vLF1Xez7fB1kv6mUl/TXPBeTZZEkhcUVJn5sdcryaD3ia47WAjnwLyNIsjILIOw2/7
+         9Y2FIRs/Bfpjdc6Npa5yOu1EzAMJnyAFWmtR6txJrMsIrUBMogdRDGOYKUEPDDD00siJ
+         7sLFyt9tTWt8d2UxcZWdly+70GqcsXEM+Ki1XLIpraCO4yRE5H7MlsCsCElkyYnLcgpl
+         SeHoA4sWYlPa0P5FckGxEnBJM4zbqRDcdyJEad/QZ9DRdMvNfmUH4Cqby5aXsWfBXqlW
+         hBmA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772774817; x=1773379617; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772775040; x=1773379840; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uHqY2c9voLqeKgMRIxJI5b6z7T8BHVQmgzjnor5i9HA=;
-        b=cRmKxER9uYSAW7CybOuPpP1LNItZVoYt1F7N7GOagoXK3VnMHS4/vyO8lbhMGvcZrM
-         g12alUI8n16lg9RYMKLGfU5mnsz0LqZnXJ1AAN/Qd+7//hsqnBKmerLvzgp17ZjQY1X1
-         T5ivgRY068e9RNv4+Gxz0YlexSgE2y12d4IVzFoZfbE+BzG94ERc9orS/dVsPrF/hTuB
-         UW9GFa53yG2lhRNF3TDrz1bA0waDRIowyTHZg/COBkbiqzudzTsM2fCYtEUoRP0WazVM
-         8ZjPvY1PE2PJl/ZC914g9OjEP5q3QOlCXTusMiT0UjiLETTrDa/P2a1hS7mRvyYJF/1r
-         Z38A==
+        bh=AWGhhnxNa8/lqkUCLrnUcXuM6cvCw6BkFJLMfMuM34I=;
+        b=n7rY+qljZu+gNr/jg8/Xf2rAwcD38K7KWMkjDOY+RyPTxUKzGTHBhKiw11Xdv31VOq
+         de9fBXhEYmuVnQsPfzfit3y+2Ao239L1mpxl3Pyzfa5sQY+E0HrwawSUQJSLyz43ZzTA
+         PhafU+MBwH7mQZRjUY9KUuzxx1r49YnP1p+qNz86ABaW/kV8YFAtaRyQOgLE1FLvbDOS
+         uqb2DZtK+G7qre7uB2XWIV66VPYOop490DRPlL12n62dVDSZqPlfQht3hizjVB5rBTj2
+         j7+brbfpqyTGMwUN8BiGRuXfetXTnrb2rX1Gjrpk/ztHA09+r1WkN7LYVUEgzILyTnLk
+         ZrXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772774817; x=1773379617;
+        d=1e100.net; s=20230601; t=1772775040; x=1773379840;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=uHqY2c9voLqeKgMRIxJI5b6z7T8BHVQmgzjnor5i9HA=;
-        b=MvkP9Bu022D/mduM9JSCa6T80ttcDcNFo5SZFVOa8mERbvYHmsIMkiF2KXolhCGUBn
-         NxgaMu2R0/gaHSYhfUcLmxm8tMV39EnXDoO71sySYoZIo207Qelo2v0RYMNIH83va1jN
-         2cSbnc+NgHr0e+paGKkiDSA/q1am8UlXdEL7FD7sNiet8dPofTQuAJBUqTgwhs24uxwN
-         MRpN0ov9qlcrd7VbDADEJUCikog57u6lDVOaw5h2YeK4vtGJ9KpOC4WGqKjz+e8aVSHm
-         inUUVCmrKbVOV6pVlrp4qqSvPv66tK5bZrRa0P1AkSvHIO/Qq/g/Wij+29NC9w6hLa8q
-         qhIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVycB+5w0Gfsf3rvJrp+ObwCjQ147kBwaiZVUmbi7XLQGfFnrX6Y4lgZ4mZbH1bndpM43AC/LA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySrYDeM79pjDI60oiK7lvCVJak4atyk6fnG2vlE3oT3DjymdKF
-	aeRVXfKAmZIYUDS676ZQY+GP5ukXqiT6VZ/WIN2bRFp1X9MpSIfSqFd0MdNKSZBmhcoajonOJ8G
-	SRb2z6I+JN6ysWIVn/N0uXsvZfKz4qOEyPYunUqAh
-X-Gm-Gg: ATEYQzw4mFjvFqTQn7o/K+ft+KHo5ib6WJi9ao2s6UtBoHgMAaDsUPof+Hk1930X65O
-	x/EMz1NZJMD+EMFyWQN2XdeX/OO3ii5xs20uUmBhqyIHAvPusIjPyOyfsMkFvLYKFMkXAfVDItZ
-	04csYojhEFmEyC5VNaePtXVpX6o5NO2AzxgL9ReeCjJT6WmRi9G8S3xg7yUhFg0C+8vW4omNQJY
-	gpplDmR7QUoUbwtGMayQ03J8A8RZcWXg+9RlKPy1B9ecYNYW0AVB7KCToRZUcRarwO1YCKf9Wbw
-	XkXkLOkGeYsHnBQC9HdahJHU8UmFnl72868ZqbOy+P2s7FRpr/26BN7Y9hvQUC4kRy5uc2z1
-X-Received: by 2002:a05:7022:23aa:b0:119:e569:f874 with SMTP id
- a92af1059eb24-128c315e7a0mr357995c88.17.1772774816491; Thu, 05 Mar 2026
- 21:26:56 -0800 (PST)
+        bh=AWGhhnxNa8/lqkUCLrnUcXuM6cvCw6BkFJLMfMuM34I=;
+        b=uHZC5AnkHWGZOnyBymtirccrL2BLoD7CQ0h+Nfs4ZHOXJn6mpvNgofbXFxEIW+4W4O
+         QVNh4geWZapXiq99LbFfsAP4b8g90pbtTP6jkh8Icfr0kIdeIUmJK0hHUpJkMxC2Zxdn
+         nqfuf8/VL2CZn05X+dKT0sksRiejtN8OK5SQJVuwpHdZzcE/pHd+rmLWmXbtKm2H6ujr
+         e5EgpR9ibhUuXGOr5AU0qjqPIokm8AtdtV/RYY0hxzYc5v79MRCqfChGmiw//IYB9jva
+         9/c9j4mrjueITE0yzst3jQqKR1wUscqOimh5VTEr6DaVolFY5e7tNfaQJZYMrD0HNmT3
+         ZWLg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/xynEgEyMjm0nz/zdh/PbyQlRbHnOpKlVgk/+B9/kAY6X0VQs+WD7bNdHuDXZFsPQtXuFj1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4iZd37kvuvoZJ9MZQyGMrO7BgNdZgbYDGJb+RLoVUHt+aqakb
+	/HehLRx4L6pTnYqEEyJm4QL/Ppyzpy2esJxqiRzl0VUjgZ5OhIvx+hXcdUBvXycejLMORwXasvL
+	M8SHfkcQbPw6O6Snv6N9Febw6lEQLqMIpESZqHtLl
+X-Gm-Gg: ATEYQzxh/y+ojamYxmgawQoL3bIuL1HEwSwk8F+UJ2Rvd/trCrQia4/Q0UAGgMRErV1
+	Va4ZrMA///iZk/svhWLgiEOIgjCEUN4sU1CiWVgBhyB05fzPu13cwh/BhLMo7+VhwnY7xUwFhHQ
+	4HHAKwJC0iqTElZVGagNz1MFfS8tq8CijBAtdkM2JxnscnbIKyi7pNi5BA+kqetpZkp5nRwF1ZJ
+	3RIAb5fOzF4Fsv3OveDmwOLf2oQOdE/EVZHAyNk6kjf6Nkrme+o7rTQ2IVeM4qvz4whuOmNp41E
+	JYv4xmauiUxRkP09SbY7UTcY3/mAva6Unl7MlGZHxTTFzG6DlC9OWZvvZapIIF9VBtNQOm9Hfcw
+	LzohMKek=
+X-Received: by 2002:a05:7022:6b86:b0:119:e569:f60d with SMTP id
+ a92af1059eb24-128c2d8fe00mr474098c88.6.1772775039009; Thu, 05 Mar 2026
+ 21:30:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260305070525.184945-1-the.latticeheart@gmail.com>
-In-Reply-To: <20260305070525.184945-1-the.latticeheart@gmail.com>
+References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
+ <20260306-unix-proto-update-null-ptr-deref-v3-1-2f0c7410c523@rbox.co>
+In-Reply-To: <20260306-unix-proto-update-null-ptr-deref-v3-1-2f0c7410c523@rbox.co>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 5 Mar 2026 21:26:45 -0800
-X-Gm-Features: AaiRm53sItMDOl-qvAuyshpf-DuzuNbF9VniBkP8YNq5BCZ5mpxHPmhyZbwjntg
-Message-ID: <CAAVpQUCoPoMPruAetG8zt=o=iZuqUKs-xaVxtf9HSrh=hi2jLw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] selftests: af_unix: validate SO_PEEK_OFF
- advancement and reset
-To: Soichiro Ueda <the.latticeheart@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Miao Wang <shankerwangmiao@gmail.com>
+Date: Thu, 5 Mar 2026 21:30:28 -0800
+X-Gm-Features: AaiRm50jkjo2D8__HZfvwOMuhiWP6gML_uFOzVrw-NUHlbujLc2OhzKbo6rD-x0
+Message-ID: <CAAVpQUDmSyxGHuyZNGbsbadXBO3yG0qffaeA0y4AzQiSg4v17g@mail.gmail.com>
+Subject: Re: [PATCH bpf v3 1/5] bpf, sockmap: Annotate af_unix sock::sk_state data-races
+To: Michal Luczaj <mhal@rbox.co>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4C1D321BB33
+X-Rspamd-Queue-Id: 79EF521BB83
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264674-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264675-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,mail.gmail.com:mid,rbox.co:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 4, 2026 at 11:05=E2=80=AFPM Soichiro Ueda
-<the.latticeheart@gmail.com> wrote:
+On Thu, Mar 5, 2026 at 3:31=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wrote:
 >
-> Extend the so_peek_off selftest to ensure the socket peek offset is handl=
-ed
-> correctly after both MSG_PEEK and actual data consumption.
+> sock_map_sk_state_allowed() and sock_map_redirect_allowed() read af_unix
+> socket sk_state locklessly.
 >
-> Verify that the peek offset advances by the same amount as the number of
-> bytes read when performing a read with MSG_PEEK.
+> Use READ_ONCE(). Note that for sock_map_redirect_allowed() change affects
+> not only af_unix, but all non-TCP sockets (UDP, af_vsock).
 >
-> After exercising SO_PEEK_OFF via MSG_PEEK, drain the receive queue with a
-> non-peek recv() and verify that it can receive all the content in the
-> buffer and SO_PEEK_OFF returns back to 0.
->
-> The verification after actual data consumption was suggested by Miao Wang
-> when the original so_peek_off selftest was introduced.
->
-> Link: https://lore.kernel.org/all/7B657CC7-B5CA-46D2-8A4B-8AB5FB83C6DA@gm=
-ail.com/
-> Suggested-by: Miao Wang <shankerwangmiao@gmail.com>
-> Signed-off-by: Soichiro Ueda <the.latticeheart@gmail.com>
-> ---
-> v1 -> v2:
-> - Add peekoffeq checks after MSG_PEEK to verify offset advancement
-> - Unify the length in the non-peek read
->
-> v1: https://lore.kernel.org/netdev/20260122033605.148626-1-the.latticehea=
-rt@gmail.com/
->
->  .../selftests/net/af_unix/so_peek_off.c       | 46 +++++++++++++++++++
->  1 file changed, 46 insertions(+)
->
-> diff --git a/tools/testing/selftests/net/af_unix/so_peek_off.c b/tools/te=
-sting/selftests/net/af_unix/so_peek_off.c
-> index 86e7b0fb522d..9640a3975aee 100644
-> --- a/tools/testing/selftests/net/af_unix/so_peek_off.c
-> +++ b/tools/testing/selftests/net/af_unix/so_peek_off.c
-> @@ -76,6 +76,19 @@ FIXTURE_TEARDOWN(so_peek_off)
->                 ASSERT_STREQ(str, buf);                         \
->         } while (0)
->
-> +#define peekoffeq(fd, expected)                                        \
-> +       do {                                                    \
-> +               int off =3D -1;                                   \
-> +               socklen_t optlen =3D sizeof(off);         \
-
-nit: Can you insert one more tab before \ here ?
-
-While at it, please sort variables in reverse xmas tree order.
-
-socklen_t optlen =3D sizeof(off);
-int ret, off =3D -1;
-
-Otherwise looks good, thanks !
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Actually TCP path also needs READ_ONCE(), but I think
+it's okay for now since this series focuses on AF_UNIX.
 
