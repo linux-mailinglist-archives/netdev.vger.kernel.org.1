@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-264720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SFZHKW+lqml6UwEAu9opvQ
-	(envelope-from <netdev+bounces-264720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:59:11 +0100
+	id KCrdFjmmqml6UwEAu9opvQ
+	(envelope-from <netdev+bounces-264721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 11:02:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 389AD21E54B
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:59:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DD421E5D7
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 11:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF8083069660
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:58:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91B683111ACF
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F84F34F46A;
-	Fri,  6 Mar 2026 09:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F7129BD95;
+	Fri,  6 Mar 2026 09:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKS/oUlo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JPKfAFXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BC034B18E;
-	Fri,  6 Mar 2026 09:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E226350D7F
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 09:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772791040; cv=none; b=qBYyQa+Gh+5o+W/b0LietsEhM/WYTqqgltB6mkjwX1rmhZrlBLwBLgypA3jZzOOn4flwR6/XhB3uHpKWjYSfuScy7jjcRa3zlH28tdbsB3SriCn3wYKj7ox8PsrMis/bz8xKtwR9J+aP+Pid+F0OBx1YkvGSeQOXftUYpVm3KlY=
+	t=1772791079; cv=none; b=DLx7EIYdolqaatVW6AuhDz1NvsQ6dwgM370mHTfLVVOnaTwBKCjZ5ijz3hx96VJGDZQhXqvlPkh9Zr7Ir2EsCB1coGbkKpA7/zv8nWsq7WE6ckGWdyVkeOjaohBYM2ae7tq0HS7hIjAxW4ExX0BuK9tYdNGj35YnMS6l+dOe7rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772791040; c=relaxed/simple;
-	bh=pkUmUb2g7nlB5B4CBhLHrn/LJcujtm0BE3qbKB1dNzw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OVyUpg2f2Lx7jZC4mUmg5E7kGZ4ubUHc0nXnJ/vmBjYZ5cY8OF/E0XozYBOCgItNvnW8LjLoVR1OQbhE1ySGiRJxUKGPzLIQT0ugAnF/uTeG9rFxxKLLpkeKq+5p1XdTvdRDjVhUahP3IY+ytkaJvuGm3qlioX7GJDlzCe+bLUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKS/oUlo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA38CC19422;
-	Fri,  6 Mar 2026 09:57:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772791039;
-	bh=pkUmUb2g7nlB5B4CBhLHrn/LJcujtm0BE3qbKB1dNzw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=sKS/oUlo15AAxdnctAxUwY2A1P2GQWdJK4gC1hid5Z0qldhSQiA/r9UWPt9d+eFMl
-	 5eFbKs0mKAYurXL1agu9sz6qDzBJ0i4Jcr+JNoieCv7QjaN+93GVXyF8cSGIVRm+zQ
-	 EBtSLT06ZjEPHbaRfYyFNaDQOzjoLX2Cwu6cVoi0SFlmoDABpyw/bw0lXXSbnR0sgZ
-	 zkmCq2VjSAVQ+2E+SVWJve839VfqrNBJombhWZWtCjIyC7jxWpgZL6+c0ZRNvG2OLn
-	 nyL+hpCk1272FRNnhcH689uJ0P3VZqG+DCCRj5vwH0qRJunhCx1nevyBm42cuSGtCB
-	 a6e49CQbKv9Yw==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Jiri Slaby <jirislaby@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, Netdev
- <netdev@vger.kernel.org>, rcu@vger.kernel.org, MPTCP Linux
- <mptcp@lists.linux.dev>, Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- "luto@kernel.org" <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
- <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org>
-Date: Fri, 06 Mar 2026 10:57:15 +0100
-Message-ID: <87qzpx2sck.ffs@tglx>
+	s=arc-20240116; t=1772791079; c=relaxed/simple;
+	bh=mnwoYEUV8u9guEyLmMzsDHUmlNESJK405lhhmirhieA=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=brbicFLdBg0wfUuFmmMjFtzinqh0618GMQNOe2MdgSSiYLNA/zPwvwuv+/oxDUtepBbdVRn3a2d5JAZRlmDdXPyZEDh8/xW8imgYP58/DiqHIKOpYM+E+I/1zJCdhHHdJuDy8kycGO2HKszXAtZIHTpKJVthEvabE0dkBq0AgxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JPKfAFXi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772791075;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mnwoYEUV8u9guEyLmMzsDHUmlNESJK405lhhmirhieA=;
+	b=JPKfAFXi0c9KKttl5YLVnVVvw49jNaIlkZ6CFGZFztzp2Rqh77hfx/Xj9hARViqwPqA5nO
+	FKF4akJgqrrxLgQ0GHxXJ75t/UgrYF49IJ/MuOXeAdUnV6DbokbIepmODMDitsMNjOGF4m
+	Fv5xhYtXjALWA2x8+OuSpwYa1d9WYY4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-177-4V7wrrt7O76KBoSEIuI2kA-1; Fri,
+ 06 Mar 2026 04:57:52 -0500
+X-MC-Unique: 4V7wrrt7O76KBoSEIuI2kA-1
+X-Mimecast-MFC-AGG-ID: 4V7wrrt7O76KBoSEIuI2kA_1772791070
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65A2419560AD;
+	Fri,  6 Mar 2026 09:57:50 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.45.224.65])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B639918001FE;
+	Fri,  6 Mar 2026 09:57:46 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <368272.1772713861@warthog.procyon.org.uk>
+References: <368272.1772713861@warthog.procyon.org.uk>
+To: netdev@vger.kernel.org
+Cc: dhowells@redhat.com, Miaoqian Lin <linmq006@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] rxrpc, afs: Fix missing error pointer check after rxrpc_kernel_lookup_peer()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 389AD21E54B
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <490695.1772791065.1@warthog.procyon.org.uk>
+Date: Fri, 06 Mar 2026 09:57:45 +0000
+Message-ID: <490696.1772791065@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: B4DD421E5D7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264720-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,auristor.com,davemloft.net,google.com,kernel.org,lists.infradead.org,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-264721-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06 2026 at 06:48, Jiri Slaby wrote:
-> On 05. 03. 26, 20:25, Thomas Gleixner wrote:
->> Is there simple way to reproduce?
->
-> Unfortunately not at all. To date, I even cannot reproduce locally, it 
-> reproduces exclusively in opensuse build service (and github CI as per 
-> Matthieu's report). I have a project in there with packages which fail 
-> more often than others:
->    https://build.opensuse.org/project/monitor/home:jirislaby:softlockup
-> But it's all green ATM.
->
-> Builds of Go 1.24 and tests of rust 1.90 fail the most. The former even 
-> takes only ~ 8 minutes, so it's not that intensive build at all. So the 
-> reasons are unknown to me. At least, Go apparently uses threads for 
-> building (unlike gcc/clang with forks/processes). Dunno about rust.
+Apologies, the patch author should be:
 
-I tried with tons of test cases which stress test mmcid with threads and
-failed.
+Miaoqian Lin <linmq006@gmail.com>
 
-Can you provide me your .config, source version, VM setup (Number of
-CPUs, memory etc.)?
+David
 
-I tried to find it on that github page Matthiue mentioned but I'm
-probably too stupid to navigate this clicky interface.
-
-Thanks
-
-        tglx
 
