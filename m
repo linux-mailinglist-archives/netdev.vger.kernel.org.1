@@ -1,292 +1,186 @@
-Return-Path: <netdev+bounces-264895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COL4JkAhq2mPaAEAu9opvQ
-	(envelope-from <netdev+bounces-264895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:47:28 +0100
+	id KOh8E/whq2mPaAEAu9opvQ
+	(envelope-from <netdev+bounces-264896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:50:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB071226D59
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:47:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D04AC226DB0
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9AF563061441
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:47:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E801309AA65
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB6A3FD156;
-	Fri,  6 Mar 2026 18:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFF536F429;
+	Fri,  6 Mar 2026 18:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmHr8s0c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQQJ5Vrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388CD4218BC
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 18:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772822835; cv=pass; b=nJyP7RrPeYOI5T+atiCdbiEFML4zIf1KeJedX5Zthdi91ayQDKWNd/VqurmlG0rHp7OqwEICZDguZ10IDl3llmVKF1jxFBuQ4q48MvrMqHyKhl9VK8l619bz5Wq2IQAuJua7RSNiIw9SUYZFropphcUgBH1KVkYq8ZrkTmp+Lm4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772822835; c=relaxed/simple;
-	bh=g0vdLma7xjZDXNlTrA81K4zbu/aX7VEdpvCQsPHac+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u5voogk2Dp8tZmfjOYRUzIwB523YSm0ISvU3rEP9rkp8oQ3YPXxJap1Gb/68EZGuGuN6j5muCzHRPJTlJUnNY9F4lttII0FvzcqFcXAcJbbY64IiFizKVdMNTB4ATvsqEqBKNuGhQphxW+1hc0i3Z3myY32Q7Hgb1+dLDR+T0W8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mmHr8s0c; arc=pass smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375F2145355
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 18:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772823026; cv=none; b=khmI98Fwv4+TGPc97t4c9ufwedr2bHAt8McbJKlLSgmERr94AfhkJg5RqSIkV9Z19e9rt7iGhYJKLiKjVwLAM87NRo0M7wGeNj5ggBh4nqXnseEbElDBx9rF/k9zZb0UII6oP4Dtan3RkAlJykMEmCrKPykc2vXYPSgzWYjBG88=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772823026; c=relaxed/simple;
+	bh=cmiwxDteA0bVU5ry0h+O5seSL9/dd7E9bW/vaIpx2a4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Np5QpYeSnhwJQ+CCtRYfpxL9DPZobiEgmslLg/mNRj5zWKMWnBwXf6Of1sr8OLq6XJxV0v3mDepKazKW0bFN/j9lCOM5DZuTLihyWUC6GLbIfmjqD1qgP/5ifQyW1YhOLZcHuK+lf/apcakSlJspRIpFY/Vrb4auS4Hr7H4LnPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQQJ5Vrt; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-463d81452abso6101017b6e.0
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 10:47:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772822830; cv=none;
-        d=google.com; s=arc-20240605;
-        b=U5O/K4PxHsj/8dyBHxxuWnnxDFaKRzqnssZdEduds0TmoGJV70JeJxfH5RSQp/JQkk
-         FQrC+LrTheSClo0otLUkAPwQlq1DKBPWuLXgOYPhpxGxhZMFv40OepQFZFysq8YcFDhi
-         KQcbHvhgZROdN8qoBcAFJhmP2fPw3eJCZSvKkE1Tn1/mK5VkweM6aa3q4yGtR1oAqspj
-         LUOQcNtNWsi1IgvB7owaSvhHFhSFHbCbqG7N2zbJJZyQ2Jzrv9krhssCcNSxnCBVc2Z6
-         q7JT2UcJJiL24rdFEXvbZEayo275bQ/KuV6z2W9uiQ5OzSM9DmYmYYvkBzai6K8S8WtY
-         tgUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
-        fh=8SYuxXDJKXt15BNx6IK/8Vs3wJe0VUYUUocKhhJH7P8=;
-        b=bhkXqbUkzwCcLK8AfQ6T87PQowXJNITQAe4v2KKapa/ZNNpPIInohEoJ0aYKAl86CT
-         rwmRNctv/S/evHplSBxT6zOVk9e03OwPtNjdKgkglsetrX5J4D0gXy/srFcmlGd2Wi+x
-         +Hz5WS+XsQ6IRNwpnx22LBXIjwWv1TvYZuVh7wQRKBkCI+E7k5H6iu6kP5FUaYtDiiWn
-         Ftk7m8iWAZL9kr7S37T6xsWJ4EqsNMlFx51gUq9xXlANCS1cdt1SHUf+i40WYNMMwbXa
-         0ReWkoeprFN7Qu88BhOPp0MXwRth5zdf4+AYieyL2rbmiWno2+VH1l15PLifnI9yj8H/
-         50DQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7986d231b3cso124919697b3.1
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 10:50:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772822830; x=1773427630; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
-        b=mmHr8s0chcn9e8Z4V2k5vT82WPObhdUqH1VWIL3u+SgBxPCX7K7H/zWfUaeRUbZPDQ
-         /8aNWcV2emYatTwZoNzn+/HmcN15XVcoclterrH3dxHQplbETRhfZqe+7Jw9jW8oZWFI
-         SlRcNLdE9c56m9dWilTrgFGru0S7XKszA9RudPfT9l9349zfO2wC8CKbMzJNkmz9/XBt
-         aGVxzA2oXfNuREbhIZ5hq94dgKS5w/areyIRTyvJOC1uk4O2iHUEjBD0BOzUKmN2SDD5
-         GypAaV91Ace1NpL+bXe7qM/8Qp9Fw2PL3xYt7KoU1XrU9Y9me6sMKmL+e9lAG4Jy60b6
-         8IXQ==
+        d=gmail.com; s=20230601; t=1772823024; x=1773427824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0lI3EKSn/5Qi2aFTkakiZu1L3daiZqHsOPjru5Xcie0=;
+        b=RQQJ5VrtRGw2BNuGkE4EdhOjmPf5opwMzWC5fjtKB2kLLoKhqowIXHNR3Bx6LSo8xb
+         mBntdf7f4GTTqEOQioQRDjDTdT6yl4gRHAmB0wCfGug+DVoQvZMzQuKCaNb/tja5j8cR
+         M/54XNA34W8MV8c6Fhq8PEG5Qv5rqC1R7VjpHCVuC/S6/I9tTcrgBzji039WgJck/XYn
+         f6kIoDJXohG8XQQRDHdcZrlaFsHNVnEk2IPS6vGrgVPCHLnvJ98MXhhItgUSszk6MBYQ
+         zKG4eQCv/g+yGtKUV4pdMSIDSvcnm2MZU6L7FN7NoBTJ6xuD3SXL1oIDMot0dNO5jWcw
+         4gZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772822830; x=1773427630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
-        b=hF7tA7CICMNo0tvTLVkR0UI4eNpC80hjOgbju6bQl0AMWcXR0fb/ESaqHgaOBGIeTd
-         InoMFZKXhhrkW2fB+BvTm53tyUpd50TsJbPcWl9T4JhFgXoeIrx9Ul3J3bTfdUedpY7k
-         QOUNzROI+cnnEyZ48p24FbH2iFBmtXcVOC80J7ibKpFfllSrKe1b0EHIA16n3f3uPmE+
-         mCV/n9RRhDL8nhcRdAY6hiFzBjlUFMK21uz1M4Y2MkX8jkNTMljfe5YLj7ZXyY1rgBt2
-         LgaFCr7SU1XTC/2p16vLYs58CApH8JMXxJJf3Cyh6jXsHiHUjS0pdsMGLbusaTZWOv+v
-         mpAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkKe7dIbXY+GBHFfk2nIExgcHmDZmIBM+Z/jeIJ9mZtH37sH591fo74TG70KmXh0QI32U8Rps=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3nW6cKPDo59SyfmVfN1MR7AWXP0N7D/CNE62y56I5FDSxe+D4
-	X3Z0FHcMC+NvxZNi/NFubQ3XKPz+BkNdDrYidK/U9qofVYIQZBERgwJlljpxPv4ePP9WAVt6Qv1
-	7RJDaYWtHUAH7gqoWm7q8x+MYNK6Mvn4=
-X-Gm-Gg: ATEYQzwxDDEh3gCaSrioXXowJ9kzqd9F0hFp0CLw/S5nsVdfkAlHXI5oLVpc7OrnQge
-	TPkHAr4lJMUjw17T6aBDI0WQPEAtRbPcqO1Xj/5mu4HRykkskHhsK/FFAt3UZOCMhluNG6ieb5s
-	eIY3ffj/InMnECQm3rDxp3hrxGUInoFDjYccU2aX68JuBVMMbuzUg01gzZDNBJXNFCDhIREuxqr
-	X2C6gSlkNJDP2o7XZZ36pVaFk/esBsOAjChR00Dlx/eNZBqBVLChp8HyGMx3C1JdaMYeCKOZdOe
-	D/CGg27ht705pp7hpA==
-X-Received: by 2002:a05:6808:1a12:b0:45f:535:a81b with SMTP id
- 5614622812f47-466dca45cacmr1736666b6e.20.1772822829773; Fri, 06 Mar 2026
- 10:47:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772823024; x=1773427824;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0lI3EKSn/5Qi2aFTkakiZu1L3daiZqHsOPjru5Xcie0=;
+        b=vnwht/XGJJwH0aELDqwP791l4PjWpbnKTEok9I7KIx8axdDXIP/8bbOWWEVXGz3Lw2
+         w4sXB4LtjzJcWEG/Eth8lor/XVATvHdNoLHXu/QqNYjwnE+/ydMChI2zO5poO7z3UnUS
+         uCjAWY31Q7UHOzdGAjCxcTp8aIDx2GfhydOoV1f2ueTpfvk4vgJXUEtoK4Jh84zXLvnG
+         vvm+KBQYYLBiwo/2Py+QSouDESMwRk6BegEp/PwIZCzN8nJlvGMN8S4Vg4toa/86NZgq
+         Fu1SIt7QZQ7aJyuoyvt5Ad+Pbn9Lb5JTF/9JDImVLOCssnivHbg2mOvo9eVyg6Z9fGNW
+         oXiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqRckh2YIHDgyfrHcHI9ABGuN2KoSe5rHIXJfVEmL7enxp4nAql/qx4UeyUBkM20z9gQ7Dr3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc0DcZd2bNtFr2Pd7yDvSwnJZsomof4GeGfEqdNPMKICeCX8+L
+	Nc6bdriUl4hcuLPwzmcfEHzgL3TKFX+M3bp6p1hdsVNS7s83wPaTqzQb
+X-Gm-Gg: ATEYQzwGmxVpJ9pqisi3C0qI8kZ/2rSS73IxWT2acwKje26Ktrra43WKZ6OVg+lyLpQ
+	a8+zXVhkNypRzexLF88oaYIbjuhNk8pjbbGP3mK5L6d6ShU3LqmfexlYzA9oYIb/06wfI3RkGZ+
+	FMqLJq4RlcG2pN7LuqQAsnoavq57cLsoBPg2VJQHzDgG6xuQEMkRIBB5YBTfPGg5fBCf+qr5TV5
+	GEabTucbtfY05ahelVU8KtUN2w1eFLm9+X7VWYiptK0qDGNt0KHW3Pb0bwhImiUyrtorfV7rfZS
+	+0+GmJ1Hd/1xfJDVhiyHmI2RLEUErMZMPWqBNtl9m/z/V6XqVrtoWQ4WQvVj5ml2IN7ziUk7HNl
+	JYrn7Lf17Y5foG60W9l2y1dhL/1IXKJ5z0j8uSfRG96V/2+oDElzxTO+VX5n6KA/USff+3mynMV
+	LvizmmZvBiaMjMKRz3DBMsTTB/Adea4TYznRJgznbIggYr0oD+FelNGIYJ
+X-Received: by 2002:a05:690e:e85:b0:64c:98df:c5d4 with SMTP id 956f58d0204a3-64d071875e2mr6076685d50.46.1772823024193;
+        Fri, 06 Mar 2026 10:50:24 -0800 (PST)
+Received: from desktop-linux.python-stargazer.ts.net ([50.168.180.218])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-798dec8b8b1sm9978057b3.10.2026.03.06.10.50.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 10:50:23 -0800 (PST)
+From: Mehul Rao <mehulrao@gmail.com>
+To: jmaloy@redhat.com,
+	davem@davemloft.net
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ying.xue@windriver.com,
+	tung.q.nguyen@dektech.com.au,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	stable@vger.kernel.org,
+	Mehul Rao <mehulrao@gmail.com>
+Subject: [PATCH net v2] tipc: fix divide-by-zero in tipc_sk_filter_connect()
+Date: Fri,  6 Mar 2026 13:50:05 -0500
+Message-ID: <20260306185005.22120-1-mehulrao@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260305142634.1813208-1-tariqt@nvidia.com> <20260305142634.1813208-6-tariqt@nvidia.com>
-In-Reply-To: <20260305142634.1813208-6-tariqt@nvidia.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 6 Mar 2026 10:46:57 -0800
-X-Gm-Features: AaiRm53OuZX6bDZqk3KXf0VBvaW1qaEMHdpnSE_P0kEPcVqB5bhMoCryjsytJug
-Message-ID: <CAMB2axO9TLY7MznMYtvbfSp5Qev=W4ZM8EtnxFBs_gM=P9vmXQ@mail.gmail.com>
-Subject: Re: [PATCH net 5/5] net/mlx5e: RX, Fix XDP multi-buf frag counting
- for legacy RQ
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EB071226D59
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D04AC226DB0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,windriver.com,dektech.com.au,vger.kernel.org,lists.sourceforge.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-264896-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264895-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,iogearbox.net,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.981];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mehulrao@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qemu.org:url,mail.gmail.com:mid,nvidia.com:email]
+	NEURAL_HAM(-0.00)[-0.985];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Mar 5, 2026 at 6:27=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> wro=
-te:
->
-> From: Dragos Tatulea <dtatulea@nvidia.com>
->
-> XDP multi-buf programs can modify the layout of the XDP buffer when the
-> program calls bpf_xdp_pull_data() or bpf_xdp_adjust_tail(). The
-> referenced commit in the fixes tag corrected the assumption in the mlx5
-> driver that the XDP buffer layout doesn't change during a program
-> execution. However, this fix introduced another issue: the dropped
-> fragments still need to be counted on the driver side to avoid page
-> fragment reference counting issues.
->
-> Such issue can be observed with the
-> test_xdp_native_adjst_tail_shrnk_data selftest when using a payload of
-> 3600 and shrinking by 256 bytes (an upcoming selftest patch): the last
-> fragment gets released by the XDP code but doesn't get tracked by the
-> driver. This results in a negative pp_ref_count during page release and
-> the following splat:
->
->   WARNING: include/net/page_pool/helpers.h:297 at mlx5e_page_release_frag=
-mented.isra.0+0x4a/0x50 [mlx5_core], CPU#12: ip/3137
->   Modules linked in: [...]
->   CPU: 12 UID: 0 PID: 3137 Comm: ip Not tainted 6.19.0-rc3+ #12 NONE
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.3-0-g=
-a6ed6b701f0a-prebuilt.qemu.org 04/01/2014
->   RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x4a/0x50 [mlx5_core]
->   [...]
->   Call Trace:
->    <TASK>
->    mlx5e_dealloc_rx_wqe+0xcb/0x1a0 [mlx5_core]
->    mlx5e_free_rx_descs+0x7f/0x110 [mlx5_core]
->    mlx5e_close_rq+0x50/0x60 [mlx5_core]
->    mlx5e_close_queues+0x36/0x2c0 [mlx5_core]
->    mlx5e_close_channel+0x1c/0x50 [mlx5_core]
->    mlx5e_close_channels+0x45/0x80 [mlx5_core]
->    mlx5e_safe_switch_params+0x1a5/0x230 [mlx5_core]
->    mlx5e_change_mtu+0xf3/0x2f0 [mlx5_core]
->    netif_set_mtu_ext+0xf1/0x230
->    do_setlink.isra.0+0x219/0x1180
->    rtnl_newlink+0x79f/0xb60
->    rtnetlink_rcv_msg+0x213/0x3a0
->    netlink_rcv_skb+0x48/0xf0
->    netlink_unicast+0x24a/0x350
->    netlink_sendmsg+0x1ee/0x410
->    __sock_sendmsg+0x38/0x60
->    ____sys_sendmsg+0x232/0x280
->    ___sys_sendmsg+0x78/0xb0
->    __sys_sendmsg+0x5f/0xb0
->    [...]
->    do_syscall_64+0x57/0xc50
->
-> This patch fixes the issue by doing page frag counting on all the
-> original XDP buffer fragments for all relevant XDP actions (XDP_TX ,
-> XDP_REDIRECT and XDP_PASS). This is basically reverting to the original
-> counting before the commit in the fixes tag.
->
-> As frag_page is still pointing to the original tail, the nr_frags
-> parameter to xdp_update_skb_frags_info() needs to be calculated
-> in a different way to reflect the new nr_frags.
+A user can set conn_timeout to any value via
+setsockopt(TIPC_CONN_TIMEOUT), including values less than 4.  When a
+SYN is rejected with TIPC_ERR_OVERLOAD and the retry path in
+tipc_sk_filter_connect() executes:
 
-I see the error I made. Thanks for fixing it.
+    delay %= (tsk->conn_timeout / 4);
 
-Reviewed-by: Amery Hung <ameryhung@gmail.com>
+If conn_timeout is in the range [0, 3], the integer division yields 0,
+and the modulo operation triggers a divide-by-zero exception, causing a
+kernel oops/panic.
 
->
-> Fixes: afd5ba577c10 ("net/mlx5e: RX, Fix generating skb from non-linear x=
-dp_buff for legacy RQ")
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Cc: Amery Hung <ameryhung@gmail.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/ne=
-t/ethernet/mellanox/mlx5/core/en_rx.c
-> index 40e53a612989..268e20884757 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> @@ -1589,6 +1589,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
->         struct skb_shared_info *sinfo;
->         u32 frag_consumed_bytes;
->         struct bpf_prog *prog;
-> +       u8 nr_frags_free =3D 0;
->         struct sk_buff *skb;
->         dma_addr_t addr;
->         u32 truesize;
-> @@ -1631,15 +1632,13 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq,=
- struct mlx5e_wqe_frag_info *wi
->
->         prog =3D rcu_dereference(rq->xdp_prog);
->         if (prog) {
-> -               u8 nr_frags_free, old_nr_frags =3D sinfo->nr_frags;
-> +               u8 old_nr_frags =3D sinfo->nr_frags;
->
->                 if (mlx5e_xdp_handle(rq, prog, mxbuf)) {
->                         if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT,
->                                                  rq->flags)) {
->                                 struct mlx5e_wqe_frag_info *pwi;
->
-> -                               wi -=3D old_nr_frags - sinfo->nr_frags;
-> -
->                                 for (pwi =3D head_wi; pwi < wi; pwi++)
->                                         pwi->frag_page->frags++;
->                         }
-> @@ -1647,10 +1646,8 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, =
-struct mlx5e_wqe_frag_info *wi
->                 }
->
->                 nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
-> -               if (unlikely(nr_frags_free)) {
-> -                       wi -=3D nr_frags_free;
-> +               if (unlikely(nr_frags_free))
->                         truesize -=3D nr_frags_free * frag_info->frag_str=
-ide;
-> -               }
->         }
->
->         skb =3D mlx5e_build_linear_skb(
-> @@ -1666,7 +1663,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
->
->         if (xdp_buff_has_frags(&mxbuf->xdp)) {
->                 /* sinfo->nr_frags is reset by build_skb, calculate again=
-. */
-> -               xdp_update_skb_frags_info(skb, wi - head_wi - 1,
-> +               xdp_update_skb_frags_info(skb, wi - head_wi - nr_frags_fr=
-ee - 1,
->                                           sinfo->xdp_frags_size, truesize=
-,
->                                           xdp_buff_get_skb_flags(&mxbuf->=
-xdp));
->
-> --
-> 2.44.0
->
+Fix this by clamping conn_timeout to a minimum of 4 at the point of use
+in tipc_sk_filter_connect().
+
+Oops: divide error: 0000 [#1] SMP KASAN NOPTI
+CPU: 0 UID: 0 PID: 119 Comm: poc-F144 Not tainted 7.0.0-rc2+
+RIP: 0010:tipc_sk_filter_rcv+0x1b99/0x3040
+Call Trace:
+ tipc_sk_backlog_rcv+0xe4/0x1d0
+ __release_sock+0x1ef/0x2a0
+ release_sock+0x55/0x190
+ tipc_connect+0x140/0x510
+ __sys_connect+0x1bb/0x2e0
+
+Fixes: 6787927475e5 ("tipc: buffer overflow handling in listener socket")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mehul Rao <mehulrao@gmail.com>
+---
+Changes in v2:
+- Clamp conn_timeout at the point of use in tipc_sk_filter_connect()
+  instead of rejecting small values in tipc_setsockopt()
+- Link to v1: https://lore.kernel.org/netdev/20260305215336.645186-1-mehulrao@gmail.com/
+---
+ net/tipc/socket.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index 4c618c2b871d..9329919fb07f 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -2233,6 +2233,8 @@ static bool tipc_sk_filter_connect(struct tipc_sock *tsk, struct sk_buff *skb,
+ 		if (skb_queue_empty(&sk->sk_write_queue))
+ 			break;
+ 		get_random_bytes(&delay, 2);
++		if (tsk->conn_timeout < 4)
++			tsk->conn_timeout = 4;
+ 		delay %= (tsk->conn_timeout / 4);
+ 		delay = msecs_to_jiffies(delay + 100);
+ 		sk_reset_timer(sk, &sk->sk_timer, jiffies + delay);
+-- 
+2.53.0
+
 
