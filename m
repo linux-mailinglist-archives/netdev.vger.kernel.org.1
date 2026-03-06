@@ -1,369 +1,328 @@
-Return-Path: <netdev+bounces-264774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGwdDT3KqmlWXAEAu9opvQ
-	(envelope-from <netdev+bounces-264774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:36:13 +0100
+	id qKadGP/KqmlWXAEAu9opvQ
+	(envelope-from <netdev+bounces-264775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:39:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A9A0220BC2
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:36:12 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 066B3220C9A
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60B563028019
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:32:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 20B843007884
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09E61E9B3D;
-	Fri,  6 Mar 2026 12:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E1A23A98D;
+	Fri,  6 Mar 2026 12:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4qMHjOg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QE+kvV7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A43D1DF75D;
-	Fri,  6 Mar 2026 12:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B0C20E03F;
+	Fri,  6 Mar 2026 12:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772800364; cv=none; b=ZTp+ksQQDtRWdqeFayV9qRWPza144GXcY6rXmlHTvATrz0tVdHiOkl4G6AM/b8+LAR/eDv9dN/7gnnGD9qbJmz7vmscERvk3HMxCIO72YSSjoo3a2cmpqEHJnfm6CgL43b+MHoV3VOqLlFVK88bgRPZQT/ycAk+9ReK5CGgn9Ms=
+	t=1772800765; cv=none; b=f0t3vTKZTt8m7+mRKMRvzRB9DP+EgHTcVayBMius+xzWfvIUCnjoJhnz4mZr9wRSgrDml+1XVBXQoEroG731IG/bi3hOolF/MKV5urCfzW6x5hdmFVLTSY4R/gt38rwTalz4ZowNwZ5TJS/wp832lWPhyrjLRKs9bRIH7+RqxC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772800364; c=relaxed/simple;
-	bh=QVn8Y7AXnOu5aPCMlNbbvX0FUbONENXusGGY7trKhug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NPiYPpPagt+fGyTqo8h89fBsV7wrjm6ldZjCMJz2ABOl2fmYBvDDtY2YRcq3C+Z3CMs0424bz9lC3egCouvgCbXYTW/bqETJzNfdPw1EUDIwmzg+ZZbacWcyEJpNny9pE/Tl68FL7DYcxVPs3QxknHNKvb01mSMD8Sq0rdwhQiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4qMHjOg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77675C4CEF7;
-	Fri,  6 Mar 2026 12:32:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772800364;
-	bh=QVn8Y7AXnOu5aPCMlNbbvX0FUbONENXusGGY7trKhug=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T4qMHjOgk3jgWcvjrkPPEKLsolahZSrljiWXH/PIK77OKljPOm5wuV74Xo62bGU2b
-	 W2MZJZyOEeSTvlWTQKvpw5ckVkmpOqUnkKU8hUrtVMu+d5hRTorZsy9a/BEQnu2MNk
-	 nkpwmlrF4FIcx3IYFoqiolIPYTFgWBFiAXMfD1sq6oLSmSACgNEMYXkg5K3N6Dj5og
-	 5jrJz2ywPJ9P8z00grks+YpbG2l3REUrSAfVA1y7lqHfuba58RIKaBs/unDG3xXkGc
-	 mn8Gi0kijcty5232VA10s00CPwrG4FcWsdUqqvgT+wM0NufnQahvqjPZh7U/cyIOmO
-	 l9QVmPUmpBsCw==
-Date: Fri, 6 Mar 2026 12:32:40 +0000
-From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 14/16] mm: rename zap_page_range_single() to
- zap_vma_range()
-Message-ID: <eb247018-b64b-4dba-97ca-9ce8c1b0186c@lucifer.local>
-References: <20260227200848.114019-1-david@kernel.org>
- <20260227200848.114019-15-david@kernel.org>
+	s=arc-20240116; t=1772800765; c=relaxed/simple;
+	bh=oPurXisUTqLAk3GU9lZ8DdyLzvmVpIks2kPl7dTV2Kc=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=AeDMDcJhPCzV5KJwqDJkuNcOXHbp35Q7DUdTY2TXCd3DP/RisPXEVzT8CcpeTYBv21TcGBTcdaOdv2mDh1sMTRUi4blXoRIbNntDSqnqOtiYjhhOPmVydOCG2pRjVLuQApwldLN138VxVMgncSE5A6EckRpVBsUm2NhUkWFMpKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QE+kvV7W; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260227200848.114019-15-david@kernel.org>
-X-Rspamd-Queue-Id: 8A9A0220BC2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772800751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=27XSKDOLXvEq4qzCWSksKAZGxaT1RZzGT8G1FYmDuRc=;
+	b=QE+kvV7WBLdBL0VW1S/v8XWCoHiWa1Ob18s3mIUTxubrsnz6m5G1xEQWzjPmRKCoXQOjph
+	UKfIIZTisE8wh6PI9rTLUcicN408VYkXd1RVsYCtrUEKcpeOr6sWQines80xPixaf4O642
+	AhhDeXcoSb1hHFsdenyPBMVV2EbmYHs=
+Date: Fri, 06 Mar 2026 12:38:57 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <6ca5294f793f4d9dbb3efd62de50daa1d2d6950d@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
+ bond_rr_gen_slave_id()
+To: "Nikolay Aleksandrov" <razor@blackwall.org>
+Cc: "Jay Vosburgh" <jv@jvosburgh.net>, netdev@vger.kernel.org,
+ jiayuan.chen@shopee.com,
+ syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>, "Jesper Dangaard Brouer"
+ <hawk@kernel.org>, "John Fastabend" <john.fastabend@gmail.com>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>, "Hao
+ Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
+ <shuah@kernel.org>, "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ "Clark Williams" <clrkwllms@kernel.org>, "Steven Rostedt"
+ <rostedt@goodmis.org>, "Jussi Maki" <joamaki@gmail.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-rt-devel@lists.linux.dev
+In-Reply-To: <aarG-99qsXKgPMws@penguin>
+References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
+ <20260304074301.35482-2-jiayuan.chen@linux.dev>
+ <aahWymAi_CtRG0gJ@penguin> <1293120.1772645248@famine>
+ <aahsuPt7cY8LxETN@penguin> <1356528.1772744631@famine>
+ <e08dcb78a13fc69be07d28d032cebe3734797a3a@linux.dev>
+ <aarG-99qsXKgPMws@penguin>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 066B3220C9A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-264774-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264775-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[74];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[jvosburgh.net,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lucifer.local:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,appspotmail.com:email,blackwall.org:email,linux.dev:dkim,linux.dev:mid,jvosburgh.net:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 09:08:45PM +0100, David Hildenbrand (Arm) wrote:
-> Let's rename it to make it better match our new naming scheme.
->
-> While at it, polish the kerneldoc.
->
-> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+March 6, 2026 at 20:22, "Nikolay Aleksandrov" <razor@blackwall.org mailto=
+:razor@blackwall.org?to=3D%22Nikolay%20Aleksandrov%22%20%3Crazor%40blackw=
+all.org%3E > wrote:
 
-LGTM, again obviously assuming the rustfmt stuff is sorted :>), so:
 
-Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
+>=20
+>=20On Fri, Mar 06, 2026 at 02:42:05AM +0000, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> 2026/3/6 05:03, "Jay Vosburgh" <jv@jvosburgh.net mailto:jv@jvosburg=
+h.net?to=3D%22Jay%20Vosburgh%22%20%3Cjv%40jvosburgh.net%3E > wrote:
+> >=20=20
+>=20>=20=20
+>=20>=20=20
+>=20>  Nikolay Aleksandrov <razor@blackwall.org> wrote:
+> >=20=20
+>=20>  >=20
+>=20>  > On Wed, Mar 04, 2026 at 09:27:28AM -0800, Jay Vosburgh wrote:
+> >  >=20
+>=20>  > >=20
+>=20>  > > Nikolay Aleksandrov <razor@blackwall.org> wrote:
+> >  > >=20
+>=20>  > > >On Wed, Mar 04, 2026 at 03:42:57PM +0800, Jiayuan Chen wrote:
+> >  > > >> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >  > > >>=20
+>=20>  > > >> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter wit=
+hout a NULL
+> >  > > >> check. rr_tx_counter is a per-CPU counter only allocated in b=
+ond_open()
+> >  > > >> when the bond mode is round-robin. If the bond device was nev=
+er brought
+> >  > > >> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
+> >  > > >>=20
+>=20>  > > >> The XDP redirect path can reach this code even when the bon=
+d is not up:
+> >  > > >> bpf_master_redirect_enabled_key is a global static key, so wh=
+en any bond
+> >  > > >> device has native XDP attached, the XDP_TX -> xdp_master_redi=
+rect()
+> >  > > >> interception is enabled for all bond slaves system-wide. This=
+ allows the
+> >  > > >> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+> >  > > >> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id(=
+) to be
+> >  > > >> reached on a bond that was never opened.
+> >  > > >>=20
+>=20>  > > >> Fix this by allocating rr_tx_counter unconditionally in bon=
+d_init()
+> >  > > >> (ndo_init), which is called by register_netdevice() and cover=
+s both
+> >  > > >> device creation paths (bond_create() and bond_newlink()). Thi=
+s also
+> >  > > >> handles the case where bond mode is changed to round-robin af=
+ter device
+> >  > > >> creation. The conditional allocation in bond_open() is remove=
+d. Since
+> >  > > >> bond_destructor() already unconditionally calls
+> >  > > >> free_percpu(bond->rr_tx_counter), the lifecycle is clean: all=
+ocate at
+> >  > > >> ndo_init, free at destructor.
+> >  > > >>=20
+>=20>  > > >> Note: rr_tx_counter is only used by round-robin mode, so th=
+is
+> >  > > >> deliberately allocates a per-cpu u32 that goes unused for oth=
+er modes.
+> >  > > >> Conditional allocation (e.g., in bond_option_mode_set) was co=
+nsidered
+> >  > > >> but rejected: the XDP path can race with mode changes on a do=
+wned bond,
+> >  > > >> and adding memory barriers to the XDP hot path is not justifi=
+ed for
+> >  > > >> saving 4 bytes per CPU.
+> >  > > >>=20
+>=20>  > > >> Fixes: 879af96ffd72 ("net, core: Add support for XDP redire=
+ction to slave device")
+> >  > > >> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmai=
+l.com
+> >  > > >> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.=
+00cc.GAE@google.com/T/
+> >  > > >> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >  > > >> ---
+> >  > > >> drivers/net/bonding/bond_main.c | 19 +++++++++++++------
+> >  > > >> 1 file changed, 13 insertions(+), 6 deletions(-)
+> >  > > >>=20
+>=20>  > > >
+> >  > > >IMO it's not worth it to waste memory in all modes, for an unpo=
+pular mode.
+> >  > > >I think it'd be better to add a null check in bond_rr_gen_slave=
+_id(),
+> >  > > >READ/WRITE_ONCE() should be enough since it is allocated only o=
+nce, and
+> >  > > >freed when the xmit code cannot be reachable anymore (otherwise=
+ we'd have
+> >  > > >more bugs now). The branch will be successfully predicted pract=
+ically always,
+> >  > > >and you can also mark the ptr being null as unlikely. That way =
+only RR takes
+> >  > > >a very minimal hit, if any.
+> >  > >=20
+>=20>  > > Is what you're suggesting different from Jiayuan's proposal[0]=
+,
+> >  > > in the sense of needing barriers in the XDP hot path to insure o=
+rdering?
+> >  > >=20
+>=20>  > > If I understand correctly, your suggestion is something like
+> >  > > (totally untested):
+> >  > >=20
+>=20>  > Basically yes, that is what I'm proposing + an unlikely() around=
+ that
+> >  > null check since it is really unlikely and will be always predicte=
+d
+> >  > correctly, this way it's only for RR mode.
+> >  >=20
+>=20>  Jiayuan,
+> >=20=20
+>=20>  Do you agree that the patch below (including Nikolay's
+> >  suggestion to add "unlikely") resolves the original issue without me=
+mory
+> >  waste, and without introducing performance issues (barriers) into th=
+e
+> >  XDP path?
+> >=20=20
+>=20>=20=20
+>=20>  Sure, it's basically similar to what my v1 did, but the patch belo=
+w can be more generic.
+> >=20=20
+>=20>  https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen=
+@linux.dev/T/#m08e3e53a8aa8d837ddc9242f4b14f2651a2b00aa
+> >=20
+>=20IMO that is worse, you'll add 2 new tests and potentially 1 more cach=
+e line
+> for everyone in a hot path that is used a lot and must be kept as fast =
+as possible.
 
-> ---
->  arch/s390/mm/gmap_helpers.c          |  2 +-
->  drivers/android/binder/page_range.rs |  4 ++--
->  drivers/android/binder_alloc.c       |  2 +-
->  include/linux/mm.h                   |  4 ++--
->  kernel/bpf/arena.c                   |  2 +-
->  kernel/events/core.c                 |  2 +-
->  mm/madvise.c                         |  4 ++--
->  mm/memory.c                          | 14 +++++++-------
->  net/ipv4/tcp.c                       |  6 +++---
->  rust/kernel/mm/virt.rs               |  4 ++--
->  10 files changed, 22 insertions(+), 22 deletions(-)
->
-> diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
-> index ae2d59a19313..f8789ffcc05c 100644
-> --- a/arch/s390/mm/gmap_helpers.c
-> +++ b/arch/s390/mm/gmap_helpers.c
-> @@ -89,7 +89,7 @@ void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, unsigned lo
->  		if (!vma)
->  			return;
->  		if (!is_vm_hugetlb_page(vma))
-> -			zap_page_range_single(vma, vmaddr, min(end, vma->vm_end) - vmaddr);
-> +			zap_vma_range(vma, vmaddr, min(end, vma->vm_end) - vmaddr);
->  		vmaddr = vma->vm_end;
->  	}
->  }
-> diff --git a/drivers/android/binder/page_range.rs b/drivers/android/binder/page_range.rs
-> index fdd97112ef5c..2fddd4ed8d4c 100644
-> --- a/drivers/android/binder/page_range.rs
-> +++ b/drivers/android/binder/page_range.rs
-> @@ -130,7 +130,7 @@ pub(crate) struct ShrinkablePageRange {
->      pid: Pid,
->      /// The mm for the relevant process.
->      mm: ARef<Mm>,
-> -    /// Used to synchronize calls to `vm_insert_page` and `zap_page_range_single`.
-> +    /// Used to synchronize calls to `vm_insert_page` and `zap_vma_range`.
->      #[pin]
->      mm_lock: Mutex<()>,
->      /// Spinlock protecting changes to pages.
-> @@ -719,7 +719,7 @@ fn drop(self: Pin<&mut Self>) {
->
->      if let Some(vma) = mmap_read.vma_lookup(vma_addr) {
->          let user_page_addr = vma_addr + (page_index << PAGE_SHIFT);
-> -        vma.zap_page_range_single(user_page_addr, PAGE_SIZE);
-> +        vma.zap_vma_range(user_page_addr, PAGE_SIZE);
->      }
->
->      drop(mmap_read);
-> diff --git a/drivers/android/binder_alloc.c b/drivers/android/binder_alloc.c
-> index dd2046bd5cde..e4488ad86a65 100644
-> --- a/drivers/android/binder_alloc.c
-> +++ b/drivers/android/binder_alloc.c
-> @@ -1185,7 +1185,7 @@ enum lru_status binder_alloc_free_page(struct list_head *item,
->  	if (vma) {
->  		trace_binder_unmap_user_start(alloc, index);
->
-> -		zap_page_range_single(vma, page_addr, PAGE_SIZE);
-> +		zap_vma_range(vma, page_addr, PAGE_SIZE);
->
->  		trace_binder_unmap_user_end(alloc, index);
->  	}
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 4bd1500b9630..833bedd3f739 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -2835,7 +2835,7 @@ struct page *vm_normal_page_pud(struct vm_area_struct *vma, unsigned long addr,
->
->  void zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
->  		  unsigned long size);
-> -void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
-> +void zap_vma_range(struct vm_area_struct *vma, unsigned long address,
->  			   unsigned long size);
->  /**
->   * zap_vma - zap all page table entries in a vma
-> @@ -2843,7 +2843,7 @@ void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
->   */
->  static inline void zap_vma(struct vm_area_struct *vma)
->  {
-> -	zap_page_range_single(vma, vma->vm_start, vma->vm_end - vma->vm_start);
-> +	zap_vma_range(vma, vma->vm_start, vma->vm_end - vma->vm_start);
->  }
->  struct mmu_notifier_range;
->
-> diff --git a/kernel/bpf/arena.c b/kernel/bpf/arena.c
-> index c34510d83b1f..37843c6a4764 100644
-> --- a/kernel/bpf/arena.c
-> +++ b/kernel/bpf/arena.c
-> @@ -656,7 +656,7 @@ static void zap_pages(struct bpf_arena *arena, long uaddr, long page_cnt)
->  	guard(mutex)(&arena->lock);
->  	/* iterate link list under lock */
->  	list_for_each_entry(vml, &arena->vma_list, head)
-> -		zap_page_range_single(vml->vma, uaddr, PAGE_SIZE * page_cnt);
-> +		zap_vma_range(vml->vma, uaddr, PAGE_SIZE * page_cnt);
->  }
->
->  static void arena_free_pages(struct bpf_arena *arena, long uaddr, long page_cnt, bool sleepable)
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index c94c56c94104..5ee02817c3bc 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -7215,7 +7215,7 @@ static int map_range(struct perf_buffer *rb, struct vm_area_struct *vma)
->  #ifdef CONFIG_MMU
->  	/* Clear any partial mappings on error. */
->  	if (err)
-> -		zap_page_range_single(vma, vma->vm_start, nr_pages * PAGE_SIZE);
-> +		zap_vma_range(vma, vma->vm_start, nr_pages * PAGE_SIZE);
->  #endif
->
->  	return err;
-> diff --git a/mm/madvise.c b/mm/madvise.c
-> index fb5fcdff2b66..6e66f56ff1a6 100644
-> --- a/mm/madvise.c
-> +++ b/mm/madvise.c
-> @@ -832,7 +832,7 @@ static int madvise_free_single_vma(struct madvise_behavior *madv_behavior)
->   * Application no longer needs these pages.  If the pages are dirty,
->   * it's OK to just throw them away.  The app will be more careful about
->   * data it wants to keep.  Be sure to free swap resources too.  The
-> - * zap_page_range_single call sets things up for shrink_active_list to actually
-> + * zap_vma_range call sets things up for shrink_active_list to actually
->   * free these pages later if no one else has touched them in the meantime,
->   * although we could add these pages to a global reuse list for
->   * shrink_active_list to pick up before reclaiming other pages.
-> @@ -1191,7 +1191,7 @@ static long madvise_guard_install(struct madvise_behavior *madv_behavior)
->  		 * OK some of the range have non-guard pages mapped, zap
->  		 * them. This leaves existing guard pages in place.
->  		 */
-> -		zap_page_range_single(vma, range->start, range->end - range->start);
-> +		zap_vma_range(vma, range->start, range->end - range->start);
->  	}
->
->  	/*
-> diff --git a/mm/memory.c b/mm/memory.c
-> index e611e9af4e85..dd737b6d28c0 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -2215,14 +2215,14 @@ void zap_vma_range_batched(struct mmu_gather *tlb,
->  }
->
->  /**
-> - * zap_page_range_single - remove user pages in a given range
-> - * @vma: vm_area_struct holding the applicable pages
-> - * @address: starting address of pages to zap
-> + * zap_vma_range - zap all page table entries in a vma range
-> + * @vma: the vma covering the range to zap
-> + * @address: starting address of the range to zap
->   * @size: number of bytes to zap
->   *
-> - * The range must fit into one VMA.
-> + * The provided address range must be fully contained within @vma.
->   */
-> -void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
-> +void zap_vma_range(struct vm_area_struct *vma, unsigned long address,
->  		unsigned long size)
->  {
->  	struct mmu_gather tlb;
-> @@ -2250,7 +2250,7 @@ void zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
->  	    		!(vma->vm_flags & VM_PFNMAP))
->  		return;
->
-> -	zap_page_range_single(vma, address, size);
-> +	zap_vma_range(vma, address, size);
->  }
->  EXPORT_SYMBOL_GPL(zap_vma_ptes);
->
-> @@ -3018,7 +3018,7 @@ static int remap_pfn_range_notrack(struct vm_area_struct *vma, unsigned long add
->  	 * maintain page reference counts, and callers may free
->  	 * pages due to the error. So zap it early.
->  	 */
-> -	zap_page_range_single(vma, addr, size);
-> +	zap_vma_range(vma, addr, size);
->  	return error;
->  }
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index befcde27dee7..cb4477ef1529 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -2104,7 +2104,7 @@ static int tcp_zerocopy_vm_insert_batch_error(struct vm_area_struct *vma,
->  		maybe_zap_len = total_bytes_to_map -  /* All bytes to map */
->  				*length + /* Mapped or pending */
->  				(pages_remaining * PAGE_SIZE); /* Failed map. */
-> -		zap_page_range_single(vma, *address, maybe_zap_len);
-> +		zap_vma_range(vma, *address, maybe_zap_len);
->  		err = 0;
->  	}
->
-> @@ -2112,7 +2112,7 @@ static int tcp_zerocopy_vm_insert_batch_error(struct vm_area_struct *vma,
->  		unsigned long leftover_pages = pages_remaining;
->  		int bytes_mapped;
->
-> -		/* We called zap_page_range_single, try to reinsert. */
-> +		/* We called zap_vma_range, try to reinsert. */
->  		err = vm_insert_pages(vma, *address,
->  				      pending_pages,
->  				      &pages_remaining);
-> @@ -2269,7 +2269,7 @@ static int tcp_zerocopy_receive(struct sock *sk,
->  	total_bytes_to_map = avail_len & ~(PAGE_SIZE - 1);
->  	if (total_bytes_to_map) {
->  		if (!(zc->flags & TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT))
-> -			zap_page_range_single(vma, address, total_bytes_to_map);
-> +			zap_vma_range(vma, address, total_bytes_to_map);
->  		zc->length = total_bytes_to_map;
->  		zc->recv_skip_hint = 0;
->  	} else {
-> diff --git a/rust/kernel/mm/virt.rs b/rust/kernel/mm/virt.rs
-> index b8e59e4420f3..04b3cc925d67 100644
-> --- a/rust/kernel/mm/virt.rs
-> +++ b/rust/kernel/mm/virt.rs
-> @@ -113,7 +113,7 @@ pub fn end(&self) -> usize {
->      /// kernel goes further in freeing unused page tables, but for the purposes of this operation
->      /// we must only assume that the leaf level is cleared.
->      #[inline]
-> -    pub fn zap_page_range_single(&self, address: usize, size: usize) {
-> +    pub fn zap_vma_range(&self, address: usize, size: usize) {
->          let (end, did_overflow) = address.overflowing_add(size);
->          if did_overflow || address < self.start() || self.end() < end {
->              // TODO: call WARN_ONCE once Rust version of it is added
-> @@ -124,7 +124,7 @@ pub fn zap_page_range_single(&self, address: usize, size: usize) {
->          // sufficient for this method call. This method has no requirements on the vma flags. The
->          // address range is checked to be within the vma.
->          unsafe {
-> -            bindings::zap_page_range_single(self.as_ptr(), address, size)
-> +            bindings::zap_vma_range(self.as_ptr(), address, size)
->          };
->      }
->
-> --
-> 2.43.0
+Hi Nikolay,
+
+Apologies for the confusion. When I said "the patch below," I was not ref=
+erring to the v1 link,
+but to the diff snippet appended at the bottom of my email.
+
+That specific snippet (using a local temp pointer) is the optimal approac=
+h. It ensures the NULL
+check for bond->rr_tx_counter is handled efficiently without introducing =
+the performance
+overhead or memory waste you were concerned about.
+
+Best regards,
+Jiayuan
+
+
+
+> >=20
+>=20> -J
+> >=20=20
+>=20>  >=20
+>=20>  > >=20
+>=20>  > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bon=
+ding/bond_main.c
+> >  > > index eb27cacc26d7..ac2a4fc0aad0 100644
+> >  > > --- a/drivers/net/bonding/bond_main.c
+> >  > > +++ b/drivers/net/bonding/bond_main.c
+> >  > > @@ -4273,13 +4273,17 @@ void bond_work_cancel_all(struct bonding=
+ *bond)
+> >  > > static int bond_open(struct net_device *bond_dev)
+> >  > > {
+> >  > > struct bonding *bond =3D netdev_priv(bond_dev);
+> >  > > + u32 __percpu *rr_tx_tmp;
+> >  > > struct list_head *iter;
+> >  > > struct slave *slave;
+> >  > >=20
+>=20>  > > - if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN && !bond->rr=
+_tx_counter) {
+> >  > > - bond->rr_tx_counter =3D alloc_percpu(u32);
+> >  > > - if (!bond->rr_tx_counter)
+> >  > > + if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN &&
+> >  > > + !READ_ONCE(bond->rr_tx_counter)) {
+> >  > > + rr_tx_tmp =3D alloc_percpu(u32);
+> >  > > + if (!rr_tx_tmp)
+> >  > > return -ENOMEM;
+> >  > > + WRITE_ONCE(bond->rr_tx_counter, rr_tx_tmp);
+> >  > > +
+> >  > > }
+> >  > >=20
+>=20>  > > /* reset slave->backup and slave->inactive */
+> >  > > @@ -4866,6 +4870,9 @@ static u32 bond_rr_gen_slave_id(struct bon=
+ding *bond)
+> >  > > struct reciprocal_value reciprocal_packets_per_slave;
+> >  > > int packets_per_slave =3D bond->params.packets_per_slave;
+> >  > >=20
+>=20>  > > + if (!READ_ONCE(bond->rr_tx_counter))
+> >  > > + packets_per_slave =3D 0;
+> >  > > +
+> >  > > switch (packets_per_slave) {
+> >  > > case 0:
+> >  > > slave_id =3D get_random_u32();
+> >  > >=20
+>=20>  > > -J
+> >  > >=20
+>=20>  > >=20
+>=20>  > > [0] https://lore.kernel.org/netdev/e4a2a652784ec206728eb3a929a=
+9892238c61f06@linux.dev/
+> >  > >
+> >  >=20
+>=20>  ---
+> >  -Jay Vosburgh, jv@jvosburgh.net
+> >
 >
 
