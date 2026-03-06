@@ -1,234 +1,213 @@
-Return-Path: <netdev+bounces-264712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPLBLOOYqmmIUAEAu9opvQ
-	(envelope-from <netdev+bounces-264712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:05:39 +0100
+	id GB20KoaYqmmIUAEAu9opvQ
+	(envelope-from <netdev+bounces-264713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:04:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8CB21D999
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:05:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314DC21D941
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43E29300B451
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:03:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 101663029258
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944C333893D;
-	Fri,  6 Mar 2026 09:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C5533A9DE;
+	Fri,  6 Mar 2026 09:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lQo1Tz30"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="xbOV+6jn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mail-106104.protonmail.ch (mail-106104.protonmail.ch [79.135.106.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FBE33A6E2;
-	Fri,  6 Mar 2026 09:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E19233858B
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 09:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772787838; cv=none; b=mP5dkUDDrWIqtkrXE0LgxI9MSu13adP/T3xORka/39tdyvtZMNkW7or9gYwqC03moldpuFnDv34LztjPEOp8TeyFoGnU0MQRZ8L+BlI/ukprnZkEDaiUVsubaoFxg4WK1K5H7iI/eRreIOkTCHzJpIk7Da4t1ycHw6e3pR29bW0=
+	t=1772787841; cv=none; b=tcFizB5E6q3dl3mI8A7C71KtnqQ3LA8MeQPOPR4LC11ExH+95IYPawwmyMqZIC7ugXU+MHNrLqhnQc/7gjLejB/CRFw3c5Ls+Qvu9J0Mx9XH6yc5IChx/zKryVRYAdeojjUV8XG+VfNeprsjwszzHi9oDdjEa7niDgSK6nRk0zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772787838; c=relaxed/simple;
-	bh=zV8WsNlP5ZzT5acXzNbKBV/9KRyTgSiyPoylqcbqXuI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AtGV0ttVfoJW4uBW/hxCTOwd8b5QJZHmir0GHC3F/+YdkwBqxsS73KdARh9qqquCh+1M+Obcriitp3Kev9ra6hfkzx5GUTvp+eyHLijSN8KEJWFYJz/0yDr5Ouwb1WsQEQkGuN8sWCatwBw6z7Q3cvYajbIdcHX3pMP4Ej5FrNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lQo1Tz30; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id B162B1A2D13;
-	Fri,  6 Mar 2026 09:03:53 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7BB185FF92;
-	Fri,  6 Mar 2026 09:03:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 680E91036977C;
-	Fri,  6 Mar 2026 10:03:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772787832; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QmkVtn+YfoRj1HaqYqZmNOYocP3ang2W3ATFJL1qd3I=;
-	b=lQo1Tz30vXTOQmTt8S3KROKy6QExMmVdS/FNk+oyuy89O47rOalayLSrhp6kGQd6Myq77u
-	SyDLoUVctecIou+PFl+d7xyIqgeCkRFhspFybDR3DkElyI3UV+xmTFbQGhu72/hnfZMRkz
-	YSpQzK4Du5xbXfTf3bZnZle80bD7eBUKGDE3mnTGtSmxc+2cxiotqLYsWIWDYUgvT35Dqw
-	PzyS4fbJofcL/22nlV41eJ7n7id8q666jOTWOtcEcTOiLCiuCZU1Vg5KU/GPL96mlwH2L/
-	lEzJxE6qTRDA8EibWjBB2tuR2CKOcFWvXUt4vLnrZEet9iP8MOjDvj+8MQ8CkA==
-Message-ID: <785e440c-6b2a-4ed7-aee3-09ca6cee797a@bootlin.com>
-Date: Fri, 6 Mar 2026 10:03:45 +0100
+	s=arc-20240116; t=1772787841; c=relaxed/simple;
+	bh=Eli/FPRcHAeLJQQC1JfW7qWN6/2FvGa4kJn8GnM5+tg=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=MJ1mkgZMHC4T+ZKwwHBvLuD1jI2EvgqbVHvJuTHIVdigVEWSy43PbuquBylAkaERWHXBaOlY+nvt7bmmciNS8vEgK5qTNEkhg63PPWZeIvFGsEVza1+LYXiW8oIkNXeAoo+DFpTG//K53Ovyzb36oDqLsGTuBQp+xT2qDZ14liA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=xbOV+6jn; arc=none smtp.client-ip=79.135.106.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1772787829; x=1773047029;
+	bh=BG6MsfApo6WVjCvrJZzMRyHrC8k12X+r7HRvskBvFSU=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=xbOV+6jnTWPybEXNCk9xakM3vEfQ7/EumXlFb65Wg+cDNLCXbZO0ZQEW2TFynXHqU
+	 m36mhHfllgnHZHtEvhehUH/5SHqdJce+5ahf+WEMMFcvyjvtWSBfXJDbzHR+Z8zmWG
+	 sCj5eB2GW+6spv2XialNBXF3vSjlovRdi2Y9AhNkPaKyWoyhIEdfTpV019enkSBB/J
+	 xjc5RxlCAqhSWluZSdDXWVSkHkjSs+7hvZf6hyrKm9r62T5A7e8ho7m7wJ5bt0lTlW
+	 ODSpfx11QTFV8dAD6WFIq6Tp7rpldntjm7m65ap/v5A3VoWR/t0+9UpYo6bAC6owC0
+	 Iae00b3qrfI4g==
+Date: Fri, 06 Mar 2026 09:03:46 +0000
+To: "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+From: CyFun <xcyfun@protonmail.com>
+Cc: "daniel@iogearbox.net" <daniel@iogearbox.net>, "ast@kernel.org" <ast@kernel.org>, "andrii@kernel.org" <andrii@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: [PATCH bpf v2] bpf: fix constant blinding bypass for PROBE_MEM32 stores
+Message-ID: <ymj6l4pBrhKjzHeR2XYjQcvWswW_741UgkR05M3iYsrzxzhD-3AfAZ1rNJ5k1b6ex0tosQAorJP38DfNDkyqbhkY-DD6RW_qTfuJ0z86psE=@protonmail.com>
+Feedback-ID: 42070492:user:proton
+X-Pm-Message-ID: c1ab93d6db44e1386836cdb366981766d0ebce10
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
- KSZ8463 global irq
-To: Tristram.Ha@microchip.com, olteanv@gmail.com
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
- pascal.eberhard@se.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com
-References: <20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com>
- <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
- <20260305095656.vlyaztv6nbdqrmil@skbuf>
- <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
- <20260305125149.ejju5ptrkviqi3sm@skbuf>
- <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
- <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 1E8CB21D999
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6"; charset=utf-8
+X-Rspamd-Queue-Id: 314DC21D941
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_UNKNOWN(0.10)[application/pgp-keys];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264712-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microchip.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-264713-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:~,4:~];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_FROM(0.00)[protonmail.com];
+	HAS_ATTACHMENT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xcyfun@protonmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[protonmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,microchip.com:email]
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:dkim,protonmail.com:email,protonmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iogearbox.net:email]
 X-Rspamd-Action: no action
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6
+Content-Type: multipart/mixed;boundary=---------------------96784b056a1fdb1f93c88584c16caf76
 
-On 3/6/26 2:10 AM, Tristram.Ha@microchip.com wrote:
->> On 3/5/26 1:51 PM, Vladimir Oltean wrote:
->>> On Thu, Mar 05, 2026 at 01:39:29PM +0100, Bastien Curutchet wrote:
->>>> Hi Vladimir,
->>>>
->>>> On 3/5/26 10:56 AM, Vladimir Oltean wrote:
->>>>> On Wed, Mar 04, 2026 at 11:18:52AM +0100, Bastien Curutchet (Schneider
->> Electric) wrote:
->>>>>> @@ -2890,14 +2899,18 @@ static irqreturn_t ksz_irq_thread_fn(int irq,
->> void *dev_id)
->>>>>>             unsigned int nhandled = 0;
->>>>>>             struct ksz_device *dev;
->>>>>>             unsigned int sub_irq;
->>>>>> -  u8 data;
->>>>>> +  u16 data;
->>>>>>             int ret;
->>>>>>             u8 n;
->>>>>>             dev = kirq->dev;
->>>>>> -  /* Read interrupt status register */
->>>>>> -  ret = ksz_read8(dev, kirq->reg_status, &data);
->>>>>> +  /*
->>>>>> +   * Most of the KSZ switches have a 8-bits long interrupt status
->>>>>> +   * register, but the KSZ8463 has a 16-bits long one. The overread here
->>>>>> +   * is safe because we only iterate over kirq->nirqs in the below loop.
->>>>>
->>>>> FWIW, this isn't the only thing making an overread "safe".
->>>>> If the adjacent register also has "clear on read" semantics, that's not
->>>>> good.
->>>>>
->>>>> I can't tell whether that's the case here, though. There are just too
->>>>> many hardware variations to check for. I just wanted to point out that
->>>>> the reasoning is incomplete.
->>>>>
->>>> You're right, I hadn't thought about the 'clear on read' case.
->>>>
->>>> I'll use ksz_read16() only for the KSZ8463 to be 100% sure it won't break
->>>> anything for other switches.
->>>
->>> I'm still on the fence on whether to say this or not, because I don't
->>> really want to get so involved in internal driver bookkeeping, but...
->>> this driver is just becoming a hell to review, even if I want to
->>> concentrate exclusively on correct API use, like I try to do.
->>>> Linus Walleij has added a new ks8995 driver, which has some overlap with
->>> the common ksz driver for the KSZ8 family. Now he wants to remove the
->>> overlapping device support:
->>> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-0-
->> a7fc63fe1916@kernel.org/
->>>
->>> Maybe we should go the other way around, migrate KSZ8 support to the
->>> ks8995 driver instead? The common ksz driver is becoming just extremely
->>> convoluted to handle all hardware variations. Would it help in any way
->>> to maintain cleaner code paths, what do you think?
->>
->> I agree, this driver is extremely convoluted because of all the
->> different hardware it handles. It wasn't easy to fit PTP support for the
->> KSZ8463 into it. And I encountered the same kind of difficulties when
->> adding periodic output support (I have another series ready for this
->> once this PTP support will be merged).
->>
->> Regarding migrating the KSZ8 support into the ksz8995, I think we would
->> quickly hit the same pain points than in ksz_common. Even inside the
->> KSZ8 family we can find a quite big amount of differences between the
->> switches. For instance, both KSZ8463 and KSZ8563 support PTP, they share
->> lots of common registers but their interrupt scheme is very different.
->>
->> I've added Tristram in Cc:, who works at Microchip. Maybe, Tristram, you
->> have some insights about which switches could share code if we decide to
->> split the big ksz_common into several drivers ?
->   
-> Although KSZ8463 uses 16-bit register for its interrupt operation, the
-> bits that are necessary for actual operation are all in the high byte, so
-> it is possible to simulate using 8-bit register for interrupt operation
-> just like the other switches.
-> 
+-----------------------96784b056a1fdb1f93c88584c16caf76
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;charset=utf-8
 
-I hadn't though about using only the high byte, I like this idea. I'll 
-implement it in the next iteration with a comment explaining why it 
-works for the KSZ8463.
+To: bpf@vger.kernel.org
+Cc: daniel@iogearbox.net, ast@kernel.org, andrii@kernel.org, netdev@vger.k=
+ernel.org
+Subject: [PATCH bpf v2] bpf: fix constant blinding bypass for PROBE_MEM32 =
+stores
 
-> Note also the previous interrupt code only works for KSZ9477 and LAN937X
-> families of switches, which have interrupts for each port.  The older
-> switches like KSZ8863, KSZ8895, and KSZ8795 all have only one global
-> interrupt and need change to work in this framework.
+BPF_ST | BPF_PROBE_MEM32 immediate stores are not handled by
+bpf_jit_blind_insn(), allowing user-controlled 32-bit immediates to
+survive unblinded into JIT-compiled native code when bpf_jit_harden >=3D 1=
+.
 
-Indeed, that's what patches 1 to 4 are here for.
+The root cause is that convert_ctx_accesses() rewrites BPF_ST|BPF_MEM
+to BPF_ST|BPF_PROBE_MEM32 for arena pointer stores during verification,
+before bpf_jit_blind_constants() runs during JIT compilation. The
+blinding switch only matches BPF_ST|BPF_MEM (mode 0x60), not
+BPF_ST|BPF_PROBE_MEM32 (mode 0xa0). The instruction falls through
+unblinded.
 
-> 
-> These switches have link change interrupt bits for external ports, so it
-> is easy to simulate them as port interrupts.  But KSZ8463 only has 1 bit
-> for link, so it is necessary to add some special code to return a value of
-> 3 to indicate both ports have link change.
-> 
+Add BPF_ST|BPF_PROBE_MEM32 cases to bpf_jit_blind_insn() alongside the
+existing BPF_ST|BPF_MEM cases. The blinding transformation is identical:
+load the blinded immediate into BPF_REG_AX via mov+xor, then convert
+the immediate store to a register store (BPF_STX).
 
-This series only use interrupt for PTP means. TBH I haven't looked at 
-the link change interrupt mechanism.
+The rewritten STX instruction must preserve the BPF_PROBE_MEM32 mode so
+the architecture JIT emits the correct arena addressing (R12-based on
+x86-64). Cannot use the BPF_STX_MEM() macro here because it hardcodes
+BPF_MEM mode; construct the instruction directly instead.
 
-> KSZ8463 is based from KSZ8863 so it should have about the same 8-bit
-> register definitions as KSZ8863.  But when it was designed it had a
-> companion chip that operates as a 16-bit network controller.  Because of
-> that all register definitions are described in 16-bit.
-> 
-> I need to try your patches to see how it works regarding to the PTP
-> interrupts.
-> 
-> Regarding to the old ks8995 driver I think it was a simple SPI driver to
-> start the KSZ8995 switch, which is an older version of KSZ8895.  It was
-> used to locate under the PHY drivers.  I did not know it was upgraded to
-> become a full DSA driver and is now trying to expand to the other
-> switches.
+Fixes: 6082b6c328b5 ("bpf: Recognize addr_space_cast instruction in the ve=
+rifier.")
+Signed-off-by: s4ch <xcyfun@protonmail.com>
+---
+v2: Rebased onto current bpf tree (commit 56145d237385).
+    v1 had a malformed diff header that caused CI to reject it.
+---
+ kernel/bpf/core.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Ok, thanks for these information
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 3ece2da55..bb2fa75de 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -1422,6 +1422,24 @@ static int bpf_jit_blind_insn(const struct bpf_insn=
+ *from,
+ 		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
+ 		*to++ =3D BPF_STX_MEM(from->code, from->dst_reg, BPF_REG_AX, from->off)=
+;
+ 		break;
++
++	case BPF_ST | BPF_PROBE_MEM32 | BPF_DW:
++	case BPF_ST | BPF_PROBE_MEM32 | BPF_W:
++	case BPF_ST | BPF_PROBE_MEM32 | BPF_H:
++	case BPF_ST | BPF_PROBE_MEM32 | BPF_B:
++		*to++ =3D BPF_ALU64_IMM(BPF_MOV, BPF_REG_AX, imm_rnd ^
++				      from->imm);
++		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
++		/* Cannot use BPF_STX_MEM() here: it hardcodes BPF_MEM
++		 * mode which would lose BPF_PROBE_MEM32 and break the
++		 * arena addressing in the architecture JIT. */
++		*to++ =3D (struct bpf_insn) {
++			.code  =3D BPF_STX | BPF_PROBE_MEM32 | BPF_SIZE(from->code),
++			.dst_reg =3D from->dst_reg,
++			.src_reg =3D BPF_REG_AX,
++			.off   =3D from->off,
++		};
++		break;
+ 	}
+ out:
+ 	return to - to_buff;
+--
+2.53.0
+-----------------------96784b056a1fdb1f93c88584c16caf76
+Content-Type: application/pgp-keys; filename="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"; name="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"; name="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"
 
-Best regards,
-Bastien
+LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4ak1FWTdKN3JoWUpLd1lCQkFI
+YVJ3OEJBUWRBTkVzQVFrd2E0bU1TZlFIU0l2bXFZQjdIQTQvQVFabVoKcVpjOTlUZk9TRTNOTFho
+amVXWjFia0J3Y205MGIyNXRZV2xzTG1OdmJTQThlR041Wm5WdVFIQnliM1J2CmJtMWhhV3d1WTI5
+dFBzS01CQkFXQ2dBK0JRSmpzbnV1QkFzSkJ3Z0pFRGRGaE9rRjdoMjNBeFVJQ2dRVwpBQUlCQWhr
+QkFoc0RBaDRCRmlFRU0xbHE1NlREL1VkT0p2ZjJOMFdFNlFYdUhiY0FBRTFuQVFDSjVZMUoKcU8z
+SjkzTWRXbnJOMzRDYTNlaGRKVEVscTNkSFFPV04wcTIwRVFFQTZsV3JCakZ5aDE1cnNtMlJ5TlFO
+Ckh5ZDlTNm5heG5mbE03WnJDRVVldndYT09BUmpzbnV1RWdvckJnRUVBWmRWQVFVQkFRZEFVMk9P
+WTBHQwo2Q3pBQWJOQ2p4K05rc3AySlgzMHByWEpnWjZ4eFJHcXRIY0RBUWdId25nRUdCWUlBQ29G
+QW1PeWU2NEoKRURkRmhPa0Y3aDIzQWhzTUZpRUVNMWxxNTZURC9VZE9KdmYyTjBXRTZRWHVIYmNB
+QUdGM0FRRFJYSnd3ClZDbjAyRlhCWEhnRWZDNHV2Q09YTDUzVmRmMENaY210bFJFd3BnRCtOS2Jv
+TWRrU2RlNHY2UVJXeldidAo4MmRmTzFBTHBuMnhscnQ0RkZvbjJBaz0KPWwxanYKLS0tLS1FTkQg
+UEdQIFBVQkxJQyBLRVkgQkxPQ0stLS0tLQo=
+-----------------------96784b056a1fdb1f93c88584c16caf76--
+
+--------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: ProtonMail
+
+wrsEARYKAG0FgmmqmGQJEDdFhOkF7h23RRQAAAAAABwAIHNhbHRAbm90YXRp
+b25zLm9wZW5wZ3Bqcy5vcmfkciulAq1i7V8rQA8XzSIt/tW7VTDaiO8aVj6I
+Te7JkBYhBDNZauekw/1HTib39jdFhOkF7h23AABL0wD+NFh5liY8sC2z7y9x
+xIHAtSlyShmIfn5ml0TSiK1XmkEA/3xhn3jW13Y2ByxpseT4AkoqokaI71un
+5t/ls2/vlbIF
+=p2P+
+-----END PGP SIGNATURE-----
+
+
+--------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6--
+
 
