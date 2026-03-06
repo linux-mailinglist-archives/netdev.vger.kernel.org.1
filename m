@@ -1,186 +1,268 @@
-Return-Path: <netdev+bounces-264896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOh8E/whq2mPaAEAu9opvQ
-	(envelope-from <netdev+bounces-264896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:50:36 +0100
+	id kDUMKRIpq2luaQEAu9opvQ
+	(envelope-from <netdev+bounces-264897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 20:20:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D04AC226DB0
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:50:35 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BA9226FFB
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 20:20:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E801309AA65
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:50:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 57BE0300D757
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 19:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFF536F429;
-	Fri,  6 Mar 2026 18:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AA03370EB;
+	Fri,  6 Mar 2026 19:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQQJ5Vrt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1TbeN3B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375F2145355
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 18:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B9F211A05;
+	Fri,  6 Mar 2026 19:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772823026; cv=none; b=khmI98Fwv4+TGPc97t4c9ufwedr2bHAt8McbJKlLSgmERr94AfhkJg5RqSIkV9Z19e9rt7iGhYJKLiKjVwLAM87NRo0M7wGeNj5ggBh4nqXnseEbElDBx9rF/k9zZb0UII6oP4Dtan3RkAlJykMEmCrKPykc2vXYPSgzWYjBG88=
+	t=1772824846; cv=none; b=aQpBZjDkfiUPB6htXY44rysEbRppu3O5huFtIwuW716ReAj/Kb7OhJ4VZu3ATCW6EpiiXyygeMfwHvnubrID4S/WrNZV6xbo3AfvytYm76ocqs/84UwvYV481nmLTQIjmS/kqE266fK48FjUsjhk7QNrRg/tZfm7CpvpafeevBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772823026; c=relaxed/simple;
-	bh=cmiwxDteA0bVU5ry0h+O5seSL9/dd7E9bW/vaIpx2a4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Np5QpYeSnhwJQ+CCtRYfpxL9DPZobiEgmslLg/mNRj5zWKMWnBwXf6Of1sr8OLq6XJxV0v3mDepKazKW0bFN/j9lCOM5DZuTLihyWUC6GLbIfmjqD1qgP/5ifQyW1YhOLZcHuK+lf/apcakSlJspRIpFY/Vrb4auS4Hr7H4LnPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQQJ5Vrt; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7986d231b3cso124919697b3.1
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 10:50:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772823024; x=1773427824; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0lI3EKSn/5Qi2aFTkakiZu1L3daiZqHsOPjru5Xcie0=;
-        b=RQQJ5VrtRGw2BNuGkE4EdhOjmPf5opwMzWC5fjtKB2kLLoKhqowIXHNR3Bx6LSo8xb
-         mBntdf7f4GTTqEOQioQRDjDTdT6yl4gRHAmB0wCfGug+DVoQvZMzQuKCaNb/tja5j8cR
-         M/54XNA34W8MV8c6Fhq8PEG5Qv5rqC1R7VjpHCVuC/S6/I9tTcrgBzji039WgJck/XYn
-         f6kIoDJXohG8XQQRDHdcZrlaFsHNVnEk2IPS6vGrgVPCHLnvJ98MXhhItgUSszk6MBYQ
-         zKG4eQCv/g+yGtKUV4pdMSIDSvcnm2MZU6L7FN7NoBTJ6xuD3SXL1oIDMot0dNO5jWcw
-         4gZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772823024; x=1773427824;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0lI3EKSn/5Qi2aFTkakiZu1L3daiZqHsOPjru5Xcie0=;
-        b=vnwht/XGJJwH0aELDqwP791l4PjWpbnKTEok9I7KIx8axdDXIP/8bbOWWEVXGz3Lw2
-         w4sXB4LtjzJcWEG/Eth8lor/XVATvHdNoLHXu/QqNYjwnE+/ydMChI2zO5poO7z3UnUS
-         uCjAWY31Q7UHOzdGAjCxcTp8aIDx2GfhydOoV1f2ueTpfvk4vgJXUEtoK4Jh84zXLvnG
-         vvm+KBQYYLBiwo/2Py+QSouDESMwRk6BegEp/PwIZCzN8nJlvGMN8S4Vg4toa/86NZgq
-         Fu1SIt7QZQ7aJyuoyvt5Ad+Pbn9Lb5JTF/9JDImVLOCssnivHbg2mOvo9eVyg6Z9fGNW
-         oXiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqRckh2YIHDgyfrHcHI9ABGuN2KoSe5rHIXJfVEmL7enxp4nAql/qx4UeyUBkM20z9gQ7Dr3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc0DcZd2bNtFr2Pd7yDvSwnJZsomof4GeGfEqdNPMKICeCX8+L
-	Nc6bdriUl4hcuLPwzmcfEHzgL3TKFX+M3bp6p1hdsVNS7s83wPaTqzQb
-X-Gm-Gg: ATEYQzwGmxVpJ9pqisi3C0qI8kZ/2rSS73IxWT2acwKje26Ktrra43WKZ6OVg+lyLpQ
-	a8+zXVhkNypRzexLF88oaYIbjuhNk8pjbbGP3mK5L6d6ShU3LqmfexlYzA9oYIb/06wfI3RkGZ+
-	FMqLJq4RlcG2pN7LuqQAsnoavq57cLsoBPg2VJQHzDgG6xuQEMkRIBB5YBTfPGg5fBCf+qr5TV5
-	GEabTucbtfY05ahelVU8KtUN2w1eFLm9+X7VWYiptK0qDGNt0KHW3Pb0bwhImiUyrtorfV7rfZS
-	+0+GmJ1Hd/1xfJDVhiyHmI2RLEUErMZMPWqBNtl9m/z/V6XqVrtoWQ4WQvVj5ml2IN7ziUk7HNl
-	JYrn7Lf17Y5foG60W9l2y1dhL/1IXKJ5z0j8uSfRG96V/2+oDElzxTO+VX5n6KA/USff+3mynMV
-	LvizmmZvBiaMjMKRz3DBMsTTB/Adea4TYznRJgznbIggYr0oD+FelNGIYJ
-X-Received: by 2002:a05:690e:e85:b0:64c:98df:c5d4 with SMTP id 956f58d0204a3-64d071875e2mr6076685d50.46.1772823024193;
-        Fri, 06 Mar 2026 10:50:24 -0800 (PST)
-Received: from desktop-linux.python-stargazer.ts.net ([50.168.180.218])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-798dec8b8b1sm9978057b3.10.2026.03.06.10.50.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 10:50:23 -0800 (PST)
-From: Mehul Rao <mehulrao@gmail.com>
-To: jmaloy@redhat.com,
-	davem@davemloft.net
-Cc: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ying.xue@windriver.com,
-	tung.q.nguyen@dektech.com.au,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	stable@vger.kernel.org,
-	Mehul Rao <mehulrao@gmail.com>
-Subject: [PATCH net v2] tipc: fix divide-by-zero in tipc_sk_filter_connect()
-Date: Fri,  6 Mar 2026 13:50:05 -0500
-Message-ID: <20260306185005.22120-1-mehulrao@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1772824846; c=relaxed/simple;
+	bh=A6Z8C8yvwJHtik94vftQER8K1+ESpIRL7rXKW3eiiKQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1CXQVuJ+DU+8jbQWA+oN+4mL8TO2CY7HsXrRoMgE6TvUPJMQ92+Cjfhu3Dgtkh1iNWhJeIsKjQDshwP/5+t0Odd7ovZ6xZedeF8Iy/PtNBPwTj+frTeBrzLjpFUnMuUyqXERUbtd2xD6J8+DViwCuyd4TYQA+jjD8nTnPp5shU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1TbeN3B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF08C4CEF7;
+	Fri,  6 Mar 2026 19:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772824846;
+	bh=A6Z8C8yvwJHtik94vftQER8K1+ESpIRL7rXKW3eiiKQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n1TbeN3BBAfYI0RcpFU27R++g4QiLRDC80Du9ib+oP2965JKnRdEZje4Jq1/X6+N1
+	 /nqWG5QDW73qbRsJf0K/ZtzOUufQmSsG7okhZL8/rL14aR3jb4YvIhnYQ8AuvfrK7M
+	 ds72DSwttGAxUDX6Dboy3fPo4lZwtOACtqj9IGu94EE5HTzFOhUZ8HMDfgk8KYptRd
+	 +gkDvIrF9Qi7YHo/fStFWfqpW3aKWF6pRFOV1Twf1CqDP5oRYYyETmLrFhlsF9/Hpz
+	 ZBZV3Wms8AIvkYwQGKbZrrGfWYYH9bdZmf8AB6hsrqnA3Jg/fawnURD0K3LQ/AATxd
+	 iqFw2GSzFADPw==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id E34001AC52CF; Fri, 06 Mar 2026 19:20:41 +0000 (GMT)
+Date: Fri, 6 Mar 2026 19:20:41 +0000
+From: Mark Brown <broonie@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: sfp: manage receiver and transmitter
+ regulators
+Message-ID: <aaspCUWel9k_ls4i@sirena.co.uk>
+References: <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
+ <20260303-sfp-regulators-v1-2-7101ae34cb84@bootlin.com>
+ <e7a1ab5e-c34d-4ca5-93eb-4f5bcfacdb40@sirena.org.uk>
+ <aab6Tqo1z-8YQ4j6@shell.armlinux.org.uk>
+ <536e57fe-9738-4026-a9c9-fdb7135cbe2f@sirena.org.uk>
+ <aab9bwKSubR6zxKG@shell.armlinux.org.uk>
+ <1dbc679e-ad6d-49c5-86bd-3b319b899584@sirena.org.uk>
+ <aacpVFhH8eV7dxHV@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D04AC226DB0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/1eyKJ6WJEua7dx/"
+Content-Disposition: inline
+In-Reply-To: <aacpVFhH8eV7dxHV@shell.armlinux.org.uk>
+X-Cookie: Think big.  Pollute the Mississippi.
+X-Rspamd-Queue-Id: 48BA9226FFB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,windriver.com,dektech.com.au,vger.kernel.org,lists.sourceforge.net,gmail.com];
-	TAGGED_FROM(0.00)[bounces-264896-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mehulrao@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264897-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.985];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-A user can set conn_timeout to any value via
-setsockopt(TIPC_CONN_TIMEOUT), including values less than 4.  When a
-SYN is rejected with TIPC_ERR_OVERLOAD and the retry path in
-tipc_sk_filter_connect() executes:
 
-    delay %= (tsk->conn_timeout / 4);
+--/1eyKJ6WJEua7dx/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If conn_timeout is in the range [0, 3], the integer division yields 0,
-and the modulo operation triggers a divide-by-zero exception, causing a
-kernel oops/panic.
+On Tue, Mar 03, 2026 at 06:32:52PM +0000, Russell King (Oracle) wrote:
+> On Tue, Mar 03, 2026 at 05:31:36PM +0000, Mark Brown wrote:
 
-Fix this by clamping conn_timeout to a minimum of 4 at the point of use
-in tipc_sk_filter_connect().
+> > supplies?  The logs you posted looked like it was controllers requesting
+> > the supplies which does look like the bindings and associated requests
+> > aren't what I'd expect for something describing the hardware.
 
-Oops: divide error: 0000 [#1] SMP KASAN NOPTI
-CPU: 0 UID: 0 PID: 119 Comm: poc-F144 Not tainted 7.0.0-rc2+
-RIP: 0010:tipc_sk_filter_rcv+0x1b99/0x3040
-Call Trace:
- tipc_sk_backlog_rcv+0xe4/0x1d0
- __release_sock+0x1ef/0x2a0
- release_sock+0x55/0x190
- tipc_connect+0x140/0x510
- __sys_connect+0x1bb/0x2e0
+> The setup here as far as can be derived from the SoC documentation is:
 
-Fixes: 6787927475e5 ("tipc: buffer overflow handling in listener socket")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mehul Rao <mehulrao@gmail.com>
----
-Changes in v2:
-- Clamp conn_timeout at the point of use in tipc_sk_filter_connect()
-  instead of rejecting small values in tipc_setsockopt()
-- Link to v1: https://lore.kernel.org/netdev/20260305215336.645186-1-mehulrao@gmail.com/
----
- net/tipc/socket.c | 2 ++
- 1 file changed, 2 insertions(+)
+> The AHCI SATA controller and COMPHY are integrated into the SoC.
+> Internally, these components would be provided power by the internal
+> SoC design.
 
-diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-index 4c618c2b871d..9329919fb07f 100644
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -2233,6 +2233,8 @@ static bool tipc_sk_filter_connect(struct tipc_sock *tsk, struct sk_buff *skb,
- 		if (skb_queue_empty(&sk->sk_write_queue))
- 			break;
- 		get_random_bytes(&delay, 2);
-+		if (tsk->conn_timeout < 4)
-+			tsk->conn_timeout = 4;
- 		delay %= (tsk->conn_timeout / 4);
- 		delay = msecs_to_jiffies(delay + 100);
- 		sk_reset_timer(sk, &sk->sk_timer, jiffies + delay);
--- 
-2.53.0
+> So, let's go through the supplies for the AHCI controller. The binding
+> documentation states:
 
+>   ahci-supply:
+>     description: Power regulator for AHCI controller
+
+> First, this is not listed as a required property. In this case, the
+> AHCI controller is internal to the SoC, and no details are given in
+> the documentation what that supply is, where it is derived from, or
+> whether it's controllable.
+
+This just shouldn't be there as a generic property for all AHCI
+controllers, if there are controllers that have such a supply it should
+be part of the controller specific bindings not forced on every single
+controller.
+
+>   target-supply:
+>     description: Power regulator for SATA target device
+
+> The board does not provide power to the target device, that is derived
+> off-board and completely up to the user. Thus, this can't be specified.
+
+Right, and also even within the board this is a property of the target
+device not the controller.  Arguably you could say that your separate
+ATX supply ends up being part of the same system for practical purposes
+but it's a stretch.
+
+>   phy-supply:
+>     description: Power regulator for SATA PHY
+
+> The PHY is an entirely separate device (the COMPHY) from the AHCI
+> controller. Thus, specifying a PHY supply for this AHCI hardware is
+> not relevant at the AHCI controller layer. Sure, other AHCI designs
+> where the PHY is not generic may require a separate PHY supply which
+> may be controllable, but here is one example where this just isn't
+> relevant.
+
+Yeah, same here.  This is a property of the PHY, and possibly of a
+specific PHY.
+
+> So, as a result of commit 962399bb7fbf ("ata: libahci_platform: Fix
+> regulator_get_optional() misuse") we have now ended up with kernel
+> boots issuing messages at warning severity (which means something is
+> wrong and requires attention) for supplies that are not relevant to
+> this SoC hardware design.
+
+The underlying issue here being that the generic AHCI code's bindings
+and hence regulator usage just don't reflect general AHCI hardware at
+all, that's then causing knock on effects since as you say there's no
+way for systems to provide sensible information corresponding to what
+the drivers are asking for. =20
+
+> We're now left with the annoying warning messages that - as I've
+> stated above - are certainly in one case just not relevant to the
+> SoC design.
+
+I agree that we should do something here, I was working on the basis
+that the bindings reflected the hardware but that seems rather far from
+reality.  I'm wondering if we should have an API that lets drivers say
+they're requesting a regulator for a "legacy" binding, that way we can
+keep all the checking of usage and avoid fragility with mishandling of
+errors but avoid complaining at users.
+
+> > For SFP my understanding is that SFP has a physical specification which
+> > includes power inputs and that these supplies are being requested by the
+> > devices that consume them.  If some part of that is not the case then it
+> > sounds like the bindings aren't describing the hardware (or at least are
+> > a bit unclear about how they're doing so) and should be revised.  The
+> > series doesn't seem to do anything at all with the supply side either,
+> > I'm guessing there are some SFP controllers with integrated power
+> > provisioning.
+
+> First, please scrap the idea of "SFP controller". There's no such
+> device. There's a SFP cage, which is a physical connector and a
+> specification of the signals on the pins. How those signals are
+> provided, or even whether they are provided is outside the scope
+> of the "specification".
+
+I see.  That's sounding like rather than having something that applies
+to all SFP devices anything we do end up having should be something that
+represents a SFP cage specifically, that's the thing that has the
+physical specification with a known set of supplies.  With soldered down
+stuff I suspect there's enough room for complication that it should be
+dealt with on a device by device basis if needed.
+
+> Given (1), it is unwise for a board with a cage to present two
+> controllable supplies, as turning one supply off can result in
+> power being back-fed via a module tying both together. Thus,
+> specifying separate supplies could be dangerous.
+
+I guess even if they're not controlled separately it's possible that
+someone might decide that having two LDOs is part of their filtering
+strategy...  It is generally easier to cope with the situation where one
+supply does two consumers that are controlled together than it is to
+deal with the situation where two supplies that are normally the same
+are delivered by two separate regulators.  It all feels very edge casey
+thugh.
+
+> Now, if you're going to say "ah, so it has power pins, you need to
+> describe them using a regulator" then I would say to you, when are
+> we introducing regulators for every device we describe in DT such
+> as LEDs, switches, GPIO pins, RAM, etc? Every device needs to have a
+> source of power after all.
+
+It sounds from the cover letter for this series like there's some demand
+for power control of SFP cages, the cover letter isn't terribly specific
+about what circumstances though.  Possibly there's some UI for this on
+the system, or the hardware has some mechanism for detecting physical
+insertion to the SFP cage (hopefully well in advance of the electrical
+contacts being made)?  Romain, are you able to share more specifics on
+the use case here?
+
+--/1eyKJ6WJEua7dx/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmrKQYACgkQJNaLcl1U
+h9AJyAf/aOr3xSlRkFQxM5FQkLmkyYkqH7j887qw30SXzASA5nJ1jE3jyYo9tMAU
+6BumFwX4sA3QrEkST3HsCMUK38SMvL2WaR6u5hf1GdD84AC9JQEfb4mJ/bCeFlpY
+dQSoMo1JngUbUozNiamQgnVjIlWXlhUnUnapV7CDkN+GpjSmzjEVHbZaPAtaqEBv
+txcaNXusw8+CVP83kbVn/9mXDOk1FgWWVkDa4uCxJXYvj/WDwsyxaUk0AVZesY6y
+Q8Jq1eTBfv82sOeXhAFtyUVOd75nt7BNfV1fRJe1ko7OF7rziE/eAEihbF87JrTh
+IIsJ+CX8hnznk//lcb097NcVYwM5yQ==
+=FoNH
+-----END PGP SIGNATURE-----
+
+--/1eyKJ6WJEua7dx/--
 
