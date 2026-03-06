@@ -1,213 +1,182 @@
-Return-Path: <netdev+bounces-264947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANeVOLpZq2mmcQEAu9opvQ
-	(envelope-from <netdev+bounces-264947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 23:48:26 +0100
+	id iN/5OaVcq2mmcQEAu9opvQ
+	(envelope-from <netdev+bounces-264948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 00:00:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A552228628
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 23:48:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60528228766
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 00:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0AF0A303100A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 22:48:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9907B3058BB4
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 22:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CCA35F16A;
-	Fri,  6 Mar 2026 22:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263C735F17D;
+	Fri,  6 Mar 2026 22:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uX2ngq1z"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Pa1YnkIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f100.google.com (mail-pj1-f100.google.com [209.85.216.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BD03502BA
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 22:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF2D35F606
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 22:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772837303; cv=none; b=L9d6jm9n1vhJjTRlnXla/G3zRgMMiCFaVLrOMJit8M04NCXXWqFAXDCq83Qxew+0p05Y5DhN2594/mFpYtMXrpFDRe8f9fb8OAWViEi7O+C1sQY5mIyryN7ugBOU56jk2Y9zUlk9FMXqbrXCrn6Xh6WRkUScfSr65sgWtWWICCY=
+	t=1772837965; cv=none; b=upIdKXJDsggDDaVFKdyrPIkvuzSkt8J3sl/zdkESxLk3tPqXefsTYjnQdqD7rzRCLTK82vnT0rI4UA9lsguLqJnQstfdaXlxqhalxLc5Mf+MKHpkLH7dzlSO/+KB2xzKHw5pbdc44PS6is0Z2lJp1JlUTqOq9HwtBuiDO9i5oUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772837303; c=relaxed/simple;
-	bh=7G6+qnfUJNedkiph200Y9njZnfcgLo1U6unr0/UMiUo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VS/1JNo/mwEwjqZYrmaph/mx1iBgddJcrWC4R26gaI/KVOCEzpOjAJAsXiXLDrMQW3dJuPnCHVV/oLgQi5X0586iJVDacQhH28BMv+YtqpZ6nK1qLsVwxCKStyEu7bx3yEOb8PQUCTnLUOfKspU0jOIQcAx9pilOYUqniNuogmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uX2ngq1z; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae6961bff0so167412645ad.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 14:48:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772837302; x=1773442102; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ET1z2PhZ/vXx0rxDcMUa4k7I7QKL/rFCVqGRGN/V+18=;
-        b=uX2ngq1zWbADKdFPik4f9Pz5UbExb6vZsITRdYL6E/uGUMfKTrJtBjMBdIZ1J7Wr5F
-         B2UI6Aj8usUoEwE8LlZA00SZCw+VciWzCsT+s5wW0v+jUDDDUcRZtck9cXXs0VXBnVL4
-         52YXN+eYY1TJl0XyohydBRZ51HtdIppvKXgKNHATV3LviZkeZXXD2u1uc3Wog9JbgjW5
-         kboD7UZILBI0IYbCSVx/XG5X85M9cN6HOzFIlVWDPDry2Xj1501cPlIGHR1JLeS2f8n8
-         dyhb/yzoRyZI4vzgfvMqKC86impeaV7qNdVckwcAFHGaPUBdD8g9eaOnDqWsvRPDOwx6
-         TcVQ==
+	s=arc-20240116; t=1772837965; c=relaxed/simple;
+	bh=1K8HM2/sMQI061gxGB5vioZL5ZaW7PlhDdZvvfgB/Rg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TZTI+SM7Cvw+nCihnLiA/IYszGWIDj7V7EYYBwmHYJaIIsmMs7gRFLrYoAUP9kSp/sqjrFPnGG/Y8zSuOzhlpKl1oqOgn5HCWKXC4ZsgCkrU0NO48L0fYMHo92kZ/jywXiF+THVLOthtkCLXmE0wxrT1JK3Em8jEstMnMzJOczM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Pa1YnkIC; arc=none smtp.client-ip=209.85.216.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f100.google.com with SMTP id 98e67ed59e1d1-3598df39444so3850801a91.2
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 14:59:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772837302; x=1773442102;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ET1z2PhZ/vXx0rxDcMUa4k7I7QKL/rFCVqGRGN/V+18=;
-        b=V3Xgpx/gRzO+CHJV+8wm3qc8n8zFkHJSpkygLM/NclyZmOC+LzmClxDVmmF+HaZMj8
-         BnsEiysERjUgtD03B435zVTwSks4JvVNg6CORDYC+e4qPZXnuFIFElmFU/ybRiKNJpfC
-         JeNn1FaOUiPaObZek6K8+FjXW2y2k3Lj5bqAApriEBnspYm9SdIX2Uk5FTaJ3S64KibN
-         JVIQi4WuScDwQM64FZxDN+yi2apP8CPe8+yL+g0X3VfORZH/NA3iq0Cfp92KcEPRu7Zf
-         rjNaiz9xnL6lVYe/sdWavA306LVYKLv9c9i/zsMggL8OVsu25SazqpJZ/IstCUSr4vZz
-         i4nw==
-X-Gm-Message-State: AOJu0Ywy+xWD8dCxQiUv0JuyOuMiUaGoNH6V/R93zss8uYuXsSiPLwkU
-	OVQjTM2SrHMSZld1NX7G7H2b2OIQjLY/SJLDCxYhi9FJPd66GtL7PRXsW6OPxphGoJVleEGbhYV
-	wWlk+945PuCrMI21rE49Q+yMU+N23WMUdPExsocwHcDBedeRNpEGPRM/BUFdsKCTY0PQkDSsQBy
-	tgIBMbRDUHyL2eiJTFuxinXYRWuE8ThNkHDm8jHvK0fPAp5T+2CWrZUyt+8qC+UcI=
-X-Received: from plai10.prod.google.com ([2002:a17:902:c94a:b0:2ae:5031:c200])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2441:b0:2ae:4fdb:d596 with SMTP id d9443c01a7336-2ae82367db1mr39069735ad.11.1772837301327;
- Fri, 06 Mar 2026 14:48:21 -0800 (PST)
-Date: Fri,  6 Mar 2026 22:48:16 +0000
+        d=1e100.net; s=20230601; t=1772837963; x=1773442763;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1aqXxRdnWIjd8YUNsLBt+pHFnxLJYEtfHlzMvKYG87w=;
+        b=l2UQtL8vZJqjh2IuMW5PzsUGzFkAvHOYJMj0bFV9blkgZtIPWdH2Y5j3k1b55VlQmF
+         TyAg4/bpE6Uqq8yYXuUarNjVWD+Z5CgHoWh5fww3oHSTL9k+P8xfc3TmOJTGfXQf5xth
+         uEntKP1MmTlVP5HD07O+1i5jTSCmjuvC5YWt4PdrE2XSR5iFCOOX/Q/PZ0yE4AmktkXI
+         hG/RAWbH8wrXYJv6LRDf3KJZiv08BB2ZrBKnEKQjluJqUvDc6GyIMbCaistfuOCl5S6O
+         u4Ms9m7DfXemZmTQ2O2iFoxYyhywKpzmnhL4PVPGOmdf7/iQmC3E/FUf/TX5HxDdV94u
+         2XqA==
+X-Gm-Message-State: AOJu0YyT9FuxeIvPgKLtKiqpdwLz7a+rXeaXs19PiXpPZKxaC8b2Njhd
+	4h2xZMfWGWEdzNtsVDjRe0Fr/OLrkwnqk60k0TzYRBS6yMuthlmutHFAgV9p4F3aaLwRs1/kNys
+	Wqpk0vALDLAOwGsHQbDCiXB9NxgPGW6AHsbV3AgIOGQ4Ac6ng3zP5k44q6v7lsE5XOE9r4HBbP/
+	xhT0BxWelPkyJD2/WlDQgD9hOaAXzeZGVqqHUaalYEtfT42PYxXDYwcLd3VFiHLo0RarYX6gJ4u
+	BTuqtYLudU=
+X-Gm-Gg: ATEYQzyh//8Q288f7tU3kimQvgtQ2iJMcxQV8e+Fa6NMgZvt+I5kR4eYPw6mjLEyjxD
+	YXRmbVhTqxDEjv6q3Gi0bl8r1Kua1peP03lMe+NklkEfbgn2KtLrBHgOKkuvXkHT//3edkgB523
+	JIBYc/NCPaS5Bf8ywuB31nBRv8ugx8rHQ4LXL9uRG00EAZTqqx+5XlBIZ+6ODfjWQYc3VHUrrQ3
+	cND93K/6cLnNsdjTTWOCAR1ZGjQesVSmMS8ovnCp2wJ5yebJpMC+PEA52tef0TssNQruSuOYDo6
+	GgA0vxNnJraSAarLaNoZPmQdoQ8EErQiJlSiTTip5l/X6GdBCh+f0vuPbPvryFkLi+ONBxjxnp0
+	P8n09JYglxjv/I0gr7fxFHxx+rKWirECzhvvLBqRZMa87MAesunb79cVjvlQZ1WKdvkZdIH/r2F
+	lkWdiKOSlGHR5JcCA4gN3UN4HBRU/UadNBowGVE1iHRS8ulx2zQ/c9oQfbs0Y=
+X-Received: by 2002:a17:902:c943:b0:2ae:7f28:124b with SMTP id d9443c01a7336-2ae8239e4bcmr37429345ad.22.1772837962947;
+        Fri, 06 Mar 2026 14:59:22 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-102.dlp.protect.broadcom.com. [144.49.247.102])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2ae83f5a7bfsm3801635ad.55.2026.03.06.14.59.22
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Mar 2026 14:59:22 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8c71156fe09so5360164285a.0
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 14:59:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1772837961; x=1773442761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1aqXxRdnWIjd8YUNsLBt+pHFnxLJYEtfHlzMvKYG87w=;
+        b=Pa1YnkICTscuy/asRfYD3OGLv8apf9sQvM09c1bT+WC15r50+1kRUUfADmrl/I3po8
+         R+WIRXujN9RGjNerDQHRXWJf32wLiMvbdPGxYiyFGOPHm7dgqtw6zT4h/+nYD11IgJcM
+         ZS+V8LuetzoSZKJg7xLd4Ncuz8hsebhNn3RIs=
+X-Received: by 2002:a05:620a:470b:b0:8c6:f411:5eec with SMTP id af79cd13be357-8cd6d4fb195mr501052785a.38.1772837961461;
+        Fri, 06 Mar 2026 14:59:21 -0800 (PST)
+X-Received: by 2002:a05:620a:470b:b0:8c6:f411:5eec with SMTP id af79cd13be357-8cd6d4fb195mr501050185a.38.1772837960862;
+        Fri, 06 Mar 2026 14:59:20 -0800 (PST)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd6f4ab73dsm199448285a.20.2026.03.06.14.59.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 14:59:20 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	bjorn@kernel.org
+Subject: [PATCH net] bnxt_en: Fix RSS table size check when changing ethtool channels
+Date: Fri,  6 Mar 2026 14:58:54 -0800
+Message-ID: <20260306225854.3575672-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.45.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306224816.3391551-1-hramamurthy@google.com>
-Subject: [PATCH net-next] gve: add support for UDP GSO for DQO format
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, nktgrg@google.com, jfraker@google.com, 
-	ziweixiao@google.com, maolson@google.com, pkaligineedi@google.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 8A552228628
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Rspamd-Queue-Id: 60528228766
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-264947-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264948-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.977];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.973];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-From: Ankit Garg <nktgrg@google.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Enable support for UDP GSO when using DQO format. Advertise the feature
-flag during device initialization and enable offload by default.
+When changing channels, the current check in bnxt_set_channels()
+is not checking for non-default RSS contexts when the RSS table size
+changes. The current check for IFF_RXFH_CONFIGURED is only sufficient
+for the default RSS context. Expand the check to include the presence
+of any non-default RSS contexts.
 
-Signed-off-by: Ankit Garg <nktgrg@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Allowing such change will result in incorrect configuration of the
+context's RSS table when the table size changes.
+
+Fixes: b3d0083caf9a ("bnxt_en: Support RSS contexts in ethtool .{get|set}_rxfh()")
+Reported-by: Björn Töpel <bjorn@kernel.org>
+Link: https://lore.kernel.org/netdev/20260303181535.2671734-1-bjorn@kernel.org/
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/google/gve/gve_adminq.c |  8 +++++---
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 33 ++++++++++++++++++++++++---------
- 2 files changed, 29 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 6ce8345e..f27b9501 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -1127,10 +1127,12 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index ba47e8294fff..28d0ece2e7b1 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -979,8 +979,8 @@ static int bnxt_set_channels(struct net_device *dev,
  
- 	gve_set_default_rss_sizes(priv);
- 
--	/* DQO supports HW-GRO. */
-+	/* DQO supports HW-GRO and UDP_GSO */
- 	if (gve_is_dqo(priv)) {
--		priv->dev->hw_features |= NETIF_F_GRO_HW;
--		priv->dev->features |= NETIF_F_GRO_HW;
-+		u64 additional_features = NETIF_F_GRO_HW | NETIF_F_GSO_UDP_L4;
-+
-+		priv->dev->hw_features |= additional_features;
-+		priv->dev->features |= additional_features;
+ 	if (bnxt_get_nr_rss_ctxs(bp, req_rx_rings) !=
+ 	    bnxt_get_nr_rss_ctxs(bp, bp->rx_nr_rings) &&
+-	    netif_is_rxfh_configured(dev)) {
+-		netdev_warn(dev, "RSS table size change required, RSS table entries must be default to proceed\n");
++	    (netif_is_rxfh_configured(dev) || bp->num_rss_ctx)) {
++		netdev_warn(dev, "RSS table size change required, RSS table entries must be default (with no additional RSS contexts present) to proceed\n");
+ 		return -EINVAL;
  	}
  
- 	priv->max_registered_pages =
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 28e85730..81d27a12 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -565,9 +565,11 @@ static void gve_tx_fill_pkt_desc_dqo(struct gve_tx_ring *tx, u32 *desc_idx,
-  */
- static int gve_prep_tso(struct sk_buff *skb)
- {
-+	struct skb_shared_info *shinfo = skb_shinfo(skb);
-+	u32 paylen, l4_start;
- 	struct tcphdr *tcp;
-+	struct udphdr *udp;
- 	int header_len;
--	u32 paylen;
- 	int err;
- 
- 	/* Note: HW requires MSS (gso_size) to be <= 9728 and the total length
-@@ -578,21 +580,34 @@ static int gve_prep_tso(struct sk_buff *skb)
- 	 * - Kernel will not produce a TSO larger than 64k
- 	 */
- 
--	if (unlikely(skb_shinfo(skb)->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
-+	if (unlikely(shinfo->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
- 		return -1;
- 
--	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
--		return -EINVAL;
--
- 	/* Needed because we will modify header. */
- 	err = skb_cow_head(skb, 0);
- 	if (err < 0)
- 		return err;
- 
--	tcp = tcp_hdr(skb);
--	paylen = skb->len - skb_transport_offset(skb);
--	csum_replace_by_diff(&tcp->check, (__force __wsum)htonl(paylen));
--	header_len = skb_tcp_all_headers(skb);
-+	l4_start = skb_transport_offset(skb);
-+	paylen = skb->len - l4_start;
-+
-+	switch (shinfo->gso_type) {
-+	case SKB_GSO_TCPV4:
-+	case SKB_GSO_TCPV6:
-+		tcp = tcp_hdr(skb);
-+		csum_replace_by_diff(&tcp->check,
-+				     (__force __wsum)htonl(paylen));
-+		header_len = skb_tcp_all_headers(skb);
-+		break;
-+	case SKB_GSO_UDP_L4:
-+		udp = udp_hdr(skb);
-+		csum_replace_by_diff(&udp->check,
-+				     (__force __wsum)htonl(paylen));
-+		header_len = sizeof(struct udphdr) + l4_start;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
- 
- 	if (unlikely(header_len > GVE_TX_MAX_HDR_SIZE_DQO))
- 		return -EINVAL;
 -- 
-2.53.0.473.g4a7958ca14-goog
+2.51.0
 
 
