@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-264908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJVkE0I0q2n2agEAu9opvQ
-	(envelope-from <netdev+bounces-264908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 21:08:34 +0100
+	id J3DQDVA6q2lYbQEAu9opvQ
+	(envelope-from <netdev+bounces-264909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 21:34:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535CD2276B1
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 21:08:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D2A22786E
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 21:34:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F11E7300A66A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 20:07:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BE31E302053B
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 20:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EF521CFE0;
-	Fri,  6 Mar 2026 20:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29E337267D;
+	Fri,  6 Mar 2026 20:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/Y/k7cv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ow/pADm/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD362E92BA;
-	Fri,  6 Mar 2026 20:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB671AF4EF;
+	Fri,  6 Mar 2026 20:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772827649; cv=none; b=BB8OCyOiGM09kpv1M/IJGj9thjWY3AqFS3t5/HnqPwZIdJU/Ox7pdeZEb+aviux5BNZL/FOhT+3KmoMOk/wUiL24CQr/XDmdzJlt1dUKRYTsCtqG9GQBVOvlarRRi45k1eQeYpTCXKQmgDftjJ07lfsfu85JJqqw5eIwVqIcUjE=
+	t=1772829258; cv=none; b=Y8vwn9pQleBa4OViGca9Je8LrL+TPNZi+iNvyhfzmenrQrka05slAQEl5hBaTLDA6gn/32jmDeN7K8zcBnQMxSMN4KLL/Eu/3v8zJt57yzpoIJZ9GDuuoQYhnsARHETS5EqPYfVf2iKhhRVBDe8fY9yu+e7F4y5gpw284Xcihj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772827649; c=relaxed/simple;
-	bh=Dv+gHW+MLlcufFDt1KPtByGMul5N1wtpZhjbi+dJd8o=;
+	s=arc-20240116; t=1772829258; c=relaxed/simple;
+	bh=8uuJpv9IrSLwbgcBfHYvoteNvJEBy5h846Xxdp3WJ4k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cOQkmzD/DerYzX6ECukLkvoaItRGQoz1DvLcbmf4Olpr0EEaChvXxHmgbndolIQIHTGec+FWcFTLoo6rCaqQpPYqSybDfvyoUZsEp6qlTHxEmcRRbtoqgVzad/kc5cs3iEjIXNR8XWYZu5axlKtdZW2G3T3MuNpF0EM7W4PWJGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/Y/k7cv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDDD2C4CEF7;
-	Fri,  6 Mar 2026 20:07:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jn+J2+MnyEArc29Br8ANrGmE9WwH9stYbyounSSjynopXEI8L4+ZhGOtZbkxWG3oSol90cBZJVRetOmNmGPJ93wwlj82USBGubmt1Pi8gSoK3XWbcest3WWmX0/0dXPWojPdTCOHCqQ85u6P1egLs0LWxUx0G39JOTDowWqWhqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ow/pADm/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02A7EC4CEF7;
+	Fri,  6 Mar 2026 20:34:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772827649;
-	bh=Dv+gHW+MLlcufFDt1KPtByGMul5N1wtpZhjbi+dJd8o=;
+	s=k20201202; t=1772829258;
+	bh=8uuJpv9IrSLwbgcBfHYvoteNvJEBy5h846Xxdp3WJ4k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V/Y/k7cvUM2saGS32xL2+jml1E17lBOV5tjhJSpnT3noMYZ+g7pEs6u68dRn+uttf
-	 VU+cVxod++yrdkl4w3rvmB4FRu8eFthpNP+tPsKrfPfcLVPz0z618hf7+pU4QKyWAV
-	 VjHnzu/UVVunasY7MMj7uiNuaU9qJQ08AjLRQDYt4BXmDs/ZT82X0l52JQ78TwbXRV
-	 Ei3I2IPigdTUkZkxQB0hzX5b5pgYrj8HEuU+GwUHTN3oxjVTd3PAUzvmExNsh9qpHA
-	 tIOOffEd8TBckCshOxOe6wscNfkKZr98ii6yxzxaVdb0Xhb1OapjidEMQot3bR0SbO
-	 6C2YnYbxZ3P5A==
-Date: Fri, 6 Mar 2026 12:07:28 -0800
+	b=ow/pADm/hd7XnBEJxFQ4RbsI3GiNf/hV/1Q2S7Egj6dX2LZYMtLrXUP0ur/VqXNEQ
+	 S4OX5bTHWfHsSrIYLxFnmh1kH81tZsiheovMduYVU7AkcXzty42hSMkAhr7syvylij
+	 UMhybVmvrSi6DLPbdeRChjLLYw6bvcJqvNaAnyNQRfaeaNuBgOD1wyW75tMjO0dX2Y
+	 AHHO785Uz+P+dPOBcSw1WX00jic/vQucAFGEp8sr0FsWD5eJEWc/BgnXxX/2V57sgS
+	 NBHuO6cuXs8cxsseKjP5WXiJbuGVFaRUK/sO1Q3j8ZikosjhHXWcH2yqNrWTgVixMf
+	 1JUcroythMCvA==
+Date: Fri, 6 Mar 2026 12:34:16 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Allison Henderson <allison.henderson@oracle.com>
-Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "achender@kernel.org" <achender@kernel.org>
-Subject: Re: [PATCH net-next v1 0/2] selftests: rds: refactor and expand rds
- selftests test
-Message-ID: <20260306120728.00fce23f@kernel.org>
-In-Reply-To: <a2184a82a5fccc0b7bee91858ff4b3d0d37054ab.camel@oracle.com>
-References: <20260302055518.301620-1-achender@kernel.org>
-	<20260302173302.4d1634be@kernel.org>
-	<18aa553886ee12855c28d9498b12d2fdaeee9b3c.camel@oracle.com>
-	<20260304103212.2e7a58ba@kernel.org>
-	<a2184a82a5fccc0b7bee91858ff4b3d0d37054ab.camel@oracle.com>
+To: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, willemb@google.com, daniel.zahka@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com,
+ kiran.kella@broadcom.com, sachin.suman@broadcom.com
+Subject: Re: [net-next 1/3] psp: Support resetting statistics on a device
+Message-ID: <20260306123416.33cc12e5@kernel.org>
+In-Reply-To: <CANQF7iCc_t43FHa+fysnZ=vB9DibvkV5n7v10OXkbZ-Ogsyt2Q@mail.gmail.com>
+References: <20260302195352.1015990-1-akhilesh.samineni@broadcom.com>
+	<20260302195352.1015990-2-akhilesh.samineni@broadcom.com>
+	<willemdebruijn.kernel.270f71617ce0@gmail.com>
+	<CANQF7iAYmKUj_WeDgf4dg941Zxm5bBVzz=yvX17PmyKMOYe6ng@mail.gmail.com>
+	<20260305065915.1e6e3284@kernel.org>
+	<CANQF7iCc_t43FHa+fysnZ=vB9DibvkV5n7v10OXkbZ-Ogsyt2Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,85 +70,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 535CD2276B1
+X-Rspamd-Queue-Id: C3D2A22786E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264908-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264909-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.936];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,vger.kernel.org,broadcom.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lib.sh:url]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, 6 Mar 2026 07:43:56 +0000 Allison Henderson wrote:
-> On Wed, 2026-03-04 at 10:32 -0800, Jakub Kicinski wrote:
-> > On Wed, 4 Mar 2026 02:50:34 +0000 Allison Henderson wrote:  
-> > > I didnt know it was causing you grief, but I am happy to work with
-> > > you to adapt it.  RDS is a little unique in that the network topology
-> > > defines the underlying transport it uses.  If you were to run it with
-> > > just a pair of veth interfaces on a single host or vm, then you will
-> > > only be using the loop back transport in rds.ko.  In order to get it
-> > > to load and test rds_tcp.ko, we need the endpoints to be in separate
-> > > network namespaces so that the destination IP isn't seen as local. So
-> > > the test case does this by forking server/client processes across
-> > > name spaces.  There really isnt a rush on this series, so if you
-> > > think we should do some refactoring/cleanup for ksft first that is
-> > > fine.  Let me know your thoughts.  
-> > 
-> > IIUC the need to set up a veth + 2 name spaces topology is very common.
-> > We have bash "libraries" / helpers in various lib.sh files to do it.
-> > Python libs also have some support (tho the default linking there is
-> > by pairing two netdevsim devices).
-> > 
-> > Well, maybe to be clear I should say that we _even_ have support in
-> > libraries for this. Not really strongly opposed to you rolling your own
-> > way of setting up the namespaces at this point. I primarily care about
-> > us being able to execute all your tests in our CI, with standard ksft
-> > commands. Maybe I did something wrong but
-> > 
-> >  make -C tools/testing/selftests TARGETS=net/rds run_tests
-> > 
-> > did not work for me.  
-> 
-> Sure, lets get this fixed first then.  Usually when I run the test, I just run the one rds test directly like this:
-> 
-> vng --build  --config .config; vng -v --rwdir ./ --run . --user root --cpus 16 -- "export
-> PYTHONPATH=tools/testing/selftests/net/; tools/testing/selftests/net/rds/run.sh" 2>&1 | tee outfile.txt;
-> 
-> I believe the way you run it would have it run directly on the host though.  Which can work but it would have to be
-> built and configured correctly for rds. Also I think when run it through make run_tests, ksft may have other lib
-> includes that get inherited by the child processes which can affect how they run.  But I'd like to see your output to
-> confirm. Could you include the output you are seeing?  Then I'll see if I can recreate and address what you're seeing on
-> my end. 
+On Fri, 6 Mar 2026 21:24:01 +0530 Akhilesh Samineni wrote:
+> That said, if the common practice in netdev is to avoid providing
+> explicit reset functionality for such statistics, we are fine with
+> aligning with that convention and not introducing a deviation.
 
-This is how we run:
-
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
-
-Base system is Fedora 43 (since we use vng that's what the "VM" is
-effectively also using). Please re-ask the questions that are still
-relevant after you go thru the link above? I'm not sure what "run
-directly on the host" means exactly ;) 
+We generally support resetting the whole device or its specific
+"blocks". Can't think of any reset specifically for stats.
 
