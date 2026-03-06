@@ -1,249 +1,469 @@
-Return-Path: <netdev+bounces-264939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPH4Bp9Lq2kOcAEAu9opvQ
-	(envelope-from <netdev+bounces-264939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:48:15 +0100
+	id 8HY+FM9Mq2k+cAEAu9opvQ
+	(envelope-from <netdev+bounces-264940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:53:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7398C228192
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:48:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A480E2281BE
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:53:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7E363019814
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:48:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23B0F301953F
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589DA346777;
-	Fri,  6 Mar 2026 21:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B069D346E7B;
+	Fri,  6 Mar 2026 21:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OsEZbJgd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cl7fF1hV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF8834676F;
-	Fri,  6 Mar 2026 21:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7D7346E46
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 21:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772833692; cv=none; b=QvbVdR/iBSyrM62qRQSzvp7x86JZ3Dlpd8ZO6mJDM9a5JZ92PHFlsP/7N7UT3GiSj8e7KwCqxHHLw0RGXQuyK+AJlGLwJToxFFXyTtAsO2olgKBbT6VDvJm301vYZC6iXdislLwdwBfTkWpu0ai+tVgzf+nkBHGNg3TQ9qBvdgs=
+	t=1772833996; cv=none; b=BsHFhdAZ5vdyEY+OAwJRil+9ddspwc+yjnHgxZmkhEmo3i0nHiLa/GwbwKka8MprIeHKcUsQC8zEseDvCxEedZ/3aW8FvVPI/RyQj9g1G1w7LTvg9La20WVJzGxYAyzG+WVIbRSvhiqDgAMjlyX+RqQnWF1UCPtr7L5VEOH6trA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772833692; c=relaxed/simple;
-	bh=qo111MQQb5LXpK46bHQeFI70poKoUHB65PmC5p5reyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=liRGW1Z7Xd3pU2khh5S9IOU6ZPA+PGIC67IT/V51K2cN2W5lVuTTQ88Fp9+dhvFnraGYcLnqaHJWcywWDk/X2BEyWDr+FK89+iNnkIWXHcC9pOHpBsr18rGDt+v+/rwbpTKsz+OBTWGd1pIdtO4wgTC5bRARa34tti2RhptCDv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OsEZbJgd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ddvZqQUFySIge6sJv5iAA04y8EBt1MEUfEfFLzy/f/A=; b=OsEZbJgdwKor4BpsKgEBLvh6Qh
-	oEWSsMJ7pRpJBZmx8r05OzzaqEImRSo2uCsqNeOdsJVxI76RAA5mJ9f4TmSOzRQSQtVG3rAMFNMFO
-	Yq2tfLG/mLXy1HG7D7i1FaG9htuCiSsNG3Ow61YfpA7SvOpP78ILzQHWdgXpSuMLij3D8adwAQX8s
-	gPVtqFRdo01hOh7kKPVCSUIcSVPVnF9GEaydXiAF4zQ/SzhMzPX5v5U+Im6yKqbFtlGMmCxT5Grvh
-	Ve5SnB4YYd+rCb3guzM2LzNXwPe6Dhvpcvs8r5Repa15QMe+wC7GcPk0ml0Xm4UYGBFMnpGqGjFER
-	Y46i+AQA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52808)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vyd1d-000000001aV-1ocF;
-	Fri, 06 Mar 2026 21:48:01 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vyd1Z-000000001kc-2mAV;
-	Fri, 06 Mar 2026 21:47:57 +0000
-Date: Fri, 6 Mar 2026 21:47:57 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH RFC net-next v2 0/7] net: stmmac: improve PCS support
-Message-ID: <aatLjarGu_qdRkP2@shell.armlinux.org.uk>
-References: <aafxqCvJ_XY4YbWw@shell.armlinux.org.uk>
- <aandp3FYSJbwoZxo@oss.qualcomm.com>
+	s=arc-20240116; t=1772833996; c=relaxed/simple;
+	bh=NA+Gg0iccmw3fanRJOkgWSag1qmDVaapR8Fd1CbpRZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TD9WLh4PdUVO46gnOaR+naWLmf8kvEkwVbUiDAS3eTQf6HB2oIL68G/ICtQFhW8KEK5QBlpAAYRqExmtkiWTBIJvPH+s9r6VZlgZAmDZJl4bNPkV5NTNdKnsonWYqSwGYIpEemYC4DMKrUWADQuQRabWLbixmEXOtBC5rl9Zidc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cl7fF1hV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0BBCC4CEF7;
+	Fri,  6 Mar 2026 21:53:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772833996;
+	bh=NA+Gg0iccmw3fanRJOkgWSag1qmDVaapR8Fd1CbpRZQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Cl7fF1hVZ6C31ZpF04MBV1dn+Qnos7wax3kKczGHxgOuaV+sogUDPFjJwSZRM6s+c
+	 gPKzJ6L8HdGdrkjRDTeakj8ncSiFxHqjehKVMDJC61N2zcw942+ZKwlRWEBAta8SWw
+	 fKzgFsUoqw1/hmz1Km7yAhPXmqv8tl9JVn8+ceY6WDZbmRGxHu/mOTYw5MCharPyy2
+	 e+fUbDC6ZpLsNBgDorme0hklCqURNJEybZpo4fY+tdArpq6ieePKp9cSQAGJOYDKzs
+	 4IONnxYRKv58MNZ49d80FjmMoD0iviV7KuvLERzj/fMZ7XOIIp5CW3foxOQxPF/krd
+	 4c3S4AeA/kpCA==
+Date: Fri, 6 Mar 2026 13:53:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Wang <weibunny@fb.com>
+Cc: <netdev@vger.kernel.org>, Daniel Zahka <daniel.zahka@gmail.com>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH v2 net-next 9/9] selftest/net: psp: Add test for
+ dev-assoc/disassoc
+Message-ID: <20260306135314.35b63df1@kernel.org>
+In-Reply-To: <20260304000050.3366381-10-weibunny@fb.com>
+References: <20260304000050.3366381-1-weibunny@fb.com>
+	<20260304000050.3366381-10-weibunny@fb.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aandp3FYSJbwoZxo@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: 7398C228192
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: A480E2281BE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264939-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-264940-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.037];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:url]
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,netns.name:url]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026 at 01:16:47AM +0530, Mohd Ayaan Anwar wrote:
-> Hi Russell,
-> On Wed, Mar 04, 2026 at 08:47:36AM +0000, Russell King (Oracle) wrote:
-> > Resending this as the original RFC now conflicts with net-next.
-> > 
-> > This series is the next of the three part series sorting out the PCS
-> > support in stmmac, building on part 2, which was posted yesterday:
-> > 
-> > 	net: stmmac: qcom-ethqos: further serdes reorganisation
-> > 
-> > Similar patches have been posted previously. This series does away with
-> > the common SerDes PHY support, instead using a flag to indicate whether
-> > 2500Mbps mode is supported (STMMAC_FLAG_SERDES_SUPPORTS_2500M.) At this
-> > time, I have no plans to resurect the common SerDes PHY support - the
-> > generic PHY layer implementations are just too random to consider that,
-> > and I certainly do not want the extra work of fixing that.
-> > 
-> > I've also changed the last patch which prints warnings when qcom-ethqos
-> > changes the PCS state - this will now indicate in a readable form
-> > whether the ANE or SGMRAL bits have changed state, rather than having
-> > to refer back to the definitions in the code or the databook.
-> > 
-> > I am hoping that - subject to this working for qcom-ethqos - we can
-> > drop this last patch in the final submission, along with the
-> > dwmac_ctrl_ane() and ethqos_pcs_set_inband() functions and associated
-> > definitions. This will also mean that stmmac will finally be driving
-> > the PCS correctly from a phylink point of view.
-> > 
-> 
-> Apologies for the delay in sharing test results. I had some board issues
-> to work through.
-> 
-> I applied your previous RFC series on top of the two qcom-ethqos/serdes
-> cleanup series and have the following results to report for the QCS9100
-> Ride R3 board (AQR115C PHY):
-> 
->   - Link up at 2.5G, 1G, and 100M is fine (phylink logs below). The PCS
->     link takes a moment to stabilize, but after that it's stable.
+On Tue, 3 Mar 2026 16:00:49 -0800 Wei Wang wrote:
+> +def _data_basic_send_netkit_psp_assoc(cfg, version, ipver):
+> +    """
+> +    Test basic data send with netkit interface associated with PSP dev.
+> +    """
+> +
+> +    _init_psp_dev(cfg, True)
+> +    psp_dev_id_for_assoc = cfg.psp_dev_id
+> +
+> +    # Associate PSP device with nk_guest interface (in guest namespace)
+> +    nk_guest_dev = ip(f"link show dev {cfg._nk_guest_ifname}", json=True, ns=cfg.netns)[0]
 
-Has it always taken a moment to stabilise? Note that the ANE changes
-will trigger a re-exchange of SGMII in-band, which is why you see
-the PCS link go down and back up after the "ANE 0->1" message.
+dev info is one of the few things the env class should have loaded for
+us. Please add it if it's missing, we have it for other envs (env.dev,
+env.remote_dev, nk should presumably be env.nk_dev ? or env.cont_dev ?)
 
-I do notice:
+> +    nk_guest_ifindex = nk_guest_dev['ifindex']
+> +
+> +    cfg.pspnl.dev_assoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
 
-	qcom-ethqos 23040000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
+Please wrap lines at 80 chars.
 
-which is a symptom that a clock is missing. There's been some recent
-patches merged into net-next which changes this:
+> +    # Check if assoc-list contains nk_guest
+> +    dev_info = cfg.pspnl.dev_get({'id': psp_dev_id_for_assoc})
+> +
+> +    if 'assoc-list' in dev_info:
+> +        found = False
+> +        for assoc in dev_info['assoc-list']:
+> +            if assoc['ifindex'] == nk_guest_ifindex and assoc['nsid'] == cfg.psp_dev_peer_nsid:
+> +                found = True
+> +                break
 
-2cd70e3968f5 net: stmmac: Defer VLAN HW configuration when interface is down
-bd7ad51253a7 net: stmmac: Fix VLAN HW state restore
-e38200e361cb net: stmmac: Improve double VLAN handling
-35dfedce442c net: stmmac: Fix error handling in VLAN add and delete paths
+Should it not be the _only_ assoc? Maybe let's start with that
+assumption and complicate the tests later if needed?
+The other tests are rotating the keys and generally assuming full
+control over PSP so I don't think we should cater to the case of
+"something else is using PSP on the base system" here either.
 
-please indicate whether you have these applied.
+Let's also check how the attributes look from inside the netns
+and how they look if the netkit and netdevsim are in the same netns?
+(unless you already have that. this patch is a bit enormous :()
 
->   - No data path issues at these speeds either.
+> +        ksft_true(found, "Associated device not found in dev_get() response")
+> +    else:
+> +        raise RuntimeError("No assoc-list in dev_get() response after association")
 
-Great.
+KsftFailEx() ?
 
->   - The warning ("PCS configuration changed from phylink by glue;
->     ANE 0 -> 1") is observed when the link comes up at 1G/100M.
+> +    # Enter guest namespace (netns) to run PSP test
+> +    with NetNSEnter(cfg.netns.name):
+> +        cfg.pspnl = PSPFamily()
+> +
+> +        s = _make_psp_conn(cfg, version, ipver)
+> +
+> +        rx_assoc = cfg.pspnl.rx_assoc({"version": version,
+> +                                       "dev-id": cfg.psp_dev_id,
+> +                                       "sock-fd": s.fileno()})
+> +        rx = rx_assoc['rx-key']
+> +        tx = _spi_xchg(s, rx)
+> +
+> +        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
+> +                            "version": version,
+> +                            "tx-key": tx,
+> +                            "sock-fd": s.fileno()})
+> +
+> +        data_len = _send_careful(cfg, s, 100)
+> +        _check_data_rx(cfg, data_len)
+> +        _close_psp_conn(cfg, s)
+> +
+> +    # Clean up - back in host namespace
+> +    cfg.pspnl = PSPFamily()
+> +    cfg.pspnl.dev_disassoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +
+> +    del cfg.psp_dev_id
+> +    del cfg.psp_info
+> +
+> +
+> +def _key_rotation_notify_multi_ns_netkit(cfg, version, ipver):
+> +    """ Test key rotation notifications across multiple namespaces using netkit """
+> +    import threading
 
-That's currently expected, because phylink thinks we're using PHY
-mode (where it's in charge of reading the PHY and telling the MAC
-what's going on) rather than using inband. This is something that
-will need to be addressed later.
+I don't think we need threading for this test.. ?
+If we open a socket while in one netns and then switch the netns back
+the previously opened socket should still be in the netns? So we can
+just ntf_check() directly from the main thread? 
 
->   - I did find one issue: the data path breaks when the link speed
->     changes from 2.5G to 1G or 100M. Notably, this is not consistently
->     reproducible, and the issue persists even after *dropping* this
->     series and the two qcom-ethqos/serdes cleanup series, so it appears
->     to be pre-existing. I am trying to debug this separately.
+> +    _init_psp_dev(cfg, True)
+> +    psp_dev_id_for_assoc = cfg.psp_dev_id
+> +
+> +    # Associate PSP device with nk_guest interface (in guest namespace)
+> +    nk_guest_dev = ip(f"link show dev {cfg._nk_guest_ifname}", json=True, ns=cfg.netns)[0]
+> +    nk_guest_ifindex = nk_guest_dev['ifindex']
+> +
+> +    cfg.pspnl.dev_assoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +
+> +    results = {'main_ns': None, 'peer_ns': None}
+> +
+> +    def listen_in_namespace(ns_name, result_key):
+> +        """Listen for key rotation notifications in a namespace"""
+> +        try:
+> +            if ns_name:
+> +                ctx = NetNSEnter(ns_name)
+> +            else:
+> +                from contextlib import nullcontext
+> +                ctx = nullcontext()
+> +
+> +            with ctx:
+> +                pspnl = PSPFamily()
+> +                pspnl.ntf_subscribe('use')
+> +
+> +                collected_notifications = []
+> +                for i in range(100):
+> +                    pspnl.check_ntf()
+> +
+> +                    try:
+> +                        while True:
+> +                            msg = pspnl.async_msg_queue.get_nowait()
+> +                            collected_notifications.append(msg['msg'])
+> +                    except:
+> +                        pass
+> +
+> +                    if collected_notifications:
+> +                        results[result_key] = collected_notifications
+> +                        break
+> +
+> +                    time.sleep(0.1)
+> +                else:
+> +                    # Timeout - no notification received
+> +                    results[result_key] = []
+> +        except Exception as e:
+> +            results[result_key] = {'error': str(e)}
+> +
+> +    # Create listener threads
+> +    # Main namespace listener
+> +    main_ns_thread = threading.Thread(
+> +        target=listen_in_namespace,
+> +        args=(None, 'main_ns'),
+> +        name='main_ns_listener'
+> +    )
+> +    # Guest namespace listener (netkit peer)
+> +    guest_ns_thread = threading.Thread(
+> +        target=listen_in_namespace,
+> +        args=(cfg.netns.name, 'peer_ns'),
+> +        name='guest_ns_listener'
+> +    )
+> +
+> +    main_ns_thread.start()
+> +    guest_ns_thread.start()
+> +
+> +    time.sleep(0.5)
+> +
+> +    # Trigger key rotation on the PSP device
+> +    cfg.pspnl.key_rotate({"id": psp_dev_id_for_assoc})
+> +
+> +    main_ns_thread.join(timeout=15)
+> +    guest_ns_thread.join(timeout=15)
+> +
+> +    # Verify notifications were received in both namespaces
+> +    ksft_not_none(results['main_ns'], "No result from main namespace listener")
+> +    ksft_not_none(results['peer_ns'], "No result from guest namespace listener")
+> +
+> +    # Check for errors in listeners
+> +    if isinstance(results['main_ns'], dict) and 'error' in results['main_ns']:
+> +        raise RuntimeError(f"Main NS listener error: {results['main_ns']['error']}")
+> +    if isinstance(results['peer_ns'], dict) and 'error' in results['peer_ns']:
+> +        raise RuntimeError(f"Guest NS listener error: {results['peer_ns']['error']}")
+> +
+> +    # Verify that both namespaces received at least one notification
+> +    ksft_gt(len(results['main_ns']), 0, "No key rotation notification received in main namespace")
+> +    ksft_gt(len(results['peer_ns']), 0, "No key rotation notification received in guest namespace")
+> +
+> +    # Verify the notification contains the expected dev_id
+> +    main_ns_has_dev = any(
+> +        ntf.get('id') == psp_dev_id_for_assoc
+> +        for ntf in results['main_ns']
+> +    )
+> +    guest_ns_has_dev = any(
+> +        ntf.get('id') == psp_dev_id_for_assoc
+> +        for ntf in results['peer_ns']
+> +    )
+> +
+> +    ksft_true(main_ns_has_dev, "Key rotation notification for correct device not found in main namespace")
+> +    ksft_true(guest_ns_has_dev, "Key rotation notification for correct device not found in guest namespace")
+> +
+> +    # Clean up
+> +    cfg.pspnl.dev_disassoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +    del cfg.psp_dev_id
+> +    del cfg.psp_info
+> +
+> +
+> +def _dev_change_notify_multi_ns_netkit(cfg, version, ipver):
+> +    """ Test dev_change notifications across multiple namespaces using netkit """
+> +    import threading
+> +
+> +    _init_psp_dev(cfg, True)
+> +    psp_dev_id_for_assoc = cfg.psp_dev_id
+> +
+> +    # Associate PSP device with nk_guest interface (in guest namespace)
+> +    nk_guest_dev = ip(f"link show dev {cfg._nk_guest_ifname}", json=True, ns=cfg.netns)[0]
+> +    nk_guest_ifindex = nk_guest_dev['ifindex']
+> +
+> +    cfg.pspnl.dev_assoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +
+> +    results = {'main_ns': None, 'peer_ns': None}
+> +
+> +    def listen_in_namespace(ns_name, result_key):
+> +        """Listen for dev_change notifications in a namespace"""
+> +        try:
+> +            if ns_name:
+> +                ctx = NetNSEnter(ns_name)
+> +            else:
+> +                from contextlib import nullcontext
+> +                ctx = nullcontext()
+> +
+> +            with ctx:
+> +                pspnl = PSPFamily()
+> +                pspnl.ntf_subscribe('mgmt')
+> +
+> +                collected_notifications = []
+> +                for i in range(100):
+> +                    pspnl.check_ntf()
+> +
+> +                    try:
+> +                        while True:
+> +                            msg = pspnl.async_msg_queue.get_nowait()
+> +                            collected_notifications.append(msg['msg'])
+> +                    except:
+> +                        pass
+> +
+> +                    if collected_notifications:
+> +                        results[result_key] = collected_notifications
+> +                        break
+> +
+> +                    time.sleep(0.1)
+> +                else:
+> +                    # Timeout - no notification received
+> +                    results[result_key] = []
+> +        except Exception as e:
+> +            results[result_key] = {'error': str(e)}
+> +
+> +    # Create listener threads
+> +    # Main namespace listener
+> +    main_ns_thread = threading.Thread(
+> +        target=listen_in_namespace,
+> +        args=(None, 'main_ns'),
+> +        name='main_ns_listener'
+> +    )
+> +    # Guest namespace listener (netkit peer)
+> +    guest_ns_thread = threading.Thread(
+> +        target=listen_in_namespace,
+> +        args=(cfg.netns.name, 'peer_ns'),
+> +        name='guest_ns_listener'
+> +    )
+> +
+> +    main_ns_thread.start()
+> +    guest_ns_thread.start()
+> +
+> +    time.sleep(1.0)  # Give threads time to subscribe
+> +
+> +    # Trigger dev_change by calling dev_set (notification is always sent)
+> +    cfg.pspnl.dev_set({'id': psp_dev_id_for_assoc, 'psp-versions-ena': cfg.psp_info['psp-versions-cap']})
+> +
+> +    main_ns_thread.join(timeout=15)
+> +    guest_ns_thread.join(timeout=15)
+> +
+> +    # Verify notifications were received in both namespaces
+> +    ksft_not_none(results['main_ns'], "No result from main namespace listener")
+> +    ksft_not_none(results['peer_ns'], "No result from guest namespace listener")
+> +
+> +    # Check for errors in listeners
+> +    if isinstance(results['main_ns'], dict) and 'error' in results['main_ns']:
+> +        raise RuntimeError(f"Main NS listener error: {results['main_ns']['error']}")
+> +    if isinstance(results['peer_ns'], dict) and 'error' in results['peer_ns']:
+> +        raise RuntimeError(f"Guest NS listener error: {results['peer_ns']['error']}")
+> +
+> +    # Verify that both namespaces received at least one notification
+> +    ksft_gt(len(results['main_ns']), 0, "No dev_change notification received in main namespace")
+> +    ksft_gt(len(results['peer_ns']), 0, "No dev_change notification received in guest namespace")
+> +
+> +    # Verify the notification contains the expected dev_id
+> +    main_ns_has_dev = any(
+> +        ntf.get('id') == psp_dev_id_for_assoc
+> +        for ntf in results['main_ns']
+> +    )
+> +    guest_ns_has_dev = any(
+> +        ntf.get('id') == psp_dev_id_for_assoc
+> +        for ntf in results['peer_ns']
+> +    )
+> +
+> +    ksft_true(main_ns_has_dev, "Dev_change notification for correct device not found in main namespace")
+> +    ksft_true(guest_ns_has_dev, "Dev_change notification for correct device not found in guest namespace")
+> +
+> +    # Clean up
+> +    cfg.pspnl.dev_disassoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +    del cfg.psp_dev_id
+> +    del cfg.psp_info
+> +
+> +
+> +def _psp_dev_get_check_netkit_psp_assoc(cfg, version, ipver):
+> +    """ Check psp dev-get output with netkit interface associated with PSP dev """
+> +
+> +    _init_psp_dev(cfg, True)
+> +    psp_dev_id_for_assoc = cfg.psp_dev_id
+> +
+> +    # Associate PSP device with nk_guest interface (in guest namespace)
+> +    nk_guest_dev = ip(f"link show dev {cfg._nk_guest_ifname}", json=True, ns=cfg.netns)[0]
+> +    nk_guest_ifindex = nk_guest_dev['ifindex']
+> +
+> +    cfg.pspnl.dev_assoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +
+> +    # Check 1: In default netns, verify dev-get has correct ifindex and assoc-list
+> +    dev_info = cfg.pspnl.dev_get({'id': psp_dev_id_for_assoc})
+> +
+> +    # Verify the PSP device has the correct ifindex
+> +    ksft_eq(dev_info['ifindex'], cfg.psp_ifindex)
+> +
+> +    # Verify assoc-list exists and contains the associated nk_guest with correct ifindex and nsid
+> +    ksft_true('assoc-list' in dev_info, "No assoc-list in dev_get() response after association")
+> +    found = False
+> +    for assoc in dev_info['assoc-list']:
+> +        if assoc['ifindex'] == nk_guest_ifindex and assoc['nsid'] == cfg.psp_dev_peer_nsid:
+> +            found = True
+> +            break
+> +    ksft_true(found, "Associated device not found in assoc-list with correct ifindex and nsid")
+> +
+> +    # Check 2: In guest netns, verify dev-get has assoc-list with nk_guest device
+> +    with NetNSEnter(cfg.netns.name):
+> +        peer_pspnl = PSPFamily()
+> +
+> +        # Dump all devices in the guest namespace
+> +        peer_devices = peer_pspnl.dev_get({}, dump=True)
+> +
+> +        # Find the device with by-association flag
+> +        peer_dev = None
+> +        for dev in peer_devices:
+> +            if dev.get('by-association'):
+> +                peer_dev = dev
+> +                break
+> +
+> +        ksft_not_none(peer_dev, "No PSP device found with by-association flag in guest netns")
+> +
+> +        # Verify assoc-list contains the nk_guest device
+> +        ksft_true('assoc-list' in peer_dev and len(peer_dev['assoc-list']) > 0,
+> +                  "Guest device should have assoc-list with local devices")
+> +
+> +        # Verify the assoc-list contains nk_guest ifindex with nsid=-1 (same namespace)
+> +        found = False
+> +        for assoc in peer_dev['assoc-list']:
+> +            if assoc['ifindex'] == nk_guest_ifindex:
+> +                ksft_eq(assoc['nsid'], -1,
+> +                        "nsid should be -1 (NETNSA_NSID_NOT_ASSIGNED) for same-namespace device")
+> +                found = True
+> +                break
+> +        ksft_true(found, "nk_guest ifindex not found in assoc-list")
+> +
+> +    # Clean up
+> +    cfg.pspnl.dev_disassoc({'id': psp_dev_id_for_assoc, 'ifindex': nk_guest_ifindex, 'nsid': cfg.psp_dev_peer_nsid})
+> +
+> +    del cfg.psp_dev_id
+> +    del cfg.psp_info
+> +
+> +
+> +def _psp_dev_assoc_cleanup_on_netkit_del(cfg):
+> +    """ Test that assoc-list is cleared when associated netkit interface is deleted """
+> +    import subprocess
 
-I think you added some debug between the logs that you've provided
-below, which I'll take as not significant.
-
-I think what's happening is the PHY's SGMII exchange times out, but
-because you're enabling SGMII with AN at the PCS, the PCS is wanting
-that to complete, and that never happens. I suspect if you unplug and
-replug the cable after its switched into 1G mode, it may work. However,
-I need to check whether AQR115C does this "AN bypass" thing.
-
-That said, as we're using outband mode, phylink will call
-phy_config_inband() with LINK_INBAND_DISABLE. This should disable
-inband mode at the PHY, but from your logs I see evidence that it
-hasn't. I think that may be because the AQR needs something more than
-writing the VEND1_GLOBAL_CFG_* registers for that to take effect.
-
-One of the hacks I have locally for an AQR113C on a SFP module which
-uses 10GBASE-R with rate matching is the following in
-aqr_gen4_config_init() to allow it to work with MACs that only support
-up to 2.5G:
-
-        phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, MDIO_CTRL1, MDIO_CTRL1_LPOWER);
-        mdelay(10);
-        phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x31a, 2);
-        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_10M,
-                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
-                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
-        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_100M,
-                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
-                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
-        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_1G,
-                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
-                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
-        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_2_5G,
-                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
-                      VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII);
-        phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, MDIO_CTRL1,
-                           MDIO_CTRL1_LPOWER);
-
-I have this immediately after "priv->wait_on_global_cfg = true;"
-
-This reprograms the vendor provisioning so that we use 2500BASE-X
-for 2.5G and SGMII for 1G and below with AN enabled. Note placing
-the PHY into low-power mode while doing this - this causes firmware
-to re-read when exiting low-power mode. I wonder if that's required
-in aqr_gen2_config_inband() - but that will cause the link to go
-down.
-
-Note that VEND1_GLOBAL_CFG_AUTONEG_ENA enables inband signalling on
-the link.
-
-With the above, you should be able to test various scenarios with
-the PHY - and changing your provisioned 10M configuration will likely
-get 10M speeds working.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+use cmd()?  feels like this code is AI generated
+please review it carefully before repost
 
