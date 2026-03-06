@@ -1,213 +1,326 @@
-Return-Path: <netdev+bounces-264713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GB20KoaYqmmIUAEAu9opvQ
-	(envelope-from <netdev+bounces-264713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:04:06 +0100
+	id GFOuGDqbqmnPUQEAu9opvQ
+	(envelope-from <netdev+bounces-264714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:15:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314DC21D941
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:04:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F9721DBC2
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:15:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 101663029258
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:04:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F6CB30398B8
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C5533A9DE;
-	Fri,  6 Mar 2026 09:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D11E340A4D;
+	Fri,  6 Mar 2026 09:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="xbOV+6jn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TyR366hp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-106104.protonmail.ch (mail-106104.protonmail.ch [79.135.106.104])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E19233858B
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 09:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD9A33B6CB;
+	Fri,  6 Mar 2026 09:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772787841; cv=none; b=tcFizB5E6q3dl3mI8A7C71KtnqQ3LA8MeQPOPR4LC11ExH+95IYPawwmyMqZIC7ugXU+MHNrLqhnQc/7gjLejB/CRFw3c5Ls+Qvu9J0Mx9XH6yc5IChx/zKryVRYAdeojjUV8XG+VfNeprsjwszzHi9oDdjEa7niDgSK6nRk0zM=
+	t=1772788508; cv=none; b=e+8vKnSn84cLNLd4ZqnhbpZQ8kIURZi7XqPNUAdVTGF1vkwY96Wprk7pcQZqALiso2xj+M5ginnmVgyAJ/eu6l2y/nFH+GVemtYGsUX4wnV8uZpVUki+WoGqVbpm++w6Mtq9LozfiSAAp/feMTT1fvNbOojpBxMNczzpuS6lCwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772787841; c=relaxed/simple;
-	bh=Eli/FPRcHAeLJQQC1JfW7qWN6/2FvGa4kJn8GnM5+tg=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=MJ1mkgZMHC4T+ZKwwHBvLuD1jI2EvgqbVHvJuTHIVdigVEWSy43PbuquBylAkaERWHXBaOlY+nvt7bmmciNS8vEgK5qTNEkhg63PPWZeIvFGsEVza1+LYXiW8oIkNXeAoo+DFpTG//K53Ovyzb36oDqLsGTuBQp+xT2qDZ14liA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=xbOV+6jn; arc=none smtp.client-ip=79.135.106.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1772787829; x=1773047029;
-	bh=BG6MsfApo6WVjCvrJZzMRyHrC8k12X+r7HRvskBvFSU=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=xbOV+6jnTWPybEXNCk9xakM3vEfQ7/EumXlFb65Wg+cDNLCXbZO0ZQEW2TFynXHqU
-	 m36mhHfllgnHZHtEvhehUH/5SHqdJce+5ahf+WEMMFcvyjvtWSBfXJDbzHR+Z8zmWG
-	 sCj5eB2GW+6spv2XialNBXF3vSjlovRdi2Y9AhNkPaKyWoyhIEdfTpV019enkSBB/J
-	 xjc5RxlCAqhSWluZSdDXWVSkHkjSs+7hvZf6hyrKm9r62T5A7e8ho7m7wJ5bt0lTlW
-	 ODSpfx11QTFV8dAD6WFIq6Tp7rpldntjm7m65ap/v5A3VoWR/t0+9UpYo6bAC6owC0
-	 Iae00b3qrfI4g==
-Date: Fri, 06 Mar 2026 09:03:46 +0000
-To: "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-From: CyFun <xcyfun@protonmail.com>
-Cc: "daniel@iogearbox.net" <daniel@iogearbox.net>, "ast@kernel.org" <ast@kernel.org>, "andrii@kernel.org" <andrii@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: [PATCH bpf v2] bpf: fix constant blinding bypass for PROBE_MEM32 stores
-Message-ID: <ymj6l4pBrhKjzHeR2XYjQcvWswW_741UgkR05M3iYsrzxzhD-3AfAZ1rNJ5k1b6ex0tosQAorJP38DfNDkyqbhkY-DD6RW_qTfuJ0z86psE=@protonmail.com>
-Feedback-ID: 42070492:user:proton
-X-Pm-Message-ID: c1ab93d6db44e1386836cdb366981766d0ebce10
+	s=arc-20240116; t=1772788508; c=relaxed/simple;
+	bh=7RvOdnrFs/iEe9G84pPe+q4PLv+gFd3Sa58Nl0eTC8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MhkrUNew/kVjjDX00OOp2HBs5hVrUxZeQ+VO91IGOaVaGPyrv/7spRARgvL4zQSEQEm5Soq62lHODY+P8EFU2BSfjsBxus5wxEs6wP6knTO423TDZzAZK0kJ8WCPPK06gaQ5BB7kgguVlb6DEYYVM5ZKe5J9x4Q4fnwuwp8KipI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TyR366hp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C425BC4CEF7;
+	Fri,  6 Mar 2026 09:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772788507;
+	bh=7RvOdnrFs/iEe9G84pPe+q4PLv+gFd3Sa58Nl0eTC8M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TyR366hpH5SBgvb3stJOO+3+JgB4eyp8Ub6SIcEY5Wv5+DIXq3qwQ1akUuyGzm4GI
+	 oVWqv0SYGKFQk/aIJcLbDc3SkZdh03GwnjPJPfc8DHBxnnTk3pTwokbH2aquirHejB
+	 nz1gJxpKMhkWSd0cvlbIm12Yo0dUUSzlaMGnA70lo5LCfYmGHYkoB3BEoaWxEw9skO
+	 0XSBCv8+kTn/Gf5HrA+24udlPqxoLhC1731SEC00PUdG+t6hKArOjAPEtT/hHxR1LY
+	 s+VuE2scXcViJMBvNGcnMzw7bfK0RAeQxP1RLAMHfxMD+S62KQ5DOUo/0QF6h57vkJ
+	 rf8R3FiiVNktg==
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	fsverity@lists.linux.dev,
+	linux-mm@kvack.org,
+	netfs@lists.linux.dev,
+	linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-nilfs@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	autofs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	codalist@coda.cs.cmu.edu,
+	ecryptfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	jfs-discussion@lists.sourceforge.net,
+	ntfs3@lists.linux.dev,
+	ocfs2-devel@lists.linux.dev,
+	devel@lists.orangefs.org,
+	linux-unionfs@vger.kernel.org,
+	apparmor@lists.ubuntu.com,
+	linux-security-module@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	selinux@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
+	netdev@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	linux-x25@vger.kernel.org,
+	audit@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-sctp@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Ian Kent <raven@themaw.net>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Jan Harkes <jaharkes@cs.cmu.edu>,
+	coda@cs.cmu.edu,
+	Nicolas Pitre <nico@fluxnic.net>,
+	Tyler Hicks <code@tyhicks.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Yangtao Li <frank.li@vivo.com>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>,
+	Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Anders Larsen <al@alarsen.net>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>,
+	Fan Wu <wufan@kernel.org>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Martin Schiller <ms@dev.tdt.de>,
+	Eric Paris <eparis@redhat.com>,
+	Joerg Reuter <jreuter@yaina.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH v3 00/12] vfs: change inode->i_ino from unsigned long to u64
+Date: Fri,  6 Mar 2026 10:09:33 +0100
+Message-ID: <20260306-kennen-zubrot-2605fcfd6950@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260304-iino-u64-v3-0-2257ad83d372@kernel.org>
+References: <20260304-iino-u64-v3-0-2257ad83d372@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6"; charset=utf-8
-X-Rspamd-Queue-Id: 314DC21D941
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2708; i=brauner@kernel.org; h=from:subject:message-id; bh=7RvOdnrFs/iEe9G84pPe+q4PLv+gFd3Sa58Nl0eTC8M=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSumvWu2uNxbBFXikaZQKrMtl0PLj1c+kZGWOrvZiHz/ W/CTGOed5SyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEzk4A5GhimT869vPnNH4Vqj t6Tr0fqPLXs3v0g/qbXpwf6o52L5D7YyMnxU+idovG+O5JQe0WVOK45/sI9bw9AjJfah78/izrQ aXg4A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B5F9721DBC2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.16 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_UNKNOWN(0.10)[application/pgp-keys];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264713-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264714-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:~,4:~];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_FROM(0.00)[protonmail.com];
-	HAS_ATTACHMENT(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org,zeniv.linux.org.uk,suse.cz,goodmis.org,efficios.com,intel.com,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,infradead.org,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.ne
+ t];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_GT_50(0.00)[171];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xcyfun@protonmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[protonmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:dkim,protonmail.com:email,protonmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iogearbox.net:email]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6
-Content-Type: multipart/mixed;boundary=---------------------96784b056a1fdb1f93c88584c16caf76
+On Wed, 04 Mar 2026 10:32:30 -0500, Jeff Layton wrote:
+> Christian said [1] to "just do it" when I proposed this, so here we are!
+> 
+> For historical reasons, the inode->i_ino field is an unsigned long,
+> which means that it's 32 bits on 32 bit architectures. This has caused a
+> number of filesystems to implement hacks to hash a 64-bit identifier
+> into a 32-bit field, and deprives us of a universal identifier field for
+> an inode.
+> 
+> [...]
 
------------------------96784b056a1fdb1f93c88584c16caf76
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;charset=utf-8
+This series makes me happy. We've been talking about this conversion for
+a while and I'm thankful that you did this work. Without the automation
+available this probably wouldn't have happened as quickly as it did now.
+Let's see what bits and pieces it missed.
 
-To: bpf@vger.kernel.org
-Cc: daniel@iogearbox.net, ast@kernel.org, andrii@kernel.org, netdev@vger.k=
-ernel.org
-Subject: [PATCH bpf v2] bpf: fix constant blinding bypass for PROBE_MEM32 =
-stores
-
-BPF_ST | BPF_PROBE_MEM32 immediate stores are not handled by
-bpf_jit_blind_insn(), allowing user-controlled 32-bit immediates to
-survive unblinded into JIT-compiled native code when bpf_jit_harden >=3D 1=
-.
-
-The root cause is that convert_ctx_accesses() rewrites BPF_ST|BPF_MEM
-to BPF_ST|BPF_PROBE_MEM32 for arena pointer stores during verification,
-before bpf_jit_blind_constants() runs during JIT compilation. The
-blinding switch only matches BPF_ST|BPF_MEM (mode 0x60), not
-BPF_ST|BPF_PROBE_MEM32 (mode 0xa0). The instruction falls through
-unblinded.
-
-Add BPF_ST|BPF_PROBE_MEM32 cases to bpf_jit_blind_insn() alongside the
-existing BPF_ST|BPF_MEM cases. The blinding transformation is identical:
-load the blinded immediate into BPF_REG_AX via mov+xor, then convert
-the immediate store to a register store (BPF_STX).
-
-The rewritten STX instruction must preserve the BPF_PROBE_MEM32 mode so
-the architecture JIT emits the correct arena addressing (R12-based on
-x86-64). Cannot use the BPF_STX_MEM() macro here because it hardcodes
-BPF_MEM mode; construct the instruction directly instead.
-
-Fixes: 6082b6c328b5 ("bpf: Recognize addr_space_cast instruction in the ve=
-rifier.")
-Signed-off-by: s4ch <xcyfun@protonmail.com>
 ---
-v2: Rebased onto current bpf tree (commit 56145d237385).
-    v1 had a malformed diff header that caused CI to reject it.
----
- kernel/bpf/core.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index 3ece2da55..bb2fa75de 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -1422,6 +1422,24 @@ static int bpf_jit_blind_insn(const struct bpf_insn=
- *from,
- 		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
- 		*to++ =3D BPF_STX_MEM(from->code, from->dst_reg, BPF_REG_AX, from->off)=
-;
- 		break;
-+
-+	case BPF_ST | BPF_PROBE_MEM32 | BPF_DW:
-+	case BPF_ST | BPF_PROBE_MEM32 | BPF_W:
-+	case BPF_ST | BPF_PROBE_MEM32 | BPF_H:
-+	case BPF_ST | BPF_PROBE_MEM32 | BPF_B:
-+		*to++ =3D BPF_ALU64_IMM(BPF_MOV, BPF_REG_AX, imm_rnd ^
-+				      from->imm);
-+		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
-+		/* Cannot use BPF_STX_MEM() here: it hardcodes BPF_MEM
-+		 * mode which would lose BPF_PROBE_MEM32 and break the
-+		 * arena addressing in the architecture JIT. */
-+		*to++ =3D (struct bpf_insn) {
-+			.code  =3D BPF_STX | BPF_PROBE_MEM32 | BPF_SIZE(from->code),
-+			.dst_reg =3D from->dst_reg,
-+			.src_reg =3D BPF_REG_AX,
-+			.off   =3D from->off,
-+		};
-+		break;
- 	}
- out:
- 	return to - to_buff;
---
-2.53.0
------------------------96784b056a1fdb1f93c88584c16caf76
-Content-Type: application/pgp-keys; filename="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"; name="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"; name="publickey - xcyfun@protonmail.com - 0x33596AE7.asc"
+Applied to the vfs-7.1.kino branch of the vfs/vfs.git tree.
+Patches in the vfs-7.1.kino branch should appear in linux-next soon.
 
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4ak1FWTdKN3JoWUpLd1lCQkFI
-YVJ3OEJBUWRBTkVzQVFrd2E0bU1TZlFIU0l2bXFZQjdIQTQvQVFabVoKcVpjOTlUZk9TRTNOTFho
-amVXWjFia0J3Y205MGIyNXRZV2xzTG1OdmJTQThlR041Wm5WdVFIQnliM1J2CmJtMWhhV3d1WTI5
-dFBzS01CQkFXQ2dBK0JRSmpzbnV1QkFzSkJ3Z0pFRGRGaE9rRjdoMjNBeFVJQ2dRVwpBQUlCQWhr
-QkFoc0RBaDRCRmlFRU0xbHE1NlREL1VkT0p2ZjJOMFdFNlFYdUhiY0FBRTFuQVFDSjVZMUoKcU8z
-SjkzTWRXbnJOMzRDYTNlaGRKVEVscTNkSFFPV04wcTIwRVFFQTZsV3JCakZ5aDE1cnNtMlJ5TlFO
-Ckh5ZDlTNm5heG5mbE03WnJDRVVldndYT09BUmpzbnV1RWdvckJnRUVBWmRWQVFVQkFRZEFVMk9P
-WTBHQwo2Q3pBQWJOQ2p4K05rc3AySlgzMHByWEpnWjZ4eFJHcXRIY0RBUWdId25nRUdCWUlBQ29G
-QW1PeWU2NEoKRURkRmhPa0Y3aDIzQWhzTUZpRUVNMWxxNTZURC9VZE9KdmYyTjBXRTZRWHVIYmNB
-QUdGM0FRRFJYSnd3ClZDbjAyRlhCWEhnRWZDNHV2Q09YTDUzVmRmMENaY210bFJFd3BnRCtOS2Jv
-TWRrU2RlNHY2UVJXeldidAo4MmRmTzFBTHBuMnhscnQ0RkZvbjJBaz0KPWwxanYKLS0tLS1FTkQg
-UEdQIFBVQkxJQyBLRVkgQkxPQ0stLS0tLQo=
------------------------96784b056a1fdb1f93c88584c16caf76--
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
---------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-wrsEARYKAG0FgmmqmGQJEDdFhOkF7h23RRQAAAAAABwAIHNhbHRAbm90YXRp
-b25zLm9wZW5wZ3Bqcy5vcmfkciulAq1i7V8rQA8XzSIt/tW7VTDaiO8aVj6I
-Te7JkBYhBDNZauekw/1HTib39jdFhOkF7h23AABL0wD+NFh5liY8sC2z7y9x
-xIHAtSlyShmIfn5ml0TSiK1XmkEA/3xhn3jW13Y2ByxpseT4AkoqokaI71un
-5t/ls2/vlbIF
-=p2P+
------END PGP SIGNATURE-----
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.1.kino
 
-
---------e61a83288252667a3c0566d3be7e1be1b93edbd2e6c4554f28de02d4c70668e6--
-
+[01/12] vfs: widen inode hash/lookup functions to u64
+        https://git.kernel.org/vfs/vfs/c/2412a9fa518a
+[02/12] audit: widen ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/a5e863be4d02
+[03/12] net: change sock.sk_ino and sock_i_ino() to u64
+        https://git.kernel.org/vfs/vfs/c/c21144a0a33f
+[04/12] vfs: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/5e5c380870b2
+[05/12] cachefiles: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/25291f67aad7
+[06/12] ext2: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/797d04a355e3
+[07/12] hugetlbfs: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/3c976fb36a9a
+[08/12] zonefs: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/988f68c01b3a
+[09/12] ext4: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/1c1427c79bc2
+[10/12] f2fs: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/6e62bf74bd8a
+[11/12] nilfs2: widen trace event i_ino fields to u64
+        https://git.kernel.org/vfs/vfs/c/6ce73711525a
+[12/12] treewide: change inode->i_ino from unsigned long to u64
+        https://git.kernel.org/vfs/vfs/c/af82d143e869
 
