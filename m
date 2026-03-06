@@ -1,219 +1,182 @@
-Return-Path: <netdev+bounces-264917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMyZDGxDq2nJbgEAu9opvQ
-	(envelope-from <netdev+bounces-264917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:13:16 +0100
+	id 0ABLDHxDq2nJbgEAu9opvQ
+	(envelope-from <netdev+bounces-264918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:13:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 854A4227C37
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:13:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F83227C57
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:13:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C380300FEE7
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:12:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4CAC43012230
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3920481AB7;
-	Fri,  6 Mar 2026 21:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0536481AA8;
+	Fri,  6 Mar 2026 21:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GXhVBQWw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWQVhSmQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410FE3F23B3
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 21:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1675C481AA4
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 21:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772831542; cv=none; b=jOShDPr6A5hy4radrpGg85CgM/MyI/6ibW+QnzLHe9rrJqfzz/azU5h19tbR0r4F05Dgg3/z24W/pB2WufrxYLH3VpTXzIKJH+yJo3qRwGgcu6oKBB/ICUQQCcsinNgBtSPrRCH7hyMT41oMcLh8KRKNuhPEsA/vN3hvrPH5CJE=
+	t=1772831599; cv=none; b=VnSL7qhGd269xe5QivmpiZ7MHgD9PnL4/1obQyTJ1fvpVJzpLAvO0T7C+x2fRXF5iFDDhUgpHs/YCzNPXeKSP+zUgpya8GvH9JHFwwjdTaeuTMCUVnWuqB8OLZIL5dqZo5FLct4O/0uToBRwxV/gYqC/8TWBlHh+RAJIg9dGPhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772831542; c=relaxed/simple;
-	bh=Wh94xCRt7HVtbFTu1E7hVihYsRF1gk17Jl85uGP6hOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WhuP9cvRSwpPdk9XGbsmYXX0BC6w/u7QtL5KbStwh9M8DlBOjPmMwLbeO19vzfeSc9Z+URtYeXCg/8fomX8+OChHB5wQKvukhswHYLkSTVdAGdLF3qlgALe1iEpGZaIR8ZAKyZi5kOqHOCCv1EwfBVaV4j2oVDv2w0pwWBuMp5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GXhVBQWw; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-439cb5af25bso3130704f8f.1
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 13:12:21 -0800 (PST)
+	s=arc-20240116; t=1772831599; c=relaxed/simple;
+	bh=qOWkm4KaoM/M/IJUqxWIPVIv0S9czaoP8RjOHXBNsO0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IjLwtiFb5cLzKoLQMiJHLni6JiTHDB2HD2ulxe1nHiv2OQoFBdcFM3xnWqEPii6IxnVdmmN6p4hvX6PdXTp31MzybUIjmUB361Uqmhp9iRO1YwYsDThvb3l0b1bqaxxIC2HRdSNrSqSt/rqlSwQyOVsL2LLOy8YYaAqFRcBuU20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JWQVhSmQ; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a12f6871b2so3383550e87.1
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 13:13:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1772831540; x=1773436340; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFVUw8hQrGrYFzA9IDyVyoE7HtboAbMzwNI4WYaE3JE=;
-        b=GXhVBQWwpETw/foijQJXVwp40wKamFTtxyyymhrAWW93iC1nCmU5vbK69SifWO12zJ
-         Z5N1mHeQigIZej11J6PZL2FOQrsXEvHFMb477XKZvzu412aglLMCKbhAs97yTVOdIvbH
-         pjLKtDRXZ2IdTTK7uBp4DzSPY9BjTZCFUSq8yJ9+dyQAJYNpYn0uF0ydECYn6xWcGMLE
-         We8BkxLZNuAQ0Y33igjFVWUOSEfW1JUkqME3+yvByiZbeEaoMPp89h5B7pvAdBIJJcgo
-         mdKajddz1yIUqIrWKHNu1VpQhQtpCLEmBs4o9u6QY3mhp1s2MN+CZDxzlFLP76yWOXJf
-         h8VQ==
+        d=gmail.com; s=20230601; t=1772831595; x=1773436395; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cf/zNSP2mIwbDjec2q9Q1Mo/k5XXLlz6S1V2sE7Q5Sc=;
+        b=JWQVhSmQmi52tkEO1YchDWC/eCYAj/x0gfcyO/xf6LJuA+NCIs3VNzLOQFTOWLfyqT
+         Z5zK2+pE6YSCa54BLyA9lT8vFEX6GNOujBLtW+h+Id5jedtojWGDpcx71p1mxpOYi1v6
+         7cRozo2JPtZ14fZvYAEKeH6LBJsT1+P/m/afOnNXSsOehWtuiLNcTrwUh9wTlPOSokeq
+         IYXwBTMHP2TexMqWcPLs82xc+Hl2ezIQKW9H0qQUnZ2ozNtDloiSau/vE2mrql/7qAM/
+         YuWsXW9uuItzyCOs2XASaczBVWrTcdW7GQDCqrwc4MFit9sLbNFQbefsTySQ/Bv32pcX
+         rcpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772831540; x=1773436340;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1772831595; x=1773436395;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LFVUw8hQrGrYFzA9IDyVyoE7HtboAbMzwNI4WYaE3JE=;
-        b=WFI2stWkvQORz1b5WohZJUqYqzOnSmSQkLkMNQ92vI17Tu2CDwikFJs8Zab/dbZjay
-         w2sKqIuJhG4zDDSupIWb78JZPHw567smg4f8DRSI4dg4Zs/5Z7srdDBWGd3dvJG5bESP
-         ueMnp3PpIOdb2jjfq74SMqjXOlbBCi2rPIg8Iwf30ADSzef00/UNvptzkSyPwS3J40rF
-         Bm33Wp+6mut2ciU9AYtp8LReH4Udhrgy166OM9aJSRO8z75/3xxh7Setp883ldXbDpq4
-         +6oC+8o2N3EeSd5lGD0jMdwYBDf+AgznNgooD3eMBVpcNDqwKRErjtA8NYe7sGhElyQ4
-         b84A==
-X-Gm-Message-State: AOJu0YwzC3x/TpeSZ4WFedjoAlZJMcScbkUuzjiI6plXX4YfrTmbEt12
-	lUSE+E3v/T9WUoTJG3xY9WERGqMQ+o8pLJznYCt8y3kA20gBmoxenv6aNWOAlZTM8vVMZDwB02D
-	MKE7P8dorJN9soy9J0mBWxqT5Pn2D+x5Nbg4O1EIdSeKx/pZHqso=
-X-Gm-Gg: ATEYQzwolwhT9cjXaNfghukjKCadGypixe5bmCMxgNpNM6DNPg49LqlOrdOmJ3OBqv4
-	K896rrcsJ+QY/+n40IY4vvGPp2Zp35WgqAEshNd+Px2eEbMijLUnsOJh/gtzn6iV+2y73RXR2cU
-	Q8TQfwvGBZjafaORQoX6C96065qD4omOp1OGS2lQ+2pkXkyZ3NpqRlxMhwqMYMtMal6wnhsoWVI
-	DhFUsUA07TF2gJIv6PYRbGv3/jNa8jZd9DMzxnH0VLjZafgelO0sdtxKKfqQk8VXR+3ry7mvut5
-	QoW8L9O5RreMoRgID9+aZxVcORgfbiB9nbaFBekw8n26rU4sObk8yHbxyyjT+SxDb0gJ5d1lteE
-	u15NBdPkNqZF1zntXr0iREobCt3999JaG6b+NbEHpI1jTRxoXU1XJDKAGkuLds6ivhd8tno3QsL
-	NPQuOmhcX9GRvNP7jvySBjAURNIdDJnKNNqo5W/xtE1Gxm+IpHF5HnoeeSBzsuFM8bh/5VgU2R
-X-Received: by 2002:a05:6000:400d:b0:439:bc89:6b18 with SMTP id ffacd0b85a97d-439da354cf0mr6733967f8f.9.1772831539605;
-        Fri, 06 Mar 2026 13:12:19 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:99eb:76f9:2124:56da? ([2001:67c:2fbc:1:99eb:76f9:2124:56da])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae2b9fbsm6436076f8f.23.2026.03.06.13.12.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Mar 2026 13:12:19 -0800 (PST)
-Message-ID: <8a22df80-824c-4711-9354-b0392220bbeb@openvpn.net>
-Date: Fri, 6 Mar 2026 22:12:18 +0100
+        bh=cf/zNSP2mIwbDjec2q9Q1Mo/k5XXLlz6S1V2sE7Q5Sc=;
+        b=Jqe9n67AuxMylbE0WDfgCENTk6a9VZjQxq/HSN4d7NARVZlpK5eNVXKrcs79ybmS5L
+         bY9rf4VG9A1PcPgse2SJTrWNwMS9gZs0t8eFv5S+FIeIh6j2JMB0nDPjQ2wujvbBM4ph
+         Ck4YsGQUTD1mqU7QGJjyf4fU2NySEfL5AlpKzsjRIKn2nPsW9bqFrQSk2yDCJL1yjJhQ
+         s9uiRaALU0102BF1eLrU6lzzYr38DKGDnnfSr3GjKogpNmrut5tGMnOkBTZLCRQYp+M+
+         82Ye26eqsT0ckqwjM8OTf6qfCoVQrVLfF8mZiUbII8g1qLu46xs0TZ5SPjATD9pkFdyZ
+         Qa6A==
+X-Gm-Message-State: AOJu0YyRCsVgEKBL4+nOhalZtpwk9GqZkN+vzFy/1r+QY+jX6uQlTgvw
+	XdcgSI/QE5eV4rCNSGFTJ77RxwsF5csJLJOTXQ1zJrRsxz8yqaYk9ilB
+X-Gm-Gg: ATEYQzz19qte1/BeXtDckN2Vwvy9rU/l3gSV/xP2c0EtOUJolUQ11JPhUYzbUZaRZIe
+	kt7FTzyVp7F8BJHNkYaNhxSM4n2YP2axel9Y6vSJXXy0YPsQ47usy3useD8oYVRtkdyiDmrsxMi
+	mghJ7agN9wdaDFErQPTyCKO9CH3/TVAmcWwNx/8SdolcjYbzVZNvi32+hnTAyDaTe0vyUoTSBnA
+	XSTxUzlYT7HuqDBXwEof4ceuZX92O82beq71U4kDJFc5bqTp+vTdc1DZPI+mAYiEC2FlVNi51kP
+	mpVHznryxl96zSPgdomviUwMsm5HRgPcanUpD4MZBHNkpHFxlaSLNb3ng/ZUuZ5jCKwdWD6c9NZ
+	B6ZHkFNFlrvXzVAvX4TY1bU1uE6FKhx+uLry8vdSi/Qit4wXbBLaTKX9HG49yvq0cxvicELHbL2
+	VxNl8K
+X-Received: by 2002:a05:6512:1315:b0:5a1:3c21:37f with SMTP id 2adb3069b0e04-5a13cab3728mr1533744e87.7.1772831595025;
+        Fri, 06 Mar 2026 13:13:15 -0800 (PST)
+Received: from router-0001 ([2a01:4f9:3080:2e0f::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a13d07e0f1sm554433e87.58.2026.03.06.13.13.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 13:13:13 -0800 (PST)
+From: Alex Dvoretsky <advoretsky@gmail.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	stable@vger.kernel.org,
+	kurt@linutronix.de,
+	maciej.fijalkowski@intel.com,
+	Alex Dvoretsky <advoretsky@gmail.com>
+Subject: [PATCH net 0/3] igb: fix TX stall during XDP teardown with AF_XDP zero-copy
+Date: Fri,  6 Mar 2026 22:13:07 +0100
+Message-ID: <20260306211310.1213330-1-advoretsky@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/9] selftests: ovpn: add notification parsing
- and matching
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Ralf Lici <ralf@mandelbit.com>,
- Sabrina Dubroca <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- linux-kselftest@vger.kernel.org, shuah@kernel.org, horms@kernel.org
-References: <20260304230643.1014-1-antonio@openvpn.net>
- <20260304230643.1014-6-antonio@openvpn.net>
- <20260306130130.559d844f@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20260306130130.559d844f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 854A4227C37
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 75F83227C57
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264917-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,linutronix.de,gmail.com];
+	TAGGED_FROM(0.00)[bounces-264918-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[advoretsky@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.939];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,openvpn.net:dkim,openvpn.net:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 06/03/2026 22:01, Jakub Kicinski wrote:
-> On Thu,  5 Mar 2026 00:06:23 +0100 Antonio Quartulli wrote:
->> +def check_requirements(requirements_path):
->> +    """Return dependency issues from requirements_path, or an empty list."""
->> +    issues = []
->> +    with open(requirements_path, encoding="utf-8") as f:
-> 
-> Semi-jokingly let me also mention that you do all this requirements
-> checking here, all the dependencies seem to have been installed on
-> netdev CI already.
+When an AF_XDP zero-copy application exits while an XDP program remains
+attached, igb can permanently stall a TX queue associated with the
+AF_XDP socket. The interface stops forwarding traffic and typically
+requires a driver reload to recover.
 
-as expected :-)
+Reproducer:
 
-> One thing for which you don't check is ngrep,
-> and that was not installed.
+  1. Attach an XDP program to igb
+  2. Run an AF_XDP zero-copy application
+  3. kill -9 the application
 
-yeah, because the script is only checking the python deps.
+The TX watchdog eventually fires and the interface becomes
+unresponsive. Reproduced on Intel I210 with Linux 6.17.
 
-> 
-> IMO the requirements checking is a waste of effort, things always
-> slip thru.
+igb_clean_rx_irq_zc() lacks a __IGB_DOWN guard. When the AF_XDP process
+exits the XSK pool is destroyed, but NAPI continues polling. The
+function then repeatedly returns the full budget, which prevents
+napi_complete_done() from completing. As a result igb_down() blocks in
+napi_synchronize() and TX completions stop being processed, eventually
+triggering the TX watchdog.
 
-I am fine with dropping the dep check if you also don't find it of much 
-value.
-We'd have to keep it updated and it won't help much once packages have 
-been installed the first time.
+Patch 1 adds a __IGB_DOWN guard to igb_clean_rx_irq_zc() to break the
+infinite NAPI poll loop.
 
-> But unless you have a strong reason to use ngrep maybe
-> switch to a more standard tool?
+Patch 2 prevents igb_tx_timeout() from scheduling reset_task during XDP
+transitions when the device is shutting down.
 
-Any recommendation?
+Patch 3 adds synchronization in igb_xdp_setup() to ensure that pending
+ndo_xsk_wakeup() calls complete before the teardown continues, and
+refreshes trans_start after igb_open() to prevent false TX timeouts.
 
-ngrep is used to make sure that received packets start with a specific 
-pattern (OpenVPN header with certain values in it).
+igc handles a similar stale trans_start situation via
+txq_trans_cond_update() (commit 86ea56c5b0c7). This patch adds
+equivalent protection for igb during XDP transitions.
 
-I presume we can just replace ngrep with tcpdump, assuming it's "more 
-standard".
+Tested on Intel I210:
 
+  - AF_XDP ZC app exit with XDP attached
+  - XDP detach while AF_XDP running
+  - repeated XDP attach/detach cycles
 
-Regards,
+Alex Dvoretsky (3):
+  igb: check __IGB_DOWN in igb_clean_rx_irq_zc()
+  igb: skip reset in igb_tx_timeout() during XDP transition
+  igb: add XDP transition guards in igb_xdp_setup()
 
+ drivers/net/ethernet/intel/igb/igb_main.c | 15 +++++++++++++++
+ drivers/net/ethernet/intel/igb/igb_xsk.c  |  3 +++
+ 2 files changed, 18 insertions(+)
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+--
+2.51.0
 
 
