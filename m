@@ -1,119 +1,144 @@
-Return-Path: <netdev+bounces-264605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264606-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMIaBhYsqmlaMgEAu9opvQ
-	(envelope-from <netdev+bounces-264605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 02:21:26 +0100
+	id wE3MFp8sqmlaMgEAu9opvQ
+	(envelope-from <netdev+bounces-264606-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 02:23:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D367521A32E
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 02:21:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC67521A386
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 02:23:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8F1D4302D708
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 01:21:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 871C63023A68
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 01:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18192316902;
-	Fri,  6 Mar 2026 01:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F14313E3B;
+	Fri,  6 Mar 2026 01:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="ETwNKXBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72089314B8F;
-	Fri,  6 Mar 2026 01:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937F02D2382;
+	Fri,  6 Mar 2026 01:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772760073; cv=none; b=hqLa8G6+H4DFlvhYNhv3XSclekWUSPmTr8KdDdpq5hu/E+SLtsEBKQv1HcqMqnnxxgnYaSdNy6h4tOcDWrv3BrlYH46jmKPcI3j1DpicFfSl+cBeEjEqvAVjER0eS2unTrVO6T2fCfOC8cXBYJr5LfAA85dZI+L5HjkEGuFOslA=
+	t=1772760218; cv=none; b=p4/XVXb1UdOpowmjWwJPx+UMmscoCPzPy9H4caUlBoASDiW1w5F9n9j+xrsjfAMMJsIsxNT11Pgmi5jz7g97T87daLMIJw6S9LRYxITKNpcwEOyogXrTnqqn17YVxsPp0BE7DzGyBDPAeVcydHmf5JDh4PMlOShJVM9uuWOFJ88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772760073; c=relaxed/simple;
-	bh=GWOizdCxZW2fKfcx6eHSwN5tLnYnZ3QiRxQ5aiT1WKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SLrmLRj6RwEDuawPvs5dksGyOyJKzQAzsN0rkDFmEUALhmKAwqBUkLGDTwYzyyIGL/jaJqGK9w6dTejNO7sZsDgG0ueXT2kdyHAvz+mvDnG+e/6hOQpcYBpbCJg1iwMBtHbgpFQ/flAW2mICIp36FkQlmhb8C/nP0rOHnVYrsnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
-X-QQ-mid: zesmtpsz2t1772760046t9db5bc17
-X-QQ-Originating-IP: pm5foq4wI0s8Yg8T5nGQpXqP6Nkc4LvL+rJqYIeiDZk=
-Received: from localhost.localdomain ( [119.167.27.18])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 06 Mar 2026 09:20:44 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13677970291522765697
-EX-QQ-RecipientCnt: 8
-From: Jialu Xu <xujialu@vimux.org>
-To: brgl@kernel.org
-Cc: kees@kernel.org,
-	krzk@kernel.org,
-	linusw@kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	xujialu@vimux.org
-Subject: Re: [PATCH v2 0/3] Remove <linux/of_gpio.h>
-Date: Fri,  6 Mar 2026 09:16:14 +0800
-Message-ID: <64F9F751CE011929+20260306012002.2320584-2-xujialu@vimux.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <CAMRc=MfBqPP3W0nCvyM9hqmgZbX8SVSZ0DGrJwLdKoAK7gqgvA@mail.gmail.com>
-References: <CAMRc=MfBqPP3W0nCvyM9hqmgZbX8SVSZ0DGrJwLdKoAK7gqgvA@mail.gmail.com>
+	s=arc-20240116; t=1772760218; c=relaxed/simple;
+	bh=+fSwAeJfOqryePzovwrmZyRsfwlXOidTguMWiwStvKU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iPUqxx4cUJHDAv9bJBEU1O/I4y0vb3X5vOFcrBJmuYKD03S9DbYcRtHAfrfje++ouTDvSgzprq9rfNqd3oEyjT1XHAwS96ufZ/26w1gJB/A7kRHiAZPZKS1CCydRkau2iKaL695P4o9XtrsqTJOiA1kquGRIBbDh+IhDUNbKe1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ETwNKXBN; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1772760214;
+	bh=+fSwAeJfOqryePzovwrmZyRsfwlXOidTguMWiwStvKU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=ETwNKXBNhlmJbKU37O3g2oWZFNizciG17L3YoAVy/tMzJJpQ/8ZJVwYf52EZqnh7H
+	 DHduc5VFWbCXdlKe9dV3nrc2m8+Js4FEI1aJNtNZq4Q+JgOMtb6z9lUjPvQn0labW1
+	 pT/7Daa7h5n6ts+v/oMJw7oiZsBBroAxlrFZbcsGavjQcYy60PuPldI9OEsYfrolLV
+	 JHQ8ggZqHuj9ejS4nWHloZQ5+sOMe1d65maS6vp9UipXTpeccO1D+ZaKcsQn3t5iaL
+	 Wk5xS3MCOeG2FE4yeMm/xsont6D1Jx7oYI7nISlyNx7hFvYF+4txtQFyJPQ7VCpVsa
+	 VFickH4S4V40Q==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 307FC6000D;
+	Fri,  6 Mar 2026 09:23:33 +0800 (AWST)
+Message-ID: <942e3fdf0522be797a337669b9a736b56c33e5d2.camel@codeconstruct.com.au>
+Subject: Re: [PATCH] net: mctp: fix device leak on probe failure
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Johan Hovold <johan@kernel.org>, Matt Johnston
+ <matt@codeconstruct.com.au>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Date: Fri, 06 Mar 2026 09:23:33 +0800
+In-Reply-To: <17790d338e59896ff843bbd3a3bf434f20b189c3.camel@codeconstruct.com.au>
+References: <20260305104549.16110-1-johan@kernel.org>
+	 <17790d338e59896ff843bbd3a3bf434f20b189c3.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: Mdy4c2f802JI9hVt7a20YERk3SaxT4+c1XlzEnok1h7RjGzWYzZK+rDV
-	g9kW9PC7YhhP9SP2EjznPOZmSJ+nxd5EBVJSwKqlU0mDOD//ZaTZLeZgx78gpg9EgDo2Ip7
-	M0cZ7/ziFNiaLbnY41bSh9LTA33eHJBqAo+nD+FrpPvQCoIYbn8GsXAHse/huBmRCZj6DGU
-	5kop8h4CL17IuPuLXSXxLzd9z1IBRmNbrzCDM+/MvVywN3xJo3sRKhMxf90BGLSmeKChL2j
-	qgvy4W3E+RIzoRasJULpsIWlRSpMdyMwTjYfHxB3n91CsMPqvZGcqzgsGVKycGdbbF1/S+q
-	75Nwhj0+XMZbsAs5/DcabVqSGjkOcNi7ZPdNTuuCWyI4iRIP6XdOqhC/zxTP97q/SI84rjg
-	q6ktbApiWDPE/6mq6cZhCe+0QSq8BpZ+/HzXE1P5o0QDZ1DwW6Pe2O6EJrITjM7X3OrAzdu
-	JBYfvRpsKnZhgnqm9YcRIrvDjHc1Kui0xpzcR7Hlnl8PYzyaOR268pHPYMj/W74mIiUJI9C
-	SN1q+2dPrd7wbeRd50jOywUJS26t5lY01MoReEwhXgmQeClx6FZ9k13+T9Ku8IqLM2Gg9xk
-	YfusrJ+lVjYlkqjOrzxfR9ud9mzY4qKvUHwjSBBGUCuTxarOa3aD1eDtzOeC/m2oOsvBlYa
-	+ICZZuYX881oJS5Ymh36EzCe8tfQq88ZxU+m7I+7Zkcyh/hhicPe03DnCcpkahmWfVdrQOz
-	fb7y1GK+X/Zx0Ud1MANqOc0c0lbsb8KedK0JvBgEVowwI3iVjVGzWbunf/4weNFcFxqd0mK
-	jgl3smjVPja1mRJ+VCAn7Hi2EBK34TKe433CAFZiStQ7tcufQne4jTFpkEXTC2oHY+UC2Uy
-	26gRzpPW44s+QtsgkHDefVOPejXFEOIMXvpbDW7xlpFjsQdImBldl1GsV/Sadfx8CeyXp0Q
-	YKbATyRxvJZYPEmQMYzu8Cmuc
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: D367521A32E
+X-Rspamd-Queue-Id: AC67521A386
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264605-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264606-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vimux.org:mid]
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Sorry, I intended to use format-patch but forgot to add the v2 version
-tag and signoff.
++CC Greg
 
-Jialu
+Context is Johan's patch at
+https://lore.kernel.org/netdev/20260305104549.16110-1-johan@kernel.org/
+
+Cheers,
+
+
+Jeremy
+
+> Hi John,
+>=20
+> > Driver core holds a reference to the USB interface and its parent USB
+> > device while the interface is bound to a driver and there is no need to
+> > take additional references unless the structures are needed after
+> > disconnect.
+> >=20
+> > This driver takes a reference to the USB device during probe but does
+> > not to release it on probe failures.
+> >=20
+> > Drop the redundant device reference to fix the leak, reduce cargo
+> > culting, make it easier to spot drivers where an extra reference is
+> > needed, and reduce the risk of further memory leaks.
+>=20
+> Sounds good, but I would suggest syncing with Greg K-H too; he's in the
+> process of doing a v2 for the same thing:
+>=20
+> =C2=A0 https://lore.kernel.org/netdev/2026022539-punch-supper-884c@gregkh=
+/
+>=20
+> Given the discussion there, this looks in-line with the longer-term move
+> from usb_get_dev(), so:
+>=20
+> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
+>=20
+> Thanks,
+>=20
+>=20
+> Jeremy
 
 
