@@ -1,130 +1,180 @@
-Return-Path: <netdev+bounces-264589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264592-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cO3mLgsZqmlfLAEAu9opvQ
-	(envelope-from <netdev+bounces-264589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:00:11 +0100
+	id WIpfNvsZqmkqLQEAu9opvQ
+	(envelope-from <netdev+bounces-264592-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:04:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B8E2199A7
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:00:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AB0219A8B
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 01:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1BAF3086A76
-	for <lists+netdev@lfdr.de>; Thu,  5 Mar 2026 23:59:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2930D30D0B2C
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 00:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36BD36998A;
-	Thu,  5 Mar 2026 23:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA504224AF7;
+	Fri,  6 Mar 2026 00:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="lwCu2cUA"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ckrkB93l"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC23352F85;
-	Thu,  5 Mar 2026 23:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6AA1F3BA4;
+	Fri,  6 Mar 2026 00:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772755147; cv=none; b=bqOJAWzDJq7+3OD7QQnhNBuFYc9SRAutPJ/PFluC1VhmOV6dcsK1pthvjiiK8fNU60xF9eNToSSG+YWoZEKsmVfKy3gwm0DmPhL0N3Rok374YDEv3D21YJmJnRUHPXttk5pJzPpIs81RTtg4PipqR1WZ3TO2DSxuNqJF7NxaiNw=
+	t=1772755307; cv=none; b=gLcp83zAaGSWOjsx/2mltZVV8QPgbxQYBcwzu/aPo2fLePTS8iiAGfpf2cnL2F8limiM4lUbTf6Q2R7TxgszpJj/t1uOSEUcTo8XOkZ3lH+IYPZY+rzNhyr1RKl6OJFhzlfAEebW4q6EHcZyDJzsIPhdlyAdYvICl7yfoQV+Tok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772755147; c=relaxed/simple;
-	bh=QLxo0RAKQmS1rfj80B0uElkCdb68NWudv6UOo2cnB70=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e8MGJaxJ7qlWyPwcPauAxoD8tcWPmNfXLKHozFcsXR8RwJbIuBcHqLLX5dY14PDVIyaVFp37vJJUwBFyqwiSfcc9nE5HRJne6bwXmGTjONj/LMPKwuHq0hVHoHNZjsChX0Z9yn9tDlL44HtaVFdS9e+a0gz5zeP4/oTi6nDLxww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=lwCu2cUA; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1772755136;
-	bh=dW8wX9XYzRgg5ooK55cx/kbvRIBTMsUrpkdIhlp63go=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=lwCu2cUApnILjn5lUwF+4A30+pSRjuaqosHTfWvNw/U/dtoElTsyuqRwI8zGw8bja
-	 yxAiVuEXbIBQ9nbeLDTp/DVxIT/yvZPubSVQDrwt1+dfEz76nQoHSS0Afcrm8Lzd54
-	 0owCL/tPFcEZcsf1OmDPLYYY/1vhXIcfWOJJC6WnvZIArY6SLNV23uuggatAASJGDC
-	 inbswKGoapPmqD4rk9aCPT38FYAqfn6+3790V5UcYmepEq1T9+J5QU48AMPdyYjLgW
-	 8AzSNcKC1fhJ5m6DRcRc4A9TNMYRg+TRetzu1e3JoW/cxQ/VM5bj40DFkaLwG8213w
-	 VG+zDD8PmHaiw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 9F6CF6000D;
-	Fri,  6 Mar 2026 07:58:54 +0800 (AWST)
-Message-ID: <17790d338e59896ff843bbd3a3bf434f20b189c3.camel@codeconstruct.com.au>
-Subject: Re: [PATCH] net: mctp: fix device leak on probe failure
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Johan Hovold <johan@kernel.org>, Matt Johnston
- <matt@codeconstruct.com.au>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Date: Fri, 06 Mar 2026 07:58:54 +0800
-In-Reply-To: <20260305104549.16110-1-johan@kernel.org>
-References: <20260305104549.16110-1-johan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1772755307; c=relaxed/simple;
+	bh=F5R/HzOo+2aYhyz7WWmZaiSz/+GLsAEzEoVVbmjeyDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iAcfosE3tPFmOd8DcxHcjU3Z1n6hIdO446fCTGrH95W/iAuUKV1OQk8BoIsBR5x9h4FEqQqzvIFSRMY+OekyY7QaT9E7suJ/lWRDsE+pbVurKdKkijXkyL2slKcAtkB5nbUSjDCQxqZdrLT6UUnqxttcqmyrpSCErBmwkNEzJBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=ckrkB93l; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
+	Content-Type; bh=1Ng2JCLkEw+qHZebwe8cQikws2towcWTqyU4dFvUKMw=; b=ckrkB93lqeKR
+	97mNnTLZFUgP+AMCA+X9WiIUT+vqRPa9vglRCN1kdmcS6GP58oZPlnepVt2gXdb/huLIvzFw4emfl
+	wjIfu59zvuni67x4/GUsaaWnwoqPY7Z8enP9DHCxfGP+prKpY4YGP5EK+ud2zsI1A1eYK7wwihLuf
+	LAfxmZGszNsgBG9kCPpGK4jfMKlVl6STPARx4T1+9COco67/pAnMYIK/pXUBpiTmVlf0woJ0zggcs
+	5zMS9OBVvbxdveH955vd5FVkzY7bbG3yioC/9mhRQK6Ranbb3YfgIJYYK0hfSp5UDkZM6GBbdlyC4
+	emowW0x2+p4r/8BsO8vs4g==;
+Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
+	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aleksey.oladko@virtuozzo.com>)
+	id 1vyIbm-006Foq-1C;
+	Fri, 06 Mar 2026 01:01:29 +0100
+Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 62601VXc519087
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 6 Mar 2026 00:01:31 GMT
+Received: (from root@localhost)
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 62601TkU519086;
+	Fri, 6 Mar 2026 00:01:29 GMT
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>, Aaron Conole <aconole@redhat.com>,
+        Ilya Maximets <imaximet@redhat.com>,
+        Eelco Chaudron <echaudro@redhat.com>,
+        Stefano Brivio <sbrivio@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dev@openvswitch.org,
+        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Subject: [PATCH net v3 0/6] selftests: net: fix false failures due to missing features and host interference
+Date: Fri,  6 Mar 2026 00:01:21 +0000
+Message-ID: <20260306000127.519064-1-aleksey.oladko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 22B8E2199A7
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 49AB0219A8B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264589-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264592-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,codeconstruct.com.au:dkim,codeconstruct.com.au:email,codeconstruct.com.au:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pmtu-test.sh:url,pmtu.sh:url,ovs-dpctl.py:url]
 X-Rspamd-Action: no action
 
-Hi John,
+Hi,
 
-> Driver core holds a reference to the USB interface and its parent USB
-> device while the interface is bound to a driver and there is no need to
-> take additional references unless the structures are needed after
-> disconnect.
->=20
-> This driver takes a reference to the USB device during probe but does
-> not to release it on probe failures.
->=20
-> Drop the redundant device reference to fix the leak, reduce cargo
-> culting, make it easier to spot drivers where an extra reference is
-> needed, and reduce the risk of further memory leaks.
+This series addresses several issues in the networking kselftests
+that cause false-positive failures depending on the host environment,
+kernel configuration, or library versions.
 
-Sounds good, but I would suggest syncing with Greg K-H too; he's in the
-process of doing a v2 for the same thing:
+The main focus of these changes is to isolate tests from the host
+environment (using namespaces) and to ensure proper fallback or
+skipping when dependencies are missing.
 
-  https://lore.kernel.org/netdev/2026022539-punch-supper-884c@gregkh/
+Summary of changes:
+1. Adds a check for cls_basic module in fib_tests. Without this
+   module, the test fails when attempting to add tc rules instead
+   of skipping.
+2. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
+   is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
+   instead of assuming the configuration was successful.
+3,4,5. Move reuseport test into dedicated network namespaces. This prevents
+   failures caused by port conflicts with host processes or interference
+   from host firewall rules.
+6. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
+   test, preventing failures on systems where kernel.io_uring_disabled
+   is set.
 
-Given the discussion there, this looks in-line with the longer-term move
-from usb_get_dev(), so:
+Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
 
-Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
+Changes in v2:
+- Fixed a typo by adding the missing backslash in Makefile
+- Added a Fixes: tag to the appropriate commit as requested
+- Link to v1: https://lore.kernel.org/linux-kselftest/20260120230558.328423-1-aleksey.oladko@virtuozzo.com
 
-Thanks,
+Changes in v3:
+- renamed pmtu.sh to pmtu-test.sh and used pmtu.sh as the name
+  of the wrapper. 
+- since the test now runs in a dedicated netns, updates the ovs
+  test case to correctly move network interfaces into the target
+  namespace.
+- Link to v2: https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#t
 
+Aleksei Oladko (4):
+  selftests: net: fib_tests: skip rp_filter test if cls_basic is
+    unavailable
+  selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
+  selftests: net: rename pmtu.sh to pmtu-test.sh
+  selftests: net: io_uring_zerocopy: enable io_uring for the test
 
-Jeremy
+Konstantin Khorenko (2):
+  selftests: net: run reuseport tests in netns to avoid port conflicts
+  selftests: net: run pmtu.sh in netns to avoid host firewall
+    interference
+
+ tools/testing/selftests/net/Makefile          |   13 +-
+ tools/testing/selftests/net/fib_tests.sh      |    2 +
+ .../selftests/net/io_uring_zerocopy_tx.sh     |    9 +
+ .../selftests/net/openvswitch/ovs-dpctl.py    |    2 +-
+ tools/testing/selftests/net/pmtu-test.sh      | 2492 +++++++++++++++++
+ tools/testing/selftests/net/pmtu.sh           | 2492 +----------------
+ tools/testing/selftests/net/reuseport_bpf.sh  |    4 +
+ .../selftests/net/reuseport_bpf_cpu.sh        |    4 +
+ .../selftests/net/reuseport_bpf_numa.sh       |    4 +
+ .../selftests/net/reuseport_dualstack.sh      |    4 +
+ 10 files changed, 2531 insertions(+), 2495 deletions(-)
+ create mode 100755 tools/testing/selftests/net/pmtu-test.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_cpu.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_numa.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_dualstack.sh
+
+-- 
+2.43.0
+
 
