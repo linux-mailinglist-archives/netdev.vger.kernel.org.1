@@ -1,194 +1,292 @@
-Return-Path: <netdev+bounces-264894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264895-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WE/YIIUgq2mPaAEAu9opvQ
-	(envelope-from <netdev+bounces-264894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:44:21 +0100
+	id COL4JkAhq2mPaAEAu9opvQ
+	(envelope-from <netdev+bounces-264895-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:47:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29CC2226CF9
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:44:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB071226D59
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 86B093033D6A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:44:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AF563061441
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DA936F42A;
-	Fri,  6 Mar 2026 18:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB6A3FD156;
+	Fri,  6 Mar 2026 18:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0rKuYUm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmHr8s0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE2815B971;
-	Fri,  6 Mar 2026 18:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772822658; cv=none; b=FQICEtZfNkjCqcV6t2KHrX+2+rQeXF4FvGm+kb5omp4RquPuvSxuj6LqJZGNw+V6BIiG4gZY/x9cmdN9lZ9/oWXPFIgCNeJbKGW1ro55velg5SWFNdEF/fVngdZyLcHP3kqAw/MkuDnNcaae+IiNH9cLR28RpYxDCuRFSMilOf4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772822658; c=relaxed/simple;
-	bh=WWByaQuOB6q/sHF8zoDtwRWPiEkme9rsf8I0HXfKpj0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E44sc/eshmq7C45Dg6M+wV0BEycBY8pf4E0t+HGiU+6pxfE/4d9ogygbuZyjsaTE4s6cb0Uf+EsYgsDdu21f5M7/Q2+sPeFIIYjxID7qucr2yDGCeZbbNwhlu3Nku4W/epGLb8556vW7GQ0JLt0Qjqsr20xmPaX+W6mKGJ6VkMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0rKuYUm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D133C4CEF7;
-	Fri,  6 Mar 2026 18:44:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772822657;
-	bh=WWByaQuOB6q/sHF8zoDtwRWPiEkme9rsf8I0HXfKpj0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=G0rKuYUmDXepXZQgTj6aGFcL/HBVDsTILixC78VSyk8/PI4QDY/DItCGlbSzkDYMa
-	 6YKdZb+p+DvXGS17NBuUuACVkZgM80J4M2vL5SR/h5rxBnT/uyEIK0MtE7tixwHE7s
-	 q49xaRgfiP0ByBHqvxLifiRoBdtWBOQtSyrPOXQXy4X2VT0fy0HRP4CheP3/mAiFt1
-	 CtGWRywQACeu1dE8kvdSQyuL6KtO/9iJahVZ3BrO7OGfO4q4CdyH6FisuvSzYgftUm
-	 xL92NBFe+2dr/yBXhqwyQpkcJL0AM5ZoEXzpdNOrlZYSPN/+68z8vYzZFbl1HNTbVP
-	 Y6sVMMNNQEBfg==
-Message-ID: <f4e4df8a-098e-4e0c-871e-bb259e9fbb80@kernel.org>
-Date: Fri, 6 Mar 2026 19:44:10 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388CD4218BC
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 18:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772822835; cv=pass; b=nJyP7RrPeYOI5T+atiCdbiEFML4zIf1KeJedX5Zthdi91ayQDKWNd/VqurmlG0rHp7OqwEICZDguZ10IDl3llmVKF1jxFBuQ4q48MvrMqHyKhl9VK8l619bz5Wq2IQAuJua7RSNiIw9SUYZFropphcUgBH1KVkYq8ZrkTmp+Lm4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772822835; c=relaxed/simple;
+	bh=g0vdLma7xjZDXNlTrA81K4zbu/aX7VEdpvCQsPHac+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u5voogk2Dp8tZmfjOYRUzIwB523YSm0ISvU3rEP9rkp8oQ3YPXxJap1Gb/68EZGuGuN6j5muCzHRPJTlJUnNY9F4lttII0FvzcqFcXAcJbbY64IiFizKVdMNTB4ATvsqEqBKNuGhQphxW+1hc0i3Z3myY32Q7Hgb1+dLDR+T0W8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mmHr8s0c; arc=pass smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-463d81452abso6101017b6e.0
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 10:47:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772822830; cv=none;
+        d=google.com; s=arc-20240605;
+        b=U5O/K4PxHsj/8dyBHxxuWnnxDFaKRzqnssZdEduds0TmoGJV70JeJxfH5RSQp/JQkk
+         FQrC+LrTheSClo0otLUkAPwQlq1DKBPWuLXgOYPhpxGxhZMFv40OepQFZFysq8YcFDhi
+         KQcbHvhgZROdN8qoBcAFJhmP2fPw3eJCZSvKkE1Tn1/mK5VkweM6aa3q4yGtR1oAqspj
+         LUOQcNtNWsi1IgvB7owaSvhHFhSFHbCbqG7N2zbJJZyQ2Jzrv9krhssCcNSxnCBVc2Z6
+         q7JT2UcJJiL24rdFEXvbZEayo275bQ/KuV6z2W9uiQ5OzSM9DmYmYYvkBzai6K8S8WtY
+         tgUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
+        fh=8SYuxXDJKXt15BNx6IK/8Vs3wJe0VUYUUocKhhJH7P8=;
+        b=bhkXqbUkzwCcLK8AfQ6T87PQowXJNITQAe4v2KKapa/ZNNpPIInohEoJ0aYKAl86CT
+         rwmRNctv/S/evHplSBxT6zOVk9e03OwPtNjdKgkglsetrX5J4D0gXy/srFcmlGd2Wi+x
+         +Hz5WS+XsQ6IRNwpnx22LBXIjwWv1TvYZuVh7wQRKBkCI+E7k5H6iu6kP5FUaYtDiiWn
+         Ftk7m8iWAZL9kr7S37T6xsWJ4EqsNMlFx51gUq9xXlANCS1cdt1SHUf+i40WYNMMwbXa
+         0ReWkoeprFN7Qu88BhOPp0MXwRth5zdf4+AYieyL2rbmiWno2+VH1l15PLifnI9yj8H/
+         50DQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772822830; x=1773427630; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
+        b=mmHr8s0chcn9e8Z4V2k5vT82WPObhdUqH1VWIL3u+SgBxPCX7K7H/zWfUaeRUbZPDQ
+         /8aNWcV2emYatTwZoNzn+/HmcN15XVcoclterrH3dxHQplbETRhfZqe+7Jw9jW8oZWFI
+         SlRcNLdE9c56m9dWilTrgFGru0S7XKszA9RudPfT9l9349zfO2wC8CKbMzJNkmz9/XBt
+         aGVxzA2oXfNuREbhIZ5hq94dgKS5w/areyIRTyvJOC1uk4O2iHUEjBD0BOzUKmN2SDD5
+         GypAaV91Ace1NpL+bXe7qM/8Qp9Fw2PL3xYt7KoU1XrU9Y9me6sMKmL+e9lAG4Jy60b6
+         8IXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772822830; x=1773427630;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2hWhdVZAhgQqjpgcV2poIb1s6L7chcwtFWzoWcynC0A=;
+        b=hF7tA7CICMNo0tvTLVkR0UI4eNpC80hjOgbju6bQl0AMWcXR0fb/ESaqHgaOBGIeTd
+         InoMFZKXhhrkW2fB+BvTm53tyUpd50TsJbPcWl9T4JhFgXoeIrx9Ul3J3bTfdUedpY7k
+         QOUNzROI+cnnEyZ48p24FbH2iFBmtXcVOC80J7ibKpFfllSrKe1b0EHIA16n3f3uPmE+
+         mCV/n9RRhDL8nhcRdAY6hiFzBjlUFMK21uz1M4Y2MkX8jkNTMljfe5YLj7ZXyY1rgBt2
+         LgaFCr7SU1XTC/2p16vLYs58CApH8JMXxJJf3Cyh6jXsHiHUjS0pdsMGLbusaTZWOv+v
+         mpAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkKe7dIbXY+GBHFfk2nIExgcHmDZmIBM+Z/jeIJ9mZtH37sH591fo74TG70KmXh0QI32U8Rps=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3nW6cKPDo59SyfmVfN1MR7AWXP0N7D/CNE62y56I5FDSxe+D4
+	X3Z0FHcMC+NvxZNi/NFubQ3XKPz+BkNdDrYidK/U9qofVYIQZBERgwJlljpxPv4ePP9WAVt6Qv1
+	7RJDaYWtHUAH7gqoWm7q8x+MYNK6Mvn4=
+X-Gm-Gg: ATEYQzwxDDEh3gCaSrioXXowJ9kzqd9F0hFp0CLw/S5nsVdfkAlHXI5oLVpc7OrnQge
+	TPkHAr4lJMUjw17T6aBDI0WQPEAtRbPcqO1Xj/5mu4HRykkskHhsK/FFAt3UZOCMhluNG6ieb5s
+	eIY3ffj/InMnECQm3rDxp3hrxGUInoFDjYccU2aX68JuBVMMbuzUg01gzZDNBJXNFCDhIREuxqr
+	X2C6gSlkNJDP2o7XZZ36pVaFk/esBsOAjChR00Dlx/eNZBqBVLChp8HyGMx3C1JdaMYeCKOZdOe
+	D/CGg27ht705pp7hpA==
+X-Received: by 2002:a05:6808:1a12:b0:45f:535:a81b with SMTP id
+ 5614622812f47-466dca45cacmr1736666b6e.20.1772822829773; Fri, 06 Mar 2026
+ 10:47:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Jiri Slaby <jirislaby@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
- <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
- <65aa19d8-0ac3-40fd-8df7-7b67c05ae227@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <65aa19d8-0ac3-40fd-8df7-7b67c05ae227@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 29CC2226CF9
+References: <20260305142634.1813208-1-tariqt@nvidia.com> <20260305142634.1813208-6-tariqt@nvidia.com>
+In-Reply-To: <20260305142634.1813208-6-tariqt@nvidia.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 6 Mar 2026 10:46:57 -0800
+X-Gm-Features: AaiRm53OuZX6bDZqk3KXf0VBvaW1qaEMHdpnSE_P0kEPcVqB5bhMoCryjsytJug
+Message-ID: <CAMB2axO9TLY7MznMYtvbfSp5Qev=W4ZM8EtnxFBs_gM=P9vmXQ@mail.gmail.com>
+Subject: Re: [PATCH net 5/5] net/mlx5e: RX, Fix XDP multi-buf frag counting
+ for legacy RQ
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: EB071226D59
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264894-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264895-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,iogearbox.net,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.981];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qemu.org:url,mail.gmail.com:mid,nvidia.com:email]
 X-Rspamd-Action: no action
 
-Hi Jiri,
+On Thu, Mar 5, 2026 at 6:27=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> wro=
+te:
+>
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+>
+> XDP multi-buf programs can modify the layout of the XDP buffer when the
+> program calls bpf_xdp_pull_data() or bpf_xdp_adjust_tail(). The
+> referenced commit in the fixes tag corrected the assumption in the mlx5
+> driver that the XDP buffer layout doesn't change during a program
+> execution. However, this fix introduced another issue: the dropped
+> fragments still need to be counted on the driver side to avoid page
+> fragment reference counting issues.
+>
+> Such issue can be observed with the
+> test_xdp_native_adjst_tail_shrnk_data selftest when using a payload of
+> 3600 and shrinking by 256 bytes (an upcoming selftest patch): the last
+> fragment gets released by the XDP code but doesn't get tracked by the
+> driver. This results in a negative pp_ref_count during page release and
+> the following splat:
+>
+>   WARNING: include/net/page_pool/helpers.h:297 at mlx5e_page_release_frag=
+mented.isra.0+0x4a/0x50 [mlx5_core], CPU#12: ip/3137
+>   Modules linked in: [...]
+>   CPU: 12 UID: 0 PID: 3137 Comm: ip Not tainted 6.19.0-rc3+ #12 NONE
+>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.3-0-g=
+a6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+>   RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x4a/0x50 [mlx5_core]
+>   [...]
+>   Call Trace:
+>    <TASK>
+>    mlx5e_dealloc_rx_wqe+0xcb/0x1a0 [mlx5_core]
+>    mlx5e_free_rx_descs+0x7f/0x110 [mlx5_core]
+>    mlx5e_close_rq+0x50/0x60 [mlx5_core]
+>    mlx5e_close_queues+0x36/0x2c0 [mlx5_core]
+>    mlx5e_close_channel+0x1c/0x50 [mlx5_core]
+>    mlx5e_close_channels+0x45/0x80 [mlx5_core]
+>    mlx5e_safe_switch_params+0x1a5/0x230 [mlx5_core]
+>    mlx5e_change_mtu+0xf3/0x2f0 [mlx5_core]
+>    netif_set_mtu_ext+0xf1/0x230
+>    do_setlink.isra.0+0x219/0x1180
+>    rtnl_newlink+0x79f/0xb60
+>    rtnetlink_rcv_msg+0x213/0x3a0
+>    netlink_rcv_skb+0x48/0xf0
+>    netlink_unicast+0x24a/0x350
+>    netlink_sendmsg+0x1ee/0x410
+>    __sock_sendmsg+0x38/0x60
+>    ____sys_sendmsg+0x232/0x280
+>    ___sys_sendmsg+0x78/0xb0
+>    __sys_sendmsg+0x5f/0xb0
+>    [...]
+>    do_syscall_64+0x57/0xc50
+>
+> This patch fixes the issue by doing page frag counting on all the
+> original XDP buffer fragments for all relevant XDP actions (XDP_TX ,
+> XDP_REDIRECT and XDP_PASS). This is basically reverting to the original
+> counting before the commit in the fixes tag.
+>
+> As frag_page is still pointing to the original tail, the nr_frags
+> parameter to xdp_update_skb_frags_info() needs to be calculated
+> in a different way to reflect the new nr_frags.
 
-On 06/03/2026 19:31, Jiri Slaby wrote:
-> On 06. 03. 26, 17:57, Matthieu Baerts wrote:
->>    653fda7ae73d ("sched/mmcid: Switch over to the new mechanism")
-> 
-> It looks like there were similar issues reported in the thread with the
-> above submitted patch. Did the patchset mentioned at the end of the
-> thread here:
->   https://lore.kernel.org/all/87h5s4mjqw.ffs@tglx/
-> made it to the list/some tree? Or are the two issues there different
-> from this one?
+I see the error I made. Thanks for fixing it.
 
-Yes, I think the two issues are different from what we are seeing. If
-I'm not mistaken, the mentioned patchset is this one:
+Reviewed-by: Amery Hung <ameryhung@gmail.com>
 
-  https://lore.kernel.org/20260129210219.452851594@kernel.org
-
-The v2 has been sent short after:
-
-  https://lore.kernel.org/20260201192234.380608594@kernel.org
-
-Applied and sent to Linus before the v6.19 release:
-
-  https://lore.kernel.org/aYcPrLN6PV5xr63J@gmail.com
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+>
+> Fixes: afd5ba577c10 ("net/mlx5e: RX, Fix generating skb from non-linear x=
+dp_buff for legacy RQ")
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Cc: Amery Hung <ameryhung@gmail.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/ne=
+t/ethernet/mellanox/mlx5/core/en_rx.c
+> index 40e53a612989..268e20884757 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> @@ -1589,6 +1589,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
+truct mlx5e_wqe_frag_info *wi
+>         struct skb_shared_info *sinfo;
+>         u32 frag_consumed_bytes;
+>         struct bpf_prog *prog;
+> +       u8 nr_frags_free =3D 0;
+>         struct sk_buff *skb;
+>         dma_addr_t addr;
+>         u32 truesize;
+> @@ -1631,15 +1632,13 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq,=
+ struct mlx5e_wqe_frag_info *wi
+>
+>         prog =3D rcu_dereference(rq->xdp_prog);
+>         if (prog) {
+> -               u8 nr_frags_free, old_nr_frags =3D sinfo->nr_frags;
+> +               u8 old_nr_frags =3D sinfo->nr_frags;
+>
+>                 if (mlx5e_xdp_handle(rq, prog, mxbuf)) {
+>                         if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT,
+>                                                  rq->flags)) {
+>                                 struct mlx5e_wqe_frag_info *pwi;
+>
+> -                               wi -=3D old_nr_frags - sinfo->nr_frags;
+> -
+>                                 for (pwi =3D head_wi; pwi < wi; pwi++)
+>                                         pwi->frag_page->frags++;
+>                         }
+> @@ -1647,10 +1646,8 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, =
+struct mlx5e_wqe_frag_info *wi
+>                 }
+>
+>                 nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
+> -               if (unlikely(nr_frags_free)) {
+> -                       wi -=3D nr_frags_free;
+> +               if (unlikely(nr_frags_free))
+>                         truesize -=3D nr_frags_free * frag_info->frag_str=
+ide;
+> -               }
+>         }
+>
+>         skb =3D mlx5e_build_linear_skb(
+> @@ -1666,7 +1663,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
+truct mlx5e_wqe_frag_info *wi
+>
+>         if (xdp_buff_has_frags(&mxbuf->xdp)) {
+>                 /* sinfo->nr_frags is reset by build_skb, calculate again=
+. */
+> -               xdp_update_skb_frags_info(skb, wi - head_wi - 1,
+> +               xdp_update_skb_frags_info(skb, wi - head_wi - nr_frags_fr=
+ee - 1,
+>                                           sinfo->xdp_frags_size, truesize=
+,
+>                                           xdp_buff_get_skb_flags(&mxbuf->=
+xdp));
+>
+> --
+> 2.44.0
+>
 
