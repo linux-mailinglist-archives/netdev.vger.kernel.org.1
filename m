@@ -1,661 +1,249 @@
-Return-Path: <netdev+bounces-264938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YD1NM+NJq2mzbwEAu9opvQ
-	(envelope-from <netdev+bounces-264938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:40:51 +0100
+	id UPH4Bp9Lq2kOcAEAu9opvQ
+	(envelope-from <netdev+bounces-264939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:48:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE744228114
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:40:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7398C228192
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 442763061AC4
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:40:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7E363019814
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10990481FD2;
-	Fri,  6 Mar 2026 21:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589DA346777;
+	Fri,  6 Mar 2026 21:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gm8wSt1D"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OsEZbJgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD62C3AE71C;
-	Fri,  6 Mar 2026 21:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF8834676F;
+	Fri,  6 Mar 2026 21:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772833247; cv=none; b=FsTiJ7lj2y2xr/sb58TBMUubeekQzasHxolQ1lmRQLB1RnO+Xj2A2k5BJYFiSqkFAj18tj3qX8fOLwmtBHl3JgEx5DE+KAM4o1oKUJCTxJJxy+9DTbADRoLQcsDoNcEx1Om3icNnkkBrnuW0ACAUlZdWuBH5XDjgnYngPrTES/0=
+	t=1772833692; cv=none; b=QvbVdR/iBSyrM62qRQSzvp7x86JZ3Dlpd8ZO6mJDM9a5JZ92PHFlsP/7N7UT3GiSj8e7KwCqxHHLw0RGXQuyK+AJlGLwJToxFFXyTtAsO2olgKBbT6VDvJm301vYZC6iXdislLwdwBfTkWpu0ai+tVgzf+nkBHGNg3TQ9qBvdgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772833247; c=relaxed/simple;
-	bh=SlMansMvYm21l9+el1iUabkboO+ZuuXyZDJ+L3iO620=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=lIb0A4DkC2gyD2pqa7EzebDG2cE/Sl8XwAei4n4pMjST+0vi2FPsYfmGJl/sH77FlxlU3fZ7eW6R40Luvughbu1sXIINbfj+TVZ0KP69phfUQCyJTZ9o+m7Kw5BWQzx1nCZ0penK9VS/W92s5HMUTHDL93h96ZMytR3FBLfvZZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gm8wSt1D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB58DC4CEF7;
-	Fri,  6 Mar 2026 21:40:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772833247;
-	bh=SlMansMvYm21l9+el1iUabkboO+ZuuXyZDJ+L3iO620=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=gm8wSt1DFQAWn+4WNvztVmCdFhfXSKfdKDzv48hzgL5gJo/VY4OPY9ha2pNN6NzLx
-	 NqclRgi3asfWDWhWjoIgqDYS9SQY2JBk81MtEHgCRspDdAOVubQRdPuiPIevc7q15K
-	 yIiYGxkNo7fZfTwU/QhC5/zc+1xglRaQZ9J6cqT2L9umiaKFIgYH+oSX5YOuewQvgp
-	 jMH7gza/D8MprXztnH7/Zp+v/rCptBdBple2nvcubP3ejB6cSUBuxPnkLs6cM1Kmu2
-	 rrPYgYo0yZipztSWhGuNOMBOCKf/1pJQr8IONyzCK5gUy1IszXDxb/Ip87uD8TDRF5
-	 OLUYn+PN7k2wQ==
-Date: Fri, 6 Mar 2026 22:40:39 +0100
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
-	rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
-	Linux Kernel <linux-kernel@vger.kernel.org>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
-	Waiman Long <longman@redhat.com>
-Message-ID: <0dbc88bc-1605-4220-a959-c0ffa68d3f9a@kernel.org>
-In-Reply-To: <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org> <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org> <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org> <20260302114636.GL606826@noisy.programming.kicks-ass.net> <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org> <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org> <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx> <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx> <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx> <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org> <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
+	s=arc-20240116; t=1772833692; c=relaxed/simple;
+	bh=qo111MQQb5LXpK46bHQeFI70poKoUHB65PmC5p5reyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=liRGW1Z7Xd3pU2khh5S9IOU6ZPA+PGIC67IT/V51K2cN2W5lVuTTQ88Fp9+dhvFnraGYcLnqaHJWcywWDk/X2BEyWDr+FK89+iNnkIWXHcC9pOHpBsr18rGDt+v+/rwbpTKsz+OBTWGd1pIdtO4wgTC5bRARa34tti2RhptCDv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OsEZbJgd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ddvZqQUFySIge6sJv5iAA04y8EBt1MEUfEfFLzy/f/A=; b=OsEZbJgdwKor4BpsKgEBLvh6Qh
+	oEWSsMJ7pRpJBZmx8r05OzzaqEImRSo2uCsqNeOdsJVxI76RAA5mJ9f4TmSOzRQSQtVG3rAMFNMFO
+	Yq2tfLG/mLXy1HG7D7i1FaG9htuCiSsNG3Ow61YfpA7SvOpP78ILzQHWdgXpSuMLij3D8adwAQX8s
+	gPVtqFRdo01hOh7kKPVCSUIcSVPVnF9GEaydXiAF4zQ/SzhMzPX5v5U+Im6yKqbFtlGMmCxT5Grvh
+	Ve5SnB4YYd+rCb3guzM2LzNXwPe6Dhvpcvs8r5Repa15QMe+wC7GcPk0ml0Xm4UYGBFMnpGqGjFER
+	Y46i+AQA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52808)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vyd1d-000000001aV-1ocF;
+	Fri, 06 Mar 2026 21:48:01 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vyd1Z-000000001kc-2mAV;
+	Fri, 06 Mar 2026 21:47:57 +0000
+Date: Fri, 6 Mar 2026 21:47:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC net-next v2 0/7] net: stmmac: improve PCS support
+Message-ID: <aatLjarGu_qdRkP2@shell.armlinux.org.uk>
+References: <aafxqCvJ_XY4YbWw@shell.armlinux.org.uk>
+ <aandp3FYSJbwoZxo@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <0dbc88bc-1605-4220-a959-c0ffa68d3f9a@kernel.org>
-X-Rspamd-Queue-Id: DE744228114
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aandp3FYSJbwoZxo@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 7398C228192
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264938-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264939-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.941];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.037];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:url]
 X-Rspamd-Action: no action
 
-06 Mar 2026 17:57:26 Matthieu Baerts <matttbe@kernel.org>:
+On Fri, Mar 06, 2026 at 01:16:47AM +0530, Mohd Ayaan Anwar wrote:
+> Hi Russell,
+> On Wed, Mar 04, 2026 at 08:47:36AM +0000, Russell King (Oracle) wrote:
+> > Resending this as the original RFC now conflicts with net-next.
+> > 
+> > This series is the next of the three part series sorting out the PCS
+> > support in stmmac, building on part 2, which was posted yesterday:
+> > 
+> > 	net: stmmac: qcom-ethqos: further serdes reorganisation
+> > 
+> > Similar patches have been posted previously. This series does away with
+> > the common SerDes PHY support, instead using a flag to indicate whether
+> > 2500Mbps mode is supported (STMMAC_FLAG_SERDES_SUPPORTS_2500M.) At this
+> > time, I have no plans to resurect the common SerDes PHY support - the
+> > generic PHY layer implementations are just too random to consider that,
+> > and I certainly do not want the extra work of fixing that.
+> > 
+> > I've also changed the last patch which prints warnings when qcom-ethqos
+> > changes the PCS state - this will now indicate in a readable form
+> > whether the ANE or SGMRAL bits have changed state, rather than having
+> > to refer back to the definitions in the code or the databook.
+> > 
+> > I am hoping that - subject to this working for qcom-ethqos - we can
+> > drop this last patch in the final submission, along with the
+> > dwmac_ctrl_ane() and ethqos_pcs_set_inband() functions and associated
+> > definitions. This will also mean that stmmac will finally be driving
+> > the PCS correctly from a phylink point of view.
+> > 
+> 
+> Apologies for the delay in sharing test results. I had some board issues
+> to work through.
+> 
+> I applied your previous RFC series on top of the two qcom-ethqos/serdes
+> cleanup series and have the following results to report for the QCS9100
+> Ride R3 board (AQR115C PHY):
+> 
+>   - Link up at 2.5G, 1G, and 100M is fine (phylink logs below). The PCS
+>     link takes a moment to stabilize, but after that it's stable.
 
-(...)
+Has it always taken a moment to stabilise? Note that the ANE changes
+will trigger a re-exchange of SGMII in-band, which is why you see
+the PCS link go down and back up after the "ANE 0->1" message.
 
-> After having sent this email, I re-checked on my side, and I was able to
-> reproduce this issue with the technique described above: using the
-> docker image with "build" argument, then max 50 boot iterations with "vm
-> auto normal" argument. I then used 'git bisect' between v6.18 and
-> v6.19-rc1 to find the guilty commit, and got:
->
-> =C2=A0 653fda7ae73d ("sched/mmcid: Switch over to the new mechanism")
->
-> Reverting it on top of v6.19-rc1 fixes the issue.
->
-> Unfortunatelly, reverting it on top of Linus' tree causes some
-> conflicts. I did my best to resolve them, and with this patch attached
-> below -- also available in [1] -- I no longer have the issue. I don't
-> know if it is correct -- some quick tests don't show any issues -- nor
-> if Jiri should test it. I guess the final fix will be different from
-> this simple revert.
+I do notice:
 
-As probably expected, even if this revert fixed the boot issues, it
-caused a regression during the tests execution, see below.
+	qcom-ethqos 23040000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
 
+which is a symptom that a clock is missing. There's been some recent
+patches merged into net-next which changes this:
 
-[=C2=A0 493.608357][=C2=A0=C2=A0=C2=A0 C3] rcu: 3-....: (26000 ticks this G=
-P) idle=3Dd54c/1/0x4000000000000000 softirq=3D214151/214154 fqs=3D6500
-[=C2=A0 493.609867][=C2=A0=C2=A0=C2=A0 C3] rcu: (t=3D26003 jiffies g=3D3926=
-97 q=3D1127 ncpus=3D4)
-[=C2=A0 493.610566][=C2=A0=C2=A0=C2=A0 C3] CPU: 3 UID: 0 PID: 4961 Comm: sl=
-eep Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N=C2=A0 7.0.0-rc2+ #1 PREEMPT(full)
-[=C2=A0 493.610575][=C2=A0=C2=A0=C2=A0 C3] Tainted: [N]=3DTEST
-[=C2=A0 493.610577][=C2=A0=C2=A0=C2=A0 C3] Hardware name: Bochs Bochs, BIOS=
- Bochs 01/01/2011
-[=C2=A0 493.610583][=C2=A0=C2=A0=C2=A0 C3] RIP: 0010:sched_mm_cid_after_exe=
-cve (kernel/sched/sched.h:4026 (discriminator 2))
-[=C2=A0 493.610596][=C2=A0=C2=A0=C2=A0 C3] Code: 05 00 00 4c 89 e8 48 c1 f8=
- 06 4c 89 4c 24 08 49 8d bc c1 10 0b 00 00 e8 99 4a 90 00 4c 8b 4c 24 08 f0=
- 4d 0f ab a9 10 0b 00 00 <0f> 82 b7 00 00 00 48 8b 54 24 10 44 8b 44 24 1c =
-48 b8 00 00 00 00
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 05 00 00 4c 89=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add=C2=
-=A0=C2=A0=C2=A0 $0x894c0000,%eax
-=C2=A0=C2=A0 5: e8 48 c1 f8 06=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call=C2=
-=A0=C2=A0 0x6f8c152
-=C2=A0=C2=A0 a: 4c 89 4c 24 08=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=
-=A0=C2=A0=C2=A0 %r9,0x8(%rsp)
-=C2=A0=C2=A0 f: 49 8d bc c1 10 0b 00 lea=C2=A0=C2=A0=C2=A0 0xb10(%r9,%rax,8=
-),%rdi
-=C2=A0 16: 00
-=C2=A0 17: e8 99 4a 90 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call=C2=A0=C2=
-=A0 0x904ab5
-=C2=A0 1c: 4c 8b 4c 24 08=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 0x8(%rsp),%r9
-=C2=A0 21: f0 4d 0f ab a9 10 0b lock bts %r13,0xb10(%r9)
-=C2=A0 28: 00 00
-=C2=A0 2a:* 0f 82 b7 00 00 00=C2=A0=C2=A0 jb=C2=A0=C2=A0=C2=A0=C2=A0 0xe7 <=
--- trapping instruction
-=C2=A0 30: 48 8b 54 24 10=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 0x10(%rsp),%rdx
-=C2=A0 35: 44 8b 44 24 1c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 0x1c(%rsp),%r8d
-=C2=A0 3a: 48=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rex.W
-=C2=A0 3b: b8 00 00 00 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 $0x0,%eax
+2cd70e3968f5 net: stmmac: Defer VLAN HW configuration when interface is down
+bd7ad51253a7 net: stmmac: Fix VLAN HW state restore
+e38200e361cb net: stmmac: Improve double VLAN handling
+35dfedce442c net: stmmac: Fix error handling in VLAN add and delete paths
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 0f 82 b7 00 00 00=C2=A0=C2=A0=C2=A0 jb=C2=A0=C2=A0=C2=A0=C2=
-=A0 0xbd
-=C2=A0=C2=A0 6: 48 8b 54 24 10=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=
-=A0=C2=A0=C2=A0 0x10(%rsp),%rdx
-=C2=A0=C2=A0 b: 44 8b 44 24 1c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=
-=A0=C2=A0=C2=A0 0x1c(%rsp),%r8d
-=C2=A0 10: 48=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rex.W
-=C2=A0 11: b8 00 00 00 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 $0x0,%eax
-[=C2=A0 493.610600][=C2=A0=C2=A0=C2=A0 C3] RSP: 0018:ffffc90002957e00 EFLAG=
-S: 00000247
-[=C2=A0 493.610605][=C2=A0=C2=A0=C2=A0 C3] RAX: 0000000000000001 RBX: 00000=
-00000000001 RCX: 0000000000000001
-[=C2=A0 493.610609][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000001 RSI: 00000=
-00000000008 RDI: ffff8881000aba10
-[=C2=A0 493.610612][=C2=A0=C2=A0=C2=A0 C3] RBP: dffffc0000000000 R08: fffff=
-fff8185fe97 R09: ffff8881000aaf00
-[=C2=A0 493.610615][=C2=A0=C2=A0=C2=A0 C3] R10: ffffed1020015743 R11: 00000=
-00000000000 R12: ffffed1021dda7a8
-[=C2=A0 493.610618][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: ffff8=
-881000aaf00 R15: ffff88810eed3800
-[=C2=A0 493.610663][=C2=A0=C2=A0=C2=A0 C3] FS:=C2=A0 0000000000000000(0000)=
- GS:ffff8881cc110000(0000) knlGS:0000000000000000
-[=C2=A0 493.610680][=C2=A0=C2=A0=C2=A0 C3] CS:=C2=A0 0010 DS: 0000 ES: 0000=
- CR0: 0000000080050033
-[=C2=A0 493.610684][=C2=A0=C2=A0=C2=A0 C3] CR2: 00007ffef3a7dd89 CR3: 00000=
-001204a1005 CR4: 0000000000370ef0
-[=C2=A0 493.610688][=C2=A0=C2=A0=C2=A0 C3] Call Trace:
-[=C2=A0 493.610691][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 <TASK>
-[=C2=A0 493.610703][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 bprm_execve (include/linux=
-/rseq.h:140)
-[=C2=A0 493.610717][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_execveat_common.isra.0 =
-(fs/exec.c:1846)
-[=C2=A0 493.610731][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __x64_sys_execve (include/=
-linux/fs.h:2539)
-[=C2=A0 493.610740][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_syscall_64 (arch/x86/en=
-try/syscall_64.c:63 (discriminator 1))
-[=C2=A0 493.610750][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? exc_page_fault (arch/x86=
-/mm/fault.c:1480 (discriminator 3))
-[=C2=A0 493.610760][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 entry_SYSCALL_64_after_hwf=
-rame (arch/x86/entry/entry_64.S:130)
-[=C2=A0 493.610767][=C2=A0=C2=A0=C2=A0 C3] RIP: 0033:0x7fb401448140
-[=C2=A0 493.610780][=C2=A0=C2=A0=C2=A0 C3] Code: Unable to access opcode by=
-tes at 0x7fb401448116.
+please indicate whether you have these applied.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[=C2=A0 493.610782][=C2=A0=C2=A0=C2=A0 C3] RSP: 002b:00007ffef3a7da70 EFLAG=
-S: 00000202 ORIG_RAX: 000000000000003b
-[=C2=A0 493.610787][=C2=A0=C2=A0=C2=A0 C3] RAX: ffffffffffffffda RBX: 00000=
-00000000000 RCX: 0000000000000000
-[=C2=A0 493.610790][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000000 RSI: 00000=
-00000000000 RDI: 0000000000000000
-[=C2=A0 493.610793][=C2=A0=C2=A0=C2=A0 C3] RBP: 0000000000000000 R08: 00000=
-00000000000 R09: 0000000000000000
-[=C2=A0 493.610795][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000000 R11: 00000=
-00000000000 R12: 0000000000000000
-[=C2=A0 493.610796][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: 00000=
-00000000000 R15: 0000000000000000
-[=C2=A0 493.610815][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 </TASK>
-main_loop_s: timed out
-[=C2=A0 503.574195][=C2=A0=C2=A0 T17] rcu: INFO: rcu_preempt detected exped=
-ited stalls on CPUs/tasks: { 3-.... } 35898 jiffies s: 8761 root: 0x8/.
-[=C2=A0 503.575291][=C2=A0=C2=A0 T17] rcu: blocking rcu_node structures (in=
-ternal RCU debug):
-[=C2=A0 503.576282][=C2=A0=C2=A0 T17] Sending NMI from CPU 1 to CPUs 3:
-[=C2=A0 503.577258][=C2=A0=C2=A0=C2=A0 C3] NMI backtrace for cpu 3
-[=C2=A0 503.577269][=C2=A0=C2=A0=C2=A0 C3] CPU: 3 UID: 0 PID: 4961 Comm: sl=
-eep Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N=C2=A0 7.0.0-rc2+ #1 PREEMPT(full)
-[=C2=A0 503.577277][=C2=A0=C2=A0=C2=A0 C3] Tainted: [N]=3DTEST
-[=C2=A0 503.577279][=C2=A0=C2=A0=C2=A0 C3] Hardware name: Bochs Bochs, BIOS=
- Bochs 01/01/2011
-[=C2=A0 503.577282][=C2=A0=C2=A0=C2=A0 C3] RIP: 0010:sched_mm_cid_after_exe=
-cve (kernel/sched/sched.h:4022)
-[=C2=A0 503.577295][=C2=A0=C2=A0=C2=A0 C3] Code: 34 2e 40 38 f0 7c 09 40 84=
- f6 0f 85 6e 01 00 00 8b 35 d6 72 d5 02 49 8d be 10 0b 00 00 e8 b6 cc f9 00=
- 49 89 c5 41 80 3c 24 00 <0f> 85 5f 01 00 00 4d 8b b7 40 05 00 00 41 39 dd =
-0f 83 1e fd ff ff
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 34 2e=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 xor=C2=A0=C2=A0=C2=A0 $0x2e,%al
-=C2=A0=C2=A0 2: 40 38 f0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 cmp=C2=A0=C2=A0=C2=A0 %sil,%al
-=C2=A0=C2=A0 5: 7c 09=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 jl=C2=A0=C2=A0=C2=A0=C2=A0 0x10
-=C2=A0=C2=A0 7: 40 84 f6=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %sil,%sil
-=C2=A0=C2=A0 a: 0f 85 6e 01 00 00=C2=A0=C2=A0=C2=A0 jne=C2=A0=C2=A0=C2=A0 0=
-x17e
-=C2=A0 10: 8b 35 d6 72 d5 02=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 0x2d57=
-2d6(%rip),%esi=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # 0x2d572ec
-=C2=A0 16: 49 8d be 10 0b 00 00 lea=C2=A0=C2=A0=C2=A0 0xb10(%r14),%rdi
-=C2=A0 1d: e8 b6 cc f9 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call=C2=A0=C2=
-=A0 0xf9ccd8
-=C2=A0 22: 49 89 c5=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rax,%r13
-=C2=A0 25: 41 80 3c 24 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmpb=C2=A0=C2=
-=A0 $0x0,(%r12)
-=C2=A0 2a:* 0f 85 5f 01 00 00=C2=A0=C2=A0=C2=A0 jne=C2=A0=C2=A0=C2=A0 0x18f=
- <-- trapping instruction
-=C2=A0 30: 4d 8b b7 40 05 00 00 mov=C2=A0=C2=A0=C2=A0 0x540(%r15),%r14
-=C2=A0 37: 41 39 dd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 cmp=C2=A0=C2=A0=C2=A0 %ebx,%r13d
-=C2=A0 3a: 0f 83 1e fd ff ff=C2=A0=C2=A0=C2=A0 jae=C2=A0=C2=A0=C2=A0 0xffff=
-fffffffffd5e
+>   - No data path issues at these speeds either.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 0f 85 5f 01 00 00=C2=A0=C2=A0=C2=A0 jne=C2=A0=C2=A0=C2=A0 0=
-x165
-=C2=A0=C2=A0 6: 4d 8b b7 40 05 00 00 mov=C2=A0=C2=A0=C2=A0 0x540(%r15),%r14
-=C2=A0=C2=A0 d: 41 39 dd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 cmp=C2=A0=C2=A0=C2=A0 %ebx,%r13d
-=C2=A0 10: 0f 83 1e fd ff ff=C2=A0=C2=A0=C2=A0 jae=C2=A0=C2=A0=C2=A0 0xffff=
-fffffffffd34
-[=C2=A0 503.577300][=C2=A0=C2=A0=C2=A0 C3] RSP: 0018:ffffc90002957e00 EFLAG=
-S: 00000246
-[=C2=A0 503.577305][=C2=A0=C2=A0=C2=A0 C3] RAX: 0000000000000001 RBX: 00000=
-00000000001 RCX: 0000000000000001
-[=C2=A0 503.577308][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000001 RSI: dffff=
-c0000000000 RDI: ffff8881000aba10
-[=C2=A0 503.577311][=C2=A0=C2=A0=C2=A0 C3] RBP: dffffc0000000000 R08: fffff=
-fff8185fe97 R09: ffff8881000aaf00
-[=C2=A0 503.577314][=C2=A0=C2=A0=C2=A0 C3] R10: ffffed1020015743 R11: 00000=
-00000000000 R12: ffffed1021dda7a8
-[=C2=A0 503.577316][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000001 R14: ffff8=
-881000aaf00 R15: ffff88810eed3800
-[=C2=A0 503.577335][=C2=A0=C2=A0=C2=A0 C3] FS:=C2=A0 0000000000000000(0000)=
- GS:ffff8881cc110000(0000) knlGS:0000000000000000
-[=C2=A0 503.577350][=C2=A0=C2=A0=C2=A0 C3] CS:=C2=A0 0010 DS: 0000 ES: 0000=
- CR0: 0000000080050033
-[=C2=A0 503.577353][=C2=A0=C2=A0=C2=A0 C3] CR2: 00007fb401448116 CR3: 00000=
-001204a1005 CR4: 0000000000370ef0
-[=C2=A0 503.577356][=C2=A0=C2=A0=C2=A0 C3] Call Trace:
-[=C2=A0 503.577360][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 <TASK>
-[=C2=A0 503.577368][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 bprm_execve (include/linux=
-/rseq.h:140)
-[=C2=A0 503.577377][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_execveat_common.isra.0 =
-(fs/exec.c:1846)
-[=C2=A0 503.577385][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __x64_sys_execve (include/=
-linux/fs.h:2539)
-[=C2=A0 503.577392][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_syscall_64 (arch/x86/en=
-try/syscall_64.c:63 (discriminator 1))
-[=C2=A0 503.577401][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? exc_page_fault (arch/x86=
-/mm/fault.c:1480 (discriminator 3))
-[=C2=A0 503.577408][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 entry_SYSCALL_64_after_hwf=
-rame (arch/x86/entry/entry_64.S:130)
-[=C2=A0 503.577415][=C2=A0=C2=A0=C2=A0 C3] RIP: 0033:0x7fb401448140
-[=C2=A0 503.577427][=C2=A0=C2=A0=C2=A0 C3] Code: Unable to access opcode by=
-tes at 0x7fb401448116.
+Great.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[=C2=A0 503.577430][=C2=A0=C2=A0=C2=A0 C3] RSP: 002b:00007ffef3a7da70 EFLAG=
-S: 00000202 ORIG_RAX: 000000000000003b
-[=C2=A0 503.577435][=C2=A0=C2=A0=C2=A0 C3] RAX: ffffffffffffffda RBX: 00000=
-00000000000 RCX: 0000000000000000
-[=C2=A0 503.577437][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000000 RSI: 00000=
-00000000000 RDI: 0000000000000000
-[=C2=A0 503.577439][=C2=A0=C2=A0=C2=A0 C3] RBP: 0000000000000000 R08: 00000=
-00000000000 R09: 0000000000000000
-[=C2=A0 503.577442][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000000 R11: 00000=
-00000000000 R12: 0000000000000000
-[=C2=A0 503.577444][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: 00000=
-00000000000 R15: 0000000000000000
-[=C2=A0 503.577453][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 </TASK>
-[=C2=A0 530.927646][=C2=A0=C2=A0=C2=A0 C3] watchdog: BUG: soft lockup - CPU=
-#3 stuck for 60s! [sleep:4961]
-[=C2=A0 530.927660][=C2=A0=C2=A0=C2=A0 C3] Modules linked in: nft_tproxy nf=
-_tproxy_ipv6 nf_tproxy_ipv4 nft_socket nf_socket_ipv4 nf_socket_ipv6 nf_tab=
-les sch_netem tcp_diag mptcp_diag inet_diag mptcp_token_test mptcp_crypto_t=
-est kunit
-[=C2=A0 530.927693][=C2=A0=C2=A0=C2=A0 C3] irq event stamp: 141062
-[=C2=A0 530.927696][=C2=A0=C2=A0=C2=A0 C3] hardirqs last=C2=A0 enabled at (=
-141061): irqentry_exit (kernel/entry/common.c:243)
-[=C2=A0 530.927711][=C2=A0=C2=A0=C2=A0 C3] hardirqs last disabled at (14106=
-2): sysvec_apic_timer_interrupt (arch/x86/include/asm/hardirq.h:81)
-[=C2=A0 530.927715][=C2=A0=C2=A0=C2=A0 C3] softirqs last=C2=A0 enabled at (=
-140962): handle_softirqs (kernel/softirq.c:469 (discriminator 2))
-[=C2=A0 530.927720][=C2=A0=C2=A0=C2=A0 C3] softirqs last disabled at (14094=
-9): __irq_exit_rcu (kernel/softirq.c:657)
-[=C2=A0 530.927727][=C2=A0=C2=A0=C2=A0 C3] CPU: 3 UID: 0 PID: 4961 Comm: sl=
-eep Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N=C2=A0 7.0.0-rc2+ #1 PREEMPT(full)
-[=C2=A0 530.927732][=C2=A0=C2=A0=C2=A0 C3] Tainted: [N]=3DTEST
-[=C2=A0 530.927734][=C2=A0=C2=A0=C2=A0 C3] Hardware name: Bochs Bochs, BIOS=
- Bochs 01/01/2011
-[=C2=A0 530.927736][=C2=A0=C2=A0=C2=A0 C3] RIP: 0010:sched_mm_cid_after_exe=
-cve (kernel/sched/sched.h:4045 (discriminator 6))
-[=C2=A0 530.927742][=C2=A0=C2=A0=C2=A0 C3] Code: 02 83 04 85 c0 0f 84 6b 02=
- 00 00 48 83 c4 30 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 48 c7 c7 40=
- f5 cd 83 e8 bd df 19 02 <49> 8d be 00 01 00 00 48 89 f8 48 c1 e8 03 80 3c =
-28 00 0f 85 65 02
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 02 83 04 85 c0 0f=C2=A0=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0 0=
-xfc08504(%rbx),%al
-=C2=A0=C2=A0 6: 84 6b 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %ch,0x2(%rbx)
-=C2=A0=C2=A0 9: 00 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0 %al,(%rax)
-=C2=A0=C2=A0 b: 48 83 c4 30=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 add=C2=A0=C2=A0=C2=A0 $0x30,%rsp
-=C2=A0=C2=A0 f: 5b=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %=
-rbx
-=C2=A0 10: 5d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %rbp
-=C2=A0 11: 41 5c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r12
-=C2=A0 13: 41 5d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r13
-=C2=A0 15: 41 5e=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r14
-=C2=A0 17: 41 5f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r15
-=C2=A0 19: c3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret
-=C2=A0 1a: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1b: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1c: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1d: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1e: 48 c7 c7 40 f5 cd 83 mov=C2=A0=C2=A0=C2=A0 $0xffffffff83cdf540,%=
-rdi
-=C2=A0 25: e8 bd df 19 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call=C2=A0=C2=
-=A0 0x219dfe7
-=C2=A0 2a:* 49 8d be 00 01 00 00 lea=C2=A0=C2=A0=C2=A0 0x100(%r14),%rdi <--=
- trapping instruction
-=C2=A0 31: 48 89 f8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi,%rax
-=C2=A0 34: 48 c1 e8 03=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 shr=C2=A0=C2=A0=C2=A0 $0x3,%rax
-=C2=A0 38: 80 3c 28 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 cmpb=C2=A0=C2=A0 $0x0,(%rax,%rbp,1)
-=C2=A0 3c: 0f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .byte 0xf
-=C2=A0 3d: 85 65 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %esp,0x2(%rbp)
+>   - The warning ("PCS configuration changed from phylink by glue;
+>     ANE 0 -> 1") is observed when the link comes up at 1G/100M.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 49 8d be 00 01 00 00 lea=C2=A0=C2=A0=C2=A0 0x100(%r14),%rdi
-=C2=A0=C2=A0 7: 48 89 f8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi,%rax
-=C2=A0=C2=A0 a: 48 c1 e8 03=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 shr=C2=A0=C2=A0=C2=A0 $0x3,%rax
-=C2=A0=C2=A0 e: 80 3c 28 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 cmpb=C2=A0=C2=A0 $0x0,(%rax,%rbp,1)
-=C2=A0 12: 0f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .byte 0xf
-=C2=A0 13: 85 65 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %esp,0x2(%rbp)
-[=C2=A0 530.927744][=C2=A0=C2=A0=C2=A0 C3] RSP: 0018:ffffc90002957e00 EFLAG=
-S: 00000202
-[=C2=A0 530.927747][=C2=A0=C2=A0=C2=A0 C3] RAX: 0000000000000003 RBX: 00000=
-00000000001 RCX: 0000000000000001
-[=C2=A0 530.927749][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000001 RSI: fffff=
-fff83cdf540 RDI: ffffffff83eec920
-[=C2=A0 530.927751][=C2=A0=C2=A0=C2=A0 C3] RBP: dffffc0000000000 R08: fffff=
-fff8185fd4a R09: 0000000000000000
-[=C2=A0 530.927752][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000003 R11: 00000=
-00000000000 R12: ffffed1021dda7a8
-[=C2=A0 530.927753][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: ffff8=
-881000aaf00 R15: ffff88810eed3800
-[=C2=A0 530.927766][=C2=A0=C2=A0=C2=A0 C3] FS:=C2=A0 0000000000000000(0000)=
- GS:ffff8881cc110000(0000) knlGS:0000000000000000
-[=C2=A0 530.927776][=C2=A0=C2=A0=C2=A0 C3] CS:=C2=A0 0010 DS: 0000 ES: 0000=
- CR0: 0000000080050033
-[=C2=A0 530.927778][=C2=A0=C2=A0=C2=A0 C3] CR2: 00007fb401448116 CR3: 00000=
-001204a1005 CR4: 0000000000370ef0
-[=C2=A0 530.927780][=C2=A0=C2=A0=C2=A0 C3] Call Trace:
-[=C2=A0 530.927784][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 <TASK>
-[=C2=A0 530.927792][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 bprm_execve (include/linux=
-/rseq.h:140)
-[=C2=A0 530.927801][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_execveat_common.isra.0 =
-(fs/exec.c:1846)
-[=C2=A0 530.927807][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __x64_sys_execve (include/=
-linux/fs.h:2539)
-[=C2=A0 530.927812][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_syscall_64 (arch/x86/en=
-try/syscall_64.c:63 (discriminator 1))
-[=C2=A0 530.927817][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? exc_page_fault (arch/x86=
-/mm/fault.c:1480 (discriminator 3))
-[=C2=A0 530.927821][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 entry_SYSCALL_64_after_hwf=
-rame (arch/x86/entry/entry_64.S:130)
-[=C2=A0 530.927826][=C2=A0=C2=A0=C2=A0 C3] RIP: 0033:0x7fb401448140
-[=C2=A0 530.927835][=C2=A0=C2=A0=C2=A0 C3] Code: Unable to access opcode by=
-tes at 0x7fb401448116.
+That's currently expected, because phylink thinks we're using PHY
+mode (where it's in charge of reading the PHY and telling the MAC
+what's going on) rather than using inband. This is something that
+will need to be addressed later.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[=C2=A0 530.927837][=C2=A0=C2=A0=C2=A0 C3] RSP: 002b:00007ffef3a7da70 EFLAG=
-S: 00000202 ORIG_RAX: 000000000000003b
-[=C2=A0 530.927839][=C2=A0=C2=A0=C2=A0 C3] RAX: ffffffffffffffda RBX: 00000=
-00000000000 RCX: 0000000000000000
-[=C2=A0 530.927840][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000000 RSI: 00000=
-00000000000 RDI: 0000000000000000
-[=C2=A0 530.927842][=C2=A0=C2=A0=C2=A0 C3] RBP: 0000000000000000 R08: 00000=
-00000000000 R09: 0000000000000000
-[=C2=A0 530.927843][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000000 R11: 00000=
-00000000000 R12: 0000000000000000
-[=C2=A0 530.927844][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: 00000=
-00000000000 R15: 0000000000000000
-[=C2=A0 530.927854][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 </TASK>
-[=C2=A0 530.927857][=C2=A0=C2=A0=C2=A0 C3] Kernel panic - not syncing: soft=
-lockup: hung tasks
-[=C2=A0 530.958801][=C2=A0=C2=A0=C2=A0 C3] CPU: 3 UID: 0 PID: 4961 Comm: sl=
-eep Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 L=C2=A0=C2=A0 N=C2=A0 7.0.0-rc2+ #1 PREEMPT(full)
-[=C2=A0 530.960019][=C2=A0=C2=A0=C2=A0 C3] Tainted: [L]=3DSOFTLOCKUP, [N]=
-=3DTEST
-[=C2=A0 530.960652][=C2=A0=C2=A0=C2=A0 C3] Hardware name: Bochs Bochs, BIOS=
- Bochs 01/01/2011
-[=C2=A0 530.961437][=C2=A0=C2=A0=C2=A0 C3] Call Trace:
-[=C2=A0 530.961931][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 <IRQ>
-[=C2=A0 530.962208][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 dump_stack_lvl (lib/dump_s=
-tack.c:122)
-[=C2=A0 530.962740][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 vpanic (kernel/panic.c:651=
-)
-[=C2=A0 530.963120][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 panic (kernel/panic.c:787)
-[=C2=A0 530.963502][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? __pfx_panic (kernel/pani=
-c.c:783)
-[=C2=A0 530.964024][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? add_taint (arch/x86/incl=
-ude/asm/bitops.h:60)
-[=C2=A0 530.964459][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 watchdog_timer_fn.cold (ke=
-rnel/watchdog.c:871)
-[=C2=A0 530.965081][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? __pfx_watchdog_timer_fn =
-(kernel/watchdog.c:774)
-[=C2=A0 530.965629][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __run_hrtimer (kernel/time=
-/hrtimer.c:1785)
-[=C2=A0 530.966417][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __hrtimer_run_queues (incl=
-ude/linux/timerqueue.h:25)
-[=C2=A0 530.966930][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? __pfx___hrtimer_run_queu=
-es (kernel/time/hrtimer.c:1819)
-[=C2=A0 530.967470][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? ktime_get_update_offsets=
-_now (kernel/time/timekeeping.c:381)
-[=C2=A0 530.968251][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 hrtimer_interrupt (kernel/=
-time/hrtimer.c:1914)
-[=C2=A0 530.968990][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __sysvec_apic_timer_interr=
-upt (arch/x86/include/asm/jump_label.h:37)
-[=C2=A0 530.969783][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 sysvec_apic_timer_interrup=
-t (arch/x86/kernel/apic/apic.c:1056 (discriminator 47))
-[=C2=A0 530.970343][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 </IRQ>
-[=C2=A0 530.970723][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 <TASK>
-[=C2=A0 530.971036][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 asm_sysvec_apic_timer_inte=
-rrupt (arch/x86/include/asm/idtentry.h:697)
-[=C2=A0 530.971947][=C2=A0=C2=A0=C2=A0 C3] RIP: 0010:sched_mm_cid_after_exe=
-cve (kernel/sched/sched.h:4045 (discriminator 6))
-[=C2=A0 530.972671][=C2=A0=C2=A0=C2=A0 C3] Code: 02 83 04 85 c0 0f 84 6b 02=
- 00 00 48 83 c4 30 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 48 c7 c7 40=
- f5 cd 83 e8 bd df 19 02 <49> 8d be 00 01 00 00 48 89 f8 48 c1 e8 03 80 3c =
-28 00 0f 85 65 02
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 02 83 04 85 c0 0f=C2=A0=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0 0=
-xfc08504(%rbx),%al
-=C2=A0=C2=A0 6: 84 6b 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %ch,0x2(%rbx)
-=C2=A0=C2=A0 9: 00 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0 %al,(%rax)
-=C2=A0=C2=A0 b: 48 83 c4 30=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 add=C2=A0=C2=A0=C2=A0 $0x30,%rsp
-=C2=A0=C2=A0 f: 5b=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %=
-rbx
-=C2=A0 10: 5d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %rbp
-=C2=A0 11: 41 5c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r12
-=C2=A0 13: 41 5d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r13
-=C2=A0 15: 41 5e=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r14
-=C2=A0 17: 41 5f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pop=C2=A0=C2=A0=C2=A0 %r15
-=C2=A0 19: c3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret
-=C2=A0 1a: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1b: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1c: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1d: cc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int3
-=C2=A0 1e: 48 c7 c7 40 f5 cd 83 mov=C2=A0=C2=A0=C2=A0 $0xffffffff83cdf540,%=
-rdi
-=C2=A0 25: e8 bd df 19 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call=C2=A0=C2=
-=A0 0x219dfe7
-=C2=A0 2a:* 49 8d be 00 01 00 00 lea=C2=A0=C2=A0=C2=A0 0x100(%r14),%rdi <--=
- trapping instruction
-=C2=A0 31: 48 89 f8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi,%rax
-=C2=A0 34: 48 c1 e8 03=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 shr=C2=A0=C2=A0=C2=A0 $0x3,%rax
-=C2=A0 38: 80 3c 28 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 cmpb=C2=A0=C2=A0 $0x0,(%rax,%rbp,1)
-=C2=A0 3c: 0f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .byte 0xf
-=C2=A0 3d: 85 65 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %esp,0x2(%rbp)
+>   - I did find one issue: the data path breaks when the link speed
+>     changes from 2.5G to 1G or 100M. Notably, this is not consistently
+>     reproducible, and the issue persists even after *dropping* this
+>     series and the two qcom-ethqos/serdes cleanup series, so it appears
+>     to be pre-existing. I am trying to debug this separately.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=C2=A0=C2=A0 0: 49 8d be 00 01 00 00 lea=C2=A0=C2=A0=C2=A0 0x100(%r14),%rdi
-=C2=A0=C2=A0 7: 48 89 f8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi,%rax
-=C2=A0=C2=A0 a: 48 c1 e8 03=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 shr=C2=A0=C2=A0=C2=A0 $0x3,%rax
-=C2=A0=C2=A0 e: 80 3c 28 00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 cmpb=C2=A0=C2=A0 $0x0,(%rax,%rbp,1)
-=C2=A0 12: 0f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .byte 0xf
-=C2=A0 13: 85 65 02=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 test=C2=A0=C2=A0 %esp,0x2(%rbp)
-[=C2=A0 530.974394][=C2=A0=C2=A0=C2=A0 C3] RSP: 0018:ffffc90002957e00 EFLAG=
-S: 00000202
-[=C2=A0 530.975308][=C2=A0=C2=A0=C2=A0 C3] RAX: 0000000000000003 RBX: 00000=
-00000000001 RCX: 0000000000000001
-[=C2=A0 530.976147][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000001 RSI: fffff=
-fff83cdf540 RDI: ffffffff83eec920
-[=C2=A0 530.977030][=C2=A0=C2=A0=C2=A0 C3] RBP: dffffc0000000000 R08: fffff=
-fff8185fd4a R09: 0000000000000000
-[=C2=A0 530.977910][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000003 R11: 00000=
-00000000000 R12: ffffed1021dda7a8
-[=C2=A0 530.978926][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: ffff8=
-881000aaf00 R15: ffff88810eed3800
-[=C2=A0 530.979595][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? sched_mm_cid_after_execv=
-e (arch/x86/include/asm/bitops.h:136 (discriminator 1))
-[=C2=A0 530.980252][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 bprm_execve (include/linux=
-/rseq.h:140)
-[=C2=A0 530.980941][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_execveat_common.isra.0 =
-(fs/exec.c:1846)
-[=C2=A0 530.981424][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 __x64_sys_execve (include/=
-linux/fs.h:2539)
-[=C2=A0 530.981941][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 do_syscall_64 (arch/x86/en=
-try/syscall_64.c:63 (discriminator 1))
-[=C2=A0 530.982406][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 ? exc_page_fault (arch/x86=
-/mm/fault.c:1480 (discriminator 3))
-[=C2=A0 530.983097][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 entry_SYSCALL_64_after_hwf=
-rame (arch/x86/entry/entry_64.S:130)
-[=C2=A0 530.983809][=C2=A0=C2=A0=C2=A0 C3] RIP: 0033:0x7fb401448140
-[=C2=A0 530.984409][=C2=A0=C2=A0=C2=A0 C3] Code: Unable to access opcode by=
-tes at 0x7fb401448116.
+I think you added some debug between the logs that you've provided
+below, which I'll take as not significant.
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[=C2=A0 530.985240][=C2=A0=C2=A0=C2=A0 C3] RSP: 002b:00007ffef3a7da70 EFLAG=
-S: 00000202 ORIG_RAX: 000000000000003b
-[=C2=A0 530.986149][=C2=A0=C2=A0=C2=A0 C3] RAX: ffffffffffffffda RBX: 00000=
-00000000000 RCX: 0000000000000000
-[=C2=A0 530.986945][=C2=A0=C2=A0=C2=A0 C3] RDX: 0000000000000000 RSI: 00000=
-00000000000 RDI: 0000000000000000
-[=C2=A0 530.987807][=C2=A0=C2=A0=C2=A0 C3] RBP: 0000000000000000 R08: 00000=
-00000000000 R09: 0000000000000000
-[=C2=A0 530.988490][=C2=A0=C2=A0=C2=A0 C3] R10: 0000000000000000 R11: 00000=
-00000000000 R12: 0000000000000000
-[=C2=A0 530.989334][=C2=A0=C2=A0=C2=A0 C3] R13: 0000000000000000 R14: 00000=
-00000000000 R15: 0000000000000000
-[=C2=A0 530.990257][=C2=A0=C2=A0=C2=A0 C3]=C2=A0 </TASK>
-[=C2=A0 530.991655][=C2=A0=C2=A0=C2=A0 C3] Kernel Offset: disabled
+I think what's happening is the PHY's SGMII exchange times out, but
+because you're enabling SGMII with AN at the PCS, the PCS is wanting
+that to complete, and that never happens. I suspect if you unplug and
+replug the cable after its switched into 1G mode, it may work. However,
+I need to check whether AQR115C does this "AN bypass" thing.
 
+That said, as we're using outband mode, phylink will call
+phy_config_inband() with LINK_INBAND_DISABLE. This should disable
+inband mode at the PHY, but from your logs I see evidence that it
+hasn't. I think that may be because the AQR needs something more than
+writing the VEND1_GLOBAL_CFG_* registers for that to take effect.
 
-More details:
+One of the hacks I have locally for an AQR113C on a SFP module which
+uses 10GBASE-R with rate matching is the following in
+aqr_gen4_config_init() to allow it to work with MACs that only support
+up to 2.5G:
 
-=C2=A0 https://github.com/multipath-tcp/mptcp_net-next/actions/runs/2277562=
-7304#summary-66068034344
+        phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, MDIO_CTRL1, MDIO_CTRL1_LPOWER);
+        mdelay(10);
+        phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x31a, 2);
+        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_10M,
+                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
+                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
+        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_100M,
+                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
+                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
+        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_1G,
+                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
+                      VEND1_GLOBAL_CFG_SERDES_MODE_SGMII);
+        phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CFG_2_5G,
+                      VEND1_GLOBAL_CFG_AUTONEG_ENA |
+                      VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII);
+        phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, MDIO_CTRL1,
+                           MDIO_CTRL1_LPOWER);
 
-Cheers,
-Matt
+I have this immediately after "priv->wait_on_global_cfg = true;"
+
+This reprograms the vendor provisioning so that we use 2500BASE-X
+for 2.5G and SGMII for 1G and below with AN enabled. Note placing
+the PHY into low-power mode while doing this - this causes firmware
+to re-read when exiting low-power mode. I wonder if that's required
+in aqr_gen2_config_inband() - but that will cause the link to go
+down.
+
+Note that VEND1_GLOBAL_CFG_AUTONEG_ENA enables inband signalling on
+the link.
+
+With the above, you should be able to test various scenarios with
+the PHY - and changing your provisioned 10M configuration will likely
+get 10M speeds working.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
