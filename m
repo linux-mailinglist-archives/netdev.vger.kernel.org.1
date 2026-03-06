@@ -1,197 +1,164 @@
-Return-Path: <netdev+bounces-264705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264706-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIuwMxuLqml0TQEAu9opvQ
-	(envelope-from <netdev+bounces-264705-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 09:06:51 +0100
+	id 4PNkF2CMqml0TQEAu9opvQ
+	(envelope-from <netdev+bounces-264706-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 09:12:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E5B021CD51
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 09:06:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E574721CE62
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 09:12:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D165301A281
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 08:06:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D988130C3658
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 08:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762A6372B3A;
-	Fri,  6 Mar 2026 08:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAA53793A8;
+	Fri,  6 Mar 2026 08:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="moBebrA3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gC65MniC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC58375AAD
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 08:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D496378D99
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 08:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772784402; cv=none; b=YtJVbnHJLCPwEptemtmHSllWiKF9VI0HIujs2kH4kxjeKKDbIPuGhJVkBlUGsaByVz2VvbJTHwBaRkBcvZbF3jpixNedackcdd2Gk8c/cDMWiDAxwV3XJY+b1ZMtVnO+KpR0KFFaCLvnMPgdh82qn4Zv4FhaMqRsRA9/c6VFK4c=
+	t=1772784465; cv=none; b=FELRdNOXu+ObgB5SH9yhzxLlyxPzEF6NK2CMyIiOLXvCJZ8cWn00ofcM/HIsYHjmSX6nNg0kTBGajKVdPmSlO7Bhfoz3vYK35gDX5lP8WCHKTvzMU/ha4TaMSTZGvmDDN0HvhbknAdUyW7B/2UhlxTjjhqjNUGenlhDs444TIG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772784402; c=relaxed/simple;
-	bh=YCScPXVM4hOLfO/yydHOsvKwR5YXuOuJJXZd9iRbi84=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Jk+fH5yWZcoQVA/1PUDD5YxJaIxy3dGTUX7xZRSnqvhjSWspHzBiaN+hW+lVweJ87GpyW4TCTobBtTKnEUbXalRYZbhEOzh1A8q1wpTia9mZSIOEYNbOq5IfwRL6RsYlPlKYB1xYS/KW9HY/BsJ3nn6PM9n7VpCrg3/RXd19xnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=moBebrA3; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772784465; c=relaxed/simple;
+	bh=w4YyGty+4MjVaZXa4YhrFXoqiPmZ1FzsE7rE0bfYb40=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nrKOWsrh1EK7R/uOWmPEu2UPDN17g9y6VzUBOlzJl00FHeRFOwLpqqtb6s1pSvI5hCyY9MmW3URAM5++2aDb+QfXANlS0Cddngg5zHZGBsbEPqGaR9ZNb+bvlgBNRy9mk0hCZGw6vPVNtqfFQVWr67Jn3skpcaVtJ1RylFyzGok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gC65MniC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DCF8C19422;
+	Fri,  6 Mar 2026 08:07:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772784464;
+	bh=w4YyGty+4MjVaZXa4YhrFXoqiPmZ1FzsE7rE0bfYb40=;
+	h=From:Date:Subject:To:Cc:From;
+	b=gC65MniC1ninb+IVM7axLnpe5Hvxmusxe9kGd3ixC/VE0V6PAST6MKogy+led8Lth
+	 v128XxXNNEuaycyr5RLq5SzeJLR38Hw4HcHmgiV9VxTxcmaJM4e0gWYGxKLYWVtpdu
+	 DO1HzkuDNMJD7rcKYwvcjnUH36E13EqYbfCgAKFyVucAQ9oXVesEuABd35ZnctzIOS
+	 tdj7z3mAak55b6zSiI6fCy0mnpXpu2ctq6epVNAASQB3xAT1nUuUNN5kHfwgL5esWA
+	 5i8fsfpjRdkSiLVN5CrNZ8R55WctRHWgRp/J+OPocC5qOLsr3vlNOoOygpjvPwXOZG
+	 RGAfONVR7sIJA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Fri, 06 Mar 2026 09:07:27 +0100
+Subject: [PATCH net-next v2] net: airoha: Make flow control source port
+ mapping dependent on nbq parameter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772784397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DW00uR8BvA5m7KptmQqZEldoo1+9rhV1LmSSrZmrVsY=;
-	b=moBebrA32CSwUx1ml+wTgo4mIv6eRTm6CgYwi9+0asdku2KzSHZQzrTFXHZf3mxUYW/juZ
-	s8FdfA78PDlGFGEnvLPEj3EYYVoqNjlFywB6JLJNdNDcHEXblHGi/3A3yAJLEZpF7x4sYi
-	zIN+Yn64663HqdgPbdOMjA4NiGbAIw8=
-Date: Fri, 06 Mar 2026 08:06:35 +0000
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <f43e3d020dd701d2fe69fd6e6b941321804555c9@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH v4 0/2] net: bonding: fix type-confusion in bonding
- header_ops
-To: "Jay Vosburgh" <jv@jvosburgh.net>
-Cc: "Jeff Garzik" <jeff@garzik.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Yuki Koike"
- <yuki.koike@gmo-cybersecurity.com>
-In-Reply-To: <1356396.1772744345@famine>
-References: <20260305110751.167489-1-kota.toda@gmo-cybersecurity.com>
- <1356396.1772744345@famine>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 6E5B021CD51
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260306-airoha-fix-loopback-for-usb-serdes-v2-1-319de9c96826@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5WNSw6DMAwFr4K8rqskony64h4VCwMGIhBGTotaI
+ e7elBt0OU9PMzsEVs8B7skOypsPXpYI7pJAO9IyMPouMjjjMuNcgeRVRsLev3EWWRtqJ+xF8RU
+ ajK6OA7osN2RsmtnyBlG0Ksf7GXnUkUcfnqKfs7nZ3/qXfrNokcq0YdMXZd5RNbEuPF9FB6iP4
+ /gC4GyyZtUAAAA=
+X-Change-ID: 20260228-airoha-fix-loopback-for-usb-serdes-2670a0146195
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Rspamd-Queue-Id: E574721CE62
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[linux.dev:?];
-	TAGGED_FROM(0.00)[bounces-264705-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264706-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DMARC_DNSFAIL(0.00)[linux.dev : SPF/DKIM temp error,none];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.842];
-	R_DKIM_TEMPFAIL(0.00)[linux.dev:s=key1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:email,jvosburgh.net:email,syzkaller.appspot.com:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-March 6, 2026 at 04:59, "Jay Vosburgh" <jv@jvosburgh.net mailto:jv@jvosbu=
-rgh.net?to=3D%22Jay%20Vosburgh%22%20%3Cjv%40jvosburgh.net%3E > wrote:
+Flow control source port mapping for USB serdes needs to be configured
+according to the GDM port nbq parameter. This is a preliminary patch
+since nbq parameter is specific for the given port serdes and needs to
+be read from the DTS (in the current codebase is assigned statically).
 
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Rely __field_prep for non-constant mask
+- Update commit log
+- Link to v1: https://lore.kernel.org/r/20260228-airoha-fix-loopback-for-usb-serdes-v1-1-a94be0f897da@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c  | 10 ++++++----
+ drivers/net/ethernet/airoha/airoha_regs.h |  5 +----
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
->=20
->=20Kota Toda <kota.toda@gmo-cybersecurity.com> wrote:
->=20
->=20>=20
->=20> In bond_setup_by_slave(), the slave=E2=80=99s header_ops are uncond=
-itionally
-> > copied into the bonding device. As a result, the bonding device may i=
-nvoke
-> > the slave-specific header operations on itself, causing
-> > netdev_priv(bond_dev) (a struct bonding) to be incorrectly interprete=
-d
-> > as the slave's private-data type.
-> >=20
->=20> This type-confusion bug can lead to out-of-bounds writes into the s=
-kb,
-> > resulting in memory corruption.
-> >=20
->=20 A few days ago, Jiayuan Chen <jiayuan.chen@linux.dev> posted a
-> fix for what sounds like the same problem[0]. Their solution appears to
-> be much less complicated.
->=20
->=20 I also wonder how this bug was discovered. The code in question
-> hasn't changed in many years, and now there are two independent fixes
-> within a week.
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 09acbe6695368132ddd92c3501f8711476db73f6..7b47d9e066cee75609501f87b0e97d936325517c 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1729,10 +1729,12 @@ static int airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ 		      SP_CPORT_MASK(val),
+ 		      __field_prep(SP_CPORT_MASK(val), FE_PSE_PORT_CDM2));
+ 
+-	if (port->id != AIROHA_GDM3_IDX && airoha_is_7581(eth))
+-		airoha_fe_rmw(eth, REG_SRC_PORT_FC_MAP6,
+-			      FC_ID_OF_SRC_PORT24_MASK,
+-			      FIELD_PREP(FC_ID_OF_SRC_PORT24_MASK, 2));
++	if (port->id == AIROHA_GDM4_IDX && airoha_is_7581(eth)) {
++		u32 mask = FC_ID_OF_SRC_PORT_MASK(nbq);
++
++		airoha_fe_rmw(eth, REG_SRC_PORT_FC_MAP6, mask,
++			      __field_prep(mask, AIROHA_GDM2_IDX));
++	}
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
+index ed4e3407f4a0e8b6a630ea1213ef155604479b66..29878b954c77c79ae45e63357840a10c23c517f2 100644
+--- a/drivers/net/ethernet/airoha/airoha_regs.h
++++ b/drivers/net/ethernet/airoha/airoha_regs.h
+@@ -376,10 +376,7 @@
+ #define SP_CPORT_MASK(_n)		GENMASK(3 + ((_n) << 2), ((_n) << 2))
+ 
+ #define REG_SRC_PORT_FC_MAP6		0x2298
+-#define FC_ID_OF_SRC_PORT27_MASK	GENMASK(28, 24)
+-#define FC_ID_OF_SRC_PORT26_MASK	GENMASK(20, 16)
+-#define FC_ID_OF_SRC_PORT25_MASK	GENMASK(12, 8)
+-#define FC_ID_OF_SRC_PORT24_MASK	GENMASK(4, 0)
++#define FC_ID_OF_SRC_PORT_MASK(_n)	GENMASK(4 + ((_n) << 3), ((_n) << 3))
+ 
+ #define REG_CDM5_RX_OQ1_DROP_CNT	0x29d4
+ 
 
-This issue has existed for years, but was likely masked by other bugs in =
-the IP GRE
-module.
-https://syzkaller.appspot.com/bug?extid=3D4c63f36709a642f801c5
-https://syzkaller.appspot.com/bug?id=3D77135d6c2fc52eff1b3c561912fbec3976=
-1e0461
+---
+base-commit: e5e09233e8a9179b260460fdb28df5c24bcfbed6
+change-id: 20260228-airoha-fix-loopback-for-usb-serdes-2670a0146195
 
-The recent commit e67c577d8989 ("ipv4: ip_gre: make ipgre_header() robust=
-"), which
-introduced pskb_expand_head, has made the wrong type-casting issue more a=
-pparent.
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-v2 was sent:
-https://lore.kernel.org/netdev/20260306021508.222062-1-jiayuan.chen@linux=
-.dev/
-
-
-> [0] https://lore.kernel.org/netdev/20260228095854.391093-1-jiayuan.chen=
-@linux.dev/
->=20
->=20>=20
->=20> Patch 1 stores the slave's header_ops in struct bonding and sets
-> > wrapper callbacks in bond_In bond_setup_by_slave(), the slave=E2=80=
-=99s
-> > header_ops are unconditionally
-> > copied into the bonding device. As a result, the bonding device may i=
-nvoke
-> > the slave-specific header operations on itself, causing
-> > netdev_priv(bond_dev) (a struct bonding) to be incorrectly interprete=
-d
-> > as the slave's private-data type.
-> >=20
->=20> Patch 2 uses READ_ONCE when loading header_ops callbacks
-> > to avoid races with concurrent updates.
-> >=20
->=20 With the READ_ONCE changes in a separate patch, does that mean
-> that patch 1 by itself is subject to race conditions that would result
-> in errors? If so, that's not acceptable, every patch must stand alone
-> and not break the kernel.
->=20
->=20 -J
->=20
->=20>=20
->=20> Fixes: 1284cd3a2b74 ("bonding: two small fixes for IPoIB support")
-> > Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
-> > Co-developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> > Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> >=20
->=20> Kota Toda (2):
-> >  net: bonding: fix type-confusion in bonding header_ops
-> >  net: add READ_ONCE for header_ops callbacks
-> >=20
->=20>  drivers/net/bonding/bond_main.c | 67 +++++++++++++++++++++++++++++=
-+++-
-> >  include/linux/netdevice.h | 41 ++++++++++++++------
-> >  include/net/bonding.h | 5 +++
-> >  include/net/cfg802154.h | 2 +-
-> >  net/core/neighbour.c | 6 +--
-> >  net/ipv4/arp.c | 2 +-
-> >  net/ipv6/ndisc.c | 2 +-
-> >  7 files changed, 106 insertions(+), 19 deletions(-)
-> >=20
->=20> --=20
->=20> 2.53.0
-> >=20
->=20---
->  -Jay Vosburgh, jv@jvosburgh.net
->
 
