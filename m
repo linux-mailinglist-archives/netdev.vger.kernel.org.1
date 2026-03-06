@@ -1,204 +1,242 @@
-Return-Path: <netdev+bounces-264633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPbEG6RCqmlQOAEAu9opvQ
-	(envelope-from <netdev+bounces-264633-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:57:40 +0100
+	id eLWMLKxDqmlxOQEAu9opvQ
+	(envelope-from <netdev+bounces-264634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:02:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C7121ACE2
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:57:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5472621AD21
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:02:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8FEB3027B68
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 02:57:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3DC6D30101CE
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 03:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D943351C2B;
-	Fri,  6 Mar 2026 02:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA6D354AC7;
+	Fri,  6 Mar 2026 03:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKjRBXaC"
+	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="PsWO+ket"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011061.outbound.protection.outlook.com [52.101.70.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B58369991
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 02:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772765829; cv=none; b=EuTwETjMTBYTMTWOc2dm+zZZdg9zdqBgnWiwrzmepHBHjRTbvmfDIyOrY105TEiZSxk1y8mKE+9C4FOaJweb6KpjzmbGA4/FAqEuEvhr4KXu179OALNxisDGJaLSqNkK+evFlQcF5nlHBkoEQiFZ1Yz4lQchPw6XtB3iKCBU720=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772765829; c=relaxed/simple;
-	bh=bXJP2SXiVX2o4dpulncWtlqjnIJImv7LNnOJ7S98Fjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TU4Gxf590lfTV2ylq3+pd4tVWdebmISn8esnTbuuas+iqD++nGhV+M+hF/1E/PFKd3IOXLXEUrL+nGUHf1zHbvoCyX37EUOmxRfJDUFk8BkdYSARLcoFRCojjyPH6mRRWxHVn5BtHfM+rAfydbE8nCjSL97dZHpu1N2viBiapok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MKjRBXaC; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c70c38515d3so1223771a12.0
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 18:57:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772765825; x=1773370625; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRFcyL5S6zZneqoCWZWBrZsq4dvGE1qemSjLy6Z68yY=;
-        b=MKjRBXaCNx8eMl5+pxlf9MmHiaTVlFPJnMimSX7rNe2o2/fsicN5SVxzgxVqASFOaP
-         8w0dsyY9VTAudnnBIz/HbYgg9BmoMHo7VJuKwfMW3EUy+E3ca13pVKvmrVAI10Pf3Ag+
-         sP09nhPricMpFElXLk0LxK+i7Ynx5ktyfxHqzmSXjkv32A85qfiE2fCzKvCfiMSLwXEk
-         33XCZ4SRlX//j9iq+eHPrzf+i+J3MjdXoskB3LN10Qh5WCqr9iCjxIcScN9W0xcklSmg
-         66YPjg9+vmqeJHb5l5yEaG+UkPE199XNUozKt7mmZ9AZ722I8eOn804tyFXexM7aoifu
-         A+UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772765825; x=1773370625;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zRFcyL5S6zZneqoCWZWBrZsq4dvGE1qemSjLy6Z68yY=;
-        b=Ams/z9hQJpL3mMUhvjpLZ7Qc1cRHgTB5MgVm6QU7jjtD4WunviHY/fIX4oKd6hABq8
-         IASdiVYxa5y7er77xozP7A0AhPw1smvVpJJvgM8gyODVF9vLsfj1r4fNUn+f3EvKha51
-         Pu2TilHYHlc4ieHBZx2uWy4HvRwHEOpvwEmLRH+H1Qn2Q410phPRxVoOyVCAJ1lRSCHN
-         n9OLj1WQd+qto9kV/dwSzWNH4R2WRvP9FxjSkmVHzKzdn/HHgTXEKxWPenTzIA5mXe1T
-         oX1PJmqvQRlE2nZbXCMZANzVxSNbMGlMrO/X5Yd5xGX3q7oXBgPU6s813Vm7gyCjuIGq
-         XwSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOZ1qj+ElhtJXekG8H+X30G81pQ049xTee4axWnH+31DC4EkFv1BziWwSza8giVdX8wgXvB1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxpBKZLWROOTxnvtqWWmiVHIS/f4BJBlvbrR5bw+J6UC8SB3Qc
-	9uOQQ+lT/1jIGAHia7zta8UdlMxGhT8W9Zngd44CkoCuZ/9bNqQzJF2R
-X-Gm-Gg: ATEYQzzgs/m4/uEC7y7bMi4RxAPinJ3dH8N2b/25cbHUpZRnGl5NIjy5Y99HV3K+WoA
-	5GeCx/yv8eBDni2lHhaFz9Bht5GRXEdbD/bM0QYjYSjBRtt+Jrvr6hv5BY1xClnD7ENujVDdJk5
-	+ac8YU+U85IsvQq5A01tMRRT9DfC2tT/UrKI8IYlseZ5yVN74PAHDnCs2XlWIznPug6BbaYPcrt
-	iLKzBohI9pp9ENHz0ErKE8HPZW6iejCApPG14KUx+1RIpSnzCpjLvcz6A8vuEn3V1MKZgcaTIFg
-	8jvkOAWRYReRnoc/niBBR0pmuZgF+BsHFQzbwToQzQ8qi1oIPBc4UmanhiGS0REpAxMQAFulCem
-	JtBRtYWVc/vlKc2y0b+k3/yYXF2zWcNFN8Yua+q0DO8Ym/0JhSKZXAC1mHaN7qM+0yxuZ40BSuz
-	NYuyj/rUsByUdlZr1UJIH3BP3VknnSrNLviR/7UcfT+B29ltJtSdoIvTt2bKJo7FSLDFcOqhc=
-X-Received: by 2002:a17:90b:28d0:b0:359:9a60:44ca with SMTP id 98e67ed59e1d1-359be392b52mr442708a91.8.1772765825222;
-        Thu, 05 Mar 2026 18:57:05 -0800 (PST)
-Received: from 3ce1e5d2d1b2.cse.ust.hk (191host009.mobilenet.cse.ust.hk. [143.89.191.9])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359b2d38ab8sm3406171a91.1.2026.03.05.18.57.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 18:57:04 -0800 (PST)
-From: Chengfeng Ye <dg573847474@gmail.com>
-To: jk@codeconstruct.com.au,
-	matt@codeconstruct.com.au,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chengfeng Ye <dg573847474@gmail.com>
-Subject: [PATCH v2] mctp: route: hold key->lock in mctp_flow_prepare_output()
-Date: Fri,  6 Mar 2026 02:56:51 +0000
-Message-Id: <20260306025651.853772-1-dg573847474@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6B61D47B4;
+	Fri,  6 Mar 2026 03:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772766119; cv=fail; b=gTLi7VZBWwtnpzzAx0jXdK+ztf2LvtIsim7xaArcUC775jNOsrJtF4t9RdY1JqWY0YLExMhytZVLN9KKNXm3A2zk2IjNGRmAT/G3gmsDUswRtba/cYRBbAf3U9boqFWS4P5h9l2uHE3YHY6pjkmD56yp1tlvI0VHBZRyuylRmEI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772766119; c=relaxed/simple;
+	bh=Aa3TZEq3LOyqY3EzBl1pmcD0VU+xV2u+0S5zFFA0T0A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=l59Xv9riQbUe7B8wOdd1JeZJ6/BNh6N7dnqUo1C7hmqwrXHNSshMBFGZiXM6f9f9PQyeXj9Uq7l08vU9eQCmHq/cHZa0UsV53gsfUpqJoN+Z+5LWzQmRcDHRfKsEKpxr/JimTWQE9mklllE6AFCfoQxC764pLrv0YXZe2ab3hts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=PsWO+ket; arc=fail smtp.client-ip=52.101.70.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UppbvxV2t9ShS7UWVUJsEPEOFX2YEXJq7tnb9o/mblQszmd2dKvQ3ayvMgj1peXNKwpBsBFr46QlKpxY8BRfwDmaYpCXvzRhxjR1xWI/t9HxSWHW6/BYV7C4PXhGLMCesuHurrvwsokYR2RDTy3e/bT11FnxRNrYQ75/hUTqWj9abbW2iT1RdorQWXhSJf9NOEtuaWD1JNlp+encZZ+KHok/IcMww205zj0u4TWLimmbVutUstZbES3ecbncHda5EWt3Oe/volR6lpzHNUbUgd3lnYMzD5/9vavkseA3wUGdFmkt8jwieKcdiEO0JdPLsworYrxNLh04i4eYikk8eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zZsydhO97wA+qLOeg7psJXuAw32qAde4g/9NvHMsiwk=;
+ b=iKAwHOvbxL7B8xewWcfo+oyfdfKif3t+I1b2B4X/5llfAOauI27kSFC+xhwozThDOTHkbcQPhPjWp0FhYLPhdFyWanBwtImS1bV5AyBasq06J5Kn7hkvlHxBV8GaZ6Em7i2mg2y4M4HjEXW9MJyDxlFMt31TLG7nGF+Ix7OXyzka64kP/pb+iEo1dm0uRaJ4MqwNK3NcAAzpKLsj7GfwUMoAMuIifPuP+QKYxxZ2kFa6iv9g1A7H95G8QhTjLFbS0VYzpG9vwKUkSddtfz7IPD9m+OPzqcOkGsWUTl9l0rMV3kAQToeRC3r4zpmkdxoWURTD2jKma0Bq55nagkDiWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zZsydhO97wA+qLOeg7psJXuAw32qAde4g/9NvHMsiwk=;
+ b=PsWO+ketW65Pch/7xNU8Js84d+MZycdlGTxvBnwhCQ4oqWWvQC5yv8tfyT7Q6scjT+BLmu0AQv3KH/DdyqVAHakpFRTZwzHxEXH2GMvhOt2R/9UiYVzCmxAoeQP79512YvO7SbHkO4mtJb1Ee/qdAcTELeFzF3ao9PAQH46BbTGt4i/EXwE8ORcJ/E8AJLQw4uZo0VplvJPSjz2fzt0I+sBejVX1d6BDXkEk/r7K7cxqVu+kjln/DWLr/5ufB6dSRPGuaA+Rbcc/IhkdeLY91gdbltzNtHSujhgSHIarShnQuHE7PHCJ4oE20A0GF8AgD9p3bC1bqNjE7i5gf6QHIw==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ DB8P189MB1144.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:167::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.17; Fri, 6 Mar 2026 03:01:54 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9678.017; Fri, 6 Mar 2026
+ 03:01:54 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Mehul Rao <mehulrao@gmail.com>
+CC: "horms@kernel.org" <horms@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "jmaloy@redhat.com" <jmaloy@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: RE: [PATCH] tipc: validate conn_timeout to prevent divide-by-zero
+Thread-Topic: [PATCH] tipc: validate conn_timeout to prevent divide-by-zero
+Thread-Index: AQHcrOscMSDc6ywML0COz929lsn6CrWgxG8A
+Date: Fri, 6 Mar 2026 03:01:54 +0000
+Message-ID:
+ <GV1P189MB1988EE7CC7EB83137335F197C67AA@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260305215336.645186-1-mehulrao@gmail.com>
+In-Reply-To: <20260305215336.645186-1-mehulrao@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DB8P189MB1144:EE_
+x-ms-office365-filtering-correlation-id: c511ee60-3439-47b2-1d88-08de7b2cb8f8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ okzHVA6jZKO8wn8Fvu9SwXXuIRAGf1QTdsXmlWfc85brLD7nys03ikaTQ1+ZQdK0cuRPnKchvzhKg04MWyJKUWm71AOLkq/uNdwut9ikR/ITZKZLiAeo+HoUwRu360tylRCpoF3cMSqpIVOS77YPGqFBzpvB5s7fqnaSRioqmHAQmGNXSc0VCBJLw6DAoS2riVqw1POw/5ByoTPCyNHyGIE557gOzpeC7Jaxy1l/SYOV3gQTfHXgbZ1bZZrgCmjFFcHFPyL0DjbwyX2ZYkHiAoZgnir9Gd13YN1adWtQjvnAvdwgaKvn4V0eT66AMnfMJ/hY9RE9O5YhQszzMRCKlCI5TBjtQFB20LwcYuz0vSWDd0WFRVfOMqjbtMGVE0t2lIYbe3Zt4chcqq6W8+yP57Mdo9aU4CejfEKfGFBk2hFYZdYCiX1/bqL1yeMEqfvclJao5GLnul1M+HJpGs5znJl/riLdJ3lNcxw1xuml4p3UCCcQRodslnrZsmuITXzi9HFJ5BGaxzjJN/Ro5Fg/1SheTIhtP0D01yQtIKs/9m5BLWhaGmwDNiNqncEKsUwWK6npVabsOrml8eDUJEPd/zLZFAKOoRKRQnkKHz6QZ21UXqrXTvRWQsip6yIWfJ5iVF/Tbk7DQZOqCOKUYSYKodDLw1lmxoBOGq9v8vLa4Mc34ne1n8bHbyw9iyNkknewmCHhBOrM7yTeEfyOB7BstiC+n+bf/GDHcVzf4crctN51zXfOBLgrfzmpsv+8cPC9nZ2iXmQUHb+5tva780rrfbiZiQZc9FZJgk2zJTHYfZo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?xGru4F/G36SsCheT1nUNbDkDk5bHvoz14oLwygPzrJXTmBn8GLdJYvctEbi9?=
+ =?us-ascii?Q?tR+aQ2EUBeo99d5KXxJQIqcvn7hdLBbKUo9pdiMu2M/Ko74gct8c3eQu3wC9?=
+ =?us-ascii?Q?afYkU4i9Xh8n2r9L/I2l04PbZQxKOt4ZgMp5INFiWNN3JnGgQ+OUcm4MN/Bu?=
+ =?us-ascii?Q?fApkgqm2oH7/is7seqNKtCz1JONrcFnATySQ8BDCmzmNrsxWdCymIXnJwh04?=
+ =?us-ascii?Q?qv9uV8epChq72LLJePhlCdcqwlVKaPoIyifd/QasZNm3IiihRZ6WeLwt/S/H?=
+ =?us-ascii?Q?gQOmMJb4cv/rxi9IqrG0Htor2GW9NUyLiUqHm50/3QFsNzn7GjeDpCImFJ/g?=
+ =?us-ascii?Q?SIESIKXXdQF4tpEtWOkW4Yjp1CRGof9RI1Z//qD61kd95RPXan8g8ZJFARWE?=
+ =?us-ascii?Q?mRfpQP2J5vLXMvB/WeuFejiDz6zm+27jKE52ckighNN+tDcw51hCRAbg9w1T?=
+ =?us-ascii?Q?Uuynv5ZNevB9VDC4oHIwbzFM+O3EmFoB57BpT+AtEEF2t72qJ6yB5hPrq+RE?=
+ =?us-ascii?Q?ZC+2Uw/Gc8Jlu2v2lkEq90qvq5J0xaqXSJtdIzGQAH/jbC10y0qIK+LHA1KQ?=
+ =?us-ascii?Q?MRVCFi5NpsJwNXVO8ojOY1BBxr/dRCO4bbzecX6NIM6GOP8mocU2NfOj9RN3?=
+ =?us-ascii?Q?UaR9AtCjs2Kyo2x9aa2CQsI7+e0w9ata0sMq1eMvbqOhJHhu64daxFaSWNjW?=
+ =?us-ascii?Q?wUgHp7SGgkLrI3u3FNxgF4b6LYQpyu63MQPOy6wE57ztewIFJ8kXwWxCxl2y?=
+ =?us-ascii?Q?4VnSYG669NR8rO9f6C9ECSwF0cJjoRg22fItpSB32Akp+rqZUUkeLd2HSiUs?=
+ =?us-ascii?Q?LltIus9H7LwrBWmyVQxk/JeN9Mwp9DLXC5EuDOgXV7a47049qsduxB2prHxD?=
+ =?us-ascii?Q?WToZdHK3sNt7w8wN3roJwwujYbgZ1ebJGInchyAgfqQdeDyLjhwF9ZBGv9I3?=
+ =?us-ascii?Q?SeFeV34dbUNfA/dGhG8PJ36ylEPjNGwier16Bkf5fEdce68uJq/oIeJqKimN?=
+ =?us-ascii?Q?zvLNNFBwiKGphB+jHRZfI0BMUmBJa0Eh0P7ek3pRCdymjgBainAYtcf9+D4d?=
+ =?us-ascii?Q?7AP3gTi78RWB5o8CPj6bKi7G5Kux8MnYrfLsd+sRFenzJw38Vekqc2vftwL5?=
+ =?us-ascii?Q?516cBWFph8tFxgPK0x/+U57x6IuOmKw+kD99xXsYz4+I+tXH85s8R6r7nfh8?=
+ =?us-ascii?Q?PovI8lWXpfVR2zPrZKbY/pyQGWBD3+qaU7c/bAZjnE3s/JK9zHl6YUM1R+ID?=
+ =?us-ascii?Q?3ruoO9+D9P/QcDuTptbifcofBQq7EiCJqNK8fY5r88s9drF0tXIwOZDKCsup?=
+ =?us-ascii?Q?kZb0Yoj5U/JRgnVQH/DUQS7vHmvE3/p40fq7KmH1kKE61GfWOIB0qA91+zB3?=
+ =?us-ascii?Q?sVvL/tBzHoJh3JcnNRGfuUjuTjP37w2FMqsgC9lBtjmopkAZ4DUa2xQibhiD?=
+ =?us-ascii?Q?KKzgkisKiPcW9D9/haRIRlgTxWVLKCr7J6OyB/3X3sjKOigyiZA6NM/mFVcc?=
+ =?us-ascii?Q?hVW+/Ld7URSBd5LK0cYLTymvoENCJ/zH+tI3yFh2OrLHiKk6c+yGaVDDmEx2?=
+ =?us-ascii?Q?o2NrZt+mXgjAXTitLRvC7STHMCg2gmMzfczioUVwcGMZrK7+GMbT+E64bOOd?=
+ =?us-ascii?Q?eDSjjwXe2KsXuC3uaAYRi+nj9tZt6qvFu9iK32uq9IsguGWjHZyTyUNigi8/?=
+ =?us-ascii?Q?/XR96vc/980e1jI/a1FSDjFuRXrZnjOQF/OPJXkeL9eQQB78qOwb78qlbAPR?=
+ =?us-ascii?Q?V+oxOf+Qsg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 18C7121ACE2
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: c511ee60-3439-47b2-1d88-08de7b2cb8f8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2026 03:01:54.5210
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SWChJW01ekIwiD/bRexjQ+Nz4KEfRJtVqAmWmepcXut8P30Xggg8jb4bTgwKK2ippE6DmxQMhs+BHIJdtKT67H9Fn+g+1kP6cKkEPBz05bs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8P189MB1144
+X-Rspamd-Queue-Id: 5472621AD21
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264633-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[est.tech:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dg573847474@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Action: no action
 
-mctp_flow_prepare_output() checks key->dev and may call
-mctp_dev_set_key(), but it does not hold key->lock while doing so.
+>Subject: [PATCH] tipc: validate conn_timeout to prevent divide-by-zero
+Add net branch to the subject: [PATCH net]
 
-mctp_dev_set_key() and mctp_dev_release_key() are annotated with
-__must_hold(&key->lock), so key->dev access is intended to be
-serialized by key->lock. The mctp_sendmsg() transmit path reaches
-mctp_flow_prepare_output() via mctp_local_output() -> mctp_dst_output()
-without holding key->lock, so the check-and-set sequence is racy.
-
-Example interleaving:
-
-  CPU0                                  CPU1
-  ----                                  ----
-  mctp_flow_prepare_output(key, devA)
-    if (!key->dev)  // sees NULL
-                                        mctp_flow_prepare_output(
-                                            key, devB)
-                                          if (!key->dev)  // still NULL
-                                          mctp_dev_set_key(devB, key)
-                                            mctp_dev_hold(devB)
-                                            key->dev = devB
-    mctp_dev_set_key(devA, key)
-      mctp_dev_hold(devA)
-      key->dev = devA   // overwrites devB
-
-Now both devA and devB references were acquired, but only the final
-key->dev value is tracked for release. One reference can be lost,
-causing a resource leak as mctp_dev_release_key() would only decrease
-the reference on one dev.
-
-Fix by taking key->lock around the key->dev check and
-mctp_dev_set_key() call.
-
-Fixes: 67737c4 ("mctp: Pass flow data & flow release events to drivers")
-Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
----
- net/mctp/route.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/net/mctp/route.c b/net/mctp/route.c
-index 0381377ab760..4a1ac55ad31e 100644
---- a/net/mctp/route.c
-+++ b/net/mctp/route.c
-@@ -359,6 +359,7 @@ static void mctp_flow_prepare_output(struct sk_buff *skb, struct mctp_dev *dev)
- {
- 	struct mctp_sk_key *key;
- 	struct mctp_flow *flow;
-+	unsigned long flags;
- 
- 	flow = skb_ext_find(skb, SKB_EXT_MCTP);
- 	if (!flow)
-@@ -366,12 +367,17 @@ static void mctp_flow_prepare_output(struct sk_buff *skb, struct mctp_dev *dev)
- 
- 	key = flow->key;
- 
-+	spin_lock_irqsave(&key->lock, flags);
-+
- 	if (key->dev) {
- 		WARN_ON(key->dev != dev);
--		return;
-+		goto out_unlock;
- 	}
- 
- 	mctp_dev_set_key(dev, key);
-+
-+out_unlock:
-+	spin_unlock_irqrestore(&key->lock, flags);
- }
- #else
- static void mctp_skb_set_flow(struct sk_buff *skb, struct mctp_sk_key *key) {}
--- 
-2.25.1
+>
+>A user can set conn_timeout to any value via
+>setsockopt(TIPC_CONN_TIMEOUT), including values less than 4.  When a SYN
+>is rejected with TIPC_ERR_OVERLOAD and the retry path in
+>tipc_sk_filter_connect() executes:
+>
+>    delay %=3D (tsk->conn_timeout / 4);
+>
+>If conn_timeout is in the range [0, 3], the integer division yields 0, and=
+ the
+>modulo operation triggers a divide-by-zero exception, causing a kernel
+>oops/panic.
+>
+>Fix this by rejecting conn_timeout values less than 4 in
+>tipc_setsockopt() with -EINVAL.  Values below 4ms are not meaningful as a
+>connection timeout anyway.
+>
+>Oops: divide error: 0000 [#1] SMP KASAN NOPTI
+>CPU: 0 UID: 0 PID: 119 Comm: poc-F144 Not tainted 7.0.0-rc2+
+>RIP: 0010:tipc_sk_filter_rcv+0x1b99/0x3040
+>Call Trace:
+> tipc_sk_backlog_rcv+0xe4/0x1d0
+> __release_sock+0x1ef/0x2a0
+> release_sock+0x55/0x190
+> tipc_connect+0x140/0x510
+> __sys_connect+0x1bb/0x2e0
+>
+>Fixes: 6787927475e5 ("tipc: buffer overflow handling in listener socket")
+>Signed-off-by: Mehul Rao <mehulrao@gmail.com>
+>---
+> net/tipc/socket.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+>
+>diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
+>4c618c2b871d..85c07b0ba0ec 100644
+>--- a/net/tipc/socket.c
+>+++ b/net/tipc/socket.c
+>@@ -3184,6 +3184,10 @@ static int tipc_setsockopt(struct socket *sock, int=
+ lvl,
+>int opt,
+> 		tsk_set_unreturnable(tsk, value);
+> 		break;
+> 	case TIPC_CONN_TIMEOUT:
+>+		if (value < 4) {
+>+			res =3D -EINVAL;
+>+			break;
+>+		}
+This needs to be fixed in function tipc_sk_filter_connect() like this:
+tipc_sk_filter_connect()
+{
+...
+get_random_bytes(&delay, 2);
+if (tsk->conn_timeout < 4)
+	tsk->conn_timeout  =3D  4;
+delay %=3D (tsk->conn_timeout / 4);
+...
+}
+> 		tipc_sk(sk)->conn_timeout =3D value;
+> 		break;
+> 	case TIPC_MCAST_BROADCAST:
+>--
+>2.48.1
 
 
