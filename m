@@ -1,192 +1,125 @@
-Return-Path: <netdev+bounces-264877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5XYVDgQBq2msZQEAu9opvQ
-	(envelope-from <netdev+bounces-264877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:29:56 +0100
+	id mKyqH/sBq2msZQEAu9opvQ
+	(envelope-from <netdev+bounces-264878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:34:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5F9224E93
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F802224FF4
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:34:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 444343055DE8
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:24:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A18D53079FAB
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BF03AE1B7;
-	Fri,  6 Mar 2026 16:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A973FB064;
+	Fri,  6 Mar 2026 16:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bo/QrYGf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5iGld1M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6483C233723;
-	Fri,  6 Mar 2026 16:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C6E36A02D;
+	Fri,  6 Mar 2026 16:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772814276; cv=none; b=oJxRCirl3hdzDagUjxR+Fm8fSKnvhIHtRYG3Ybustrhe7oV71SX5MaJ45NAOwZl9BSBKXcsZAT9dqhG+7IRKS3asZR4QMNeEzvH0wql08vviQT7jM1/wPcN/FaO6/AHOIrqeJycZukC9sVn0Falqi1ZRdPR4tiaQkI+/A0hvaRs=
+	t=1772814516; cv=none; b=eecX8LucWkV3dMNh/BNjQh2XRBuKptMy4BpM+weBcoHjrkSBsisscVgcLg4pPHUwkMcNDora0UWxKVMbAhm1BHWPBEldNaXUumuSzEbJEy2ba1/seSgasEfQtEke6uic3YJ5ybU9GEcQvZZjBluuOM90kOMDG4X9sGGTvdPFFMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772814276; c=relaxed/simple;
-	bh=Ba8mQLOaFnpnr0NzmQQ3FPas3CvCs/fUBqA1uiRtQN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TDotoLvLrGc3J45qiypaAiZbN3PoCsS7bzNXztWeD3BgbudlBXQme6E38wVZyG9NiCG5iaAXiQGj1TY56yR/lWznP5LRpjnrOeaR6f5PGJlCZFVuvdN8THqdd1G5BPS8WHPu00GZ2PGtpUPQDMGriffVo9dIhyaN0qfp36Uux9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bo/QrYGf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BD5C4CEF7;
-	Fri,  6 Mar 2026 16:24:33 +0000 (UTC)
+	s=arc-20240116; t=1772814516; c=relaxed/simple;
+	bh=205rfIeun8AwJY38haTQgbjnsy/DlyRTaLsXQffpNHE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Eig0YBtndm/3zXXM7Et7OQy7qXcBsIEPtn6y4HT4NWMPbRzCzfsbca4U9iO6lLFugezLTd7SOvJW5d62w3UQGXsXZ646Nn13GfHUMv/3aJB//0UCtcR0hItA3KyePvV/O0N6aIWRbrO5HNnpJqfj5acC5hiJFuMpHxsarAekjBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5iGld1M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF2DEC2BC86;
+	Fri,  6 Mar 2026 16:28:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772814276;
-	bh=Ba8mQLOaFnpnr0NzmQQ3FPas3CvCs/fUBqA1uiRtQN0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bo/QrYGfW4wrreeK3uFebWWpTvTwtJqaPQPIfKqff0TT+zbEkH0chP2GMl4V0GuPC
-	 tGGsZmrSsRdM4+JJlH7eIDmb76zJm0ErizR4axrQtKNQe9wH1xWFDnK8Tg3tOAqJv8
-	 QtTZhvr0N8ioLqXDl7FHsaqamlxKLQd4fmN24l4yGP/HBR726s9ixtifJ40yiLCl7b
-	 ciDT5WM+5BqGBwPkfKMJihIrBhOF9cNe7U8QQGsXoQLuAM1+JGz53WiWSNw8YFmWqp
-	 oNe06SFmN88UMpT7dvclF+putj9KN15FuH7OhJIC6MX7ZDq3F3iqrbJX2/HddHrH6N
-	 p/GdpXeVEfZQA==
-Date: Fri, 6 Mar 2026 16:24:31 +0000
-From: Conor Dooley <conor@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Charles Perry <charles.perry@microchip.com>, netdev@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg
- disabled
-Message-ID: <20260306-distaste-depress-55d020802bae@spud>
-References: <20260224202854.112813-1-charles.perry@microchip.com>
- <20260224202854.112813-2-charles.perry@microchip.com>
- <20260304-nebulizer-rounding-40fbc81a2ba1@spud>
- <aahI1y0NO9ax/V8J@bby-cbu-swbuild03.eng.microchip.com>
- <20260304-unvented-crinkle-37f0bfd03541@spud>
- <aaht0/XpUCz+58bz@bby-cbu-swbuild03.eng.microchip.com>
- <20260305-backlit-epilogue-62139ae694a6@spud>
- <aamLf63OfJ5RH69v@bby-cbu-swbuild03.eng.microchip.com>
- <20260305-fantasy-useable-40ca04f0266e@spud>
- <aamS-LPZaOfamwQC@shell.armlinux.org.uk>
+	s=k20201202; t=1772814515;
+	bh=205rfIeun8AwJY38haTQgbjnsy/DlyRTaLsXQffpNHE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=a5iGld1M6hGqiZ8SR4yq2NziFDbhCxtlVHcMYW0Ue7kFQ3GM4UArem1NDdR9bLUA5
+	 IChadfebU2WtaNregf8eTSVdAnWL+cG2ZJXe9JKGKbkViP1g5ZwgIaQC0WzB3ZnhYU
+	 XkehYFYN/ypXA3WtS5lhoGO8FXRD8wgExVH0eXGRDR0lV0RY0qxs1IqkDwba8kglUp
+	 64obhyAhGYsMPkHf/h2jbjQFKHev8Tdtn8z3lBmLHj5zFHbFnQvvVybgfj9/ASsD/Q
+	 cnLHxXyck4VvsSPum30opewQYiq9s3vXr2C/kwN/nVTNXgVv+eM94ygpie92PJOgrX
+	 7l4EcjqXESFaA==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Jiri Slaby <jirislaby@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, Netdev
+ <netdev@vger.kernel.org>, rcu@vger.kernel.org, MPTCP Linux
+ <mptcp@lists.linux.dev>, Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "luto@kernel.org" <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
+ <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
+ RCU stalls, timeout
+In-Reply-To: <babe39d9-aeb4-47ae-83fb-eae6193fb3aa@kernel.org>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
+ <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
+ <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
+ <babe39d9-aeb4-47ae-83fb-eae6193fb3aa@kernel.org>
+Date: Fri, 06 Mar 2026 17:28:31 +0100
+Message-ID: <87o6l03osw.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mDj1BB+t/c7mmT8n"
-Content-Disposition: inline
-In-Reply-To: <aamS-LPZaOfamwQC@shell.armlinux.org.uk>
-X-Rspamd-Queue-Id: 7D5F9224E93
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 1F802224FF4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-264878-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264877-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.976];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.322];
 	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+On Fri, Mar 06 2026 at 11:16, Jiri Slaby wrote:
+> On 06. 03. 26, 10:57, Thomas Gleixner wrote:
+>
+> If that helps, I would be likely able to "bisect" the 4 your mm_cid 
+> patches if they can be reverted on the top of 6.19 easily. (By letting 
+> the kernel run in the build service.)
 
---mDj1BB+t/c7mmT8n
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That would just introduce the other bugs again. Let me try to reproduce.
 
-On Thu, Mar 05, 2026 at 02:28:08PM +0000, Russell King (Oracle) wrote:
-> I suggest something like the following in vitesse.c for this PHY:
->=20
-> #define VSC8662_EXT_CON1		0x17
-> #define VSC8662_EXT_CON_MAC_AN		BIT(13)
->=20
-> #define VSC8662_MAC_AN			0x1b
-> #define VSC8662_MAC_AN_BYPASS		BIT(13)
->=20
-> static unsigned int vsc8662_inband_caps(struct phy_device *phydev,
-> 					phy_interface_t interface)
-> {
-> 	if (interface =3D=3D PHY_INTERFACE_MODE_SGMII)
-> 		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE |
-> 		       LINK_INBAND_BYPASS;
->=20
-> 	return 0;
-> }
->=20
-> static int vsc8662_config_inband(struct phy_device *phydev, unsigned int =
-modes)
-> {
-> 	bool changed =3D false;
-> 	u16 mask;
-> 	int ret;
->=20
-> 	mask =3D VSC8662_EXT_CON_MAC_AN;
-> 	ret =3D phy_modify_changed(phydev, VSC8662_EXT_CON1, mask,
-> 				 modes & (LINK_INBAND_ENABLE |
-> 				 	  LINK_INBAND_BYPASS) ? mask : 0);
-> 	if (ret > 0)
-> 		changed =3D true;
 
-FYI, clang warns that changed is set but not used.
-
-> 	else if (ret < 0)
-> 		return ret;
->=20
-> 	mask =3D VSC8662_MAC_AN_BYPASS;
-> 	ret =3D phy_modify(phydev, VSC8662_MAC_AN, mask,
-> 			 modes & LINK_INBAND_BYPASS ? mask : 0);
-> 	if (ret < 0)
-> 		return ret;
->=20
-> 	return genphy_soft_reset(phydev);
-> }
->=20
-> and the appropriate initialisers in the phy_driver struct.
-
-I tested this, on top of the failing next that I found the problem on,
-and it seems to make things work. Thanks for coming up with it.
-
-Could you please make this a patch, I don't understand why this is the
-correct way to fix the problem, or the impact on users of the 8662 other
-than me, so I wouldn't be able to write a suitable commit message.
-
-Cheers,
-Conor.
-
---mDj1BB+t/c7mmT8n
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaar/vwAKCRB4tDGHoIJi
-0uXBAPsFNIh3ZrTgJkV3Bf0AgYY/bP6tPP2WSb12J7/tBPl6YAD/cHTX+lDR7RMD
-Qj6IPIViHAADJdgB/uRBnLfEB9658gs=
-=UWpI
------END PGP SIGNATURE-----
-
---mDj1BB+t/c7mmT8n--
 
