@@ -1,149 +1,224 @@
-Return-Path: <netdev+bounces-264819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGLMIwHlqmkTYAEAu9opvQ
-	(envelope-from <netdev+bounces-264819-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 15:30:25 +0100
+	id aCWoC0jFqmnVWwEAu9opvQ
+	(envelope-from <netdev+bounces-264759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:15:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F0B222B3D
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 15:30:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF36C220574
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 98996302258D
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 14:29:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1602F3194D8C
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4071E3A8725;
-	Fri,  6 Mar 2026 14:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9BA38E13B;
+	Fri,  6 Mar 2026 12:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQnXRPyw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jbWBZLnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9E839F17B
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 14:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606DD38E10F;
+	Fri,  6 Mar 2026 12:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772807363; cv=none; b=S7uB0lOgK5OT9LivEc4O3w2HHWnwVnHQpwBv37E3S5vT7cRpH2n1I7AJB9PnDsLa49+qgJilxlQdHYsgeO/P0RZtZ79Z0rj3HZA9WsqDPY+iGDQ83azaHNil1bO57nBjmWR55Q53x88ObbKel8ayjsdeQkPLohRgn0u+9EOt8KQ=
+	t=1772798885; cv=none; b=s3sZ91qdFzGIeQvInj/CVnn/kSYofzoqdXAccObVM2hf/ddrv9QOCWb+lEODi0wot3fAoUj7lH9nsqUIo86Ests4rWr0VidT17pcAXnqHvlxnLbMEumST5gN5mjOblkDNfbpYDCuD4H5Vis7zhKwnXDHXaxSKLs4O3tim7+/Qi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772807363; c=relaxed/simple;
-	bh=4dxZNPnaKxb/NGgZVRqmwUJ0LlrEW4DV1oGVNgx8CSg=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Y7fRfP5mzFIyPFTcbmk1ZeGBjvVBmYgIas6zAcu2bcKCKG1tObundg+41xDi9dusKmTW19eI+yAg+1e1iTn0mAGl0BBMZ/TzjloLSz5I3I+P7+gmS4mBXoZLY9AhXtFLLUwiyoeln7igr823ql36uARFVY8Q7o4Rr1giFng1mlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kQnXRPyw; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso85347055e9.3
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 06:29:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772807360; x=1773412160; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4dxZNPnaKxb/NGgZVRqmwUJ0LlrEW4DV1oGVNgx8CSg=;
-        b=kQnXRPywVBfB9bFvhaGDVZsWeo636FH/0y2fLda4GrSJEhGMnQKDozu5FwLAGrAXok
-         0NgLwo36Np6YWmYp+qSx5U6gs+NAJK0n/CQ/1AZ/gWGDCNW9I6KVliTds70BXLBxlN5V
-         AbtRV3ysvBbvTrllxZ7P0EoTyRZERDVr8TVtYx58up/cRF27NNDDnPDIfHCAwvQs7mET
-         j2uw5svNtrp4YZQGYathI6PUTJUnlOD8z0/PIUxhZodebs4DwBqa0lEvoyLA7qVR34ry
-         93vry05rO4Y8dnhYBZOr+meLnsJf/+5wrNs1nbKqK86OFfUlmF/4FZP8gcbus6c85RJD
-         30Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772807360; x=1773412160;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4dxZNPnaKxb/NGgZVRqmwUJ0LlrEW4DV1oGVNgx8CSg=;
-        b=gNx+0tpmuW7i+HoHGbUYVSiXck7z4XbUiJj3yNWLmI7L8IpAuJkNfF/GZC8RQmluMC
-         0qY1QpeO0Nohi3S1OLyz1HsSnPTfoMpz5fwSM1CTApljGxfJxeMx0puam7P8fJ8p2rRr
-         scsNrI3GKcosccnqUfR1SjxI9kXX0Gx3a5zho0yLNh7TLdenkid6PdU6W00kLPw9pXaA
-         XOfwGz5nhmpBaubM7WwLhnjCgnYS/C6ioIIRggCHNhotgTr4YUE2TXalw0FNOl7ud0pf
-         UdANJe/Qek6Gn9Cz7s6DYPopaFXDv+DS5ul+PL1tkp8vLv7AsIBwtu9MZlKgebaQM88q
-         vT1A==
-X-Forwarded-Encrypted: i=1; AJvYcCU5wCinQD0caOp/wfaQA4Xq7ZGOh/NwZPhd8KcsfjFFKzQKKfJRPXFEVcPQJ4EB/SLTKipdK1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxob7Z4GAJNeHXkBJcXchQoTU7FatJnEv1sYJDvXIg7i+Bu9cO6
-	ZwIIMtvJMzHpZ4DyWfTrXDNBnoNqy6O7765Lm3FGIm4670BpuTfsk+iV
-X-Gm-Gg: ATEYQzzb7K6fJxMO3E3S4NCsa/mNkha8cbVXLJwC7kWe7D6BEUvsYkQVqVREZJKMQkG
-	cGoEFZFCe7BwtUMTVmCJpwIg6TEEJSm8E7V/0kKYpQJXjoIR5LoQNyW2Qspzvt21opfd5lWQ9nS
-	L3DfS8Yspi6iKPEvQekeEQeDOOQ4fhCXe0p/pxSFwHXdDL5vouauxzobzw817BG6oChcFZeOLP+
-	iUDh7AumBZHchcCG20bl/0jO+X/JDh3yIgRghXQozL+yjUF1jz0b+NKWYO/rBkN1SzuuPmCZDem
-	0Fzizn0HfseXlxlyaVYMbK6uFrWRUs2GyJFrvMwgIUjDIToitV0UaRy5z5mNmz28xhzakCH18a1
-	dbDnUZQ9zNyEhRuzgapk0dkX4n3uRLEnjV3mo2LCtz9X1zmxianBlGce7MrrrfrdFdXI4zGbOg4
-	i3GxqcZtmtJQVXhNzcjH9F7bsTkg==
-X-Received: by 2002:a05:600c:a12:b0:477:6d96:b3c8 with SMTP id 5b1f17b1804b1-485269648fcmr33770035e9.23.1772807359863;
-        Fri, 06 Mar 2026 06:29:19 -0800 (PST)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dad8d95dsm4655526f8f.7.2026.03.06.06.29.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 06:29:18 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  liuhangbin@gmail.com,  matttbe@kernel.org
-Subject: Re: [PATCH net-next 01/10] tools: ynl: move samples to tests
-In-Reply-To: <20260306020901.524105-2-kuba@kernel.org>
-Date: Fri, 06 Mar 2026 12:07:32 +0000
-Message-ID: <m2eclxi2kb.fsf@gmail.com>
-References: <20260306020901.524105-1-kuba@kernel.org>
-	<20260306020901.524105-2-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1772798885; c=relaxed/simple;
+	bh=AOkKMy7Q4DfFPGIXcT/fjITfQuCQoW4Bs+ylC4rcZ6Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZ1hFPa5A9Ud1diYNgPPGNupI8q7gTNQvKzEYwCH424A5L2fcLH8oKEWyUDbfJdtmr4k79KF8PiTspOUMUnw4A6vFUfSygmheqDHoUaucNEjIhMHDNVubaZAQ48FNzmyjEHCevpb+lIBrnnXZehKRlG5T8jqokdh03jlhpvbK4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jbWBZLnv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6264Kbk91171368;
+	Fri, 6 Mar 2026 12:07:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=k0Y8HK
+	c8LITYke4TuHe/rf3FmEyQ4SxYm63/LK4sQmI=; b=jbWBZLnvvW47NLrLv2PLiX
+	8/71+Ny6nTHYI1HfC6xQXX04xWV8ZOXLnpe4cT0Jejy73ES8bWXKtIGxNVPkM6Q3
+	lRq0TGxQH7vvcSvWtarpQORg4CZTX3KreMhA/a0NI7nXbyDgikrzP0UqjcG0y9Gb
+	erThU6SAX6dN9PXQBhDo+KUhTOq3w+MRW7gqinoM3kLtTCul8Rx89dkdOYm3HDCo
+	SHRMeNTHU06tQPJmbFsKKi1avzz8UkaeZiqQe+Kcst10L2wrfo8itE4jFmPWVuQO
+	/UDm8ufGohLUEkRnyvEalrFnJmS4jyMT1a7GjEm4pg6BDRYWzv7mFttjUlsX+RbA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cksk47u98-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Mar 2026 12:07:58 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6269ngZF008796;
+	Fri, 6 Mar 2026 12:07:57 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cmdd1qfcp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Mar 2026 12:07:57 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 626C7uqu31326746
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Mar 2026 12:07:56 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2EB6558063;
+	Fri,  6 Mar 2026 12:07:56 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C8D0758059;
+	Fri,  6 Mar 2026 12:07:50 +0000 (GMT)
+Received: from [9.39.19.120] (unknown [9.39.19.120])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Mar 2026 12:07:50 +0000 (GMT)
+Message-ID: <bdcd2405-93d1-4b4c-91ae-174b577e5734@linux.ibm.com>
+Date: Fri, 6 Mar 2026 17:37:49 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 93F0B222B3D
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] net/smc: transition to RDMA core CQ pooling
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dust Li
+ <dust.li@linux.alibaba.com>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+        Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+        pasic@linux.ibm.com
+References: <20260305022323.96125-1-alibuda@linux.alibaba.com>
+Content-Language: en-US
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <20260305022323.96125-1-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: 6ce2a2YXkWd_epGEgQNeRWeP-pai1ZQD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDExMSBTYWx0ZWRfX6pH5UMJ1/Rr/
+ 36I00uan44a8iLSXuGg3gSx4ezrQRXu4s2v8xEsZczBhoPXZf7icqWltF5Y4q4A4clUJJwkKUHa
+ vIu1PCEgD6bybawl3auwK1P9F6+Wxdwj0G3PfuWGs2ihZ8lTtRIhRrjyCRyfyCDi2/Hd/o7rUqi
+ 9oxiNyiiemIMT5MQh2cc0ceTx5LKXq+uFCs48BYURntAkm+kt1KZoqN61l+rqgOE8wXEmgHDU25
+ IXhaD2ngNGaYP982OrZYp04XbBwSIJCbXCNX8Py4ju5Oa1MQ/kL3zmdtc4PQT0/oKFuY0ZXiUVz
+ 2GwPCKSwgo0idpMfcYa1hzoXjgh2hh9bjzkF7bt1+/WJyQ+tw0BKWFwBeGQZkNou6WN3n4A8V/u
+ FC2B41ArNlA9nLFFSjxTqjD62BaPZDfzAa+H2yYvtUZljSwfszF0UW6pATMwNkTl2bUXKesCD2j
+ yLDTEMpcbde4E6b8AcQ==
+X-Authority-Analysis: v=2.4 cv=csCWUl4i c=1 sm=1 tr=0 ts=69aac39e cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=cEV2uSDX2Sh9gm4Zn8EA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: MObLhJvsXRtNPJA-fLZwDpPFZsQi7c_b
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-06_04,2026-03-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 adultscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060111
+X-Rspamd-Queue-Id: BF36C220574
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264819-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[donaldhunter@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-264759-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> The "samples" were always poor man's tests (used to manually
-> confirm that C YNL works).
->
-> Move all C sample programs from tools/net/ynl/samples/ to
-> tools/net/ynl/tests/, "merge" the Makefiles. The subsequent
-> changes will convert each sample into a proper KTAP selftests.
->
-> Since these are now tests rather than samples - default to
-> enabling asan. After all we're testing user space code here.
->
-> Sort the gitignore while at it, the page-pool entry was a leftover
-> so delete it.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+On 05/03/26 7:53 am, D. Wythe wrote:
+> The current SMC-R implementation relies on global per-device CQs
+> and manual polling within tasklets, which introduces severe
+> scalability bottlenecks due to global lock contention and tasklet
+> scheduling overhead, resulting in poor performance as concurrency
+> increases.
+> 
+> Refactor the completion handling to utilize the ib_cqe API and
+> standard RDMA core CQ pooling. This transition provides several key
+> advantages:
+> 
+> 1. Multi-CQ: Shift from a single shared per-device CQ to multiple
+> link-specific CQs via the CQ pool. This allows completion processing
+> to be parallelized across multiple CPU cores, effectively eliminating
+> the global CQ bottleneck.
+> 
+> 2. Leverage DIM: Utilizing the standard CQ pool with IB_POLL_SOFTIRQ
+> enables Dynamic Interrupt Moderation from the RDMA core, optimizing
+> interrupt frequency and reducing CPU load under high pressure.
+> 
+> 3. O(1) Context Retrieval: Replaces the expensive wr_id based lookup
+> logic (e.g., smc_wr_tx_find_pending_index) with direct context retrieval
+> using container_of() on the embedded ib_cqe.
+> 
+> 4. Code Simplification: This refactoring results in a reduction of
+> ~150 lines of code. It removes redundant sequence tracking, complex lookup
+> helpers, and manual CQ management, significantly improving maintainability.
+> 
+> Performance Test: redis-benchmark with max 32 connections per QP
+> Data format: Requests Per Second (RPS), Percentage in brackets
+> represents the gain/loss compared to TCP.
+> 
+> | Clients | TCP      | SMC (original)      | SMC (cq_pool)       |
+> |---------|----------|---------------------|---------------------|
+> | c = 1   | 24449    | 31172  (+27%)       | 34039  (+39%)       |
+> | c = 2   | 46420    | 53216  (+14%)       | 64391  (+38%)       |
+> | c = 16  | 159673   | 83668  (-48%)  <--  | 216947 (+36%)       |
+> | c = 32  | 164956   | 97631  (-41%)  <--  | 249376 (+51%)       |
+> | c = 64  | 166322   | 118192 (-29%)  <--  | 249488 (+50%)       |
+> | c = 128 | 167700   | 121497 (-27%)  <--  | 249480 (+48%)       |
+> | c = 256 | 175021   | 146109 (-16%)  <--  | 240384 (+37%)       |
+> | c = 512 | 168987   | 101479 (-40%)  <--  | 226634 (+34%)       |
+> 
+> The results demonstrate that this optimization effectively resolves the
+> scalability bottleneck, with RPS increasing by over 110% at c=64
+> compared to the original implementation.
+
+Since your performance results look really-really nice on x86 but ours
+show severe degradations on s390x, one way forward could be adding the
+cq_poll mechanism but also keeping the existing mechanism for now
+(because the things are right now it works better on s390x) and making
+it either runtime or compile time configurable which of the both is
+going to be used.
+
+Alternatively, we could work together making the cq_poll mechanism does
+not introduce a regression to s390x (ideally improve performance for
+s390x as well). But it that case we would like to have this change
+deferred until we find a way to make the regression disappear.
+
+I am aware that the first option, co-existence, would kill the
+simplification aspect of this and instead introduce added complexity.
+But we are talking about a major regression here on one end, and major
+improvements on the other end, so it might be still worth it. In any
+case, we are very motivated to eventually get rid of the old mechanism,
+provided significant performance regressions can be avoided.
 
