@@ -1,227 +1,135 @@
-Return-Path: <netdev+bounces-264936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKfgKn5Iq2mSbwEAu9opvQ
-	(envelope-from <netdev+bounces-264936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:34:54 +0100
+	id aEG6I8VIq2lcbwEAu9opvQ
+	(envelope-from <netdev+bounces-264937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:36:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6997822803B
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:34:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0D6228095
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 22:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ADE0F301E5FA
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:34:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0E48304150A
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 21:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C58948C8BD;
-	Fri,  6 Mar 2026 21:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8584921B7;
+	Fri,  6 Mar 2026 21:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b543YH+w"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10A5481FA0;
-	Fri,  6 Mar 2026 21:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A7735C1BE
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 21:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772832811; cv=none; b=cqawdU2bo1nrJfVXAKBE8Jy3pYuy+dz2TGx7dmdHjskdv0TbFUKYOx+OdlLBDU/ubfRSfsi9BRSmNLnHQRMI3OX3xZx3hLvVeeWhVw/5Ekpf0ksuPnQx6t5qARVi7wyH98QovRj9YKjl6+M0jJ62wlB5+U2ObRLPZOJ9pFoK7oI=
+	t=1772832894; cv=none; b=ME/RtbW2pfFFzKqIsFmgnGlRAPQw5LEjgajcZsujYIJEyfWRwQbYK5PPbNXToyPA5+O6fZGiJZnJJBcSQGE5Qsjti7YiIYSzeGmcdtu9FoyF5eif+KaQwW/cIm7MRM65XahYF0XDKgTh3D9vth6mNEVghUWdTsbp4MnHO0lqTEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772832811; c=relaxed/simple;
-	bh=NHuaQiTzSmO3g4EAar1A6/M/PbC/7TvQgP1OBcPdmcE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gddwgaS6Ubv7ti4U1UYL8AypMFbycw9b2BKxR91Rmrg5sIaTI2zVjfBPdzxhc2HCFQZG0NNyX/zr/gl97/kTKXfktykT8hXudhgi8Qpyge7FezIoJW9EBc8E4JJ8O/GcICX+dJajvE5sN/3ZmkHRAFJV5uuUO1xngEYxtH2ciVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 3489220B6F04; Fri,  6 Mar 2026 13:33:26 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3489220B6F04
-From: Long Li <longli@microsoft.com>
-To: "K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Long Li <longli@microsoft.com>
-Subject: [PATCH net-next v3 6/6] RDMA/mana_ib: Allocate interrupt contexts on EQs
-Date: Fri,  6 Mar 2026 13:33:02 -0800
-Message-ID: <20260306213302.544681-7-longli@microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260306213302.544681-1-longli@microsoft.com>
-References: <20260306213302.544681-1-longli@microsoft.com>
+	s=arc-20240116; t=1772832894; c=relaxed/simple;
+	bh=RmOjQI27w8qt6Hy3OmiOo3U/if9ywnIgHB6qrSkuFHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zr2zjxkg8E1UKdAu6UVcoOh/eEhnGchVOf+3l7a9Qdm+x6BLzDnm/spCgypL6bC7Qi7d+CJxR9FaGm7bYAhVEIoNCxE6XMCC9VAiRS5RD17k6tOsV20rd/xyrI2QVDu1pkwNf2m7brCHAZpzCI5RlH77WlVK4BgT1m6s8ZPbj44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b543YH+w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B93C4CEF7;
+	Fri,  6 Mar 2026 21:34:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772832893;
+	bh=RmOjQI27w8qt6Hy3OmiOo3U/if9ywnIgHB6qrSkuFHc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b543YH+wrtBAhooc9f2vQMw/d+KFEs2By9P7D0Nen2Vdf2REl4vTUbkIqRjqRaofM
+	 EANHx091PylzvUEwA6goLN/HbgvFQcf3PT94ZrCoznfN24UXGt51dTSWggSLREK+Zl
+	 DfBD7e5/g8wFF9llpBR4A1rRv7Fy2wXurej4sFjf4I4BO06p5F604YcpJlPuEJE0iK
+	 7Qkfcg3q4jNf+wW8Z7Z8+wIjsV/YoBvN/G6MDTIInESkgKx+Vp0ynWjqc/d9flrQkG
+	 iNUdFnJYfDeGIPdh0fJapuAZWej4R5f1+Nbggg09iCmAwa2PpUQR/J3V5kUZmZSclp
+	 4jGkFsG+4Ga3g==
+Date: Fri, 6 Mar 2026 13:34:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Wei Wang <weibunny@meta.com>, "daniel.zahka@gmail.com"
+ <daniel.zahka@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, David Wei <dw@davidwei.uk>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH v2 net-next 5/9] psp: add unprivileged version of
+ psp_device_get_locked
+Message-ID: <20260306133452.71d27227@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.101ad57610d58@gmail.com>
+References: <20260304000050.3366381-1-weibunny@fb.com>
+	<20260304000050.3366381-6-weibunny@fb.com>
+	<willemdebruijn.kernel.2c99d96277de8@gmail.com>
+	<SA1PR15MB5817C41068E5167A39F4CBD1BD7CA@SA1PR15MB5817.namprd15.prod.outlook.com>
+	<94f9ac32-b476-40e5-bebc-37a954884396@gmail.com>
+	<1d2b02b2-0541-4a17-af2a-95345395d2b6@gmail.com>
+	<SA1PR15MB5817DD5000DA78CC8187C743BD7CA@SA1PR15MB5817.namprd15.prod.outlook.com>
+	<willemdebruijn.kernel.101ad57610d58@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6997822803B
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4D0D6228095
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264937-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-264936-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.405];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[meta.com,gmail.com,vger.kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Use the GIC functions to allocate interrupt contexts for RDMA EQs. These
-interrupt contexts may be shared with Ethernet EQs when MSI-X vectors
-are limited.
+On Wed, 04 Mar 2026 18:41:09 -0500 Willem de Bruijn wrote:
+>  [...]  
+>  [...]  
+>  [...]  
+>  [...]  
+> > 
+> > Agree. And the current set of privileged operations should only include: dev-set, key-rotation.
+> > All others should be unprivileged I think...
+> > (The get-stats command which I should make sure they are called with unpriv = true. I will change that in the next version.)
+> >   
+> > >
+> > > well, now that I sent that I realize that criteria is so broad to
+> > > include things like rx-assoc and tx-assoc, which obviously need to be
+> > > unprivileged :(  
+> > 
+> > Yes. tx-assoc and rx-assoc are currently implemented as unprivileged. They call psp_assoc_device_get_locked() which currently calls psp_dev_check_access() with unpriv = true.  
+> 
+> Consider a more descriptive monitor than unprivileged too. As is, it's
+> not clear what privilege or capability is implied.
+> 
+> Perhaps just assoc_allowed?
 
-The driver now supports allocating dedicated MSI-X for each EQ. Indicate
-this capability through driver capability bits.
-
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c | 33 ++++++++++++++++++++++++++-----
- include/net/mana/gdma.h           |  7 +++++--
- 2 files changed, 33 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index d51dd0ee85f4..0b74dd093b41 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -787,6 +787,7 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
- 	struct gdma_queue_spec spec = {};
-+	struct gdma_irq_context *gic;
- 	int err, i;
- 
- 	spec.type = GDMA_EQ;
-@@ -797,9 +798,15 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
- 	spec.eq.msix_index = 0;
- 
-+	gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+	if (!gic)
-+		return -ENOMEM;
-+
- 	err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->fatal_err_eq);
--	if (err)
-+	if (err) {
-+		mana_gd_put_gic(gc, false, 0);
- 		return err;
-+	}
- 
- 	mdev->eqs = kzalloc_objs(struct gdma_queue *,
- 				 mdev->ib_dev.num_comp_vectors);
-@@ -810,31 +817,47 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.callback = NULL;
- 	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
-+
-+		gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+		if (!gic) {
-+			err = -ENOMEM;
-+			goto destroy_eqs;
-+		}
-+
- 		err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->eqs[i]);
--		if (err)
-+		if (err) {
-+			mana_gd_put_gic(gc, false, spec.eq.msix_index);
- 			goto destroy_eqs;
-+		}
- 	}
- 
- 	return 0;
- 
- destroy_eqs:
--	while (i-- > 0)
-+	while (i-- > 0) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		mana_gd_put_gic(gc, false, (i + 1) % gc->num_msix_usable);
-+	}
- 	kfree(mdev->eqs);
- destroy_fatal_eq:
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 	return err;
- }
- 
- void mana_ib_destroy_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
--	int i;
-+	int i, msi;
- 
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 
--	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++)
-+	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		msi = (i + 1) % gc->num_msix_usable;
-+		mana_gd_put_gic(gc, false, msi);
-+	}
- 
- 	kfree(mdev->eqs);
- }
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 4e0278b00bbb..662e58f51e87 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -612,6 +612,7 @@ enum {
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- #define GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB BIT(4)
- #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
-+#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- /* Driver can handle holes (zeros) in the device list */
- #define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
-@@ -628,7 +629,8 @@ enum {
- /* Driver detects stalled send queues and recovers them */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
- 
--#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
-+/* Driver supports separate EQ/MSIs for each vPort */
-+#define GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT BIT(19)
- 
- /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
- #define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
-@@ -656,7 +658,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
- 	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
--- 
-2.43.0
-
+Sorry for chiming in late. Maybe things would be more intuitive if 
+we flipped the logic and called the arg/functions "admin" instead
+"unpriv" ?
 
