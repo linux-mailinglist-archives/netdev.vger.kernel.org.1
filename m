@@ -1,209 +1,599 @@
-Return-Path: <netdev+bounces-264880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CKdIOQGq2kMZgEAu9opvQ
-	(envelope-from <netdev+bounces-264880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:55:00 +0100
+	id kH/MAJUHq2kMZgEAu9opvQ
+	(envelope-from <netdev+bounces-264881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:57:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D67FD225860
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:54:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF982258F7
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD18131CEC46
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:50:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC44A301A40C
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235B03A6400;
-	Fri,  6 Mar 2026 16:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20F13ED118;
+	Fri,  6 Mar 2026 16:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="eE83mali"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCEFH8g4"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010070.outbound.protection.outlook.com [52.101.84.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3CB248873;
-	Fri,  6 Mar 2026 16:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772815760; cv=fail; b=ud27Tq7ao2fKWx2gTTpZBkVNiRufQBZlvNokEKXOrrq0YvePGlJPb0n/33k6a3I1R1r7N6DeML2bPURb2C+U2WKGEwloRwU4/4DXCUDzYQp7bdQCsr19toJBDeUVd5UkihzfIcQje4IUpvkSx79GEQ/OPyX5Tted/FpjNFaHCJE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772815760; c=relaxed/simple;
-	bh=k9PPMkC1DqhVaFQSdO1EznT2IH9/BPMLjTIwYWwRQ6c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nWvBKi2N6Uii7wOflbiyDr5koxQKK0OvoFdEGh4YmVFzDTAWzLTVUS9myF/m7iN0ZHGyCliLGwaoHjXKgv27+fH1/4KTjl1IWqAy9p//hqKpwTbig02ADJpeRvePHfXVZ5cODT9HRiJS6nBVz/lzUZq9K3A/VOgZilDttRrFP9I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=eE83mali; arc=fail smtp.client-ip=52.101.84.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E3JoDn8/Br5AVFZULAqH0AnUoFGnwScB5pKfjv63K/ebbyVJ46I2t6XIABkeW0gSgHbIr7Cb40ZvXxDJA0zzQ71Y0IlLkCFRCcWb/ozBK5QEq3LTjMq43EzoFtzdaTwKuZ1GtCK2FYQJHPbsdZzinlTcjYroC+Pils9a/2LArK8QpIDDUygC+aR/gDeuYeTW5xRPQ2V60WAdbQbbU+WRnzejYJY8oz3l5KoHdxqV2eTEti2mnDGHo0DP4HMM3RP/RrspbbyG4lIqRi3wCKFLxm/ZhNrd9B2UlfWxIR8zRCQZRwmRtIaG80fzV5qTUqWKeTq2XlZUL4cJz/nv+4Hh/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GyMQ1RlYIyEW5DlrtqQBrsIcYha29pNEMX0tt6IfVJ0=;
- b=pMjbekWeTXvM7bLnivBDbSlCFJ6/7m8SCz7fqmReICpsArCADNgVGuLWa1K2+9ezwbCovGY5gStQIAqbzjqHocaGQXBP2N/IsmvD9tnTUNz6Ks+ZlycPnWJaQ+0CuLK2H7YhgDA6C7je5pn60xiqt3m6FfrTzCZyCodKjBA0eOiY3AWjruOAae59pFgFnLr7PjNtbTSJaoFnYNjq/tQ+Tmmd6CwcRELsOt7DQMnnEb8GpQDg3ce123VZR6B0NWeGEfQSIGS9M6fR5VxqTvmYd542RLdk3FRlYZLqDOfSxNzSRyqXhefTaWovGREuYFNW4ZnY8RwBTyr0Ph7L67lE9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GyMQ1RlYIyEW5DlrtqQBrsIcYha29pNEMX0tt6IfVJ0=;
- b=eE83maliS8nM8xNwpp8k86SyCgoMN1g9mvNHJy9aZEiE9QP6zu0ryGwtcMPcJqx4yPYxbnFQB3NTQKBx/JQvwT6915UB9hc+IhH/hz2JBtB6SpwdtjrnUvE6xPXNBE3bYiZQRPdj576eM007s4s/rMpIENvjGIafZBMX4gTC7L6M/sxH2zJxIM85dz3v8t0Wyd7beHcLUiGb9Wm9EJmc8IQBY8WpzYYklIB4ZZECNPgLBPrqQHAYbj7nB2UbPvg0i1e6Q1rNa2SvkO8qJmgP61Nk6gVroLaP9Zh1ClDICjqnv1HCkYan9UM7rFW3YaEJvSvTXXVahiaLOp8jS49AuQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB9366.eurprd04.prod.outlook.com (2603:10a6:102:2a9::8)
- by PA4PR04MB7773.eurprd04.prod.outlook.com (2603:10a6:102:cd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.19; Fri, 6 Mar
- 2026 16:49:14 +0000
-Received: from PA4PR04MB9366.eurprd04.prod.outlook.com
- ([fe80::75e4:8143:ddbc:6588]) by PA4PR04MB9366.eurprd04.prod.outlook.com
- ([fe80::75e4:8143:ddbc:6588%6]) with mapi id 15.20.9654.020; Fri, 6 Mar 2026
- 16:49:14 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	Frank.Li@nxp.com
-Cc: Frank Li <frank.li@nxp.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH net] net: enetc: safely reinitialize TX BD ring when it has unsent frames
-Date: Fri,  6 Mar 2026 11:48:53 -0500
-Message-ID: <20260306164856.292071-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260306054002.2208360-1-wei.fang@nxp.com>
-References: <20260306054002.2208360-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0018.namprd13.prod.outlook.com
- (2603:10b6:a03:2c0::23) To PA4PR04MB9366.eurprd04.prod.outlook.com
- (2603:10a6:102:2a9::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6B733BBC6;
+	Fri,  6 Mar 2026 16:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772816245; cv=none; b=dekzVQUWJCqJ5V5ZYM0mFdr0TyMqeGb37OXhWFA1m65GurpddF/dGS8xcubXX/4gV3lfI6qpxuvytSdnHE7VHDzo2S71nlvx1LTf8AieyHiEeTNPMRcvVsvZKI1koQ3K4EkrRf0XZCffO7lqRq/FfRSQdMRk3ogpMt+zfqskcRc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772816245; c=relaxed/simple;
+	bh=eaABNllMG0qTbtWw4Y2G9zMyK6AnHKYBqWoLTy3MoZs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GsA91B0V1fki6h7dAWHd3RYjthwbf6FVvMbUdYi4vq52OZVt6gnEid6tWRlrUHvM+JqSnehJelFzXq1x00IhVofMEN7gcIN7leGSR72zf6LFKFuDctwDPCqivr5otSd7s3PHBlhU4LuTaPlkXMtzv2DujluZJ2M4o73lYU9g1Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCEFH8g4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83E8FC4CEF7;
+	Fri,  6 Mar 2026 16:57:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772816245;
+	bh=eaABNllMG0qTbtWw4Y2G9zMyK6AnHKYBqWoLTy3MoZs=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=DCEFH8g4MVZzxEJLk1gFC38/FByh62Ts5Is8J4c0LdCQZrDbVJJ8jKJwNJRUiiEQq
+	 4HotBbKq0R34CMIh+QadGC6vEtrvpaWx0qZAqLg/tgVsN/Zh3U16evf2Xl7FzPlpyz
+	 1kfq7nDlYYN81Gx97RaKAV4+QQeM3yF97qsRcrgnf0frhpTFrTHRqWcEGpawtnxJlS
+	 iE1hOSEmixn/knt+Yc+FbhDJgV+EN2nJRWXrRIGwmZfTwFj1NrMlN80cZXhwonko2z
+	 UkcLeVt/Phh+IzM08d/PeaFVvx+4oXTfyKDnSfCAhol7/bQZQTTQ3MyGOf994BssJW
+	 iViLbzGMk+2Ng==
+Message-ID: <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
+Date: Fri, 6 Mar 2026 17:57:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB9366:EE_|PA4PR04MB7773:EE_
-X-MS-Office365-Filtering-Correlation-Id: 700e7d01-8fae-4de2-3343-08de7ba04c9f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|19092799006|52116014|376014|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	LizucsieSiLBZOdRxElqykWZwfg24W8f22ifmiII4Y/DSyj1D4+zNRBRMsfjhawLTotS3Grw6vRNOG+PMEjcPd4x3Teoaogltp/1ndgPBQaryOLznTDsKv7ADdGOYezWdTz+5Yyq7PdtU1epaeO2hZS7NYLa5QLoyn3QnKgKXbKboamRM2DnmXBr/LZjVi0qMBmwA/lJDCptwi6j9sFnDWGLehrFLeTPHFaeXJtPZQdpun6soaUF3hiAWivlLW4MoVqeb+QW7YXCnseOeLxZuy9aJxZGWw2nSNf2HOEjkr7ldJBqGk66rd5lIBSOzpro1sz6K+bA633e6pX2ZMr64x59ZQF1SGlXMbsIHSMkeE8GDYwUL0g0nTlC8olXEvLCDLLg8UcsBhsavMQg4NMp5A53tvu8s7f6VvIMHW0sJEcb8xIGblDHR1gqbdqWuHMQz1HpSQwQS6sxEs3y0mk44V0mKH8td2eBPF55YJ8xNfoNCTdDY9jailBVYz6y+Z59zg65kZV4khUGS/Rm347SO3tnh+W3LrrD2/uWi0zlwnhcv8h1cTwPjooUY85OUs7EjqIzb//dQNdE/p719Qhwo/Ah+5nz0V1GtPb6pueazysPU7BYSoPy7T+Z6tTRqUSIMo/71SYQM0xGNcS2V9T2O0RkZ3HKAyMFvgOwycjezzwCQOwLl1fPSAhC0j7eAPcN8xgJCCUycjz2ZcQ0sijH5uEw+j02diwP39dvO7WbM9ASDl4eWt/Yl8tEkBDQfjrxopnlb7+0QtmFR4IxqFzSQmK9d8mCzkuNs1N+zckfM1JCgTwqfv56cYRWnUGd0Qhd
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9366.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(52116014)(376014)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?tkRC+OArn/C3M6WhnRCSedMG6FD8i5y1ExcR3n1Am19W8LH6fumw7SAyRalE?=
- =?us-ascii?Q?3JmwUjirv1eIoLZZtUNVh/Tx/rURit7ah6AxkZ5wQSxtN6Z3e7tSv1jIppty?=
- =?us-ascii?Q?QXwHzCcRiuaM3udDgefmxj9exrf3PHZbMbi7gRupb/X4Afji1/gEkBslmpFA?=
- =?us-ascii?Q?EOICgznnH0g6OOOpBsBKOXDIQMh/uf8MBGc0asQfMsy2BfAsJNfWQE8aXd9b?=
- =?us-ascii?Q?9Ix+9JERPZRpzqWiyc4OYDvJftYN6Fb3QZDAYSk0Ab+afLpc5z3CtUbBtmMh?=
- =?us-ascii?Q?6gphPZ9b3r0KPGissxdlONfqI7ARSrrVz2WNP0MkuGZKyJQKyhbP3lY8OL3/?=
- =?us-ascii?Q?mSQhB+DUAoyGkG+A9Iug5nMh7tuMt4bCRWBbclMkEKtSBI6XPpURGLPyhVix?=
- =?us-ascii?Q?pycDEBhDx7cn27sjo3lwmjEWlWQZfKInP8cXs8iG5FX/G7O8VxUkg61OR6en?=
- =?us-ascii?Q?qxehpt7KD1fGJk9i378E985Vf/vmy1VXgdQGZBiJPvX9q46e7HV2BQsg9s2y?=
- =?us-ascii?Q?eLFRtPXnqSy+pWIAoiycTtQsUVEvFDKnNpltJaIDWZU6XqGQxuLhDaSQLubL?=
- =?us-ascii?Q?CUyIkV3qZknzz14uK5WZoudYjNQamlnNy10/cv58leg+r3ofdiiR87R5LB7R?=
- =?us-ascii?Q?hhMXgo1QEqGFxPL5qAKVI9IOSEEhRMoDvZqp8g2c+y55akTMCN38EitHeeCt?=
- =?us-ascii?Q?zu86Pv8pOYt0H5EBvhhBwtKYYC7xkJXWnGhnBxrOSMEgTC04qBkqO7cHbWfp?=
- =?us-ascii?Q?BipDp5HbOgQZ4IecgMYIcrRiXbQNWZapJ+4DMs1SBiCjU4CJdkSQ8mYmpqWN?=
- =?us-ascii?Q?6yJa0WnTjHUZPa+KoCHIxu9mEseG6DC60aDhH9x1O2t5RhIYUjWolmQQgSNr?=
- =?us-ascii?Q?awR6ouX2XNdTN16N00aUXz/MLGfpI8/CpM0kBqEC82xmHZiQtJ+vJZ+B/yxv?=
- =?us-ascii?Q?ZW2w+wiAibX/b4w9wLa+ObM0yhU+cef05RSCV1G/QrkKtHBBDT2HnRCtfdI4?=
- =?us-ascii?Q?55KrTQnc0sXBP/tESUCcksKbo8aZjuclcLiKudHbmdNtVvbR/2G8pm1blEe0?=
- =?us-ascii?Q?enr0uyDfyx4V7pUzDbKVrOnrofY0Hegn727L2ohf1sMCmwPFLJCXmf/aKtIU?=
- =?us-ascii?Q?tdlsx0Q9I7DJg7o/a+r7mkYLmLvM+MNz1IkdDoNuL4QOEwVzLNgebxrmJz2o?=
- =?us-ascii?Q?bQqXCUv1xUGh88WRRLCvyVQw7oI4k+OI5wdZ1x0bNwn/ptMOCx2UkMW/U4HC?=
- =?us-ascii?Q?j4xlL23NumnQTw23K/K+J7hzPkZWZb/tC9onjY/nzGvh8qLVkk/uVU7Parmj?=
- =?us-ascii?Q?U3KSSTX+w7abCtBTngxbkIAIvp1wVqnQnAWE2mPdzAxS/mPD4fbNwa7x1YDQ?=
- =?us-ascii?Q?4UZvlCJjhxK7GI6yliLwJPJvFf0bNfcJtF+6qcDep+h+8f1HbFNrtKrExUp4?=
- =?us-ascii?Q?mr6uVgawpnSmErqioToGxvLVhktkkd5sF975OTQnmfkIrqduob/QU5UoTuMa?=
- =?us-ascii?Q?F22jk9hJxLvoiSNHTE3+kNJBPv8k15ZyUOIWr5OKSPJsU+U/dROAHNdNFl+2?=
- =?us-ascii?Q?mpl7pVMTIGF0Fm2VJYxtwwE/UIrFTA42x2V8uJikgGTdO+47LN2pZUdbxONs?=
- =?us-ascii?Q?lcoMLejwDk5RqqqmxbjNVNPQf9LAHDg7tAGb4NKGkGpVIc1oU7st9J4s+CSt?=
- =?us-ascii?Q?jSgoe0XFvX/bcIB1SYoHD3kCocpOm/ApfSMtaDcnDiuB5uYF?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 700e7d01-8fae-4de2-3343-08de7ba04c9f
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB9366.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2026 16:49:14.7076
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vdB2/V7KqzFVCuF1ao0GXdKCEXj/NKA8otZE1RHcjixJAPL0wEd3aotuJzqB/Cd/c9+xxNDzagANNwZHPqe7rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7773
-X-Rspamd-Queue-Id: D67FD225860
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Content-Language: en-GB, fr-BE
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
+ <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
+ <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
+ <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
+ <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 6CF982258F7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264881-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264880-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Frank.Li@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.990];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:dkim,nxp.com:email,nxp.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,opensuse.org:url]
 X-Rspamd-Action: no action
 
-From: Frank Li (AI-BOT) <frank.li@nxp.com>
+Hi Thomas, Jiri, Peter,
 
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-> index 3ed0f7a02767..1ce6551e186c 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-> @@ -134,6 +134,12 @@
->
->  /* Port operational register */
->  #define ENETC4_POR			0x4100
-> +#define  POR_TXDIS			BIT(0)
-> +#define  POR_RXDIS			BIT(1)
-> +
-> +/* Port status register */
-> +#define ENETC4_PSR			0x4100
-> +#define  PSR_RX_BUSY			BIT(1)
+On 06/03/2026 12:06, Matthieu Baerts wrote:
+> On 06/03/2026 10:57, Thomas Gleixner wrote:
+>> On Fri, Mar 06 2026 at 06:48, Jiri Slaby wrote:
+>>> On 05. 03. 26, 20:25, Thomas Gleixner wrote:
+>>>> Is there simple way to reproduce?
+>>>
+>>> Unfortunately not at all. To date, I even cannot reproduce locally, it 
+>>> reproduces exclusively in opensuse build service (and github CI as per 
+>>> Matthieu's report). I have a project in there with packages which fail 
+>>> more often than others:
+>>>    https://build.opensuse.org/project/monitor/home:jirislaby:softlockup
+>>> But it's all green ATM.
+>>>
+>>> Builds of Go 1.24 and tests of rust 1.90 fail the most. The former even 
+>>> takes only ~ 8 minutes, so it's not that intensive build at all. So the 
+>>> reasons are unknown to me. At least, Go apparently uses threads for 
+>>> building (unlike gcc/clang with forks/processes). Dunno about rust.
+>>
+>> I tried with tons of test cases which stress test mmcid with threads and
+>> failed.
+> 
+> On my side, I didn't manage to reproduce it locally either.
 
-AI: ENETC4_PSR and ENETC4_POR both defined as 0x4100. Likely a typo; check
-the hardware spec for the correct offset of ENETC4_PSR.
+Apparently I can now... sorry, I don't know why I was not able to do
+that before!
 
-> +	while (!(enetc_port_rd(&si->hw, ENETC4_PM_IEVENT(mac)) &
-> +		 PM_IEVENT_RX_EMPTY)) {
-> +		if (timeout >= 100) {
-> +			dev_warn(&si->pdev->dev,
-> +				 "MAC %d RX is not empty\n", mac);
-> +			break;
-> +		};
+(...)
 
-AI: Stray semicolon after closing brace; remove it.
+> It is possible to locally launch the same command using the same QEMU
+> version (but not the same host kernel) with the help of Docker:
+> 
+>   $ cd <kernel source code>
+>   # docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+>     -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+>     manual normal
+> 
+> This will build a new kernel in O=.virtme/build, launch it and give you
+> access to a prompt.
+> 
+> 
+> After that, you can do also use the "auto" mode with the last built
+> image to boot the VM, only print "OK", stop and retry if there were no
+> errors:
+> 
+>   $ cd <kernel source code>
+>   $ echo 'echo OK' > .virtme-exec-run
+>   # i=1; \
+>     while docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+>     -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+>     vm auto normal; do \
+>       echo "== Attempt: $i: OK =="; \
+>       i=$((i+1)); \
+>     done; \
+>     echo "== Failure after $i attempts =="
 
-Frank
+After having sent this email, I re-checked on my side, and I was able to
+reproduce this issue with the technique described above: using the
+docker image with "build" argument, then max 50 boot iterations with "vm
+auto normal" argument. I then used 'git bisect' between v6.18 and
+v6.19-rc1 to find the guilty commit, and got:
+
+  653fda7ae73d ("sched/mmcid: Switch over to the new mechanism")
+
+Reverting it on top of v6.19-rc1 fixes the issue.
+
+Unfortunatelly, reverting it on top of Linus' tree causes some
+conflicts. I did my best to resolve them, and with this patch attached
+below -- also available in [1] -- I no longer have the issue. I don't
+know if it is correct -- some quick tests don't show any issues -- nor
+if Jiri should test it. I guess the final fix will be different from
+this simple revert.
+
+Note: I also tried Peter's patch (thank you for sharing it!), but I can
+still reproduce the issue with it on top of Linus' tree.
+
+[1] https://git.kernel.org/matttbe/net-next/c/5e4b47fd150c
+
+Cheers,
+Matt
+
+---
+diff --git a/include/linux/rseq.h b/include/linux/rseq.h
+index b9d62fc2140d..ef4ff117d037 100644
+--- a/include/linux/rseq.h
++++ b/include/linux/rseq.h
+@@ -84,6 +84,24 @@ static __always_inline void rseq_sched_set_ids_changed(struct task_struct *t)
+ 	t->rseq.event.ids_changed = true;
+ }
+ 
++/*
++ * Invoked from switch_mm_cid() in context switch when the task gets a MM
++ * CID assigned.
++ *
++ * This does not raise TIF_NOTIFY_RESUME as that happens in
++ * rseq_sched_switch_event().
++ */
++static __always_inline void rseq_sched_set_task_mm_cid(struct task_struct *t, unsigned int cid)
++{
++	/*
++	 * Requires a comparison as the switch_mm_cid() code does not
++	 * provide a conditional for it readily. So avoid excessive updates
++	 * when nothing changes.
++	 */
++	if (t->rseq.ids.mm_cid != cid)
++		t->rseq.event.ids_changed = true;
++}
++
+ /* Enforce a full update after RSEQ registration and when execve() failed */
+ static inline void rseq_force_update(void)
+ {
+@@ -163,6 +181,7 @@ static inline void rseq_handle_slowpath(struct pt_regs *regs) { }
+ static inline void rseq_signal_deliver(struct ksignal *ksig, struct pt_regs *regs) { }
+ static inline void rseq_sched_switch_event(struct task_struct *t) { }
+ static inline void rseq_sched_set_ids_changed(struct task_struct *t) { }
++static inline void rseq_sched_set_task_mm_cid(struct task_struct *t, unsigned int cid) { }
+ static inline void rseq_force_update(void) { }
+ static inline void rseq_virt_userspace_exit(void) { }
+ static inline void rseq_fork(struct task_struct *t, u64 clone_flags) { }
+diff --git a/include/linux/rseq_types.h b/include/linux/rseq_types.h
+index da5fa6f40294..61d294d3bbd7 100644
+--- a/include/linux/rseq_types.h
++++ b/include/linux/rseq_types.h
+@@ -131,18 +131,18 @@ struct rseq_data { };
+ /**
+  * struct sched_mm_cid - Storage for per task MM CID data
+  * @active:	MM CID is active for the task
+- * @cid:	The CID associated to the task either permanently or
+- *		borrowed from the CPU
++ * @cid:	The CID associated to the task
++ * @last_cid:	The last CID associated to the task
+  */
+ struct sched_mm_cid {
+ 	unsigned int		active;
+ 	unsigned int		cid;
++	unsigned int		last_cid;
+ };
+ 
+ /**
+  * struct mm_cid_pcpu - Storage for per CPU MM_CID data
+- * @cid:	The CID associated to the CPU either permanently or
+- *		while a task with a CID is running
++ * @cid:	The CID associated to the CPU
+  */
+ struct mm_cid_pcpu {
+ 	unsigned int	cid;
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 65113a304518..af3f65f963e2 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -999,6 +999,7 @@ static struct task_struct *dup_task_struct(struct task_struct *orig, int node)
+ 
+ #ifdef CONFIG_SCHED_MM_CID
+ 	tsk->mm_cid.cid = MM_CID_UNSET;
++	tsk->mm_cid.last_cid = MM_CID_UNSET;
+ 	tsk->mm_cid.active = 0;
+ #endif
+ 	return tsk;
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index b7f77c165a6e..cc969711cb08 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5281,7 +5281,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
+ 		}
+ 	}
+ 
+-	mm_cid_switch_to(prev, next);
++	switch_mm_cid(prev, next);
+ 
+ 	/*
+ 	 * Tell rseq that the task was scheduled in. Must be after
+@@ -10634,7 +10634,7 @@ static bool mm_cid_fixup_task_to_cpu(struct task_struct *t, struct mm_struct *mm
+ 	return true;
+ }
+ 
+-static void mm_cid_do_fixup_tasks_to_cpus(struct mm_struct *mm)
++static void __maybe_unused mm_cid_do_fixup_tasks_to_cpus(struct mm_struct *mm)
+ {
+ 	struct task_struct *p, *t;
+ 	unsigned int users;
+@@ -10673,7 +10673,7 @@ static void mm_cid_do_fixup_tasks_to_cpus(struct mm_struct *mm)
+ 	}
+ }
+ 
+-static void mm_cid_fixup_tasks_to_cpus(void)
++static void __maybe_unused mm_cid_fixup_tasks_to_cpus(void)
+ {
+ 	struct mm_struct *mm = current->mm;
+ 
+@@ -10691,81 +10691,25 @@ static bool sched_mm_cid_add_user(struct task_struct *t, struct mm_struct *mm)
+ void sched_mm_cid_fork(struct task_struct *t)
+ {
+ 	struct mm_struct *mm = t->mm;
+-	bool percpu;
+ 
+ 	WARN_ON_ONCE(!mm || t->mm_cid.cid != MM_CID_UNSET);
+ 
+ 	guard(mutex)(&mm->mm_cid.mutex);
+-	scoped_guard(raw_spinlock_irq, &mm->mm_cid.lock) {
+-		struct mm_cid_pcpu *pcp = this_cpu_ptr(mm->mm_cid.pcpu);
+-
+-		/* First user ? */
+-		if (!mm->mm_cid.users) {
+-			sched_mm_cid_add_user(t, mm);
+-			t->mm_cid.cid = mm_get_cid(mm);
+-			/* Required for execve() */
+-			pcp->cid = t->mm_cid.cid;
+-			return;
+-		}
+-
+-		if (!sched_mm_cid_add_user(t, mm)) {
+-			if (!cid_on_cpu(mm->mm_cid.mode))
+-				t->mm_cid.cid = mm_get_cid(mm);
+-			return;
+-		}
+-
+-		/* Handle the mode change and transfer current's CID */
+-		percpu = cid_on_cpu(mm->mm_cid.mode);
+-		if (!percpu)
+-			mm_cid_transit_to_task(current, pcp);
+-		else
+-			mm_cid_transit_to_cpu(current, pcp);
+-	}
+-
+-	if (percpu) {
+-		mm_cid_fixup_tasks_to_cpus();
+-	} else {
+-		mm_cid_fixup_cpus_to_tasks(mm);
+-		t->mm_cid.cid = mm_get_cid(mm);
++	scoped_guard(raw_spinlock, &mm->mm_cid.lock) {
++		sched_mm_cid_add_user(t, mm);
++		/* Preset last_cid for mm_cid_select() */
++		t->mm_cid.last_cid = mm->mm_cid.max_cids - 1;
+ 	}
+ }
+ 
+ static bool sched_mm_cid_remove_user(struct task_struct *t)
+ {
+ 	t->mm_cid.active = 0;
+-	scoped_guard(preempt) {
+-		/* Clear the transition bit */
+-		t->mm_cid.cid = cid_from_transit_cid(t->mm_cid.cid);
+-		mm_unset_cid_on_task(t);
+-	}
++	mm_unset_cid_on_task(t);
+ 	t->mm->mm_cid.users--;
+ 	return mm_update_max_cids(t->mm);
+ }
+ 
+-static bool __sched_mm_cid_exit(struct task_struct *t)
+-{
+-	struct mm_struct *mm = t->mm;
+-
+-	if (!sched_mm_cid_remove_user(t))
+-		return false;
+-	/*
+-	 * Contrary to fork() this only deals with a switch back to per
+-	 * task mode either because the above decreased users or an
+-	 * affinity change increased the number of allowed CPUs and the
+-	 * deferred fixup did not run yet.
+-	 */
+-	if (WARN_ON_ONCE(cid_on_cpu(mm->mm_cid.mode)))
+-		return false;
+-	/*
+-	 * A failed fork(2) cleanup never gets here, so @current must have
+-	 * the same MM as @t. That's true for exit() and the failed
+-	 * pthread_create() cleanup case.
+-	 */
+-	if (WARN_ON_ONCE(current->mm != mm))
+-		return false;
+-	return true;
+-}
+-
+ /*
+  * When a task exits, the MM CID held by the task is not longer required as
+  * the task cannot return to user space.
+@@ -10776,48 +10720,10 @@ void sched_mm_cid_exit(struct task_struct *t)
+ 
+ 	if (!mm || !t->mm_cid.active)
+ 		return;
+-	/*
+-	 * Ensure that only one instance is doing MM CID operations within
+-	 * a MM. The common case is uncontended. The rare fixup case adds
+-	 * some overhead.
+-	 */
+-	scoped_guard(mutex, &mm->mm_cid.mutex) {
+-		/* mm_cid::mutex is sufficient to protect mm_cid::users */
+-		if (likely(mm->mm_cid.users > 1)) {
+-			scoped_guard(raw_spinlock_irq, &mm->mm_cid.lock) {
+-				if (!__sched_mm_cid_exit(t))
+-					return;
+-				/*
+-				 * Mode change. The task has the CID unset
+-				 * already and dealt with an eventually set
+-				 * TRANSIT bit. If the CID is owned by the CPU
+-				 * then drop it.
+-				 */
+-				mm_drop_cid_on_cpu(mm, this_cpu_ptr(mm->mm_cid.pcpu));
+-			}
+-			mm_cid_fixup_cpus_to_tasks(mm);
+-			return;
+-		}
+-		/* Last user */
+-		scoped_guard(raw_spinlock_irq, &mm->mm_cid.lock) {
+-			/* Required across execve() */
+-			if (t == current)
+-				mm_cid_transit_to_task(t, this_cpu_ptr(mm->mm_cid.pcpu));
+-			/* Ignore mode change. There is nothing to do. */
+-			sched_mm_cid_remove_user(t);
+-		}
+-	}
+ 
+-	/*
+-	 * As this is the last user (execve(), process exit or failed
+-	 * fork(2)) there is no concurrency anymore.
+-	 *
+-	 * Synchronize eventually pending work to ensure that there are no
+-	 * dangling references left. @t->mm_cid.users is zero so nothing
+-	 * can queue this work anymore.
+-	 */
+-	irq_work_sync(&mm->mm_cid.irq_work);
+-	cancel_work_sync(&mm->mm_cid.work);
++	guard(mutex)(&mm->mm_cid.mutex);
++	scoped_guard(raw_spinlock, &mm->mm_cid.lock)
++		sched_mm_cid_remove_user(t);
+ }
+ 
+ /* Deactivate MM CID allocation across execve() */
+@@ -10831,12 +10737,18 @@ void sched_mm_cid_after_execve(struct task_struct *t)
+ {
+ 	if (t->mm)
+ 		sched_mm_cid_fork(t);
++	guard(preempt)();
++	mm_cid_select(t);
+ }
+ 
+ static void mm_cid_work_fn(struct work_struct *work)
+ {
+ 	struct mm_struct *mm = container_of(work, struct mm_struct, mm_cid.work);
+ 
++	/* Make it compile, but not functional yet */
++	if (!IS_ENABLED(CONFIG_NEW_MM_CID))
++		return;
++
+ 	guard(mutex)(&mm->mm_cid.mutex);
+ 	/* Did the last user task exit already? */
+ 	if (!mm->mm_cid.users)
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index 43bbf0693cca..b60d49fc9c11 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -4003,7 +4003,83 @@ static inline void mm_cid_switch_to(struct task_struct *prev, struct task_struct
+ 	mm_cid_schedin(next);
+ }
+ 
++/* Active implementation */
++static inline void init_sched_mm_cid(struct task_struct *t)
++{
++	struct mm_struct *mm = t->mm;
++	unsigned int max_cid;
++
++	if (!mm)
++		return;
++
++	/* Preset last_mm_cid */
++	max_cid = min_t(int, READ_ONCE(mm->mm_cid.nr_cpus_allowed), atomic_read(&mm->mm_users));
++	t->mm_cid.last_cid = max_cid - 1;
++}
++
++static inline bool __mm_cid_get(struct task_struct *t, unsigned int cid, unsigned int max_cids)
++{
++	struct mm_struct *mm = t->mm;
++
++	if (cid >= max_cids)
++		return false;
++	if (test_and_set_bit(cid, mm_cidmask(mm)))
++		return false;
++	t->mm_cid.cid = t->mm_cid.last_cid = cid;
++	__this_cpu_write(mm->mm_cid.pcpu->cid, cid);
++	return true;
++}
++
++static inline bool mm_cid_get(struct task_struct *t)
++{
++	struct mm_struct *mm = t->mm;
++	unsigned int max_cids;
++
++	max_cids = READ_ONCE(mm->mm_cid.max_cids);
++
++	/* Try to reuse the last CID of this task */
++	if (__mm_cid_get(t, t->mm_cid.last_cid, max_cids))
++		return true;
++
++	/* Try to reuse the last CID of this mm on this CPU */
++	if (__mm_cid_get(t, __this_cpu_read(mm->mm_cid.pcpu->cid), max_cids))
++		return true;
++
++	/* Try the first zero bit in the cidmask. */
++	return __mm_cid_get(t, find_first_zero_bit(mm_cidmask(mm), num_possible_cpus()), max_cids);
++}
++
++static inline void mm_cid_select(struct task_struct *t)
++{
++	/*
++	 * mm_cid_get() can fail when the maximum CID, which is determined
++	 * by min(mm->nr_cpus_allowed, mm->mm_users) changes concurrently.
++	 * That's a transient failure as there cannot be more tasks
++	 * concurrently on a CPU (or about to be scheduled in) than that.
++	 */
++	for (;;) {
++		if (mm_cid_get(t))
++			break;
++	}
++}
++
++static inline void switch_mm_cid(struct task_struct *prev, struct task_struct *next)
++{
++	if (prev->mm_cid.active) {
++		if (prev->mm_cid.cid != MM_CID_UNSET)
++			clear_bit(prev->mm_cid.cid, mm_cidmask(prev->mm));
++		prev->mm_cid.cid = MM_CID_UNSET;
++	}
++
++	if (next->mm_cid.active) {
++		mm_cid_select(next);
++		rseq_sched_set_task_mm_cid(next, next->mm_cid.cid);
++	}
++}
++
+ #else /* !CONFIG_SCHED_MM_CID: */
++static inline void mm_cid_select(struct task_struct *t) { }
++static inline void switch_mm_cid(struct task_struct *prev, struct task_struct *next) { }
+ static inline void mm_cid_switch_to(struct task_struct *prev, struct task_struct *next) { }
+ #endif /* !CONFIG_SCHED_MM_CID */
+ 
+-- 
+Sponsored by the NGI0 Core fund.
 
