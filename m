@@ -1,193 +1,234 @@
-Return-Path: <netdev+bounces-264711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLbqCQ2YqmmIUAEAu9opvQ
-	(envelope-from <netdev+bounces-264711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:02:05 +0100
+	id YPLBLOOYqmmIUAEAu9opvQ
+	(envelope-from <netdev+bounces-264712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:05:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6EF21D90B
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:01:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8CB21D999
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 10:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 35E07300E4B6
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:01:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43E29300B451
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 09:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A21D32AAC5;
-	Fri,  6 Mar 2026 09:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944C333893D;
+	Fri,  6 Mar 2026 09:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ahlOo+mh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lQo1Tz30"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26BF273D8F
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 09:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FBE33A6E2;
+	Fri,  6 Mar 2026 09:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772787715; cv=none; b=YTum6TYHqXViC4LsNXJLZrqOoanZNTDQX4lKXLF4KjIjEbkXBm6LsAJAuhK1Op7QbEdzgHV1JBVki9tja6jDzUaqf7sRBCGnAcNCvlb8oTVj9ayY7DyePQ+q21cm48wBYz4NECEsH4NelSsjIsp9u8cC+TEyGfxEllpqecedyP4=
+	t=1772787838; cv=none; b=mP5dkUDDrWIqtkrXE0LgxI9MSu13adP/T3xORka/39tdyvtZMNkW7or9gYwqC03moldpuFnDv34LztjPEOp8TeyFoGnU0MQRZ8L+BlI/ukprnZkEDaiUVsubaoFxg4WK1K5H7iI/eRreIOkTCHzJpIk7Da4t1ycHw6e3pR29bW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772787715; c=relaxed/simple;
-	bh=jKvSCK2VZow3Ee2fl3Vir23oJKTdWa67+5Es5wmbAYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qzmcxJnmKdNgQHbeE9bpFjMo22gH7AxYOmB8CQkXb603Khdhepwd4AXTalDfduMIxlnCWBvxOZLyHiL2ywytfwEmV2eYkRAzMTrIz4LI4V7B2gTwx3hn5nbPJxxpsQMYTlTZWTQp9S7ZINLDEqdPASHbxo6V9OMDdBH98PhImOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ahlOo+mh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZgDBXmEnVujJM8vulMEVYeA6ICqdKuQICuLq3YHevSE=; b=ahlOo+mh3t8qpxKXMd1PjHafv8
-	37m8cqehiUO9Z7eeLymK0NQLXS2kg/oIzYDJb/+pa/1UWGRgWbVrqrzTls5cEEWCNlrHOHM8cTYwQ
-	a5II4e0BX4jwm8RucqWkof7Cty24hFJL9ulS8FjKmCsGQN7FbTvSSZfsOuq6UAfECxPkKZRk/aJ/8
-	XbyLQLvyn0r0SFGP1co3x79I6CK5a2c/lL3xzvApaImX44AhUkUNRDimQ0ixXKyiyVJXayzafi+LL
-	2RQjiZdzN9d1XCKWHlaN+a9mSDe44Xinj4sdhoXz2tXjO0f+CtHT4Jrefqs2ytwtMX/ozvm4Z6pWd
-	3Y7Uo/bQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47666)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vyR40-000000000jm-29aw;
-	Fri, 06 Mar 2026 09:01:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vyR3w-000000001IO-41FR;
-	Fri, 06 Mar 2026 09:01:36 +0000
-Date: Fri, 6 Mar 2026 09:01:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-sunxi@lists.linux.dev, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Samuel Holland <samuel@sholland.org>
-Subject: Re: [PATCH net-next v2 3/8] net: stmmac: mdio: simplify MDC clock
- divisor lookup
-Message-ID: <aaqX8IxLzZ7jGM4r@shell.armlinux.org.uk>
-References: <aald--qJquWGIvmO@shell.armlinux.org.uk>
- <E1vy6A9-0000000Btwp-0lxY@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1772787838; c=relaxed/simple;
+	bh=zV8WsNlP5ZzT5acXzNbKBV/9KRyTgSiyPoylqcbqXuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AtGV0ttVfoJW4uBW/hxCTOwd8b5QJZHmir0GHC3F/+YdkwBqxsS73KdARh9qqquCh+1M+Obcriitp3Kev9ra6hfkzx5GUTvp+eyHLijSN8KEJWFYJz/0yDr5Ouwb1WsQEQkGuN8sWCatwBw6z7Q3cvYajbIdcHX3pMP4Ej5FrNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lQo1Tz30; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id B162B1A2D13;
+	Fri,  6 Mar 2026 09:03:53 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7BB185FF92;
+	Fri,  6 Mar 2026 09:03:53 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 680E91036977C;
+	Fri,  6 Mar 2026 10:03:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772787832; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=QmkVtn+YfoRj1HaqYqZmNOYocP3ang2W3ATFJL1qd3I=;
+	b=lQo1Tz30vXTOQmTt8S3KROKy6QExMmVdS/FNk+oyuy89O47rOalayLSrhp6kGQd6Myq77u
+	SyDLoUVctecIou+PFl+d7xyIqgeCkRFhspFybDR3DkElyI3UV+xmTFbQGhu72/hnfZMRkz
+	YSpQzK4Du5xbXfTf3bZnZle80bD7eBUKGDE3mnTGtSmxc+2cxiotqLYsWIWDYUgvT35Dqw
+	PzyS4fbJofcL/22nlV41eJ7n7id8q666jOTWOtcEcTOiLCiuCZU1Vg5KU/GPL96mlwH2L/
+	lEzJxE6qTRDA8EibWjBB2tuR2CKOcFWvXUt4vLnrZEet9iP8MOjDvj+8MQ8CkA==
+Message-ID: <785e440c-6b2a-4ed7-aee3-09ca6cee797a@bootlin.com>
+Date: Fri, 6 Mar 2026 10:03:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vy6A9-0000000Btwp-0lxY@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: 6E6EF21D90B
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
+ KSZ8463 global irq
+To: Tristram.Ha@microchip.com, olteanv@gmail.com
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
+ pascal.eberhard@se.com, miquel.raynal@bootlin.com,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com
+References: <20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com>
+ <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
+ <20260305095656.vlyaztv6nbdqrmil@skbuf>
+ <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
+ <20260305125149.ejju5ptrkviqi3sm@skbuf>
+ <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
+ <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 1E8CB21D999
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264711-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264712-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[microchip.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.364];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,shell.armlinux.org.uk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,microchip.com:email]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05, 2026 at 10:42:37AM +0000, Russell King (Oracle) wrote:
-> As each lookup now iterates over each table in the same way, simplfy
-> the code to select the table, and then walk that table.
+Hi,
+
+On 3/6/26 2:10 AM, Tristram.Ha@microchip.com wrote:
+>> On 3/5/26 1:51 PM, Vladimir Oltean wrote:
+>>> On Thu, Mar 05, 2026 at 01:39:29PM +0100, Bastien Curutchet wrote:
+>>>> Hi Vladimir,
+>>>>
+>>>> On 3/5/26 10:56 AM, Vladimir Oltean wrote:
+>>>>> On Wed, Mar 04, 2026 at 11:18:52AM +0100, Bastien Curutchet (Schneider
+>> Electric) wrote:
+>>>>>> @@ -2890,14 +2899,18 @@ static irqreturn_t ksz_irq_thread_fn(int irq,
+>> void *dev_id)
+>>>>>>             unsigned int nhandled = 0;
+>>>>>>             struct ksz_device *dev;
+>>>>>>             unsigned int sub_irq;
+>>>>>> -  u8 data;
+>>>>>> +  u16 data;
+>>>>>>             int ret;
+>>>>>>             u8 n;
+>>>>>>             dev = kirq->dev;
+>>>>>> -  /* Read interrupt status register */
+>>>>>> -  ret = ksz_read8(dev, kirq->reg_status, &data);
+>>>>>> +  /*
+>>>>>> +   * Most of the KSZ switches have a 8-bits long interrupt status
+>>>>>> +   * register, but the KSZ8463 has a 16-bits long one. The overread here
+>>>>>> +   * is safe because we only iterate over kirq->nirqs in the below loop.
+>>>>>
+>>>>> FWIW, this isn't the only thing making an overread "safe".
+>>>>> If the adjacent register also has "clear on read" semantics, that's not
+>>>>> good.
+>>>>>
+>>>>> I can't tell whether that's the case here, though. There are just too
+>>>>> many hardware variations to check for. I just wanted to point out that
+>>>>> the reasoning is incomplete.
+>>>>>
+>>>> You're right, I hadn't thought about the 'clear on read' case.
+>>>>
+>>>> I'll use ksz_read16() only for the KSZ8463 to be 100% sure it won't break
+>>>> anything for other switches.
+>>>
+>>> I'm still on the fence on whether to say this or not, because I don't
+>>> really want to get so involved in internal driver bookkeeping, but...
+>>> this driver is just becoming a hell to review, even if I want to
+>>> concentrate exclusively on correct API use, like I try to do.
+>>>> Linus Walleij has added a new ks8995 driver, which has some overlap with
+>>> the common ksz driver for the KSZ8 family. Now he wants to remove the
+>>> overlapping device support:
+>>> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-0-
+>> a7fc63fe1916@kernel.org/
+>>>
+>>> Maybe we should go the other way around, migrate KSZ8 support to the
+>>> ks8995 driver instead? The common ksz driver is becoming just extremely
+>>> convoluted to handle all hardware variations. Would it help in any way
+>>> to maintain cleaner code paths, what do you think?
+>>
+>> I agree, this driver is extremely convoluted because of all the
+>> different hardware it handles. It wasn't easy to fit PTP support for the
+>> KSZ8463 into it. And I encountered the same kind of difficulties when
+>> adding periodic output support (I have another series ready for this
+>> once this PTP support will be merged).
+>>
+>> Regarding migrating the KSZ8 support into the ksz8995, I think we would
+>> quickly hit the same pain points than in ksz_common. Even inside the
+>> KSZ8 family we can find a quite big amount of differences between the
+>> switches. For instance, both KSZ8463 and KSZ8563 support PTP, they share
+>> lots of common registers but their interrupt scheme is very different.
+>>
+>> I've added Tristram in Cc:, who works at Microchip. Maybe, Tristram, you
+>> have some insights about which switches could share code if we decide to
+>> split the big ksz_common into several drivers ?
+>   
+> Although KSZ8463 uses 16-bit register for its interrupt operation, the
+> bits that are necessary for actual operation are all in the high byte, so
+> it is possible to simulate using 8-bit register for interrupt operation
+> just like the other switches.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_mdio.c | 29 +++++++------------
->  1 file changed, 11 insertions(+), 18 deletions(-)
+
+I hadn't though about using only the high byte, I like this idea. I'll 
+implement it in the next iteration with a comment explaining why it 
+works for the KSZ8463.
+
+> Note also the previous interrupt code only works for KSZ9477 and LAN937X
+> families of switches, which have interrupts for each port.  The older
+> switches like KSZ8863, KSZ8895, and KSZ8795 all have only one global
+> interrupt and need change to work in this framework.
+
+Indeed, that's what patches 1 to 4 are here for.
+
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index 6292911fb54b..c9f0b8b601d2 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -535,6 +535,7 @@ static const struct stmmac_clk_rate stmmac_xgmac_csr_to_mdc[] = {
->   */
->  static u32 stmmac_clk_csr_set(struct stmmac_priv *priv)
->  {
-> +	const struct stmmac_clk_rate *rates;
->  	unsigned long clk_rate;
->  	u32 value = ~0;
->  	int i;
-> @@ -548,25 +549,17 @@ static u32 stmmac_clk_csr_set(struct stmmac_priv *priv)
->  	 * the frequency of clk_csr_i. So we do not change the default
->  	 * divider.
->  	 */
-> -	for (i = 0; stmmac_std_csr_to_mdc[i].rate; i++)
-> -		if (clk_rate > stmmac_std_csr_to_mdc[i].rate)
-> -			break;
-> -	if (stmmac_std_csr_to_mdc[i].cr != (u8)~0)
-> -		value = stmmac_std_csr_to_mdc[i].cr;
-> -
-> -	if (priv->plat->flags & STMMAC_FLAG_HAS_SUN8I) {
-> -		for (i = 0; stmmac_sun8i_csr_to_mdc[i].rate; i++)
-> -			if (clk_rate > stmmac_sun8i_csr_to_mdc[i].rate)
-> -				break;
-> -		value = stmmac_sun8i_csr_to_mdc[i].cr;
-> -	}
-> +	rates = stmmac_std_csr_to_mdc;
-> +	if (priv->plat->flags & STMMAC_FLAG_HAS_SUN8I)
-> +		rates = stmmac_sun8i_csr_to_mdc;
-> +	if (priv->plat->core_type == DWMAC_CORE_XGMAC)
-> +		rates = stmmac_xgmac_csr_to_mdc;
->  
-> -	if (priv->plat->core_type == DWMAC_CORE_XGMAC) {
-> -		for (i = 0; stmmac_xgmac_csr_to_mdc[i].rate; i++)
-> -			if (clk_rate > stmmac_xgmac_csr_to_mdc[i].rate)
-> -				break;
-> -		value = stmmac_xgmac_csr_to_mdc[i].cr;
-> -	}
-> +	for (i = 0; rates[i].rate; i++)
-> +		if (clk_rate > rates[i].rate)
-> +			break;
-> +	if (rates[i].cr != (u8)~0)
-> +		value = rates[i].cr;
+> These switches have link change interrupt bits for external ports, so it
+> is easy to simulate them as port interrupts.  But KSZ8463 only has 1 bit
+> for link, so it is necessary to add some special code to return a value of
+> 3 to indicate both ports have link change.
+> 
 
-Looking at the AI review, it seems to me that the AI review is
-incorrect.
+This series only use interrupt for PTP means. TBH I haven't looked at 
+the link change interrupt mechanism.
 
-With reference to the full original code which can be seen in:
-https://patchwork.kernel.org/project/netdevbpf/patch/E1vy69y-0000000Btwd-3oq7@rmk-PC.armlinux.org.uk/
+> KSZ8463 is based from KSZ8863 so it should have about the same 8-bit
+> register definitions as KSZ8863.  But when it was designed it had a
+> companion chip that operates as a 16-bit network controller.  Because of
+> that all register definitions are described in 16-bit.
+> 
+> I need to try your patches to see how it works regarding to the PTP
+> interrupts.
+> 
+> Regarding to the old ks8995 driver I think it was a simple SPI driver to
+> start the KSZ8995 switch, which is an older version of KSZ8895.  It was
+> used to locate under the PHY drivers.  I did not know it was upgraded to
+> become a full DSA driver and is now trying to expand to the other
+> switches.
 
-If we look at the original code, then we can see that the intention
-is that if clk_rate is smaller than the last real entry for the
-sun8i and xgmac cases, the value should end up as zero - and this is
-exactly what the new code does. So, the behaviour is preserved, even
-though AI thinks it isn't.
+Ok, thanks for these information
 
-AI seems to think that reaching the last entry for sun8i and xgmac
-means we have an invalid rate. That is where AI is going wrong -
-that is an incorrect "assumption".
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Best regards,
+Bastien
 
