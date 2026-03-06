@@ -1,179 +1,119 @@
-Return-Path: <netdev+bounces-264874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMLnFEX9qmkIZQEAu9opvQ
-	(envelope-from <netdev+bounces-264874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:13:57 +0100
+	id 6N+fEGj/qmmDZQEAu9opvQ
+	(envelope-from <netdev+bounces-264875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:23:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACB6A224A12
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:13:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA27E224CF3
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 17:23:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6775630E9DB1
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:08:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9E6D930D4359
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 16:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3F33EB7FE;
-	Fri,  6 Mar 2026 16:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2493F3ED5C8;
+	Fri,  6 Mar 2026 16:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N2C9zwea"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6lfjvds"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9813936C0B2;
-	Fri,  6 Mar 2026 16:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013C33ED13B
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 16:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772813319; cv=none; b=TX8j1uuzedwBCZSClqFhG7aZegA7msYTct2Fa58awsuMB1BmdZszJMILfgFHunRDIAitUk1f9x4MPwq7RgDvSGX3XE8GFSJqxE2A6IZgJcDFjemgeSi8aOwDpYWpptYsjl1fO1ARpP/fZav7RIjRp0up9mMgbgk9tgb4/K3C8R0=
+	t=1772813817; cv=none; b=fycsLbPUB3hijC9+HXKj6u/Su7++p6rYKSygb4qhVr5bkzLvFS6Y4uOZJ1c7GUojGjEfMyR9jjmCEJ1iSFN3HR04KDRzP+/0r5MHdgHVVJGwAkYXROvoWzcAo2OvmsboVTtFYJL46Wf72JraRvcCtrxSfMxNwd/O8pkS7qZGCI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772813319; c=relaxed/simple;
-	bh=+sjkWFv/7ZW6Z3LHH2S7c+ePzZw61xuomCUGyBIfLLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SA7XBiEImo8j33i68hY35cpfYaGGT65FOxtznxDpAO/rY1AyTFBxPCA2oOUTcSpQK/BRAySwD7i9yrigquIHfx7laGai3Z2QLmR9GHywrpMurAVxyg+UoM0wADoo9VWzeyQxempPIG1bzuY7auefNwNmkOWzKVL9fZ1vReE6WlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N2C9zwea; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEAC9C4CEF7;
-	Fri,  6 Mar 2026 16:08:35 +0000 (UTC)
+	s=arc-20240116; t=1772813817; c=relaxed/simple;
+	bh=ZiC41Lc9MKXMu3ERSODotf8Rnmczzur/6SsZnuBXsJs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B4XOj59O/uAMi1jQ9POwZJX+ngynACZaFdcyUg0atT8szaknK7iXUD8GXW0vb5mzq82E1v0yNiWy4l4rs6HhycaRUq6zfh2G8s2rx70obZMjwhsuEmV2T9an81vKpq24hgysAMidcLR5/fI3xFFfTd8+syZkWhkKZ+GlWp/+ONM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6lfjvds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B6AC2BCB2;
+	Fri,  6 Mar 2026 16:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772813319;
-	bh=+sjkWFv/7ZW6Z3LHH2S7c+ePzZw61xuomCUGyBIfLLo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N2C9zweavdafykxSZ2UFUKNQzatfkiZ9RBWyXoISDIu43sPdK/Bu105r0ZFSw2O8p
-	 lg8NDHt239fmFlB3N6XmR26ihibWD7GrzXZQqItVgtCvCXyG0e4VRbiZJpJiZxrG64
-	 wCb2PjnTZrqnU5fhdcJ26/k1LltnWEk6kWRiq2h0bdPAd41BS9eGgPRRB7ODTScGH+
-	 59Ziv9aVBvZFAhv0VU6ps0qcDS0FYljmctSaZAE1S6M11ZgxmSdLVHlYdnz5IJS8Uy
-	 /6ZwE168X6+6RwICoagnlzPE+lA/YqNlcYh7dPltw3Ovl08dp/r08+ukOcIJim6hHg
-	 adpvWW+oB8cNQ==
-From: Simon Horman <horms@kernel.org>
-To: longli@microsoft.com
-Cc: Simon Horman <horms@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	haiyangz@microsoft.com,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	kuba@kernel.org,
-	wei.liu@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	schakrabarti@linux.microsoft.com,
-	erick.archer@outlook.com,
-	linux-kernel@vger.kernel.org,
-	kys@microsoft.com,
-	decui@microsoft.com,
-	netdev@vger.kernel.org
-Subject: Re: [v2,net-next,1/6] net: mana: Create separate EQs for each vPort
-Date: Fri,  6 Mar 2026 16:08:20 +0000
-Message-ID: <20260306160820.525640-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260304000017.333312-2-longli@microsoft.com>
-References: <20260304000017.333312-2-longli@microsoft.com>
+	s=k20201202; t=1772813816;
+	bh=ZiC41Lc9MKXMu3ERSODotf8Rnmczzur/6SsZnuBXsJs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k6lfjvdsLF7BOsL8s/jBSFwXa8hAcFOGtTRuNnqWN4XpUl823+KIEGHpUYJppKxGK
+	 KEM6a3qv7wgdqx8TLFVVMuXHGEjg342Jtx4wkOUE9hMVFDtU+2b3C9yOyp1RMUJeK8
+	 vgYYYS7bZXVFWi6CbFk68RDnOQy/MduN+B0VRQYrc2WPj/K5uvWxxY/tgXdduJWlx6
+	 ywBqOp4YUX6TmG9UxFK+BRmUgpE1quvySt//rVI3Q75gdY8UTuJokfVV9lyp+OE9ZH
+	 PN0Z3/4de5njQW4PG2huuRfxBCtYj4nnfsb+uA6hHo3FhNy10t3jseK6h4rC8bzTg/
+	 CW3hp5o4tbARg==
+Message-ID: <19f56671-3507-434a-bfe8-a7c6d25ed19d@kernel.org>
+Date: Fri, 6 Mar 2026 09:16:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: ACB6A224A12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tcp: move tcp_v4_early_demux() to
+ net/ipv4/ip_input.c
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260306131130.654991-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260306131130.654991-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: AA27E224CF3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,microsoft.com,vger.kernel.org,linux.microsoft.com,redhat.com,outlook.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-264874-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-264875-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 3/6/26 6:11 AM, Eric Dumazet wrote:
+> tcp_v4_early_demux() has a single caller : ip_rcv_finish_core().
+> 
+> Move it to net/ipv4/ip_input.c and mark it static, for possible
+> compiler/linker optimizations.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/net/tcp.h   |  1 -
+>  net/ipv4/ip_input.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/tcp_ipv4.c | 38 --------------------------------------
+>  3 files changed, 39 insertions(+), 39 deletions(-)
+> 
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: mana: Create separate EQs for each vPort
 
-To prepare for assigning vPorts to dedicated MSI-X vectors, this commit
-removes EQ sharing among vPorts and creates dedicated EQs for each vPort.
-The EQ definition is moved from struct mana_context to struct
-mana_port_context and related support functions are updated.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-
-[ ... ]
-
-> @@ -499,6 +497,9 @@ struct mana_port_context {
->
->  	u8 mac_addr[ETH_ALEN];
->
-> +	struct mana_eq *eqs;
-> +	struct dentry *mana_eqs_debugfs;
-> +
->  	enum TRI_STATE rss_state;
->
->  	mana_handle_t default_rxobj;
-
-[ ... ]
-
-> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-> --- a/drivers/infiniband/hw/mana/qp.c
-> +++ b/drivers/infiniband/hw/mana/qp.c
-> @@ -188,7 +188,7 @@ struct mana_obj_spec cq_spec = {};
->  		cq_spec.gdma_region = cq->queue.gdma_region;
->  		cq_spec.queue_size = cq->cqe * COMP_ENTRY_SIZE;
->  		cq_spec.modr_ctx_id = 0;
-> -		eq = &mpc->ac->eqs[cq->comp_vector];
-> +		eq = &mpc->eqs[cq->comp_vector % mpc->num_queues];
-                           ^^^^^^^
->  		cq_spec.attached_eq = eq->eq->id;
-
-Can mpc->eqs be NULL here? Looking at the initialization paths:
-
-Before this patch, mpc->ac->eqs was allocated during mana_probe() and was
-always non-NULL after driver initialization.
-
-After this patch, mpc->eqs is only allocated in two places:
-1. mana_alloc_queues() - called when the Ethernet interface is brought up
-2. mana_ib_cfg_vport() - called when RDMA RAW QPs configure the vport
-
-However, mana_ib_create_qp_rss() doesn't call mana_ib_cfg_vport(). If an
-RSS QP is created via RDMA verbs before the Ethernet port is brought up
-and before any RAW QP has configured the vport, mpc->eqs would still be
-NULL.
-
-Computing &mpc->eqs[cq->comp_vector % mpc->num_queues] from a NULL pointer
-produces an invalid address, and the subsequent dereference eq->eq->id
-would crash the kernel.
-
-Should there be a NULL check here, or should mana_ib_create_qp_rss()
-ensure EQs are created before reaching this point?
-
->
->  		ret = mana_create_wq_obj(mpc, mpc->port_handle, GDMA_RQ,
-
-[ ... ]
 
