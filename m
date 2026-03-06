@@ -1,615 +1,351 @@
-Return-Path: <netdev+bounces-264867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264856-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LwiGfX3qmlxZAEAu9opvQ
-	(envelope-from <netdev+bounces-264867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:51:17 +0100
+	id kEyaKT34qmlxZAEAu9opvQ
+	(envelope-from <netdev+bounces-264856-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:52:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24C02243D9
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:51:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F21922445C
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 29B2F305D263
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 15:49:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4243E3073A47
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 15:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1353EBF09;
-	Fri,  6 Mar 2026 15:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6713836C0DE;
+	Fri,  6 Mar 2026 15:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rr5T8ZVo"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VZfYEMdQ";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GMhU1uyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E932F3EB7F8
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 15:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE19346FAB
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 15:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772812175; cv=none; b=O3RUe6RBZvSf+1haTqd5D1CIivSgE72ZerTwLY6o/T3C7OA8Kjc9UOrwod0MWkdjJT0JavL3usesTH7ij3L5JZ4bsj+5cyl4oTA+9ibOb5N6nef9D4b0gxnIhsst+fAGpVOnxhCm2AmHrgcDNjFicIZutSUA7l9FHnnUZzNoud4=
+	t=1772812028; cv=none; b=A+/0RIdKPG+ED2QBgiqlRFTecvB1GbYgDGvLbMALE+oRNV1u0j3HTkZgiL0WGaMKgCdOZe+c5jLTVDc+XFMxIAt+uIqOKrfbr0/jfEupRi19S0drRzGvyW55djcTQsAsn6nrSTHequAvnY6nO7Zf2Os6DBAoEZSI8UuSPoo/NN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772812175; c=relaxed/simple;
-	bh=2bqmAe4MDbDAkCULiEykTd+QxH4ulctvP2IJ9jekacs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DYrtYwqphVK9TAcbgXlLhwFly4sNGzbL97XYNFBiQ0WjmU6VArO1gZh4WeLBqOp9NNxqXM0c25ITsdwigt8Ge8RY2yxP28YNY+1MnlidqL5ujKfv+wvc49svhvQa5+JczyGMNXkV3ahAOJZammTVf/NvVbmj0ITxWHWuehy6NGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rr5T8ZVo; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-359a5d8b3f8so2051642a91.3
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 07:49:33 -0800 (PST)
+	s=arc-20240116; t=1772812028; c=relaxed/simple;
+	bh=9XdbdEuY3r56nFysWw/+z8F36Fo03OLGA684GE1V7LQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t2WyC5bt9bkvMtME4qn+16aGWplLCt0etrV9/TAJd2ytCjnUoUnacPneTJHk4g7xxjRJwSArzeRNGbStRcQme0reg4/1OsEpslRpwEuIqKg/yWtOHnINKYV9y6ekdNP7IP2F+Q/1fxxaRsfhzwABp5sPX93pjYGeKfbifulHDc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VZfYEMdQ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GMhU1uyj; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 626FT73s027794
+	for <netdev@vger.kernel.org>; Fri, 6 Mar 2026 15:47:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=s7+GDpIdG2iguwUQE64k+F
+	OMd/bKz4kwkSaaXmdUVO0=; b=VZfYEMdQLwm3iGAC8DTJYKn9ThXfpZxkj8H5O9
+	CxC6cxr3IAoE1xNSfDYa4MPhmG6nCTd+gUJmCMhCaV/RU0LiRWTkJ7hHrS+AULiw
+	OaBh1VseKUHqqHAGdPDpFybbsMTxBeDzf3sU6AppYKVicsaAljTT99rK/1zp+DMJ
+	QFh6FPfkB83m9Nu8o2CxdxQUnlQwm+8gOK/GIYGv2LpH1oM8ASFq+ESsbB2SsDD7
+	1WKZykouR/FN9jI6kUmrg7iBn/w8kxjL+Zr842gMr6ckoywG0wngMn+3CL6WSPFD
+	D8FblqQjRiKAp1YWk+n9mSbHqJhp7bf835XLtHl0xj4RdhrA==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cqv98h5mv-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 15:47:03 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c711251ac5so5137678985a.1
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 07:47:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772812173; x=1773416973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wouP51WRVkoVl7gi11YNMLD9kIN48p1TbHSTtEAAOxY=;
-        b=Rr5T8ZVoEzlvHuUS+/K5y67qjCPCQCcz1JDSV1EUHvTGXqntNHPe0sd7e6h9DoUfgS
-         ex6qCC2SI7kMqIGDI0p/x/1cGjsqgTQ+nV3g3NCqRtMSfSaYam+M8ni5ohX4f2mxbfPU
-         uTGh5JVgzQ8N7iOL+xuF5OOCessgzy5yVBtiNHAytuVoV+nLdyAdLdV/MVa74awdpqW9
-         Wd7oO48yhuLG1dRIE9L1ZpVjRDkdgBpE+z8i+lVWeWauyLGBMjsKh7kuc3UaYfwJ7REm
-         2c31+JDxLC48eQgU5JWGcqTcNWM0MsP/J04o9coC2Y46/UQ7f9ZZiSwVJGADlYs4Kd0l
-         5B8g==
+        d=oss.qualcomm.com; s=google; t=1772812023; x=1773416823; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s7+GDpIdG2iguwUQE64k+FOMd/bKz4kwkSaaXmdUVO0=;
+        b=GMhU1uyjRoW7MJoiVxOPeRCZcSo+KtBV5dQWI70mtMj6VcDuNrgdTfwGvuLUl9gOOt
+         eJJOFPihviQzAigLDH9WqB1+cVa6T2AGHyksbGyhfF2xpvPInvmuIBIRLUHyzSyfZl8d
+         ML/VryM8B2UZb46TU73eUlPDvX6RhWel3T0UzHpgjkkFnLbIqcNbP4kfsH+0kEItNa4I
+         YGWlXEOmim4NJSNzsbTdFVGCD74whlgPBPOrBpXZ3mbESVwTG0rfVFweEz1mn4iNdFmF
+         Ex47dvlXCMGExJUC6jDplY45cKVe7/ViSi2FN2bIH/XI1JWnAdYzNOj4+rmSTpcap/Nq
+         fcgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772812173; x=1773416973;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wouP51WRVkoVl7gi11YNMLD9kIN48p1TbHSTtEAAOxY=;
-        b=JddIbzoePAuq9L0OgRZH2K0AVkInKK9Zbd+GoUEtJ6j7BAww3nJMwuoZQXjmGcFm/2
-         e8W9xv3DA9kERsilVtmNNG8Ym0uczpMC+0XpFEwAriss3U1e87JQIVWXzNemVmca0C7w
-         nhVaBdQjSYALeg8q6OmLRWqGWimCP4htmFyEQQ7pHHRkb0ZvgPavASiWf+VsCOCtKCQH
-         aE9shGq9449XQS+USOywg1V8Bi7sjDiYcTRntK7GnI7FCq5RYhB9v2q92ppgDOxMrpGz
-         yA0hOMq8u4t0AGaCo2r+XPsPVDD5r3q7xc59tfrZPSNcgNGNz2jpYs9pp1rEcSuXAACX
-         NVLA==
-X-Gm-Message-State: AOJu0YyQDkVRpNed4miNGIAjzIMTHEdYd+t4Pw+KjmjgQ2VixLkzT6nj
-	hma7ciWXvELiwZw/r5BS8cRy9N9yHzW5p2ZbC+s6aTjGirwQfbOY5vadjGGywbT2Fjg=
-X-Gm-Gg: ATEYQzxg3EQ76vr5TYvaYSkoSTuJGxjIvIa9cO+gEpXmJlb+wYXAJ1HPgdyrwFu8tSh
-	b8GaM5rTWRrU9RTT6YkidbOZsYwf41t7Nu3/asCAveg+BB1kDPbBjLVkxTCvSuHnrBCz+MPIphb
-	x1nda3uvbMohprwyC4B7h7dOhdXIw3qannmM+6kk60l+i0f0b53/VbsSGzxQhLTk7gB6CCQeFyQ
-	h3IYizM5hb8vWBFnvgq4Jf0mBhyQMMIqz9NuTDmsG0/65LjAymx1k97uZRogAIGyTjZCDxAjhDY
-	sdIv1hpZgBrrV7IW3EELoHqIVqMwmytkbA0/t1bfuRu71XF/ouz51qDKnVkZIQKM2M/c9eDQtX+
-	fRMNbUtvVrklZiZqzpIWV1Ww9NLF3G79P+YzPulAluPU0lA06GTTPkubo1yZfuZfrt6F9uhBowp
-	oWmaQv6V2CrtYvg9PtQ7Hltc3DDnxajlO0bGTss7GbN0Sy
-X-Received: by 2002:a17:90b:33c4:b0:359:806c:7a94 with SMTP id 98e67ed59e1d1-359be233997mr2425732a91.7.1772812173122;
-        Fri, 06 Mar 2026 07:49:33 -0800 (PST)
-Received: from d.home.yangfl.dn42 ([2603:c020:800b:d7ff::38])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359bbaa5fa1sm1532769a91.0.2026.03.06.07.49.27
+        d=1e100.net; s=20230601; t=1772812023; x=1773416823;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s7+GDpIdG2iguwUQE64k+FOMd/bKz4kwkSaaXmdUVO0=;
+        b=BJTWGm3/yGhQLxSmkda21a1wpt8xPVdcOKYo+f4ON8MAVLd/nYuxq5IjQDmqWN5Qab
+         LXHXx2SqqgKwIGEaH+jcBwF59YrJYyNAXKO9i7/4plxcCgNmR/fdZAC0RHB3f4zdhe0F
+         TewjDIfnJMLQ2pViKxZsU7n97VDPV8YCq3Nc9SL1boFBVDrtmi1DT3jEAmZE7TTN/FKj
+         paAXcSeKO7bvEYz32zonnn+C565nMLqfHDO/P1qwWUgizJtkAo/tSZKrIL3W91DsiRX3
+         wg6OIENCOjzqCEIHanYcaHvfP7uiNMttuNCD4kseflzhtETxZj3atSBlOciLUT6LKDme
+         msEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWjBDL/AiXADGUMno8MzjUW4605txI6YQIqH9hu0ccCusqfOHsBFm4No6YwZX433XJkwT4FwNI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGMvUlMpBjrr1usYenD20KzLtqAPFfu3vfNxTDD6qjqhi6KhQw
+	hCHAIpL92XnjH9Yo17VOWqUO6G8YC5YgWGr2iYJWWQVDZHszogM4DHANZAYXa6u5hQ8to3lS+iT
+	/kaokDspovYdUrEHCG/BxkgLGDHuntuRzMjLTuMx+laldMX8sjpYrDzBWnTE=
+X-Gm-Gg: ATEYQzyw3CDJdTB3Bztc85za3tg75jxQf3/Z87eJH9GS8V1Lb9M2cm7+fD/RF5y0iuq
+	4k5SanZz6/FI7mEEmMamKkRBcWOTAZAXwmdb/D7cVeQoIK8rR3HgrVDwIXhX1vEgoM+UYfDnWsX
+	V+YjkAAuaOdSbi22xAV0L84g/jR6I7zE6Wr04s3ENbrGrgV1tF1/ecszmWp3nxjxcdWgbhp1X8o
+	qrneX0LWfnZ1qm48dG9VtRamPH22B3e/N5FhzneUyqL1Ya/NAGf/TSv7y2mcQF+AWzcj1eddDKi
+	jroAqNhaGzEp8Adnel2shzFUfGDSQxUvPS4jpiFOy3iGlUEx5Pf/AVpIfAaZEnxvuPvMM8j5M0H
+	czXkO7iDY8fxEZLp6Z/cW6tVj9mqJUhKTAynCYNewh5M96Axb1i5p
+X-Received: by 2002:a05:620a:480c:b0:8cd:6175:9b17 with SMTP id af79cd13be357-8cd6d324d9cmr316909485a.3.1772812023098;
+        Fri, 06 Mar 2026 07:47:03 -0800 (PST)
+X-Received: by 2002:a05:620a:480c:b0:8cd:6175:9b17 with SMTP id af79cd13be357-8cd6d324d9cmr316900985a.3.1772812022400;
+        Fri, 06 Mar 2026 07:47:02 -0800 (PST)
+Received: from brgl-qcom.local ([2a01:cb1d:dc:7e00:6d2b:ebde:c946:11eb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae35cf7sm5122767f8f.26.2026.03.06.07.46.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 07:49:32 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 2/2] net: dsa: yt921x: Use u64_stats_t for MIB stats
-Date: Fri,  6 Mar 2026 23:46:27 +0800
-Message-ID: <20260306154637.3126497-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260306154637.3126497-1-mmyangfl@gmail.com>
-References: <20260306154637.3126497-1-mmyangfl@gmail.com>
+        Fri, 06 Mar 2026 07:47:01 -0800 (PST)
+From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: [PATCH net-next v7 0/7] net: stmmac: qcom-ethqos: add support for
+ SCMI power domains
+Date: Fri, 06 Mar 2026 16:46:38 +0100
+Message-Id: <20260306-qcom-sa8255p-emac-v7-0-d6a3013094b7@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F24C02243D9
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN72qmkC/3XQzW6DMAwA4Fepcl6QnX926ntMPRgIbaRC2oShT
+ hXvvozDOgl2sWQ5/hz7ybJPwWf2fniy5OeQQxxLYt8OrL3QePY8dCVnAoQGC4rf2zjwTE5ofeN
+ +oJY7ZUBITa1GwUrfLfk+PFbzg41+4qN/TOxUKpeQp5i+1mEzrvXVrRF23Bk5cCnI1m2P3hh3v
+ IaRUqxiOq/cLH8JBGH3CFkIq62xTS0kULMh1IvA3e1mVYjeGmMAnG09bQj9l9j9hS4EYCe9JOq
+ l2y5iXoTAeo8whVDO9ghOKIP+GHOu7p90LU+HqoSfyxfAAKL4D3CGZKcaQZ2TW+C0LMs3WLN6r
+ xACAAA=
+X-Change-ID: 20250704-qcom-sa8255p-emac-8460235ac512
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Matthew Gerlach <matthew.gerlach@altera.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Keguang Zhang <keguang.zhang@gmail.com>,
+        Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
+        Romain Gantois <romain.gantois@bootlin.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Heiko Stuebner <heiko@sntech.de>, Chen Wang <unicorn_wang@outlook.com>,
+        Inochi Amaoto <inochiama@gmail.com>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Minda Chen <minda.chen@starfivetech.com>,
+        Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Fu Wei <wefu@redhat.com>,
+        Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Shuang Liang <liangshuang@eswincomputing.com>,
+        Zhi Li <lizhi2@eswincomputing.com>,
+        Shangjuan Wei <weishangjuan@eswincomputing.com>,
+        "G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>,
+        Clark Wang <xiaoning.wang@nxp.com>, Linux Team <linux-imx@nxp.com>,
+        Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>,
+        Samin Guo <samin.guo@starfivetech.com>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        Swathi K S <swathi.ks@samsung.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        Drew Fustini <dfustini@tenstorrent.com>, linux-sunxi@lists.linux.dev,
+        linux-amlogic@lists.infradead.org, linux-mips@vger.kernel.org,
+        imx@lists.linux.dev, linux-renesas-soc@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
+        linux-riscv@lists.infradead.org, brgl@kernel.org,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4813;
+ i=bartosz.golaszewski@oss.qualcomm.com; h=from:subject:message-id;
+ bh=9XdbdEuY3r56nFysWw/+z8F36Fo03OLGA684GE1V7LQ=;
+ b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBpqvbl89SImz11xHcuz4WDVyxsJu7Xg04hSUq/w
+ BshdqAyIB2JAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCaar25QAKCRAFnS7L/zaE
+ w/ttD/9UXcdtgk6BPmYCk4u4YMb/6T+/x/SMFrWGNcnRTVeKZmKBx4XjiUEWNxvf5vdXE7bS7LI
+ 3pNu8sde/ehrP/o4h65JxnvK+daDpw2rs1rxMwbf8Osf2XcY4xBuLdhoUkfj6X2E7xkc7OCLDF5
+ 0GJcZkdvmaL/0qU2JQf1bsrSRnGrI0bz2c+oLTE3kEW2mzFJ3t8ZIHUR5Q8xrSeJubKdIJ9mDC5
+ 6mfHpHuReCcjyw49JAEkqKZAIhrqunr5JJ6dyIAWPIwqcxsdZ1aeOaBnQXpXnootXhGIm+PO93d
+ kGukWxEniA2Gprewa2DHJdYLbCtTS3w5D7Fl3OSIZJ21wDu+kjUeI5SyziMbdj4Z7wXtrB+Jc+U
+ Js61MNa07EM9v717I0ht1296Ag55084wrRRZngMtH40//I9x6VshC0VMEIRt9s23cCuV/bVoP2e
+ 5m+r5Kug4Vn1Jrov/zT/uyi3UU94Z1C8yl4WhipbO8JVGiAw8o+5sBtB+WJIJy7ucZbFs6MlCVa
+ CjkVBLpUBQI0ypw49JdCOhl2qe+Kx5IJLBzuTrUxNgaZ4cV67SsTlP760yTMVxNmv67oU7ojW0l
+ 9InFvM/EOxvqQqfpGCJLI11zBLgGUzSx/uH5Uf5IyATrOA/Bv0VWr/3rEap3MqTV8KG7sMr5MBS
+ fYcPCKLAprXrKvg==
+X-Developer-Key: i=bartosz.golaszewski@oss.qualcomm.com; a=openpgp;
+ fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
+X-Proofpoint-GUID: J7IQR_yzaVtkVDPARSyKX3eeM5_Mc43L
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE0NiBTYWx0ZWRfX+zv1IZYqtlba
+ aS4yDFCqvUkQyWaQpp7t+YXriF3d9sw764Q3qG3ow7j+G7ThPIyeToOPvPLLZDlY9yc3QyOOq4G
+ SxiIBiDDkQiulEG5jHP8p9n8cjlpbpOFNMvIfI+U0rjc86g7IwKs0ToL7BWOa/VVGrshJ+wVeL9
+ Xi0GRPvhaXOh0K6YO3v8xuYzX1m05KWwrhhKDJbGG9WYZ+qNRUYPKsv8MSUHQ9eoETB/OJQdDZI
+ BPTgKtNdX98NArrJ4lXnj59gIh0lLDcMz4eVCAaMPWUpljN22bleV0nW6QfNeCrjJ1zrv2r5SNY
+ 2PeZQd406Ja9ng/FPK0gBuXl/4EFtTCq8n3LmU+c9pUzmIxwhV5AOK2WDHD/FrtNsgAYrCG0A3a
+ Znykxx5Iq7fhOacdQ5SyRx5Fs1R7GmAPXaqWIN6LX8iiNocfw6lEgxpbbm7Z3sKYkbMm1d7EGMA
+ sWgxbuLG1hgd6r9PIQA==
+X-Authority-Analysis: v=2.4 cv=LbcxKzfi c=1 sm=1 tr=0 ts=69aaf6f7 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=KKAkSRfTAAAA:8 a=PHq6YzTAAAAA:8 a=h7uu4O38hj_b6GN6T5YA:9
+ a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22 a=cvBusfyB2V15izCimMoJ:22
+ a=ZKzU8r6zoKMcqsNulkmm:22
+X-Proofpoint-ORIG-GUID: J7IQR_yzaVtkVDPARSyKX3eeM5_Mc43L
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-06_04,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 spamscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
+ phishscore=0 adultscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060146
+X-Rspamd-Queue-Id: 0F21922445C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264867-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,foss.st.com,st.com,synopsys.com,sholland.org,altera.com,linaro.org,baylibre.com,googlemail.com,pengutronix.de,oss.nxp.com,nxp.com,bootlin.com,bp.renesas.com,sntech.de,outlook.com,esmil.dk,starfivetech.com,mail.toshiba,glider.be,eswincomputing.com,intel.com,rock-chips.com,samsung.com,oss.qualcomm.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264856-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,linaro.org:email,armlinux.org.uk:email];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.980];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[bartosz.golaszewski@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[78];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.971];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-64-bit variables might not be atomic on 32-bit architectures, and could
-lead to load/store tearing. Use u64_stats_t to ensure consistency.
+Add support for the firmware-managed variant of the DesignWare MAC on
+the sa8255p platform. This series contains new DT bindings and driver
+changes required to support the MAC in the STMMAC driver.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+It also reorganizes the ethqos code quite a bit to make the introduction
+of power domains into the driver a bit easier on the eye.
+
+The DTS changes will go in separately.
+
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 ---
- drivers/net/dsa/yt921x.c | 197 +++++++++++++++++++++++----------------
- drivers/net/dsa/yt921x.h | 114 ++++++++++++----------
- 2 files changed, 178 insertions(+), 133 deletions(-)
+Changes in v7:
+- Restored the correct authorship after learning git uses .mailmap for
+  the --author switch
+- Rebased on top of changes from Russell
+- Fixed resource management issues in error paths
+- Link to v6: https://lore.kernel.org/r/20260112-qcom-sa8255p-emac-v6-0-86a3d4b2ad83@oss.qualcomm.com
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index a968a3fb56f8..b9ae49e01c2e 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -20,6 +20,7 @@
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/sort.h>
-+#include <linux/u64_stats_sync.h>
- 
- #include <net/dsa.h>
- #include <net/dscp.h>
-@@ -670,22 +671,20 @@ yt921x_mbus_ext_init(struct yt921x_priv *priv, struct device_node *mnp)
- static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- {
- 	struct yt921x_port *pp = &priv->ports[port];
-+	struct yt921x_mib *mib_new = &pp->mib_new;
- 	struct device *dev = to_device(priv);
- 	struct yt921x_mib *mib = &pp->mib;
-+	u64 rx_frames;
-+	u64 tx_frames;
- 	int res = 0;
- 
--	/* Reading of yt921x_port::mib is not protected by a lock and it's vain
--	 * to keep its consistency, since we have to read registers one by one
--	 * and there is no way to make a snapshot of MIB stats.
--	 *
--	 * Writing (by this function only) is and should be protected by
--	 * reg_lock.
-+	/* u64_stats_read/set is redundant for mib_new, but I don't want to
-+	 * declare a plain u64 yt921x_mib variant.
- 	 */
- 
- 	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
- 		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
- 		u32 reg = YT921X_MIBn_DATA0(port) + desc->offset;
--		u64 *valp = &((u64 *)mib)[i];
- 		u32 val0;
- 		u64 val;
- 
-@@ -694,7 +693,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			break;
- 
- 		if (desc->size <= 1) {
--			u64 old_val = *valp;
-+			u64 old_val = u64_stats_read(&mib->stats[i]);
- 
- 			val = (old_val & ~(u64)U32_MAX) | val0;
- 			if (val < old_val)
-@@ -708,7 +707,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			val = ((u64)val1 << 32) | val0;
- 		}
- 
--		WRITE_ONCE(*valp, val);
-+		u64_stats_set(&mib_new->stats[i], val);
- 	}
- 
- 	if (res) {
-@@ -717,14 +716,29 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 		return res;
- 	}
- 
--	pp->rx_frames = mib->rx_64byte + mib->rx_65_127byte +
--			mib->rx_128_255byte + mib->rx_256_511byte +
--			mib->rx_512_1023byte + mib->rx_1024_1518byte +
--			mib->rx_jumbo;
--	pp->tx_frames = mib->tx_64byte + mib->tx_65_127byte +
--			mib->tx_128_255byte + mib->tx_256_511byte +
--			mib->tx_512_1023byte + mib->tx_1024_1518byte +
--			mib->tx_jumbo;
-+	rx_frames = u64_stats_read(&mib_new->rx_64byte) +
-+		    u64_stats_read(&mib_new->rx_65_127byte) +
-+		    u64_stats_read(&mib_new->rx_128_255byte) +
-+		    u64_stats_read(&mib_new->rx_256_511byte) +
-+		    u64_stats_read(&mib_new->rx_512_1023byte) +
-+		    u64_stats_read(&mib_new->rx_1024_1518byte) +
-+		    u64_stats_read(&mib_new->rx_jumbo);
-+	tx_frames = u64_stats_read(&mib_new->tx_64byte) +
-+		    u64_stats_read(&mib_new->tx_65_127byte) +
-+		    u64_stats_read(&mib_new->tx_128_255byte) +
-+		    u64_stats_read(&mib_new->tx_256_511byte) +
-+		    u64_stats_read(&mib_new->tx_512_1023byte) +
-+		    u64_stats_read(&mib_new->tx_1024_1518byte) +
-+		    u64_stats_read(&mib_new->tx_jumbo);
-+
-+	u64_stats_update_begin(&pp->syncp);
-+	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-+		u64_stats_set(&mib->stats[i],
-+			      u64_stats_read(&mib_new->stats[i]));
-+	}
-+	u64_stats_set(&pp->rx_frames, rx_frames);
-+	u64_stats_set(&pp->tx_frames, tx_frames);
-+	u64_stats_update_end(&pp->syncp);
- 
- 	return 0;
- }
-@@ -772,8 +786,8 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
- 	size_t j;
- 
- 	mutex_lock(&priv->reg_lock);
-+
- 	yt921x_read_mib(priv, port);
--	mutex_unlock(&priv->reg_lock);
- 
- 	j = 0;
- 	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-@@ -782,9 +796,11 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
- 		if (!desc->name)
- 			continue;
- 
--		data[j] = ((u64 *)mib)[i];
-+		data[j] = u64_stats_read(&mib->stats[i]);
- 		j++;
- 	}
-+
-+	mutex_unlock(&priv->reg_lock);
- }
- 
- static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
-@@ -813,31 +829,33 @@ yt921x_dsa_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_mib *mib = &pp->mib;
- 
- 	mutex_lock(&priv->reg_lock);
-+
- 	yt921x_read_mib(priv, port);
--	mutex_unlock(&priv->reg_lock);
- 
--	mac_stats->FramesTransmittedOK = pp->tx_frames;
--	mac_stats->SingleCollisionFrames = mib->tx_single_collisions;
--	mac_stats->MultipleCollisionFrames = mib->tx_multiple_collisions;
--	mac_stats->FramesReceivedOK = pp->rx_frames;
--	mac_stats->FrameCheckSequenceErrors = mib->rx_crc_errors;
--	mac_stats->AlignmentErrors = mib->rx_alignment_errors;
--	mac_stats->OctetsTransmittedOK = mib->tx_good_bytes;
--	mac_stats->FramesWithDeferredXmissions = mib->tx_deferred;
--	mac_stats->LateCollisions = mib->tx_late_collisions;
--	mac_stats->FramesAbortedDueToXSColls = mib->tx_aborted_errors;
-+	mac_stats->FramesTransmittedOK = u64_stats_read(&pp->tx_frames);
-+	mac_stats->SingleCollisionFrames = u64_stats_read(&mib->tx_single_collisions);
-+	mac_stats->MultipleCollisionFrames = u64_stats_read(&mib->tx_multiple_collisions);
-+	mac_stats->FramesReceivedOK = u64_stats_read(&pp->rx_frames);
-+	mac_stats->FrameCheckSequenceErrors = u64_stats_read(&mib->rx_crc_errors);
-+	mac_stats->AlignmentErrors = u64_stats_read(&mib->rx_alignment_errors);
-+	mac_stats->OctetsTransmittedOK = u64_stats_read(&mib->tx_good_bytes);
-+	mac_stats->FramesWithDeferredXmissions = u64_stats_read(&mib->tx_deferred);
-+	mac_stats->LateCollisions = u64_stats_read(&mib->tx_late_collisions);
-+	mac_stats->FramesAbortedDueToXSColls = u64_stats_read(&mib->tx_aborted_errors);
- 	/* mac_stats->FramesLostDueToIntMACXmitError */
- 	/* mac_stats->CarrierSenseErrors */
--	mac_stats->OctetsReceivedOK = mib->rx_good_bytes;
-+	mac_stats->OctetsReceivedOK = u64_stats_read(&mib->rx_good_bytes);
- 	/* mac_stats->FramesLostDueToIntMACRcvError */
--	mac_stats->MulticastFramesXmittedOK = mib->tx_multicast;
--	mac_stats->BroadcastFramesXmittedOK = mib->tx_broadcast;
-+	mac_stats->MulticastFramesXmittedOK = u64_stats_read(&mib->tx_multicast);
-+	mac_stats->BroadcastFramesXmittedOK = u64_stats_read(&mib->tx_broadcast);
- 	/* mac_stats->FramesWithExcessiveDeferral */
--	mac_stats->MulticastFramesReceivedOK = mib->rx_multicast;
--	mac_stats->BroadcastFramesReceivedOK = mib->rx_broadcast;
-+	mac_stats->MulticastFramesReceivedOK = u64_stats_read(&mib->rx_multicast);
-+	mac_stats->BroadcastFramesReceivedOK = u64_stats_read(&mib->rx_broadcast);
- 	/* mac_stats->InRangeLengthErrors */
- 	/* mac_stats->OutOfRangeLengthField */
--	mac_stats->FrameTooLongErrors = mib->rx_oversize_errors;
-+	mac_stats->FrameTooLongErrors = u64_stats_read(&mib->rx_oversize_errors);
-+
-+	mutex_unlock(&priv->reg_lock);
- }
- 
- static void
-@@ -849,12 +867,14 @@ yt921x_dsa_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_mib *mib = &pp->mib;
- 
- 	mutex_lock(&priv->reg_lock);
-+
- 	yt921x_read_mib(priv, port);
--	mutex_unlock(&priv->reg_lock);
- 
--	ctrl_stats->MACControlFramesTransmitted = mib->tx_pause;
--	ctrl_stats->MACControlFramesReceived = mib->rx_pause;
-+	ctrl_stats->MACControlFramesTransmitted = u64_stats_read(&mib->tx_pause);
-+	ctrl_stats->MACControlFramesReceived = u64_stats_read(&mib->rx_pause);
- 	/* ctrl_stats->UnsupportedOpcodesReceived */
-+
-+	mutex_unlock(&priv->reg_lock);
- }
- 
- static const struct ethtool_rmon_hist_range yt921x_rmon_ranges[] = {
-@@ -878,31 +898,33 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_mib *mib = &pp->mib;
- 
- 	mutex_lock(&priv->reg_lock);
-+
- 	yt921x_read_mib(priv, port);
--	mutex_unlock(&priv->reg_lock);
- 
- 	*ranges = yt921x_rmon_ranges;
- 
--	rmon_stats->undersize_pkts = mib->rx_undersize_errors;
--	rmon_stats->oversize_pkts = mib->rx_oversize_errors;
--	rmon_stats->fragments = mib->rx_alignment_errors;
-+	rmon_stats->undersize_pkts = u64_stats_read(&mib->rx_undersize_errors);
-+	rmon_stats->oversize_pkts = u64_stats_read(&mib->rx_oversize_errors);
-+	rmon_stats->fragments = u64_stats_read(&mib->rx_alignment_errors);
- 	/* rmon_stats->jabbers */
- 
--	rmon_stats->hist[0] = mib->rx_64byte;
--	rmon_stats->hist[1] = mib->rx_65_127byte;
--	rmon_stats->hist[2] = mib->rx_128_255byte;
--	rmon_stats->hist[3] = mib->rx_256_511byte;
--	rmon_stats->hist[4] = mib->rx_512_1023byte;
--	rmon_stats->hist[5] = mib->rx_1024_1518byte;
--	rmon_stats->hist[6] = mib->rx_jumbo;
-+	rmon_stats->hist[0] = u64_stats_read(&mib->rx_64byte);
-+	rmon_stats->hist[1] = u64_stats_read(&mib->rx_65_127byte);
-+	rmon_stats->hist[2] = u64_stats_read(&mib->rx_128_255byte);
-+	rmon_stats->hist[3] = u64_stats_read(&mib->rx_256_511byte);
-+	rmon_stats->hist[4] = u64_stats_read(&mib->rx_512_1023byte);
-+	rmon_stats->hist[5] = u64_stats_read(&mib->rx_1024_1518byte);
-+	rmon_stats->hist[6] = u64_stats_read(&mib->rx_jumbo);
-+
-+	rmon_stats->hist_tx[0] = u64_stats_read(&mib->tx_64byte);
-+	rmon_stats->hist_tx[1] = u64_stats_read(&mib->tx_65_127byte);
-+	rmon_stats->hist_tx[2] = u64_stats_read(&mib->tx_128_255byte);
-+	rmon_stats->hist_tx[3] = u64_stats_read(&mib->tx_256_511byte);
-+	rmon_stats->hist_tx[4] = u64_stats_read(&mib->tx_512_1023byte);
-+	rmon_stats->hist_tx[5] = u64_stats_read(&mib->tx_1024_1518byte);
-+	rmon_stats->hist_tx[6] = u64_stats_read(&mib->tx_jumbo);
- 
--	rmon_stats->hist_tx[0] = mib->tx_64byte;
--	rmon_stats->hist_tx[1] = mib->tx_65_127byte;
--	rmon_stats->hist_tx[2] = mib->tx_128_255byte;
--	rmon_stats->hist_tx[3] = mib->tx_256_511byte;
--	rmon_stats->hist_tx[4] = mib->tx_512_1023byte;
--	rmon_stats->hist_tx[5] = mib->tx_1024_1518byte;
--	rmon_stats->hist_tx[6] = mib->tx_jumbo;
-+	mutex_unlock(&priv->reg_lock);
- }
- 
- static void
-@@ -912,33 +934,41 @@ yt921x_dsa_get_stats64(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
-+
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		stats->rx_length_errors = u64_stats_read(&mib->rx_undersize_errors) +
-+					  u64_stats_read(&mib->rx_fragment_errors);
-+		stats->rx_over_errors = u64_stats_read(&mib->rx_oversize_errors);
-+		stats->rx_crc_errors = u64_stats_read(&mib->rx_crc_errors);
-+		stats->rx_frame_errors = u64_stats_read(&mib->rx_alignment_errors);
-+		/* stats->rx_fifo_errors */
-+		/* stats->rx_missed_errors */
-+
-+		stats->tx_aborted_errors = u64_stats_read(&mib->tx_aborted_errors);
-+		/* stats->tx_carrier_errors */
-+		stats->tx_fifo_errors = u64_stats_read(&mib->tx_undersize_errors);
-+		/* stats->tx_heartbeat_errors */
-+		stats->tx_window_errors = u64_stats_read(&mib->tx_late_collisions);
-+
-+		stats->rx_packets = u64_stats_read(&pp->rx_frames);
-+		stats->tx_packets = u64_stats_read(&pp->tx_frames);
-+		stats->rx_bytes = u64_stats_read(&mib->rx_good_bytes) -
-+				  ETH_FCS_LEN * stats->rx_packets;
-+		stats->tx_bytes = u64_stats_read(&mib->tx_good_bytes) -
-+				  ETH_FCS_LEN * stats->tx_packets;
-+		stats->rx_dropped = u64_stats_read(&mib->rx_dropped);
-+		/* stats->tx_dropped */
-+		stats->multicast = u64_stats_read(&mib->rx_multicast);
-+		stats->collisions = u64_stats_read(&mib->tx_collisions);
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- 
--	stats->rx_length_errors = mib->rx_undersize_errors +
--				  mib->rx_fragment_errors;
--	stats->rx_over_errors = mib->rx_oversize_errors;
--	stats->rx_crc_errors = mib->rx_crc_errors;
--	stats->rx_frame_errors = mib->rx_alignment_errors;
--	/* stats->rx_fifo_errors */
--	/* stats->rx_missed_errors */
--
--	stats->tx_aborted_errors = mib->tx_aborted_errors;
--	/* stats->tx_carrier_errors */
--	stats->tx_fifo_errors = mib->tx_undersize_errors;
--	/* stats->tx_heartbeat_errors */
--	stats->tx_window_errors = mib->tx_late_collisions;
--
--	stats->rx_packets = pp->rx_frames;
--	stats->tx_packets = pp->tx_frames;
--	stats->rx_bytes = mib->rx_good_bytes - ETH_FCS_LEN * stats->rx_packets;
--	stats->tx_bytes = mib->tx_good_bytes - ETH_FCS_LEN * stats->tx_packets;
- 	stats->rx_errors = stats->rx_length_errors + stats->rx_over_errors +
- 			   stats->rx_crc_errors + stats->rx_frame_errors;
- 	stats->tx_errors = stats->tx_aborted_errors + stats->tx_fifo_errors +
- 			   stats->tx_window_errors;
--	stats->rx_dropped = mib->rx_dropped;
--	/* stats->tx_dropped */
--	stats->multicast = mib->rx_multicast;
--	stats->collisions = mib->tx_collisions;
- }
- 
- static void
-@@ -950,11 +980,13 @@ yt921x_dsa_get_pause_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_mib *mib = &pp->mib;
- 
- 	mutex_lock(&priv->reg_lock);
-+
- 	yt921x_read_mib(priv, port);
--	mutex_unlock(&priv->reg_lock);
- 
--	pause_stats->tx_pause_frames = mib->tx_pause;
--	pause_stats->rx_pause_frames = mib->rx_pause;
-+	pause_stats->tx_pause_frames = u64_stats_read(&mib->tx_pause);
-+	pause_stats->rx_pause_frames = u64_stats_read(&mib->rx_pause);
-+
-+	mutex_unlock(&priv->reg_lock);
- }
- 
- static int
-@@ -3423,6 +3455,7 @@ static int yt921x_mdio_probe(struct mdio_device *mdiodev)
- 
- 		pp->index = i;
- 		INIT_DELAYED_WORK(&pp->mib_read, yt921x_poll_mib);
-+		u64_stats_init(&pp->syncp);
- 	}
- 
- 	ds = &priv->ds;
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 3f129b8d403f..93d0f55d1745 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -6,6 +6,8 @@
- #ifndef __YT921X_H
- #define __YT921X_H
- 
-+#include <linux/u64_stats_sync.h>
-+
- #include <net/dsa.h>
- 
- #define YT921X_SMI_SWITCHID_M		GENMASK(3, 2)
-@@ -530,55 +532,61 @@ enum yt921x_fdb_entry_status {
- #define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
- 
- struct yt921x_mib {
--	u64 rx_broadcast;
--	u64 rx_pause;
--	u64 rx_multicast;
--	u64 rx_crc_errors;
--
--	u64 rx_alignment_errors;
--	u64 rx_undersize_errors;
--	u64 rx_fragment_errors;
--	u64 rx_64byte;
--
--	u64 rx_65_127byte;
--	u64 rx_128_255byte;
--	u64 rx_256_511byte;
--	u64 rx_512_1023byte;
--
--	u64 rx_1024_1518byte;
--	u64 rx_jumbo;
--	u64 rx_good_bytes;
--
--	u64 rx_bad_bytes;
--	u64 rx_oversize_errors;
--
--	u64 rx_dropped;
--	u64 tx_broadcast;
--	u64 tx_pause;
--	u64 tx_multicast;
--
--	u64 tx_undersize_errors;
--	u64 tx_64byte;
--	u64 tx_65_127byte;
--	u64 tx_128_255byte;
--
--	u64 tx_256_511byte;
--	u64 tx_512_1023byte;
--	u64 tx_1024_1518byte;
--	u64 tx_jumbo;
--
--	u64 tx_good_bytes;
--	u64 tx_collisions;
--
--	u64 tx_aborted_errors;
--	u64 tx_multiple_collisions;
--	u64 tx_single_collisions;
--	u64 tx_good;
--
--	u64 tx_deferred;
--	u64 tx_late_collisions;
--	u64 rx_oam;
--	u64 tx_oam;
-+	union {
-+		struct {
-+			u64_stats_t rx_broadcast;
-+			u64_stats_t rx_pause;
-+			u64_stats_t rx_multicast;
-+			u64_stats_t rx_crc_errors;
-+
-+			u64_stats_t rx_alignment_errors;
-+			u64_stats_t rx_undersize_errors;
-+			u64_stats_t rx_fragment_errors;
-+			u64_stats_t rx_64byte;
-+
-+			u64_stats_t rx_65_127byte;
-+			u64_stats_t rx_128_255byte;
-+			u64_stats_t rx_256_511byte;
-+			u64_stats_t rx_512_1023byte;
-+
-+			u64_stats_t rx_1024_1518byte;
-+			u64_stats_t rx_jumbo;
-+			u64_stats_t rx_good_bytes;
-+
-+			u64_stats_t rx_bad_bytes;
-+			u64_stats_t rx_oversize_errors;
-+
-+			u64_stats_t rx_dropped;
-+			u64_stats_t tx_broadcast;
-+			u64_stats_t tx_pause;
-+			u64_stats_t tx_multicast;
-+
-+			u64_stats_t tx_undersize_errors;
-+			u64_stats_t tx_64byte;
-+			u64_stats_t tx_65_127byte;
-+			u64_stats_t tx_128_255byte;
-+
-+			u64_stats_t tx_256_511byte;
-+			u64_stats_t tx_512_1023byte;
-+			u64_stats_t tx_1024_1518byte;
-+			u64_stats_t tx_jumbo;
-+
-+			u64_stats_t tx_good_bytes;
-+			u64_stats_t tx_collisions;
-+
-+			u64_stats_t tx_aborted_errors;
-+			u64_stats_t tx_multiple_collisions;
-+			u64_stats_t tx_single_collisions;
-+			u64_stats_t tx_good;
-+
-+			u64_stats_t tx_deferred;
-+			u64_stats_t tx_late_collisions;
-+			u64_stats_t rx_oam;
-+			u64_stats_t tx_oam;
-+		};
-+
-+		u64_stats_t stats[];
-+	};
- };
- 
- struct yt921x_port {
-@@ -588,9 +596,13 @@ struct yt921x_port {
- 	bool isolated;
- 
- 	struct delayed_work mib_read;
-+	struct u64_stats_sync syncp;
- 	struct yt921x_mib mib;
--	u64 rx_frames;
--	u64 tx_frames;
-+	u64_stats_t rx_frames;
-+	u64_stats_t tx_frames;
-+
-+	/* only used by read routine to avoid huge allocations on the stack */
-+	struct yt921x_mib mib_new;
- };
- 
- struct yt921x_reg_ops {
+Changes in v6:
+- Fix $id value in the bindings
+- Drop patch 3/8 from the series
+- Update init/exit callback signatures
+- Link to v5: https://lore.kernel.org/r/20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org
+- Link to v6: https://lore.kernel.org/r/20251219-qcom-sa8255p-emac-v6-0-487f1082461e@oss.qualcomm.com
+
+Changes in v5:
+- Name the DT binding document after the new compatbile
+- Add missing space
+- Make the power-domains limits stricter
+- Link to v4: https://lore.kernel.org/r/20251104-qcom-sa8255p-emac-v4-0-f76660087cea@linaro.org
+
+Changes in v4:
+- Remove the phys property from the SCMI bindings
+- Mark the power-domain-names property as required
+- Set maxItems for power-domains to 1 for all existing bindings to
+  maintain the current requirements after modifying the value in the
+  top-level document
+- Link to v3: https://lore.kernel.org/r/20251027-qcom-sa8255p-emac-v3-0-75767b9230ab@linaro.org
+
+Changes in v3:
+- Drop 'power' and 'perf' prefixes from power domain names
+- Rebase on top of Russell's changes to dwmac
+- Rebase on top of even more changes from Russell that are not yet
+  in next (E1vB6ld-0000000BIPy-2Qi4@rmk-PC.armlinux.org.uk)
+- Link to v2: https://lore.kernel.org/all/20251008-qcom-sa8255p-emac-v2-0-92bc29309fce@linaro.org/
+
+Changes in v2:
+- Fix the power-domains property in DT bindings
+- Rework the DT bindings example
+- Drop the DTS patch, it will go upstream separately
+- Link to v1: https://lore.kernel.org/r/20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org
+
+---
+Bartosz Golaszewski (7):
+      dt-bindings: net: qcom: document the ethqos device for SCMI-based systems
+      net: stmmac: qcom-ethqos: use generic device properties
+      net: stmmac: qcom-ethqos: wrap emac driver data in additional structure
+      net: stmmac: qcom-ethqos: split power management fields into a separate structure
+      net: stmmac: qcom-ethqos: split power management context into a separate struct
+      net: stmmac: qcom-ethqos: define a callback for setting the serdes speed
+      net: stmmac: qcom-ethqos: add support for sa8255p
+
+ .../bindings/net/allwinner,sun7i-a20-gmac.yaml     |   3 +
+ .../bindings/net/altr,socfpga-stmmac.yaml          |   3 +
+ .../bindings/net/amlogic,meson-dwmac.yaml          |   3 +
+ .../devicetree/bindings/net/eswin,eic7700-eth.yaml |   3 +
+ .../devicetree/bindings/net/intel,dwmac-plat.yaml  |   3 +
+ .../bindings/net/loongson,ls1b-gmac.yaml           |   3 +
+ .../bindings/net/loongson,ls1c-emac.yaml           |   3 +
+ .../devicetree/bindings/net/nxp,dwmac-imx.yaml     |   3 +
+ .../devicetree/bindings/net/nxp,lpc1850-dwmac.yaml |   3 +
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     |   3 +
+ .../devicetree/bindings/net/qcom,ethqos.yaml       |   3 +
+ .../bindings/net/qcom,sa8255p-ethqos.yaml          |  98 ++++++
+ .../devicetree/bindings/net/renesas,rzn1-gmac.yaml |   3 +
+ .../bindings/net/renesas,rzv2h-gbeth.yaml          |   3 +
+ .../devicetree/bindings/net/rockchip-dwmac.yaml    |   3 +
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   5 +-
+ .../bindings/net/sophgo,cv1800b-dwmac.yaml         |   3 +
+ .../bindings/net/sophgo,sg2044-dwmac.yaml          |   3 +
+ .../bindings/net/starfive,jh7110-dwmac.yaml        |   3 +
+ .../devicetree/bindings/net/stm32-dwmac.yaml       |   3 +
+ .../devicetree/bindings/net/tesla,fsd-ethqos.yaml  |   3 +
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml |   3 +
+ .../bindings/net/toshiba,visconti-dwmac.yaml       |   3 +
+ MAINTAINERS                                        |   1 +
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |   2 +-
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 346 +++++++++++++++++----
+ 26 files changed, 453 insertions(+), 62 deletions(-)
+---
+base-commit: cfb9039037a5796e3880d225d657165f378bb2b6
+change-id: 20250704-qcom-sa8255p-emac-8460235ac512
+
+Best regards,
 -- 
-2.51.0
+Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
 
