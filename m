@@ -1,149 +1,167 @@
-Return-Path: <netdev+bounces-264891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 92FCAp4Xq2kfaAEAu9opvQ
-	(envelope-from <netdev+bounces-264891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:06:22 +0100
+	id uOmvMGQaq2lNaAEAu9opvQ
+	(envelope-from <netdev+bounces-264892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:18:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583A52268D0
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:06:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4197C2269EC
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6AB053056B52
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:06:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8F95302AC1A
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9851941325C;
-	Fri,  6 Mar 2026 18:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA8B36CE0E;
+	Fri,  6 Mar 2026 18:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gi//W0Uw"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Jb+P+e5Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A63346E55
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 18:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D5A29DB9A;
+	Fri,  6 Mar 2026 18:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772820364; cv=none; b=eSIIdIyt1UBosKWmFr9Zhi+korrZE9UBD6KM4Wofg01rR3L+fCrFtXb9xktEXiKi4BWSyDpiFKvE3JhAxo6tDp1C3AHYF1VqfShXmzeLvvAizRIRhWUhUjROxFU9XSYxx/O7CwJZCMbiWPntJPqGwcC+R9m7PjmtCLCM1O4w+XA=
+	t=1772821066; cv=none; b=I7jZJ7y2LQXYqQGVRtlDciVPov/zyeQSntok2g3ZiYKeJc6BNdHXVSMLhLkshOn0DvR5foPw6dfZk4tnUu0acMukmkePcLbXadyOihrhZO4NMqeQWrUhMTqQNtIj13caDtIkuXT2iCZyeHoCLF4bZmqz9fUbGUNIgDYJWD/4GK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772820364; c=relaxed/simple;
-	bh=VMDQ5Yg8DCFYUJFdKdJTTFR7iu9BxC3IjQ7xLhN4EqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=APokGBMiiLMSVCMjG6X1VvzXdexpA0G5LHfjd0D/7PSInakzDbGyykRxlf/ZAksNNkuTGN96Ss/7TxhyJlQ8RTW1ez9NOYpn8wwkMK7UinDVkhYV8Cw+8BO5wcNslUiTcZuQMG81Fz/sQB+D7rBHTs0i6zbj5JOE0BXyfsAN5u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gi//W0Uw; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772820362; x=1804356362;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VMDQ5Yg8DCFYUJFdKdJTTFR7iu9BxC3IjQ7xLhN4EqM=;
-  b=Gi//W0Uwg4nAqZU8eR6wgnc+ayGtJqg7GfvhywTVzlHnO1HUjh96MsJP
-   fCz3kO2EtSQRWuYWztShpgr2uWZGN/RUXAnoQOB+/gyt6QopA4vWyf9Is
-   SlO3cjU3/vbYTJSmm+0vbPvRKAz0c7xATaiKtwej8akrqqnV/ZwOYHYDY
-   OoTkkk66DwanBzaOplsd9K1yCNKPir0AYX8hG2Px3+ixR2hceel033s4Z
-   COcvDWWUhS9vxG5pre1fRy/csXLKNtb1vl1rwBb90u6BHKoJO+majEreF
-   ZPJWuVtdHWohy7NeT7eVHUrTydi5WlfpFU5qx/jzd1c2aA//3Q9RpbzC8
-   Q==;
-X-CSE-ConnectionGUID: T8Y0ruBwRNaxBumragf3+w==
-X-CSE-MsgGUID: 72AfeRMJQtqbI7UN3cIejw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="84569103"
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="84569103"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 10:06:02 -0800
-X-CSE-ConnectionGUID: YQXmBd72SHu1SoNel6V9gw==
-X-CSE-MsgGUID: HypUqcfAQqCMvXFitCLhhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="218241820"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by orviesa006.jf.intel.com with ESMTP; 06 Mar 2026 10:05:59 -0800
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vyZYj-000000002In-128R;
-	Fri, 06 Mar 2026 18:05:57 +0000
-Date: Fri, 6 Mar 2026 19:05:28 +0100
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next] net/sched: do not reset queues in graft
- operations
-Message-ID: <202603061942.KTg7xG4K-lkp@intel.com>
-References: <20260306113402.435055-1-edumazet@google.com>
+	s=arc-20240116; t=1772821066; c=relaxed/simple;
+	bh=CjBVHyzR9fHsdnb581zQ4Fu5bvkO7Ru56ezXawB6POk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UspH6z8oCv3dx/t2XTgeUJEzPqoeMap2H2Uesw+lmQy53w09g9aO+9+4WlDuSbpmnCI36kg37uKd6R6zmgIM92Niu6pLD6+EgMxjMNIEeFMn+LzAGLx8ABE/GqyflFsFq4hT0cSqJqRfno2uKGg09s26vZgGY8773zW9jnfz21c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Jb+P+e5Q; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 626I3TuN1521799;
+	Fri, 6 Mar 2026 18:17:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=a/oRUYWcSJtAJGGmBk2fDl7ql51Mp
+	tzuHCKbavwl+2E=; b=Jb+P+e5QPsUUn+PcFcsAakPNMYTgZY83+HdH96HeE8cXJ
+	ndjIx/2wtP7E8RRStyIh04CP/SD/c7cWLyfo9j07U/bfDuLQnqi7la5uDFU+/oje
+	F2UWWW7N2L0QZtjSLXfbBxNAfDf1duWef0EfRdZ3/QhlLFwQVtmybLIsarz+eeCi
+	Yqi9H0wzRCzm1ht8kwvKVx/jCPMP16lpZaIHJu/eh2meEkLUetfoJk92q73xH2q0
+	y3Qdni7q9MRRkVAUQr4dB8kIbossI/mG+/Qf2fKNOakhJVHyY7Dtrf3v5cxSdFWx
+	BbDcaIET/2rFldgohl4bICJMhvCJ+vbwFykbaa81g==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cr3vbr0r6-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 06 Mar 2026 18:17:36 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 626Gt41q021359;
+	Fri, 6 Mar 2026 18:09:01 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptess22-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 06 Mar 2026 18:09:01 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 626I1lOn031624;
+	Fri, 6 Mar 2026 18:09:00 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4ckptess15-1;
+	Fri, 06 Mar 2026 18:09:00 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] selftests: fib_tests: fix link-local retrieval in fib6_nexthop()
+Date: Fri,  6 Mar 2026 10:08:19 -0800
+Message-ID: <20260306180830.2329477-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260306113402.435055-1-edumazet@google.com>
-X-Rspamd-Queue-Id: 583A52268D0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=854 bulkscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 suspectscore=0 adultscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
+ definitions=main-2603060171
+X-Authority-Analysis: v=2.4 cv=Jpn8bc4C c=1 sm=1 tr=0 ts=69ab1a40 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=BqU2WV_vvsyTyxaotp0D:22 a=yPCof4ZbAAAA:8 a=u9kQJRMvwuPXqKQrNZ8A:9
+X-Proofpoint-GUID: ozr22xpL5gDfEabSdlN-njjdFhJ10SQe
+X-Proofpoint-ORIG-GUID: ozr22xpL5gDfEabSdlN-njjdFhJ10SQe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE3MiBTYWx0ZWRfX5JyeFdJI75xO
+ LX21cwEMZyWGNbWBxZA2Wqe0a9XfrbEJOeLFf4zu+j5jWk55AJK2QxM6ZUdw/jM9+FfLYO6QwX6
+ cBmzT7MmzbVnF5B9RzkxGENhwtWpEjuvrmvZbo6quGaBQWA2i/SSZbf/GAeR0vxuLsXHRRqBn9X
+ dRA92lOcYkJTuPgyD70fYnI3EmSjcF1p3gN6Rr8zCGYXS11nB8LvEhO9zwrKymFkRxSOxmk9G9Y
+ 0kEvJplHnk9vBOCnYbNsTazVdDa8lFGx6SyiEahNWGvJB9uV2wpix+PXAPJXdYpak4KU7PxwSGs
+ WkCzpkBO/586mBSuqTXDflQO3g90/gd7wRUIjVUPT2CYVV2IsvFSdpM+x2ouFZOrNKq3jt+fKVo
+ /fscc7bnvtftS9h74qvxGJNLovQYGtiGFFcvZLVGtYE6v+Q9sZi9VpYEv1o4zVWRx/7q/07BzCp
+ H88NizSiyuoVe18GKGA==
+X-Rspamd-Queue-Id: 4197C2269EC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
+	FREEMAIL_CC(0.00)[gmail.com,oracle.com];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-264892-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264891-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:dkim,oracle.com:email,oracle.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,01.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-Hi Eric,
+fib6_nexthop() retrieves the link-local address for two interfaces used
+in the test. However, both lldummy and llv1 are obtained from dummy0.
 
-kernel test robot noticed the following build warnings:
+llv1 is expected to be retrieved from veth1, which is the interface used
+later in the test. The subsequent check and error message also expect
+the address to be retrieved from veth1.
 
-[auto build test WARNING on net-next/main]
+Fix this by retrieving llv1 from veth1.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-sched-do-not-reset-queues-in-graft-operations/20260306-205258
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260306113402.435055-1-edumazet%40google.com
-patch subject: [PATCH net-next] net/sched: do not reset queues in graft operations
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260306/202603061942.KTg7xG4K-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260306/202603061942.KTg7xG4K-lkp@intel.com/reproduce)
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+Targeting net-next since this is a selftest-only fix/correctness
+cleanup and not a fix for a user-visible regression.
+---
+ tools/testing/selftests/net/fib_tests.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603061942.KTg7xG4K-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: net/sched/sch_generic.c:1377 function parameter 'reset_needed' not described in 'dev_deactivate_many'
->> Warning: net/sched/sch_generic.c:1377 function parameter 'reset_needed' not described in 'dev_deactivate_many'
-
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index c5694cc4ddd2..439461080c60 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -545,7 +545,7 @@ fib4_nexthop()
+ fib6_nexthop()
+ {
+ 	local lldummy=$(get_linklocal dummy0)
+-	local llv1=$(get_linklocal dummy0)
++	local llv1=$(get_linklocal veth1)
+ 
+ 	if [ -z "$lldummy" ]; then
+ 		echo "Failed to get linklocal address for dummy0"
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.50.1
+
 
