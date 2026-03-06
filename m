@@ -1,158 +1,115 @@
-Return-Path: <netdev+bounces-264805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SH0tDWXdqmlqXwEAu9opvQ
-	(envelope-from <netdev+bounces-264805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:57:57 +0100
+	id MOjKK43cqmlqXwEAu9opvQ
+	(envelope-from <netdev+bounces-264806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:54:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E3422231F
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:57:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28EA622229E
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F01D4306FE0A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:50:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 25953309C9E1
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCD439B489;
-	Fri,  6 Mar 2026 13:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33026399019;
+	Fri,  6 Mar 2026 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="V+Lc+Q3Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vNvn0cnb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5743A1A35
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 13:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218F0330676;
+	Fri,  6 Mar 2026 13:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772804998; cv=none; b=ojNuZVZd2u/7v+0/DQGq0jc1hOFWxq0BqdU/APzQsxCXCOX5nkhr7quVnTyzGgCm3uTe0TMEFFVNNSL1w9am36Dvc4OOQo0RFEK3tnnfcq81OUZZT9DXDrH1858avL9O6QW39PWynzjj4etRWa/xFVG0W1WvpGdx8HtYgw4dlVo=
+	t=1772805028; cv=none; b=lU+VzmXuWH/mKU1K+4IRL1JkdKS8MlIK8RxOAYj2cwFM7wLap+u/i9MrAueN14VHsM3MYGgApb0aktqrwvU9CJP+E3mQ1NiTd1FfYrtBBiIzQ+qb+An6re3FV4htSUDr+UOBG3yO5ZjbxB/9PFM6WuWDvSzufXFtaGCHpbvMeAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772804998; c=relaxed/simple;
-	bh=xDkL6TzFGrTxC514XfyOIrW4ST8vZI8e5m+MG2Hs1Zo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BOJ3AvuqOucY2W6oX7alEBQISA5Hpz7N5qkqBRdpzJzgiD8iohxF3XGCT225HWbWHXnRHkmPOPRZVbx515RA5Ro1jDMOf6rzJoHucph/GMDzi+qqlItgPLusn9HA6Na+rmkDk41wHC3PqRUgDjVpI9cClUVjhFleXpGoCUevUAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=V+Lc+Q3Y; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 000A2C40431;
-	Fri,  6 Mar 2026 13:50:08 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D6AF35FF92;
-	Fri,  6 Mar 2026 13:49:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 47679103699EA;
-	Fri,  6 Mar 2026 14:49:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772804988; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=c20mkraPRlwGY3oRHlW+Mslb5VLebC/91Q18kftMfIc=;
-	b=V+Lc+Q3YI20csUK/+es6cMzQASPQbm3w0yg/676z9/NKiipGSIEG+Xm0iztANxCElgi6ho
-	3SetuUv4madjjCv8utjMBKnn2LX9XiLztVnv7/xWOTO3FBB/DAIF0xnkxbDOHaUocQKppe
-	TLNSBuLsBbamRXcb9fA/myymZx6gqKHxZWim+hdnIKkWusoxhfcmm6Wi6OV7KY7+9uFLLi
-	yR8gUKiFUkq3C8uZU3g4sgtTQkN4C6bbWGuCPXMC84gv/ViTnEgv/WM8uKDd6WfqINtslQ
-	WR4Tw59PXLXt9GIhLJp1Hq2cg8/8OzgRvf1x9aVACnZvpAgc7f4H9soUuirqfA==
-Message-ID: <ff7fc863-0f8a-49e2-8e75-ee446a43df34@bootlin.com>
-Date: Fri, 6 Mar 2026 14:49:43 +0100
+	s=arc-20240116; t=1772805028; c=relaxed/simple;
+	bh=ytWK1jKnyeKXF+mq1lMXFMlBgIqR9ijziULw9jkJtvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sY+b+D8Gld7J4NDAbm9zOB4EAJTjf2a4wvh3FUYApFt/khpvhmwjWAUh5kFtJb/bv4aKRYUyN3+ADz47n2wAqcMZTOy0dx0JMRcaVPQLBZ41Uy/YgcWSW8v2QzXgXBa21cl83MGzcgj9XYhDlPNRBMQPHKDU9PJxwGLN0CqNZtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vNvn0cnb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=uEI9CzsDJrE8mNx2N+kMo8wNobvLjxOyMo21wYJgdNU=; b=vN
+	vn0cnbEnJPEzdx4Jy2Qw+YqRAwpigMVZtxfx2HgdrmsPxgPUlOM39hJENl6RpRVTdOxlu4Z2FtC7r
+	ps6YXHkh9uZRx/idUdIAMRU71olNvq3e/6vkciP7SdiBrEy0etwRlTA6wQuzYV9KhxNPG40wnyQHP
+	OudLUXnGCCXe50g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vyVZ6-00ATzf-EF; Fri, 06 Mar 2026 14:50:04 +0100
+Date: Fri, 6 Mar 2026 14:50:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>
+Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mnhagan88@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] net: sfp: improve Huawei MA5671a fixup
+Message-ID: <73bdd0c9-5e51-415a-a9f2-ce6f14a46103@lunn.ch>
+References: <20260306125139.213637-1-noltari@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/8] net: stmmac: mdio related cleanups
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Samuel Holland <samuel@sholland.org>
-References: <aald--qJquWGIvmO@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aald--qJquWGIvmO@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: C8E3422231F
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260306125139.213637-1-noltari@gmail.com>
+X-Rspamd-Queue-Id: 28EA622229E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264805-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264806-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.997];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
 X-Rspamd-Action: no action
 
-Hi,
-
-On 05/03/2026 11:42, Russell King (Oracle) wrote:
-> Hi,
+On Fri, Mar 06, 2026 at 01:29:55PM +0100, Álvaro Fernández Rojas wrote:
+> With the current sfp_fixup_ignore_tx_fault() fixup we ignore the TX_FAULT
+> signal, but we also need to apply sfp_fixup_ignore_los() in order to be
+> able to communicate with the module even if the fiber isn't connected for
+> configuration purposes.
+> This is needed for all the MA5671a firmwares, excluding the FS modded
+> firmware.
 > 
-> The first four patches clean up the MDC clock divisor selection code,
-> turning the three different ways we choose a divisor into tabular form,
-> rather than doing the selection purely in code.
-> 
-> Convert MDIO to use field_prep() which allows a non-constant mask to be
-> used when preparing fields.
-> 
-> Then use u32 and the associated typed GENMASK for MDIO register field
-> definitions.
-> 
-> Finally, an extra couple of patches that use appropriate types in
-> struct mdio_bus_data.
-> 
-> v2:
-> - add comments about 300MHz to commit message in patch 1
-> - fix incorrect usage of stmmac_sun8i_csr_to_mdc in patch 3
-> - fix BIT_u32()->BIT_U32() in patch 8
+> Fixes: 2069624dac19 ("net: sfp: Add tx-fault workaround for Huawei MA5671A SFP ONT")
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 
-I have tested this series as a whole on 2 platforms using the dwmac mdio
-driver (socfpga - KSZ9031 / imx8mp + KSZ9131), no regressions found. I'm
-not stressing the 300M case though.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-feel free to add my :
-
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
->  drivers/net/ethernet/stmicro/stmmac/common.h       |  10 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c  |   2 +-
->  .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   |  11 +--
->  drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c  |   9 +-
->  .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   |   9 +-
->  .../net/ethernet/stmicro/stmmac/dwmac100_core.c    |   9 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   9 +-
->  .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  18 ++--
->  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c  | 106 ++++++++++++---------
->  include/linux/stmmac.h                             |   6 +-
->  10 files changed, 92 insertions(+), 97 deletions(-)
-> 
-
+    Andrew
 
