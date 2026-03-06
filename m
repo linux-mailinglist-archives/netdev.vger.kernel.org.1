@@ -1,142 +1,130 @@
-Return-Path: <netdev+bounces-264800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHa9EL3ZqmkZXwEAu9opvQ
-	(envelope-from <netdev+bounces-264800-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:42:21 +0100
+	id 6Cw9DcvZqmkZXwEAu9opvQ
+	(envelope-from <netdev+bounces-264801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:42:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D806221F51
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:42:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB20221F68
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C02AA300371B
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:32:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D59D13014910
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E1D273803;
-	Fri,  6 Mar 2026 13:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34DC29D265;
+	Fri,  6 Mar 2026 13:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CmkehRQ6"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="syuwf17O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447222459DD
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 13:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786C42D978A
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 13:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772803931; cv=none; b=IZqN2V1Hvq4Ilkqqzd6IBmqDXjg73C3Vqt+dCsvR5a8UtbeiH/JN34mqPP9q1GTwTue4TGloMy6w86wMu12s6sRKViolxd5sbMNvPPstN28DYbWNV2rFNV3yMc26QgQaJcthMCyd8+/T/4WBdl5OZ5UO4k+r5Xzt7k39v5oHmi4=
+	t=1772803942; cv=none; b=dwbQKBfSRl6THlIm9EjNi67Ba1u5UfD7eBigGP7n3caxobCStSdd0w7Oxz5kGY/Kr2YV3jrApktq1caTxRHK5W7xFXCxf/7fpJGvL5kCploLE3vTneIDJCVGhlPeX9svyRfbJhc+4U+myf/mouxkxzfsvN5I69KRCUMvBV+sE54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772803931; c=relaxed/simple;
-	bh=yglAOU9EoSizb5k31tzUSZH4Y6UBTD/3pT/iR9wOnVw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TqWFd0c8Y/ftwAw8uMlC/8WJQ8o4vizPp69Hjy0j/5yWef7+7V9wGrM02689vSdjA3CBlJ5nnJ0Unj+2Ncekb8tz3cMNq2SESbBBPaFxBXHGDFZUntWztejPm7o+lwsCMVXxIXcaj8f1AhpV9kC7/pwjqRcBj7DjbaCSzE2BFr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CmkehRQ6; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cb5359e9d3so5542379785a.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 05:32:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772803929; x=1773408729; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C70vZFB5s1l7KkMHM++Ikt2rVAfRsUYTpLA6EyebqCE=;
-        b=CmkehRQ6bnEKtqIenE0wK9HyLM8wfAVpmPWEn6mQAvHixBWTR7iYrjyf8ZElkS8y/q
-         L45l4KWFEKkkdvt1aQoJmxQ3lZTiLvZ5EJDCfMQmSU35G01LwTaHYFnEbH1eqMDhvC6z
-         tjUNMvuvxcuPgDAo5uz2PLK3/ZTrQh2pOU2YWNQxrGT6vkhIPEz5hge2C6+0IYHbJAht
-         /zhvT5p1ihCj52qz2OttCFum5gYp/45d+QzBlPokAT6S47dKYPcamTGFg7L94K/lQiEr
-         pZEkFjluCae4POy1cUGCHNigblHqcMFlESSQzvfGdkfymLwZySZJoK1dVcTDXpOp07+Y
-         VHMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772803929; x=1773408729;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C70vZFB5s1l7KkMHM++Ikt2rVAfRsUYTpLA6EyebqCE=;
-        b=itiHRRjrdCx7fqRk71H4e4S+aLsZSF34C+rzbWsrf+bse97B9LQz1Nguel39Pv4a0v
-         PKgvUOafxRosbJUcwEy3tLDXmoPxciGjvc+Tb4kaNmgwUC9Zfp9hdex3mPdavrAC34+D
-         1CSdJc61akDvaKBrxus5XNv3vQpR543xj6Fdw717Id3kOBUzSGEWOhM9hTHYToL6gveE
-         +Of7sW/L4XK4gO5g9QvGgQPIyjfH309jTswblKT1nmL8ySeig+ZMqKpDXlSx5Fh7AmiO
-         ESVziEphAlnlGZy7wgt/Hr+8fPVSiYByk1K51oBIYJLfDv7s8n4heME/K3vrOhhf9tor
-         BqbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU05i3dVpDQIeTahTk2wLn9GKYzdEi8YX66otkB5GBnM+CenDB7rC9Nid9FXuHOLjVVBWHdjAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHjYaPkIimPefBfWaXk/HsIjO6m9cV3WrhxaGiZmSWeqZbzomz
-	M61Neo1ZT9hen5sMibXW+9oHAkayAYNzqIVlZhLjHR6NHasP5B4qlbljqNARdvXVfjGNTEM3Esa
-	FcOw3TLc62FZiJg==
-X-Received: from qkip25.prod.google.com ([2002:a05:620a:22f9:b0:8c7:cb6:2f03])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3183:b0:8c6:a3ed:2f65 with SMTP id af79cd13be357-8cd6d386220mr254014285a.23.1772803928753;
- Fri, 06 Mar 2026 05:32:08 -0800 (PST)
-Date: Fri,  6 Mar 2026 13:31:54 +0000
+	s=arc-20240116; t=1772803942; c=relaxed/simple;
+	bh=O2EdVReohsVktiZ9IisdOizANkbEVPstJd5vArlYlW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EHHIzS+wivitJQlIXxChg/I+gRib6nuk/4C0ZPUbyBoAkEG7ixk0doClujliVnPVInhAnJm7lSc1cyorzYdi/172pNnzv+oAYWJFVl9GRrMeeJXl/r9Fb7z8E3l/sF/eexRvHqzF3/i/bYMJ1cddwlvfUPEgTWLACrDkMy6gSbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=syuwf17O; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 3AE001A2D49;
+	Fri,  6 Mar 2026 13:32:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 05F5E5FF92;
+	Fri,  6 Mar 2026 13:32:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 78C9E1036994E;
+	Fri,  6 Mar 2026 14:32:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772803939; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=MtGSXQd1rJ7F7WpffOYtsvHkK2yZmux9XID3eldxZIU=;
+	b=syuwf17OBQRSlsgCUAuuSAuSoqGuBwfoHBbK9g4Bh9AQzCvKCyDFKN8bmPdlRnKdOk2aA5
+	VB87AhBHBpX2LO5ODAZrlnihKEnT6E4qGUIBbmgJG+GU9TaDwiiVp4DXTEFjl1l3ZNBkmB
+	DWbv/EG5B41lrbD3F8ZQpXF9BKZEDeD1S7Kz/AgXstteX1JnGIygade+ftEaVahkmKSFMs
+	SjnnmLlvC93omtAOC+oJX7rh0eLn65jRgr8dw5WmzANFwfDlriHcxzeNK4eOdNFrqDYGmR
+	VWfJdHlegT6ZvN1nCIzgcsemxAf3jSE5a2s9VVh8cop3kGZpKDlGdzWtPxlSJw==
+Message-ID: <065b3dc0-b092-45c5-b7ea-e0a54264558e@bootlin.com>
+Date: Fri, 6 Mar 2026 14:32:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306133154.678730-1-edumazet@google.com>
-Subject: [PATCH net-next] net/sched: use rtnl_kfree_skbs() in pfifo_fast_reset()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 4D806221F51
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 8/8] net: stmmac: make pcs_mask and phy_mask
+ u32
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Samuel Holland <samuel@sholland.org>
+References: <aald--qJquWGIvmO@shell.armlinux.org.uk>
+ <E1vy6AY-0000000BtxJ-3smT@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vy6AY-0000000BtxJ-3smT@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 2FB20221F68
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264801-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264800-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,armlinux.org.uk:email,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
 X-Rspamd-Action: no action
 
-rtnl_kfree_skbs() reduces RTNL and qdisc spinlock hold time.
+Hi,
 
-skbs are freed later after RTNL has been released.
+On 05/03/2026 11:43, Russell King (Oracle) wrote:
+> The PCS and PHY masks are passed to the mdio bus layer as phy_mask
+> to prevent bus addresses between 0 and 31 inclusive being scanned,
+> and this is declared as u32. Also declare these as u32 in stmmac
+> for type consistency.
+> 
+> Since this is a u32, use BIT_U32() rather than BIT() to generate
+> values for these fields.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/sch_generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 55e17f9e5636f2d9e798889ff59b2f69c9c1709c..40e0d20ed0227ede4f1cb292613f1918c5a48f2c 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -850,7 +850,7 @@ static void pfifo_fast_reset(struct Qdisc *qdisc)
- 			continue;
- 
- 		while ((skb = __skb_array_consume(q)) != NULL)
--			kfree_skb(skb);
-+			rtnl_kfree_skbs(skb, skb);
- 	}
- 
- 	if (qdisc_is_percpu_stats(qdisc)) {
--- 
-2.53.0.473.g4a7958ca14-goog
-
+Maxime
 
