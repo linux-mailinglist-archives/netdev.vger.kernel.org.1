@@ -1,328 +1,250 @@
-Return-Path: <netdev+bounces-264775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264776-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKadGP/KqmlWXAEAu9opvQ
-	(envelope-from <netdev+bounces-264775-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:39:27 +0100
+	id SNexM9nLqmnUXAEAu9opvQ
+	(envelope-from <netdev+bounces-264776-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:43:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066B3220C9A
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:39:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5049D220D76
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 20B843007884
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:39:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42004309415F
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E1A23A98D;
-	Fri,  6 Mar 2026 12:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8847288530;
+	Fri,  6 Mar 2026 12:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QE+kvV7W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teU+WZvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B0C20E03F;
-	Fri,  6 Mar 2026 12:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8939C286D53;
+	Fri,  6 Mar 2026 12:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772800765; cv=none; b=f0t3vTKZTt8m7+mRKMRvzRB9DP+EgHTcVayBMius+xzWfvIUCnjoJhnz4mZr9wRSgrDml+1XVBXQoEroG731IG/bi3hOolF/MKV5urCfzW6x5hdmFVLTSY4R/gt38rwTalz4ZowNwZ5TJS/wp832lWPhyrjLRKs9bRIH7+RqxC4=
+	t=1772800810; cv=none; b=FIERidZlnzKuqOQMylcQlpd5eVAKVMY+FdzbvCGSwIe2X0fMt7JuK/ECDnvjVvhke/+vqDRlRlaZ90mNat/J/8H6GnKB2oqp45AXTujKaXYInhhk8FB6qMF6ogYyExJLxe9IHOKcmNVun/k66HawNSAIfYRO6ECLTQcBN7lluLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772800765; c=relaxed/simple;
-	bh=oPurXisUTqLAk3GU9lZ8DdyLzvmVpIks2kPl7dTV2Kc=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=AeDMDcJhPCzV5KJwqDJkuNcOXHbp35Q7DUdTY2TXCd3DP/RisPXEVzT8CcpeTYBv21TcGBTcdaOdv2mDh1sMTRUi4blXoRIbNntDSqnqOtiYjhhOPmVydOCG2pRjVLuQApwldLN138VxVMgncSE5A6EckRpVBsUm2NhUkWFMpKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QE+kvV7W; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772800810; c=relaxed/simple;
+	bh=momqQiCPeBiESmsNjbCQuXjIElnPD5t8ixlqkLdaUNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oi9peaPdNngUeQ35HPbdsfC2NO+/sAWbk+FWiUqlnGdW9GdcY81vYWPAiH02Yg0G840kKycA+/HZn4S7yDQFMQEYU6o+NTQlqnxSqvKBEKMdIGXyZ5SEEmdrpqUkjoXTYWR8xpvZUnFpg7vGd0ezofZmehB9T8yLo1jg0wGK1UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teU+WZvc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E997C4CEF7;
+	Fri,  6 Mar 2026 12:40:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772800810;
+	bh=momqQiCPeBiESmsNjbCQuXjIElnPD5t8ixlqkLdaUNY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=teU+WZvcr3Vfjfj4PS79KVLwqpyqTY1ONa1PtwIvjXtMon6hdWoFyi7tYSgQVQlA7
+	 7WqNZXjH072FsKlQxHwMb1xYD4ogJ/HhRqFMhvz7mUpomd6qDRF1LsEb2Nx0xCA20F
+	 Q306mWNpenrHSDponyi32Ye/+ALDPg+T87ZCaJf9rHbmPLs7TEcXwfiNFZJ08Qk58i
+	 YudRyMnPxWInwwAAt3CqHvwKRQrMAo7VQbC5DvtngGuMvZuxZUii1u78G4eRDQ1D/r
+	 cgHhuLioq6MaNE+pd+1wCN6iTybUQcrEBmRwhDJWiYLDD7kyNQioEEvs3ECG9KmNxt
+	 q/+pMMPgggcHw==
+Date: Fri, 6 Mar 2026 12:40:07 +0000
+From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
+	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
+	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 08/16] mm/memory: move adjusting of address range to
+ unmap_vmas()
+Message-ID: <6858ccdd-5065-4396-81c9-489bf2d43c9e@lucifer.local>
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-9-david@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772800751;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=27XSKDOLXvEq4qzCWSksKAZGxaT1RZzGT8G1FYmDuRc=;
-	b=QE+kvV7WBLdBL0VW1S/v8XWCoHiWa1Ob18s3mIUTxubrsnz6m5G1xEQWzjPmRKCoXQOjph
-	UKfIIZTisE8wh6PI9rTLUcicN408VYkXd1RVsYCtrUEKcpeOr6sWQines80xPixaf4O642
-	AhhDeXcoSb1hHFsdenyPBMVV2EbmYHs=
-Date: Fri, 06 Mar 2026 12:38:57 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <6ca5294f793f4d9dbb3efd62de50daa1d2d6950d@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-To: "Nikolay Aleksandrov" <razor@blackwall.org>
-Cc: "Jay Vosburgh" <jv@jvosburgh.net>, netdev@vger.kernel.org,
- jiayuan.chen@shopee.com,
- syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, "Jesper Dangaard Brouer"
- <hawk@kernel.org>, "John Fastabend" <john.fastabend@gmail.com>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>, "Hao
- Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
- <shuah@kernel.org>, "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
- "Clark Williams" <clrkwllms@kernel.org>, "Steven Rostedt"
- <rostedt@goodmis.org>, "Jussi Maki" <joamaki@gmail.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-rt-devel@lists.linux.dev
-In-Reply-To: <aarG-99qsXKgPMws@penguin>
-References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
- <20260304074301.35482-2-jiayuan.chen@linux.dev>
- <aahWymAi_CtRG0gJ@penguin> <1293120.1772645248@famine>
- <aahsuPt7cY8LxETN@penguin> <1356528.1772744631@famine>
- <e08dcb78a13fc69be07d28d032cebe3734797a3a@linux.dev>
- <aarG-99qsXKgPMws@penguin>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 066B3220C9A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227200848.114019-9-david@kernel.org>
+X-Rspamd-Queue-Id: 5049D220D76
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264775-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[jvosburgh.net,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-264776-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,appspotmail.com:email,blackwall.org:email,linux.dev:dkim,linux.dev:mid,jvosburgh.net:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	RCPT_COUNT_GT_50(0.00)[74];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lucifer.local:mid]
 X-Rspamd-Action: no action
 
-March 6, 2026 at 20:22, "Nikolay Aleksandrov" <razor@blackwall.org mailto=
-:razor@blackwall.org?to=3D%22Nikolay%20Aleksandrov%22%20%3Crazor%40blackw=
-all.org%3E > wrote:
+On Fri, Feb 27, 2026 at 09:08:39PM +0100, David Hildenbrand (Arm) wrote:
+> __zap_vma_range() has two callers, whereby
+> zap_page_range_single_batched() documents that the range must fit into
+> the VMA range.
+>
+> So move adjusting the range to unmap_vmas() where it is actually
+> required and add a safety check in __zap_vma_range() instead. In
+> unmap_vmas(), we'd never expect to have empty ranges (otherwise, why
+> have the vma in there in the first place).
+>
+> __zap_vma_range() will no longer be called with start == end, so
+> cleanup the function a bit. While at it, simplify the overly long
+> comment to its core message.
+>
+> We will no longer call uprobe_munmap() for start == end, which actually
+> seems to be the right thing to do.
+>
+> Note that hugetlb_zap_begin()->...->adjust_range_if_pmd_sharing_possible()
+> cannot result in the range exceeding the vma range.
+>
+> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
 
+LGTM, So:
 
->=20
->=20On Fri, Mar 06, 2026 at 02:42:05AM +0000, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> 2026/3/6 05:03, "Jay Vosburgh" <jv@jvosburgh.net mailto:jv@jvosburg=
-h.net?to=3D%22Jay%20Vosburgh%22%20%3Cjv%40jvosburgh.net%3E > wrote:
-> >=20=20
->=20>=20=20
->=20>=20=20
->=20>  Nikolay Aleksandrov <razor@blackwall.org> wrote:
-> >=20=20
->=20>  >=20
->=20>  > On Wed, Mar 04, 2026 at 09:27:28AM -0800, Jay Vosburgh wrote:
-> >  >=20
->=20>  > >=20
->=20>  > > Nikolay Aleksandrov <razor@blackwall.org> wrote:
-> >  > >=20
->=20>  > > >On Wed, Mar 04, 2026 at 03:42:57PM +0800, Jiayuan Chen wrote:
-> >  > > >> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >  > > >>=20
->=20>  > > >> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter wit=
-hout a NULL
-> >  > > >> check. rr_tx_counter is a per-CPU counter only allocated in b=
-ond_open()
-> >  > > >> when the bond mode is round-robin. If the bond device was nev=
-er brought
-> >  > > >> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
-> >  > > >>=20
->=20>  > > >> The XDP redirect path can reach this code even when the bon=
-d is not up:
-> >  > > >> bpf_master_redirect_enabled_key is a global static key, so wh=
-en any bond
-> >  > > >> device has native XDP attached, the XDP_TX -> xdp_master_redi=
-rect()
-> >  > > >> interception is enabled for all bond slaves system-wide. This=
- allows the
-> >  > > >> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
-> >  > > >> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id(=
-) to be
-> >  > > >> reached on a bond that was never opened.
-> >  > > >>=20
->=20>  > > >> Fix this by allocating rr_tx_counter unconditionally in bon=
-d_init()
-> >  > > >> (ndo_init), which is called by register_netdevice() and cover=
-s both
-> >  > > >> device creation paths (bond_create() and bond_newlink()). Thi=
-s also
-> >  > > >> handles the case where bond mode is changed to round-robin af=
-ter device
-> >  > > >> creation. The conditional allocation in bond_open() is remove=
-d. Since
-> >  > > >> bond_destructor() already unconditionally calls
-> >  > > >> free_percpu(bond->rr_tx_counter), the lifecycle is clean: all=
-ocate at
-> >  > > >> ndo_init, free at destructor.
-> >  > > >>=20
->=20>  > > >> Note: rr_tx_counter is only used by round-robin mode, so th=
-is
-> >  > > >> deliberately allocates a per-cpu u32 that goes unused for oth=
-er modes.
-> >  > > >> Conditional allocation (e.g., in bond_option_mode_set) was co=
-nsidered
-> >  > > >> but rejected: the XDP path can race with mode changes on a do=
-wned bond,
-> >  > > >> and adding memory barriers to the XDP hot path is not justifi=
-ed for
-> >  > > >> saving 4 bytes per CPU.
-> >  > > >>=20
->=20>  > > >> Fixes: 879af96ffd72 ("net, core: Add support for XDP redire=
-ction to slave device")
-> >  > > >> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmai=
-l.com
-> >  > > >> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.=
-00cc.GAE@google.com/T/
-> >  > > >> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >  > > >> ---
-> >  > > >> drivers/net/bonding/bond_main.c | 19 +++++++++++++------
-> >  > > >> 1 file changed, 13 insertions(+), 6 deletions(-)
-> >  > > >>=20
->=20>  > > >
-> >  > > >IMO it's not worth it to waste memory in all modes, for an unpo=
-pular mode.
-> >  > > >I think it'd be better to add a null check in bond_rr_gen_slave=
-_id(),
-> >  > > >READ/WRITE_ONCE() should be enough since it is allocated only o=
-nce, and
-> >  > > >freed when the xmit code cannot be reachable anymore (otherwise=
- we'd have
-> >  > > >more bugs now). The branch will be successfully predicted pract=
-ically always,
-> >  > > >and you can also mark the ptr being null as unlikely. That way =
-only RR takes
-> >  > > >a very minimal hit, if any.
-> >  > >=20
->=20>  > > Is what you're suggesting different from Jiayuan's proposal[0]=
-,
-> >  > > in the sense of needing barriers in the XDP hot path to insure o=
-rdering?
-> >  > >=20
->=20>  > > If I understand correctly, your suggestion is something like
-> >  > > (totally untested):
-> >  > >=20
->=20>  > Basically yes, that is what I'm proposing + an unlikely() around=
- that
-> >  > null check since it is really unlikely and will be always predicte=
-d
-> >  > correctly, this way it's only for RR mode.
-> >  >=20
->=20>  Jiayuan,
-> >=20=20
->=20>  Do you agree that the patch below (including Nikolay's
-> >  suggestion to add "unlikely") resolves the original issue without me=
-mory
-> >  waste, and without introducing performance issues (barriers) into th=
-e
-> >  XDP path?
-> >=20=20
->=20>=20=20
->=20>  Sure, it's basically similar to what my v1 did, but the patch belo=
-w can be more generic.
-> >=20=20
->=20>  https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen=
-@linux.dev/T/#m08e3e53a8aa8d837ddc9242f4b14f2651a2b00aa
-> >=20
->=20IMO that is worse, you'll add 2 new tests and potentially 1 more cach=
-e line
-> for everyone in a hot path that is used a lot and must be kept as fast =
-as possible.
+Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
 
-Hi Nikolay,
-
-Apologies for the confusion. When I said "the patch below," I was not ref=
-erring to the v1 link,
-but to the diff snippet appended at the bottom of my email.
-
-That specific snippet (using a local temp pointer) is the optimal approac=
-h. It ensures the NULL
-check for bond->rr_tx_counter is handled efficiently without introducing =
-the performance
-overhead or memory waste you were concerned about.
-
-Best regards,
-Jiayuan
-
-
-
-> >=20
->=20> -J
-> >=20=20
->=20>  >=20
->=20>  > >=20
->=20>  > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bon=
-ding/bond_main.c
-> >  > > index eb27cacc26d7..ac2a4fc0aad0 100644
-> >  > > --- a/drivers/net/bonding/bond_main.c
-> >  > > +++ b/drivers/net/bonding/bond_main.c
-> >  > > @@ -4273,13 +4273,17 @@ void bond_work_cancel_all(struct bonding=
- *bond)
-> >  > > static int bond_open(struct net_device *bond_dev)
-> >  > > {
-> >  > > struct bonding *bond =3D netdev_priv(bond_dev);
-> >  > > + u32 __percpu *rr_tx_tmp;
-> >  > > struct list_head *iter;
-> >  > > struct slave *slave;
-> >  > >=20
->=20>  > > - if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN && !bond->rr=
-_tx_counter) {
-> >  > > - bond->rr_tx_counter =3D alloc_percpu(u32);
-> >  > > - if (!bond->rr_tx_counter)
-> >  > > + if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN &&
-> >  > > + !READ_ONCE(bond->rr_tx_counter)) {
-> >  > > + rr_tx_tmp =3D alloc_percpu(u32);
-> >  > > + if (!rr_tx_tmp)
-> >  > > return -ENOMEM;
-> >  > > + WRITE_ONCE(bond->rr_tx_counter, rr_tx_tmp);
-> >  > > +
-> >  > > }
-> >  > >=20
->=20>  > > /* reset slave->backup and slave->inactive */
-> >  > > @@ -4866,6 +4870,9 @@ static u32 bond_rr_gen_slave_id(struct bon=
-ding *bond)
-> >  > > struct reciprocal_value reciprocal_packets_per_slave;
-> >  > > int packets_per_slave =3D bond->params.packets_per_slave;
-> >  > >=20
->=20>  > > + if (!READ_ONCE(bond->rr_tx_counter))
-> >  > > + packets_per_slave =3D 0;
-> >  > > +
-> >  > > switch (packets_per_slave) {
-> >  > > case 0:
-> >  > > slave_id =3D get_random_u32();
-> >  > >=20
->=20>  > > -J
-> >  > >=20
->=20>  > >=20
->=20>  > > [0] https://lore.kernel.org/netdev/e4a2a652784ec206728eb3a929a=
-9892238c61f06@linux.dev/
-> >  > >
-> >  >=20
->=20>  ---
-> >  -Jay Vosburgh, jv@jvosburgh.net
-> >
+> ---
+>  mm/memory.c | 58 +++++++++++++++++++++--------------------------------
+>  1 file changed, 23 insertions(+), 35 deletions(-)
+>
+> diff --git a/mm/memory.c b/mm/memory.c
+> index f0aaec57a66b..fdcd2abf29c2 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -2073,44 +2073,28 @@ static void unmap_page_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>  	tlb_end_vma(tlb, vma);
+>  }
+>
+> -
+> -static void __zap_vma_range(struct mmu_gather *tlb,
+> -		struct vm_area_struct *vma, unsigned long start_addr,
+> -		unsigned long end_addr, struct zap_details *details)
+> +static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+> +		unsigned long start, unsigned long end,
+> +		struct zap_details *details)
+>  {
+> -	unsigned long start = max(vma->vm_start, start_addr);
+> -	unsigned long end;
+> -
+> -	if (start >= vma->vm_end)
+> -		return;
+> -	end = min(vma->vm_end, end_addr);
+> -	if (end <= vma->vm_start)
+> -		return;
+> +	VM_WARN_ON_ONCE(start >= end || !range_in_vma(vma, start, end));
+>
+>  	if (vma->vm_file)
+>  		uprobe_munmap(vma, start, end);
+>
+> -	if (start != end) {
+> -		if (unlikely(is_vm_hugetlb_page(vma))) {
+> -			/*
+> -			 * It is undesirable to test vma->vm_file as it
+> -			 * should be non-null for valid hugetlb area.
+> -			 * However, vm_file will be NULL in the error
+> -			 * cleanup path of mmap_region. When
+> -			 * hugetlbfs ->mmap method fails,
+> -			 * mmap_region() nullifies vma->vm_file
+> -			 * before calling this function to clean up.
+> -			 * Since no pte has actually been setup, it is
+> -			 * safe to do nothing in this case.
+> -			 */
+> -			if (vma->vm_file) {
+> -				zap_flags_t zap_flags = details ?
+> -				    details->zap_flags : 0;
+> -				__unmap_hugepage_range(tlb, vma, start, end,
+> -							     NULL, zap_flags);
+> -			}
+> -		} else
+> -			unmap_page_range(tlb, vma, start, end, details);
+> +	if (unlikely(is_vm_hugetlb_page(vma))) {
+> +		zap_flags_t zap_flags = details ? details->zap_flags : 0;
+> +
+> +		/*
+> +		 * vm_file will be NULL when we fail early while instantiating
+> +		 * a new mapping. In this case, no pages were mapped yet and
+> +		 * there is nothing to do.
+> +		 */
+> +		if (!vma->vm_file)
+> +			return;
+> +		__unmap_hugepage_range(tlb, vma, start, end, NULL, zap_flags);
+> +	} else {
+> +		unmap_page_range(tlb, vma, start, end, details);
+>  	}
+>  }
+>
+> @@ -2174,8 +2158,9 @@ void unmap_vmas(struct mmu_gather *tlb, struct unmap_desc *unmap)
+>  				unmap->vma_start, unmap->vma_end);
+>  	mmu_notifier_invalidate_range_start(&range);
+>  	do {
+> -		unsigned long start = unmap->vma_start;
+> -		unsigned long end = unmap->vma_end;
+> +		unsigned long start = max(vma->vm_start, unmap->vma_start);
+> +		unsigned long end = min(vma->vm_end, unmap->vma_end);
+> +
+>  		hugetlb_zap_begin(vma, &start, &end);
+>  		__zap_vma_range(tlb, vma, start, end, &details);
+>  		hugetlb_zap_end(vma, &details);
+> @@ -2204,6 +2189,9 @@ void zap_page_range_single_batched(struct mmu_gather *tlb,
+>
+>  	VM_WARN_ON_ONCE(!tlb || tlb->mm != vma->vm_mm);
+>
+> +	if (unlikely(!size))
+> +		return;
+> +
+>  	mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, vma->vm_mm,
+>  				address, end);
+>  	hugetlb_zap_begin(vma, &range.start, &range.end);
+> --
+> 2.43.0
 >
 
