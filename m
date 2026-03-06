@@ -1,303 +1,319 @@
-Return-Path: <netdev+bounces-264745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHx+DFu1qml9VgEAu9opvQ
-	(envelope-from <netdev+bounces-264745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:07:07 +0100
+	id XJLhMUS3qmkiVwEAu9opvQ
+	(envelope-from <netdev+bounces-264746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:15:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A8221F6D6
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:07:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BEA21F819
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0219330093B3
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 11:07:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1187F304A8BF
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 11:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E39385513;
-	Fri,  6 Mar 2026 11:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D59333122D;
+	Fri,  6 Mar 2026 11:15:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niRYr2GU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Skgyak60"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8E9382F15;
-	Fri,  6 Mar 2026 11:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07EF382386;
+	Fri,  6 Mar 2026 11:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772795220; cv=none; b=YDiN+r+9Gw03wrMf0PLCOWHMoaskZonOY2BA4oUDFgsx7kXC5yu2FFlSsA7uJS/dYPa9nfqW/bGU1MlzUloujJlPNrEDpWM5oCaCT0uWyZsMegQP8X7h7aHEKsO/ckXPI8jLuI9YpTDx6WqtB9daHngc6mUV7oYsIZh8MbXsEso=
+	t=1772795713; cv=none; b=lhUVbfDgt0qhtXHWQQEjdKvIi/jZGmPtzOB1xV97EhqcdN4OXFEkMvxuGxfiqC9TbcoDZk32XA5rDBTAU0dCDkvjEZ7YZTpU9l3mSvaaS0/EL/qqH/L5A/eGAtTDMvka3KzMdtbWbdbgi2MjSMPA5mJnA0SxGppiE/xKMd3NM8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772795220; c=relaxed/simple;
-	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	s=arc-20240116; t=1772795713; c=relaxed/simple;
+	bh=qQ1LMDD+Itww5H6FRPGdFnCtQZPG9QaXWO16g4BtvUo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hdty7cG86xga+EJZI8glT4JGr+EUzrFjAUgnWqyTwla0rZarIj66AtgxXlhh6QnPqrjjQqShUYrEsdjtyZbfsIsm2FlBRlYd7lJWi0Wpse+3Jl6qqM54WadSAty0omABefsbXusRvQsqT5awtDusSHAHynUWgQd21GauBjIAVu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niRYr2GU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E533C4CEF7;
-	Fri,  6 Mar 2026 11:06:55 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=hjZUePYDD3CWOfH4p3JZH7HiF+GBZbdPhU1NudCgQF3vDLBBIkzgMKIaeZV2r63VrtMDKFMRfkaItFJX0hzZk2GkAWEm8ls+IrWHRA0zn9QRLmhNM8WDjlkKH1R/iUZlB0uuppue8UtIVhA5jPwspT5lFRR4UTJsXPxX/kNpKCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Skgyak60; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 847E0C4CEF7;
+	Fri,  6 Mar 2026 11:15:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772795219;
-	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	s=k20201202; t=1772795713;
+	bh=qQ1LMDD+Itww5H6FRPGdFnCtQZPG9QaXWO16g4BtvUo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=niRYr2GUkeZ2evtY/MvpTINahTL9FeEOM2+S5jIOhI6rTICEN4ErbX/41cP3OcnQk
-	 zhd2aol7vsSHYfqBanZvFiKJcNJc6c4P89P7ym6dPfWZKLhYYMXYar4U8Pdft4PWnT
-	 fygpvXhCsB69JLcRjvP2uqCg8fjYbwpXeM/cE7qNEJfb1msgEIWCQl/tf49x0ZGqn0
-	 mrfXLzAm9K2gKESMGb16yku1dBu7nk1ppJCDfTKLNkWttrSTSXXuNLZaasQnr9ATSW
-	 EFnRv7/BKOZYAfL8DUdTEHwCuhf7KQyUra8DtlOk4TzKJd2blbg/WJLhMHSgfV9Lx7
-	 xvZe13Ywzo6dQ==
-Message-ID: <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
-Date: Fri, 6 Mar 2026 12:06:51 +0100
+	b=Skgyak6008iYf4a1IVMcmJvZE0GpMmvDXnAhMshbpPBO4aHsjy2crfozYy6et/0R7
+	 cOuCCW6eAlwzlF8Cq2xCHao/cLtTSg0J0uU0zRBaRlqVjayGhQrg4Ra4NobcmyGRPt
+	 aVYjcHh45zQ4NqXoJHFefVxg3RawaJ1ypVmXGRhHDdxrw3KphnWp1OGcxw2ltf0TXe
+	 VG0gVZrhVGW2lVH6g+1/MFwmL4XnQD0CenN8KvfKAYlzGfkE2rBTr/AMgj9EHy2deR
+	 ujFoLH/jLreUoOMAz0jFfGbuvmSfMSZ7z0uh8T5d1cgCovmJ6nVLsG1teYcS1nYbFw
+	 ZK7dB2H5G62FA==
+Message-ID: <5dab61a6-d8cc-431d-b59e-744d98195d90@kernel.org>
+Date: Fri, 6 Mar 2026 12:15:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <87qzpx2sck.ffs@tglx>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/14] firmware: qcom: Add a generic PAS service
+To: Sumit Garg <sumit.garg@kernel.org>, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, robin.clark@oss.qualcomm.com,
+ sean@poorly.run, akhilpo@oss.qualcomm.com, lumag@kernel.org,
+ abhinav.kumar@linux.dev, jesszhan0024@gmail.com,
+ marijn.suijten@somainline.org, airlied@gmail.com, simona@ffwll.ch,
+ vikash.garodia@oss.qualcomm.com, dikshita.agarwal@oss.qualcomm.com,
+ bod@kernel.org, mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+ trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+ pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+ tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+ srinivas.kandagatla@oss.qualcomm.com, amirreza.zarrabi@oss.qualcomm.com,
+ jens.wiklander@linaro.org, op-tee@lists.trustedfirmware.org,
+ apurupa@qti.qualcomm.com, skare@qti.qualcomm.com,
+ Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260306105027.290375-1-sumit.garg@kernel.org>
+ <20260306105027.290375-3-sumit.garg@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260306105027.290375-3-sumit.garg@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 35A8221F6D6
+X-Rspamd-Queue-Id: 38BEA21F819
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264745-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-264746-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Hi Thomas,
-
-Thank you for looking into this!
-
-On 06/03/2026 10:57, Thomas Gleixner wrote:
-> On Fri, Mar 06 2026 at 06:48, Jiri Slaby wrote:
->> On 05. 03. 26, 20:25, Thomas Gleixner wrote:
->>> Is there simple way to reproduce?
->>
->> Unfortunately not at all. To date, I even cannot reproduce locally, it 
->> reproduces exclusively in opensuse build service (and github CI as per 
->> Matthieu's report). I have a project in there with packages which fail 
->> more often than others:
->>    https://build.opensuse.org/project/monitor/home:jirislaby:softlockup
->> But it's all green ATM.
->>
->> Builds of Go 1.24 and tests of rust 1.90 fail the most. The former even 
->> takes only ~ 8 minutes, so it's not that intensive build at all. So the 
->> reasons are unknown to me. At least, Go apparently uses threads for 
->> building (unlike gcc/clang with forks/processes). Dunno about rust.
+On 06/03/2026 11:50, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 > 
-> I tried with tons of test cases which stress test mmcid with threads and
-> failed.
+> Qcom platforms has the legacy of using non-standard SCM calls
+> splintered over the various kernel drivers. These SCM calls aren't
+> compliant with the standard SMC calling conventions which is a
+> prerequisite to enable migration to the FF-A specifications from
+> Arm.
+> 
+> OP-TEE as an alternative trusted OS to QTEE can't support these non-
+> standard SCM calls. And even for newer architectures QTEE won't be able
+> to support SCM calls either with FF-A requirements coming in. And with
+> both OP-TEE and QTEE drivers well integrated in the TEE subsystem, it
+> makes further sense to reuse the TEE bus client drivers infrastructure.
+> 
+> The added benefit of TEE bus infrastructure is that there is support
+> for discoverable/enumerable services. With that client drivers don't
+> have to manually invoke a special SCM call to know the service status.
+> 
+> So enable the generic Peripheral Authentication Service (PAS) provided
+> by the firmware. It acts as the common layer with different TZ
+> backends plugged in whether it's an SCM implementation or a proper
+> TEE bus based PAS service implementation.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/firmware/qcom/Kconfig          |   8 +
+>  drivers/firmware/qcom/Makefile         |   1 +
+>  drivers/firmware/qcom/qcom_pas.c       | 295 +++++++++++++++++++++++++
+>  drivers/firmware/qcom/qcom_pas.h       |  53 +++++
+>  include/linux/firmware/qcom/qcom_pas.h |  41 ++++
+>  5 files changed, 398 insertions(+)
+>  create mode 100644 drivers/firmware/qcom/qcom_pas.c
+>  create mode 100644 drivers/firmware/qcom/qcom_pas.h
+>  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+> 
+> diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
+> index b477d54b495a..8653639d06db 100644
+> --- a/drivers/firmware/qcom/Kconfig
+> +++ b/drivers/firmware/qcom/Kconfig
+> @@ -6,6 +6,14 @@
+>  
+>  menu "Qualcomm firmware drivers"
+>  
+> +config QCOM_PAS
+> +	tristate
+> +	help
+> +	  Enable the generic Peripheral Authentication Service (PAS) provided
+> +	  by the firmware. It acts as the common layer with different TZ
+> +	  backends plugged in whether it's an SCM implementation or a proper
+> +	  TEE bus based PAS service implementation.
+> +
+>  config QCOM_SCM
+>  	select QCOM_TZMEM
+>  	tristate
+> diff --git a/drivers/firmware/qcom/Makefile b/drivers/firmware/qcom/Makefile
+> index 0be40a1abc13..dc5ab45f906a 100644
+> --- a/drivers/firmware/qcom/Makefile
+> +++ b/drivers/firmware/qcom/Makefile
+> @@ -8,3 +8,4 @@ qcom-scm-objs += qcom_scm.o qcom_scm-smc.o qcom_scm-legacy.o
+>  obj-$(CONFIG_QCOM_TZMEM)	+= qcom_tzmem.o
+>  obj-$(CONFIG_QCOM_QSEECOM)	+= qcom_qseecom.o
+>  obj-$(CONFIG_QCOM_QSEECOM_UEFISECAPP) += qcom_qseecom_uefisecapp.o
+> +obj-$(CONFIG_QCOM_PAS)		+= qcom_pas.o
+> diff --git a/drivers/firmware/qcom/qcom_pas.c b/drivers/firmware/qcom/qcom_pas.c
+> new file mode 100644
+> index 000000000000..dc04ff1b6be0
+> --- /dev/null
+> +++ b/drivers/firmware/qcom/qcom_pas.c
+> @@ -0,0 +1,295 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> + */
+> +
+> +#include <linux/delay.h>
+> +#include <linux/device/devres.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+> +#include <linux/of.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +
+> +#include "qcom_pas.h"
+> +#include "qcom_scm.h"
+> +
+> +static struct qcom_pas_ops *ops_ptr;
 
-On my side, I didn't manage to reproduce it locally either.
+I really dislike this singleton design. And it is not even needed! If
+you were storing here some allocated instance of SCM/PAS I could
+understand, but singleton for only ops? Just implement one driver (so
+SCM + whatever you have here) which will decide which ops to use,
+through the probe. Really, this is neither needed nor beneficial.
+
+It actually leads to more problems with this barrier handling, see
+further comments.
+...
+
+> +
+> +/**
+> + * qcom_pas_shutdown() - Shut down the remote processor
+> + * @pas_id:	peripheral authentication service id
+> + *
+> + * Returns 0 on success.
+> + */
+> +int qcom_pas_shutdown(u32 pas_id)
+> +{
+> +	if (ops_ptr)
+> +		return ops_ptr->shutdown(ops_ptr->dev, pas_id);
+> +
+> +	return -ENODEV;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_pas_shutdown);
+> +
+> +/**
+> + * qcom_pas_supported() - Check if the peripheral authentication service is
+> + *			  available for the given peripheral
+> + * @pas_id:	peripheral authentication service id
+> + *
+> + * Returns true if PAS is supported for this peripheral, otherwise false.
+> + */
+> +bool qcom_pas_supported(u32 pas_id)
+> +{
+> +	if (ops_ptr)
+
+Lack of barriers here is not looking right. Existing/old code is not a
+good example, I fixed only the obvious issue, but new code should be
+correct from the beginning.
+
+Barriers should normally be always paired, unless you have some clear
+path no concurrent execution can happen here, but such explanation is
+missing, look:
+
+> +		return ops_ptr->supported(ops_ptr->dev, pas_id);
+> +
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_pas_supported);
+> +
+> +/**
+> + * qcom_pas_is_available() - Check for PAS service
+> + *
+> + * Returns true on success.
+> + */
+> +bool qcom_pas_is_available(void)
+> +{
+> +	/* The barrier is needed to synchronize with client drivers. */
 
 
-> Can you provide me your .config, source version, VM setup (Number of
-> CPUs, memory etc.)?
+Here. This is pretty pointless/redundant comment. Obviously barriers are
+to synchronize with whoever is calling this and only clients are calling.
 
-My CI ran into this issue 2 days ago, with and without a debug kernel
-config. The kernel being tested was on top of 'net-next', which was on
-top of this commit from Linus' tree: fbdfa8da05b6 ("selftests:
-tc-testing: fix list_categories() crash on list type").
+You must say something useful, not just barrier is a barrier... It's
+like documenting mutex "to synchronize".
 
-- Config without debug:
+> +	return !!smp_load_acquire(&ops_ptr);
 
 
-https://github.com/user-attachments/files/25791728/config-run-22657946888-normal-join.gz
-
-- Config with debug:
-
-
-https://github.com/user-attachments/files/25791960/config-run-22657946888-debug-nojoin.gz
-
-- Just in case, stacktraces available there:
-
-  https://github.com/multipath-tcp/mptcp_net-next/actions/runs/22657946888
-
-
-My tests are being executed in VMs I don't control using a kernel v6.14
-on Azure with 4 vCPUs, 16GB of RAM, and KVM nested support. From more
-details about what's in it:
-
-
-https://github.com/actions/runner-images/blob/ubuntu24/20260302.42/images/ubuntu/Ubuntu2404-Readme.md
-
-
-From there, a docker container is started, from which QEMU 10.1.0
-(Debian 1:10.1.0+ds-5ubuntu2.2) is launched with 4 vCPU and 5GB of RAM
-using this command:
-
-
-/usr/bin/qemu-system-x86_64 \
-  -name mptcpdev \
-  -m 5120M \
-  -smp 4 \
-  -chardev socket,id=charvirtfs5,path=/tmp/virtmevrwrzu5k \
-  -device vhost-user-fs-device,chardev=charvirtfs5,tag=ROOTFS \
-  -object memory-backend-memfd,id=mem,size=5120M,share=on \
-  -numa node,memdev=mem \
-  -machine accel=kvm:tcg \
-  -M microvm,accel=kvm,pcie=on,rtc=on \
-  -cpu host,topoext=on \
-  -parallel none \
-  -net none \
-  -echr 1 \
-  -chardev file,path=/proc/self/fd/2,id=dmesg \
-  -device virtio-serial-device \
-  -device virtconsole,chardev=dmesg \
-  -chardev stdio,id=console,signal=off,mux=on \
-  -serial chardev:console \
-  -mon chardev=console \
-  -vga none \
-  -display none \
-  -device vhost-vsock-device,guest-cid=3 \
-  -kernel
-/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/arch/x86/boot/bzImage
-\
-  -append 'virtme_hostname=mptcpdev nr_open=1048576
-virtme_link_mods=/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/.virtme_mods/lib/modules/0.0.0
-virtme_rw_overlay0=/tmp console=hvc0 earlyprintk=serial,ttyS0,115200
-virtme_console=ttyS0 psmouse.proto=exps
-virtme.vsockexec=`/tmp/virtme-console/3.sh`
-virtme_chdir=home/runner/work/mptcp_net-next/mptcp_net-next
-virtme_root_user=1 rootfstype=virtiofs root=ROOTFS raid=noautodetect rw
-debug nokaslr mitigations=off softlockup_panic=1 nmi_watchdog=1
-hung_task_panic=1 panic=-1 oops=panic
-init=/usr/local/lib/python3.13/dist-packages/virtme/guest/bin/virtme-ng-init'
-\
-  -gdb tcp::1234 \
-  -qmp tcp::3636,server,nowait \
-  -no-reboot
-
-
-It is possible to locally launch the same command using the same QEMU
-version (but not the same host kernel) with the help of Docker:
-
-  $ cd <kernel source code>
-  # docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
-    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
-    manual normal
-
-This will build a new kernel in O=.virtme/build, launch it and give you
-access to a prompt.
-
-
-After that, you can do also use the "auto" mode with the last built
-image to boot the VM, only print "OK", stop and retry if there were no
-errors:
-
-  $ cd <kernel source code>
-  $ echo 'echo OK' > .virtme-exec-run
-  # i=1; \
-    while docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
-    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
-    vm auto normal; do \
-      echo "== Attempt: $i: OK =="; \
-      i=$((i+1)); \
-    done; \
-    echo "== Failure after $i attempts =="
-
-
-> I tried to find it on that github page Matthiue mentioned but I'm
-> probably too stupid to navigate this clicky interface.
-
-I'm sorry about that, I understand, the interface is not very clear. Do
-not hesitate to tell me if you need anything else from me.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+Best regards,
+Krzysztof
 
