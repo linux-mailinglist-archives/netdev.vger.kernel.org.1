@@ -1,274 +1,253 @@
-Return-Path: <netdev+bounces-264670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PUaOIVRqmlNPQEAu9opvQ
-	(envelope-from <netdev+bounces-264670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 05:01:09 +0100
+	id qBSMEe8sq2koagEAu9opvQ
+	(envelope-from <netdev+bounces-264901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 20:37:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F8721B59F
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 05:01:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB85E2271ED
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 20:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 06B3A300BC6A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 04:01:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1F40301D963
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 19:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDA2366801;
-	Fri,  6 Mar 2026 04:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52903A0EB0;
+	Fri,  6 Mar 2026 19:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="bI3daVns"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E0136A03F;
-	Fri,  6 Mar 2026 04:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33033374E46
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 19:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772769662; cv=none; b=jHFIT56q3GBcISJNuurv9E2bxYmJky14bNVbRIBIt2iu1UimeqAueSHosoyDRLB+Q2wso8a7R9LuoPWkx7H4Ha4WThs649FiEwQrXROJDrL94WmcD4cd112cFL2YQzhKYxpT4u90ZdLDYeDR9bt5HWkuzkVq1fGzLqWANcnfgYA=
+	t=1772825836; cv=none; b=UoRNEAytDp4Mg53gjDpGkrX41hW0d18roaJnsZudYhOX01gswQqMa1OeKjxphCEWvwyYbgcTEWraTg5qGJNaUuGV7bWnIMGysNdaCOPpjp5A8ACgF9Tohr2aOwSjTRbpsBWJjx7G80jTFxdlizVH0btYXr+qQ05X/Q/Qq3gcT+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772769662; c=relaxed/simple;
-	bh=CJcKGBki7v36X72qsmzgsFmDkpf9cdrWvVWNI9hOGkc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VluxsILZp9nsWTbpaoVtvDJqUBT1Xv4C+GMWxrafKbDNH133fRNbnSusYjIeqNbjAhNjbWrYsvL79g2lThS9oFRpz28UzuPlGts/7xWT0qJ/mysl8UtWMNDJ4hUOKjLTYMhGZrlrhe5aZrT97FOa7zwE9muniUUyYETuBTfS6Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
-X-QQ-mid: esmtpsz19t1772769634t18b456ed
-X-QQ-Originating-IP: BNKoUk/EEm2ysShfV34K1wbEp9Va9qA1DojK65Fhm/I=
-Received: from localhost.localdomain ( [119.167.27.18])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 06 Mar 2026 12:00:23 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7250432472425711869
-EX-QQ-RecipientCnt: 8
-From: Jialu Xu <xujialu@vimux.org>
-To: xujialu@vimux.org
-Cc: brgl@kernel.org,
-	kees@kernel.org,
-	krzk@kernel.org,
-	linusw@kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
-Date: Fri,  6 Mar 2026 11:59:13 +0800
-Message-ID: <554DC15F66B052BB+20260306035909.2447844-7-xujialu@vimux.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org>
-References: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org>
+	s=arc-20240116; t=1772825836; c=relaxed/simple;
+	bh=Wwf/rlX3fcPNX7opmKjPBceQ7Qog+/0/LSi+9Fr9rJo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qptL9+/MR0oO0yBLfG43ee5rDAuoz5PKTkWA2+r0m3hl0MkZhPN64+pFCrCkJWOtpbADIznFXD95q7+Im+Dg/r5EppxkN1qPETC69+HXziQs2QCYYUjbXIKMzqPowaohziqW8/THa0YsO4K1rTNeeZLq3Kp68rTsEvr2nf3KMfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=bI3daVns; arc=none smtp.client-ip=44.202.169.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5007b.ext.cloudfilter.net ([10.0.29.167])
+	by cmsmtp with ESMTPS
+	id yWauvBWqLKXDJyaz4vpRFz; Fri, 06 Mar 2026 19:37:14 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id yayevsbPjV6WMyayev37pe; Fri, 06 Mar 2026 19:36:48 +0000
+X-Authority-Analysis: v=2.4 cv=E//Npbdl c=1 sm=1 tr=0 ts=69ab2cea
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=pGLkceISAAAA:8
+ a=VwQbUJbxAAAA:8 a=ODW9KA4OjjfVspghKLMA:9 a=QEXdDO2ut3YA:10 a=O8hF6Hzn-FEA:10
+ a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=s14wzuuHmz3UuRviyTrofkZdIBROu5zpnbLynCi7onI=; b=bI3daVnsoDPSVQtd5Z7tI2lRpp
+	g/ww7yzBZgYzPumY8rslJs/0WNMuta6MZfJRv4y2Z9FgC5NO7xz67x5QS9HI0ms/EYlANsSbKT2p7
+	nTEhiuTdw8NaAxPyBU753SBgB1soF0qZeYzMtPppnYTqwK4MiYrW0bGhYvt0d0unXssCWirbkkiaW
+	nh8JcOdqToBaAKUbA4ZCqqeK9AznmgK0dUf7yHi6SXJWjThwTdWIU83IpkR8Xf8WCuHJFXXPwj5rm
+	13xAH7Am+4kxOI11WeM0UH3ucE+BEJ7W847yR+ic0S3gA+pJep8JEI2RlWCAPN7yTQFUOASsQ5JYT
+	PC6lQE7Q==;
+Received: from [177.238.16.13] (port=47618 helo=[192.168.0.21])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vyayb-00000001bKv-3mkP;
+	Fri, 06 Mar 2026 13:36:47 -0600
+Message-ID: <eb6c7f12-22d8-4384-b755-932fdfea5034@embeddedor.com>
+Date: Fri, 6 Mar 2026 13:36:11 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: Nxo56qkCB4EiaeIznA6Y2Y6th2NxT1tsNFQjMt2a7YTK9P5yndahLDZl
-	5SP0Z/qrVx+pwUk2ofkH7hnjAP/z0G1+i67T9Zd0KONbI0ZLnS82p8afRnop/rdx1LjqZ2/
-	BW4kiIH1are7rBy6ci+8d6WmFo6uMN40Ggj4HmjVBg14xI+U6iP0D6XwLVfqNDK2fA8Ay8p
-	7ZITh9pnLlwdtV5cHOeTqKePe/WAe4xn68eCF+ui2ybja+2dq/ccgqXwiq7PHM43MKt6cuI
-	EHhwmtIVTFEVCfo92EOsZOgu0xMnG6vDk0hP7F/FiMk4tdFhZWZvW2tJhqeI2xlB1D/PEE3
-	nkflU3BIk1Q6xx1TqXcvv+rIl6WRCSvGHvV4HK/UClAyCKLkWK+WWmn7F0T6M8hSKA00uwU
-	YLOcjUTgRImeYQ9SZQK4LyyrKNz41wMoiDnbZg04Q24pOKt8OGKATRXkLKZTQKvxx5r+wAl
-	T3oQbsqIxHT+KrPSzD1prACYIRWrCz/+teP2FiBEhTsVjKxmyEp/lsg8r2T25W3+kf88u/E
-	LM07dsQ6Ixco0g3B6fRFJQqtCeR5dxT5/Adw3cPT/vsMDJQxMS2rutfV0R0kFi3ZCRcs7/f
-	4s9dpcM/6Q7d1LoObSUm26LpSISaLmf1u6gAONh8VWIuTwxQAnuzN2tZ5ijeALvY7wk+T7S
-	hwuY4D5pn5mfIoUP75tznxt+r/Y5mvzvlP9aJLw3Sp1y2OExvs0JjwyWPX6k+8LMkwzjrco
-	n8QdpOUSBlGHrpKfy5pVzy8//WHT1IXue1eY+E8DASirSmlP+1mhRNo2neprIWZXLu5Yl+Z
-	Eh0XxhC9QVz/6s2ISFDMlVm8TesZlgJ+mndBSePTf7xjeriwkyISeMI0xDsP2uEXYgBMCsb
-	pFwe71mGfh7oqy6XjmVMO79UzG04JacpB19SLyj6gsM+At3d3QZ95doin2l6Y+lx5zJrEIi
-	5CGWniue+Y4thErmu6sCMNpMrHcSSAtRFZinjaOYrEfxKWRj3xQQ7oS6RSi84VZGaU7Vy1Q
-	tavcDv63g2kJI2sA6WmqXsLRanxdImCMVdAlwTPg==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: E4F8721B59F
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: rocker: kzalloc + kcalloc to kzalloc_flex
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ open "list:KERNEL" HARDENING "(not" covered by other
+ "areas):Keyword:b__counted_by(_le|_be)?b" <linux-hardening@vger.kernel.org>
+References: <20260306025449.12333-1-rosenp@gmail.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20260306025449.12333-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.16.13
+X-Source-L: No
+X-Exim-ID: 1vyayb-00000001bKv-3mkP
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.21]) [177.238.16.13]:47618
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 53
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfLbwWre5+KMfuS1qq7xc3o0KYDuAQoDyu7dmOVNACgM8KzGC8VXyCCVPN+YSMBS9t7OngLjimBvLb+iEJSYdtIE2ilGRWNHKTyQc7J5bLKFOuiU139LW
+ iqPUR47idDzxq0IFDh7DPJduvALmBWQ17OlyDetGaQKPbG46+et/APtgaz3BjraFahsjqfyRPvQ4GB6E3ZylL91dylsTtNQZCYo=
+X-Rspamd-Queue-Id: CB85E2271ED
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.991];
-	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
-	R_DKIM_NA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264670-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264901-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[embeddedor.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_SOURCE(0.00)[];
+	HAS_X_ANTIABUSE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_SPAM(0.00)[0.336];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,embeddedor.com:mid]
 X-Rspamd-Action: no action
 
-All in-tree consumers have been converted to the descriptor-based API.
-Remove the deprecated of_get_named_gpio() helper, delete the
-<linux/of_gpio.h> header, and drop the corresponding entry from
-MAINTAINERS.
 
-Also remove the completed TODO item for this cleanup.
 
-Signed-off-by: Jialu Xu <xujialu@vimux.org>
-Reviewed-by: Linus Walleij <linusw@kernel.org>
----
- MAINTAINERS               |  1 -
- drivers/gpio/TODO         | 28 ----------------------------
- drivers/gpio/gpiolib-of.c | 27 ---------------------------
- include/linux/of_gpio.h   | 38 --------------------------------------
- 4 files changed, 94 deletions(-)
- delete mode 100644 include/linux/of_gpio.h
+On 3/6/26 11:54, Rosen Penev wrote:
+> Combining the allocations simplifies things, especially the free path.
+> 
+> Remove ofdpa_group_tbl_entry_free as a result. kfree is shorter.
+> 
+> Add __counted_by for extra runtime analysis.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 61bf550fd37c2..8152fa2158295 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10958,7 +10958,6 @@ F:	drivers/gpio/
- F:	include/dt-bindings/gpio/
- F:	include/linux/gpio.h
- F:	include/linux/gpio/
--F:	include/linux/of_gpio.h
- K:	(devm_)?gpio_(request|free|direction|get|set)
- K:	GPIOD_FLAGS_BIT_NONEXCLUSIVE
- K:	devm_gpiod_unhinge
-diff --git a/drivers/gpio/TODO b/drivers/gpio/TODO
-index 5acaeab029ec6..7ce80fde1f17e 100644
---- a/drivers/gpio/TODO
-+++ b/drivers/gpio/TODO
-@@ -58,34 +58,6 @@ Work items:
- 
- -------------------------------------------------------------------------------
- 
--Get rid of <linux/of_gpio.h>
--
--This header and helpers appeared at one point when there was no proper
--driver infrastructure for doing simpler MMIO GPIO devices and there was
--no core support for parsing device tree GPIOs from the core library with
--the [devm_]gpiod_get() calls we have today that will implicitly go into
--the device tree back-end. It is legacy and should not be used in new code.
--
--Work items:
--
--- Change all consumer drivers that #include <linux/of_gpio.h> to
--  #include <linux/gpio/consumer.h> and stop doing custom parsing of the
--  GPIO lines from the device tree. This can be tricky and often involves
--  changing board files, etc.
--
--- Pull semantics for legacy device tree (OF) GPIO lookups into
--  gpiolib-of.c: in some cases subsystems are doing custom flags and
--  lookups for polarity inversion, open drain and what not. As we now
--  handle this with generic OF bindings, pull all legacy handling into
--  gpiolib so the library API becomes narrow and deep and handle all
--  legacy bindings internally. (See e.g. commits 6953c57ab172,
--  6a537d48461d etc)
--
--- Delete <linux/of_gpio.h> when all the above is complete and everything
--  uses <linux/gpio/consumer.h> or <linux/gpio/driver.h> instead.
--
---------------------------------------------------------------------------------
--
- Collect drivers
- 
- Collect GPIO drivers from arch/* and other places that should be placed
-diff --git a/drivers/gpio/gpiolib-of.c b/drivers/gpio/gpiolib-of.c
-index 3bdd9af674474..c512d735e85ff 100644
---- a/drivers/gpio/gpiolib-of.c
-+++ b/drivers/gpio/gpiolib-of.c
-@@ -14,7 +14,6 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_address.h>
--#include <linux/of_gpio.h>
- #include <linux/pinctrl/pinctrl.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-@@ -446,32 +445,6 @@ static struct gpio_desc *of_get_named_gpiod_flags(const struct device_node *np,
- 	return desc;
- }
- 
--/**
-- * of_get_named_gpio() - Get a GPIO number to use with GPIO API
-- * @np:		device node to get GPIO from
-- * @propname:	Name of property containing gpio specifier(s)
-- * @index:	index of the GPIO
-- *
-- * **DEPRECATED** This function is deprecated and must not be used in new code.
-- *
-- * Returns:
-- * GPIO number to use with Linux generic GPIO API, or one of the errno
-- * value on the error condition.
-- */
--int of_get_named_gpio(const struct device_node *np, const char *propname,
--		      int index)
--{
--	struct gpio_desc *desc;
--
--	desc = of_get_named_gpiod_flags(np, propname, index, NULL);
--
--	if (IS_ERR(desc))
--		return PTR_ERR(desc);
--	else
--		return desc_to_gpio(desc);
--}
--EXPORT_SYMBOL_GPL(of_get_named_gpio);
--
- /* Converts gpio_lookup_flags into bitmask of GPIO_* values */
- static unsigned long of_convert_gpio_flags(enum of_gpio_flags flags)
- {
-diff --git a/include/linux/of_gpio.h b/include/linux/of_gpio.h
-deleted file mode 100644
-index d0f66a5e1b2a7..0000000000000
---- a/include/linux/of_gpio.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0+ */
--/*
-- * OF helpers for the GPIO API
-- *
-- * Copyright (c) 2007-2008  MontaVista Software, Inc.
-- *
-- * Author: Anton Vorontsov <avorontsov@ru.mvista.com>
-- */
--
--#ifndef __LINUX_OF_GPIO_H
--#define __LINUX_OF_GPIO_H
--
--#include <linux/compiler.h>
--#include <linux/gpio/driver.h>
--#include <linux/gpio.h>		/* FIXME: Shouldn't be here */
--#include <linux/of.h>
--
--struct device_node;
--
--#ifdef CONFIG_OF_GPIO
--
--extern int of_get_named_gpio(const struct device_node *np,
--			     const char *list_name, int index);
--
--#else /* CONFIG_OF_GPIO */
--
--#include <linux/errno.h>
--
--/* Drivers may not strictly depend on the GPIO support, so let them link. */
--static inline int of_get_named_gpio(const struct device_node *np,
--                                   const char *propname, int index)
--{
--	return -ENOSYS;
--}
--
--#endif /* CONFIG_OF_GPIO */
--
--#endif /* __LINUX_OF_GPIO_H */
--- 
-2.47.3
+Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks
+-Gustavo
+
+> ---
+>   drivers/net/ethernet/rocker/rocker_ofdpa.c | 31 +++++-----------------
+>   1 file changed, 7 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/rocker/rocker_ofdpa.c b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+> index 50ea5f9ef63a..66a8ae67c3ea 100644
+> --- a/drivers/net/ethernet/rocker/rocker_ofdpa.c
+> +++ b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+> @@ -104,7 +104,6 @@ struct ofdpa_group_tbl_entry {
+>   	u32 cmd;
+>   	u32 group_id; /* key */
+>   	u16 group_count;
+> -	u32 *group_ids;
+>   	union {
+>   		struct {
+>   			u8 pop_vlan;
+> @@ -123,6 +122,8 @@ struct ofdpa_group_tbl_entry {
+>   			u32 group_id;
+>   		} l3_unicast;
+>   	};
+> +
+> +	u32 group_ids[] __counted_by(group_count);
+>   };
+>   
+>   struct ofdpa_fdb_tbl_entry {
+> @@ -1059,19 +1060,6 @@ ofdpa_group_tbl_find(const struct ofdpa *ofdpa,
+>   	return NULL;
+>   }
+>   
+> -static void ofdpa_group_tbl_entry_free(struct ofdpa_group_tbl_entry *entry)
+> -{
+> -	switch (ROCKER_GROUP_TYPE_GET(entry->group_id)) {
+> -	case ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD:
+> -	case ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST:
+> -		kfree(entry->group_ids);
+> -		break;
+> -	default:
+> -		break;
+> -	}
+> -	kfree(entry);
+> -}
+> -
+>   static int ofdpa_group_tbl_add(struct ofdpa_port *ofdpa_port, int flags,
+>   			       struct ofdpa_group_tbl_entry *match)
+>   {
+> @@ -1085,7 +1073,7 @@ static int ofdpa_group_tbl_add(struct ofdpa_port *ofdpa_port, int flags,
+>   
+>   	if (found) {
+>   		hash_del(&found->entry);
+> -		ofdpa_group_tbl_entry_free(found);
+> +		kfree(found);
+>   		found = match;
+>   		found->cmd = ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_MOD;
+>   	} else {
+> @@ -1122,14 +1110,14 @@ static int ofdpa_group_tbl_del(struct ofdpa_port *ofdpa_port, int flags,
+>   
+>   	spin_unlock_irqrestore(&ofdpa->group_tbl_lock, lock_flags);
+>   
+> -	ofdpa_group_tbl_entry_free(match);
+> +	kfree(match);
+>   
+>   	if (found) {
+>   		err = rocker_cmd_exec(ofdpa_port->rocker_port,
+>   				      ofdpa_flags_nowait(flags),
+>   				      ofdpa_cmd_group_tbl_del,
+>   				      found, NULL, NULL);
+> -		ofdpa_group_tbl_entry_free(found);
+> +		kfree(found);
+>   	}
+>   
+>   	return err;
+> @@ -1166,18 +1154,13 @@ static int ofdpa_group_l2_fan_out(struct ofdpa_port *ofdpa_port,
+>   {
+>   	struct ofdpa_group_tbl_entry *entry;
+>   
+> -	entry = kzalloc_obj(*entry);
+> +	entry = kzalloc_flex(*entry, group_ids, group_count);
+>   	if (!entry)
+>   		return -ENOMEM;
+>   
+> -	entry->group_id = group_id;
+>   	entry->group_count = group_count;
+> +	entry->group_id = group_id;
+>   
+> -	entry->group_ids = kcalloc(group_count, sizeof(u32), GFP_KERNEL);
+> -	if (!entry->group_ids) {
+> -		kfree(entry);
+> -		return -ENOMEM;
+> -	}
+>   	memcpy(entry->group_ids, group_ids, group_count * sizeof(u32));
+>   
+>   	return ofdpa_group_tbl_do(ofdpa_port, flags, entry);
 
 
