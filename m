@@ -1,230 +1,239 @@
-Return-Path: <netdev+bounces-264885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264887-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBqsHGQOq2n1ZgEAu9opvQ
-	(envelope-from <netdev+bounces-264885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:27:00 +0100
+	id NScLGfQNq2nxZgEAu9opvQ
+	(envelope-from <netdev+bounces-264887-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:25:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9738A2261C4
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:26:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEAD62260BC
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7B10730A577A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 17:15:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9936F30C5839
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 17:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E43442317C;
-	Fri,  6 Mar 2026 17:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022A730CDBC;
+	Fri,  6 Mar 2026 17:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="r3lYaMHr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nPhm2M+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D6733123D;
-	Fri,  6 Mar 2026 17:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E684E1A0BF3
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 17:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772817255; cv=none; b=J38CLAk1nclXOdsP9SGCyFGoHsewl7932j0pCE+Jy32wrhx32vxYUS9+RUoy+AmDr8ErFAdK3BGSvpiezMLI7kdxOmfddSAbileEszwvcq35F99EPQzSnWwQma1BB2UWWCfYRPYpspikdS4rcat6E93ZXEveAiZwoIGm1r0fpvs=
+	t=1772817495; cv=none; b=XmWj7CaWNgs5DksU1icujZcDD9Xs35x+i4yiCNHWkea8c0kfsU5VTrW7oAp/jqbE/QdtZGgrulQl7x+LCW5PQenS3/TZxyfV5+XU2wLPzGD0ihoMKTEIczBCS8Tnt+GiYV8GA/gG9F3cfbsi/EQeD+lwlcWPgvaWW5Bhp4e/BlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772817255; c=relaxed/simple;
-	bh=o6VJeQyvdF8sluPuypwR31NZuyAPIZ6njNUnRKK3xck=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TmDNSgzLYEP8T21i18P0AEd8MYP3J8naCHkdD/c48g1sWldgqQpJ2nmZ1B/qHnKqMtRD2FuxJs2Ilw56cn7ZIKAZOOSCUG7GkVOFIvM1ZnljfZgRaR/w8B8oxai9vFUT65mYKsBDF9NlT8LKzMTY8awqNJDts4HgM9z31YDZhzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=r3lYaMHr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6265xX6P1938926;
-	Fri, 6 Mar 2026 17:14:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=yNgeVx
-	WFeQuNfZOKEGXswceUvqNdkuSeuOfc7dV8XuQ=; b=r3lYaMHryUKzL7x2Rs9w88
-	kEPef60F80ZffOh32orTXis6/O9WdCJin13jw/v9Lb33G66KTjKI18f8l20EH5ho
-	Hc5W0HPWotekpbW/J9hb7KI5LYhGhNNW3Q5qrMWSzZ1aGgjXnEmAz9wuZjkzfz1O
-	GgJH3DYK3BWpY7PIb3CJ8CfVrPCxidRhyZjj6xva9+qPHAMG+d63maKwt9BEH+Hx
-	Fbsg+3ZwcnQD4Zi+Ysn/i2NBj4gDQBer/n9RyLaQIbRe/8S4U9rIO7uafXi0LHkL
-	fGmuZchrnolK9jKoAkr9OgkZ/5g1EgfNbo451P5Ck3ZajrgSaTgqXIS1PVLu4jwA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cksrjhqpw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Mar 2026 17:14:09 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 626ExE9m008816;
-	Fri, 6 Mar 2026 17:14:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cmdd1rg32-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Mar 2026 17:14:08 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 626HE5de46268762
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Mar 2026 17:14:05 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E69F2004F;
-	Fri,  6 Mar 2026 17:14:05 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1306E2004E;
-	Fri,  6 Mar 2026 17:14:05 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  6 Mar 2026 17:14:05 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-Date: Fri, 06 Mar 2026 18:13:59 +0100
-Subject: [PATCH v3 2/2] PCI: AtomicOps: Fix logic in enable function
+	s=arc-20240116; t=1772817495; c=relaxed/simple;
+	bh=0M7QbmYyI0ceEzylMfV5fRYbSSi9sDXzTiYHtoplO/c=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=p7lk7GQ79ea6l/kZhhfpX9tS9upizaj6OXCM/QNJs1k5N1uVnimT+jBd6TUsL+QlJFFjwKDi64Z9hI3XpKAnlX+Q683wzeK1aVcRzDU54tTRUORBznSLLcbBShYw0KU0iHCQPsPH2exVAn9fYKn94cxEy8x70O5XjtPU6uq+qts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nPhm2M+d; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 41E2A4E42594;
+	Fri,  6 Mar 2026 17:18:11 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0981D5FF92;
+	Fri,  6 Mar 2026 17:18:11 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2FEDC10369A8B;
+	Fri,  6 Mar 2026 18:18:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772817489; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=FKv6jIYCxjPP+YKO7zW1o8pEb+7cdjqlbdtxG5+Tcj0=;
+	b=nPhm2M+dSa+p25gnNKJqh89kRAcnlUNPmXF8ti0M2wlmP8uS8ZqmBweLnf/sm1sb0K6yt7
+	tWe5MpMr8oCCYlNV9ArwPkWxAGqRaRDK9TnYnJycIP+4unZOIKClmKMKwIJwKqhBATTWnC
+	aYsnbjXdHho122JCnKhGDqQ14ZvYCkkpdg2t2gCimiDRwfuh5x9cKfROEKLhG279JjHVgH
+	KOZ+50hANPoGRNaFcNXpvqmZiOSn3DCWXZ2hAtxqv9sb/nJbVME5c0uUdbLbrCVMd4e0g4
+	d6V1ysxtZ+O6PcgChKlTyQS1CbS5/4pUEijhQK9Klwmng3s1ytrIyPvQ33pZeQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260306-fix_pciatops-v3-2-99d12bcafb19@linux.ibm.com>
-References: <20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com>
-In-Reply-To: <20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com>
-To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Gerd Bayer <gbayer@linux.ibm.com>, stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=Rp/I7SmK c=1 sm=1 tr=0 ts=69ab0b62 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=VwQbUJbxAAAA:8 a=ud980_RLCRqylQVSWKAA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE2MiBTYWx0ZWRfX2oKgBMBfkkba
- 7OetCSS45o7LKDtHWVw8/o9wNtN5TyurORZzR9G4uZ1TVAE75PNudQJMTde8oA7F1e8sTLPgJ59
- hVjdwh67zTEi0PpH+h/AaEgbt7xorqgJ6CpTC/3vq1SwguOB4ns230/x+fp3L+3RTt+UU8nZ+c5
- aLfRUjptJ65Tap5Pw1C0oapTw3+JY9udZykS378Tk7IL8DBfhvOZHiMlnWXzJLhd6swLyZcTvwl
- 9KTxLmilDvL0P3drgTEcbCNJIy4v3XZt73iHnKtusMMP91m36+yI7QEKAf0kSWUFIog/9xSdk+Q
- rtAcvoJykfi9Xwq1TbL+JUNcdM+6zcjyuFfe5W2cOiJqE6wdA2FrRafWShI+DjsQ3BUKoRIYghx
- r6uOVbu/WwI3UtlnkfXgG8+KLwzOqpjHVSC/rn1XZtXiaE4Y6kHqBMcqtxzaJl0d/nUn0GWqy+l
- stplczivw5lhcoT/vbA==
-X-Proofpoint-GUID: zn42x3jkt0ZS9LoIc48rpJ9nhUIXcNWk
-X-Proofpoint-ORIG-GUID: bRWP3uFGBbxRaVPYW9XwslJ_Ru1E7una
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 priorityscore=1501 spamscore=0 phishscore=0 adultscore=0
- bulkscore=0 clxscore=1011 impostorscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060162
-X-Rspamd-Queue-Id: 9738A2261C4
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 06 Mar 2026 18:18:03 +0100
+Message-Id: <DGVVCKPUZVSQ.3U7SG8TTTA1CM@bootlin.com>
+Subject: Re: [PATCH net-next 8/8] net: macb: add Tx zero-copy AF_XDP support
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, "Vladimir Kondratiev"
+ <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
+To: "Maxime Chevallier" <maxime.chevallier@bootlin.com>,
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>,
+ "Richard Cochran" <richardcochran@gmail.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
+ <20260304-macb-xsk-v1-8-ba2ebe2bdaa3@bootlin.com>
+ <74089907-d7d3-4242-92a5-909812779932@bootlin.com>
+In-Reply-To: <74089907-d7d3-4242-92a5-909812779932@bootlin.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: BEAD62260BC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_TO(0.00)[bootlin.com,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.955];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264887-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264885-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.994];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Move the check for root port requirements past the loop within
-pci_enable_atomic_ops_to_root() that checks on potential switch
-(up- and downstream) ports.
+Hello!
 
-Inside the loop traversing the PCI tree upwards, prepend the switch case
-to validate the routing capability on any port with a fallthrough-case
-that does the additional check for Atomic Ops not being blocked on
-upstream ports.
+On Fri Mar 6, 2026 at 1:48 PM CET, Maxime Chevallier wrote:
+> On 04/03/2026 19:24, Th=C3=A9o Lebrun wrote:
+>> Add a new buffer type (to `enum macb_tx_buff_type`). Near the end of
+>> macb_tx_complete(), we go and read the XSK buffers using
+>> xsk_tx_peek_release_desc_batch() and append those buffers to our Tx
+>> ring.
+>>=20
+>> Additionally, in macb_tx_complete(), we signal to the XSK subsystem
+>> number of bytes completed and conditionally mark the need_wakeup
+>> flag.
+>>=20
+>> Lastly, we update XSK wakeup by writing the TCOMP bit in the per-queue
+>> IMR register, to ensure NAPI scheduling will take place.
+>>=20
+>> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
+>> ---
+>
+> [...]
+>
+>> +static void macb_xdp_xmit_zc(struct macb *bp, unsigned int queue_index,=
+ int budget)
+>> +{
+>> +	struct macb_queue *queue =3D &bp->queues[queue_index];
+>> +	struct xsk_buff_pool *xsk =3D queue->xsk_pool;
+>> +	dma_addr_t mapping;
+>> +	u32 slot_available;
+>> +	size_t bytes =3D 0;
+>> +	u32 batch;
+>> +
+>> +	guard(spinlock_irqsave)(&queue->tx_ptr_lock);
+>> +
+>> +	/* This is a hard error, log it. */
+>> +	slot_available =3D CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_r=
+ing_size);
+>> +	if (slot_available < 1) {
+>> +		netif_stop_subqueue(bp->dev, queue_index);
+>> +		netdev_dbg(bp->dev, "tx_head =3D %u, tx_tail =3D %u\n",
+>> +			   queue->tx_head, queue->tx_tail);
+>> +		return;
+>> +	}
+>> +
+>> +	batch =3D min_t(u32, slot_available, budget);
+>> +	batch =3D xsk_tx_peek_release_desc_batch(xsk, batch);
+>> +	if (!batch)
+>> +		return;
+>> +
+>> +	for (u32 i =3D 0; i < batch; i++) {
+>> +		struct xdp_desc *desc =3D &xsk->tx_descs[i];
+>> +
+>> +		mapping =3D xsk_buff_raw_get_dma(xsk, desc->addr);
+>> +		xsk_buff_raw_dma_sync_for_device(xsk, mapping, desc->len);
+>> +
+>> +		macb_xdp_submit_buff(bp, queue_index, (struct macb_tx_buff){
+>> +			.ptr =3D NULL,
+>> +			.mapping =3D mapping,
+>> +			.size =3D desc->len,
+>> +			.mapped_as_page =3D false,
+>> +			.type =3D MACB_TYPE_XSK,
+>> +		});
+>> +
+>> +		bytes +=3D desc->len;
+>> +	}
+>> +
+>> +	/* Make newly initialized descriptor visible to hardware */
+>> +	wmb();
+>> +	spin_lock(&bp->lock);
+>> +	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
+>> +	spin_unlock(&bp->lock);
+>
+> this lock is also taken in interrupt context, this should probably use a
+> irqsave/restore variant. Now, there are a few other parts of this driver
+> that use a plain spin_lock() call and except for the paths that actually
+> run in interrupt context, they don't seem correct to me :(
 
-Do not enable Atomic Op Requests if nothing can be learned about how the
-device is attached - e.g. if it is on an "isolated" bus, as in s390.
+I almost sent a reply agreeing with you, but actually here is the
+exhaustive `spin_lock(&bp->lock)` list:
 
-Reported-by: Alexander Schmidt <alexs@linux.ibm.com>
-Cc: stable@vger.kernel.org
-Fixes: 430a23689dea ("PCI: Add pci_enable_atomic_ops_to_root()")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- drivers/pci/pci.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+   #   Function                Context
+   ------------------------------------------
+   1   gem_wol_interrupt()     irq
+   2   macb_interrupt()        irq
+   3   macb_wol_interrupt()    irq
+   4   macb_tx_error_task()    workqueue/user
+   5   macb_tx_restart()       napi/softirq
+   6   macb_xdp_xmit_zc()      napi/softirq
+   7   macb_start_xmit()       user
+   8   macb_xdp_submit_frame() user
 
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index cc8abe6b1d07661488895876dbbcf8aaeadf4a17..23db6ad5f310ed009a9b2ca4933c7498e0d22b85 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -3677,7 +3677,7 @@ void pci_acs_init(struct pci_dev *dev)
- int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
- {
- 	struct pci_bus *bus = dev->bus;
--	struct pci_dev *bridge;
-+	struct pci_dev *bridge = NULL;
- 	u32 cap, ctl2;
- 
- 	/*
-@@ -3715,29 +3715,27 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
- 		switch (pci_pcie_type(bridge)) {
- 		/* Ensure switch ports support AtomicOp routing */
- 		case PCI_EXP_TYPE_UPSTREAM:
--		case PCI_EXP_TYPE_DOWNSTREAM:
--			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
--				return -EINVAL;
--			break;
--
--		/* Ensure root port supports all the sizes we care about */
--		case PCI_EXP_TYPE_ROOT_PORT:
--			if ((cap & cap_mask) != cap_mask)
--				return -EINVAL;
--			break;
--		}
--
--		/* Ensure upstream ports don't block AtomicOps on egress */
--		if (pci_pcie_type(bridge) == PCI_EXP_TYPE_UPSTREAM) {
-+			/* Upstream ports must not block AtomicOps on egress */
- 			pcie_capability_read_dword(bridge, PCI_EXP_DEVCTL2,
- 						   &ctl2);
- 			if (ctl2 & PCI_EXP_DEVCTL2_ATOMIC_EGRESS_BLOCK)
- 				return -EINVAL;
-+			fallthrough;
-+		/* All switch ports need to route AtomicOps */
-+		case PCI_EXP_TYPE_DOWNSTREAM:
-+			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
-+				return -EINVAL;
-+			break;
- 		}
--
- 		bus = bus->parent;
- 	}
- 
-+	/* Finally, last bridge must be root port and support requested sizes */
-+	if ((!bridge) ||
-+	    (pci_pcie_type(bridge) != PCI_EXP_TYPE_ROOT_PORT) ||
-+	    ((cap & cap_mask) != cap_mask))
-+		return -EINVAL;
-+
- 	pcie_capability_set_word(dev, PCI_EXP_DEVCTL2,
- 				 PCI_EXP_DEVCTL2_ATOMIC_REQ);
- 	return 0;
+And all contexts are safe because it always is this sequence in non-IRQ
+contexts (#4-8):
 
--- 
-2.51.0
+   spin_lock_irqsave(&queue->tx_ptr_lock, flags);
+   spin_lock(&bp->lock);
+   spin_unlock(&bp->lock);
+   spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+
+So bp->tx_ptr_lock always wraps bp->lock and does the local CPU IRQ
+disabling.
+
+(I also checked we don't risk ABBA deadlock, and we don't: all code
+acquires bp->tx_ptr_lock THEN bp->lock.)
+
+However, there is still a bug in the code you quoted: setting
+BIT(TSTART) is done twice by macb_xdp_xmit_zc():
+ - once in the helper function macb_xdp_submit_buff() and,
+ - once in its own body (code you quoted)
+This is fixed for V2!
+
+Thanks Maxime,
+Have a nice week-end,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
