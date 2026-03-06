@@ -1,142 +1,219 @@
-Return-Path: <netdev+bounces-264820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LIBA5zlqmkTYAEAu9opvQ
-	(envelope-from <netdev+bounces-264820-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 15:33:00 +0100
+	id MOAlJETIqmnVWwEAu9opvQ
+	(envelope-from <netdev+bounces-264770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:27:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A172D222BA0
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 15:32:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D762209CC
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDDCC306A911
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 14:29:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DB1D3032CE5
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022233ACA58;
-	Fri,  6 Mar 2026 14:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD4637F75E;
+	Fri,  6 Mar 2026 12:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6RGWysP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpY6K6f3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941C83A256B
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 14:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147B41B4257;
+	Fri,  6 Mar 2026 12:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772807364; cv=none; b=i0H1nKrqtyhnXy2H8RBLfki+/YhuHHYXcSXzSbJqL6AmDlwu+VOIq4mURHE5Ux/ghqjBfahuWv8wM9UGUlsy9YElz2pKHoR6djAnqpHS4L/7vO5K0RFZArSOUffVkI7w15hGnIv9oYB+Y6/xmi+CiLj4gaYCxIn8VLxZwvzIlo8=
+	t=1772799995; cv=none; b=u/N3s5P/7qRg6mdAvp/8A6nkDZfJc1MyhhgPYRCoQpru61uXXcd1tqRG+fgmergN8n1D8xRKJLq4JKbsGiF3qg6pmuW+YM47+WaWhNFwTZ//8T2P2SBOr6f3WnTQCJCswZjmj3QTPyPmtSSFoMIjSAmT8MY+L7PRR243+q1M+Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772807364; c=relaxed/simple;
-	bh=ru7BcOy2QGPb1lxmwW935BBVkRhCD2QUq5jqUemeLX0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=biAaT86nbL3LtDogILM3vcc8uUDZGIDb3H1Ub4cu92zIZ4GVv+J/MqjQS6+tUlV11KetBG7YeXDzXoxHmc9pzgUAbffVPdKRqhGDLuP5d2wuDDr4hGTHtzpTlffc4ZLD+sJdDy4PeX6RQOA6T46vRlICdLvBm7iyb6DTqWY49+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l6RGWysP; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-439d8dc4ae4so865437f8f.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 06:29:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772807362; x=1773412162; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ru7BcOy2QGPb1lxmwW935BBVkRhCD2QUq5jqUemeLX0=;
-        b=l6RGWysPT8dKMk0aiE2wq0dtj39o+xkvUM4vj4yoJHfYBKk6Mf68bwB5dLrjILSSil
-         VFdGrtcyIC6yGLYBHWSWH8CC8MgDTsjwRddf+GhwbT5f6E+qdRhoAYn9OyN6i7cDY7kS
-         6kI8ouJxlO708TcywyvUTUROgei1cL+vns66Uj93LZa1l81nkII2jSG2FYiuKbdkF/1h
-         Oe8kK3niJBEDh1Zb1EzXEYivIDXlJ9z/USqHogkRSw+UfOQuHt0jrbowrKie724+qSvk
-         oNWuRvrdnWld51NVeU+iYq5DJrvFx0jBebzxfrlaQazyzIR7dPXHOzaI+Tq8HfNCfFKl
-         K9Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772807362; x=1773412162;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ru7BcOy2QGPb1lxmwW935BBVkRhCD2QUq5jqUemeLX0=;
-        b=T99oOx/L5yl8xCm4kU5OPiAykI1ncDw1a9pooBMfCZvE13rWC2pCqVu5Cm5C0BiKZc
-         stgO4JSU1lil3asD4qndb1Vn6P5+jG97Ml4dS8XNHebGnQs8PBl8S1L7KwfUmOtdeQL8
-         GD+dwHFYsFatNO6I37XgIrpr41Q95j3j0bx1qqSzNf0QbMtIuH3TWX4DTQhyZjYEloQS
-         MgqqgTW6JYmFYTwIzdVWzc7aCcVWm5FA37yEEHmqJNPUEz3fjMghSj0uWG3sPiiAFab4
-         izO+8pWuWati0Pv7Ehiu6pN9gPzbDQwoN50KMwLS/N6p3yWFAlXyStgNckBl0Fmkx0DS
-         iYnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWA5udqZSYDAbitze0+wKgxFyuxDKAr2CDxTIPwBM56AAG1JQWTQake2MD3Lvj3CuL/5EY09OQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynqYHQynY2rmtmFu+JpuJ3fdC3z3EH6/IXgo58c1fviZnhTg9U
-	HyUu2iWrOcqUpd3LlStv7vOws/uSdSLw//YikiGSwDfeg7X4pwaZIMgr
-X-Gm-Gg: ATEYQzz9LQ4vo3EgPPzi9T9ZX2eYRT98spXIX6KYuNQOuBBCceLG+wn+5hHNm3MQIZX
-	Ib4eMILfvZxrVOceSM8GcQPPbcQJ2W7sZ84qd9rGMXR482j/gT/3Jfqq+zM6jVKb0CJ62R9Vf0i
-	ARD9jz4sMdMbyB/csqWzFhpIO31l8WrZKw4BONgHkaP0xiAmCfPo3Mc7TudUWDfLr8rTH1jEmUx
-	E3CmGPPW1xO/NfseL/XOfTMCEWg1JJJVwC0P3ZGpGUK05kepG1tZwYxxTnBtaHiPs/9YGrMywkw
-	3mL993sBg3+WxLkM6HXK08FRKarOHujp41r0eTe2lp2wQ8323tI68KiAMlEokcNnhglmDVryMYv
-	8HKhczDNCH/Sx5D4YwggFsqXbr9+8SRbDVraQg/x1dPsjvpraQ+wdG5+XpPnk2Qfixq6hesIN8f
-	RubdWTVNQJFx9vgJ8udqLtP+u3ZoN5NKZEj4QI
-X-Received: by 2002:a05:6000:1a8a:b0:439:d755:a895 with SMTP id ffacd0b85a97d-439da86f787mr4105638f8f.42.1772807361864;
-        Fri, 06 Mar 2026 06:29:21 -0800 (PST)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae36785sm4507302f8f.27.2026.03.06.06.29.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 06:29:21 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  liuhangbin@gmail.com,  matttbe@kernel.org
-Subject: Re: [PATCH net-next 06/10] tools: ynl: add netdevsim wrapper
- library for YNL tests
-In-Reply-To: <20260306020901.524105-7-kuba@kernel.org>
-Date: Fri, 06 Mar 2026 12:23:26 +0000
-Message-ID: <m2a4wli1tt.fsf@gmail.com>
-References: <20260306020901.524105-1-kuba@kernel.org>
-	<20260306020901.524105-7-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1772799995; c=relaxed/simple;
+	bh=2P0FvPHpjsAhaxOTJ42bBLcCaRl4aaXZ5kIUOMNVWG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uTreZUeKxD9IxpjwSJ8UI8Hf5deY1rEG5jWqewQ8vgyrIzpfk7Q6BmqzODcmVFKhAOIb0ZyetyScle9FKJHbzreHbRrSnnk8Tn/3l1gXA2xXUPIo/oDC3OyDY4afzqw024UV5VxiyxJRRbq5XI1OLsTg1EilO7yl/MNYWkZeMWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpY6K6f3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3469DC4CEF7;
+	Fri,  6 Mar 2026 12:26:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772799994;
+	bh=2P0FvPHpjsAhaxOTJ42bBLcCaRl4aaXZ5kIUOMNVWG4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TpY6K6f3dvGsTTghQkD02tTChA2EwqMp/TpQHYfK66zjyTbZ8MiJAmvnb4buPO2Ol
+	 ASVRmYPmWBmFSlqURChzwTNJTonaTuZGs5/EHFxAeEK+JJM37rDxeHbP+7uPAPbDNB
+	 ZJH6y/sj2SwJrkrFUmj4U4BCckhgnUnVgGUpwh2dSE34XG3Ns9Rv8SqsanNsG90lqE
+	 qDOiPmqQr5aqOlEJ3hzzDS0y2SX/ydi84zZQWgo/w3iX/S4bMLqQGcMFP6NoojCwMK
+	 m9eF4QgqmVkNoXqv/RAre6ur7cbDQLHMeE6WwwrH+FV41xx9ytsuDVQOKxlgtAVRGn
+	 vdR8q0SNanDlA==
+Date: Fri, 6 Mar 2026 12:26:31 +0000
+From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
+	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
+	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 10/16] mm/memory: use __zap_vma_range() in
+ zap_vma_for_reaping()
+Message-ID: <c03e1ced-6fa5-4d66-9c91-66693193383f@lucifer.local>
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-11-david@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: A172D222BA0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227200848.114019-11-david@kernel.org>
+X-Rspamd-Queue-Id: 38D762209CC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-264770-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264820-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[donaldhunter@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[74];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lucifer.local:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> Some tests need netdevsim setup which is painful to do from C.
+On Fri, Feb 27, 2026 at 09:08:41PM +0100, David Hildenbrand (Arm) wrote:
+> Let's call __zap_vma_range() instead of unmap_page_range() to prepare
+> for further cleanups.
 >
-> Add ynl_nsim_lib.sh, a shared library providing nsim_setup and
-> nsim_cleanup functions for tests that need a netdevsim device.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> To keep the existing behavior, whereby we do not call uprobe_munmap()
+> which could block, add a new "reaping" member to zap_details and use it.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+I am always in favour of making further use of helper structs :)
+
+>
+> Likely we should handle the possible blocking in uprobe_munmap()
+> differently, but for now keep it unchanged.
+>
+> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+
+OK this looks like it's doing the equivalent of what was there before, so:
+
+Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
+
+> ---
+>  include/linux/mm.h |  1 +
+>  mm/memory.c        | 13 +++++++++----
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 21b67c203e62..4710f7c7495a 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2800,6 +2800,7 @@ struct zap_details {
+>  	struct folio *single_folio;	/* Locked folio to be unmapped */
+>  	bool skip_cows;			/* Do not zap COWed private pages */
+>  	bool reclaim_pt;		/* Need reclaim page tables? */
+> +	bool reaping;			/* Reaping, do not block. */
+>  	zap_flags_t zap_flags;		/* Extra flags for zapping */
+>  };
+>
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 7d7c24c6917c..394b2e931974 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -2079,14 +2079,18 @@ static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>  		unsigned long start, unsigned long end,
+>  		struct zap_details *details)
+>  {
+> +	const bool reaping = details && details->reaping;
+> +
+>  	VM_WARN_ON_ONCE(start >= end || !range_in_vma(vma, start, end));
+>
+> -	if (vma->vm_file)
+> +	/* uprobe_munmap() might sleep, so skip it when reaping. */
+> +	if (vma->vm_file && !reaping)
+>  		uprobe_munmap(vma, start, end);
+>
+>  	if (unlikely(is_vm_hugetlb_page(vma))) {
+>  		zap_flags_t zap_flags = details ? details->zap_flags : 0;
+>
+> +		VM_WARN_ON_ONCE(reaping);
+>  		/*
+>  		 * vm_file will be NULL when we fail early while instantiating
+>  		 * a new mapping. In this case, no pages were mapped yet and
+> @@ -2111,11 +2115,12 @@ static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>   */
+>  int zap_vma_for_reaping(struct vm_area_struct *vma)
+>  {
+> +	struct zap_details details = {
+> +		.reaping = true,
+> +	};
+>  	struct mmu_notifier_range range;
+>  	struct mmu_gather tlb;
+>
+> -	VM_WARN_ON_ONCE(is_vm_hugetlb_page(vma));
+> -
+
+I guess because you've moved this safety check into __zap_vma_range()?
+
+>  	mmu_notifier_range_init(&range, MMU_NOTIFY_CLEAR, 0, vma->vm_mm,
+>  				vma->vm_start, vma->vm_end);
+>  	tlb_gather_mmu(&tlb, vma->vm_mm);
+> @@ -2123,7 +2128,7 @@ int zap_vma_for_reaping(struct vm_area_struct *vma)
+>  		tlb_finish_mmu(&tlb);
+>  		return -EBUSY;
+>  	}
+> -	unmap_page_range(&tlb, vma, range.start, range.end, NULL);
+> +	__zap_vma_range(&tlb, vma, range.start, range.end, &details);
+>  	mmu_notifier_invalidate_range_end(&range);
+>  	tlb_finish_mmu(&tlb);
+>  	return 0;
+> --
+> 2.43.0
+>
 
