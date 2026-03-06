@@ -1,125 +1,215 @@
-Return-Path: <netdev+bounces-264784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264785-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WIVrB83Rqmn3XQEAu9opvQ
-	(envelope-from <netdev+bounces-264784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:08:29 +0100
+	id CC52F//Rqmn3XQEAu9opvQ
+	(envelope-from <netdev+bounces-264785-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:09:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECFB221628
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:08:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC0E22164D
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30F893019F19
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:05:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FB7C3008D20
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 13:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F163C390C9D;
-	Fri,  6 Mar 2026 13:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6C93921DA;
+	Fri,  6 Mar 2026 13:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jn1euWhY"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NUMrv+YK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF77296BBA;
-	Fri,  6 Mar 2026 13:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E23E38F25B
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 13:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772802300; cv=none; b=QGS+p8UhS+fIbqN79TBU5NLM7l36olHCKNWW9+GyCRAurHirLNq9I7BA91HLPUjxzHDj/bDzmFW6wZI18Ds/UIcP7WFIwN/DibyYbSYO/rxrJ53jyRjVL1FYF+4RmhoQUTJ7J2TPSbtPGglfuVIiOJPCHCdBBR/cJNp5k6c0u0I=
+	t=1772802359; cv=none; b=JegGuYNZJGBqPxSBSIwJxWGcOyos6/wd6UlQ+/4L6QjOLzkVsMiCrvrAcA3SJc6rIW+wEfl8pVsGWkTi1adQ9/+lxPkSMCJCLwGAEA9FGmDOTIDcXOhVkENvwPzVWQTT6bMIYX4t1OkIkDIUT4SkHR6TovUvJgS9keeiJQ0xd/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772802300; c=relaxed/simple;
-	bh=YJnF7YYdSjTbFJ8+etdFZLhgzDDcBHopGM6zUsnq2ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u8QhZABFrouzUUpUrMW5HIX8ZRTQInH0o64Vc4JRimlbbkT9HAe3XYjoNlmDzdDCJdfIXAFIuMw98oWNbjbrkxmafKJzhsp6gmd5LZw8Y+t8xMrSl93r04ypx4MSg6l2i/aSz4gqAmfV4HxE0F+ymNKjaYfyaKdEOaX4logk9GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jn1euWhY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A16C4CEF7;
-	Fri,  6 Mar 2026 13:04:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772802300;
-	bh=YJnF7YYdSjTbFJ8+etdFZLhgzDDcBHopGM6zUsnq2ao=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jn1euWhYr/Pd9jPE66YzP8kHD3pZ4nV3KKC7AcJLmzKI91pTUlGm/ZxkZcmnfLqWQ
-	 gixWhqWW0AgaUI3k/3izuS8Rk8YqulP0waTkkory339bhClMLI6pY9Gr2tNTUoqbou
-	 pf1B8zyQDqinDt6D59p0S3gw1upaA86ZdVk2j0JT6V/oz5dvI1zCnC7koCEF05OPuV
-	 WZzsnKXleKIFi3Vunt5XdE/82g+Q+EKlI6qyqu3+trFXycG/GQgtOF25Av3JXeAkWz
-	 AWrrK5JtvIMBt2d2CRrLLksECsMSLTq9OxK9ETsGGjhHZzOqjOTHbhq+hSE63aWFM4
-	 NPAjakE06dAdg==
-Date: Fri, 6 Mar 2026 13:04:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/4] net: macb: add support for Microchip p64h
- ethernet endpoint
-Message-ID: <20260306130454.GB461701@kernel.org>
-References: <20260303180318.1814791-1-charles.perry@microchip.com>
- <20260303180318.1814791-5-charles.perry@microchip.com>
+	s=arc-20240116; t=1772802359; c=relaxed/simple;
+	bh=quvLNFx0dzRo4ProJ/vdHwIGUIiV542xDUw1+ZsSqNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YnuUabrmKlYl5mAIHWtwlhTNp3weI2uT49S2pQwPpag/SuipOrmgBa6WnUC1uEJ75q7EqmLHUIYaVRN2w1fDlv5kutubWTXfU7ujRWIYbYFwndG96VtSxHMlPhZB6akZBY9MhUaq3UugttYJMmOOVELSaj0YCPkr6XGicN49a44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NUMrv+YK; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-439bc14dcf4so3537513f8f.1
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 05:05:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1772802356; x=1773407156; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3sFlLcLIiWA3KVD8eDJmdII6jxrEQxk04g4842tHVZo=;
+        b=NUMrv+YKyhbuLThWZPADGGkKHfQ0SyNJqreN9vhYJLO/OsB8/b9yngFT/R+UW/dU3W
+         W2nDsfk/RAvJl0VpNvPFg2zHDgA/cggtw9sB9v3vQ1fLwYZ72tEUxbhaRqGI48EZGOEl
+         6FoHOupzyJTc7klPr3J0ZzUrkJwxtbiRtfEJj8ddAPE0xzsyzrSAj2kilEsU2iUtYS+/
+         OYHyQZgy3pnHkB98FlcES5ufXaZZ61d0K2rvcS7n1BiEDH1Dyl+JN/5o5Rbre5GbmgG2
+         xq+TRDjPpmODJ2twnAf8DsyHiBuJfdqoTlTF2zeT8yKYLpFcKb33Cmm+5gH4+O/0TqcA
+         G/xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772802356; x=1773407156;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3sFlLcLIiWA3KVD8eDJmdII6jxrEQxk04g4842tHVZo=;
+        b=VBQNldot7BuoJgUv58eax41KJ7xoNrpCtwKY6tUEd4/Hvy2qv7dy2AdaYHlHHAUclq
+         Ht/xxVJR4FE4Hb54k8l/cg6YcRSAecVmw4GjgXvOtnCFfI86XkLfMeOhNEXpAiRvjnMf
+         SS8KcZPsjbTVdH9QKfgXjEJBH1toClPFPJMTBXLfbMTYnIJZdTpHgHCziA6Vv+SdCHb7
+         ge4Ip5JKV6GbX5w/M7SXj9phnwTsBLf79qI7safRQPtdAbKo7n0tPrmDEg8GGHxmLoEv
+         AeL3QjchqD7GX7BzgJjOoCr2uxgzK1qYfGqXPriXShuQpEr3pZXmjVtlD0JPdBnsuZoJ
+         MTAA==
+X-Gm-Message-State: AOJu0Yy/tiZ/qJRT7rPfU8qCn0sOnyUrUUPapM/yh+IRWi3uf9vF+8eJ
+	RlKynoFe/ymu/tomhlmPNPRflonGe5b3p0uSPWDd0MXwo+bS12fezSvFEBMO2HUtmgIkvVifctx
+	na2rwjv2YQJXahNNIrCo3GxfmQ/TuiDIp3sp3rah+AyK/X6Gz4os=
+X-Gm-Gg: ATEYQzw/vKSuFnX1wAwXgEOeWkRhBUwWxQXeIIsS+jFrx5mrAp+WxP70W2ddFWp+aU3
+	QzMZqAVr7dkGKK5KCTxVqTbxnf2QT7iryoHUYNkbUz3KHjQD2KW1UvwequcGjGEvhIe0nfJ8wvQ
+	CXAdh1vDZrdfqBfS1EJnYJn9GR5tVwF6HF/AX19oXcNjLJk6JRXHEiHbraZCgfgNOW61qTu2tCx
+	vHwRbNbTUgXxO3aBcolZtDoUJrXR4VMMAZz3Ay414l5S4QCN3/fE7Uy8LBS5iUT7lYUJlwnZFgb
+	Xu+gekZok8OdRsBwY/Lj8kAVGrCkl3741HgPGz24S65wdl/A2Ir36/KqI5unezlQ81qVw7MUkHA
+	2Xs9hvvmbKJuNAOYkPDXiEGYI0dITH4vHZKGA0hAMy7O5Sr9u18Z57ySVymE/18B3OrpZtvewL/
+	gYzBZ6zxrPePOPzMbTo47k3XGGDnJAsfWKTUWkoToM9h0xx0Y3BqbNazvGAsHTTw==
+X-Received: by 2002:a05:600c:3e10:b0:480:4a90:1afd with SMTP id 5b1f17b1804b1-485264e7588mr32493645e9.0.1772802356375;
+        Fri, 06 Mar 2026 05:05:56 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:e1e0:441c:b462:d279? ([2001:67c:2fbc:1:e1e0:441c:b462:d279])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48527681e2bsm36651985e9.5.2026.03.06.05.05.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Mar 2026 05:05:55 -0800 (PST)
+Message-ID: <b3197cdc-83db-4739-966c-018f8570070d@openvpn.net>
+Date: Fri, 6 Mar 2026 14:05:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303180318.1814791-5-charles.perry@microchip.com>
-X-Rspamd-Queue-Id: AECFB221628
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/9] selftests: ovpn: add notification parsing
+ and matching
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Ralf Lici <ralf@mandelbit.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ linux-kselftest@vger.kernel.org, shuah@kernel.org, horms@kernel.org
+References: <20260304230643.1014-1-antonio@openvpn.net>
+ <20260304230643.1014-6-antonio@openvpn.net>
+ <20260305191732.2bbc386b@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20260305191732.2bbc386b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: AEC0E22164D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264784-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264785-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[openvpn.net:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,requirements.py:url,openvpn.net:dkim,openvpn.net:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 10:03:18AM -0800, Charles Perry wrote:
-> p64h doesn't have the USRIO register so MACB_CAPS_USRIO_DISABLED is
-> used.
+On 06/03/2026 04:17, Jakub Kicinski wrote:
+> On Thu,  5 Mar 2026 00:06:23 +0100 Antonio Quartulli wrote:
+>>   .../selftests/net/ovpn/check_requirements.py  | 47 +++++++++++++++++++
 > 
-> p64h does support PTP and has the timestamping unit so
-> MACB_CAPS_GEM_HAS_PTP is used.
-> 
-> jumbo_max_len is set to 16383 (0x3FFF) as reported by the DCFG2 register
-> bits 0..13. The JML register also has a default value of 0x3FFF.
-> 
-> dma_burst_length is set to 16 because that's what most other platforms
-> use and it worked for me so far. There is one other mode where bursts of
-> up to 256 are allowed but this might impact negatively other masters on
-> the NOC.  The register default value is 4 (bursts up to 4).
-> 
-> Signed-off-by: Charles Perry <charles.perry@microchip.com>
+> this file is not included in the Makefile, it should probably be under
+> TEST_FILES ? otherwise when tests are installed with make install this
+> file won't be copied
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Right, will do.
+
+> 
+>> +if has_listener_requirements; then
+>> +	for p in $(seq 0 ${NUM_PEERS}); do
+>> +		setup_listener ${p}
+>> +	done
+>> +fi
+> 
+> There should probably be an else branch which prints some kind of
+>   echo "SKIP - requirements missing"
+> 
+> Your requirements.py script prints stuff but the output needs to
+> contain the word SKIP
+
+If "has_listener_requirements" is false, the test script still goes on, 
+but it won't check the received netlink notification content.
+
+So we're not really skipping the whole test, just one specific check 
+that requires extra tooling (which is normally found on all standard 
+distros).
+
+
+Do you think we should rather SKIP the whole test so that we can easily 
+spot that something is missing?
+
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
