@@ -1,222 +1,303 @@
-Return-Path: <netdev+bounces-264744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264745-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGAKBIe0qml9VgEAu9opvQ
-	(envelope-from <netdev+bounces-264744-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:03:35 +0100
+	id gHx+DFu1qml9VgEAu9opvQ
+	(envelope-from <netdev+bounces-264745-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:07:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D0721F67B
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:03:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A8221F6D6
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:07:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C02623045A99
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 11:03:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0219330093B3
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 11:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FCA349B18;
-	Fri,  6 Mar 2026 11:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E39385513;
+	Fri,  6 Mar 2026 11:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="GVzXkSNU";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="j3lOvFtf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niRYr2GU"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6018923C516
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 11:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8E9382F15;
+	Fri,  6 Mar 2026 11:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772795001; cv=none; b=iterpLbKfL1GaipJtGbEWer9rqI/MZwE5bFcPes9vBiLcOiYbnWvMmg11mva0y9IZ3syrXMMnNYufLjLVyQNe7MGyIrRgcipe2NF/AI08yc443JaMcRWBqL7rfrIHrgtaIeBupqatBYfQkTBDd2YevSTkOhX/CqEybeF1g4c6LI=
+	t=1772795220; cv=none; b=YDiN+r+9Gw03wrMf0PLCOWHMoaskZonOY2BA4oUDFgsx7kXC5yu2FFlSsA7uJS/dYPa9nfqW/bGU1MlzUloujJlPNrEDpWM5oCaCT0uWyZsMegQP8X7h7aHEKsO/ckXPI8jLuI9YpTDx6WqtB9daHngc6mUV7oYsIZh8MbXsEso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772795001; c=relaxed/simple;
-	bh=PIvre5oKJmAYKAU5/KLObYZpm7u8CjW4WK0kaQiiXbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nk5dIFhy7pQvXzaWr+cgjjaCVJyb71ao3YGlQ5gief4/KqezYu4Utgeqlcr0rKO6/1eFAIQ7Cl539eqE3tVhzvbvUaLLAxJruGyo0wIGYxCa7zZr53c5uh3Cu1zuDlcKjX8jMgOuSBwKelt9yON31aN9dGaWZhriAlIRQsAswsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=GVzXkSNU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=j3lOvFtf; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 58942140021F;
-	Fri,  6 Mar 2026 06:03:18 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 06 Mar 2026 06:03:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1772794998; x=
-	1772881398; bh=dLL/nLB3sa5pSYrC5t9KIx0W5G+Id7KRhtEZd1fY5y0=; b=G
-	VzXkSNUWnM/aIBCBT/Ft0XWkRzSRyS2wlPdekvdMNa0G/Pdy42HoBACeNnbcgMzn
-	64Gqk0UAhZrDiL5R1vMzwrs6WcQVq63KFjJCwvmPkCwlfmnb8dO1GveEPq1hyk2K
-	/4xuPZ03pVPKssVwF/UZjgz0Rv3/ox4MLMuU0bU0CgAgEIQFA4G0dR4upn0S40pM
-	S1rvB/ElE1yXTmTEDdQ+axjsQWTsjVkJEolDeiMmDiNeZo3I0HYe7C08cIJte6KX
-	t9iypQY/b/qU3U1e2Kiw3Y67pgp/E58cpkEakKDnyP7vAnw7EL6OP/xhngJfZUqu
-	LVUbE5nP5IreUpH9WosTA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1772794998; x=1772881398; bh=dLL/nLB3sa5pSYrC5t9KIx0W5G+Id7KRhtE
-	Zd1fY5y0=; b=j3lOvFtfvphQc8wnJQlcqJXDrz0X4cpP9gDYLKNxAk9hqp+0eX9
-	8Kg3h9RSz9O7DpRgT8tJEB0QieyTFn2Dy8Bk/PDN6sNk6uA/ijdA1zSZHmb8xFOe
-	3WDK5r594+MjFh9tLT8D8m9FVmY2DKPPT7d2W3p+jS1xdrLatN7FBCbvBusx7z8h
-	y2PIRbZ1TqTDABBjKI1ncC7AKTRgxxErQwM1c83/fo5+OEG29DDuxNqP5BGR/E8h
-	cFwP0YA2aC5w9xkqD1856Ngac8pXJWYVttDSQEeDZqexGW2PvVFK90VKw7NMTK6l
-	MXS2EG0h4yOluTXTi5qdfopVVTaxOR09EHw==
-X-ME-Sender: <xms:dbSqaT3j9k40_pqt4hZ7nTGrDvXSd36ng1xFrTwJAvBlGe4fdM4AOw>
-    <xme:dbSqafBMEGWidhzXObobNVMnw5tvQT2Lt_UabAhj0L1u2be4vny6JLxp3GJ3E_obh
-    0OxYKZLRyRZTGEVcswQ2TkeyfULpBJwz8A29TmGa9b8tHvfIyf21Mk>
-X-ME-Received: <xmr:dbSqafh_OS-meqaQ-FXArseEzbD0v1YqgFU9Fi9f3Gxu-L6BXtlJC5v8MogJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieeludefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
-    htpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtghomhdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtg
-    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgs
-    rgeskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:dbSqaRPbUvXTSGjork0Wys6UIAEkzH3KywFU6bCD78mtFAN6jLej6A>
-    <xmx:dbSqaf9WVjVkii5d9YgqeHwCWnwxo-AqXOiktAGQ1PYgLzvZBKkrlg>
-    <xmx:dbSqaSd1wx8vwR1kE5VpUeB_ouWH4C6by9x1jzi69e0OsVL8gjJw8Q>
-    <xmx:dbSqaezLISYCcBBm841loGJB-q6JOt7rH9vp-K6Jqr-JNkQuw9TL-Q>
-    <xmx:drSqafa6_-MREMeStvqG91MXwa4sQj4wdP_l6JMaG6WO3_TUbpS3rkVB>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 6 Mar 2026 06:03:17 -0500 (EST)
-Date: Fri, 6 Mar 2026 12:03:15 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Hyunwoo Kim <imv4bel@gmail.com>, pabeni@redhat.com,
-	netdev@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org
-Subject: Re: [PATCH net] ovpn: Fix race condition in ovpn_dellink()
-Message-ID: <aaq0cxEEkPf7CDV4@krikkit>
-References: <aaVgJ16edTfQkYbx@v4bel>
- <6aa197ce-9e72-473c-a8c9-d190d85fb625@openvpn.net>
+	s=arc-20240116; t=1772795220; c=relaxed/simple;
+	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hdty7cG86xga+EJZI8glT4JGr+EUzrFjAUgnWqyTwla0rZarIj66AtgxXlhh6QnPqrjjQqShUYrEsdjtyZbfsIsm2FlBRlYd7lJWi0Wpse+3Jl6qqM54WadSAty0omABefsbXusRvQsqT5awtDusSHAHynUWgQd21GauBjIAVu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niRYr2GU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E533C4CEF7;
+	Fri,  6 Mar 2026 11:06:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772795219;
+	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=niRYr2GUkeZ2evtY/MvpTINahTL9FeEOM2+S5jIOhI6rTICEN4ErbX/41cP3OcnQk
+	 zhd2aol7vsSHYfqBanZvFiKJcNJc6c4P89P7ym6dPfWZKLhYYMXYar4U8Pdft4PWnT
+	 fygpvXhCsB69JLcRjvP2uqCg8fjYbwpXeM/cE7qNEJfb1msgEIWCQl/tf49x0ZGqn0
+	 mrfXLzAm9K2gKESMGb16yku1dBu7nk1ppJCDfTKLNkWttrSTSXXuNLZaasQnr9ATSW
+	 EFnRv7/BKOZYAfL8DUdTEHwCuhf7KQyUra8DtlOk4TzKJd2blbg/WJLhMHSgfV9Lx7
+	 xvZe13Ywzo6dQ==
+Message-ID: <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
+Date: Fri, 6 Mar 2026 12:06:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6aa197ce-9e72-473c-a8c9-d190d85fb625@openvpn.net>
-X-Rspamd-Queue-Id: 66D0721F67B
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Content-Language: en-GB, fr-BE
+To: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
+ <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
+ <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
+ <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <87qzpx2sck.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 35A8221F6D6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org];
-	TAGGED_FROM(0.00)[bounces-264744-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-264745-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Sorry Antonio, things are a bit busy over here, I'm finally getting to
-this.
+Hi Thomas,
 
-2026-03-03, 21:15:59 +0100, Antonio Quartulli wrote:
-> Hi,
+Thank you for looking into this!
+
+On 06/03/2026 10:57, Thomas Gleixner wrote:
+> On Fri, Mar 06 2026 at 06:48, Jiri Slaby wrote:
+>> On 05. 03. 26, 20:25, Thomas Gleixner wrote:
+>>> Is there simple way to reproduce?
+>>
+>> Unfortunately not at all. To date, I even cannot reproduce locally, it 
+>> reproduces exclusively in opensuse build service (and github CI as per 
+>> Matthieu's report). I have a project in there with packages which fail 
+>> more often than others:
+>>    https://build.opensuse.org/project/monitor/home:jirislaby:softlockup
+>> But it's all green ATM.
+>>
+>> Builds of Go 1.24 and tests of rust 1.90 fail the most. The former even 
+>> takes only ~ 8 minutes, so it's not that intensive build at all. So the 
+>> reasons are unknown to me. At least, Go apparently uses threads for 
+>> building (unlike gcc/clang with forks/processes). Dunno about rust.
 > 
-> On 02/03/2026 11:02, Hyunwoo Kim wrote:
-> > When ovpn_dellink() is called, it invokes
-> > cancel_delayed_work_sync() to stop keepalive_work before freeing
-> > the device.
-> > However, ovpn_nl_peer_new_doit() runs without any lock shared
-> > with the RTNL path, so keepalive_work can be scheduled after
-> > cancel_delayed_work_sync() returns.
-> > 
-> > The following is a simple race scenario:
-> > 
-> >            cpu0                            cpu1
-> > 
-> > ovpn_dellink(dev)
-> >    cancel_delayed_work_sync(keepalive_work)
-> >                                     ovpn_nl_peer_new_doit()
-> >                                       ovpn_nl_peer_modify()
-> >                                         ovpn_peer_keepalive_set()
-> >                                           mod_delayed_work(keepalive_work)
-> > 
-> > To prevent this race condition, cancel_delayed_work_sync() is
-> > replaced with disable_delayed_work_sync().
-> 
-> I was about to agree on your fix, however, it seems there is a larger issue
-> here and this patch is just addressing one symptom.
-> 
-> If you are truly able to execute the whole ovpn_nl_peer_new_doit() after
-> cancel_delayed_work_sync() and before the netdev refcounter reaches 0, I
-> think we may get stuck in the "wait for device to be freed..." loop.
-> 
-> That's because the ovpn_peer_new() will acquire a reference to the netdev,
-> preventing it to be fully released.
-> 
-> 
-> Sabrina, do you have any thought on this?
-> It seems as if there is no safe guard against adding peers while destroying
-> the interface.
+> I tried with tons of test cases which stress test mmcid with threads and
+> failed.
 
-Feel free to add:
-
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 2e0420febda0..3bf6ea5f7208 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -214,6 +214,10 @@ static void ovpn_dellink(struct net_device *dev, struct list_head *head)
- 
- 	cancel_delayed_work_sync(&ovpn->keepalive_work);
- 	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
-+
-+	pr_warn("sleeping\n");
-+	msleep(10000);
-+
- 	unregister_netdevice_queue(dev, head);
- }
- 
-
-to help reproduce the race, I usually do something like that if it's
-possible to sleep in that context.
+On my side, I didn't manage to reproduce it locally either.
 
 
-I think you're right, the newly-added peer will miss
-ovpn_peers_free. Can we simply move cancel_delayed_work_sync +
-ovpn_peers_free to ndo_uninit and not provide a dellink?
+> Can you provide me your .config, source version, VM setup (Number of
+> CPUs, memory etc.)?
 
-At ndo_uninit, the netdevice is no longer listed so PEER_NEW won't
-find it, but delaying the release of the reference on the netdev via
-peer cleanup should still be ok (unregister_netdevice_many_notify
-calls unlist_netdevice and then ndo_uninit, then we add it to the
-todo_list and netdev_run_todo processes that list and does
-netdev_wait_allrefs_any).
+My CI ran into this issue 2 days ago, with and without a debug kernel
+config. The kernel being tested was on top of 'net-next', which was on
+top of this commit from Linus' tree: fbdfa8da05b6 ("selftests:
+tc-testing: fix list_categories() crash on list type").
 
+- Config without debug:
+
+
+https://github.com/user-attachments/files/25791728/config-run-22657946888-normal-join.gz
+
+- Config with debug:
+
+
+https://github.com/user-attachments/files/25791960/config-run-22657946888-debug-nojoin.gz
+
+- Just in case, stacktraces available there:
+
+  https://github.com/multipath-tcp/mptcp_net-next/actions/runs/22657946888
+
+
+My tests are being executed in VMs I don't control using a kernel v6.14
+on Azure with 4 vCPUs, 16GB of RAM, and KVM nested support. From more
+details about what's in it:
+
+
+https://github.com/actions/runner-images/blob/ubuntu24/20260302.42/images/ubuntu/Ubuntu2404-Readme.md
+
+
+From there, a docker container is started, from which QEMU 10.1.0
+(Debian 1:10.1.0+ds-5ubuntu2.2) is launched with 4 vCPU and 5GB of RAM
+using this command:
+
+
+/usr/bin/qemu-system-x86_64 \
+  -name mptcpdev \
+  -m 5120M \
+  -smp 4 \
+  -chardev socket,id=charvirtfs5,path=/tmp/virtmevrwrzu5k \
+  -device vhost-user-fs-device,chardev=charvirtfs5,tag=ROOTFS \
+  -object memory-backend-memfd,id=mem,size=5120M,share=on \
+  -numa node,memdev=mem \
+  -machine accel=kvm:tcg \
+  -M microvm,accel=kvm,pcie=on,rtc=on \
+  -cpu host,topoext=on \
+  -parallel none \
+  -net none \
+  -echr 1 \
+  -chardev file,path=/proc/self/fd/2,id=dmesg \
+  -device virtio-serial-device \
+  -device virtconsole,chardev=dmesg \
+  -chardev stdio,id=console,signal=off,mux=on \
+  -serial chardev:console \
+  -mon chardev=console \
+  -vga none \
+  -display none \
+  -device vhost-vsock-device,guest-cid=3 \
+  -kernel
+/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/arch/x86/boot/bzImage
+\
+  -append 'virtme_hostname=mptcpdev nr_open=1048576
+virtme_link_mods=/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/.virtme_mods/lib/modules/0.0.0
+virtme_rw_overlay0=/tmp console=hvc0 earlyprintk=serial,ttyS0,115200
+virtme_console=ttyS0 psmouse.proto=exps
+virtme.vsockexec=`/tmp/virtme-console/3.sh`
+virtme_chdir=home/runner/work/mptcp_net-next/mptcp_net-next
+virtme_root_user=1 rootfstype=virtiofs root=ROOTFS raid=noautodetect rw
+debug nokaslr mitigations=off softlockup_panic=1 nmi_watchdog=1
+hung_task_panic=1 panic=-1 oops=panic
+init=/usr/local/lib/python3.13/dist-packages/virtme/guest/bin/virtme-ng-init'
+\
+  -gdb tcp::1234 \
+  -qmp tcp::3636,server,nowait \
+  -no-reboot
+
+
+It is possible to locally launch the same command using the same QEMU
+version (but not the same host kernel) with the help of Docker:
+
+  $ cd <kernel source code>
+  # docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+    manual normal
+
+This will build a new kernel in O=.virtme/build, launch it and give you
+access to a prompt.
+
+
+After that, you can do also use the "auto" mode with the last built
+image to boot the VM, only print "OK", stop and retry if there were no
+errors:
+
+  $ cd <kernel source code>
+  $ echo 'echo OK' > .virtme-exec-run
+  # i=1; \
+    while docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+    vm auto normal; do \
+      echo "== Attempt: $i: OK =="; \
+      i=$((i+1)); \
+    done; \
+    echo "== Failure after $i attempts =="
+
+
+> I tried to find it on that github page Matthiue mentioned but I'm
+> probably too stupid to navigate this clicky interface.
+
+I'm sorry about that, I understand, the interface is not very clear. Do
+not hesitate to tell me if you need anything else from me.
+
+Cheers,
+Matt
 -- 
-Sabrina
+Sponsored by the NGI0 Core fund.
+
 
