@@ -1,167 +1,173 @@
-Return-Path: <netdev+bounces-264892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uOmvMGQaq2lNaAEAu9opvQ
-	(envelope-from <netdev+bounces-264892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:18:12 +0100
+	id KDC3MYUdq2mPaAEAu9opvQ
+	(envelope-from <netdev+bounces-264893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:31:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4197C2269EC
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:18:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E61226AFC
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 19:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8F95302AC1A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:17:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D2C430514A1
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 18:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA8B36CE0E;
-	Fri,  6 Mar 2026 18:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D5C33BBAD;
+	Fri,  6 Mar 2026 18:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Jb+P+e5Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npsIiHCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D5A29DB9A;
-	Fri,  6 Mar 2026 18:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CA7306B1B;
+	Fri,  6 Mar 2026 18:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772821066; cv=none; b=I7jZJ7y2LQXYqQGVRtlDciVPov/zyeQSntok2g3ZiYKeJc6BNdHXVSMLhLkshOn0DvR5foPw6dfZk4tnUu0acMukmkePcLbXadyOihrhZO4NMqeQWrUhMTqQNtIj13caDtIkuXT2iCZyeHoCLF4bZmqz9fUbGUNIgDYJWD/4GK0=
+	t=1772821878; cv=none; b=O4lyN4hLJLHwVXgclLXUf19sPkTaJEXY0JR51yaIRU7lSBRBlkf9GCdgUu4dWQ7/VKtRCT0nlXsu1JR29hbY+rVl16jcJdqEXHpmdw9Ic87d/lnkLq/LQIovRnly26pP6/Uyfjtsr+Tx5cY3Wyh8fH99IX/FTH3jb+qzwi/QvZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772821066; c=relaxed/simple;
-	bh=CjBVHyzR9fHsdnb581zQ4Fu5bvkO7Ru56ezXawB6POk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UspH6z8oCv3dx/t2XTgeUJEzPqoeMap2H2Uesw+lmQy53w09g9aO+9+4WlDuSbpmnCI36kg37uKd6R6zmgIM92Niu6pLD6+EgMxjMNIEeFMn+LzAGLx8ABE/GqyflFsFq4hT0cSqJqRfno2uKGg09s26vZgGY8773zW9jnfz21c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Jb+P+e5Q; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 626I3TuN1521799;
-	Fri, 6 Mar 2026 18:17:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=a/oRUYWcSJtAJGGmBk2fDl7ql51Mp
-	tzuHCKbavwl+2E=; b=Jb+P+e5QPsUUn+PcFcsAakPNMYTgZY83+HdH96HeE8cXJ
-	ndjIx/2wtP7E8RRStyIh04CP/SD/c7cWLyfo9j07U/bfDuLQnqi7la5uDFU+/oje
-	F2UWWW7N2L0QZtjSLXfbBxNAfDf1duWef0EfRdZ3/QhlLFwQVtmybLIsarz+eeCi
-	Yqi9H0wzRCzm1ht8kwvKVx/jCPMP16lpZaIHJu/eh2meEkLUetfoJk92q73xH2q0
-	y3Qdni7q9MRRkVAUQr4dB8kIbossI/mG+/Qf2fKNOakhJVHyY7Dtrf3v5cxSdFWx
-	BbDcaIET/2rFldgohl4bICJMhvCJ+vbwFykbaa81g==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cr3vbr0r6-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 06 Mar 2026 18:17:36 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 626Gt41q021359;
-	Fri, 6 Mar 2026 18:09:01 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptess22-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 06 Mar 2026 18:09:01 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 626I1lOn031624;
-	Fri, 6 Mar 2026 18:09:00 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4ckptess15-1;
-	Fri, 06 Mar 2026 18:09:00 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] selftests: fib_tests: fix link-local retrieval in fib6_nexthop()
-Date: Fri,  6 Mar 2026 10:08:19 -0800
-Message-ID: <20260306180830.2329477-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1772821878; c=relaxed/simple;
+	bh=O8qHcGyY3OBV+GYrqcLvI3k6DaTD+s8dw1QzDwMSMo8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a4DtTvxl5uGTYmjRxRNx4FcamDCgXoq3r7UOYEOfE0sfSBUP/q6jtC1DBWUBTXLMuR+7ED33FeTw9Ip97HeiE3b8le4KemvtJCs6GsWZRmkKL75Ld4F65fmbi5u6E2JG0aRqYhTMZFhQ8MU5IVxZO6lJV/5SwFDHMu/v0cMWTrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npsIiHCU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E53EDC2BC86;
+	Fri,  6 Mar 2026 18:31:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772821878;
+	bh=O8qHcGyY3OBV+GYrqcLvI3k6DaTD+s8dw1QzDwMSMo8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=npsIiHCURklCu/sXQndCgWpvhwg75HHbTpaeq5yDwxmGDxw6j4jdhFUH6rqVkAt5e
+	 U8tUOXgRsfMTPZVTVbpZd5oFjnFuEbMU5myboxnykHK8btlY4BzXRUuVu8Ok13nH/0
+	 tQrjZBowxX9dCB53BRdhtdqpOd/TRA0sI3Fnm35J15qNfkTbV+/i32OsyzwzgU/j6m
+	 pP0CX40lOd+eqsv5TwnuVddzZ2oIo9TfNIJ4Ekh7JseyqUYCx86wyqgVUp1U/tIOlA
+	 TbSKa8aNbI9VzfwkTeoDIU5nIvUTsLSRw24uwlyZiS/YDlaTUC7OKgFEtJw/ngVWER
+	 rwDrHik0E0cdA==
+Message-ID: <65aa19d8-0ac3-40fd-8df7-7b67c05ae227@kernel.org>
+Date: Fri, 6 Mar 2026 19:31:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=854 bulkscore=0 mlxscore=0
- malwarescore=0 spamscore=0 suspectscore=0 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
- definitions=main-2603060171
-X-Authority-Analysis: v=2.4 cv=Jpn8bc4C c=1 sm=1 tr=0 ts=69ab1a40 cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=BqU2WV_vvsyTyxaotp0D:22 a=yPCof4ZbAAAA:8 a=u9kQJRMvwuPXqKQrNZ8A:9
-X-Proofpoint-GUID: ozr22xpL5gDfEabSdlN-njjdFhJ10SQe
-X-Proofpoint-ORIG-GUID: ozr22xpL5gDfEabSdlN-njjdFhJ10SQe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE3MiBTYWx0ZWRfX5JyeFdJI75xO
- LX21cwEMZyWGNbWBxZA2Wqe0a9XfrbEJOeLFf4zu+j5jWk55AJK2QxM6ZUdw/jM9+FfLYO6QwX6
- cBmzT7MmzbVnF5B9RzkxGENhwtWpEjuvrmvZbo6quGaBQWA2i/SSZbf/GAeR0vxuLsXHRRqBn9X
- dRA92lOcYkJTuPgyD70fYnI3EmSjcF1p3gN6Rr8zCGYXS11nB8LvEhO9zwrKymFkRxSOxmk9G9Y
- 0kEvJplHnk9vBOCnYbNsTazVdDa8lFGx6SyiEahNWGvJB9uV2wpix+PXAPJXdYpak4KU7PxwSGs
- WkCzpkBO/586mBSuqTXDflQO3g90/gd7wRUIjVUPT2CYVV2IsvFSdpM+x2ouFZOrNKq3jt+fKVo
- /fscc7bnvtftS9h74qvxGJNLovQYGtiGFFcvZLVGtYE6v+Q9sZi9VpYEv1o4zVWRx/7q/07BzCp
- H88NizSiyuoVe18GKGA==
-X-Rspamd-Queue-Id: 4197C2269EC
+User-Agent: Mozilla Thunderbird
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+To: Matthieu Baerts <matttbe@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
+ <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
+ <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
+ <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
+ <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
+ <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <bacd7e6a-18a3-4e81-9b37-3e59fb1b2183@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 44E61226AFC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,oracle.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264893-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264892-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:dkim,oracle.com:email,oracle.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.935];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-fib6_nexthop() retrieves the link-local address for two interfaces used
-in the test. However, both lldummy and llv1 are obtained from dummy0.
+On 06. 03. 26, 17:57, Matthieu Baerts wrote:
+>    653fda7ae73d ("sched/mmcid: Switch over to the new mechanism")
 
-llv1 is expected to be retrieved from veth1, which is the interface used
-later in the test. The subsequent check and error message also expect
-the address to be retrieved from veth1.
+It looks like there were similar issues reported in the thread with the 
+above submitted patch. Did the patchset mentioned at the end of the 
+thread here:
+   https://lore.kernel.org/all/87h5s4mjqw.ffs@tglx/
+made it to the list/some tree? Or are the two issues there different 
+from this one?
 
-Fix this by retrieving llv1 from veth1.
-
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
-Targeting net-next since this is a selftest-only fix/correctness
-cleanup and not a fix for a user-visible regression.
----
- tools/testing/selftests/net/fib_tests.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index c5694cc4ddd2..439461080c60 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -545,7 +545,7 @@ fib4_nexthop()
- fib6_nexthop()
- {
- 	local lldummy=$(get_linklocal dummy0)
--	local llv1=$(get_linklocal dummy0)
-+	local llv1=$(get_linklocal veth1)
- 
- 	if [ -z "$lldummy" ]; then
- 		echo "Failed to get linklocal address for dummy0"
+thanks,
 -- 
-2.50.1
-
+js
+suse labs
 
