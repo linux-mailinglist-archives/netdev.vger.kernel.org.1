@@ -1,181 +1,198 @@
-Return-Path: <netdev+bounces-264778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMREFNrMqmnwXAEAu9opvQ
-	(envelope-from <netdev+bounces-264778-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:47:22 +0100
+	id AF8cEdbOqmkNXQEAu9opvQ
+	(envelope-from <netdev+bounces-264779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:55:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0094A220ED1
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:47:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC034221283
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:55:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9C3A53078F2F
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:43:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 136EA313B4B3
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3707127F736;
-	Fri,  6 Mar 2026 12:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04EAB38F23F;
+	Fri,  6 Mar 2026 12:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p9mC0Dtb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KSLV+Asz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FC72701B6;
-	Fri,  6 Mar 2026 12:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441ED38F231;
+	Fri,  6 Mar 2026 12:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772801005; cv=none; b=WU31MgBlu8AGjfB9jHpHzOx7GVzBYsDnhDT+Ll+wMxd++QQNNB087SwWfDks9z21mLNQXlxUw+n0Bdxbattg1poRTH29UrG1fxc4x1Zs0RXzN2POHWchjXAV2mYsjrHg9aN0aHKvfz4EQ4kGmqnpiYjH+9M99eMDvQ1z7V+g/s4=
+	t=1772801320; cv=none; b=MJC066tHkFSkr10YLFAEt10HKR6K8h8kePxHg0TkBPPEcqivOgq/QUHb7VC5sicw9ghnlZBhqEtQepHl8W54/U/+xEYcMCaZHnnMdIpFpLHIjPZILvf4zSB2a4kROI3kCU974QU+2qG0puMdIq2N2Jpk2Jc3F+Vo2z6WXMamwnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772801005; c=relaxed/simple;
-	bh=laI5Gks8UKTtQyxqn7mx9nW4b8iCTs15iKu2otVUFHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7qq3JTt31p5g0XaukvqdQ4cMt2aprEER950/tWV7vWw7DUsIr/ABNUj0oYPdzUTeZm2lM4k+5hi2lkhtdhtA8Z5V4rcPT6Ox7OzDogZYMx9zyZ89yqkuLp+uZT9Ha5aNIHOG6WikO89HFD48fLsdcvyQji2rR2NK8L3ENXn7MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p9mC0Dtb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149B7C4CEF7;
-	Fri,  6 Mar 2026 12:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772801004;
-	bh=laI5Gks8UKTtQyxqn7mx9nW4b8iCTs15iKu2otVUFHw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p9mC0Dtb5HP8pcPpgD7riizGZNEqblFXhyCBB7gyX3iYqVlML2IEu/E46TQAfJ6kB
-	 5ES8F1tVf64ZhuAJ2vES+zOK4kRMzYtKhCjqesskIYnO8sAKVgRvaUWEnRMwLwSDQe
-	 6ozGy1rqY43AQN4mamdsvpi0UFTEWG/1ua9kPc8CcoyCTro7l1nx6xbY3HJtSjDB33
-	 HoXIf0/JjwlmXYcHIiJHIJDR1zTA/RgIid+TR7+6DmUz/5MSsmXaWj5qjtxVswmSpB
-	 y7qIWK2NRTkB+QK0r3eC/5U81n1lw5TgFlHl0zqxfvXpiP2u3XAAAbXR9+cd9x48Kv
-	 4L7tL1NMHpRqQ==
-Date: Fri, 6 Mar 2026 12:43:21 +0000
-From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 16/16] mm/memory: support VM_MIXEDMAP in
- zap_special_vma_range()
-Message-ID: <f2a7bdf4-8db7-4101-b7c6-3f5d9c20e078@lucifer.local>
-References: <20260227200848.114019-1-david@kernel.org>
- <20260227200848.114019-17-david@kernel.org>
+	s=arc-20240116; t=1772801320; c=relaxed/simple;
+	bh=qPicryEkwijXPwqofzoau04znhdrfvIHnu6/Pyv8VUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BVihGVd7dXXnplZN/r+bv3cO7uB41wrjZLFJgFk/+vbevr61DUIqZT3ZLghXXc4iT2ZnoyoWk9jfipOI30NgKLHHgYtQbdh3BH4hvL8xGO74PyLdGHpbmxdQSqtNvtKguN92o3iPTh0hk2Bs8QJfMoxg3960Emt22roScN8NTEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KSLV+Asz; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id EC50A1A2D23;
+	Fri,  6 Mar 2026 12:48:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BEF445FF92;
+	Fri,  6 Mar 2026 12:48:31 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1C126103699D2;
+	Fri,  6 Mar 2026 13:48:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1772801310; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=FkZSFQh+KvpketIOrBtEelxV6rwNiCRVKYCWCZUIhEw=;
+	b=KSLV+Asz8WIYjHDBTLUnCDHxCh86N/EhI3LyQKwjdzdWns3qJQA4RavwYkb70hzWBNNCT4
+	xKlaqWKEg0WCzgTZJU+/nb7YjDneVLt82ijLzRYw6FhNH02v1herHWe9vtJF4Ej4LkdCV6
+	KnCWz6qxbFPOU/2NL661KQaOLbXrq8kDswrMXSgIaogUEhuOON/2mp4ITWIB5Ova+DcKq4
+	YjJuJr4qZOPXlYPHq7eBRvw1PqCyT9RrmYvjFA0OSa346a9S6+dlf4VoePMBoMgRRIKQhx
+	VtT66m1EHlvByauqhG/yS/af69G41C+sBtGmgh9/L4+AREexPyIfsVy+ljcRHw==
+Message-ID: <74089907-d7d3-4242-92a5-909812779932@bootlin.com>
+Date: Fri, 6 Mar 2026 13:48:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260227200848.114019-17-david@kernel.org>
-X-Rspamd-Queue-Id: 0094A220ED1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 8/8] net: macb: add Tx zero-copy AF_XDP support
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+ Gregory CLEMENT <gregory.clement@bootlin.com>,
+ =?UTF-8?Q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>,
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
+ <20260304-macb-xsk-v1-8-ba2ebe2bdaa3@bootlin.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260304-macb-xsk-v1-8-ba2ebe2bdaa3@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: BC034221283
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-264778-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264779-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[bootlin.com,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[74];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lucifer.local:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 09:08:47PM +0100, David Hildenbrand (Arm) wrote:
-> There is demand for also zapping page table entries by drivers in
-> VM_MIXEDMAP VMAs[1].
->
-> Nothing really speaks against supporting VM_MIXEDMAP for driver use. We
-> just don't want arbitrary drivers to zap in ordinary (non-special) VMAs.
->
-> [1] https://lore.kernel.org/r/aYSKyr7StGpGKNqW@google.com
+Hi Théo,
 
-Dude, you have to start your indices with 0 what kind of programmer are
-you? ;)
-
->
-> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
-
-Agreed that there's no reason not to allow this, so LGTM and:
-
-Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
-
-Thanks for this series overall, very nice cleanup and I was frustra^Whappy
-to see that there was nothing major or really of note to comment on here, a
-rare occurrence in review :)
-
+On 04/03/2026 19:24, Théo Lebrun wrote:
+> Add a new buffer type (to `enum macb_tx_buff_type`). Near the end of
+> macb_tx_complete(), we go and read the XSK buffers using
+> xsk_tx_peek_release_desc_batch() and append those buffers to our Tx
+> ring.
+> 
+> Additionally, in macb_tx_complete(), we signal to the XSK subsystem
+> number of bytes completed and conditionally mark the need_wakeup
+> flag.
+> 
+> Lastly, we update XSK wakeup by writing the TCOMP bit in the per-queue
+> IMR register, to ensure NAPI scheduling will take place.
+> 
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 > ---
->  mm/memory.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/mm/memory.c b/mm/memory.c
-> index f3b7b7e16138..3fe30dc2f179 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -2239,13 +2239,13 @@ void zap_vma_range(struct vm_area_struct *vma, unsigned long address,
->   * @size: number of bytes to zap
->   *
->   * This function does nothing when the provided address range is not fully
-> - * contained in @vma, or when the @vma is not VM_PFNMAP.
-> + * contained in @vma, or when the @vma is not VM_PFNMAP or VM_MIXEDMAP.
->   */
->  void zap_special_vma_range(struct vm_area_struct *vma, unsigned long address,
->  		unsigned long size)
->  {
->  	if (!range_in_vma(vma, address, address + size) ||
-> -	    		!(vma->vm_flags & VM_PFNMAP))
-> +	   !(vma->vm_flags & (VM_PFNMAP | VM_MIXEDMAP)))
->  		return;
->
->  	zap_vma_range(vma, address, size);
-> --
-> 2.43.0
->
 
-Cheers, Lorenzo
+[...]
+
+> +static void macb_xdp_xmit_zc(struct macb *bp, unsigned int queue_index, int budget)
+> +{
+> +	struct macb_queue *queue = &bp->queues[queue_index];
+> +	struct xsk_buff_pool *xsk = queue->xsk_pool;
+> +	dma_addr_t mapping;
+> +	u32 slot_available;
+> +	size_t bytes = 0;
+> +	u32 batch;
+> +
+> +	guard(spinlock_irqsave)(&queue->tx_ptr_lock);
+> +
+> +	/* This is a hard error, log it. */
+> +	slot_available = CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size);
+> +	if (slot_available < 1) {
+> +		netif_stop_subqueue(bp->dev, queue_index);
+> +		netdev_dbg(bp->dev, "tx_head = %u, tx_tail = %u\n",
+> +			   queue->tx_head, queue->tx_tail);
+> +		return;
+> +	}
+> +
+> +	batch = min_t(u32, slot_available, budget);
+> +	batch = xsk_tx_peek_release_desc_batch(xsk, batch);
+> +	if (!batch)
+> +		return;
+> +
+> +	for (u32 i = 0; i < batch; i++) {
+> +		struct xdp_desc *desc = &xsk->tx_descs[i];
+> +
+> +		mapping = xsk_buff_raw_get_dma(xsk, desc->addr);
+> +		xsk_buff_raw_dma_sync_for_device(xsk, mapping, desc->len);
+> +
+> +		macb_xdp_submit_buff(bp, queue_index, (struct macb_tx_buff){
+> +			.ptr = NULL,
+> +			.mapping = mapping,
+> +			.size = desc->len,
+> +			.mapped_as_page = false,
+> +			.type = MACB_TYPE_XSK,
+> +		});
+> +
+> +		bytes += desc->len;
+> +	}
+> +
+> +	/* Make newly initialized descriptor visible to hardware */
+> +	wmb();
+> +	spin_lock(&bp->lock);
+> +	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
+> +	spin_unlock(&bp->lock);
+
+this lock is also taken in interrupt context, this should probably use a
+irqsave/restore variant. Now, there are a few other parts of this driver
+that use a plain spin_lock() call and except for the paths that actually
+run in interrupt context, they don't seem correct to me :(
+
+Maxime
+
+
 
