@@ -1,181 +1,218 @@
-Return-Path: <netdev+bounces-264782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NhpGGbQqmn3XQEAu9opvQ
-	(envelope-from <netdev+bounces-264782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:02:30 +0100
+	id CEV6LrrJqmlWXAEAu9opvQ
+	(envelope-from <netdev+bounces-264772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:34:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B2022143C
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 14:02:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D06E220B39
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 13:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E1B831ACCA2
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:52:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 249F1310C6C0
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 12:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E3938F252;
-	Fri,  6 Mar 2026 12:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA54A3659FF;
+	Fri,  6 Mar 2026 12:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCEse1HL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrOKh0OA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3F4386459
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 12:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A4D35CB70;
+	Fri,  6 Mar 2026 12:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772801540; cv=none; b=LVeywxv8ajenPZ8Kr1arieKosbrf60O9l+ouIPKPFNt5btxWDZ59pIU9BfZjv5n9ifEOyUA/UD0phxnG77+oB/k6UCd7DdGQQASZB3NHq5cvmErbgXm0XG3C8BBxVXU5pF7atPS23kBqM9ptxsv3IaeH/fDFcj6k6SH61rGEpuQ=
+	t=1772800213; cv=none; b=oULI35aGPeGHJB9T5gAPu/xtZrMCIhDRl2V76Xv7F5W9kNaYakhOj7tERGvP12CzMWk6s5SyNpogvy7U1viTq9GmOfPnLsbsKiYuKqO9NfiQ2dps/FF/lk3UmuLI0Zj+U2PWRNxBYn/nh3N4gfVfo0iGsoLVkiDE4MWu9zuFeJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772801540; c=relaxed/simple;
-	bh=HAy43ssDo0xlUcBDIU7vQZtNnpxG03JPCL6Ldi51ASI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OBk8kI0I91psFRaIxb6nCnAzQlsc7jrXkOPW8lL7cYCosY08yfQDwAlWBFfdFs/VDuVJjD5VEdeQeMt2K4kWGgjLNXhTrRqgs6JNe7PxALDJKvt+kcJ833TRz3hKl2eb2Ft6WnKPf/6hp5Q3qm8+/Q703ixD4sF/0aDNw1BrDY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCEse1HL; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-439b7c2788dso4008389f8f.1
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 04:52:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772801537; x=1773406337; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8B8kg8ACcCsMXy3SgsyRYngVEpIsqkcoCsLOS/nNqQ=;
-        b=RCEse1HLoUtQApOdbPXFvYItGrEKWhMZ5FH1L4npAxteGeWOhAEAekijg3Ur83ovNu
-         D7j0Aio5nwazNQz3y4rO88a+svlEbLx5fyxypjkMFUV4PDnOpv7HYjT9Aw1NVdIwO6l+
-         sTgZ1jssfWdVnLQwQe6naotyBRoBV2AugdTmASE0Okxrsi3juIOafyTCxnp4K0weRpaH
-         XodiSWNrkHzZSWM6/wl3D42yExGGPiuDybF+9otR/5TaBWNzrcLkSb73hvP6va35kQWK
-         mnp6OV+L7iHTbxYpTfTm4axD+IZ/Q/dtFxxA6XolA28oMQbRPK0SIHepheSZx4bgl64w
-         FM4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772801537; x=1773406337;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y8B8kg8ACcCsMXy3SgsyRYngVEpIsqkcoCsLOS/nNqQ=;
-        b=KomubXrbvHQI4WbFxBztyfrvNNRRWm7V46yQSwx0bP8PXKIJP38kAYzK+ZKWhmcd7e
-         LpS7422VcYyLywLRxlevD2YaXsF0CK6e00YpTtixakHxYs/4KxGaU21vfwYV8mRhfu7g
-         HVmxKvNQ6DTdC7wAIGT6TrcZCK4VCvgCx3z9yC62hQc8C6w+9mDnnGPvXNR74ofvvXdC
-         eVZjm56layRoEr4PTpR2F33OVSt8+HRikH7eBzIKtQ5n/lEKtmJKDHRaodAaCyFGWMWa
-         qDVoOR8VI4NIJABfsOT6OqisXLPLf+jkKpGkCY2ioRPRKK9GzW4PgIuNcKvPQilQQkgD
-         Xlnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcziiSg1n0cDakmiQXH3869FECP24dcIqrZzs8zKakP+vHT958hnq9Bp0alDnLeVtXgo0B8T4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2OF1e3PiuR4Zqpe9qXA6kz6T2CCtro6kv8eL2j4Zh2HCjWywo
-	/rZTavazOZRoq7zTvc4fGZ/yupjkTT9xRPZCKRkM9pc0UuK/KDSP4pan
-X-Gm-Gg: ATEYQzx75s3OlYg8XKMgu042++2+ZPa/CZDw09DYtnwEHHBsuylQF0+eXzcFM166JtP
-	EMuM6Nq/sGQx2WNTPNEyu1BRGci/SV005CzkExhd1KK52D/nC1c76MBxvAtioaI/+5tgNoyCg8v
-	ZFRyiqDReKfJ6JHa3YRI213dTzMluN1sZTYNSqlWI1MwW66gaDCf0myU81ehAfiAff34wmxnm8C
-	PUF0YrLYtgZl1I/ZcYM1npoL3PBOnrhaulSqhbn7S5NaZMkHLrNQm6ns1lof+7Ciju05dQpEcBe
-	pumVg15Dy+PcSXQSSQt4CULH7bbuJvZ0PHJ7dS+74i/OqFSgxD4E7LCqM5ufHYdbESx0/ERaR/z
-	CAyT3oTz6S1oMQCUTPevHjHjTbDOWhu74SqyTZETzwGnjZnfrPMa56ebQVRfYgOYW0bbx6j3O2M
-	v3CSEBiXpdFTdaLuRcqIb56JeDryaHx87SOThqnYP6gMiu7EljKYIhr572Rpgz+UIRkrYyNjL9c
-	BLmrcmhsXX4hU4X5KocoApkO04w
-X-Received: by 2002:a05:600c:8b8b:b0:483:103c:b1ee with SMTP id 5b1f17b1804b1-48526922599mr34173745e9.8.1772801536778;
-        Fri, 06 Mar 2026 04:52:16 -0800 (PST)
-Received: from skynet.lan (2a02-9142-4581-3c00-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4581:3c00::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48527681a3esm76085715e9.4.2026.03.06.04.52.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 04:52:15 -0800 (PST)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mnhagan88@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net v3] net: sfp: improve Huawei MA5671a fixup
-Date: Fri,  6 Mar 2026 13:29:55 +0100
-Message-ID: <20260306125139.213637-1-noltari@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1772800213; c=relaxed/simple;
+	bh=Kftdd8omZX7VELmkL5LGQUFF+sQIeOHfzVU13moKjvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LWajjViCAAGo3WOSVYisjCVVQtaULdbbsV7aC0ST4yeRizepLtU6s02FLOJ6mlLYoKVv+yC+2pVNC+rriaU/6xZfX+bLYeJEPfy/2tukqYV3K0sWh/qqNycmK4+aGBM79tDQnMyjdrZWht0RSD09ef7ehgmc/lpOwaCsbbVIrmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrOKh0OA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33C3C4CEF7;
+	Fri,  6 Mar 2026 12:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772800213;
+	bh=Kftdd8omZX7VELmkL5LGQUFF+sQIeOHfzVU13moKjvE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RrOKh0OAhxHMytB1jOn/jttu3GJlb3C3rXPB9TooAMKbyt3vUr89Pt0+i4u40IkqV
+	 RX2hBvNB6H5hwNgpkw2833/q+m2pIU+tXLy6aT2UqxNKjA9gRXZUoAjf58JN5/E+WU
+	 b+1XKEzPnARh8OeG9Vznq4eIhrMwfxCOh6yt4sHKclOXteR/4dXp5YR9O3YGnPPT2n
+	 aDJp5EcMC6pPhjaUS4A5KpHj2GJduynNISMtMzESwpD0c6OWnPmGQWuaLB8H96xPbV
+	 V8tWz99yS9NFw2rriHryb/Y2+I+FJmH4No3lieIJOsE5G/KrymQlZobYCswq94RN1W
+	 nF2PinBdqWDrw==
+Date: Fri, 6 Mar 2026 12:30:10 +0000
+From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
+	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
+	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 12/16] mm: rename zap_vma_pages() to zap_vma()
+Message-ID: <2f4ee3ee-549c-4c0f-980d-3853193776b6@lucifer.local>
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-13-david@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 70B2022143C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227200848.114019-13-david@kernel.org>
+X-Rspamd-Queue-Id: 1D06E220B39
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.39 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.77)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-264782-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-264772-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[74];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[noltari@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lucifer.local:mid]
 X-Rspamd-Action: no action
 
-With the current sfp_fixup_ignore_tx_fault() fixup we ignore the TX_FAULT
-signal, but we also need to apply sfp_fixup_ignore_los() in order to be
-able to communicate with the module even if the fiber isn't connected for
-configuration purposes.
-This is needed for all the MA5671a firmwares, excluding the FS modded
-firmware.
+On Fri, Feb 27, 2026 at 09:08:43PM +0100, David Hildenbrand (Arm) wrote:
+> Let's rename it to an even simpler name. While at it, add some
+> simplistic kernel doc.
+>
+> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
 
-Fixes: 2069624dac19 ("net: sfp: Add tx-fault workaround for Huawei MA5671A SFP ONT")
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- v3: avoid using a vendor name in the function
- v2: rebase on top of net/main instead of linux/master
+LGTM, so:
 
- drivers/net/phy/sfp.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index f4bf53da3d4f..5db841377199 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -367,6 +367,12 @@ static void sfp_fixup_ignore_tx_fault(struct sfp *sfp)
- 	sfp->state_ignore_mask |= SFP_F_TX_FAULT;
- }
- 
-+static void sfp_fixup_ignore_tx_fault_and_los(struct sfp *sfp)
-+{
-+	sfp_fixup_ignore_tx_fault(sfp);
-+	sfp_fixup_ignore_los(sfp);
-+}
-+
- static void sfp_fixup_ignore_hw(struct sfp *sfp, unsigned int mask)
- {
- 	sfp->state_hw_mask &= ~mask;
-@@ -530,7 +536,7 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	// Huawei MA5671A can operate at 2500base-X, but report 1.2GBd NRZ in
- 	// their EEPROM
- 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
--		  sfp_fixup_ignore_tx_fault),
-+		  sfp_fixup_ignore_tx_fault_and_los),
- 
- 	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
- 	// incorrectly report 2500MBd NRZ in their EEPROM.
--- 
-2.47.3
-
+> ---
+>  arch/powerpc/platforms/book3s/vas-api.c | 2 +-
+>  arch/powerpc/platforms/pseries/vas.c    | 2 +-
+>  include/linux/mm.h                      | 6 +++++-
+>  lib/vdso/datastore.c                    | 2 +-
+>  mm/page-writeback.c                     | 2 +-
+>  5 files changed, 9 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/powerpc/platforms/book3s/vas-api.c b/arch/powerpc/platforms/book3s/vas-api.c
+> index ea4ffa63f043..e96d79db69fe 100644
+> --- a/arch/powerpc/platforms/book3s/vas-api.c
+> +++ b/arch/powerpc/platforms/book3s/vas-api.c
+> @@ -414,7 +414,7 @@ static vm_fault_t vas_mmap_fault(struct vm_fault *vmf)
+>  	/*
+>  	 * When the LPAR lost credits due to core removal or during
+>  	 * migration, invalidate the existing mapping for the current
+> -	 * paste addresses and set windows in-active (zap_vma_pages in
+> +	 * paste addresses and set windows in-active (zap_vma() in
+>  	 * reconfig_close_windows()).
+>  	 * New mapping will be done later after migration or new credits
+>  	 * available. So continue to receive faults if the user space
+> diff --git a/arch/powerpc/platforms/pseries/vas.c b/arch/powerpc/platforms/pseries/vas.c
+> index ceb0a8788c0a..fa05f04364fe 100644
+> --- a/arch/powerpc/platforms/pseries/vas.c
+> +++ b/arch/powerpc/platforms/pseries/vas.c
+> @@ -807,7 +807,7 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
+>  		 * is done before the original mmap() and after the ioctl.
+>  		 */
+>  		if (vma)
+> -			zap_vma_pages(vma);
+> +			zap_vma(vma);
+>
+>  		mutex_unlock(&task_ref->mmap_mutex);
+>  		mmap_write_unlock(task_ref->mm);
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 4710f7c7495a..4bd1500b9630 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2837,7 +2837,11 @@ void zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
+>  		  unsigned long size);
+>  void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
+>  			   unsigned long size);
+> -static inline void zap_vma_pages(struct vm_area_struct *vma)
+> +/**
+> + * zap_vma - zap all page table entries in a vma
+> + * @vma: The vma to zap.
+> + */
+> +static inline void zap_vma(struct vm_area_struct *vma)
+>  {
+>  	zap_page_range_single(vma, vma->vm_start, vma->vm_end - vma->vm_start);
+>  }
+> diff --git a/lib/vdso/datastore.c b/lib/vdso/datastore.c
+> index a565c30c71a0..222c143aebf7 100644
+> --- a/lib/vdso/datastore.c
+> +++ b/lib/vdso/datastore.c
+> @@ -121,7 +121,7 @@ int vdso_join_timens(struct task_struct *task, struct time_namespace *ns)
+>  	mmap_read_lock(mm);
+>  	for_each_vma(vmi, vma) {
+>  		if (vma_is_special_mapping(vma, &vdso_vvar_mapping))
+> -			zap_vma_pages(vma);
+> +			zap_vma(vma);
+>  	}
+>  	mmap_read_unlock(mm);
+>
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index 601a5e048d12..29f7567e5a71 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -2645,7 +2645,7 @@ void folio_account_cleaned(struct folio *folio, struct bdi_writeback *wb)
+>   * while this function is in progress, although it may have been truncated
+>   * before this function is called.  Most callers have the folio locked.
+>   * A few have the folio blocked from truncation through other means (e.g.
+> - * zap_vma_pages() has it mapped and is holding the page table lock).
+> + * zap_vma() has it mapped and is holding the page table lock).
+>   * When called from mark_buffer_dirty(), the filesystem should hold a
+>   * reference to the buffer_head that is being marked dirty, which causes
+>   * try_to_free_buffers() to fail.
+> --
+> 2.43.0
+>
 
