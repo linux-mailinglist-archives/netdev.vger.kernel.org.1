@@ -1,190 +1,193 @@
-Return-Path: <netdev+bounces-264838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264839-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEbeJYXuqmmOYAEAu9opvQ
-	(envelope-from <netdev+bounces-264838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:11:01 +0100
+	id 0NTOE4LuqmnNYwEAu9opvQ
+	(envelope-from <netdev+bounces-264839-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:10:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0164A223867
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:11:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D074223860
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 16:10:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE79C3006161
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 15:10:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17A3D301346C
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 15:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5575A3AE71E;
-	Fri,  6 Mar 2026 15:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ADC3A4519;
+	Fri,  6 Mar 2026 15:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhzpAi3C"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CWYU1PE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012003.outbound.protection.outlook.com [40.107.200.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A986387582
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 15:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772809800; cv=none; b=EB+ojN/qgPe+HAB2qAsIGgkjFmn8W0t1NWNcXZVAyIuEITbKB1OI7cuEfsS0Likv1bc/7vwR77ZNQdO5HJnyijsPIbFG54SaT9jRne6/pndO/91YX/hYFlbUaRyHQ+C8Aozr6PPgHjVPb2jzr4EJc82j2q53Rw/U+IueevcNc/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772809800; c=relaxed/simple;
-	bh=GgoUw+SaJyllGA06GAIgRiDqdGje3nKOsdp/CsOdWJ8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QIKYebfivOnQDJUiie+Et0ybhuYOZ3r3lF8a7ZoDe1MoWo6M24DCnuNskqog0fPRA2q6bKmLfDYbCsE+hH1IZGZ00JbyNkmkzhPUhj5IBHi40x5YCbXk52dAm4jyU86wx0Lm8XlNscMrBru31IIfFVgtLKlEBr8yQ3iV/oklBP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhzpAi3C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE34BC4CEF7;
-	Fri,  6 Mar 2026 15:09:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772809799;
-	bh=GgoUw+SaJyllGA06GAIgRiDqdGje3nKOsdp/CsOdWJ8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=DhzpAi3CoQh5QBzl/i/d0ZlPOmhmHdma6wDPKGaWVNqfKRIVkL/nQpuZXxFM7DYju
-	 B6k33hBk3hwbOZiriTqAyAHNCWdvSyPrFH69MWcRZXxAkYWhaipgPU/1ysgvTlTeST
-	 rWBcrdQAWyY4FVuzdWzoPbxqj3Pmr9QnLMbnnPEgNBZFMJ7abAx/1B4AGj/hMYLA3K
-	 IxSt4T0GX6guNElx5WFN5Y9i6ojmdOR234wh7H7/LzsqANrd8NUxa+CmOyD27OAVw5
-	 holmPDga0xVcX92eMoPbZL4DEh08kbdDbiZSK90a5zcxdSwTkN0cIu3m3wU1JwYFk/
-	 4weKS5/UeLGYg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 06 Mar 2026 16:09:47 +0100
-Subject: [PATCH net-next] net: airoha: Move GDM forward port configuration
- in ndo_open/ndo_stop callbacks
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AFA34F498
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 15:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772809852; cv=fail; b=ZMrPXcBBNRiI/PitMZRYkUPYPmi2CrZASFmi0Zf2tLogYlTiT7Z/kWkRdVS15+JZjWRaPcsiTlwBTFTSj3AeiusLbp0SOrcYwB83oYqugG4hG/KUBUt6sJ/lYVoyWjSp3hMsgCqjztgKzqI7DsLaUFlpWaSpCBLNPejNN6pFN2g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772809852; c=relaxed/simple;
+	bh=d0i6RmOrXNMKn70OWHbo1BmBEMP0wv7J3jSNJSmgysY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NG9T4AuUrvxFMWI2bYnCyUMrnka3jLbYMt+Rgz/HM/ukibiwcCa5Z2Ym8sXuQN7p0LJ/ezMVDqu5NGMbRIo5aYqn8eVQoIvL+dQG5WZ3r7n+MaUmTSalznYYtzdi/hpAbtOtW1WBG1ul37Bje5G1gdtNGH2pVNe5uHl8F2WemoQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CWYU1PE1; arc=fail smtp.client-ip=40.107.200.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zA1C/BnD2p8vY7nDcOaQmoLJfs5f+SB6cOMkkh0DUhvS9DHF9Xut7kJKn3Tyr/e8DqDxGOrDWeXPobPprU+ygcKh/hrohRafhKoHxOWD7+52asKI5U5nMQBj5syxst+M+M+u2qC6z6e4JznfuThn6pTBSMwAkl7fRVXaQ6u1xrkBu05WoClRzhx+uNBzQ/UxJe7z4uq45aStrIZisBjH1eS4HmFf4hFf9K3lR3tMPstAlZgJoTjq3qKBeUxcfuYfLnx8N9SCK/WUSTRQP57qyqA6w8hG6NUyf2SEayy7A2i7JmE0mwoViq7NtCIeWSKilwIyJPoPO5kJ3pUh0dV1uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XV2oypc8eIMmqeiHnNEvlBJcROJf4qkxjYgkCOtESdE=;
+ b=jTS/frrR4T7nOkS5hwgfphdjL3ChLjUm2VtTfp/MxtrizMXWw6EHa0hqWl19bYTfZ6jA+L3cOp5z5toV/2h6PvQAXIr6AS0ZXxfZdaYG6B4EOMH/7P3neBgQYX6E4Ez63KVemReGCBfj9T+36+nGsd1t6IhvxqhVGfbXMnXwyljuzpCFOcay5II2juesrVtlUw1cTMNXITCG3xPxSxZMTtIpmAikHDTR780sSR2zYwNcbF8c0sJj7WIqYalhPmA94R2o9p3XDghn0urqaU8c2hjeJGpYy0iJtjWdtw/qDmFIGKbX+XkdZwPsPm2Gih5qXuOfOFEwcbHOw4xGeOcvmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XV2oypc8eIMmqeiHnNEvlBJcROJf4qkxjYgkCOtESdE=;
+ b=CWYU1PE1HDD+JbTHAQ7XPLoEp7okoXSyQ+Ll//MPdhA5hHc2a7pj1kOjNCfyeu/zku0FjNEEUlYICm2CluIJSOOXy0q7MWgOQ3tpJdD7/YmKSLGp3CyXFGd6MmH9qTiuX4agp4fE5Ui7U9hyp22brApRXUrIuiSuL6Z0TySv3dzYU6f5jFLXcUv+5LPKkS4n9tfY8CJcCAxxmUY8olW17kEza+bTGcmPI1rb1AaI34LVJgxyIfEArr9moqKyVvHogYgHY0JpvWtyUgDTRYdp3x9NSuruNEmlRGnaRyot0QMqtCfM6CFhZApXzuZPAF9j6CIS9kAdtHPsqUMuETwUhA==
+Received: from SA9PR10CA0001.namprd10.prod.outlook.com (2603:10b6:806:a7::6)
+ by PH0PR12MB7486.namprd12.prod.outlook.com (2603:10b6:510:1e9::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.5; Fri, 6 Mar
+ 2026 15:10:45 +0000
+Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
+ (2603:10b6:806:a7:cafe::77) by SA9PR10CA0001.outlook.office365.com
+ (2603:10b6:806:a7::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.18 via Frontend Transport; Fri,
+ 6 Mar 2026 15:10:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Fri, 6 Mar 2026 15:10:45 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 6 Mar
+ 2026 07:10:23 -0800
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Fri, 6 Mar 2026 07:10:20 -0800
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Cosmin
+ Ratiu" <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [PATCH net v3 0/3] macsec: Add support for VLAN filtering in offload mode
+Date: Fri, 6 Mar 2026 17:10:01 +0200
+Message-ID: <20260306151004.2862198-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260306-airoha-gdm-forward-ndo-open-stop-v1-1-7b7a20dd9ef0@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NwQqDMAyA4VeRnBdoLbixVxkegomaw5qSDieI7
- 27x+F3+/4AqrlLh3R3gsmlVyw3x0cG0Ul4ElZuhD/0QUhiQ1G0lXPiLs/mfnDGzoRXJWH9WMKY
- UJ4r8TPyClikus+734jOe5wVqSMRUcgAAAA==
-X-Change-ID: 20260306-airoha-gdm-forward-ndo-open-stop-1331ca1d73d8
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: 0164A223867
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|PH0PR12MB7486:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43b93e4f-b895-4a66-a31f-08de7b928a7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	L10Wm4+95iRZUBoePGh46cIrNPxJL20McKkPdWEYvixAfbx6sNoJCDfCiRoIxCXan5glzQFuhg64enRQ74Wj5bUTLblIGdc9o7yfcinMwpNbYtyXEmfiNjCmDklcKFhR/0V8uvLu6d99kZzmLLi60oUwN0t2tmHwaGyBDaxkoJ3jF7fd5FyaCEkSR2EowmW4PbJ16jFqbU9BHwxfuBycy1kuvlh5ltdyPRXeOBiLbbJ7k61fbTYg0zsUJXXRsVpgR1ruqYHK7Vg3ZZ/Rc7v9iEVzIFeznx+y0n2kTeJZRGBbVS3smXF/dggxA4fgt2H2ZHf5HT6npMsihj/Qy1eFQMg0r8PHp4+7mubDDz8dBl+1K2goGOQDtYDCJayA5yVD5l6E9Ls1cwlBqXPYVeuAqszPCIaCKy8szvhztPuZZCj6fYsA/mru9oWI4oRDGtiYlrwwZyewJZWPusslr4TaANaGLXsNEvy39dnwgJoXchDrtvjIPmoRce/VodJgMHONO75tkFhBHdCPe1bUBd7xu/rMC7hhPYKKa2VEWpI+el7hQztNfuvhA3xNXrubInuJ4zOUq9mrWYk20ijse0Pp28ka0PbiKYlf/xnhKzazTMuzOT7RIvHTNj1GCystwgTDkDCfMG8Ow4vyi2mmUNfd3KaTmgN2yeoygbVG9/fOYZdauX7brXhTCeSYe2ehCvgGgUYJD3A0OZRDCZfwNXFXaloozsZtRcq6SLqznhy5ew4xtnUQ+7tTpVeClh+8JdYqmU5pZX77cL5CzGaERKOVWw==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	X/SOvV+WruTPzSn+YxcgcJrgRaTda2whU/XYxgsuRm2qdoYb0YTzabW5rbrlntOVRRSA6HNE7HOEbzLvjKPezA3mDWI+eE3NoOqL1Wn6JD1lNK+RWTkeBBCl8jHk5K2gXYIY2Ml501g6hHS+5tv5zjGwjHX9ZvxKTx43J0AVTaP66U++t2Sngm/oxESFNyWFoA5ortuRKw6Nl1qe85/7kQvZkg/zOJw3t1EFdDb1tHTC0C0g+3d13ECd6Ua8fTPjiDxJ6nyyCX+A2sWu53dMc6JDxIlrPd1oHtmZhWYnWYASrHSHD0rsBQ9VXP/MbX2UcSns0QprJoy2nznFa4mAELfDKX+U/eadZRYTbcAdjXqpmwJ+Cl0q1i7a4eIDaMXgeOPIH/oTMG1fhNHh2JaHigTD+cieuv48NgLoZG/Q/xIRsK9vykvCYVkNPaHO/W9R
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2026 15:10:45.0691
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43b93e4f-b895-4a66-a31f-08de7b928a7e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002636C.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7486
+X-Rspamd-Queue-Id: 1D074223860
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264838-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264839-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:mid,Nvidia.com:dkim];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.970];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-This change allows to set GDM forward port configuration to
-FE_PSE_PORT_DROP stopping the network device. Hw design requires to stop
-packet forwarding putting the interface down.  Moreover, PPE firmware
-requires to use PPE1 for GDM3 or GDM4.
+This short series adds support for VLANs in macsec devices when offload
+mode is enabled. This allows VLAN netdevs on top of macsec netdevs to
+function, which accidentally used to be the case in the past, but was
+broken. This series adds back proper support.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+netdevsim was extended to support VLANs and there's also a selftest for
+the new functionality.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 09acbe6695368132ddd92c3501f8711476db73f6..dc36b5b669108cc32c4fd5a5479d9024978ceeba 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1611,6 +1611,7 @@ static int airoha_dev_open(struct net_device *dev)
- 	int err, len = ETH_HLEN + dev->mtu + ETH_FCS_LEN;
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
-+	u32 pse_port = FE_PSE_PORT_PPE1;
- 
- 	netif_tx_start_all_queues(dev);
- 	err = airoha_set_vip_for_gdm_port(port, true);
-@@ -1634,6 +1635,14 @@ static int airoha_dev_open(struct net_device *dev)
- 			GLOBAL_CFG_RX_DMA_EN_MASK);
- 	atomic_inc(&qdma->users);
- 
-+	if (port->id == AIROHA_GDM2_IDX &&
-+	    airoha_ppe_is_enabled(qdma->eth, 1)) {
-+		/* For PPE2 always use secondary cpu port. */
-+		pse_port = FE_PSE_PORT_PPE2;
-+	}
-+	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
-+				    pse_port);
-+
- 	return 0;
- }
- 
-@@ -1651,6 +1660,9 @@ static int airoha_dev_stop(struct net_device *dev)
- 	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++)
- 		netdev_tx_reset_subqueue(dev, i);
- 
-+	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
-+				    FE_PSE_PORT_DROP);
-+
- 	if (atomic_dec_and_test(&qdma->users)) {
- 		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
- 				  GLOBAL_CFG_TX_DMA_EN_MASK |
-@@ -1742,7 +1754,7 @@ static int airoha_dev_init(struct net_device *dev)
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
- 	struct airoha_eth *eth = qdma->eth;
--	u32 pse_port, fe_cpu_port;
-+	u32 fe_cpu_port;
- 	u8 ppe_id;
- 
- 	airoha_set_macaddr(port, dev->dev_addr);
-@@ -1763,7 +1775,7 @@ static int airoha_dev_init(struct net_device *dev)
- 		if (airoha_ppe_is_enabled(eth, 1)) {
- 			/* For PPE2 always use secondary cpu port. */
- 			fe_cpu_port = FE_PSE_PORT_CDM2;
--			pse_port = FE_PSE_PORT_PPE2;
-+			ppe_id = 1;
- 			break;
- 		}
- 		fallthrough;
-@@ -1772,13 +1784,11 @@ static int airoha_dev_init(struct net_device *dev)
- 
- 		/* For PPE1 select cpu port according to the running QDMA. */
- 		fe_cpu_port = qdma_id ? FE_PSE_PORT_CDM2 : FE_PSE_PORT_CDM1;
--		pse_port = FE_PSE_PORT_PPE1;
-+		ppe_id = 0;
- 		break;
- 	}
- 	}
- 
--	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(port->id), pse_port);
--	ppe_id = pse_port == FE_PSE_PORT_PPE2 ? 1 : 0;
- 	airoha_fe_rmw(eth, REG_PPE_DFT_CPORT0(ppe_id),
- 		      DFT_CPORT_MASK(port->id),
- 		      __field_prep(DFT_CPORT_MASK(port->id), fe_cpu_port));
+V3:
+- Moved back to net.
+- Added proper rollback support for VLAN filters in case of failure.
+- Added VLAN as a requirement for the new macsec tests.
 
----
-base-commit: e5e09233e8a9179b260460fdb28df5c24bcfbed6
-change-id: 20260306-airoha-gdm-forward-ndo-open-stop-1331ca1d73d8
+V2: https://lore.kernel.org/netdev/20260227090227.1552512-1-cratiu@nvidia.com/
+- Sent to net-next instead of net because of apparent complexity.
+- Changed VLAN filtering to only function in offload mode.
+- Added tests.
 
-Best regards,
+V1: https://lore.kernel.org/netdev/20260107104723.2750725-1-cratiu@nvidia.com/
+
+Cosmin Ratiu (3):
+  nsim: Add support for VLAN filters
+  selftests: Add macsec offload VLAN tests
+  macsec: Support VLAN-filtering lower devices
+
+ drivers/net/macsec.c                          | 44 +++++++++++--
+ drivers/net/netdevsim/netdev.c                | 65 ++++++++++++++++++-
+ drivers/net/netdevsim/netdevsim.h             |  8 +++
+ .../selftests/drivers/net/netdevsim/config    |  1 +
+ .../drivers/net/netdevsim/ethtool-common.sh   |  5 +-
+ .../drivers/net/netdevsim/macsec-offload.sh   | 59 +++++++++++++++++
+ 6 files changed, 173 insertions(+), 9 deletions(-)
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.49.0
 
 
