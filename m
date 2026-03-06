@@ -1,353 +1,222 @@
-Return-Path: <netdev+bounces-264743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJn9KoeyqmlEVgEAu9opvQ
-	(envelope-from <netdev+bounces-264743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 11:55:03 +0100
+	id yGAKBIe0qml9VgEAu9opvQ
+	(envelope-from <netdev+bounces-264744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:03:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F8D21F4E4
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 11:55:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D0721F67B
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 12:03:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 090D73008D29
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 10:54:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C02623045A99
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 11:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5ED381AE3;
-	Fri,  6 Mar 2026 10:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FCA349B18;
+	Fri,  6 Mar 2026 11:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAUdhJ9J"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="GVzXkSNU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="j3lOvFtf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A34135839C;
-	Fri,  6 Mar 2026 10:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6018923C516
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 11:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772794463; cv=none; b=PrVK5jam97WPBR1Zz5PuvAwnE8UL/KcNNPu6AJhUWcElH8lm1ZM+TBkEBwo9jgymnrv7jGDkJeFCLLByiD/OJbh+WeljUzRu80A8hkafRldY2it/DsvngVdBPSnY6CJcxVpBzCGjpfUsxNcJdALYWQ7c59qMn5zef23B7/cO0aU=
+	t=1772795001; cv=none; b=iterpLbKfL1GaipJtGbEWer9rqI/MZwE5bFcPes9vBiLcOiYbnWvMmg11mva0y9IZ3syrXMMnNYufLjLVyQNe7MGyIrRgcipe2NF/AI08yc443JaMcRWBqL7rfrIHrgtaIeBupqatBYfQkTBDd2YevSTkOhX/CqEybeF1g4c6LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772794463; c=relaxed/simple;
-	bh=ph2CnyWrkdsg4Xijfgxsxm+iahK50TtAU8/Tx//bQqY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=anQmpfghajGCn6AkNRpOk6Fd/sI4KbYkJJon6hCCtDntsF/iOssgEc9Lry7xVtcglWgep/MVvVvt568CMPBrAhOmI+g0Tgdh+R6HQ3lIW8MoB5bb8JUp+zpP0mdGIQx79UzYNgC4UX0Q31ioH90HSLEwOLoJNbPmj3zUOrNM4+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAUdhJ9J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6C6C4CEF7;
-	Fri,  6 Mar 2026 10:54:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772794463;
-	bh=ph2CnyWrkdsg4Xijfgxsxm+iahK50TtAU8/Tx//bQqY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QAUdhJ9JDGWkk8O7YS+yDBla0u+0Qq6vjlHT5c+egG61AQra7CUieN9MJYOYFBl5o
-	 VRMRI2HggkdjxWufIXqYxSmj+NazN09zFeGblsNAkupzyne8EFjzL2BINLCV4S3xke
-	 wrdzP28ecAhXvqdwc3/A2Y8kCCLOx8RpjeA1m2dqmL8BN8iZMAJPAMm4CCKzjNYrt+
-	 0ZNFoJRmxBQhLWRC2rlPiWWH+RaH9pIfWNOe+Kqix3RzLiJO/WREQ+eX6PGxS5ZBz/
-	 tsOPdUnSC0SJzp6rc66NQjX1KDtfRkIQ7Y+9fdHe29FtwRMonBpe3AweKyX7OxqO6V
-	 bwqngNCD86NTw==
-From: Sumit Garg <sumit.garg@kernel.org>
-To: linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org
-Cc: andersson@kernel.org,
-	konradybcio@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com,
-	sean@poorly.run,
-	akhilpo@oss.qualcomm.com,
-	lumag@kernel.org,
-	abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com,
-	marijn.suijten@somainline.org,
-	airlied@gmail.com,
-	simona@ffwll.ch,
-	vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com,
-	bod@kernel.org,
-	mchehab@kernel.org,
-	elder@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jjohnson@kernel.org,
-	mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com,
-	mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com,
-	jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com,
-	vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com,
-	jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org,
-	apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: [PATCH 14/14] firmware: qcom_scm: Remove SCM PAS wrappers
-Date: Fri,  6 Mar 2026 16:20:27 +0530
-Message-ID: <20260306105027.290375-15-sumit.garg@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260306105027.290375-1-sumit.garg@kernel.org>
-References: <20260306105027.290375-1-sumit.garg@kernel.org>
+	s=arc-20240116; t=1772795001; c=relaxed/simple;
+	bh=PIvre5oKJmAYKAU5/KLObYZpm7u8CjW4WK0kaQiiXbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nk5dIFhy7pQvXzaWr+cgjjaCVJyb71ao3YGlQ5gief4/KqezYu4Utgeqlcr0rKO6/1eFAIQ7Cl539eqE3tVhzvbvUaLLAxJruGyo0wIGYxCa7zZr53c5uh3Cu1zuDlcKjX8jMgOuSBwKelt9yON31aN9dGaWZhriAlIRQsAswsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=GVzXkSNU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=j3lOvFtf; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 58942140021F;
+	Fri,  6 Mar 2026 06:03:18 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Fri, 06 Mar 2026 06:03:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1772794998; x=
+	1772881398; bh=dLL/nLB3sa5pSYrC5t9KIx0W5G+Id7KRhtEZd1fY5y0=; b=G
+	VzXkSNUWnM/aIBCBT/Ft0XWkRzSRyS2wlPdekvdMNa0G/Pdy42HoBACeNnbcgMzn
+	64Gqk0UAhZrDiL5R1vMzwrs6WcQVq63KFjJCwvmPkCwlfmnb8dO1GveEPq1hyk2K
+	/4xuPZ03pVPKssVwF/UZjgz0Rv3/ox4MLMuU0bU0CgAgEIQFA4G0dR4upn0S40pM
+	S1rvB/ElE1yXTmTEDdQ+axjsQWTsjVkJEolDeiMmDiNeZo3I0HYe7C08cIJte6KX
+	t9iypQY/b/qU3U1e2Kiw3Y67pgp/E58cpkEakKDnyP7vAnw7EL6OP/xhngJfZUqu
+	LVUbE5nP5IreUpH9WosTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1772794998; x=1772881398; bh=dLL/nLB3sa5pSYrC5t9KIx0W5G+Id7KRhtE
+	Zd1fY5y0=; b=j3lOvFtfvphQc8wnJQlcqJXDrz0X4cpP9gDYLKNxAk9hqp+0eX9
+	8Kg3h9RSz9O7DpRgT8tJEB0QieyTFn2Dy8Bk/PDN6sNk6uA/ijdA1zSZHmb8xFOe
+	3WDK5r594+MjFh9tLT8D8m9FVmY2DKPPT7d2W3p+jS1xdrLatN7FBCbvBusx7z8h
+	y2PIRbZ1TqTDABBjKI1ncC7AKTRgxxErQwM1c83/fo5+OEG29DDuxNqP5BGR/E8h
+	cFwP0YA2aC5w9xkqD1856Ngac8pXJWYVttDSQEeDZqexGW2PvVFK90VKw7NMTK6l
+	MXS2EG0h4yOluTXTi5qdfopVVTaxOR09EHw==
+X-ME-Sender: <xms:dbSqaT3j9k40_pqt4hZ7nTGrDvXSd36ng1xFrTwJAvBlGe4fdM4AOw>
+    <xme:dbSqafBMEGWidhzXObobNVMnw5tvQT2Lt_UabAhj0L1u2be4vny6JLxp3GJ3E_obh
+    0OxYKZLRyRZTGEVcswQ2TkeyfULpBJwz8A29TmGa9b8tHvfIyf21Mk>
+X-ME-Received: <xmr:dbSqafh_OS-meqaQ-FXArseEzbD0v1YqgFU9Fi9f3Gxu-L6BXtlJC5v8MogJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieeludefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
+    htpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtghomhdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
+    nhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtg
+    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgs
+    rgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:dbSqaRPbUvXTSGjork0Wys6UIAEkzH3KywFU6bCD78mtFAN6jLej6A>
+    <xmx:dbSqaf9WVjVkii5d9YgqeHwCWnwxo-AqXOiktAGQ1PYgLzvZBKkrlg>
+    <xmx:dbSqaSd1wx8vwR1kE5VpUeB_ouWH4C6by9x1jzi69e0OsVL8gjJw8Q>
+    <xmx:dbSqaezLISYCcBBm841loGJB-q6JOt7rH9vp-K6Jqr-JNkQuw9TL-Q>
+    <xmx:drSqafa6_-MREMeStvqG91MXwa4sQj4wdP_l6JMaG6WO3_TUbpS3rkVB>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 6 Mar 2026 06:03:17 -0500 (EST)
+Date: Fri, 6 Mar 2026 12:03:15 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>, pabeni@redhat.com,
+	netdev@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org
+Subject: Re: [PATCH net] ovpn: Fix race condition in ovpn_dellink()
+Message-ID: <aaq0cxEEkPf7CDV4@krikkit>
+References: <aaVgJ16edTfQkYbx@v4bel>
+ <6aa197ce-9e72-473c-a8c9-d190d85fb625@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D3F8D21F4E4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6aa197ce-9e72-473c-a8c9-d190d85fb625@openvpn.net>
+X-Rspamd-Queue-Id: 66D0721F67B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-264744-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264743-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_NA(0.00)[queasysnail.net];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+Sorry Antonio, things are a bit busy over here, I'm finally getting to
+this.
 
-Now since all the Qcom SCM client drivers have been migrated over to
-generic PAS TZ service, let's drop the exported SCM PAS wrappers.
+2026-03-03, 21:15:59 +0100, Antonio Quartulli wrote:
+> Hi,
+> 
+> On 02/03/2026 11:02, Hyunwoo Kim wrote:
+> > When ovpn_dellink() is called, it invokes
+> > cancel_delayed_work_sync() to stop keepalive_work before freeing
+> > the device.
+> > However, ovpn_nl_peer_new_doit() runs without any lock shared
+> > with the RTNL path, so keepalive_work can be scheduled after
+> > cancel_delayed_work_sync() returns.
+> > 
+> > The following is a simple race scenario:
+> > 
+> >            cpu0                            cpu1
+> > 
+> > ovpn_dellink(dev)
+> >    cancel_delayed_work_sync(keepalive_work)
+> >                                     ovpn_nl_peer_new_doit()
+> >                                       ovpn_nl_peer_modify()
+> >                                         ovpn_peer_keepalive_set()
+> >                                           mod_delayed_work(keepalive_work)
+> > 
+> > To prevent this race condition, cancel_delayed_work_sync() is
+> > replaced with disable_delayed_work_sync().
+> 
+> I was about to agree on your fix, however, it seems there is a larger issue
+> here and this patch is just addressing one symptom.
+> 
+> If you are truly able to execute the whole ovpn_nl_peer_new_doit() after
+> cancel_delayed_work_sync() and before the netdev refcounter reaches 0, I
+> think we may get stuck in the "wait for device to be freed..." loop.
+> 
+> That's because the ovpn_peer_new() will acquire a reference to the netdev,
+> preventing it to be fully released.
+> 
+> 
+> Sabrina, do you have any thought on this?
+> It seems as if there is no safe guard against adding peers while destroying
+> the interface.
 
-Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
----
- drivers/firmware/qcom/qcom_scm.c       | 84 --------------------------
- include/linux/firmware/qcom/qcom_scm.h | 29 ---------
- 2 files changed, 113 deletions(-)
+Feel free to add:
 
-diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
-index 2d7937ae7c8f..ce68ed294d78 100644
---- a/drivers/firmware/qcom/qcom_scm.c
-+++ b/drivers/firmware/qcom/qcom_scm.c
-@@ -554,26 +554,6 @@ static void qcom_scm_set_download_mode(u32 dload_mode)
- 		dev_err(__scm->dev, "failed to set download mode: %d\n", ret);
+diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+index 2e0420febda0..3bf6ea5f7208 100644
+--- a/drivers/net/ovpn/main.c
++++ b/drivers/net/ovpn/main.c
+@@ -214,6 +214,10 @@ static void ovpn_dellink(struct net_device *dev, struct list_head *head)
+ 
+ 	cancel_delayed_work_sync(&ovpn->keepalive_work);
+ 	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
++
++	pr_warn("sleeping\n");
++	msleep(10000);
++
+ 	unregister_netdevice_queue(dev, head);
  }
  
--struct qcom_scm_pas_context *devm_qcom_scm_pas_context_alloc(struct device *dev,
--							     u32 pas_id,
--							     phys_addr_t mem_phys,
--							     size_t mem_size)
--{
--	struct qcom_pas_context *ctx;
--
--	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
--	if (!ctx)
--		return ERR_PTR(-ENOMEM);
--
--	ctx->dev = dev;
--	ctx->pas_id = pas_id;
--	ctx->mem_phys = mem_phys;
--	ctx->mem_size = mem_size;
--
--	return (struct qcom_scm_pas_context *)ctx;
--}
--EXPORT_SYMBOL_GPL(devm_qcom_scm_pas_context_alloc);
--
- static int __qcom_scm_pas_init_image(struct device *dev, u32 pas_id,
- 				     dma_addr_t mdata_phys,
- 				     struct qcom_scm_res *res)
-@@ -674,14 +654,6 @@ static int __qcom_scm_pas_init_image2(struct device *dev, u32 pas_id,
- 	return ret ? : res.result[0];
- }
- 
--int qcom_scm_pas_init_image(u32 pas_id, const void *metadata, size_t size,
--			    struct qcom_scm_pas_context *ctx)
--{
--	return __qcom_scm_pas_init_image2(__scm->dev, pas_id, metadata, size,
--					  (struct qcom_pas_context *)ctx);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_init_image);
--
- static void __qcom_scm_pas_metadata_release(struct device *dev,
- 					    struct qcom_pas_context *ctx)
- {
-@@ -693,13 +665,6 @@ static void __qcom_scm_pas_metadata_release(struct device *dev,
- 	ctx->ptr = NULL;
- }
- 
--void qcom_scm_pas_metadata_release(struct qcom_scm_pas_context *ctx)
--{
--	__qcom_scm_pas_metadata_release(__scm->dev,
--					(struct qcom_pas_context *)ctx);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_metadata_release);
--
- static int __qcom_scm_pas_mem_setup(struct device *dev, u32 pas_id,
- 				    phys_addr_t addr, phys_addr_t size)
- {
-@@ -732,12 +697,6 @@ static int __qcom_scm_pas_mem_setup(struct device *dev, u32 pas_id,
- 	return ret ? : res.result[0];
- }
- 
--int qcom_scm_pas_mem_setup(u32 pas_id, phys_addr_t addr, phys_addr_t size)
--{
--	return __qcom_scm_pas_mem_setup(__scm->dev, pas_id, addr, size);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_mem_setup);
--
- static void *__qcom_scm_pas_get_rsc_table(struct device *dev, u32 pas_id,
- 					  void *input_rt_tzm,
- 					  size_t input_rt_size,
-@@ -867,18 +826,6 @@ static void *__qcom_scm_pas_get_rsc_table2(struct device *dev,
- 	return ret ? ERR_PTR(ret) : tbl_ptr;
- }
- 
--struct resource_table *qcom_scm_pas_get_rsc_table(struct qcom_scm_pas_context *ctx,
--						  void *input_rt,
--						  size_t input_rt_size,
--						  size_t *output_rt_size)
--{
--	return __qcom_scm_pas_get_rsc_table2(__scm->dev,
--					     (struct qcom_pas_context *)ctx,
--					     input_rt, input_rt_size,
--					     output_rt_size);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_get_rsc_table);
--
- static int __qcom_scm_pas_auth_and_reset(struct device *dev, u32 pas_id)
- {
- 	int ret;
-@@ -908,12 +855,6 @@ static int __qcom_scm_pas_auth_and_reset(struct device *dev, u32 pas_id)
- 	return ret ? : res.result[0];
- }
- 
--int qcom_scm_pas_auth_and_reset(u32 pas_id)
--{
--	return __qcom_scm_pas_auth_and_reset(__scm->dev, pas_id);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_auth_and_reset);
--
- static int __qcom_scm_pas_prepare_and_auth_reset(struct device *dev,
- 						 struct qcom_pas_context *ctx)
- {
-@@ -942,13 +883,6 @@ static int __qcom_scm_pas_prepare_and_auth_reset(struct device *dev,
- 	return ret;
- }
- 
--int qcom_scm_pas_prepare_and_auth_reset(struct qcom_scm_pas_context *ctx)
--{
--	return __qcom_scm_pas_prepare_and_auth_reset(__scm->dev,
--						     (struct qcom_pas_context *)ctx);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_prepare_and_auth_reset);
--
- static int __qcom_scm_pas_set_remote_state(struct device *dev, u32 state,
- 					   u32 pas_id)
- {
-@@ -968,12 +902,6 @@ static int __qcom_scm_pas_set_remote_state(struct device *dev, u32 state,
- 	return ret ? : res.result[0];
- }
- 
--int qcom_scm_set_remote_state(u32 state, u32 id)
--{
--	return __qcom_scm_pas_set_remote_state(__scm->dev, state, id);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_set_remote_state);
--
- static int __qcom_scm_pas_shutdown(struct device *dev, u32 pas_id)
- {
- 	int ret;
-@@ -1003,12 +931,6 @@ static int __qcom_scm_pas_shutdown(struct device *dev, u32 pas_id)
- 	return ret ? : res.result[0];
- }
- 
--int qcom_scm_pas_shutdown(u32 pas_id)
--{
--	return __qcom_scm_pas_shutdown(__scm->dev, pas_id);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_shutdown);
--
- static bool __qcom_scm_pas_supported(struct device *dev, u32 pas_id)
- {
- 	int ret;
-@@ -1030,12 +952,6 @@ static bool __qcom_scm_pas_supported(struct device *dev, u32 pas_id)
- 	return ret ? false : !!res.result[0];
- }
- 
--bool qcom_scm_pas_supported(u32 pas_id)
--{
--	return __qcom_scm_pas_supported(__scm->dev, pas_id);
--}
--EXPORT_SYMBOL_GPL(qcom_scm_pas_supported);
--
- static struct qcom_pas_ops qcom_pas_ops_scm = {
- 	.drv_name		= "qcom_scm",
- 	.supported		= __qcom_scm_pas_supported,
-diff --git a/include/linux/firmware/qcom/qcom_scm.h b/include/linux/firmware/qcom/qcom_scm.h
-index 5747bd191bf1..a0a6bc0229c4 100644
---- a/include/linux/firmware/qcom/qcom_scm.h
-+++ b/include/linux/firmware/qcom/qcom_scm.h
-@@ -64,35 +64,6 @@ bool qcom_scm_is_available(void);
- int qcom_scm_set_cold_boot_addr(void *entry);
- int qcom_scm_set_warm_boot_addr(void *entry);
- void qcom_scm_cpu_power_down(u32 flags);
--int qcom_scm_set_remote_state(u32 state, u32 id);
--
--struct qcom_scm_pas_context {
--	struct device *dev;
--	u32 pas_id;
--	phys_addr_t mem_phys;
--	size_t mem_size;
--	void *ptr;
--	dma_addr_t phys;
--	ssize_t size;
--	bool use_tzmem;
--};
--
--struct qcom_scm_pas_context *devm_qcom_scm_pas_context_alloc(struct device *dev,
--							     u32 pas_id,
--							     phys_addr_t mem_phys,
--							     size_t mem_size);
--int qcom_scm_pas_init_image(u32 pas_id, const void *metadata, size_t size,
--			    struct qcom_scm_pas_context *ctx);
--void qcom_scm_pas_metadata_release(struct qcom_scm_pas_context *ctx);
--int qcom_scm_pas_mem_setup(u32 pas_id, phys_addr_t addr, phys_addr_t size);
--int qcom_scm_pas_auth_and_reset(u32 pas_id);
--int qcom_scm_pas_shutdown(u32 pas_id);
--bool qcom_scm_pas_supported(u32 pas_id);
--struct resource_table *qcom_scm_pas_get_rsc_table(struct qcom_scm_pas_context *ctx,
--						  void *input_rt, size_t input_rt_size,
--						  size_t *output_rt_size);
--
--int qcom_scm_pas_prepare_and_auth_reset(struct qcom_scm_pas_context *ctx);
- 
- int qcom_scm_io_readl(phys_addr_t addr, unsigned int *val);
- int qcom_scm_io_writel(phys_addr_t addr, unsigned int val);
+
+to help reproduce the race, I usually do something like that if it's
+possible to sleep in that context.
+
+
+I think you're right, the newly-added peer will miss
+ovpn_peers_free. Can we simply move cancel_delayed_work_sync +
+ovpn_peers_free to ndo_uninit and not provide a dellink?
+
+At ndo_uninit, the netdevice is no longer listed so PEER_NEW won't
+find it, but delaying the release of the reference on the netdev via
+peer cleanup should still be ok (unregister_netdevice_many_notify
+calls unlist_netdevice and then ndo_uninit, then we add it to the
+todo_list and netdev_run_todo processes that list and does
+netdev_wait_allrefs_any).
+
 -- 
-2.51.0
-
+Sabrina
 
