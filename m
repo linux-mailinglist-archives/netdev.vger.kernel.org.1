@@ -1,119 +1,289 @@
-Return-Path: <netdev+bounces-264626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDAfM80+qmnGNwEAu9opvQ
-	(envelope-from <netdev+bounces-264626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:41:17 +0100
+	id 0BiyDwg/qmnGNwEAu9opvQ
+	(envelope-from <netdev+bounces-264627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:42:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791DC21AAAC
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:41:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC3E21AACB
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 03:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 802DC30240A0
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 02:41:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00634302614A
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 02:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A072350D46;
-	Fri,  6 Mar 2026 02:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B5B327BFC;
+	Fri,  6 Mar 2026 02:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdpTYMc5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fnjQCxqX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1368B33688C;
-	Fri,  6 Mar 2026 02:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F70353ED9
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 02:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772764873; cv=none; b=s4hz/DBvjrf8gYS02IIOSLKeqfmJLZdAlGIuRQzmfT+Ma6odjLSUPN5k7VqdPm345d+et2nkpBjs3bNdCyxY5iZHzXWrRsik2Bq5AZMjA1KmVHRZ5GM0G9JbmCkx28HBNN4+qAUGaEHfvpFinwM8/mvs0NSXNy8XXcGEFuRIJcY=
+	t=1772764933; cv=none; b=pPu7OxmDfCJb8JvBlwI98cGvu2jS/my2mWqqRLfJ0FCnJILsMGqYeaID9WvIQek5R5w4NiPUGGwBtiRjvTbMhX6BYcPqSpdHL/2GuiXOVH51h9uF8fwEOW4B2dUR2oUVVHxR3tU2iLthV7ECVBYVNbI7hgblnMQdIax4lPBhYh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772764873; c=relaxed/simple;
-	bh=GqBefeOg7i4T3RBZfpPYC0R9yFaXJA9/wZ3SV33UALg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OwdTSkyHC+jCsQPx1SWAq0GeVg3FDuBOEGqmFVaC7S991GPVJVWS9mceLELOWNRwQyClFHYvru6ADXXRpHx8XHbOxqAmaRZ+9n2i0EbGrBMB8se+f4xUPRDfFpg5vX215f8YjleUqY/J0Xf7xFfmU+LjEcnF9CefnrCO+VmlS64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdpTYMc5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 559C0C116C6;
-	Fri,  6 Mar 2026 02:41:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772764872;
-	bh=GqBefeOg7i4T3RBZfpPYC0R9yFaXJA9/wZ3SV33UALg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fdpTYMc5NwRNUbWd0gQzyhspSY8WIBfasZ+FM5jpmEle0Io7zgtUm7WqI6Tk8hpoW
-	 1Uo2MhmCexY1Zbp9vGfW5v/EK8eYiysS8tbfEwHDURFh38ddvDxvXhC9cStSvtLsgU
-	 yHJDt/gOxUk67CbiogXGtVTBImEdqqzVVLpdhopq3Ae02/+gzzhQYvE2PsnXkLr+Xk
-	 jpMrxZc0RELRDX5kPKbhcjmSpptupK/7dmEd0bSzlkb5GAFO4y2Y9ckpi0ySwBhUrO
-	 f3d3IpBpOyS1S567dOCRsJb55HvqRyRT9DJmzOHG7dQjq/AEAqq9k4x3zmuZXz11eM
-	 0GaskYBuE9fDw==
-Date: Thu, 5 Mar 2026 18:41:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, tglx@kernel.org,
- tglx@linutronix.de, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, mani@kernel.org,
- imran.shaik@oss.qualcomm.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
- xiaoning.wang@nxp.com, jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
- yangbo.lu@nxp.com, svens@linux.ibm.com, nick.shi@broadcom.com,
- ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
- imx@lists.linux.dev, linux-s390@vger.kernel.org, dust.li@linux.alibaba.com,
- xuanzhuo@linux.alibaba.com, taniya.das@oss.qualcomm.com
-Subject: Re: [RFC v2 0/2] ptp: Move non-NIC PHC drivers from netdev to
- clock/timekeeping maintainership
-Message-ID: <20260305184110.13e79837@kernel.org>
-In-Reply-To: <4a9af4b1-6820-4173-8daf-4201bb1bcca5@linux.alibaba.com>
-References: <20260227081934.96865-1-guwen@linux.alibaba.com>
-	<be4c63a8dc43be15576565b4bd4567b3cf433d58.camel@infradead.org>
-	<4a9af4b1-6820-4173-8daf-4201bb1bcca5@linux.alibaba.com>
+	s=arc-20240116; t=1772764933; c=relaxed/simple;
+	bh=v4cflm4NiRNKit0+IyjvwCr+f6yIyaerrT9iAHpzkIU=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=otvC5F73tBha3rlpZtTs6UQLCX6pb3N8awnzmFpZRPQ+ZBEH3CJPQoOykusVJ+SjlPj1Jms94SEvKH11kmGvFtPPV4+zBJRwURqJcrVb1j/ugIhE6ZRbCx3fNEgU+3ED6jIqhYetaDcG5BwGve+DWMUh0soXmZDrj9g8ITDcsfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fnjQCxqX; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 791DC21AAAC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772764929;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B/7M8Q3sVB0HPgbs9UCg3aqgHeu4f7DPzAlrQa5392Y=;
+	b=fnjQCxqXAMRp37ZcPFn9LlnceurWpFBB9B2+YtuSlaxPqcpkS+UHJi0+LkQoG8VLp90//y
+	g4wAh6ZSpng0H91NYyOONQGjyId1JhnzdUEh/00XwLhdZMZgwvZ5Vjb0lFdFX1oeGVMjEM
+	89ppIQryir/ENCv097hDuCwxq9ZZbDc=
+Date: Fri, 06 Mar 2026 02:42:05 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <e08dcb78a13fc69be07d28d032cebe3734797a3a@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v4 1/2] bonding: fix null-ptr-deref in
+ bond_rr_gen_slave_id()
+To: "Jay Vosburgh" <jv@jvosburgh.net>, "Nikolay Aleksandrov"
+ <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
+ syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>, "Jesper Dangaard Brouer"
+ <hawk@kernel.org>, "John Fastabend" <john.fastabend@gmail.com>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>, "Hao
+ Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
+ <shuah@kernel.org>, "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ "Clark Williams" <clrkwllms@kernel.org>, "Steven Rostedt"
+ <rostedt@goodmis.org>, "Jussi Maki" <joamaki@gmail.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-rt-devel@lists.linux.dev
+In-Reply-To: <1356528.1772744631@famine>
+References: <20260304074301.35482-1-jiayuan.chen@linux.dev>
+ <20260304074301.35482-2-jiayuan.chen@linux.dev>
+ <aahWymAi_CtRG0gJ@penguin> <1293120.1772645248@famine>
+ <aahsuPt7cY8LxETN@penguin> <1356528.1772744631@famine>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 8FC3E21AACB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264626-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,oss.qualcomm.com,nxp.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,linux.alibaba.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264627-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[jvosburgh.net:email,linux.dev:dkim,linux.dev:mid,appspotmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,shopee.com:email,blackwall.org:email]
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 20:25:11 +0800 Wen Gu wrote:
-> As mentioned in RFC v1, the use cases for drivers in the emulated PHC category
-> are expected to be quite diverse, and not limited to the virtualization/guest
-> time sync use case. For example, existing drivers such as ptp_ocp [1] and
-> upcoming ones such as mhi_phc [2] are not related to virtualization use cases.
+2026/3/6 05:03, "Jay Vosburgh" <jv@jvosburgh.net mailto:jv@jvosburgh.net?=
+to=3D%22Jay%20Vosburgh%22%20%3Cjv%40jvosburgh.net%3E > wrote:
 
-ptp_ocp is a real PCIe device with an atomic clock. mhi_phc is some
-qualcomm fw-defined thing, so more closely mapping what you're doing.
-ptp_ocp should probably stay under netdev, we maintain DPLL drivers,
-too. Main thing we/I don't want to deal with is all the corporate NIH
-virtualization excreta.
+
+>=20
+>=20Nikolay Aleksandrov <razor@blackwall.org> wrote:
+>=20
+>=20>=20
+>=20> On Wed, Mar 04, 2026 at 09:27:28AM -0800, Jay Vosburgh wrote:
+> >=20
+>=20> >=20
+>=20> > Nikolay Aleksandrov <razor@blackwall.org> wrote:
+> > >=20=20
+>=20> >  >On Wed, Mar 04, 2026 at 03:42:57PM +0800, Jiayuan Chen wrote:
+> > >  >> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> > >  >>=20
+>=20> >  >> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter witho=
+ut a NULL
+> > >  >> check. rr_tx_counter is a per-CPU counter only allocated in bon=
+d_open()
+> > >  >> when the bond mode is round-robin. If the bond device was never=
+ brought
+> > >  >> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
+> > >  >>=20
+>=20> >  >> The XDP redirect path can reach this code even when the bond =
+is not up:
+> > >  >> bpf_master_redirect_enabled_key is a global static key, so when=
+ any bond
+> > >  >> device has native XDP attached, the XDP_TX -> xdp_master_redire=
+ct()
+> > >  >> interception is enabled for all bond slaves system-wide. This a=
+llows the
+> > >  >> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+> > >  >> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() =
+to be
+> > >  >> reached on a bond that was never opened.
+> > >  >>=20
+>=20> >  >> Fix this by allocating rr_tx_counter unconditionally in bond_=
+init()
+> > >  >> (ndo_init), which is called by register_netdevice() and covers =
+both
+> > >  >> device creation paths (bond_create() and bond_newlink()). This =
+also
+> > >  >> handles the case where bond mode is changed to round-robin afte=
+r device
+> > >  >> creation. The conditional allocation in bond_open() is removed.=
+ Since
+> > >  >> bond_destructor() already unconditionally calls
+> > >  >> free_percpu(bond->rr_tx_counter), the lifecycle is clean: alloc=
+ate at
+> > >  >> ndo_init, free at destructor.
+> > >  >>=20
+>=20> >  >> Note: rr_tx_counter is only used by round-robin mode, so this
+> > >  >> deliberately allocates a per-cpu u32 that goes unused for other=
+ modes.
+> > >  >> Conditional allocation (e.g., in bond_option_mode_set) was cons=
+idered
+> > >  >> but rejected: the XDP path can race with mode changes on a down=
+ed bond,
+> > >  >> and adding memory barriers to the XDP hot path is not justified=
+ for
+> > >  >> saving 4 bytes per CPU.
+> > >  >>=20
+>=20> >  >> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirect=
+ion to slave device")
+> > >  >> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.=
+com
+> > >  >> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00=
+cc.GAE@google.com/T/
+> > >  >> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> > >  >> ---
+> > >  >> drivers/net/bonding/bond_main.c | 19 +++++++++++++------
+> > >  >> 1 file changed, 13 insertions(+), 6 deletions(-)
+> > >  >>=20
+>=20> >  >
+> > >  >IMO it's not worth it to waste memory in all modes, for an unpopu=
+lar mode.
+> > >  >I think it'd be better to add a null check in bond_rr_gen_slave_i=
+d(),
+> > >  >READ/WRITE_ONCE() should be enough since it is allocated only onc=
+e, and
+> > >  >freed when the xmit code cannot be reachable anymore (otherwise w=
+e'd have
+> > >  >more bugs now). The branch will be successfully predicted practic=
+ally always,
+> > >  >and you can also mark the ptr being null as unlikely. That way on=
+ly RR takes
+> > >  >a very minimal hit, if any.
+> > >=20=20
+>=20> >  Is what you're suggesting different from Jiayuan's proposal[0],
+> > >  in the sense of needing barriers in the XDP hot path to insure ord=
+ering?
+> > >=20=20
+>=20> >  If I understand correctly, your suggestion is something like
+> > >  (totally untested):
+> > >=20
+>=20> Basically yes, that is what I'm proposing + an unlikely() around th=
+at
+> > null check since it is really unlikely and will be always predicted
+> > correctly, this way it's only for RR mode.
+> >=20
+>=20 Jiayuan,
+>=20
+>=20 Do you agree that the patch below (including Nikolay's
+> suggestion to add "unlikely") resolves the original issue without memor=
+y
+> waste, and without introducing performance issues (barriers) into the
+> XDP path?
+
+
+Sure, it's basically similar to what my v1 did, but the patch below can b=
+e more generic.
+
+https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.=
+dev/T/#m08e3e53a8aa8d837ddc9242f4b14f2651a2b00aa
+
+>  -J
+>=20
+>=20>=20
+>=20> >=20
+>=20> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bondin=
+g/bond_main.c
+> > >  index eb27cacc26d7..ac2a4fc0aad0 100644
+> > >  --- a/drivers/net/bonding/bond_main.c
+> > >  +++ b/drivers/net/bonding/bond_main.c
+> > >  @@ -4273,13 +4273,17 @@ void bond_work_cancel_all(struct bonding *=
+bond)
+> > >  static int bond_open(struct net_device *bond_dev)
+> > >  {
+> > >  struct bonding *bond =3D netdev_priv(bond_dev);
+> > >  + u32 __percpu *rr_tx_tmp;
+> > >  struct list_head *iter;
+> > >  struct slave *slave;
+> > >=20=20
+>=20> >  - if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN && !bond->rr_t=
+x_counter) {
+> > >  - bond->rr_tx_counter =3D alloc_percpu(u32);
+> > >  - if (!bond->rr_tx_counter)
+> > >  + if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN &&
+> > >  + !READ_ONCE(bond->rr_tx_counter)) {
+> > >  + rr_tx_tmp =3D alloc_percpu(u32);
+> > >  + if (!rr_tx_tmp)
+> > >  return -ENOMEM;
+> > >  + WRITE_ONCE(bond->rr_tx_counter, rr_tx_tmp);
+> > >  +
+> > >  }
+> > >=20=20
+>=20> >  /* reset slave->backup and slave->inactive */
+> > >  @@ -4866,6 +4870,9 @@ static u32 bond_rr_gen_slave_id(struct bondi=
+ng *bond)
+> > >  struct reciprocal_value reciprocal_packets_per_slave;
+> > >  int packets_per_slave =3D bond->params.packets_per_slave;
+> > >=20=20
+>=20> >  + if (!READ_ONCE(bond->rr_tx_counter))
+> > >  + packets_per_slave =3D 0;
+> > >  +
+> > >  switch (packets_per_slave) {
+> > >  case 0:
+> > >  slave_id =3D get_random_u32();
+> > >=20=20
+>=20> >  -J
+> > >=20=20
+>=20> >=20=20
+>=20> >  [0] https://lore.kernel.org/netdev/e4a2a652784ec206728eb3a929a98=
+92238c61f06@linux.dev/
+> > >
+> >=20
+>=20---
+>  -Jay Vosburgh, jv@jvosburgh.net
+>
 
