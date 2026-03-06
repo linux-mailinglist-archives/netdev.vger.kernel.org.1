@@ -1,192 +1,280 @@
-Return-Path: <netdev+bounces-264680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMVwIhZrqmlORAEAu9opvQ
-	(envelope-from <netdev+bounces-264680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:50:14 +0100
+	id INnfEkpsqmkPRQEAu9opvQ
+	(envelope-from <netdev+bounces-264682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:55:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC0921BD27
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:50:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B603921BDA4
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 06:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3CBE83025262
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 05:50:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D06E302A18B
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 05:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA45F334688;
-	Fri,  6 Mar 2026 05:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A03D36D4E2;
+	Fri,  6 Mar 2026 05:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="RWETvEfg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IW7pXcC7"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011033.outbound.protection.outlook.com [52.101.70.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA99F2206AC;
-	Fri,  6 Mar 2026 05:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772776211; cv=fail; b=nQzSvMywuoj2ZC1RWcRBPyTk34FevQpdq2Wlf/vVVELEz47zZWbFtcCQ5FXyriTGDpxtX1y7mxB3O9afr75wTm816VTKEj3ThogelrsAF3b4iJpWkvUQ/+83LeOVNKN/n971l2kF25+HsnU4zh0zaJGYlwYkQASUbR+z9Oz+R1o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772776211; c=relaxed/simple;
-	bh=CYy7kay/v7+/eZvTiliIRS4opev5IQIp6g3971jbcC0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QIKzQaqWvF0kl/hUJwJCERVUOIWkPys/69a7LAFf/zkaNL4qT1VGhwQ4c83TlhCzTC7B0aGQO3HJwS8C69tEngdyq3lu2KrTPmbXldQCq/6r70d/OEV+ufy9adbxy4Twpwga+EjXCOuVsSOYEMAxA621eUPlIglKxVmOtqMO+2M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=RWETvEfg; arc=fail smtp.client-ip=52.101.70.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Bb1mERiOrTqIWRD/yQqP0rqH0bPs5Q1sNgl22ZJJDXj8ytOWwu5B3cx9fmMjBx4buHIxZmSoZumZwV8DhP5kuw8K6Vf6A+sdYWxxlFIb2zhZWu55cn0zqCAcNXOE8lkKZHKeF2xV6l16kFPOGuLVXyA9kjDOuYC/MXwg2woZreZmHfyX7sRbP1tB+eL1r/TJMPr768+5bBs3peRRRqBo9fM5HTtK4wR1i9nfo1rFgsa2Jp7Ku7TO0BOnk2GnjlNa4ZuPn/zAML4oOi6vcMH5u3j9qTfnwrDLSn18HnYHehYvXO8lP+U6y3bpRIAL2nU6+rtAfT7QVROAy7SvuVy2TA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n4lqeeyrRDZ1lX2lAP6Zj+6U5KIKrIhgZ8zdcpO6bcQ=;
- b=ne/oGuogXl2rBnSE+mRQDzFU16gT4swht1igkY4YkB2cSn+Xw9RVodMOaBXDa+08JP8MjvWcIMHQ2LcykYLJW6jE1Vmz6g90n0Cmx6B1J3dtFmTbBiTlbp+j9/CQE+CSoCfWq3BChnZnjKOVzI6JLK2tBmvw3nNzdpVg3Dtq6qFpyUQ626cnVN+UHr+VerPIWg0+h319s5Jv2palUCskByHG3/KnYY4DiuCjQpoiYDz9894ck557tuW8y1Oj5xklhEZsBm6wDCNl82fW2PuoAmnXQ5zXNpD4daA1uMAWT/29zwAc0Pqhpar7+eKI21zLLdgyJP+kCuIXu2qtWzG3qQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n4lqeeyrRDZ1lX2lAP6Zj+6U5KIKrIhgZ8zdcpO6bcQ=;
- b=RWETvEfg0ywlepvEQCH3YrwJxjnquOwkGnkjxoM/T5ZZgu3XtNvm7t5fV5VAdKotumuK6mdwZeUYxMsoTaCTBNDdiXFyEs3x/8dxZGs+b23Fs1oTub7O7lbnpgREbq0048yW1Iy9EYuTUqJYn0mnDQomNnuqfeTkCxHMf7xTt34A/7YbIsjCNaHvVWoDDlia9VN/zBKsEA1Ft9YQMMjJSH7F3vS5Ujy1LeSgW8LJIVORztqVRmdZoYbuwDvT5AfDA0L01Wxau3yB/0doAKWFv7bBTy+tOH6BKA9UcTWWLw6fvGzGKbSoUO9TrXIIU9i58gGlqn27KdTNG6nlGpjqBw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GV2PR04MB11189.eurprd04.prod.outlook.com (2603:10a6:150:27c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.19; Fri, 6 Mar
- 2026 05:50:05 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9678.017; Fri, 6 Mar 2026
- 05:50:05 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, Frank Li <frank.li@nxp.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH net] net: enetc: safely reinitialize TX BD ring when it
- has unsent frames
-Thread-Topic: [PATCH net] net: enetc: safely reinitialize TX BD ring when it
- has unsent frames
-Thread-Index: AQHcrStuINDxuw1sR0C5AmU+yxos17Wg/ohg
-Date: Fri, 6 Mar 2026 05:50:05 +0000
-Message-ID:
- <PAXPR04MB8510B6B8E6B1CA0D83148883887AA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20260306054002.2208360-1-wei.fang@nxp.com>
-In-Reply-To: <20260306054002.2208360-1-wei.fang@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GV2PR04MB11189:EE_
-x-ms-office365-filtering-correlation-id: febb6bf6-02b2-4ea2-8b98-08de7b443795
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|19092799006|366016|38070700021|921020;
-x-microsoft-antispam-message-info:
- 3lLpeCrIzrAJ9Q0huw0trI2nlJGnW7+2BBAp+ILKbrTRzhxz4lA52JiOOBWGHvkM7qAmBq5/H+8zHRQn9k3+xsrsFQ5eWrVHvILWXim+viAkKmQqdB6QGtcaQmXmK4jwlumsJET84sA0W7IhStORxYQy6xPSqW02kf3CKfDz5pLaYRS0wmxbgQgTHdD4CiNmKfQCB/p2rpaaXf6z4LBgRZhwiGyFFQ1Zj9T9wemMAWCOi/hCQRVb0LHp6p68s9wnLWVn+Kkm2SCM+oBFRZgOuShuQ97mEeA2cWEr+WP3wFcRsf7CdIYdNzeuv0+ZpkSeXtDwhrggKv948udiEFfnoUPwadyCSumDpZ0/f74fkM4nLjSXdu8ixhKcjF5X2E9rqFBuePo5ooWWSXiEQfWsJWrqmdaQXNHYEHfJH1QMIJPCybU7fbqghhMdTWxym6X9NGsr/9aS0P9u7Z/GppR2yecTpBCQhYtZjSWLv5P/YUZbzPL13/HH3qdJfLraJP/d2qOh0JqR7fSpA/4j5cFnvkdUvgko6deUvoBcwaRSfyjNqFEQXUt5hdOskbI+W8Pz4aQ8UFmrgAf2IMAloH7zsbouk0lLc3k0vvc4EZycm7JMNeBQ+KqphFMY+ZHMQwNjGFsI42n1hCXq0zAX5BeZV7lreComLukWVeDDk/U7YvX1vWCVgB0hz2rVVjZPoQUfX8DvjR+RB87uyDIeS8UID2BDj7Hf6wAluZx/L9YStxbomJDbACBQ7p4hblIsC7xPNtW2Vl/wfV4qGM5dBkGAOsYH+vxi6exqSV8djnHnAZc2iCZk1dEakDOqA89Ky+lE
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(19092799006)(366016)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?2B6//teDm5q8mcdvPkyPcLLDoWbmOetGJMKAHQ61vo0ASceyeaXKPP79aUOy?=
- =?us-ascii?Q?OmSwzmAynZU3iOawGdhryX+yEVafBlBeNX3i30kjiilLIXFdZM0AH2xHwF1X?=
- =?us-ascii?Q?asWpR/QXxMyO4zpeZ5eQh9ekHZ7VMhX3IvO5lgkmgdGXrprMcmr2suYaA/Fs?=
- =?us-ascii?Q?G6lSBpqkEVpZVrdyhnhpgqXhAyjLPnUFeB/JlI4YpmG1BwnlLkAZ5dM2U2Sy?=
- =?us-ascii?Q?uUO39FQ9qS0Wb0hrsNiL8U94zDEL/rIGrDx/b3iLGfp3lPdFcNcsS6bnrFY3?=
- =?us-ascii?Q?mszh6CsCSTwvQmTSx68VNXxaop8rCcjP8boWiUcyug8yD7nzop2e4KynKGvb?=
- =?us-ascii?Q?294yMkm1wL5DHwjZL+lfRpZnhwkFQCsSXU7x0qt7eD31EOg22kzYlpzQrbo0?=
- =?us-ascii?Q?jHPAFpdy2gI8kMMTkDFX1GTI+4y6PFwCMS+lNxBJlqgck4LeMCPiVo2uHyhC?=
- =?us-ascii?Q?cjj5EfwVT5oCSjCw9Sai4in6JsoceKiFPLV3oCyTIUKuMqJNrMiFoBL69kah?=
- =?us-ascii?Q?k/m3yrKZK57c7CzHAmcbrFdFnLEU8cBxYdB5XSffLMgEtu2w9xZhDS6/4jIl?=
- =?us-ascii?Q?HMJDIOJ4gfdCGuQWeta08Vw+gW4VcijBm4q50WPY1wf89rTbKA70qb+UpkBI?=
- =?us-ascii?Q?3kseKpOhoNNH8H/sjI5GILUEOc2S5kXoXzOl83bhFM8OEhK/aFvnCn9Ik0kB?=
- =?us-ascii?Q?cw+dNrPODDJhKhlsWqbVIT5NY/56ojyW8V2jmEMsoNvKBKnizheD2wh59qh/?=
- =?us-ascii?Q?5Q3gvJupBcEx8nFhLJO7E7YzFuZ7eKP+Ag5hoONdrybOznYA8IsAY8rY37OB?=
- =?us-ascii?Q?flSc8ha30vGjerh4w5EJSCHB9kww9OA+GgU5bO7PNKdX4aXa3v+9WObuVvv6?=
- =?us-ascii?Q?KnexdW3bR8YW1SZmJYjt/xcKCcCBk5PJ5+DcpPGTt19ruT9c0MnVKRz8K+Jx?=
- =?us-ascii?Q?hQlvm7SIZmCAv6N9aSsEQM0cdTpuoaZR870EV+Y0Qeyvdhj1jlXFEXdpADW4?=
- =?us-ascii?Q?tFm8P1k5ZZu9L6cuxrnEPcUHXUjYktmCp4byO0KfeJjS8UrFLTsGvFr2zr48?=
- =?us-ascii?Q?QwdlAaVBtxv0osLri7JwOLBgDcTtFKNH1qp9E0+ip5S+AgNdxIgHblmYyRU5?=
- =?us-ascii?Q?kBjp4x8wbz7Y2F6BGJZ/tHnIAPXM7t5qjRF3cQ1UCW0i7jdekjjtZEL1KDLz?=
- =?us-ascii?Q?i6XMan9uwE90dvhnJ4EY6l09WpkFwkn4S7d1mfLFgqscl/3JLwMh70Q8xdoU?=
- =?us-ascii?Q?REmhyir6ZgPh0IpixbGIntBh+rjzKeJpE0qBprRgIJBjffSJWNGdN1dbHC3c?=
- =?us-ascii?Q?P0PrlYD7CKrP/ABl+s1PI/JaKc1TQ9M5saB5wInWcQbcJQbIAuUIikVLKTBD?=
- =?us-ascii?Q?9/fjfgAkSujlIRvIuhO4YJQEvS4ugK8RtxhwBgN19QFXpEULZhZYaU9leCz0?=
- =?us-ascii?Q?b+We0znN2UVqUFfg3x5E44sCZvyJ0sIAgEQ/H22sOIXIB+LHlVAwLsjzGlh+?=
- =?us-ascii?Q?6lEGgpG3HfPUdOqhhYGbBMUiqp19thM7wt9yRQmkXl/J9Pb1wWf3135rv/O1?=
- =?us-ascii?Q?nYkIvRw1fT3gCLAND89p1RhwbaRDICL1rVEy+JPrylWiZBxqydy0+eRBVagD?=
- =?us-ascii?Q?RO4YUjmmYGYgYn+brkEpB+9b9PuaJ7JTokbWH3WRSitS/Fo189lT+RwOJz1/?=
- =?us-ascii?Q?WQzFC7g5dG7Ew2TCvJ/uTeIUTM+GPCtYVtmA0dB0reqnpaWh?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B342BE639;
+	Fri,  6 Mar 2026 05:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772776508; cv=none; b=mzZ9Rp+Vj/l8Rn9YxeCN4H07Us3LTPL59vUby/f6PwXa70j1mo9ruK2vSahYQZKhI/R2T8w5od8YE+wQYpV3VVYHAkY1CSgEF1604tKWO0F2/p2D4m/m3mLKfT1vPol/58C1M3NfMuDx6EiWNNVoxEtBjaHEWUStjTJBiSu/dVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772776508; c=relaxed/simple;
+	bh=GUiuj7AaGmQpmRYyqhKAtU/WnjAxfsGJW6g2GYPPo9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pSKMFv7lWWOMalo49l2D5zrZeVWBZdayhI4MFozo2FyGGEzHEfj2WC71Gmj8KCTomkpuSjkx3ifLqO7jrfQnUl5aYirDT+rjo4EWG+/9DAi1Wkb+yRKnuJg7fKGdtQexp7Ya3pDwJcLj1JGLxF3xPF5AQJ5tbunH6GLnHjuhkM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IW7pXcC7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837A1C4CEF7;
+	Fri,  6 Mar 2026 05:55:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772776507;
+	bh=GUiuj7AaGmQpmRYyqhKAtU/WnjAxfsGJW6g2GYPPo9A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IW7pXcC7Gacp2Gysrx5tfJg8SAu4O8J32A05d3jIcxRdmEeZmqPXGCvK2Jls9vGcl
+	 3NQLOG2HZBLQhGivk6C5FjU778Pfc4afWO38ViPAy5cy9EFYXe3uPb+9nLOifQUrP/
+	 Q3zSC0ZXI8wGewTCsI9PJRl5UwPT/XD8u6HUf2IdIgadOXr2MY24ylYA0X3EqK66Nj
+	 oY8oFmPXTLANw9E58LDEHK3ohqMYR17IXiKYTaPr9zHCMFp8XqyIjvNXwrI7zvOdXx
+	 uj94oWjEOiHk8ygzLEKRB5iC/U/EOdriIy4TQikAzImhmScb1XC7B2W2Ec2rag1+sa
+	 kMjaUfiRXYkZA==
+Date: Fri, 6 Mar 2026 11:24:55 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v8 1/2] net: mhi: Enable Ethernet interface support
+Message-ID: <myiqilk7t6yvqrjx5ew7srbtqh6xbk5jdd5pjqfeanwh3ymbdu@xy6lledx4hha>
+References: <20260212-eth_vdev_next-20260211-v8-0-0974b3a8d61b@qti.qualcomm.com>
+ <20260212-eth_vdev_next-20260211-v8-1-0974b3a8d61b@qti.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: febb6bf6-02b2-4ea2-8b98-08de7b443795
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2026 05:50:05.3655
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hiqhMzlbl20/x8GTQ8FgFEPrM+y4pGZDYOEWPp+lwiHcZ7dzEPBCtAquYbuiD0MrS+LVADNR8AtjiPC2Lso5Aw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB11189
-X-Rspamd-Queue-Id: 2AC0921BD27
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260212-eth_vdev_next-20260211-v8-1-0974b3a8d61b@qti.qualcomm.com>
+X-Rspamd-Queue-Id: B603921BDA4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264680-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264682-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nxp.com:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qualcomm.com:email]
 X-Rspamd-Action: no action
 
-> --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-> @@ -20,6 +20,8 @@
->  #define ENETC_SIMR	0
->  #define ENETC_SIMR_EN	BIT(31)
->  #define ENETC_SIMR_RSSE	BIT(0)
-> +#define ENETC_SISR	4
-> +#define  SISR_TX_BUSY	BIT(0)
+On Thu, Feb 12, 2026 at 04:30:22PM +0530, Vivek Pernamitta wrote:
+> From: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+> 
+> Add support to configure a new client as Ethernet type over MHI by
+> setting "mhi_device_info.ethernet_if = true". Create a new Ethernet
+> interface named eth%d. This complements existing NET driver support.
+> 
+> Allocate MHI netdevs using NET_NAME_ENUM to reflect kernel-enumerated
+> naming. This updates the reported name_assign_type for MHI net
+> interfaces created by this driver, aligning naming semantics across
+> existing and new devices. No functional or interface naming changes
+> are introduced
+> 
+> Introduce IP_SW1, ETH0, and ETH1 network interfaces required for
 
-Sorry, I only realized I hadn't removed this debug register after
-sending this patch. :(
+IP_SW1 is not related to this patch.
 
-I will remove this in v2.
+> M-plane, NETCONF, and S-plane components.
+> 
 
+The main thing you want to describe in description is that IP_ETH channels are
+representing the Ethernet interface of the MHI device for which the driver is
+also creating the netdev interface so that the host can access the Ethernet
+interface of the device.
+
+> M-plane:
+> Implement DU M-Plane software for non-real-time O-RAN management
+> between O-DU and O-RU using NETCONF/YANG and O-RAN WG4 M-Plane YANG
+> models. Provide capability exchange, configuration management,
+> performance monitoring, and fault management per O-RAN.WG4.TS.MP.0-
+> R004-v18.00.
+> 
+> NETCONF:
+> Use NETCONF protocol for configuration operations such as fetching,
+> modifying, and deleting network device configurations.
+> 
+> S-plane:
+> Support frequency and time synchronization between O-DUs and O-RUs
+> using Synchronous Ethernet and IEEE 1588. Assume PTP transport over
+> L2 Ethernet (ITU-T G.8275.1) for full timing support; allow PTP over
+> UDP/IP (ITU-T G.8275.2) with reduced reliability. as per ORAN spec
+> O-RAN.WG4.CUS.0-R003-v12.00.
+> 
+> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+> ---
+>  drivers/net/mhi_net.c | 67 ++++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 56 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+> index ae169929a9d8e449b5a427993abf68e8d032fae2..aa65b267d5c06c76482eaede097c500edc1cdf7f 100644
+> --- a/drivers/net/mhi_net.c
+> +++ b/drivers/net/mhi_net.c
+> @@ -4,6 +4,7 @@
+>   * Copyright (C) 2020 Linaro Ltd <loic.poulain@linaro.org>
+>   */
+>  
+> +#include <linux/etherdevice.h>
+>  #include <linux/if_arp.h>
+>  #include <linux/mhi.h>
+>  #include <linux/mod_devicetable.h>
+> @@ -42,6 +43,7 @@ struct mhi_net_dev {
+>  
+>  struct mhi_device_info {
+>  	const char *netname;
+> +	bool ethernet_if;
+>  };
+>  
+>  static int mhi_ndo_open(struct net_device *ndev)
+> @@ -119,11 +121,29 @@ static void mhi_ndo_get_stats64(struct net_device *ndev,
+>  	} while (u64_stats_fetch_retry(&mhi_netdev->stats.tx_syncp, start));
+>  }
+>  
+> +static int mhi_mac_address(struct net_device *dev, void *p)
+> +{
+> +	if (dev->type == ARPHRD_ETHER)
+> +		return eth_mac_addr(dev, p);
+> +
+> +	return 0;
+> +}
+> +
+> +static int mhi_validate_address(struct net_device *dev)
+> +{
+> +	if (dev->type == ARPHRD_ETHER)
+> +		return eth_validate_addr(dev);
+> +
+> +	return 0;
+> +}
+> +
+>  static const struct net_device_ops mhi_netdev_ops = {
+>  	.ndo_open               = mhi_ndo_open,
+>  	.ndo_stop               = mhi_ndo_stop,
+>  	.ndo_start_xmit         = mhi_ndo_xmit,
+>  	.ndo_get_stats64	= mhi_ndo_get_stats64,
+> +	.ndo_set_mac_address    = mhi_mac_address,
+> +	.ndo_validate_addr      = mhi_validate_address,
+>  };
+>  
+>  static void mhi_net_setup(struct net_device *ndev)
+> @@ -140,6 +160,13 @@ static void mhi_net_setup(struct net_device *ndev)
+>  	ndev->tx_queue_len = 1000;
+>  }
+>  
+> +static void mhi_ethernet_setup(struct net_device *ndev)
+> +{
+> +	ndev->netdev_ops = &mhi_netdev_ops;
+> +	ether_setup(ndev);
+> +	ndev->max_mtu = ETH_MAX_MTU;
+> +}
+> +
+>  static struct sk_buff *mhi_net_skb_agg(struct mhi_net_dev *mhi_netdev,
+>  				       struct sk_buff *skb)
+>  {
+> @@ -209,16 +236,20 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+>  			mhi_netdev->skbagg_head = NULL;
+>  		}
+>  
+> -		switch (skb->data[0] & 0xf0) {
+> -		case 0x40:
+> -			skb->protocol = htons(ETH_P_IP);
+> -			break;
+> -		case 0x60:
+> -			skb->protocol = htons(ETH_P_IPV6);
+> -			break;
+> -		default:
+> -			skb->protocol = htons(ETH_P_MAP);
+> -			break;
+> +		if (!!mhi_netdev->ndev->header_ops) {
+
+Why not just if (mhi_netdev->ndev->header_ops)?
+
+But you should really check ARPHRD_ETHER type here and below.
+
+> +			skb->protocol = eth_type_trans(skb, mhi_netdev->ndev);
+> +		} else {
+> +			switch (skb->data[0] & 0xf0) {
+> +			case 0x40:
+> +				skb->protocol = htons(ETH_P_IP);
+> +				break;
+> +			case 0x60:
+> +				skb->protocol = htons(ETH_P_IPV6);
+> +				break;
+> +			default:
+> +				skb->protocol = htons(ETH_P_MAP);
+> +				break;
+> +			}
+>  		}
+>  
+>  		u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+> @@ -306,6 +337,9 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+>  	struct mhi_net_dev *mhi_netdev;
+>  	int err;
+>  
+> +	if (!!ndev->header_ops)
+> +		eth_hw_addr_random(ndev);
+> +
+>  	mhi_netdev = netdev_priv(ndev);
+>  
+>  	dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+> @@ -356,7 +390,8 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+>  	int err;
+>  
+>  	ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
+> -			    NET_NAME_PREDICTABLE, mhi_net_setup);
+> +			    NET_NAME_ENUM, info->ethernet_if ?
+> +			    mhi_ethernet_setup : mhi_net_setup);
+>  	if (!ndev)
+>  		return -ENOMEM;
+>  
+> @@ -380,10 +415,17 @@ static void mhi_net_remove(struct mhi_device *mhi_dev)
+>  
+>  static const struct mhi_device_info mhi_hwip0 = {
+>  	.netname = "mhi_hwip%d",
+> +	.ethernet_if = false,
+
+Default state is false isn't it? No need to set it explicitly.
+
+- Mani
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
