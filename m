@@ -1,97 +1,61 @@
-Return-Path: <netdev+bounces-264663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264667-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLM/AaxMqmmIOwEAu9opvQ
-	(envelope-from <netdev+bounces-264663-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:40:28 +0100
+	id F+NMGWlQqmktPQEAu9opvQ
+	(envelope-from <netdev+bounces-264667-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:56:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735DD21B373
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:40:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B76E421B53F
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C20AC301B14A
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 03:40:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B6853029E51
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 03:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA2A36BCE6;
-	Fri,  6 Mar 2026 03:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHxeyGom"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C1236C586;
+	Fri,  6 Mar 2026 03:56:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB20248873
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 03:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279C815B971;
+	Fri,  6 Mar 2026 03:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772768423; cv=none; b=cmvEIzJUaeETUrviTAXk1IPzmsXj3JEnm0xcJrW6hI19TWgUYljORfs7kkEdz2/pTRn4S8hiu5ZI6hNBAUgkUTOZMGJd2kKlvhP2LRJKHxD+Sho0g/cHPqnX9QiMDYDUQGA/LubN3/32wWkVIg7T1+e7uWRz5U48Vx01VZJiyMA=
+	t=1772769379; cv=none; b=C/02MmbsVG/McZgs3amxEbsW9ozurEo1aYufDP5B/4AvqIJmAk7D47eitabc8txxg8JSrbe2+SbdTiCSzIs3Ip6Vatjw1H1klYUbkTobj+pgGPsuHOCYlw9BQMmi+cpfIVgHEMGG3gAoiFNotO/sBW6olG01NU+EREKJsjF/IJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772768423; c=relaxed/simple;
-	bh=ZKGQMmynGH72RNGVGSJeWjju/XTm1pbnlX08xLpX844=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a01MrSele6s2HWz6bKth/F5qea13gZnZ22nTw429qrYkUFNTLv77JerUQ7JJf9WylTY0MSbdfGC7UfSOrvyJzBfOVvDGuKjjTzW60Ei7HggqRLCPeglJptCUCfyZNYHB8WU1q5cSEbtKECxeju0CFSvL6Oqw/SvSu47FLH23SX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bHxeyGom; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-899e87b04d8so97094336d6.3
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 19:40:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772768420; x=1773373220; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=myrPwAZMujLUe8MJ6Ba22b/AUfkQBCrFe4aRwPYkeIA=;
-        b=bHxeyGomsLiPvjHUQ6QJ5EM1oIHaa6BIC4AJtQoQaXaBZ9IPHK0ZHoK2sYyxqv/Mpq
-         iMeSf1gUN0TQQ6cbqwPb1qX2V3W74vuBDfXuy6i8RBEIR1SwYhU3I1RZREIW/8lraMzO
-         pYwNfNPzvwFZSj/pOQG13U7lsmxYy/zeTsLBnPM9RQd3cWqDKe5YsNYkVubFqZ8Z/a6c
-         kuLUYQyqVi/UgDhjHtqdJ/4CvPdiCaUr/aECTz4WrbKFHFAXA71ihqmxEPHPGoHCp/6/
-         X+sO0VQFVsl2j7j9p/BeRVja2KourQVop7op3Vm9rzFa30CSaZjbU3UititmedSpcvjf
-         mGHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772768420; x=1773373220;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=myrPwAZMujLUe8MJ6Ba22b/AUfkQBCrFe4aRwPYkeIA=;
-        b=pNNHCCxlqA+nKPM5HY12QL7h20aXvsBOPl6DOgTXQHw3altYmyaQA0Axur+QN3U8fF
-         Gp33tk08RqeIT6isOZPvptRp9dQHKyCdyZP0BMYodRYWYAR0irr+yn7CM8rl+dFi5x57
-         TgRqXeJ/ADu29yjC6Rr0/dlywd0ChfHn9JkQCIRj+aJuN1jub5ewFtq4dbhPVlv1SjE2
-         6ChoM3TSDvjKygTRvt7V4Cgz1Q1Oi6QNzx5gf/ZVJ3fqvZVNmvNuBpBWtTz2+JtDbBHe
-         b/ofCAXwJf7NXJ0YYdSO634jX+BpEJV3tO24X1x22V/e86sPCKnUb8z1gFweRG88fjLT
-         b3zQ==
-X-Gm-Message-State: AOJu0YzzLAdNBTE6k7fFiQ5rwh6ZEITnT9QQa+tzm591ModsKBtEk3kh
-	oF7IAL7bKcsCTc563KGF7B+hu+W3AelDINsVKoDK7xMSJXIAiV73m846F89isaSp
-X-Gm-Gg: ATEYQzz0owNzTl3PxvDO4SefS33ugDjCJYkpJW/z/xUNYHVmYqLsUW+BKpR6Ug91R/a
-	pcbQruPFLEyYi/zNEZzMcT0ndJjGbmIvEHmNwDYGVxEGFHXawFE8BEGysMq7qrR00lBMEkZgcfv
-	u9Om6kuk/AYILrSXfTPBkpaCUPH+QEFSk4evKP1f/vp56aShP4KjDFsryc/VlKhCbSPo4HCEA+A
-	coscpeZuQPuZ4EDQQVIIBwF3rUGfLl7GJDmJ7WTbeg9O4sbPuPmMmjoxcao0qa6SFYR2jI+cMDi
-	noLxIeUlNpIDHuFNHD+U9bBoiO2FMMoGKfYCF9I7k3OYveQP6SY92wMzwNR1sJAMEwAynbgcXpL
-	+EYn7LyS0G7PZ7QsdHHNM8wBGDYtM1jubtH2QUvLOVipHOQq2f7vzB6IAC8AncwKh8+ixj4ANBS
-	hTAcGLniYkQtCN8P5W6ANb2zDcLtTs1jK88AI3Osgcf8ERQqFsYVXSJQ==
-X-Received: by 2002:ad4:5769:0:b0:895:c06:8cbf with SMTP id 6a1803df08f44-89a30c2b8b3mr7786186d6.62.1772768420459;
-        Thu, 05 Mar 2026 19:40:20 -0800 (PST)
-Received: from I4-L-HQH5357-01.ad.psu.edu ([130.203.159.160])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a316f8228sm2158306d6.38.2026.03.05.19.40.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 19:40:20 -0800 (PST)
-From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1772769379; c=relaxed/simple;
+	bh=o6rF9s4zSbCq3JBi/YYnPZ8Kt0rMmZQ12sel9dbCuWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EYoNfC0B7X2Tg6lx5Sr+HVRI9D8zZoN+0uNV9A6e4LaO0+V/Y5Aq7ie0cHiPSR5KEEVQ5WfzQ3fo1kNETu2D9k7j19wx2olfERsnNG1hWrLdYIWSzqq57VQDuxAMYZn8IJredHvIndy6sVqMLfRoca+TJHSRdujgGZwd4/eeHCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
+X-QQ-mid: esmtpsz16t1772769356teb805c45
+X-QQ-Originating-IP: 0WbQ8Cs/6XDkzEfM2+B6aawAkwXW+iDEsaPKq+113Ys=
+Received: from localhost.localdomain ( [119.167.27.18])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 06 Mar 2026 11:55:54 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 2877752370245726965
+EX-QQ-RecipientCnt: 8
+From: Jialu Xu <xujialu@vimux.org>
+To: xujialu@vimux.org
+Cc: brgl@kernel.org,
+	kees@kernel.org,
+	krzk@kernel.org,
+	linusw@kernel.org,
+	linux-gpio@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	gregkh@linuxfoundation.org,
-	horms@kernel.org,
-	jirislaby@kernel.org,
-	shaojijie@huawei.com,
-	jiayuan.chen@shopee.com,
-	alan@linux.intel.com,
-	Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-Subject: [PATCH net v5] serial: caif: hold tty->link reference in ldisc_open and ser_release
-Date: Thu,  5 Mar 2026 22:40:06 -0500
-Message-Id: <20260306034006.3395740-1-shuangpeng.kernel@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	netdev@vger.kernel.org
+Subject: [PATCH v3 0/3] Remove <linux/of_gpio.h>
+Date: Fri,  6 Mar 2026 11:53:39 +0800
+Message-ID: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <7187C401290C256B+20260304084808.440955-1-xujialu@vimux.org>
+References: <7187C401290C256B+20260304084808.440955-1-xujialu@vimux.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,90 +63,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 735DD21B373
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: OCUSzqUNJvDoVsljY+TJkdVj+DRlD3h4OlCdW+Wc2TO+wpwMuvmK6Kqh
+	UzNwBOQPzYTWYdEHVPNRIXpE7fzNC5kG1mPbHMnT/4xs2ufW6GsO0cDv9OpVL1OsyB57aUg
+	Hzj1nVDIHB7hJeOAH57fYV6C3VwxlGntIHHr6GoatZYPvig1tGiO3SvZ7A1ZRvzHfs1PaMA
+	qGx1mNsLY4V6fC59sYJhPjPHB84YyN36ESh27a7lts8ZyqAZ7yFAcEjRpKAlcHDq7qw0Oaf
+	W/AKuKQ1CY/XkZlEaDEvlMdC/sid/1GNbTgy1CbTTlpjyD34Lf4EZebJnoMSKDOdfMn4HZy
+	tmvMqqp7X8hDzWoBIZbLJKCL2aJXfEwX/DRBXlEcGxAstIGzwybf/rcd9VfCxeJ9yz4QJcp
+	IxGgCOrsDxm03Z+bTorKMTaL+fTzyWBRD30q3qCV6TwBjr56Pzv5pmmxGky/Fgj9rR7c4/i
+	4iI6C1PpwiJd1M2uJHOKE36Yc7unFTgY3Wb5O38VBkSp1Xrw4rtLWOpKpkZOntOwvhJwcvH
+	YRaNGKDpMOUdYAq/QujJXG4LegdLpigog53v/SqBBPEXANC3O2NHk+fabxissF1AHoB8Y5I
+	a3QZ1D3bWOYsxmfV8NsKtndY8o6/985josZ0x7PpAuw3pfNsiXt0EfQIHU40+Fs9woe+NHR
+	4tJl4Ck7gWoHlprOW29kIH6C2nFYE4RAD5hLbJagGL71+tv5IdKDK/qou0R7Z6C0OMLvkCu
+	mIZmd4/V5FZHZux/x/gtBJP22NkVqRRFr51QShVOc6upJ4mCNaFdzNJJHKGmlIf+8rKcsss
+	lZcDFF418+aZUszlNaCBeCNgt340v4QQRu+W5nVacrDYnItgRaZYmLFCNpEigLYw3MgtGJI
+	JAh4KpPqj4kW1ENqEucene0dtctmZrcxzlkyEi0AXQFqx0RV7Yx8O5NW0E8knf8tBHzqejn
+	YlolI3oXDexAeFo65/de9pIUe7hKRN1h5Ygw96CAyu45obby3FVEoy7xw3c4ezg7EoCX75u
+	LkSN05Pw==
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: B76E421B53F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-264663-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,lunn.ch,linuxfoundation.org,huawei.com,shopee.com,linux.intel.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.991];
+	RCVD_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264667-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
-A reproducer triggers a KASAN slab-use-after-free in pty_write_room()
-when caif_serial's TX path calls tty_write_room(). The faulting access
-is on tty->link->port.
+Convert the last three NFC consumers of <linux/of_gpio.h> to the
+GPIO descriptor API, then remove the deprecated header entirely.
 
-Hold an extra kref on tty->link for the lifetime of the caif_serial line
-discipline: get it in ldisc_open() and drop it in ser_release(), and
-also drop it on the ldisc_open() error path.
+Changes in v3:
+- Expand commit messages with more detail. (Linus Walleij)
+- Add missing Signed-off-by. (Linus Walleij)
+- Remove include/linux/of_gpio.h entry from MAINTAINERS. (Linus Walleij)
 
-With this change applied, the reproducer no longer triggers the UAF in
-my testing.
+Changes in v2:
+- Add rename quirks in gpiolib-of.c for s3fwrn5 legacy DT properties
+  (s3fwrn5,en-gpios -> en, s3fwrn5,fw-gpios -> wake) to preserve
+  backward compatibility with old device trees. (Linus Walleij)
 
-Link: https://gist.github.com/shuangpengbai/c898debad6bdf170a84be7e6b3d8707f
-Link: https://lore.kernel.org/netdev/20260301220525.1546355-1-shuangpeng.kernel@gmail.com
-Fixes: e31d5a05948e ("caif: tty's are kref objects so take a reference")
-Signed-off-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
----
-Changes since v4:
-  - Fixes: reference e31d5a05948e ("caif: tty's are kref objects so take a reference")
+[PATCH v3 1/3] nfc: s3fwrn5: convert to gpio descriptors
+[PATCH v3 2/3] nfc: nfcmrvl: convert to gpio descriptors
+[PATCH v3 3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
 
- drivers/net/caif/caif_serial.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-index b90890030751..1873d8287bb9 100644
---- a/drivers/net/caif/caif_serial.c
-+++ b/drivers/net/caif/caif_serial.c
-@@ -297,6 +297,7 @@ static void ser_release(struct work_struct *work)
- 			dev_close(ser->dev);
- 			unregister_netdevice(ser->dev);
- 			debugfs_deinit(ser);
-+			tty_kref_put(tty->link);
- 			tty_kref_put(tty);
- 		}
- 		rtnl_unlock();
-@@ -331,6 +332,7 @@ static int ldisc_open(struct tty_struct *tty)
- 
- 	ser = netdev_priv(dev);
- 	ser->tty = tty_kref_get(tty);
-+	tty_kref_get(tty->link);
- 	ser->dev = dev;
- 	debugfs_init(ser, tty);
- 	tty->receive_room = 4096;
-@@ -339,6 +341,7 @@ static int ldisc_open(struct tty_struct *tty)
- 	rtnl_lock();
- 	result = register_netdevice(dev);
- 	if (result) {
-+		tty_kref_put(tty->link);
- 		tty_kref_put(tty);
- 		rtnl_unlock();
- 		free_netdev(dev);
--- 
-2.34.1
-
+ MAINTAINERS                      |  1 -
+ drivers/gpio/TODO                | 28 ----------------------------
+ drivers/gpio/gpiolib-of.c        | 31 ++++---------------------------
+ drivers/nfc/nfcmrvl/main.c       | 46 +++++++++++++++-------------------------------
+ drivers/nfc/nfcmrvl/nfcmrvl.h    |  4 +++-
+ drivers/nfc/nfcmrvl/uart.c       | 23 ++++++++++++++++-------
+ drivers/nfc/nfcmrvl/usb.c        |  2 +-
+ drivers/nfc/s3fwrn5/i2c.c        | 55 ++++++++-----------------------------------------------
+ drivers/nfc/s3fwrn5/phy_common.c | 11 +++++------
+ drivers/nfc/s3fwrn5/phy_common.h |  5 +++--
+ drivers/nfc/s3fwrn5/uart.c       | 45 ++++++++++++---------------------------------
+ include/linux/of_gpio.h          | 38 --------------------------------------
+ 12 files changed, 67 insertions(+), 222 deletions(-)
 
