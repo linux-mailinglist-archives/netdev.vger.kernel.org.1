@@ -1,199 +1,211 @@
-Return-Path: <netdev+bounces-264883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NCyE8AJq2k/ZgEAu9opvQ
-	(envelope-from <netdev+bounces-264883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:07:12 +0100
+	id gBEOM0AOq2nwZgEAu9opvQ
+	(envelope-from <netdev+bounces-264884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:26:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D48225A50
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:07:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47083226179
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 18:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D3423013D47
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 17:07:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C941309109D
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 17:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9483AE708;
-	Fri,  6 Mar 2026 17:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5675841160E;
+	Fri,  6 Mar 2026 17:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xhi48k+K"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rT+ENp9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6039A285C91
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 17:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E21F301016;
+	Fri,  6 Mar 2026 17:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772816829; cv=none; b=qGUwyTMy+WvYO/YTDNeuhZHjxJQrZeKOibRjdGGTlNfGZQHzRGD7KhRcGWeI9CII1rtEIi/Zxl3wJ7eqofJ1nY+LFtFsKmoQmkPSWDt78sOJX3vgWGYWOgxHCg8cr30r5UcuE8RlhvLL92Qx//mB6fAZuelDdowdPlIczCDh/Co=
+	t=1772817255; cv=none; b=BauRc3VQU+Ls/1BuOsD+B6v4jjx95F8n1PqfyczmcECjE4kpwnUCmuHfqx0dqspQEUKWy9qAIlVlyhxBpB2jscdPjmui8X4vqVSmxFxG0YlVx81xy/Ou1BCZnZPku116xXfB7OVcmb3wPdtp1JnOzNK+sDaVQ/zHXb7PkKZFHL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772816829; c=relaxed/simple;
-	bh=rOfy8wDuOSu8y8pr/Cvv0Qci/pxPShgpI/D6IioqFB8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A2adRTpDHWXEnITsuRtXbWvfuZt31GYuJ//46AlEbtE+YDNPgyWsJkCi5AeMfVqQr8nnp//YfdovceQCNL9a0gxojLwdlwdaCa+OZ6VwWYRCwfoVG08c7YIqi6RoFKlkGgM4+72KMP9Mnz7RM70U177l2FldZ8tA8P0WS+/p8l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xhi48k+K; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-35691a231a7so5868191a91.3
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 09:07:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772816828; x=1773421628; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ExtvjVB4+EytPuBHPXzj1SFBmx/1CWZqQrsowLFQdM=;
-        b=Xhi48k+KzJP++mpOHiSM8tR04+aFKaojPeQ73Z7CJryZlN9+EzmV5tjE7jdoy9w/qL
-         tsOmBREU/vCoobFXMfUrrRfo1oMB8XclaN0AxwnRPb4kF/sjC4eAaVg3IKpQzov1DU8U
-         yodeEDGTa6yvYc7f+EgmlHmX3NNfYCNigrTlp3W8lQ5Lcy2qJ8Rk3qjzKCPn0V/5xpIW
-         2qPXnZLuUIVx5cyxH6zd06WXpauGnQrsgwCdjDceGXXUTRuTCQoC3NfrWQPZd05on23I
-         vTZY3TObKXxY1ly98EZFhXj1wnfs6o9piwbj21PicGPZUXXf1/AeEooTjcE+jPXPS3ZM
-         iApA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772816828; x=1773421628;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ExtvjVB4+EytPuBHPXzj1SFBmx/1CWZqQrsowLFQdM=;
-        b=tLYnFJLZq+pqakdZ68DbTcMXR+FrfWQLiYLSUojnRDNvuHeU+x8JtHjl7NqMpbt93R
-         ni9LBqGT3BcIazzeXaN5cY0XDMa3j+maI0PxW3xW9rt4oXzpP+bQsoGv7EIHvHtRiJUd
-         Wk55G8DDl0Hq/0r+kh9S3TzyuVQYUeGVnrlzeSm/b3t9ePrSvLxb3tg6DEkUQ9bmdwGj
-         fMDzNQhPwoXdbveLGHoHgdIVVRzGzGddchocvrBDFKSaNGhKAtq655+JbzeeM2qhu7hi
-         q0v+M/qlyhEtc5Ag5Kbbv0N9he7jkn7UyfFMbXJjjOeqLs189lv8hb0fKmR31QzUbj7u
-         Ilrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxN+3vvM2HFnhVnC9zsCKSe+2TJN9XwnAKGLBmzBp5ildPGSEgQYF+5wN/pzEvSWnoD6cqZFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy51pP3ejdhvwbhV8cWrRYGH+njdeeu0YivnNe1hs66wuJ0gXb0
-	tCEx0hMppWmozp0Qb1ANVQOK4R/If/2c/pGlOAbrXoHKgEeGh938Gzo=
-X-Gm-Gg: ATEYQzxSv1I8I4zzTfMZ02S6HKZM6Da+6IDBsaa4mjoGoqr/oyGy28DAc6JsxtGyPwi
-	TqMz2scnZ4siz1y+VL6RPACvPolCQNOfxgvLY5H8XlNiwWLQG6CxRMjCt3YMEPoWz3tQSkaJr/l
-	ulUX2Xm46uszc2l9OsiZBm/VswbccmOjAdht5CZBXAVsSdbhSTDjKH2IQIwc6qBGXo82i59hTNt
-	ISzlnLV9lQUCXp5/JQVB6xoSlr3Us4fL1bFJzAGkZVTUGKQrGkPTgp0iNIBIJJoz1lXdlFWVsxx
-	w0fbcarZCCsEktooWlcyEx6hymelVmR03YsjCBiWIrKmZFvA8dXwEtd/bIVC+JiJMaD4nONR1Nz
-	T0z58R7iddUhsHojdKSkh7rRl8FU97Uk4HSecjQiwmHj9CJo6BRM7UfDoRvKnRJwjTHbuTv+g6r
-	CUEtMRkBg2qwiCuoPJXsntd4b5XknC34h68UFN0+SrKBJhdlxL64SiYWUcZY+sFg==
-X-Received: by 2002:a17:90b:4c0b:b0:356:35a5:4a64 with SMTP id 98e67ed59e1d1-359be21a64amr2430433a91.4.1772816827521;
-        Fri, 06 Mar 2026 09:07:07 -0800 (PST)
-Received: from at-Standard-PC-Q35-ICH9-2009.. ([171.61.164.134])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359b2de79f6sm5943996a91.9.2026.03.06.09.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 09:07:06 -0800 (PST)
-From: Atharva Tiwari <atharvatiwarilinuxdev@gmail.com>
-To: 
-Cc: Atharva Tiwari <atharvatiwarilinuxdev@gmail.com>,
-	Vincent MORVAN <vinc@42.fr>,
-	Paul SAGE <paul.sage@42.fr>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] tg3: replace placeholder MAC address with device property
-Date: Fri,  6 Mar 2026 22:36:55 +0530
-Message-ID: <20260306170657.39384-1-atharvatiwarilinuxdev@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1772817255; c=relaxed/simple;
+	bh=sC0UA3HGh+vvY+glSh0Z1KBEsW7LssAg4KQrcg3e2HM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=S4zucfdPxCFoI4zlV/69v52tfoGhHYxtYp+rDEmCJ5Di68I8vGsFcr30GmckQh1wbqsrBPrbReKMvc1WIj5IUgwyLmitWzGM7n7NwGSjfusVmf6I8e7NJXtVjR9wHpjoQEPsp8Z6A9Mk5wTEZMirBWNMr8iPeyMoVhymgIdsZlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rT+ENp9n; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6265G3jX2966823;
+	Fri, 6 Mar 2026 17:14:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=zqF2tgZOu4+g9WSY2jpKPjaKdyyB
+	itdYIpnUb0kkSb8=; b=rT+ENp9npbs9xC1Yq5iL4ucDCmHUpZhXExy4fkTiwxeD
+	Nuicpbx7u8DiiNHopqlphWbGCwJsh1hIwqro+MUOvxmFbksdNtsLl14T4hgy6jBi
+	eL1TuP53hZMHgO9+msdiDWyAgm/CiWF1EUsyWMJsys+RaOneFJxK2AaipmDLHxgl
+	P7jwixcZHlk+X9bx9yQOAEQjgAKG36M5OWOTnzxtZmgjaYio3XoPM76CbMPY5qj8
+	udLbJxl1it1Ar/QpXgGnBHhdhD2V7v9H7fg72KMJdFd5YjjXb79LLlCUd3UGbd7n
+	Y3LQsQ4Nbt8g1C/WtaG5Mx3I5bX533aLvBrNwbitFw==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckskd9mje-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Mar 2026 17:14:10 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 626DFfFu003201;
+	Fri, 6 Mar 2026 17:14:08 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmb2ygvm9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Mar 2026 17:14:08 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 626HE4k027918700
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Mar 2026 17:14:05 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D51332004E;
+	Fri,  6 Mar 2026 17:14:04 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A42182004D;
+	Fri,  6 Mar 2026 17:14:04 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Mar 2026 17:14:04 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH v3 0/2] PCI: AtomicOps: Fix pci_enable_atomic_ops_to_root()
+Date: Fri, 06 Mar 2026 18:13:57 +0100
+Message-Id: <20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A4D48225A50
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFULq2kC/2XO2wrCMAyA4VcZubYj7dhBr3wPEVm76AJuHe0sk
+ 7F3txuCqJd/Qj4ygyfH5OGQzOAosGfbx8h2CZi27m8kuIkNClUuJRbiytNlMFyPdvCipKrAioz
+ RmEE8GRzF/cadzrFb9qN1z00Pcp2+IYnfUJACBTUmr+q81IWi4537x5Sy7lJjO1ixoD6Akj+fB
+ BWBBmVGe12Soj9gWZYXnNw6he0AAAA=
+X-Change-ID: 20251106-fix_pciatops-7e8608eccb03
+To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Gerd Bayer <gbayer@linux.ibm.com>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: tSUQ0VflUwKyYu-21dE9ye7pIvfZXIQ6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE2MiBTYWx0ZWRfX9AWxr+yUj8zN
+ PSXhdYfOHWIGXToEllsf1uJ8DB4OOBN/Dl8fNTSVqeNX3GIunNwyo/bkBzMOQw9IcsplpHNVC0H
+ jJJZEBSfz4BjVxfzVJaUy49LeasL8SAlAvBWCE+/URaF2cSjWLvEvCcmrY/+hG/er0tH7mustpX
+ 8O//M+J2FlgDAwr17vhEmiiq+atrYidEjzyht+rPoSGhSSYnnyL75cpSWuUKV1w5Vw+ziY61D8c
+ XwG6I+gUzR71r9Lh/UMLogbsRVhWByZ1TwagiCbMlpLsAXP2roDpIZSk/5QZ7NlTZqd8CDSq/rU
+ rBG7+UKj+nsF1InuOBcShfGpr9o0wbtxCJIED+yD9sSI0WBp8+KrfYw/jCjODUzCRpkSV2viNs8
+ Gjn+LQvSqPZdxo2XrV5CUyJGZQgwZfDSNnxD34XukCgtAtZPe8Y8Rko43tdYQhBZBK8aHfk73/p
+ Zxc766MKqnBop4I3Ggw==
+X-Authority-Analysis: v=2.4 cv=H7DWAuYi c=1 sm=1 tr=0 ts=69ab0b62 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=AXBlPMOSM4AmvKD3g9wA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: T7KQx6Fzn0zi_m8NhBWvjPqEaQu8ZwtY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 suspectscore=0 phishscore=0 clxscore=1015 priorityscore=1501
+ adultscore=0 bulkscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060162
+X-Rspamd-Queue-Id: 47083226179
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,42.fr,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-264883-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atharvatiwarilinuxdev@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
+	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,42.fr:email]
+	DKIM_TRACE(0.00)[ibm.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.956];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264884-lists,netdev=lfdr.de];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-From: Paul SAGE <paul.sage@42.fr>
+Hi Bjorn et al.
 
-On some systems (e.g. iMac 20,1 with BCM57766), the tg3 driver reads
-a default placeholder mac address (00:10:18:00:00:00) from the
-mailbox. The correct value on those systems are stored in the
-'local-mac-address' property.
+this series addresses a few issues that have come up with the helper
+function that enables Atomic Op Requests to be initiated by PCI
+enpoints:
 
-This patch, detect the default value and tries to retrieve
-the correct address from the device_get_mac_address
-function instead.
+A. Most in-tree users of this helper use it incorrectly [0].
+B. On s390, Atomic Op Requests are enabled, although the helper
+   cannot know whether the root port is really supporting them.
+C. Loop control in the helper function does not guarantee that a root
+   port's capabilities are ever checked against those requested by the
+   caller.
 
-The patch has been tested on two different systems:
-- iMac 20,1 (BCM57766) model which use the local-mac-address property
-- iMac 13,2 (BCM57766) model which can use the mailbox,
-    NVRAM or MAC control registers
+Address these issue with the following patches:
+Patch 1: Make it harder to mis-use the enablement function,
+Patch 2: Addresses issues B. and C.
 
-Co-developed-by: Vincent MORVAN <vinc@42.fr>
-Signed-off-by: Vincent MORVAN <vinc@42.fr>
-Signed-off-by: Paul SAGE <paul.sage@42.fr>
-Signed-off-by: Atharva Tiwari <atharvatiwarilinuxdev@gmail.com>
+I did test that issue B is fixed with these patches. Also, I verified
+that Atomic Ops enablement on a Mellanox/Nvidia ConnectX-6 adapter
+plugged straight into the root port of a x86 system still gets AtomicOp
+Requests enabled. However, I did not test this with any PCIe switches
+between root port and endpoint.
+
+Ideally, both patches would be incorporated immediately, so we could
+start correcting the mis-uses in the device drivers. I don't know of any
+complaints when using Atomic Ops on devices where the driver is
+mis-using the helper. Patch 2 however, is fixing an obseved issue.
+
+[0]: https://lore.kernel.org/all/fbe34de16f5c0bf25a16f9819a57fdd81e5bb08c.camel@linux.ibm.com/
+[1]: https://lore.kernel.org/all/20251105-mlxatomics-v1-0-10c71649e08d@linux.ibm.com/
+
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+Changes in v3:
+- rebase to 7.0-rc2
+- gentle ping
+- add netdev and rdma lists for awareness
+- Link to v2: https://lore.kernel.org/r/20251216-fix_pciatops-v2-0-d013e9b7e2ee@linux.ibm.com
+
+Changes in v2:
+- rebase to 6.19-rc1
+- otherwise unchanged to v1
+- Link to v1: https://lore.kernel.org/r/20251110-fix_pciatops-v1-0-edc58a57b62e@linux.ibm.com
 
 ---
-v2:
-- Wrapped commit message to 70 characters
-- Removed BROADCOM_OUI constant
----
----
- drivers/net/ethernet/broadcom/tg3.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Gerd Bayer (2):
+      PCI: AtomicOps: Define valid root port capabilities
+      PCI: AtomicOps: Fix logic in enable function
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 75f66587983d..b9950651b20c 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -17030,6 +17030,14 @@ static int tg3_get_invariants(struct tg3 *tp, const struct pci_device_id *ent)
- 	return err;
- }
- 
-+static int tg3_is_default_mac_address(u8 *addr)
-+{
-+	u32 addr_high = (addr[0] << 16) | (addr[1] << 8) | addr[2];
-+	u32 addr_low = (addr[3] << 16) | (addr[4] << 8) | addr[5];
-+
-+	return addr_high == 0x00001018 && addr_low == 0;
-+}
-+
- static int tg3_get_device_address(struct tg3 *tp, u8 *addr)
- {
- 	u32 hi, lo, mac_offset;
-@@ -17103,6 +17111,10 @@ static int tg3_get_device_address(struct tg3 *tp, u8 *addr)
- 
- 	if (!is_valid_ether_addr(addr))
- 		return -EINVAL;
-+
-+	if (tg3_is_default_mac_address(addr))
-+		device_get_mac_address(&tp->pdev->dev, addr);
-+
- 	return 0;
- }
- 
+ drivers/pci/pci.c             | 43 +++++++++++++++++++++----------------------
+ include/uapi/linux/pci_regs.h |  8 ++++++++
+ 2 files changed, 29 insertions(+), 22 deletions(-)
+---
+base-commit: 5ee8dbf54602dc340d6235b1d6aa17c0f283f48c
+change-id: 20251106-fix_pciatops-7e8608eccb03
+
+Best regards,
 -- 
-2.43.0
+Gerd Bayer <gbayer@linux.ibm.com>
 
 
