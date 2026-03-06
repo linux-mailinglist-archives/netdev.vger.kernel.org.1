@@ -1,198 +1,230 @@
-Return-Path: <netdev+bounces-264684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLOKKt5tqmmIRQEAu9opvQ
-	(envelope-from <netdev+bounces-264684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 07:02:06 +0100
+	id IGneOJBuqmkPRQEAu9opvQ
+	(envelope-from <netdev+bounces-264685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 07:05:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0331821BE8B
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 07:02:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AFF421BF1D
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 07:05:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AB5C3017025
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 06:02:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2051303788C
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 06:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688AD33031F;
-	Fri,  6 Mar 2026 06:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C82836E464;
+	Fri,  6 Mar 2026 06:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GIZR7BNf";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="cNp0tLCO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jg6FGjoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5251E219FC
-	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 06:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A6836D9F4;
+	Fri,  6 Mar 2026 06:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772776919; cv=none; b=CLlpiCljIGsf1ooqri07GGfWeW6vBAhEO/vFi3STAkZL21crqcXhs7b63xkXpae0WYdqKMBbpn0r8+Gw7r/vkQSQvwQRLtYE33okCKkBpLOJDvn2U7Tcfhizu4xk7XnHvtj/QCLIln/oLWrDPVPx181zSOXL4R4tjbyK4AF5Zy8=
+	t=1772777092; cv=none; b=KXE27YJHNjxUDiJ26GjELuLvSECv/PQP8bSEXEOTjg9V0BIl1xmXsA9kIWibSqNmfhZWHk0DWyuw7CT7ZaVX4fdZKF43oTJu/mDWceiGbeDD2iUGIcjCAjbRLqlD2ZwWkB03c6ZPGyDE+Jnk7r/hJZHOwf5q0vvCR7PyNfd8ato=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772776919; c=relaxed/simple;
-	bh=GzTLSMPHExwAy+6CUVsKaw1CSSI421JbGQHa7+s9Haw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=iQx2f33wLjDiw3rAx839P8DaAxv3IBYWCDUTmQdD6ugDbtU5dwY+gU8b+N71MZdW9CTh+/T8ot7I3RQaQxmbAXguc4GL/sEZH4veN6lq0ksB1l0uRnpeRf/+p+L/aOXBchdLLBKjoARJwmrKWJ2OBUOiZ1ZtYZ9U+KO+kTC13s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GIZR7BNf; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=cNp0tLCO; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6264aVlk1087383
-	for <netdev@vger.kernel.org>; Fri, 6 Mar 2026 06:01:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	uvxxD5R2g1eKWFZrtyXXoI1KYxWzBTsSDcmN5FvjfNg=; b=GIZR7BNfEcvDTUgK
-	9n6eapf7PspeSBAYS+veW9/JdXbb+Gw9sgLVG5YwqOzgmdvLO562jArO/l8fLpOm
-	v8gjaCKTxUUueU1lQ3d5VfxcgQ1Nw3LKJi9o9lIPO4iQ+3tpC7WndSIsxcqn/Xb2
-	BNcsnczva50mCP5UESTi1/rWnoCGCptrTE03NRt8c8j5FHr2v7NQj589q+eknOtg
-	PXqW0tkEUY1NMN2lg+EISEAqIr+aeGH2/MYnrWcNyrAaLKZlgrpOS3r4NpqAG4Wq
-	6naMb4OMi9z0Dm3q0vVL+a3N89HjolcAhbi0aslOdnsRrg/SoO4gj5j3uSoPc4Es
-	aSMvLA==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cqfg69syf-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 06:01:57 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2ae502a1dd9so66027565ad.3
-        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 22:01:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772776917; x=1773381717; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvxxD5R2g1eKWFZrtyXXoI1KYxWzBTsSDcmN5FvjfNg=;
-        b=cNp0tLCOm8VT/8XP+KIFM7wvjYEZopf899SX01rYzhtCnjlzFaGzgjiED+a1LEvPeh
-         dDT8hxXlQdVBgIRILyM67xG2GN481tLMSGwUx8mH26LI5vDHglfGZVfJXO8P67f7pYcj
-         gobThAmzaPcM4j3+EsH8kC57AUW+rWjbndxmLcNywlc/vpoKVH5LxuG+3Z6jSd8HMhc8
-         CKw4VeaDSERcsl/qRcqKX9+yTrN/+aYHdIfMkZCARblxf0DacW23wECwcZPLksT5OcFH
-         yJcDNvM//TDEGyn0oA4n6CaYy7ZkZQjdBVLb0eYQZT4x+MNqxoOvc4Jec8R8gVURGC8B
-         H0bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772776917; x=1773381717;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uvxxD5R2g1eKWFZrtyXXoI1KYxWzBTsSDcmN5FvjfNg=;
-        b=NZbgj+29w0tixwzivbWeVlYpAaZ1tmmzKU0GwyU61wZABm3hlzJwM8Q5DcgkUpeERX
-         HZy5KeKZp/7gf8cxDSMxQmjrdvVw2GrcXuHVVskrRai5BKI+FjQyFbwCmCa7066fbv2O
-         Gho8vayHHbX9cZ/7Uiv/fUusBGILdc/Vvgh/cv+pXvd0LeWXl5ptKcDnSWCABZLagJT4
-         aNeAxnW8H6+Qul+MWig7pmu3O6mMXIQZNpsMB2roRV9rXZ2k24UxOVRilI3V3bimL9E+
-         k82j8tjfTkjjswejGefLBRV8Dpzb7Gf2FsQf6EbiC1b81VROAAIKEzwekjgui5lrhPDg
-         BzFQ==
-X-Gm-Message-State: AOJu0Yxi+YxajdvEDREN4L5+ns6q4/LXfvauTfa4D9d9QYnVgq0TDmIT
-	lSt7XYya4x9TZ7KRegmh4d7CD6QPxzUBezogmoNHG3QQ8bbdJ2yp8cNWtquJP+aiRNcCuK9NyGv
-	Ow32cwktNyflBlH+eVL0lsdE7rj2i+ob3pypYeC5YI2hl6uQX6y9Yykt8YLE=
-X-Gm-Gg: ATEYQzyiab/BLQWACAZXlXdtz8r28dWSj4rRvVql319aBXEAPCCKxO4ITF+1mEFgbA0
-	5CgcIZYOQRTmCY4GL5qVNsQxouQKe1HDmtvBgzbteCHlQBQ3unxiSdTKWhvSFDQRty5IcN97jc1
-	YWnQKa/KNGzsemseThoygc8Nc14JDsBVpSV1/CVoX7LkL8k0nYQolxYk/j/89KcMMamStLn7QQi
-	CFzd+jmKx6bKxon79v8KYHJDNBbZtfaDyZ7lP5ONbweYmcOnkYsAcVH9hLqNPPiESt7SrPtXL15
-	XHaGVks+3QCA4dayzwYsBd71tkw1gObh/jpfpj1Nff9Z9Qw1JBVtrsd9RPbvl/opqB1f7f1VzS9
-	MCeO/0tqKtXz+CARZPwfiKUIPgc60DgiF/9TDfqZD4zJEzwk=
-X-Received: by 2002:a17:902:c40f:b0:2ae:803e:6c0d with SMTP id d9443c01a7336-2ae8243b636mr12263585ad.19.1772776916888;
-        Thu, 05 Mar 2026 22:01:56 -0800 (PST)
-X-Received: by 2002:a17:902:c40f:b0:2ae:803e:6c0d with SMTP id d9443c01a7336-2ae8243b636mr12263295ad.19.1772776916367;
-        Thu, 05 Mar 2026 22:01:56 -0800 (PST)
-Received: from work.lan ([2409:4091:a0f4:6806:a6f5:7b5a:25de:64e1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e7c58asm6644065ad.25.2026.03.05.22.01.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 22:01:55 -0800 (PST)
-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
-        linux-arm-msm@vger.kernel.org
-In-Reply-To: <20260212-eth_vdev_next-20260211-v8-0-0974b3a8d61b@qti.qualcomm.com>
-References: <20260212-eth_vdev_next-20260211-v8-0-0974b3a8d61b@qti.qualcomm.com>
-Subject: Re: (subset) [PATCH v8 0/2] net: mhi: Add support to enable
- ethernet interface
-Message-Id: <177277691237.6655.4175169329604491727.b4-ty@oss.qualcomm.com>
-Date: Fri, 06 Mar 2026 11:31:52 +0530
+	s=arc-20240116; t=1772777092; c=relaxed/simple;
+	bh=vWeu+rrJuKn1HkWhdpVCh461e+ugjTi9tY18/n63aBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HfmHriGTPcOHbffrmOWv8AmXtRasJ1twsQG3TXe2qEC3gIX6P+elKuc3/v57V8InTFbuLn6nfe/HFlu0vSa5sVOOJDCYecB403sLVS+entV4YwZUlAUnnBTEm13qcQiywC1eZQSkqWPczFcs/Cd+/zFQs9/xQxLqtJ2H/DouzAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jg6FGjoK; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b2218c30-a704-4395-a67e-95c62b75586f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772777076;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lha1WxEP+imAaOmc44xUnzff4mjB8gJAeNTzMUJkIRU=;
+	b=Jg6FGjoK1PpSXKlligTbMsTDBRMhL/de2yK3tlsDKu2sxpMYtli5ImRDeZIg6MwAsnjUmF
+	a0QOh6/N3x4yIg2UuELd1FVRhP/cE7IHjZT+I5QqUdXIsQgwZBxHusHK71Rt9lrQFUEsyj
+	NF7WpdbM6vil13A0pzoVwjUupJo3jCs=
+Date: Fri, 6 Mar 2026 14:04:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
-X-Proofpoint-GUID: GGQebPsFYuMLUFZJue--DTOpfv396H9M
-X-Proofpoint-ORIG-GUID: GGQebPsFYuMLUFZJue--DTOpfv396H9M
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDA1NSBTYWx0ZWRfX93D8zhPBTBhd
- ZLJJD7kQPWjE5XtbyeOML8F/q2jltIyLuGtRWr5DB9znXg7plJ/TLWBGErfWr7lbooHmfYKkqZK
- oTOc4hvUkB6fUec+cXt34u3omdqK8aq0uyHe+O/nJeVVHDzsv+7YlczB8gIn4dAuPXmUu1W1ynu
- Whgpdc6fhmhHFpS2ChG2/K1EHjP+YVN61+pqwSQ+0w3ICqiBKhR6x0q3twoXDULkAHSAAYWysPQ
- cHvFxB/8hxHj9/DfBgvsqdVAiSrJDue4p16I1jtWcH8lDjrrh0sxUkj6saHwJp2hMA1rAoQvMwe
- HjjcdTkaHZLc+vP9VtDZiQx9R/wfW5egwayZmVeTzy3oVnVCYD3oA0N37+EQoblR2DvrEEi8V9e
- EPD187pOusmGjRreyg5OQ+aMdNmh7kugfacM6tC0kMqYDbTAfsnVJvmW4tWqYIl22T26Sq0NkS0
- +bfdDKTBapnKYIBa6AA==
-X-Authority-Analysis: v=2.4 cv=XKg9iAhE c=1 sm=1 tr=0 ts=69aa6dd5 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8
- a=w-hdCPvak80ow5GQZm0A:9 a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-06_02,2026-03-04_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- malwarescore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603060055
-X-Rspamd-Queue-Id: 0331821BE8B
+Subject: Re: [PATCH bpf v3 3/5] bpf, sockmap: Fix af_unix iter deadlock
+To: Michal Luczaj <mhal@rbox.co>, John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Cong Wang <cong.wang@bytedance.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
+ <20260306-unix-proto-update-null-ptr-deref-v3-3-2f0c7410c523@rbox.co>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260306-unix-proto-update-null-ptr-deref-v3-3-2f0c7410c523@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 5AFF421BF1D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264685-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[rbox.co,gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264684-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manivannan.sadhasivam@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid]
 X-Rspamd-Action: no action
 
 
-On Thu, 12 Feb 2026 16:30:21 +0530, Vivek Pernamitta wrote:
-> Add support to configure a new client as Ethernet type over MHI
-> by setting "mhi_device_info.ethernet_if = true". Create a new
-> Ethernet interface named eth%d. This complements existing NET
-> driver support.
-> 
-> Enable IP_SW1 (ch:48/49), IP_ETH0 (ch:50,51) and IP_ETH1 (ch:52,
-> 53) channels over MHI for M-plane, NETCONF and S-plane interface
-> for QDU100.
-> 
-> [...]
+On 3/6/26 7:30 AM, Michal Luczaj wrote:
+> bpf_iter_unix_seq_show() may deadlock when lock_sock_fast() takes the fast
+> path and the iter prog attempts to update a sockmap. Which ends up spinning
+> at sock_map_update_elem()'s bh_lock_sock():
+>
+> WARNING: possible recursive locking detected
+> test_progs/1393 is trying to acquire lock:
+> ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: sock_map_update_elem+0xdb/0x1f0
+>
+> but task is already holding lock:
+> ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: __lock_sock_fast+0x37/0xe0
+>
+> other info that might help us debug this:
+>   Possible unsafe locking scenario:
+>
+>         CPU0
+>         ----
+>    lock(slock-AF_UNIX);
+>    lock(slock-AF_UNIX);
+>
+>   *** DEADLOCK ***
+>
+>   May be due to missing lock nesting notation
+>
+> 4 locks held by test_progs/1393:
+>   #0: ffff88814b59c790 (&p->lock){+.+.}-{4:4}, at: bpf_seq_read+0x59/0x10d0
+>   #1: ffff88811ec25fd8 (sk_lock-AF_UNIX){+.+.}-{0:0}, at: bpf_seq_read+0x42c/0x10d0
+>   #2: ffff88811ec25f58 (slock-AF_UNIX){+...}-{3:3}, at: __lock_sock_fast+0x37/0xe0
+>   #3: ffffffff85a6a7c0 (rcu_read_lock){....}-{1:3}, at: bpf_iter_run_prog+0x51d/0xb00
+>
+> Call Trace:
+>   dump_stack_lvl+0x5d/0x80
+>   print_deadlock_bug.cold+0xc0/0xce
+>   __lock_acquire+0x130f/0x2590
+>   lock_acquire+0x14e/0x2b0
+>   _raw_spin_lock+0x30/0x40
+>   sock_map_update_elem+0xdb/0x1f0
+>   bpf_prog_2d0075e5d9b721cd_dump_unix+0x55/0x4f4
+>   bpf_iter_run_prog+0x5b9/0xb00
+>   bpf_iter_unix_seq_show+0x1f7/0x2e0
+>   bpf_seq_read+0x42c/0x10d0
+>   vfs_read+0x171/0xb20
+>   ksys_read+0xff/0x200
+>   do_syscall_64+0x6b/0x3a0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+> Fixes: 2c860a43dd77 ("bpf: af_unix: Implement BPF iterator for UNIX domain socket.")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>   net/unix/af_unix.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 3756a93dc63a..3d2cfb4ecbcd 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -3729,15 +3729,14 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
+>   	struct bpf_prog *prog;
+>   	struct sock *sk = v;
+>   	uid_t uid;
+> -	bool slow;
+>   	int ret;
+>   
+>   	if (v == SEQ_START_TOKEN)
+>   		return 0;
+>   
+> -	slow = lock_sock_fast(sk);
+> +	lock_sock(sk);
+>   
+> -	if (unlikely(sk_unhashed(sk))) {
+> +	if (unlikely(sock_flag(sk, SOCK_DEAD))) {
+>   		ret = SEQ_SKIP;
+>   		goto unlock;
+>   	}
 
-Applied, thanks!
 
-[2/2] bus: mhi: host: pci: Enable IP_SW1, IP_ETH0 and IP_ETH1 channels for QDU100
-      commit: 3cdd83ccd7d0d990ec55b35c8a794d84b22a9fd0
+Switching to lock_sock() fixes the deadlock, but it does not provide mutual
+exclusion with unix_release_sock(), which uses unix_state_lock() exclusively
+and does not touch lock_sock() at all. So a dying socket can still reach the
+BPF prog concurrently with unix_release_sock() running on another CPU.
 
-Best regards,
--- 
-Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Both SOCK_DEAD and the clearing of unix_peer(sk) happen under
+unix_state_lock() in unix_release_sock(). Without taking unix_state_lock()
+before the SOCK_DEAD check, there is a window:
 
+iter unix_release_sock()
+---  lock_sock(sk)
+SOCK_DEAD == 0(check passes)
+   unix_state_lock(sk)
+                                                   unix_peer(sk) = NULL
+   sock_set_flag(sk, SOCK_DEAD)
+   unix_state_unlock(sk)
+BPF prog runs
+→ accesses unix_peer(sk) == NULL → crash
+
+This was not raised in the v2 discussion.
+
+The natural fix is to check SOCK_DEAD under unix_state_lock(). However,
+holding unix_state_lock() throughout BPF prog execution would conflict with
+patch 5: sock_map_sk_acquire_fast() also takes unix_state_lock() for AF_UNIX
+sockets, resulting in a recursive spinlock deadlock.
+
+
+Kuniyuki, Martin — what is the right approach here?
+
+> @@ -3747,7 +3746,7 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
+>   	prog = bpf_iter_get_info(&meta, false);
+>   	ret = unix_prog_seq_show(prog, &meta, v, uid);
+>   unlock:
+> -	unlock_sock_fast(sk, slow);
+> +	release_sock(sk);
+>   	return ret;
+>   }
+>   
+>
 
