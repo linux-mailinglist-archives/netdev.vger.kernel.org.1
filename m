@@ -1,115 +1,208 @@
-Return-Path: <netdev+bounces-264637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLPwGT1GqmnxOQEAu9opvQ
-	(envelope-from <netdev+bounces-264637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:13:01 +0100
+	id sGbmAohGqmnxOQEAu9opvQ
+	(envelope-from <netdev+bounces-264638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:14:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA7421AED6
-	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:13:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5E821AEFB
+	for <lists+netdev@lfdr.de>; Fri, 06 Mar 2026 04:14:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BED8A301FD6F
-	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 03:11:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0A9D33027D8E
+	for <lists+netdev@lfdr.de>; Fri,  6 Mar 2026 03:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D9D36997D;
-	Fri,  6 Mar 2026 03:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7184C36AB6C;
+	Fri,  6 Mar 2026 03:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHTi4Tzu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+iQM0m1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96718331A7E;
-	Fri,  6 Mar 2026 03:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EC7366069
+	for <netdev@vger.kernel.org>; Fri,  6 Mar 2026 03:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772766701; cv=none; b=Fu2fBQg2IURjEFfJaQSVYxZJegc2EMglJzOWP/d0VdhoaJVbQMU40ap3rUJzaoV9j7hw6iOavZZ0UpTPPGLmTkWVu9znEqV1pGM1z1nzlok/AWUlyUOXsL9NgH8geKXkTHa//tZDHQpmVQi6GIHWknV65PXHU3ORzh4qQb+mR7I=
+	t=1772766851; cv=none; b=FRC+t9uWKq6unF6xr5C7jiKmnNNLens9QGIiMRF5rqTz2+jNRnFWI0U+rAlxc3oQi6Nfqc/piRaswHg9RbP6mxQ9/wdZxxfTSL4jWk2BPHxmlM4aJaeO6mhoGJ172WogFIcRfRCb7IpZEVamoFDw4Za1i/aKlLtBio/N2oV4bZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772766701; c=relaxed/simple;
-	bh=hzghbVU9PWt4YBpLOfXoyj78C9FtEGJLhIQfLff/1GE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SD1vKUM0jSfjEvJit6Etw8ScBX3TZCLk1Wr8r6IccYKcAAPL5jvEONEYAh6vVCLyyyp/+G09X8KM0kE1dscMCgnx61425ZX5oLMxUOo0F01jADtE/BUYRSyK2/HFfewVoulW1Swa+ACkQSsCrSNJNfEeSmeQK81UJk875ZrG7RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHTi4Tzu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 267A3C116C6;
-	Fri,  6 Mar 2026 03:11:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772766701;
-	bh=hzghbVU9PWt4YBpLOfXoyj78C9FtEGJLhIQfLff/1GE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WHTi4TzuVFa6mRPEmR038ojSkahWxC8DyO53/0nX6GJFSRrs8xKivxj2o/HEAEANo
-	 YemdxYLBzRC+WsyckXbc7qsY6amqugntbZjFMvo1pVlEFIOh0trqmgBVZ/nM3yV6l6
-	 krwUTc2ZS9wqJS2Gh4nNiYo4D+kTjtPGKCeuufseFix+F/iDCZvci2kFzKRZKjGmc/
-	 elFz8qEo+9Gf2X9uKOwYuHZnCqefiNpWa5pXqBuj+m/X5FWzfR1qk/cqHXaSo3LQNS
-	 YKRH/wfbuJ9MaH+4jLRWRSkY6eQk+WUVCyGQCBf2LjitMasxsbOfoHbgpjr/QlSBCG
-	 dRnqcq4YwC4Mg==
-Date: Thu, 5 Mar 2026 19:11:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, =?UTF-8?B?QmVub8OudA==?= Monin
- <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next 0/8] net: macb: add XSK support
-Message-ID: <20260305191139.71d929be@kernel.org>
-In-Reply-To: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
-References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
+	s=arc-20240116; t=1772766851; c=relaxed/simple;
+	bh=ckTCUOoiVNYeEw/M1IXNtDeSz8draygJacRfDD11QLw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pi6aldHOMuHScI77/XgD783yU638OWrGX/GD9CwhOGR/Jmyq2Lg5Cu7R8zg/DBcrF6ktTVhK2i4wTFn4fFuL5g3ol0nhUWX7ojnuzU5ARtRv+vcE6sanfz+byiIZjNG4om71pT97VHq71zusJ/kD18r2j5INCqEVVXEviGMhQjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L+iQM0m1; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c70d802cc05so769390a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Mar 2026 19:14:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772766850; x=1773371650; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GAKk9BLlPBGd+3xOdk2XRyvunkKExwApsKu0QsVvEfo=;
+        b=L+iQM0m1bH7knQFT+BgbZ431B64R2E99qTPmefwUADWKexlN2vSd6NBSzS0p3lA2vN
+         72cHxND6nHIEMwxhcN0nmZ84jpv4+4DLA/3wvA19VSwRCdNZ4E6sGc7ID/bZQUua71gQ
+         18DhBJ5KRd860pT5uxVJ7e7YBo7Jok2FZFbbOoraxqD5JWzPRif1BnwJc/tH99Elb/Ew
+         gKpcM+vCb5d0ii8/6HQDkt8J/CvTs0cQWu4CLha1J0AbHvuq9d3tD+7sAS0uykfRiurR
+         t2htM4aNEg4qU39TtG8KLdSKSes5mgKv9NU95iPyuyyul7ANJCGpzWA+TuQ2VA82Vygi
+         Zt8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772766850; x=1773371650;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GAKk9BLlPBGd+3xOdk2XRyvunkKExwApsKu0QsVvEfo=;
+        b=sH7TmiaEu7dOeLgEjrKqnAwLZpkC6xOE2pT3lnW+v72IjqdvZBz5aZucwDoikgQmmK
+         I2jjR1c+UJlGn/0treSIKf6Zs8HxmfOOFtogRVvBFRIp/o4Z7qnM4wXLaSA3YLVkRmnD
+         J0nslTf7FfPHz6h1WpF4tUU2eL7GcSaqWS5UOWHjpFA8e+5Um+7MnMdi3PgC1fPZphyg
+         U3w6Nsrrfz7iHVGmYT5S+udFAP51A6mrckZ9HgRzpmgEW/JyrwKhkfu9XAnpqlzVVhvK
+         XVuPhvdLssejIblYqLksP3x6thuY8hMoKC0RzlH3d3cdR57rYdg1PCJU4/yHpFve8pZb
+         am1w==
+X-Forwarded-Encrypted: i=1; AJvYcCXq0nxXrQoik/78XZPw1FnUEZX21QgUNWDHKo/dRLt39lQ8GqbBwNZ0zVF4F1nP+wE+JnFpEV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymkhdXpaoUFhpf+5KJkG5IfmlQtSrgXdGYPYpfZiGgxKSVa5jo
+	gt0q8aUO0R7Ocnuq7sSN94TF2KX83dhCUJ6mm3GEvOafwXAc3iNfj2FD
+X-Gm-Gg: ATEYQzzWLzeNmIYbDsJZkxpyc+lf1Y+Omz2Gh8vHLZW2k6M+82M2mdIB9eFCghdExz6
+	A0WEa4umxaI0JtLYhqeXdFKieh9sFigyWhfjlhKyghrfUb7ButoiKvU0EQ3Qj9xc/R/NJrAbUFc
+	Dtu+0ItYWo+lIN3FirmCZtyoLS6RZQc82qsQFZWl1/yLwM+73IjIxCmIat2FR7pcZr2lSbrX0rN
+	TmFoixWHYPbcbjWpwocYLIZL3jdKC3o40aE/rxcjPoVmK39ZeYd+50PXLcG6RD7a/DD66xOAdOx
+	gF3pDSlXk5wvGnQDCaWoLKl1ztlzgo4vdo+d+p0c8ZAH8Es4JMpAYEyzwDfLGGybbsw3vvBOz95
+	lggY6p7iXSUNCo4rua5Jm8kWAzYjq6XTCitT5k1nqjUFyRhjvRKD8EYBq9NrpXZh9mHi+TZF1+W
+	vs9DaL199JbYj7ql4uWTNeBx9WjqbrzjLIzYGWkB4lbFeLV51+mjN3jGIQAT1Nsmb2Q5/hzvw=
+X-Received: by 2002:a05:6a00:8d4:b0:821:8145:6948 with SMTP id d2e1a72fcca58-829a2f90d65mr429767b3a.7.1772766849425;
+        Thu, 05 Mar 2026 19:14:09 -0800 (PST)
+Received: from 3ce1e5d2d1b2.cse.ust.hk (191host009.mobilenet.cse.ust.hk. [143.89.191.9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a465b6c7sm144405b3a.25.2026.03.05.19.14.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 19:14:08 -0800 (PST)
+From: Chengfeng Ye <dg573847474@gmail.com>
+To: jk@codeconstruct.com.au,
+	matt@codeconstruct.com.au,
+	netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chengfeng Ye <dg573847474@gmail.com>
+Subject: [PATCH v3] mctp: route: hold key->lock in mctp_flow_prepare_output()
+Date: Fri,  6 Mar 2026 03:14:02 +0000
+Message-Id: <20260306031402.857224-1-dg573847474@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: BEA7421AED6
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7A5E821AEFB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-264637-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-264638-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,mobileye.com,bootlin.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[dg573847474@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, 04 Mar 2026 19:24:23 +0100 Th=C3=A9o Lebrun wrote:
-> Applies on top of net-next (4ad96a7c9e2c) and Paolo's XDP work [0].
+mctp_flow_prepare_output() checks key->dev and may call
+mctp_dev_set_key(), but it does not hold key->lock while doing so.
 
-You have to wait until dependencies are merged.
-If you want to post in the meantime is has to be as an RFC
---=20
-pw-bot: cr
+mctp_dev_set_key() and mctp_dev_release_key() are annotated with
+__must_hold(&key->lock), so key->dev access is intended to be
+serialized by key->lock. The mctp_sendmsg() transmit path reaches
+mctp_flow_prepare_output() via mctp_local_output() -> mctp_dst_output()
+without holding key->lock, so the check-and-set sequence is racy.
+
+Example interleaving:
+
+  CPU0                                  CPU1
+  ----                                  ----
+  mctp_flow_prepare_output(key, devA)
+    if (!key->dev)  // sees NULL
+                                        mctp_flow_prepare_output(
+                                            key, devB)
+                                          if (!key->dev)  // still NULL
+                                          mctp_dev_set_key(devB, key)
+                                            mctp_dev_hold(devB)
+                                            key->dev = devB
+    mctp_dev_set_key(devA, key)
+      mctp_dev_hold(devA)
+      key->dev = devA   // overwrites devB
+
+Now both devA and devB references were acquired, but only the final
+key->dev value is tracked for release. One reference can be lost,
+causing a resource leak as mctp_dev_release_key() would only decrease
+the reference on one dev.
+
+Fix by taking key->lock around the key->dev check and
+mctp_dev_set_key() call.
+
+Fixes: 67737c457281 ("mctp: Pass flow data & flow release events to drivers")
+Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+---
+v2: Add fix tag
+v3: Shift mctp_dev_set_key() to else block and invert the branch logic 
+---
+ net/mctp/route.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/net/mctp/route.c b/net/mctp/route.c
+index 0381377ab760..59ad60b88563 100644
+--- a/net/mctp/route.c
++++ b/net/mctp/route.c
+@@ -359,6 +359,7 @@ static void mctp_flow_prepare_output(struct sk_buff *skb, struct mctp_dev *dev)
+ {
+ 	struct mctp_sk_key *key;
+ 	struct mctp_flow *flow;
++	unsigned long flags;
+ 
+ 	flow = skb_ext_find(skb, SKB_EXT_MCTP);
+ 	if (!flow)
+@@ -366,12 +367,14 @@ static void mctp_flow_prepare_output(struct sk_buff *skb, struct mctp_dev *dev)
+ 
+ 	key = flow->key;
+ 
+-	if (key->dev) {
++	spin_lock_irqsave(&key->lock, flags);
++
++	if (!key->dev)
++		mctp_dev_set_key(dev, key);
++	else
+ 		WARN_ON(key->dev != dev);
+-		return;
+-	}
+ 
+-	mctp_dev_set_key(dev, key);
++	spin_unlock_irqrestore(&key->lock, flags);
+ }
+ #else
+ static void mctp_skb_set_flow(struct sk_buff *skb, struct mctp_sk_key *key) {}
+-- 
+2.25.1
+
 
