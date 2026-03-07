@@ -1,157 +1,162 @@
-Return-Path: <netdev+bounces-264970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMAfJnlrq2nycwEAu9opvQ
-	(envelope-from <netdev+bounces-264970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 01:04:09 +0100
+	id 5LrKHc1rq2kHdAEAu9opvQ
+	(envelope-from <netdev+bounces-264971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 01:05:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401CA228E4F
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 01:04:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4062228E57
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 01:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A26913022986
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 00:04:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B070C302BDE7
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 00:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7AF2E413;
-	Sat,  7 Mar 2026 00:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B522E413;
+	Sat,  7 Mar 2026 00:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ihXinTtH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NztodOTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987024C81
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 00:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23201C13B;
+	Sat,  7 Mar 2026 00:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772841846; cv=none; b=GJWrtaA0D8LbVf/D+vTYUDjPDNTOon9DLXFnwou57NjOfGU2Dxt5uoAB1H2FALTGN+VbeGn5RjL6En9I/PndfH7kQWnSM7qM+sM7OkZJHHqwf3jkBQkEKqq6mXhcdqA3V0XXDEoS3jy78ufz7PVumrkl9VpYTb6FQj3wnfnscm0=
+	t=1772841931; cv=none; b=M6rGDqflgAQz+/WAuyTmkWNwbmrMy3d1z80/Yig13rCZmR6vyicW/iOLg9BVZ+Wo0WStNMXM77ONYuvVglZz8iApNx3QPxuHVb2+5Omk8ui4CJthw9uRgHRkyN+jjfwF1s0xqOtFxPH7yQQtZBt8FIHF4VwhWVq4ubm0MW0YK2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772841846; c=relaxed/simple;
-	bh=Oq6i+H3v/yPVvO2FJiTNolpyjO3CpjZSQcMebne3h8g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q0qQJzDs0H8f2K9v5NQMyRWW6eQYH+LkWf6vbYIKKVa5AFGLBRMAtF0L22s07jgi69+PmTc0ZX6fOJMuTSlfHlRH0IalQtkjo/7NWIl/Rf8NMl4hRPnOGqloW34hu7H6U0nryAYgF9OOFGF0K/syiKUMV+GYVbmkVa3H4rjfLIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ihXinTtH; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dc3a8b4c-32f3-4905-8cca-078f220abfef@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772841832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EHbeFglmCtgzA3qJvWmuinGohwBorJjMNIER9qJwK6c=;
-	b=ihXinTtHdoZ+Cnx64OuUP3org3GvdBYo6bMdbg2NFzvT015bfNYpMDlSBttTh6O5xrZYah
-	dBvBaQSLbexAejGr78NFhy/iOR25WW+JQpOWjoz6ZkMvTY7wQNba3sRGxXittla8D2WtJX
-	fjHSISQihkFk7qGZ9K7qgfKarYL5qSs=
-Date: Fri, 6 Mar 2026 16:03:47 -0800
+	s=arc-20240116; t=1772841931; c=relaxed/simple;
+	bh=h1a75gdjqpmW7z6/ZJFcSnXVV4clbTBNT+a53CyNqlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GrqneUwxF/xKqc9r8l2X8GE4YB66GvpWE/afRce0XdRpqWXBt1nZUIUGhswU+IOISgq5QNZZ+L14xkyKJ/UkrawuUI2nFCTHHG18W+TPeYHeExtA6q7ZDfHB4lh+p8MJBWJ+utdIv2eUOev2zfqMWAJ9gb8oQEOJSJgfrEJeQUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NztodOTZ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FsRPNID5PAvwSRgv4YV66cyR8EgMHDZN2LmKg1jcxCM=; b=NztodOTZPF9ce0GYVQJAZ+0fjy
+	KV4HTH+asXGOH0lQE3k6M2wop9lFdAzefd7jR5MM3xj6q8N9PcSjGV0+uf+jrpaeoFvji0BdL9dnf
+	SANdQViLj+hPkphrXXTiUBm3G8E8vFbOOT/tw9VmMZNTdPJfmulOohOFPbs1aoVq0Vv34oDYuT5tu
+	+p0BYZlh2rO8i4xrXVofszwbHZYp/eak0RGso5AItkqLKHWlhNHGaookuQCJEXpp06fCnenMRzzop
+	Zb7/tyfFyNR6UPxCNJ4KbGbLWyGo+0L9VgPy+xt/01N1ztatymJKwIGpIEOAG6JGhh7bXGKEfUovm
+	2YYtpyPg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59864)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vyfAY-000000001gD-1Kzj;
+	Sat, 07 Mar 2026 00:05:22 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vyfAU-000000001pI-2HLV;
+	Sat, 07 Mar 2026 00:05:18 +0000
+Date: Sat, 7 Mar 2026 00:05:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH] dt-bindings: mark unimplemented AXI snps,kbbe snps,mb
+ and snps,rb
+Message-ID: <aatrvmyW-SaHuVN7@shell.armlinux.org.uk>
+References: <E1vxq3L-0000000BsQm-4C8v@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf/net 2/6] sockmap: Annotate sk->sk_write_space() for
- UDP.
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20260221233234.3814768-1-kuniyu@google.com>
- <20260221233234.3814768-3-kuniyu@google.com>
- <fjt7fesjnzwuzeuiouv6rpvoxebounjqv3jlc34tvmzh252zep@hizdvwr2qwe4>
- <CAAVpQUAJgFtcJGtuMufS9mhaShs7OQDxx7jTGOSbG9wCdeCN7Q@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAAVpQUAJgFtcJGtuMufS9mhaShs7OQDxx7jTGOSbG9wCdeCN7Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 401CA228E4F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1vxq3L-0000000BsQm-4C8v@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: C4062228E57
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264970-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-264971-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_SPAM(0.00)[0.107];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+Any chance of a review from the DT maintainers please?
 
+Thanks.
 
-On 3/4/26 7:43 PM, Kuniyuki Iwashima wrote:
-> On Wed, Mar 4, 2026 at 5:48 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
->>
->> On Sat, Feb 21, 2026 at 11:30:49PM +0800, Kuniyuki Iwashima wrote:
->>> UDP TX skb->destructor() is sock_wfree(), and UDP only
->>> holds lock_sock() for UDP_CORK / MSG_MORE sendmsg().
->>>
->>> Otherwise, sk->sk_write_space() is read locklessly.
->>>
->>> Let's use WRITE_ONCE() and READ_ONCE() for sk->sk_write_space().
->>>
->>> Fixes: 7b98cd42b049 ("bpf: sockmap: Add UDP support")
->>> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
->>> ---
->>> v3: Use WRITE_ONCE() in udp_bpf_update_proto()
->>> v2: Cache sk->sk_write_space in sock_wfree()
->>> ---
->>>   net/core/skmsg.c   | 2 +-
->>>   net/core/sock.c    | 8 ++++++--
->>>   net/ipv4/udp_bpf.c | 2 +-
->>>   3 files changed, 8 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->>> index 75fa94217e1e..3d7eb2f4ac98 100644
->>> --- a/net/core/skmsg.c
->>> +++ b/net/core/skmsg.c
->>> @@ -1297,7 +1297,7 @@ void sk_psock_start_verdict(struct sock *sk, struct sk_psock *psock)
->>>
->>>        psock->saved_data_ready = sk->sk_data_ready;
->>>        WRITE_ONCE(sk->sk_data_ready, sk_psock_verdict_data_ready);
->>> -     sk->sk_write_space = sk_psock_write_space;
->>> +     WRITE_ONCE(sk->sk_write_space, sk_psock_write_space);
->>>   }
->>
->> I noticed that Patch 1 and 2 were submitted earlier and are on bpf tree.
->> Given that Eric's commit (which you reviewed) is now in net.git, these two patches
->> should probably be dropped in the next version, right? Just confirming.
+On Wed, Mar 04, 2026 at 05:30:32PM +0000, Russell King (Oracle) wrote:
+> Mark the AXI snps,kbbe snps,mb and snps,rb properties as not
+> implemented. These were introduced by commit afea03656add ("stmmac:
+> rework DMA bus setting and introduce new platform AXI structure").
+> While stmmac has code to parse these properties and save their values,
+> these are written to write-only struct members - no code in stmmac
+> has ever read their value. Hence, these properties have been non-
+> functional from day one.
 > 
-> I was thinking git can just handle them well, and even the
-> patch 2 has a delta in sock_wfree().
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 38bc34dc4f09..45dba6533458 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -202,11 +202,11 @@ title: Synopsys DesignWare MAC
+>          * snps,xit_frm, unlock on WoL
+>          * snps,wr_osr_lmt, max write outstanding req. limit
+>          * snps,rd_osr_lmt, max read outstanding req. limit
+> -        * snps,kbbe, do not cross 1KiB boundary.
+> +        * snps,kbbe, do not cross 1KiB boundary (not implemented)
+>          * snps,blen, this is a vector of supported burst length.
+>          * snps,fb, fixed-burst
+> -        * snps,mb, mixed-burst
+> -        * snps,rb, rebuild INCRx Burst
+> +        * snps,mb, mixed-burst (not implemented)
+> +        * snps,rb, rebuild INCRx Burst (not implemented)
+>  
+>    snps,mtl-rx-config:
+>      $ref: /schemas/types.yaml#/definitions/phandle
+> -- 
+> 2.47.3
+> 
+> 
 
-At least for patch 1, I am not sure git can handle it well without human 
-intervention because the sk_write_space is backward from Eric.
-
-For the missing change in sock_wfree (?), it probably makes sense to 
-create a separate patch on top of Eric's change and target net. My 
-understanding is patch 3-6 can be on its own without patch 1+2.
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
