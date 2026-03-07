@@ -1,53 +1,65 @@
-Return-Path: <netdev+bounces-265060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265061-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oM03N3egq2kKfAEAu9opvQ
-	(envelope-from <netdev+bounces-265060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:50:15 +0100
+	id CD0kBSChq2kKfAEAu9opvQ
+	(envelope-from <netdev+bounces-265061-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:53:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48835229FF8
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:50:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6237422A017
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:53:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A61A304DEBD
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:50:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15A1A3027942
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2292C08D0;
-	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738C030DED5;
+	Sat,  7 Mar 2026 03:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHWfPf4H"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="bASu/eQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BE8CA5A;
-	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D254284884;
+	Sat,  7 Mar 2026 03:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772855410; cv=none; b=ed+OdJSfeEMzQTc+olivbaKRriO+fZJTYoT89StIcdhIAoFQNV5ogXwxclTqqur31RnTJ6CmwoVPhXBMCsk+C9wTW2FbNlWU9R/1IMfKIM2NDRnV5JjpE7XwaaCHKr6Do+hRYfg4jG69E/YxRh3opTz9UJu1QYceoYeJ99Ag4ds=
+	t=1772855581; cv=none; b=sH83LRhVJ+ddai3To9vCRpKbwNU9T29arVDIoYy1H8MwkWalWsDz9WAL/6BZHotae4vPwad9/wlQ7e4iBKvIZV6aT/aTGNfqz2zKQeJxV0j4POISsVZpb2n38FH55rbSEcOUmEvgft86YLh5if63ReY+9vclDzCUqD95VL0zGh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772855410; c=relaxed/simple;
-	bh=p7EQiPGlxyBmjCH3g3gPtPkS1GF4dOhZ5LgBywc6bPg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hYkFA9GQNq2g7J3OusSaf4kwvs6Y7LK2OTDl9NOK4smIcVC+a9yvfi3hOxDqK2KWOtjvDp2HROumnGmCl3vzr1v6P2r3k0AzQSoRle+UpXC/sPZjKwl/1XgJP67bk+KvA/yUoGb9ZFxFMHxFkn3f56rbqvAHamPJox7kyew513s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHWfPf4H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB73AC19422;
-	Sat,  7 Mar 2026 03:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772855409;
-	bh=p7EQiPGlxyBmjCH3g3gPtPkS1GF4dOhZ5LgBywc6bPg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bHWfPf4H0n2QDEQMOOcOTBi9o8erIKm9NK0sTTJHgr9GwCCvul7fwjhY+lTfJxePK
-	 nCHDQZlrvmZMMPWLHXb3Q9OIdtfRWPz2seOJoNVZpf3y92s/ZXFUYGD/pH3XIuZDvD
-	 8jsosbY39Sg13Tol7NyNQZXtyfnduZDD4SdNAzND6uUOdV5Tb4eHu5gKegbKUsAhc5
-	 LmzeM4GxcOmcHYBPhVIp/VxPJVYLiqTZOLfT+xmrSelXyzJvIsR8mSPSo5RRGnDiGL
-	 upmyVUYOIImyjYa26Kql9JL9m/HDlCPqRvGLGxnzKuJ7jAlRhdSPW93yauJ+VB38JL
-	 4DW9/4PzDKpNA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DBC3808200;
-	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772855581; c=relaxed/simple;
+	bh=2VKjOBAvdDuHyTYpQp4+fH3E0GVniSmbG/grWeTNYbQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ts9hR08j/Ipt8PHgSuZnOtGjXK5YKGmIXbtdvMN4f0/YM+Owiw+CLx3O9+quWVdizBi0s0e93dWQZBiICSCXIqKP8YKbRmf/O2jDfWCRSGng+QS2CSKYIIgkAhiSF8ZORArzTGFvgX7d+HbWVoTa7PshK6sKGPhC5nVCQhE8yCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=bASu/eQk; arc=none smtp.client-ip=1.95.21.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Y9
+	FgILjFxFmSSdvhtpxbCtpywPbYSocA+aWvpBBe7Rk=; b=bASu/eQkGl/8rQYpBI
+	YVg51DJUWaN8XRRs4aE/UVCMXIV1OHmWs1zCoFZPNEejjZdUCcdQax2/nLEAffCs
+	WtEYv6oFEZ8QoT7P1j4Q2SMKUX6dgFhE4YNaJXqnQYsxXo23g55UVlJMhvFJo3Xc
+	CugXBhm+57LkYHs5njeSTk2xU=
+Received: from localhost.net (unknown [])
+	by gzsmtp3 (Coremail) with UTF8SMTPA id M88vCgD3f6vioKtpEUwtAg--.60202S2;
+	Sat, 07 Mar 2026 11:52:03 +0800 (CST)
+From: xietangxin <xietangxin@yeah.net>
+To: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Cc: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	xietangxin <xietangxin@yeah.net>
+Subject: [PATCH] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
+Date: Sat,  7 Mar 2026 11:51:10 +0800
+Message-ID: <20260307035110.7121-1-xietangxin@yeah.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,88 +67,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/6] selftests: net: fix false failures due to
- missing
- features and host interference
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177285540880.145254.2317239509731397843.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Mar 2026 03:50:08 +0000
-References: <20260306000127.519064-1-aleksey.oladko@virtuozzo.com>
-In-Reply-To: <20260306000127.519064-1-aleksey.oladko@virtuozzo.com>
-To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, aconole@redhat.com,
- imaximet@redhat.com, echaudro@redhat.com, sbrivio@redhat.com,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, dev@openvswitch.org
-X-Rspamd-Queue-Id: 48835229FF8
+X-CM-TRANSID:M88vCgD3f6vioKtpEUwtAg--.60202S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxArW3XF43AFy5Jw1kArW3GFg_yoW5WF4fpF
+	4YkrW5Zr4vqry7Aa95Xw4kWry8Zan5J3y3Grs0gw1a9398CFy5tr1IvryUtFWDCFs5Z347
+	Zr4Fvr17KrZ0vFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Utu4UUUUUU=
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiNAOl2WmroOOxQwAA34
+X-Rspamd-Queue-Id: 6237422A017
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265060-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-265061-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[yeah.net];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.938];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[yeah.net:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovs-dpctl.py:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,yeah.net];
+	NEURAL_HAM(-0.00)[-0.993];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,yeah.net:dkim,yeah.net:email,yeah.net:mid]
 X-Rspamd-Action: no action
 
-Hello:
+A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
+and the device's IFF_XMIT_DST_RELEASE flag is cleared
+(e.g., during the configuration of tc route filter rules).
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
+expects the driver to hold the reference to skb->dst until the packet
+is fully transmitted and freed. In virtio_net with napi_tx=N,
+skbs may remain in the virtio transmit ring for an extended period.
 
-On Fri,  6 Mar 2026 00:01:21 +0000 you wrote:
-> Hi,
-> 
-> This series addresses several issues in the networking kselftests
-> that cause false-positive failures depending on the host environment,
-> kernel configuration, or library versions.
-> 
-> The main focus of these changes is to isolate tests from the host
-> environment (using namespaces) and to ensure proper fallback or
-> skipping when dependencies are missing.
-> 
-> [...]
+If the network namespace is destroyed while these skbs are still pending,
+the corresponding dst_ops structure has freed. When a subsequent packet
+is transmitted, free_old_xmit() is triggered to clean up old skbs.
+It then calls dst_release() on the skb associated with the stale dst_entry.
+Since the dst_ops (referenced by the dst_entry) has already been freed,
+a UAF kernel paging request occurs.
 
-Here is the summary with links:
-  - [net,v3,1/6] selftests: net: fib_tests: skip rp_filter test if cls_basic is unavailable
-    (no matching commit)
-  - [net,v3,2/6] selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
-    https://git.kernel.org/netdev/net-next/c/0bcac7b11262
-  - [net,v3,3/6] selftests: net: run reuseport tests in netns to avoid port conflicts
-    (no matching commit)
-  - [net,v3,4/6] selftests: net: rename pmtu.sh to pmtu-test.sh
-    (no matching commit)
-  - [net,v3,5/6] selftests: net: run pmtu.sh in netns to avoid host firewall interference
-    (no matching commit)
-  - [net,v3,6/6] selftests: net: io_uring_zerocopy: enable io_uring for the test
-    (no matching commit)
+fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
+the dst reference before the skb is queued in virtio_net.
 
-You are awesome, thank you!
+Call Trace:
+ Unable to handle kernel paging request at virtual address ffff80007e150000
+ CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc1+ #6 PREEMPT
+  ...
+  percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
+  dst_release+0xe0/0x110  net/core/dst.c:177
+  skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
+  sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
+  dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
+  napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
+  __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_net]
+  free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
+  start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
+  ...
+
+Reproduction Steps:
+NETDEV="enp3s0"
+
+config_qdisc_route_filter() {
+    tc qdisc del dev $NETDEV root
+    tc qdisc add dev $NETDEV root handle 1: prio
+    tc filter add dev $NETDEV parent 1:0 protocol ip prio 100 route to 100 flowid 1:1
+    ip route add 192.168.1.100/32 dev $NETDEV realm 100
+}
+
+test_ns() {
+    ip netns add testns
+    ip link set $NETDEV netns testns
+    ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
+    ip netns exec testns ping -c 1 10.0.32.1
+    ip netns del testns
+}
+
+config_qdisc_route_filter
+
+test_ns
+sleep 2
+test_ns
+
+Signed-off-by: xietangxin <xietangxin@yeah.net>
+---
+ drivers/net/virtio_net.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 72d6a9c6a..5b13a61b3 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3351,6 +3351,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	/* Don't wait up for transmitted skbs to be freed. */
+ 	if (!use_napi) {
+ 		skb_orphan(skb);
++		skb_dst_drop(skb);
+ 		nf_reset_ct(skb);
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
