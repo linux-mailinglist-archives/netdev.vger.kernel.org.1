@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-265076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPqgJnGuq2nmfQEAu9opvQ
-	(envelope-from <netdev+bounces-265076-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:49:53 +0100
+	id uNwCJ7auq2nmfQEAu9opvQ
+	(envelope-from <netdev+bounces-265077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:51:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA8B22A236
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:49:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDB922A262
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 148CF3064126
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 04:47:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3E0B930AB63A
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 04:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230D135A3A3;
-	Sat,  7 Mar 2026 04:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE5D3603CF;
+	Sat,  7 Mar 2026 04:46:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355D934D4E9;
-	Sat,  7 Mar 2026 04:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6D2355F5C;
+	Sat,  7 Mar 2026 04:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772858779; cv=none; b=vCjrezaW0qgRVVOGFNjBGdgrT5IHgfa2Ea203yQjTbP+m8TQ3xBYOiSKa0JNUOvurd91RyEU3MnucYHTG7OIoadziAtv3dc5lL/KmbbQyC3vHn2P44jLrvCqyu1db9wGT4BTC6RjnTrSsfz2WiDi/CpN8/wJJ2UVL3g7/fuOA4c=
+	t=1772858780; cv=none; b=Yxgc+p2RLUEg9NNGZ+p2Vt3q+2y9iJS1YjmWsZimqEomU5XYsjH9Bc09Vf24G0NqBX5BEDES7UwZLm0/73vcz5gzMv3YodRCt2FnXzR7aoigrfY8xHJsg1OJAx2bVA3DutZbgo39uCtkKXrfb0w1IIbEQ6xFdIxf7wqGATTtOSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772858779; c=relaxed/simple;
-	bh=aYI6noFunMVNidkq3fDpollILn8CuOzlAMZ2XG27agk=;
+	s=arc-20240116; t=1772858780; c=relaxed/simple;
+	bh=qEndSg74IrSsHyC+dBq6x34fpvQkg8HB8RGj8cYl2Wg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l+ryl41RliNl38LKwXccsbyctdSyQLbABNbCBoSOx/26S5hMYz9FXK/oDot5dBuNqCg+7d5L/KgCVUBn88XY+NS92jR9wfgTRjZvLp+9ijFByaEUUQLhp7EXnIAJeTnKrLpv2fVkgD+hYZyt6yhhnyI/U14ExtVCE+BlTZqNypo=
+	 MIME-Version:Content-Type; b=gsDo6U6dVMXHZefNfQ1/GWc92br6JTVdhUz4Rm1p/+sg9Nn36NpycAgzwh72QKimOPbiYwaiGCp8XiPnseRCYl2eLZiKIVUSDAHxxyNDud8ts98MG5beWhzAhaHq/NuLfCM6aVCeu7TLJtONqjPakxwmdoj1XAIJTBK2AgaqsQo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 42CA054CDF2;
-	Sat,  7 Mar 2026 05:46:14 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 174B554C936;
+	Sat,  7 Mar 2026 05:46:16 +0100 (CET)
 From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
 To: bridge@lists.linux.dev
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	shuah@kernel.org,
 	petrm@nvidia.com,
 	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v4 10/14] net: bridge: mcast: track active state, bridge up/down
-Date: Sat,  7 Mar 2026 05:45:44 +0100
-Message-ID: <20260307044548.5230-11-linus.luessing@c0d3.blue>
+Subject: [PATCH net-next v4 11/14] net: bridge: mcast: track active state, prepare for outside lock reads
+Date: Sat,  7 Mar 2026 05:45:45 +0100
+Message-ID: <20260307044548.5230-12-linus.luessing@c0d3.blue>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260307044548.5230-1-linus.luessing@c0d3.blue>
 References: <20260307044548.5230-1-linus.luessing@c0d3.blue>
@@ -68,7 +68,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 2CA8B22A236
+X-Rspamd-Queue-Id: 5DDB922A262
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -78,7 +78,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265076-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265077-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.884];
+	NEURAL_HAM(-0.00)[-0.867];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[linus.luessing@c0d3.blue,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,nvidia.com,lunn.ch,kernel.org,redhat.com,google.com,davemloft.net,fomichev.me,gmail.com,c0d3.blue];
@@ -100,91 +100,88 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[c0d3.blue:mid,c0d3.blue:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This is mainly for switchdev and DSA later: To ensure that we switch
-to inactive before destroying a bridge interface. A switchdev/DSA driver
-might have allocated resources after we switched to an enabled multicast
-active state. This gives switchdev/DSA drivers a chance to free these
-resources again when we destroy the bridge (later).
+We are updating ip{4,6}_active and check all variables their state relies
+on while holding the bridge multicast spinlock. However we are going to
+read it without this lock in a follow-up commit on fast/data path, too.
 
-Putting it into the ndo_stop / bridge interface down part instead of the
-ndo_uninit / bridge destroy part though for a better semantic match. If
-the bridge interface is down / stopped then it is also inactive.
-
-No functional change for the fast/data path.
+As these variables are only booleans this shouldn't be a problem,
+ip{4,6}_active will be loaded and stored atomically. And those
+read sides should converge eventually. But to allow tooling to verify
+this use the READ_ONCE() and WRITE_ONCE macros.
 
 Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
 ---
- include/uapi/linux/if_link.h |  8 ++++----
- net/bridge/br_multicast.c    | 12 ++++++++++++
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ net/bridge/br_multicast.c | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index d963be8679b5..679368784643 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -748,14 +748,14 @@ enum in6_addr_gen_mode {
-  * @IFLA_BR_MCAST_ACTIVE_V4
-  *   Bridge IPv4 mcast active state, read only.
-  *
-- *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an IGMP querier is present,
-- *   0 otherwise.
-+ *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled, an IGMP querier is present
-+ *   and the bridge interface is up, 0 otherwise.
-  *
-  * @IFLA_BR_MCAST_ACTIVE_V6
-  *   Bridge IPv6 mcast active state, read only.
-  *
-- *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an MLD querier is present,
-- *   0 otherwise.
-+ *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled, an MLD querier is present
-+ *   and the bridge interface is up, 0 otherwise.
-  */
- enum {
- 	IFLA_BR_UNSPEC,
 diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 1059984d8147..cb78f9555db6 100644
+index cb78f9555db6..6faa484dede7 100644
 --- a/net/bridge/br_multicast.c
 +++ b/net/bridge/br_multicast.c
-@@ -1124,6 +1124,7 @@ static void br_multicast_notify_active(struct net_bridge_mcast *brmctx,
-  *
-  * The multicast active state is set, per protocol family, if:
-  *
-+ * - the bridge interface is up
-  * - multicast snooping is enabled
-  * - an IGMP/MLD querier is present
-  * - for own IPv6 MLD querier: an IPv6 link-local address is configured on the
-@@ -1142,6 +1143,11 @@ static void br_multicast_update_active(struct net_bridge_mcast *brmctx)
+@@ -1085,9 +1085,10 @@ static void br_ip4_multicast_update_active(struct net_bridge_mcast *brmctx,
+ 					   bool force_inactive)
+ {
+ 	if (force_inactive)
+-		brmctx->ip4_active = false;
++		WRITE_ONCE(brmctx->ip4_active, false);
+ 	else
+-		brmctx->ip4_active = br_ip4_multicast_querier_exists(brmctx);
++		WRITE_ONCE(brmctx->ip4_active,
++			   br_ip4_multicast_querier_exists(brmctx));
+ }
  
- 	lockdep_assert_held_once(&brmctx->br->multicast_lock);
- 
-+	if (!netif_running(brmctx->br->dev)) {
-+		force_inactive = true;
-+		goto update;
-+	}
-+
- 	if (!br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED)) {
- 		force_inactive = true;
- 		goto update;
-@@ -4431,6 +4437,9 @@ static void __br_multicast_open(struct net_bridge_mcast *brmctx)
+ static void br_ip6_multicast_update_active(struct net_bridge_mcast *brmctx,
+@@ -1095,23 +1096,26 @@ static void br_ip6_multicast_update_active(struct net_bridge_mcast *brmctx,
+ {
  #if IS_ENABLED(CONFIG_IPV6)
- 	__br_multicast_open_query(brmctx->br, &brmctx->ip6_own_query);
+ 	if (force_inactive)
+-		brmctx->ip6_active = false;
++		WRITE_ONCE(brmctx->ip6_active, false);
+ 	else
+-		brmctx->ip6_active = br_ip6_multicast_querier_exists(brmctx);
++		WRITE_ONCE(brmctx->ip6_active,
++			   br_ip6_multicast_querier_exists(brmctx));
  #endif
-+
-+	/* bridge interface is up, maybe set multicast state to active */
-+	br_multicast_update_active(brmctx);
  }
  
- static void br_multicast_open_locked(struct net_bridge *br)
-@@ -4478,6 +4487,9 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
- 	timer_shutdown(&brmctx->ip6_other_query.delay_timer);
- 	timer_shutdown(&brmctx->ip6_own_query.timer);
- #endif
+ static void br_multicast_notify_active(struct net_bridge_mcast *brmctx,
+ 				       bool ip4_active_old, bool ip6_active_old)
+ {
+-	if (brmctx->ip4_active == ip4_active_old &&
+-	    brmctx->ip6_active == ip6_active_old)
++	int ip4_active = brmctx->ip4_active;
++	int ip6_active = brmctx->ip6_active;
 +
-+	/* bridge interface is down, set multicast state to inactive */
-+	br_multicast_update_active(brmctx);
++	if (ip4_active == ip4_active_old &&
++	    ip6_active == ip6_active_old)
+ 		return;
+ 
+ 	br_debug(brmctx->br, "mc_active changed, vid: %i: v4: %i->%i, v6: %i->%i\n",
+ 		 brmctx->vlan ? brmctx->vlan->vid : -1,
+-		 ip4_active_old, brmctx->ip4_active,
+-		 ip6_active_old, brmctx->ip6_active);
++		 ip4_active_old, ip4_active, ip6_active_old, ip6_active);
  }
  
- void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
+ /**
+@@ -4269,7 +4273,7 @@ void br_multicast_ctx_init(struct net_bridge *br,
+ 	brmctx->multicast_membership_interval = 260 * HZ;
+ 
+ 	brmctx->ip4_querier.port_ifidx = 0;
+-	brmctx->ip4_active = 0;
++	WRITE_ONCE(brmctx->ip4_active, 0);
+ 	seqcount_spinlock_init(&brmctx->ip4_querier.seq, &br->multicast_lock);
+ 	brmctx->multicast_igmp_version = 2;
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -4277,7 +4281,7 @@ void br_multicast_ctx_init(struct net_bridge *br,
+ 	brmctx->ip6_querier.port_ifidx = 0;
+ 	seqcount_spinlock_init(&brmctx->ip6_querier.seq, &br->multicast_lock);
+ #endif
+-	brmctx->ip6_active = 0;
++	WRITE_ONCE(brmctx->ip6_active, 0);
+ 
+ 	timer_setup(&brmctx->ip4_mc_router_timer, NULL, 0);
+ 	timer_setup(&brmctx->ip4_other_query.timer, NULL, 0);
 -- 
 2.53.0
 
