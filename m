@@ -1,382 +1,609 @@
-Return-Path: <netdev+bounces-265139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265141-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIgMMf8ZrGm4kgEAu9opvQ
-	(envelope-from <netdev+bounces-265139-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 13:28:47 +0100
+	id iLyxBN4drGkRlAEAu9opvQ
+	(envelope-from <netdev+bounces-265141-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 13:45:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBD922BB11
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 13:28:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA9D22BBDE
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 13:45:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A1D54302085F
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 12:28:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 987ED3008303
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 12:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D2D34E750;
-	Sat,  7 Mar 2026 12:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C973F392C46;
+	Sat,  7 Mar 2026 12:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="eavrdTuj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gePsTJQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923E4299959;
-	Sat,  7 Mar 2026 12:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC97C34BA53
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 12:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772886522; cv=none; b=MK/RJCpIJJHMMoAfREzi2x5HtqtDk1n3KEODuSGEcSI2S9oe93VcI9WL00Ww4hfdtbFc03wy4DJSK1QijOwr7lmkSjKK1X0GANONgSVFc05nlIT6eHG8ly4EG08kxV1svqpQeQtjxhXIHvWjwqRbu7IQpblsuOXiV8Qd1p7dLD8=
+	t=1772887514; cv=none; b=BE22wQ4Gmgd9i/R0o93kwnmMSGnZB+sJhl7Wl2jkNYPJtSH56A8cLEzDfSp75N3JRSsoXqCeWZs3wMLL+myHE2r401OXO0yAl4TlLi/xRMrLU6bjD2A8eS64Zp+mNmfokLMbCWqF6UStzqlObh3gGjzMfJt3S0u4cbSamh0lwbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772886522; c=relaxed/simple;
-	bh=LPRIazzZIfxpm7W+AMeFq/K6szh34FzU1F7O4yuEWg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cf4wDFvRQTy2WmagV3Okui+G/ComL6ZCywOcQy3OwAtZ3SnQYK6EwiiF6OkFuWWTbmIq8N7wZ0K2IIkavs5VseHP7nN0ZgEK6wN8RVp1gaIZUhoc83Rv+BYSNGl0TDzjG7bLzUhCC1cX2Wn/9b5jCYAFEfRO/fwJj3pE0ok/Jvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=eavrdTuj; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=VLisGpI9bU473iY8R1G6XN5hECPZkmgPzS0UYnsU8A4=; b=eavrdTujX5ErW3ejq6xDgwQrCd
-	+pO8C1Rxm86gLNq7yqyiYP/k0boGfOyTrwThdydp6/I+hCqHJZHL8otlDadE3GjqbYWc8U5H/vZ1E
-	74iENkif6cyA2eQYtn85X79J041wf7pcS6WL/IO1opM4592YH/TuHj6gD4hetETrXmHzPJDEjr6xG
-	TNlWztZq5H20Thr8HWiZhStSofYghHbfqMXFdaG3jF/lQtZ2IOESGcnAzGUb9C3cly2zCLNpRRwtF
-	SgAOYIeTpLTXdIfrifzaeElP6DEv2NohiJrAooQkViPXVFSKZosKZpD7YwuZxWCGXGvjQKcC4dq+F
-	zHyFuSbg==;
-Received: from [122.175.9.182] (port=64662 helo=cypher.couthit.local)
-	by server.couthit.com with esmtpa (Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1vyqlq-00000000pP7-3sOt;
-	Sat, 07 Mar 2026 07:28:39 -0500
-From: Parvathi Pudi <parvathi@couthit.com>
-To: nm@ti.com,
-	vigneshr@ti.com,
-	afd@ti.com,
-	khilman@baylibre.com,
-	rogerq@kernel.org,
-	tony@atomide.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	richardcochran@gmail.com,
-	aaro.koskinen@iki.fi,
-	andreas@kemnade.info
-Cc: andrew@lunn.ch,
-	linux-omap@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	danishanwar@ti.com,
-	pratheesh@ti.com,
-	j-rameshbabu@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	m-malladi@ti.com,
-	krishna@couthit.com,
-	mohan@couthit.com,
-	pmohan@couthit.com,
-	basharath@couthit.com,
-	parvathi@couthit.com,
-	Murali Karicheri <m-karicheri2@ti.com>
-Subject: [PATCH v5 3/3] arm: dts: ti: Add device tree support for PRU-ICSS on AM335x
-Date: Sat,  7 Mar 2026 17:53:57 +0530
-Message-ID: <20260307122641.738450-4-parvathi@couthit.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260307122641.738450-1-parvathi@couthit.com>
-References: <20260307122641.738450-1-parvathi@couthit.com>
+	s=arc-20240116; t=1772887514; c=relaxed/simple;
+	bh=cVLLyXB9vg75HttolN/DpKVa2tDWJ/km/qpiCJZiY4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c8p6iuUvSF76IPazxpF7hHd7Liqjamwcm+P0svBnSgRsM8ttaXso7rf5POjbid4amG7b5CpNEY8FaHEbagymZZgOth4+EN1U8xsMWObWiPJLnv+Fi4QHNr3is9qNigSKGTGSaeZH6KJTBM5lhbBAL5CYRxgw3azsUSyGoBmUjIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gePsTJQf; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772887512; x=1804423512;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cVLLyXB9vg75HttolN/DpKVa2tDWJ/km/qpiCJZiY4A=;
+  b=gePsTJQfdg3zY0FRMQDLmgEBiA5ESdC9qs+RIX9pcHkxL/7QK8NIYH+v
+   9ZsatJ+lGreiEPgkp0LoiiPONin6/t9f5cNnP9UrT7967gglAQgSIknJs
+   5B/OuasLK14Qk0zBu8JqGZ8jtvJRY18WHlSVPVwV6eRwp03eJz070nyYK
+   cCBqxRs0qFL8ALkK/7gsCFBjGVQJx6XL4/8+IXoOlqX73+67Jyh9+xigA
+   NPPIZTcEcl7UGOcH2PTZEbIw+vm1xhBDuDOXpn2oJx5BntZFjBu/UQeBX
+   EiPuFYGsuloEpRsRDItgOMhGvCcxVTZSP6Vfy7uz7J/EPvK53nzpTtXML
+   w==;
+X-CSE-ConnectionGUID: CbJNT5njQJmYi5x96FmZlg==
+X-CSE-MsgGUID: ZBcmSAqqQqSabLO08406sA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="99449775"
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="99449775"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2026 04:45:12 -0800
+X-CSE-ConnectionGUID: xdG1BgUvSL2QGH/mU7NYzA==
+X-CSE-MsgGUID: nJ1zVpPXQWSxDUl+P2cadg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="242289603"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by fmviesa002.fm.intel.com with ESMTP; 07 Mar 2026 04:45:09 -0800
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vyr1n-000000002UD-0WUM;
+	Sat, 07 Mar 2026 12:45:07 +0000
+Date: Sat, 7 Mar 2026 13:44:28 +0100
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Kui-Feng Lee <thinker.li@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with
+ exceptions from tb6_gc_hlist.
+Message-ID: <202603071301.jcZkyoAP-lkp@intel.com>
+References: <20260307024709.718395-3-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Rspamd-Queue-Id: 3CBD922BB11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260307024709.718395-3-kuniyu@google.com>
+X-Rspamd-Queue-Id: ACA9D22BBDE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.64 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[couthit.com:s=default];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_X_AS(0.00)[parvathi@couthit.com];
-	FREEMAIL_TO(0.00)[ti.com,baylibre.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_X_GMSV(0.00)[parvathi@couthit.com];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,kernel.org,google.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265141-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265139-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.495];
-	HAS_X_SOURCE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	HAS_X_ANTIABUSE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[couthit.com:-];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-From: Roger Quadros <rogerq@ti.com>
+Hi Kuniyuki,
 
-The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
-This patch adds the new device tree overlay file in-order to enable
-PRU-ICSS instance, along with makefile changes.
+kernel test robot noticed the following build errors:
 
-PRU-ICSS instance consists of two PRU cores along with various
-peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
-Ethernet Peripheral(IEP), the Real Time Media Independent Interface
-controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+[auto build test ERROR on net/main]
 
-am33xx-l4.dtsi - Adds IEP and eCAP peripheral as child nodes
-of the PRUSS subsystem node.
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/ipv6-Remove-permanent-routes-from-tb6_gc_hlist-when-all-exceptions-expire/20260307-104803
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260307024709.718395-3-kuniyu%40google.com
+patch subject: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with exceptions from tb6_gc_hlist.
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260307/202603071301.jcZkyoAP-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260307/202603071301.jcZkyoAP-lkp@intel.com/reproduce)
 
-am335x-icev2-prueth.dtso - Adds PRU-ICSS instance node along with PRU
-eth port information and corresponding port configuration. It includes
-interrupt mapping for packet reception, HW timestamp collection, and PRU
-Ethernet ports in MII mode,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603071301.jcZkyoAP-lkp@intel.com/
 
-GPIO configuration, boot strapping along with delay configuration for
-individual PRU Ethernet port and other required nodes.
+All errors (new ones prefixed by >>):
 
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
----
- arch/arm/boot/dts/ti/omap/Makefile            |   5 +
- .../ti/omap/am335x-icev2-prueth-overlay.dtso  | 149 ++++++++++++++++++
- arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 ++
- 3 files changed, 165 insertions(+)
- create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:10: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:39: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                                              ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:10: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:38: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                                             ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:48: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                                       ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:65: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                  ^
+   include/linux/compiler_types.h:642:53: note: expanded from macro '__unqual_scalar_typeof'
+     642 | #define __unqual_scalar_typeof(x) __typeof_unqual__(x)
+         |                                                     ^
+   In file included from drivers/scsi/cxgbi/libcxgbi.c:28:
+   In file included from include/net/ip6_route.h:7:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:72: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   7 errors generated.
+--
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:10: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:39: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                                              ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:10: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:38: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                                             ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:48: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                                       ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:65: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                  ^
+   include/linux/compiler_types.h:642:53: note: expanded from macro '__unqual_scalar_typeof'
+     642 | #define __unqual_scalar_typeof(x) __typeof_unqual__(x)
+         |                                                     ^
+   In file included from drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:72: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:995:44: warning: variable 'size6' set but not used [-Wunused-but-set-variable]
+     995 |         int t4 = is_t4(lldi->adapter_type), size, size6;
+         |                                                   ^
+   drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:1776:21: warning: variable 'size6' set but not used [-Wunused-but-set-variable]
+    1776 |         unsigned int size, size6;
+         |                            ^
+   2 warnings and 7 errors generated.
+--
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:10: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:667:39: note: expanded from macro '__native_word'
+     667 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                                              ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:10: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                 ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:668:38: note: expanded from macro '__native_word'
+     668 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                                             ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:48: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                                       ^
+   include/linux/compiler_types.h:706:22: note: expanded from macro 'compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:694:23: note: expanded from macro '_compiletime_assert'
+     694 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:686:9: note: expanded from macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:65: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                  ^
+   include/linux/compiler_types.h:642:53: note: expanded from macro '__unqual_scalar_typeof'
+     642 | #define __unqual_scalar_typeof(x) __typeof_unqual__(x)
+         |                                                     ^
+   In file included from cxgb4i/cxgb4i.c:20:
+   In file included from include/net/tcp.h:45:
+   In file included from include/net/xfrm.h:26:
+>> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct net'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                     ~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:72: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   cxgb4i/cxgb4i.c:995:44: warning: variable 'size6' set but not used [-Wunused-but-set-variable]
+     995 |         int t4 = is_t4(lldi->adapter_type), size, size6;
+         |                                                   ^
+   cxgb4i/cxgb4i.c:1776:21: warning: variable 'size6' set but not used [-Wunused-but-set-variable]
+    1776 |         unsigned int size, size6;
+         |                            ^
+   2 warnings and 7 errors generated.
 
-diff --git a/arch/arm/boot/dts/ti/omap/Makefile b/arch/arm/boot/dts/ti/omap/Makefile
-index 4c577214f512..6fb58fe51648 100644
---- a/arch/arm/boot/dts/ti/omap/Makefile
-+++ b/arch/arm/boot/dts/ti/omap/Makefile
-@@ -84,6 +84,10 @@ dtb-$(CONFIG_ARCH_OMAP4) += \
- 	omap4-samsung-espresso10.dtb \
- 	omap4-xyboard-mz609.dtb \
- 	omap4-xyboard-mz617.dtb
-+
-+am335x-icev2-prueth-dtbs := am335x-icev2.dtb \
-+	am335x-icev2-prueth-overlay.dtbo
-+
- dtb-$(CONFIG_SOC_AM33XX) += \
- 	am335x-baltos-ir2110.dtb \
- 	am335x-baltos-ir3220.dtb \
-@@ -101,6 +105,7 @@ dtb-$(CONFIG_SOC_AM33XX) += \
- 	am335x-evmsk.dtb \
- 	am335x-guardian.dtb \
- 	am335x-icev2.dtb \
-+	am335x-icev2-prueth.dtb \
- 	am335x-lxm.dtb \
- 	am335x-mba335x.dtb \
- 	am335x-moxa-uc-2101.dtb \
-diff --git a/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso b/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
-new file mode 100644
-index 000000000000..3b82cf719671
---- /dev/null
-+++ b/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
-@@ -0,0 +1,149 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * DT overlay for IDK AM335x
-+ *
-+ * Copyright (C) 2018 Texas Instruments Incorporated - http://www.ti.com/
-+ */
-+
-+/*
-+ * AM335x ICE V2 board
-+ * http://www.ti.com/tool/tmdsice3359
-+ */
-+
-+/dts-v1/;
-+/plugin/;
-+
-+#include <dt-bindings/bus/ti-sysc.h>
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/pinctrl/am33xx.h>
-+#include <dt-bindings/clock/am3.h>
-+
-+&{/} {
-+        /* Dual-MAC Ethernet application node on PRU-ICSS */
-+        pruss_eth: pruss-eth {
-+                compatible = "ti,am3359-prueth";
-+                ti,prus = <&pru0>, <&pru1>;
-+                sram = <&ocmcram>;
-+                ti,mii-rt = <&pruss_mii_rt>;
-+                ti,iep = <&pruss_iep>;
-+                ti,ecap = <&pruss_ecap>;
-+                interrupts = <20 2 2>, <21 3 3>;
-+                interrupt-names = "rx_hp", "rx_lp";
-+                interrupt-parent = <&pruss_intc>;
-+
-+                pinctrl-0 = <&pruss_eth_default>;
-+                pinctrl-names = "default";
-+
-+                ethernet-ports {
-+                        #address-cells = <1>;
-+                        #size-cells = <0>;
-+                        pruss_emac0: ethernet-port@0 {
-+                                reg = <0>;
-+                                phy-handle = <&pruss_eth0_phy>;
-+                                phy-mode = "mii";
-+                                interrupts = <20 2 2>, <26 6 6>, <23 6 6>;
-+                                interrupt-names = "rx", "emac_ptp_tx",
-+                                                  "hsr_ptp_tx";
-+                                /* Filled in by bootloader */
-+                                local-mac-address = [00 00 00 00 00 00];
-+                        };
-+
-+                        pruss_emac1: ethernet-port@1 {
-+                                reg = <1>;
-+                                phy-handle = <&pruss_eth1_phy>;
-+                                phy-mode = "mii";
-+                                interrupts = <21 3 3>, <27 9 7>, <24 9 7>;
-+                                interrupt-names = "rx", "emac_ptp_tx",
-+                                                  "hsr_ptp_tx";
-+                                /* Filled in by bootloader */
-+                                local-mac-address = [00 00 00 00 00 00];
-+                        };
-+                };
-+        };
-+};
-+
-+&am33xx_pinmux {
-+	/* MDIO node for PRU-ICSS */
-+        pruss_mdio_default: pruss-mdio-default {
-+                pinctrl-single,pins = <
-+			AM33XX_IOPAD(0x88c, PIN_OUTPUT | MUX_MODE5) /* (V12) gpmc_clk.pr1_mdio_mdclk */
-+			AM33XX_IOPAD(0x888, PIN_INPUT | MUX_MODE5) /* (T13) gpmc_csn3.pr1_mdio_data */
-+                >;
-+        };
-+
-+	/* Pinmux configuration for PRU-ICSS */
-+        pruss_eth_default: pruss-eth-default {
-+                pinctrl-single,pins = <
-+			AM33XX_IOPAD(0x8a0, PIN_INPUT | MUX_MODE2) /* (R1) lcd_data0.pr1_mii_mt0_clk */
-+			AM33XX_IOPAD(0x8b4, PIN_OUTPUT | MUX_MODE2) /* (T2) lcd_data5.pr1_mii0_txd0 */
-+			AM33XX_IOPAD(0x8b0, PIN_OUTPUT | MUX_MODE2) /* (T1) lcd_data4.pr1_mii0_txd1 */
-+			AM33XX_IOPAD(0x8ac, PIN_OUTPUT | MUX_MODE2) /* (R4) lcd_data3.pr1_mii0_txd2 */
-+			AM33XX_IOPAD(0x8a8, PIN_OUTPUT | MUX_MODE2) /* (R3) lcd_data2.pr1_mii0_txd3 */
-+			AM33XX_IOPAD(0x8cc, PIN_INPUT | MUX_MODE5) /* (U4) lcd_data11.pr1_mii0_rxd0 */
-+			AM33XX_IOPAD(0x8c8, PIN_INPUT | MUX_MODE5) /* (U3) lcd_data10.pr1_mii0_rxd1 */
-+			AM33XX_IOPAD(0x8c4, PIN_INPUT | MUX_MODE5) /* (U2) lcd_data9.pr1_mii0_rxd2 */
-+			AM33XX_IOPAD(0x8c0, PIN_INPUT | MUX_MODE5) /* (U1) lcd_data8.pr1_mii0_rxd3 */
-+			AM33XX_IOPAD(0x8a4, PIN_OUTPUT | MUX_MODE2) /* (R2) lcd_data1.pr1_mii0_txen */
-+			AM33XX_IOPAD(0x8d8, PIN_INPUT | MUX_MODE5) /* (V4) lcd_data14.pr1_mii_mr0_clk */
-+			AM33XX_IOPAD(0x8dc, PIN_INPUT | MUX_MODE5) /* (T5) lcd_data15.pr1_mii0_rxdv */
-+			AM33XX_IOPAD(0x8d4, PIN_INPUT | MUX_MODE5) /* (V3) lcd_data13.pr1_mii0_rxer */
-+			AM33XX_IOPAD(0x8d0, PIN_INPUT | MUX_MODE5) /* (V2) lcd_data12.pr1_mii0_rxlink */
-+			AM33XX_IOPAD(0x8e8, PIN_INPUT | MUX_MODE2) /* (V5) lcd_pclk.pr1_mii0_crs */
-+
-+			AM33XX_IOPAD(0x840, PIN_INPUT | MUX_MODE5) /* (R13) gpmc_a0.pr1_mii_mt1_clk */
-+			AM33XX_IOPAD(0x850, PIN_OUTPUT | MUX_MODE5) /* (R14) gpmc_a4.pr1_mii1_txd0 */
-+			AM33XX_IOPAD(0x84c, PIN_OUTPUT | MUX_MODE5) /* (T14) gpmc_a3.pr1_mii1_txd1 */
-+			AM33XX_IOPAD(0x848, PIN_OUTPUT | MUX_MODE5) /* (U14) gpmc_a2.pr1_mii1_txd2 */
-+			AM33XX_IOPAD(0x844, PIN_OUTPUT | MUX_MODE5) /* (V14) gpmc_a1.pr1_mii1_txd3 */
-+			AM33XX_IOPAD(0x860, PIN_INPUT | MUX_MODE5) /* (V16) gpmc_a8.pr1_mii1_rxd0 */
-+			AM33XX_IOPAD(0x85c, PIN_INPUT | MUX_MODE5) /* (T15) gpmc_a7.pr1_mii1_rxd1 */
-+			AM33XX_IOPAD(0x858, PIN_INPUT | MUX_MODE5) /* (U15) gpmc_a6.pr1_mii1_rxd2 */
-+			AM33XX_IOPAD(0x854, PIN_INPUT | MUX_MODE5) /* (V15) gpmc_a5.pr1_mii1_rxd3 */
-+			AM33XX_IOPAD(0x874, PIN_OUTPUT | MUX_MODE5) /* (U17) gpmc_wpn.pr1_mii1_txen */
-+			AM33XX_IOPAD(0x864, PIN_INPUT | MUX_MODE5) /* (U16) gpmc_a9.pr1_mii_mr1_clk */
-+			AM33XX_IOPAD(0x868, PIN_INPUT | MUX_MODE5) /* (T16) gpmc_a10.pr1_mii1_rxdv */
-+			AM33XX_IOPAD(0x86c, PIN_INPUT | MUX_MODE5) /* (V17) gpmc_a11.pr1_mii1_rxer */
-+			AM33XX_IOPAD(0x878, PIN_INPUT | MUX_MODE5) /* (U18) gpmc_be1n.pr1_mii1_rxlink */
-+			AM33XX_IOPAD(0x8ec, PIN_INPUT | MUX_MODE2) /* (R6) lcd_ac_bias_en.pr1_mii1_crs */
-+                >;
-+        };
-+};
-+
-+&gpio3 {
-+        mux-mii-hog {
-+                /* ETH1 mux: Low for MII-PRU, high for RMII-CPSW */
-+                output-low;
-+        };
-+};
-+
-+/*
-+ * Disable CPSW switch node and
-+ * MDIO configuration to prevent
-+ * conflict with PRU-ICSS
-+ */
-+&mac_sw {
-+        status = "disable";
-+};
-+
-+&davinci_mdio_sw {
-+        status = "disable";
-+};
-+
-+/* PRU-ICSS MDIO configuration */
-+&pruss_mdio {
-+        pinctrl-0 = <&pruss_mdio_default>;
-+        pinctrl-names = "default";
-+        reset-gpios = <&gpio2 5 GPIO_ACTIVE_LOW>;
-+        reset-delay-us = <2>; /* PHY datasheet states 1uS min */
-+        status = "okay";
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        pruss_eth0_phy: ethernet-phy@1 {
-+                 reg = <1>;
-+        };
-+
-+        pruss_eth1_phy: ethernet-phy@3 {
-+                 reg = <3>;
-+        };
-+};
-diff --git a/arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi b/arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi
-index 89d16fcc773e..a63ef307d918 100644
---- a/arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi
-+++ b/arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi
-@@ -896,6 +896,17 @@ pruss_mii_rt: mii-rt@32000 {
- 					reg = <0x32000 0x58>;
- 				};
- 
-+				pruss_iep: iep@2e000 {
-+					compatible = "ti,am3356-icss-iep";
-+					reg = <0x2e000 0x31c>;
-+					clocks = <&pruss_iepclk_mux>;
-+				};
-+
-+				pruss_ecap: ecap@30000 {
-+					compatible = "ti,pruss-ecap";
-+					reg = <0x30000 0x60>;
-+				};
-+
- 				pruss_intc: interrupt-controller@20000 {
- 					compatible = "ti,pruss-intc";
- 					reg = <0x20000 0x2000>;
+
+vim +557 include/net/ip6_fib.h
+
+   548	
+   549	static inline void fib6_may_remove_gc_list(struct net *net,
+   550						   struct fib6_info *f6i)
+   551	{
+   552		struct fib6_gc_args gc_args;
+   553	
+   554		if (hlist_unhashed(&f6i->gc_link))
+   555			return;
+   556	
+ > 557		gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+   558		gc_args.more = 0,
+   559	
+   560		fib6_age_exceptions(f6i, &gc_args, jiffies);
+   561	}
+   562	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
