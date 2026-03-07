@@ -1,779 +1,427 @@
-Return-Path: <netdev+bounces-265193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265194-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIBgNuiZrGlarAEAu9opvQ
-	(envelope-from <netdev+bounces-265193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:34:32 +0100
+	id EMvdI6earGmUrQEAu9opvQ
+	(envelope-from <netdev+bounces-265194-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:37:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5AD22DBA5
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:34:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94EF322DBB7
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:37:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6FC8301CCD7
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:34:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 641C0300B289
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0ED3290AF;
-	Sat,  7 Mar 2026 21:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA749359A81;
+	Sat,  7 Mar 2026 21:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQ33v8W2"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="cTJlYEzM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455CF31354D
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772919270; cv=none; b=Bv2NHdzSNNyM9A2/zldA15FNHgHSpTqMrBifO3b4j97Veex5Eh6NXekYx+F0qvq6PT8X4HtwrBN6SQMA+whPu2fManuCPb4IRwfClhV4bqfRZMRYpv/HdjOUJ+DfrbHGHZJjmRxrW2Qbylzf4WLJr2jfBnBnptcvQFyHzY6fT8U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772919270; c=relaxed/simple;
-	bh=ev1rdSz3lvB9Ehe8iTvbKraS2RGiLo/XPLKnB54eYC8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gQyCLDx0cMyeeJPj0sJU4cRKuhfbKA5mhiLqveWItRLB1JuXVf/jsOeRfzX10QzXmGE7gvzBJ8ImvHEWqSuv4K45yCRm34lOMgHXfObbBHqxship6ZLcBbRrlNNvgHdCjDV9OfNoppgOOCtKnIuaSDpWuyx7DChM1VrcIVMVDRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQ33v8W2; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4836f4cbe0bso90625165e9.3
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:34:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502AD33A9C4
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772919455; cv=pass; b=jBLWBxFoA3+uV9UxRZ/VFekFMz5WCdZOgR65ksX+0KoJLxfEeseaxgMgTi30GNuHMzJEz9W6Qiafvp0fUKHtCG0ApVwlYtPKFcFSUgDpnpkEZ2D8KC6emrBcNmRckRKlMLkXWfC+fsHhMVBbNFm0b30aE9ge8Dxl9ZL2EJqhr88=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772919455; c=relaxed/simple;
+	bh=WDwWZdc9BnDjVU87cF0t+e1oCeBeoUzRFGAxWbMfhgE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=urskAAQf/yVvmvV9bpVkxEKfHWWM9j60d7VYxutQauzfVwhTBLXhHqBM7bVuDwgX40YStWtR4N8gSmWzRasPk9QeClXObdGGRQhuy+Q8wBCGXvVqHHZCwmu/8Ioq9ehiAQtnKt31aYhCxd4ZGzSFC5iHkPZwleXu2dwJSYdxEdk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=cTJlYEzM; arc=pass smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8297e0b27e5so2213763b3a.1
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:37:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772919453; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VTKkeFfSIRCHeOjSkJdIqwH5mZZS8vZ+aThq3J9Le8XrIN2NI0i5fE0vi9jhf0UeDc
+         LzJlH3333pPRAmpcoSPCqp61fL2PrVno6PSFeKMVxloAKeFXO5zhtcesbxUp1yoNiC/6
+         H2EP8tz+HkhV+ZAmsvRWpqnz3Zoz682/h/3amUZNk2rcJa8hG1CVCbbBBEauymJZPr9u
+         t/01bn/b67qbj4ymIkR3Wya3b1dz/7hHtsEU0hkEmMnr2cknEVypNk/qauQY0AV2VTyC
+         tEc5tyza8uedXNM8i+/NwW/x9/87eusciJMz3y7oBCHT2etvrmcrrmjsr8N8ZtFpvske
+         yZ9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BLekuXTpZCk/2xRsyir8NHL/C+qFDUmVruKtYYzpMrM=;
+        fh=XbHPF5C6HPaMxzMDCunEGacfg98lbNTEx1C8FNIVCUM=;
+        b=d42iDzjxXbqWfG5koejnPxlh9qDK0ohfUnAstWNAGUGZpdfSHY/Xfbsm9stKWS1Idp
+         kqgVPY13TZxaE+/0Dlmn5dj28EiGh+Z33VIpEyXXwaM2ANcN/z5AXVUtxrdM/UV5ZObh
+         0hQqmDIK/vnbkp6RU04wUABF7gDfaNkF9xAG9JnvaIt3KgxuOfoSxAMw76vRlGKWO4+T
+         vGssB2xuxe7zRzYqlr5//g72IuHsTd5c394KDmkyLXTinBKDNN36LvjV3yAcgOuCNrYy
+         BxDnt4xw/BVbA9xsYdtsakLAztte/RQ9ycDH7ogePU62G6Pd4U477V+wlRNEXnnr1vd0
+         jDtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772919266; x=1773524066; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=82046iM7Oim513yPDaii1gcOw4YLIILRg6SzZ4lKPKk=;
-        b=WQ33v8W2JBmlZXTMmcH8snM1QkZbNOmlUVUeDsyABzeBqWw9yYc6y78uIjxrrhOH6S
-         NMzeV4YEH4VwAXAleIaVwXnuIB3UuabN1Q/IzoU8P9DlcPyJ2TZpXU/xeY3pkJUv6ffm
-         Ic5EL3kEPB5D5ZQeMddTqnnZo8T+Ob5YjF3JBPG47n53L7l9oQJIAJfdZ0AR/uvRJfoX
-         Gpu+J988PcPy87/LDplADbMJdCyOhKdUxHRX2twYCsotJUBOlDkTRkGLHge46R6cYF3N
-         sEWgzt3q3zZ9rLrO6DaQajdY6TztIBRNjKl0RluFBb+5oZZ41HZ7vdcCAXhw5N9sSwv2
-         TxzQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772919453; x=1773524253; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BLekuXTpZCk/2xRsyir8NHL/C+qFDUmVruKtYYzpMrM=;
+        b=cTJlYEzMNqMeEKOqWBEEWI1B9nsRKuCGf7ckaNtc/AfFDK5oMqfcAJyYvVd6gfFTm+
+         MHv3xcuHGqStLtqTEyqz9ss0/9Kmyd41w3Tvl3/DfViHsKAgfdSHBXoDZCoBodPRRTo9
+         eWsrsQ2jKSjM1BVZ0HNFIfLc1BRMEDD99DzV9KkgqQ2Ydb9VgDnVOMcmO99dxtGvbvoS
+         X/44a9ajJhp96nNthU8viQP1rNkTStB226iEZp2v7HAgIRc/BpMtHKuxT7Ylxz29MPLg
+         b1vScf2/S4dtDhMNEqZZNlyqehRtMCsQRyLgCQr++zdnX+VVrPVJ7wmonW8Dd6YYo+tI
+         CHsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772919266; x=1773524066;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=82046iM7Oim513yPDaii1gcOw4YLIILRg6SzZ4lKPKk=;
-        b=mezXgbkToyl+3BTT/c6AONVb+0dYBqoZOOwnrAfdJ4cLOld7qXQZmN5g/XPUYPwCzU
-         KAdjjZnr4V9OM5MIqqQyxl+ut2rCFH8AeHwcYK9Mx19ka+S0CURWCuCNumqO9EDjJq/P
-         4N2F0Lxx/148Qir+uuxF4DIHzCBhZJDkiAzelumfTfBGJ3WlCVQUluJqs70L/2aTmWnC
-         4VU8UzS7ObkIG+T6qMfPhHXHR7YegLbv2aj3/vDOAblPf+gGM8amf4SW+GQZIIWU4XRC
-         9UtirU7ifHA7t1vmXjRuQ7HXeyiXF7ebbTOx4PswhmJmifWPWUS6aqUkJ2Gud1qyajnv
-         gOkg==
-X-Gm-Message-State: AOJu0YyU8fEhirnOlIQrxYiPrWOsGTPyn8iamMgsl6V2A3AnYUm2aJiL
-	ww60GH322vkx6A58XP0LifVrtAg2Sna/NX7Wv/38nKN2UlTSUa0bjfVR
-X-Gm-Gg: ATEYQzyrpdsK0myjcIDanPOAfDPhGd0hAOw9/yOoKlIW5DhdDbBeO7LFKvl/T7CU6w0
-	jI8d55sqTM3zcXBV5ZO1b/yHR2Be9+yYdaicyTSp7c8KgaBGVBQe6Yzjfn+TK2CqtNHHkSPOgUM
-	4Bor5zDEVxehIAuGmgv3mspNZtQtYvmM+vH+t9KZATFF696Jnq04MirtOS4pboiu17vrSQOxYYz
-	XwwcFqoDkPvDQ3+ZyeMEpoZJGD2jL/uFNQQ7x6x7X33sBUanUcENjJr7dHzvWN0GA05W4ubVhxf
-	/5WBrhuj21HDnmVFSDxWKg/iFRBlfiCqC/G9ooqvPRfttx+/hvclCFdm6PriAgJBJuH0gN472qP
-	78QUYfzFubSGbR5z5W5saZD65Ixd3tWD72O9RuNygZaVDpJMNSsivcIgzPjw+EqGWHa1nh9Q2AQ
-	3L1QGvNdc5x/cGZYo91oZKr+/4P1rwk4OCnhEiosqUuOd43IpHPmlDzfec7O7vwk0XBKSR215hB
-	7LD7QTR45AjozZYCucPuHG5bCjyQwk5BEtRBIoluXcx9d5lgBMjzr0jNdTTMRrAXw==
-X-Received: by 2002:a05:600c:620b:b0:483:6a8d:b2fc with SMTP id 5b1f17b1804b1-4852691c73dmr104019915e9.8.1772919266257;
-        Sat, 07 Mar 2026 13:34:26 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f0f:7f00:f48b:e818:2b17:74e3? (p200300ea8f0f7f00f48be8182b1774e3.dip0.t-ipconnect.de. [2003:ea:8f0f:7f00:f48b:e818:2b17:74e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae2ba66sm11860646f8f.20.2026.03.07.13.34.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Mar 2026 13:34:25 -0800 (PST)
-Message-ID: <e4366c43-ce89-43ef-b67e-8c09af3d45f7@gmail.com>
-Date: Sat, 7 Mar 2026 22:34:23 +0100
+        d=1e100.net; s=20230601; t=1772919453; x=1773524253;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BLekuXTpZCk/2xRsyir8NHL/C+qFDUmVruKtYYzpMrM=;
+        b=S69yl8Gjxsyc1h1h7ANW2MGcBxnT+mvrwMOhNfvUQuH5l10BDe/AVt61GIHpQXbO6y
+         Qc3VUeIEfbEvmkJ+Y3PV/nCxX7bBSqNWWUEw1+ClH+ixmRPZ7Z1GvgaH/Qi2O3tLCZes
+         j8imOgrFvxL1pDc+IIoh4yZsrg6Kx0yIAM8bl4M5JFeZqH6DHOmJy76pPprpy1zFTiUD
+         lZelyDPcd0pime6svJqdtY1D0IzdeRcE6A3JaTHj4O9TYBF0o5MWop2kXuyqkYcgxXM+
+         d3+1dXO9IJ88/rDf4ohp5YGKA7td8Mk4UQT2kGxVSd7oM384rGIT5dVEaetZOT3Wai+Q
+         YAWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXdmz73zNY/X9r6NP7kq4pKwkr8Fqo+1AUfA0hB2cdARmHxYvLV4mKOx4Bz+Eip5j8tTRInTQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkP89WZZ0ZmrhXxAaliobz1JPJ4SrUTTs2OyreOvAQjL9aP8D0
+	2A26J/uV1FO7ijIoliSt0o1VWl6dtcnKAR3q3Gcu8KOf4q74/56rr8XCEJSmDpJeidwYVG5vrKi
+	sAdpNL2S2IKk2bBSmuzwBmoJiGpZR2ENVg6bMv0OD
+X-Gm-Gg: ATEYQzwG9qn6IG3Yk5xvez+lQR2sCmkuIl8Bp0cdnKzrKF4ZBaF5r96mrmvsuJ6scZy
+	jS6NEPeHJrf3GExQRrJSbWR25pDFI7fIy9p8KH7uCeYxJM0tuBDXajWeiISfUe0eFD2mZbX2R42
+	fnrRj4tTWHC7e5efcqnam+N0LIJd2MrNobK7clGZmNgYbgjMPIuN9RxRsTuFEHaOS1p364KC6bP
+	mRgRof+BeoE6Ml1+gN304VKkcsBcq4/Z04CO8xe1Ov1b6dXnRXqaZqukF/5JVOIOdeUXE34FA7J
+	RONZzWGcp9S3WCQ=
+X-Received: by 2002:a05:6a00:ae07:b0:81f:50ea:5d96 with SMTP id
+ d2e1a72fcca58-829a2e14ae7mr4663911b3a.18.1772919452679; Sat, 07 Mar 2026
+ 13:37:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 5/5] net: phy: move remaining provider code to
- mdio_bus_provider.c
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>
-References: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
-Content-Language: en-US
-In-Reply-To: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 3C5AD22DBA5
+References: <20260307163430.470644-1-edumazet@google.com>
+In-Reply-To: <20260307163430.470644-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 7 Mar 2026 16:37:21 -0500
+X-Gm-Features: AaiRm53IwD_HGBvn9iNu272U-Gw6uJDTj-k6DWnDVMwt6tHmJ6OrKak1uzeQbWc
+Message-ID: <CAM0EoMkFfW2q=LN9s0hegFVd+cnc0hx2xp=CpoJHFVHx0D38xQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net/sched: do not reset queues in graft operations
+To: Eric Dumazet <edumazet@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Victor Nogueira <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	eric.dumazet@gmail.com, Yunsheng Lin <linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 94EF322DBB7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265193-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-265194-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.992];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.854];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,redhat.com,vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,huawei.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,mojatatu-com.20230601.gappssmtp.com:dkim,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mojatatu.com:email]
 X-Rspamd-Action: no action
 
-This moves definition of mdio_bus class and bus_type to the provider
-side, what allows to make them private to libphy.
-As a prerequisite MDIO statistics handling is moved to the
-provider side as well.
+On Sat, Mar 7, 2026 at 11:34=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Following typical script is extremely disruptive,
+> because each graft operation calls dev_deactivate()
+> which resets all the queues of the device.
+>
+> QPARAM=3D"limit 100000 flow_limit 1000 buckets 4096"
+> TXQS=3D64
+> for ETH in eth1
+> do
+>  tc qd del dev $ETH root 2>/dev/null
+>  tc qd add dev $ETH root handle 1: mq
+>  for i in `seq 1 $TXQS`
+>  do
+>    slot=3D$( printf %x $(( i )) )
+>    tc qd add dev $ETH parent 1:$slot fq $QPARAM
+>  done
+> done
+>
+> One can add "ip link set dev $ETH down/up" to reduce the disruption time:
+>
+> QPARAM=3D"limit 100000 flow_limit 1000 buckets 4096"
+> TXQS=3D64
+> for ETH in eth1
+> do
+>  ip link set dev $ETH down
+>  tc qd del dev $ETH root 2>/dev/null
+>  tc qd add dev $ETH root handle 1: mq
+>  for i in `seq 1 $TXQS`
+>  do
+>    slot=3D$( printf %x $(( i )) )
+>    tc qd add dev $ETH parent 1:$slot fq $QPARAM
+>  done
+>  ip link set dev $ETH up
+> done
+>
+> Or we can add a @reset_needed flag to dev_deactivate() and
+> dev_deactivate_many().
+>
+> This flag is set to true at device dismantle or linkwatch_do_dev(),
+> and to false for graft operations.
+>
+> In the future, we might only stop one queue instead of the whole
+> device, ie call dev_deactivate_queue() instead of dev_deactivate().
+>
+> I think the problem (quadratic behavior) was added in commit
+> 2fb541c862c9 ("net: sch_generic: aviod concurrent reset and enqueue op
+> for lockless qdisc") but this does not look serious enough to deserve
+> risky backports.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/mdio_bus.c          | 282 ----------------------------
- drivers/net/phy/mdio_bus_provider.c | 275 +++++++++++++++++++++++++++
- drivers/net/phy/phylib-internal.h   |   3 +
- include/linux/phy.h                 |   3 -
- 4 files changed, 278 insertions(+), 285 deletions(-)
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 9fb47332602..00d0e4159e9 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -10,20 +10,14 @@
- 
- #include <linux/device.h>
- #include <linux/errno.h>
--#include <linux/etherdevice.h>
- #include <linux/ethtool.h>
--#include <linux/gpio/consumer.h>
- #include <linux/init.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/mii.h>
- #include <linux/mm.h>
- #include <linux/module.h>
--#include <linux/netdevice.h>
--#include <linux/of_device.h>
--#include <linux/of_mdio.h>
- #include <linux/phy.h>
--#include <linux/reset.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
- #include <linux/string.h>
-@@ -64,218 +58,6 @@ bool mdiobus_is_registered_device(struct mii_bus *bus, int addr)
- }
- EXPORT_SYMBOL(mdiobus_is_registered_device);
- 
--/**
-- * mdiobus_release - mii_bus device release callback
-- * @d: the target struct device that contains the mii_bus
-- *
-- * Description: called when the last reference to an mii_bus is
-- * dropped, to free the underlying memory.
-- */
--static void mdiobus_release(struct device *d)
--{
--	struct mii_bus *bus = to_mii_bus(d);
--
--	WARN(bus->state != MDIOBUS_RELEASED &&
--	     /* for compatibility with error handling in drivers */
--	     bus->state != MDIOBUS_ALLOCATED,
--	     "%s: not in RELEASED or ALLOCATED state\n",
--	     bus->id);
--
--	if (bus->state == MDIOBUS_RELEASED)
--		fwnode_handle_put(dev_fwnode(d));
--
--	kfree(bus);
--}
--
--struct mdio_bus_stat_attr {
--	struct device_attribute attr;
--	int address;
--	unsigned int field_offset;
--};
--
--static struct mdio_bus_stat_attr *to_sattr(struct device_attribute *attr)
--{
--	return container_of(attr, struct mdio_bus_stat_attr, attr);
--}
--
--static u64 mdio_bus_get_stat(struct mdio_bus_stats *s, unsigned int offset)
--{
--	const u64_stats_t *stats = (const void *)s + offset;
--	unsigned int start;
--	u64 val = 0;
--
--	do {
--		start = u64_stats_fetch_begin(&s->syncp);
--		val = u64_stats_read(stats);
--	} while (u64_stats_fetch_retry(&s->syncp, start));
--
--	return val;
--}
--
--static ssize_t mdio_bus_stat_field_show(struct device *dev,
--					struct device_attribute *attr,
--					char *buf)
--{
--	struct mdio_bus_stat_attr *sattr = to_sattr(attr);
--	struct mii_bus *bus = to_mii_bus(dev);
--	u64 val = 0;
--
--	if (sattr->address < 0) {
--		/* get global stats */
--		for (int i = 0; i < PHY_MAX_ADDR; i++)
--			val += mdio_bus_get_stat(&bus->stats[i],
--						 sattr->field_offset);
--	} else {
--		val = mdio_bus_get_stat(&bus->stats[sattr->address],
--					sattr->field_offset);
--	}
--
--	return sysfs_emit(buf, "%llu\n", val);
--}
--
--static ssize_t mdio_bus_device_stat_field_show(struct device *dev,
--					       struct device_attribute *attr,
--					       char *buf)
--{
--	struct mdio_bus_stat_attr *sattr = to_sattr(attr);
--	struct mdio_device *mdiodev = to_mdio_device(dev);
--	struct mii_bus *bus = mdiodev->bus;
--	int addr = mdiodev->addr;
--	u64 val;
--
--	val = mdio_bus_get_stat(&bus->stats[addr], sattr->field_offset);
--
--	return sysfs_emit(buf, "%llu\n", val);
--}
--
--#define MDIO_BUS_STATS_ATTR(field)					\
--static const struct mdio_bus_stat_attr dev_attr_mdio_bus_##field = {	\
--	.attr = __ATTR(field, 0444, mdio_bus_stat_field_show, NULL),	\
--	.address = -1,							\
--	.field_offset = offsetof(struct mdio_bus_stats, field),		\
--};									\
--static const struct mdio_bus_stat_attr dev_attr_mdio_bus_device_##field = { \
--	.attr = __ATTR(field, 0444, mdio_bus_device_stat_field_show, NULL), \
--	.field_offset = offsetof(struct mdio_bus_stats, field),		\
--}
--
--MDIO_BUS_STATS_ATTR(transfers);
--MDIO_BUS_STATS_ATTR(errors);
--MDIO_BUS_STATS_ATTR(writes);
--MDIO_BUS_STATS_ATTR(reads);
--
--#define MDIO_BUS_STATS_ADDR_ATTR_DECL(field, addr, file)		\
--static const struct mdio_bus_stat_attr					\
--dev_attr_mdio_bus_addr_##field##_##addr = {				\
--	.attr = { .attr = { .name = file, .mode = 0444 },		\
--		     .show = mdio_bus_stat_field_show,			\
--	},								\
--	.address = addr,						\
--	.field_offset = offsetof(struct mdio_bus_stats, field),		\
--}
--
--#define MDIO_BUS_STATS_ADDR_ATTR(field, addr)				\
--	MDIO_BUS_STATS_ADDR_ATTR_DECL(field, addr,			\
--				 __stringify(field) "_" __stringify(addr))
--
--#define MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(addr)			\
--	MDIO_BUS_STATS_ADDR_ATTR(transfers, addr);			\
--	MDIO_BUS_STATS_ADDR_ATTR(errors, addr);				\
--	MDIO_BUS_STATS_ADDR_ATTR(writes, addr);				\
--	MDIO_BUS_STATS_ADDR_ATTR(reads, addr)				\
--
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(0);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(1);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(2);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(3);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(4);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(5);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(6);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(7);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(8);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(9);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(10);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(11);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(12);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(13);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(14);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(15);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(16);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(17);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(18);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(19);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(20);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(21);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(22);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(23);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(24);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(25);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(26);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(27);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(28);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(29);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(30);
--MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(31);
--
--#define MDIO_BUS_STATS_ADDR_ATTR_GROUP(addr)				\
--	&dev_attr_mdio_bus_addr_transfers_##addr.attr.attr,		\
--	&dev_attr_mdio_bus_addr_errors_##addr.attr.attr,		\
--	&dev_attr_mdio_bus_addr_writes_##addr.attr.attr,		\
--	&dev_attr_mdio_bus_addr_reads_##addr.attr.attr			\
--
--static const struct attribute *const mdio_bus_statistics_attrs[] = {
--	&dev_attr_mdio_bus_transfers.attr.attr,
--	&dev_attr_mdio_bus_errors.attr.attr,
--	&dev_attr_mdio_bus_writes.attr.attr,
--	&dev_attr_mdio_bus_reads.attr.attr,
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(0),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(1),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(2),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(3),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(4),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(5),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(6),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(7),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(8),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(9),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(10),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(11),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(12),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(13),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(14),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(15),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(16),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(17),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(18),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(19),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(20),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(21),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(22),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(23),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(24),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(25),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(26),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(27),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(28),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(29),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(30),
--	MDIO_BUS_STATS_ADDR_ATTR_GROUP(31),
--	NULL,
--};
--
--static const struct attribute_group mdio_bus_statistics_group = {
--	.name		= "statistics",
--	.attrs_const	= mdio_bus_statistics_attrs,
--};
--__ATTRIBUTE_GROUPS(mdio_bus_statistics);
--
--const struct class mdio_bus_class = {
--	.name		= "mdio_bus",
--	.dev_release	= mdiobus_release,
--	.dev_groups	= mdio_bus_statistics_groups,
--};
--EXPORT_SYMBOL_GPL(mdio_bus_class);
--
- static void mdiobus_stats_acct(struct mdio_bus_stats *stats, bool op, int ret)
- {
- 	preempt_disable();
-@@ -841,69 +623,5 @@ int mdiobus_c45_modify_changed(struct mii_bus *bus, int addr, int devad,
- }
- EXPORT_SYMBOL_GPL(mdiobus_c45_modify_changed);
- 
--/**
-- * mdio_bus_match - determine if given MDIO driver supports the given
-- *		    MDIO device
-- * @dev: target MDIO device
-- * @drv: given MDIO driver
-- *
-- * Return: 1 if the driver supports the device, 0 otherwise
-- *
-- * Description: This may require calling the devices own match function,
-- *   since different classes of MDIO devices have different match criteria.
-- */
--static int mdio_bus_match(struct device *dev, const struct device_driver *drv)
--{
--	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
--	struct mdio_device *mdio = to_mdio_device(dev);
--
--	/* Both the driver and device must type-match */
--	if (!(mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY) !=
--	    !(mdio->flags & MDIO_DEVICE_FLAG_PHY))
--		return 0;
--
--	if (of_driver_match_device(dev, drv))
--		return 1;
--
--	if (mdio->bus_match)
--		return mdio->bus_match(dev, drv);
--
--	return 0;
--}
--
--static int mdio_uevent(const struct device *dev, struct kobj_uevent_env *env)
--{
--	int rc;
--
--	/* Some devices have extra OF data and an OF-style MODALIAS */
--	rc = of_device_uevent_modalias(dev, env);
--	if (rc != -ENODEV)
--		return rc;
--
--	return 0;
--}
--
--static const struct attribute *const mdio_bus_device_statistics_attrs[] = {
--	&dev_attr_mdio_bus_device_transfers.attr.attr,
--	&dev_attr_mdio_bus_device_errors.attr.attr,
--	&dev_attr_mdio_bus_device_writes.attr.attr,
--	&dev_attr_mdio_bus_device_reads.attr.attr,
--	NULL,
--};
--
--static const struct attribute_group mdio_bus_device_statistics_group = {
--	.name		= "statistics",
--	.attrs_const	= mdio_bus_device_statistics_attrs,
--};
--__ATTRIBUTE_GROUPS(mdio_bus_device_statistics);
--
--const struct bus_type mdio_bus_type = {
--	.name		= "mdio_bus",
--	.dev_groups	= mdio_bus_device_statistics_groups,
--	.match		= mdio_bus_match,
--	.uevent		= mdio_uevent,
--};
--EXPORT_SYMBOL(mdio_bus_type);
--
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("MDIO bus/device layer");
-diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
-index d50fe6eb4b0..bc0f10ba150 100644
---- a/drivers/net/phy/mdio_bus_provider.c
-+++ b/drivers/net/phy/mdio_bus_provider.c
-@@ -28,6 +28,281 @@
- #include <linux/string.h>
- #include <linux/uaccess.h>
- #include <linux/unistd.h>
-+#include "phylib-internal.h"
-+
-+/**
-+ * mdiobus_release - mii_bus device release callback
-+ * @d: the target struct device that contains the mii_bus
-+ *
-+ * Description: called when the last reference to an mii_bus is
-+ * dropped, to free the underlying memory.
-+ */
-+static void mdiobus_release(struct device *d)
-+{
-+	struct mii_bus *bus = to_mii_bus(d);
-+
-+	WARN(bus->state != MDIOBUS_RELEASED &&
-+	     /* for compatibility with error handling in drivers */
-+	     bus->state != MDIOBUS_ALLOCATED,
-+	     "%s: not in RELEASED or ALLOCATED state\n",
-+	     bus->id);
-+
-+	if (bus->state == MDIOBUS_RELEASED)
-+		fwnode_handle_put(dev_fwnode(d));
-+
-+	kfree(bus);
-+}
-+
-+struct mdio_bus_stat_attr {
-+	struct device_attribute attr;
-+	int address;
-+	unsigned int field_offset;
-+};
-+
-+static struct mdio_bus_stat_attr *to_sattr(struct device_attribute *attr)
-+{
-+	return container_of(attr, struct mdio_bus_stat_attr, attr);
-+}
-+
-+static u64 mdio_bus_get_stat(struct mdio_bus_stats *s, unsigned int offset)
-+{
-+	const u64_stats_t *stats = (const void *)s + offset;
-+	unsigned int start;
-+	u64 val = 0;
-+
-+	do {
-+		start = u64_stats_fetch_begin(&s->syncp);
-+		val = u64_stats_read(stats);
-+	} while (u64_stats_fetch_retry(&s->syncp, start));
-+
-+	return val;
-+}
-+
-+static ssize_t mdio_bus_stat_field_show(struct device *dev,
-+					struct device_attribute *attr,
-+					char *buf)
-+{
-+	struct mdio_bus_stat_attr *sattr = to_sattr(attr);
-+	struct mii_bus *bus = to_mii_bus(dev);
-+	u64 val = 0;
-+
-+	if (sattr->address < 0) {
-+		/* get global stats */
-+		for (int i = 0; i < PHY_MAX_ADDR; i++)
-+			val += mdio_bus_get_stat(&bus->stats[i],
-+						 sattr->field_offset);
-+	} else {
-+		val = mdio_bus_get_stat(&bus->stats[sattr->address],
-+					sattr->field_offset);
-+	}
-+
-+	return sysfs_emit(buf, "%llu\n", val);
-+}
-+
-+static ssize_t mdio_bus_device_stat_field_show(struct device *dev,
-+					       struct device_attribute *attr,
-+					       char *buf)
-+{
-+	struct mdio_bus_stat_attr *sattr = to_sattr(attr);
-+	struct mdio_device *mdiodev = to_mdio_device(dev);
-+	struct mii_bus *bus = mdiodev->bus;
-+	int addr = mdiodev->addr;
-+	u64 val;
-+
-+	val = mdio_bus_get_stat(&bus->stats[addr], sattr->field_offset);
-+
-+	return sysfs_emit(buf, "%llu\n", val);
-+}
-+
-+#define MDIO_BUS_STATS_ATTR(field)					\
-+static const struct mdio_bus_stat_attr dev_attr_mdio_bus_##field = {	\
-+	.attr = __ATTR(field, 0444, mdio_bus_stat_field_show, NULL),	\
-+	.address = -1,							\
-+	.field_offset = offsetof(struct mdio_bus_stats, field),		\
-+};									\
-+static const struct mdio_bus_stat_attr dev_attr_mdio_bus_device_##field = { \
-+	.attr = __ATTR(field, 0444, mdio_bus_device_stat_field_show, NULL), \
-+	.field_offset = offsetof(struct mdio_bus_stats, field),		\
-+}
-+
-+MDIO_BUS_STATS_ATTR(transfers);
-+MDIO_BUS_STATS_ATTR(errors);
-+MDIO_BUS_STATS_ATTR(writes);
-+MDIO_BUS_STATS_ATTR(reads);
-+
-+#define MDIO_BUS_STATS_ADDR_ATTR_DECL(field, addr, file)		\
-+static const struct mdio_bus_stat_attr					\
-+dev_attr_mdio_bus_addr_##field##_##addr = {				\
-+	.attr = { .attr = { .name = file, .mode = 0444 },		\
-+		     .show = mdio_bus_stat_field_show,			\
-+	},								\
-+	.address = addr,						\
-+	.field_offset = offsetof(struct mdio_bus_stats, field),		\
-+}
-+
-+#define MDIO_BUS_STATS_ADDR_ATTR(field, addr)				\
-+	MDIO_BUS_STATS_ADDR_ATTR_DECL(field, addr,			\
-+				 __stringify(field) "_" __stringify(addr))
-+
-+#define MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(addr)			\
-+	MDIO_BUS_STATS_ADDR_ATTR(transfers, addr);			\
-+	MDIO_BUS_STATS_ADDR_ATTR(errors, addr);				\
-+	MDIO_BUS_STATS_ADDR_ATTR(writes, addr);				\
-+	MDIO_BUS_STATS_ADDR_ATTR(reads, addr)				\
-+
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(0);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(1);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(2);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(3);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(4);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(5);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(6);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(7);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(8);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(9);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(10);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(11);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(12);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(13);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(14);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(15);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(16);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(17);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(18);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(19);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(20);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(21);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(22);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(23);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(24);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(25);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(26);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(27);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(28);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(29);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(30);
-+MDIO_BUS_STATS_ADDR_ATTR_GROUP_DECL(31);
-+
-+#define MDIO_BUS_STATS_ADDR_ATTR_GROUP(addr)				\
-+	&dev_attr_mdio_bus_addr_transfers_##addr.attr.attr,		\
-+	&dev_attr_mdio_bus_addr_errors_##addr.attr.attr,		\
-+	&dev_attr_mdio_bus_addr_writes_##addr.attr.attr,		\
-+	&dev_attr_mdio_bus_addr_reads_##addr.attr.attr			\
-+
-+static const struct attribute *const mdio_bus_statistics_attrs[] = {
-+	&dev_attr_mdio_bus_transfers.attr.attr,
-+	&dev_attr_mdio_bus_errors.attr.attr,
-+	&dev_attr_mdio_bus_writes.attr.attr,
-+	&dev_attr_mdio_bus_reads.attr.attr,
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(0),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(1),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(2),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(3),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(4),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(5),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(6),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(7),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(8),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(9),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(10),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(11),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(12),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(13),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(14),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(15),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(16),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(17),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(18),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(19),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(20),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(21),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(22),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(23),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(24),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(25),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(26),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(27),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(28),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(29),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(30),
-+	MDIO_BUS_STATS_ADDR_ATTR_GROUP(31),
-+	NULL,
-+};
-+
-+static const struct attribute_group mdio_bus_statistics_group = {
-+	.name		= "statistics",
-+	.attrs_const	= mdio_bus_statistics_attrs,
-+};
-+__ATTRIBUTE_GROUPS(mdio_bus_statistics);
-+
-+const struct class mdio_bus_class = {
-+	.name		= "mdio_bus",
-+	.dev_release	= mdiobus_release,
-+	.dev_groups	= mdio_bus_statistics_groups,
-+};
-+
-+/**
-+ * mdio_bus_match - determine if given MDIO driver supports the given
-+ *		    MDIO device
-+ * @dev: target MDIO device
-+ * @drv: given MDIO driver
-+ *
-+ * Return: 1 if the driver supports the device, 0 otherwise
-+ *
-+ * Description: This may require calling the devices own match function,
-+ *   since different classes of MDIO devices have different match criteria.
-+ */
-+static int mdio_bus_match(struct device *dev, const struct device_driver *drv)
-+{
-+	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
-+	struct mdio_device *mdio = to_mdio_device(dev);
-+
-+	/* Both the driver and device must type-match */
-+	if (!(mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY) !=
-+	    !(mdio->flags & MDIO_DEVICE_FLAG_PHY))
-+		return 0;
-+
-+	if (of_driver_match_device(dev, drv))
-+		return 1;
-+
-+	if (mdio->bus_match)
-+		return mdio->bus_match(dev, drv);
-+
-+	return 0;
-+}
-+
-+static int mdio_uevent(const struct device *dev, struct kobj_uevent_env *env)
-+{
-+	int rc;
-+
-+	/* Some devices have extra OF data and an OF-style MODALIAS */
-+	rc = of_device_uevent_modalias(dev, env);
-+	if (rc != -ENODEV)
-+		return rc;
-+
-+	return 0;
-+}
-+
-+static const struct attribute *const mdio_bus_device_statistics_attrs[] = {
-+	&dev_attr_mdio_bus_device_transfers.attr.attr,
-+	&dev_attr_mdio_bus_device_errors.attr.attr,
-+	&dev_attr_mdio_bus_device_writes.attr.attr,
-+	&dev_attr_mdio_bus_device_reads.attr.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group mdio_bus_device_statistics_group = {
-+	.name		= "statistics",
-+	.attrs_const	= mdio_bus_device_statistics_attrs,
-+};
-+__ATTRIBUTE_GROUPS(mdio_bus_device_statistics);
-+
-+const struct bus_type mdio_bus_type = {
-+	.name		= "mdio_bus",
-+	.dev_groups	= mdio_bus_device_statistics_groups,
-+	.match		= mdio_bus_match,
-+	.uevent		= mdio_uevent,
-+};
- 
- /**
-  * mdiobus_alloc_size - allocate a mii_bus structure
-diff --git a/drivers/net/phy/phylib-internal.h b/drivers/net/phy/phylib-internal.h
-index bfb1aa82386..664ed7faa51 100644
---- a/drivers/net/phy/phylib-internal.h
-+++ b/drivers/net/phy/phylib-internal.h
-@@ -9,6 +9,9 @@
- struct mdio_device;
- struct phy_device;
- 
-+extern const struct bus_type mdio_bus_type;
-+extern const struct class mdio_bus_class;
-+
- /*
-  * phy_supported_speeds - return all speeds currently supported by a PHY device
-  */
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index e9b0d7427b0..5de4b172cd0 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2446,9 +2446,6 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
- 
- struct phy_port *phy_get_sfp_port(struct phy_device *phydev);
- 
--extern const struct bus_type mdio_bus_type;
--extern const struct class mdio_bus_class;
--
- /**
-  * phy_module_driver() - Helper macro for registering PHY drivers
-  * @__phy_drivers: array of PHY drivers to register
--- 
-2.53.0
+cheers,
+jamal
 
-
+> Cc: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+> v2: clarified the changelog
+>     added kdoc missing part (kernel build bots)
+>
+>  include/net/sch_generic.h |  4 ++--
+>  net/core/dev.c            |  2 +-
+>  net/core/link_watch.c     |  2 +-
+>  net/sched/sch_api.c       |  2 +-
+>  net/sched/sch_generic.c   | 20 ++++++++++++--------
+>  net/sched/sch_htb.c       |  4 ++--
+>  net/sched/sch_mq.c        |  2 +-
+>  net/sched/sch_mqprio.c    |  2 +-
+>  net/sched/sch_taprio.c    |  2 +-
+>  9 files changed, 22 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index c355300893a3921740cf6b919cc58de953cd610c..16beba40914ee5a9454f9eec2=
+ad6e600543c89f2 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -710,8 +710,8 @@ void dev_qdisc_change_real_num_tx(struct net_device *=
+dev,
+>  void dev_init_scheduler(struct net_device *dev);
+>  void dev_shutdown(struct net_device *dev);
+>  void dev_activate(struct net_device *dev);
+> -void dev_deactivate(struct net_device *dev);
+> -void dev_deactivate_many(struct list_head *head);
+> +void dev_deactivate(struct net_device *dev, bool reset_needed);
+> +void dev_deactivate_many(struct list_head *head, bool reset_needed);
+>  struct Qdisc *dev_graft_qdisc(struct netdev_queue *dev_queue,
+>                               struct Qdisc *qdisc);
+>  void qdisc_reset(struct Qdisc *qdisc);
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 203dc36aaed55e706f5d978ec02c6bf48201e3d4..6fc9350f0be8756ae849d5b0c=
+a9b222055d96ced 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -1756,7 +1756,7 @@ static void __dev_close_many(struct list_head *head=
+)
+>                 smp_mb__after_atomic(); /* Commit netif_running(). */
+>         }
+>
+> -       dev_deactivate_many(head);
+> +       dev_deactivate_many(head, true);
+>
+>         list_for_each_entry(dev, head, close_list) {
+>                 const struct net_device_ops *ops =3D dev->netdev_ops;
+> diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+> index 25c455c10a01cf535d6a7d2952d51434fe462690..ff2c1d4538efbc89cd49d8d84=
+77542a6e7bacbad 100644
+> --- a/net/core/link_watch.c
+> +++ b/net/core/link_watch.c
+> @@ -181,7 +181,7 @@ static void linkwatch_do_dev(struct net_device *dev)
+>                 if (netif_carrier_ok(dev))
+>                         dev_activate(dev);
+>                 else
+> -                       dev_deactivate(dev);
+> +                       dev_deactivate(dev, true);
+>
+>                 netif_state_change(dev);
+>         }
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index cc43e3f7574fae203989f5c28b4934f0720e64c2..c0bab092ea809955b3a5aaa08=
+c169bca55cfaf7f 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -1120,7 +1120,7 @@ static int qdisc_graft(struct net_device *dev, stru=
+ct Qdisc *parent,
+>                 }
+>
+>                 if (dev->flags & IFF_UP)
+> -                       dev_deactivate(dev);
+> +                       dev_deactivate(dev, false);
+>
+>                 qdisc_offload_graft_root(dev, new, old, extack);
+>
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index 556e0d8003161d3dfe68e484f6349714cf989c0c..d4fe907c4ad5895b1dda5249c=
+55e4c1e0168023e 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -1370,11 +1370,12 @@ static bool some_qdisc_is_busy(struct net_device =
+*dev)
+>  /**
+>   *     dev_deactivate_many - deactivate transmissions on several devices
+>   *     @head: list of devices to deactivate
+> + *     @reset_needed: qdisc should be reset if true.
+>   *
+>   *     This function returns only when all outstanding transmissions
+>   *     have completed, unless all devices are in dismantle phase.
+>   */
+> -void dev_deactivate_many(struct list_head *head)
+> +void dev_deactivate_many(struct list_head *head, bool reset_needed)
+>  {
+>         bool sync_needed =3D false;
+>         struct net_device *dev;
+> @@ -1393,11 +1394,14 @@ void dev_deactivate_many(struct list_head *head)
+>         if (sync_needed)
+>                 synchronize_net();
+>
+> -       list_for_each_entry(dev, head, close_list) {
+> -               netdev_for_each_tx_queue(dev, dev_reset_queue, NULL);
+> +       if (reset_needed) {
+> +               list_for_each_entry(dev, head, close_list) {
+> +                       netdev_for_each_tx_queue(dev, dev_reset_queue, NU=
+LL);
+>
+> -               if (dev_ingress_queue(dev))
+> -                       dev_reset_queue(dev, dev_ingress_queue(dev), NULL=
+);
+> +                       if (dev_ingress_queue(dev))
+> +                               dev_reset_queue(dev, dev_ingress_queue(de=
+v),
+> +                                               NULL);
+> +               }
+>         }
+>
+>         /* Wait for outstanding qdisc_run calls. */
+> @@ -1412,12 +1416,12 @@ void dev_deactivate_many(struct list_head *head)
+>         }
+>  }
+>
+> -void dev_deactivate(struct net_device *dev)
+> +void dev_deactivate(struct net_device *dev, bool reset_needed)
+>  {
+>         LIST_HEAD(single);
+>
+>         list_add(&dev->close_list, &single);
+> -       dev_deactivate_many(&single);
+> +       dev_deactivate_many(&single, reset_needed);
+>         list_del(&single);
+>  }
+>  EXPORT_SYMBOL(dev_deactivate);
+> @@ -1473,7 +1477,7 @@ int dev_qdisc_change_tx_queue_len(struct net_device=
+ *dev)
+>         int ret =3D 0;
+>
+>         if (up)
+> -               dev_deactivate(dev);
+> +               dev_deactivate(dev, false);
+>
+>         for (i =3D 0; i < dev->num_tx_queues; i++) {
+>                 ret =3D qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
+> diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> index cf6cd4ccfa2029d9a45e35d6780520290690732d..eb12381795ce1bb0f3b8c5f50=
+2e16ad64c4408c8 100644
+> --- a/net/sched/sch_htb.c
+> +++ b/net/sched/sch_htb.c
+> @@ -1387,7 +1387,7 @@ htb_graft_helper(struct netdev_queue *dev_queue, st=
+ruct Qdisc *new_q)
+>         struct Qdisc *old_q;
+>
+>         if (dev->flags & IFF_UP)
+> -               dev_deactivate(dev);
+> +               dev_deactivate(dev, false);
+>         old_q =3D dev_graft_qdisc(dev_queue, new_q);
+>         if (new_q)
+>                 new_q->flags |=3D TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
+> @@ -1421,7 +1421,7 @@ static void htb_offload_move_qdisc(struct Qdisc *sc=
+h, struct htb_class *cl_old,
+>                 struct Qdisc *qdisc;
+>
+>                 if (dev->flags & IFF_UP)
+> -                       dev_deactivate(dev);
+> +                       dev_deactivate(dev, false);
+>                 qdisc =3D dev_graft_qdisc(queue_old, NULL);
+>                 WARN_ON(qdisc !=3D cl_old->leaf.q);
+>         }
+> diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
+> index 0ed199fa18f04a06197116b6ab64ff3647dbace9..a0133a7b9d3b09a0d2a606423=
+4c8fdef60dbf955 100644
+> --- a/net/sched/sch_mq.c
+> +++ b/net/sched/sch_mq.c
+> @@ -201,7 +201,7 @@ static int mq_graft(struct Qdisc *sch, unsigned long =
+cl, struct Qdisc *new,
+>         struct net_device *dev =3D qdisc_dev(sch);
+>
+>         if (dev->flags & IFF_UP)
+> -               dev_deactivate(dev);
+> +               dev_deactivate(dev, false);
+>
+>         *old =3D dev_graft_qdisc(dev_queue, new);
+>         if (new)
+> diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
+> index b83276409416fabeccc441e5127211632ddcfedb..002add5ce9e0ab04a6260495d=
+1bec02983c2a204 100644
+> --- a/net/sched/sch_mqprio.c
+> +++ b/net/sched/sch_mqprio.c
+> @@ -469,7 +469,7 @@ static int mqprio_graft(struct Qdisc *sch, unsigned l=
+ong cl, struct Qdisc *new,
+>                 return -EINVAL;
+>
+>         if (dev->flags & IFF_UP)
+> -               dev_deactivate(dev);
+> +               dev_deactivate(dev, false);
+>
+>         *old =3D dev_graft_qdisc(dev_queue, new);
+>
+> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> index f721c03514f6008ecc59fe4c4ca4a082099dc125..8e375281195061da848fb2bfa=
+f79cf125afccac0 100644
+> --- a/net/sched/sch_taprio.c
+> +++ b/net/sched/sch_taprio.c
+> @@ -2184,7 +2184,7 @@ static int taprio_graft(struct Qdisc *sch, unsigned=
+ long cl,
+>                 return -EINVAL;
+>
+>         if (dev->flags & IFF_UP)
+> -               dev_deactivate(dev);
+> +               dev_deactivate(dev, false);
+>
+>         /* In offload mode, the child Qdisc is directly attached to the n=
+etdev
+>          * TX queue, and thus, we need to keep its refcount elevated in o=
+rder
+> --
+> 2.53.0.473.g4a7958ca14-goog
+>
 
