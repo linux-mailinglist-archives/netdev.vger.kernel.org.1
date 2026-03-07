@@ -1,198 +1,269 @@
-Return-Path: <netdev+bounces-265134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CDk6OT8GrGkxjAEAu9opvQ
-	(envelope-from <netdev+bounces-265134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 12:04:31 +0100
+	id cCazAR0TrGkujwEAu9opvQ
+	(envelope-from <netdev+bounces-265135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 12:59:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE6B22B539
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 12:04:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F7022BA1B
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 12:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CF4383022586
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 11:03:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E60243010619
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 11:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9382F33BBD2;
-	Sat,  7 Mar 2026 11:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FED135836E;
+	Sat,  7 Mar 2026 11:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KfYWPFr2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OXuMtDBK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0840A322C99;
-	Sat,  7 Mar 2026 11:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0807433C18B
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 11:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772881423; cv=none; b=rt74+Ctg8nnMWuOwQ5rsFJjjepJvu5/XJwO1bVRTShXFuosxpYMFzWFsrMc0yALadO+SVnDsUHjKD89onUCrMqXLvidZb8qxnmJ/KBnDvXUNTF1xsaWWBre5We5VvH7Xgncz9q1X20a0DIMb/Uuezw/hu2UA4EZuUlKcVrgNK2Y=
+	t=1772884762; cv=none; b=NHXuXaeUHrwe+O57HzLGSOiopKXQQH3l2b+pP0f8b3Slf/KQBi/L5hV/wXq3B41yPBidnztr3OXDsPumAB6cPgHYCLI1lkENsIqJO6/8pAvJFyezLtwnfqRhboPyYE6k0uRF+K4Q6uPZi3Q+ictW3PLcXVBPoCldrXSCwdKVoqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772881423; c=relaxed/simple;
-	bh=sVNzSxlK1PzuAr8F/B4Bf+nuIbGcCC+LacFY6MERQig=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=pqlvsLhbCIcXu0rJtoCJceFUAYs7nUhh2RkmCJr2E2uJUUyvNINztoXvASmFY8qDJVJuzXd0Qzz4p+eSMOfWVijk9NIQ5X1dPlD5N9JNH85Qe9waYytaWNfsiKx41Y89yyAibKyKM9rEhJ71TOTuQ0cDZ9sqHtFZIJX/H6qoKgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KfYWPFr2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gKq7Ur0o7o0fnfG6VoXbzm/WfSG13rcROPhghnkiHuY=; b=KfYWPFr2YVcrUXRrfluFTGbIdz
-	zfP6GrfPdxzliFEeNl0EUGmWfcyryLQacMv+YTvtqKM+3Q+OmiV3uNxunJFspWh1m+t5LJSKdtHKa
-	5SSGGFOgivZjhIs8Oz7PdmUD+OHCk7OBIipXu1cJyvlr0wg/KdAKgl0GOyE+LTB/RTYdRVSQWbnRa
-	kKbyPGq4M4yQAfjH19uHnoof+jyOD6Ac6/x7xUeO3omUaSgO3oLcQKAkPv82lpBdTfHGM091t6YwL
-	ajg8IJI6neZctZHkKSkCWx5qLsSNAfLWjb8Cw+Bv7tP4Wr+qBbecwLWjZey17tioABP4T/hLw+f9L
-	iR9IRxfg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59388 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vypRE-00000000298-28R9;
-	Sat, 07 Mar 2026 11:03:18 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vypR8-0000000CSwb-3P3f;
-	Sat, 07 Mar 2026 11:03:10 +0000
-In-Reply-To: <aawFuXTVAgVOrw4k@shell.armlinux.org.uk>
-References: <aawFuXTVAgVOrw4k@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1772884762; c=relaxed/simple;
+	bh=+Jtk73AtwgRWJ77Gc08frUB+SRwy2ZqoFSuRtxuDPTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xsfp1YGrlUa/e3QpmEfegU+53dPmzPBgWaupykGLt8ocWQ8y1SHnfDZICh+mBnBSTnExADXhvcz38W/SIhhK4aPwtmw6VECN921nHrWfxSXZytdngfRLX4ZcZ2PLzOM0ze58MK05Ul02jDbNmtBcKmfI1S9T6ZzczJ7z/JTcXtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OXuMtDBK; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772884758; x=1804420758;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+Jtk73AtwgRWJ77Gc08frUB+SRwy2ZqoFSuRtxuDPTs=;
+  b=OXuMtDBKFZTQkWTMm57MTDSUJD44PsC/TCuM7I3ONcGSEe30XVNyI3rb
+   wrm3DP1yCMm6jJ4eaSxjl4+cmocIb/g7zvbCQdf7TzLNkn0Nb2bYhw2fT
+   qDj2VN5sNB1qxLaax68iACA/kI5aVaX+ZyfuB8s4/k4dimOVhWbZOPZ+V
+   JCy2JBlJfpNGP6jAiKITBMTOEJcqeYHrXXNBJV8/5Wblz/rtsCchfdn5o
+   X6kpd9yhpbuSrXPE8riCzjmsWBA2OfTTmGlHA20NNE6G5tWuuKDRIiiQD
+   gralCqIjmDGWD08COwsIm/hOPTY1tZ2G1zLosITb2AlDW+tYz+z19n2pH
+   g==;
+X-CSE-ConnectionGUID: e/vXirIqQG2tumh1y9taIA==
+X-CSE-MsgGUID: u2nd012CRtOel8+Ltjpc0w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="73894571"
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="73894571"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2026 03:59:15 -0800
+X-CSE-ConnectionGUID: jkXcanMZTJOwpdxikpcG9Q==
+X-CSE-MsgGUID: +6WBOzAITNGNzzg4L5JlLA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="249736287"
+Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 07 Mar 2026 03:59:12 -0800
+Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vyqJI-000000001xR-3BCP;
+	Sat, 07 Mar 2026 11:59:08 +0000
+Date: Sat, 7 Mar 2026 19:58:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Frank Li <Frank.Li@nxp.com>,
-	imx@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jan Petrous <jan.petrous@oss.nxp.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	s32@nxp.com,
-	Samuel Holland <samuel@sholland.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Yao Zi <me@ziyao.cc>
-Subject: [PATCH net-next 7/7] net: stmmac: add documentation for clocks
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Kui-Feng Lee <thinker.li@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with
+ exceptions from tb6_gc_hlist.
+Message-ID: <202603071918.kDLKvFsA-lkp@intel.com>
+References: <20260307024709.718395-3-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vypR8-0000000CSwb-3P3f@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 07 Mar 2026 11:03:10 +0000
-X-Rspamd-Queue-Id: EAE6B22B539
+In-Reply-To: <20260307024709.718395-3-kuniyu@google.com>
+X-Rspamd-Queue-Id: 90F7022BA1B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265134-lists,netdev=lfdr.de,kernel];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,kernel.org,google.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[27];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:?];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-265135-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.215];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.077];
+	DMARC_DNSFAIL(0.00)[intel.com : server fail];
+	R_DKIM_TEMPFAIL(0.00)[intel.com:s=Intel];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,01.org:url]
 X-Rspamd-Action: no action
 
-Add documentation covering stmmac_clk, pclk, clk_ptp_ref and clk_tx_i
-in the hope that this will help understand what each of these clocks
-are for.
+Hi Kuniyuki,
 
-There is confusion around stmmac_clk and pclk which can't be easily
-resolved today as the Imagination Technologies Pistachio board that
-pclk was introduced for has no public documentation and is likely now
-obsolete. So the origins of pclk are lost to the winds of time.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- include/linux/stmmac.h | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+[auto build test WARNING on net/main]
 
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 3521b88aa345..a9c0cb61dd50 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -300,10 +300,41 @@ struct plat_stmmacenet_data {
- 	struct phylink_pcs *(*select_pcs)(struct stmmac_priv *priv,
- 					  phy_interface_t interface);
- 	void *bsp_priv;
-+
-+	/* stmmac clocks:
-+	 *  stmmac_clk: CSR clock (which can be hclk_i, clk_csr_i, aclk_i,
-+	 *    or clk_app_i depending on GMAC configuration). This clock
-+	 *    generates the MDC clock.
-+	 *
-+	 *  pclk: introduced for Imagination Technologies Pistachio board -
-+	 *    see 5f9755d26fbf ("stmmac: Add an optional register interface
-+	 *    clock"). This is probably used for cases where separate clocks
-+	 *    are provided for the host interface and register interface. In
-+	 *    this case, as the MDC clock is derived from stmmac_clk, pclk
-+	 *    can only really be the "application clock" for the "host
-+	 *    interface" and not the "register interface" aka CSR clock as
-+	 *    it is never used when determining the divider for the MDC
-+	 *    clock.
-+	 *
-+	 *  clk_ptp_ref: optional PTP reference clock (clk_ptp_ref_i). When
-+	 *    present, this clock increments the timestamp value. Otherwise,
-+	 *    the rate of stmmac_clk will be used.
-+	 *
-+	 *  clk_tx_i: MAC transmit clock, which will be 2.5MHz for 10M,
-+	 *    25MHz for 100M, or 125MHz for 1G irrespective of the interface
-+	 *    mode. For the DWMAC PHY interface modes:
-+	 *
-+	 *    GMII/MII	PHY's transmit clock for 10M (2.5MHz) or 100M (25MHz),
-+	 *		or 125MHz local clock for 1G mode
-+	 *    RMII	50MHz RMII clock divided by 2 or 20.
-+	 *    RGMII	125MHz local clock divided by 1, 5, or 50.
-+	 *    SGMII	125MHz SerDes clock divided by 1, 5, or 50.
-+	 *    TBI/RTBI	125MHz SerDes clock
-+	 */
- 	struct clk *stmmac_clk;
- 	struct clk *pclk;
- 	struct clk *clk_ptp_ref;
--	struct clk *clk_tx_i;		/* clk_tx_i to MAC core */
-+	struct clk *clk_tx_i;
- 	unsigned long clk_ptp_rate;
- 	unsigned long clk_ref_rate;
- 	struct clk_bulk_data *clks;
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/ipv6-Remove-permanent-routes-from-tb6_gc_hlist-when-all-exceptions-expire/20260307-104803
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260307024709.718395-3-kuniyu%40google.com
+patch subject: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with exceptions from tb6_gc_hlist.
+config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20260307/202603071918.kDLKvFsA-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260307/202603071918.kDLKvFsA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603071918.kDLKvFsA-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   include/net/ip6_fib.h:557:42: error: 'struct net' has no member named 'ipv6'; did you mean 'ipv4'?
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                          ^~~~
+   include/linux/compiler_types.h:686:23: note: in definition of macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:706:9: note: in expansion of macro '_compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   include/net/ip6_fib.h:557:42: error: 'struct net' has no member named 'ipv6'; did you mean 'ipv4'?
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                          ^~~~
+   include/linux/compiler_types.h:686:23: note: in definition of macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:706:9: note: in expansion of macro '_compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   include/net/ip6_fib.h:557:42: error: 'struct net' has no member named 'ipv6'; did you mean 'ipv4'?
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                          ^~~~
+   include/linux/compiler_types.h:686:23: note: in definition of macro '__compiletime_assert'
+     686 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:706:9: note: in expansion of macro '_compiletime_assert'
+     706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   include/net/ip6_fib.h:557:42: error: 'struct net' has no member named 'ipv6'; did you mean 'ipv4'?
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                          ^~~~
+   include/linux/compiler_types.h:642:53: note: in definition of macro '__unqual_scalar_typeof'
+     642 | #define __unqual_scalar_typeof(x) __typeof_unqual__(x)
+         |                                                     ^
+   include/asm-generic/rwonce.h:50:9: note: in expansion of macro '__READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |         ^~~~~~~~~~~
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   In file included from ./arch/openrisc/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:372,
+                    from include/linux/build_bug.h:5,
+                    from include/linux/bits.h:30,
+                    from include/linux/capability.h:18,
+                    from net/core/sock.c:89:
+   include/net/ip6_fib.h:557:42: error: 'struct net' has no member named 'ipv6'; did you mean 'ipv4'?
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                          ^~~~
+   include/asm-generic/rwonce.h:44:73: note: in definition of macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   include/net/ip6_fib.h:557:27: note: in expansion of macro 'READ_ONCE'
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                           ^~~~~~~~~
+   In file included from include/net/xfrm.h:26,
+                    from net/core/sock.c:133:
+>> include/net/ip6_fib.h:557:73: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     557 |         gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+         |                                                                         ^
+
+
+vim +557 include/net/ip6_fib.h
+
+   548	
+   549	static inline void fib6_may_remove_gc_list(struct net *net,
+   550						   struct fib6_info *f6i)
+   551	{
+   552		struct fib6_gc_args gc_args;
+   553	
+   554		if (hlist_unhashed(&f6i->gc_link))
+   555			return;
+   556	
+ > 557		gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
+   558		gc_args.more = 0,
+   559	
+   560		fib6_age_exceptions(f6i, &gc_args, jiffies);
+   561	}
+   562	
+
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
