@@ -1,1018 +1,1263 @@
-Return-Path: <netdev+bounces-265146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265147-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id HOo2CnI7rGmTnQEAu9opvQ
-	(envelope-from <netdev+bounces-265146-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 15:51:30 +0100
+	id eEP+McI9rGmWngEAu9opvQ
+	(envelope-from <netdev+bounces-265147-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 16:01:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB7FF22C3CA
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 15:51:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F292222C412
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 16:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7BC98301BDFB
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 14:51:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45126303A8CD
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 15:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4E3286405;
-	Sat,  7 Mar 2026 14:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1310C319843;
+	Sat,  7 Mar 2026 15:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=t.fuechsel@gmx.de header.b="ewsQ3fwg"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="EIndN1Nc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184C326CE3B;
-	Sat,  7 Mar 2026 14:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772895085; cv=none; b=S0kCItvfDmxcVgSV5lOLlBeVNww6OEgoINj+tVlevQxBUbfgsl/37NhH4O2XGTX8ppZUkLE5MAxlkqluuTkGozso/Ap2y8h4xvrlmM1voLtAo6xp+T+lgok4xXW04le2sVnFYUXIi8DJt7IjpWlJLKsP3Ga1bzQERTygBQ8sEKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772895085; c=relaxed/simple;
-	bh=SHVmtj/JnH1O9ywwr5EGZsY/iHF56SN06jjp42Rj2vo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qcwv43M4p0dyulHo/Kcam2K8dBkEwGkdzfRGrKhrolxheAILs23nUBO5FTztnNsA+vUNUWkvT6a8oBuuajiUhROFsWNA1oBpqeT/YIX/mRdVmBsTQmU53sj9NfsxsXQy0yxqQh5SFfSlxXtyPAQjZ/uTKSxzsMUBSZrHmV0lbjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=t.fuechsel@gmx.de header.b=ewsQ3fwg; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1772895068; x=1773499868; i=t.fuechsel@gmx.de;
-	bh=1InblDLulJk8r66o/+xo2S6yRad1/d1PJjl9TxCoc+c=;
-	h=X-UI-Sender-Class:Date:From:To:Subject:Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ewsQ3fwgfEcbqj4dihj9BIfPXh9fcdaSBeKEhvUbNbxvv0SSnr54YDpen02ORECM
-	 g1MlQ4wTzzTG2wJDbAJSGV3J2O1no6ryt08fJNKtm/RU5emHm9bwIeisaHf8sk27r
-	 UcPNj1MgnZUvRHN7wlp1RwW9uiu9gQCwTNDayuZY1X5qZ0aNDB8H4uiYDaE1fW5vB
-	 dfg+a9D9f2b481sXWrXPtGcozoXrajRyQbNKoxMeFmYNouQZeEtuJRrEHE0LP4B62
-	 goRzOIwTWCYltFKLTd1t6IFAEb5SW+5kKMtNn1wZXnfIYkm9UXjwqq7dQvdkcXHgc
-	 WZpfzft/86pc8AeqdQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MxUnz-1vjwRB0U9p-016AdI; Sat, 07
- Mar 2026 15:51:08 +0100
-Date: Sat, 7 Mar 2026 15:51:05 +0100
-From: Tim Fuechsel <t.fuechsel@gmx.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Lukas Prause <lukas.prause@ikt.uni-hannover.de>,
-	Tim Fuechsel <t.fuechsel@gmx.de>
-Subject: [RFC v2 RESEND] tcp: Add TCP ROCCET congestion control module.
-Message-ID: <aaw7WZdZA9MDo8cm@volt-roccet-vm>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0A72D77F7;
+	Sat,  7 Mar 2026 15:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772895672; cv=fail; b=JfgDwh06+fDN3iwVBw060H2veTzMTAClwyXj3vvMqzVS8D/xYcv/fM9NPi3kRnq3uyn/7ZeQqMtUTpgs2esR8hz/asriGShX7fKXE890/uxS52mfyDxPcC7rLjbV+mCLKD8JoFkBV990wrE1K1x2F4n2XahiQt/7PVbxvbtEBkw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772895672; c=relaxed/simple;
+	bh=bOxa8rfjNwkBj9n84ddMb5wvzyjPdJUfeRGsrbItc04=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WW3iSP//yRnvvV2++Ft/ZL29L4gloUcCcmZ6T7485RGOOvxrBVtALWjprVYcshrUzA26Ke99S6cwjOfV7r6y4OTC+/2a83JztuLJAtQf9Lk14cehqfT/9V9Zj99lw0LvsHTKR8ejd/0p9MfVf6wj3WZ9oMh09v1jjmvF9OJpzls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=EIndN1Nc; arc=fail smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 627A7eIA358800;
+	Sat, 7 Mar 2026 07:00:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=ieFD1eWJiPsFYZcJ2dThV0CUsutCA0L+uAMf3IbEelc=; b=EIndN1NchgPy
+	zrDqvrNMWfaqZtKoXq3UGuPrzD+nJ1S4pulFXtzvQPOMLh4lszr/LmEUtMTeB2rp
+	D+NYSiK9g/JFgKFjJ61zOi22p6vPsaW0FfLli09uWdKJaUcGfkv6p1N3eReYHXzr
+	nN73+BnDBxILtLDRlt81Ompc5EPvjBOL04tdMf9UB1l24CrHOrrUzn5Py1ilU90A
+	MnzEYo+hTLjCSy7XOvaXS8MVNbgAy7iZ+xbhhnjSQb4UktoHyzMI0covmWgm6RYS
+	UP263CgwfxWcCq1F+pfTxWk28ChelgzrZA7yGao8TRjm4SzRSXXz0uBk+vkDwDbf
+	uc7gQZZeoQ==
+Received: from bn8pr05cu002.outbound.protection.outlook.com (mail-eastus2azon11011013.outbound.protection.outlook.com [52.101.57.13])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4crj099btn-2
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sat, 07 Mar 2026 07:00:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BezTUCNzd1SVLJxeetVZ4zRaRmdZPRgWQ59H4kNPUq/z0oHFk5eB/HT+4e/Lhf/RnWUuDbLFu6j8dHm4BRnY1ShCEAMKHLDGdLjYUkiqVnc8RG1HLTe4be+xjYtMdEWkviRPkUeYnNRqnA2OLQlCsq/5wgFpOodTO/NgGQzyzoLBx+fP+E2NloybN+0SXcQ6RGHz4pPYfk0vLkezcqAGOBHpc3JoyNToepwYm3qILd4D3+PTdLjapFCNRmTJkW81AVwg9CBlbaeSY6XysDg1MG2EIWTrbkyQUb9LISWJFpSM9AZvYt+eWbjxjeleCnbrU8je/vCu8AP+eVlzJoqfDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ieFD1eWJiPsFYZcJ2dThV0CUsutCA0L+uAMf3IbEelc=;
+ b=uSpr974m7qaasgPdo18Gw5jxRLOkbwdODT948TzZYq0mGR3NHokBnHjPu1FCwPskixCbEMR0F8tU0uVBc5PeEmGjRezj4iGdrxeK2Qea2K1WjQzNWCFCFBlIPzrDxwrGvldvhXbwMPb6kQVrxaS9fP/jRMwm3DLwJFOFzwWVpuwLtoeN+BIcDw7cuIeSs62EVz3SlHfDqn47c42WS1nha/u8Qyy70jQaU9M6SH22AFHpniRlVEViPCukSWOVkal8qRlAfbx+zSyueSp3h7uw6aiQO4a/A7OwjOkwn7lOW1lB3LYsd6PbnwiQaxhhm+vavwCLUNQP6UNY6/AdbCNrJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from DM6PR15MB3893.namprd15.prod.outlook.com (2603:10b6:5:2b6::17)
+ by PH0PR15MB5238.namprd15.prod.outlook.com (2603:10b6:510:14c::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.7; Sat, 7 Mar
+ 2026 15:00:34 +0000
+Received: from DM6PR15MB3893.namprd15.prod.outlook.com
+ ([fe80::12c7:cfea:e8a3:9667]) by DM6PR15MB3893.namprd15.prod.outlook.com
+ ([fe80::12c7:cfea:e8a3:9667%4]) with mapi id 15.20.9700.003; Sat, 7 Mar 2026
+ 15:00:34 +0000
+Message-ID: <011f89d3-8d66-4547-92d2-e685a3a7f441@meta.com>
+Date: Sat, 7 Mar 2026 20:30:17 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10] virtio_net: add page_pool support for buffer
+ allocation
+From: Vishwanath Seshagiri <vishs@meta.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>,
+        Matteo Croce <technoboy85@gmail.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kernel-team@meta.com
+References: <20260303074253.3449987-1-vishs@meta.com>
+ <20260305073638-mutt-send-email-mst@kernel.org>
+ <fc4e8dcf-ba26-4170-9405-eb4a2728d92f@meta.com>
+Content-Language: en-US
+In-Reply-To: <fc4e8dcf-ba26-4170-9405-eb4a2728d92f@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5P287CA0176.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1af::17) To DM6PR15MB3893.namprd15.prod.outlook.com
+ (2603:10b6:5:2b6::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1339FLj4pVckPFcb47ELkgY15RvvNKn8bw/Vd6WmF0d3k8PPhfo
- b0tOAHNR+2HSyn84zHyGhXARXLlqb/1kqvrhSpzSTBlngWhNhmH41qnB3rCPcPYdILyUE2Z
- +pPd8Oq0WAP1q4Zrj0QYa5cESDBAhsUcucEmj6LwgOH2Yf2ZclDquFXdlKtQFNfL+KSIZUF
- KpnOMjcglOqeAxrhLXuQw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Bg7qs/ILDfs=;ICx4T90REQAe4wlffT5b7GR1iMG
- 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
- Ay+s/h8OGiFWkKcbhK1RCghy4fc8n
-X-Rspamd-Queue-Id: AB7FF22C3CA
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR15MB3893:EE_|PH0PR15MB5238:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6122043e-1f12-47ce-82ca-08de7c5a4888
+X-LD-Processed: 8ae927fe-1255-47a7-a2af-5f3a069daaa2,ExtAddr
+X-FB-Source: Internal
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+ G2lTKm0kZBaGVS9o4DARpdStpixwcS92oYu5Wm1xIruraNwAqWlEITiUW2eiUYIfxBvBL6hh+lxoJKb67M/cTr0upxjlhk6vBZlDHGfq/66z21+ZOkWpCrQ7NiIGY924yh2RC/TSpqm+gfhjU06gAHHAeXJwnszaZzlyjk+OkqehUu3/e/AtjScbIrjb5KnaMlztexQypj5ofpk3rLOBvpV9DCS8Zn8WTafTWxKj2cdM7XUgqqrO7zMS9VXwkun4I0ZTocFghI7ebuQF1B+vHESOUi4H8O+txM+Wwn0GkgmigQi64oVxJZPYQA3FQbprYcCLtHZTP1+gO8a2uada9a21JvMHNdR1UcX0QxoLg/XnoQswItFh2Hyd03oJ9727sgrJ6vqtrfXlVyL01GU5obvq91K7dI+qUyKHcMFaPACQYfBaS5lvxnEh2e18EzvaGB68NkOynsx25cdQyza5nOptEpWrPv+iEZem4jqJYMf+rJF3m1QfugaScMY8xEzknmyixCYxxFmn/3OHkAwaFQJ6c0lgN01yIdfMqdB9ASUPV9S4WDjTfDYeYdfQZ2qoP0VMr/ZCHy2b5Sv3v71ok+W5TZlVU5mWFocgqRLnlTB8VeLVI/jroB5IqdnaF8cQhFaZeRKxzvSuJYCtv2xS47XsO6ZcfcTjn4feBg9yKPZGJanaoF5ttQG0TIJTAJot
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR15MB3893.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?utf-8?B?aDBJK0V0VnMvaXFQVGR0TjJXUWpKd2Erc20vZmwzWWt3dmhlSWJ3OWNob2lq?=
+ =?utf-8?B?Q2VaRUM2Yi9idDBzN3NSZE4xQ3B5YWVud0JWOU5iMjV6RXZDUVRtWGFBRGZi?=
+ =?utf-8?B?RkR0UExXOE5sK3RENms4QVFNeHh2S0pJL0tCOFY1ckF4emRWSmgrd1JHTDNp?=
+ =?utf-8?B?cnloSTBMOXdHSWNUeE5zbmo4bmgzaWlkeG5ET0xXMlFIYXdRWUs2WW1IeXR4?=
+ =?utf-8?B?TnFxR0lBQzZBS3FETXphQ01Ec3NKSmZ2Z3lDWjljUUtzV2J5M0NNVk11SUF3?=
+ =?utf-8?B?NUwranJCTzJlYXo3bWxQbFhHUGpXaFFid1N6Rk5XOTZNU1BTczRnMGdsQWlR?=
+ =?utf-8?B?NWxyRzNkVjNjUDFHK1o5OHIrT2M1Y1A2TDdhNXc3N3dNZG9PMGJnRXNvd3Nu?=
+ =?utf-8?B?eVdaeEZMQWN4SUJDZ2lSVDRFRW56alc1T0dNcCtVbGpVZW5WRGh2S1dWQUpt?=
+ =?utf-8?B?QktwTDVyZWFpa0VkNFZlQjF6NFFPOUlXcXhVSGdhd3A1bDBqUUpkL2dlUWV2?=
+ =?utf-8?B?dXZiSkZSU1l0YjFLUUxQOSs5cWFIOU92UXRsUVhZSjVEUFpvOU4xUHVYSDA2?=
+ =?utf-8?B?SE5tbmNkY1hVdmgreW9KZmtuU2F3dUlUZmlxampZOEswaWZ0UjJZdC9rVVRU?=
+ =?utf-8?B?cWxiVUxsRlJ2dy9ybGhJcGxjTEpsZUNmL2RNalVKbUE4VHpQUC9jQitDNUFJ?=
+ =?utf-8?B?d2lMSTVCYlQ4c3N3MG8vckRhdk14NUsxVkpLdVUzaHBlNDJvSG40T1FkTE44?=
+ =?utf-8?B?MGdQRi9WMzU0U29kNE9ENjZTcWJlWGtGNmZkQlBhZ1pwRUFmdUEweFRIUEpZ?=
+ =?utf-8?B?Y0NOQzJDTmQ0OUNzUllOLzlhVGxxMmExTk4vdzdMa1RleU9GZW5KMVBvV2wz?=
+ =?utf-8?B?cDM4NTJYZVR2NG9LSEZBYWk0VnI1VTdDOGJ2WHZ5TlhVN2FpUlBTanVmWFRs?=
+ =?utf-8?B?c3Nkc2FLcTFOSUhockdmK05BVzlaK0Jjc215c0RUcFRCYXlZNEJLUElvdHJN?=
+ =?utf-8?B?aG9QSjlDYUFOR1hVMmVHS0JseERVWlRBYXZxNVdlMHhDVU95ZnRqM0szUk1q?=
+ =?utf-8?B?RDZpb3F4Zi9yRWw3bDdQRDdiN3hCRENaVnBWZlZzNFF6bVFKMzlrb0pHUjZv?=
+ =?utf-8?B?eUdlOWdHSEpseHFXOExkTy9BcDRCbzhIa1lPUTNiZzFVTkdQMTUzMmJWTmNi?=
+ =?utf-8?B?MitjUlJyKzRRazRaWGlmMmFCSGtrWkdJemVzVGJhZ3paRkZJMVBmemQ3NEhC?=
+ =?utf-8?B?SVU2aWduUG1laGhvczh0L0RJR2NYRnVCa0xQNWZhdHc0ZTJXWnNnU0thOSta?=
+ =?utf-8?B?bVVOTUR3NXROYmhGTG9PU2lCQkl1N0dGSkZnek9ydktBUmNOZ0w3eGx3SkRK?=
+ =?utf-8?B?VWdNUU04YTVmUE9RekUxc1UyeXFJVlkzV1luNmxMYjZ3anI0QkROVFpoTkxP?=
+ =?utf-8?B?WFhpQUFBYytyeWFYRFhWd1dLbWN0bTlYZWFWa2RzM01ZcXlWTWpxam0wb29M?=
+ =?utf-8?B?c00wUE5hOTlBOUVMVHdTLzhPSzRHc2cwbHRWcVhCZTZ5S3dCOTRZSkJiRDg3?=
+ =?utf-8?B?TEhFelhBWlRhbGRqbldxV3AwS1gzNG9EbUpDUjVSaVZWcG1ZYWNDUWh5em9x?=
+ =?utf-8?B?ZjY2WmVCeUNXVE14VzRyZWhucS8wc0R4aWJyRjhWaHBMVVF5bXJ4WWh2YkY0?=
+ =?utf-8?B?Rlh1TkZUTFRPZnZrVTMyRWdNM0NDcnl2VE10VHlGcVlvOGpBdGV6TWlQakU2?=
+ =?utf-8?B?dURHeS94eXYvUmpUZ1AwUjNUdGtlZ1RYaGVpKzhYN05UaDFvOUhMcGd6NFVC?=
+ =?utf-8?B?OHBDS2MxOWR1cmphVXU2b3RUSGUwQzF1TmVyWmhWaVdadlg4b1ZkSVM3YklP?=
+ =?utf-8?B?QWNSa3ZlOTl5UTV1eVQzRjJ3MkhMOUFwS3FrWUwydkFrcFhtcDJLQUF4TU40?=
+ =?utf-8?B?UXVCTjJwTEF0V0lXK0FLVURLOERaNWczYVdwbS9nZjNJc0JPZFFRQXVxcUV1?=
+ =?utf-8?B?QksrcStGNjE1K3pZL2h4NjRwME9vSW56NWhNTndrTXp3NFdHVlVaMDdxR0VR?=
+ =?utf-8?B?Z0JFaUtVeVVORkpWWHpQdFlqbzI1Nm9iOHNYSzB5SzIyZENFZ0hsYzdVSC9r?=
+ =?utf-8?B?RHVxNG4xdldUVGcwUDMyMjVhMElUUUJZSDNxKzh5ZkZ4VUpYVWNBcXJNQzJp?=
+ =?utf-8?B?YStZQ1lrbnJ2azdxWmNHblZEU2ZLKzhjUHltQlNtYjBmeUcxcVFJanRWUlZw?=
+ =?utf-8?B?UllNd2Zxd01YU0psS3kwajdnaVJ4VXRrdEt3S2U3d0tuOFVCcWJ6eFFnc1F2?=
+ =?utf-8?Q?B4OqMBtyBo6vBWjjAf?=
+X-Exchange-RoutingPolicyChecked:
+	kth/I2owmt5lgRVtzWBAgAVlLwhuBOA3yrV9y6FoSGb2xlSVm4mRR2SeHXs0lKyYvvlgO+FJi4Mh94NqsDLBH74HAFh8MZ2uRWqZn2UhiabJljZZe3nUCJNxEN0EkBrUcPseMIGMq5Gni4lxe8V0qsQ9uhxTfROToCpUkQi/UA1rBKdnvc5D8E2ZjgGfafYhXkxb6kfRNLzOiq5OPtElJYqtu/BzrXXYNxlSCcJGxYK8l8Ocw2OIH5LgwgbYYb8vdAmXVjIOepAyF3OJczp5/6sZ4APZvzEJQryiZsp0MWoBe+yz27mLw4B/cEerVwG9WOfp8n0jgOqt6wBWBXyutQ==
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6122043e-1f12-47ce-82ca-08de7c5a4888
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR15MB3893.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2026 15:00:34.2952
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TJDEhjHs47G6DQ+9cUjhNOscR2IFa/Il9OqxHPqkVv8jCmRSK/3C8vEc6yUW6mns
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR15MB5238
+X-Proofpoint-ORIG-GUID: vm1w-t45Pj2-Fww9QHol-qkjJABICpn7
+X-Authority-Analysis: v=2.4 cv=T4GBjvKQ c=1 sm=1 tr=0 ts=69ac3d96 cx=c_pps
+ a=g4bHFsidlxN+L/prI/sWbA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=03ozwUkBphtHgyqjj1sw:22
+ a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=grV1kQxFQDfxUPLecMkA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA3MDE0MiBTYWx0ZWRfXz8EAPPP+VEOr
+ 4Od/EpTUz/S+o7jyRAyweYuzshMVrJvY4wZUbCGkcSEf4nv9g8iP730Y60kL0pm9DGyGxI02vZN
+ Mh7WU323IRss+bDHMVp8o0Dz7cpQtehdJTpoVX2rv6vtDHy75O1Bv41duImGiqK9hEkTXAkzKJv
+ /RoBzJMnNwkRB+IObpkv5AB1+KsgblZsCbDbu74wBLeuTefO5dM/ClCYmBSC7+crmwjSbvZcjkb
+ FJi3XFTKbwMXWmSjUM/iQSlVNkFWq9NOZrB/3YAMDt9YljksuuHoGlB+RaHoKsoVrR0EM1yqxMW
+ iA07l0I9837f6emD457sv7tmZSRg0y85ZobWfiL6o7X/BPxqHxFLuM9obYMqH/RNXymCMAUD8t/
+ 6absIbTfpZgZan8kdlTgEbXWW+EUdw+d97NergZrNdsrxrfSPzwD8WgCjcdYxc0iVwGSthk0wyz
+ oRvePcyO5coAd73uKGQ==
+X-Proofpoint-GUID: vm1w-t45Pj2-Fww9QHol-qkjJABICpn7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-07_05,2026-03-06_02,2025-10-01_01
+X-Rspamd-Queue-Id: F292222C412
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,ikt.uni-hannover.de,gmx.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265146-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265147-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:dkim,meta.com:email,meta.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.777];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[t.fuechsel@gmx.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmx.de:+];
+	FROM_NEQ_ENVFROM(0.00)[vishs@meta.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[meta.com:+];
+	NEURAL_HAM(-0.00)[-0.992];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:dkim,gmx.de:email,doi.org:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,ncsu.edu:url,swin.edu.au:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-TCP ROCCET is an extension of TCP CUBIC that improves its overall
-performance. By its mode of function, CUBIC causes bufferbloat while
-it tries to detect the available throughput of a network path. This is
-particularly a problem with large buffers in mobile networks. A more
-detailed description and analysis of this problem caused by TCP CUBIC
-can be found in [1]. TCP ROCCET addresses this problem by adding two
-additional metrics to detect congestion (queueing and bufferbloat)
-on a network path. TCP ROCCET achieves better performance than CUBIC
-and BBRv3, by maintaining similar throughput while reducing the latency.
-In addition, TCP ROCCET does not have fairness issues when sharing a
-link with TCP CUBIC and BBRv3. A paper that evaluates the performance
-and function of TCP ROCCET has already been peer-reviewed and will be
-presented at the WONS 2026 conference. A draft of this paper can be
-found here [2].
 
-[1] https://doi.org/10.1109/VTC2023-Fall60731.2023.10333357
-[2] https://arxiv.org/abs/2510.25281
 
-Signed-off-by: Lukas Prause <lukas.prause@ikt.uni-hannover.de>
-Signed-off-by: Tim Fuechsel <t.fuechsel@gmx.de>
-
-=2D--
-
-Changes since v1:
-	- Removes bug in ECN handling.
-	- Received ECE bit is handled as ROCCET congestion event.
-=2D--
- net/ipv4/Kconfig      |  12 +
- net/ipv4/Makefile     |   1 +
- net/ipv4/tcp_roccet.c | 671 ++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_roccet.h |  56 ++++
- 4 files changed, 740 insertions(+)
- create mode 100644 net/ipv4/tcp_roccet.c
- create mode 100644 net/ipv4/tcp_roccet.h
-
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index b71c22475c51..781a0db37309 100644
-=2D-- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -664,6 +664,18 @@ config TCP_CONG_CDG
- 	    delay gradients." In Networking 2011. Preprint:
- 	    http://caia.swin.edu.au/cv/dahayes/content/networking2011-cdg-prepri=
-nt.pdf
-=20
-+config TCP_CONG_ROCCET
-+	tristate "ROCCET TCP"
-+	default n
-+	help
-+      TCP ROCCET is a sender-side only modification of the TCP CUBIC
-+      protocol stack that optimizes the performance of TCP congestion
-+      control. Especially for networks with large buffers (wireless,
-+      cellular networks), TCP ROCCET has improved performance by maintain=
-ing
-+      similar throughput as CUBIC while reducing the latency.
-+       For more information, see: https://arxiv.org/abs/2510.25281
-+
-+
- config TCP_CONG_BBR
- 	tristate "BBR TCP"
- 	default n
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index ec36d2ec059e..35fa62b6d07f 100644
-=2D-- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -45,6 +45,7 @@ obj-$(CONFIG_INET_TCP_DIAG) +=3D tcp_diag.o
- obj-$(CONFIG_INET_UDP_DIAG) +=3D udp_diag.o
- obj-$(CONFIG_INET_RAW_DIAG) +=3D raw_diag.o
- obj-$(CONFIG_TCP_CONG_BBR) +=3D tcp_bbr.o
-+obj-$(CONFIG_TCP_CONG_ROCCET) +=3D tcp_roccet.o
- obj-$(CONFIG_TCP_CONG_BIC) +=3D tcp_bic.o
- obj-$(CONFIG_TCP_CONG_CDG) +=3D tcp_cdg.o
- obj-$(CONFIG_TCP_CONG_CUBIC) +=3D tcp_cubic.o
-diff --git a/net/ipv4/tcp_roccet.c b/net/ipv4/tcp_roccet.c
-new file mode 100644
-index 000000000000..892faf907edb
-=2D-- /dev/null
-+++ b/net/ipv4/tcp_roccet.c
-@@ -0,0 +1,671 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * TCP ROCCET: An RTT-Oriented CUBIC Congestion Control
-+ * Extension for 5G and Beyond Networks
-+ *
-+ * TCP ROCCET is a new TCP congestion control
-+ * algorithm suited for current cellular 5G NR beyond networks.
-+ * It extends the kernel default congestion control CUBIC
-+ * and improves its performance, and additionally solves an
-+ * unwanted side effects of CUBIC=E2=80=99s implementation.
-+ * ROCCET uses its own Slow Start, called LAUNCH, where loss
-+ * is not considered as a congestion event.
-+ * The congestion avoidance phase, called ORBITER, uses
-+ * CUBIC's window growth function and adds, based on RTT
-+ * and ACK rate, congestion events.
-+ *
-+ * A peer-reviewed paper on TCP ROCCET will be presented at the WONS 2026=
- conference.
-+ * A draft of the paper is available here:
-+ *		https://arxiv.org/abs/2510.25281
-+ *
-+ *
-+ * Further information about CUBIC:
-+ * TCP CUBIC: Binary Increase Congestion control for TCP v2.3
-+ * Home page:
-+ *	http://netsrv.csc.ncsu.edu/twiki/bin/view/Main/BIC
-+ * This is from the implementation of CUBIC TCP in
-+ * Sangtae Ha, Injong Rhee and Lisong Xu,
-+ *  "CUBIC: A New TCP-Friendly High-Speed TCP Variant"
-+ *  in ACM SIGOPS Operating System Review, July 2008.
-+ * Available from:
-+ *  http://netsrv.csc.ncsu.edu/export/cubic_a_new_tcp_2008.pdf
-+ *
-+ * CUBIC integrates a new slow start algorithm, called HyStart.
-+ * The details of HyStart are presented in
-+ *  Sangtae Ha and Injong Rhee,
-+ *  "Taming the Elephants: New TCP Slow Start", NCSU TechReport 2008.
-+ * Available from:
-+ *  http://netsrv.csc.ncsu.edu/export/hystart_techreport_2008.pdf
-+ *
-+ * All testing results are available from:
-+ * http://netsrv.csc.ncsu.edu/wiki/index.php/TCP_Testing
-+ *
-+ * Unless CUBIC is enabled and congestion window is large
-+ * this behaves the same as the original Reno.
-+ */
-+
-+#include "tcp_roccet.h"
-+#include "linux/printk.h"
-+#include <linux/btf.h>
-+#include <linux/btf_ids.h>
-+#include <linux/math64.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <net/tcp.h>
-+
-+/* Scale factor beta calculation (max_cwnd =3D snd_cwnd * beta) */
-+#define BICTCP_BETA_SCALE 1024
-+
-+#define BICTCP_HZ 10 /* BIC HZ 2^10 =3D 1024 */
-+
-+/* Alpha value for the sRrTT  multiplied by 100.
-+ * Here 20 represents a value of 0.2
-+ */
-+#define ROCCET_ALPHA_TIMES_100 20
-+
-+/* The amount of seconds ROCCET stores a minRTT.
-+ * Enable "calculate_min_rtt" first.
-+ */
-+#define ROCCET_RTT_LOOKBACK_S 10
-+
-+/* Parameters that are specific to the ROCCET-Algorithm */
-+static int sr_rtt_upper_bound __read_mostly =3D 100;
-+static int ack_rate_diff_ss __read_mostly =3D 10;
-+static int ack_rate_diff_ca __read_mostly =3D 200;
-+static bool calculate_min_rtt __read_mostly;
-+static bool ignore_loss __read_mostly;
-+static int roccet_min_rtt_interpolation_factor __read_mostly =3D 70;
-+
-+module_param(sr_rtt_upper_bound, int, 0644);
-+MODULE_PARM_DESC(sr_rtt_upper_bound, "ROCCET's upper bound for srRTT.");
-+module_param(ack_rate_diff_ss, int, 0644);
-+MODULE_PARM_DESC(ack_rate_diff_ss,
-+		 "ROCCET's threshold to exit slow start if ACK-rate defer by given amou=
-nt of segments.");
-+module_param(ack_rate_diff_ca, int, 0644);
-+MODULE_PARM_DESC(ack_rate_diff_ca,
-+		 "ROCCET's threshold for ack-rate and cum_cwnd, in percantage of the cu=
-rrent cwnd.");
-+module_param(calculate_min_rtt, bool, 0644);
-+MODULE_PARM_DESC(calculate_min_rtt,
-+		 "Calculate min RTT if no lower RTT occurs after 10 sec.");
-+module_param(ignore_loss, bool, 0644);
-+MODULE_PARM_DESC(ignore_loss, "Ignore loss as a congestion event.");
-+module_param(roccet_min_rtt_interpolation_factor, int, 0644);
-+MODULE_PARM_DESC(roccet_min_rtt_interpolation_factor,
-+		 "ROCCET factor for interpolating the current RTT with the last minRTT =
-(minRTT =3D (factor * currRTT + (100-factor) * minRTT) / 100)");
-+
-+static int fast_convergence __read_mostly =3D 1;
-+static int beta __read_mostly =3D 717; /* =3D 717/1024 (BICTCP_BETA_SCALE=
-) */
-+static int initial_ssthresh __read_mostly;
-+static int bic_scale __read_mostly =3D 41;
-+static int tcp_friendliness __read_mostly =3D 1;
-+
-+static u32 cube_rtt_scale __read_mostly;
-+static u32 beta_scale __read_mostly;
-+static u64 cube_factor __read_mostly;
-+
-+/* Note parameters that are used for precomputing scale factors are read-=
-only */
-+module_param(fast_convergence, int, 0644);
-+MODULE_PARM_DESC(fast_convergence, "turn on/off fast convergence");
-+module_param(beta, int, 0644);
-+MODULE_PARM_DESC(beta, "beta for multiplicative increase");
-+module_param(initial_ssthresh, int, 0644);
-+MODULE_PARM_DESC(initial_ssthresh, "initial value of slow start threshold=
-");
-+module_param(bic_scale, int, 0444);
-+MODULE_PARM_DESC(bic_scale,
-+		 "scale (scaled by 1024) value for bic function (bic_scale/1024)");
-+module_param(tcp_friendliness, int, 0644);
-+MODULE_PARM_DESC(tcp_friendliness, "turn on/off tcp friendliness");
-+
-+static inline void roccettcp_reset(struct roccettcp *ca)
-+{
-+	memset(ca, 0, offsetof(struct roccettcp, curr_rtt));
-+	ca->bw_limit.sum_cwnd =3D 1;
-+	ca->bw_limit.sum_acked =3D 1;
-+	ca->bw_limit.next_check =3D 0;
-+	ca->curr_min_rtt_timed.rtt =3D ~0U;
-+	ca->curr_min_rtt_timed.time =3D ~0U;
-+	ca->last_rtt =3D 0;
-+	ca->ece_received =3D false;
-+}
-+
-+static inline void update_min_rtt(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+
-+	if (now - ca->curr_min_rtt_timed.time >
-+		    ROCCET_RTT_LOOKBACK_S * USEC_PER_SEC &&
-+	    calculate_min_rtt) {
-+		u32 new_min_rtt =3D max(ca->curr_rtt, 1);
-+		u32 old_min_rtt =3D ca->curr_min_rtt_timed.rtt;
-+
-+		u32 interpolated_min_rtt =3D
-+			(new_min_rtt * roccet_min_rtt_interpolation_factor +
-+			 old_min_rtt *
-+				 (100 - roccet_min_rtt_interpolation_factor)) /
-+			100;
-+
-+		ca->curr_min_rtt_timed.rtt =3D interpolated_min_rtt;
-+		ca->curr_min_rtt_timed.time =3D now;
-+	}
-+
-+	/* Check if new lower min RTT was found. If so, set it directly */
-+	if (ca->curr_rtt < ca->curr_min_rtt_timed.rtt) {
-+		ca->curr_min_rtt_timed.rtt =3D max(ca->curr_rtt, 1);
-+		ca->curr_min_rtt_timed.time =3D now;
-+	}
-+}
-+
-+/* Return difference between last and current ack rate.
-+ */
-+static inline int get_ack_rate_diff(struct roccettcp *ca)
-+{
-+	return ca->ack_rate.last_rate - ca->ack_rate.curr_rate;
-+}
-+
-+/* Update ack rate sampled by 100ms.
-+ */
-+static inline void update_ack_rate(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+	u32 interval =3D USEC_PER_MSEC * 100;
-+
-+	if ((u32)(now - ca->ack_rate.last_rate_time) >=3D interval) {
-+		ca->ack_rate.last_rate_time =3D now;
-+		ca->ack_rate.last_rate =3D ca->ack_rate.curr_rate;
-+		ca->ack_rate.curr_rate =3D ca->ack_rate.cnt;
-+		ca->ack_rate.cnt =3D 0;
-+	} else {
-+		ca->ack_rate.cnt +=3D 1;
-+	}
-+}
-+
-+/* Compute srRTT.
-+ */
-+static inline void update_srrtt(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (ca->curr_min_rtt_timed.rtt =3D=3D 0)
-+		return;
-+
-+	/* Calculate the new rRTT (Scaled by 100).
-+	 * 100 * ((sRTT - sRTT_min) / sRTT_min)
-+	 */
-+	u32 rrtt =3D (100 * (ca->curr_rtt - ca->curr_min_rtt_timed.rtt)) /
-+		   ca->curr_min_rtt_timed.rtt;
-+
-+	// (1 - alpha) * srRTT + alpha * rRTT
-+	ca->curr_srrtt =3D ((100 - ROCCET_ALPHA_TIMES_100) * ca->curr_srrtt +
-+			  ROCCET_ALPHA_TIMES_100 * rrtt) / 100;
-+}
-+
-+__bpf_kfunc static void roccettcp_init(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	roccettcp_reset(ca);
-+
-+	if (initial_ssthresh)
-+		tcp_sk(sk)->snd_ssthresh =3D initial_ssthresh;
-+
-+	/* Initial roccet parameters */
-+	ca->roccet_last_event_time_us =3D 0;
-+	ca->curr_min_rtt =3D ~0U;
-+	ca->ack_rate.last_rate =3D 0;
-+	ca->ack_rate.last_rate_time =3D 0;
-+	ca->ack_rate.curr_rate =3D 0;
-+	ca->ack_rate.cnt =3D 0;
-+}
-+
-+__bpf_kfunc static void roccettcp_cwnd_event(struct sock *sk,
-+					     enum tcp_ca_event event)
-+{
-+	if (event =3D=3D CA_EVENT_TX_START) {
-+		struct roccettcp *ca =3D inet_csk_ca(sk);
-+		u32 now =3D tcp_jiffies32;
-+		s32 delta;
-+
-+		delta =3D now - tcp_sk(sk)->lsndtime;
-+
-+		/* We were application limited (idle) for a while.
-+		 * Shift epoch_start to keep cwnd growth to cubic curve.
-+		 */
-+		if (ca->epoch_start && delta > 0) {
-+			ca->epoch_start +=3D delta;
-+			if (after(ca->epoch_start, now))
-+				ca->epoch_start =3D now;
-+		}
-+		return;
-+	}
-+}
-+
-+/* calculate the cubic root of x using a table lookup followed by one
-+ * Newton-Raphson iteration.
-+ * Avg err ~=3D 0.195%
-+ */
-+static u32 cubic_root(u64 a)
-+{
-+	u32 x, b, shift;
-+	/* cbrt(x) MSB values for x MSB values in [0..63].
-+	 * Precomputed then refined by hand - Willy Tarreau
-+	 *
-+	 * For x in [0..63],
-+	 *   v =3D cbrt(x << 18) - 1
-+	 *   cbrt(x) =3D (v[x] + 10) >> 6
-+	 */
-+	static const u8 v[] =3D {
-+		/* 0x00 */ 0,	54,  54,  54,  118, 118, 118, 118,
-+		/* 0x08 */ 123, 129, 134, 138, 143, 147, 151, 156,
-+		/* 0x10 */ 157, 161, 164, 168, 170, 173, 176, 179,
-+		/* 0x18 */ 181, 185, 187, 190, 192, 194, 197, 199,
-+		/* 0x20 */ 200, 202, 204, 206, 209, 211, 213, 215,
-+		/* 0x28 */ 217, 219, 221, 222, 224, 225, 227, 229,
-+		/* 0x30 */ 231, 232, 234, 236, 237, 239, 240, 242,
-+		/* 0x38 */ 244, 245, 246, 248, 250, 251, 252, 254,
-+	};
-+
-+	b =3D fls64(a);
-+	if (b < 7) {
-+		/* a in [0..63] */
-+		return ((u32)v[(u32)a] + 35) >> 6;
-+	}
-+
-+	b =3D ((b * 84) >> 8) - 1;
-+	shift =3D (a >> (b * 3));
-+
-+	x =3D ((u32)(((u32)v[shift] + 10) << b)) >> 6;
-+
-+	/* Newton-Raphson iteration
-+	 *                         2
-+	 * x    =3D ( 2 * x  +  a / x  ) / 3
-+	 *  k+1          k         k
-+	 */
-+	x =3D (2 * x + (u32)div64_u64(a, (u64)x * (u64)(x - 1)));
-+	x =3D ((x * 341) >> 10);
-+	return x;
-+}
-+
-+/* Compute congestion window to use.
-+ */
-+static inline void bictcp_update(struct roccettcp *ca, u32 cwnd, u32 acke=
-d)
-+{
-+	u32 delta, bic_target, max_cnt;
-+	u64 offs, t;
-+
-+	ca->ack_cnt +=3D acked; /* count the number of ACKed packets */
-+
-+	if (ca->last_cwnd =3D=3D cwnd &&
-+	    (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
-+		return;
-+
-+	/* The CUBIC function can update ca->cnt at most once per jiffy.
-+	 * On all cwnd reduction events, ca->epoch_start is set to 0,
-+	 * which will force a recalculation of ca->cnt.
-+	 */
-+	if (ca->epoch_start && tcp_jiffies32 =3D=3D ca->last_time)
-+		goto tcp_friendliness;
-+
-+	ca->last_cwnd =3D cwnd;
-+	ca->last_time =3D tcp_jiffies32;
-+
-+	if (ca->epoch_start =3D=3D 0) {
-+		ca->epoch_start =3D tcp_jiffies32; /* record beginning */
-+		ca->ack_cnt =3D acked; /* start counting */
-+		ca->tcp_cwnd =3D cwnd; /* syn with cubic */
-+
-+		if (ca->last_max_cwnd <=3D cwnd) {
-+			ca->bic_K =3D 0;
-+			ca->bic_origin_point =3D cwnd;
-+		} else {
-+			/* Compute new K based on
-+			 * (wmax-cwnd) * (srtt>>3 / HZ) / c * 2^(3*bictcp_HZ)
-+			 */
-+			ca->bic_K =3D cubic_root(cube_factor *
-+					       (ca->last_max_cwnd - cwnd));
-+			ca->bic_origin_point =3D ca->last_max_cwnd;
-+		}
-+	}
-+
-+	/* cubic function - calc */
-+	/* calculate c * time^3 / rtt,
-+	 *  while considering overflow in calculation of time^3
-+	 * (so time^3 is done by using 64 bit)
-+	 * and without the support of division of 64bit numbers
-+	 * (so all divisions are done by using 32 bit)
-+	 *  also NOTE the unit of those variables
-+	 *	  time  =3D (t - K) / 2^bictcp_HZ
-+	 *	  c =3D bic_scale >> 10
-+	 * rtt  =3D (srtt >> 3) / HZ
-+	 * !!! The following code does not have overflow problems,
-+	 * if the cwnd < 1 million packets !!!
-+	 */
-+
-+	t =3D (s32)(tcp_jiffies32 - ca->epoch_start);
-+	t +=3D usecs_to_jiffies(ca->delay_min);
-+
-+	/* change the unit from HZ to bictcp_HZ */
-+	t <<=3D BICTCP_HZ;
-+	do_div(t, HZ);
-+
-+	if (t < ca->bic_K) /* t - K */
-+		offs =3D ca->bic_K - t;
-+	else
-+		offs =3D t - ca->bic_K;
-+
-+	/* c/rtt * (t-K)^3 */
-+	delta =3D (cube_rtt_scale * offs * offs * offs) >> (10 + 3 * BICTCP_HZ);
-+	if (t < ca->bic_K) /* below origin*/
-+		bic_target =3D ca->bic_origin_point - delta;
-+	else /* above origin*/
-+		bic_target =3D ca->bic_origin_point + delta;
-+
-+	/* cubic function - calc bictcp_cnt*/
-+	if (bic_target > cwnd)
-+		ca->cnt =3D cwnd / (bic_target - cwnd);
-+	else
-+		ca->cnt =3D 100 * cwnd; /* very small increment*/
-+
-+	/* The initial growth of cubic function may be too conservative
-+	 * when the available bandwidth is still unknown.
-+	 */
-+	if (ca->last_max_cwnd =3D=3D 0 && ca->cnt > 20)
-+		ca->cnt =3D 20; /* increase cwnd 5% per RTT */
-+
-+tcp_friendliness:
-+	/* TCP Friendly */
-+	if (tcp_friendliness) {
-+		u32 scale =3D beta_scale;
-+
-+		delta =3D (cwnd * scale) >> 3;
-+		while (ca->ack_cnt > delta) { /* update tcp cwnd */
-+			ca->ack_cnt -=3D delta;
-+			ca->tcp_cwnd++;
-+		}
-+
-+		if (ca->tcp_cwnd > cwnd) { /* if bic is slower than tcp */
-+			delta =3D ca->tcp_cwnd - cwnd;
-+			max_cnt =3D cwnd / delta;
-+			if (ca->cnt > max_cnt)
-+				ca->cnt =3D max_cnt;
-+		}
-+	}
-+
-+	/* The maximum rate of cwnd increase CUBIC allows is 1 packet per
-+	 * 2 packets ACKed, meaning cwnd grows at 1.5x per RTT.
-+	 */
-+	ca->cnt =3D max(ca->cnt, 2U);
-+}
-+
-+__bpf_kfunc static void roccettcp_cong_avoid(struct sock *sk, u32 ack,
-+					     u32 acked)
-+{
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+	u32 bw_limit_detect =3D 0;
-+	u32 roccet_xj;
-+	u32 jitter;
-+
-+	if (ca->last_rtt > ca->curr_rtt)
-+		jitter =3D ca->last_rtt - ca->curr_rtt;
-+	else
-+		jitter =3D ca->curr_rtt - ca->last_rtt;
-+
-+	/* Update roccet parameters */
-+	update_ack_rate(sk);
-+	update_min_rtt(sk);
-+	update_srrtt(sk);
-+
-+	/* ROCCET drain.
-+	 * Do not increase the cwnd for 100ms after a roccet congestion event
-+	 */
-+	if (now - ca->roccet_last_event_time_us <=3D 100 * USEC_PER_MSEC)
-+		return;
-+
-+	/* LAUNCH: Detect an exit point for tcp slow start
-+	 * in networks with large buffers of multiple BDP
-+	 * Like in cellular networks (5G, ...).
-+	 * Or exit LAUNCH if cwnd is too large for application layer
-+	 * data rate.
-+	 */
-+
-+	if ((tcp_in_slow_start(tp) && ca->curr_srrtt > sr_rtt_upper_bound &&
-+	     get_ack_rate_diff(ca) >=3D ack_rate_diff_ss) ||
-+	    (!tcp_is_cwnd_limited(sk) && tcp_in_slow_start(tp))) {
-+		ca->epoch_start =3D 0;
-+
-+		/* Handle initial slow start. Here we observe the most problems */
-+		if (tp->snd_ssthresh =3D=3D TCP_INFINITE_SSTHRESH) {
-+			tcp_sk(sk)->snd_ssthresh =3D tcp_snd_cwnd(tp) / 2;
-+			tcp_snd_cwnd_set(tp, tcp_snd_cwnd(tp) / 2);
-+		} else {
-+			tcp_sk(sk)->snd_ssthresh =3D
-+				tcp_snd_cwnd(tp) - (tcp_snd_cwnd(tp) / 3);
-+			tcp_snd_cwnd_set(tp, tcp_snd_cwnd(tp) -
-+						     (tcp_snd_cwnd(tp) / 3));
-+		}
-+		ca->roccet_last_event_time_us =3D now;
-+		return;
-+	}
-+
-+	if (tcp_in_slow_start(tp)) {
-+		acked =3D tcp_slow_start(tp, acked);
-+		if (!acked)
-+			return;
-+	}
-+
-+	if (ca->bw_limit.next_check =3D=3D 0)
-+		ca->bw_limit.next_check =3D now + 5 * ca->curr_rtt;
-+
-+	ca->bw_limit.sum_cwnd +=3D tcp_snd_cwnd(tp);
-+	ca->bw_limit.sum_acked +=3D acked;
-+
-+	if (ca->bw_limit.next_check < now) {
-+		/* We send more data as we got acked in the last 5 RTTs */
-+		if ((ca->bw_limit.sum_cwnd * 100) / ca->bw_limit.sum_acked >=3D
-+		    ack_rate_diff_ca)
-+			bw_limit_detect =3D 1;
-+
-+		/* reset struct and set next end of period */
-+		ca->bw_limit.sum_cwnd =3D 1;
-+
-+		/* set to 1 to avoid division by zero */
-+		ca->bw_limit.sum_acked =3D 1;
-+		ca->bw_limit.next_check =3D now + 5 * ca->curr_rtt;
-+	}
-+
-+	/* Respects the jitter of the connection and add it on top of the upper =
-bound
-+	 * for the srRTT
-+	 */
-+	roccet_xj =3D ((jitter * 100) / ca->curr_min_rtt_timed.rtt) +
-+		    sr_rtt_upper_bound;
-+	if (roccet_xj < sr_rtt_upper_bound)
-+		roccet_xj =3D sr_rtt_upper_bound;
-+
-+	if (ca->curr_srrtt > roccet_xj && (bw_limit_detect || ca->ece_received))=
- {
-+		if (ca->ece_received)
-+			ca->ece_received =3D false;
-+		ca->epoch_start =3D 0;
-+		ca->roccet_last_event_time_us =3D now;
-+		ca->cnt =3D 100 * tcp_snd_cwnd(tp);
-+
-+		/* Set Wmax if cwnd is larger than the old Wmax */
-+		if (tcp_snd_cwnd(tp) > ca->last_max_cwnd)
-+			ca->last_max_cwnd =3D tcp_snd_cwnd(tp);
-+
-+		tcp_snd_cwnd_set(tp, min(tp->snd_cwnd_clamp,
-+					 max((tcp_snd_cwnd(tp) * beta) / BICTCP_BETA_SCALE, 2U)));
-+		tp->snd_ssthresh =3D tcp_snd_cwnd(tp);
-+		return;
-+	}
-+
-+	/* Terminates this function if cwnd is not fully utilized.
-+	 * In mobile networks like 5G, this termination causes the cwnd to be fr=
-ozen at
-+	 * an excessively high value. This is because slow start or HyStart mass=
-ively
-+	 * exceed the available bandwidth and leave the cwnd at an excessively h=
-igh
-+	 * value. The cwnd cannot therefore be fully utilized because it is limi=
-ted by
-+	 * the connection capacity.
-+	 */
-+	if (!tcp_is_cwnd_limited(sk))
-+		return;
-+
-+	bictcp_update(ca, tcp_snd_cwnd(tp), acked);
-+	tcp_cong_avoid_ai(tp, max(1, ca->cnt), acked);
-+}
-+
-+__bpf_kfunc static u32 roccettcp_recalc_ssthresh(struct sock *sk)
-+{
-+	const struct tcp_sock *tp =3D tcp_sk(sk);
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (ignore_loss)
-+		return tcp_snd_cwnd(tp);
-+
-+	/* Don't exit slow start if loss occurs. */
-+	if (tcp_in_slow_start(tp))
-+		return tcp_snd_cwnd(tp);
-+
-+	ca->epoch_start =3D 0; /* end of epoch */
-+
-+	/* Wmax and fast convergence */
-+	if (tcp_snd_cwnd(tp) < ca->last_max_cwnd && fast_convergence)
-+		ca->last_max_cwnd =3D
-+			(tcp_snd_cwnd(tp) * (BICTCP_BETA_SCALE + beta)) /
-+			(2 * BICTCP_BETA_SCALE);
-+	else
-+		ca->last_max_cwnd =3D tcp_snd_cwnd(tp);
-+
-+	return max((tcp_snd_cwnd(tp) * beta) / BICTCP_BETA_SCALE, 2U);
-+}
-+
-+__bpf_kfunc static void roccettcp_state(struct sock *sk, u8 new_state)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (new_state =3D=3D TCP_CA_Loss)
-+		roccettcp_reset(ca);
-+}
-+
-+__bpf_kfunc static void roccettcp_acked(struct sock *sk,
-+					const struct ack_sample *sample)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	/* Some calls are for duplicates without timestamps */
-+	if (sample->rtt_us < 0)
-+		return;
-+
-+	/* Discard delay samples right after fast recovery */
-+	if (ca->epoch_start && (s32)(tcp_jiffies32 - ca->epoch_start) < HZ)
-+		return;
-+
-+	u32 delay =3D sample->rtt_us;
-+
-+	if (delay =3D=3D 0)
-+		delay =3D 1;
-+
-+	/* first time call or link delay decreases */
-+	if (ca->delay_min =3D=3D 0 || ca->delay_min > delay)
-+		ca->delay_min =3D delay;
-+
-+	/* Get valid sample for roccet */
-+	if (sample->rtt_us > 0) {
-+		ca->last_rtt =3D ca->curr_rtt;
-+		ca->curr_rtt =3D sample->rtt_us;
-+	}
-+}
-+
-+__bpf_kfunc static void roccet_in_ack_event(struct sock *sk, u32 flags)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	/* Handle ECE bit.
-+	 * Processing of ECE events is done in roccettcp_cong_avoid()
-+	 */
-+	if (flags & CA_ACK_ECE)
-+		ca->ece_received =3D true;
-+}
-+
-+static struct tcp_congestion_ops roccet_tcp __read_mostly =3D {
-+	.init =3D roccettcp_init,
-+	.ssthresh =3D roccettcp_recalc_ssthresh,
-+	.cong_avoid =3D roccettcp_cong_avoid,
-+	.set_state =3D roccettcp_state,
-+	.undo_cwnd =3D tcp_reno_undo_cwnd,
-+	.cwnd_event =3D roccettcp_cwnd_event,
-+	.pkts_acked =3D roccettcp_acked,
-+	.in_ack_event   =3D roccet_in_ack_event,
-+	.owner =3D THIS_MODULE,
-+	.name =3D "roccet",
-+};
-+
-+BTF_KFUNCS_START(tcp_roccet_check_kfunc_ids)
-+BTF_ID_FLAGS(func, roccettcp_init)
-+BTF_ID_FLAGS(func, roccettcp_recalc_ssthresh)
-+BTF_ID_FLAGS(func, roccettcp_cong_avoid)
-+BTF_ID_FLAGS(func, roccettcp_state)
-+BTF_ID_FLAGS(func, roccettcp_cwnd_event)
-+BTF_ID_FLAGS(func, roccettcp_acked)
-+BTF_KFUNCS_END(tcp_roccet_check_kfunc_ids)
-+
-+static const struct btf_kfunc_id_set tcp_roccet_kfunc_set =3D {
-+	.owner =3D THIS_MODULE,
-+	.set =3D &tcp_roccet_check_kfunc_ids,
-+};
-+
-+static int __init roccettcp_register(void)
-+{
-+	int ret;
-+
-+	BUILD_BUG_ON(sizeof(struct roccettcp) > ICSK_CA_PRIV_SIZE);
-+
-+	/* Precompute a bunch of the scaling factors that are used per-packet
-+	 * based on SRTT of 100ms
-+	 */
-+
-+	beta_scale =3D
-+		8 * (BICTCP_BETA_SCALE + beta) / 3 / (BICTCP_BETA_SCALE - beta);
-+
-+	cube_rtt_scale =3D (bic_scale * 10); /* 1024*c/rtt */
-+
-+	/* calculate the "K" for (wmax-cwnd) =3D c/rtt * K^3
-+	 *  so K =3D cubic_root( (wmax-cwnd)*rtt/c )
-+	 * the unit of K is bictcp_HZ=3D2^10, not HZ
-+	 *
-+	 *  c =3D bic_scale >> 10
-+	 *  rtt =3D 100ms
-+	 *
-+	 * the following code has been designed and tested for
-+	 * cwnd < 1 million packets
-+	 * RTT < 100 seconds
-+	 * HZ < 1,000,00  (corresponding to 10 nano-second)
-+	 */
-+
-+	/* 1/c * 2^2*bictcp_HZ * srtt */
-+	cube_factor =3D 1ull << (10 + 3 * BICTCP_HZ); /* 2^40 */
-+
-+	/* divide by bic_scale and by constant Srtt (100ms) */
-+	do_div(cube_factor, bic_scale * 10);
-+
-+	ret =3D register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS,
-+					&tcp_roccet_kfunc_set);
-+	if (ret < 0)
-+		return ret;
-+	return tcp_register_congestion_control(&roccet_tcp);
-+}
-+
-+static void __exit roccettcp_unregister(void)
-+{
-+	tcp_unregister_congestion_control(&roccet_tcp);
-+}
-+
-+module_init(roccettcp_register);
-+module_exit(roccettcp_unregister);
-+
-+MODULE_AUTHOR("Lukas Prause, Tim F=C3=BCchsel");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("ROCCET TCP");
-+MODULE_VERSION("1.0");
-diff --git a/net/ipv4/tcp_roccet.h b/net/ipv4/tcp_roccet.h
-new file mode 100644
-index 000000000000..a7201866d5ac
-=2D-- /dev/null
-+++ b/net/ipv4/tcp_roccet.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * TCP ROCCET congestion control interface
-+ */
-+#ifndef __TCP_ROCCET_H
-+#define __TCP_ROCCET_H 1
-+
-+#include <linux/math64.h>
-+
-+struct ack_rate {
-+	u16 last_rate;	/* Last ACK-rate */
-+	u32 last_rate_time;	/* Timestamp of the last ACK-rate */
-+	u16 curr_rate;	/* Current ACK-rate */
-+	u16 cnt;	/* Used for counting acks */
-+};
-+
-+struct bandwidth_limit_detect {
-+	u32 sum_cwnd;	/* sum of cwnd during time interval */
-+	u32 sum_acked;	/* sum of received acks during time interval */
-+	u32 next_check;	/* end/upper bound of time interval */
-+};
-+
-+struct timed_rtt {
-+	u32 time;	/* Time of recording */
-+	u32 rtt;	/* Measured RTT */
-+};
-+
-+/* Based on the BICTCP struct with additions specific for the ROCCET-Algo=
-rithm */
-+struct roccettcp {
-+	u32 cnt;		/* increase cwnd by 1 after ACKs */
-+	u32 last_max_cwnd;	/* last maximum snd_cwnd */
-+	u32 last_cwnd;		/* the last snd_cwnd */
-+	u32 last_time;		/* time when updated last_cwnd */
-+	u32 bic_origin_point;	/* origin point of bic function */
-+	u32 bic_K;		/* time to origin point from the
-+				 * beginning of the current epoch
-+				 */
-+	u32 delay_min;		/* min delay (usec) */
-+	u32 epoch_start;	/* beginning of an epoch */
-+	u32 ack_cnt;		/* number of acks */
-+	u32 tcp_cwnd;		/* estimated tcp cwnd */
-+	u32 curr_rtt;		/* the minimum rtt of current round */
-+
-+	u32 roccet_last_event_time_us;	/* The last time ROCCET was triggered */
-+	bool ece_received;	/* Set to true if an ECE bit was received */
-+	u32 curr_min_rtt;		/* The current observed minRTT */
-+	struct timed_rtt curr_min_rtt_timed;	/* The current observed minRTT with
-+						 * the timestamp when it was observed
-+						 */
-+	u32 curr_srrtt;			/* The srRTT calculated based on the latest ACK */
-+	struct ack_rate ack_rate;	/* The last and the current ACK rate */
-+	struct bandwidth_limit_detect bw_limit;
-+	u32 last_rtt;			/* Used for jitter calculation */
-+};
-+
-+#endif /* __TCP_ROCCET_H */
-=2D-=20
-2.43.0
+On 3/7/26 7:36 PM, Vishwanath Seshagiri wrote:
+> 
+> 
+> On 3/5/26 6:08 PM, Michael S. Tsirkin wrote:
+>> On Mon, Mar 02, 2026 at 11:42:53PM -0800, Vishwanath Seshagiri wrote:
+>>> Use page_pool for RX buffer allocation in mergeable and small buffer
+>>> modes to enable page recycling and avoid repeated page allocator calls.
+>>> skb_mark_for_recycle() enables page reuse in the network stack.
+>>>
+>>> Big packets mode is unchanged because it uses page->private for linked
+>>> list chaining of multiple pages per buffer, which conflicts with
+>>> page_pool's internal use of page->private.
+>>>
+>>> Implement conditional DMA premapping using virtqueue_dma_dev():
+>>> - When non-NULL (vhost, virtio-pci): use PP_FLAG_DMA_MAP with page_pool
+>>>    handling DMA mapping, submit via virtqueue_add_inbuf_premapped()
+>>> - When NULL (VDUSE, direct physical): page_pool handles allocation only,
+>>>    submit via virtqueue_add_inbuf_ctx()
+>>>
+>>> This preserves the DMA premapping optimization from commit 31f3cd4e5756b
+>>> ("virtio-net: rq submits premapped per-buffer") while adding page_pool
+>>> support as a prerequisite for future zero-copy features (devmem TCP,
+>>> io_uring ZCRX).
+>>>
+>>> Page pools are created in probe and destroyed in remove (not open/ 
+>>> close),
+>>> following existing driver behavior where RX buffers remain in virtqueues
+>>> across interface state changes.
+>>>
+>>> Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
+>>> ---
+>>> Changes in v10:
+>>> - add_recvbuf_small: use alloc_len to avoid clobbering len (Michael 
+>>> S. Tsirkin)
+>>
+>> this was not my comment though?
+> 
+> Apologies! I misunderstood the comment as a variable naming issue
+> than truesize under accounting.
+> 
+>>
+>>> - v9:
+>>>    https://lore.kernel.org/virtualization/20260302041005.1627210-1- 
+>>> vishs@meta.com/
+>>>
+>>> Changes in v9:
+>>> - Fix virtnet_skb_append_frag() for XSK callers (Michael S. Tsirkin)
+>>> - v8:
+>>>    https://lore.kernel.org/virtualization/e824c5a3-cfe0-4d11-958f- 
+>>> c3ec82d11d37@meta.com/
+>>>
+>>> Changes in v8:
+>>> - Remove virtnet_no_page_pool() helper, replace with direct !rq- 
+>>> >page_pool
+>>>    checks or inlined conditions (Xuan Zhuo)
+>>> - Extract virtnet_rq_submit() helper to consolidate DMA/non-DMA buffer
+>>>    submission in add_recvbuf_small() and add_recvbuf_mergeable()
+>>> - Add skb_mark_for_recycle(nskb) for overflow frag_list skbs in
+>>>    virtnet_skb_append_frag() to ensure page_pool pages are returned to
+>>>    the pool instead of freed via put_page()
+>>> - Rebase on net-next (kzalloc_objs API)
+>>> - v7:
+>>>    https://lore.kernel.org/virtualization/20260210014305.3236342-1- 
+>>> vishs@meta.com/
+>>>
+>>> Changes in v7:
+>>> - Replace virtnet_put_page() helper with direct page_pool_put_page()
+>>>    calls (Xuan Zhuo)
+>>> - Add virtnet_no_page_pool() helper to consolidate big_packets mode 
+>>> check
+>>>    (Michael S. Tsirkin)
+>>> - Add DMA sync_for_cpu for subsequent buffers in xdp_linearize_page() 
+>>> when
+>>>    use_page_pool_dma is set (Michael S. Tsirkin)
+>>> - Remove unused pp_params.dev assignment in non-DMA path
+>>> - Add page pool recreation in virtnet_restore_up() for freeze/restore 
+>>> support (Chris Mason's
+>>> Review Prompt)
+>>> - v6:
+>>>    https://lore.kernel.org/virtualization/20260208175410.1910001-1- 
+>>> vishs@meta.com/
+>>>
+>>> Changes in v6:
+>>> - Drop page_pool_frag_offset_add() helper and switch to 
+>>> page_pool_alloc_va();
+>>>    page_pool_alloc_netmem() already handles internal fragmentation 
+>>> internally
+>>>    (Jakub Kicinski)
+>>> - v5:
+>>>    https://lore.kernel.org/virtualization/20260206002715.1885869-1- 
+>>> vishs@meta.com/
+>>>
+>>> Benchmark results:
+>>>
+>>> Configuration: pktgen TX -> tap -> vhost-net | virtio-net RX -> XDP_DROP
+>>>
+>>> Small packets (64 bytes, mrg_rxbuf=off):
+>>>    1Q:  853,493 -> 868,923 pps  (+1.8%)
+>>>    2Q: 1,655,793 -> 1,696,707 pps (+2.5%)
+>>>    4Q: 3,143,375 -> 3,302,511 pps (+5.1%)
+>>>    8Q: 6,082,590 -> 6,156,894 pps (+1.2%)
+>>>
+>>> Mergeable RX (64 bytes):
+>>>    1Q:   766,168 ->   814,493 pps  (+6.3%)
+>>>    2Q: 1,384,871 -> 1,670,639 pps (+20.6%)
+>>>    4Q: 2,773,081 -> 3,080,574 pps (+11.1%)
+>>>    8Q: 5,600,615 -> 6,043,891 pps  (+7.9%)
+>>>
+>>> Mergeable RX (1500 bytes):
+>>>    1Q:   741,579 ->   785,442 pps  (+5.9%)
+>>>    2Q: 1,310,043 -> 1,534,554 pps (+17.1%)
+>>>    4Q: 2,748,700 -> 2,890,582 pps  (+5.2%)
+>>>    8Q: 5,348,589 -> 5,618,664 pps  (+5.0%)
+>>>
+>>>   drivers/net/Kconfig      |   1 +
+>>>   drivers/net/virtio_net.c | 466 ++++++++++++++++++++-------------------
+>>>   2 files changed, 237 insertions(+), 230 deletions(-)
+>>>
+>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+>>> index 17108c359216..b2fd90466bab 100644
+>>> --- a/drivers/net/Kconfig
+>>> +++ b/drivers/net/Kconfig
+>>> @@ -452,6 +452,7 @@ config VIRTIO_NET
+>>>       depends on VIRTIO
+>>>       select NET_FAILOVER
+>>>       select DIMLIB
+>>> +    select PAGE_POOL
+>>>       help
+>>>         This is the virtual network driver for virtio.  It can be 
+>>> used with
+>>>         QEMU based VMMs (like KVM or Xen).  Say Y or M.
+>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>> index 72d6a9c6a5a2..d722031604bf 100644
+>>> --- a/drivers/net/virtio_net.c
+>>> +++ b/drivers/net/virtio_net.c
+>>> @@ -26,6 +26,7 @@
+>>>   #include <net/netdev_rx_queue.h>
+>>>   #include <net/netdev_queues.h>
+>>>   #include <net/xdp_sock_drv.h>
+>>> +#include <net/page_pool/helpers.h>
+>>>   static int napi_weight = NAPI_POLL_WEIGHT;
+>>>   module_param(napi_weight, int, 0444);
+>>> @@ -290,14 +291,6 @@ struct virtnet_interrupt_coalesce {
+>>>       u32 max_usecs;
+>>>   };
+>>> -/* The dma information of pages allocated at a time. */
+>>> -struct virtnet_rq_dma {
+>>> -    dma_addr_t addr;
+>>> -    u32 ref;
+>>> -    u16 len;
+>>> -    u16 need_sync;
+>>> -};
+>>> -
+>>>   /* Internal representation of a send virtqueue */
+>>>   struct send_queue {
+>>>       /* Virtqueue associated with this send _queue */
+>>> @@ -356,8 +349,10 @@ struct receive_queue {
+>>>       /* Average packet length for mergeable receive buffers. */
+>>>       struct ewma_pkt_len mrg_avg_pkt_len;
+>>> -    /* Page frag for packet buffer allocation. */
+>>> -    struct page_frag alloc_frag;
+>>> +    struct page_pool *page_pool;
+>>> +
+>>> +    /* True if page_pool handles DMA mapping via PP_FLAG_DMA_MAP */
+>>> +    bool use_page_pool_dma;
+>>>       /* RX: fragments + linear part + virtio header */
+>>>       struct scatterlist sg[MAX_SKB_FRAGS + 2];
+>>> @@ -370,9 +365,6 @@ struct receive_queue {
+>>>       struct xdp_rxq_info xdp_rxq;
+>>> -    /* Record the last dma info to free after new pages is 
+>>> allocated. */
+>>> -    struct virtnet_rq_dma *last_dma;
+>>> -
+>>>       struct xsk_buff_pool *xsk_pool;
+>>>       /* xdp rxq used by xsk */
+>>> @@ -521,11 +513,14 @@ static int virtnet_xdp_handler(struct bpf_prog 
+>>> *xdp_prog, struct xdp_buff *xdp,
+>>>                      struct virtnet_rq_stats *stats);
+>>>   static void virtnet_receive_done(struct virtnet_info *vi, struct 
+>>> receive_queue *rq,
+>>>                    struct sk_buff *skb, u8 flags);
+>>> -static struct sk_buff *virtnet_skb_append_frag(struct sk_buff 
+>>> *head_skb,
+>>> +static struct sk_buff *virtnet_skb_append_frag(struct receive_queue 
+>>> *rq,
+>>> +                           struct sk_buff *head_skb,
+>>>                              struct sk_buff *curr_skb,
+>>>                              struct page *page, void *buf,
+>>>                              int len, int truesize);
+>>>   static void virtnet_xsk_completed(struct send_queue *sq, int num);
+>>> +static void free_unused_bufs(struct virtnet_info *vi);
+>>> +static void virtnet_del_vqs(struct virtnet_info *vi);
+>>>   enum virtnet_xmit_type {
+>>>       VIRTNET_XMIT_TYPE_SKB,
+>>> @@ -709,12 +704,10 @@ static struct page *get_a_page(struct 
+>>> receive_queue *rq, gfp_t gfp_mask)
+>>>   static void virtnet_rq_free_buf(struct virtnet_info *vi,
+>>>                   struct receive_queue *rq, void *buf)
+>>>   {
+>>> -    if (vi->mergeable_rx_bufs)
+>>> -        put_page(virt_to_head_page(buf));
+>>> -    else if (vi->big_packets)
+>>> +    if (!rq->page_pool)
+>>>           give_pages(rq, buf);
+>>>       else
+>>> -        put_page(virt_to_head_page(buf));
+>>> +        page_pool_put_page(rq->page_pool, virt_to_head_page(buf), 
+>>> -1, false);
+>>>   }
+>>>   static void enable_rx_mode_work(struct virtnet_info *vi)
+>>> @@ -876,10 +869,16 @@ static struct sk_buff *page_to_skb(struct 
+>>> virtnet_info *vi,
+>>>           skb = virtnet_build_skb(buf, truesize, p - buf, len);
+>>>           if (unlikely(!skb))
+>>>               return NULL;
+>>> +        /* Big packets mode chains pages via page->private, which is
+>>> +         * incompatible with the way page_pool uses page->private.
+>>> +         * Currently, big packets mode doesn't use page pools.
+>>> +         */
+>>> +        if (!rq->page_pool) {
+>>> +            page = (struct page *)page->private;
+>>> +            if (page)
+>>> +                give_pages(rq, page);
+>>> +        }
+>>> -        page = (struct page *)page->private;
+>>> -        if (page)
+>>> -            give_pages(rq, page);
+>>>           goto ok;
+>>>       }
+>>> @@ -925,133 +924,16 @@ static struct sk_buff *page_to_skb(struct 
+>>> virtnet_info *vi,
+>>>       hdr = skb_vnet_common_hdr(skb);
+>>>       memcpy(hdr, hdr_p, hdr_len);
+>>>       if (page_to_free)
+>>> -        put_page(page_to_free);
+>>> +        page_pool_put_page(rq->page_pool, page_to_free, -1, true);
+>>>       return skb;
+>>>   }
+>>> -static void virtnet_rq_unmap(struct receive_queue *rq, void *buf, 
+>>> u32 len)
+>>> -{
+>>> -    struct virtnet_info *vi = rq->vq->vdev->priv;
+>>> -    struct page *page = virt_to_head_page(buf);
+>>> -    struct virtnet_rq_dma *dma;
+>>> -    void *head;
+>>> -    int offset;
+>>> -
+>>> -    BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>> -
+>>> -    head = page_address(page);
+>>> -
+>>> -    dma = head;
+>>> -
+>>> -    --dma->ref;
+>>> -
+>>> -    if (dma->need_sync && len) {
+>>> -        offset = buf - (head + sizeof(*dma));
+>>> -
+>>> -        virtqueue_map_sync_single_range_for_cpu(rq->vq, dma->addr,
+>>> -                            offset, len,
+>>> -                            DMA_FROM_DEVICE);
+>>> -    }
+>>> -
+>>> -    if (dma->ref)
+>>> -        return;
+>>> -
+>>> -    virtqueue_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+>>> -                     DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
+>>> -    put_page(page);
+>>> -}
+>>> -
+>>>   static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, 
+>>> void **ctx)
+>>>   {
+>>> -    struct virtnet_info *vi = rq->vq->vdev->priv;
+>>> -    void *buf;
+>>> -
+>>> -    BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>> -
+>>> -    buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+>>> -    if (buf)
+>>> -        virtnet_rq_unmap(rq, buf, *len);
+>>> -
+>>> -    return buf;
+>>> -}
+>>> -
+>>> -static void virtnet_rq_init_one_sg(struct receive_queue *rq, void 
+>>> *buf, u32 len)
+>>> -{
+>>> -    struct virtnet_info *vi = rq->vq->vdev->priv;
+>>> -    struct virtnet_rq_dma *dma;
+>>> -    dma_addr_t addr;
+>>> -    u32 offset;
+>>> -    void *head;
+>>> -
+>>> -    BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>> -
+>>> -    head = page_address(rq->alloc_frag.page);
+>>> -
+>>> -    offset = buf - head;
+>>> -
+>>> -    dma = head;
+>>> -
+>>> -    addr = dma->addr - sizeof(*dma) + offset;
+>>> -
+>>> -    sg_init_table(rq->sg, 1);
+>>> -    sg_fill_dma(rq->sg, addr, len);
+>>> -}
+>>> -
+>>> -static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, 
+>>> gfp_t gfp)
+>>> -{
+>>> -    struct page_frag *alloc_frag = &rq->alloc_frag;
+>>> -    struct virtnet_info *vi = rq->vq->vdev->priv;
+>>> -    struct virtnet_rq_dma *dma;
+>>> -    void *buf, *head;
+>>> -    dma_addr_t addr;
+>>> -
+>>> -    BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>> -
+>>> -    head = page_address(alloc_frag->page);
+>>> -
+>>> -    dma = head;
+>>> -
+>>> -    /* new pages */
+>>> -    if (!alloc_frag->offset) {
+>>> -        if (rq->last_dma) {
+>>> -            /* Now, the new page is allocated, the last dma
+>>> -             * will not be used. So the dma can be unmapped
+>>> -             * if the ref is 0.
+>>> -             */
+>>> -            virtnet_rq_unmap(rq, rq->last_dma, 0);
+>>> -            rq->last_dma = NULL;
+>>> -        }
+>>> -
+>>> -        dma->len = alloc_frag->size - sizeof(*dma);
+>>> -
+>>> -        addr = virtqueue_map_single_attrs(rq->vq, dma + 1,
+>>> -                          dma->len, DMA_FROM_DEVICE, 0);
+>>> -        if (virtqueue_map_mapping_error(rq->vq, addr))
+>>> -            return NULL;
+>>> -
+>>> -        dma->addr = addr;
+>>> -        dma->need_sync = virtqueue_map_need_sync(rq->vq, addr);
+>>> -
+>>> -        /* Add a reference to dma to prevent the entire dma from
+>>> -         * being released during error handling. This reference
+>>> -         * will be freed after the pages are no longer used.
+>>> -         */
+>>> -        get_page(alloc_frag->page);
+>>> -        dma->ref = 1;
+>>> -        alloc_frag->offset = sizeof(*dma);
+>>> -
+>>> -        rq->last_dma = dma;
+>>> -    }
+>>> -
+>>> -    ++dma->ref;
+>>> -
+>>> -    buf = head + alloc_frag->offset;
+>>> -
+>>> -    get_page(alloc_frag->page);
+>>> -    alloc_frag->offset += size;
+>>> +    BUG_ON(!rq->page_pool);
+>>> -    return buf;
+>>> +    return virtqueue_get_buf_ctx(rq->vq, len, ctx);
+>>>   }
+>>>   static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+>>> @@ -1067,9 +949,6 @@ static void virtnet_rq_unmap_free_buf(struct 
+>>> virtqueue *vq, void *buf)
+>>>           return;
+>>>       }
+>>> -    if (!vi->big_packets || vi->mergeable_rx_bufs)
+>>> -        virtnet_rq_unmap(rq, buf, 0);
+>>> -
+>>>       virtnet_rq_free_buf(vi, rq, buf);
+>>>   }
+>>> @@ -1335,7 +1214,7 @@ static int xsk_append_merge_buffer(struct 
+>>> virtnet_info *vi,
+>>>           truesize = len;
+>>> -        curr_skb  = virtnet_skb_append_frag(head_skb, curr_skb, page,
+>>> +        curr_skb  = virtnet_skb_append_frag(rq, head_skb, curr_skb, 
+>>> page,
+>>>                               buf, len, truesize);
+>>>           if (!curr_skb) {
+>>>               put_page(page);
+>>> @@ -1771,7 +1650,7 @@ static int virtnet_xdp_xmit(struct net_device 
+>>> *dev,
+>>>       return ret;
+>>>   }
+>>> -static void put_xdp_frags(struct xdp_buff *xdp)
+>>> +static void put_xdp_frags(struct receive_queue *rq, struct xdp_buff 
+>>> *xdp)
+>>>   {
+>>>       struct skb_shared_info *shinfo;
+>>>       struct page *xdp_page;
+>>> @@ -1781,7 +1660,7 @@ static void put_xdp_frags(struct xdp_buff *xdp)
+>>>           shinfo = xdp_get_shared_info_from_buff(xdp);
+>>>           for (i = 0; i < shinfo->nr_frags; i++) {
+>>>               xdp_page = skb_frag_page(&shinfo->frags[i]);
+>>> -            put_page(xdp_page);
+>>> +            page_pool_put_page(rq->page_pool, xdp_page, -1, true);
+>>>           }
+>>>       }
+>>>   }
+>>> @@ -1873,7 +1752,7 @@ static struct page *xdp_linearize_page(struct 
+>>> net_device *dev,
+>>>       if (page_off + *len + tailroom > PAGE_SIZE)
+>>>           return NULL;
+>>> -    page = alloc_page(GFP_ATOMIC);
+>>> +    page = page_pool_alloc_pages(rq->page_pool, GFP_ATOMIC);
+>>>       if (!page)
+>>>           return NULL;
+>>> @@ -1896,8 +1775,12 @@ static struct page *xdp_linearize_page(struct 
+>>> net_device *dev,
+>>>           p = virt_to_head_page(buf);
+>>>           off = buf - page_address(p);
+>>> +        if (rq->use_page_pool_dma)
+>>> +            page_pool_dma_sync_for_cpu(rq->page_pool, p,
+>>> +                           off, buflen);
+>>> +
+>>>           if (check_mergeable_len(dev, ctx, buflen)) {
+>>> -            put_page(p);
+>>> +            page_pool_put_page(rq->page_pool, p, -1, true);
+>>>               goto err_buf;
+>>>           }
+>>> @@ -1905,21 +1788,21 @@ static struct page *xdp_linearize_page(struct 
+>>> net_device *dev,
+>>>            * is sending packet larger than the MTU.
+>>>            */
+>>>           if ((page_off + buflen + tailroom) > PAGE_SIZE) {
+>>> -            put_page(p);
+>>> +            page_pool_put_page(rq->page_pool, p, -1, true);
+>>>               goto err_buf;
+>>>           }
+>>>           memcpy(page_address(page) + page_off,
+>>>                  page_address(p) + off, buflen);
+>>>           page_off += buflen;
+>>> -        put_page(p);
+>>> +        page_pool_put_page(rq->page_pool, p, -1, true);
+>>>       }
+>>>       /* Headroom does not contribute to packet length */
+>>>       *len = page_off - XDP_PACKET_HEADROOM;
+>>>       return page;
+>>>   err_buf:
+>>> -    __free_pages(page, 0);
+>>> +    page_pool_put_page(rq->page_pool, page, -1, true);
+>>>       return NULL;
+>>>   }
+>>> @@ -1996,7 +1879,7 @@ static struct sk_buff *receive_small_xdp(struct 
+>>> net_device *dev,
+>>>               goto err_xdp;
+>>>           buf = page_address(xdp_page);
+>>> -        put_page(page);
+>>> +        page_pool_put_page(rq->page_pool, page, -1, true);
+>>>           page = xdp_page;
+>>>       }
+>>> @@ -2028,13 +1911,15 @@ static struct sk_buff 
+>>> *receive_small_xdp(struct net_device *dev,
+>>>       if (metasize)
+>>>           skb_metadata_set(skb, metasize);
+>>> +    skb_mark_for_recycle(skb);
+>>> +
+>>>       return skb;
+>>>   err_xdp:
+>>>       u64_stats_inc(&stats->xdp_drops);
+>>>   err:
+>>>       u64_stats_inc(&stats->drops);
+>>> -    put_page(page);
+>>> +    page_pool_put_page(rq->page_pool, page, -1, true);
+>>>   xdp_xmit:
+>>>       return NULL;
+>>>   }
+>>> @@ -2056,6 +1941,13 @@ static struct sk_buff *receive_small(struct 
+>>> net_device *dev,
+>>>        */
+>>>       buf -= VIRTNET_RX_PAD + xdp_headroom;
+>>> +    if (rq->use_page_pool_dma) {
+>>> +        int offset = buf - page_address(page) +
+>>> +                 VIRTNET_RX_PAD + xdp_headroom;
+>>> +
+>>> +        page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, len);
+>>> +    }
+>>> +
+>>>       len -= vi->hdr_len;
+>>>       u64_stats_add(&stats->bytes, len);
+>>> @@ -2082,12 +1974,14 @@ static struct sk_buff *receive_small(struct 
+>>> net_device *dev,
+>>>       }
+>>>       skb = receive_small_build_skb(vi, xdp_headroom, buf, len);
+>>> -    if (likely(skb))
+>>> +    if (likely(skb)) {
+>>> +        skb_mark_for_recycle(skb);
+>>>           return skb;
+>>> +    }
+>>>   err:
+>>>       u64_stats_inc(&stats->drops);
+>>> -    put_page(page);
+>>> +    page_pool_put_page(rq->page_pool, page, -1, true);
+>>>       return NULL;
+>>>   }
+>>> @@ -2142,7 +2036,7 @@ static void mergeable_buf_free(struct 
+>>> receive_queue *rq, int num_buf,
+>>>           }
+>>>           u64_stats_add(&stats->bytes, len);
+>>>           page = virt_to_head_page(buf);
+>>> -        put_page(page);
+>>> +        page_pool_put_page(rq->page_pool, page, -1, true);
+>>>       }
+>>>   }
+>>> @@ -2252,8 +2146,12 @@ static int virtnet_build_xdp_buff_mrg(struct 
+>>> net_device *dev,
+>>>           page = virt_to_head_page(buf);
+>>>           offset = buf - page_address(page);
+>>> +        if (rq->use_page_pool_dma)
+>>> +            page_pool_dma_sync_for_cpu(rq->page_pool, page,
+>>> +                           offset, len);
+>>> +
+>>>           if (check_mergeable_len(dev, ctx, len)) {
+>>> -            put_page(page);
+>>> +            page_pool_put_page(rq->page_pool, page, -1, true);
+>>>               goto err;
+>>>           }
+>>> @@ -2272,7 +2170,7 @@ static int virtnet_build_xdp_buff_mrg(struct 
+>>> net_device *dev,
+>>>       return 0;
+>>>   err:
+>>> -    put_xdp_frags(xdp);
+>>> +    put_xdp_frags(rq, xdp);
+>>>       return -EINVAL;
+>>>   }
+>>> @@ -2337,7 +2235,7 @@ static void *mergeable_xdp_get_buf(struct 
+>>> virtnet_info *vi,
+>>>           if (*len + xdp_room > PAGE_SIZE)
+>>>               return NULL;
+>>> -        xdp_page = alloc_page(GFP_ATOMIC);
+>>> +        xdp_page = page_pool_alloc_pages(rq->page_pool, GFP_ATOMIC);
+>>>           if (!xdp_page)
+>>>               return NULL;
+>>> @@ -2347,7 +2245,7 @@ static void *mergeable_xdp_get_buf(struct 
+>>> virtnet_info *vi,
+>>>       *frame_sz = PAGE_SIZE;
+>>> -    put_page(*page);
+>>> +    page_pool_put_page(rq->page_pool, *page, -1, true);
+>>>       *page = xdp_page;
+>>> @@ -2393,6 +2291,8 @@ static struct sk_buff 
+>>> *receive_mergeable_xdp(struct net_device *dev,
+>>>           head_skb = build_skb_from_xdp_buff(dev, vi, &xdp, 
+>>> xdp_frags_truesz);
+>>>           if (unlikely(!head_skb))
+>>>               break;
+>>> +
+>>> +        skb_mark_for_recycle(head_skb);
+>>>           return head_skb;
+>>>       case XDP_TX:
+>>> @@ -2403,10 +2303,10 @@ static struct sk_buff 
+>>> *receive_mergeable_xdp(struct net_device *dev,
+>>>           break;
+>>>       }
+>>> -    put_xdp_frags(&xdp);
+>>> +    put_xdp_frags(rq, &xdp);
+>>>   err_xdp:
+>>> -    put_page(page);
+>>> +    page_pool_put_page(rq->page_pool, page, -1, true);
+>>>       mergeable_buf_free(rq, num_buf, dev, stats);
+>>>       u64_stats_inc(&stats->xdp_drops);
+>>> @@ -2414,7 +2314,8 @@ static struct sk_buff 
+>>> *receive_mergeable_xdp(struct net_device *dev,
+>>>       return NULL;
+>>>   }
+>>> -static struct sk_buff *virtnet_skb_append_frag(struct sk_buff 
+>>> *head_skb,
+>>> +static struct sk_buff *virtnet_skb_append_frag(struct receive_queue 
+>>> *rq,
+>>> +                           struct sk_buff *head_skb,
+>>>                              struct sk_buff *curr_skb,
+>>>                              struct page *page, void *buf,
+>>>                              int len, int truesize)
+>>> @@ -2429,6 +2330,9 @@ static struct sk_buff 
+>>> *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>>>           if (unlikely(!nskb))
+>>>               return NULL;
+>>> +        if (head_skb->pp_recycle)
+>>> +            skb_mark_for_recycle(nskb);
+>>> +
+>>>           if (curr_skb == head_skb)
+>>>               skb_shinfo(curr_skb)->frag_list = nskb;
+>>>           else
+>>> @@ -2446,7 +2350,10 @@ static struct sk_buff 
+>>> *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>>>       offset = buf - page_address(page);
+>>>       if (skb_can_coalesce(curr_skb, num_skb_frags, page, offset)) {
+>>> -        put_page(page);
+>>> +        if (head_skb->pp_recycle)
+>>> +            page_pool_put_page(rq->page_pool, page, -1, true);
+>>> +        else
+>>> +            put_page(page);
+>>>           skb_coalesce_rx_frag(curr_skb, num_skb_frags - 1,
+>>>                        len, truesize);
+>>>       } else {
+>>> @@ -2475,6 +2382,10 @@ static struct sk_buff 
+>>> *receive_mergeable(struct net_device *dev,
+>>>       unsigned int headroom = mergeable_ctx_to_headroom(ctx);
+>>>       head_skb = NULL;
+>>> +
+>>> +    if (rq->use_page_pool_dma)
+>>> +        page_pool_dma_sync_for_cpu(rq->page_pool, page, offset, len);
+>>> +
+>>>       u64_stats_add(&stats->bytes, len - vi->hdr_len);
+>>>       if (check_mergeable_len(dev, ctx, len))
+>>> @@ -2499,6 +2410,8 @@ static struct sk_buff *receive_mergeable(struct 
+>>> net_device *dev,
+>>>       if (unlikely(!curr_skb))
+>>>           goto err_skb;
+>>> +
+>>> +    skb_mark_for_recycle(head_skb);
+>>>       while (--num_buf) {
+>>>           buf = virtnet_rq_get_buf(rq, &len, &ctx);
+>>>           if (unlikely(!buf)) {
+>>> @@ -2513,11 +2426,17 @@ static struct sk_buff 
+>>> *receive_mergeable(struct net_device *dev,
+>>>           u64_stats_add(&stats->bytes, len);
+>>>           page = virt_to_head_page(buf);
+>>> +        if (rq->use_page_pool_dma) {
+>>> +            offset = buf - page_address(page);
+>>> +            page_pool_dma_sync_for_cpu(rq->page_pool, page,
+>>> +                           offset, len);
+>>> +        }
+>>> +
+>>>           if (check_mergeable_len(dev, ctx, len))
+>>>               goto err_skb;
+>>>           truesize = mergeable_ctx_to_truesize(ctx);
+>>> -        curr_skb  = virtnet_skb_append_frag(head_skb, curr_skb, page,
+>>> +        curr_skb  = virtnet_skb_append_frag(rq, head_skb, curr_skb, 
+>>> page,
+>>>                               buf, len, truesize);
+>>>           if (!curr_skb)
+>>>               goto err_skb;
+>>> @@ -2527,7 +2446,7 @@ static struct sk_buff *receive_mergeable(struct 
+>>> net_device *dev,
+>>>       return head_skb;
+>>>   err_skb:
+>>> -    put_page(page);
+>>> +    page_pool_put_page(rq->page_pool, page, -1, true);
+>>>       mergeable_buf_free(rq, num_buf, dev, stats);
+>>>   err_buf:
+>>> @@ -2658,6 +2577,24 @@ static void receive_buf(struct virtnet_info 
+>>> *vi, struct receive_queue *rq,
+>>>       virtnet_receive_done(vi, rq, skb, flags);
+>>>   }
+>>> +static int virtnet_rq_submit(struct receive_queue *rq, char *buf,
+>>> +                 int len, void *ctx, gfp_t gfp)
+>>> +{
+>>> +    if (rq->use_page_pool_dma) {
+>>> +        struct page *page = virt_to_head_page(buf);
+>>> +        dma_addr_t addr = page_pool_get_dma_addr(page) +
+>>> +                  (buf - (char *)page_address(page));
+>>> +
+>>> +        sg_init_table(rq->sg, 1);
+>>> +        sg_fill_dma(rq->sg, addr, len);
+>>> +        return virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1,
+>>> +                             buf, ctx, gfp);
+>>> +    }
+>>> +
+>>> +    sg_init_one(rq->sg, buf, len);
+>>> +    return virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+>>> +}
+>>> +
+>>>   /* Unlike mergeable buffers, all buffers are allocated to the
+>>>    * same size, except for the headroom. For this reason we do
+>>>    * not need to use  mergeable_len_to_ctx here - it is enough
+>>> @@ -2666,32 +2603,27 @@ static void receive_buf(struct virtnet_info 
+>>> *vi, struct receive_queue *rq,
+>>>   static int add_recvbuf_small(struct virtnet_info *vi, struct 
+>>> receive_queue *rq,
+>>>                    gfp_t gfp)
+>>>   {
+>>> -    char *buf;
+>>>       unsigned int xdp_headroom = virtnet_get_headroom(vi);
+>>>       void *ctx = (void *)(unsigned long)xdp_headroom;
+>>> -    int len = vi->hdr_len + VIRTNET_RX_PAD + GOOD_PACKET_LEN + 
+>>> xdp_headroom;
+>>> +    unsigned int len = vi->hdr_len + VIRTNET_RX_PAD + 
+>>> GOOD_PACKET_LEN + xdp_headroom;
+>>> +    unsigned int alloc_len;
+>>> +    char *buf;
+>>>       int err;
+>>>       len = SKB_DATA_ALIGN(len) +
+>>>             SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>>> -    if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+>>> -        return -ENOMEM;
+>>> -
+>>
+>>
+>> reepating my comment from v9:
+>>
+>>> -    buf = virtnet_rq_alloc(rq, len, gfp);
+>>> +    alloc_len = len;
+>>> +    buf = page_pool_alloc_va(rq->page_pool, &alloc_len, gfp);
+>>
+>> So alloc_len can increase here when at end of page ...
+>>
+>>
+>>>       if (unlikely(!buf))
+>>>           return -ENOMEM;
+>>>       buf += VIRTNET_RX_PAD + xdp_headroom;
+>>> -    virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
+>>> -
+>>> -    err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx, 
+>>> gfp);
+>>> -    if (err < 0) {
+>>> -        virtnet_rq_unmap(rq, buf, 0);
+>>> -        put_page(virt_to_head_page(buf));
+>>> -    }
+>>> +    err = virtnet_rq_submit(rq, buf, vi->hdr_len + GOOD_PACKET_LEN, 
+>>> ctx, gfp);
+>>> +    if (err < 0)
+>>> +        page_pool_put_page(rq->page_pool, virt_to_head_page(buf), 
+>>> -1, false);
+>>>       return err;
+>>>   }
+>>
+>>
+>> but then is not used until end of function and does not update the 
+>> truesize.
+> 
+> I'll fix this in v11 by encoding the actual allocation size from
+> page_pool_alloc_va() in the ctx pointer, so receive_small_build_skb()
+> can pass the real buffer size to build_skb() for correct truesize
+> accounting.
+> 
+>>
+>>
+>>
+>>> @@ -2764,13 +2696,12 @@ static unsigned int 
+>>> get_mergeable_buf_len(struct receive_queue *rq,
+>>>   static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>>>                    struct receive_queue *rq, gfp_t gfp)
+>>>   {
+>>> -    struct page_frag *alloc_frag = &rq->alloc_frag;
+>>>       unsigned int headroom = virtnet_get_headroom(vi);
+>>>       unsigned int tailroom = headroom ? sizeof(struct 
+>>> skb_shared_info) : 0;
+>>>       unsigned int room = SKB_DATA_ALIGN(headroom + tailroom);
+>>> -    unsigned int len, hole;
+>>> -    void *ctx;
+>>> +    unsigned int len, alloc_len;
+>>>       char *buf;
+>>> +    void *ctx;
+>>>       int err;
+>>>       /* Extra tailroom is needed to satisfy XDP's assumption. This
+>>> @@ -2779,39 +2710,22 @@ static int add_recvbuf_mergeable(struct 
+>>> virtnet_info *vi,
+>>>        */
+>>>       len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+>>> -    if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+>>> -        return -ENOMEM;
+>>> -
+>>> -    if (!alloc_frag->offset && len + room + sizeof(struct 
+>>> virtnet_rq_dma) > alloc_frag->size)
+>>> -        len -= sizeof(struct virtnet_rq_dma);
+>>> -
+>>> -    buf = virtnet_rq_alloc(rq, len + room, gfp);
+>>> +    alloc_len = len + room;
+>>> +    buf = page_pool_alloc_va(rq->page_pool, &alloc_len, gfp);
+>>>       if (unlikely(!buf))
+>>>           return -ENOMEM;
+>>>       buf += headroom; /* advance address leaving hole at front of 
+>>> pkt */
+>>> -    hole = alloc_frag->size - alloc_frag->offset;
+>>> -    if (hole < len + room) {
+>>> -        /* To avoid internal fragmentation, if there is very likely not
+>>> -         * enough space for another buffer, add the remaining space to
+>>> -         * the current buffer.
+>>> -         * XDP core assumes that frame_size of xdp_buff and the length
+>>> -         * of the frag are PAGE_SIZE, so we disable the hole mechanism.
+>>> -         */
+>>> -        if (!headroom)
+>>> -            len += hole;
+>>> -        alloc_frag->offset += hole;
+>>> -    }
+>>> -    virtnet_rq_init_one_sg(rq, buf, len);
+>>> +    if (!headroom)
+>>> +        len = alloc_len - room;
+>>>       ctx = mergeable_len_to_ctx(len + room, headroom);
+>>> -    err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx, 
+>>> gfp);
+>>> -    if (err < 0) {
+>>> -        virtnet_rq_unmap(rq, buf, 0);
+>>> -        put_page(virt_to_head_page(buf));
+>>> -    }
+>>> +    err = virtnet_rq_submit(rq, buf, len, ctx, gfp);
+>>> +
+>>> +    if (err < 0)
+>>> +        page_pool_put_page(rq->page_pool, virt_to_head_page(buf), 
+>>> -1, false);
+>>>       return err;
+>>>   }
+>>> @@ -2963,7 +2877,7 @@ static int virtnet_receive_packets(struct 
+>>> virtnet_info *vi,
+>>>       int packets = 0;
+>>>       void *buf;
+>>> -    if (!vi->big_packets || vi->mergeable_rx_bufs) {
+>>> +    if (rq->page_pool) {
+>>>           void *ctx;
+>>>           while (packets < budget &&
+>>>                  (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
+>>> @@ -3128,7 +3042,10 @@ static int virtnet_enable_queue_pair(struct 
+>>> virtnet_info *vi, int qp_index)
+>>>           return err;
+>>>       err = xdp_rxq_info_reg_mem_model(&vi->rq[qp_index].xdp_rxq,
+>>> -                     MEM_TYPE_PAGE_SHARED, NULL);
+>>> +                     vi->rq[qp_index].page_pool ?
+>>> +                        MEM_TYPE_PAGE_POOL :
+>>> +                        MEM_TYPE_PAGE_SHARED,
+>>> +                     vi->rq[qp_index].page_pool);
+>>>       if (err < 0)
+>>>           goto err_xdp_reg_mem_model;
+>>> @@ -3168,6 +3085,82 @@ static void virtnet_update_settings(struct 
+>>> virtnet_info *vi)
+>>>           vi->duplex = duplex;
+>>>   }
+>>> +static int virtnet_create_page_pools(struct virtnet_info *vi)
+>>> +{
+>>> +    int i, err;
+>>> +
+>>> +    if (vi->big_packets && !vi->mergeable_rx_bufs)
+>>> +        return 0;
+>>> +
+>>> +    for (i = 0; i < vi->max_queue_pairs; i++) {
+>>> +        struct receive_queue *rq = &vi->rq[i];
+>>> +        struct page_pool_params pp_params = { 0 };
+>>> +        struct device *dma_dev;
+>>> +
+>>> +        if (rq->page_pool)
+>>> +            continue;
+>>> +
+>>> +        if (rq->xsk_pool)
+>>> +            continue;
+>>> +
+>>> +        pp_params.order = 0;
+>>> +        pp_params.pool_size = virtqueue_get_vring_size(rq->vq);
+>>> +        pp_params.nid = dev_to_node(vi->vdev->dev.parent);
+>>> +        pp_params.netdev = vi->dev;
+>>> +        pp_params.napi = &rq->napi;
+>>> +
+>>> +        /* Use page_pool DMA mapping if backend supports DMA API.
+>>> +         * DMA_SYNC_DEV is needed for non-coherent archs on recycle.
+>>> +         */
+>>> +        dma_dev = virtqueue_dma_dev(rq->vq);
+>>> +        if (dma_dev) {
+>>> +            pp_params.dev = dma_dev;
+>>> +            pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+>>> +            pp_params.dma_dir = DMA_FROM_DEVICE;
+>>> +            pp_params.max_len = PAGE_SIZE;
+>>> +            pp_params.offset = 0;
+>>> +            rq->use_page_pool_dma = true;
+>>> +        } else {
+>>> +            /* No DMA API (e.g., VDUSE): page_pool for allocation 
+>>> only. */
+>>> +            pp_params.flags = 0;
+>>> +            rq->use_page_pool_dma = false;
+>>> +        }
+>>> +
+>>> +        rq->page_pool = page_pool_create(&pp_params);
+>>> +        if (IS_ERR(rq->page_pool)) {
+>>> +            err = PTR_ERR(rq->page_pool);
+>>> +            rq->page_pool = NULL;
+>>> +            goto err_cleanup;
+>>> +        }
+>>> +    }
+>>> +    return 0;
+>>> +
+>>> +err_cleanup:
+>>> +    while (--i >= 0) {
+>>> +        struct receive_queue *rq = &vi->rq[i];
+>>> +
+>>> +        if (rq->page_pool) {
+>>> +            page_pool_destroy(rq->page_pool);
+>>> +            rq->page_pool = NULL;
+>>> +        }
+>>> +    }
+>>> +    return err;
+>>> +}
+>>> +
+>>> +static void virtnet_destroy_page_pools(struct virtnet_info *vi)
+>>> +{
+>>> +    int i;
+>>> +
+>>> +    for (i = 0; i < vi->max_queue_pairs; i++) {
+>>> +        struct receive_queue *rq = &vi->rq[i];
+>>> +
+>>> +        if (rq->page_pool) {
+>>> +            page_pool_destroy(rq->page_pool);
+>>> +            rq->page_pool = NULL;
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>>   static int virtnet_open(struct net_device *dev)
+>>>   {
+>>>       struct virtnet_info *vi = netdev_priv(dev);
+>>> @@ -5715,6 +5708,10 @@ static int virtnet_restore_up(struct 
+>>> virtio_device *vdev)
+>>>       if (err)
+>>>           return err;
+>>> +    err = virtnet_create_page_pools(vi);
+>>> +    if (err)
+>>> +        goto err_del_vqs;
+>>> +
+>>>       virtio_device_ready(vdev);
+>>>       enable_rx_mode_work(vi);
+>>> @@ -5724,12 +5721,24 @@ static int virtnet_restore_up(struct 
+>>> virtio_device *vdev)
+>>>           err = virtnet_open(vi->dev);
+>>>           rtnl_unlock();
+>>>           if (err)
+>>> -            return err;
+>>> +            goto err_destroy_pools;
+>>>       }
+>>>       netif_tx_lock_bh(vi->dev);
+>>>       netif_device_attach(vi->dev);
+>>>       netif_tx_unlock_bh(vi->dev);
+>>> +    return 0;
+>>> +
+>>> +err_destroy_pools:
+>>> +    virtio_reset_device(vdev);
+>>> +    free_unused_bufs(vi);
+>>> +    virtnet_destroy_page_pools(vi);
+>>> +    virtnet_del_vqs(vi);
+>>> +    return err;
+>>> +
+>>> +err_del_vqs:
+>>> +    virtio_reset_device(vdev);
+>>> +    virtnet_del_vqs(vi);
+>>>       return err;
+>>>   }
+>>> @@ -5857,7 +5866,7 @@ static int virtnet_xsk_pool_enable(struct 
+>>> net_device *dev,
+>>>       /* In big_packets mode, xdp cannot work, so there is no need to
+>>>        * initialize xsk of rq.
+>>>        */
+>>> -    if (vi->big_packets && !vi->mergeable_rx_bufs)
+>>> +    if (!vi->rq[qid].page_pool)
+>>>           return -ENOENT;
+>>>       if (qid >= vi->curr_queue_pairs)
+>>> @@ -6287,17 +6296,6 @@ static void free_receive_bufs(struct 
+>>> virtnet_info *vi)
+>>>       rtnl_unlock();
+>>>   }
+>>> -static void free_receive_page_frags(struct virtnet_info *vi)
+>>> -{
+>>> -    int i;
+>>> -    for (i = 0; i < vi->max_queue_pairs; i++)
+>>> -        if (vi->rq[i].alloc_frag.page) {
+>>> -            if (vi->rq[i].last_dma)
+>>> -                virtnet_rq_unmap(&vi->rq[i], vi->rq[i].last_dma, 0);
+>>> -            put_page(vi->rq[i].alloc_frag.page);
+>>> -        }
+>>> -}
+>>> -
+>>>   static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void 
+>>> *buf)
+>>>   {
+>>>       struct virtnet_info *vi = vq->vdev->priv;
+>>> @@ -6401,7 +6399,7 @@ static int virtnet_find_vqs(struct virtnet_info 
+>>> *vi)
+>>>       vqs_info = kzalloc_objs(*vqs_info, total_vqs);
+>>>       if (!vqs_info)
+>>>           goto err_vqs_info;
+>>> -    if (!vi->big_packets || vi->mergeable_rx_bufs) {
+>>> +    if (vi->mergeable_rx_bufs || !vi->big_packets) {
+>>>           ctx = kzalloc_objs(*ctx, total_vqs);
+>>>           if (!ctx)
+>>>               goto err_ctx;
+>>> @@ -6441,10 +6439,8 @@ static int virtnet_find_vqs(struct 
+>>> virtnet_info *vi)
+>>>           vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi- 
+>>> >rq[i].vq);
+>>>           vi->sq[i].vq = vqs[txq2vq(i)];
+>>>       }
+>>> -
+>>>       /* run here: ret == 0. */
+>>> -
+>>>   err_find:
+>>>       kfree(ctx);
+>>>   err_ctx:
+>>> @@ -6945,6 +6941,14 @@ static int virtnet_probe(struct virtio_device 
+>>> *vdev)
+>>>               goto free;
+>>>       }
+>>> +    /* Create page pools for receive queues.
+>>> +     * Page pools are created at probe time so they can be used
+>>> +     * with premapped DMA addresses throughout the device lifetime.
+>>> +     */
+>>> +    err = virtnet_create_page_pools(vi);
+>>> +    if (err)
+>>> +        goto free_irq_moder;
+>>> +
+>>>   #ifdef CONFIG_SYSFS
+>>>       if (vi->mergeable_rx_bufs)
+>>>           dev->sysfs_rx_queue_group = &virtio_net_mrg_rx_group;
+>>> @@ -6958,7 +6962,7 @@ static int virtnet_probe(struct virtio_device 
+>>> *vdev)
+>>>           vi->failover = net_failover_create(vi->dev);
+>>>           if (IS_ERR(vi->failover)) {
+>>>               err = PTR_ERR(vi->failover);
+>>> -            goto free_vqs;
+>>> +            goto free_page_pools;
+>>>           }
+>>>       }
+>>> @@ -7075,9 +7079,11 @@ static int virtnet_probe(struct virtio_device 
+>>> *vdev)
+>>>       unregister_netdev(dev);
+>>>   free_failover:
+>>>       net_failover_destroy(vi->failover);
+>>> -free_vqs:
+>>> +free_page_pools:
+>>> +    virtnet_destroy_page_pools(vi);
+>>> +free_irq_moder:
+>>> +    virtnet_free_irq_moder(vi);
+>>>       virtio_reset_device(vdev);
+>>> -    free_receive_page_frags(vi);
+>>>       virtnet_del_vqs(vi);
+>>>   free:
+>>>       free_netdev(dev);
+>>> @@ -7102,7 +7108,7 @@ static void remove_vq_common(struct 
+>>> virtnet_info *vi)
+>>>       free_receive_bufs(vi);
+>>> -    free_receive_page_frags(vi);
+>>> +    virtnet_destroy_page_pools(vi);
+>>>       virtnet_del_vqs(vi);
+>>>   }
+>>> -- 
+>>> 2.47.3
+>>
+> 
 
 
