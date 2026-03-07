@@ -1,150 +1,213 @@
-Return-Path: <netdev+bounces-265210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGVvDMGrrGldsgEAu9opvQ
-	(envelope-from <netdev+bounces-265210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:50:41 +0100
+	id jXwFG+KsrGn8sgEAu9opvQ
+	(envelope-from <netdev+bounces-265211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:55:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EAC22DED2
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:50:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB4E22DF04
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD215301ECCE
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:50:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5244C301589C
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC4A29C351;
-	Sat,  7 Mar 2026 22:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2D32D7DF3;
+	Sat,  7 Mar 2026 22:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3lp3Sag"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="naCO/ixn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2924E261B9E
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 22:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE3D28850C;
+	Sat,  7 Mar 2026 22:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772923835; cv=none; b=CY6KnQsrcGpA1untUJwDz6DbgG7KB6THdgD7pnjJXAHAR7Yv81qocNbxIp7ZZRhGsuY7o5EsyVeAbuCTIu495bp4YYGCGFb7yo7qdk9V6DHivJ0+OgZhquGtwKkk5ZFdIpeb/BE3rdC1R17rBwf6SeDvIsNbWRXCtSejfI+KUIQ=
+	t=1772924126; cv=none; b=M9ua1f5mlCIFWDW4TbzqGMBeXr1ZhMmErgC8iXTc9IXTFzosGeLX0cXT/xspVmnyjK1Pubv4QDCoU3rjf5pawnYrX63byXibY2AujpKhvOZ5K6KE8rVz4sLAh9oru2UKq+Q5kO9ICIRoDwY1tDcf+Gp8LP5JGRamtl6He80XCDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772923835; c=relaxed/simple;
-	bh=DR7iCf5iCuY1oxdfXKGg1i5bjdnpv/6wc+i8qgFECKg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pmtP2cTXyiVUQHRmwT3mTZV9sGdpBNsnNdpUSBHJYRkdCuN0Kc+xNuXKs6AlE6PWis8o+xYU1WMogaFrLB4s1r+XVfL5rGiIDlFN+zmrGJP5TsLJs1GxBL1l539r5GI7xZQhfSSl2BOq2H/2ARn3dfiLft0a1Q0A2Olu8MPhevw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3lp3Sag; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4837b9913c9so85782905e9.0
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 14:50:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772923832; x=1773528632; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2Ga3PqBJMZ/HRtk4qSHoFPMCGwKdMPoOZIGSkIVk3w=;
-        b=c3lp3Sagcksko3ht3N+8zjx9JMpXLtOfz33uofA/RgkOsUlD0uV0RUzA2Bu19qr6E+
-         NcYxjWE7OaW6l622558IspFLeo+9oxtzXPu0AYdIm3XThqKbJhcz/VgbvNH4Kg3oW+Sd
-         Z8JeXn135QLSUWSdqAhURJjeGxn69kjht2aqiu9Sbw2hyJPkimTfdQtRY9+MdpWYcEAk
-         K5wz9KnnqPFyBgIVB95xC5yEwki6n2RLMJyHUcw2yuJSr/7O4oA4KrJNStx5bhHnunCJ
-         D6MVy3EdH3wuKA/FQ3gEpDcfz7j/Lgf0/nyQI6xm1COLUX0onVGwgVCXkxbgTqQIC6lR
-         /4og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772923832; x=1773528632;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2Ga3PqBJMZ/HRtk4qSHoFPMCGwKdMPoOZIGSkIVk3w=;
-        b=QK0OEjDTM7totXGFDODsb/XetcjVgHNu+sR04N8v1EP64qtdauVQDGtWcUhw7ECjJE
-         3RS9qRA90xVRRPMmumMW3fCb9hPikemMXngUZ7VJfSNtYOrGl2m+ix3K9GyhXlTj8Oa+
-         uf6c0FXYF7pX2EUMmid6IIjgbNDRUlGH1roNBDNSpkB/D/tJuqmf0LL118NMgNoVDZ0Z
-         89C/uAif2cPUrl8IgL3R9ZfE3hJ+N1O/UqJ7O46cmrmDXdi4mElKne7LbtOb+uJEFTjC
-         4Eg/B0MNOs5mWUYkJdYmxEhak3hv6L24xyeyy3s9lO68kTfdf3ELrkkuosUE0yPsRb6r
-         fbWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjgp5BaG5J2TZnvkthLoAbXt8Od0ps75pypkIveWCbXVXjCMeYysdaTACGIBlala/MzWZKflU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRQIv7Bgwi62Y8DkZPRAZqSARvbKRFoz7O95xaT5wsik8yVQlI
-	4YtLVOcIwV95rFUnSRFULcAG/IDJMSgy9FUE6fTWaIsb1VEm89esE3zCs0b0N3ZNeU8HS/fZpxZ
-	2Klj7OtZt1XPzIVuRwA==
-X-Received: from wmdv10.prod.google.com ([2002:a05:600c:12ca:b0:485:2d79:6c74])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:37c9:b0:483:612d:7a9a with SMTP id 5b1f17b1804b1-485268bf171mr105914175e9.0.1772923832367;
- Sat, 07 Mar 2026 14:50:32 -0800 (PST)
-Date: Sat, 7 Mar 2026 22:50:31 +0000
-In-Reply-To: <20260307135941.51353a4f@kernel.org>
+	s=arc-20240116; t=1772924126; c=relaxed/simple;
+	bh=S6aJclqK+GWTZQHZVx1zYz2w7ZwWYx+BBc38YF5p2MA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D9yt5z/jTgmU3Q+OGVhK0yGcbuUEGrvEa2tsTT+mHxUUsgAWyPTuRjx5PJr0HBlr2TyoYqSmdjaGejf/yTCIe1Ldmk5QKVipZc5l6u8VzIRuJbqf27sysnoEr23jVRLWUB2Fbbn7o8ocObtYkAR72sa9JStrMnTCxG0zjRx6kIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=naCO/ixn; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772924124; x=1804460124;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=S6aJclqK+GWTZQHZVx1zYz2w7ZwWYx+BBc38YF5p2MA=;
+  b=naCO/ixn8RoFTn+QyOb14j8ShE25EcrnP4+Uw+cIJvXG6YoIFXUG5S9r
+   tHXe/HOIJcaNSmviE3Zn85ZqHEy27X4xDu1lCCod4Gzqi8EtENZYYeNX3
+   O0UoO1jA7DP43g0DcIy6/uABmpH5f2+SZV/1UcOq1UvjshYSDE2feQqkS
+   aRyptnt6zRBMHzMVR+DBHZx0sSl2eQKmnnajascobXuermbk/5Npd5/e7
+   DcvK5/70gYiHtWYJQiwTKoyzeMLzlcpzqd/wzMohILVHCOV5n3HC8TCDO
+   2ilC954HJMI9KKl9ALv+05nkbTZZ77lU5lMga/Al1PtR3NSS6VgCz2lho
+   w==;
+X-CSE-ConnectionGUID: o/Jte0ujQIyOXfqj7dT+UA==
+X-CSE-MsgGUID: otUGgUrTTwaEk/nH3yxCHg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11722"; a="77598418"
+X-IronPort-AV: E=Sophos;i="6.23,107,1770624000"; 
+   d="scan'208";a="77598418"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2026 14:55:24 -0800
+X-CSE-ConnectionGUID: htWg7lEFRlybX9uySWVXlQ==
+X-CSE-MsgGUID: h8ouixoaT8+JuVm4+ZsPdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,107,1770624000"; 
+   d="scan'208";a="223480544"
+Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 07 Mar 2026 14:55:21 -0800
+Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vz0YH-000000002hF-3ZvM;
+	Sat, 07 Mar 2026 22:55:17 +0000
+Date: Sun, 8 Mar 2026 06:55:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/2] net: dsa: yt921x: Use u64_stats_t for
+ MIB stats
+Message-ID: <202603080637.k8pQfAUS-lkp@intel.com>
+References: <20260306154637.3126497-3-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260307104131.4c1d0de5@kernel.org> <aayWSuOM59uojtuG@google.com> <20260307135941.51353a4f@kernel.org>
-Message-ID: <aayrtyPKOqVGpich@google.com>
-Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
-From: Alice Ryhl <aliceryhl@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 85EAC22DED2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306154637.3126497-3-mmyangfl@gmail.com>
+X-Rspamd-Queue-Id: CCB4E22DF04
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265210-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,lunn.ch,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265211-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.979];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-On Sat, Mar 07, 2026 at 01:59:41PM -0800, Jakub Kicinski wrote:
-> On Sat, 7 Mar 2026 21:19:06 +0000 Alice Ryhl wrote:
-> > On Sat, Mar 07, 2026 at 10:41:31AM -0800, Jakub Kicinski wrote:
-> > > On Fri, 06 Mar 2026 15:12:12 +0000 Alice Ryhl wrote:  
-> > > > The C Binder driver exposes messages over netlink when transactions
-> > > > fail, so that a userpace daemon can respond to processes with many
-> > > > failing transactions.  
-> > > 
-> > > Ugh, now I regret letting binder use Netlink. Should have seen this
-> > > coming :/  
-> > 
-> > To be honest, I'm not entirely happy with what Binder is using netlink
-> > for either, but it is what it is.
-> 
-> If we're both not happy let's take this opportunity to find a better
-> solution?
+Hi David,
 
-My understanding is that userspace is already using or looking into
-using the netlink uapi that Binder exposes here. I don't know to what
-extent; it's not used *that* much yet, but it may still be tricky to
-change the uapi at this point.
+kernel test robot noticed the following build errors:
 
-Alice
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/net-dsa-yt921x-Return-early-for-failed-MIB-read/20260307-004743
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260306154637.3126497-3-mmyangfl%40gmail.com
+patch subject: [PATCH net-next v4 2/2] net: dsa: yt921x: Use u64_stats_t for MIB stats
+config: i386-buildonly-randconfig-003-20260307 (https://download.01.org/0day-ci/archive/20260308/202603080637.k8pQfAUS-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.4.0-5) 12.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260308/202603080637.k8pQfAUS-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603080637.k8pQfAUS-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/dsa/yt921x.c:29:
+>> drivers/net/dsa/yt921x.h:588:29: error: flexible array member in union
+     588 |                 u64_stats_t stats[];
+         |                             ^~~~~
+
+
+vim +588 drivers/net/dsa/yt921x.h
+
+   533	
+   534	struct yt921x_mib {
+   535		union {
+   536			struct {
+   537				u64_stats_t rx_broadcast;
+   538				u64_stats_t rx_pause;
+   539				u64_stats_t rx_multicast;
+   540				u64_stats_t rx_crc_errors;
+   541	
+   542				u64_stats_t rx_alignment_errors;
+   543				u64_stats_t rx_undersize_errors;
+   544				u64_stats_t rx_fragment_errors;
+   545				u64_stats_t rx_64byte;
+   546	
+   547				u64_stats_t rx_65_127byte;
+   548				u64_stats_t rx_128_255byte;
+   549				u64_stats_t rx_256_511byte;
+   550				u64_stats_t rx_512_1023byte;
+   551	
+   552				u64_stats_t rx_1024_1518byte;
+   553				u64_stats_t rx_jumbo;
+   554				u64_stats_t rx_good_bytes;
+   555	
+   556				u64_stats_t rx_bad_bytes;
+   557				u64_stats_t rx_oversize_errors;
+   558	
+   559				u64_stats_t rx_dropped;
+   560				u64_stats_t tx_broadcast;
+   561				u64_stats_t tx_pause;
+   562				u64_stats_t tx_multicast;
+   563	
+   564				u64_stats_t tx_undersize_errors;
+   565				u64_stats_t tx_64byte;
+   566				u64_stats_t tx_65_127byte;
+   567				u64_stats_t tx_128_255byte;
+   568	
+   569				u64_stats_t tx_256_511byte;
+   570				u64_stats_t tx_512_1023byte;
+   571				u64_stats_t tx_1024_1518byte;
+   572				u64_stats_t tx_jumbo;
+   573	
+   574				u64_stats_t tx_good_bytes;
+   575				u64_stats_t tx_collisions;
+   576	
+   577				u64_stats_t tx_aborted_errors;
+   578				u64_stats_t tx_multiple_collisions;
+   579				u64_stats_t tx_single_collisions;
+   580				u64_stats_t tx_good;
+   581	
+   582				u64_stats_t tx_deferred;
+   583				u64_stats_t tx_late_collisions;
+   584				u64_stats_t rx_oam;
+   585				u64_stats_t tx_oam;
+   586			};
+   587	
+ > 588			u64_stats_t stats[];
+   589		};
+   590	};
+   591	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
