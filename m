@@ -1,155 +1,177 @@
-Return-Path: <netdev+bounces-265111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHoIHnbuq2mYiAEAu9opvQ
-	(envelope-from <netdev+bounces-265111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:23:02 +0100
+	id kHR2IDP2q2kNigEAu9opvQ
+	(envelope-from <netdev+bounces-265112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:56:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB22522AE08
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:23:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFAC222AEBE
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A185A303B7DE
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 09:22:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 493A83023DD2
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 09:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261BC38757F;
-	Sat,  7 Mar 2026 09:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CC9388E65;
+	Sat,  7 Mar 2026 09:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4eeIcNEM"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="lgvRcWZF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hBz5KwyA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE11D30595B
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 09:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EAC3815F6;
+	Sat,  7 Mar 2026 09:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772875339; cv=none; b=oKH8C4ZgLS5ycF4hS6dMIQB8gd9iG6rYhl3B9/dbuNdu814vmJlDBV7WLhdn8Z5zv6OjJzDT/mwJAYSpujcoXjLYmnpdlWHJd1bnTwxI8Z0qFFT6HWuvU5zk11pbndLnAzb2hTyejJKf8/ivfxWsRNW/jcL5nWC/qjZmpC3u3nU=
+	t=1772877358; cv=none; b=UWhueEpKxwT2IC5cLx4D1iEY+bvC/MlY85zgW7W27xa7ARWItLBJco5X9Nc7fncmTXcvL22thJ8JSsF6hZs7rnk6+xNCfW6P3UmJ8EPUe4sOzxxmnDQlaic7gpLvMLbKIfRmGuPudk4m1QIY4XBDpakn2NjNvREhMsdj7+1lq0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772875339; c=relaxed/simple;
-	bh=RLuf0BWPmBmgE3OCwKI148eNby71BqdruVzZ8uESdto=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jizDJrKKj1Mhe3LbLdqxMvlXWIePE0xDAfNH2lXD00b71+7obk163uMmpEy/Uqi61U74MObAkIYV0ibRxxsqLAH8+9VDJJaC1g403yWNw/v8Oa7pk86h9CDzDAy14DdHknP1nCkOJneqvZIJTCoeL2jBiDFhQWtOUpBo33Kcn6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4eeIcNEM; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-79881805767so117174557b3.3
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 01:22:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772875337; x=1773480137; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=boljEDKAW+CRCitfA07JSzymSe3HqQTSV5hrgqY/gb8=;
-        b=4eeIcNEMbz5cbXKtV4hsNgSMOF8nVV6UP7wODJNgE0LFSu41yNQLOnLUbpsWTEElFd
-         tNM6G9Hr/2rObgpQe+VI5wADuutaMewDLOy6v8VjwZqxaK4Oix0TyzTjc0Dpzcfn5U4i
-         HxjLWoeg2WzbOK44MA+eS9Fd4/C/tzy1a5QdZ+HJNO784v2IHsjn46Hy9mqFnMXHdJgC
-         r+rh7VQfywOcpbfmGeLKdTni2krtvLvok/CtvQFbJh0BtpopYT0lKNKLYE1LDcwcVUmP
-         VztMNGs03VQgtysipD9jv5UNGf0xewZvmQH1eJhG18yoqlHDA/ZHPd9zfknq/MTV6pgT
-         cufA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772875337; x=1773480137;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=boljEDKAW+CRCitfA07JSzymSe3HqQTSV5hrgqY/gb8=;
-        b=HAGs19u1YaDnDXRAeJExgM4RY/RyRtN9vBgLj1s0QHS+WazO4T+qVbULpF8o3dC8kc
-         E4lk379Xsi07aG9PUWriPNLTJRNzV5uIp+NeYMYpIffCM3bl4GXD54kW0RDqHM3N4fkj
-         zMP+QLCLI7cyePyakBobwuV2/pAWIKwgVGd3JDDGDpxUfIznpa+C3OUM9YuJWOpOUxT6
-         6f3LbjROgqwsYZbRz13iGVhHt0uF+TgokFnJgMphc3Z6rexTKJFPrhbkTfwhWwBnBC5N
-         PSZNGILAZg+o+jgxAWhCj6uSPk3p6dGSYaS5C4Re3lbQxSc1KRBIjtvom285Y4L1gFRP
-         lfZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEAvulF1M/JOXB3gmFpRgjq5sP7IFfP3OdLP17+UVgPXNdX1PeQeNEjTJr6dyu2+XP4OO21Js=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSo37BIny0hwQ6lWQ+QqoQ0xsY5luLfop2U5MZ+jm4YhuBYD1F
-	15cR2azRHL46dWwHGwHrDfcNASKt9brCZ6Oe77n78KV/vuZsIRvPEWbFyvSq5YpmsdkTR1VT5XM
-	H26g9DHvjedwDaQ==
-X-Received: from ywah17.prod.google.com ([2002:a05:690c:c011:b0:798:6b80:4165])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:6e86:b0:797:d37d:d5a1 with SMTP id 00721157ae682-798dd7c6bb0mr45157047b3.61.1772875336648;
- Sat, 07 Mar 2026 01:22:16 -0800 (PST)
-Date: Sat,  7 Mar 2026 09:22:14 +0000
+	s=arc-20240116; t=1772877358; c=relaxed/simple;
+	bh=Df9GB+6IauF0Rnhzz/Yqto6sGQOVH06v0bqc3v/uO0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pXloQgVP9yrCpa7d4JqytUJGi3WR/uWQ1bhzXepBOoxbZGvgk4Zo8xA1F81D2y1F3qwh62KgWgm7xV69lot43bNAVjf2kxmKwczmWYQO8HmDUdNp+6MK0oEhcz4ZTtbs3iFA9Vx58uGo4YTL9NPy9EJBAuFp97VAkHp0HoKxyrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=lgvRcWZF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hBz5KwyA; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 38F3B140019C;
+	Sat,  7 Mar 2026 04:55:56 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Sat, 07 Mar 2026 04:55:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm3; t=1772877356; x=1772963756; bh=hE
+	nNNQ5a6evc6u740wz/gwb2DqYMzUoH08coN9IEFGU=; b=lgvRcWZFrWX8oLfDzP
+	gGjPGWsGPXQasyX+/Ak62HF/tupVHygC8skE00WVA7/FGy8bPux9t1YHrfchZvy1
+	+199SJzwu3bj/jBoT6HI3MENm1Gcu3p5U9pCgLcXTUNyr+drx8ZGIcch3KJW1end
+	P6AGB2rlyVLPIdd04de4kaAMoZAMSBXRt2PZWT6nCIDNQa0zHJYYfGDKFnjT3+rF
+	Mlv2Ikry6NTn7LPwq1qdM5TPI2W0z8Tw7pLD9OJ9IWQCFKzKFgSfAU3+eQGs9H9h
+	gZ1x1MO0S9N3ubX8jixREpTQs6ziBGrpDCrVuSQfXFVULZRDcUlXjwtoJ3IZFdSC
+	WX0A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1772877356; x=1772963756; bh=hEnNNQ5a6evc6u740wz/gwb2DqYM
+	zUoH08coN9IEFGU=; b=hBz5KwyARnBX7Z5AbzCK8hkGEdMNxhrnrcmVoQPWINae
+	Vu72OKhBMhTuLjteAL0eS1jAoGz395pWZeSpzP2jE4O5PQrCp8sbD+o+yTKG4nFR
+	ieGQTTH+5M6XT/xOba5YaAlUE3QGoWc2GcPN/y02ohibDfUPqcKMBhW0WzI/Ks1z
+	Hjt86DzrkAy6BNzKqsS65pFFMjWaw0Ywq6x6xgxgxF1suhucCUGXjGneopZU1bbU
+	LiF+SOx3pUGV9JWG9xX8N4i3xjUWry6NS4sodiViuEREfULAEaH7bEgsby06t2Wf
+	4OAu8/j/E2Mnytt3WsjYTNEPcNjr7xdejBFzY3/ZkA==
+X-ME-Sender: <xms:K_araQuvAwmHCH-6ZERAwfCH7mHSlVpktQCJ8Oxf1VJcC9IFXMFugw>
+    <xme:K_araQhrbj5MM3V2ClPprsk0pRUzDiGwHFoXStvYAOkGP_EjRqgvMjcEm9Xif4J7q
+    Dl8YCzJ0zu5EppSFm_KLZkDOE1BgMwrbpS_BcETNPDM887WacjjeOpf>
+X-ME-Received: <xmr:K_araWaaqsA9prEYFsLpFub4cAiP-H5Ut36hzpIY8isb__X69y_-mLUQdiBvE_JWpid_Piqibc_y7R74tEAWHP_4ffC9Kec>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvjeduledvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
+    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
+    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefgffef
+    udefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhn
+    ugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehr
+    vghnvghsrghsrdgtohhmpdhrtghpthhtohepphgruhhlsehpsggrrhhkvghrrdguvghvpd
+    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
+    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivg
+    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
+    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhr
+    vghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:K_arafbYZfJKLBvXQSNp4DTLsFnNSytHQLwkmD7nbIr1wx6Yfbjr-Q>
+    <xmx:K_arabzN0qDMfMOKYVmotOUVuoKnqyXKWqMGRnGMd1m8-zpwk2KcMw>
+    <xmx:K_arabeRWlLFjOtx-Uhr0CV090iKy2eWomAXtM2s7EC1rQeebOl78Q>
+    <xmx:K_araQ43qf-rSo1rbaaFwjIMTRGEkuSIZy5rC-BWXYcEiH6Flrn-Ag>
+    <xmx:LParaXIrJT0FLsUdQJBoDrJzq313BExjW0Kr2CnOoJQnxFds2xTfg0qn>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 7 Mar 2026 04:55:54 -0500 (EST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Paul Barker <paul@pbarker.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next,v2] net: ethernet: ravb: Disable interrupts when closing device
+Date: Sat,  7 Mar 2026 10:55:32 +0100
+Message-ID: <20260307095532.2118495-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260307092214.2433548-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: move sysctl_tcp_shrink_window to
- netns_ipv4_read_txrx group
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: DB22522AE08
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DFAC222AEBE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm3,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265111-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265112-lists,netdev=lfdr.de,renesas];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.988];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.975];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-Commit 18fd64d25422 ("netns-ipv4: reorganize netns_ipv4 fast path
-variables") missed that __tcp_select_window() is reading
-net->ipv4.sysctl_tcp_shrink_window.
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-Move this field to netns_ipv4_read_txrx group, as __tcp_select_window()
-is used both in tx and rx paths.
+Disable E-MAC interrupts when closing the device.
 
-Saves a potential cache line miss.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[Niklas: Rebase from BSP and reword commit message]
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 ---
- include/net/netns/ipv4.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+* Changes since v1
+- Specify E-MAC interrupts in commit message.
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 4c249aeaf7f12f8237232a6f3d3f3ed56d0a53d4..38624beff9b34161327d7549fcd0f041c9c91679 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -74,6 +74,7 @@ struct netns_ipv4 {
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 84b657fc2e15..2c725824b348 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -2367,6 +2367,7 @@ static int ravb_close(struct net_device *ndev)
+ 	ravb_write(ndev, 0, RIC0);
+ 	ravb_write(ndev, 0, RIC2);
+ 	ravb_write(ndev, 0, TIC);
++	ravb_write(ndev, 0, ECSIPR);
  
- 	/* TXRX readonly hotpath cache lines */
- 	__cacheline_group_begin(netns_ipv4_read_txrx);
-+	u8		sysctl_tcp_shrink_window;
- 	__cacheline_group_end(netns_ipv4_read_txrx);
- 
- 	/* RX readonly hotpath cache line */
-@@ -122,7 +123,6 @@ struct netns_ipv4 {
- #endif
- 	bool			fib_has_custom_local_routes;
- 	bool			fib_offload_disabled;
--	u8			sysctl_tcp_shrink_window;
- #ifdef CONFIG_IP_ROUTE_CLASSID
- 	atomic_t		fib_num_tclassid_users;
- #endif
+ 	/* PHY disconnect */
+ 	if (ndev->phydev) {
 -- 
-2.53.0.473.g4a7958ca14-goog
+2.52.0
 
 
