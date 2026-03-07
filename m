@@ -1,335 +1,268 @@
-Return-Path: <netdev+bounces-265107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265108-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHpiJjXPq2lhhAEAu9opvQ
-	(envelope-from <netdev+bounces-265107-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:09:41 +0100
+	id EKApHHvTq2mshAEAu9opvQ
+	(envelope-from <netdev+bounces-265108-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:27:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006EB22A8DC
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:09:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1332422A9B8
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:27:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E2AE2301C547
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 07:09:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 527CD3035D5A
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 07:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD0D346760;
-	Sat,  7 Mar 2026 07:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34315372B5E;
+	Sat,  7 Mar 2026 07:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aju4W2lZ"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g9S+oxob";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c1lV+sfd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g9S+oxob";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c1lV+sfd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1596617993
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 07:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF9436D4F0
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 07:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772867377; cv=none; b=SOuWDR7ScGaCIoqAboaxK+FfO5cCpe0Y4thG2lOr5JbYO8PjZVolkEYJEG6PGwDdYkJ1Wtenfp50nCQwWrTk4NzKM0q3Fcspx+WK17hwf7OjvgM+Pmym72Ou9aEU1W9fdL7sk1AiUF87czSXh7DvPUwl0QBJQ/1abRqhYRvr61I=
+	t=1772868453; cv=none; b=pZzROKBFXtNm4o9E8g460dWisNzq2vGrUiiCwX8rdhcSncT0QWP/4HZ8IGRiZLnyEfoAJ1F5fObXzTtMDTxMumehrDwLdAOO3+ZhmknYh003ZJ88ZNua6rCMEAjzDu0usLOChTC8t3qjUPNIOzqaAyk1OkNnxQRku40Ix9zqfgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772867377; c=relaxed/simple;
-	bh=QL9BKetlDyYpgfINgsubMIhGmpsylXXyhHbGNaDmUEI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pO4wg+GwSKj61Y3Wj803iQAlgZfbvvOMzjoJ/EqiHShPG4wdvokUEEeEMmw/5khl736fUgTdkanemNRNafjPC6hojtnKeQiHq+p9DIUvhQwtUPt4NjKQsNQodbWvq032QfNmxDKr3/tdAExSZXWQgQ+Dpr3RtD+PhPKTkv2QWP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Aju4W2lZ; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8cd73c4a827so93160785a.3
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 23:09:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772867375; x=1773472175; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Re/IoXRnVnrwqwk2PCf3MrXGdyviIMQnH+YNq0WCLs=;
-        b=Aju4W2lZjwPnL77OAKXVOY8ZXs/20TjC3mZN4u11l/RVIuqAzj3oGc2Wc1qZpOsB6+
-         LaY7czTpS62y1Lj9iuqOC3Zou193+3ZxsIv4x039tb8lScIeBBi0yV9nRtI4peM07dyF
-         /pwXjJFiThdnWGRu8zek878NiajaXcvKe8f7mfQqdzJLFd3ZWk4cxzaHhRld6nYI9ubf
-         vGztJV11a20RejJ+Yt6JdFO4q4ohfAH5VLq6VRiOzg/hIVsqlvRZ+jlHNMBqcNRQdTpr
-         2rqGjNRKXRu8yITj+jJKyjmSVoM9ikG6k0WFNzTuTGAWz1XHYt5a/WkzhwQrDpTBRBcH
-         wGyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772867375; x=1773472175;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Re/IoXRnVnrwqwk2PCf3MrXGdyviIMQnH+YNq0WCLs=;
-        b=ufptSmbx6HephD2hc44/3MFB9VOtkydhtaKziDSGvhG+2RZwUWpTqhsX1jSFa4pbkt
-         JWIIxpqSEWE1IRqRp87nTt2nCWwUafc66gmgjCiZQlE5BfcmXJhW3eiAlYjGmp1Kg86g
-         NJf6A1lsj5l9DXxt1EZoZlYMMvZUI7QZQBsl13rMNRRyIxjHW2ryek1m7nE1OwDYbUms
-         Q3HqejETC30S7ZLo87UH7zEgoS8QmktbINjyll8XE3nIheN+M9/OazbTMxNuHVWxosee
-         6lrQOzXD+/xP32zwv+hJeNvsNltfAjPl2WLDN3wRDagKifa1o7kXwSN61420auwLjeYV
-         la/w==
-X-Gm-Message-State: AOJu0YyePQns6O5J1uxDRzq8PY+s99OfQIv1JN2oWVcv/a92UYZvGABw
-	TWf2cgKLVgh/e2qPfXIygkOcgsKaCd3iDQgSp6sF0NzAXksh87WO3JDi
-X-Gm-Gg: ATEYQzybO2YMzGkSIfr/O8Uo3HwM32fLfSNZQXpMoBLIKT8KiS1ogklvxnURL36Hs1B
-	FhBIe1a15bGTqXDVgDLUb9JLNtZXZ6Xq5axH2QOn7lBY03ajxaSXMehC7OJ/jAFr+iw1lb21gn1
-	OG6OyDSWTFAQKCbtP9Z6ViRGEyujxwr826tVR/Hjm4Fy8TIfCd2vsGxp0WrvCZWrjaY+8MT2L2N
-	btz/8xq5jmqRbxgLmBv9gGU9ffWl699+mrrf4SFhnynP7bZFqvsvI0UZ9pz/Q9WUq6/ZCQeAg9g
-	LaRYRBwIs4aMVjRb9yj9Vh2HlXz3PNXc78InUrKNq0talmGcbuf9dLHh6spZzq2OocvwtE6XVIb
-	SB3J4MQcLm8JRUZrEcv8Y65qtE//nrB+ydM3hxoWUahxFOsWZd9Qz1coHgUn2P8fZfux/hwm+Ks
-	zJxaU/mN4B54bcXlcYRg8JnMHnVc8yGXuR
-X-Received: by 2002:a05:620a:1729:b0:8b2:dcde:b668 with SMTP id af79cd13be357-8cd6d51357emr597796685a.62.1772867374858;
-        Fri, 06 Mar 2026 23:09:34 -0800 (PST)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd6f5736c0sm262405985a.49.2026.03.06.23.09.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 23:09:34 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Sat, 07 Mar 2026 15:08:54 +0800
-Subject: [PATCH net v2] net: macb: Shuffle the tx ring before enabling tx
+	s=arc-20240116; t=1772868453; c=relaxed/simple;
+	bh=yaJnNdWIBiiQlM/3NBeQUA6f9ZCPn33PYdxt7nXQrlw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P0lJ+VMDtmTp2QW28Ky1/CojOCqjhSGlVsguzXQD5BMoKOdeWSyz/mrHUfqLLDqsz+UlIB61WZkP8EJKBXWRdU94cvz19h8UVtD9BmlrHdCGA/HeXeFqnLbOG+MncemFVWMUtVzHmrpxjqsYMqTNcUGP07OkXalhBj3D3FPWBnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g9S+oxob; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c1lV+sfd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g9S+oxob; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c1lV+sfd; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0D7F35BDEB;
+	Sat,  7 Mar 2026 07:27:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772868449; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAcBCoTYWQSQmnwUltm9shdu8DulQvP79VCTXPkDMBQ=;
+	b=g9S+oxobMqr907rfZheqjA/fFsqDd2SaMbArqZdTFhSgRSl2GRPO2wBLZ9TDI7ex6cH7fy
+	zc+ekPT/X3qfBQ5fFKqTO5aE2TwUahcRuxt8r8i6cnH0hmzACL+mAKABHZMEgTBJM2BrDd
+	1biBe7FuwYarfvYrq0JC7Qb+l82GxHs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772868449;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAcBCoTYWQSQmnwUltm9shdu8DulQvP79VCTXPkDMBQ=;
+	b=c1lV+sfdbbmCz8Msc2QNNb/IbPomRQwcVSqCvAJde73SZ3Iexqahc9U5YastUJmXY3WSsv
+	9IacDlBqcyjaMgBw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772868449; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAcBCoTYWQSQmnwUltm9shdu8DulQvP79VCTXPkDMBQ=;
+	b=g9S+oxobMqr907rfZheqjA/fFsqDd2SaMbArqZdTFhSgRSl2GRPO2wBLZ9TDI7ex6cH7fy
+	zc+ekPT/X3qfBQ5fFKqTO5aE2TwUahcRuxt8r8i6cnH0hmzACL+mAKABHZMEgTBJM2BrDd
+	1biBe7FuwYarfvYrq0JC7Qb+l82GxHs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772868449;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PAcBCoTYWQSQmnwUltm9shdu8DulQvP79VCTXPkDMBQ=;
+	b=c1lV+sfdbbmCz8Msc2QNNb/IbPomRQwcVSqCvAJde73SZ3Iexqahc9U5YastUJmXY3WSsv
+	9IacDlBqcyjaMgBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 882AF3EA61;
+	Sat,  7 Mar 2026 07:27:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 0KNZHV/Tq2nfQgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 07 Mar 2026 07:27:27 +0000
+Message-ID: <691d5589-46ea-4947-9510-bfd9d991ed02@suse.de>
+Date: Sat, 7 Mar 2026 08:27:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 2/3] bpf: bpf_out_neigh_v6: Fix nd_tbl NULL
+ dereference when IPv6 is disabled
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Hangbin Liu <liuhangbin@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260305-net-nd_tbl_fixes-v3-0-fde28b30a744@suse.com>
+ <20260305-net-nd_tbl_fixes-v3-2-fde28b30a744@suse.com>
+ <20260305182521.0ca7313c@kernel.org>
+ <b3477010-6fdd-4bec-8951-152b12bf56e6@suse.de>
+ <20260306183914.4b13a03d@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260306183914.4b13a03d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260307-zynqmp-v2-1-6ef98a70e1d0@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAbPq2kC/zXMSwqDMBAG4KvIrJtiRhOlq96juLBmogM12kSkV
- nL3hkCX/4PvhECeKcCtOMHTzoEXlwJeChim3o0k2KQMWKIuUdbie7j3vIqmNpWyVavRtpDOqyf
- Lnww9wNEGXSonDtvij4zvMk/ZqUr1d3YppFCGGkRVG6Wf93Hu+XUdlhm6GOMP1dAmLaEAAAA=
-X-Change-ID: 20260214-zynqmp-74d35f3862f8
-To: netdev@vger.kernel.org
-Cc: Kevin Hao <haokexin@gmail.com>, 
- Quanyang Wang <quanyang.wang@windriver.com>, stable@vger.kernel.org, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: 006EB22A8DC
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 1332422A9B8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265107-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,windriver.com,vger.kernel.org,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[suse.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265108-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.972];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,davemloft.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Quanyang observed that when using an NFS rootfs on an AMD ZynqMp board,
-the rootfs may take an extended time to recover after a suspend.
-Upon investigation, it was determined that the issue originates from a
-problem in the macb driver.
+On 3/7/26 3:39 AM, Jakub Kicinski wrote:
+> On Fri, 6 Mar 2026 10:58:44 +0100 Fernando Fernandez Mancera wrote:
+>>>> +	if (unlikely(!ipv6_stub->nd_tbl))
+>>>> +		goto out_drop;
+>>>
+>>> So neither Fernando nor you checked whether this code can be built
+>>> as a module? ipv6_mod_enabled() should work just fine
+>>
+>> I checked it. If IPV6=m this is not fine.
+>>
+>> ld: vmlinux.o: in function `bpf_out_neigh_v6':
+>> filter.c:(.text+0x3231d60): undefined reference to `ipv6_mod_enabled'
+> 
+> Guess I got it backwards :/ Should we add this to the series?
+> 
 
-According to the Zynq UltraScale TRM [1], when transmit is disabled,
-the transmit buffer queue pointer resets to point to the address
-specified by the transmit buffer queue base address register.
+No worries.
 
-In the current implementation, the code merely resets `queue->tx_head`
-and `queue->tx_tail` to '0'. This approach presents several issues:
+> -->8--------
+> Subject: ipv6: move the disable_ipv6_mod knob to core code
+> 
+> Make sure disable_ipv6_mod itself is not part of the IPv6 module,
+> in case core code wants to refer to it. We will remove support
+> for IPv6=m soon, this change helps make fixes we commit before
+> that less messy.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
 
-- Packets already queued in the tx ring are silently lost,
-  leading to memory leaks since the associated skbs cannot be released.
+Ricardo could you add it and check if it is fine? FWIW; I am sending 
+today the series removing IPV6=m after some testing to net-next tree.
 
-- Concurrent write access to `queue->tx_head` and `queue->tx_tail` may
-  occur from `macb_tx_poll()` or `macb_start_xmit()` when these values
-  are reset to '0'.
+Thanks,
+Fernando.
 
-- The transmission may become stuck on a packet that has already been sent
-  out, with its 'TX_USED' bit set, but has not yet been processed. However,
-  due to the manipulation of 'queue->tx_head' and 'queue->tx_tail',
-  `macb_tx_poll()` incorrectly assumes there are no packets to handle
-  because `queue->tx_head == queue->tx_tail`. This issue is only resolved
-  when a new packet is placed at this position. This is the root cause of
-  the prolonged recovery time observed for the NFS root filesystem.
-
-To resolve this issue, shuffle the tx ring and tx skb array so that
-the first unsent packet is positioned at the start of the tx ring.
-Additionally, ensure that updates to `queue->tx_head` and
-`queue->tx_tail` are properly protected with the appropriate lock.
-
-[1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
-
-Fixes: bf9cf80cab81 ("net: macb: Fix tx/rx malfunction after phy link down and up")
-Reported-by: Quanyang Wang <quanyang.wang@windriver.com>
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
-Cc: stable@vger.kernel.org
----
-Changes in v2:
-- Resolves the issue of incomplete copying of the tx descriptor, as identified by the AI [1].
-
-- Resolves warnings for lines exceeding 80 columns.
-
-- Link to v1: https://lore.kernel.org/r/20260305-zynqmp-v1-1-5de72254d56b@gmail.com
-
-[1] https://netdev-ai.bots.linux.dev/ai-review.html?id=44318d8b-d8c3-42c8-8884-238421f708c5
----
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <linux@armlinux.org.uk>
----
- drivers/net/ethernet/cadence/macb_main.c | 98 +++++++++++++++++++++++++++++++-
- 1 file changed, 95 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 3dcae4d5f74c9709a86fae837d25501da4484bf7..952aaf84757c20e94f3bbc98162a18330aa4cf73 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -37,6 +37,7 @@
- #include <linux/tcp.h>
- #include <linux/types.h>
- #include <linux/udp.h>
-+#include <linux/gcd.h>
- #include <net/pkt_sched.h>
- #include "macb.h"
- 
-@@ -786,6 +787,97 @@ static void macb_mac_link_down(struct phylink_config *config, unsigned int mode,
- 	netif_tx_stop_all_queues(ndev);
- }
- 
-+/* Use juggling algorithm to left rotate tx ring and tx skb array */
-+static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
-+{
-+	unsigned int head, tail, count, ring_size, desc_size;
-+	struct macb_tx_skb tx_skb, *skb_curr, *skb_next;
-+	struct macb_dma_desc *desc_curr, *desc_next;
-+	unsigned int i, cycles, shift, curr, next;
-+	struct macb *bp = queue->bp;
-+	unsigned char desc[24];
-+	unsigned long flags;
-+
-+	desc_size = macb_dma_desc_get_size(bp);
-+
-+	if (WARN_ON_ONCE(desc_size > ARRAY_SIZE(desc)))
-+		return;
-+
-+	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
-+	head = queue->tx_head;
-+	tail = queue->tx_tail;
-+	ring_size = bp->tx_ring_size;
-+	count = CIRC_CNT(head, tail, ring_size);
-+
-+	if (!(tail % ring_size))
-+		goto unlock;
-+
-+	if (!count) {
-+		queue->tx_head = 0;
-+		queue->tx_tail = 0;
-+		goto unlock;
-+	}
-+
-+	shift = tail % ring_size;
-+	cycles = gcd(ring_size, shift);
-+
-+	for (i = 0; i < cycles; i++) {
-+		memcpy(&desc, macb_tx_desc(queue, i), desc_size);
-+		memcpy(&tx_skb, macb_tx_skb(queue, i),
-+		       sizeof(struct macb_tx_skb));
-+
-+		curr = i;
-+		next = (curr + shift) % ring_size;
-+
-+		while (next != i) {
-+			desc_curr = macb_tx_desc(queue, curr);
-+			desc_next = macb_tx_desc(queue, next);
-+
-+			memcpy(desc_curr, desc_next, desc_size);
-+
-+			if (next == ring_size - 1)
-+				desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-+			if (curr == ring_size - 1)
-+				desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-+
-+			skb_curr = macb_tx_skb(queue, curr);
-+			skb_next = macb_tx_skb(queue, next);
-+			memcpy(skb_curr, skb_next, sizeof(struct macb_tx_skb));
-+
-+			curr = next;
-+			next = (curr + shift) % ring_size;
-+		}
-+
-+		desc_curr = macb_tx_desc(queue, curr);
-+		memcpy(desc_curr, &desc, desc_size);
-+		if (i == ring_size - 1)
-+			desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-+		if (curr == ring_size - 1)
-+			desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-+		memcpy(macb_tx_skb(queue, curr), &tx_skb,
-+		       sizeof(struct macb_tx_skb));
-+	}
-+
-+	queue->tx_head = count;
-+	queue->tx_tail = 0;
-+
-+	/* Make descriptor updates visible to hardware */
-+	wmb();
-+
-+unlock:
-+	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
-+}
-+
-+/* Rotate the queue so that the tail is at index 0 */
-+static void gem_shuffle_tx_rings(struct macb *bp)
-+{
-+	struct macb_queue *queue;
-+	int q;
-+
-+	for (q = 0, queue = bp->queues; q < bp->num_queues; q++, queue++)
-+		gem_shuffle_tx_one_ring(queue);
-+}
-+
- static void macb_mac_link_up(struct phylink_config *config,
- 			     struct phy_device *phy,
- 			     unsigned int mode, phy_interface_t interface,
-@@ -824,8 +916,6 @@ static void macb_mac_link_up(struct phylink_config *config,
- 			ctrl |= MACB_BIT(PAE);
- 
- 		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--			queue->tx_head = 0;
--			queue->tx_tail = 0;
- 			queue_writel(queue, IER,
- 				     bp->rx_intr_mask | MACB_TX_INT_FLAGS | MACB_BIT(HRESP));
- 		}
-@@ -839,8 +929,10 @@ static void macb_mac_link_up(struct phylink_config *config,
- 
- 	spin_unlock_irqrestore(&bp->lock, flags);
- 
--	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC))
-+	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
- 		macb_set_tx_clk(bp, speed);
-+		gem_shuffle_tx_rings(bp);
-+	}
- 
- 	/* Enable Rx and Tx; Enable PTP unicast */
- 	ctrl = macb_readl(bp, NCR);
-
----
-base-commit: a0ae2a256046c0c5d3778d1a194ff2e171f16e5f
-change-id: 20260214-zynqmp-74d35f3862f8
-
-Best regards,
--- 
-Kevin Hao <haokexin@gmail.com>
+>   include/linux/ipv6.h | 7 ++++++-
+>   net/ipv4/af_inet.c   | 6 ++++++
+>   net/ipv6/af_inet6.c  | 8 --------
+>   3 files changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+> index 443053a76dcf..e5b6853d517a 100644
+> --- a/include/linux/ipv6.h
+> +++ b/include/linux/ipv6.h
+> @@ -333,7 +333,12 @@ struct tcp6_timewait_sock {
+>   };
+>   
+>   #if IS_ENABLED(CONFIG_IPV6)
+> -bool ipv6_mod_enabled(void);
+> +extern int disable_ipv6_mod;
+> +
+> +static inline bool ipv6_mod_enabled(void)
+> +{
+> +        return disable_ipv6_mod == 0;
+> +}
+>   
+>   static inline struct ipv6_pinfo *inet6_sk(const struct sock *__sk)
+>   {
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index babcd75a08e2..f1944e8fd9d3 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -124,6 +124,12 @@
+>   
+>   #include <trace/events/sock.h>
+>   
+> +/* Keep the definition of IPv6 disable here for now, to avoid annoying linker
+> + * issues in case IPv6=m
+> + */
+> +int disable_ipv6_mod;
+> +EXPORT_SYMBOL(disable_ipv6_mod);
+> +
+>   /* The inetsw table contains everything that inet_create needs to
+>    * build a new socket.
+>    */
+> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+> index 0b995a961359..03c175cbbdb6 100644
+> --- a/net/ipv6/af_inet6.c
+> +++ b/net/ipv6/af_inet6.c
+> @@ -86,8 +86,6 @@ struct ipv6_params ipv6_defaults = {
+>   	.autoconf = 1,
+>   };
+>   
+> -static int disable_ipv6_mod;
+> -
+>   module_param_named(disable, disable_ipv6_mod, int, 0444);
+>   MODULE_PARM_DESC(disable, "Disable IPv6 module such that it is non-functional");
+>   
+> @@ -97,12 +95,6 @@ MODULE_PARM_DESC(disable_ipv6, "Disable IPv6 on all interfaces");
+>   module_param_named(autoconf, ipv6_defaults.autoconf, int, 0444);
+>   MODULE_PARM_DESC(autoconf, "Enable IPv6 address autoconfiguration on all interfaces");
+>   
+> -bool ipv6_mod_enabled(void)
+> -{
+> -	return disable_ipv6_mod == 0;
+> -}
+> -EXPORT_SYMBOL_GPL(ipv6_mod_enabled);
+> -
+>   static struct ipv6_pinfo *inet6_sk_generic(struct sock *sk)
+>   {
+>   	const int offset = sk->sk_prot->ipv6_pinfo_offset;
 
 
