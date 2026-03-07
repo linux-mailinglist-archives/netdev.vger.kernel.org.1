@@ -1,121 +1,179 @@
-Return-Path: <netdev+bounces-265046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGYRNmycq2kJewEAu9opvQ
-	(envelope-from <netdev+bounces-265046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:33:00 +0100
+	id XsHAHFGdq2lsewEAu9opvQ
+	(envelope-from <netdev+bounces-265047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:36:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0E8229F10
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:33:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB00229F47
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:36:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 120AA3020861
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:32:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A337303D2CD
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5607330CDA2;
-	Sat,  7 Mar 2026 03:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1E52D7D27;
+	Sat,  7 Mar 2026 03:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGyqRF/3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgLjiEvd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F25C2DD5F6;
-	Sat,  7 Mar 2026 03:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58541281369
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 03:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772854376; cv=none; b=nEMmfeKP5df/6O//xhsIYQCRl5B8jvhVxL+lOv/5Kp4UkB5ghoq5iXYW+GoTEDOdMKbVgDG2WVHnHDZx5375qEjW57SO0cOVYMK1BDsDcmwbYumF+sphbe9kpBFOINzgomfuDstDvPTN8pfYPNUv9pbsK8+zK+6WbDFv2lp+NuU=
+	t=1772854603; cv=none; b=nb3BWiKynrZ9xoRE5vkDRDtVRdnC+a4tRhZk/RuqyreZkMvV+prbf1blUCQmo7vOHazjryiWwqvhrKxO5xDDEZEtRUmhZilUx1jSZd07qZsupeDLl8zW2ljbIATBlrucKcmuAVEEH8vZ6gwHhIZNjbYK0ggbv6NRQ5IyjOFDOlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772854376; c=relaxed/simple;
-	bh=UB4aqVHBkq7Z6U0PCU86267heuJHua5cm31mgeVxY3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XeBiXyw78tiQFs5MfApf+8vdLMKGom0epL5lEQ4b4PfyANrSDfeDRvU+lI7eOqM4IH5APNidQNrgirQJ4TnLqMHgSr2ffJH9U+ZA7LcBj3eJBe6wKjA5vqRx1gs1S+niU04oj3qOag1MbvexUDhSfPDtO2+hOoTaeWvyZc/WlEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGyqRF/3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69D9C19422;
-	Sat,  7 Mar 2026 03:32:54 +0000 (UTC)
+	s=arc-20240116; t=1772854603; c=relaxed/simple;
+	bh=P2/c4HUsSRxLdFwv8qd05MUthAhc/AJ/Ut2/iyCEJN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G7Fs7ORyaZeGu5QNfBQBQhZvDSVQpGV5zE79Z78AVBdrh38P6H+Y4V9jOyJYkMM/QZ8FuQ+RiMOW0kldxwXoqQzNA3VmFQYht6Q7WOrvgUlXbDqt1fJyOSYlt88jypbmxDqMcxOH576pz+gWCBatfagQv9Kg8tQUGSGdJgPN8xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgLjiEvd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D80DC19422;
+	Sat,  7 Mar 2026 03:36:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772854375;
-	bh=UB4aqVHBkq7Z6U0PCU86267heuJHua5cm31mgeVxY3I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lGyqRF/3qzEa7lUUuOdYRlHTYZ8SUHXAAJTLsEiatdGzW/HtZ0lre9XP1JLBn9FT4
-	 FiB8d6JjDEBERM5v9dDKjL9ZRFWnIVKcKCTQRNG7/LAaP3Zzc6Lp3//EjpID8pnFBo
-	 5e4K9pd3jXePOLfbQ0bga42/+X20Gs37yz3iGKGwbReGfvo40vSYXrE1bB/+hs79JN
-	 MMDMX/wuV8tpMKLLtpSofe2S1yk+kr/shs1IGhF6wbU0DhCnRHIFxH+VE+EzBgOMHN
-	 OVIU0NfXL/Uspb2E4ksgXotAe2pnN7Dlf5zwCRTtf9Yu9yGKT//AWVXjEX4wsf421L
-	 i0ORcG8R3BMzA==
-Date: Fri, 6 Mar 2026 19:32:53 -0800
+	s=k20201202; t=1772854603;
+	bh=P2/c4HUsSRxLdFwv8qd05MUthAhc/AJ/Ut2/iyCEJN0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RgLjiEvd8sYHYwfIsg663cOuWqaSSOeV4u3BVZ6fllBxyvW0RC8aghp5KGrbGHNWE
+	 3Edd7z1C3KrC0ZG+SW8HUNyxzOTWQ6t2XU1db1vELPlyQLcK8VuRQmwxaOAdayr6BK
+	 R7Ha0TnLXHkxTLZbAAl/0XRJ2nDG8Hn+ye9UqQQujVEC/pN+nz9W84GqyFV8a7yVFo
+	 YwVRb4woL+S3uAiCQhNJnPcmlRLzQe0yW7g5q8LWwLsq9hy6joH7+pU8hRTCOuMiSm
+	 R1VoxuDdxyChyVxoMJCrqphfeBI3lukihOvkpmmDNnrwFvgkRYeF5tW3MYzkrpaO/t
+	 QyoYlaYatO7Ew==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com,
- corbet@lwn.net, skhan@linuxfoundation.org, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- przemyslaw.kitszel@intel.com, mschmidt@redhat.com, andrew+netdev@lunn.ch,
- rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com,
- daniel.zahka@gmail.com, linux-doc@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 01/13] devlink: expose devlink instance
- index over netlink
-Message-ID: <20260306193253.6d7d2383@kernel.org>
-In-Reply-To: <20260304160022.6114-2-jiri@resnulli.us>
-References: <20260304160022.6114-1-jiri@resnulli.us>
-	<20260304160022.6114-2-jiri@resnulli.us>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	liuhangbin@gmail.com,
+	matttbe@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/10] tools: ynl: convert samples into selftests
+Date: Fri,  6 Mar 2026 19:36:20 -0800
+Message-ID: <20260307033630.1396085-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4B0E8229F10
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: BCB00229F47
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265046-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	NEURAL_HAM(-0.00)[-0.991];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265047-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed,  4 Mar 2026 17:00:10 +0100 Jiri Pirko wrote:
-> +      -
-> +        name: index
-> +        type: uint
-> +        doc: Unique devlink instance index.
+The "samples" were always poor man's tests, used to manually
+confirm that C YNL works as expected. Since a proper tests/
+directory now exists move the samples and use the kselftest
+harness to turn them into selftests outputting KTAP.
 
-AI complains on patch 6 that the index is truncated because it's saved
-to a u32. Let's add:
+v2:
+ - add missing ASSERTs on allocation failures
+ - fix the exec in the bash wrappers preventing cleanup
+v1: https://lore.kernel.org/20260306020901.524105-1-kuba@kernel.org
 
-        checks:
-           max: u32-max
+Jakub Kicinski (10):
+  tools: ynl: move samples to tests
+  tools: ynl: convert netdev sample to selftest
+  tools: ynl: convert ovs sample to selftest
+  tools: ynl: convert rt-link sample to selftest
+  tools: ynl: convert tc and tc-filter-add samples to selftest
+  tools: ynl: add netdevsim wrapper library for YNL tests
+  tools: ynl: convert devlink sample to selftest
+  tools: ynl: convert ethtool sample to selftest
+  tools: ynl: convert rt-addr sample to selftest
+  tools: ynl: convert rt-route sample to selftest
 
-here and the policy will take care of the check, you can then remove
-the explicit checks too
+ tools/net/ynl/Makefile                      |   4 +-
+ tools/net/ynl/samples/Makefile              |  36 --
+ tools/net/ynl/tests/Makefile                |  70 +++-
+ tools/net/ynl/samples/devlink.c             |  61 ---
+ tools/net/ynl/samples/ethtool.c             |  65 ----
+ tools/net/ynl/samples/netdev.c              | 128 ------
+ tools/net/ynl/samples/ovs.c                 |  60 ---
+ tools/net/ynl/samples/rt-addr.c             |  80 ----
+ tools/net/ynl/samples/rt-link.c             | 184 ---------
+ tools/net/ynl/samples/rt-route.c            |  80 ----
+ tools/net/ynl/samples/tc-filter-add.c       | 335 ----------------
+ tools/net/ynl/samples/tc.c                  |  80 ----
+ tools/net/ynl/tests/devlink.c               | 101 +++++
+ tools/net/ynl/tests/ethtool.c               |  92 +++++
+ tools/net/ynl/tests/netdev.c                | 231 +++++++++++
+ tools/net/ynl/tests/ovs.c                   | 108 ++++++
+ tools/net/ynl/tests/rt-addr.c               | 111 ++++++
+ tools/net/ynl/tests/rt-link.c               | 206 ++++++++++
+ tools/net/ynl/tests/rt-route.c              | 113 ++++++
+ tools/net/ynl/tests/tc.c                    | 409 ++++++++++++++++++++
+ tools/net/ynl/{samples => tests}/.gitignore |   3 +-
+ tools/net/ynl/tests/config                  |   8 +
+ tools/net/ynl/tests/devlink.sh              |   5 +
+ tools/net/ynl/tests/ethtool.sh              |   5 +
+ tools/net/ynl/tests/rt-addr.sh              |   5 +
+ tools/net/ynl/tests/rt-route.sh             |   5 +
+ tools/net/ynl/tests/ynl_nsim_lib.sh         |  35 ++
+ 27 files changed, 1501 insertions(+), 1119 deletions(-)
+ delete mode 100644 tools/net/ynl/samples/Makefile
+ delete mode 100644 tools/net/ynl/samples/devlink.c
+ delete mode 100644 tools/net/ynl/samples/ethtool.c
+ delete mode 100644 tools/net/ynl/samples/netdev.c
+ delete mode 100644 tools/net/ynl/samples/ovs.c
+ delete mode 100644 tools/net/ynl/samples/rt-addr.c
+ delete mode 100644 tools/net/ynl/samples/rt-link.c
+ delete mode 100644 tools/net/ynl/samples/rt-route.c
+ delete mode 100644 tools/net/ynl/samples/tc-filter-add.c
+ delete mode 100644 tools/net/ynl/samples/tc.c
+ create mode 100644 tools/net/ynl/tests/devlink.c
+ create mode 100644 tools/net/ynl/tests/ethtool.c
+ create mode 100644 tools/net/ynl/tests/netdev.c
+ create mode 100644 tools/net/ynl/tests/ovs.c
+ create mode 100644 tools/net/ynl/tests/rt-addr.c
+ create mode 100644 tools/net/ynl/tests/rt-link.c
+ create mode 100644 tools/net/ynl/tests/rt-route.c
+ create mode 100644 tools/net/ynl/tests/tc.c
+ rename tools/net/ynl/{samples => tests}/.gitignore (87%)
+ create mode 100755 tools/net/ynl/tests/devlink.sh
+ create mode 100755 tools/net/ynl/tests/ethtool.sh
+ create mode 100755 tools/net/ynl/tests/rt-addr.sh
+ create mode 100755 tools/net/ynl/tests/rt-route.sh
+ create mode 100644 tools/net/ynl/tests/ynl_nsim_lib.sh
+
 -- 
-pw-bot: cr
+2.53.0
+
 
