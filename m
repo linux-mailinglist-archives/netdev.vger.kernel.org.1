@@ -1,63 +1,53 @@
-Return-Path: <netdev+bounces-265008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIDACoGEq2n/dgEAu9opvQ
-	(envelope-from <netdev+bounces-265008-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:50:57 +0100
+	id 4CeGF+uEq2n/dgEAu9opvQ
+	(envelope-from <netdev+bounces-265009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:52:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD99D2297ED
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:50:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3F222982A
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:52:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D6C2B307C403
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:49:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9169F308BB80
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3B133A9C1;
-	Sat,  7 Mar 2026 01:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C8932573F;
+	Sat,  7 Mar 2026 01:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNWSWxFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE0A332612;
-	Sat,  7 Mar 2026 01:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ABC331221;
+	Sat,  7 Mar 2026 01:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772848059; cv=none; b=RWgLn1RKtmkCIk/9ehKq6BGp4g0UH+vEiCAXxFtQRSzKlUI+ZdLgDyO6rSkHqhpk3Q1dLh1p7v+HEKTDFXsUFzVt9xjhrtSrg/PIHhJ13JVp3sJL2o2TDci+PWAjYU7ZV1myKN0wxolJ8atq5x6tS0a4rbpxldCagZBXAPnsUxw=
+	t=1772848207; cv=none; b=VKkorVRihLhekpHWNg3Mw+4CYLptHdBZRT/R6L+qKXNF+4wn7S8CtIvqMsZWQDJKxOhvLUzYWEtvKNNcxRY0w5HPxcGFaVrQGokFlP9oZ7tdckCLXmBrinip9iZo6mhjCt+zCNwEJK+sz4xiZwgC86n6Fc9EALLpbHHTC+sF0mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772848059; c=relaxed/simple;
-	bh=xcDte7rRDknX365WIhKJshHQ92tBG5T6BHy4SirFks8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h5LjRD7HdT0C3az84AGlS4Y5uT2gqpoBpYPT/DF10uqwjs/DEWGJpmRPfOh+KRoN/yJC2v0Xh9pYWgfVEmHETijmG8sGD+fFfdawgDfZcmExwHhQRQCRfoiu4voC3l4cL+nqLiGuQSlVs0VFd2lpU3+pfbWsPG51t2Xi9hKtIK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 7DFE020B6F03; Fri,  6 Mar 2026 17:47:37 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7DFE020B6F03
-From: Long Li <longli@microsoft.com>
-To: Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH rdma-next 8/8] RDMA/mana_ib: Skip firmware commands for invalidated handles
-Date: Fri,  6 Mar 2026 17:47:22 -0800
-Message-ID: <20260307014723.556523-9-longli@microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260307014723.556523-1-longli@microsoft.com>
-References: <20260307014723.556523-1-longli@microsoft.com>
+	s=arc-20240116; t=1772848207; c=relaxed/simple;
+	bh=1ZABRamW31pQt/jXUGfYJz4dnUPI3Zy+7mm/WNHMNIA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BPvez6klEtbx3++4Inlbes1MC2kO2XN6nHHxoos2VHOAWuiXfPPIDeiM5eFTcEt89oKoDVswhZHrRoxHU75BXM2u+Ni5RDM6qrkVJ47xGmtPikDnfVW1saP4hsJFECdvlfTmXUb//ChDe1UCDk1rwDtqnVKBnLbFWIbzUcLwAKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNWSWxFD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69497C4CEF7;
+	Sat,  7 Mar 2026 01:50:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772848206;
+	bh=1ZABRamW31pQt/jXUGfYJz4dnUPI3Zy+7mm/WNHMNIA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CNWSWxFD+cuIgjzfovygktsfnDcn+XKMFSTQ+rtcnQepOZbN/559W7CKCD0zWPxmP
+	 XHSaHfI/cydoYQH+r6EHA2GA1OEXMvdZcmlk8IMBtquImotASpn6uVefULV9ceW4Nv
+	 MtDprxGxwng9MKhija42bnOW+5OAvWSg3hIlIO+L4QwOl7NBpl6+UUnKyhKXIVv8r+
+	 IJJssZLiiOucywfJEOOfF3S9AY54PD3uyFDetnejDSDYX3W6Mq2pkJ6c1732pBRssa
+	 q9TGJYAG12HpEZCEpI84Enn0ovgvOMtVn2W7+dBL5gTDKcyY2cVwS5/5xz1FHif6pA
+	 RXEgnWsD0Jbdg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FEB3808200;
+	Sat,  7 Mar 2026 01:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,159 +55,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DD99D2297ED
+Subject: Re: [PATCH] net/sched: teql: fix NULL pointer dereference in
+ iptunnel_xmit on TEQL slave xmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177284820555.121768.767933765005897381.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Mar 2026 01:50:05 +0000
+References: <20260304044216.3517851-3-bestswngs@gmail.com>
+In-Reply-To: <20260304044216.3517851-3-bestswngs@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: security@kernel.org, edumazet@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xmei5@asu.edu
+X-Rspamd-Queue-Id: CB3F222982A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265008-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-265009-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.692];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.930];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-After a service reset, firmware handles for PD, CQ, WQ, QP, and MR
-are set to INVALID_MANA_HANDLE by the reset notification path.
+Hello:
 
-Check for INVALID_MANA_HANDLE in each destroy callback before issuing
-firmware destroy commands. When a handle is invalid, skip the firmware
-call and proceed directly to kernel resource cleanup (umem, queues,
-memory). This avoids sending stale handles to firmware after reset.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Affected callbacks:
-  - mana_ib_dealloc_pd: skip mana_ib_gd_destroy_pd
-  - mana_ib_destroy_cq: skip mana_ib_gd_destroy_cq and queue destroy
-  - mana_ib_destroy_wq: skip mana_ib_destroy_queue
-  - mana_ib_destroy_qp_rss: skip mana_destroy_wq_obj per WQ
-  - mana_ib_destroy_qp_raw: skip mana_destroy_wq_obj
-  - mana_ib_dereg_mr: skip mana_ib_gd_destroy_mr
+On Wed,  4 Mar 2026 12:42:18 +0800 you wrote:
+> From: Weiming Shi <bestswngs@gmail.com>
+> 
+> teql_master_xmit() calls netdev_start_xmit(skb, slave) to transmit
+> through slave devices, but does not update skb->dev to the slave device
+> beforehand.
+> 
+> When a gretap tunnel is a TEQL slave, the transmit path reaches
+> iptunnel_xmit() which saves dev = skb->dev (still pointing to teql0
+> master) and later calls iptunnel_xmit_stats(dev, pkt_len). This
+> function does:
+> 
+> [...]
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/cq.c   | 10 ++++++----
- drivers/infiniband/hw/mana/main.c | 12 +++++++++---
- drivers/infiniband/hw/mana/mr.c   |  8 +++++---
- drivers/infiniband/hw/mana/qp.c   |  9 ++++++---
- 4 files changed, 26 insertions(+), 13 deletions(-)
+Here is the summary with links:
+  - net/sched: teql: fix NULL pointer dereference in iptunnel_xmit on TEQL slave xmit
+    https://git.kernel.org/netdev/net/c/0cc0c2e661af
 
-diff --git a/drivers/infiniband/hw/mana/cq.c b/drivers/infiniband/hw/mana/cq.c
-index b054684b8de7..315301bccb97 100644
---- a/drivers/infiniband/hw/mana/cq.c
-+++ b/drivers/infiniband/hw/mana/cq.c
-@@ -143,10 +143,12 @@ int mana_ib_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
- 
- 	mana_ib_remove_cq_cb(mdev, cq);
- 
--	/* Ignore return code as there is not much we can do about it.
--	 * The error message is printed inside.
--	 */
--	mana_ib_gd_destroy_cq(mdev, cq);
-+	if (cq->cq_handle != INVALID_MANA_HANDLE) {
-+		/* Ignore return code as there is not much we can do about it.
-+		 * The error message is printed inside.
-+		 */
-+		mana_ib_gd_destroy_cq(mdev, cq);
-+	}
- 
- 	mana_ib_destroy_queue(mdev, &cq->queue);
- 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index 61ce30aa9cb2..d60205184dba 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -147,6 +147,9 @@ int mana_ib_dealloc_pd(struct ib_pd *ibpd, struct ib_udata *udata)
- 		mutex_unlock(&mana_ucontext->lock);
- 	}
- 
-+	if (pd->pd_handle == INVALID_MANA_HANDLE)
-+		return 0;
-+
- 	mana_gd_init_req_hdr(&req.hdr, GDMA_DESTROY_PD, sizeof(req),
- 			     sizeof(resp));
- 
-@@ -280,9 +283,12 @@ void mana_ib_dealloc_ucontext(struct ib_ucontext *ibcontext)
- 	list_del_init(&mana_ucontext->dev_list);
- 	mutex_unlock(&mdev->ucontext_lock);
- 
--	ret = mana_gd_destroy_doorbell_page(gc, mana_ucontext->doorbell);
--	if (ret)
--		ibdev_dbg(ibdev, "Failed to destroy doorbell page %d\n", ret);
-+	if (mana_ucontext->doorbell != INVALID_DOORBELL) {
-+		ret = mana_gd_destroy_doorbell_page(gc, mana_ucontext->doorbell);
-+		if (ret)
-+			ibdev_dbg(ibdev, "Failed to destroy doorbell page %d\n",
-+				  ret);
-+	}
- }
- 
- int mana_ib_create_kernel_queue(struct mana_ib_dev *mdev, u32 size, enum gdma_queue_type type,
-diff --git a/drivers/infiniband/hw/mana/mr.c b/drivers/infiniband/hw/mana/mr.c
-index 7189ccd41576..75bc2a9c366a 100644
---- a/drivers/infiniband/hw/mana/mr.c
-+++ b/drivers/infiniband/hw/mana/mr.c
-@@ -336,9 +336,11 @@ int mana_ib_dereg_mr(struct ib_mr *ibmr, struct ib_udata *udata)
- 		mutex_unlock(&mana_ucontext->lock);
- 	}
- 
--	err = mana_ib_gd_destroy_mr(dev, mr->mr_handle);
--	if (err)
--		return err;
-+	if (mr->mr_handle != INVALID_MANA_HANDLE) {
-+		err = mana_ib_gd_destroy_mr(dev, mr->mr_handle);
-+		if (err)
-+			return err;
-+	}
- 
- 	if (mr->umem)
- 		ib_umem_release(mr->umem);
-diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-index d590aca9b93a..76d59addb645 100644
---- a/drivers/infiniband/hw/mana/qp.c
-+++ b/drivers/infiniband/hw/mana/qp.c
-@@ -846,9 +846,11 @@ static int mana_ib_destroy_qp_rss(struct mana_ib_qp *qp,
- 	for (i = 0; i < (1 << ind_tbl->log_ind_tbl_size); i++) {
- 		ibwq = ind_tbl->ind_tbl[i];
- 		wq = container_of(ibwq, struct mana_ib_wq, ibwq);
--		ibdev_dbg(&mdev->ib_dev, "destroying wq->rx_object %llu\n",
-+		ibdev_dbg(&mdev->ib_dev,
-+			  "destroying wq->rx_object %llu\n",
- 			  wq->rx_object);
--		mana_destroy_wq_obj(mpc, GDMA_RQ, wq->rx_object);
-+		if (wq->rx_object != INVALID_MANA_HANDLE)
-+			mana_destroy_wq_obj(mpc, GDMA_RQ, wq->rx_object);
- 	}
- 
- 	return 0;
-@@ -867,7 +869,8 @@ static int mana_ib_destroy_qp_raw(struct mana_ib_qp *qp, struct ib_udata *udata)
- 	mpc = netdev_priv(ndev);
- 	pd = container_of(ibpd, struct mana_ib_pd, ibpd);
- 
--	mana_destroy_wq_obj(mpc, GDMA_SQ, qp->qp_handle);
-+	if (qp->qp_handle != INVALID_MANA_HANDLE)
-+		mana_destroy_wq_obj(mpc, GDMA_SQ, qp->qp_handle);
- 
- 	mana_ib_destroy_queue(mdev, &qp->raw_sq);
- 
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
