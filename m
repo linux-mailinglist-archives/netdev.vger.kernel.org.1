@@ -1,127 +1,303 @@
-Return-Path: <netdev+bounces-265196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265195-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJZ3MkifrGmrrgEAu9opvQ
-	(envelope-from <netdev+bounces-265196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:57:28 +0100
+	id wKhDEl6crGn1rQEAu9opvQ
+	(envelope-from <netdev+bounces-265195-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:45:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD80B22DC56
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:57:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9521E22DC07
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C162B3007AEF
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:57:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7D60301C3FF
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D12377579;
-	Sat,  7 Mar 2026 21:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDA636F413;
+	Sat,  7 Mar 2026 21:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gnxNrxDG"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="xCtPdzN5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F7C35BDCB;
-	Sat,  7 Mar 2026 21:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772920640; cv=none; b=gd8Mum10R0hJ2U1UZzUtlIq7/VBHzL4p6778i28Nzrj5nBAAi8Csxi/+HsPW6ubii+1pLSNqu6m0rxw576tApYSeKr9f4pfgA6BnMYHenL2b6IoKt526pu7SZg0eS+xItbCClROgvtdfgwRPgNz04e01E2ouB1NKbJkf7cnLsq0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772920640; c=relaxed/simple;
-	bh=99M4VuiUwyQ2j0+BsOoEDhTe6t3pSU59HjbXD5IpkVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWxKVKHIjuuyJqd2zEtxj3bu2Ci+Uij0C+eriiFH2OuIlSFQo6JXvz93wf/27ljsaxHqLjmWpyZUOyn/+aREWQ6w+vAaQ1UqI0MJ2F6sKwTm/6HF2nS39cSWV+9U5PFPrR6DWIMYgdp0zxshWRlvNS/QWVVZ3qcCfQjTsLKfmus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gnxNrxDG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WyD3akZ6snIIF8wdvZDEhv9RdHIGsOCzt0lWUwHBS0k=; b=gnxNrxDGKhBw8txpCJD3Xsr5rq
-	99pgbNCWaKQ26if8o04Ee1hqvDneQLjU0s7ulkMPKdUXqhVmsliSaROBJqlF+iyn/COsXdOu20LG0
-	nCPva+ysB+S/jzYRyUdU/e1DiN44aOA3bExEuMPwD1s2Aj3D9gJ2x41an9ylRoF1S+lg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vyzMu-00Af0y-Vd; Sat, 07 Mar 2026 22:39:28 +0100
-Date: Sat, 7 Mar 2026 22:39:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
-Message-ID: <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch>
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260307104131.4c1d0de5@kernel.org>
- <aayWSuOM59uojtuG@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6611CA59
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772919898; cv=pass; b=rGlPfq1qvIEXasrMbHy3K2XA3D7jw1trKqzPVbvuze4dR7/4xZ9rhwCdxHbO0L6l+oHf+mNBZClnIa/DGrFSVxQRHICCIbhqv+xaLjsLGySm4UrB5X6O6c2eySunCRMBsQbmzM23RqfrxYUzQN3lNNmD9Kxtz9dM1XevaQyIBm0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772919898; c=relaxed/simple;
+	bh=8Nkt2Hzm/eKoD0o78Q0vwEVjA5+jdOgq9O130/QWXwU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GEyopm7id8Ra4mK7r5/rDovntyVDc331CaYiWh/qiNP3uYdIPz9yTvQVFMo5CVLOGtfc799L1/Cj6f9ivVaAspD5f1w5o/m3P0glUsWIIR2pKAZ6oMJoRImkiEiCMypfJ6VL1jx9JhR/hFd5AvnzvrmVkRxHB0S6uT0IQGqYElk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=xCtPdzN5; arc=pass smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c7382731edfso2558151a12.1
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:44:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772919897; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eDu90wDXcaa/HtfavivUkFc/fy3QAPgc904015sNKTzBnr5FWMNvGyOLejHbqQhRtC
+         x26I/heA2IaPUXFRxZMVE2Y7TQ/VEfsPwlV51n3aG3zv57RGZZUhkgcCsvdj1wIZhDOk
+         98ebifoLNavwY4muNHt6cDqL32kPz8Rd7B1SgncO76y+6bPK0KZd0nt8irXyxNfcfgs1
+         PnreHElQvEiUOZ4UemvW8HCZVLA8Ww1YlqeeHQ5U0cWepRcyErTDfvazjbOZ2HaCGbLd
+         MKs47icMcXdsgppDTmSCu5H4rPZnhq5ou+Tzvi6K/5UwBB2xOn2vKAI0v74F3g4D2roa
+         8SUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oks8lHMp6UuyX/hSHIVsSt7ajtxYcSLJoT7pKnR6Wz0=;
+        fh=ZdmH6RzG/W+vp3LR2CqFQNddfyY8x4lUC9infNw7qkw=;
+        b=WvcLTXHb+5DnYyxBrheeIbhCO6Rw8OdDVG/d+ciTMSRf2Eg1/njY/4HiS+CWfAlj7r
+         tW1btVhXkDlCUHDC2fkWr7dunBOK9n70M8/wK+f/H4XPWxzAXZRAaYfoxh0/jC4eGluB
+         XOtG/wE6YxQ5c8NSgiwb2Lp2f2HueMzEPX4+gnWn96iB44SXiTaZxaOe+1rZ4M8DJceU
+         DaOaF88YCScXQ3mle7IZGPhGwdQ/bxDSzGaqmmrVRFCQYlhRfcQ+ASpyZty8LbozYI6y
+         5FPo4WgPbuJtD/6UH9TcwETl81tHQTuQ3rFSBYiHu+YbTmYoRN7Qayn3JtrjVlA5p9Fn
+         LlSQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772919897; x=1773524697; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oks8lHMp6UuyX/hSHIVsSt7ajtxYcSLJoT7pKnR6Wz0=;
+        b=xCtPdzN5bKU9x9TjLCTegdi73WQ8fYj6G9YhHKonDhuD9Gbc6L2rGqZZAen1PtuFsJ
+         bGyVLH9/qgHHBxQ5P1y9EmlqnPCSuac/B+6VfN7H/DV09mvBVfTi5xNMVkpOMmATEYgX
+         phuTX9Q6RSOVaaTEcLgTonIAeyzTSX8lL26pT1x7+gWNXUyEX20RSTDAbhHdHDPgJpLi
+         lke9nMDRINm+va+hL1Sh1VbRzNJMZ3m0/a7Ixm9P8bgRW6SohB1wI3AYL6OLjeyDF6a7
+         eXNc/0t2dN3wDC3++plTJqARAYhoZgP7G3KHbYGdAjQVfGtp8/hLF6qiCm7Cm/zFTb9p
+         pUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772919897; x=1773524697;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oks8lHMp6UuyX/hSHIVsSt7ajtxYcSLJoT7pKnR6Wz0=;
+        b=pKZydu33UCcli03dvYPbeWyMjkI4AjAAV1WM0h2nPshiLqre88HtZh2zaGNfq09XO2
+         0AlWoTzF/LVqLnoLoxbVLM7JpwguRKC0FO6twLcPTZWCq7FIMZYXwTxP5jF7rpk1S7sH
+         ZZ5DoeoZwmtOnbnNR4k6Kwto+3T2PTm02xJVtK12gxDLYXxqWPA6SYklegf7elepz19w
+         tfDMsz5bkQnNnvcTRzNCzeIpSTKSo3HCoA0Af7rAlHW0Lqg2bFLlSfY6HX+PdId/o/w1
+         NkeUks19TtVK7AIe7qXSd66nG32YZJEiRwOMeWw+a1jgFRiH+OUM46VzFyENTOKIzLwe
+         QVcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZk458B8x14sTcd69FfjDgInAMv4qbZauLVAFqm9COZrhQGgCp/2x9+LHPMhcX/ZxyoLvFbZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/nyk+kg006v5VvoxWJPcXevAXgMfiXrIk3Yg1FhLrxoKphG0E
+	0hSad5yfVPR4tHTSFa4E79xV3U9bxTHzdDHlPNZ1kMN3fEdEjJeLAeZ07dWCNF48vFRWX9ZpOw/
+	hckOjUeoug3iCj0ZBZotWrRWQ8Z6nmt4UD88vG5sN
+X-Gm-Gg: ATEYQzz7pgHd96G3XGf9HakePa4+O+8At//BOOscLij6NrymGJ0bN1CdhwUA8k8EXZU
+	+DaXbm3gbfQwfMgNWMeP/3G4IJ81kRRsdpRLxJIl55NcHQwnmONmFTGBFru+nYe+hpeZHHruXTn
+	EIIt5o0ypmQkQHw0z6DQ4i8erwDP160ycVC5vAC93xSPVF68AuPWEyHoqA68drEHmGxCexC2y7G
+	k4ofeRuNO3brGeyIovQQQTqoAHosK80QTiRTuRgpCWFGkEWnHpZeOkgWxQd3p4NGqnh/ou3rJl8
+	f3aPwudmv/qfrh8=
+X-Received: by 2002:a05:6a21:6089:b0:398:7ed3:a001 with SMTP id
+ adf61e73a8af0-3987ed3ab79mr824686637.2.1772919896797; Sat, 07 Mar 2026
+ 13:44:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aayWSuOM59uojtuG@google.com>
-X-Rspamd-Queue-Id: BD80B22DC56
+References: <20260307133601.3863071-1-edumazet@google.com>
+In-Reply-To: <20260307133601.3863071-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 7 Mar 2026 16:44:45 -0500
+X-Gm-Features: AaiRm53Ej8ujSJi7AvTD3476hDaPoo4HqsT_Xs11QlemmRVWKTS4Axwz4ENE6cM
+Message-ID: <CAM0EoMmEaXQO5YbLvmty0rcpe3=P9ckbNtskiXZ_vvHeVVk9cg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/sched: refine indirect call mitigation in tc_wrapper.h
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Victor Noguiera <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.ai>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9521E22DC07
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265196-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265195-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	DMARC_NA(0.00)[mojatatu.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,resnulli.us,vger.kernel.org,gmail.com,mojatatu.com,mojatatu.ai];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:email,mojatatu-com.20230601.gappssmtp.com:dkim,mail.gmail.com:mid,mojatatu.ai:email]
 X-Rspamd-Action: no action
 
-> > Please no duplication of existing code in Rust.
-> 
-> The plan is certainly to get rid of C Binder, but it was unfortunately
-> not possible to get there without a transition period.
+On Sat, Mar 7, 2026 at 8:36=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> Some modern cpus disable X86_FEATURE_RETPOLINE feature,
+> even if a direct call can still be beneficial.
+>
+> Even when IBRS is present, an indirect call is more expensive
+> than a direct one:
+>
+> Direct Calls:
+>   Compilers can perform powerful optimizations like inlining,
+>   where the function body is directly inserted at the call site,
+>   eliminating call overhead entirely.
+>
+> Indirect Calls:
+>   Inlining is much harder, if not impossible, because the compiler
+>   doesn't know the target function at compile time.
+>   Techniques like Indirect Call Promotion can help by using
+>   profile-guided optimization to turn frequently taken indirect calls
+>   into conditional direct calls, but they still add complexity
+>   and potential overhead compared to a truly direct call.
+>
+> In this patch, I split tc_skip_wrapper in two different
+> static keys, one for tc_act() (tc_skip_wrapper_act)
+> and one for tc_classify() (tc_skip_wrapper_cls).
+>
+> Then I enable the tc_skip_wrapper_cls only if the count
+> of builtin classifiers is above one.
+>
+> I enable tc_skip_wrapper_act only it the count of builtin
+> actions is above one.
+>
 
-Dumb question....
+Sorry, not clear from reading the patch - why "above one"?
 
-Why?
+cheers,
+jamal
 
-You are just sending messages to user space. Does the rust version
-send different messages? Can user space tell the difference?
-
-     Andrew
+> In our production kernels, we only have CONFIG_NET_CLS_BPF=3Dy
+> and CONFIG_NET_ACT_BPF=3Dy. Other are modules or are not compiled.
+>
+> Tested on AMD Turin cpus, cls_bpf_classify() cost went
+> from 1% down to 0.18 %, and FDO will be able to inline
+> it in tcf_classify() for further gains.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+> Cc: Victor Noguiera <victor@mojatatu.com>
+> Cc: Pedro Tammela <pctammela@mojatatu.ai>
+> ---
+>  include/net/tc_wrapper.h | 47 +++++++++++++++++++++++++++++++++++-----
+>  net/sched/sch_api.c      |  3 ++-
+>  2 files changed, 44 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/tc_wrapper.h b/include/net/tc_wrapper.h
+> index ffe58a02537c3ae7979e37ace09373a443d81cc9..4ebb053bb0dd6f5f1af572fe6=
+2404eacfd0885ed 100644
+> --- a/include/net/tc_wrapper.h
+> +++ b/include/net/tc_wrapper.h
+> @@ -12,7 +12,8 @@
+>
+>  #define TC_INDIRECT_SCOPE
+>
+> -extern struct static_key_false tc_skip_wrapper;
+> +extern struct static_key_false tc_skip_wrapper_act;
+> +extern struct static_key_false tc_skip_wrapper_cls;
+>
+>  /* TC Actions */
+>  #ifdef CONFIG_NET_CLS_ACT
+> @@ -46,7 +47,7 @@ TC_INDIRECT_ACTION_DECLARE(tunnel_key_act);
+>  static inline int tc_act(struct sk_buff *skb, const struct tc_action *a,
+>                            struct tcf_result *res)
+>  {
+> -       if (static_branch_likely(&tc_skip_wrapper))
+> +       if (static_branch_likely(&tc_skip_wrapper_act))
+>                 goto skip;
+>
+>  #if IS_BUILTIN(CONFIG_NET_ACT_GACT)
+> @@ -153,7 +154,7 @@ TC_INDIRECT_FILTER_DECLARE(u32_classify);
+>  static inline int tc_classify(struct sk_buff *skb, const struct tcf_prot=
+o *tp,
+>                                 struct tcf_result *res)
+>  {
+> -       if (static_branch_likely(&tc_skip_wrapper))
+> +       if (static_branch_likely(&tc_skip_wrapper_cls))
+>                 goto skip;
+>
+>  #if IS_BUILTIN(CONFIG_NET_CLS_BPF)
+> @@ -202,8 +203,44 @@ static inline int tc_classify(struct sk_buff *skb, c=
+onst struct tcf_proto *tp,
+>  static inline void tc_wrapper_init(void)
+>  {
+>  #ifdef CONFIG_X86
+> -       if (!cpu_feature_enabled(X86_FEATURE_RETPOLINE))
+> -               static_branch_enable(&tc_skip_wrapper);
+> +       int cnt_cls =3D IS_BUILTIN(CONFIG_NET_CLS_BPF) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_U32)  +
+> +               IS_BUILTIN(CONFIG_NET_CLS_FLOWER) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_FW) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_MATCHALL) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_BASIC) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_CGROUP) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_FLOW) +
+> +               IS_BUILTIN(CONFIG_NET_CLS_ROUTE4);
+> +
+> +       int cnt_act =3D IS_BUILTIN(CONFIG_NET_ACT_GACT) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_MIRRED) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_PEDIT) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_SKBEDIT) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_SKBMOD) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_POLICE) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_BPF) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_CONNMARK) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_CSUM) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_CT) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_CTINFO) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_GATE) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_MPLS) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_NAT) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_TUNNEL_KEY) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_VLAN) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_IFE) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_SIMP) +
+> +               IS_BUILTIN(CONFIG_NET_ACT_SAMPLE);
+> +
+> +       if (cpu_feature_enabled(X86_FEATURE_RETPOLINE))
+> +               return;
+> +
+> +       if (cnt_cls > 1)
+> +               static_branch_enable(&tc_skip_wrapper_cls);
+> +
+> +       if (cnt_act > 1)
+> +               static_branch_enable(&tc_skip_wrapper_act);
+>  #endif
+>  }
+>
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index cc43e3f7574fae203989f5c28b4934f0720e64c2..61a9dc219a18fb34d10893fe4=
+5a0030d3c23f5d0 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -2479,7 +2479,8 @@ static struct pernet_operations psched_net_ops =3D =
+{
+>  };
+>
+>  #if IS_ENABLED(CONFIG_MITIGATION_RETPOLINE)
+> -DEFINE_STATIC_KEY_FALSE(tc_skip_wrapper);
+> +DEFINE_STATIC_KEY_FALSE(tc_skip_wrapper_act);
+> +DEFINE_STATIC_KEY_FALSE(tc_skip_wrapper_cls);
+>  #endif
+>
+>  static const struct rtnl_msg_handler psched_rtnl_msg_handlers[] __initco=
+nst =3D {
+> --
+> 2.53.0.473.g4a7958ca14-goog
+>
 
