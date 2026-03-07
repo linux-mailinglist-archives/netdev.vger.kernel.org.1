@@ -1,137 +1,156 @@
-Return-Path: <netdev+bounces-265187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wINqEOqYrGlarAEAu9opvQ
-	(envelope-from <netdev+bounces-265187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:18 +0100
+	id 4J44Of+YrGlarAEAu9opvQ
+	(envelope-from <netdev+bounces-265188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F2522DB5F
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ABB522DB6E
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2FA42301CCD7
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:30:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D38E3014513
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894C736F41B;
-	Sat,  7 Mar 2026 21:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D414823B62C;
+	Sat,  7 Mar 2026 21:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hpInvjh8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6bhg/Dl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532E833AD99
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2ED1AF4EF
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772919015; cv=none; b=Tpw8XMJvX+55qCrW0xZNV3yMCdcth4CNqILTrlAyLBn9J6b7LGIaxphrUT0K2RkXzy05coOiJ8Tfk7DE6B6+d5LX6Q7dek7fyQ+EeiIqF5XKpuV165/1bad+zyL+RO8LzMW0Odqpw8tXwy8ZaoNoc/Aj1vKkXNuauW0CTMKA8zk=
+	t=1772919036; cv=none; b=MO2hjJky8dGbeOwgVu3tU+/F2P9wgPBED8KaqDF64G10IcicErPLlWch0nGHSPsTny13msjzaXrGJu/4DAiCz7N73u6D302AqtgPQouzdoK8SB7ZrWYv1zX09quBfukBlv66WJJO7gzlDVszRCkHyGPo+vd8DlpXxAy6X3BAJIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772919015; c=relaxed/simple;
-	bh=5blZ65rb52lpa9/KLUc49AAPOcoeZtUgQI+crtdIS4w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=muLeDVYxwYMJOoQGH+60cC88wIqGzb0tdDDsWxgcDFrEDRIHi2ibh3odkzc3vdmCrf3dVz9J/MwKp5LuU2uPKEu0yCRJI9D1dTBUQ+ypz6woJLXBT6EB51x3rk3AvHVcUJoBrSHs8RaHQILjNUajgVjtye7C0fOVzrnkYk/FEXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hpInvjh8; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48535f4d5e1so446915e9.0
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:30:14 -0800 (PST)
+	s=arc-20240116; t=1772919036; c=relaxed/simple;
+	bh=z864TyzABOtYMtQeHQAosZ3lSecPscocjISXWpc1Pq8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=YUEuu+j4e4OVslm2Sg4VKEeVkMha7pnhjXmefczWsiO7WDtT0+gNlvOOZbg4BDlmGXhfuM8i6Q8RyRdZ6u86sESFGMCKR3ONOfbHBtk8y8Snak5nR3/PAdUu0IUqMPNRz01F2BDy07+xxE7kjn4E53DUX/IOfWEm1he5b3y1Wqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6bhg/Dl; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4327790c4e9so7973771f8f.2
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:30:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772919013; x=1773523813; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrqxpHngCov/LvVCWNrhiPff2zJYB2s6GPlhyApK1cM=;
-        b=hpInvjh8seVsmn2NdXieKNpeQv9ZC1ZZ1MPHY59EYJ+uTwkWJb8x1ih/O6X6ek5Eih
-         6D9ulRSIKj+ZpfjdkYzDXPopfvu7NGDY75a2RXsLcC0WcQlbA7TXAaPrMYlMjwk7AwNF
-         V09wA0il/FUF3F9G0tbPboYfqjmlzi6D1xGaCQAU9ybArRwI8E86is8QlviZHtqJII4n
-         UaqoTWC75jBLeXVw0zPxQJtN8iVP1LXyzRVXRSYATilBcLy3r7R62OyyPMN9XqophMec
-         DIVrjULX8NTyOcexQMtaUizmZAJDV0v2mRxKHQESmgETETbsirFij1ACDQUmuSKp4Pzp
-         fnFA==
+        d=gmail.com; s=20230601; t=1772919034; x=1773523834; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FebKW6Yr63nJXVOjkkbWJf1p6+srXrnOt4l6HU3sWX0=;
+        b=a6bhg/DldYfNWDl+Z/2wAXyFaXj8mA5+tolT8j3jOlU1vvAh+osQumg+NRc4EqXU0N
+         q+wlZWEehLiGTA8NgS528zJ/4EeLmnQdqKlSfg9pDZ9KvSfA3ZFjnpxWXOhUYEoT/HZ+
+         f4ps72R3Gl2PluWkHMSwX97fWNJjCigW3yQRp7syKL2tBIodFHXOkqrwqBlmbZO9W2Qi
+         lFTOxF7IboMNaTGDKogeSeeIlcvsydNXDEmruOCdyw0KZWy00Ig1+jvyVCGfUFsRHtTQ
+         vmfFJaHq6Vn0i0QX5mDNm50Y5SSkn5iSl65KT8F/0lPpDR66AKdueKJPBeWBWoirfhvA
+         fnMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772919013; x=1773523813;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrqxpHngCov/LvVCWNrhiPff2zJYB2s6GPlhyApK1cM=;
-        b=YVYGwjmNnF8w47lbXKYVNcLGLzyyuj7/6EOwkxKyZGUEKdGBCSpuhJ9w2fKALY2w3k
-         x+ndA8h00wLT8QXMQwXEz5jBzP1etFwDt16Y4NvLxjp9lYfJWqVjM3OXZs42WTcitAUV
-         +aNGFqFIk6Rpb3or6Vuw0auf75cXMy9am2iORp9TWlNsLP4+RlUrWam/gOcBkMfI/sk0
-         HVjo1SUfggdg3OeTECeUANzJkbTjxC1G2FR5hWwbhhhlaxZFxyUZweFxXEm0F0ZTyFzC
-         Bu6/wZnCuVU8+ahFElZs7UxgEJfxN2llf0E2h+qKGHMBl8x+Qb6TYMyl918oh35M+iyD
-         2UVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPI2PMzHax14XS22oKcp/HQC9icwk1PHbjo1lgN12AXEfMSx8tIZdbaa5xWwOHkGcuw27WSwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUccpxp3ZvuXBvniWp8EezU4N92kFZQKllvhIiTQaamP1v9yRb
-	tFLDVkWXZCSRl/UWwrTLq7zbb0u83xcdEy84Lxep2CPqi3S75uHg+8lPyQkrIddIfEan0I1hJ6V
-	IoqPmv7uaufOzpi9LUw==
-X-Received: from wmbdv11.prod.google.com ([2002:a05:600c:620b:b0:483:7c8d:ed1d])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:5253:b0:483:456a:514b with SMTP id 5b1f17b1804b1-4852692f158mr110926015e9.12.1772919012662;
- Sat, 07 Mar 2026 13:30:12 -0800 (PST)
-Date: Sat, 7 Mar 2026 21:30:11 +0000
-In-Reply-To: <20260307104155.108d5d69@kernel.org>
+        d=1e100.net; s=20230601; t=1772919034; x=1773523834;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FebKW6Yr63nJXVOjkkbWJf1p6+srXrnOt4l6HU3sWX0=;
+        b=ZRifv7IylIvhYUJxhtIP36exp00CQ/nENS6zEx99lDRes9aLs4SOTosQnq3GQ/pvr2
+         8mWVkfgIeY67qsIkBfhHZ9dSbOhIOEzRzaSuBH4ZNJf7oP3BE3B6vvr1Nx25THppaWnB
+         /ARaZCEwcDPyFz2lZ4eT8F7m4+vqx9ZO0kGOdjjwO2f2tXUcVmCNvAwWAvjzfn+o1COU
+         gE09ZUQ6P0T+22/dZ9/Sw64NGq2vyCnG+11yxJUGB4NfMi2E/1iyXc0K5narBQ3bTjyk
+         8hjChoHHQ3+oKW5H4mUjw6T8fYJU7/3CIWL6ciVGgcmA8Xp21UV9HMj5ygkIIT4gI8Nk
+         t/sA==
+X-Gm-Message-State: AOJu0Yx96TCM/ybvxai89UdH7sxlWQ3qb6e1t5Z8t6HTiHUPZvw3MSYb
+	Z8BvB6OT9wQyN1tM4wLZVXeZ5uPZBmzSKbnCvz20yIPgyOCVEYvFEaUQ
+X-Gm-Gg: ATEYQzx8TPgfXBQCWoB9me9QUxFmhYF3xqcYnYPdgmgphjP+Wsac7Xyh4Qlz4B6IJpt
+	3q6zOulxnel4RBy2/Cc98jQ0tYR89i/Kl5M9hDTTzRiz2ZgJY8aMuohn2wBXYhs2m+/Z81292Qn
+	7itYgCH0IgjxF/LMeRt491DJlvw10csdLsqu3QHSFkWXuoUiJpcAxn+S6qyZp4MWJHVoLwj2w/h
+	lEp7ttsvriZzr0edya78JS4kv03sJO5InjQme50LpLCz1Zhg7ZzGW9f0JBCzVV70/e9qZEySt7m
+	teI+/DMkhBLFZBI0lvQg6KnUlbuixn3TyasjXx6xitmy2ufDfCgy42K7JXkhiFjwxMC++YLq8TJ
+	Et3Q0DJUc2qyR0ODK6m1xyIESXmOeiDWkD7j/kKARzdXMQ09gGgbYBeXQIugCA4GpoNLuJsp3Zv
+	HO+qUF1a05CNOc0zZm+CwxDG/skBM+XIPlOeC5wM32iTC3qoMvlpzB2/yAkrfVGTo+eKOO+OOSI
+	jElLTEg4tDO2aDGVGEAzQzh2FRiQIxwZiIbpu8mTE2KOfK9s9g+woauXLFdvuFDCg==
+X-Received: by 2002:a05:600c:c11c:b0:483:c12b:fe3c with SMTP id 5b1f17b1804b1-485269188damr78533035e9.4.1772919033829;
+        Sat, 07 Mar 2026 13:30:33 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f0f:7f00:f48b:e818:2b17:74e3? (p200300ea8f0f7f00f48be8182b1774e3.dip0.t-ipconnect.de. [2003:ea:8f0f:7f00:f48b:e818:2b17:74e3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4853044d849sm94946455e9.11.2026.03.07.13.30.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 07 Mar 2026 13:30:33 -0800 (PST)
+Message-ID: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
+Date: Sat, 7 Mar 2026 22:30:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260306-binder-netlink-v1-2-daceb5bc83f2@google.com> <20260307104155.108d5d69@kernel.org>
-Message-ID: <aayY46dOBAJdFVKb@google.com>
-Subject: Re: [PATCH 2/4] ynl_gen: generate Rust files from yaml files
-From: Alice Ryhl <aliceryhl@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 70F2522DB5F
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next 0/5] net: phy: further decouple provider from
+ consumer part
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 6ABB522DB6E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265187-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.990];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ynl_gen_rust.py:url]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.879];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sat, Mar 07, 2026 at 10:41:55AM -0800, Jakub Kicinski wrote:
-> On Fri, 06 Mar 2026 15:12:14 +0000 Alice Ryhl wrote:
-> > +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-> 
-> The name of the file says gen_c ...
+This series aims at further decoupling the provider and consumer part
+in phylib.
 
-I see there is also an ynl_gen_rst.py file in the same directory. Are
-you suggesting that I create a ynl_gen_rust.py file instead?
+Heiner Kallweit (5):
+  net: phy: move mdio_device reset handling functions in the code
+  net: phy: make mdio_device.c part of libphy
+  net: phy: move (of_)mdio_find_bus to mdio_bus_provider.c
+  net: phy: move registering mdio_bus_class and mdio_bus_type to libphy
+  net: phy: move remaining provider code to mdio_bus_provider.c
 
-Alice
+ drivers/net/phy/Makefile            |   6 +-
+ drivers/net/phy/mdio-private.h      |  11 -
+ drivers/net/phy/mdio_bus.c          | 385 ----------------------------
+ drivers/net/phy/mdio_bus_provider.c | 319 +++++++++++++++++++++++
+ drivers/net/phy/mdio_device.c       | 165 +++++++-----
+ drivers/net/phy/phy_device.c        |  13 +
+ drivers/net/phy/phylib-internal.h   |   7 +
+ include/linux/mdio.h                |   2 -
+ include/linux/phy.h                 |   3 -
+ 9 files changed, 441 insertions(+), 470 deletions(-)
+ delete mode 100644 drivers/net/phy/mdio-private.h
+
+-- 
+2.53.0
+
 
