@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-265066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJiQEpytq2nQfQEAu9opvQ
-	(envelope-from <netdev+bounces-265066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:46:20 +0100
+	id yFhXKLqtq2nQfQEAu9opvQ
+	(envelope-from <netdev+bounces-265068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:46:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E0422A13C
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:46:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BD822A16A
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 05:46:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66EFF301C10E
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 04:46:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3FDF6302566E
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 04:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94DC30F7F7;
-	Sat,  7 Mar 2026 04:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF4634403E;
+	Sat,  7 Mar 2026 04:46:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE592472B6;
-	Sat,  7 Mar 2026 04:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D025033343B;
+	Sat,  7 Mar 2026 04:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772858772; cv=none; b=g9eCu3eHAoN23s0SoIUJGyy5gtes1mZI9Ky7r5hwqDmVfHBU9z2J6OWdY0A60OEOiZ6YshS6UDR8g1m97R00tQiUY5gizwfACW+oaJCVxLw+STWJWMZ1sHmzi6LO0n99bYmR/fDouaPOeYaYE9h5vxvJsu8HW7sM1yI+LFTt7Y0=
+	t=1772858775; cv=none; b=Za5b9yZcfoKKyJWjDiK3H0KTP4NqB2cz56UzAh7uVWXJpT4iGOMJOiPiCffdWw4z9pgdxOwEpfsAUK3k21I86r6fxcPtZXcwQu+rBlwIk/mNqmcuMifdYaiblZonT5/fhYwPAIA4HY8+rR5w6ZbLdCnkBaIG3gJKI3ckrJSDLaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772858772; c=relaxed/simple;
-	bh=IFecUremhg3u00+Jo1RGIULqOMOIEUZQbifAaAop3DY=;
+	s=arc-20240116; t=1772858775; c=relaxed/simple;
+	bh=zBJOqATIXLbw8kMDkg4KFg57IXtqIqZV3Mz7gkChBss=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L49l3vEI5HxcXykrcpr/18I0c0U8s/MohvA8iAV3G9YTnBMAyl9LjRt4x2nGeGX6AqHbkiemzRaf3mSd1al7KYmLdVAq+KZGBZfvb9DtwdhnSt2jNjp+6WjHfkIlN33MG7zYGU3v+ryJMtkaNqIFNYsM0m50fZHVVIEkigEajmo=
+	 MIME-Version:Content-Type; b=jKnDDmfqbXA81HBGkTI4rjA0G/w58YxC0k2fYrDJxYEfNzavMTF7oMdjd6IC/k/VkWh/Ld+VV2vbxltUE0dkIWKWcT7vX35/OV1zm98osZe0nj8sgZ7gU3QzTBrzMh8y3SBzVbB3XQOWOZl+ZmCDjj8+GD/BShYzK7t+pijMpSY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 24FAD54CDF2;
-	Sat,  7 Mar 2026 05:46:02 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9928354CE95;
+	Sat,  7 Mar 2026 05:46:03 +0100 (CET)
 From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
 To: bridge@lists.linux.dev
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	shuah@kernel.org,
 	petrm@nvidia.com,
 	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v4 01/14] net: bridge: mcast: export ip{4,6}_active state to netlink
-Date: Sat,  7 Mar 2026 05:45:35 +0100
-Message-ID: <20260307044548.5230-2-linus.luessing@c0d3.blue>
+Subject: [PATCH net-next v4 02/14] net: bridge: mcast: track active state, adding tests
+Date: Sat,  7 Mar 2026 05:45:36 +0100
+Message-ID: <20260307044548.5230-3-linus.luessing@c0d3.blue>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260307044548.5230-1-linus.luessing@c0d3.blue>
 References: <20260307044548.5230-1-linus.luessing@c0d3.blue>
@@ -68,17 +68,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 08E0422A13C
+X-Rspamd-Queue-Id: C8BD822A16A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265066-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265068-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -89,235 +89,789 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.894];
+	NEURAL_HAM(-0.00)[-0.878];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[linus.luessing@c0d3.blue,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,nvidia.com,lunn.ch,kernel.org,redhat.com,google.com,davemloft.net,fomichev.me,gmail.com,c0d3.blue];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bridge_mdb_active.sh:url,c0d3.blue:mid,c0d3.blue:email,lib.sh:url]
 X-Rspamd-Action: no action
 
-Export the new ip{4,6}_active variables to netlink, to be able to
-check from userspace that they are updated as intended.
+Before making any significant changes to the internals of the Linux
+bridge add some tests regarding the multicast activity. This is
+also to verify that we have the semantics of the new
+*_MCAST_ACTIVE_{V4,V6} netlink attributes as expected.
 
 Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- include/uapi/linux/if_bridge.h |  2 ++
- include/uapi/linux/if_link.h   | 12 ++++++++++++
- net/bridge/br_netlink.c        | 20 +++++++++++++++++++-
- net/bridge/br_private.h        |  2 +-
- net/bridge/br_vlan_options.c   | 25 +++++++++++++++++++++++--
- net/core/rtnetlink.c           |  2 +-
- 6 files changed, 58 insertions(+), 5 deletions(-)
+ .../testing/selftests/net/forwarding/Makefile |   1 +
+ .../net/forwarding/bridge_mdb_active.sh       | 742 ++++++++++++++++++
+ 2 files changed, 743 insertions(+)
+ create mode 100755 tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
 
-diff --git a/include/uapi/linux/if_bridge.h b/include/uapi/linux/if_bridge.h
-index e52f8207ab27..910103b1ef03 100644
---- a/include/uapi/linux/if_bridge.h
-+++ b/include/uapi/linux/if_bridge.h
-@@ -584,6 +584,8 @@ enum {
- 	BRIDGE_VLANDB_GOPTS_MCAST_ROUTER_PORTS,
- 	BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE,
- 	BRIDGE_VLANDB_GOPTS_MSTI,
-+	BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V4,
-+	BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V6,
- 	__BRIDGE_VLANDB_GOPTS_MAX
- };
- #define BRIDGE_VLANDB_GOPTS_MAX (__BRIDGE_VLANDB_GOPTS_MAX - 1)
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 83a96c56b8ca..66c59953d301 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -744,6 +744,16 @@ enum in6_addr_gen_mode {
-  * @IFLA_BR_FDB_MAX_LEARNED
-  *   Set the number of max dynamically learned FDB entries for the current
-  *   bridge.
-+ *
-+ * @IFLA_BR_MCAST_ACTIVE_V4
-+ *   Bridge IPv4 mcast active state, read only.
-+ *
-+ *   1 if an IGMP querier is present, 0 otherwise.
-+ *
-+ * @IFLA_BR_MCAST_ACTIVE_V6
-+ *   Bridge IPv6 mcast active state, read only.
-+ *
-+ *   1 if an MLD querier is present, 0 otherwise.
-  */
- enum {
- 	IFLA_BR_UNSPEC,
-@@ -796,6 +806,8 @@ enum {
- 	IFLA_BR_MCAST_QUERIER_STATE,
- 	IFLA_BR_FDB_N_LEARNED,
- 	IFLA_BR_FDB_MAX_LEARNED,
-+	IFLA_BR_MCAST_ACTIVE_V4,
-+	IFLA_BR_MCAST_ACTIVE_V6,
- 	__IFLA_BR_MAX,
- };
- 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 0264730938f4..7fff59c3bf76 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -1264,7 +1264,9 @@ static const struct nla_policy br_policy[IFLA_BR_MAX + 1] = {
- 	[IFLA_BR_VLAN_STATS_ENABLED] = { .type = NLA_U8 },
- 	[IFLA_BR_MCAST_STATS_ENABLED] = { .type = NLA_U8 },
- 	[IFLA_BR_MCAST_IGMP_VERSION] = { .type = NLA_U8 },
-+	[IFLA_BR_MCAST_ACTIVE_V4] = { .type = NLA_REJECT },
- 	[IFLA_BR_MCAST_MLD_VERSION] = { .type = NLA_U8 },
-+	[IFLA_BR_MCAST_ACTIVE_V6] = { .type = NLA_REJECT },
- 	[IFLA_BR_VLAN_STATS_PER_PORT] = { .type = NLA_U8 },
- 	[IFLA_BR_MULTI_BOOLOPT] =
- 		NLA_POLICY_EXACT_LEN(sizeof(struct br_boolopt_multi)),
-@@ -1625,7 +1627,9 @@ static size_t br_get_size(const struct net_device *brdev)
- 	       nla_total_size_64bit(sizeof(u64)) + /* IFLA_BR_MCAST_QUERY_RESPONSE_INTVL */
- 	       nla_total_size_64bit(sizeof(u64)) + /* IFLA_BR_MCAST_STARTUP_QUERY_INTVL */
- 	       nla_total_size(sizeof(u8)) +	/* IFLA_BR_MCAST_IGMP_VERSION */
-+	       nla_total_size(sizeof(u8)) +     /* IFLA_BR_MCAST_ACTIVE_V4 */
- 	       nla_total_size(sizeof(u8)) +	/* IFLA_BR_MCAST_MLD_VERSION */
-+	       nla_total_size(sizeof(u8)) +     /* IFLA_BR_MCAST_ACTIVE_V6 */
- 	       br_multicast_querier_state_size() + /* IFLA_BR_MCAST_QUERIER_STATE */
- #endif
- #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-@@ -1639,6 +1643,8 @@ static size_t br_get_size(const struct net_device *brdev)
- 
- static int br_fill_info(struct sk_buff *skb, const struct net_device *brdev)
- {
-+	struct ethhdr eth6 __maybe_unused = { .h_proto = htons(ETH_P_IPV6) };
-+	struct ethhdr eth4 __maybe_unused = { .h_proto = htons(ETH_P_IP) };
- 	struct net_bridge *br = netdev_priv(brdev);
- 	u32 forward_delay = jiffies_to_clock_t(br->forward_delay);
- 	u32 hello_time = jiffies_to_clock_t(br->hello_time);
-@@ -1717,12 +1723,24 @@ static int br_fill_info(struct sk_buff *skb, const struct net_device *brdev)
- 			br->multicast_ctx.multicast_startup_query_count) ||
- 	    nla_put_u8(skb, IFLA_BR_MCAST_IGMP_VERSION,
- 		       br->multicast_ctx.multicast_igmp_version) ||
-+	    nla_put_u8(skb, IFLA_BR_MCAST_ACTIVE_V4,
-+		       netif_running(brdev) &&
-+		       br_opt_get(br, BROPT_MULTICAST_ENABLED) &&
-+		       !br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
-+		       br_multicast_querier_exists(&br->multicast_ctx, &eth4,
-+						   NULL)) ||
- 	    br_multicast_dump_querier_state(skb, &br->multicast_ctx,
- 					    IFLA_BR_MCAST_QUERIER_STATE))
- 		return -EMSGSIZE;
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (nla_put_u8(skb, IFLA_BR_MCAST_MLD_VERSION,
--		       br->multicast_ctx.multicast_mld_version))
-+		       br->multicast_ctx.multicast_mld_version) ||
-+	    nla_put_u8(skb, IFLA_BR_MCAST_ACTIVE_V6,
-+		       netif_running(brdev) &&
-+		       br_opt_get(br, BROPT_MULTICAST_ENABLED) &&
-+		       !br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
-+		       br_multicast_querier_exists(&br->multicast_ctx, &eth6,
-+						   NULL)))
- 		return -EMSGSIZE;
- #endif
- 	clockval = jiffies_to_clock_t(br->multicast_ctx.multicast_last_member_interval);
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 9b55d38ea9ed..545be319b6cb 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -1902,7 +1902,7 @@ int br_vlan_rtm_process_global_options(struct net_device *dev,
- bool br_vlan_global_opts_can_enter_range(const struct net_bridge_vlan *v_curr,
- 					 const struct net_bridge_vlan *r_end);
- bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
--			      const struct net_bridge_vlan *v_opts);
-+			      struct net_bridge_vlan *v_opts);
- 
- /* vlan state manipulation helpers using *_ONCE to annotate lock-free access,
-  * while br_vlan_set_state() may access data protected by multicast_lock.
-diff --git a/net/bridge/br_vlan_options.c b/net/bridge/br_vlan_options.c
-index 5514e1fc8d1f..06045d68a2d1 100644
---- a/net/bridge/br_vlan_options.c
-+++ b/net/bridge/br_vlan_options.c
-@@ -367,10 +367,13 @@ bool br_vlan_global_opts_can_enter_range(const struct net_bridge_vlan *v_curr,
- }
- 
- bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
--			      const struct net_bridge_vlan *v_opts)
-+			      struct net_bridge_vlan *v_opts)
- {
-+	struct ethhdr eth6 __maybe_unused = { .h_proto = htons(ETH_P_IPV6) };
-+	struct ethhdr eth4 __maybe_unused = { .h_proto = htons(ETH_P_IP) };
- 	struct nlattr *nest2 __maybe_unused;
- 	u64 clockval __maybe_unused;
-+	bool mcact __maybe_unused;
- 	struct nlattr *nest;
- 
- 	nest = nla_nest_start(skb, BRIDGE_VLANDB_GLOBAL_OPTIONS);
-@@ -385,10 +388,17 @@ bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
- 		goto out_err;
- 
- #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
-+	mcact = netif_running(v_opts->br->dev) &&
-+		br_opt_get(v_opts->br, BROPT_MULTICAST_ENABLED) &&
-+		br_opt_get(v_opts->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
-+		!br_multicast_ctx_vlan_global_disabled(&v_opts->br_mcast_ctx) &&
-+		br_multicast_querier_exists(&v_opts->br_mcast_ctx, &eth4, NULL);
+diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
+index bbaf4d937dd8..6692751b24d5 100644
+--- a/tools/testing/selftests/net/forwarding/Makefile
++++ b/tools/testing/selftests/net/forwarding/Makefile
+@@ -7,6 +7,7 @@ TEST_PROGS := \
+ 	bridge_igmp.sh \
+ 	bridge_locked_port.sh \
+ 	bridge_mdb.sh \
++	bridge_mdb_active.sh \
+ 	bridge_mdb_host.sh \
+ 	bridge_mdb_max.sh \
+ 	bridge_mdb_port_down.sh \
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh b/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
+new file mode 100755
+index 000000000000..3c93c55ffa61
+--- /dev/null
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
+@@ -0,0 +1,742 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
- 	if (nla_put_u8(skb, BRIDGE_VLANDB_GOPTS_MCAST_SNOOPING,
- 		       !!(v_opts->priv_flags & BR_VLFLAG_GLOBAL_MCAST_ENABLED)) ||
- 	    nla_put_u8(skb, BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION,
- 		       v_opts->br_mcast_ctx.multicast_igmp_version) ||
-+	    nla_put_u8(skb, BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V4, mcact) ||
- 	    nla_put_u32(skb, BRIDGE_VLANDB_GOPTS_MCAST_LAST_MEMBER_CNT,
- 			v_opts->br_mcast_ctx.multicast_last_member_count) ||
- 	    nla_put_u32(skb, BRIDGE_VLANDB_GOPTS_MCAST_STARTUP_QUERY_CNT,
-@@ -442,8 +452,15 @@ bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
- 	}
- 
- #if IS_ENABLED(CONFIG_IPV6)
-+	mcact = netif_running(v_opts->br->dev) &&
-+		br_opt_get(v_opts->br, BROPT_MULTICAST_ENABLED) &&
-+		br_opt_get(v_opts->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
-+		!br_multicast_ctx_vlan_global_disabled(&v_opts->br_mcast_ctx) &&
-+		br_multicast_querier_exists(&v_opts->br_mcast_ctx, &eth6, NULL);
++# shellcheck disable=SC2317
++#
++# Disabling SC2317 because:
++# 1) shellcheck does not seem to like a trap together with a final exit call
++# 2) shellcheck does not seem to understand that tests_run calls all functions
++#    listed in ALL_TESTS
 +
- 	if (nla_put_u8(skb, BRIDGE_VLANDB_GOPTS_MCAST_MLD_VERSION,
--		       v_opts->br_mcast_ctx.multicast_mld_version))
-+		       v_opts->br_mcast_ctx.multicast_mld_version) ||
-+	    nla_put_u8(skb, BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V6, mcact))
- 		goto out_err;
- #endif
- #endif
-@@ -468,7 +485,9 @@ static size_t rtnl_vlan_global_opts_nlmsg_size(const struct net_bridge_vlan *v)
- #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
- 		+ nla_total_size(sizeof(u8)) /* BRIDGE_VLANDB_GOPTS_MCAST_SNOOPING */
- 		+ nla_total_size(sizeof(u8)) /* BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION */
-+		+ nla_total_size(sizeof(u8)) /* BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V4 */
- 		+ nla_total_size(sizeof(u8)) /* BRIDGE_VLANDB_GOPTS_MCAST_MLD_VERSION */
-+		+ nla_total_size(sizeof(u8)) /* BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V6 */
- 		+ nla_total_size(sizeof(u32)) /* BRIDGE_VLANDB_GOPTS_MCAST_LAST_MEMBER_CNT */
- 		+ nla_total_size(sizeof(u32)) /* BRIDGE_VLANDB_GOPTS_MCAST_STARTUP_QUERY_CNT */
- 		+ nla_total_size(sizeof(u64)) /* BRIDGE_VLANDB_GOPTS_MCAST_LAST_MEMBER_INTVL */
-@@ -650,9 +669,11 @@ static const struct nla_policy br_vlan_db_gpol[BRIDGE_VLANDB_GOPTS_MAX + 1] = {
- 	[BRIDGE_VLANDB_GOPTS_RANGE]	= { .type = NLA_U16 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_SNOOPING]	= { .type = NLA_U8 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_MLD_VERSION]	= { .type = NLA_U8 },
-+	[BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V6]	= { .type = NLA_REJECT },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_QUERY_INTVL]	= { .type = NLA_U64 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER]	= { .type = NLA_U8 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION]	= { .type = NLA_U8 },
-+	[BRIDGE_VLANDB_GOPTS_MCAST_ACTIVE_V4]	= { .type = NLA_REJECT },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_LAST_MEMBER_CNT]	= { .type = NLA_U32 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_STARTUP_QUERY_CNT]	= { .type = NLA_U32 },
- 	[BRIDGE_VLANDB_GOPTS_MCAST_LAST_MEMBER_INTVL]	= { .type = NLA_U64 },
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index dad4b1054955..8febe7475f1f 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -62,7 +62,7 @@
- 
- #include "dev.h"
- 
--#define RTNL_MAX_TYPE		50
-+#define RTNL_MAX_TYPE		52
- #define RTNL_SLAVE_MAX_TYPE	44
- 
- struct rtnl_link {
++# +-------+      +---------+
++# | brq0  |      | br0     |
++# | + $h1 |      | + $swp1 |
++# +----|--+      +----|----+
++#      |              |
++#      \--------------/
++#
++#
++# This script checks if we have the expected mcast_active_v{4,6} state
++# on br0 in a variety of scenarios. This state determines if ultimately
++# multicast snooping is applied to multicast data packets
++# (multicast snooping active) or if they are (by default) flooded instead
++# (multicast snooping inactive).
++#
++# Notably, multicast snooping can be enabled but still be inactive if not all
++# requirements to safely apply multicast snooping to multicast data packets
++# are met.
++#
++# Depending on the test case an IGMP/MLD querier might be on brq0, on br0
++# or neither.
++
++
++ALL_TESTS="
++	test_inactive
++	test_active_other_querier
++	test_active_own_querier
++	test_inactive_brdown
++	test_inactive_nov6
++	test_inactive_snooping_off
++	test_inactive_querier_off
++	test_inactive_other_querier_norespdelay
++	test_inactive_own_querier_norespdelay
++	test_inactive
++	test_vlan_inactive
++	test_vlan_active_other_querier
++	test_vlan_active_own_querier
++	test_vlan_inactive_brdown
++	test_vlan_inactive_nov6
++	test_vlan_inactive_snooping_off
++	test_vlan_inactive_vlans_snooping_off
++	test_vlan_inactive_vlan_snooping_off
++	test_vlan_inactive_other_querier_norespdelay
++	test_vlan_inactive_own_querier_norespdelay
++"
++
++NUM_NETIFS=2
++MCAST_MAX_RESP_IVAL_SEC=1
++MCAST_VLAN_ID=42
++source lib.sh
++
++switch_create()
++{
++	ip link add dev br0 type bridge\
++		vlan_filtering 0 \
++		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))\
++		mcast_snooping 0 \
++		mcast_vlan_snooping 0
++	ip link add dev brq0 type bridge\
++		vlan_filtering 0 \
++		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))\
++		mcast_snooping 0 \
++		mcast_vlan_snooping 0
++
++	echo 1 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
++	echo 1 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
++
++	ip link set dev "$swp1" master br0
++	ip link set dev "$h1" master brq0
++
++	ip link set dev "$h1" up
++	ip link set dev "$swp1" up
++}
++
++switch_destroy()
++{
++	ip link set dev "$swp1" down
++	ip link set dev "$h1" down
++
++	ip link del dev brq0
++	ip link del dev br0
++}
++
++setup_prepare()
++{
++	h1=${NETIFS[p1]}
++	swp1=${NETIFS[p2]}
++
++	switch_create
++}
++
++cleanup()
++{
++	pre_cleanup
++	switch_destroy
++}
++
++mcast_active_check_failed()
++{
++	local af="$1"
++	local vlan="$2"
++	local active="$3"
++	local lineno="$4"
++
++	check_err 1 "$lineno: Mcast ${vlan}${active} check failed ($af)"
++}
++
++mcast_active_check_ret()
++{
++	local ret="$1"
++	local af="$2"
++	local state="$3"
++	local vlan="$4"
++	local lineno="$5"
++
++	if [ "$state" -eq 0 ]; then
++		if [ "$ret" -eq 0 ]; then
++			mcast_active_check_failed \
++				"$af" "$vlan" "inactive" "$lineno"
++		fi
++	elif [ "$state" -eq 1 ]; then
++		if [ "$ret" -ne 0 ]; then
++			mcast_active_check_failed \
++				"$af" "$vlan" "active" "$lineno"
++		fi
++	fi
++}
++
++jq_check_mcast_active()
++{
++	local af="$1"
++
++	jq -e ".[] | select(.linkinfo.info_data.mcast_active_$af == 1)"
++}
++
++mcast_active_check()
++{
++	local af="$1"
++	local state="$2"
++	local lineno="$3"
++
++	ip -d -j link show dev br0\
++		| jq_check_mcast_active "$af" &> /dev/null
++	mcast_active_check_ret "$?" "$af" "$state" "" "$lineno"
++}
++
++jq_check_vlan_mcast_active()
++{
++	local vid="$1"
++	local af="$2"
++
++	jq -e ".[].vlans.[] | select(.vlan == $vid and .mcast_active_$af == 1)"
++}
++
++mcast_vlan_active_check()
++{
++	local af="$1"
++	local state="$2"
++	local lineno="$3"
++	local vid="${MCAST_VLAN_ID}"
++
++	bridge -j vlan global show dev br0\
++		| jq_check_vlan_mcast_active "$vid" "$af" &> /dev/null
++	mcast_active_check_ret "$?" "$af" "$state" "VLAN " "$lineno"
++}
++
++mcast_assert_active_v4()
++{
++	mcast_active_check "v4" "1" "$1"
++}
++
++mcast_assert_active_v6()
++{
++	mcast_active_check "v6" "1" "$1"
++}
++
++mcast_assert_inactive_v4()
++{
++	mcast_active_check "v4" "0" "$1"
++}
++
++mcast_assert_inactive_v6()
++{
++	mcast_active_check "v6" "0" "$1"
++}
++
++mcast_vlan_assert_active_v4()
++{
++	mcast_vlan_active_check "v4" "1" "$1"
++}
++
++mcast_vlan_assert_active_v6()
++{
++	mcast_vlan_active_check "v6" "1" "$1"
++}
++
++mcast_vlan_assert_inactive_v4()
++{
++	mcast_vlan_active_check "v4" "0" "$1"
++}
++
++mcast_vlan_assert_inactive_v6()
++{
++	mcast_vlan_active_check "v6" "0" "$1"
++}
++
++test_inactive_nolog()
++{
++	local lineno="$1"
++
++	ip link set dev br0 down
++	ip link set dev brq0 down
++	ip link set dev br0 type bridge mcast_snooping 0
++	ip link set dev brq0 type bridge mcast_snooping 0
++	ip link set dev br0 type bridge mcast_querier 0
++	ip link set dev brq0 type bridge mcast_querier 0
++	ip link set dev br0 type bridge mcast_vlan_snooping 0
++	ip link set dev br0 type bridge vlan_filtering 0
++
++	echo 1 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
++	echo 1 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
++
++	mcast_assert_inactive_v4 "$lineno"
++	mcast_assert_inactive_v6 "$lineno"
++}
++
++test_inactive()
++{
++	RET=0
++
++	test_inactive_nolog "$LINENO"
++	log_test "Mcast inactive test"
++}
++
++wait_lladdr_dad() {
++	local jq_select
++	local jq_tentative
++
++	jq_select="select(.scope == \"link\" and ((.tentative == true) | not))"
++	jq_tentative="map(${jq_select}) | .[]"
++
++	ip -6 -j a s dev "$1"\
++		| jq -e ".[].addr_info | ${jq_tentative}" &> /dev/null
++}
++
++test_active_setup_bridge()
++{
++	[ -n "$1" ] && echo 0 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
++	[ -n "$2" ] && echo 0 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
++
++	[ -n "$3" ] && ip link set dev br0 up
++	[ -n "$4" ] && ip link set dev brq0 up
++	[ -n "$5" ] && slowwait 3 wait_lladdr_dad br0
++	[ -n "$6" ] && slowwait 3 wait_lladdr_dad brq0
++}
++
++test_active_setup_config()
++{
++	[ -n "$1" ] && ip link set dev br0 type bridge mcast_snooping 1
++	[ -n "$2" ] && ip link set dev brq0 type bridge mcast_snooping 1
++	[ -n "$3" ] && ip link set dev br0 type bridge mcast_querier 1
++	[ -n "$4" ] && ip link set dev brq0 type bridge mcast_querier 1
++}
++
++test_active_setup_wait()
++{
++	sleep $((MCAST_MAX_RESP_IVAL_SEC * 2))
++}
++
++test_active_setup_reset_own_querier()
++{
++	ip link set dev br0 type bridge mcast_querier 0
++	ip link set dev br0 type bridge mcast_querier 1
++
++	test_active_setup_wait
++}
++
++test_vlan_active_setup_config()
++{
++	[ -n "$1" ] && ip link set dev br0 type bridge vlan_filtering 1
++	[ -n "$2" ] && ip link set dev brq0 type bridge vlan_filtering 1
++	[ -n "$3" ] && ip link set dev br0 type bridge mcast_vlan_snooping 1
++	[ -n "$4" ] && ip link set dev brq0 type bridge mcast_vlan_snooping 1
++}
++
++test_vlan_active_setup_add_vlan()
++{
++	bridge vlan add vid "${MCAST_VLAN_ID}" dev "$swp1"
++	bridge vlan add vid "${MCAST_VLAN_ID}" dev "$h1"
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0\
++		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0\
++		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_snooping 0
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_snooping 0
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 0
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_querier 0
++}
++
++test_vlan_active_setup_config_vlan()
++{
++	[ -n "$1" ] && bridge vlan global set \
++			vid "${MCAST_VLAN_ID}" dev br0 mcast_snooping 1
++	[ -n "$2" ] && bridge vlan global set \
++			vid "${MCAST_VLAN_ID}" dev brq0 mcast_snooping 1
++	[ -n "$3" ] && bridge vlan global set \
++			vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 1
++	[ -n "$4" ] && bridge vlan global set \
++			vid "${MCAST_VLAN_ID}" dev brq0 mcast_querier 1
++}
++
++test_vlan_teardown()
++{
++	bridge vlan del vid "${MCAST_VLAN_ID}" dev "$swp1"
++	bridge vlan del vid "${MCAST_VLAN_ID}" dev "$h1"
++	mcast_assert_inactive_v4 "$1"
++	mcast_assert_inactive_v6 "$1"
++	mcast_vlan_assert_inactive_v4 "$1"
++	mcast_vlan_assert_inactive_v6 "$1"
++}
++
++test_vlan_active_setup_reset_own_querier()
++{
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 0
++	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 1
++
++	test_active_setup_wait
++}
++
++test_active_other_querier_nolog()
++{
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  "4"
++	test_active_setup_wait
++
++	mcast_assert_active_v4 "$1"
++	mcast_assert_active_v6 "$1"
++}
++
++test_active_other_querier()
++{
++	RET=0
++
++	test_active_other_querier_nolog "$LINENO"
++	test_inactive_nolog "$LINENO"
++	log_test "Mcast active with other querier test"
++}
++
++test_active_own_querier_nolog()
++{
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_active_v4 "$1"
++	mcast_assert_active_v6 "$1"
++}
++
++test_active_own_querier()
++{
++	RET=0
++
++	test_active_own_querier_nolog "$LINENO"
++	test_inactive_nolog "$LINENO"
++	log_test "Mcast active with own querier test"
++}
++
++test_active_final()
++{
++	mcast_assert_active_v4 "$1"
++	mcast_assert_active_v6 "$1"
++
++	test_inactive_nolog "$1"
++}
++
++test_inactive_brdown()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" ""  "4" ""  "6"
++	test_active_setup_config "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge ""  ""  "3" ""  ""  ""
++	mcast_assert_active_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge ""  ""  ""  ""  "5" ""
++	test_active_setup_reset_own_querier
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, bridge down test"
++}
++
++test_inactive_nov6()
++{
++	RET=0
++
++	test_active_setup_bridge ""  "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_active_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge "1" ""  ""  ""  "5" ""
++	test_active_setup_reset_own_querier
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, own querier, no IPv6 address test"
++}
++
++test_inactive_snooping_off()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config ""  "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_config "1" ""  ""  ""
++	test_active_setup_reset_own_querier
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, snooping disabled test"
++}
++
++test_inactive_querier_off()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_config ""  ""  "3" ""
++	test_active_setup_wait
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, no querier test"
++}
++
++test_inactive_other_querier_norespdelay()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" "3" ""
++	# skipping: test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_wait
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, other querier, no response delay test"
++}
++
++test_inactive_own_querier_norespdelay()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  "4"
++	# skipping: test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_wait
++	test_active_final "$LINENO"
++
++	log_test "Mcast inactive, own querier, no response delay test"
++}
++
++test_vlan_inactive()
++{
++	RET=0
++
++	test_inactive_nolog "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	ip link set dev br0 type bridge vlan_filtering 1
++	ip link set dev br0 type bridge mcast_vlan_snooping 1
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	ip link set dev br0 type bridge mcast_vlan_snooping 0
++	ip link set dev br0 type bridge vlan_filtering 0
++	test_active_own_querier_nolog "$LINENO"
++	ip link set dev br0 type bridge vlan_filtering 1
++	mcast_assert_active_v4 "$LINENO"
++	mcast_assert_active_v6 "$LINENO"
++
++	ip link set dev br0 type bridge mcast_vlan_snooping 1
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_inactive_nolog "$LINENO"
++	log_test "Mcast VLAN inactive test"
++}
++
++test_vlan_active_final()
++{
++	mcast_assert_inactive_v4 "$1"
++	mcast_assert_inactive_v6 "$1"
++	mcast_vlan_assert_active_v4 "$1"
++	mcast_vlan_assert_active_v6 "$1"
++
++	test_vlan_teardown "$1"
++	test_inactive_nolog "$1"
++}
++
++test_vlan_active_other_querier()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" ""  "4"
++	test_active_setup_wait
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN active, other querier test"
++}
++
++test_vlan_active_own_querier()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	test_active_setup_wait
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN active, own querier test"
++}
++
++test_vlan_inactive_brdown()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" ""  "4" ""  "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge ""  ""  "3" ""  ""  ""
++	test_active_setup_wait
++	mcast_vlan_assert_active_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge ""  ""  ""  ""  "5" ""
++	test_vlan_active_setup_reset_own_querier
++	test_vlan_active_final "$LINENO, RET: $RET"
++
++	log_test "Mcast VLAN inactive, bridge down test"
++}
++
++test_vlan_inactive_nov6()
++{
++	RET=0
++
++	test_active_setup_bridge ""  "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_active_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_bridge "1" ""  ""  ""  "5" ""
++	test_vlan_active_setup_reset_own_querier
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, own querier, no IPv6 address test"
++}
++
++test_vlan_inactive_snooping_off()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config ""  "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_config "1" ""  ""  ""
++	test_vlan_active_setup_reset_own_querier
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, snooping disabled test"
++}
++
++test_vlan_inactive_vlans_snooping_off()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" ""  "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_vlan_active_setup_config ""  ""  "3" ""
++	test_vlan_active_setup_reset_own_querier
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, snooping for VLANs disabled test"
++}
++
++test_vlan_inactive_vlan_snooping_off()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan ""  "2" "3" ""
++	test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_vlan_active_setup_config_vlan "1" ""  ""  ""
++	test_vlan_active_setup_reset_own_querier
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, snooping for this VLAN disabled test"
++}
++
++test_vlan_inactive_other_querier_norespdelay()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" ""  "4"
++	# skipping: test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_wait
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, other querier, no response delay test"
++}
++
++test_vlan_inactive_own_querier_norespdelay()
++{
++	RET=0
++
++	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
++	test_active_setup_config "1" "2" ""  ""
++	test_vlan_active_setup_config "1" "2" "3" "4"
++	test_vlan_active_setup_add_vlan
++	test_vlan_active_setup_config_vlan "1" "2" "3" ""
++	# skipping: test_active_setup_wait
++
++	mcast_assert_inactive_v4 "$LINENO"
++	mcast_assert_inactive_v6 "$LINENO"
++	mcast_vlan_assert_inactive_v4 "$LINENO"
++	mcast_vlan_assert_inactive_v6 "$LINENO"
++
++	test_active_setup_wait
++	test_vlan_active_final "$LINENO"
++
++	log_test "Mcast VLAN inactive, own querier, no response delay test"
++}
++
++trap cleanup EXIT
++
++setup_prepare
++
++if ! ip -d link show dev br0 2>&1 | grep -q "mcast_active"; then
++	echo "SKIP: iproute2 too old, missing mcast_active support"
++	exit "$ksft_skip"
++fi
++
++setup_wait
++tests_run
++
++exit "$EXIT_STATUS"
 -- 
 2.53.0
 
