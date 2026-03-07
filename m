@@ -1,140 +1,155 @@
-Return-Path: <netdev+bounces-265110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HnYDqLpq2m7hwEAu9opvQ
-	(envelope-from <netdev+bounces-265110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:02:26 +0100
+	id AHoIHnbuq2mYiAEAu9opvQ
+	(envelope-from <netdev+bounces-265111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:23:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9500422AC9A
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:02:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB22522AE08
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 10:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24C713040762
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 09:01:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A185A303B7DE
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 09:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCAE38656B;
-	Sat,  7 Mar 2026 09:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261BC38757F;
+	Sat,  7 Mar 2026 09:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hA+HFpjo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4eeIcNEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5382D7DDB;
-	Sat,  7 Mar 2026 09:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE11D30595B
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 09:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772874084; cv=none; b=b0yK/Yoh0AgtfmWprE1hlzDGKi6HZeNMtYqrR+XqjCE4JZm+TmOQiQ3+ryhYaH/4pSEdRG8ArKx22nEF7zj5Hf7zWQ3MjNkj+YcZJVOTcShpmgzbmGR6fImlzyrutZDBFM8oerFAbdinPlk1Ngh9C0u6RofgKR5/mJ9FhPRAERs=
+	t=1772875339; cv=none; b=oKH8C4ZgLS5ycF4hS6dMIQB8gd9iG6rYhl3B9/dbuNdu814vmJlDBV7WLhdn8Z5zv6OjJzDT/mwJAYSpujcoXjLYmnpdlWHJd1bnTwxI8Z0qFFT6HWuvU5zk11pbndLnAzb2hTyejJKf8/ivfxWsRNW/jcL5nWC/qjZmpC3u3nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772874084; c=relaxed/simple;
-	bh=HcmWURFUVniNjlOMNWDM3XuhFZvHHR6RnWvZS7kjD5g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cgC0XiE/KIS/sIom+nhQ9O67RTcPx0/BltWo+oliK10g/b+EmbTtUXOApmuMqXRrHi7lX6GRb6rF9X7hykWGg1BWvV3LGjalY26UCIP323ySlF8suClXMQAZPa/ej4xtHOmuHvdTliJJHFMbPhpZ+bBvKS9QqOUTOlnTlqAhUwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hA+HFpjo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DE6BC19422;
-	Sat,  7 Mar 2026 09:01:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772874084;
-	bh=HcmWURFUVniNjlOMNWDM3XuhFZvHHR6RnWvZS7kjD5g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=hA+HFpjozgXqTlDFB0SU/ogBf+NmAVfr8Cd/grcE/wxMp2i/Tr62Z9AxK1wOAcLkR
-	 asV19eEDOIcIdV4fmUvFHZhSkygR6E/mBuD0ZWkX+TARAC0xfnygdvSO82yJuHBUmc
-	 uqc/Fi+ihn4doL60XgJq0qXoR767rhw/wUG81QAH6g8/c7VZCYFRwRK/y2PssMB/Pd
-	 rrY5xqnVOlW4egEBDYjFo6Yz+qIL0/T4GjiUVuj6QsvArog9MuxIImTasX/DGu0Kl+
-	 Iobi7xCHzAav2fDVfrw9As91C4zs/bQmofRtnLXH+K/eV/0CpbMBfJyX0Ieg4aJTvu
-	 JtxU+kcF3Amog==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Shinichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long
- <longman@redhat.com>, Marco Elver <elver@google.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <20260306152458.GT606826@noisy.programming.kicks-ass.net>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
-Date: Sat, 07 Mar 2026 10:01:20 +0100
-Message-ID: <87ldg42eu7.ffs@tglx>
+	s=arc-20240116; t=1772875339; c=relaxed/simple;
+	bh=RLuf0BWPmBmgE3OCwKI148eNby71BqdruVzZ8uESdto=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jizDJrKKj1Mhe3LbLdqxMvlXWIePE0xDAfNH2lXD00b71+7obk163uMmpEy/Uqi61U74MObAkIYV0ibRxxsqLAH8+9VDJJaC1g403yWNw/v8Oa7pk86h9CDzDAy14DdHknP1nCkOJneqvZIJTCoeL2jBiDFhQWtOUpBo33Kcn6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4eeIcNEM; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-79881805767so117174557b3.3
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 01:22:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772875337; x=1773480137; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=boljEDKAW+CRCitfA07JSzymSe3HqQTSV5hrgqY/gb8=;
+        b=4eeIcNEMbz5cbXKtV4hsNgSMOF8nVV6UP7wODJNgE0LFSu41yNQLOnLUbpsWTEElFd
+         tNM6G9Hr/2rObgpQe+VI5wADuutaMewDLOy6v8VjwZqxaK4Oix0TyzTjc0Dpzcfn5U4i
+         HxjLWoeg2WzbOK44MA+eS9Fd4/C/tzy1a5QdZ+HJNO784v2IHsjn46Hy9mqFnMXHdJgC
+         r+rh7VQfywOcpbfmGeLKdTni2krtvLvok/CtvQFbJh0BtpopYT0lKNKLYE1LDcwcVUmP
+         VztMNGs03VQgtysipD9jv5UNGf0xewZvmQH1eJhG18yoqlHDA/ZHPd9zfknq/MTV6pgT
+         cufA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772875337; x=1773480137;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=boljEDKAW+CRCitfA07JSzymSe3HqQTSV5hrgqY/gb8=;
+        b=HAGs19u1YaDnDXRAeJExgM4RY/RyRtN9vBgLj1s0QHS+WazO4T+qVbULpF8o3dC8kc
+         E4lk379Xsi07aG9PUWriPNLTJRNzV5uIp+NeYMYpIffCM3bl4GXD54kW0RDqHM3N4fkj
+         zMP+QLCLI7cyePyakBobwuV2/pAWIKwgVGd3JDDGDpxUfIznpa+C3OUM9YuJWOpOUxT6
+         6f3LbjROgqwsYZbRz13iGVhHt0uF+TgokFnJgMphc3Z6rexTKJFPrhbkTfwhWwBnBC5N
+         PSZNGILAZg+o+jgxAWhCj6uSPk3p6dGSYaS5C4Re3lbQxSc1KRBIjtvom285Y4L1gFRP
+         lfZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEAvulF1M/JOXB3gmFpRgjq5sP7IFfP3OdLP17+UVgPXNdX1PeQeNEjTJr6dyu2+XP4OO21Js=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSo37BIny0hwQ6lWQ+QqoQ0xsY5luLfop2U5MZ+jm4YhuBYD1F
+	15cR2azRHL46dWwHGwHrDfcNASKt9brCZ6Oe77n78KV/vuZsIRvPEWbFyvSq5YpmsdkTR1VT5XM
+	H26g9DHvjedwDaQ==
+X-Received: from ywah17.prod.google.com ([2002:a05:690c:c011:b0:798:6b80:4165])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690c:6e86:b0:797:d37d:d5a1 with SMTP id 00721157ae682-798dd7c6bb0mr45157047b3.61.1772875336648;
+ Sat, 07 Mar 2026 01:22:16 -0800 (PST)
+Date: Sat,  7 Mar 2026 09:22:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 9500422AC9A
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260307092214.2433548-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: move sysctl_tcp_shrink_window to
+ netns_ipv4_read_txrx group
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: DB22522AE08
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-265110-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265111-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.314];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.988];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06 2026 at 16:24, Peter Zijlstra wrote:
-> On Fri, Mar 06, 2026 at 10:57:15AM +0100, Thomas Gleixner wrote:
->
->> I tried with tons of test cases which stress test mmcid with threads and
->> failed.
->
-> Are some of those in tools/testing/selftests ?
->
-> Anyway, I was going over that code, and I noticed that there seems to be
-> inconsistent locking for mm_mm_cid::pcpu.
->
-> There's a bunch of sites that state we need rq->lock for remote access;
-> but then things like sched_mm_cid_fork() and sched_mm_cid_exit() seem to
-> think that holding mm_cid->lock is sufficient.
->
-> This doesn't make sense to me, but maybe I missed something.
+Commit 18fd64d25422 ("netns-ipv4: reorganize netns_ipv4 fast path
+variables") missed that __tcp_select_window() is reading
+net->ipv4.sysctl_tcp_shrink_window.
 
-fork() and exit() are fully serialized. There can't be a mode change
-with remote access going on concurrently.
+Move this field to netns_ipv4_read_txrx group, as __tcp_select_window()
+is used both in tx and rx paths.
 
-I gave up staring at it yesterday as my brain started to melt. Let me
-try again.
+Saves a potential cache line miss.
 
-Thanks,
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/netns/ipv4.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-        tglx
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 4c249aeaf7f12f8237232a6f3d3f3ed56d0a53d4..38624beff9b34161327d7549fcd0f041c9c91679 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -74,6 +74,7 @@ struct netns_ipv4 {
+ 
+ 	/* TXRX readonly hotpath cache lines */
+ 	__cacheline_group_begin(netns_ipv4_read_txrx);
++	u8		sysctl_tcp_shrink_window;
+ 	__cacheline_group_end(netns_ipv4_read_txrx);
+ 
+ 	/* RX readonly hotpath cache line */
+@@ -122,7 +123,6 @@ struct netns_ipv4 {
+ #endif
+ 	bool			fib_has_custom_local_routes;
+ 	bool			fib_offload_disabled;
+-	u8			sysctl_tcp_shrink_window;
+ #ifdef CONFIG_IP_ROUTE_CLASSID
+ 	atomic_t		fib_num_tclassid_users;
+ #endif
+-- 
+2.53.0.473.g4a7958ca14-goog
+
 
