@@ -1,80 +1,95 @@
-Return-Path: <netdev+bounces-264991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SbIlIVR+q2mYdgEAu9opvQ
-	(envelope-from <netdev+bounces-264991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:24:36 +0100
+	id 6mrvBvh+q2mwdgEAu9opvQ
+	(envelope-from <netdev+bounces-264992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:27:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6889222955F
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:24:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2615822956F
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70AEB301DAE3
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:24:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 445D03020D5B
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677472D8DA3;
-	Sat,  7 Mar 2026 01:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5A92DAFD7;
+	Sat,  7 Mar 2026 01:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="edDruARH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QhPOicbw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843782C0F75;
-	Sat,  7 Mar 2026 01:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686BC2DA769
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 01:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772846671; cv=none; b=NWgBv9FMUZ+Cfo0o396eItbGbVYkluD8JPt82uW64ifXy3hc+1DHs/V4SA4XrGGIyffI6f0klQfIlGt5JHkg2pcKpiONJYwSQfdn7EQ46CGyR47hLlKlokg30RaZN1vDIivCET5dB8vzwj+YxYPKdD3inPmGjxZOuaIZNCT8Qgo=
+	t=1772846836; cv=none; b=V+oXw0jNlI5cASfXH733Mcf0+6fwN6S0YT6HUUDieNaTKyNXrFC5xhCSTawqO2SeZ06zPlF4FE3YcCS13oYC4ImQI/MpdFUTqvaNYlem788iR3ooVXLD3U8rSp8+oWbfHcRm5VwTdAEW+h7ZEgkpa/tkTuVUV6GMRK0S6o6SgFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772846671; c=relaxed/simple;
-	bh=ZkKxlHy2ZfpuRQh/qqsLp8wSLhvfVOpqtRbX482kiYE=;
+	s=arc-20240116; t=1772846836; c=relaxed/simple;
+	bh=63+2mikLSv6El2mdrElgZ7skd2bM5hOJ8NnXiyxeesY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oWB8EgctU6XXHk6zAnUoQhDGZl0m3epNyqRzQx2fILjojXCYb2H1j759JtsEYmQu1c86MpJFaDNZZSFQDZkcS1enVmj8oq8bP5Ns5lsNpqGpg1qDTt0I7fYGIh72k4bEnAsGlFKkPH9cpCUk8B20VipLPqDIv+YwvMut9gb+NVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=edDruARH; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772846669; x=1804382669;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZkKxlHy2ZfpuRQh/qqsLp8wSLhvfVOpqtRbX482kiYE=;
-  b=edDruARHBfh63Tb3idq9U3JCmNRbWcu6bYZrB/1ouxu3LG0VB8tp8QeL
-   mVs+CMdnt3cfJcrIBIhey6fHIFmolGgDcaopYliHHf+/2PohFJGMXNnYW
-   a2ll42EvsyrnTxzTNOKZFc61kDuaHEsquqhym6l0sXY9xCT5yDysaYzJ6
-   PFnA8UaATB1r6Uoq7m+5CTOlgUkU5aLAHB9kqCjbnYZaLHhVMFZX9ZnUH
-   3ReZO8jWoPjvZIFmpCx6YFmGXHePHRKM6rr15Vg28n7QfDDONLrD6z3KM
-   cMM2JMFbqe2x+ulcxzL4vKpdA2Jp7rIrbRkZRTcd0+SJVV5byrbs0dIbw
-   g==;
-X-CSE-ConnectionGUID: 5fBxaz2JSqyZaR8sS6X27w==
-X-CSE-MsgGUID: WTyMcX5jQoWoR67Csczg9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="73878141"
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="73878141"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 17:24:29 -0800
-X-CSE-ConnectionGUID: ImTCdRdzR2uoaAE1zvxEUQ==
-X-CSE-MsgGUID: 8QoW4UlqQY6FfsGIRgf6/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="223287665"
-Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 06 Mar 2026 17:24:27 -0800
-Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vygP1-000000001YP-0tpb;
-	Sat, 07 Mar 2026 01:24:23 +0000
-Date: Sat, 7 Mar 2026 09:24:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: Re: [PATCH net-next 1/2] amd-xgbe: Simplify powerdown/powerup paths
-Message-ID: <202603070918.CSq5IR0g-lkp@intel.com>
-References: <20260306121047.1231755-2-Raju.Rangoju@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkPCYT0+0YKCPcLrLwDnvRLlL3pKhXIbE+7znL+jQrwtwmKE9LIMztqUyTJJbHjpe93LGTXsSSAVU2cwD8cUeOQTi5CL3vrRrSR60EH/OuYz7L/7h7JaSlD7P0mtE3ApnGTFpc2tuXMZubzTaYAldHWRca0uRzVA/o+2a0zJcjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QhPOicbw; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8297310ce0aso2231915b3a.2
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 17:27:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772846835; x=1773451635; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dhsogTCHA7Y/An3JeHJX1RKI2H43I9Gsp7Uf5CnyRNM=;
+        b=QhPOicbwHsxq8Eq8rJGXW+fzGLF3Bgarw/M9GU7UOz6ECzkP52skfxG1+JZUSJ3C7z
+         S7eS1b3seBv851aIItPl7smYO4jXIpwVP2YMm+MpLeF2jEfHiq9JOTXPQ2mm9xhQM0C2
+         TQUFh7k8t0ixcKotZtxpnHYBexDl16biLHr7nLtLo1QrWoPai40jSGiHKDz0UMeNeua/
+         jm5PCfHrPmza6F8bvfrtjbnlg5cpQBtH7AMpSbDL+vSe25wGSuQgMfTaw8Eqk34oWiIX
+         yQMRMxBnNDvrjgCs0KZrhmeh8ORTrJ8GPZKbvzMZSxtMCH8hVdxwEKf4IZaVajPJrEuv
+         Ficw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772846835; x=1773451635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dhsogTCHA7Y/An3JeHJX1RKI2H43I9Gsp7Uf5CnyRNM=;
+        b=DaKwoSEUAq/WOj5g2SbS7F0swzVy2E2jIbk/fmuM6PInCJ8UsAEXnU4uRHAIP4Xqcw
+         ir18zU5kz5QndI40ALO8AKlKn7N5POfxjY1jfVjPRpCs3msXI77+7sYaAlCzPT4fNER6
+         j90MrSWmB0ujSqVsKdjOHtFLzh4zdAyc00IXcz3UABYRUn27S7L7OtFiTq6YPnrsYc7+
+         ujO/l6+rJvLVmJnHgd23nCAVvVwfiXbRJfL3hujBB06Wu9EXDfj2oBZTJywebhSORN3C
+         kVzSebehdkpx4odW4RTHD8X198GqU1hmZWXsp2MZbt8OV2Ra2gpCXJpdAO29PsVy1RJJ
+         qtUg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6QopT8vEqX1ZFXSfErjpQyJNp2LRfWPgI52sOa9tY2sggVpdtas+7tJjjUB6epZE1hH9aMlU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUwpJDx7MLTUspeDhji0yRiNXj6eLPN4qeVZzTyNLex5cVeqNL
+	BB/HNDvRrvzZ7xv5IGPQnCBGWgPWdLh9GrzuKRDzNyBEwPvJ/IZB3ggZ
+X-Gm-Gg: ATEYQzy6RSobTTInLV/u+0MIWTHlfoyNxM0CasFV4yXXhfFCOchvNKb4c43hPilxUCh
+	DrmuhWLgQDz7oGEjcAcMEZMQbO4NZWs7Rmdpq1SipitAY+ylsfLmHC9D0W63UCHAdUH31HbYxu2
+	Rt9thPEWr7li2tyujN+QCcRNBHuUElGTNMz7cN76+1C8zhUBSCL8rRv3bsIy1Xo1uJnVytyeryc
+	jdN/hi4A63Bacg0ajAWa5gZFfVkFqk3tvHJQVxaQO05XJc8EsNHL0J/Ne5dYti/1U2vORTo/tSC
+	ylzFf70wf9HeF6jQJbg+U8K1moZ28G5fP6qYCArQWtyahHiaRYDGwhAwU/Ql9r7z59OoQVVNEnA
+	EHUM/dlG+Sp4KKrJlwIeDcE7jVptzXHqVSew9f75NllHyIZib2cesuQGYQGOrzJI190aIygvcNx
+	hBStVCKw4szWlGPr/bqH+9rPQYkI8=
+X-Received: by 2002:a05:6a00:3d13:b0:81f:4dc7:d31 with SMTP id d2e1a72fcca58-829a2f6d393mr3710435b3a.33.1772846834619;
+        Fri, 06 Mar 2026 17:27:14 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a4638141sm3144325b3a.6.2026.03.06.17.27.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 17:27:13 -0800 (PST)
+Date: Sat, 7 Mar 2026 01:27:06 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Tonghao Zhang <tonghao@bamaicloud.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Liang Li <liali@redhat.com>
+Subject: Re: [PATCH net 0/2] bond: fix 2 link state issues
+Message-ID: <aat-6piJ1updznEP@fedora>
+References: <20260304-b4-bond_updelay-v1-0-f72eb2e454d0@gmail.com>
+ <20260306162613.05a8ca6e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,111 +98,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260306121047.1231755-2-Raju.Rangoju@amd.com>
-X-Rspamd-Queue-Id: 6889222955F
+In-Reply-To: <20260306162613.05a8ca6e@kernel.org>
+X-Rspamd-Queue-Id: 2615822956F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-264992-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-264991-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.981];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.946];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,01.org:url]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Raju,
+On Fri, Mar 06, 2026 at 04:26:13PM -0800, Jakub Kicinski wrote:
+> On Wed, 04 Mar 2026 15:13:52 +0800 Hangbin Liu wrote:
+> > Here is the reproducer:
+> > 
+> > ```
+> > ip netns add ns
+> > ip -n ns link add bond0 type bond mode 3 miimon 100 updelay 200 downdelay 200
+> > ip -n ns link add type veth
+> > ip -n ns link add type veth
+> > ip -n ns link set veth1 up
+> > ip -n ns link set veth3 up
+> > ip -n ns link set veth0 master bond0
+> > ip -n ns link set veth2 master bond0
+> > ip -n ns link set bond0 up
+> > sleep 1
+> > ip -n ns link set veth3 down
+> > sleep 1
+> > ip -n ns link set veth3 up
+> > sleep 1
+> > dmesg | tail
+> 
+> Are you planning to add a regression test? Or you think this is too
+> much of a one-off regression? Just curious.. 
 
-kernel test robot noticed the following build warnings:
+Hmm, I didn't plan to write a test case for this corner issue. But with your
+reminder, may be I can add a common updealy/downdelay parameter test case.
+I will add this on my todo list.
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-Simplify-powerdown-powerup-paths/20260306-202410
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260306121047.1231755-2-Raju.Rangoju%40amd.com
-patch subject: [PATCH net-next 1/2] amd-xgbe: Simplify powerdown/powerup paths
-config: sparc-randconfig-001-20260307 (https://download.01.org/0day-ci/archive/20260307/202603070918.CSq5IR0g-lkp@intel.com/config)
-compiler: sparc-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260307/202603070918.CSq5IR0g-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603070918.CSq5IR0g-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/amd/xgbe/xgbe-pci.c:379:12: warning: 'xgbe_pci_resume' defined but not used [-Wunused-function]
-     379 | static int xgbe_pci_resume(struct device *dev)
-         |            ^~~~~~~~~~~~~~~
->> drivers/net/ethernet/amd/xgbe/xgbe-pci.c:363:12: warning: 'xgbe_pci_suspend' defined but not used [-Wunused-function]
-     363 | static int xgbe_pci_suspend(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~
-
-
-vim +/xgbe_pci_resume +379 drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-
-   362	
- > 363	static int xgbe_pci_suspend(struct device *dev)
-   364	{
-   365		struct xgbe_prv_data *pdata = dev_get_drvdata(dev);
-   366		struct net_device *netdev = pdata->netdev;
-   367		int ret = 0;
-   368	
-   369		if (netif_running(netdev))
-   370			ret = xgbe_powerdown(netdev);
-   371	
-   372		pdata->lpm_ctrl = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_CTRL1);
-   373		pdata->lpm_ctrl |= MDIO_CTRL1_LPOWER;
-   374		XMDIO_WRITE(pdata, MDIO_MMD_PCS, MDIO_CTRL1, pdata->lpm_ctrl);
-   375	
-   376		return ret;
-   377	}
-   378	
- > 379	static int xgbe_pci_resume(struct device *dev)
-   380	{
-   381		struct xgbe_prv_data *pdata = dev_get_drvdata(dev);
-   382		struct net_device *netdev = pdata->netdev;
-   383		int ret = 0;
-   384	
-   385		XP_IOWRITE(pdata, XP_INT_EN, 0x1fffff);
-   386	
-   387		pdata->lpm_ctrl &= ~MDIO_CTRL1_LPOWER;
-   388		XMDIO_WRITE(pdata, MDIO_MMD_PCS, MDIO_CTRL1, pdata->lpm_ctrl);
-   389	
-   390		if (netif_running(netdev)) {
-   391			ret = xgbe_powerup(netdev);
-   392	
-   393			/* Schedule a restart in case the link or phy state changed
-   394			 * while we were powered down.
-   395			 */
-   396			schedule_work(&pdata->restart_work);
-   397		}
-   398	
-   399		return ret;
-   400	}
-   401	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks
+Hangbin
 
