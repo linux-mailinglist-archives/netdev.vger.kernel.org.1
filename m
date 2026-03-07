@@ -1,187 +1,151 @@
-Return-Path: <netdev+bounces-265199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Ei3D+SmrGkZsQEAu9opvQ
-	(envelope-from <netdev+bounces-265199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:29:56 +0100
+	id MOZNMo2prGkbsgEAu9opvQ
+	(envelope-from <netdev+bounces-265200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:41:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79C822DD6A
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:29:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 476A722DDA0
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 59F39302087E
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:29:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6A32301E3D8
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F372737F73A;
-	Sat,  7 Mar 2026 22:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE162BFC7B;
+	Sat,  7 Mar 2026 22:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPlKjvtQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="or7ofdcw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D8536A022;
-	Sat,  7 Mar 2026 22:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356CB244661
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 22:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772922581; cv=none; b=PGwboNYyJXAZ3N14GVFYbeUo84KQs/uUl1vLcol2p4VjzdGt6/XOyAgoKWCwmFm2VeyILXxsG7zqzAYJg250jSzO0IcKOMnWIayIM/8sgvqI/R2pYcSVjshTq3tl9yMEQSandviXRjNvHHOt5h09iqnHYUJ2PwYfIscNOOCCDn4=
+	t=1772923273; cv=none; b=gkJnCIgORVUeo9fGgDLnj60C1CoBR2KoqURAVwnGIhlqptcsUNKVRH3RguAE/PClsAGJmQux9UXGvDRMCLM5WJNA/Hh86DlMGiD0bXlbf3Mmw3Ar/0aCQxTBsrthsB+nLvqca/OAkPfPoLb8mepYBAWKcP7CJNkGQs/UF+PUIEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772922581; c=relaxed/simple;
-	bh=86FT+jrr9lGMW3QHw5UUhDZPyggZzHYm9O0FiRH+WkU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=biE7RJcSz8blcX0IbLbaLesFsKomQQd+0HtN2AGdxKz1OtLUHbHxsbKAaXK5I18PrIWnUQ6rS+saykRXQ3eq3bYUoHl0AhFnwDkSAsVqlgQaNUxwc+gm5dtKe6VqNRKwv/OTaTbTcLfn9TXeToL3l0dbdGpQNDh+OJOBDlew5SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPlKjvtQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99543C2BC87;
-	Sat,  7 Mar 2026 22:29:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772922581;
-	bh=86FT+jrr9lGMW3QHw5UUhDZPyggZzHYm9O0FiRH+WkU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=gPlKjvtQ5cF+gE/3W0nLutAk5CKaszMueR5skxzq/VMBn5QO/gCsJVXZ0UIWABUyM
-	 ABMXz/bXvcP25SRqoPk+yAZak0P2Txk8pUVnQC/3TIAOlNokLvwrPypJ0ZnlXQBPtI
-	 281Nmu2q8wdMiHjc8NM4FZ3B5+COBSN8OxZoUmQ2rPj4RHjevT0QhutpmVjFKbsRja
-	 Isl+/hDXMez1W6w5Zo6PSZohvesCgb4tPbygO3lMfc7BNxI2jJ3elX4fxvtye8gjW8
-	 BDJJUB+ht/tAEy7Fad/DMR8U3gbgPQvVrlfF8UvFCdX3Yqp+ZyS8WaSG0dyNHV6bUE
-	 PHtBGVseM+TYQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Shinichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long
- <longman@redhat.com>, Marco Elver <elver@google.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <87ldg42eu7.ffs@tglx>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx>
-Date: Sat, 07 Mar 2026 23:29:37 +0100
-Message-ID: <87h5qr2rzi.ffs@tglx>
+	s=arc-20240116; t=1772923273; c=relaxed/simple;
+	bh=I4VtaTm8XHSftyNG90a7MzUKFwrfQloyAsT6smzws+Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=a6A173Hwm/I7dYteiSMl1QOGArD3RzT+uR9YZvjwAEQWpEKVl/nZVqjEzuIOxTUl8ApHAkjFkfHZdbNYXhhuVNgu58s+pjLUiL5PNOhiArSGHMIPwQ4UvshK+VqTYiswz8XNCMnK6lchzFqhkD4AEtZLy282vf0ABPgoNayaLuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=or7ofdcw; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4852ccff333so12532725e9.2
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 14:41:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772923270; x=1773528070; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H7GRPrhIM/HbWD59Yul47MIZsf01ZYQyC3nXK9qbXgs=;
+        b=or7ofdcwi17qkjHaB9Nw5750BROHdHokL2xHrxfJXCrZqrXels4SE3nzsNWXmLGsCI
+         9PpmwLR9X9Eit+M1JqoDTSdJQoXAsLzgn7esFeYGY1RSb1OLHTxHR3MC7h8kYycI2yWJ
+         jzJ6nN6f5jH/XVOsybBhH/YlMAdsV/Schnr06EXlz6aX0NsQawGxyNJ6TSz9nYaC+ijv
+         W+KU8A/wUzaHj6FZObXNdJian7TGcfSsrv3nG6qzF6E9fnhxpWbnsI3IxLYRFdDWkbsD
+         zv43nwKBgjrj7p9ElRAGy6dFo+Ldok9AunfyoAClDUXQ27+lSSh8kAgVNa5Y9o5bnYmy
+         c98g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772923270; x=1773528070;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H7GRPrhIM/HbWD59Yul47MIZsf01ZYQyC3nXK9qbXgs=;
+        b=jb4ihxfxNeitJIrGlmKKnd1unWDeXxxoLuT+IlMZyBI13P7gQDx1bh0sAqfFVZ0MgC
+         C9e3A7UqBH+BsdnIFVGEVe8wIUFAJ64MV1tG6604v9qUbZshRZThz7fQ4TuykQWwfxAV
+         /6tAXbhhSvhCKeZSg2gmRSM4deVgeM8G79waQ3JIAH/V8e9AblDzUz+Np8Hr/rUb0Tbj
+         q30tIQTDRQuTZKTVxno4XUuJOPrllgN+nGD/OcRiApefIhStpqZOgiKJb4odPXGTZGxF
+         1geHXr+nS8xXHv3NkGM44nPayORKlpuGUTdzvZtA1NfxXrLe1mugkALeqUV2vIDeyuDQ
+         PxqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTAdWnJuHageKSfYO8uYUrG1hoBCBHh+kZnPp91SztkP2VYA0nmMrzUQCrZuBoFKDlb0IzU/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2T38Pc5J5bod7AcldKnremDFKenPn1itmEb5HjhwHoJEWHfJh
+	wL9z4ghFq+Gsmkt1rELbBu9srnGn8gfrxg3U0wFYhcULWyo0trcZLoMsfxirkJv9M+Ig5Ym9UMM
+	cF/yT9+fihWedo1clgQ==
+X-Received: from wmjy4.prod.google.com ([2002:a7b:cd84:0:b0:483:27fd:cf2b])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:350e:b0:480:4a90:1afe with SMTP id 5b1f17b1804b1-485269785afmr99848205e9.34.1772923270530;
+ Sat, 07 Mar 2026 14:41:10 -0800 (PST)
+Date: Sat, 7 Mar 2026 22:41:09 +0000
+In-Reply-To: <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: E79C822DD6A
+Mime-Version: 1.0
+References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
+ <20260307104131.4c1d0de5@kernel.org> <aayWSuOM59uojtuG@google.com> <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch>
+Message-ID: <aayphfkModIeENp3@google.com>
+Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
+From: Alice Ryhl <aliceryhl@google.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
+	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Rspamd-Queue-Id: 476A722DDA0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-265199-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265200-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.988];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.306];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sat, Mar 07 2026 at 10:01, Thomas Gleixner wrote:
-> I gave up staring at it yesterday as my brain started to melt. Let me
-> try again.
+On Sat, Mar 07, 2026 at 10:39:28PM +0100, Andrew Lunn wrote:
+> > > Please no duplication of existing code in Rust.
+> > 
+> > The plan is certainly to get rid of C Binder, but it was unfortunately
+> > not possible to get there without a transition period.
+> 
+> Dumb question....
+> 
+> Why?
 
-[Un]Surprisingly a rested and awake brain works way better.
+The reasons for moving to a Rust implementation are discussed in the
+cover letter [1], and in my 2023 plumbers talk [2].
 
-The good news is that I actually found a nasty brown paperbag bug in
-mm_cid_schedout() while going through all of this with a fine comb:
+[1]: https://lore.kernel.org/all/20231101-rust-binder-v1-0-08ba9197f637@google.com/
+[2]: https://www.youtube.com/watch?v=Kt3hpvMZv8o
 
-     cid = cid_from_transit_cid(...);
+> You are just sending messages to user space. Does the rust version
+> send different messages? Can user space tell the difference?
 
-     That preserves the MM_CID_ONCPU bit, which makes mm_drop_cid()
-     clear bit 0x40000000 + CID. That is obviously way outside of the
-     bitmap. So the actual CID bit is not cleared and the clear just
-     corrupts some other piece of memory.
+No, it sends the same messages. The intent is for Android to move to the
+Rust implementation without userspace being able to tell the difference.
 
-     I just retried with all the K*SAN muck enabled which should catch
-     that out of bounds access, but it never triggered and I haven't
-     seen syzbot reports to that effect either.
-
-     Fix for that is below.
-
-The bad news is that I couldn't come up with a scenario yet where this
-bug leads to the outcome observed by Jiri and Matthieu, because the not
-dropped CID bit in the bitmap is by chance cleaned up on the next
-schedule in on that CPU due to the ONCPU bit still being set.
-
-I'll look at it more tomorrow in the hope that this rested brain
-approach works out again.
-
-Thanks,
-
-        tglx
----
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -3809,7 +3809,8 @@ static __always_inline bool cid_on_task(
- 
- static __always_inline void mm_drop_cid(struct mm_struct *mm, unsigned int cid)
- {
--	clear_bit(cid, mm_cidmask(mm));
-+	if (!WARN_ON_ONCE(cid >= num_possible_cpus()))
-+		clear_bit(cid, mm_cidmask(mm));
- }
- 
- static __always_inline void mm_unset_cid_on_task(struct task_struct *t)
-@@ -3978,7 +3979,13 @@ static __always_inline void mm_cid_sched
- 		return;
- 
- 	mode = READ_ONCE(mm->mm_cid.mode);
-+
-+	/*
-+	 * Needs to clear both TRANSIT and ONCPU to make the range comparison
-+	 * and mm_drop_cid() work correctly.
-+	 */
- 	cid = cid_from_transit_cid(prev->mm_cid.cid);
-+	cid = cpu_cid_to_cid(cid);
- 
- 	/*
- 	 * If transition mode is done, transfer ownership when the CID is
-@@ -3994,6 +4001,11 @@ static __always_inline void mm_cid_sched
- 	} else {
- 		mm_drop_cid(mm, cid);
- 		prev->mm_cid.cid = MM_CID_UNSET;
-+		/*
-+		 * Invalidate the per CPU CID so that the next mm_cid_schedin()
-+		 * can't observe MM_CID_ONCPU on the per CPU CID.
-+		 */
-+		mm_cid_update_pcpu_cid(mm, 0);
- 	}
- }
- 
+Alice
 
