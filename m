@@ -1,168 +1,122 @@
-Return-Path: <netdev+bounces-265161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265162-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aAQ4KShgrGmlpAEAu9opvQ
-	(envelope-from <netdev+bounces-265161-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 18:28:08 +0100
+	id eDQuIJBirGkPpQEAu9opvQ
+	(envelope-from <netdev+bounces-265162-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 18:38:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E53522CFB8
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 18:28:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E9322D0AC
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 18:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D06C73021E4E
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 17:24:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4E9D23009E18
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 17:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB9331B80D;
-	Sat,  7 Mar 2026 17:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3456C33438F;
+	Sat,  7 Mar 2026 17:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVzbHH5m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZRFxMARI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD42C330659
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 17:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0B230F545;
+	Sat,  7 Mar 2026 17:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772904252; cv=none; b=YskvkNxakLxPk6wBfdPjl3xNp2ajqhJnU/DySzhnVdTXk67JRFXx6RaJEwyI99L8JkyzLH8ZpJNprlrI+r8kA1xFXSOB/r3ZGGGPs4NeNo7YNsFYL+tqP7ee1ptEDoX6w/5QYl6bYN/A4xQeEARNqb/sHF+aShHAugIiErzOZwI=
+	t=1772905099; cv=none; b=egnWsVSx4urLlklNGzvMUad5+Na65cUq69KZyAd0By/tPkIfeYt5eVIO1oBcDZ/I1BCEOpqE/sHBcMvdK434Ba/I25KuSRk8d6qYfZidlZ7PcA9Gqv+lxMGrytlMqtaD69mpX556LL/od0zc+kHaUni7DxguJ1siR4szrcnHZRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772904252; c=relaxed/simple;
-	bh=gZ+JzdkG3tpp5v5mkGmBvNixpFXUOmaqnsWndspvqS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NfL8c8jtLM1xNCXtW//E8kcHolwr0qcXcekZ+2uz2xzKotmRECV1CJ+w9mDq1+ZoTD2fZgOHxLV82bcxIOCqGWhnUFA7OaujHrsXgCaWzYVSPz2du61ZOB8lqat3H4Qti4hPJ2t5QxJnHUeDC6uoUog0wdHTM2A+QRIstSlllvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVzbHH5m; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82735a41920so3902790b3a.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 09:24:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772904250; x=1773509050; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mkxoUjDwyEKhbXBPEFB5Rnx4oGaKmH57R3vhYiR1yRk=;
-        b=EVzbHH5m5ph3K673go94pRukmHUCL4U1paVgy6Uqr4XtKOJCDAYay5PQez70MIAi6D
-         5q0BZK85nEfrb+C45c35ygA5hFN/ZqBaFIG0y6s3ntnab0HZ7par3Ae7TDtluu5qWaVk
-         zJ4CAq/JfLzHXtFvQ2W0QH07gokFQp6pfPeg5ARXnFOYeYm11Y8ECL+dpItbClZD6GTx
-         V2Z8SfAfqOVLdGiiR3Y35srzTDfGG9Ovif8mPFESDDzt/nJS1hbYJtAH3YqIoxumc6AB
-         bMP5kqKWTJCklEHgKYsVjRBuUvdGMpwTOv27BBGDUNTCX7Vli5h7XfaIqDDlzv49TzdW
-         GqKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772904250; x=1773509050;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mkxoUjDwyEKhbXBPEFB5Rnx4oGaKmH57R3vhYiR1yRk=;
-        b=cHHDBEJteDplNYZ3hz7MBplrq+O3n0kMcECYnENWKQ/1AuJZNKFTVYMo1kxb9gxuzC
-         cwGJZaFwD4CnQoULnkZ78anCcdAgJA3s5VMv1h+AemDKUSBM0+ujtdtTiIuFc0fMuqEB
-         v7qo8rFuvI5/w7PaYIw7t5FyB39naYQS3yzc2IblvT6TXVpDZKvRH8j24No9u7/EOW5D
-         EQL5EhYaie4JQbJUUciQhbX2Iu1K5O4rmc9h/H3nwjtRMHpuDKVeoXd3cNMLf5p4K1JM
-         /FT0/LhzdFcTJj4y2GPOalnlY/TmWuAeX6Y15i8gwagbWG9dqUnQ8PjXroc8LNznnk4v
-         QkeA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcaj7S0ynF80SUnA0GM2/m2Zz/t0tZSKOjI5AZ4ASdnCQTzT6+6Un/Zl2Zh7oKQc7Sk0FIQw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrUEDnRk+GGAVIySXIKPAF/QCUgNzkZghScYBY4h0rwC6Hn21D
-	TFxmMr5The69rKDEPlf+DVQpDsNIZ0MlYzjUkfUesfqlJ3zS7f1cruhX
-X-Gm-Gg: ATEYQzwMZgCURArl4+4qu4UgW9DvHh0AMIsJn4XrbAoQyYkMrOwjrKgzycxlhf1Y1wH
-	bplkbpapht+gEcUvR7XNaHKx+2b5pBnl7HWHLnfuuB3Mbm3tCARXfxoB9AhLpzvbhsNekBF1F/B
-	8Ga0l4lX/awJHlnlS4tFWylPce1gldEmaNRwkD8NsAQfS6QPlgTo2Gs1XhmW+EKJF8T1YPnnTiz
-	ceosMduQZHrcgmQWnX9zEgfCQ7Ow3bdOtTGiSHP3bx8HcykRaHw3xcqs9lny5eAOeI+TMcUNCjj
-	lGesM1ob/8wLC6I0Dvxxx/hd+4G+DRkM285xdjPzMDpMRluQ7Pt4SVcujOctMMfPBMZ9Rcqn/Ol
-	1XhDjsBPNDdw/Oe/FP8hhCMocY1Hvu8+wtd3lzLY91xaSO/BmN8SYhLO2Vl7EFnzpGfunRWxhfI
-	2uE2EK0NOAn5Ah2+YeUgLS8yTNLKGjcmNodS/WBlQX9A==
-X-Received: by 2002:a05:6a00:2d1e:b0:827:3845:921 with SMTP id d2e1a72fcca58-829a2e16119mr4719509b3a.27.1772904250125;
-        Sat, 07 Mar 2026 09:24:10 -0800 (PST)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a4636973sm6437528b3a.3.2026.03.07.09.24.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Mar 2026 09:24:09 -0800 (PST)
-Date: Sun, 8 Mar 2026 02:24:06 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: pablo@netfilter.org, fw@strlen.de, phil@nwl.cc, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net] netfilter: nfnetlink_queue: fix entry leak in bridge
- verdict error path
-Message-ID: <aaxfNvmoiil_UhY-@v4bel>
+	s=arc-20240116; t=1772905099; c=relaxed/simple;
+	bh=t7qdO9corSfNTkZPrumwwSolizuoerkE8WBeCc0vSxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aLYgkGP4CSByhhgLnBui7kHiSG+MI4Ahh+40OgexBDOd51HmYFIJ0d+a9GbfzJyFzGkQYE5FbWryjVgwAkaLZO2eFCwmcXeuDPJcR03Rte4UgE291hz4XvXFSQRo/RbvpEHZGwb/NhfxzysZXoBTAa+VGGyyKO75OcHc6dUyIPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZRFxMARI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B553C19422;
+	Sat,  7 Mar 2026 17:38:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772905098;
+	bh=t7qdO9corSfNTkZPrumwwSolizuoerkE8WBeCc0vSxI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZRFxMARIJYSzQ4/pC47IjJE1JISAHrDyeTDYyXdZRpsxofeWOqeTSwsssyCPUU0Hr
+	 OxgMQXI0n0ipLpC/IubZHWPh7Gmk+pxcsLyQNG/w58fj9h4CFAVQdNKn4PXYTz/Ymu
+	 xECw/diZ4y/WoU9mEXlpFK2czG49Jyedma1XOuFjNxXFpNqHg4HSCQFnTCG9vQd4j7
+	 BXyrs5UtMyWhkjaxo0vGfWAfjam0kJEv9zkybXe8+m7dz/zhpqpRMTdMtbn/1o94XL
+	 lNZEhQVnJCZUNVEQD78/d7Ynita/mLfIlyEODnK2Ir5JVE4HcTjn8a6Dnsdkks1XmY
+	 /9qEvcVDTwSMQ==
+Date: Sat, 7 Mar 2026 19:38:14 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Long Li <longli@microsoft.com>
+Cc: Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH rdma-next 0/8] RDMA/mana_ib: Handle service reset for
+ RDMA resources
+Message-ID: <20260307173814.GN12611@unreal>
+References: <20260307014723.556523-1-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Rspamd-Queue-Id: 0E53522CFB8
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260307014723.556523-1-longli@microsoft.com>
+X-Rspamd-Queue-Id: 81E9322D0AC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265161-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-265162-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.971];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.930];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-nfqnl_recv_verdict() calls find_dequeue_entry() to remove the queue
-entry from the queue data structures, taking ownership of the entry.
-For PF_BRIDGE packets, it then calls nfqa_parse_bridge() to parse VLAN
-attributes.  If nfqa_parse_bridge() returns an error (e.g. NFQA_VLAN
-present but NFQA_VLAN_TCI missing), the function returns immediately
-without freeing the dequeued entry or its sk_buff.
+On Fri, Mar 06, 2026 at 05:47:14PM -0800, Long Li wrote:
+> When the MANA hardware undergoes a service reset, the ETH auxiliary device
+> (mana.eth) used by DPDK persists across the reset cycle — it is not removed
+> and re-added like RC/UD/GSI QPs. This means userspace RDMA consumers such
+> as DPDK have no way of knowing that firmware handles for their PD, CQ, WQ,
+> QP and MR resources have become stale.
 
-This leaks the nf_queue_entry, its associated sk_buff, and all held
-references (net_device refcounts, struct net refcount).  Repeated
-triggering exhausts kernel memory.
+NAK to any of this.
 
-Fix this by dropping the entry via nfqnl_reinject() with NF_DROP verdict
-on the error path, consistent with other error handling in this file.
+In case of hardware reset, mana_ib AUX device needs to be destroyed and
+recreated later.
 
-Fixes: 8d45ff22f1b4 ("netfilter: bridge: nf queue verdict to use NFQA_VLAN and NFQA_L2HDR")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- net/netfilter/nfnetlink_queue.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The same is applicable for mana.eth as well.
 
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index 7f5248b5f1ee..47f7f62906e2 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -1546,8 +1546,10 @@ static int nfqnl_recv_verdict(struct sk_buff *skb, const struct nfnl_info *info,
- 
- 	if (entry->state.pf == PF_BRIDGE) {
- 		err = nfqa_parse_bridge(entry, nfqa);
--		if (err < 0)
-+		if (err < 0) {
-+			nfqnl_reinject(entry, NF_DROP);
- 			return err;
-+		}
- 	}
- 
- 	if (nfqa[NFQA_PAYLOAD]) {
--- 
-2.43.0
-
+Thanks
 
