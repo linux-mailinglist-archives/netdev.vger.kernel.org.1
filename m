@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-265093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265094-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HPLB6XKq2n7gwEAu9opvQ
-	(envelope-from <netdev+bounces-265093-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:13 +0100
+	id WHlrMbTKq2n7gwEAu9opvQ
+	(envelope-from <netdev+bounces-265094-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87EE322A7C8
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F69922A7D6
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E91D3061512
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DCA230AF3C7
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C8E374753;
-	Sat,  7 Mar 2026 06:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3D1378820;
+	Sat,  7 Mar 2026 06:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fs1blK3P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOS8VkO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87113016FC
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9E137187B
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772865883; cv=none; b=kiUB4HrcVO54opkmxzcztxb3CyUxpazJn/ptAL0Lrqtj0Xybjh/YVdf03z0QWBQvoYpy3dsPSskdV7I1l9UW4DaSwJH8GiEnzxQjwwRPIE8E8HpI2YU/uUau+9pGXiDLJ10YtjDcP8cV0gIrdaycsBT0KEU+9lkyCBDAKUbssfs=
+	t=1772865884; cv=none; b=YOuzClmQwL7XjJUCoUm8y9OAPUxSPIedZLvCIj07W2UxX5Y0fJLH0tvbCxkiISWBHiLE4VewuRHzFtRJuGqFwyAj6ifOlA+eJMWV8ZminJ5BYebs3YAX2y7aVeGH0B2iyqpvtSwj+GS86k3DtUmmcsckbMkAlAA3mBT+6ke3AWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772865883; c=relaxed/simple;
-	bh=I0tzPL0aFeMS2WWrGqYaGnXOAI66uZHw3bD/yJmzb4k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lauOTUUXJ55HZrd4WhAcLGDt5+PnGG0x7xQ7JKzC5S1Ed3Cb9g4LqevU8rvR5dQxd6eNjQXp1ITz0NNQg+RsXq1eXzVFVwO0y52Z4dN6cgn9FMQThji0g1OOVYvyKxueTzBhoJN2LP3uj28SvfS8TFnpw/2WhbKA9NiiZV5UPV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fs1blK3P; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1772865884; c=relaxed/simple;
+	bh=rMKMDKqkXjLxye/2LPEjB4JCC2je+wDR+KuxZr55syI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Yb88QEKB529m8VarvtCL9QVKl4hKHDsCcJBEDTItrtBShzUtzto8R9DTDSeXAsBADmfMr7dkZIZrwGfoRKGvX9lqe+WRvKrTs/+BjN+YoR219ibMvepjfQqg7Qf2T+2S1UCG2+GGW5Rd4J/LdYtfQ0+sRPaYEyCw8RuXvetj3EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOS8VkO9; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ae4988e039so44569695ad.1
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:44:41 -0800 (PST)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82735a41920so3808854b3a.2
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:44:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772865881; x=1773470681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpZf5Rj08FR646dOpjG3VqxqgOpKghxdnT1y4De/qHk=;
-        b=fs1blK3PU6okBMId/nzw2yXSH6HXh84Mqq59IEEYzPJ95aPgFrxXPqA/5E2nKuCENh
-         KfIAMarr/sR3sxHYzHz+Z56+FwetElU1bQ7DJcsAeo85v12HeVoSfjA8FPKuRctCw91n
-         /R0qg4MyDoRsh0B0xoNq6M6RPoW8KBHOoKTss6iELiOE6Yqq3AqHHfvmHhc/xF897fIC
-         RdZPBs4rv+LYN924ZzL766nYvAnyJFAOHahpsArrtQnirblUmaRbS0DrJGMjJmjN71wC
-         BH37HWbiJak2pXz39Dg5xNY5HTHcv6d//bpDWLOGPeI+x3rn6dkI/RVTuZ9k7BfFqY7n
-         IIgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772865881; x=1773470681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772865882; x=1773470682; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kpZf5Rj08FR646dOpjG3VqxqgOpKghxdnT1y4De/qHk=;
-        b=FgqQMNJc1DdQSO6AZlDCfJhMhdGGn/JdtYJORcv/fyfGT1TdOF+WSk5ogvAEtgRiaf
-         tV/gbtei4SGJYFsGzCHr+KcCTIGpLMwsKvmnFKzZtXJrLzmmSM2m/g5KOizGe1PdP5Uy
-         vRriwax/0K9Jnz3+2o8GXxy2zRH9sifzEpKbKMBIH+7Iqow9aMIQ2DdJiDqzo0NAXhan
-         RkisRymGN0Os8bFAri76D/jTbp+rDdCgCVUPGdUGuT5O5RhpsxPjDr69Ko1WHfH8PLb5
-         IXAzIHRuQ7UyiF2NVF7RDmuh13OWhVHrzbcFNEUnLs84o72SfWRw6jXEU/6vPR7GbKsp
-         Vg0g==
-X-Gm-Message-State: AOJu0YxFnasRGv6P7TiT7kReKJvofmTNgXBoXdI/nda0AiC4C+Eqq1UM
-	ODvfJY9H4DpN4G+WGRF+5n35rtaWOVsqK7klDi/xA8wgXC0ezCyNxbrF
-X-Gm-Gg: ATEYQzyYz9DVkbB/7yKTZIyKO12PMRbQbgxYlVafZmlUwdlMcm0Altfo0WyJ4+aCETG
-	nkETerCy7mPZaieSn8ew+IAqnOUFHFiE17mb5mlptecELlEDXoYX2KU5VqN2TyLO9mt17eG/VUC
-	o967Gmbrgpf1g2JSnIfdsNYqfwuDMZhWehZx8bS6lvGugo62vf+al4OttG1OVNzjUb6KRRLJKKI
-	oPMSokyP3rzEg0APiPMpUmzi5+X+9RBd3hUAmqQ1oXIx7IMODt4/9dUO6DScKD5VmzA+jBEY0iq
-	ZjsOv2zBtN6e1D9/2VcvsGMws+b9KxZVUBIJWE07bpf03MRP5d5H8pz4nOQwMxJ9EnVLybAe5IJ
-	aH8unHNPsBcTH8If63G7/Ky2i3T4RVIdZ8N0vA9pQUnjV3bYeWBN1ty0V4eSTHZxGRhZW0KssGE
-	fylx3ARlqYuZFY
-X-Received: by 2002:a17:903:1d0:b0:2a7:aac1:7201 with SMTP id d9443c01a7336-2ae75b09c8fmr84034725ad.3.1772865881101;
-        Fri, 06 Mar 2026 22:44:41 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:1::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e57af3sm55536105ad.13.2026.03.06.22.44.40
+        bh=S2Kn+p57CT+fsStJXUMecOK55ul6D9D2EzUggqAfVNk=;
+        b=UOS8VkO9KQdh5yC9rjIuEHySfFwwOpVUoTmfSFcrl5uif/fv1ocarxe/biB8zOnpHz
+         VFHDfen3IZlXjbIWKcRZahTejXI5j0K9FGlzZpjbwH+SainoW0rU1O9vgx6ag1stHqTW
+         8EJGgeiUZDq5rddwv9NZSlU0DErE7DTepAgo9e1AKcZtcI/J14GlO7IRnmKGCm6Vx8Ur
+         0yrgr35LLaDGNajlpScPLa8SpOB5aS1f1SqK4kWyMASnt46O1uHCLqQCFCMfa9FCKUP8
+         rl3Px1JjS5SLZgs0n1w6iDlkLfncl5YV+ysNHFqapOKpfHe/pt2w5K31hDorJNgCSdWM
+         8CQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772865882; x=1773470682;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=S2Kn+p57CT+fsStJXUMecOK55ul6D9D2EzUggqAfVNk=;
+        b=nrdV5JG9/5GVYgsCCIj0M9uYr6lhRxaWkn91FUD8R2b1xBGDzumzAuIasbU2vaOiG0
+         RZECZlpyekihnAo70wJ9a79gxcjpC3ItYlNnNNY+OZ3USi7x8RP9kKsG/EYQU+ZfUPi6
+         9u7Jh2fuWg/liEvqNOJiI8hxQ8zIkF9NwT32n3hyE5FbvCBVYwcqwg9s7uwdKOPqjHq6
+         tn7jsfZrnOEgjd8UJeYwfDgKK9hT7DNwglnKqFjuRMoMGJA61/wI+olUMTd8TBdZ7SJH
+         rxROFqnDRxXaHO/zbX6fSWy7b0Vq3iy7oGc6X/s07tYbu848QrC/0Hx1TLuF6ulJr0mo
+         iO3g==
+X-Gm-Message-State: AOJu0YyBKtvNu1vNWY+n17tqr6CbgqOkX4donWY+xmNgB4Vh/FCD/JP8
+	6LmoVlqJ4pgoirdIqBtY8CtJzi6NGgTCoEoPUMc9LpCkCnpLUzPeKsrF
+X-Gm-Gg: ATEYQzwJ/ZPV+A+YcSYwxom67kYdmr9sRvo/+a3bxwAj3MVEPArX5CICyl2YKu+B0CY
+	x4WV1a2hKrFpSXffUE/LwJU03TYX5deBhnjuPd/SAL6RvBR4S14G3bPviZ8iExF0dGtFXnHaYgB
+	Dr2clj+BAEPPDEAtfEH2vAflj1Ce3X4JrtGD4XsJWizBT3fblaQuWJKW9A3cBAVz4Dobx4DmDXX
+	0VdmCiH9gC1637nlBObdxi9O+nmNPgge+MJ9jmmWXLl7UGZQLrTrj5QXKTRVVfY/bRrGwn3rTAe
+	QOFIEqNMeRIl+bN06aOlWN2jUByr4dbTZs7LQosRcAjCXLumHOYWvMbz0dcWi7GxKhv7MNdHbAg
+	yVhaZfWk4jLwKQvOYm6OcU6RPoDA0dFDzdgq2z8Sa5Dmgo1pVDLw2XnkpbKa0YzG8V1zKFFn0sz
+	7T/2LQ9EpyT0tz
+X-Received: by 2002:a05:6a00:cd6:b0:827:26b0:58d3 with SMTP id d2e1a72fcca58-829a2f8d460mr4268932b3a.54.1772865882190;
+        Fri, 06 Mar 2026 22:44:42 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:d::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a4636968sm3557285b3a.9.2026.03.06.22.44.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 22:44:40 -0800 (PST)
+        Fri, 06 Mar 2026 22:44:41 -0800 (PST)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -83,10 +85,12 @@ Cc: netdev@vger.kernel.org,
 	martin.lau@kernel.org,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [RFC PATCH bpf-next v2 00/11] Dynptr cleanup and bugfixes
-Date: Fri,  6 Mar 2026 22:44:28 -0800
-Message-ID: <20260307064439.3247440-1-ameryhung@gmail.com>
+Subject: [RFC PATCH bpf-next v2 01/11] bpf: Set kfunc dynptr arg type flag based on prototype
+Date: Fri,  6 Mar 2026 22:44:29 -0800
+Message-ID: <20260307064439.3247440-2-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260307064439.3247440-1-ameryhung@gmail.com>
+References: <20260307064439.3247440-1-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,7 +98,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 87EE322A7C8
+X-Rspamd-Queue-Id: 6F69922A7D6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -109,7 +113,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265093-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265094-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -129,215 +133,295 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This patchset (1) cleans up dynptr handling (2) refactors object parent-
-child relationship tracking to make it more precise and (3) fixes dynptr
-UAF bug due to a missing link between dynptr and the parent referenced
-object in the verifier.
+The verifier should decide whether a dynptr argument is read-only
+based on if the type is "const struct bpf_dynptr *", not the type of
+the register passed to the kfunc. This currently does not cause issues
+because existing kfuncs that mutate struct bpf_dynptr are constructors
+(e.g., bpf_dynptr_from_xxx and bpf_dynptr_clone). These kfuncs have
+additional check in process_dynptr_func() to make sure the stack slot
+does not contain initialized dynptr. Nonetheless, this should still be
+fixed to avoid future issues when there is a non-constructor dynptr
+kfunc that can mutate dynptr. This is also a small step toward unifying
+kfunc and helper handling in the verifier, where the first step is to
+generate kfunc prototype similar to bpf_func_proto before the main
+verification loop.
 
-This patchset will make dynptr tracks its parent object. In bpf qdisc
-programs, an skb may be freed through kfuncs. However, since dynptr
-currently does not track the parent referenced object (e.g., skb), the
-verifier will not invalidate the dynptr after the skb is freed,
-resulting in use-after-free. The similar issue also affects file dynptr.
-To solve the issue, we need to track the parent skb in the derived
-dynptr and slices.
+We also need to correctly mark some kfunc arguments as "const struct
+bpf_dynptr *" to align with other kfuncs that take non-mutable dynptr
+argument and to not break their usage. Adding const qualifier does
+not break backward compatibility.
 
-However, we need to refactor the verifier's object tracking mechanism
-first because id and ref_obj_id cannot easily express more than simple
-object relationship. To illustrate this, we use an example as shown in
-the figure below.
-
-Before: object (id,ref_obj_id,dynptr_id)
-  id         = id of the object (used for nullness tracking)
-  ref_obj_id = id of the underlying referenced object (used for lifetime
-               tracking)
-  dynptr_id  = id of the parent dynptr of the slice (used for tracking
-               parent dynptr, only for PTR_TO_MEM)
-
-                      skb (0,1,0)
-                             ^ (try to link dynptr to parent ref_obj_id)
-                             +-------------------------------+
-                             |           bpf_dynptr_clone    |
-                 dynptr A (2,1,0)                dynptr C (4,1,0)
-                           ^                               ^
-        bpf_dynptr_slice   |                               |
-                           |                               |
-              slice B (3,1,2)                 slice D (5,1,4)
-                         ^
-    bpf_dynptr_from_mem  |
-    (NOT allowed yet)    |
-             dynptr E (6,1,0)
-
-Lets first try to fix the bug by letting dynptr track the parent skb
-using ref_obj_id and propagating the ref_obj_id to slices so that when
-the skb goes away the derived dynptrs and slices will also be
-invalidated. However, if dynptr A is destroyed by overwriting the stack
-slot, release_reference(ref_obj_id=1) would be called and all nodes will
-be invaldiated. The correct handling should leave skb, dynptr C, and
-slice D intact since non-referenced dynptr clone's lifetime does not
-need to tie to the original dynptr. This is not a problem before since
-dynptr created from skb has ref_obj_id = 0. In the future if we start
-allowing creating dynptr from slice, the current design also cannot
-correctly handle the removal of dynptr E. All objects will be
-incorrectly invalidated instead of only invalidating childrens of
-dynptr E. While it is possible to solve the issue by adding more
-specialized handling in the dynptr paths [0], it creates more complexity.
-
-To track precise object relationship in a simpler way, u32 parent_id is
-added to bpf_reg_state to track parent object. This replaces the
-PTR_TO_MEM specific dynptr_id. Therefore, for dynptr A, since it is a
-non-referenced dynptr, its ref_obj_id is set to 0. The parent_id will be
-set to 1 to track the id of the skb. Note that, this will not grow
-bpf_reg_state on 64 byte machine as there is a 7-byte padding.
-
-After: object (id,ref_obj_id,parent_id)
-  id         = id of the object (used for nullness tracking)
-  ref_obj_id = id of the referenced object; objects with same ref_obj_id
-               have the same lifetime (used for lifetime tracking)
-  parent_id  = id of the parent object; points to id (used for object
-               relationship tracking)
-
-(1) Non-referenced dynptr with referenced parent (e.g., skb in Qdisc):
-
-                          skb (1,1,0)
-                               ^
-          bpf_dynptr_from_skb  +-------------------------------+
-                               |      bpf_dynptr_clone(A, C)   |
-                 dynptr A (2,0,1)               dynptr C (4,0,1)
-                           ^                              ^
-        bpf_dynptr_slice   |                              |
-                           |                              |
-              slice B (3,0,2)                slice D (5,0,4)
-                       ^
-  bpf_dynptr_from_mem  |
-  (NOT allowed yet)    |
-         dynptr E (6,0,3)
-
-The figures below show how the new design works in different 
-referenced/non-referenced dynptr + referenced/non-referenced parent
-combinations. The relationship between slices and dynptrs is ignored
-as they are still the same. The main difference is how clone dynptrs
-are represented. Since bpf_dynptr_clone() does not initializes a new
-dynptr, the clone of referenced dynptr cannot function when the
-original or any of the clone is invalidated. To represent this,
-they will share the same ref_obj_id. For non-referenced dynptr, the
-original and the clones will be able live independently.
-
-
-(2) Non-referenced dynptr with non-referenced parent (e.g., skb in TC,
-    always valid):
-
-      bpf_dynptr_from_skb
-                                  bpf_dynptr_clone(A, C)
-             dynptr A (1,0,0)                  dynptr C (2,0,0)
-
-                         dynptr A and C live independently
-
-(3) Referenced dynptr with referenced parent:
-
-                     file (1,1,0)
-                           ^ ^
-     bpf_dynptr_from_file  | +-------------------------------+
-                           |       bpf_dynptr_clone(A, C)    |
-             dynptr A (2,3,1)                  dynptr C (4,3,1)
-                         ^                                 ^
-                         |                                 |
-                         dynptr A and C have the same lifetime
-
-
-(4) Referenced dynptr with non-referenced parent:
-
- bpf_ringbuf_reserve_dynptr  
-                                  bpf_dynptr_clone(A, C)
-             dynptr A (1,1,0)                  dynptr C (2,1,0)
-                         ^                                 ^
-                         |                                 |
-                         dynptr A and C have the same lifetime
-
-
-I also tried folding id and ref_obj_id into id and using ref_obj_id to
-track parent [1]. This design was not able to express the relationship
-of referenced sk pointer and casted referenced sk pointer. The two
-objects needs two id to express that they have the same lifetime but
-different nullness.
-
-Referenced socket pointer:
-
-                                C = ptr_casting_function(A)
-                ptr A (1,1,0)                     ptr C (2,1,0)
-                         ^                                 ^
-                         |                                 |
-                        ptr C may be NULL even if ptr A is valid
-			but they have the same lifetime
-
-
-To avoid recursive call chain of release_reference() ->
-unmark_stack_slots_dynptr(), release_reference() now uses
-stacked-based DFS to find and invalidate registers and stack slots
-containing the to-be-released id/ref_obj_id and all dependant ids
-whose parent_id matches the id. Currently, it skips id == 0, which
-however maybe a valid id e.g., pkt pointer by reading ctx. Future work
-may start giving them > 0 id. This should not affect the current usecase
-where skb and file are both given > 0 id.
-
-[0] https://lore.kernel.org/bpf/20250414161443.1146103-2-memxor@gmail.com/
-[1] https://github.com/ameryhung/bpf/commits/obj_relationship_v2_no_parent_id/ 
-
-
-Changelog:
-
-v1 -> v2
-  - Redesign: Use object (id, ref_obj_id, parent_id) instead of 
-    (id, ref_obj_id) as it cannot express ptr casting without
-    introduing specialized code to handle the case
-  - Use stack-based DFS to release objects to avoid recursion (Andrii)
-  - Keep reg->id after null check
-  - Add dynptr cleanup
-  - Fix dynptr kfunc arg type determination
-  - Add a file dynptr UAF selftest
-  Link: https://lore.kernel.org/bpf/20260202214817.2853236-1-ameryhung@gmail.com/
-
+Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
+ fs/verity/measure.c                            |  2 +-
+ include/linux/bpf.h                            |  8 ++++----
+ kernel/bpf/helpers.c                           | 10 +++++-----
+ kernel/bpf/verifier.c                          | 18 +++++++++++++++++-
+ kernel/trace/bpf_trace.c                       | 18 +++++++++---------
+ tools/testing/selftests/bpf/bpf_kfuncs.h       |  6 +++---
+ .../selftests/bpf/progs/dynptr_success.c       |  6 +++---
+ .../bpf/progs/test_kfunc_dynptr_param.c        |  7 +------
+ 8 files changed, 43 insertions(+), 32 deletions(-)
 
-Amery Hung (11):
-  bpf: Set kfunc dynptr arg type flag based on prototype
-  selftests/bpf: Test passing CONST_PTR_TO_DYNPTR to kfunc that may
-    mutate dynptr
-  bpf: Unify dynptr handling in the verifier
-  bpf: Assign reg->id when getting referenced kptr from ctx
-  bpf: Preserve reg->id of pointer objects after null-check
-  bpf: Refactor object relationship tracking and fix dynptr UAF bug
-  bpf: Remove redundant dynptr arg check for helper
-  selftests/bpf: Test creating dynptr from dynptr data and slice
-  selftests/bpf: Test using dynptr after freeing the underlying object
-  selftests/bpf: Test using slice after invalidating dynptr clone
-  selftests/bpf: Test using file dynptr after the reference on file is
-    dropped
-
- fs/verity/measure.c                           |   2 +-
- include/linux/bpf.h                           |   8 +-
- include/linux/bpf_verifier.h                  |  14 +-
- kernel/bpf/helpers.c                          |  10 +-
- kernel/bpf/log.c                              |   4 +-
- kernel/bpf/verifier.c                         | 496 +++++++-----------
- kernel/trace/bpf_trace.c                      |  18 +-
- tools/testing/selftests/bpf/bpf_kfuncs.h      |   6 +-
- .../selftests/bpf/prog_tests/bpf_qdisc.c      |  50 ++
- .../bpf/progs/bpf_qdisc_dynptr_clone.c        |  69 +++
- .../progs/bpf_qdisc_fail__invalid_dynptr.c    |  62 +++
- ...f_qdisc_fail__invalid_dynptr_cross_frame.c |  68 +++
- .../bpf_qdisc_fail__invalid_dynptr_slice.c    |  64 +++
- .../testing/selftests/bpf/progs/dynptr_fail.c |  85 ++-
- .../selftests/bpf/progs/dynptr_success.c      |   6 +-
- .../selftests/bpf/progs/file_reader_fail.c    |  60 +++
- .../bpf/progs/test_kfunc_dynptr_param.c       |   9 +-
- .../selftests/bpf/progs/user_ringbuf_fail.c   |   4 +-
- 18 files changed, 684 insertions(+), 351 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c
-
+diff --git a/fs/verity/measure.c b/fs/verity/measure.c
+index 6a35623ebdf0..3840436e4510 100644
+--- a/fs/verity/measure.c
++++ b/fs/verity/measure.c
+@@ -118,7 +118,7 @@ __bpf_kfunc_start_defs();
+  *
+  * Return: 0 on success, a negative value on error.
+  */
+-__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr *digest_p)
++__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, const struct bpf_dynptr *digest_p)
+ {
+ 	struct bpf_dynptr_kern *digest_ptr = (struct bpf_dynptr_kern *)digest_p;
+ 	const struct inode *inode = file_inode(file);
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index b78b53198a2e..946a37b951f7 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -3621,8 +3621,8 @@ static inline int bpf_fd_reuseport_array_update_elem(struct bpf_map *map,
+ struct bpf_key *bpf_lookup_user_key(s32 serial, u64 flags);
+ struct bpf_key *bpf_lookup_system_key(u64 id);
+ void bpf_key_put(struct bpf_key *bkey);
+-int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
+-			       struct bpf_dynptr *sig_p,
++int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
++			       const struct bpf_dynptr *sig_p,
+ 			       struct bpf_key *trusted_keyring);
+ 
+ #else
+@@ -3640,8 +3640,8 @@ static inline void bpf_key_put(struct bpf_key *bkey)
+ {
+ }
+ 
+-static inline int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
+-					     struct bpf_dynptr *sig_p,
++static inline int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
++					     const struct bpf_dynptr *sig_p,
+ 					     struct bpf_key *trusted_keyring)
+ {
+ 	return -EOPNOTSUPP;
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 6eb6c82ed2ee..3d44896587ac 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -3000,8 +3000,8 @@ __bpf_kfunc int bpf_dynptr_clone(const struct bpf_dynptr *p,
+  * Copies data from source dynptr to destination dynptr.
+  * Returns 0 on success; negative error, otherwise.
+  */
+-__bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_off,
+-				struct bpf_dynptr *src_ptr, u64 src_off, u64 size)
++__bpf_kfunc int bpf_dynptr_copy(const struct bpf_dynptr *dst_ptr, u64 dst_off,
++				const struct bpf_dynptr *src_ptr, u64 src_off, u64 size)
+ {
+ 	struct bpf_dynptr_kern *dst = (struct bpf_dynptr_kern *)dst_ptr;
+ 	struct bpf_dynptr_kern *src = (struct bpf_dynptr_kern *)src_ptr;
+@@ -3055,7 +3055,7 @@ __bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_off,
+  * at @offset with the constant byte @val.
+  * Returns 0 on success; negative error, otherwise.
+  */
+-__bpf_kfunc int bpf_dynptr_memset(struct bpf_dynptr *p, u64 offset, u64 size, u8 val)
++__bpf_kfunc int bpf_dynptr_memset(const struct bpf_dynptr *p, u64 offset, u64 size, u8 val)
+ {
+ 	struct bpf_dynptr_kern *ptr = (struct bpf_dynptr_kern *)p;
+ 	u64 chunk_sz, write_off;
+@@ -4069,8 +4069,8 @@ __bpf_kfunc void bpf_key_put(struct bpf_key *bkey)
+  *
+  * Return: 0 on success, a negative value on error.
+  */
+-__bpf_kfunc int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
+-			       struct bpf_dynptr *sig_p,
++__bpf_kfunc int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
++			       const struct bpf_dynptr *sig_p,
+ 			       struct bpf_key *trusted_keyring)
+ {
+ #ifdef CONFIG_SYSTEM_DATA_VERIFICATION
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 1153a828ce8d..0f77c4c5b510 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -12276,6 +12276,22 @@ static bool is_kfunc_arg_dynptr(const struct btf *btf, const struct btf_param *a
+ 	return __is_kfunc_ptr_arg_type(btf, arg, KF_ARG_DYNPTR_ID);
+ }
+ 
++static bool is_kfunc_arg_const_ptr(const struct btf *btf, const struct btf_param *arg)
++{
++	const struct btf_type *t, *resolved_t;
++
++	t = btf_type_skip_modifiers(btf, arg->type, NULL);
++	if (!t || !btf_type_is_ptr(t))
++		return false;
++
++	resolved_t = btf_type_skip_modifiers(btf, t->type, NULL);
++	for (; t != resolved_t; t = btf_type_by_id(btf, t->type))
++		if (BTF_INFO_KIND(t->info) == BTF_KIND_CONST)
++			return true;
++
++	return false;
++}
++
+ static bool is_kfunc_arg_list_head(const struct btf *btf, const struct btf_param *arg)
+ {
+ 	return __is_kfunc_ptr_arg_type(btf, arg, KF_ARG_LIST_HEAD_ID);
+@@ -13509,7 +13525,7 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+ 			enum bpf_arg_type dynptr_arg_type = ARG_PTR_TO_DYNPTR;
+ 			int clone_ref_obj_id = 0;
+ 
+-			if (reg->type == CONST_PTR_TO_DYNPTR)
++			if (is_kfunc_arg_const_ptr(btf, &args[i]))
+ 				dynptr_arg_type |= MEM_RDONLY;
+ 
+ 			if (is_kfunc_arg_uninit(btf, &args[i]))
+diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
+index 9bc0dfd235af..127c317376be 100644
+--- a/kernel/trace/bpf_trace.c
++++ b/kernel/trace/bpf_trace.c
+@@ -3391,7 +3391,7 @@ typedef int (*copy_fn_t)(void *dst, const void *src, u32 size, struct task_struc
+  * direct calls into all the specific callback implementations
+  * (copy_user_data_sleepable, copy_user_data_nofault, and so on)
+  */
+-static __always_inline int __bpf_dynptr_copy_str(struct bpf_dynptr *dptr, u64 doff, u64 size,
++static __always_inline int __bpf_dynptr_copy_str(const struct bpf_dynptr *dptr, u64 doff, u64 size,
+ 						 const void *unsafe_src,
+ 						 copy_fn_t str_copy_fn,
+ 						 struct task_struct *tsk)
+@@ -3533,49 +3533,49 @@ __bpf_kfunc int bpf_send_signal_task(struct task_struct *task, int sig, enum pid
+ 	return bpf_send_signal_common(sig, type, task, value);
+ }
+ 
+-__bpf_kfunc int bpf_probe_read_user_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_probe_read_user_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					   u64 size, const void __user *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy(dptr, off, size, (const void __force *)unsafe_ptr__ign,
+ 				 copy_user_data_nofault, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_probe_read_kernel_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_probe_read_kernel_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					     u64 size, const void *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy(dptr, off, size, unsafe_ptr__ign,
+ 				 copy_kernel_data_nofault, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_probe_read_user_str_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_probe_read_user_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					       u64 size, const void __user *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy_str(dptr, off, size, (const void __force *)unsafe_ptr__ign,
+ 				     copy_user_str_nofault, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_probe_read_kernel_str_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_probe_read_kernel_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 						 u64 size, const void *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy_str(dptr, off, size, unsafe_ptr__ign,
+ 				     copy_kernel_str_nofault, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_copy_from_user_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_copy_from_user_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					  u64 size, const void __user *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy(dptr, off, size, (const void __force *)unsafe_ptr__ign,
+ 				 copy_user_data_sleepable, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_copy_from_user_str_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_copy_from_user_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					      u64 size, const void __user *unsafe_ptr__ign)
+ {
+ 	return __bpf_dynptr_copy_str(dptr, off, size, (const void __force *)unsafe_ptr__ign,
+ 				     copy_user_str_sleepable, NULL);
+ }
+ 
+-__bpf_kfunc int bpf_copy_from_user_task_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_copy_from_user_task_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 					       u64 size, const void __user *unsafe_ptr__ign,
+ 					       struct task_struct *tsk)
+ {
+@@ -3583,7 +3583,7 @@ __bpf_kfunc int bpf_copy_from_user_task_dynptr(struct bpf_dynptr *dptr, u64 off,
+ 				 copy_user_data_sleepable, tsk);
+ }
+ 
+-__bpf_kfunc int bpf_copy_from_user_task_str_dynptr(struct bpf_dynptr *dptr, u64 off,
++__bpf_kfunc int bpf_copy_from_user_task_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
+ 						   u64 size, const void __user *unsafe_ptr__ign,
+ 						   struct task_struct *tsk)
+ {
+diff --git a/tools/testing/selftests/bpf/bpf_kfuncs.h b/tools/testing/selftests/bpf/bpf_kfuncs.h
+index 7dad01439391..ffb9bc1cace0 100644
+--- a/tools/testing/selftests/bpf/bpf_kfuncs.h
++++ b/tools/testing/selftests/bpf/bpf_kfuncs.h
+@@ -70,13 +70,13 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
+ 
+ extern int bpf_get_file_xattr(struct file *file, const char *name,
+ 			      struct bpf_dynptr *value_ptr) __ksym;
+-extern int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr *digest_ptr) __ksym;
++extern int bpf_get_fsverity_digest(struct file *file, const struct bpf_dynptr *digest_ptr) __ksym;
+ 
+ extern struct bpf_key *bpf_lookup_user_key(__s32 serial, __u64 flags) __ksym;
+ extern struct bpf_key *bpf_lookup_system_key(__u64 id) __ksym;
+ extern void bpf_key_put(struct bpf_key *key) __ksym;
+-extern int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_ptr,
+-				      struct bpf_dynptr *sig_ptr,
++extern int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_ptr,
++				      const struct bpf_dynptr *sig_ptr,
+ 				      struct bpf_key *trusted_keyring) __ksym;
+ 
+ struct dentry;
+diff --git a/tools/testing/selftests/bpf/progs/dynptr_success.c b/tools/testing/selftests/bpf/progs/dynptr_success.c
+index e0d672d93adf..e0745b6e467e 100644
+--- a/tools/testing/selftests/bpf/progs/dynptr_success.c
++++ b/tools/testing/selftests/bpf/progs/dynptr_success.c
+@@ -914,7 +914,7 @@ void *user_ptr;
+ char expected_str[384];
+ __u32 test_len[7] = {0/* placeholder */, 0, 1, 2, 255, 256, 257};
+ 
+-typedef int (*bpf_read_dynptr_fn_t)(struct bpf_dynptr *dptr, u64 off,
++typedef int (*bpf_read_dynptr_fn_t)(const struct bpf_dynptr *dptr, u64 off,
+ 				    u64 size, const void *unsafe_ptr);
+ 
+ /* Returns the offset just before the end of the maximum sized xdp fragment.
+@@ -1106,7 +1106,7 @@ int test_copy_from_user_str_dynptr(void *ctx)
+ 	return 0;
+ }
+ 
+-static int bpf_copy_data_from_user_task(struct bpf_dynptr *dptr, u64 off,
++static int bpf_copy_data_from_user_task(const struct bpf_dynptr *dptr, u64 off,
+ 					u64 size, const void *unsafe_ptr)
+ {
+ 	struct task_struct *task = bpf_get_current_task_btf();
+@@ -1114,7 +1114,7 @@ static int bpf_copy_data_from_user_task(struct bpf_dynptr *dptr, u64 off,
+ 	return bpf_copy_from_user_task_dynptr(dptr, off, size, unsafe_ptr, task);
+ }
+ 
+-static int bpf_copy_data_from_user_task_str(struct bpf_dynptr *dptr, u64 off,
++static int bpf_copy_data_from_user_task_str(const struct bpf_dynptr *dptr, u64 off,
+ 					    u64 size, const void *unsafe_ptr)
+ {
+ 	struct task_struct *task = bpf_get_current_task_btf();
+diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
+index d249113ed657..c3631fd41977 100644
+--- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
++++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
+@@ -11,12 +11,7 @@
+ #include <bpf/bpf_helpers.h>
+ #include <bpf/bpf_tracing.h>
+ #include "bpf_misc.h"
+-
+-extern struct bpf_key *bpf_lookup_system_key(__u64 id) __ksym;
+-extern void bpf_key_put(struct bpf_key *key) __ksym;
+-extern int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_ptr,
+-				      struct bpf_dynptr *sig_ptr,
+-				      struct bpf_key *trusted_keyring) __ksym;
++#include "bpf_kfuncs.h"
+ 
+ struct {
+ 	__uint(type, BPF_MAP_TYPE_RINGBUF);
 -- 
 2.47.3
 
