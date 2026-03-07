@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-265100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMgcCA7Lq2n7gwEAu9opvQ
-	(envelope-from <netdev+bounces-265100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:51:58 +0100
+	id eH+cFkfKq2n7gwEAu9opvQ
+	(envelope-from <netdev+bounces-265101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:48:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E56D22A821
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:51:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3C722A770
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E06FF30707BC
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 47F263062EC9
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5888837F8BD;
-	Sat,  7 Mar 2026 06:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B415A37B03C;
+	Sat,  7 Mar 2026 06:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1Qv9R1f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4c8jrBP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DC237B03C
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCB637FF4E
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772865890; cv=none; b=J2CtbA67LARZPjhrctGd2LeyU4eiSmPiCyzyiWFU+5SEdd1zlYZXeIbmMhuoQq0fEZZ5XxrP71STzpf95WNiKv4iCXYzU9INLYTDk73EfZiqx8yoVveN89v8P7yh9XySDEDUivA7D9gbwpqvX6QF7ENnntq7yDTGPI4qmm1FE+k=
+	t=1772865891; cv=none; b=SkEf4wetx4nO4mnFI33f1Wwpadu8FVYUAgOUKjHn5F7AT5E5gnaFM5wLAK3F6irDCXbiBkqwdYpuBxHqHnkVfaUjZXwO+p1bM6Hi4y+AK30tDgoK3b6UQGBd0iuG967clNoOuqEjRvVlcbexBL398yVpqXSzswm/0YNUKnIEx+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772865890; c=relaxed/simple;
-	bh=220J2NF5yCyk7tRF95PoeS+Bz3Vq8x488ZxOVCO6gxU=;
+	s=arc-20240116; t=1772865891; c=relaxed/simple;
+	bh=+lr2vlS6ETl2QkmquAVBxAjL9FC2dwcWWpltl/omZjY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bph7NFaVPTchEDvpyRdrUKsvUonZZyiCR4WOxnSIacZf3WycGlc19gdWOipEVY92u/pyVHXFBEQuibQT8KuwpPrZlUTGdMJCeB0j6c13gklpkVAhaRMyyEflnAZZaHHv8ZTIxLM7lww3ylWDOw8cTQxUgDXNm2bz5Rl/g6Gg9VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1Qv9R1f; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=cCM0skcvshrg8pywlZ8+1uPFgGClSgPk27cjjXiHjcOJnCLSe5hH8bnsghwOl/a6vJ7MBbkL2aofhPuhvEl6rHt3mybwAI0N0l/clF+ZQXoyFWfDE3N3dmIrEcKAIif3o1b195ZS4zJsIBDZqpRDdbn+mZSUizShFicqBByvB9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4c8jrBP; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82989744ee0so2179698b3a.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:44:48 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ae8979dbb2so4725465ad.3
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:44:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772865888; x=1773470688; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772865890; x=1773470690; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=etdBLDx36dMtVbyrSAhU63rVIi5uq5aFdbc/ugTsJBw=;
-        b=K1Qv9R1fN1e+kaWl38fkUKUgv9e9uS7dCpWSR1Ur4bpDneOKZzgqhLmJtCcIoXg9wL
-         Q2leoUWiAeHWoNTnuuq6ebnKMGYcjpE7kTIaXr8DEnmhB9CvvUmRYsK7D7Lgf6uTP/LO
-         2zv0JXIsYukWYnhwl/pz9rCIBmtHLn0kvAfDTCbhb33efEJ1oMAnWz4kl89ViZxP7v2v
-         EqOfNICGGdPP0ehFIXQMYGGvz5ZgsiygaUtYTfCCs5DMtM4KiU6ikXApcZrGO/G2rjXy
-         M21q3n01ca3SjC+OGES61RrnOh6Q28MFlXqeuwqMb0ooxdJNCrwP9jincr7Lnvt0odOK
-         MRVg==
+        bh=MAvuWZcmmyV939xPdlaiE2LYkNV1C8x4Vf2BYdbK888=;
+        b=X4c8jrBPZxBiVmD8cScK4r9cd0pR4FlAGStGR+iMiPWrzn25+4hgaeelW27MJ7XauC
+         lAB6FVO/OqLrgcMIznET9V2shl+Xm5czY4Is7brBsHt0LWxd+KrZjJ4Lv9Mr/SyPVT0Z
+         UM6QvAIPN1evO8UKqR83AvjzNbTiyLFC74s9uK1azthlk5xzs1VgC3Uf31itfXw3CL90
+         o7FFqzlfQjIg+css98DGEr/sgtL8Pi7K7P2E2K6+Xx27/uGIumYnoOZPhw9oQ1PvZASt
+         xFqMYyEW1VZS3jWBcWOhpaRql4LWBUh/cuou0F5Ax1VLb/GaVhVf3DnF9g0T6yHwbLov
+         MkaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772865888; x=1773470688;
+        d=1e100.net; s=20230601; t=1772865890; x=1773470690;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=etdBLDx36dMtVbyrSAhU63rVIi5uq5aFdbc/ugTsJBw=;
-        b=fZBEs/swOftCuE3UGtmEb7WEjqaq3Vao52cK4k5AI7Kp7Ox5DSYlosMcApX1QU++pq
-         rp/QVvL2iN9bHpwJKtmjIrMxhMSaamL+F9sZj3U0Qg2ulwK36QT9FoIOEhxBJYPU24ac
-         hId/79fXjMbvZsvLSMkveSjGZ89R0WsTCdU8di4r5jadpeA63auxWkFYK8etUkwGhUh4
-         EjFdSj1x2D6Uji4adnwuWI4oHO7Bff7Qbv7jkjdsMVX7UUcPcOqOlxqi9MhCJpYZrphZ
-         rh668vzFS/M6IbXNvilp+XIS9sFFQ1bTCw75ePlFcgB4c6eK593ZfbqvTkge7/uKompp
-         AApw==
-X-Gm-Message-State: AOJu0YyDOYEI69lwmvxiubUtz64DZehwQJ7lh27wzB1uHbrTy6lLTA0W
-	6UCaOofDBsosauB1F3/jt4itr6uBPMO0mdse4FcXRrLXMhNAx6usDvmT
-X-Gm-Gg: ATEYQzzcV5hMMJ3rWozh0Df3wK3NArPFZYtArfwDlCoxzNdd4jNVtRvLWMYmb98cItR
-	Jp7+X46UcAHt48oX/rhFwwP80+n8e+Srba4jP2+c7g5ljm+dmpI31WcK5erPIgTPCqVlx96Cl4u
-	sSAbM41qv9t9I6VY4vrwzquhsviz8eztTp1fl1L4XyzljZKsRH/6+uWPBdBJEOwYxFNwTj0dzRB
-	IsYaqfa29o8LZUpNM3+P6m/Cgz1v7XUpabgeLH19TCMK8BpPyGQ21PIqSoRAW7vkVcv9Y4EvP8V
-	7MIqz/HszmP+tUiLqXVw9uZjXzA6uqpXbDIHtdsvcymV+GT3pdhBvi+OnRZBoNE4uFkMDkimnRf
-	idT8kPcvXumj8UQEn6u8QZGCcvOrNfkCW8mkkZoSBZ5iZcygRQXcbPtpACAblkngJ7a27i7JI4k
-	HkBFg7yo72wK/5
-X-Received: by 2002:a05:6a00:1c87:b0:81e:d7c3:2f3a with SMTP id d2e1a72fcca58-829a2f5a754mr4012267b3a.46.1772865888530;
-        Fri, 06 Mar 2026 22:44:48 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:3::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a4676187sm4391941b3a.27.2026.03.06.22.44.48
+        bh=MAvuWZcmmyV939xPdlaiE2LYkNV1C8x4Vf2BYdbK888=;
+        b=nFTT03hOlvz01fvHSlXgETN0mZA/YNxlawNJCR6utXDVt/oMAVJdvAq1UCDKh0nVzC
+         9Ccash8oP0/80YCSQ5uTRMqCpnoCtctrFnPc7SZtoqEF8lnzcplLeSoZE2HhCiwjXupF
+         D1MSFPsGTy04YIEsPI5iwaTOzIC7XgDWgc/B8YtAmeQQ2plLtiQAA1GriC0GRAhENBxy
+         H8oHOFIb+NDTYT34uzDbO4EQP9rasrb68J3DLDmqK+JH27SC7o/Sf148YJJrZLgGYMRL
+         sXcGrj3Aduvov60sYkdKVsk91je4KMEZsAn1ajraKGmsr/p6oqWW9XWh+076jjpAAD8e
+         +TaQ==
+X-Gm-Message-State: AOJu0YzO7+90+wNZrEdB8Cp34p2Kq8sF/KQTojo3jtPgB3X04X5dWWIZ
+	hoBeAk0B/vl/xOZnPK+W+Fx8omHpU+L3DNmLxOotl1BMaiosCA2oPcYg
+X-Gm-Gg: ATEYQzzZjiFDXbv9zp29HjMQYG2/gSPU1I88xjPInIMrkY+5BP7v8gXDAAPFs4WFjU+
+	O1AvLobvreP3MERV8hnetxars38qakVh1seQvQ8ViHixQ8/KseXi+SN1NR2/UhebbiHVwOBjksF
+	rKk9dJy55kOUThTkQBbvsp4XyfjXuzgLirEIIJ6kJXyW4p4tSbSZnHiyeLyt5v1neD1BQqgIZZA
+	ekO5S0sZRQrL5x3U1kh67xoFdOL8tdpI/XxkHQFnKIF3JbUlVcX0Gglv8F5D1qeHhGiLiiNlLXu
+	zGWSW866Y6Xd1mR60YOFCd5u9xJ5gipzlotL+1mPbnOl4y5m67sN17XBABwGM53hb2XP0f0wjld
+	d7ieS77DsBMBb2xZgSqD1O4CR34PKci5VCvNZNQyQTM1HUHwybOX7X8bLnU5Enyq9s3QK2SSHug
+	2rSWkf83XMbD1Feg==
+X-Received: by 2002:a17:902:ef08:b0:2ae:5b64:12da with SMTP id d9443c01a7336-2ae82506badmr52343715ad.45.1772865889893;
+        Fri, 06 Mar 2026 22:44:49 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:54::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f8a67esm53870265ad.61.2026.03.06.22.44.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 22:44:48 -0800 (PST)
+        Fri, 06 Mar 2026 22:44:49 -0800 (PST)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -85,9 +85,9 @@ Cc: netdev@vger.kernel.org,
 	martin.lau@kernel.org,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [RFC PATCH bpf-next v2 07/11] bpf: Remove redundant dynptr arg check for helper
-Date: Fri,  6 Mar 2026 22:44:35 -0800
-Message-ID: <20260307064439.3247440-8-ameryhung@gmail.com>
+Subject: [RFC PATCH bpf-next v2 08/11] selftests/bpf: Test creating dynptr from dynptr data and slice
+Date: Fri,  6 Mar 2026 22:44:36 -0800
+Message-ID: <20260307064439.3247440-9-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260307064439.3247440-1-ameryhung@gmail.com>
 References: <20260307064439.3247440-1-ameryhung@gmail.com>
@@ -98,7 +98,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8E56D22A821
+X-Rspamd-Queue-Id: 2E3C722A770
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265100-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265101-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -127,111 +127,73 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-unmark_stack_slots_dynptr() already makes sure that CONST_PTR_TO_DYNPTR
-cannot be released. process_dynptr_func() also prevents passing
-uninitialized dynptr to helpers expecting initialized dynptr. Now that
-unmark_stack_slots_dynptr() also error returned from
-release_reference(), there should be no reason to keep these redundant
-checks.
+The verifier currently does not allow creating dynptr from dynptr data
+or slice. Add a selftest to test this explicitly.
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- kernel/bpf/verifier.c                         | 21 +------------------
- .../testing/selftests/bpf/progs/dynptr_fail.c |  6 +++---
- .../selftests/bpf/progs/user_ringbuf_fail.c   |  4 ++--
- 3 files changed, 6 insertions(+), 25 deletions(-)
+ .../testing/selftests/bpf/progs/dynptr_fail.c | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 0436fc4d9107..80b9ef6f329f 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -9737,26 +9737,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
- 
- skip_type_check:
- 	if (arg_type_is_release(arg_type)) {
--		if (arg_type_is_dynptr(arg_type)) {
--			struct bpf_func_state *state = func(env, reg);
--			int spi;
--
--			/* Only dynptr created on stack can be released, thus
--			 * the get_spi and stack state checks for spilled_ptr
--			 * should only be done before process_dynptr_func for
--			 * PTR_TO_STACK.
--			 */
--			if (reg->type == PTR_TO_STACK) {
--				spi = dynptr_get_spi(env, reg);
--				if (spi < 0 || !state->stack[spi].spilled_ptr.id) {
--					verbose(env, "arg %d is an unacquired reference\n", regno);
--					return -EINVAL;
--				}
--			} else {
--				verbose(env, "cannot release unowned const bpf_dynptr\n");
--				return -EINVAL;
--			}
--		} else if (!reg->ref_obj_id && !register_is_null(reg)) {
-+		if (!arg_type_is_dynptr(arg_type) && !reg->ref_obj_id && !register_is_null(reg)) {
- 			verbose(env, "R%d must be referenced when passed to release function\n",
- 				regno);
- 			return -EINVAL;
 diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-index 5e1b1cf4ea8e..631e37500ec6 100644
+index 631e37500ec6..6b162512b0c9 100644
 --- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
 +++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-@@ -135,7 +135,7 @@ int ringbuf_missing_release_callback(void *ctx)
+@@ -704,6 +704,48 @@ int dynptr_from_mem_invalid_api(void *ctx)
+ 	return 0;
+ }
  
- /* Can't call bpf_ringbuf_submit/discard_dynptr on a non-initialized dynptr */
- SEC("?raw_tp")
--__failure __msg("arg 1 is an unacquired reference")
-+__failure __msg("Expected an initialized dynptr as arg #0")
- int ringbuf_release_uninit_dynptr(void *ctx)
- {
- 	struct bpf_dynptr ptr;
-@@ -649,7 +649,7 @@ int invalid_offset(void *ctx)
- 
- /* Can't release a dynptr twice */
- SEC("?raw_tp")
--__failure __msg("arg 1 is an unacquired reference")
-+__failure __msg("Expected an initialized dynptr as arg #0")
- int release_twice(void *ctx)
- {
- 	struct bpf_dynptr ptr;
-@@ -676,7 +676,7 @@ static int release_twice_callback_fn(__u32 index, void *data)
-  * within a callback function, fails
-  */
- SEC("?raw_tp")
--__failure __msg("arg 1 is an unacquired reference")
-+__failure __msg("Expected an initialized dynptr as arg #0")
- int release_twice_callback(void *ctx)
- {
- 	struct bpf_dynptr ptr;
-diff --git a/tools/testing/selftests/bpf/progs/user_ringbuf_fail.c b/tools/testing/selftests/bpf/progs/user_ringbuf_fail.c
-index 54de0389f878..e8f4ae86470f 100644
---- a/tools/testing/selftests/bpf/progs/user_ringbuf_fail.c
-+++ b/tools/testing/selftests/bpf/progs/user_ringbuf_fail.c
-@@ -146,7 +146,7 @@ try_discard_dynptr(struct bpf_dynptr *dynptr, void *context)
-  * not be able to read past the end of the pointer.
-  */
- SEC("?raw_tp")
--__failure __msg("cannot release unowned const bpf_dynptr")
-+__failure __msg("cannot pass pointer to const bpf_dynptr, the helper mutates it")
- int user_ringbuf_callback_discard_dynptr(void *ctx)
- {
- 	bpf_user_ringbuf_drain(&user_ringbuf, try_discard_dynptr, NULL, 0);
-@@ -166,7 +166,7 @@ try_submit_dynptr(struct bpf_dynptr *dynptr, void *context)
-  * not be able to read past the end of the pointer.
-  */
- SEC("?raw_tp")
--__failure __msg("cannot release unowned const bpf_dynptr")
-+__failure __msg("cannot pass pointer to const bpf_dynptr, the helper mutates it")
- int user_ringbuf_callback_submit_dynptr(void *ctx)
- {
- 	bpf_user_ringbuf_drain(&user_ringbuf, try_submit_dynptr, NULL, 0);
++/* Cannot create dynptr from dynptr data */
++SEC("?raw_tp")
++__failure __msg("Unsupported reg type mem for bpf_dynptr_from_mem data")
++int dynptr_from_dynptr_data(void *ctx)
++{
++	struct bpf_dynptr ptr, ptr2;
++	__u8 *data;
++
++	if (get_map_val_dynptr(&ptr))
++		return 0;
++
++	data = bpf_dynptr_data(&ptr, 0, sizeof(__u32));
++	if (!data)
++		return 0;
++
++	/* this should fail */
++	bpf_dynptr_from_mem(data, sizeof(__u32), 0, &ptr2);
++
++	return 0;
++}
++
++/* Cannot create dynptr from dynptr slice */
++SEC("?tc")
++__failure __msg("Unsupported reg type mem for bpf_dynptr_from_mem data")
++int dynptr_from_dynptr_slice(struct __sk_buff *skb)
++{
++	struct bpf_dynptr ptr, ptr2;
++	struct ethhdr *hdr;
++	char buffer[sizeof(*hdr)] = {};
++
++	bpf_dynptr_from_skb(skb, 0, &ptr);
++
++	hdr = bpf_dynptr_slice_rdwr(&ptr, 0, buffer, sizeof(buffer));
++	if (!hdr)
++		return SK_DROP;
++
++	/* this should fail */
++	bpf_dynptr_from_mem(hdr, sizeof(*hdr), 0, &ptr2);
++
++	return SK_PASS;
++}
++
+ SEC("?tc")
+ __failure __msg("cannot overwrite referenced dynptr") __log_level(2)
+ int dynptr_pruning_overwrite(struct __sk_buff *ctx)
 -- 
 2.47.3
 
