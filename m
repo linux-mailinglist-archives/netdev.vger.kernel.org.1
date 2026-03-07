@@ -1,169 +1,142 @@
-Return-Path: <netdev+bounces-265059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265060-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IG7cEu2eq2m9ewEAu9opvQ
-	(envelope-from <netdev+bounces-265059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:43:41 +0100
+	id oM03N3egq2kKfAEAu9opvQ
+	(envelope-from <netdev+bounces-265060-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:50:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8553229FD2
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48835229FF8
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B76AA305288C
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:43:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A61A304DEBD
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6B231326B;
-	Sat,  7 Mar 2026 03:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2292C08D0;
+	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEu0t4Kq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHWfPf4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E312E5CDF1;
-	Sat,  7 Mar 2026 03:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BE8CA5A;
+	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772855013; cv=none; b=j3mpEWdUyoZxyR88NLSlIDRZ6OX2GMRebt4knPBITJnhlWgiFsWH0D6EndFsa6nUrfGHnaMZ2y37Zw86GJjDtpUqYTYVu4M7YVgGFP6BbKGRiqaueg3RLvQPPQcZZnuzDvu4ab8tCGKyr8g/O5ELuykESjVtFbCPJON1N1MPZp4=
+	t=1772855410; cv=none; b=ed+OdJSfeEMzQTc+olivbaKRriO+fZJTYoT89StIcdhIAoFQNV5ogXwxclTqqur31RnTJ6CmwoVPhXBMCsk+C9wTW2FbNlWU9R/1IMfKIM2NDRnV5JjpE7XwaaCHKr6Do+hRYfg4jG69E/YxRh3opTz9UJu1QYceoYeJ99Ag4ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772855013; c=relaxed/simple;
-	bh=Npi1ivSwi9obv8U3L34yLEE92R/UJPUFNgtE+UQvMxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=alyaLMcqJ0JfYT1RYdJQQ3uJcFlxFUU1dZL7Me6SWNlxMhq5N3jn8DAeTHJTsH1HVrYVtgrfokJfSRHMZB2QIpNl5uAlW2APJb41KjI4451EHwnruE43CUpjZQy3/PGhzqXdNzPmjQ00rS/UO+H08zA3B6xYf9sIGELXQaZ4oEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEu0t4Kq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B574C19422;
-	Sat,  7 Mar 2026 03:43:29 +0000 (UTC)
+	s=arc-20240116; t=1772855410; c=relaxed/simple;
+	bh=p7EQiPGlxyBmjCH3g3gPtPkS1GF4dOhZ5LgBywc6bPg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hYkFA9GQNq2g7J3OusSaf4kwvs6Y7LK2OTDl9NOK4smIcVC+a9yvfi3hOxDqK2KWOtjvDp2HROumnGmCl3vzr1v6P2r3k0AzQSoRle+UpXC/sPZjKwl/1XgJP67bk+KvA/yUoGb9ZFxFMHxFkn3f56rbqvAHamPJox7kyew513s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHWfPf4H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB73AC19422;
+	Sat,  7 Mar 2026 03:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772855012;
-	bh=Npi1ivSwi9obv8U3L34yLEE92R/UJPUFNgtE+UQvMxI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eEu0t4KqV0RXFs7ptg/3zuFhP8YGOnn/jnZa56ETLQ7fgpNICTk8CQhJZpG4tICj5
-	 9RlrKYLlJyDOyDPNeBLR9i/IjqdNks26GRcxcCKRkytQCHcQ6FoDX/kaYfzkVD4I29
-	 VM9fiopVVkrFjgAsAsP4yJKaVHQNAk5h1pWtGezpWDjiDE/LERIK9Eu1Hdtj4vsLVN
-	 H0PIpltzVprS8RunFG2e2J+vtV+FW1P/lak0nG4JwecP2NkAj4/C1wWxjJb+/LP9AH
-	 GyW7ZvTZlWI7b0Tg++YRXjC6U4V+brYhXf+KEuvVmI7jGUkI3lB5LBJNCK9YPVYeb/
-	 PrBzkjLXUw4jA==
-Date: Fri, 6 Mar 2026 19:43:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio
- <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Richard
- Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Vinod Koul <vkoul@kernel.org>, Giuseppe
- Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
- Chen-Yu Tsai <wens@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, Matthew Gerlach
- <matthew.gerlach@altera.com>, Neil Armstrong <neil.armstrong@linaro.org>,
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Keguang Zhang
- <keguang.zhang@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>,
- s32@nxp.com, Romain Gantois <romain.gantois@bootlin.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner
- <heiko@sntech.de>, Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto
- <inochiama@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>, Minda Chen
- <minda.chen@starfivetech.com>, Drew Fustini <fustini@kernel.org>, Guo Ren
- <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, Nobuhiro Iwamatsu
- <nobuhiro.iwamatsu.x90@mail.toshiba>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Maxime
- Ripard <mripard@kernel.org>, Shuang Liang <liangshuang@eswincomputing.com>,
- Zhi Li <lizhi2@eswincomputing.com>, Shangjuan Wei
- <weishangjuan@eswincomputing.com>, "G. Jaya Kumaran"
- <vineetha.g.jaya.kumaran@intel.com>, Clark Wang <xiaoning.wang@nxp.com>,
- Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, David Wu
- <david.wu@rock-chips.com>, Samin Guo <samin.guo@starfivetech.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S
- <swathi.ks@samsung.com>, Bartosz Golaszewski <brgl@kernel.org>, Mohd Ayaan
- Anwar <mohd.anwar@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, Drew Fustini
- <dfustini@tenstorrent.com>, linux-sunxi@lists.linux.dev,
- linux-amlogic@lists.infradead.org, linux-mips@vger.kernel.org,
- imx@lists.linux.dev, linux-renesas-soc@vger.kernel.org,
- linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
- linux-riscv@lists.infradead.org, Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski@oss.qualcomm.com>, Konrad Dybcio
- <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH net-next v7 0/7] net: stmmac: qcom-ethqos: add support
- for SCMI power domains
-Message-ID: <20260306194328.238d89ff@kernel.org>
-In-Reply-To: <20260306-qcom-sa8255p-emac-v7-0-d6a3013094b7@oss.qualcomm.com>
-References: <20260306-qcom-sa8255p-emac-v7-0-d6a3013094b7@oss.qualcomm.com>
+	s=k20201202; t=1772855409;
+	bh=p7EQiPGlxyBmjCH3g3gPtPkS1GF4dOhZ5LgBywc6bPg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bHWfPf4H0n2QDEQMOOcOTBi9o8erIKm9NK0sTTJHgr9GwCCvul7fwjhY+lTfJxePK
+	 nCHDQZlrvmZMMPWLHXb3Q9OIdtfRWPz2seOJoNVZpf3y92s/ZXFUYGD/pH3XIuZDvD
+	 8jsosbY39Sg13Tol7NyNQZXtyfnduZDD4SdNAzND6uUOdV5Tb4eHu5gKegbKUsAhc5
+	 LmzeM4GxcOmcHYBPhVIp/VxPJVYLiqTZOLfT+xmrSelXyzJvIsR8mSPSo5RRGnDiGL
+	 upmyVUYOIImyjYa26Kql9JL9m/HDlCPqRvGLGxnzKuJ7jAlRhdSPW93yauJ+VB38JL
+	 4DW9/4PzDKpNA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DBC3808200;
+	Sat,  7 Mar 2026 03:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E8553229FD2
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/6] selftests: net: fix false failures due to
+ missing
+ features and host interference
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177285540880.145254.2317239509731397843.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Mar 2026 03:50:08 +0000
+References: <20260306000127.519064-1-aleksey.oladko@virtuozzo.com>
+In-Reply-To: <20260306000127.519064-1-aleksey.oladko@virtuozzo.com>
+To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, aconole@redhat.com,
+ imaximet@redhat.com, echaudro@redhat.com, sbrivio@redhat.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dev@openvswitch.org
+X-Rspamd-Queue-Id: 48835229FF8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,foss.st.com,st.com,synopsys.com,sholland.org,altera.com,linaro.org,baylibre.com,googlemail.com,pengutronix.de,oss.nxp.com,nxp.com,bootlin.com,bp.renesas.com,sntech.de,outlook.com,esmil.dk,starfivetech.com,mail.toshiba,glider.be,eswincomputing.com,intel.com,rock-chips.com,samsung.com,oss.qualcomm.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-265059-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-265060-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[76];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.983];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.938];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ovs-dpctl.py:url]
 X-Rspamd-Action: no action
 
-On Fri, 06 Mar 2026 16:46:38 +0100 Bartosz Golaszewski wrote:
-> Add support for the firmware-managed variant of the DesignWare MAC on
-> the sa8255p platform. This series contains new DT bindings and driver
-> changes required to support the MAC in the STMMAC driver.
-> 
-> It also reorganizes the ethqos code quite a bit to make the introduction
-> of power domains into the driver a bit easier on the eye.
-> 
-> The DTS changes will go in separately.
+Hello:
 
-Looks like it conflicts with patches merged last night, please rebase
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Applying: dt-bindings: net: qcom: document the ethqos device for SCMI-based systems
-Applying: net: stmmac: qcom-ethqos: use generic device properties
-Using index info to reconstruct a base tree...
-M	drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-Falling back to patching base and 3-way merge...
-Auto-merging drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-CONFLICT (content): Merge conflict in drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-Recorded preimage for 'drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c'
-error: Failed to merge in the changes.
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Patch failed at 0002 net: stmmac: qcom-ethqos: use generic device properties
+On Fri,  6 Mar 2026 00:01:21 +0000 you wrote:
+> Hi,
+> 
+> This series addresses several issues in the networking kselftests
+> that cause false-positive failures depending on the host environment,
+> kernel configuration, or library versions.
+> 
+> The main focus of these changes is to isolate tests from the host
+> environment (using namespaces) and to ensure proper fallback or
+> skipping when dependencies are missing.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/6] selftests: net: fib_tests: skip rp_filter test if cls_basic is unavailable
+    (no matching commit)
+  - [net,v3,2/6] selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
+    https://git.kernel.org/netdev/net-next/c/0bcac7b11262
+  - [net,v3,3/6] selftests: net: run reuseport tests in netns to avoid port conflicts
+    (no matching commit)
+  - [net,v3,4/6] selftests: net: rename pmtu.sh to pmtu-test.sh
+    (no matching commit)
+  - [net,v3,5/6] selftests: net: run pmtu.sh in netns to avoid host firewall interference
+    (no matching commit)
+  - [net,v3,6/6] selftests: net: io_uring_zerocopy: enable io_uring for the test
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
