@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-265087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gAK2DXPJq2m8gwEAu9opvQ
-	(envelope-from <netdev+bounces-265087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:45:07 +0100
+	id aH7RGiHKq2nggwEAu9opvQ
+	(envelope-from <netdev+bounces-265091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:48:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBAB722A6BB
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:45:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF4722A748
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:48:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 216B430390BC
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:44:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7AB833053CE4
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2445937AA78;
-	Sat,  7 Mar 2026 06:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A593815D4;
+	Sat,  7 Mar 2026 06:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="fbK5H1+k"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="CbM3ef6Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC263793D7;
-	Sat,  7 Mar 2026 06:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02099377572;
+	Sat,  7 Mar 2026 06:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772865854; cv=none; b=CwsJhMIBnpTESZgCcseDRO0/8j6n71+CHhMRJoRTg3hfuWn9jCzXkmr2s6VT3rJBBrqzbiH8IG3qLWVbfUHU/0s0InJBl91g/U+TNisHafWZskHbksR8K+eT0fNvE8XtNuBYp9YZPIIsaY58Rds+f2ivHM2R92t6vX7TIVBZt7w=
+	t=1772865857; cv=none; b=OQK1gZqF3m09x4Fqa4y9fXzcW2Y+TVgYPuMjptxrYk66+sIhVHH0MIahwM0lbNMDvGQJG4ycB6mqA/GhmGk5uQRzIgxY89vMTOmifj3z29+6iqdjHnqg6OKHcKn35ZE+9LQpF6iAF+LjlP+/8YjdOJrL2SwdG5E+6/eTwdKk4lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772865854; c=relaxed/simple;
-	bh=eHgaqAtHbJyOpJAZlYAAYp/D85yr9tg4xNOBbnoJ7ho=;
+	s=arc-20240116; t=1772865857; c=relaxed/simple;
+	bh=cvjmKAKhEq1h4g27mLn1x/IfFjZtptKlo2+AsMA7DS0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ux59o3ntNbW+4NXso3PDMsdtQ26xXUE6/bhbKmdsXgQDzajeuNEg0Go4odbKHdJshJSFsm3T6T6gtZOWmrd1adf/JUugqB2gJA3xxIEBuEPTMOQ8NDaEZJp+sJ6j+bCOLUJQd3AkjVxyzD/MjbF0MYTG2dD44Zc7evpw605CK4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=fbK5H1+k; arc=none smtp.client-ip=113.46.200.216
+	 MIME-Version:Content-Type; b=qxvWAuyTEA0QDkqAQkc3KueSYWC25mq8+vADmX9MpKDBUmRI1PdBN2hOVSG6z+7rpDW3CcQTDXZyDWrbrhkt771F37YIrekQjat22ouSbvZn0WlEGXKUAmeVG1CHIVKDHNS/DIk0mTwor1UskwfHOnB+ODAYDrmeWCLjtKuvGZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=CbM3ef6Z; arc=none smtp.client-ip=113.46.200.224
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=rd9YSCz4HUPlKdajNb7K73BKr4WWIz5l0s2dAgJkSbA=;
-	b=fbK5H1+kee4/CbJUdZrhvSy7GKjrgnRfSQVsJpmaqpR12uJZMkOogunPpMJmfTTtTHEPFfW2p
-	PB3CKp6uS29mC86fRYVtmgVj5mBSTUSrwiE3H8kWrsg+Lx5qTBZHT1DZD9VlIH9oQe0SZTK0MDh
-	125foVoexKje34vMR5PY79o=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4fSYX74t3Cz1T4Fs;
-	Sat,  7 Mar 2026 14:39:03 +0800 (CST)
+	bh=MFA1o2Bv6mBXv9NnXLBlEOC0J1Am8EXz+TrfM0cRERo=;
+	b=CbM3ef6ZVrXSdKqOIhEYrjVDz/6YTv54D8jw4h+wqcg3Hec27M4Kp157Dnrs3fitpfVZZQ1W4
+	bycR/I4Iws5r3qasZY5AYgxnIU01x0yXPcctf0/6LdJqmA/FAUNWNzDo8mfh/1nTKQV3vwa2rPN
+	p2WzLqvV51v2x95WodYLVEg=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4fSYXQ5rfFz1cyQp;
+	Sat,  7 Mar 2026 14:39:18 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 595C740567;
-	Sat,  7 Mar 2026 14:44:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 68F0A4055B;
+	Sat,  7 Mar 2026 14:44:11 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Sat, 7 Mar 2026 14:44:08 +0800
+ 15.2.1544.36; Sat, 7 Mar 2026 14:44:10 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
 	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
@@ -61,9 +61,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
 	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
 	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
 	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>
-Subject: [PATCH net-next v02 7/9] hinic3: Add PF FLR wait and timeout handling
-Date: Sat, 7 Mar 2026 14:43:46 +0800
-Message-ID: <66a989891540db75b6159d335dd8a2ed08884ae0.1772697509.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v02 8/9] hinic3: Add PF/VF capability parsing and parameter validation
+Date: Sat, 7 Mar 2026 14:43:47 +0800
+Message-ID: <bcd1c72d1bb3420c6f56d1729450280c6d980572.1772697509.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1772697509.git.zhuyikai1@h-partners.com>
 References: <cover.1772697509.git.zhuyikai1@h-partners.com>
@@ -77,7 +77,7 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
  kwepemf100013.china.huawei.com (7.202.181.12)
-X-Rspamd-Queue-Id: CBAB722A6BB
+X-Rspamd-Queue-Id: DDF4722A748
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -93,9 +93,9 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265087-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265091-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -104,71 +104,132 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-0.992];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,h-partners.com:mid,h-partners.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,h-partners.com:mid,h-partners.com:email]
 X-Rspamd-Action: no action
 
-  Add a mechanism for PF to wait for the completion of FLR, ensuring
-hardware state consistency after an FLR event.
+  Add the ability to parse PF and VF capabilities and validate
+related parameters(SQ & RQ).
 
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
 ---
- .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 47 +++++++++++++++++--
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  8 ++++
+ 2 files changed, 52 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-index 1defd6800790..a6e4e9968334 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-@@ -292,6 +292,32 @@ int hinic3_set_cmdq_depth(struct hinic3_hwdev *hwdev, u16 cmdq_depth)
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+index ca60cf4b6282..2dfa4fb39627 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+@@ -17,6 +17,17 @@ static void hinic3_parse_pub_res_cap(struct hinic3_hwdev *hwdev,
+ {
+ 	cap->port_id = dev_cap->port_id;
+ 	cap->supp_svcs_bitmap = dev_cap->svc_cap_en;
++
++	cap->cos_valid_bitmap = dev_cap->valid_cos_bitmap;
++	cap->port_cos_valid_bitmap = dev_cap->port_cos_valid_bitmap;
++
++	if (type != HINIC3_FUNC_TYPE_VF)
++		cap->max_vf = dev_cap->max_vf;
++	else
++		cap->max_vf = 0;
++
++	dev_dbg(hwdev->dev, "Port_id: 0x%x, cos_bitmap: 0x%x, Max_vf: 0x%x\n",
++		cap->port_id, cap->cos_valid_bitmap, cap->max_vf);
+ }
+ 
+ static void hinic3_parse_l2nic_res_cap(struct hinic3_hwdev *hwdev,
+@@ -28,6 +39,13 @@ static void hinic3_parse_l2nic_res_cap(struct hinic3_hwdev *hwdev,
+ 
+ 	nic_svc_cap->max_sqs = min(dev_cap->nic_max_sq_id + 1,
+ 				   HINIC3_CFG_MAX_QP);
++
++	nic_svc_cap->max_rqs = min(dev_cap->nic_max_rq_id + 1,
++				   HINIC3_CFG_MAX_QP);
++	nic_svc_cap->default_num_queues = dev_cap->nic_default_num_queues;
++
++	dev_dbg(hwdev->dev, "L2nic resource capbility, max_sqs: 0x%x, max_rqs: 0x%x\n",
++		nic_svc_cap->max_sqs, nic_svc_cap->max_rqs);
+ }
+ 
+ static void hinic3_parse_dev_cap(struct hinic3_hwdev *hwdev,
+@@ -44,8 +62,8 @@ static void hinic3_parse_dev_cap(struct hinic3_hwdev *hwdev,
+ 		hinic3_parse_l2nic_res_cap(hwdev, cap, dev_cap, type);
+ }
+ 
+-static int get_cap_from_fw(struct hinic3_hwdev *hwdev,
+-			   enum hinic3_func_type type)
++static int hinic3_get_cap_from_fw(struct hinic3_hwdev *hwdev,
++				  enum hinic3_func_type type)
+ {
+ 	struct mgmt_msg_params msg_params = {};
+ 	struct cfg_cmd_dev_cap dev_cap = {};
+@@ -69,6 +87,29 @@ static int get_cap_from_fw(struct hinic3_hwdev *hwdev,
  	return 0;
  }
  
-+#define HINIC3_FLR_TIMEOUT    1000
-+
-+static enum hinic3_wait_return hinic3_check_flr_finish_handler(void *priv_data)
++static int hinic3_get_dev_cap(struct hinic3_hwdev *hwdev)
 +{
-+	struct hinic3_hwdev *hwdev = priv_data;
-+	struct hinic3_hwif *hwif = hwdev->hwif;
-+	enum hinic3_pf_status status;
++	enum hinic3_func_type type = HINIC3_FUNC_TYPE(hwdev);
++	int err;
 +
-+	if (!hwdev->chip_present_flag)
-+		return HINIC3_WAIT_PROCESS_ERR;
-+
-+	status = hinic3_get_pf_status(hwif);
-+	if (status == HINIC3_PF_STATUS_FLR_FINISH_FLAG) {
-+		hinic3_set_pf_status(hwif, HINIC3_PF_STATUS_ACTIVE_FLAG);
-+		return HINIC3_WAIT_PROCESS_CPL;
-+	}
-+
-+	return HINIC3_WAIT_PROCESS_WAITING;
-+}
-+
-+static int hinic3_wait_for_flr_finish(struct hinic3_hwdev *hwdev)
-+{
-+	return hinic3_wait_for_timeout(hwdev, hinic3_check_flr_finish_handler,
-+				       HINIC3_FLR_TIMEOUT, 0xa * USEC_PER_MSEC);
-+}
-+
- #define HINIC3_WAIT_CMDQ_IDLE_TIMEOUT    5000
- 
- static enum hinic3_wait_return check_cmdq_stop_handler(void *priv_data)
-@@ -389,6 +415,14 @@ int hinic3_func_rx_tx_flush(struct hinic3_hwdev *hwdev)
- 		ret = err;
- 	}
- 
-+	if (HINIC3_FUNC_TYPE(hwdev) != HINIC3_FUNC_TYPE_VF) {
-+		err = hinic3_wait_for_flr_finish(hwdev);
++	switch (type) {
++	case HINIC3_FUNC_TYPE_PF:
++	case HINIC3_FUNC_TYPE_VF:
++		err = hinic3_get_cap_from_fw(hwdev, type);
 +		if (err) {
-+			dev_warn(hwdev->dev, "Wait firmware FLR timeout\n");
-+			ret = err;
++			dev_err(hwdev->dev, "Failed to get FW capability\n");
++			return err;
 +		}
++		break;
++	default:
++		dev_err(hwdev->dev, "Unsupported PCI Function type: %d\n",
++			type);
++		return -EINVAL;
 +	}
 +
- 	hinic3_toggle_doorbell(hwif, ENABLE_DOORBELL);
++	return 0;
++}
++
+ static int hinic3_init_irq_info(struct hinic3_hwdev *hwdev)
+ {
+ 	struct hinic3_cfg_mgmt_info *cfg_mgmt = hwdev->cfg_mgmt;
+@@ -215,7 +256,7 @@ void hinic3_free_irq(struct hinic3_hwdev *hwdev, u32 irq_id)
  
- 	err = hinic3_reinit_cmdq_ctxts(hwdev);
+ int hinic3_init_capability(struct hinic3_hwdev *hwdev)
+ {
+-	return get_cap_from_fw(hwdev, HINIC3_FUNC_TYPE_VF);
++	return hinic3_get_dev_cap(hwdev);
+ }
+ 
+ bool hinic3_support_nic(struct hinic3_hwdev *hwdev)
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+index 58806199bf54..361c0b6a70f0 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+@@ -26,6 +26,8 @@ struct hinic3_irq_info {
+ 
+ struct hinic3_nic_service_cap {
+ 	u16 max_sqs;
++	u16 max_rqs;
++	u16 default_num_queues;
+ };
+ 
+ /* Device capabilities */
+@@ -34,6 +36,12 @@ struct hinic3_dev_cap {
+ 	u16                           supp_svcs_bitmap;
+ 	/* Physical port */
+ 	u8                            port_id;
++
++	u8                            cos_valid_bitmap;
++	u8                            port_cos_valid_bitmap;
++	/* max number of VFs that PF supports */
++	u16                           max_vf;
++
+ 	struct hinic3_nic_service_cap nic_svc_cap;
+ };
+ 
 -- 
 2.43.0
 
