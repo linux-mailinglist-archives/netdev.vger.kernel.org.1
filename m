@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-265117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265118-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKwaErYDrGkFjAEAu9opvQ
-	(envelope-from <netdev+bounces-265117-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:53:42 +0100
+	id SHRmI60DrGkFjAEAu9opvQ
+	(envelope-from <netdev+bounces-265118-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:53:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4508722B34A
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:53:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385BD22B342
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2C8613014A31
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 10:53:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 40B32301287F
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 10:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D6233AD82;
-	Sat,  7 Mar 2026 10:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0172EFDAF;
+	Sat,  7 Mar 2026 10:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zp8DijVf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PAJGbZzB"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CF821CFE0
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 10:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D219C2F0C79
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 10:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772880803; cv=none; b=o4Djf3yIx7o+J4Wk9AKRPZrW32O/qzDlfNygjnu4cB6FOBcc05Wsm0c5gIl4oeyJcE0fzSiIijUbXUpjGm6xnkhaGQ7QmKeQlKjHVFHIQ9b5N5VNwv8xGukMQ1QGfrZFVqLq9x8JQy0lRaQUA8ZOIv43OiGmemlUBzWPvStncNY=
+	t=1772880809; cv=none; b=aJ4IG2AjeDHCaAr9K5iT+eZ6LKo/6PISpSJtZiyuVdWl0PtZQowwnkV5sb5W2jSzETSyWPqcIYsbsGFlBr2UrRvJ9mtkUQm9RHkINnxJyVit/3pG4DrHzMrmYVJ2ZGovgaOS4SegtA3+8HkGz024gHV1EtprlsE0ABxckAn/ObI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772880803; c=relaxed/simple;
-	bh=mZ+GO9kHO5m6bVPwQQYDdVPiodNPwBklQKFVT92K9Uc=;
+	s=arc-20240116; t=1772880809; c=relaxed/simple;
+	bh=9w9cwcPMOgEFDGejGbrp1T0JFPNYcy6kp4TZLoyys9Y=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=MGXFZjKct3BY70Y9+nxiiUQNkZagBSOH4sqSNDWXFRAERYByRtEuBs/QkPuz4WvpBcG05UfCD2yhuqWvakKnngpM/5wWv+rVlMHosPOW8n0EV4VIaMeQxLEFjs+uTwxCDdvqWCRms9iVRtz3W1hg4sIFCACjnlbWaUOgqSA8QJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zp8DijVf; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=PUPBKeMoy2SdvBFCeS9XwgfZzxi7dtHKzaPSMaV7LgXLHUdBAaRkA0w6eMbXVSNysmD7+mRBhlyG928s33H1yPb4PAuWJeuSw0pWchAuXR256lNCYdL6vxP/9rMZC0iBZ6NDW5B0qoFn4XcZPktElD9bq/RfNDHA5DkpInprLm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PAJGbZzB; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=702wOfxhINsK5kpNSdhf3nuVOhqS4fpKbmE3wnxb/5E=; b=zp8DijVfcZtlxs1VZOj203boBT
-	EwdhwEwD2iFXynI2iHVd8aFWjUBuyL5wg7XqUmXymxPsBLEoB4Bvror9Z7GQSTKpIwk93qeSLZoVX
-	6CflVvA8vqFg5eMu76YzFXevfVnYRjBIDVAYHtPo6VDF99f3SQHtvphp4F7VbefZD6CZThx6uDe1t
-	OFFv7ehbJ5oVkmbJiQysJMIqXR5rbHcHYXWdW0g56PcYj8MbApxy4haBIL3YOM1oO1LTehmyy7x3i
-	S6WY2zBI1EwQvDtbOZNSSdp1bLHeRRVVlnSNTMtLX1QEl6JpJPvww3pWqWoPdLcckYv2jeJbZDvPi
-	YGcLDkEg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43718 helo=rmk-PC.armlinux.org.uk)
+	bh=eZByVWOPK5ttZJFgRSm0Ifxd/gEF6TSQDdAxyvu8aiQ=; b=PAJGbZzB0YYtWulTCT7vwtolYD
+	qGVLnWWhzgd+uf5R92VO5h/SSIC1q1wYcIw7Yy7zbYlwJZEZrXdNN3sulnyUJA78NqrOSKKT+wJxt
+	S/6dA0MEqaLnDp0BcpmOpFcIfaZRr35dK51eZ1WZ8UnTt2Wy0PDhBrsxa8ojuEviAOF8B8IpydRGM
+	nXww/9+GiZVg/aJKw5sCQeuUvIfHFJ6yv9+H57Jeax/9nNXEzTck6FppJ3+AfKW/4mb6pd6wUZ5qH
+	7x0xzFEKFFDiDZFeph0SVzpZe1RzLGZqnjHcmrdwb5ztPpMZ5XcAJOuaiPw5cEgPeWe/aefvdDJqP
+	HNBDKC9Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:34482 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vypHY-0000000024v-01SQ;
-	Sat, 07 Mar 2026 10:53:16 +0000
+	id 1vypHd-00000000258-0hEc;
+	Sat, 07 Mar 2026 10:53:21 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vypHX-0000000CSbc-123K;
-	Sat, 07 Mar 2026 10:53:15 +0000
+	id 1vypHc-0000000CSbl-1X6v;
+	Sat, 07 Mar 2026 10:53:20 +0000
 In-Reply-To: <aawDiK7DjcSXSs1X@shell.armlinux.org.uk>
 References: <aawDiK7DjcSXSs1X@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -69,8 +69,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 1/2] net: stmmac: ptp: rearrange n_ext_ts
- initialisation
+Subject: [PATCH net-next 2/2] net: stmmac: ptp: remove redundant
+ priv->pps[].available
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,16 +80,16 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vypHX-0000000CSbc-123K@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vypHc-0000000CSbl-1X6v@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 07 Mar 2026 10:53:15 +0000
-X-Rspamd-Queue-Id: 4508722B34A
+Date: Sat, 07 Mar 2026 10:53:20 +0000
+X-Rspamd-Queue-Id: 385BD22B342
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
@@ -98,11 +98,11 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265117-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-265118-lists,netdev=lfdr.de,kernel];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.296];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.264];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
@@ -112,41 +112,85 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,rmk-PC.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-Use local variables for n_ext_ts rather than referencing the DMA
-capability several times.
+priv->pps[].available is set in stmmac_ptp_register() for all PPS
+outputs reported by hardware up to STMMAC_PPS_MAX.
+
+Since we now set priv->ptp_clock_ops.n_per_out to the number of PPS
+outputs that both the hardware and driver can support to prevent
+array overflow in stmmac_enable(), this makes priv->pps[].available
+redundant. Remove this struct member.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c        | 2 --
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 2 --
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h        | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c    | 4 ----
+ 4 files changed, 9 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+index 1c431b918719..f1bb981cab7c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+@@ -525,8 +525,6 @@ int dwmac5_flex_pps_config(void __iomem *ioaddr, int index,
+ 	u32 val = readl(ioaddr + MAC_PPS_CONTROL);
+ 	u64 period;
+ 
+-	if (!cfg->available)
+-		return -EINVAL;
+ 	if (tnsec & TRGTBUSY0)
+ 		return -EBUSY;
+ 	if (!sub_second_inc || !systime_flags)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index 915e7c2ab11f..efa76b147f9e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -1162,8 +1162,6 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
+ 	u32 val = readl(ioaddr + XGMAC_PPS_CONTROL);
+ 	u64 period;
+ 
+-	if (!cfg->available)
+-		return -EINVAL;
+ 	if (tnsec & XGMAC_TRGTBUSY0)
+ 		return -EBUSY;
+ 	if (!sub_second_inc || !systime_flags)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 1fe96cd24b4f..335e60439b42 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -181,7 +181,6 @@ struct stmmac_tc_entry {
+ 
+ #define STMMAC_PPS_MAX		4
+ struct stmmac_pps_cfg {
+-	bool available;
+ 	struct timespec64 start;
+ 	struct timespec64 period;
+ };
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 98da499ba3b1..654d04f8c373 100644
+index 654d04f8c373..960249960004 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -335,6 +335,7 @@ const struct ptp_clock_info dwmac1000_ptp_clock_ops = {
- void stmmac_ptp_register(struct stmmac_priv *priv)
+@@ -336,7 +336,6 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
  {
  	unsigned int pps_out_num = priv->dma_cap.pps_out_num;
-+	unsigned int n_ext_ts;
- 	int i;
+ 	unsigned int n_ext_ts;
+-	int i;
  
  	if (pps_out_num > STMMAC_PPS_MAX) {
-@@ -358,8 +359,9 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
- 	if (pps_out_num)
- 		priv->ptp_clock_ops.n_per_out = pps_out_num;
+ 		dev_warn(priv->device,
+@@ -345,9 +344,6 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
+ 		pps_out_num = STMMAC_PPS_MAX;
+ 	}
  
--	if (priv->dma_cap.aux_snapshot_n)
--		priv->ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
-+	n_ext_ts = priv->dma_cap.aux_snapshot_n;
-+	if (n_ext_ts)
-+		priv->ptp_clock_ops.n_ext_ts = n_ext_ts;
- 
- 	if (priv->plat->ptp_max_adj)
- 		priv->ptp_clock_ops.max_adj = priv->plat->ptp_max_adj;
+-	for (i = 0; i < pps_out_num; i++)
+-		priv->pps[i].available = true;
+-
+ 	/* Calculate the clock domain crossing (CDC) error if necessary */
+ 	priv->plat->cdc_error_adj = 0;
+ 	if (priv->plat->core_type == DWMAC_CORE_GMAC4)
 -- 
 2.47.3
 
