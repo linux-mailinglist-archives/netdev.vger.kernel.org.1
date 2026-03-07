@@ -1,179 +1,165 @@
-Return-Path: <netdev+bounces-265185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NJ9M+qXrGlarAEAu9opvQ
-	(envelope-from <netdev+bounces-265185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:26:02 +0100
+	id qDZiHpOYrGlarAEAu9opvQ
+	(envelope-from <netdev+bounces-265186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:28:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B68522DB13
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:26:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E805C22DB42
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9D80301C88B
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:26:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6BE6E30209CC
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57832345CAB;
-	Sat,  7 Mar 2026 21:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E63366DBE;
+	Sat,  7 Mar 2026 21:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="PSifYJS6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NU8GDp0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325232D9499
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772918760; cv=pass; b=T6bnm4r4u4YGit/d6TUtp8FDRiXbq10NSrVxEzOlriFGUHWEdvXIiJoMs26QeRE+AUP49VvRAcsiYkNUfwkKjU6RQc21MxNbRthXl0o7ucGwJxWtGPt9TD1lD0b9WEM8nKdWcz62+4pZ2LnpKSSgOruRlnEX2d4fiyXenpRx/vo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772918760; c=relaxed/simple;
-	bh=PRQLBx/RLPDriKRe7fmZpdUli+5tZoupcNSox3pcsa8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lH6G7C0Qbx+xcYuqpkiUh/c44eazMJE66Gik3MU6aUT/qQ9nZ1sGl2hC4tz0pecJpyMr888EXJVu7MAzEVadZ2qCAvRdbHT4icYbEGrPZsjbE/vu38zZxn0l/cmgfSQ3+7dKLMpFWVFHzwq2Qdldx5ZEq77M9+9F1LfAmIrSW+I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=PSifYJS6; arc=pass smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-829b2019b39so572173b3a.3
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:25:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772918758; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EbuSSe0iRvU+DbrHQVC5BPdwT9PytRKrAVGYZUSTwnT8omB/NBn8KHA8kmRIRerJ1S
-         dfbYG620HDclLIRb6eVyxMyyFcis+58SZwKBT+7PHkM1WEu9JFbXfZdJR2sZbC6tnwTY
-         VGIJd1lD+Bi+8zcTn8EHkiDve+E2na5Z8RV1kKDKWOJJZAlyO4kAE3eFL66H1zP94PLI
-         fo/I/u3bXJ7t9/4gmgAYIwlMy2QOni7nUXMTBdzwD8OCKY6QxgzUSJ278+x0o+l/gjHY
-         TsG0mrFAy2M05O66Vsc3zsRUSTXEMAlcEVi+4y/U/U6+JyJ2zlCVcajWS9mIRl5tKZmg
-         B/kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OYvXUAY2hmuPvlFnXce6eIWWoBwZyZWq4HDuaCVxamI=;
-        fh=Ic1+bM3dE47N+CA5TwXHsWr5uX+hah0o0WNPW+gb7wI=;
-        b=EWjoC+IWaCiQI0HMrXI3P4ckfhlahS8LI1Uf6AswmQTUzyWM5heHSDwqGdXJC+ZC02
-         ai53/rFEHyfmwY/dZbmOH3yaZuGr5u+QntQnmr4zWBVNWZ6qAVC0D75EEMwR7rKnbsTX
-         yCx4Eg+VFh+KPOtLMdo0wGP960ctrd8Ra/z6zcoj174KK8SnpqoQiDGQ3KZCBQmbLGXQ
-         Vq8spMvVoRNhZGvJsNojHchiqhNcg+fnWokYBUI4L33hezdPkpuaEaGvP1svlyIx9aGo
-         31WPN99dJ/u7UzIMASS9vnw61z/2UyMKxBBGTTbHtMjmuRErbM32OmvfZhL163kJEhiy
-         D2dg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D340834D4F7
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772918923; cv=none; b=MPDfgseesqcvPUJNFjkTkkKf2ZoVNRwXlz0abwSQaxmQkQir8Gn80l1w24rv+MHVmHytp/76aAP7G7PV17zQamypiZ8DADvY/4ekbDWdvLccS1256QpEPwCMQ1ICXN7MrClKE5YwQUMM3zOG9lGERSB8kRDEZsulPLurk2ZkgQA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772918923; c=relaxed/simple;
+	bh=1bK4p5mzYeMCWDs67MGklTJGxrWR+9TZ2JdRQtnv8Ww=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Hg7V27fruuo16wFoO3Kx2URgP8v3ed7ghjVWo2xOQXQ4PYkX+eyfah8H9pjndlTecp0XOO7qx5PZGEg8WaBChArOrf30EdPqtnBu26fE7JqMpjOhNFZ1K0EUzBsg4bV9+XTyK5aWU5jfxPTr1Vo9UFz7RbWShMXYp7DcG8Ich40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NU8GDp0g; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-660f37136ecso1307643a12.0
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:28:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772918758; x=1773523558; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OYvXUAY2hmuPvlFnXce6eIWWoBwZyZWq4HDuaCVxamI=;
-        b=PSifYJS65SNjU+/ysAcvD5mfLC8j5T1AGtjLC01TMMYO/qTeLyiQbQZwxPoXRuJeWM
-         HwnYPZYUZPoAfYiami+ROvwrQEWgPkkcS88wX+7W/rH0bjAepN9ZpfobNTqsxL52gxRl
-         2m5pDsyeM2k8dKvwiVmW21AL6PvILplFp5nMIOB/ZvGtST79eKtyaen6WwgxqF1CjcmL
-         oEOUfIZQ4k918G9v2UBaLcElyfC0OlFQ3QnzQE8Ng/vhN+PoaywyK1qzRyb4xpU2dkt9
-         MSP9sY4SSg142/p24D1G7fycA8kDSoYEVqbrZbtIGWafOGwkbuw9HzZ32oHsi/2vpqka
-         gRAA==
+        d=google.com; s=20230601; t=1772918919; x=1773523719; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KXZ2BtMMwe7rXhuI9FW2OS3wA90krDOiJKGgmhoSpL0=;
+        b=NU8GDp0g20o35tVSF2xZAWpKYNqzKc0JdJ0p2GzKlRGomkAI1xh2kfVeplpTnxKD7r
+         978MPt33LOd/U/rygfzMtKvHQA4/GBEfK2cnuYh7nuJDOvGVX6CfsxZ5ljVFUFnXS3Is
+         docUZYk+e434kTIFf3ZsbErf/KHulPGTKlA1v4jWdw+dOKe1oiLOYdLJXJXTlAvDrxW6
+         ndTtTxuhC40YE4ZHYdwm+NeROrSby7P0WDdiwu1ffMX4YfeTSbktCRQ6PKkNjn+0haIR
+         pPfelNjMrf2IExS+27TqN6LvxeACByxJnreqKkMwh06tGqUG8drEn3WlvJo32XrfrPvc
+         erjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772918758; x=1773523558;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OYvXUAY2hmuPvlFnXce6eIWWoBwZyZWq4HDuaCVxamI=;
-        b=o8EK8QkF3PWeHvFeMvpGEdDYYy5uKvzE3pR3piupLi/fdCddWadz1duKdqOy3D5AW3
-         x6YLjYNoXXypyZkcNONM58hbpmkqWuqJM6Q/CdOQ0XPpfy5eAbh5msQzxA9fjesIVs/K
-         k3iIrCr+kn6NJf4UC9H5P527PzlWUG4REKV25swLTxAjPn7i4vX03S93cUC1BVw5PAjl
-         peE4x2nwYESUfIfEFPz8wsDm2Fs9XLVg319r9wbnecm3VsytrEXgXidAHdw39fDvVBqX
-         w7VKmo1Nek4JUWD8+nh7cAHHY3FYjqwqBJjn6RvvIrghk6oKjDRPwodbrzP1FyPmBd5C
-         dppw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3JfEGxswWntTTOhtS700K2G/HGi/ZBs4ZOozHAjuUUcO6VP7svQ8KZ43dHN1zCPYQeVwP0Yo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLSyxC8APh/6A9HxWPDuYi5KZoAm92iNktviVr7/+xmWGggoC4
-	fcd3O9HEKHnaHoXGetA/YeChaqnDEqXpCfiYTBvTAt+f8ME+X18nI4p3muJ+g82fP/y6IXMOwtQ
-	4Z9zxGaVDmx+qTzjS7n6jN4vDH5WfQkWzQJeGu7wC
-X-Gm-Gg: ATEYQzySelsH3zRKaoC7INmHZdECQ8wWZ2E8kno3KdHmZhv4ug5OHrDEdbFBiLn4IvC
-	vLct2Rl+ojiFnjxiZcy9alnV5P35rtqDYOmhZlxl8xq2hdBIOZGz+jXsDrVD+sblpRKQOMGSxDd
-	57NuKywH0nD7NqqW5s1+JEu9idTAiDePj6x1OkI4WyF1ACxnNJK8/9avnouBGll9cb74TtvHHTT
-	jtLzdyJuWn+KNdQf1Tbn54FX8FC7GpKVfV52bsgTS0z07hE8nXxEL2RZSw5hKYFiOpvZgzZwvv3
-	/t1DW+wiCIK7Tlg=
-X-Received: by 2002:a05:6a00:928a:b0:829:883c:1d5e with SMTP id
- d2e1a72fcca58-829a2f6c373mr5530869b3a.30.1772918758566; Sat, 07 Mar 2026
- 13:25:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772918919; x=1773523719;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KXZ2BtMMwe7rXhuI9FW2OS3wA90krDOiJKGgmhoSpL0=;
+        b=pGZFoMd/7DCewWtYn3yRtSnYxvNwnUFzdKOZvU4ffBfV8BJZHDj3M8Rd956Xprnk2V
+         nBnCVnewYbfyf1TJXGfYIV/R2rEpMe5/N1erh7yeUHZmbl1nxKPYlzsg+6YP32/WbP9T
+         opCZjCVkLdR6GP8ZLyiGtggsC38it7tLLXrOxpzFdKBR+RpRXWxFGjGGAtR5+z8Jqp2j
+         UIkspmi+uDkWzAjewxjmjdKgv34Ek4y04Wvxp/7CjYSW6JuF0xn6ji5Wuvb34+VEQr2I
+         N2U5ueqvZ1vyRF5GLqDc7zp5ZKGuuzGmeKOngx/py3C+kg6AMrk/rg9apRYWRT/1M3TR
+         fyvw==
+X-Forwarded-Encrypted: i=1; AJvYcCWjh7HA4yVNxp5l8cpxeiV+ag3hcX3qirnvn8NxdZJfSBKzNMkkgTKmVxh/9af1J5LJpFownL8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoPnFD1lsGNfK2+TMrHIonX9PD4e6sKr8ATkZoRhwRNLhJPCMC
+	ow87YmoicNd8Bhv5N/En9+//T6UX+J0DgcvBmqwNoHJSGd9lpob6wogTbk5mhqvvoxERXGNmUcL
+	zpBQ975giNcB2pe1F3Q==
+X-Received: from edse9.prod.google.com ([2002:aa7:d7c9:0:b0:660:e726:1fa])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:42cb:b0:65f:7000:928f with SMTP id 4fb4d7f45d1cf-6619d2efe84mr3606718a12.0.1772918918922;
+ Sat, 07 Mar 2026 13:28:38 -0800 (PST)
+Date: Sat, 7 Mar 2026 21:28:38 +0000
+In-Reply-To: <081b1f16-5c8b-4a18-a9f1-d56e757de4c0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260307120607.3504191-1-edumazet@google.com>
-In-Reply-To: <20260307120607.3504191-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 7 Mar 2026 16:25:47 -0500
-X-Gm-Features: AaiRm53Opprvr41x8kL155vquQrQ-j1OfPPykbhjnDSECmyWMH4mMpr_JqO21CI
-Message-ID: <CAM0EoMnQepA=vSb+ti9QOGYL_Mwc1M3Li_6MHpUNtjHJrqQewA@mail.gmail.com>
-Subject: Re: [PATCH net-next] MAINTAINERS: include/net/tc_wrapper.h belongs to
- TC subsystem
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1B68522DB13
+Mime-Version: 1.0
+References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
+ <20260306-binder-netlink-v1-1-daceb5bc83f2@google.com> <081b1f16-5c8b-4a18-a9f1-d56e757de4c0@lunn.ch>
+Message-ID: <aayYhgy3pRxFWbr7@google.com>
+Subject: Re: [PATCH 1/4] rust: netlink: add raw netlink abstraction
+From: Alice Ryhl <aliceryhl@google.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
+	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Rspamd-Queue-Id: E805C22DB42
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265185-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265186-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,resnulli.us,vger.kernel.org,gmail.com];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.988];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu-com.20230601.gappssmtp.com:dkim,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,netlink.rs:url]
 X-Rspamd-Action: no action
 
-On Sat, Mar 7, 2026 at 7:06=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> include/net/tc_wrapper.h changes should be reviewed by TC maintainers.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7b277d5bf3d1247544a2871b794b578c5675cdfb..6175c34910269fe6d1d20cbfb=
-0985e25ab72fc5f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -25751,6 +25751,7 @@ F:      include/net/pkt_cls.h
->  F:     include/net/pkt_sched.h
->  F:     include/net/sch_priv.h
->  F:     include/net/tc_act/
-> +F:     include/net/tc_wrapper.h
->  F:     include/uapi/linux/pkt_cls.h
->  F:     include/uapi/linux/pkt_sched.h
->  F:     include/uapi/linux/tc_act/
+On Sat, Mar 07, 2026 at 04:43:02PM +0100, Andrew Lunn wrote:
+> > diff --git a/rust/kernel/netlink.rs b/rust/kernel/netlink.rs
+> 
+> ...
+> 
+> > +/// The default netlink message size.
+> > +pub const GENLMSG_DEFAULT_SIZE: usize = bindings::GENLMSG_DEFAULT_SIZE;
+> > +
+> > +/// A wrapper around `struct sk_buff` for generic netlink messages.
+> > +///
+> > +/// # Invariants
+> > +///
+> > +/// The pointer has ownership over a valid `sk_buff`.
+> > +pub struct SkBuff {
+> > +    skb: NonNull<kernel::bindings::sk_buff>,
+> > +}
+> 
+> struct sk_buff is a core data structure which appears all over the
+> networking stack, but also other places like crypto, scsi, tty, file
+> systems, etc. Since it is a top level data structure, it seems odd
+> Rust puts it into netlink.rs.
+> 
+> How do you see the Rust SkBuff evolving to a general purpose data
+> structure which can be used everywhere?
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+We can make a kernel::net module (rust/kernel/net/) and put it there
+instead? I guess netlink.rs can also be a submodule of that.
 
-cheers,
-jamal
+Hmm ... but I'm currently using genlmsg_new() / nlmsg_free(), and I
+assume the other use-cases do not go through those methods, since they
+sound netlink specific.
 
-> --
-> 2.53.0.473.g4a7958ca14-goog
->
+To be honest, I'm new to the kernel's networking stack, so I probably
+can't design Rust wrapper for sk_buff that supports all those different
+usecases without someone walking me through how it works. It may or may
+not be best to write a netlink-specific struct now and expand it later.
+
+Alice
 
