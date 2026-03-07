@@ -1,157 +1,335 @@
-Return-Path: <netdev+bounces-265106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265107-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBXVHYjLq2n7gwEAu9opvQ
-	(envelope-from <netdev+bounces-265106-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:54:00 +0100
+	id IHpiJjXPq2lhhAEAu9opvQ
+	(envelope-from <netdev+bounces-265107-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:09:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAEF22A84F
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:53:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006EB22A8DC
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 08:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 87D7830005A9
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:53:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E2AE2301C547
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 07:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EAA376BF2;
-	Sat,  7 Mar 2026 06:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD0D346760;
+	Sat,  7 Mar 2026 07:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hK1XjJ+4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aju4W2lZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40889368972
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772866432; cv=pass; b=Z5KeK0hjbTWkMyAsRSu6QpQL7dop1gnSaTNt3NAFV2mw5WdvRjBsHAI+0iWZzR28mnu0TpUzOk3yR9MeGIgCLZ/fZrYaFiKG3obikkSZYruM3LN70y3c+rqd/E1xsuafcjhr1Ph4ybsIvpKYxDJJ9avUhuv6KHgGm+hLO8ULZLM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772866432; c=relaxed/simple;
-	bh=icsl/YTr4fZbb0OxrSi9kUnwufOmLm2RUbcyua4fIKY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=JJ3Tf9vmlT7cyQ5uT9NSkoTFGy347CJsX5Nv3bcUjxIJplrahpfwQB9am9W8H+QUR8rIe1JfmQfrZluwUjEIAh4Ys5EO8Mql5g37AixutPIhWFROBXOTsirY8Qf2PstOylmCf2BLNi+tcynkr8+uY3oRaxzMveac+Y1jy2hJeZ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hK1XjJ+4; arc=pass smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1596617993
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 07:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772867377; cv=none; b=SOuWDR7ScGaCIoqAboaxK+FfO5cCpe0Y4thG2lOr5JbYO8PjZVolkEYJEG6PGwDdYkJ1Wtenfp50nCQwWrTk4NzKM0q3Fcspx+WK17hwf7OjvgM+Pmym72Ou9aEU1W9fdL7sk1AiUF87czSXh7DvPUwl0QBJQ/1abRqhYRvr61I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772867377; c=relaxed/simple;
+	bh=QL9BKetlDyYpgfINgsubMIhGmpsylXXyhHbGNaDmUEI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pO4wg+GwSKj61Y3Wj803iQAlgZfbvvOMzjoJ/EqiHShPG4wdvokUEEeEMmw/5khl736fUgTdkanemNRNafjPC6hojtnKeQiHq+p9DIUvhQwtUPt4NjKQsNQodbWvq032QfNmxDKr3/tdAExSZXWQgQ+Dpr3RtD+PhPKTkv2QWP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Aju4W2lZ; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6615c461d3fso3760834a12.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:53:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772866428; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZWP3FAEGvnvM63mz9+vctfRnZSVKxHd5jrVtwqjSrx3ri0+8SI0msFwFODdV6hW5cp
-         Chr8LSFGK4WXDbIeI+eLUZ7dPnmcvxnZYYNsilaS2W4cclJ9IhPBfWP8YP0I2isgCVrs
-         4ERWRaJhtuNkaaHBLMldTQRjttpfdCPnrkVUH89o/YS5xblyosfyd+AulktXjecuLxn5
-         y6asASFf3pMFcuEbmwR+umDcqEtbbrrpiuWJr7kFNjX7mqtPWtHfPj73skgogXqJ+zzT
-         0fEcCSOhBvGrRpWOb07Zu3u9O40Re+IcFepZScSYTOrVzagKv0OHsinUvHCcSZOScEV9
-         t0EQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=icsl/YTr4fZbb0OxrSi9kUnwufOmLm2RUbcyua4fIKY=;
-        fh=aDUZZ9N6NPmO6DMPx8G1ADwl9DVnQFUvUJ2oivftvxg=;
-        b=YUJ7b7dnMOa9Eb3vwfGNo34n07FaRbpJKuud10UqWP2BD1V9XuaHNkYWxxaYmCArtT
-         rRxj/jsCRyo9CJi1VvBNvqX1vwU3wAKIGtdbcSa1IO6soc3Sw8vy3Ho5mMem6i046Iyp
-         6npHzQvX0vmqXmtOCWAV9GQPaq6rWm+3hOXimFZgdwMat7VhNYRFjFN5qRkK7+upiaov
-         KfJ49YrTMivbFdP1MrW0lfaAhWk3hRyTTLdtTUvunuCsUi6VUiGO/w69P3asvClzHMJs
-         ihnhxQidFnPpgEGwTKCdSU1BGc9Wy6cUFFL6NmWgspsqrWDwbXgwQfKXHWgZGKNDODxq
-         r8Mg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8cd73c4a827so93160785a.3
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 23:09:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772866428; x=1773471228; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=icsl/YTr4fZbb0OxrSi9kUnwufOmLm2RUbcyua4fIKY=;
-        b=hK1XjJ+4Yq6cVOceBWjxKK72vPuQ59u7O5G0UswVGYMqN9RdLkSV7Qmn/FK895Sh7u
-         uoknI2lG5gLDF+MG66ZJeDJtUe4sxxUDTYSfsKn0SzitP+hE2ajeduib1c+bXG/DtX34
-         RV/P0y1EfSBifaEs39IbtzYaHwPWLMapA1XAshZujanHS7FLMRX64ZhpAYZx3PpBzO19
-         g2TfWrtloyJdYsCTZfRw/U7awJgJ2ZA9NVObJeH9k50c/FJoybC1wdQrHmL/rSGXSDF3
-         yNdYbQMyMB3ouFa5l4md3ntAj2AqKKvjAou3aGF8jYDXDRSKyjkV8dK9fD9toYKgdJBV
-         yOCQ==
+        d=gmail.com; s=20230601; t=1772867375; x=1773472175; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Re/IoXRnVnrwqwk2PCf3MrXGdyviIMQnH+YNq0WCLs=;
+        b=Aju4W2lZjwPnL77OAKXVOY8ZXs/20TjC3mZN4u11l/RVIuqAzj3oGc2Wc1qZpOsB6+
+         LaY7czTpS62y1Lj9iuqOC3Zou193+3ZxsIv4x039tb8lScIeBBi0yV9nRtI4peM07dyF
+         /pwXjJFiThdnWGRu8zek878NiajaXcvKe8f7mfQqdzJLFd3ZWk4cxzaHhRld6nYI9ubf
+         vGztJV11a20RejJ+Yt6JdFO4q4ohfAH5VLq6VRiOzg/hIVsqlvRZ+jlHNMBqcNRQdTpr
+         2rqGjNRKXRu8yITj+jJKyjmSVoM9ikG6k0WFNzTuTGAWz1XHYt5a/WkzhwQrDpTBRBcH
+         wGyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772866428; x=1773471228;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1772867375; x=1773472175;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=icsl/YTr4fZbb0OxrSi9kUnwufOmLm2RUbcyua4fIKY=;
-        b=wyoj/ql6AZUQvP6bo7ykQ6CBVRucSnGtsd1ah2fB0UpM+T9qZh473bpCFU7vY3/kqv
-         PURJ/ldoMpRcQAmA3FYDahFXyi8o9Db4I7A0/zBFH0A1DEIBRDu3ZoLs7ReHUswOrpy1
-         6j67WxgrPPNjMrWAc+g34dN4Ljji4dcnaljMCgimZZHf7dsQxUEuEazYXcGSZNNDNVFE
-         YHW8Wnf/eg7nkn3cXNwmxZmXqMzi9+Sp0uERKGDp8Ogx4uB24AUTOw74APibj/sML5bj
-         Aa+YPQWIqCISiSOBaxm/VL/9jbyUExlnZva1hlc5hVNDgqRkSuTkI3JVKHEqKaD2vE3t
-         UXTg==
-X-Gm-Message-State: AOJu0YwfmojUNxKPvRTri0GZtX9evQ1ecnURV0S7B2HLq5TGB4fikvEn
-	XuO+4gLXLThraCCzBHyKy8w1/J52NAlTfofPwBJr9ooeM+u3j+246srNLHSXJdcm8lrg3B+6cUb
-	S59L72CRWiHPJaFS4I2v91NtQhF+fQQPZ/7yN
-X-Gm-Gg: ATEYQzxUGPeGp9x7Ko4O/poXsQ8+34PHr99RSKH9YAZxG6iU0wHHrX3JQXrQ/wmeLHN
-	+YHcqHtq6LOB2bPADYFVprY46TMzI2yRnYJu8I2Ds6BESxr5Fl1pwvp5MsxulIMkgaXxoUoVEVf
-	3eedMf4GsI8xS5Ov3GnG1S0APUGUcRIIuk3yXIu/Jec5cJ0GV519KQLnAbOTEGnw6no2wJsBz/R
-	fXDWSBr51jPbLDMzClCjXfDRtqvPXHmpW3NlxUv1RFcWom2/LtrJi7Bfxd8hSXQtIdQQv/PBufo
-	MqClw1cSF0dIHXqCEDc=
-X-Received: by 2002:a17:907:8dc3:b0:b87:1741:a484 with SMTP id
- a640c23a62f3a-b942e0f391bmr257941966b.43.1772866428070; Fri, 06 Mar 2026
- 22:53:48 -0800 (PST)
+        bh=3Re/IoXRnVnrwqwk2PCf3MrXGdyviIMQnH+YNq0WCLs=;
+        b=ufptSmbx6HephD2hc44/3MFB9VOtkydhtaKziDSGvhG+2RZwUWpTqhsX1jSFa4pbkt
+         JWIIxpqSEWE1IRqRp87nTt2nCWwUafc66gmgjCiZQlE5BfcmXJhW3eiAlYjGmp1Kg86g
+         NJf6A1lsj5l9DXxt1EZoZlYMMvZUI7QZQBsl13rMNRRyIxjHW2ryek1m7nE1OwDYbUms
+         Q3HqejETC30S7ZLo87UH7zEgoS8QmktbINjyll8XE3nIheN+M9/OazbTMxNuHVWxosee
+         6lrQOzXD+/xP32zwv+hJeNvsNltfAjPl2WLDN3wRDagKifa1o7kXwSN61420auwLjeYV
+         la/w==
+X-Gm-Message-State: AOJu0YyePQns6O5J1uxDRzq8PY+s99OfQIv1JN2oWVcv/a92UYZvGABw
+	TWf2cgKLVgh/e2qPfXIygkOcgsKaCd3iDQgSp6sF0NzAXksh87WO3JDi
+X-Gm-Gg: ATEYQzybO2YMzGkSIfr/O8Uo3HwM32fLfSNZQXpMoBLIKT8KiS1ogklvxnURL36Hs1B
+	FhBIe1a15bGTqXDVgDLUb9JLNtZXZ6Xq5axH2QOn7lBY03ajxaSXMehC7OJ/jAFr+iw1lb21gn1
+	OG6OyDSWTFAQKCbtP9Z6ViRGEyujxwr826tVR/Hjm4Fy8TIfCd2vsGxp0WrvCZWrjaY+8MT2L2N
+	btz/8xq5jmqRbxgLmBv9gGU9ffWl699+mrrf4SFhnynP7bZFqvsvI0UZ9pz/Q9WUq6/ZCQeAg9g
+	LaRYRBwIs4aMVjRb9yj9Vh2HlXz3PNXc78InUrKNq0talmGcbuf9dLHh6spZzq2OocvwtE6XVIb
+	SB3J4MQcLm8JRUZrEcv8Y65qtE//nrB+ydM3hxoWUahxFOsWZd9Qz1coHgUn2P8fZfux/hwm+Ks
+	zJxaU/mN4B54bcXlcYRg8JnMHnVc8yGXuR
+X-Received: by 2002:a05:620a:1729:b0:8b2:dcde:b668 with SMTP id af79cd13be357-8cd6d51357emr597796685a.62.1772867374858;
+        Fri, 06 Mar 2026 23:09:34 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd6f5736c0sm262405985a.49.2026.03.06.23.09.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 23:09:34 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Sat, 07 Mar 2026 15:08:54 +0800
+Subject: [PATCH net v2] net: macb: Shuffle the tx ring before enabling tx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Zoltan Boszormenyi <zboszor@gmail.com>
-Date: Sat, 7 Mar 2026 07:53:37 +0100
-X-Gm-Features: AaiRm52oApQxPA_933l6yCyCax0-bXqz9r7twsr13mebquFeMVbciV5bsQ8e6IM
-Message-ID: <CAPeTZW8Qe7+gunv2_rhyMQUyXj7aUfVtJcSUENnaWBYYMBq4DA@mail.gmail.com>
-Subject: Realtek 8157/8159 support in r8152
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260307-zynqmp-v2-1-6ef98a70e1d0@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAbPq2kC/zXMSwqDMBAG4KvIrJtiRhOlq96juLBmogM12kSkV
+ nL3hkCX/4PvhECeKcCtOMHTzoEXlwJeChim3o0k2KQMWKIuUdbie7j3vIqmNpWyVavRtpDOqyf
+ Lnww9wNEGXSonDtvij4zvMk/ZqUr1d3YppFCGGkRVG6Wf93Hu+XUdlhm6GOMP1dAmLaEAAAA=
+X-Change-ID: 20260214-zynqmp-74d35f3862f8
 To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7DAEF22A84F
+Cc: Kevin Hao <haokexin@gmail.com>, 
+ Quanyang Wang <quanyang.wang@windriver.com>, stable@vger.kernel.org, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>
+X-Mailer: b4 0.14.2
+X-Rspamd-Queue-Id: 006EB22A8DC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265106-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265107-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_ONE(0.00)[1];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zboszor@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.967];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,windriver.com,vger.kernel.org,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.972];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,davemloft.net:email]
 X-Rspamd-Action: no action
 
-Hi,
+Quanyang observed that when using an NFS rootfs on an AMD ZynqMp board,
+the rootfs may take an extended time to recover after a suspend.
+Upon investigation, it was determined that the issue originates from a
+problem in the macb driver.
 
-I recently bought a 10Gbit USB network device.
-It shows the USB ID 0bda:815a for which Google says it's an rtl8159.
+According to the Zynq UltraScale TRM [1], when transmit is disabled,
+the transmit buffer queue pointer resets to point to the address
+specified by the transmit buffer queue base address register.
 
-The cdc_ncm driver is loaded for this device out of the box with 6.19.6,
-but ethtool says that it runs at 4294Mb/sec speed and shows no actual
-phy identification for supported speeds, etc.
+In the current implementation, the code merely resets `queue->tx_head`
+and `queue->tx_tail` to '0'. This approach presents several issues:
 
-I looked at the sources of the vendor driver version 2.21.4 and
-it lists this USB ID as supported, and for that matter, a couple of
-others that are missing from the upstream kernel driver,
-for older chips as well, and for the new 8157 (5Gbit) and 8159 (10Gbit)
-devices.
+- Packets already queued in the tx ring are silently lost,
+  leading to memory leaks since the associated skbs cannot be released.
 
-Please, add support for these devices to r8152 soon.
+- Concurrent write access to `queue->tx_head` and `queue->tx_tail` may
+  occur from `macb_tx_poll()` or `macb_start_xmit()` when these values
+  are reset to '0'.
 
-Thank you in advance,
-Zolt=C3=A1n B=C3=B6sz=C3=B6rm=C3=A9nyi
+- The transmission may become stuck on a packet that has already been sent
+  out, with its 'TX_USED' bit set, but has not yet been processed. However,
+  due to the manipulation of 'queue->tx_head' and 'queue->tx_tail',
+  `macb_tx_poll()` incorrectly assumes there are no packets to handle
+  because `queue->tx_head == queue->tx_tail`. This issue is only resolved
+  when a new packet is placed at this position. This is the root cause of
+  the prolonged recovery time observed for the NFS root filesystem.
+
+To resolve this issue, shuffle the tx ring and tx skb array so that
+the first unsent packet is positioned at the start of the tx ring.
+Additionally, ensure that updates to `queue->tx_head` and
+`queue->tx_tail` are properly protected with the appropriate lock.
+
+[1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
+
+Fixes: bf9cf80cab81 ("net: macb: Fix tx/rx malfunction after phy link down and up")
+Reported-by: Quanyang Wang <quanyang.wang@windriver.com>
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Cc: stable@vger.kernel.org
+---
+Changes in v2:
+- Resolves the issue of incomplete copying of the tx descriptor, as identified by the AI [1].
+
+- Resolves warnings for lines exceeding 80 columns.
+
+- Link to v1: https://lore.kernel.org/r/20260305-zynqmp-v1-1-5de72254d56b@gmail.com
+
+[1] https://netdev-ai.bots.linux.dev/ai-review.html?id=44318d8b-d8c3-42c8-8884-238421f708c5
+---
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <linux@armlinux.org.uk>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 98 +++++++++++++++++++++++++++++++-
+ 1 file changed, 95 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 3dcae4d5f74c9709a86fae837d25501da4484bf7..952aaf84757c20e94f3bbc98162a18330aa4cf73 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -37,6 +37,7 @@
+ #include <linux/tcp.h>
+ #include <linux/types.h>
+ #include <linux/udp.h>
++#include <linux/gcd.h>
+ #include <net/pkt_sched.h>
+ #include "macb.h"
+ 
+@@ -786,6 +787,97 @@ static void macb_mac_link_down(struct phylink_config *config, unsigned int mode,
+ 	netif_tx_stop_all_queues(ndev);
+ }
+ 
++/* Use juggling algorithm to left rotate tx ring and tx skb array */
++static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
++{
++	unsigned int head, tail, count, ring_size, desc_size;
++	struct macb_tx_skb tx_skb, *skb_curr, *skb_next;
++	struct macb_dma_desc *desc_curr, *desc_next;
++	unsigned int i, cycles, shift, curr, next;
++	struct macb *bp = queue->bp;
++	unsigned char desc[24];
++	unsigned long flags;
++
++	desc_size = macb_dma_desc_get_size(bp);
++
++	if (WARN_ON_ONCE(desc_size > ARRAY_SIZE(desc)))
++		return;
++
++	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
++	head = queue->tx_head;
++	tail = queue->tx_tail;
++	ring_size = bp->tx_ring_size;
++	count = CIRC_CNT(head, tail, ring_size);
++
++	if (!(tail % ring_size))
++		goto unlock;
++
++	if (!count) {
++		queue->tx_head = 0;
++		queue->tx_tail = 0;
++		goto unlock;
++	}
++
++	shift = tail % ring_size;
++	cycles = gcd(ring_size, shift);
++
++	for (i = 0; i < cycles; i++) {
++		memcpy(&desc, macb_tx_desc(queue, i), desc_size);
++		memcpy(&tx_skb, macb_tx_skb(queue, i),
++		       sizeof(struct macb_tx_skb));
++
++		curr = i;
++		next = (curr + shift) % ring_size;
++
++		while (next != i) {
++			desc_curr = macb_tx_desc(queue, curr);
++			desc_next = macb_tx_desc(queue, next);
++
++			memcpy(desc_curr, desc_next, desc_size);
++
++			if (next == ring_size - 1)
++				desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
++			if (curr == ring_size - 1)
++				desc_curr->ctrl |= MACB_BIT(TX_WRAP);
++
++			skb_curr = macb_tx_skb(queue, curr);
++			skb_next = macb_tx_skb(queue, next);
++			memcpy(skb_curr, skb_next, sizeof(struct macb_tx_skb));
++
++			curr = next;
++			next = (curr + shift) % ring_size;
++		}
++
++		desc_curr = macb_tx_desc(queue, curr);
++		memcpy(desc_curr, &desc, desc_size);
++		if (i == ring_size - 1)
++			desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
++		if (curr == ring_size - 1)
++			desc_curr->ctrl |= MACB_BIT(TX_WRAP);
++		memcpy(macb_tx_skb(queue, curr), &tx_skb,
++		       sizeof(struct macb_tx_skb));
++	}
++
++	queue->tx_head = count;
++	queue->tx_tail = 0;
++
++	/* Make descriptor updates visible to hardware */
++	wmb();
++
++unlock:
++	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
++}
++
++/* Rotate the queue so that the tail is at index 0 */
++static void gem_shuffle_tx_rings(struct macb *bp)
++{
++	struct macb_queue *queue;
++	int q;
++
++	for (q = 0, queue = bp->queues; q < bp->num_queues; q++, queue++)
++		gem_shuffle_tx_one_ring(queue);
++}
++
+ static void macb_mac_link_up(struct phylink_config *config,
+ 			     struct phy_device *phy,
+ 			     unsigned int mode, phy_interface_t interface,
+@@ -824,8 +916,6 @@ static void macb_mac_link_up(struct phylink_config *config,
+ 			ctrl |= MACB_BIT(PAE);
+ 
+ 		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+-			queue->tx_head = 0;
+-			queue->tx_tail = 0;
+ 			queue_writel(queue, IER,
+ 				     bp->rx_intr_mask | MACB_TX_INT_FLAGS | MACB_BIT(HRESP));
+ 		}
+@@ -839,8 +929,10 @@ static void macb_mac_link_up(struct phylink_config *config,
+ 
+ 	spin_unlock_irqrestore(&bp->lock, flags);
+ 
+-	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC))
++	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
+ 		macb_set_tx_clk(bp, speed);
++		gem_shuffle_tx_rings(bp);
++	}
+ 
+ 	/* Enable Rx and Tx; Enable PTP unicast */
+ 	ctrl = macb_readl(bp, NCR);
+
+---
+base-commit: a0ae2a256046c0c5d3778d1a194ff2e171f16e5f
+change-id: 20260214-zynqmp-74d35f3862f8
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
+
 
