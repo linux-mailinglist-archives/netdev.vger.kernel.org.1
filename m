@@ -1,364 +1,214 @@
-Return-Path: <netdev+bounces-265151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGqEE8xTrGkOowEAu9opvQ
-	(envelope-from <netdev+bounces-265151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 17:35:24 +0100
+	id vBNwOcJVrGlvowEAu9opvQ
+	(envelope-from <netdev+bounces-265152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 17:43:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B5D22CB43
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 17:35:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D67522CB6A
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 17:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0826C302F384
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 16:34:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDB9D3017791
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 16:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D4F3A63E3;
-	Sat,  7 Mar 2026 16:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5ED3A63F7;
+	Sat,  7 Mar 2026 16:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UvvVgR9E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BuzzSMKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA2C3A4F55
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 16:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772901275; cv=none; b=oZm8Ig9Q70BGaGi/I77q1mC6lA3mnZUjbFB54WY+eA/Rzr3PmDHaPltOLruQUmERsuESbx0mzspN+ifWl6pOZyjskTQLksAef4w5gpU4AQ37ajzpjicPhLeFeCKVTRwan3gTUzCxmgQy4KW8MBHCgC/J+CLnn6C5mReVeynSSpU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772901275; c=relaxed/simple;
-	bh=TanHhOYEtuKFFolNKHEneRF1CLOPB8FiyE4E1WsqtUs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Xd7iPc1Wn0cxd9TQnbIfLMYDssKBiQ0o4ag8D9GrJFV6tBFdEQsrXrEVMDo2xKfb7FCppx5VwVv3C2+6Lnr7S0KH+cEjQqkASIGDnChjDiTqvGtieKcn5aZHlDRbjOE50nYg9WE26gSCQgSnilTkKbfG1Li07NR7vBsaiVh01jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UvvVgR9E; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A752D877D
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 16:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772901822; cv=pass; b=g3AQo3T8InXtRJqVEwkJGgSmWWUvP9jrgvAYKUnw9knZzByFXehahlYIZ4SmY8s+Z7ckY88wGa6qt70KCfl9aetpZYL3D6neYzzWhTKs8BOtIINQo67i9WkCxbtraKLhDDLMcLEb+03AE208UjNTkn84AlC+4pMrzx9nxSvfBa4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772901822; c=relaxed/simple;
+	bh=VmqsC2ZOzAjEDREONaQ5bo5cteXzdyYDPLla5Txg7ik=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HS/U0w4X+62EexCaM95KnDK/DRsaw86CPweN2hT7dGfdEcBtel2jKU77RSDAu4LEqpcy7q5ARY+JBptS/O33ywIrES9BwPpiGJD6cJlkkQ7rb7k+zcr0HgSJX1tGpnPxIyp7JE1oQO+wgKVm8i6V4Di/QIW4g6Sz6FHEupYpqPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BuzzSMKP; arc=pass smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-506b4005ab7so885443151cf.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 08:34:32 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-89a15b9a556so63049866d6.3
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 08:43:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772901820; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lLgd3DzenPY2hbooiaqO7mm2Oz8sFPWGteeo/Ix/ct5NmC468njt7DQSpXKQFzKVda
+         0TZ+tUgt0R1CdWOL09qc8xRvfw4xR7HdfFiY9tjZquTeuaJbF/jip6gSKVBFdmQdKnkX
+         pa/Ho0W+FihpKTvakunWjo7apqzVPteZ56TGFmZ9B8BaATf94pz6K+6RskfVB7P5OFGa
+         d8PgzJH6MqX6NhQyknAorQ7U6YJmtEI0fJ12ah6zLM0ntc5e+KUDKh+cbOpllc3Daov8
+         n1/If9aSAus1n002fk6z4sy6OorndOZzGCREFlggmsbxLOqCjIWc6m3CBXYvVdKZJDbd
+         jRQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=eKgpUbrVmNyMZC1IB7c4wRi8BzaImvn4akHqVzx6BS0=;
+        fh=vwaMzn6kl2t1J02FMQDJSAjjXGnSI4nUITAvDq1UeCw=;
+        b=f8DwL4/zxPH6XTcdcqjJvEbf95akoQH5oCQFH8F4Hfp4+M4uw+XtzM7+klW/ma2E0q
+         lOeQ0CUoPex6nj8M8i0nsujVLg22+2u1bUOJpPwcqumSX3OGSSpxikeu7O0ryANQlMM1
+         OYBmhMfW/sKCoAxWRKdTHQ/9qlN9vQNddZ+EvmhUB8h07m4wJ6gzSe9a2zBpWGFi1rtP
+         a/escmPVGUSDGndITrauXLOe5N5VCjPsTtUqehMt1NlIJ2j5/IJu0WMdvIk/HeRdZu2Z
+         47ixo5+QhUYkp8ljhoz2CdZvFBLWuVhH5Xj9m4kflNqgoPivjU/sx6Vq3ZMJhdXnVHwo
+         JVig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772901272; x=1773506072; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=B/L2NtnWYT3/D//o5Owk0t4WwkSxK6Eq0HsnAyfct5U=;
-        b=UvvVgR9E8U3t8G43CYCW0TtbHW78wEIb51ajtSTRJUHEBc/ZMxXL7iye/+IGitsBdM
-         IErG1pRCrstMxtkY8OfYuY2t23qJ5Ehb07/5t0uNEPnpn2LBC22ARUG4NWQlrQwhRvaJ
-         pWotBCP1l3nK295h2mwegSkfjCU7x5SMAIJYNLaxYdGlM0zHH3qS9I14WySkMmp/7Gb/
-         599dYRjkXQRICyn126J8eWJ8DJq8WThynV0lu+XMRtM72uj89qN0KxeBK78EHaZK8aa3
-         y3uUxpPSrP9GMEfmQSpcVL2jp5qW0CosYJW/CHfQrOWyGGRRNDXVzE/utDe6hbKtopea
-         27ww==
+        d=google.com; s=20230601; t=1772901820; x=1773506620; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eKgpUbrVmNyMZC1IB7c4wRi8BzaImvn4akHqVzx6BS0=;
+        b=BuzzSMKP6osZAlzhncIR1mngQ0nUDBKKoZsu7+47nTYysDEXT8M+GI0XAK986WagMq
+         LPInWFvIGOFoe78i9Z2SPtwKU5bia4pLsGRVvOmKCre4z0zGo031OoOXw345eLZXM6HI
+         nHvU9pQxUQO+C3hKAePC40ZqNqGbNrvPjjv5tR2mkTLRVmnAYekLZGJBGiwQbJVjmcv4
+         3zZ1xGp1RvQG5LcKVWngkFBp1zD5kxT4Or+wqnut1EJZN6RvBB3Ou5bX6FuTG/inYP7D
+         voF0ikCp4cWc79+8ONtGFK7HKomKrR0BWIdOnEkN7PngqjVgX94naenuUVCsHF5p3715
+         jM2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772901272; x=1773506072;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B/L2NtnWYT3/D//o5Owk0t4WwkSxK6Eq0HsnAyfct5U=;
-        b=YllsbHFUe79oV0HAtJPCvmfPQQvVNktxLs7kmBTAenCLf5QPgJNwecKVUHqKIb9bew
-         FtB9uYSTmQwSdtkfRSe1CpJ+kjCu3BBPx9t+s/gZZzVmeLUkfNGJS42ur1XwrduB6swm
-         pWW94KWhkPCZiUaHfQhdGNorB8ybFq9gTKWwyEFQeVWFk8AkIfN67vT42vJ+wE4Xo/Ov
-         3V74WJ6bNnHgvHy14lqdn9Qif784FnFSoH43GWdnbtO2VudA++0U7jx0dtN+u19ifrKX
-         PMZd+EOGhCORqvTIe1K5AS7WOfqH19ftZU7zp9i+pv30U/mjAXnpQC3a0JNcNnvff0DP
-         N6Kg==
-X-Gm-Message-State: AOJu0YznqNCcdwbZ/USuwpKY9IE3oMAnm3Pd2ZIMXedtRPNcE1SSJSIW
-	yZtTcWWfy1dCxprM2A/fLnbfm+Hzf0ddf4H6rpgUBjRLNUm8IeqaawYzXPoWI2BV9fQjvJpPKQy
-	HLTmSE2YFqMgFZw==
-X-Received: from qtuu11-n2.prod.google.com ([2002:a05:622a:aa4b:20b0:501:1ae8:35f9])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5fd0:0:b0:4ee:1e63:a4e0 with SMTP id d75a77b69052e-508f4976c0fmr80792051cf.74.1772901271483;
- Sat, 07 Mar 2026 08:34:31 -0800 (PST)
-Date: Sat,  7 Mar 2026 16:34:30 +0000
+        d=1e100.net; s=20230601; t=1772901820; x=1773506620;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eKgpUbrVmNyMZC1IB7c4wRi8BzaImvn4akHqVzx6BS0=;
+        b=NQPU/MYvcmE5sLx45YgAbA+rt+0Vk+KhIRS2Cc8cxdD56pqZH55uYxvZOUJwndQpK8
+         pj7vvwru/w3UyaTy5IbqeK0e+f5v8NJTp3vXapEc9Tl1h/nSCqgI5ChdMXoZTd4H+zRp
+         EWBrD1od/GRWlqktPVPYUXUteRZAnc/Dl9bHET3/QSvHLeM3ZwzogzDl23H9gXZn9TSM
+         G44XFlwIDQ4vTtU8Y/VCgaAz47mwQJna0xpOdQoeWtOrXJJyVG4jkwPvZ/2BVxjzHAZc
+         Ab1bO2vVX3GMwR37Jb/mac1WQlcAGrU9jiERhoVsEse+xBKnjX5pk+snzYn+7vRo8sGH
+         7wkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLYrpMlgVMUweuoQohS59q3NNt/GuKeSgfC8on6fK6tXAmjjAk+eOwd73/Y2AjX9RPS1zia20=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzBB8iaQo5W+pS0nxFUo0LJKEViGSiYA8xE+73v2+uL9EcGMpE
+	CNp76/BgoZhTY5SF+Ayxjx1mRYLUeDtQ0mFAGx4a0fyXowpqkYbILjEpgpxqtoDfp+RvEjz08za
+	melBV4zJ7eJEUWfe6vAZKr/55eVUVnCLa0SKjJtyAGJcpVziNhYikYciJAp4=
+X-Gm-Gg: ATEYQzyKh/O6vFoh4SaJo9WUwFrAUoQyaO3vKn+CxyfcNzd+9X1R0u71Er+hzZ9irQT
+	ICLe1rz8qZcMa63SbFAoMdVXxLZOWLjnKq+PqRC5AULudxoodnYL9VKCBk7LkbFGd4qqoiyHpOd
+	GFDCkU5rs+f01WWhxlfdKJORrDIfYKRbRggSAdARdTJlxFhXVbyekwFF+QrPIcRxlERgq+cnsZe
+	6Ha4UPFkZvwjaPTAKdhgeoXzXe7o7eorwen8SR97XpVwQB8oUuWaK+7LebzjhqHC1p4wPuLe21d
+	aMwo2Wae
+X-Received: by 2002:a05:6214:d66:b0:899:fdd1:4a56 with SMTP id
+ 6a1803df08f44-89a30ace6e7mr85307326d6.35.1772901819868; Sat, 07 Mar 2026
+ 08:43:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260307163430.470644-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net/sched: do not reset queues in graft operations
+MIME-Version: 1.0
+References: <20260307162905.3697050-1-yss2813483011xxl@gmail.com>
+In-Reply-To: <20260307162905.3697050-1-yss2813483011xxl@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Yunsheng Lin <linyunsheng@huawei.com>
+Date: Sat, 7 Mar 2026 17:43:28 +0100
+X-Gm-Features: AaiRm53CZNV-mygWIm42S9O0nG-0dyvR8SzJXSlTsLpzJ5HwwjVyLtLpA6EKJ4M
+Message-ID: <CANn89iLYGsCr6i+rP13nq8H8H1pT6h=hGDn+kds0js6v4gr6Mg@mail.gmail.com>
+Subject: Re: [PATCH net] net: clear mangleid_features for SKB_GSO_DODGY TCPv4
+To: Guoyu Su <yss2813483011xxl@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, 
+	syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: A4B5D22CB43
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3D67522CB6A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265151-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265152-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.979];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,mojatatu.com,gmail.com,resnulli.us,redhat.com,google.com,huawei.com];
-	NEURAL_HAM(-0.00)[-0.987];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,1543a7d954d9c6d00407];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-Following typical script is extremely disruptive,
-because each graft operation calls dev_deactivate()
-which resets all the queues of the device.
+On Sat, Mar 7, 2026 at 5:29=E2=80=AFPM Guoyu Su <yss2813483011xxl@gmail.com=
+> wrote:
+>
+> Syzbot reported a KMSAN uninit-value warning in netif_skb_features() [1],=
+ which originates from gso_features_check():
+>
+>   BUG: KMSAN: uninit-value in gso_features_check net/core/dev.c:3804 [inl=
+ine]
+>   BUG: KMSAN: uninit-value in netif_skb_features+0x6fb/0x1870 net/core/de=
+v.c:3828
+>    gso_features_check net/core/dev.c:3804 [inline]
+>    netif_skb_features+0x6fb/0x1870 net/core/dev.c:3828
+>    validate_xmit_skb+0xb6/0x2400 net/core/dev.c:4003
+>    ...
+>    __dev_queue_xmit+0x3016/0x5a50 net/core/dev.c:4795
+>    packet_snd net/packet/af_packet.c:3077 [inline]
+>    packet_sendmsg+0x91d9/0xa320 net/packet/af_packet.c:3109
+>
+> SKB_GSO_DODGY marks packets whose GSO-related header metadata should be t=
+reated as untrusted (for example, packets injected via AF_PACKET).
+>
+> gso_features_check() checks IP_DF through iph->frag_off for SKB_GSO_TCPV4=
+ packets. For DODGY packets with untrusted metadata, this may result in a K=
+MSAN uninit-value report.
+>
+> Handle such packets conservatively by clearing mangleid_features when SKB=
+_GSO_DODGY is set, without relying on iph->frag_off.
+>
+> [1] https://syzkaller.appspot.com/bug?extid=3D1543a7d954d9c6d00407
+>
+> Reported-by: syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
+> Tested-by: syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/68e4b5d8.050a0220.256323.0018.GAE@goo=
+gle.com/T/
+> Signed-off-by: Guoyu Su <yss2813483011xxl@gmail.com>
 
-QPARAM="limit 100000 flow_limit 1000 buckets 4096"
-TXQS=64
-for ETH in eth1
-do
- tc qd del dev $ETH root 2>/dev/null
- tc qd add dev $ETH root handle 1: mq
- for i in `seq 1 $TXQS`
- do
-   slot=$( printf %x $(( i )) )
-   tc qd add dev $ETH parent 1:$slot fq $QPARAM
- done
-done
+Missing FIxes: tag. Please help us.
 
-One can add "ip link set dev $ETH down/up" to reduce the disruption time:
+> ---
+>  net/core/dev.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 14a83f2035b9..9b19154b6f7f 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3808,7 +3808,12 @@ static netdev_features_t gso_features_check(const =
+struct sk_buff *skb,
+>                 struct iphdr *iph =3D skb->encapsulation ?
+>                                     inner_ip_hdr(skb) : ip_hdr(skb);
+>
+> -               if (!(iph->frag_off & htons(IP_DF)))
+> +               /* SKB_GSO_DODGY packets carry untrusted L3/L4 header met=
+adata.
+> +                * Avoid dereferencing IPv4 header fields and conservativ=
+ely
+> +                * clear mangleid support in that case.
+> +                */
+> +               if ((skb_shinfo(skb)->gso_type & SKB_GSO_DODGY) ||
+> +                   !(iph->frag_off & htons(IP_DF)))
+>                         features &=3D ~dev->mangleid_features;
+>         }
 
-QPARAM="limit 100000 flow_limit 1000 buckets 4096"
-TXQS=64
-for ETH in eth1
-do
- ip link set dev $ETH down
- tc qd del dev $ETH root 2>/dev/null
- tc qd add dev $ETH root handle 1: mq
- for i in `seq 1 $TXQS`
- do
-   slot=$( printf %x $(( i )) )
-   tc qd add dev $ETH parent 1:$slot fq $QPARAM
- done
- ip link set dev $ETH up
-done
 
-Or we can add a @reset_needed flag to dev_deactivate() and
-dev_deactivate_many().
+You are not really fixing the bug, you hide it with another.
 
-This flag is set to true at device dismantle or linkwatch_do_dev(),
-and to false for graft operations.
-
-In the future, we might only stop one queue instead of the whole
-device, ie call dev_deactivate_queue() instead of dev_deactivate().
-
-I think the problem (quadratic behavior) was added in commit
-2fb541c862c9 ("net: sch_generic: aviod concurrent reset and enqueue op
-for lockless qdisc") but this does not look serious enough to deserve
-risky backports.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>
----
-v2: clarified the changelog
-    added kdoc missing part (kernel build bots)
-
- include/net/sch_generic.h |  4 ++--
- net/core/dev.c            |  2 +-
- net/core/link_watch.c     |  2 +-
- net/sched/sch_api.c       |  2 +-
- net/sched/sch_generic.c   | 20 ++++++++++++--------
- net/sched/sch_htb.c       |  4 ++--
- net/sched/sch_mq.c        |  2 +-
- net/sched/sch_mqprio.c    |  2 +-
- net/sched/sch_taprio.c    |  2 +-
- 9 files changed, 22 insertions(+), 18 deletions(-)
-
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index c355300893a3921740cf6b919cc58de953cd610c..16beba40914ee5a9454f9eec2ad6e600543c89f2 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -710,8 +710,8 @@ void dev_qdisc_change_real_num_tx(struct net_device *dev,
- void dev_init_scheduler(struct net_device *dev);
- void dev_shutdown(struct net_device *dev);
- void dev_activate(struct net_device *dev);
--void dev_deactivate(struct net_device *dev);
--void dev_deactivate_many(struct list_head *head);
-+void dev_deactivate(struct net_device *dev, bool reset_needed);
-+void dev_deactivate_many(struct list_head *head, bool reset_needed);
- struct Qdisc *dev_graft_qdisc(struct netdev_queue *dev_queue,
- 			      struct Qdisc *qdisc);
- void qdisc_reset(struct Qdisc *qdisc);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 203dc36aaed55e706f5d978ec02c6bf48201e3d4..6fc9350f0be8756ae849d5b0ca9b222055d96ced 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1756,7 +1756,7 @@ static void __dev_close_many(struct list_head *head)
- 		smp_mb__after_atomic(); /* Commit netif_running(). */
- 	}
- 
--	dev_deactivate_many(head);
-+	dev_deactivate_many(head, true);
- 
- 	list_for_each_entry(dev, head, close_list) {
- 		const struct net_device_ops *ops = dev->netdev_ops;
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index 25c455c10a01cf535d6a7d2952d51434fe462690..ff2c1d4538efbc89cd49d8d8477542a6e7bacbad 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -181,7 +181,7 @@ static void linkwatch_do_dev(struct net_device *dev)
- 		if (netif_carrier_ok(dev))
- 			dev_activate(dev);
- 		else
--			dev_deactivate(dev);
-+			dev_deactivate(dev, true);
- 
- 		netif_state_change(dev);
- 	}
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index cc43e3f7574fae203989f5c28b4934f0720e64c2..c0bab092ea809955b3a5aaa08c169bca55cfaf7f 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1120,7 +1120,7 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
- 		}
- 
- 		if (dev->flags & IFF_UP)
--			dev_deactivate(dev);
-+			dev_deactivate(dev, false);
- 
- 		qdisc_offload_graft_root(dev, new, old, extack);
- 
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 556e0d8003161d3dfe68e484f6349714cf989c0c..d4fe907c4ad5895b1dda5249c55e4c1e0168023e 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -1370,11 +1370,12 @@ static bool some_qdisc_is_busy(struct net_device *dev)
- /**
-  * 	dev_deactivate_many - deactivate transmissions on several devices
-  * 	@head: list of devices to deactivate
-+ *	@reset_needed: qdisc should be reset if true.
-  *
-  *	This function returns only when all outstanding transmissions
-  *	have completed, unless all devices are in dismantle phase.
-  */
--void dev_deactivate_many(struct list_head *head)
-+void dev_deactivate_many(struct list_head *head, bool reset_needed)
- {
- 	bool sync_needed = false;
- 	struct net_device *dev;
-@@ -1393,11 +1394,14 @@ void dev_deactivate_many(struct list_head *head)
- 	if (sync_needed)
- 		synchronize_net();
- 
--	list_for_each_entry(dev, head, close_list) {
--		netdev_for_each_tx_queue(dev, dev_reset_queue, NULL);
-+	if (reset_needed) {
-+		list_for_each_entry(dev, head, close_list) {
-+			netdev_for_each_tx_queue(dev, dev_reset_queue, NULL);
- 
--		if (dev_ingress_queue(dev))
--			dev_reset_queue(dev, dev_ingress_queue(dev), NULL);
-+			if (dev_ingress_queue(dev))
-+				dev_reset_queue(dev, dev_ingress_queue(dev),
-+						NULL);
-+		}
- 	}
- 
- 	/* Wait for outstanding qdisc_run calls. */
-@@ -1412,12 +1416,12 @@ void dev_deactivate_many(struct list_head *head)
- 	}
- }
- 
--void dev_deactivate(struct net_device *dev)
-+void dev_deactivate(struct net_device *dev, bool reset_needed)
- {
- 	LIST_HEAD(single);
- 
- 	list_add(&dev->close_list, &single);
--	dev_deactivate_many(&single);
-+	dev_deactivate_many(&single, reset_needed);
- 	list_del(&single);
- }
- EXPORT_SYMBOL(dev_deactivate);
-@@ -1473,7 +1477,7 @@ int dev_qdisc_change_tx_queue_len(struct net_device *dev)
- 	int ret = 0;
- 
- 	if (up)
--		dev_deactivate(dev);
-+		dev_deactivate(dev, false);
- 
- 	for (i = 0; i < dev->num_tx_queues; i++) {
- 		ret = qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
-diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
-index cf6cd4ccfa2029d9a45e35d6780520290690732d..eb12381795ce1bb0f3b8c5f502e16ad64c4408c8 100644
---- a/net/sched/sch_htb.c
-+++ b/net/sched/sch_htb.c
-@@ -1387,7 +1387,7 @@ htb_graft_helper(struct netdev_queue *dev_queue, struct Qdisc *new_q)
- 	struct Qdisc *old_q;
- 
- 	if (dev->flags & IFF_UP)
--		dev_deactivate(dev);
-+		dev_deactivate(dev, false);
- 	old_q = dev_graft_qdisc(dev_queue, new_q);
- 	if (new_q)
- 		new_q->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
-@@ -1421,7 +1421,7 @@ static void htb_offload_move_qdisc(struct Qdisc *sch, struct htb_class *cl_old,
- 		struct Qdisc *qdisc;
- 
- 		if (dev->flags & IFF_UP)
--			dev_deactivate(dev);
-+			dev_deactivate(dev, false);
- 		qdisc = dev_graft_qdisc(queue_old, NULL);
- 		WARN_ON(qdisc != cl_old->leaf.q);
- 	}
-diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
-index 0ed199fa18f04a06197116b6ab64ff3647dbace9..a0133a7b9d3b09a0d2a6064234c8fdef60dbf955 100644
---- a/net/sched/sch_mq.c
-+++ b/net/sched/sch_mq.c
-@@ -201,7 +201,7 @@ static int mq_graft(struct Qdisc *sch, unsigned long cl, struct Qdisc *new,
- 	struct net_device *dev = qdisc_dev(sch);
- 
- 	if (dev->flags & IFF_UP)
--		dev_deactivate(dev);
-+		dev_deactivate(dev, false);
- 
- 	*old = dev_graft_qdisc(dev_queue, new);
- 	if (new)
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index b83276409416fabeccc441e5127211632ddcfedb..002add5ce9e0ab04a6260495d1bec02983c2a204 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -469,7 +469,7 @@ static int mqprio_graft(struct Qdisc *sch, unsigned long cl, struct Qdisc *new,
- 		return -EINVAL;
- 
- 	if (dev->flags & IFF_UP)
--		dev_deactivate(dev);
-+		dev_deactivate(dev, false);
- 
- 	*old = dev_graft_qdisc(dev_queue, new);
- 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index f721c03514f6008ecc59fe4c4ca4a082099dc125..8e375281195061da848fb2bfaf79cf125afccac0 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -2184,7 +2184,7 @@ static int taprio_graft(struct Qdisc *sch, unsigned long cl,
- 		return -EINVAL;
- 
- 	if (dev->flags & IFF_UP)
--		dev_deactivate(dev);
-+		dev_deactivate(dev, false);
- 
- 	/* In offload mode, the child Qdisc is directly attached to the netdev
- 	 * TX queue, and thus, we need to keep its refcount elevated in order
--- 
-2.53.0.473.g4a7958ca14-goog
-
+Please take a look at qdisc_pkt_len_segs_init() for a hint.
 
