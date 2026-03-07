@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-265050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJpuGoidq2lsewEAu9opvQ
-	(envelope-from <netdev+bounces-265050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:37:44 +0100
+	id sCPaM5adq2lsewEAu9opvQ
+	(envelope-from <netdev+bounces-265051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:37:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E779C229F65
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:37:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EE0229F6C
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:37:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B54B83088305
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:36:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E4B8309AA65
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67363311C2A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8B33128B6;
 	Sat,  7 Mar 2026 03:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCyKTVO1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HWLZ2WE7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412FE311959
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C401131282C
 	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 03:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772854605; cv=none; b=XADBygZb2/uPdAmUeZi2CgPuFiQ46thUkDcd99kEa8KAXI2mnNckqC5Qw/WgHpqg2K+jzYQWWvOz25WOAAmhKyhaCE4+LAP89fEQD15WxQe2vFfNZQHREjDAp+t2At2k8RWC8vYdzv2166JTXKtNM1nUwZPhMc4j/QYh8LlfCwY=
+	t=1772854605; cv=none; b=ut5GaHzZHI0mW1tzjO1g8niOA37dcxCEFW9YAZHi3/fFFS8BcquzropfXb0svNx1I3o0A/XGTM60ILmcbfsF315bJ9ySXNFzXU+WNDGlzqWzNC7mvDOdE+H2QdJ3CYk9IiSFeKeMAFE0hr0Wzm5+X0V2xVQjxZqQG3aWRdKBBWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772854605; c=relaxed/simple;
-	bh=EXZ9iSzjDV+permXa1OiU2KmjA45N/wSvwtpF7ZIIwQ=;
+	bh=5sR6tDQdYFMgjKLPm0iP15hvGCnc3k6Ne2ET96hdeA8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wy0H0AJxUKbAnAlaIaT5cc3bSOqwpHxJwfOtDEiF4Yu0DJYP1zBVh0JfGcTnnBuWBY14SSGrDo+fl2iisCItoneMezYXCzVMTUi1Kf7YDjYDlfLADkZvwXOVYW/Ha9IvecNx1irlnFs5R1KDZqHxlUUzeuPvatCe/LUgYyjsRgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCyKTVO1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FACC2BC86;
-	Sat,  7 Mar 2026 03:36:44 +0000 (UTC)
+	 MIME-Version; b=d7/E4TuQ1jwaY1Xz6ZDtHGATg+jobYaW6o6vNq5dzEvSk8Zr29IJ73R3YqaS6/ejoCuw1gH0Jb7JGfnQwo2jLw5ilMXH0wqHr6kSCxn+K4pvXOZDIOmDw5MeouQL06jrwkRlYpmOxldhmaT5B3RoojhXyPy8H1sk8z7so7iCePM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HWLZ2WE7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2322EC2BC9E;
+	Sat,  7 Mar 2026 03:36:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772854605;
-	bh=EXZ9iSzjDV+permXa1OiU2KmjA45N/wSvwtpF7ZIIwQ=;
+	bh=5sR6tDQdYFMgjKLPm0iP15hvGCnc3k6Ne2ET96hdeA8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gCyKTVO1vF0dyflhL5nQ5LeEME6CBgLEXw1k8uXrHE64mBtAbG1Keb7i7bbALAD2H
-	 s5adEM4m973uirJG1hqpDrFfuFn4AuRLw2/D3ivXCtnbQsZtKG+CZ/9mGuCQmlTWVY
-	 YmLeLcIONidbSwgLAdOCFwqD/bK+p02p2pDubu2TeZ7bdhsiuN7Z3+B+KgI+nCiWD8
-	 SXaoz6Wj3DjaWTTYsQP27i1NxoiuKtuVzW8HwDxRZEdW4RWWx0Ur6SsM4olUFHRfoh
-	 HME8Iy0aBL3G6Drnnw93qB0Zng1HSnyWxD0f+VnUPJnVIDZ5FztPw0s+pLtyaej2sr
-	 ai2NQfyZHQ5Pw==
+	b=HWLZ2WE7u0uVUzhB4xLMY3znfdHyzfTDtocTxIHCM9kcxnEkc1mThknYM3jpnvoet
+	 OBrwq3zJtYCqveLsRWFNBk9O8WG02e1s+WE+isnXefVL1SXitpv2HPnjvNh6Nq1B+e
+	 XUJg3WqHqFQkxBkB7g0zIw4HsV7MtebdiavUqtzcoXgTkk3pY5fCivuamDk/Y9fndX
+	 0Jj4xjPWOHVRYW5W0adi+PQrKvL6mqo9Bo+kzpTq0ETuvN9KzjQjiBAjbMdv8nOiDI
+	 L6WJxaU9K7Oc/g9U0yPPkSPGLa4UG5ISkZcZ7fjXmZg0GFCx8TDVaVLIYVpKyuKTcq
+	 ag22AZoo5++hA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: netdev@vger.kernel.org,
 	liuhangbin@gmail.com,
 	matttbe@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 03/10] tools: ynl: convert ovs sample to selftest
-Date: Fri,  6 Mar 2026 19:36:23 -0800
-Message-ID: <20260307033630.1396085-4-kuba@kernel.org>
+Subject: [PATCH net-next v2 04/10] tools: ynl: convert rt-link sample to selftest
+Date: Fri,  6 Mar 2026 19:36:24 -0800
+Message-ID: <20260307033630.1396085-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260307033630.1396085-1-kuba@kernel.org>
 References: <20260307033630.1396085-1-kuba@kernel.org>
@@ -68,7 +68,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E779C229F65
+X-Rspamd-Queue-Id: 32EE0229F6C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -77,7 +77,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -85,9 +85,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265050-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265051-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -101,218 +101,329 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Convert ovs.c to produce KTAP output with kselftest_harness.
-The single "crud" test creates a new OVS datapath, fetches it back
-by name, then dumps all datapaths verifying the new one appears.
+Convert rt-link.c to use kselftest_harness.h with FIXTURE/TEST_F.
+Move rt-link from BINS to TEST_GEN_PROGS.
 
-IIRC I added this test because ovs is a genetlink family but
-has a family-specific fixed header.
+Output:
 
   TAP version 13
-  1..1
-  # Starting 1 tests from 1 test cases.
-  #  RUN           ovs.crud ...
-  # get:
-  # ynl-test(3): pid:0 cache:256
-  # dump:
-  # ynl-test(3): pid:0 cache:256
-  #            OK  ovs.crud
-  ok 1 ovs.crud
-  # PASSED: 1 / 1 tests passed.
-  # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
+  1..3
+  # Starting 3 tests from 1 test cases.
+  #  RUN           rt_link.dump ...
+  #   1:          lo: mtu 65536
+  #   2:          sit0: mtu  1480  kind sit
+  #            OK  rt_link.dump
+  ok 1 rt_link.dump
+  #  RUN           rt_link.netkit ...
+  #   4:          nk1: mtu  1500  kind netkit    primary 1  policy blackhole
+  #            OK  rt_link.netkit
+  ok 2 rt_link.netkit
+  #  RUN           rt_link.netkit_err_msg ...
+  #            OK  rt_link.netkit_err_msg
+  ok 3 rt_link.netkit_err_msg
+  # PASSED: 3 / 3 tests passed.
+  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/tests/Makefile |   3 +-
- tools/net/ynl/tests/ovs.c    | 128 ++++++++++++++++++++++++-----------
- tools/net/ynl/tests/config   |   1 +
- 3 files changed, 91 insertions(+), 41 deletions(-)
+ tools/net/ynl/tests/Makefile  |   2 +-
+ tools/net/ynl/tests/rt-link.c | 196 +++++++++++++++++++---------------
+ tools/net/ynl/tests/config    |   1 +
+ 3 files changed, 111 insertions(+), 88 deletions(-)
 
 diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
-index 1d77d3662f46..df9d37c8b2a4 100644
+index df9d37c8b2a4..08d1146d91ce 100644
 --- a/tools/net/ynl/tests/Makefile
 +++ b/tools/net/ynl/tests/Makefile
-@@ -20,12 +20,12 @@ TEST_PROGS := \
- 
+@@ -21,13 +21,13 @@ TEST_PROGS := \
  TEST_GEN_PROGS := \
  	netdev \
-+	ovs \
+ 	ovs \
++	rt-link \
  # end of TEST_GEN_PROGS
  
  BINS := \
  	devlink \
  	ethtool \
--	ovs \
  	rt-addr \
- 	rt-link \
+-	rt-link \
  	rt-route \
-@@ -34,6 +34,7 @@ BINS := \
- # end of BINS
- 
- CFLAGS_netdev:=$(CFLAGS_netdev) $(CFLAGS_rt-link)
-+CFLAGS_ovs:=$(CFLAGS_ovs_datapath)
- CFLAGS_tc-filter-add:=$(CFLAGS_tc)
- 
- include $(wildcard *.d)
-diff --git a/tools/net/ynl/tests/ovs.c b/tools/net/ynl/tests/ovs.c
-index 3e975c003d77..d49f5a8e647e 100644
---- a/tools/net/ynl/tests/ovs.c
-+++ b/tools/net/ynl/tests/ovs.c
-@@ -4,57 +4,105 @@
- 
- #include <ynl.h>
+ 	tc \
+ 	tc-filter-add \
+diff --git a/tools/net/ynl/tests/rt-link.c b/tools/net/ynl/tests/rt-link.c
+index acdd4b4a0f74..ef619ce6143f 100644
+--- a/tools/net/ynl/tests/rt-link.c
++++ b/tools/net/ynl/tests/rt-link.c
+@@ -7,16 +7,21 @@
+ #include <arpa/inet.h>
+ #include <net/if.h>
  
 +#include <kselftest_harness.h>
 +
- #include "ovs_datapath-user.h"
+ #include "rt-link-user.h"
+ 
+-static void rt_link_print(struct rt_link_getlink_rsp *r)
++static void rt_link_print(struct __test_metadata *_metadata,
++			  struct rt_link_getlink_rsp *r)
+ {
+ 	unsigned int i;
+ 
+-	printf("%3d: ", r->_hdr.ifi_index);
++	EXPECT_TRUE((bool)r->_hdr.ifi_index);
++	ksft_print_msg("%3d: ", r->_hdr.ifi_index);
+ 
++	EXPECT_TRUE((bool)r->_len.ifname);
+ 	if (r->_len.ifname)
+-		printf("%16s: ", r->ifname);
++		printf("%6s: ", r->ifname);
+ 
+ 	if (r->_present.mtu)
+ 		printf("mtu %5d  ", r->mtu);
+@@ -50,7 +55,7 @@ static void rt_link_print(struct rt_link_getlink_rsp *r)
+ 	printf("\n");
+ }
+ 
+-static int rt_link_create_netkit(struct ynl_sock *ys)
++static int netkit_create(struct ynl_sock *ys)
+ {
+ 	struct rt_link_getlink_ntf *ntf_gl;
+ 	struct rt_link_newlink_req *req;
+@@ -58,49 +63,24 @@ static int rt_link_create_netkit(struct ynl_sock *ys)
+ 	int ret;
+ 
+ 	req = rt_link_newlink_req_alloc();
+-	if (!req) {
+-		fprintf(stderr, "Can't alloc req\n");
++	if (!req)
+ 		return -1;
+-	}
+ 
+-	/* rtnetlink doesn't provide info about the created object.
+-	 * It expects us to set the ECHO flag and the dig the info out
+-	 * of the notifications...
+-	 */
+ 	rt_link_newlink_req_set_nlflags(req, NLM_F_CREATE | NLM_F_ECHO);
+-
+ 	rt_link_newlink_req_set_linkinfo_kind(req, "netkit");
+-
+-	/* Test error messages */
+-	rt_link_newlink_req_set_linkinfo_data_netkit_policy(req, 10);
+-	ret = rt_link_newlink(ys, req);
+-	if (ret) {
+-		printf("Testing error message for policy being bad:\n\t%s\n", ys->err.msg);
+-	} else {
+-		fprintf(stderr,	"Warning: unexpected success creating netkit with bad attrs\n");
+-		goto created;
+-	}
+-
+ 	rt_link_newlink_req_set_linkinfo_data_netkit_policy(req, NETKIT_DROP);
+ 
+ 	ret = rt_link_newlink(ys, req);
+-created:
+ 	rt_link_newlink_req_free(req);
+-	if (ret) {
+-		fprintf(stderr, "YNL: %s\n", ys->err.msg);
++	if (ret)
+ 		return -1;
+-	}
+ 
+-	if (!ynl_has_ntf(ys)) {
+-		fprintf(stderr,
+-			"Warning: interface created but received no notification, won't delete the interface\n");
++	if (!ynl_has_ntf(ys))
+ 		return 0;
+-	}
+ 
+ 	ntf = ynl_ntf_dequeue(ys);
+-	if (ntf->cmd !=	RTM_NEWLINK) {
+-		fprintf(stderr,
+-			"Warning: unexpected notification type, won't delete the interface\n");
++	if (!ntf || ntf->cmd != RTM_NEWLINK) {
++		ynl_ntf_free(ntf);
+ 		return 0;
+ 	}
+ 	ntf_gl = (void *)ntf;
+@@ -110,75 +90,117 @@ static int rt_link_create_netkit(struct ynl_sock *ys)
+ 	return ret;
+ }
+ 
+-static void rt_link_del(struct ynl_sock *ys, int ifindex)
++static void netkit_delete(struct __test_metadata *_metadata,
++			  struct ynl_sock *ys, int ifindex)
+ {
+ 	struct rt_link_dellink_req *req;
+ 
+ 	req = rt_link_dellink_req_alloc();
+-	if (!req) {
+-		fprintf(stderr, "Can't alloc req\n");
+-		return;
+-	}
++	ASSERT_NE(NULL, req);
+ 
+ 	req->_hdr.ifi_index = ifindex;
+-	if (rt_link_dellink(ys, req))
+-		fprintf(stderr, "YNL: %s\n", ys->err.msg);
+-	else
+-		fprintf(stderr,
+-			"Trying to delete a Netkit interface (ifindex %d)\n",
+-			ifindex);
+-
++	EXPECT_EQ(0, rt_link_dellink(ys, req));
+ 	rt_link_dellink_req_free(req);
+ }
  
 -int main(int argc, char **argv)
-+static void ovs_print_datapath(struct __test_metadata *_metadata,
-+			       struct ovs_datapath_get_rsp *dp)
++FIXTURE(rt_link)
 +{
-+	EXPECT_TRUE((bool)dp->_len.name);
-+	if (!dp->_len.name)
-+		return;
-+
-+	EXPECT_TRUE((bool)dp->_hdr.dp_ifindex);
-+	ksft_print_msg("%s(%d): pid:%u cache:%u\n",
-+		       dp->name, dp->_hdr.dp_ifindex,
-+		       dp->upcall_pid, dp->masks_cache_size);
-+}
-+
-+FIXTURE(ovs)
- {
- 	struct ynl_sock *ys;
-+	char *dp_name;
++	struct ynl_sock *ys;
 +};
 +
-+FIXTURE_SETUP(ovs)
++FIXTURE_SETUP(rt_link)
 +{
-+	self->ys = ynl_sock_create(&ynl_ovs_datapath_family, NULL);
-+	ASSERT_NE(NULL, self->ys)
-+		TH_LOG("failed to create OVS datapath socket");
++	struct ynl_error yerr;
++
++	self->ys = ynl_sock_create(&ynl_rt_link_family, &yerr);
++	ASSERT_NE(NULL, self->ys) {
++		TH_LOG("failed to create rt-link socket: %s", yerr.msg);
++	}
 +}
 +
-+FIXTURE_TEARDOWN(ovs)
++FIXTURE_TEARDOWN(rt_link)
 +{
-+	if (self->dp_name) {
-+		struct ovs_datapath_del_req *req;
-+
-+		req = ovs_datapath_del_req_alloc();
-+		if (req) {
-+			ovs_datapath_del_req_set_name(req, self->dp_name);
-+			ovs_datapath_del(self->ys, req);
-+			ovs_datapath_del_req_free(req);
-+		}
-+	}
 +	ynl_sock_destroy(self->ys);
 +}
 +
-+TEST_F(ovs, crud)
-+{
-+	struct ovs_datapath_get_req_dump *dreq;
-+	struct ovs_datapath_new_req *new_req;
-+	struct ovs_datapath_get_list *dps;
-+	struct ovs_datapath_get_rsp *dp;
-+	struct ovs_datapath_get_req *req;
-+	bool found = false;
- 	int err;
- 
--	ys = ynl_sock_create(&ynl_ovs_datapath_family, NULL);
--	if (!ys)
++TEST_F(rt_link, dump)
+ {
+ 	struct rt_link_getlink_req_dump *req;
+ 	struct rt_link_getlink_list *rsp;
+-	struct ynl_error yerr;
+-	struct ynl_sock *ys;
+-	int created = 0;
+-
+-	ys = ynl_sock_create(&ynl_rt_link_family, &yerr);
+-	if (!ys) {
+-		fprintf(stderr, "YNL: %s\n", yerr.msg);
 -		return 1;
-+	new_req = ovs_datapath_new_req_alloc();
-+	ASSERT_NE(NULL, new_req);
-+	ovs_datapath_new_req_set_upcall_pid(new_req, 1);
-+	ovs_datapath_new_req_set_name(new_req, "ynl-test");
- 
+-	}
+-
 -	if (argc > 1) {
--		struct ovs_datapath_new_req *req;
-+	err = ovs_datapath_new(self->ys, new_req);
-+	ovs_datapath_new_req_free(new_req);
-+	ASSERT_EQ(0, err) {
-+		TH_LOG("new failed: %s", self->ys->err.msg);
-+	}
-+	self->dp_name = "ynl-test";
+-		fprintf(stderr, "Trying to create a Netkit interface\n");
+-		created = rt_link_create_netkit(ys);
+-		if (created < 0)
+-			goto err_destroy;
+-	}
  
--		req = ovs_datapath_new_req_alloc();
--		if (!req)
--			goto err_close;
-+	ksft_print_msg("get:\n");
-+	req = ovs_datapath_get_req_alloc();
+ 	req = rt_link_getlink_req_dump_alloc();
+-	if (!req)
+-		goto err_del_ifc;
+-
+-	rsp = rt_link_getlink_dump(ys, req);
 +	ASSERT_NE(NULL, req);
-+	ovs_datapath_get_req_set_name(req, "ynl-test");
++	rsp = rt_link_getlink_dump(self->ys, req);
+ 	rt_link_getlink_req_dump_free(req);
+-	if (!rsp)
+-		goto err_close;
++	ASSERT_NE(NULL, rsp) {
++		TH_LOG("dump failed: %s", self->ys->err.msg);
++	}
++	ASSERT_FALSE(ynl_dump_empty(rsp));
  
--		ovs_datapath_new_req_set_upcall_pid(req, 1);
--		ovs_datapath_new_req_set_name(req, argv[1]);
+-	if (ynl_dump_empty(rsp))
+-		fprintf(stderr, "Error: no links reported\n");
+ 	ynl_dump_foreach(rsp, link)
+-		rt_link_print(link);
++		rt_link_print(_metadata, link);
++
+ 	rt_link_getlink_list_free(rsp);
 -
--		err = ovs_datapath_new(ys, req);
--		ovs_datapath_new_req_free(req);
--		if (err)
--			goto err_close;
--	} else {
--		struct ovs_datapath_get_req_dump *req;
--		struct ovs_datapath_get_list *dps;
+-	if (created)
+-		rt_link_del(ys, created);
 -
--		printf("Dump:\n");
--		req = ovs_datapath_get_req_dump_alloc();
--
--		dps = ovs_datapath_get_dump(ys, req);
--		ovs_datapath_get_req_dump_free(req);
--		if (!dps)
--			goto err_close;
--
--		ynl_dump_foreach(dps, dp) {
--			printf("  %s(%d): pid:%u cache:%u\n",
--			       dp->name, dp->_hdr.dp_ifindex,
--			       dp->upcall_pid, dp->masks_cache_size);
--		}
--		ovs_datapath_get_list_free(dps);
-+	dp = ovs_datapath_get(self->ys, req);
-+	ovs_datapath_get_req_free(req);
-+	ASSERT_NE(NULL, dp) {
-+		TH_LOG("get failed: %s", self->ys->err.msg);
- 	}
- 
 -	ynl_sock_destroy(ys);
-+	ovs_print_datapath(_metadata, dp);
-+	EXPECT_STREQ("ynl-test", dp->name);
-+	ovs_datapath_get_rsp_free(dp);
- 
 -	return 0;
-+	ksft_print_msg("dump:\n");
-+	dreq = ovs_datapath_get_req_dump_alloc();
-+	ASSERT_NE(NULL, dreq);
- 
+-
 -err_close:
--	fprintf(stderr, "YNL (%d): %s\n", ys->err.code, ys->err.msg);
+-	fprintf(stderr, "YNL: %s\n", ys->err.msg);
+-err_del_ifc:
+-	if (created)
+-		rt_link_del(ys, created);
+-err_destroy:
 -	ynl_sock_destroy(ys);
 -	return 2;
-+	dps = ovs_datapath_get_dump(self->ys, dreq);
-+	ovs_datapath_get_req_dump_free(dreq);
-+	ASSERT_NE(NULL, dps) {
+ }
++
++TEST_F(rt_link, netkit)
++{
++	struct rt_link_getlink_req_dump *dreq;
++	struct rt_link_getlink_list *rsp;
++	bool found = false;
++	int netkit_ifindex;
++
++	/* Create netkit with valid policy */
++	netkit_ifindex = netkit_create(self->ys);
++	ASSERT_GT(netkit_ifindex, 0)
++		TH_LOG("failed to create netkit: %s", self->ys->err.msg);
++
++	/* Verify it appears in a dump */
++	dreq = rt_link_getlink_req_dump_alloc();
++	ASSERT_NE(NULL, dreq);
++	rsp = rt_link_getlink_dump(self->ys, dreq);
++	rt_link_getlink_req_dump_free(dreq);
++	ASSERT_NE(NULL, rsp) {
 +		TH_LOG("dump failed: %s", self->ys->err.msg);
 +	}
 +
-+	ynl_dump_foreach(dps, d) {
-+		ovs_print_datapath(_metadata, d);
-+		if (d->name && !strcmp(d->name, "ynl-test"))
++	ynl_dump_foreach(rsp, link) {
++		if (link->_hdr.ifi_index == netkit_ifindex) {
++			rt_link_print(_metadata, link);
 +			found = true;
++		}
 +	}
-+	ovs_datapath_get_list_free(dps);
++	rt_link_getlink_list_free(rsp);
 +	EXPECT_TRUE(found);
- }
++
++	netkit_delete(_metadata, self->ys, netkit_ifindex);
++}
++
++TEST_F(rt_link, netkit_err_msg)
++{
++	struct rt_link_newlink_req *req;
++	int ret;
++
++	/* Test creating netkit with bad policy - should fail */
++	req = rt_link_newlink_req_alloc();
++	ASSERT_NE(NULL, req);
++	rt_link_newlink_req_set_nlflags(req, NLM_F_CREATE);
++	rt_link_newlink_req_set_linkinfo_kind(req, "netkit");
++	rt_link_newlink_req_set_linkinfo_data_netkit_policy(req, 10);
++
++	ret = rt_link_newlink(self->ys, req);
++	rt_link_newlink_req_free(req);
++	EXPECT_NE(0, ret) {
++		TH_LOG("creating netkit with bad policy should fail");
++	}
++
++	/* Expect:
++	 * Kernel error: 'Provided default xmit policy not supported' (bad attribute: .linkinfo.data(netkit).policy)
++	 */
++	EXPECT_NE(NULL, strstr(self->ys->err.msg, "bad attribute: .linkinfo.data(netkit).policy")) {
++		TH_LOG("expected extack msg not found: %s",
++		       self->ys->err.msg);
++	}
++}
 +
 +TEST_HARNESS_MAIN
 diff --git a/tools/net/ynl/tests/config b/tools/net/ynl/tests/config
-index 339f1309c03f..357b34611da4 100644
+index 357b34611da4..b4c58d86a6c2 100644
 --- a/tools/net/ynl/tests/config
 +++ b/tools/net/ynl/tests/config
-@@ -3,4 +3,5 @@ CONFIG_INET_DIAG=y
+@@ -3,5 +3,6 @@ CONFIG_INET_DIAG=y
  CONFIG_IPV6=y
  CONFIG_NET_NS=y
  CONFIG_NETDEVSIM=m
-+CONFIG_OPENVSWITCH=m
++CONFIG_NETKIT=y
+ CONFIG_OPENVSWITCH=m
  CONFIG_VETH=m
 -- 
 2.53.0
