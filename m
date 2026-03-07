@@ -1,240 +1,207 @@
-Return-Path: <netdev+bounces-265018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDYZA76Rq2mkeQEAu9opvQ
-	(envelope-from <netdev+bounces-265018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:47:26 +0100
+	id 2HkSCt2Sq2nWeQEAu9opvQ
+	(envelope-from <netdev+bounces-265019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:52:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0476A229ABB
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:47:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77FFF229AEE
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3B34530200E4
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 02:47:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D761302335E
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 02:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F93A2DCF55;
-	Sat,  7 Mar 2026 02:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79D82DCF41;
+	Sat,  7 Mar 2026 02:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4r+3d+8S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yKcO4mz2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85EB26F476
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 02:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772851637; cv=none; b=cgG71le1yUJ+CTOKWW3mmuzC/hWHFxUULPg6URCdVPb446ZEkU0ZaY4miNUHa1anEh62bPKTvP0Uq5WE58JzRXZCahEfPWVz3a+Hf7wcCJBx9qj7LMVDqHOAHCJeu/ng8chnZ4jvmyhBOZiKIyCGJxDMLYDQbRBWkSo4ZkfahP8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772851637; c=relaxed/simple;
-	bh=PvoznXb2jkMoY6Rq/zt5ZgHaRzKfsp9wTqQzeR3hGtI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qCZj/L7i0ArCu6aEeAH+iMfGF62JGu9GvRrhIEP+8XFDJKVfU6p4RyMYB7wVQjEMUhyI5hsjiVercijVY6JJkI5WQvaXd8UGdlt8wp0CGdxyAJ+J4S81P3vVZ+X+NOwFCOmPGpryb9p5JSrmCBxrdrLaYCSxDuYSGNFvfFvKw3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4r+3d+8S; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9855E19D891
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 02:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772851929; cv=pass; b=os4D7W6uxj0gaeQ7ZCpVIGGeZXu4qLnCPzlGAGo2Oqcmm24aB5wddoorYPgm8ZBIkQL4hxJ3Pt1OdeCHb5dwiYI+2/t9INDbxp2BO6RND4ehmsMNfslKVWpgaw9NiR1AUjq0766L/EHzRDhmHwAzngp0Pwcqk4Vw7FbdCQXPSpE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772851929; c=relaxed/simple;
+	bh=4BJbbBpB+4Ao+97wbkRI8QtTUQJaPUNX5MXyBu9vgsk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hUDmvOZuZP9j+YDok0VC8w42DgCdKfZ4bVIpOJhSEiIpDwIrQseS153Qa+tbMMpzIXpZvgQgWdYookd4X37kFkmT2BcrE2tUAuDHEMAdGMO7GOjJg5zPvH92XAqzP+cZLn6Et/jB64wrrsJghuCv5rRZzmDrpKFvNVkLN/G90tA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yKcO4mz2; arc=pass smtp.client-ip=74.125.82.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2adef9d486bso87342305ad.2
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 18:47:15 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1273349c56bso12127740c88.0
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 18:52:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772851928; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lh5zdLFf9evyzFNZceJC2NQE/9FODLDiIvS7XxG6l5V3Q7AlOY4C+Odk+M++YxQ3e0
+         QGDgQYxISBhnnw9bLEvq95H+6+MxITKbKzKz1KED914fJpNZdNrY2aoDgfWpeArqtkWd
+         /yBm85UEkAYBRWcDHlXWhZAj+W0aPRu/rUkiD9T1oqy42kRdX9xhbnX4cEIDiICQWGzV
+         EBAz5cApNFWjET511F4fRAGOCe0nxQ8zUFkqPeBiu3q4SI6ZAJgVDmIgpqI5y8c44QsT
+         qI91pSk4C2CH8CyXW9ZHkQqnnyzmB3cQFgOt7h/lMlpzCaKIn0TSXu7DLRfAxLH6090w
+         eeIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xjakxqhkR6F6GvE5Rla3VN9z4lTj65H5ZSm8n5xtYXw=;
+        fh=Ww/NWFhWQT4YPpDdLiYschkWUynmcyLVyf0N5L9GjVg=;
+        b=Z62jqI8S9Oz9sxYk1BJ1SyfK863Ptgpny+UtsHMZ1l8te0uw1im6kOtXMaZHyiVpQm
+         1H6yzWBDTZs95UQKtWeqZVuRtTos4vjOaEAEbyqTeJU+8tQT8WXnev3AEiBKrq80PgF2
+         sRhEW8/bYkEUwxPQirClEgcDgtn7Eqhwt8qQrrfTMbdIBzC1O/eIJR0p+3KxVtONjZj2
+         7Sy24Rq9sqdXYOWqmtIq1ahtpeZ0cxYO0WvLYZZeM1PZB00N4dlnl9uGxxUTuAW5bmBa
+         2djRUDyx0RZVO93kdFRnusFl7gYrJlNKEQ+up2KeR0B4R4NlXj0g/pY2APsS+iGxvtpV
+         Nl2Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772851635; x=1773456435; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MHiZHpv+UNZB1GUua9s+4ivCvaJlc/tiQo4N5oUALfI=;
-        b=4r+3d+8SLB/etxZNa56nUp8etnGxaAcGDDfYiDUOoBgEJWNr8YCxLSaIslZx9ADflt
-         U2seuqmK1RQSZPr/iOBJ+4as9KUK/SL9LNDHcb8NxAr+G3qO6O0RdImo0mDHzIRP2Xqz
-         AniH9crxLyUnOPLW0Nbg6+p0cszaw9CNvtkAqbxQVl/H3aT1zc1ZSWiP/cQ9PqNXsuvh
-         ZVsNL/zTZR9euPwhhZ0FT9tHopMv9VVHef+CgytTuwsIKNXkJBOiRfbeVkJ6sq3tHPGB
-         /LKG9OtvWLV2OE7AeLSVfdOZdRyKgcJGhP1Dh6HXSdbafq/gPBVCg/vxHAkwfn2jymuJ
-         6Yhg==
+        d=google.com; s=20230601; t=1772851928; x=1773456728; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjakxqhkR6F6GvE5Rla3VN9z4lTj65H5ZSm8n5xtYXw=;
+        b=yKcO4mz2rKAWz1li/4+6ObzSAEkH58tIOniR0n4RM+ywaiTtppNvN9yeTIshQ4Z8dx
+         Oga1l9jhPplxZrP7/BH38vo6dAqWg3dpJL0l8PYzzWbSj2URCuYboG3bNz2QY61uj6V7
+         fOGdTLXBkniwlldEwy9+tzr0p4f54nawUY26CR4joyJ7PciNCSTUQzs3p0THZkmjsRMS
+         okvUrCjdVFMOKYtmhGNOQZyk4rEap+Bp2dXzhhM6Z4C8Z0gHTHhFgu2+FqHKYViL20nJ
+         xqfXLgg2GdPKjbPw9crEuM5jN8sw/mNzJDsacuBoPqzujWESvWkNqYdEUiKHszfo60S9
+         Hb9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772851635; x=1773456435;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MHiZHpv+UNZB1GUua9s+4ivCvaJlc/tiQo4N5oUALfI=;
-        b=g1npqoDqNlVdEAdVCap8Wmk23rBE/CSEolhe8MS+Lcqy50U1OfB1KvfFpEx8iw4PP8
-         bMyroG3a/FOdDqJ71hUGHhEl34r1A4Nkp9U1T3dce6YiT/GDMOMlSyUAAzVgUPzMk700
-         AilYDCdxYyWLle3M7/rcEfysVVnQHo81tWbl5LOkZuVsp2zWLkVtABLLXGo36O+i1XWY
-         A4Lz4gibqhMqkZslggC9X4qQGd7CX92fXE3mFDeamW1hmX4xEOS68uLvLYs4FTEUtQUI
-         riQ/APUN7SoJNnSl/G8L+wbgDSgsOpkP79ove88LZoJ3d1bJQ4rrcPibFEaq7M1ENhqM
-         yNug==
-X-Forwarded-Encrypted: i=1; AJvYcCUiMXYctGNFKNRAtt0xYR+kbUCxTd092z4E56gXo96TgC4Go8pIjfNKk7IDG9UaKiIPbEEHRXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyImLa5MCCCqCMX+DF4pGTmRflUP1j3/ra/VwHVSk1Um6ZbdCvQ
-	FAm/e8xW+uBDxWm/cBOJ9wfKAY7a96sRdwAwLYqk7Uv/rEgJ5QgfGy5HrIk8UaB65KL2N8l4bqs
-	Px3Qulg==
-X-Received: from plw20.prod.google.com ([2002:a17:903:45d4:b0:2ae:4ac1:4017])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c94a:b0:2ae:698d:94a6
- with SMTP id d9443c01a7336-2ae8241dd3dmr50729635ad.2.1772851635210; Fri, 06
- Mar 2026 18:47:15 -0800 (PST)
-Date: Sat,  7 Mar 2026 02:46:57 +0000
-In-Reply-To: <20260307024709.718395-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1772851928; x=1773456728;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xjakxqhkR6F6GvE5Rla3VN9z4lTj65H5ZSm8n5xtYXw=;
+        b=qfJMLGkn7Oi17dPiy3ruuA1la49aYOW4yX2gaRyblQmS/rCXUlkicAtXNBEeWNapKY
+         ueZ/KRw6S7utSzDeeF9zRBnKmxu6wKzzlHkVKMlhZZ/UmNWC+mcr0ikZAVyjp5J1KjYm
+         QKWICk4KuI9/jRmnSKgeve9XtnmiN8ia48XMTfHNqTukxCsaGkHM3zReHNWXTQKo5xAE
+         rPXu/wg9hfqv+tUKI4Fqo621nrtBFAs8jf5YNKeUNBqmglKh292PI1n89Lg6kQvNPbN+
+         vvYc7CyZIWfB+N4ysMjBEcMcRUWspzYezjUsj9b4kD5x6VLuH1G50zlNMg3FafQ90FkF
+         AV5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWLr21irB4ArMw0gbNy4LYIcpq4sWs1Xl/S40Xm+GkB4ZjQ73TY3xwvRnKJUec+d8QMj9q25hw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyruyczQd6UkMxc6zPVMOENaS/bRagdXuRWfmEUikRxST00ZTU3
+	Sj1LtO/yoX5ZH9PamsJ66LJzx5xi2MPh7BhZ4ACa3W9Yel2hYb7q9f0swJvoys4i+MsC+6g/QKZ
+	bcs8TOYSwE2r08BxCAo91cv3q0D1iM93P3wtWQAXT
+X-Gm-Gg: ATEYQzxmOaau9TPxiPDKnB5GbeSsYQztfTTgG5CmUgBbSTRj9lQgpQaOx8xA1cSY6Wq
+	cPIh9Gr2D6t5jAVcQq7uOdMIQA8C7f7mWqp/cUottcxmsIPOsAxWF85YIf3Yy6EeESSlgIOQqXY
+	AQcGaVXNN0N4ZW+qrY/HpGAEAyFghyhrjaEpn6+P7QIVC14aZbNHy2Ir62q9TmswTN3NC/jakSm
+	ZmNPIMr5uexLrBIUdiNx/MLC01ZJbEcsRmaRewB1HhN91PjJhyxXtbo41NzzEWKnU69t+jlfemQ
+	bV4xaFl+LfSsNEaqh2GvwdsQ3BjAGZF+zbeWHbkBdixUuhbre9/S4DvAZtWO+xZ0sTNSekD0
+X-Received: by 2002:a05:7022:b97:b0:119:e569:f611 with SMTP id
+ a92af1059eb24-128c2dbf473mr1823517c88.10.1772851927152; Fri, 06 Mar 2026
+ 18:52:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260307024709.718395-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260307024709.718395-3-kuniyu@google.com>
-Subject: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with
- exceptions from tb6_gc_hlist.
+MIME-Version: 1.0
+References: <20260221233234.3814768-1-kuniyu@google.com> <20260221233234.3814768-3-kuniyu@google.com>
+ <fjt7fesjnzwuzeuiouv6rpvoxebounjqv3jlc34tvmzh252zep@hizdvwr2qwe4>
+ <CAAVpQUAJgFtcJGtuMufS9mhaShs7OQDxx7jTGOSbG9wCdeCN7Q@mail.gmail.com> <dc3a8b4c-32f3-4905-8cca-078f220abfef@linux.dev>
+In-Reply-To: <dc3a8b4c-32f3-4905-8cca-078f220abfef@linux.dev>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kui-Feng Lee <thinker.li@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Date: Fri, 6 Mar 2026 18:51:55 -0800
+X-Gm-Features: AaiRm53SH2xBuZiQ1NmUKZNE7yQ2FpyC_SMw6TEOzf7sARE4BLWXj9MismNDHqE
+Message-ID: <CAAVpQUCSZY9qErcJfHR0S_D1=4mwhTDqZgRfECUaPg37D6xrOA@mail.gmail.com>
+Subject: Re: [PATCH v4 bpf/net 2/6] sockmap: Annotate sk->sk_write_space() for UDP.
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Sitnicki <jakub@cloudflare.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 0476A229ABB
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 77FFF229AEE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,cloudflare.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265019-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265018-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.987];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.981];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email]
 X-Rspamd-Action: no action
 
-The cited commit mechanically put fib6_remove_gc_list()
-just after every fib6_clean_expires() call.
+On Fri, Mar 6, 2026 at 4:03=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+>
+>
+> On 3/4/26 7:43 PM, Kuniyuki Iwashima wrote:
+> > On Wed, Mar 4, 2026 at 5:48=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux=
+.dev> wrote:
+> >>
+> >> On Sat, Feb 21, 2026 at 11:30:49PM +0800, Kuniyuki Iwashima wrote:
+> >>> UDP TX skb->destructor() is sock_wfree(), and UDP only
+> >>> holds lock_sock() for UDP_CORK / MSG_MORE sendmsg().
+> >>>
+> >>> Otherwise, sk->sk_write_space() is read locklessly.
+> >>>
+> >>> Let's use WRITE_ONCE() and READ_ONCE() for sk->sk_write_space().
+> >>>
+> >>> Fixes: 7b98cd42b049 ("bpf: sockmap: Add UDP support")
+> >>> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >>> ---
+> >>> v3: Use WRITE_ONCE() in udp_bpf_update_proto()
+> >>> v2: Cache sk->sk_write_space in sock_wfree()
+> >>> ---
+> >>>   net/core/skmsg.c   | 2 +-
+> >>>   net/core/sock.c    | 8 ++++++--
+> >>>   net/ipv4/udp_bpf.c | 2 +-
+> >>>   3 files changed, 8 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> >>> index 75fa94217e1e..3d7eb2f4ac98 100644
+> >>> --- a/net/core/skmsg.c
+> >>> +++ b/net/core/skmsg.c
+> >>> @@ -1297,7 +1297,7 @@ void sk_psock_start_verdict(struct sock *sk, st=
+ruct sk_psock *psock)
+> >>>
+> >>>        psock->saved_data_ready =3D sk->sk_data_ready;
+> >>>        WRITE_ONCE(sk->sk_data_ready, sk_psock_verdict_data_ready);
+> >>> -     sk->sk_write_space =3D sk_psock_write_space;
+> >>> +     WRITE_ONCE(sk->sk_write_space, sk_psock_write_space);
+> >>>   }
+> >>
+> >> I noticed that Patch 1 and 2 were submitted earlier and are on bpf tre=
+e.
+> >> Given that Eric's commit (which you reviewed) is now in net.git, these=
+ two patches
+> >> should probably be dropped in the next version, right? Just confirming=
+.
+> >
+> > I was thinking git can just handle them well, and even the
+> > patch 2 has a delta in sock_wfree().
+>
+> At least for patch 1, I am not sure git can handle it well without human
+> intervention because the sk_write_space is backward from Eric.
+>
+> For the missing change in sock_wfree (?), it probably makes sense to
+> create a separate patch on top of Eric's change and target net. My
+> understanding is patch 3-6 can be on its own without patch 1+2.
 
-When a temporary route is promoted to a permanent route,
-there may already be exception routes tied to it.
-
-If fib6_remove_gc_list() removes the route from tb6_gc_hlist,
-such exception routes will no longer be aged.
-
-Let's replace fib6_remove_gc_list() with a new helper
-fib6_may_remove_gc_list() and use fib6_age_exceptions() there.
-
-Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/net/ip6_fib.h | 17 ++++++++++++++++-
- net/ipv6/addrconf.c   |  4 ++--
- net/ipv6/ip6_fib.c    |  6 +++---
- net/ipv6/route.c      |  2 +-
- 4 files changed, 22 insertions(+), 7 deletions(-)
-
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 88b0dd4d8e09..188494d1b509 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -507,8 +507,9 @@ void fib6_rt_update(struct net *net, struct fib6_info *rt,
- void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
- 		     unsigned int flags);
- 
-+void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
-+			 unsigned long now);
- void fib6_run_gc(unsigned long expires, struct net *net, bool force);
--
- void fib6_gc_cleanup(void);
- 
- int fib6_init(void);
-@@ -545,6 +546,20 @@ static inline void fib6_remove_gc_list(struct fib6_info *f6i)
- 		hlist_del_init(&f6i->gc_link);
- }
- 
-+static inline void fib6_may_remove_gc_list(struct net *net,
-+					   struct fib6_info *f6i)
-+{
-+	struct fib6_gc_args gc_args;
-+
-+	if (hlist_unhashed(&f6i->gc_link))
-+		return;
-+
-+	gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval),
-+	gc_args.more = 0,
-+
-+	fib6_age_exceptions(f6i, &gc_args, jiffies);
-+}
-+
- struct ipv6_route_iter {
- 	struct seq_net_private p;
- 	struct fib6_walker w;
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 0e55f139e05d..f4e23b543585 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2862,7 +2862,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
- 					fib6_add_gc_list(rt);
- 				} else {
- 					fib6_clean_expires(rt);
--					fib6_remove_gc_list(rt);
-+					fib6_may_remove_gc_list(net, rt);
- 				}
- 
- 				spin_unlock_bh(&table->tb6_lock);
-@@ -4840,7 +4840,7 @@ static int modify_prefix_route(struct net *net, struct inet6_ifaddr *ifp,
- 
- 		if (!(flags & RTF_EXPIRES)) {
- 			fib6_clean_expires(f6i);
--			fib6_remove_gc_list(f6i);
-+			fib6_may_remove_gc_list(net, f6i);
- 		} else {
- 			fib6_set_expires(f6i, expires);
- 			fib6_add_gc_list(f6i);
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fadfca49d6b1..dd26657b6a4a 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1133,7 +1133,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 					return -EEXIST;
- 				if (!(rt->fib6_flags & RTF_EXPIRES)) {
- 					fib6_clean_expires(iter);
--					fib6_remove_gc_list(iter);
-+					fib6_may_remove_gc_list(info->nl_net, iter);
- 				} else {
- 					fib6_set_expires(iter, rt->expires);
- 					fib6_add_gc_list(iter);
-@@ -2348,8 +2348,8 @@ static void fib6_flush_trees(struct net *net)
- /*
-  *	Garbage collection
-  */
--static void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
--				unsigned long now)
-+void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
-+			 unsigned long now)
- {
- 	bool may_expire = rt->fib6_flags & RTF_EXPIRES && rt->expires;
- 	int old_more = gc_args->more;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 08cd86f49bf9..cb521700cee7 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -1033,7 +1033,7 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, int len,
- 
- 		if (!addrconf_finite_timeout(lifetime)) {
- 			fib6_clean_expires(rt);
--			fib6_remove_gc_list(rt);
-+			fib6_may_remove_gc_list(net, rt);
- 		} else {
- 			fib6_set_expires(rt, jiffies + HZ * lifetime);
- 			fib6_add_gc_list(rt);
--- 
-2.53.0.473.g4a7958ca14-goog
-
+Sure, I posted 1&2 in the same series as I thought they
+are sockmap stuff, but I will post 3~6 separately.
 
