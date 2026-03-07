@@ -1,151 +1,179 @@
-Return-Path: <netdev+bounces-265200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOZNMo2prGkbsgEAu9opvQ
-	(envelope-from <netdev+bounces-265200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:41:17 +0100
+	id YBQ1C8iqrGldsgEAu9opvQ
+	(envelope-from <netdev+bounces-265201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:46:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 476A722DDA0
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:41:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C3C22DDEF
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 23:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6A32301E3D8
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:41:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DB9ED30172F1
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 22:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE162BFC7B;
-	Sat,  7 Mar 2026 22:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71259311C35;
+	Sat,  7 Mar 2026 22:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="or7ofdcw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lojrWjYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356CB244661
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 22:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB9D202C29;
+	Sat,  7 Mar 2026 22:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772923273; cv=none; b=gkJnCIgORVUeo9fGgDLnj60C1CoBR2KoqURAVwnGIhlqptcsUNKVRH3RguAE/PClsAGJmQux9UXGvDRMCLM5WJNA/Hh86DlMGiD0bXlbf3Mmw3Ar/0aCQxTBsrthsB+nLvqca/OAkPfPoLb8mepYBAWKcP7CJNkGQs/UF+PUIEw=
+	t=1772923574; cv=none; b=mrjg18Stmn3dBzGNMRd+vBL6kQNVcBY9fLSrAtUeWfazMS6Psq+iHsbxC4L/Isk2fpEruI1F3nzSAPkX+497EWI6EvzmbHsxqC0JguiwKsuw40vxvq6uDV5Pvd3vGwWqtH+zFbJVlBXp5RxBZsYuuL051lY5bqA/aQBB9/+aAJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772923273; c=relaxed/simple;
-	bh=I4VtaTm8XHSftyNG90a7MzUKFwrfQloyAsT6smzws+Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a6A173Hwm/I7dYteiSMl1QOGArD3RzT+uR9YZvjwAEQWpEKVl/nZVqjEzuIOxTUl8ApHAkjFkfHZdbNYXhhuVNgu58s+pjLUiL5PNOhiArSGHMIPwQ4UvshK+VqTYiswz8XNCMnK6lchzFqhkD4AEtZLy282vf0ABPgoNayaLuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=or7ofdcw; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4852ccff333so12532725e9.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 14:41:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772923270; x=1773528070; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7GRPrhIM/HbWD59Yul47MIZsf01ZYQyC3nXK9qbXgs=;
-        b=or7ofdcwi17qkjHaB9Nw5750BROHdHokL2xHrxfJXCrZqrXels4SE3nzsNWXmLGsCI
-         9PpmwLR9X9Eit+M1JqoDTSdJQoXAsLzgn7esFeYGY1RSb1OLHTxHR3MC7h8kYycI2yWJ
-         jzJ6nN6f5jH/XVOsybBhH/YlMAdsV/Schnr06EXlz6aX0NsQawGxyNJ6TSz9nYaC+ijv
-         W+KU8A/wUzaHj6FZObXNdJian7TGcfSsrv3nG6qzF6E9fnhxpWbnsI3IxLYRFdDWkbsD
-         zv43nwKBgjrj7p9ElRAGy6dFo+Ldok9AunfyoAClDUXQ27+lSSh8kAgVNa5Y9o5bnYmy
-         c98g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772923270; x=1773528070;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7GRPrhIM/HbWD59Yul47MIZsf01ZYQyC3nXK9qbXgs=;
-        b=jb4ihxfxNeitJIrGlmKKnd1unWDeXxxoLuT+IlMZyBI13P7gQDx1bh0sAqfFVZ0MgC
-         C9e3A7UqBH+BsdnIFVGEVe8wIUFAJ64MV1tG6604v9qUbZshRZThz7fQ4TuykQWwfxAV
-         /6tAXbhhSvhCKeZSg2gmRSM4deVgeM8G79waQ3JIAH/V8e9AblDzUz+Np8Hr/rUb0Tbj
-         q30tIQTDRQuTZKTVxno4XUuJOPrllgN+nGD/OcRiApefIhStpqZOgiKJb4odPXGTZGxF
-         1geHXr+nS8xXHv3NkGM44nPayORKlpuGUTdzvZtA1NfxXrLe1mugkALeqUV2vIDeyuDQ
-         PxqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTAdWnJuHageKSfYO8uYUrG1hoBCBHh+kZnPp91SztkP2VYA0nmMrzUQCrZuBoFKDlb0IzU/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2T38Pc5J5bod7AcldKnremDFKenPn1itmEb5HjhwHoJEWHfJh
-	wL9z4ghFq+Gsmkt1rELbBu9srnGn8gfrxg3U0wFYhcULWyo0trcZLoMsfxirkJv9M+Ig5Ym9UMM
-	cF/yT9+fihWedo1clgQ==
-X-Received: from wmjy4.prod.google.com ([2002:a7b:cd84:0:b0:483:27fd:cf2b])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:350e:b0:480:4a90:1afe with SMTP id 5b1f17b1804b1-485269785afmr99848205e9.34.1772923270530;
- Sat, 07 Mar 2026 14:41:10 -0800 (PST)
-Date: Sat, 7 Mar 2026 22:41:09 +0000
-In-Reply-To: <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch>
+	s=arc-20240116; t=1772923574; c=relaxed/simple;
+	bh=hCRoFUTpcoC9MUKo/CzRUy7a8gJWYpogs+xyO029ryY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uj89DoqCv3UdAbkBvqI7dvQyyjBCZhhATFQUL5YPuwhD/bKHtbLxdde3D3vnHH+nlAja7IbzYa5X+oJsZGABNsqQzRmAxakOqnbBPd76Y0lbNnOgRVTt1zYKgX3uIMOMDicU17Uzvj4aUob/HVRf0oRwCApCHvNT9Ww4NXwuQck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lojrWjYv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA3BC19422;
+	Sat,  7 Mar 2026 22:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772923574;
+	bh=hCRoFUTpcoC9MUKo/CzRUy7a8gJWYpogs+xyO029ryY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lojrWjYvnH0FA8H2gpTBza2sa6Drj44gj3G9Sq1JK1JQ/mvZoVLjiCb2pKlnUMYOi
+	 oxWwDvisbpol0tLIdjMWg0GqD0YjWkOxcM5tfZ03R+ilXVzfo0UkLkbFic1i8od89Z
+	 b4s630f9e++4wPEDt0TbsmN+nELFCuVlmpn0nkXHiGkXwavBuX9SuUfx59QoM24ZTE
+	 tmSa+zKAA7yKgbjc5kxX+8du88uOS0gpgsfx0JH3AxNRysJJOwAzx86yzpECMBcmQR
+	 MqmlgS+XYGWCZeuUVWPjOC8oV2JV/s9Y1Sl6kNt7+/fowiecW/RAIv5h+xMNuEjZd7
+	 S6eaFfynGA6AA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [RFC PATCH 0/8] Reimplement TCP-AO using crypto library
+Date: Sat,  7 Mar 2026 14:43:33 -0800
+Message-ID: <20260307224341.5644-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260307104131.4c1d0de5@kernel.org> <aayWSuOM59uojtuG@google.com> <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch>
-Message-ID: <aayphfkModIeENp3@google.com>
-Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
-From: Alice Ryhl <aliceryhl@google.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 476A722DDA0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D7C3C22DDEF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265200-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265201-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.988];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sat, Mar 07, 2026 at 10:39:28PM +0100, Andrew Lunn wrote:
-> > > Please no duplication of existing code in Rust.
-> > 
-> > The plan is certainly to get rid of C Binder, but it was unfortunately
-> > not possible to get there without a transition period.
-> 
-> Dumb question....
-> 
-> Why?
+This series can also be retrieved from:
 
-The reasons for moving to a Rust implementation are discussed in the
-cover letter [1], and in my 2023 plumbers talk [2].
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tcp-ao-v1
 
-[1]: https://lore.kernel.org/all/20231101-rust-binder-v1-0-08ba9197f637@google.com/
-[2]: https://www.youtube.com/watch?v=Kt3hpvMZv8o
+For now this series is an RFC, since it depends on the AES-CMAC library
+API that is queued in libcrypto-next for 7.1.  So, the soonest that this
+could be applied to net-next is 7.2.  I'm sending it out now in case
+anyone has any early feedback.
 
-> You are just sending messages to user space. Does the rust version
-> send different messages? Can user space tell the difference?
+This series refactors the TCP-AO (TCP Authentication Option) code to do
+MAC and KDF computations using lib/crypto/ instead of crypto_ahash.
+This greatly simplifies the code and makes it much more efficient.  The
+entire tcp_sigpool and crypto_ahash cloning mechanisms become
+unnecessary and are removed, as the problems they were designed to solve
+don't exist with the library APIs.
 
-No, it sends the same messages. The intent is for Android to move to the
-Rust implementation without userspace being able to tell the difference.
+To make this possible, this series also restricts the supported
+algorithms to a reasonable set, rather than supporting arbitrary
+algorithms that don't make sense and are very likely not being used.
+Specifically, this series leaves in place the support for AES-128-CMAC
+and HMAC-SHA1 which are the only algorithms that actually have an RFC
+specifying their use in TCP-AO, along with HMAC-SHA256 which is a
+reasonable algorithm to continue supporting as a Linux extension.
 
-Alice
+This passes the tcp_ao selftests (tools/testing/selftests/net/tcp_ao).
+
+To get a sense for how much more efficient this makes the TCP-AO code,
+here's a microbenchmark for tcp_ao_hash_skb() with skb->len == 128:
+
+        Algorithm       Avg cycles (before)     Avg cycles (after)
+        ---------       -------------------     ------------------
+        HMAC-SHA1       3319                    1256
+        HMAC-SHA256     3311                    1344
+        AES-128-CMAC    2720                    1107
+
+Eric Biggers (8):
+  net/tcp-ao: Drop support for most non-RFC-specified algorithms
+  net/tcp-ao: Use crypto library API instead of crypto_ahash
+  net/tcp-ao: Use stack-allocated MAC and traffic_key buffers
+  net/tcp-ao: Return void from functions that can no longer fail
+  net/tcp: Remove tcp_sigpool
+  crypto: hash - Remove support for cloning hash tfms
+  crypto: cipher - Remove support for cloning cipher tfms
+  crypto: api - Remove core support for cloning tfms
+
+ crypto/ahash.c                                |  70 --
+ crypto/api.c                                  |  26 -
+ crypto/cipher.c                               |  28 -
+ crypto/cmac.c                                 |  16 -
+ crypto/cryptd.c                               |  16 -
+ crypto/hmac.c                                 |  31 -
+ crypto/internal.h                             |   2 -
+ crypto/shash.c                                |  37 -
+ include/crypto/hash.h                         |   8 -
+ include/crypto/internal/cipher.h              |   2 -
+ include/net/tcp.h                             |  42 +-
+ include/net/tcp_ao.h                          |  69 +-
+ net/ipv4/Kconfig                              |   8 +-
+ net/ipv4/Makefile                             |   1 -
+ net/ipv4/tcp_ao.c                             | 677 +++++++++---------
+ net/ipv4/tcp_output.c                         |  10 +-
+ net/ipv4/tcp_sigpool.c                        | 366 ----------
+ net/ipv6/tcp_ao.c                             | 139 ++--
+ tools/testing/selftests/net/tcp_ao/config     |   3 -
+ .../selftests/net/tcp_ao/key-management.c     |  41 +-
+ 20 files changed, 435 insertions(+), 1157 deletions(-)
+ delete mode 100644 net/ipv4/tcp_sigpool.c
+
+
+base-commit: 0a217be68aedd0f6b48cf0476462bc94bd73eee7
+-- 
+2.53.0
+
 
