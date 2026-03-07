@@ -1,168 +1,166 @@
-Return-Path: <netdev+bounces-265119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNSdNRsErGkxjAEAu9opvQ
-	(envelope-from <netdev+bounces-265119-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:55:23 +0100
+	id OAk3CsoErGkxjAEAu9opvQ
+	(envelope-from <netdev+bounces-265120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:58:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E548F22B35A
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:55:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FF822B3BF
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 11:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 244E930131FD
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 10:55:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D47663012B67
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 10:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D8733DEF2;
-	Sat,  7 Mar 2026 10:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4187734A3CC;
+	Sat,  7 Mar 2026 10:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WxF3aTDC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTixRSYn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29A033D4EE
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 10:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07470346FDB
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 10:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772880917; cv=none; b=oYD+L8OvQKOWOsKtQNZjaRQ5G1VvFAIW2i1tR8L7wj7uGXwa4lgePIxuo/UHPjnaCa3K7p36k4rhUyqIe8vJvS9gwb5MXwW82KlSNZsh98qTg2v2iwC85NZ1IFFrelIWZNDUd6dVhP9XemB4l6lTHPoGjmjIRRLGq2A7782icjw=
+	t=1772881094; cv=none; b=JIeXY5qPs+gP48MAhBaLx+U2BAyOMogf4QcwBcwcbUiVr7sBN4BJCLuVrkSlaxwQVGNdHpfj//KnQR6pu50Eq5scZxSN9AeUbGDdu1U7fyeLtFtEmD2cTsLimCF9NnGwvp6XWuzN8qmbyUZe3Bh6kDvRhVeoUEm0CtwO3hXRU9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772880917; c=relaxed/simple;
-	bh=HFTayiyaQeUwvWuHNi5cBnmmRspVLiADKRqF/4G/nXQ=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=CEma/E8rU3e+voP9sx2i8VCcQ7GRpfR1ApkccxzTdd3aE+ZGilqOTlTIlDARI54hW8dT9MAWxxqexV4sidxT4NTElTaVogkqBhJ5ykeEwWJMGIr93kV5bYQfqzxb+3JzFLihjlzcQmqoR+vqWXiG23+29qr/xpE56IDkGc1KxwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WxF3aTDC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=GfNekjph7q7LXyyIy0Z8aqKol/fBgQeMMk9zE7ThleU=; b=WxF3aTDCUrRJBwIbMzjWFYbU0r
-	33/vaxd8Ym3gLdVk6F2Ccz6xDxmHvVfBPBdlgWd/VUKwH+jnd0vaf/+DY5iPoQ5sa+xJEy4MkYBD6
-	/54XR4kbG9E3r1V+4jSWmztu7BdDPKXjoMfGv3rx5Zwj+Tm0i+Hqrmz5/5zr1oeA7nc/q7fjp4iMd
-	6LBAn/f0zvfpJnr60lNxC5ARqKaYvKT4vgExZR5b/khhSIR266U2pAxP+q55YLS2EjHxwc6G5zxO8
-	sOgh947rwpB95S9nICy0Vr2pkv2RWEAYw5VzSGpLsnmwdXa/YG5Frm4YcoHN1xr8BLN3MFbch4c48
-	+U725hGQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:40590 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vypJN-0000000025f-2pMA;
-	Sat, 07 Mar 2026 10:55:09 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vypJM-0000000CSiJ-48yO;
-	Sat, 07 Mar 2026 10:55:09 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1772881094; c=relaxed/simple;
+	bh=JqYPGHt/TQECE/E6zuwNqEwKXnQlrnAHciMrFdwbmZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=meAcRUi4iDIdbtHJV2qTneXZ2+ufOpYO3CLmiUI2prFaZDFadvSF3mzW43SMfc4mKN6sChIl0UsO7gFW/DaSlXZmjvobPetRXgYi4aXIqMqod861qWKixoGplHRJfaVrHOzxkADhRepKUMZ4g+3UXMI1dX1h5UhaNJ3vMLhYUA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTixRSYn; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-506bcb23a78so89541861cf.3
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 02:58:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772881092; x=1773485892; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dykdbePLxtRxAe6YmrUCwFD8VwzL2P54+xi7/+YogDY=;
+        b=gTixRSYneg5GgB0+9JKJksMrqfJiDS4zyxDYFuQsdtGeTZBD2ziocR6fkLKBtl1lp8
+         EO0ToiTup/oe12v8T1TBHFxAr7jjQB+FbzP3Ykxad1g1oaX3mf0VH8sGG72XnZXCG1Yf
+         RDDaodAXAVsoYsyR7c8La+VIfWIHZ7fSQTPakMy8OuyltoYKej9l1pFl6fB/B4KrY4dR
+         75NZvM1eBf12Iigjn8TNLrvsL6jbWe5BBoK4WMNogo09z025E57A/klmX28QY4Ktns5V
+         472NTb07FCQNhGB2u5kbgKybRGCQWb/lupMKPrBhvB5XI757Z6zqme/VF9a9g6NyMFW8
+         74hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772881092; x=1773485892;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dykdbePLxtRxAe6YmrUCwFD8VwzL2P54+xi7/+YogDY=;
+        b=K+C6U1R8Pv2gtIXv4Z+IvReAI31m/9AUwCbRjCahZVxkNBX++NobBNqyPuHzuJMjEs
+         CITTZVczqAeXQZvFBWuPI00o+wx7ukAZCPlA6RwqO3nASoSs/24zvzl43T4gibMdvSbh
+         gJfcTxNO305Ncn+FTuD0Qj0uPMBDJm5xhBQ+GLN7GRRKEfUNn3xI3x6fS4p5qatfIJ9h
+         k7yEFmfL0lytFUd8lj0a+RmRh+QLl95K8ErjqYoIuR58bQdvJq7QJlXkH6dlqLQFc8a1
+         A91wLYBcGnXQHl4J3noPPIaRGl4XXooSs0njyjnWhVrZj4gVqMAJnAAGRXBi7VM+4t//
+         jf0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUjEHbR9EsLbnNcS8LcRca8w6pp3CF1KAwwosqwQIziJGeXkAItWXY+lp3c6WvOonSqhp/IZws=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGerrSdxUtKA5Yfl+ZKEv6jCZpk1zAyAK4CWaYh6g/42ce8CMS
+	NEZKATVupQOsg7U+lCRSigD9NLihc58PKUjF1de8tUHLm1Qel0VTJ8xN
+X-Gm-Gg: ATEYQzyyEu1hDIQdj4/xYj/zPVfh+6FyDb8IajxhUuSIYZzfvDcpYanPPGXp93qczDE
+	5ALrtRD8rWQBqK443+WJi3qkaeU6dfnoXlS5sXAdebUjLV9c9rydfQ8yzboAJHU85gw/LHXjczy
+	HlSLIItvioTWuXJNdN0v7aQlaLVPPRPcX1LSyBYh/Y/6O93sN2upuu4pbo3af7ZEBOahz0agjP/
+	6b62C340GPqGoVab9mpF6JBQgDr7eJlZQXY+7L1E0RK1freBvmGDr2kyUFCtfxlf2gXWS8dDliE
+	U5Xe9mjYboQlGRhtMT44QlU2/pNcghr70s+tEXagJScJH7FffKm/zqcI26XxCCphMkMihZEZs2r
+	/gE5qxig2Zr/gEKXpCzCDD+2qUmjomX5y7F/Ro+kiKwoZsGQYQIV2VYqXEdcxLIfz7QQQ3BuUA5
+	bEdS1Ar6dLMahTQByBAMeiAK6laN/gwebLfgIP60m9kbCOLakDK1WiLa3EmuSnMx36ESs=
+X-Received: by 2002:a05:622a:a9d1:20b0:508:feeb:47da with SMTP id d75a77b69052e-508feeb4d3cmr28359351cf.15.1772881091665;
+        Sat, 07 Mar 2026 02:58:11 -0800 (PST)
+Received: from PF5YBGDS.localdomain ([163.114.130.7])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-508f655819asm26604921cf.14.2026.03.07.02.58.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Mar 2026 02:58:10 -0800 (PST)
+Date: Sat, 7 Mar 2026 05:58:08 -0500
+From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: remove stmmac_dwmac4_get_mac_addr()
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Willem de Bruijn <willemb@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/5] eth fbnic: Add msix self test
+Message-ID: <aawEwLt-RZGs2yAx@PF5YBGDS.localdomain>
+References: <20260305150947.16893-1-mike.marciniszyn@gmail.com>
+ <20260305150947.16893-4-mike.marciniszyn@gmail.com>
+ <aasqpPj2rOIKgnSY@PF5YBGDS.localdomain>
+ <20260306140958.42ccee3a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vypJM-0000000CSiJ-48yO@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 07 Mar 2026 10:55:08 +0000
-X-Rspamd-Queue-Id: E548F22B35A
+In-Reply-To: <20260306140958.42ccee3a@kernel.org>
+X-Rspamd-Queue-Id: C0FF822B3BF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265120-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265119-lists,netdev=lfdr.de,kernel];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.266];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,intel.com,trager.us,gmail.com,linaro.org,kylinos.cn,fomichev.me,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.976];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,checkpatch.pl:url,PF5YBGDS.localdomain:mid]
 X-Rspamd-Action: no action
 
-stmmac_dwmac4_get_mac_addr() is identical to stmmac_get_mac_addr().
-Remove stmmac_dwmac4_get_mac_addr() to avoid this code duplication.
+On Fri, Mar 06, 2026 at 02:09:58PM -0800, Jakub Kicinski wrote:
+> On Fri, 6 Mar 2026 14:27:32 -0500 Mike Marciniszyn wrote:
+> > There is a change in the patchworks checkpatch test the wants to see this as:
+> >
+> > test_data = kzalloc_obj(*test_data, GFP_KERNEL);
+> >
+> > Unfortunately, the net-next repo does not yet have this api and doesn't
+> > have the checkpatch and the new api that comes in:
+> >
+> > Commit 070580b0b174 ("checkpatch: Suggest kmalloc_obj family for sizeof allocations")
+> >
+> > This looks like the checkpatch.pl in the test is not from net-next/main.
+>
+> I suspect your local tree is old? Or I don't get what you're saying..
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c  |  4 ++--
- .../net/ethernet/stmicro/stmmac/dwmac4_lib.c   | 18 ------------------
- 2 files changed, 2 insertions(+), 20 deletions(-)
+Sorry.   I must have messed up the rebase.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-index 602771e19d0f..e6bcb77b22a2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-@@ -373,8 +373,8 @@ static void dwmac4_get_umac_addr(struct mac_device_info *hw,
- {
- 	void __iomem *ioaddr = hw->pcsr;
- 
--	stmmac_dwmac4_get_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n),
--				   GMAC_ADDR_LOW(reg_n));
-+	stmmac_get_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n),
-+			    GMAC_ADDR_LOW(reg_n));
- }
- 
- static int dwmac4_set_lpi_mode(struct mac_device_info *hw,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-index 8c87a20880c4..a0249715fafa 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-@@ -226,21 +226,3 @@ void stmmac_dwmac4_set_mac(void __iomem *ioaddr, bool enable)
- 	if (value != old_val)
- 		writel(value, ioaddr + GMAC_CONFIG);
- }
--
--void stmmac_dwmac4_get_mac_addr(void __iomem *ioaddr, unsigned char *addr,
--				unsigned int high, unsigned int low)
--{
--	unsigned int hi_addr, lo_addr;
--
--	/* Read the MAC address from the hardware */
--	hi_addr = readl(ioaddr + high);
--	lo_addr = readl(ioaddr + low);
--
--	/* Extract the MAC address from the high and low words */
--	addr[0] = lo_addr & 0xff;
--	addr[1] = (lo_addr >> 8) & 0xff;
--	addr[2] = (lo_addr >> 16) & 0xff;
--	addr[3] = (lo_addr >> 24) & 0xff;
--	addr[4] = hi_addr & 0xff;
--	addr[5] = (hi_addr >> 8) & 0xff;
--}
--- 
-2.47.3
+The lastest next-next DOES have the correct API.
 
+v4 on the way.
+
+Mike
 
