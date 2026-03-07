@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-265188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4J44Of+YrGlarAEAu9opvQ
-	(envelope-from <netdev+bounces-265188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:39 +0100
+	id mCMAEi2ZrGlarAEAu9opvQ
+	(envelope-from <netdev+bounces-265189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:31:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ABB522DB6E
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:30:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B2E22DB75
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 22:31:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D38E3014513
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:30:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 391C530098BC
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 21:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D414823B62C;
-	Sat,  7 Mar 2026 21:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBC32D9499;
+	Sat,  7 Mar 2026 21:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6bhg/Dl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gUO+L8lE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2ED1AF4EF
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C662C3245
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 21:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772919036; cv=none; b=MO2hjJky8dGbeOwgVu3tU+/F2P9wgPBED8KaqDF64G10IcicErPLlWch0nGHSPsTny13msjzaXrGJu/4DAiCz7N73u6D302AqtgPQouzdoK8SB7ZrWYv1zX09quBfukBlv66WJJO7gzlDVszRCkHyGPo+vd8DlpXxAy6X3BAJIs=
+	t=1772919082; cv=none; b=r8f3pmkPduUAP9Qt91p2EnyareTeiGDng5TZJteA4wjxUXEM5aNrtRjE9xxndROOCi79tRCt6xZcdzT8L4EwOkgyFgXXFhn4NXnCsQ2hBbX1j/WciirpjKgaBpsKNMi1n635Vxx3Ui+GHZ60n6LcRd2SvlqfVlULiYMOb9Ylyx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772919036; c=relaxed/simple;
-	bh=z864TyzABOtYMtQeHQAosZ3lSecPscocjISXWpc1Pq8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=YUEuu+j4e4OVslm2Sg4VKEeVkMha7pnhjXmefczWsiO7WDtT0+gNlvOOZbg4BDlmGXhfuM8i6Q8RyRdZ6u86sESFGMCKR3ONOfbHBtk8y8Snak5nR3/PAdUu0IUqMPNRz01F2BDy07+xxE7kjn4E53DUX/IOfWEm1he5b3y1Wqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6bhg/Dl; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1772919082; c=relaxed/simple;
+	bh=THA3bSVQzv73wv2LgwqQEn2CkXKfTFif1AVKB23g0Uc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DgbsPWC7Xdp9RFy/AZQB5PY0laUmVrUU5iKriiDfpgGDxGYJUFxEPWlE9+4v26IoTO5P3Nl8kQ/+2XhQsgPloqPcYUMUj+FlCTECqON7FVCEyyl5uTTD4L2kkVRy0iaJMgx4N/q7KthMaxCWPRbhwTXvgcrxOjAGIUpU6CWL3v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gUO+L8lE; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4327790c4e9so7973771f8f.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:30:35 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4852f8ac7e9so8928495e9.1
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 13:31:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772919034; x=1773523834; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FebKW6Yr63nJXVOjkkbWJf1p6+srXrnOt4l6HU3sWX0=;
-        b=a6bhg/DldYfNWDl+Z/2wAXyFaXj8mA5+tolT8j3jOlU1vvAh+osQumg+NRc4EqXU0N
-         q+wlZWEehLiGTA8NgS528zJ/4EeLmnQdqKlSfg9pDZ9KvSfA3ZFjnpxWXOhUYEoT/HZ+
-         f4ps72R3Gl2PluWkHMSwX97fWNJjCigW3yQRp7syKL2tBIodFHXOkqrwqBlmbZO9W2Qi
-         lFTOxF7IboMNaTGDKogeSeeIlcvsydNXDEmruOCdyw0KZWy00Ig1+jvyVCGfUFsRHtTQ
-         vmfFJaHq6Vn0i0QX5mDNm50Y5SSkn5iSl65KT8F/0lPpDR66AKdueKJPBeWBWoirfhvA
-         fnMw==
+        d=gmail.com; s=20230601; t=1772919080; x=1773523880; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=D3yVBrm0NO/kyrzRjsGOfgFPVCo6bv+SX/DHuerXF6U=;
+        b=gUO+L8lEXI0sxVkxX85WtmMlruQoBPG+PqaVDgOQvifBAb1CPKPMFApg2o3BjWUTh5
+         AdXrtAJU24/Y4NYyetQ9i1aPpg8qEZXbuwqmOIBoemOMjFAJIPpdXmgjDhRniPgo6849
+         OvtcA+ivRDTYU/YSm8V46R485u1hMWJHxEV1KEyar6nlovqgs7yzyNdF+xvhkFyA5EJ9
+         UBU/Ngk/32937P0J/OApZVcfVtoq4lkK+qh4PB0ktc+oit4h95xmLeVirAfhPYaygdmF
+         FJ7+6ypqk1iFStmj0xASpu5SXojAdy9zqFv2hSpw4R7fQKERhGarZoEZPHWdV+fPhNrI
+         9D0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772919034; x=1773523834;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FebKW6Yr63nJXVOjkkbWJf1p6+srXrnOt4l6HU3sWX0=;
-        b=ZRifv7IylIvhYUJxhtIP36exp00CQ/nENS6zEx99lDRes9aLs4SOTosQnq3GQ/pvr2
-         8mWVkfgIeY67qsIkBfhHZ9dSbOhIOEzRzaSuBH4ZNJf7oP3BE3B6vvr1Nx25THppaWnB
-         /ARaZCEwcDPyFz2lZ4eT8F7m4+vqx9ZO0kGOdjjwO2f2tXUcVmCNvAwWAvjzfn+o1COU
-         gE09ZUQ6P0T+22/dZ9/Sw64NGq2vyCnG+11yxJUGB4NfMi2E/1iyXc0K5narBQ3bTjyk
-         8hjChoHHQ3+oKW5H4mUjw6T8fYJU7/3CIWL6ciVGgcmA8Xp21UV9HMj5ygkIIT4gI8Nk
-         t/sA==
-X-Gm-Message-State: AOJu0Yx96TCM/ybvxai89UdH7sxlWQ3qb6e1t5Z8t6HTiHUPZvw3MSYb
-	Z8BvB6OT9wQyN1tM4wLZVXeZ5uPZBmzSKbnCvz20yIPgyOCVEYvFEaUQ
-X-Gm-Gg: ATEYQzx8TPgfXBQCWoB9me9QUxFmhYF3xqcYnYPdgmgphjP+Wsac7Xyh4Qlz4B6IJpt
-	3q6zOulxnel4RBy2/Cc98jQ0tYR89i/Kl5M9hDTTzRiz2ZgJY8aMuohn2wBXYhs2m+/Z81292Qn
-	7itYgCH0IgjxF/LMeRt491DJlvw10csdLsqu3QHSFkWXuoUiJpcAxn+S6qyZp4MWJHVoLwj2w/h
-	lEp7ttsvriZzr0edya78JS4kv03sJO5InjQme50LpLCz1Zhg7ZzGW9f0JBCzVV70/e9qZEySt7m
-	teI+/DMkhBLFZBI0lvQg6KnUlbuixn3TyasjXx6xitmy2ufDfCgy42K7JXkhiFjwxMC++YLq8TJ
-	Et3Q0DJUc2qyR0ODK6m1xyIESXmOeiDWkD7j/kKARzdXMQ09gGgbYBeXQIugCA4GpoNLuJsp3Zv
-	HO+qUF1a05CNOc0zZm+CwxDG/skBM+XIPlOeC5wM32iTC3qoMvlpzB2/yAkrfVGTo+eKOO+OOSI
-	jElLTEg4tDO2aDGVGEAzQzh2FRiQIxwZiIbpu8mTE2KOfK9s9g+woauXLFdvuFDCg==
-X-Received: by 2002:a05:600c:c11c:b0:483:c12b:fe3c with SMTP id 5b1f17b1804b1-485269188damr78533035e9.4.1772919033829;
-        Sat, 07 Mar 2026 13:30:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772919080; x=1773523880;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D3yVBrm0NO/kyrzRjsGOfgFPVCo6bv+SX/DHuerXF6U=;
+        b=mDQseRgQO+rOecRcxhg1bX0CIOBlcnVQ137nh+F8Q7qvZ+t/KDPevaTmmx6CXe7+BK
+         +1Ox8J+JHUgz2hYRd8wns2Fq2/98gHXnh5UBf16J7OphTndkSzTOzouKOgA+j/D29XKe
+         yytN4o6X4b0lE10pTcfLVEKseUEsgnLLn42lepT8wYvG7ycMUNNABbRbZnBxO9UxKM5v
+         zUiaHu+Iyudg5J76NsfgsfSwhJ5vYewSG6jMNi3fYvOeDnGtet5mHm8nsPjXGlhj/adI
+         8xloByNSVpKxpWPQ1oSFu/cLzx0fMRnLLp9rZ+1TtITyNJEFdt9xCgUBMYYWpaX/nJk+
+         ZPxg==
+X-Gm-Message-State: AOJu0YxZqHVx2MmijM5hNdy8nrbAcMDc7jg+f0XdFDg956jhqu7RPNDO
+	pvo5rMSgTMbPtdLlF9WWsI+xDwxUojfsdWYTMssgy5oc7M3uVJleUA8Y
+X-Gm-Gg: ATEYQzwGTzzPWWYPDvhuJGwJ+yhegSIuXoseOxykfn+m5iBfbraNG/icOU79QlwtyrY
+	P5ke/hrcPm7VHBIYU7FgHJ/IUCF9gkBnoCb/PTSdsfDP7qMj3h+FdbAIxgT3FklPYwG+hMyyc4W
+	DOA/mk/WfTrTSz4IMfEdG8gQRZDewtKTkuiCUIbRzpxikyH0wtkIkl+KYS8AkMMKmQnEshXD789
+	htVW8Pc0sROCfGusXFEyJ3bX8tqXOxizgw+Ri4KEVFP4utYwZVxYhPXxREUND/sXd9u3P29sQLc
+	2d8K9w6ioX6XCwrV6YT5ebJGvWIfYeNO6pSISsGM94TIfLivRwlYti5PXTdhxsSqxih19dWcsNm
+	pt/+4FNW99CbuOBPHfx67sbAr1DbkN9Gk1DKVAj7Gr8hTBQEjRfzgbg+wUTujOWzZn5rF8YPtjX
+	PFcVNgYtma3LtJ3nBen3Yrvde59ySJV2aZK6Bgl+SFbt9YsiUBnvN/9BapiDTBRIM7265hVHVYX
+	hngx+IIl/x6RQ9R5YGxd0FzbABIUwE28D5qV/SrBmFvGSHT7Eo1lRzcZnGYj2no6Q==
+X-Received: by 2002:a05:600c:a117:b0:483:7eea:b185 with SMTP id 5b1f17b1804b1-4852695aedemr85218335e9.16.1772919079827;
+        Sat, 07 Mar 2026 13:31:19 -0800 (PST)
 Received: from ?IPV6:2003:ea:8f0f:7f00:f48b:e818:2b17:74e3? (p200300ea8f0f7f00f48be8182b1774e3.dip0.t-ipconnect.de. [2003:ea:8f0f:7f00:f48b:e818:2b17:74e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4853044d849sm94946455e9.11.2026.03.07.13.30.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4852767d8e4sm127214005e9.2.2026.03.07.13.31.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Mar 2026 13:30:33 -0800 (PST)
-Message-ID: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
-Date: Sat, 7 Mar 2026 22:30:32 +0100
+        Sat, 07 Mar 2026 13:31:19 -0800 (PST)
+Message-ID: <d7a8bf27-690b-4d69-8237-a8c12ffd28f8@gmail.com>
+Date: Sat, 7 Mar 2026 22:31:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,29 +85,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: [PATCH net-next 1/5] net: phy: move mdio_device reset handling
+ functions in the code
+From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
  Philipp Zabel <p.zabel@pengutronix.de>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next 0/5] net: phy: further decouple provider from
- consumer part
+References: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
+Content-Language: en-US
+In-Reply-To: <8b34944e-3abf-4dd1-908d-c21d08c62c34@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6ABB522DB6E
+X-Rspamd-Queue-Id: D1B2E22DB75
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265188-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265189-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -119,38 +122,205 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.879];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.828];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This series aims at further decoupling the provider and consumer part
-in phylib.
+In preparation of a follow-up patch this moves reset-related functions
+in the code.
 
-Heiner Kallweit (5):
-  net: phy: move mdio_device reset handling functions in the code
-  net: phy: make mdio_device.c part of libphy
-  net: phy: move (of_)mdio_find_bus to mdio_bus_provider.c
-  net: phy: move registering mdio_bus_class and mdio_bus_type to libphy
-  net: phy: move remaining provider code to mdio_bus_provider.c
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/mdio_device.c | 162 +++++++++++++++++-----------------
+ 1 file changed, 81 insertions(+), 81 deletions(-)
 
- drivers/net/phy/Makefile            |   6 +-
- drivers/net/phy/mdio-private.h      |  11 -
- drivers/net/phy/mdio_bus.c          | 385 ----------------------------
- drivers/net/phy/mdio_bus_provider.c | 319 +++++++++++++++++++++++
- drivers/net/phy/mdio_device.c       | 165 +++++++-----
- drivers/net/phy/phy_device.c        |  13 +
- drivers/net/phy/phylib-internal.h   |   7 +
- include/linux/mdio.h                |   2 -
- include/linux/phy.h                 |   3 -
- 9 files changed, 441 insertions(+), 470 deletions(-)
- delete mode 100644 drivers/net/phy/mdio-private.h
-
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index b8a5a183819..da4fb7484c7 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -24,6 +24,87 @@
+ #include <linux/property.h>
+ #include "mdio-private.h"
+ 
++/**
++ * mdio_device_register_reset - Read and initialize the reset properties of
++ *				an mdio device
++ * @mdiodev: mdio_device structure
++ *
++ * Return: Zero if successful, negative error code on failure
++ */
++int mdio_device_register_reset(struct mdio_device *mdiodev)
++{
++	struct reset_control *reset;
++
++	/* Deassert the optional reset signal */
++	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
++						 "reset", GPIOD_OUT_LOW);
++	if (IS_ERR(mdiodev->reset_gpio))
++		return PTR_ERR(mdiodev->reset_gpio);
++
++	if (mdiodev->reset_gpio)
++		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
++
++	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
++	if (IS_ERR(reset)) {
++		gpiod_put(mdiodev->reset_gpio);
++		mdiodev->reset_gpio = NULL;
++		return PTR_ERR(reset);
++	}
++
++	mdiodev->reset_ctrl = reset;
++
++	/* Read optional firmware properties */
++	device_property_read_u32(&mdiodev->dev, "reset-assert-us",
++				 &mdiodev->reset_assert_delay);
++	device_property_read_u32(&mdiodev->dev, "reset-deassert-us",
++				 &mdiodev->reset_deassert_delay);
++
++	return 0;
++}
++
++/**
++ * mdio_device_unregister_reset - uninitialize the reset properties of
++ *				  an mdio device
++ * @mdiodev: mdio_device structure
++ */
++void mdio_device_unregister_reset(struct mdio_device *mdiodev)
++{
++	gpiod_put(mdiodev->reset_gpio);
++	mdiodev->reset_gpio = NULL;
++	reset_control_put(mdiodev->reset_ctrl);
++	mdiodev->reset_ctrl = NULL;
++	mdiodev->reset_assert_delay = 0;
++	mdiodev->reset_deassert_delay = 0;
++}
++
++void mdio_device_reset(struct mdio_device *mdiodev, int value)
++{
++	unsigned int d;
++
++	if (!mdiodev->reset_gpio && !mdiodev->reset_ctrl)
++		return;
++
++	if (mdiodev->reset_state == value)
++		return;
++
++	if (mdiodev->reset_gpio)
++		gpiod_set_value_cansleep(mdiodev->reset_gpio, value);
++
++	if (mdiodev->reset_ctrl) {
++		if (value)
++			reset_control_assert(mdiodev->reset_ctrl);
++		else
++			reset_control_deassert(mdiodev->reset_ctrl);
++	}
++
++	d = value ? mdiodev->reset_assert_delay : mdiodev->reset_deassert_delay;
++	if (d)
++		fsleep(d);
++
++	mdiodev->reset_state = value;
++}
++EXPORT_SYMBOL(mdio_device_reset);
++
+ void mdio_device_free(struct mdio_device *mdiodev)
+ {
+ 	put_device(&mdiodev->dev);
+@@ -108,87 +189,6 @@ void mdio_device_remove(struct mdio_device *mdiodev)
+ }
+ EXPORT_SYMBOL(mdio_device_remove);
+ 
+-/**
+- * mdio_device_register_reset - Read and initialize the reset properties of
+- *				an mdio device
+- * @mdiodev: mdio_device structure
+- *
+- * Return: Zero if successful, negative error code on failure
+- */
+-int mdio_device_register_reset(struct mdio_device *mdiodev)
+-{
+-	struct reset_control *reset;
+-
+-	/* Deassert the optional reset signal */
+-	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
+-						 "reset", GPIOD_OUT_LOW);
+-	if (IS_ERR(mdiodev->reset_gpio))
+-		return PTR_ERR(mdiodev->reset_gpio);
+-
+-	if (mdiodev->reset_gpio)
+-		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
+-
+-	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
+-	if (IS_ERR(reset)) {
+-		gpiod_put(mdiodev->reset_gpio);
+-		mdiodev->reset_gpio = NULL;
+-		return PTR_ERR(reset);
+-	}
+-
+-	mdiodev->reset_ctrl = reset;
+-
+-	/* Read optional firmware properties */
+-	device_property_read_u32(&mdiodev->dev, "reset-assert-us",
+-				 &mdiodev->reset_assert_delay);
+-	device_property_read_u32(&mdiodev->dev, "reset-deassert-us",
+-				 &mdiodev->reset_deassert_delay);
+-
+-	return 0;
+-}
+-
+-/**
+- * mdio_device_unregister_reset - uninitialize the reset properties of
+- *				  an mdio device
+- * @mdiodev: mdio_device structure
+- */
+-void mdio_device_unregister_reset(struct mdio_device *mdiodev)
+-{
+-	gpiod_put(mdiodev->reset_gpio);
+-	mdiodev->reset_gpio = NULL;
+-	reset_control_put(mdiodev->reset_ctrl);
+-	mdiodev->reset_ctrl = NULL;
+-	mdiodev->reset_assert_delay = 0;
+-	mdiodev->reset_deassert_delay = 0;
+-}
+-
+-void mdio_device_reset(struct mdio_device *mdiodev, int value)
+-{
+-	unsigned int d;
+-
+-	if (!mdiodev->reset_gpio && !mdiodev->reset_ctrl)
+-		return;
+-
+-	if (mdiodev->reset_state == value)
+-		return;
+-
+-	if (mdiodev->reset_gpio)
+-		gpiod_set_value_cansleep(mdiodev->reset_gpio, value);
+-
+-	if (mdiodev->reset_ctrl) {
+-		if (value)
+-			reset_control_assert(mdiodev->reset_ctrl);
+-		else
+-			reset_control_deassert(mdiodev->reset_ctrl);
+-	}
+-
+-	d = value ? mdiodev->reset_assert_delay : mdiodev->reset_deassert_delay;
+-	if (d)
+-		fsleep(d);
+-
+-	mdiodev->reset_state = value;
+-}
+-EXPORT_SYMBOL(mdio_device_reset);
+-
+ /**
+  * mdio_probe - probe an MDIO device
+  * @dev: device to probe
 -- 
 2.53.0
+
 
 
