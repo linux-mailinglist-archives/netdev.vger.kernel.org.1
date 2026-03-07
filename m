@@ -1,72 +1,92 @@
-Return-Path: <netdev+bounces-265092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265093-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGl/KXLKq2n7gwEAu9opvQ
-	(envelope-from <netdev+bounces-265092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:49:22 +0100
+	id 8HPLB6XKq2n7gwEAu9opvQ
+	(envelope-from <netdev+bounces-265093-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D2F22A7A8
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:49:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EE322A7C8
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 07:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92F18309E744
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2E91D3061512
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 06:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E62385526;
-	Sat,  7 Mar 2026 06:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C8E374753;
+	Sat,  7 Mar 2026 06:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="J0qH+0zY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fs1blK3P"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9B837EFFF;
-	Sat,  7 Mar 2026 06:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87113016FC
+	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 06:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772865858; cv=none; b=oRDlyc0GbupWmLvP44t1HZ5AQ7un2hPpO/bCoLhjmEGejQ3vYyn1zjddS7ALc6P28KkF45gVtsg/7AL0TOEfULtLeubrasO9xwyGZm9GmAOlyb/7jIgnFcGyXLX4KTsUklSybAgevdEzem/LI7XNHkHSAf/vrxGHHsaNfHf7OTU=
+	t=1772865883; cv=none; b=kiUB4HrcVO54opkmxzcztxb3CyUxpazJn/ptAL0Lrqtj0Xybjh/YVdf03z0QWBQvoYpy3dsPSskdV7I1l9UW4DaSwJH8GiEnzxQjwwRPIE8E8HpI2YU/uUau+9pGXiDLJ10YtjDcP8cV0gIrdaycsBT0KEU+9lkyCBDAKUbssfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772865858; c=relaxed/simple;
-	bh=Oy7m18gvTCTbk7+WCe3zI26MgvPtpylmVzQrzf296Y0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dwwrL+3vykf1coUfN2FUxa7Jmr74DrHbjnkf5dLZR/8UMfVlgQ3XkrtITVj5R6F+TaqAP5lh+dkuSqJ7Z7jZpD+BmTQGmudfPQbRutEadY8aCN/v79vVZL3mK4hsyvvOZanvKCPZ/ThIXBbtqDccRNYzG2xPHsQbFETHHoBt8KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=J0qH+0zY; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=0xYBmUUEOgO5T/ut1Bgf0ZO0IiGKDioUNLZSdrZbG6E=;
-	b=J0qH+0zYKhmvYnxQZ4p+bPOaeI6gIX0EzugqWKG5gZTXmbZQBdc4K2Lvz7KIXjwjS+cNBgs4P
-	6KFVKEdWjmkt9uh/rAJDWKTfUuCLsVTJsmTBWWr9Sgdp7m4K7HGsA3B8KmtlwR7KCvkAiEt8zAx
-	Ceq1ViFSLlYIF9LTmZH+GuI=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4fSYXT3Dt5zRhRm;
-	Sat,  7 Mar 2026 14:39:21 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 87B0140567;
-	Sat,  7 Mar 2026 14:44:13 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Sat, 7 Mar 2026 14:44:12 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
-	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
-	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
-	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>
-Subject: [PATCH net-next v02 9/9] hinic3: Add ethtool basic ops
-Date: Sat, 7 Mar 2026 14:43:48 +0800
-Message-ID: <739c746b8fc7dcc721eea6773ebb3023b4faefaa.1772697509.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1772697509.git.zhuyikai1@h-partners.com>
-References: <cover.1772697509.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1772865883; c=relaxed/simple;
+	bh=I0tzPL0aFeMS2WWrGqYaGnXOAI66uZHw3bD/yJmzb4k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lauOTUUXJ55HZrd4WhAcLGDt5+PnGG0x7xQ7JKzC5S1Ed3Cb9g4LqevU8rvR5dQxd6eNjQXp1ITz0NNQg+RsXq1eXzVFVwO0y52Z4dN6cgn9FMQThji0g1OOVYvyKxueTzBhoJN2LP3uj28SvfS8TFnpw/2WhbKA9NiiZV5UPV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fs1blK3P; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ae4988e039so44569695ad.1
+        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 22:44:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772865881; x=1773470681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kpZf5Rj08FR646dOpjG3VqxqgOpKghxdnT1y4De/qHk=;
+        b=fs1blK3PU6okBMId/nzw2yXSH6HXh84Mqq59IEEYzPJ95aPgFrxXPqA/5E2nKuCENh
+         KfIAMarr/sR3sxHYzHz+Z56+FwetElU1bQ7DJcsAeo85v12HeVoSfjA8FPKuRctCw91n
+         /R0qg4MyDoRsh0B0xoNq6M6RPoW8KBHOoKTss6iELiOE6Yqq3AqHHfvmHhc/xF897fIC
+         RdZPBs4rv+LYN924ZzL766nYvAnyJFAOHahpsArrtQnirblUmaRbS0DrJGMjJmjN71wC
+         BH37HWbiJak2pXz39Dg5xNY5HTHcv6d//bpDWLOGPeI+x3rn6dkI/RVTuZ9k7BfFqY7n
+         IIgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772865881; x=1773470681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kpZf5Rj08FR646dOpjG3VqxqgOpKghxdnT1y4De/qHk=;
+        b=FgqQMNJc1DdQSO6AZlDCfJhMhdGGn/JdtYJORcv/fyfGT1TdOF+WSk5ogvAEtgRiaf
+         tV/gbtei4SGJYFsGzCHr+KcCTIGpLMwsKvmnFKzZtXJrLzmmSM2m/g5KOizGe1PdP5Uy
+         vRriwax/0K9Jnz3+2o8GXxy2zRH9sifzEpKbKMBIH+7Iqow9aMIQ2DdJiDqzo0NAXhan
+         RkisRymGN0Os8bFAri76D/jTbp+rDdCgCVUPGdUGuT5O5RhpsxPjDr69Ko1WHfH8PLb5
+         IXAzIHRuQ7UyiF2NVF7RDmuh13OWhVHrzbcFNEUnLs84o72SfWRw6jXEU/6vPR7GbKsp
+         Vg0g==
+X-Gm-Message-State: AOJu0YxFnasRGv6P7TiT7kReKJvofmTNgXBoXdI/nda0AiC4C+Eqq1UM
+	ODvfJY9H4DpN4G+WGRF+5n35rtaWOVsqK7klDi/xA8wgXC0ezCyNxbrF
+X-Gm-Gg: ATEYQzyYz9DVkbB/7yKTZIyKO12PMRbQbgxYlVafZmlUwdlMcm0Altfo0WyJ4+aCETG
+	nkETerCy7mPZaieSn8ew+IAqnOUFHFiE17mb5mlptecELlEDXoYX2KU5VqN2TyLO9mt17eG/VUC
+	o967Gmbrgpf1g2JSnIfdsNYqfwuDMZhWehZx8bS6lvGugo62vf+al4OttG1OVNzjUb6KRRLJKKI
+	oPMSokyP3rzEg0APiPMpUmzi5+X+9RBd3hUAmqQ1oXIx7IMODt4/9dUO6DScKD5VmzA+jBEY0iq
+	ZjsOv2zBtN6e1D9/2VcvsGMws+b9KxZVUBIJWE07bpf03MRP5d5H8pz4nOQwMxJ9EnVLybAe5IJ
+	aH8unHNPsBcTH8If63G7/Ky2i3T4RVIdZ8N0vA9pQUnjV3bYeWBN1ty0V4eSTHZxGRhZW0KssGE
+	fylx3ARlqYuZFY
+X-Received: by 2002:a17:903:1d0:b0:2a7:aac1:7201 with SMTP id d9443c01a7336-2ae75b09c8fmr84034725ad.3.1772865881101;
+        Fri, 06 Mar 2026 22:44:41 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:1::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e57af3sm55536105ad.13.2026.03.06.22.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Mar 2026 22:44:40 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [RFC PATCH bpf-next v2 00/11] Dynptr cleanup and bugfixes
+Date: Fri,  6 Mar 2026 22:44:28 -0800
+Message-ID: <20260307064439.3247440-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,939 +94,251 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100013.china.huawei.com (7.202.181.12)
-X-Rspamd-Queue-Id: 65D2F22A7A8
+X-Rspamd-Queue-Id: 87EE322A7C8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265092-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-265093-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,h-partners.com:mid,h-partners.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-  Implement following ethtool callback function:
-.get_link_ksettings
-.get_drvinfo
-.get_msglevel
-.set_msglevel
-.get_link
+This patchset (1) cleans up dynptr handling (2) refactors object parent-
+child relationship tracking to make it more precise and (3) fixes dynptr
+UAF bug due to a missing link between dynptr and the parent referenced
+object in the verifier.
 
-  These callbacks allow users to utilize ethtool for detailed
-network configuration and monitoring.
+This patchset will make dynptr tracks its parent object. In bpf qdisc
+programs, an skb may be freed through kfuncs. However, since dynptr
+currently does not track the parent referenced object (e.g., skb), the
+verifier will not invalidate the dynptr after the skb is freed,
+resulting in use-after-free. The similar issue also affects file dynptr.
+To solve the issue, we need to track the parent skb in the derived
+dynptr and slices.
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
+However, we need to refactor the verifier's object tracking mechanism
+first because id and ref_obj_id cannot easily express more than simple
+object relationship. To illustrate this, we use an example as shown in
+the figure below.
+
+Before: object (id,ref_obj_id,dynptr_id)
+  id         = id of the object (used for nullness tracking)
+  ref_obj_id = id of the underlying referenced object (used for lifetime
+               tracking)
+  dynptr_id  = id of the parent dynptr of the slice (used for tracking
+               parent dynptr, only for PTR_TO_MEM)
+
+                      skb (0,1,0)
+                             ^ (try to link dynptr to parent ref_obj_id)
+                             +-------------------------------+
+                             |           bpf_dynptr_clone    |
+                 dynptr A (2,1,0)                dynptr C (4,1,0)
+                           ^                               ^
+        bpf_dynptr_slice   |                               |
+                           |                               |
+              slice B (3,1,2)                 slice D (5,1,4)
+                         ^
+    bpf_dynptr_from_mem  |
+    (NOT allowed yet)    |
+             dynptr E (6,1,0)
+
+Lets first try to fix the bug by letting dynptr track the parent skb
+using ref_obj_id and propagating the ref_obj_id to slices so that when
+the skb goes away the derived dynptrs and slices will also be
+invalidated. However, if dynptr A is destroyed by overwriting the stack
+slot, release_reference(ref_obj_id=1) would be called and all nodes will
+be invaldiated. The correct handling should leave skb, dynptr C, and
+slice D intact since non-referenced dynptr clone's lifetime does not
+need to tie to the original dynptr. This is not a problem before since
+dynptr created from skb has ref_obj_id = 0. In the future if we start
+allowing creating dynptr from slice, the current design also cannot
+correctly handle the removal of dynptr E. All objects will be
+incorrectly invalidated instead of only invalidating childrens of
+dynptr E. While it is possible to solve the issue by adding more
+specialized handling in the dynptr paths [0], it creates more complexity.
+
+To track precise object relationship in a simpler way, u32 parent_id is
+added to bpf_reg_state to track parent object. This replaces the
+PTR_TO_MEM specific dynptr_id. Therefore, for dynptr A, since it is a
+non-referenced dynptr, its ref_obj_id is set to 0. The parent_id will be
+set to 1 to track the id of the skb. Note that, this will not grow
+bpf_reg_state on 64 byte machine as there is a 7-byte padding.
+
+After: object (id,ref_obj_id,parent_id)
+  id         = id of the object (used for nullness tracking)
+  ref_obj_id = id of the referenced object; objects with same ref_obj_id
+               have the same lifetime (used for lifetime tracking)
+  parent_id  = id of the parent object; points to id (used for object
+               relationship tracking)
+
+(1) Non-referenced dynptr with referenced parent (e.g., skb in Qdisc):
+
+                          skb (1,1,0)
+                               ^
+          bpf_dynptr_from_skb  +-------------------------------+
+                               |      bpf_dynptr_clone(A, C)   |
+                 dynptr A (2,0,1)               dynptr C (4,0,1)
+                           ^                              ^
+        bpf_dynptr_slice   |                              |
+                           |                              |
+              slice B (3,0,2)                slice D (5,0,4)
+                       ^
+  bpf_dynptr_from_mem  |
+  (NOT allowed yet)    |
+         dynptr E (6,0,3)
+
+The figures below show how the new design works in different 
+referenced/non-referenced dynptr + referenced/non-referenced parent
+combinations. The relationship between slices and dynptrs is ignored
+as they are still the same. The main difference is how clone dynptrs
+are represented. Since bpf_dynptr_clone() does not initializes a new
+dynptr, the clone of referenced dynptr cannot function when the
+original or any of the clone is invalidated. To represent this,
+they will share the same ref_obj_id. For non-referenced dynptr, the
+original and the clones will be able live independently.
+
+
+(2) Non-referenced dynptr with non-referenced parent (e.g., skb in TC,
+    always valid):
+
+      bpf_dynptr_from_skb
+                                  bpf_dynptr_clone(A, C)
+             dynptr A (1,0,0)                  dynptr C (2,0,0)
+
+                         dynptr A and C live independently
+
+(3) Referenced dynptr with referenced parent:
+
+                     file (1,1,0)
+                           ^ ^
+     bpf_dynptr_from_file  | +-------------------------------+
+                           |       bpf_dynptr_clone(A, C)    |
+             dynptr A (2,3,1)                  dynptr C (4,3,1)
+                         ^                                 ^
+                         |                                 |
+                         dynptr A and C have the same lifetime
+
+
+(4) Referenced dynptr with non-referenced parent:
+
+ bpf_ringbuf_reserve_dynptr  
+                                  bpf_dynptr_clone(A, C)
+             dynptr A (1,1,0)                  dynptr C (2,1,0)
+                         ^                                 ^
+                         |                                 |
+                         dynptr A and C have the same lifetime
+
+
+I also tried folding id and ref_obj_id into id and using ref_obj_id to
+track parent [1]. This design was not able to express the relationship
+of referenced sk pointer and casted referenced sk pointer. The two
+objects needs two id to express that they have the same lifetime but
+different nullness.
+
+Referenced socket pointer:
+
+                                C = ptr_casting_function(A)
+                ptr A (1,1,0)                     ptr C (2,1,0)
+                         ^                                 ^
+                         |                                 |
+                        ptr C may be NULL even if ptr A is valid
+			but they have the same lifetime
+
+
+To avoid recursive call chain of release_reference() ->
+unmark_stack_slots_dynptr(), release_reference() now uses
+stacked-based DFS to find and invalidate registers and stack slots
+containing the to-be-released id/ref_obj_id and all dependant ids
+whose parent_id matches the id. Currently, it skips id == 0, which
+however maybe a valid id e.g., pkt pointer by reading ctx. Future work
+may start giving them > 0 id. This should not affect the current usecase
+where skb and file are both given > 0 id.
+
+[0] https://lore.kernel.org/bpf/20250414161443.1146103-2-memxor@gmail.com/
+[1] https://github.com/ameryhung/bpf/commits/obj_relationship_v2_no_parent_id/ 
+
+
+Changelog:
+
+v1 -> v2
+  - Redesign: Use object (id, ref_obj_id, parent_id) instead of 
+    (id, ref_obj_id) as it cannot express ptr casting without
+    introduing specialized code to handle the case
+  - Use stack-based DFS to release objects to avoid recursion (Andrii)
+  - Keep reg->id after null check
+  - Add dynptr cleanup
+  - Fix dynptr kfunc arg type determination
+  - Add a file dynptr UAF selftest
+  Link: https://lore.kernel.org/bpf/20260202214817.2853236-1-ameryhung@gmail.com/
+
 ---
- drivers/net/ethernet/huawei/hinic3/Makefile   |   1 +
- .../ethernet/huawei/hinic3/hinic3_ethtool.c   | 425 ++++++++++++++++++
- .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  28 ++
- .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |   2 +
- .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  12 +
- .../net/ethernet/huawei/hinic3/hinic3_main.c  |   3 +
- .../huawei/hinic3/hinic3_mgmt_interface.h     |  16 +-
- .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   |  83 ++++
- .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   | 110 +++++
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   3 +
- .../net/ethernet/huawei/hinic3/hinic3_rss.c   |   2 +-
- 11 files changed, 683 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/Makefile b/drivers/net/ethernet/huawei/hinic3/Makefile
-index 26c05ecf31c9..4ebad3a4f943 100644
---- a/drivers/net/ethernet/huawei/hinic3/Makefile
-+++ b/drivers/net/ethernet/huawei/hinic3/Makefile
-@@ -6,6 +6,7 @@ obj-$(CONFIG_HINIC3) += hinic3.o
- hinic3-objs := hinic3_cmdq.o \
- 	       hinic3_common.o \
- 	       hinic3_eqs.o \
-+	       hinic3_ethtool.o \
- 	       hinic3_filter.o \
- 	       hinic3_hw_cfg.o \
- 	       hinic3_hw_comm.o \
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
-new file mode 100644
-index 000000000000..90fc16288de9
---- /dev/null
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
-@@ -0,0 +1,425 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
-+
-+#include <linux/kernel.h>
-+#include <linux/pci.h>
-+#include <linux/device.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/errno.h>
-+#include <linux/etherdevice.h>
-+#include <linux/netdevice.h>
-+#include <linux/ethtool.h>
-+
-+#include "hinic3_lld.h"
-+#include "hinic3_hw_comm.h"
-+#include "hinic3_nic_dev.h"
-+#include "hinic3_nic_cfg.h"
-+
-+#define HINIC3_MGMT_VERSION_MAX_LEN     32
-+
-+static void hinic3_get_drvinfo(struct net_device *netdev,
-+			       struct ethtool_drvinfo *info)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	u8 mgmt_ver[HINIC3_MGMT_VERSION_MAX_LEN];
-+	struct pci_dev *pdev = nic_dev->pdev;
-+	int err;
-+
-+	strscpy(info->driver, HINIC3_NIC_DRV_NAME, sizeof(info->driver));
-+	strscpy(info->bus_info, pci_name(pdev), sizeof(info->bus_info));
-+
-+	err = hinic3_get_mgmt_version(nic_dev->hwdev, mgmt_ver,
-+				      HINIC3_MGMT_VERSION_MAX_LEN);
-+	if (err) {
-+		netdev_err(netdev, "Failed to get fw version\n");
-+		return;
-+	}
-+
-+	snprintf(info->fw_version, sizeof(info->fw_version), "%s", mgmt_ver);
-+}
-+
-+static u32 hinic3_get_msglevel(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	return nic_dev->msg_enable;
-+}
-+
-+static void hinic3_set_msglevel(struct net_device *netdev, u32 data)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	nic_dev->msg_enable = data;
-+
-+	netdev_dbg(netdev, "Set message level: 0x%x\n", data);
-+}
-+
-+static const u32 hinic3_link_mode_ge[] = {
-+	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
-+	ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_10ge_base_r[] = {
-+	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseR_FEC_BIT,
-+	ETHTOOL_LINK_MODE_10000baseCR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_25ge_base_r[] = {
-+	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_40ge_base_r4[] = {
-+	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_50ge_base_r[] = {
-+	ETHTOOL_LINK_MODE_50000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseCR_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_50ge_base_r2[] = {
-+	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_100ge_base_r[] = {
-+	ETHTOOL_LINK_MODE_100000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseCR_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_100ge_base_r2[] = {
-+	ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_100ge_base_r4[] = {
-+	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_200ge_base_r2[] = {
-+	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT,
-+};
-+
-+static const u32 hinic3_link_mode_200ge_base_r4[] = {
-+	ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT,
-+};
-+
-+struct hw2ethtool_link_mode {
-+	const u32 *link_mode_bit_arr;
-+	u32       arr_size;
-+	u32       speed;
-+};
-+
-+static const struct hw2ethtool_link_mode
-+	hw2ethtool_link_mode_table[LINK_MODE_MAX_NUMBERS] = {
-+	[LINK_MODE_GE] = {
-+		.link_mode_bit_arr = hinic3_link_mode_ge,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_ge),
-+		.speed             = SPEED_1000,
-+	},
-+	[LINK_MODE_10GE_BASE_R] = {
-+		.link_mode_bit_arr = hinic3_link_mode_10ge_base_r,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_10ge_base_r),
-+		.speed             = SPEED_10000,
-+	},
-+	[LINK_MODE_25GE_BASE_R] = {
-+		.link_mode_bit_arr = hinic3_link_mode_25ge_base_r,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_25ge_base_r),
-+		.speed             = SPEED_25000,
-+	},
-+	[LINK_MODE_40GE_BASE_R4] = {
-+		.link_mode_bit_arr = hinic3_link_mode_40ge_base_r4,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_40ge_base_r4),
-+		.speed             = SPEED_40000,
-+	},
-+	[LINK_MODE_50GE_BASE_R] = {
-+		.link_mode_bit_arr = hinic3_link_mode_50ge_base_r,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_50ge_base_r),
-+		.speed             = SPEED_50000,
-+	},
-+	[LINK_MODE_50GE_BASE_R2] = {
-+		.link_mode_bit_arr = hinic3_link_mode_50ge_base_r2,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_50ge_base_r2),
-+		.speed             = SPEED_50000,
-+	},
-+	[LINK_MODE_100GE_BASE_R] = {
-+		.link_mode_bit_arr = hinic3_link_mode_100ge_base_r,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_100ge_base_r),
-+		.speed             = SPEED_100000,
-+	},
-+	[LINK_MODE_100GE_BASE_R2] = {
-+		.link_mode_bit_arr = hinic3_link_mode_100ge_base_r2,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_100ge_base_r2),
-+		.speed             = SPEED_100000,
-+	},
-+	[LINK_MODE_100GE_BASE_R4] = {
-+		.link_mode_bit_arr = hinic3_link_mode_100ge_base_r4,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_100ge_base_r4),
-+		.speed             = SPEED_100000,
-+	},
-+	[LINK_MODE_200GE_BASE_R2] = {
-+		.link_mode_bit_arr = hinic3_link_mode_200ge_base_r2,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_200ge_base_r2),
-+		.speed             = SPEED_200000,
-+	},
-+	[LINK_MODE_200GE_BASE_R4] = {
-+		.link_mode_bit_arr = hinic3_link_mode_200ge_base_r4,
-+		.arr_size          = ARRAY_SIZE(hinic3_link_mode_200ge_base_r4),
-+		.speed             = SPEED_200000,
-+	},
-+};
-+
-+#define GET_SUPPORTED_MODE     0
-+#define GET_ADVERTISED_MODE    1
-+
-+struct hinic3_link_settings {
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
-+
-+	u32 speed;
-+	u8  duplex;
-+	u8  port;
-+	u8  autoneg;
-+};
-+
-+#define HINIC3_ADD_SUPPORTED_LINK_MODE(ecmd, mode) \
-+	set_bit(ETHTOOL_LINK_##mode##_BIT, (ecmd)->supported)
-+#define HINIC3_ADD_ADVERTISED_LINK_MODE(ecmd, mode) \
-+	set_bit(ETHTOOL_LINK_##mode##_BIT, (ecmd)->advertising)
-+
-+static void hinic3_add_speed_link_mode(unsigned long *bitmap, u32 mode)
-+{
-+	u32 i;
-+
-+	for (i = 0; i < hw2ethtool_link_mode_table[mode].arr_size; i++) {
-+		if (hw2ethtool_link_mode_table[mode].link_mode_bit_arr[i] >=
-+		    __ETHTOOL_LINK_MODE_MASK_NBITS)
-+			continue;
-+
-+		set_bit(hw2ethtool_link_mode_table[mode].link_mode_bit_arr[i],
-+			bitmap);
-+	}
-+}
-+
-+/* Related to enum mag_cmd_port_speed */
-+static const u32 hw_to_ethtool_speed[] = {
-+	(u32)SPEED_UNKNOWN, SPEED_10,    SPEED_100,   SPEED_1000,   SPEED_10000,
-+	SPEED_25000,        SPEED_40000, SPEED_50000, SPEED_100000, SPEED_200000
-+};
-+
-+static void
-+hinic3_add_ethtool_link_mode(struct hinic3_link_settings *link_settings,
-+			     u32 hw_link_mode, u32 name)
-+{
-+	unsigned long *advertising_mask = link_settings->advertising;
-+	unsigned long *supported_mask = link_settings->supported;
-+	u32 link_mode;
-+
-+	for (link_mode = 0; link_mode < LINK_MODE_MAX_NUMBERS; link_mode++) {
-+		if (hw_link_mode & BIT(link_mode)) {
-+			if (name == GET_SUPPORTED_MODE)
-+				hinic3_add_speed_link_mode(supported_mask,
-+							   link_mode);
-+			else
-+				hinic3_add_speed_link_mode(advertising_mask,
-+							   link_mode);
-+		}
-+	}
-+}
-+
-+static void
-+hinic3_link_speed_set(struct net_device *netdev,
-+		      struct hinic3_link_settings *link_settings,
-+		      struct hinic3_nic_port_info *port_info)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	bool link_status_up;
-+	int err;
-+
-+	if (port_info->supported_mode != LINK_MODE_UNKNOWN)
-+		hinic3_add_ethtool_link_mode(link_settings,
-+					     port_info->supported_mode,
-+					     GET_SUPPORTED_MODE);
-+	if (port_info->advertised_mode != LINK_MODE_UNKNOWN)
-+		hinic3_add_ethtool_link_mode(link_settings,
-+					     port_info->advertised_mode,
-+					     GET_ADVERTISED_MODE);
-+
-+	err = hinic3_get_link_status(nic_dev->hwdev, &link_status_up);
-+	if (!err && link_status_up) {
-+		link_settings->speed =
-+			port_info->speed < ARRAY_SIZE(hw_to_ethtool_speed) ?
-+			hw_to_ethtool_speed[port_info->speed] :
-+			(u32)SPEED_UNKNOWN;
-+
-+		link_settings->duplex = port_info->duplex;
-+	} else {
-+		link_settings->speed = (u32)SPEED_UNKNOWN;
-+		link_settings->duplex = DUPLEX_UNKNOWN;
-+	}
-+}
-+
-+static void
-+hinic3_link_port_type_set(struct hinic3_link_settings *link_settings,
-+			  u8 port_type)
-+{
-+	switch (port_type) {
-+	case MAG_CMD_WIRE_TYPE_ELECTRIC:
-+		HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_TP);
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_TP);
-+		link_settings->port = PORT_TP;
-+		break;
-+
-+	case MAG_CMD_WIRE_TYPE_AOC:
-+	case MAG_CMD_WIRE_TYPE_MM:
-+	case MAG_CMD_WIRE_TYPE_SM:
-+		HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_FIBRE);
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_FIBRE);
-+		link_settings->port = PORT_FIBRE;
-+		break;
-+
-+	case MAG_CMD_WIRE_TYPE_COPPER:
-+		HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_FIBRE);
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_FIBRE);
-+		link_settings->port = PORT_DA;
-+		break;
-+
-+	case MAG_CMD_WIRE_TYPE_BACKPLANE:
-+		HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_Backplane);
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_Backplane);
-+		link_settings->port = PORT_NONE;
-+		break;
-+
-+	default:
-+		link_settings->port = PORT_OTHER;
-+		break;
-+	}
-+}
-+
-+static int
-+hinic3_get_link_pause_settings(struct net_device *netdev,
-+			       struct hinic3_link_settings *link_settings)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_nic_pause_config nic_pause = {};
-+	int err;
-+
-+	err = hinic3_get_pause_info(nic_dev, &nic_pause);
-+	if (err) {
-+		netdev_err(netdev, "Failed to get pause param from hw\n");
-+		return err;
-+	}
-+
-+	HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_Pause);
-+	if (nic_pause.rx_pause && nic_pause.tx_pause) {
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_Pause);
-+	} else if (nic_pause.tx_pause) {
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings,
-+						MODE_Asym_Pause);
-+	} else if (nic_pause.rx_pause) {
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_Pause);
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings,
-+						MODE_Asym_Pause);
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+hinic3_get_link_settings(struct net_device *netdev,
-+			 struct hinic3_link_settings *link_settings)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_nic_port_info port_info = {};
-+	int err;
-+
-+	err = hinic3_get_port_info(nic_dev->hwdev, &port_info);
-+	if (err) {
-+		netdev_err(netdev, "Failed to get port info\n");
-+		return err;
-+	}
-+
-+	hinic3_link_speed_set(netdev, link_settings, &port_info);
-+
-+	hinic3_link_port_type_set(link_settings, port_info.port_type);
-+
-+	link_settings->autoneg = port_info.autoneg_state == PORT_CFG_AN_ON ?
-+				 AUTONEG_ENABLE : AUTONEG_DISABLE;
-+	if (port_info.autoneg_cap)
-+		HINIC3_ADD_SUPPORTED_LINK_MODE(link_settings, MODE_Autoneg);
-+	if (port_info.autoneg_state == PORT_CFG_AN_ON)
-+		HINIC3_ADD_ADVERTISED_LINK_MODE(link_settings, MODE_Autoneg);
-+
-+	if (!HINIC3_IS_VF(nic_dev->hwdev)) {
-+		err = hinic3_get_link_pause_settings(netdev, link_settings);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+hinic3_get_link_ksettings(struct net_device *netdev,
-+			  struct ethtool_link_ksettings *link_settings)
-+{
-+	struct ethtool_link_settings *base = &link_settings->base;
-+	struct hinic3_link_settings settings = {};
-+	int err;
-+
-+	ethtool_link_ksettings_zero_link_mode(link_settings, supported);
-+	ethtool_link_ksettings_zero_link_mode(link_settings, advertising);
-+
-+	err = hinic3_get_link_settings(netdev, &settings);
-+	if (err)
-+		return err;
-+
-+	bitmap_copy(link_settings->link_modes.supported, settings.supported,
-+		    __ETHTOOL_LINK_MODE_MASK_NBITS);
-+	bitmap_copy(link_settings->link_modes.advertising, settings.advertising,
-+		    __ETHTOOL_LINK_MODE_MASK_NBITS);
-+
-+	base->autoneg = settings.autoneg;
-+	base->speed = settings.speed;
-+	base->duplex = settings.duplex;
-+	base->port = settings.port;
-+
-+	return 0;
-+}
-+
-+static const struct ethtool_ops hinic3_ethtool_ops = {
-+	.supported_coalesce_params      = ETHTOOL_COALESCE_USECS |
-+					  ETHTOOL_COALESCE_PKT_RATE_RX_USECS,
-+	.get_link_ksettings             = hinic3_get_link_ksettings,
-+	.get_drvinfo                    = hinic3_get_drvinfo,
-+	.get_msglevel                   = hinic3_get_msglevel,
-+	.set_msglevel                   = hinic3_set_msglevel,
-+	.get_link                       = ethtool_op_get_link,
-+};
-+
-+void hinic3_set_ethtool_ops(struct net_device *netdev)
-+{
-+	netdev->ethtool_ops = &hinic3_ethtool_ops;
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-index a6e4e9968334..0dbf9cbe7f9a 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-@@ -580,3 +580,31 @@ int hinic3_clean_root_ctxt(struct hinic3_hwdev *hwdev)
- 
- 	return 0;
- }
-+
-+#define HINIC3_FW_VER_TYPE_MPU  1
-+
-+int hinic3_get_mgmt_version(struct hinic3_hwdev *hwdev, u8 *mgmt_ver,
-+			    u8 version_size)
-+{
-+	struct comm_cmd_get_fw_version fw_ver = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	fw_ver.fw_type = HINIC3_FW_VER_TYPE_MPU;
-+
-+	mgmt_msg_params_init_default(&msg_params, &fw_ver, sizeof(fw_ver));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
-+				       COMM_CMD_GET_FW_VERSION, &msg_params);
-+
-+	if (err || fw_ver.head.status) {
-+		dev_err(hwdev->dev,
-+			"Failed to get fw version, err: %d, status: 0x%x\n",
-+			err, fw_ver.head.status);
-+		return -EFAULT;
-+	}
-+
-+	snprintf(mgmt_ver, version_size, "%s", fw_ver.ver);
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-index 8e4737c486b7..e672f9af5cb1 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-@@ -49,5 +49,7 @@ void hinic3_sync_time_to_fw(struct hinic3_hwdev *hwdev);
- int hinic3_set_root_ctxt(struct hinic3_hwdev *hwdev, u32 rq_depth, u32 sq_depth,
- 			 int rx_buf_sz);
- int hinic3_clean_root_ctxt(struct hinic3_hwdev *hwdev);
-+int hinic3_get_mgmt_version(struct hinic3_hwdev *hwdev, u8 *mgmt_ver,
-+			    u8 version_size);
- 
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-index 329a9c464ff9..cfc9daa3034f 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-@@ -114,6 +114,7 @@ enum comm_cmd {
- 	COMM_CMD_SET_DMA_ATTR            = 25,
- 
- 	/* Commands for obtaining information */
-+	COMM_CMD_GET_FW_VERSION          = 60,
- 	COMM_CMD_SYNC_TIME               = 62,
- 	COMM_CMD_SEND_BDF_INFO           = 64,
- };
-@@ -275,6 +276,17 @@ struct comm_cmd_bdf_info {
- 	u8                   rsvd2[5];
- };
- 
-+#define COMM_FW_VERSION_LEN       16
-+#define COMM_FW_COMPILE_TIME_LEN  20
-+struct comm_cmd_get_fw_version {
-+	struct mgmt_msg_head head;
-+
-+	u16                  fw_type;
-+	u16                  rsvd1;
-+	u8                   ver[COMM_FW_VERSION_LEN];
-+	u8                   time[COMM_FW_COMPILE_TIME_LEN];
-+};
-+
- /* Services supported by HW. HW uses these values when delivering events.
-  * HW supports multiple services that are not yet supported by driver
-  * (e.g. RoCE).
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index 6039fcf3c1dd..0a888fe4c975 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -18,6 +18,7 @@
- 
- #define HINIC3_NIC_DRV_DESC  "Intelligent Network Interface Card Driver"
- 
-+#define HINIC3_DEFAULT_MSG_ENABLE  (NETIF_MSG_DRV | NETIF_MSG_LINK)
- #define HINIC3_RX_BUF_LEN          2048
- #define HINIC3_LRO_REPLENISH_THLD  256
- #define HINIC3_NIC_DEV_WQ_NAME     "hinic3_nic_dev_wq"
-@@ -143,6 +144,7 @@ static int hinic3_init_nic_dev(struct net_device *netdev,
- 	nic_dev->hwdev = hwdev;
- 	nic_dev->pdev = pdev;
- 
-+	nic_dev->msg_enable = HINIC3_DEFAULT_MSG_ENABLE;
- 	nic_dev->rx_buf_len = HINIC3_RX_BUF_LEN;
- 	nic_dev->lro_replenish_thld = HINIC3_LRO_REPLENISH_THLD;
- 	nic_dev->vlan_bitmap = kzalloc(HINIC3_VLAN_BITMAP_SIZE(nic_dev),
-@@ -241,6 +243,7 @@ static void hinic3_sw_uninit(struct net_device *netdev)
- static void hinic3_assign_netdev_ops(struct net_device *netdev)
- {
- 	hinic3_set_netdev_ops(netdev);
-+	hinic3_set_ethtool_ops(netdev);
- }
- 
- static void netdev_feature_init(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-index c0c87a8c2198..c5bca3c4af96 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-@@ -183,7 +183,18 @@ struct l2nic_cmd_lro_timer {
- /* IEEE 802.1Qaz std */
- #define L2NIC_DCB_COS_MAX     0x8
- 
--struct l2nic_cmd_set_rss_ctx_tbl {
-+struct l2nic_cmd_pause_config {
-+	struct mgmt_msg_head msg_head;
-+	u8                   port_id;
-+	u8                   opcode;
-+	u16                  rsvd1;
-+	u8                   auto_neg;
-+	u8                   rx_pause;
-+	u8                   tx_pause;
-+	u8                   rsvd2[5];
-+};
-+
-+struct l2nic_cmd_rss_ctx_tbl {
- 	struct mgmt_msg_head msg_head;
- 	u16                  func_id;
- 	u16                  rsvd1;
-@@ -238,6 +249,7 @@ enum l2nic_cmd {
- 	L2NIC_CMD_CFG_RSS_HASH_KEY    = 63,
- 	L2NIC_CMD_CFG_RSS_HASH_ENGINE = 64,
- 	L2NIC_CMD_SET_RSS_CTX_TBL     = 65,
-+	L2NIC_CMD_CFG_PAUSE_INFO      = 101,
- 	L2NIC_CMD_QOS_DCB_STATE       = 110,
- 	L2NIC_CMD_FORCE_PKT_DROP      = 113,
- 	L2NIC_CMD_MAX                 = 256,
-@@ -259,6 +271,8 @@ enum l2nic_ucode_cmd {
- enum mag_cmd {
- 	MAG_CMD_SET_PORT_ENABLE = 6,
- 	MAG_CMD_GET_LINK_STATUS = 7,
-+
-+	MAG_CMD_GET_PORT_INFO   = 153,
- };
- 
- /* firmware also use this cmd report link event to driver */
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-index 44abccf9cb29..172072140794 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-@@ -639,6 +639,39 @@ int hinic3_get_link_status(struct hinic3_hwdev *hwdev, bool *link_status_up)
- 	return 0;
- }
- 
-+int hinic3_get_port_info(struct hinic3_hwdev *hwdev,
-+			 struct hinic3_nic_port_info *port_info)
-+{
-+	struct mag_cmd_get_port_info port_msg = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	port_msg.port_id = hinic3_physical_port_id(hwdev);
-+
-+	mgmt_msg_params_init_default(&msg_params, &port_msg, sizeof(port_msg));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_HILINK,
-+				       MAG_CMD_GET_PORT_INFO, &msg_params);
-+
-+	if (err || port_msg.head.status) {
-+		dev_err(hwdev->dev,
-+			"Failed to get port info, err: %d, status: 0x%x\n",
-+			err, port_msg.head.status);
-+		return -EFAULT;
-+	}
-+
-+	port_info->autoneg_cap = port_msg.an_support;
-+	port_info->autoneg_state = port_msg.an_en;
-+	port_info->duplex = port_msg.duplex;
-+	port_info->port_type = port_msg.wire_type;
-+	port_info->speed = port_msg.speed;
-+	port_info->fec = port_msg.fec;
-+	port_info->supported_mode = port_msg.supported_mode;
-+	port_info->advertised_mode = port_msg.advertised_mode;
-+
-+	return 0;
-+}
-+
- int hinic3_set_vport_enable(struct hinic3_hwdev *hwdev, u16 func_id,
- 			    bool enable)
- {
-@@ -661,3 +694,53 @@ int hinic3_set_vport_enable(struct hinic3_hwdev *hwdev, u16 func_id,
- 
- 	return 0;
- }
-+
-+#define UNSUPPORT_SET_PAUSE     0x10
-+static int hinic3_cfg_hw_pause(struct hinic3_hwdev *hwdev, u8 opcode,
-+			       struct hinic3_nic_pause_config *nic_pause)
-+{
-+	struct l2nic_cmd_pause_config pause_info = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	pause_info.port_id = hinic3_physical_port_id(hwdev);
-+	pause_info.opcode = opcode;
-+	if (opcode == MGMT_MSG_CMD_OP_SET) {
-+		pause_info.auto_neg = nic_pause->auto_neg;
-+		pause_info.rx_pause = nic_pause->rx_pause;
-+		pause_info.tx_pause = nic_pause->tx_pause;
-+	}
-+
-+	mgmt_msg_params_init_default(&msg_params, &pause_info,
-+				     sizeof(pause_info));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-+				       L2NIC_CMD_CFG_PAUSE_INFO, &msg_params);
-+
-+	if (err || pause_info.msg_head.status) {
-+		if (pause_info.msg_head.status == UNSUPPORT_SET_PAUSE) {
-+			err = -EOPNOTSUPP;
-+			dev_err(hwdev->dev, "Can not set pause when pfc is enabled\n");
-+		} else {
-+			dev_err(hwdev->dev, "Failed to %s pause info, err: %d, status: 0x%x\n",
-+				opcode == MGMT_MSG_CMD_OP_SET ? "set" : "get",
-+				err, pause_info.msg_head.status);
-+		}
-+		return err;
-+	}
-+
-+	if (opcode == MGMT_MSG_CMD_OP_GET) {
-+		nic_pause->auto_neg = pause_info.auto_neg;
-+		nic_pause->rx_pause = pause_info.rx_pause;
-+		nic_pause->tx_pause = pause_info.tx_pause;
-+	}
-+
-+	return 0;
-+}
-+
-+int hinic3_get_pause_info(struct hinic3_nic_dev *nic_dev,
-+			  struct hinic3_nic_pause_config *nic_pause)
-+{
-+	return hinic3_cfg_hw_pause(nic_dev->hwdev, MGMT_MSG_CMD_OP_GET,
-+				   nic_pause);
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-index c32eaa886e17..5d52202a8d4e 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-@@ -6,6 +6,7 @@
- 
- #include <linux/types.h>
- 
-+#include "hinic3_hwif.h"
- #include "hinic3_hw_intf.h"
- #include "hinic3_mgmt_interface.h"
- 
-@@ -35,6 +36,49 @@ struct hinic3_sq_attr {
- 	u64 ci_dma_base;
- };
- 
-+enum mag_cmd_port_an {
-+	PORT_CFG_AN_ON  = 1,
-+};
-+
-+/* mag supported/advertised link mode bitmap */
-+enum mag_cmd_link_mode {
-+	LINK_MODE_GE            = 0,
-+	LINK_MODE_10GE_BASE_R   = 1,
-+	LINK_MODE_25GE_BASE_R   = 2,
-+	LINK_MODE_40GE_BASE_R4  = 3,
-+	LINK_MODE_50GE_BASE_R   = 4,
-+	LINK_MODE_50GE_BASE_R2  = 5,
-+	LINK_MODE_100GE_BASE_R  = 6,
-+	LINK_MODE_100GE_BASE_R2 = 7,
-+	LINK_MODE_100GE_BASE_R4 = 8,
-+	LINK_MODE_200GE_BASE_R2 = 9,
-+	LINK_MODE_200GE_BASE_R4 = 10,
-+	LINK_MODE_MAX_NUMBERS,
-+
-+	LINK_MODE_UNKNOWN       = 0xFFFF
-+};
-+
-+struct mag_cmd_get_port_info {
-+	struct mgmt_msg_head head;
-+
-+	u8                   port_id;
-+	u8                   rsvd0[3];
-+
-+	u8                   wire_type;
-+	u8                   an_support;
-+	u8                   an_en;
-+	u8                   duplex;
-+
-+	u8                   speed;
-+	u8                   fec;
-+	u8                   lanes;
-+	u8                   rsvd1;
-+
-+	u32                  supported_mode;
-+	u32                  advertised_mode;
-+	u8                   rsvd2[8];
-+};
-+
- #define MAG_CMD_PORT_DISABLE    0x0
- #define MAG_CMD_TX_ENABLE       0x1
- #define MAG_CMD_RX_ENABLE       0x2
-@@ -52,6 +96,39 @@ struct mag_cmd_set_port_enable {
- 	u8                   rsvd1[3];
- };
- 
-+/* xsfp wire type, refers to cmis protocol definition */
-+enum mag_wire_type {
-+	MAG_CMD_WIRE_TYPE_UNKNOWN   = 0x0,
-+	MAG_CMD_WIRE_TYPE_MM        = 0x1,
-+	MAG_CMD_WIRE_TYPE_SM        = 0x2,
-+	MAG_CMD_WIRE_TYPE_COPPER    = 0x3,
-+	MAG_CMD_WIRE_TYPE_ACC       = 0x4,
-+	MAG_CMD_WIRE_TYPE_BASET     = 0x5,
-+	MAG_CMD_WIRE_TYPE_AOC       = 0x40,
-+	MAG_CMD_WIRE_TYPE_ELECTRIC  = 0x41,
-+	MAG_CMD_WIRE_TYPE_BACKPLANE = 0x42
-+};
-+
-+#define XSFP_INFO_MAX_SIZE    640
-+struct mag_cmd_get_xsfp_info {
-+	struct mgmt_msg_head head;
-+
-+	u8                   port_id;
-+	u8                   wire_type;
-+	u16                  out_len;
-+	u32                  rsvd;
-+	u8                   sfp_info[XSFP_INFO_MAX_SIZE];
-+};
-+
-+struct mag_cmd_get_xsfp_present {
-+	struct mgmt_msg_head head;
-+
-+	u8                   port_id;
-+	/* 0:present, 1:absent */
-+	u8                   abs_status;
-+	u8                   rsvd[2];
-+};
-+
- enum link_err_type {
- 	LINK_ERR_MODULE_UNRECOGENIZED,
- 	LINK_ERR_NUM,
-@@ -69,6 +146,34 @@ struct hinic3_port_module_event {
- 	enum link_err_type          err_type;
- };
- 
-+struct hinic3_nic_port_info {
-+	u8  port_type;
-+	u8  autoneg_cap;
-+	u8  autoneg_state;
-+	u8  duplex;
-+	u8  speed;
-+	u8  fec;
-+	u32 supported_mode;
-+	u32 advertised_mode;
-+};
-+
-+struct hinic3_nic_pause_config {
-+	u8 auto_neg;
-+	u8 rx_pause;
-+	u8 tx_pause;
-+};
-+
-+struct hinic3_nic_cfg {
-+	/* Valid when pfc is disabled */
-+	bool                           pause_set;
-+	struct hinic3_nic_pause_config nic_pause;
-+
-+	u8                             pfc_en;
-+	u8                             pfc_bitmap;
-+
-+	struct hinic3_nic_port_info    port_info;
-+};
-+
- int hinic3_get_nic_feature_from_hw(struct hinic3_nic_dev *nic_dev);
- int hinic3_set_nic_feature_to_hw(struct hinic3_nic_dev *nic_dev);
- bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
-@@ -100,9 +205,14 @@ int hinic3_set_rx_mode(struct hinic3_hwdev *hwdev, u32 rx_mode);
- int hinic3_sync_dcb_state(struct hinic3_hwdev *hwdev, u8 op_code, u8 state);
- int hinic3_set_port_enable(struct hinic3_hwdev *hwdev, bool enable);
- int hinic3_get_link_status(struct hinic3_hwdev *hwdev, bool *link_status_up);
-+int hinic3_get_port_info(struct hinic3_hwdev *hwdev,
-+			 struct hinic3_nic_port_info *port_info);
- int hinic3_set_vport_enable(struct hinic3_hwdev *hwdev, u16 func_id,
- 			    bool enable);
- int hinic3_add_vlan(struct hinic3_hwdev *hwdev, u16 vlan_id, u16 func_id);
- int hinic3_del_vlan(struct hinic3_hwdev *hwdev, u16 vlan_id, u16 func_id);
- 
-+int hinic3_get_pause_info(struct hinic3_nic_dev *nic_dev,
-+			  struct hinic3_nic_pause_config *nic_pause);
-+
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index 29189241f446..9502293ff710 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -101,6 +101,7 @@ struct hinic3_nic_dev {
- 	struct hinic3_hwdev             *hwdev;
- 	struct hinic3_nic_io            *nic_io;
- 
-+	u32                             msg_enable;
- 	u16                             max_qps;
- 	u16                             rx_buf_len;
- 	u32                             lro_replenish_thld;
-@@ -148,4 +149,6 @@ void hinic3_qps_irq_uninit(struct net_device *netdev);
- void hinic3_set_rx_mode_work(struct work_struct *work);
- void hinic3_clean_mac_list_filter(struct net_device *netdev);
- 
-+void hinic3_set_ethtool_ops(struct net_device *netdev);
-+
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
-index 4ff1b2f79838..25db74d8c7dd 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
-@@ -132,7 +132,7 @@ static int hinic3_rss_set_indir_tbl(struct hinic3_hwdev *hwdev,
- static int hinic3_set_rss_type(struct hinic3_hwdev *hwdev,
- 			       struct hinic3_rss_type rss_type)
- {
--	struct l2nic_cmd_set_rss_ctx_tbl ctx_tbl = {};
-+	struct l2nic_cmd_rss_ctx_tbl ctx_tbl = {};
- 	struct mgmt_msg_params msg_params = {};
- 	u32 ctx;
- 	int err;
+Amery Hung (11):
+  bpf: Set kfunc dynptr arg type flag based on prototype
+  selftests/bpf: Test passing CONST_PTR_TO_DYNPTR to kfunc that may
+    mutate dynptr
+  bpf: Unify dynptr handling in the verifier
+  bpf: Assign reg->id when getting referenced kptr from ctx
+  bpf: Preserve reg->id of pointer objects after null-check
+  bpf: Refactor object relationship tracking and fix dynptr UAF bug
+  bpf: Remove redundant dynptr arg check for helper
+  selftests/bpf: Test creating dynptr from dynptr data and slice
+  selftests/bpf: Test using dynptr after freeing the underlying object
+  selftests/bpf: Test using slice after invalidating dynptr clone
+  selftests/bpf: Test using file dynptr after the reference on file is
+    dropped
+
+ fs/verity/measure.c                           |   2 +-
+ include/linux/bpf.h                           |   8 +-
+ include/linux/bpf_verifier.h                  |  14 +-
+ kernel/bpf/helpers.c                          |  10 +-
+ kernel/bpf/log.c                              |   4 +-
+ kernel/bpf/verifier.c                         | 496 +++++++-----------
+ kernel/trace/bpf_trace.c                      |  18 +-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |   6 +-
+ .../selftests/bpf/prog_tests/bpf_qdisc.c      |  50 ++
+ .../bpf/progs/bpf_qdisc_dynptr_clone.c        |  69 +++
+ .../progs/bpf_qdisc_fail__invalid_dynptr.c    |  62 +++
+ ...f_qdisc_fail__invalid_dynptr_cross_frame.c |  68 +++
+ .../bpf_qdisc_fail__invalid_dynptr_slice.c    |  64 +++
+ .../testing/selftests/bpf/progs/dynptr_fail.c |  85 ++-
+ .../selftests/bpf/progs/dynptr_success.c      |   6 +-
+ .../selftests/bpf/progs/file_reader_fail.c    |  60 +++
+ .../bpf/progs/test_kfunc_dynptr_param.c       |   9 +-
+ .../selftests/bpf/progs/user_ringbuf_fail.c   |   4 +-
+ 18 files changed, 684 insertions(+), 351 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_cross_frame.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__invalid_dynptr_slice.c
+
 -- 
-2.43.0
+2.47.3
 
 
