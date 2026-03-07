@@ -1,128 +1,151 @@
-Return-Path: <netdev+bounces-264996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-264997-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2LKHKf+Bq2mwdgEAu9opvQ
-	(envelope-from <netdev+bounces-264996-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:40:15 +0100
+	id uJS1IAGDq2n/dgEAu9opvQ
+	(envelope-from <netdev+bounces-264997-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:44:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080292296AB
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:40:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29CA62296DB
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 02:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59960301A396
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:40:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EDF93027684
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 01:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09EE2EAD1B;
-	Sat,  7 Mar 2026 01:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEwJy3oA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46202ECE86;
+	Sat,  7 Mar 2026 01:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE862C234B;
-	Sat,  7 Mar 2026 01:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF59270EC1;
+	Sat,  7 Mar 2026 01:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772847611; cv=none; b=ox8rh12bAlGkftSBaxsRZFmQ5iEGoEu35Ad/wSZvwjXKHtGIHHiFa7BwsUeDXJ0xZj9ObcIYl57by9j5tP0L5OrU0XFKrp3dn389NauXv8ojpkrFH4egNO8FwVikLQyUVq+oBAgjIaL8GOiCn9f7pjCfDPSOkd2W+Z9SQRVtTSI=
+	t=1772847868; cv=none; b=WFhc4MabDOmEVybRkR66qqAXQ/WxL4rzBz65+jZGTLLJ758bl5rk7caPGhPlzglc9eyS2H5wolKGsgHwso/wqswOlDU1AfZ6g/irntDvRzs36KpyZVgdNFHYcqGyOp7VgrgI87AvHpGPkTZpFWolPd6Mrzx/N8Cg8t7tdsg/gs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772847611; c=relaxed/simple;
-	bh=mgMRBhHY0rQ04G43pB4XKXWyiH/QkT6t6BUb4NAq4T4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=l8YwBdxpKmZxw7sKhWn1V2w63aha+RmEKvHqRQbULSIjkC+xzTO/jN3vnMvZSjtmHJwRpdCJAxT2Tov0oyefw9K8Zg4bGxcHnWoAvJJ1Y3ZdMCptuTSBJmd98QxCfFpkDFpL91hcQVb+rYbEo5oiSaNvo6f2jlyupNLvhIT4SwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEwJy3oA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33291C4CEF7;
-	Sat,  7 Mar 2026 01:40:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772847611;
-	bh=mgMRBhHY0rQ04G43pB4XKXWyiH/QkT6t6BUb4NAq4T4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZEwJy3oArxinktXVjvYFXp7h/PRX/nnavhqD6q7Ad120ICKM/mBI8H9Y4PGzCaItt
-	 Z6iWe4jCl6z/P77ygJWhYTYxLzb/E9l54eui8bTZD7HKrEfdhEsN4z2jl1Bs2jhAV6
-	 4kEIVhCAoDX+SvFI99GnzhC2mIkMb+GGyrJ2SMVNdondMuZmtFK2yqOSYWd52iQIT7
-	 AWGXhv2koJ5rRV3bJb7LScCYaToclQeOSu1ZlwAkGUGDifBjaSXU1pCmuCqcWg9/XS
-	 S7+p/6qVYpLLJh8r5fq3UO9BX97Ylj2dxmqk5r0t+nmbN1TcnpJAqd1WH5ngfQcZlI
-	 xWs+ijGSHc2Yg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE4B3808200;
-	Sat,  7 Mar 2026 01:40:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772847868; c=relaxed/simple;
+	bh=QF81WmpxRrWYRBaun7KIn1uyg/V2x5q4tPvGnG722MQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EL9z3vo8F89b/1lgaUrH5Dkhlkvowv/390GujfcmQo1T4LmOgazB6NQZuJj9L966wA+5I4h4HcblgpYnYppK37LO5KAaMN11z3oipNl0VY5Y1DQLkckmqMY/R7hGbf+bLMSDHXqOi6K3lBuqT1C8EDV4R0wWiSnbST8BXepqplk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 8061A20B6F02; Fri,  6 Mar 2026 17:44:27 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8061A20B6F02
+From: Long Li <longli@microsoft.com>
+To: "K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Long Li <longli@microsoft.com>
+Subject: [PATCH 0/8] RDMA/mana_ib: Handle service reset for RDMA resources
+Date: Fri,  6 Mar 2026 17:44:04 -0800
+Message-ID: <20260307014414.556256-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ncsi: fix skb leak in error paths
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177284761030.119780.6748764252279562099.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Mar 2026 01:40:10 +0000
-References: <20260305060656.3357250-1-zhangjian.3032@bytedance.com>
-In-Reply-To: <20260305060656.3357250-1-zhangjian.3032@bytedance.com>
-To: ByteDance <zhangjian.3032@bytedance.com>
-Cc: sam@mendozajonas.com, fercerpav@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- joel@jms.id.au, gwshan@linux.vnet.ibm.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Rspamd-Queue-Id: 080292296AB
+X-Rspamd-Queue-Id: 29CA62296DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mendozajonas.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,jms.id.au,linux.vnet.ibm.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-264996-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-264997-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.132];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello:
+When the MANA hardware undergoes a service reset, the ETH auxiliary device
+(mana.eth) used by DPDK persists across the reset cycle — it is not removed
+and re-added like RC/UD/GSI QPs. This means userspace RDMA consumers such
+as DPDK have no way of knowing that firmware handles for their PD, CQ, WQ,
+QP and MR resources have become stale.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series adds per-ucontext resource tracking and a reset notification
+mechanism so that:
 
-On Thu,  5 Mar 2026 14:06:55 +0800 you wrote:
-> Early return paths in NCSI RX and AEN handlers fail to release
-> the received skb, resulting in a memory leak.
-> 
-> Specifically, ncsi_aen_handler() returns on invalid AEN packets
-> without consuming the skb. Similarly, ncsi_rcv_rsp() exits early
-> when failing to resolve the NCSI device, response handler, or
-> request, leaving the skb unfreed.
-> 
-> [...]
+1. The RDMA driver is informed of service reset events via direct callbacks
+   from the ETH driver (reset_notify / resume_notify).
 
-Here is the summary with links:
-  - [net,v2] net: ncsi: fix skb leak in error paths
-    https://git.kernel.org/netdev/net/c/5c3398a54266
+2. On reset, all tracked firmware handles are invalidated (set to
+   INVALID_MANA_HANDLE), user doorbell mappings are revoked via
+   rdma_user_mmap_disassociate(), and IB_EVENT_PORT_ERR is dispatched to
+   each affected ucontext so userspace can detect the reset.
 
-You are awesome, thank you!
+3. Destroy callbacks check for INVALID_MANA_HANDLE and skip firmware
+   commands for resources already invalidated by the reset path,
+   preventing stale handles from being sent to firmware.
+
+4. A reset_rwsem serializes handle invalidation against resource creation
+   to avoid races between the reset path and new resource allocation.
+
+Patches 1-6 introduce per-ucontext tracking lists for each resource type.
+Patch 7 implements the reset/resume notification mechanism with rwsem
+serialization, mmap revocation, and IB event dispatch.
+Patch 8 adds INVALID_MANA_HANDLE checks in destroy callbacks.
+
+Tested with DPDK testpmd on Azure VM (linux-next-20260306) — confirmed
+IB_EVENT_PORT_ERR (type=10) and IB_EVENT_PORT_ACTIVE (type=9) are delivered
+to userspace during service reset, and testpmd tears down cleanly afterwards.
+
+Long Li (8):
+  RDMA/mana_ib: Track ucontext per device
+  RDMA/mana_ib: Track PD per ucontext
+  RDMA/mana_ib: Track CQ per ucontext
+  RDMA/mana_ib: Track WQ per ucontext
+  RDMA/mana_ib: Track QP per ucontext
+  RDMA/mana_ib: Track MR per ucontext
+  RDMA/mana_ib: Notify service reset events to RDMA devices
+  RDMA/mana_ib: Skip firmware commands for invalidated handles
+
+ drivers/infiniband/hw/mana/cq.c               |  44 +++++--
+ drivers/infiniband/hw/mana/device.c           | 105 ++++++++++++++++++
+ drivers/infiniband/hw/mana/main.c             |  56 +++++++++-
+ drivers/infiniband/hw/mana/mana_ib.h          |  19 ++++
+ drivers/infiniband/hw/mana/mr.c               |  33 +++++-
+ drivers/infiniband/hw/mana/qp.c               |  61 +++++++---
+ drivers/infiniband/hw/mana/wq.c               |  24 ++++
+ drivers/net/ethernet/microsoft/mana/mana_en.c |  14 ++-
+ include/net/mana/gdma.h                       |   6 +
+ 9 files changed, 331 insertions(+), 31 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+2.43.0
 
