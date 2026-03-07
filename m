@@ -1,91 +1,79 @@
-Return-Path: <netdev+bounces-265037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265036-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PTTASiaq2nYegEAu9opvQ
-	(envelope-from <netdev+bounces-265037-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:23:20 +0100
+	id kB1ZCBqaq2nYegEAu9opvQ
+	(envelope-from <netdev+bounces-265036-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:23:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 206CD229D85
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:23:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADAD3229D77
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 99A5B3004404
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:22:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DF5B4305CE1C
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A893019C3;
-	Sat,  7 Mar 2026 03:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC1A302767;
+	Sat,  7 Mar 2026 03:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lqLm34mX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQI/Ew1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA2E24E4A8
-	for <netdev@vger.kernel.org>; Sat,  7 Mar 2026 03:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357E22EF67A;
+	Sat,  7 Mar 2026 03:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772853767; cv=none; b=Ikys7XYFqN5H7afefxYooK0LNK2+roM0gzN4LoWi4wJDPOV0PMzvH0y/pwfRAYwjzz7v5KHMaFPU+yUsN78ANahEQLo/Zf6uAdEK26RkuiG7sk6yKS/TPVidzzxqH5K9OY9ggANQ0neetfJP6ZY0zyzk8HZS2ARm2uCvX41Q9R8=
+	t=1772853751; cv=none; b=sj/DAUSqO2vUYLipDHH//XQAs6tI6V1KbPndIjS30+hLQDdVLfp/vxk7JYq/K3QkO0KrE/WcUZYzFfLdQCYphykofj1wn/ZoakCnPymHZy5eiq7rd+rM2z7Y5P/o6ok1GLePet9k0Hs/uALdJsGJIjnwCvdVJ5vYyw1OF5UVRLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772853767; c=relaxed/simple;
-	bh=ZyHvlwBT/YtbcP9Vmkuk7ZUS2woIMfHuib2VTN8SRTI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D/KfZyrKeQn9NXTbOqIiaEZXNJ+T49Bvo+i1lJOk5aVqdRkkp6fXzpd4GZ1FBzLdKOKDY9XqnRXtPT1WAOfXOtQTZKMkiaPpBjkZaDQO/2anvtcuWgYiy4miaZ2V2NaIHWvHLtqiuQB+oa8+5oPPtOuCokf8vvGLVa31ghmhzQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lqLm34mX; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8297c035d28so1174719b3a.0
-        for <netdev@vger.kernel.org>; Fri, 06 Mar 2026 19:22:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772853765; x=1773458565; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=k8NQdtceWV+OEbrLdoBXT0TqIGhQ3YN4L9sn2VN1ws8=;
-        b=lqLm34mXFdbDlFZk/BFuEsLj8jw8ttenqMmE0VlAr5jHo32bgF7qD//9BPgx5vqfkN
-         w8ZGk/klN9tYEDosrfELQmyhnLA0rTprIp/W+IshYoSZjd8SgHhN9a5sVOW9XB5d+gvi
-         +u9cEw3KWkU8Odcd9Y+K2huWziBwRkViIuohEARbx64m5BVtf5mnXeGeX2lia/jsAc+s
-         EGgq8HVh1xhKpnlJqIXZxl+mThCzr8HyGB14PmzuEbHwcl02DTdL+SSNjSDbL2dos9Lb
-         pm04OgZR8GQmEijZLGiAWmcSgXyh7pMP8x3wrz6qavn1O1JEn6eGMZ+j0V9ipnEukH+J
-         ZMZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772853765; x=1773458565;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k8NQdtceWV+OEbrLdoBXT0TqIGhQ3YN4L9sn2VN1ws8=;
-        b=f53Rx7Ru1T5IwVWxoGz9HoiddWXvWppOjTQj1+2KhzgQPLn0ZuLZvgQKVEMmQwk9DN
-         +6t42N7/AjYXj+MXtU90TLuGJbK16EPsy3MDFqXAJikacuKKxO+DM+FcKPY4F5r1BMT9
-         7On/q6ASrkQkFMR8mKG3ulG6t1UAYLpx4+KV5MXhWny1sv9MNlYML3Q1SvGjqyAruRic
-         FzM++8wt6ELrhPkc1VaL12PUkBJlO9Op5WVWKfgR+WCu7HDqfkVg+KCZvbqfUoUlS36I
-         n5S8pNXC/swnm3Uc0Y1Kmqc3BGRxXLwFONpDIF/weopWw0m6dcpjiGxISc8HJNB+vEnD
-         SCUQ==
-X-Gm-Message-State: AOJu0Yx/HtBF+IS8bMy0H8S7KqEjTix5WMfOxhAXj4MX09fCwyIlRwr8
-	rSQn4s8whxbUdiedHXwzGHyEudflVIsPgiSjm2yATW2zg+8kgmaEsaPu7tyfGRXHonw=
-X-Gm-Gg: ATEYQzzsaUatS9+NeyANhOsNMLtzMb4la5YPLIERJiLwJUQNdHYXfjuVzsMlxpaRFs4
-	Gr9XfBK0vOsGI4CUOb3JQL299wgU2WJYDIoo12P4eYCMVDLumOb+UK8V/tg8uqJ43BZ1UP5hW1w
-	fV+p6zVzdyeJXfekGu5cbQncEWlrlJjSMCv4YO2CiRMYGhu3CT+P4LytUpSI5mr+K7u/v4FmGnL
-	rfvPDnomyn7Evwtc0+lJVNxoUEemlt6lGEfHHNz6ZYJBFaujOicjOh6zblFnWhk2v6A7OFnGXDv
-	EehDHLR+g2sR+b2BzwS/36Jk2FBG92fif6xt3qjqSD+jdNlBZlLhaedAhHgLPv5c3XQOtb6fEK7
-	rH4paGS4/tGO9df8Np4gvNmSphsr+DHFhFryHvKoE09rPzbfv7HajXqlDwmMZ9fxOn3vKmwPN0m
-	y4AHRjeoko2odky6sFsnN6Xeg9FZnCL+rR8y7UimLs75467R1WP7gI57+LTlGbhNO36Q==
-X-Received: by 2002:a05:6a00:928a:b0:829:9a7b:db79 with SMTP id d2e1a72fcca58-829a2f6c7camr3849209b3a.42.1772853765513;
-        Fri, 06 Mar 2026 19:22:45 -0800 (PST)
-Received: from ryzen ([2601:644:8000:56f5::8bd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a467239asm3323729b3a.26.2026.03.06.19.22.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 19:22:44 -0800 (PST)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Raju Rangoju <Raju.Rangoju@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2 net-next] net: xgbe: use device_get_mac_addr
-Date: Fri,  6 Mar 2026 19:22:27 -0800
-Message-ID: <20260307032227.640904-1-rosenp@gmail.com>
+	s=arc-20240116; t=1772853751; c=relaxed/simple;
+	bh=f7vsilBDwEzuk1bMRooPqG0F25UkXjIOv3nKksiKV4Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HMqYIit037LTDavM844tD7kVIrhYAbz8bV7GhRmRSvwJq3EAKNAouPzY2sMC+xCBJMnhT4X9yUZ3mpRFSoIf6iQH878m2+bCDzHQ2PKbhW9gOsKr1muE4kRFZab87YyLthnCCFC79wACpqZB0JgkqHpFcChPXSUjlvuHknoXhRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XQI/Ew1Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFAA4C19422;
+	Sat,  7 Mar 2026 03:22:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772853750;
+	bh=f7vsilBDwEzuk1bMRooPqG0F25UkXjIOv3nKksiKV4Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XQI/Ew1QbJ3TWlRy3ljDCaea11ic1tkjQETXwWqVHHsO4ANtHEi5T2qNJckE2AvwW
+	 DrmtokVMviwjXCyIP1ycb4mn8PQt6VyNmzuJYv0L5UpND3376yaTH9ZFT7EBfeB76c
+	 1ml4CXHPIL67lpuy+0vAA+2SLnckYwyvOsNcQBV7l8vRq1BsX3puluEXoZRELhd15E
+	 14lK3FXq8qVse/Hy4s6O878I8zFWenzPQJpKa9yzp9oX+HPCn6uqaeIfQJN2Zkf/Af
+	 7T/d9jBOVs5hCOIJ5gxJqSMr3zxa5eZyAkw1r7aU+ytZKrRa0djXcGI5DOW8N5sR7J
+	 /FXMhPghoScvQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: ernis@linux.microsoft.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	yury.norov@gmail.com,
+	kys@microsoft.com,
+	decui@microsoft.com,
+	kees@kernel.org,
+	longli@microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	kotaranov@microsoft.com,
+	andrew+netdev@lunn.ch,
+	linux-hyperv@vger.kernel.org,
+	edumazet@google.com,
+	haiyangz@microsoft.com,
+	ssengar@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	horms@kernel.org,
+	shirazsaleem@microsoft.com,
+	wei.liu@kernel.org
+Subject: Re: [net-next] net: mana: Expose hardware diagnostic info via debugfs
+Date: Fri,  6 Mar 2026 19:22:28 -0800
+Message-ID: <20260307032228.1379456-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260305205252.470089-1-ernis@linux.microsoft.com>
+References: <20260305205252.470089-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,84 +81,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 206CD229D85
+X-Rspamd-Queue-Id: ADAD3229D77
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265037-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,vger.kernel.org,gmail.com,microsoft.com,linux.microsoft.com,davemloft.net,lunn.ch,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-265036-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.983];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
 X-Rspamd-Action: no action
 
-device_get_mac_addr is basically device_property_read_u8_array with an
-is_valid_ether_addr call. Allows just checking for ret.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Remove XGBE_MAC_ADDR_PROPERTY. device_get_mac_addr supports more
-properties than just "mac-address".
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- v2: remove XGBE_MAC_ADDR_PROPERTY
- drivers/net/ethernet/amd/xgbe/xgbe-platform.c | 8 +++-----
- drivers/net/ethernet/amd/xgbe/xgbe.h          | 1 -
- 2 files changed, 3 insertions(+), 6 deletions(-)
+net: mana: Expose hardware diagnostic info via debugfs
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
-index 47d53e59ccf6..f2db920fbaec 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
-@@ -252,11 +252,9 @@ static int xgbe_platform_probe(struct platform_device *pdev)
- 		dev_dbg(dev, "sir1_regs  = %p\n", pdata->sir1_regs);
+This commit adds debugfs entries to expose hardware configuration and
+diagnostic information for the MANA driver. It creates device-level and
+port-level debugfs entries to aid in debugging initialization and runtime
+operations.
 
- 	/* Retrieve the MAC address */
--	ret = device_property_read_u8_array(dev, XGBE_MAC_ADDR_PROPERTY,
--					    pdata->mac_addr,
--					    sizeof(pdata->mac_addr));
--	if (ret || !is_valid_ether_addr(pdata->mac_addr)) {
--		dev_err(dev, "invalid %s property\n", XGBE_MAC_ADDR_PROPERTY);
-+	ret = device_get_mac_address(dev, pdata->mac_addr);
-+	if (ret) {
-+		dev_err(dev, "invalid MAC address property\n");
- 		if (!ret)
- 			ret = -EINVAL;
- 		goto err_io;
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 4333d269ee84..e57e416a1d5a 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -96,7 +96,6 @@
- 	min_t(unsigned int, IEEE_8021QAZ_MAX_TCS, (_cnt))
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index aef8612b73cb..fb513d7802cb 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -152,6 +152,11 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
+>  	if (gc->max_num_queues > gc->num_msix_usable - 1)
+>  		gc->max_num_queues = gc->num_msix_usable - 1;
+>
+> +	debugfs_create_u32("num_msix_usable", 0400, gc->mana_pci_debugfs,
+> +			   &gc->num_msix_usable);
+> +	debugfs_create_u32("max_num_queues", 0400, gc->mana_pci_debugfs,
+> +			   &gc->max_num_queues);
+> +
+>  	return 0;
+>  }
+>
+> @@ -1222,6 +1227,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
+>  		return err ? err : -EPROTO;
+>  	}
+>  	gc->pf_cap_flags1 = resp.pf_cap_flags1;
+> +	gc->gdma_protocol_ver = resp.gdma_protocol_ver;
+> +
+> +	debugfs_create_x64("gdma_protocol_ver", 0400, gc->mana_pci_debugfs,
+> +			   &gc->gdma_protocol_ver);
+> +	debugfs_create_x64("pf_cap_flags1", 0400, gc->mana_pci_debugfs,
+> +			   &gc->pf_cap_flags1);
+> +
 
- /* Common property names */
--#define XGBE_MAC_ADDR_PROPERTY	"mac-address"
- #define XGBE_PHY_MODE_PROPERTY	"phy-mode"
- #define XGBE_DMA_IRQS_PROPERTY	"amd,per-channel-interrupt"
- #define XGBE_SPEEDSET_PROPERTY	"amd,speed-set"
---
-2.53.0
+Do these debugfs entries get recreated on every suspend/resume cycle?
 
+Both mana_gd_query_max_resources() and mana_gd_verify_vf_version() are
+called from mana_gd_setup() during device initialization. On suspend,
+mana_gd_suspend() calls mana_gd_cleanup() which doesn't remove these
+debugfs entries. When mana_gd_resume() calls mana_gd_setup() again, it
+attempts to create the same debugfs entries a second time.
+
+This means debugfs_start_creating() in fs/debugfs/inode.c will print an
+error for each duplicate file:
+
+    "'num_msix_usable' already exists in 'mana/<slot>/'"
+    "'max_num_queues' already exists in 'mana/<slot>/'"
+    "'gdma_protocol_ver' already exists in 'mana/<slot>/'"
+    "'pf_cap_flags1' already exists in 'mana/<slot>/'"
+
+This produces 4 error messages in dmesg on every suspend/resume cycle,
+contradicting the commit message's goal of operating "without adding
+noise to dmesg."
+
+Should these device-level entries be removed during suspend (in
+mana_gd_cleanup or mana_gd_suspend), or should their creation be moved
+to mana_gd_probe where they're only created once?
+
+[ ... ]
+-- 
+pw-bot: cr
 
