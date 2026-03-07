@@ -1,68 +1,61 @@
-Return-Path: <netdev+bounces-265020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265021-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMO0B+2Tq2kSegEAu9opvQ
-	(envelope-from <netdev+bounces-265020-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:56:45 +0100
+	id IBaXGZWVq2k5egEAu9opvQ
+	(envelope-from <netdev+bounces-265021-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:03:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65515229B33
-	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 03:56:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE35A229B92
+	for <lists+netdev@lfdr.de>; Sat, 07 Mar 2026 04:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 990EC3012C7F
-	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 02:56:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9BF4A303CE1D
+	for <lists+netdev@lfdr.de>; Sat,  7 Mar 2026 03:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60582DCF52;
-	Sat,  7 Mar 2026 02:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8Qg6Gki"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE44B24E4A8;
+	Sat,  7 Mar 2026 03:03:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C327A2DCF41;
-	Sat,  7 Mar 2026 02:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F4D8287E;
+	Sat,  7 Mar 2026 03:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772852201; cv=none; b=GYNHWCB389gsxpSzfLSQmIvwgz4lPX3/icsl1EwttvEhr2Lo3nGvqGL3edzLtPG9Uls9O1s6OuhDNf1wBYTdU77tBY82FPvxhIwnyi+xEn6sjW0pilGnQFk4C7uRRv0CpJOj8hkX8k2b3xfeT/Qw32McvIfuNFO5QHAO14USFxA=
+	t=1772852623; cv=none; b=lYt8tqZje0qCxE9MlDXlVt62LjfEHzLwUHntF+8neJbUvZWPUJohUtLYGu5F1uXOApe05T/B8Mvk7vR4qP+pBK8qA1K6bt9KWD//j11zKIvfUDc4J2K44LUHACchcyNiQR4SoVc8Ad+AQVq0uejUX/1AmgZhNKg1oJXxDqVkQPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772852201; c=relaxed/simple;
-	bh=pxIvuwvEYaO6ieaDBTEST/67jzsmSiyiMXageS18q3A=;
+	s=arc-20240116; t=1772852623; c=relaxed/simple;
+	bh=2qEMoPU7Y7jQU/igu5k94abz0JxdmOk//rFiMzdngS0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dKzdFkqvK+aemAUvucqlx04gNhFJE+CquLKTDj2No9NhqC1U9jta1dfLi7L4tgTMmM3x+XCUSl3PJyV09o7ICsLBebWr4XJVsPiaXavnCGmNmnvCKnH9qy8SKsiilD6b01u37HPgeYnsr9kucAPuyE4aHiGE/ygJWrd2P059mOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8Qg6Gki; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAF47C4CEF7;
-	Sat,  7 Mar 2026 02:56:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772852201;
-	bh=pxIvuwvEYaO6ieaDBTEST/67jzsmSiyiMXageS18q3A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M8Qg6GkisVN2IIp03Nq7B6feJmwzImgM0yriuEd3QRKbM+aXdOci7DEC6VUcW7kqN
-	 evLrw4EzngPuZODDykuPiVJMpM0cwe38ngX8BiEuL2RRHRt3xf8yTFrjGnUYPfIsIX
-	 KeNP4VLYP+fTfIpBlAmu3FVH1f1QwT2J6wgLkcLpk9SJnZGjF0zDA60IbREyJzZxYQ
-	 bgdObtC5yq7lHtfs0lBAo4P/OILt527OSJaErQYUO1Bs3nvDbgv0bx/mEb51QDfB4Y
-	 qOhV5cGoakpPIm09j/woOqPLkdnwEkKCd+B0ARfU1wByNKc0i7/Hkd4K6ixWjEurlE
-	 knA5QqFB+FtOg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: haokexin@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	edumazet@google.com,
-	claudiu.beznea@tuxon.dev,
-	davem@davemloft.net,
-	stable@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	linux@armlinux.org.uk,
-	pabeni@redhat.com,
-	nicolas.ferre@microchip.com,
-	quanyang.wang@windriver.com
-Subject: Re: [net] net: macb: Shuffle the tx ring before enabling tx
-Date: Fri,  6 Mar 2026 18:56:38 -0800
-Message-ID: <20260307025638.1345906-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260305-zynqmp-v1-1-5de72254d56b@gmail.com>
-References: <20260305-zynqmp-v1-1-5de72254d56b@gmail.com>
+	 MIME-Version; b=PemMceqb7aAi2en3r84EL7IWlYqsadhWyQSEEzJjc9hznIP5kr0tTyZlJfk/UbDl2lYdBJXgzVXJUYetuGH0zSMJdOnEcI9camMo/+DXZGSk8Hzx6xYzX0+1GHdJs2PcnasTQ/HJyHqiEhz9Dbj4j5GbI02K9ofbZiHFBod/K70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org; spf=none smtp.mailfrom=vimux.org; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vimux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vimux.org
+X-QQ-mid: zesmtpgz3t1772852593tad37748f
+X-QQ-Originating-IP: rCnVVLaFxZUPhKrsw8HeluFr67JBPivdf/UyOL1eGq0=
+Received: from localhost.localdomain ( [219.147.0.82])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 07 Mar 2026 11:03:11 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14700551489280560095
+EX-QQ-RecipientCnt: 8
+From: Jialu Xu <xujialu@vimux.org>
+To: xujialu@vimux.org
+Cc: brgl@kernel.org,
+	kees@kernel.org,
+	krzk@kernel.org,
+	linusw@kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 0/3] Remove <linux/of_gpio.h>
+Date: Sat,  7 Mar 2026 11:00:56 +0800
+Message-ID: <7131965EF4C8E8BD+20260307030255.3490715-1-xujialu@vimux.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org>
+References: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,190 +63,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 65515229B33
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:vimux.org:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: N5QgOzgsHQHe3MC7jJhuMq/jhHayaqTar+WE+1QHdQTo4LTrw2Qc7S+Z
+	oHuaus9lKCNSBq6grexYvoMP4+B+vZCPFX46mpLEAvCpSRzBQou8GCNp7w3+IQgKBhM9sOc
+	84qzYuvmg5BXxiqmalj99SKZSphdlm1D1OICpmrGpwdF7HprRcQibki3N2pKYdl6jAknSFs
+	z+fEYBHCqtUAmt8zaMEDvdcYhg6osxpwxr57aEauIaz2oO05XbF4BCYV5vDNKSjdaPoE0Ix
+	W2soR2ygS82+R4MyWkUsznqONssOlgqO+kvmi3+9eJJ0HNRJ+66ya0dQlUEI09aaxN8k1qR
+	NbQ8yQiPC0Igg1tCD6zj3X0hm9o8LW2BU8hwNarmiiwQWxiMAtbbUnivUQRH65xwLX24028
+	BTgro9JN4C3ULmcKFUgIBblvpT+JtLMyCm/NzrFktKcS2nd2TKEQ/pLVFwRr1iAPVTybKok
+	a9jpphKhdas/jwDH53U8BKKrVk+m0VMEz9OuqwhdQRvKm3i1bBPtwZXFr/px/er9Z5RFtXL
+	1nJolkMQwEJwtVkUpC2Bj8qiZa6xlcSpA6G4wj2rZsGF0iQpOMqlNJgOIvXnPj9N5NmDZtd
+	aA9EAs7+aPz6lgs1Icx5oHHrMe/4CeCVgKvr0j2IclSGVBitHAj/5Fmzdaf47pEb8h7gGIG
+	S5NPX4eLV3UK45nw02qB1/MWGi+Qiz6OSYtv+Fz2ThKGkgDh7iPZ15lzQpCaHTppM1GoBdk
+	sGM550YR7W2FO4XbQACIY6Jm/Ub1qwZpGSyYuV00LklsbPi2VL8uwOf18cGiKHJmHEaP+xk
+	jm7E2QIxEHoZ/hVcJ0rbWcm6fPqR4rSf+rIrttU3FlPCvM2RVOEgnx3o0SYxKgqbjtNmKBK
+	dlFQlltTqsaHRCcfoodVTRnZ6ro5Vxa3OBGr7iqs/r+XE272kf3BkRj2Sp6UIqOmkukULjh
+	E/hxsV0AcwLAzJMVfaMqybl+iwXZ0g1GvE8W/UYJrnY5FPcoyWzuyi9Ic
+X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: BE35A229B92
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-265020-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265021-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[vimux.org: no valid DMARC record];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[xujialu@vimux.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.405];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Convert the last three NFC consumers of <linux/of_gpio.h> to the
+GPIO descriptor API, then remove the deprecated header entirely.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: macb: Shuffle the tx ring before enabling tx
+Changes in v4:
+- Fix uninitialized reset_gpio in I2C/SPI paths by initializing it
+  to NULL in nfcmrvl_parse_dt(). (Jakub Kicinski)
+- Fix GPIO polarity for nfcmrvl: use GPIOD_OUT_HIGH and invert
+  gpiod_set_value() arguments to match active-low reset line
+  documented in marvell,nci.yaml. (Jakub Kicinski)
+- Fix continuation line alignment in s3fwrn5. (Jakub Kicinski)
 
-Quanyang observed that when using an NFS rootfs on an AMD ZynqMp board,
-the rootfs may take an extended time to recover after a suspend. Upon
-investigation, it was determined that the issue originates from a problem
-in the macb driver. To resolve this issue, shuffle the tx ring and tx skb
-array so that the first unsent packet is positioned at the start of the tx
-ring.
+Changes in v3:
+- Expand commit messages with more detail. (Linus Walleij)
+- Add missing Signed-off-by. (Linus Walleij)
+- Remove include/linux/of_gpio.h entry from MAINTAINERS. (Linus Walleij)
 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 5bc35f651ebd..3ceeff22c12f 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
+Changes in v2:
+- Add rename quirks in gpiolib-of.c for s3fwrn5 legacy DT properties
+  (s3fwrn5,en-gpios -> en, s3fwrn5,fw-gpios -> wake) to preserve
+  backward compatibility with old device trees. (Linus Walleij)
 
-[ ... ]
+[PATCH v4 1/3] nfc: s3fwrn5: convert to gpio descriptors
+[PATCH v4 2/3] nfc: nfcmrvl: convert to gpio descriptors
+[PATCH v4 3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
 
-> @@ -668,6 +669,88 @@ static void macb_mac_link_down(struct phylink_config *config, unsigned int mode,
->  	netif_tx_stop_all_queues(ndev);
->  }
->
-> +/* Use juggling algorithm to left rotate tx ring and tx skb array */
-> +static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
-> +{
-> +	unsigned int i, head, tail, count, size, cycles, shift, curr, next;
-> +	struct macb_dma_desc desc, *desc_curr, *desc_next;
-> +	struct macb_tx_skb tx_skb, *skb_curr, *skb_next;
-> +	struct macb *bp = queue->bp;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
-> +	head = queue->tx_head;
-> +	tail = queue->tx_tail;
-> +	size = bp->tx_ring_size;
-> +	count = CIRC_CNT(head, tail, size);
-> +
-> +	if (!(tail % size))
-> +		goto unlock;
-> +
-> +	if (!count) {
-> +		queue->tx_head = 0;
-> +		queue->tx_tail = 0;
-> +		goto unlock;
-> +	}
-> +
-> +	shift = tail % size;
-> +	cycles = gcd(size, shift);
-> +
-> +	for (i = 0; i < cycles; i++) {
-> +		memcpy(&desc, macb_tx_desc(queue, i), sizeof(struct macb_dma_desc));
-> +		memcpy(&tx_skb, macb_tx_skb(queue, i), sizeof(struct macb_tx_skb));
-> +
-> +		curr = i;
-> +		next = (curr + shift) % size;
-> +
-> +		while (next != i) {
-> +			desc_curr = macb_tx_desc(queue, curr);
-> +			desc_next = macb_tx_desc(queue, next);
-> +
-> +			memcpy(desc_curr, desc_next, sizeof(struct macb_dma_desc));
-                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Does this memcpy corrupt the descriptor fields on systems with 64-bit DMA?
-The macb_tx_desc() macro uses macb_adj_dma_desc_idx() to properly space the
-descriptor pointers in the ring according to the descriptor size reported by
-macb_dma_desc_get_size(bp), which can be 8 bytes (base), 16 bytes (with
-DMA64), or 24 bytes (with DMA64 + PTP). However, all three memcpy calls in
-this function use sizeof(struct macb_dma_desc), which is only 8 bytes and
-covers only the addr and ctrl fields.
-
-On systems where macb_dma64(bp) == true, such as the AMD ZynqMp platform
-this patch targets, each descriptor has an additional macb_dma_desc_64
-struct containing the upper 32 bits of the DMA address (addrh field).
-
-When the shuffle copies descriptors using only 8 bytes, it moves the lower
-32-bit address (desc->addr) and control word (desc->ctrl) to new positions
-but leaves the upper 32-bit address (addrh) unmoved in the old location.
-After the shuffle, hardware reads a composite 64-bit DMA address from
-mismatched descriptor slots: the old slot's addrh combined with the new
-slot's addr.
-
-This would cause DMA to a corrupted physical address, potentially leading
-to memory corruption or bus errors.
-
-The driver uses macb_dma_desc_get_size(bp) elsewhere for operations on the
-descriptor ring:
-
-drivers/net/ethernet/cadence/macb_main.c:macb_alloc_consistent() {
-    ...
-    size = bp->tx_ring_size * macb_dma_desc_get_size(bp);
-    queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
-                                        &queue->tx_ring_dma, GFP_KERNEL);
-    ...
-}
-
-and in:
-
-drivers/net/ethernet/cadence/macb_main.c:macb_free_consistent() {
-    ...
-    size = bp->tx_ring_size * macb_dma_desc_get_size(bp);
-    dma_free_coherent(&bp->pdev->dev, size, queue->tx_ring,
-                      queue->tx_ring_dma);
-    ...
-}
-
-Should the memcpy size here use macb_dma_desc_get_size(bp) instead of
-sizeof(struct macb_dma_desc)?
-
-The same issue appears at two other locations in this function (the initial
-memcpy saving desc at the start of the loop, and the final memcpy restoring
-desc at the end). Additionally, the stack-allocated "struct macb_dma_desc
-desc" temporary buffer may be too small to hold the extended descriptor.
-
-> +
-> +			if (next == bp->tx_ring_size - 1)
-> +				desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-> +			if (curr == bp->tx_ring_size - 1)
-> +				desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-> +
-> +			skb_curr = macb_tx_skb(queue, curr);
-> +			skb_next = macb_tx_skb(queue, next);
-> +			memcpy(skb_curr, skb_next, sizeof(struct macb_tx_skb));
-> +
-> +			curr = next;
-> +			next = (curr + shift) % size;
-> +		}
-> +
-> +		desc_curr = macb_tx_desc(queue, curr);
-> +		memcpy(desc_curr, &desc, sizeof(struct macb_dma_desc));
-> +		if (i == bp->tx_ring_size - 1)
-> +			desc_curr->ctrl &= ~MACB_BIT(TX_WRAP);
-> +		if (curr == bp->tx_ring_size - 1)
-> +			desc_curr->ctrl |= MACB_BIT(TX_WRAP);
-> +		memcpy(macb_tx_skb(queue, curr), &tx_skb, sizeof(struct macb_tx_skb));
-> +	}
-> +
-> +	queue->tx_head = count;
-> +	queue->tx_tail = 0;
-> +
-> +	/* Make descriptor updates visible to hardware */
-> +	wmb();
-> +
-> +unlock:
-> +	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
-> +}
-
-[ ... ]
--- 
-pw-bot: cr
+ MAINTAINERS                      |  1 -
+ drivers/gpio/TODO                | 28 ----------------------------
+ drivers/gpio/gpiolib-of.c        | 31 ++++---------------------------
+ drivers/nfc/nfcmrvl/main.c       | 47 ++++++++++++++++-------------------------------
+ drivers/nfc/nfcmrvl/nfcmrvl.h    |  4 +++-
+ drivers/nfc/nfcmrvl/uart.c       | 23 ++++++++++++++++-------
+ drivers/nfc/nfcmrvl/usb.c        |  2 +-
+ drivers/nfc/s3fwrn5/i2c.c        | 54 +++++++-----------------------------------------------
+ drivers/nfc/s3fwrn5/phy_common.c | 11 +++++------
+ drivers/nfc/s3fwrn5/phy_common.h |  5 +++--
+ drivers/nfc/s3fwrn5/uart.c       | 43 ++++++++++---------------------------------
+ include/linux/of_gpio.h          | 38 --------------------------------------
+ 12 files changed, 65 insertions(+), 222 deletions(-)
 
