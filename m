@@ -1,186 +1,164 @@
-Return-Path: <netdev+bounces-265233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKwXGj4QrWmBxwEAu9opvQ
-	(envelope-from <netdev+bounces-265233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 06:59:26 +0100
+	id PIXqNKkZrWn5yAEAu9opvQ
+	(envelope-from <netdev+bounces-265234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:39:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABD422EA03
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 06:59:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFD222EBE0
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37E983031F3D
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 05:58:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C710A301159D
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 06:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB968335BA7;
-	Sun,  8 Mar 2026 05:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ne+YBOzG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28A92FFDEB;
+	Sun,  8 Mar 2026 06:39:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870B633469C;
-	Sun,  8 Mar 2026 05:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFAF2D6401
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 06:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772949519; cv=none; b=IImhgUNZFxk0ickXEasmQZYZZptlhiUDWeew3t1edG8oyOxglS4kwWEMpI7PjMtQj5qJBssyXMjO6UfszTWdFRjc2D3TEOuwXG90ceQMDYL9dkza+QFOei8AdOVxZyOUJpmd2rYYDnSacD4a+6u/IgNaZEFm6vn+Skjqc4h8J9c=
+	t=1772951972; cv=none; b=c5Ybp6Y2pOzQfGRWcNpfyfyKqFtyG3ceyQrlDkLeSYIqaObTodxTbUwyV/4CydSlTh/VO1L+LzxIo9e3Z2HabIz5M6j/qj/bA/lWM+Yrg+juHQ4m2krb/sxZqCyQopXPk374rqzUQmC7cdsFa/caXzYkE3lyWLmy+1u1WVcskj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772949519; c=relaxed/simple;
-	bh=G90OIRDw/VUMkYj3G1MxeuZl1L9q28TxclvVpaSB0I8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JpJFJqwJaKvEwmfKsRI5MNxqgwiOQJ8jQZvq52H6RLAgdmy06Uj5L6Oz7Doh1Xvil39n0DSLhQ5dhjA3ij1d91OM67Eb0pPL+5K4UymTyX+Iiusruqi/RBsM75aC+14nrOI0wHqhKZlj4VWJIDWhixj+vuYd324T74wcxu6S0y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ne+YBOzG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B2AC2BCB0;
-	Sun,  8 Mar 2026 05:58:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772949519;
-	bh=G90OIRDw/VUMkYj3G1MxeuZl1L9q28TxclvVpaSB0I8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ne+YBOzGbDLzByLACMmBwXSggJdZRSIvSLKfThvdXSNoGpQfZwne6kSQoFUwo5EMA
-	 APvYL0mOpyT71592GQ8E4HSaujiQTE3AAAzdaeM9FJ/YeRz6KSCvkzOXAmUUcC4znY
-	 dF3NxaOLu4SlRp74KUN0IALBT7NVe3k1FfgzcqTmTA5cDxYDaw8Pcc53DzLPj/xOX4
-	 BW4JUfNRs+s6zl1M3nJylhNdsPVG25VeSbYNBSyggl1iZpLAWWVFhBJQHHP2tMQoTg
-	 79nyFj2Q+V3OamgvfYhQi/goFo3S3Lv8mIYwo/zKITIlTQOVs73Xa1submPydpkpe6
-	 dbTKImhR8M9HA==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v1 3/3] selftests: rds: Fix tcpdump segfault in rds selftests
-Date: Sat,  7 Mar 2026 22:58:35 -0700
-Message-ID: <20260308055835.1338257-4-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260308055835.1338257-1-achender@kernel.org>
-References: <20260308055835.1338257-1-achender@kernel.org>
+	s=arc-20240116; t=1772951972; c=relaxed/simple;
+	bh=uNLIHze9mlx4oh6ofrENJDypOEscvSBNiXd1v5Pwm8s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=mnWy2Y9Je6guXNr11wS5WjhQ/ILul8e0Yym/ey9tz+ApMFNHHNdnBrXFDnYA4IJ7Eq+29DHwyxTS5uymoY0lCUrtE+IyKEaGq12JGR3mp6jT96fwkRxChP8ydyGkNcz23KHR2s0uf2B26dEAtY/KtZgdkywRPpbr5pRDdQwS4fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-679dda090fbso175837764eaf.2
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 22:39:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772951970; x=1773556770;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PXqz6ZgCdOp3HYkESBSwuN66nDli/XUoxf/iWpvSR1Y=;
+        b=EXQps0d4ssrfZi2WKOCFRKoQJdvCG84N2YrERbubWUqGqk4TZ0n0Lvx/5VbG7aQqJS
+         fvxaVIZRsSxF8kojVFlolezuKzYk9pLTUbEcL8nsah6Hhuhq2mNDxwWoYaC/zah8R8xV
+         MDqECgx8/Y5s8TWO2LsTHfII5oezyArvI2gl9Vne3tWGZKPXQymkwem17R33DcKZvIFb
+         NWbB2wB5ZTk/lcSqkAv7SWSwDbUSS7ZpD7y2ZB3mlAHrVxwggOS7ov4scaTMZtMsIxSk
+         R1TsYoBNxpdDzEZKCTC+i+Tvs8HucsSXqtYLqZxlD9rE9ER67b9kE84Q9GEHfwSRMVlq
+         O55w==
+X-Forwarded-Encrypted: i=1; AJvYcCVFlAW11UHvBLoXo3Z+FcStSAZ/98pNfhEw2+6Cezi0YuktGJG5cp+2udxDJ59BKLTe9JbXw6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVhuwIomLBBLmuIs5roYcFs1QAm12sloIT9STyl28nLZFD3Byy
+	7eCJuy36R891Na8I90aSzDnFGz5XS3QlDO2WsfP9GU4Kv/qWoj3YchMQE/7fSrtQMFrG1Qp5s60
+	aBFqfHoB0EJ2SXdHmZgv6FB6LX20gzjkpPNNZZI5nfzT/mG7q2ysJrGCwiYg=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EABD422EA03
+X-Received: by 2002:a05:6820:4b94:b0:662:fbdd:1adb with SMTP id
+ 006d021491bc7-67b9bc8875emr5077737eaf.25.1772951970585; Sat, 07 Mar 2026
+ 22:39:30 -0800 (PST)
+Date: Sat, 07 Mar 2026 22:39:30 -0800
+In-Reply-To: <695e9924.050a0220.1c677c.0371.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69ad19a2.a70a0220.52840.0001.GAE@google.com>
+Subject: Re: [syzbot] [netfilter?] WARNING in nf_hook_entry_head (2)
+From: syzbot <syzbot+6f6a1d20567a8d6b2a58@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 1FFD222EBE0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=779072223d02a312];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-265233-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265234-lists,netdev=lfdr.de,6f6a1d20567a8d6b2a58];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.983];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.865];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-net/rds/test.py sees a segfault in tcpdump when executed through the
-ksft runner.
+syzbot has found a reproducer for the following issue on:
 
-[   21.903713] tcpdump[1469]: segfault at 0 ip 000072100e99126d
-sp 00007ffccf740fd0 error 4
-[   21.903721]  in libc.so.6[16a26d,7798b149a000+188000]
-[   21.905074]  in libc.so.6[16a26d,72100e84f000+188000] likely on
-CPU 5 (core 5, socket 0)
-[   21.905084] Code: 00 0f 85 a0 00 00 00 48 83 c4 38 89 d8 5b 41 5c
-41 5d 41 5e 41 5f 5d c3 0f 1f 44 00 00 48 8b 05 91 8b 09 00 8b 4d ac
-64 89 08 <41> 0f b6 07 83 e8 2b a8 fd 0f 84 54 ff ff ff 49 8b 36 4c 89
-ff e8
-[   21.906760]  likely on CPU 9 (core 9, socket 0)
-[   21.913469] Code: 00 0f 85 a0 00 00 00 48 83 c4 38 89 d8 5b 41 5c 41
-5d 41 5e 41 5f 5d c3 0f 1f 44 00 00 48 8b 05 91 8b 09 00 8b 4d ac 64 89
-08 <41> 0f b6 07 83 e8 2b a8 fd 0f 84 54 ff ff ff 49 8b 36 4c 89 ff e8
+HEAD commit:    c113d5e32678 Merge branch 'net-spacemit-a-few-error-handli..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=176fca02580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=779072223d02a312
+dashboard link: https://syzkaller.appspot.com/bug?extid=6f6a1d20567a8d6b2a58
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1457075a580000
 
-The os.fork() call creates extra complexity because it forks the entire
-process including the python interpreter.  ip() then calls cmd() which
-creates a subprocess.Popen.  We can avoid the extra layering by simply
-calling subprocess.Popen directly. Track the process handles directly
-and terminate them at cleanup rather than relying on killall. Further
-tcpdump's -Z flag attempts to change savefile ownership, which is not
-supported by the 9p protocol.  Fix this by writing pcap captures to
-"/tmp" during the test and move them to the log directory after tcpdump
-exits.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a1a0aa684791/disk-c113d5e3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6d0461aed5ba/vmlinux-c113d5e3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/05b26502bb1f/bzImage-c113d5e3.xz
 
-Signed-off-by: Allison Henderson <achender@kernel.org>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6f6a1d20567a8d6b2a58@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+1
+WARNING: net/netfilter/core.c:329 at nf_hook_entry_head+0x23e/0x2c0 net/netfilter/core.c:329, CPU#1: kworker/u8:6/166
+Modules linked in:
+CPU: 1 UID: 0 PID: 166 Comm: kworker/u8:6 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+Workqueue: netns cleanup_net
+RIP: 0010:nf_hook_entry_head+0x23e/0x2c0 net/netfilter/core.c:329
+Code: 4c 89 f8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df 80 3c 08 00 74 08 4c 89 ff e8 ed 82 69 f8 4d 39 37 74 36 e8 43 41 ff f7 90 <0f> 0b 90 31 db 48 89 d8 5b 41 5e 41 5f 5d c3 cc cc cc cc cc e8 29
+RSP: 0018:ffffc900030a7820 EFLAGS: 00010293
+RAX: ffffffff89c657eb RBX: ffff8880358c4000 RCX: ffff88801f3a3d00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffff88801f3a3d00 R09: 0000000000000006
+R10: 000000000000000a R11: 0000000000000000 R12: ffff888068070000
+R13: 0000000000000005 R14: ffff888068070000 R15: ffff8880358c4108
+FS:  0000000000000000(0000) GS:ffff888125561000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5f121e9e80 CR3: 0000000029e2a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __nf_unregister_net_hook+0x74/0x6f0 net/netfilter/core.c:491
+ nft_unregister_flowtable_ops net/netfilter/nf_tables_api.c:8905 [inline]
+ __nft_unregister_flowtable_net_hooks net/netfilter/nf_tables_api.c:8920 [inline]
+ __nft_release_hook net/netfilter/nf_tables_api.c:11904 [inline]
+ __nft_release_hooks net/netfilter/nf_tables_api.c:11918 [inline]
+ nf_tables_pre_exit_net+0x64a/0x900 net/netfilter/nf_tables_api.c:12069
+ ops_pre_exit_list net/core/net_namespace.c:161 [inline]
+ ops_undo_list+0x187/0x940 net/core/net_namespace.c:234
+ cleanup_net+0x56b/0x800 net/core/net_namespace.c:704
+ process_one_work kernel/workqueue.c:3275 [inline]
+ process_scheduled_works+0xb02/0x1830 kernel/workqueue.c:3358
+ worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
- tools/testing/selftests/net/rds/test.py | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
-
-diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
-index 8256afe6ad6f..93e23e8b256c 100755
---- a/tools/testing/selftests/net/rds/test.py
-+++ b/tools/testing/selftests/net/rds/test.py
-@@ -11,8 +11,8 @@ import signal
- import socket
- import subprocess
- import sys
--from pwd import getpwuid
--from os import stat
-+import tempfile
-+import shutil
- 
- # Allow utils module to be imported from different directory
- this_dir = os.path.dirname(os.path.realpath(__file__))
-@@ -125,14 +125,14 @@ ip(f"-n {NET1} route add {addrs[0][0]}/32 dev {VETH1}")
- ip(f"netns exec {NET0} ping -c 1 {addrs[1][0]}")
- 
- # Start a packet capture on each network
-+tcpdump_procs = []
- for net in [NET0, NET1]:
--    tcpdump_pid = os.fork()
--    if tcpdump_pid == 0:
--        pcap = logdir+'/'+net+'.pcap'
--        subprocess.check_call(['touch', pcap])
--        user = getpwuid(stat(pcap).st_uid).pw_name
--        ip(f"netns exec {net} /usr/sbin/tcpdump -Z {user} -i any -w {pcap}")
--        sys.exit(0)
-+    pcap = logdir+'/'+net+'.pcap'
-+    fd, pcap_tmp = tempfile.mkstemp(suffix=".pcap", prefix=f"{net}-", dir="/tmp")
-+    p = subprocess.Popen(
-+        ['ip', 'netns', 'exec', net,
-+         '/usr/sbin/tcpdump', '-i', 'any', '-w', pcap_tmp])
-+    tcpdump_procs.append((p, pcap_tmp, pcap, fd))
- 
- # simulate packet loss, duplication and corruption
- for net, iface in [(NET0, VETH0), (NET1, VETH1)]:
-@@ -248,7 +248,11 @@ for s in sockets:
- print(f"getsockopt(): {nr_success}/{nr_error}")
- 
- print("Stopping network packet captures")
--subprocess.check_call(['killall', '-q', 'tcpdump'])
-+for p, pcap_tmp, pcap, fd in tcpdump_procs:
-+    p.terminate()
-+    p.wait()
-+    os.close(fd)
-+    shutil.move(pcap_tmp, pcap)
- 
- # We're done sending and receiving stuff, now let's check if what
- # we received is what we sent.
--- 
-2.43.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
