@@ -1,161 +1,272 @@
-Return-Path: <netdev+bounces-265303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JiTKoF2rWkC3QEAu9opvQ
-	(envelope-from <netdev+bounces-265303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:15:45 +0100
+	id M9nUEWF3rWk83QEAu9opvQ
+	(envelope-from <netdev+bounces-265304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:19:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22ADB2305DB
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:15:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E31723061B
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 46FAD3006F33
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 13:15:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 531E5300E3AD
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 13:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53199382F09;
-	Sun,  8 Mar 2026 13:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QyfGYFnx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD14419CC28;
+	Sun,  8 Mar 2026 13:19:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784D83806C0
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 13:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42ECF1B87C0
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 13:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772975737; cv=none; b=VYqxSff1KxCMoVl+jLXgxKYDpmYgZ4x/TdZ1Dyfm53Wd8O68Ou0BrR/5oaMoJunSSEp3xoCDBGngWPkN1N33bbi8CdGwdYWQhzJDLBKX/W7Zlq8VhXqKNcIUwMXuau8PR5rNgV0dta46nyTHJ0TvJTmb/bU2nlVnQ0scTCIQZ3w=
+	t=1772975964; cv=none; b=egVsOfx1fpeZ3wUNXhDW7SS7VwEE9oQ4cH5cKli9d8ZtADkboA1xghZttZfM9dakxKoSduPt3ooLzy0pUacyUt5t9sFNdYyHnMmZZl4lw5aP+A27iUTrBDIBKEDwiEQeexmcN9pTHfps7vseayr0TrcjBZ0cP1Xpr1tj7DvuqGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772975737; c=relaxed/simple;
-	bh=0GOur689d8dOGKE+EPgs3lS+HUhqtViQTTFNzlXpRPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNiw3ozqUicHS98LLb1LFYWqv3Lgh02sIjW4bGiKpkOBknviY50B3MlXzMLb2SnEa0/EBUXCzHIPW8t9spoINH4omGaeg68ZJ/n6/91xV4W2InMm587XapBrb/zCQEduXgyDeevkj3NGSpW/0Yt4FGR3JZ+5BeC+0az2X/+gf3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QyfGYFnx; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772975736; x=1804511736;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=0GOur689d8dOGKE+EPgs3lS+HUhqtViQTTFNzlXpRPo=;
-  b=QyfGYFnx/GtZCu0Kgq3CKSrIHc8lNMWQxHRn9xJHftGBwCarjisFSH2v
-   D4fZDcw+uYtdWFsU4RMl82beTFQRgs4ounXMpx+izztHQFusF5Ou1DLYU
-   XcjJI9XjXYkhdxJ7eWrCF7EQpmRgNkuqkQyOUU3O1y3HXP0sXAVPcQrCi
-   Xo/3OBwhvGo+ArvOdy56PG1QH02cDB3qEu6ZhcMWGBEKT2HsGMRF40XO/
-   2+zTeo6WSXyFEty3ipRnQ+aMtvw2VC1/OIpmxwQgcYlvR1mkCGE8rgWRg
-   vm35zrUeh6bf+Yt2aV9uXW4ypK6I6tpMsNwz0hU6a/tNAOxjSJ9mE/Qcm
-   A==;
-X-CSE-ConnectionGUID: bIM0KEXWSvGzFF9GrJoA8w==
-X-CSE-MsgGUID: kIgCtzVhR2WtxARFT+J8Uw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11722"; a="85492799"
-X-IronPort-AV: E=Sophos;i="6.23,108,1770624000"; 
-   d="scan'208";a="85492799"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2026 06:15:35 -0700
-X-CSE-ConnectionGUID: /tG/f+c1SiSvDmqnEDYYUA==
-X-CSE-MsgGUID: 6/tRRvMmT16I5XnQZRCMDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,108,1770624000"; 
-   d="scan'208";a="224432011"
-Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 08 Mar 2026 06:15:32 -0700
-Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vzDyj-0000000037s-1ceF;
-	Sun, 08 Mar 2026 13:15:29 +0000
-Date: Sun, 8 Mar 2026 21:15:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Subject: Re: [PATCH net-next 2/5] net: phy: make mdio_device.c part of libphy
-Message-ID: <202603082137.KWkiQ4Ij-lkp@intel.com>
-References: <8600cf79-7604-43c1-8cc0-306e58e31153@gmail.com>
+	s=arc-20240116; t=1772975964; c=relaxed/simple;
+	bh=VxgoZKej2zxHVTo6U3V2GDY9zpnHtt7tzpMW+WH8AoQ=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=bA6IgdKhtifrXs7HpunFX2tfV2S/Mg9JswW6UDiP8uv9F60PTN68RPZa1Sx9WJhdyKvnqNf0irfBPZGKHp99dGgmG2Zdrh9wsVBi9Llfwd5Gc92o3o/7RUygrmxZCyML18CV6d5Ct8FstMRT2b2vUbwF0foxL6uPcIppauDoY+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-40f09403c56so39041800fac.1
+        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 06:19:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772975962; x=1773580762;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xEvJ/INFfVN6lwZ8YdWWHWxn8b628hEFbjYdmQGHNJg=;
+        b=wIJb0wU0eeyFPQIbdoofulLMO2tUBLkdAykhdUfjKb8HYF7YUOvm0a+oPy/iWjIJ9n
+         2ARtd4b/ReQwxxd/eRK0mYvcrlpuRsglCj85gVdeC33r/VKFg0ibEzjGBDQSRVnxRArz
+         eCmzK9ZiOC3HbBXAdi6KxYHXwKBuy7R0K4B7Rk9PcynmRQnkWcH56qvJmlTYrzQACn9J
+         LEsSjw+p6JAhPw4ZwRsENrA3o6ZJimQoKLgMtbHLm2i73ghfNzdvaEhkY5/Q3ai2FYi4
+         jhghQ1//iFHU9PQHdSdHRo3+w1co5jIU4FzjXbEH/8NiviMWDDBrnpyK6VZtUkUwkOCU
+         AcXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNfOjWltGka12+UoTmsz1ApMIbJn7IX2de+5Xv7YdCVYumXsBu8wpOGXP+TwSPfBsdOhQ58E0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf+FXbY3NJ2iLsyyH2/+m6Gvf/c+Wn0K3c+zU9X8gZD8CJ5cHy
+	1kh3qbddQi+zGO1nuviWyVDM0lO8+EULM4yhSVmtmv3x5Z9/40IcTpk2yGpfsdMvR2vmxBYeOJo
+	P628qocDjb+tEmgWyq8tTT1guhZ/w5wNuh977HQ2FEMBtWBt9ikWgyRC2or8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8600cf79-7604-43c1-8cc0-306e58e31153@gmail.com>
-X-Rspamd-Queue-Id: 22ADB2305DB
+X-Received: by 2002:a4a:ee1a:0:b0:67b:b337:d436 with SMTP id
+ 006d021491bc7-67bb337dc70mr300446eaf.10.1772975962336; Sun, 08 Mar 2026
+ 06:19:22 -0700 (PDT)
+Date: Sun, 08 Mar 2026 06:19:22 -0700
+In-Reply-To: <20260307204425.1900467-1-kuba@kernel.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69ad775a.a00a0220.b130.0002.GAE@google.com>
+Subject: [syzbot ci] Re: genetlink: apply reject policy for split ops on the
+ dispatch path
+From: syzbot ci <syzbot+ci571d3086db3b046d@syzkaller.appspotmail.com>
+To: alok.a.tiwari@oracle.com, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, kees@kernel.org, kuba@kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	shuah@kernel.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 7E31723061B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265303-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,kernel.org,redhat.com,davemloft.net,google.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.937];
+	NEURAL_SPAM(0.00)[0.336];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265304-lists,netdev=lfdr.de,ci571d3086db3b046d];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzbot.org:url,googlegroups.com:email]
 X-Rspamd-Action: no action
 
-Hi Heiner,
+syzbot ci has tested the following series
 
-kernel test robot noticed the following build errors:
+[v1] genetlink: apply reject policy for split ops on the dispatch path
+https://lore.kernel.org/all/20260307204425.1900467-1-kuba@kernel.org
+* [PATCH net-next 1/2] genetlink: apply reject policy for split ops on the dispatch path
+* [PATCH net-next 2/2] selftests: net: make sure that Netlink rejects unknown attrs in dump
 
-[auto build test ERROR on net-next/main]
+and found the following issue:
+KASAN: slab-out-of-bounds Read in devlink_nl_dumpit
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-phy-move-mdio_device-reset-handling-functions-in-the-code/20260308-053505
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/8600cf79-7604-43c1-8cc0-306e58e31153%40gmail.com
-patch subject: [PATCH net-next 2/5] net: phy: make mdio_device.c part of libphy
-config: sparc64-randconfig-002-20260308 (https://download.01.org/0day-ci/archive/20260308/202603082137.KWkiQ4Ij-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260308/202603082137.KWkiQ4Ij-lkp@intel.com/reproduce)
+Full report is available here:
+https://ci.syzbot.org/series/cced225b-516e-4f54-b4f2-57afc46c5c2a
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603082137.KWkiQ4Ij-lkp@intel.com/
+***
 
-All errors (new ones prefixed by >>):
+KASAN: slab-out-of-bounds Read in devlink_nl_dumpit
 
-   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns-usb3.o: in function `bcm_ns_usb3_mdio_driver_init':
->> drivers/phy/broadcom/phy-bcm-ns-usb3.c:241: undefined reference to `mdio_driver_register'
-   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns-usb3.o: in function `bcm_ns_usb3_mdio_driver_exit':
->> drivers/phy/broadcom/phy-bcm-ns-usb3.c:241: undefined reference to `mdio_driver_unregister'
-   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns2-pcie.o: in function `ns2_pci_phy_driver_init':
->> drivers/phy/broadcom/phy-bcm-ns2-pcie.c:82: undefined reference to `mdio_driver_register'
-   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns2-pcie.o: in function `ns2_pci_phy_driver_exit':
->> drivers/phy/broadcom/phy-bcm-ns2-pcie.c:82: undefined reference to `mdio_driver_unregister'
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      0bcac7b11262557c990da1ac564d45777eb6b005
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/4ea10ec3-e985-401a-a2b5-87b89ca3a776/config
+C repro:   https://ci.syzbot.org/findings/c23aee43-2180-46d5-93cb-e8c1cbcb1c39/c_repro
+syz repro: https://ci.syzbot.org/findings/c23aee43-2180-46d5-93cb-e8c1cbcb1c39/syz_repro
+
+==================================================================
+BUG: KASAN: slab-out-of-bounds in devlink_nl_dumpit+0x2a4/0x410 net/devlink/netlink.c:355
+Read of size 8 at addr ffff88810a48eab0 by task syz.0.17/5954
+
+CPU: 0 UID: 0 PID: 5954 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xba/0x230 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ devlink_nl_dumpit+0x2a4/0x410 net/devlink/netlink.c:355
+ genl_dumpit+0x10b/0x1b0 net/netlink/genetlink.c:1027
+ netlink_dump+0x722/0xe80 net/netlink/af_netlink.c:2325
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2440
+ genl_family_rcv_msg_dumpit+0x213/0x310 net/netlink/genetlink.c:1076
+ genl_family_rcv_msg net/netlink/genetlink.c:1192 [inline]
+ genl_rcv_msg+0x5e8/0x7a0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2591
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2645
+ __sys_sendmsg net/socket.c:2677 [inline]
+ __do_sys_sendmsg net/socket.c:2682 [inline]
+ __se_sys_sendmsg net/socket.c:2680 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6bf799c799
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff4b3c0b38 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f6bf7c15fa0 RCX: 00007f6bf799c799
+RDX: 0000000000000000 RSI: 0000200000001780 RDI: 0000000000000003
+RBP: 00007f6bf7a32bd9 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6bf7c15fac R14: 00007f6bf7c15fa0 R15: 00007f6bf7c15fa0
+ </TASK>
+
+Allocated by task 5954:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __do_kmalloc_node mm/slub.c:5238 [inline]
+ __kmalloc_noprof+0x35c/0x760 mm/slub.c:5250
+ kmalloc_noprof include/linux/slab.h:954 [inline]
+ genl_family_rcv_msg_attrs_parse+0xa3/0x2a0 net/netlink/genetlink.c:941
+ genl_start+0x180/0x6c0 net/netlink/genetlink.c:980
+ __netlink_dump_start+0x469/0x7e0 net/netlink/af_netlink.c:2431
+ genl_family_rcv_msg_dumpit+0x213/0x310 net/netlink/genetlink.c:1076
+ genl_family_rcv_msg net/netlink/genetlink.c:1192 [inline]
+ genl_rcv_msg+0x5e8/0x7a0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2591
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2645
+ __sys_sendmsg net/socket.c:2677 [inline]
+ __do_sys_sendmsg net/socket.c:2682 [inline]
+ __se_sys_sendmsg net/socket.c:2680 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88810a48eaa0
+ which belongs to the cache kmalloc-16 of size 16
+The buggy address is located 0 bytes to the right of
+ allocated 16-byte region [ffff88810a48eaa0, ffff88810a48eab0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10a48e
+flags: 0x17ff00000000000(node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 017ff00000000000 ffff888100041640 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800800080 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 11308983860, free_ts 11289885463
+ create_dummy_stack mm/page_owner.c:103 [inline]
+ register_dummy_stack+0x98/0x100 mm/page_owner.c:109
+ init_page_owner+0x2e/0x600 mm/page_owner.c:127
+ invoke_init_callbacks mm/page_ext.c:152 [inline]
+ page_ext_init+0x500/0x540 mm/page_ext.c:490
+ mm_core_init+0x51/0x70 mm/mm_init.c:2735
+page last free pid 1 tgid 1 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1433 [inline]
+ __free_frozen_pages+0xc2b/0xdb0 mm/page_alloc.c:2978
+ ___free_pages_bulk mm/kasan/shadow.c:333 [inline]
+ __kasan_populate_vmalloc_do mm/kasan/shadow.c:385 [inline]
+ __kasan_populate_vmalloc+0x137/0x1d0 mm/kasan/shadow.c:424
+ kasan_populate_vmalloc include/linux/kasan.h:580 [inline]
+ alloc_vmap_area+0xd73/0x14b0 mm/vmalloc.c:2129
+ __get_vm_area_node+0x1f8/0x300 mm/vmalloc.c:3232
+ get_vm_area_caller+0x82/0xb0 mm/vmalloc.c:3283
+ __ioremap_caller+0x3d7/0x620 arch/x86/mm/ioremap.c:292
+ pcim_iomap+0xde/0x2b0 drivers/pci/devres.c:548
+ ahci_init_one+0x99e/0x34b0 drivers/ata/ahci.c:1973
+ local_pci_probe drivers/pci/pci-driver.c:323 [inline]
+ pci_call_probe drivers/pci/pci-driver.c:385 [inline]
+ __pci_device_probe drivers/pci/pci-driver.c:446 [inline]
+ pci_device_probe+0x41a/0xc70 drivers/pci/pci-driver.c:480
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x267/0xaf0 drivers/base/dd.c:661
+ __driver_probe_device+0x18c/0x320 drivers/base/dd.c:803
+ driver_probe_device+0x4f/0x240 drivers/base/dd.c:833
+ __driver_attach+0x3e7/0x710 drivers/base/dd.c:1227
+ bus_for_each_dev+0x23b/0x2c0 drivers/base/bus.c:383
+ bus_add_driver+0x345/0x670 drivers/base/bus.c:715
+ driver_register+0x23a/0x320 drivers/base/driver.c:249
+
+Memory state around the buggy address:
+ ffff88810a48e980: fa fb fc fc 00 00 fc fc fa fb fc fc fa fb fc fc
+ ffff88810a48ea00: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+>ffff88810a48ea80: fa fb fc fc 00 00 fc fc 00 06 fc fc 00 00 fc fc
+                                     ^
+ ffff88810a48eb00: fa fb fc fc 00 00 fc fc 00 00 fc fc fa fb fc fc
+ ffff88810a48eb80: 00 00 fc fc 00 00 fc fc fa fb fc fc 00 00 fc fc
+==================================================================
 
 
-vim +241 drivers/phy/broadcom/phy-bcm-ns-usb3.c
+***
 
-af850e14a7ae49 drivers/phy/broadcom/phy-bcm-ns-usb3.c Rafał Miłecki 2017-06-08  240  
-36a94760c98954 drivers/phy/broadcom/phy-bcm-ns-usb3.c Rafał Miłecki 2020-11-13 @241  mdio_module_driver(bcm_ns_usb3_mdio_driver);
-e5666281d9eadb drivers/phy/phy-bcm-ns-usb3.c          Rafał Miłecki 2016-08-12  242  
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
