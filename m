@@ -1,597 +1,373 @@
-Return-Path: <netdev+bounces-265247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEhNAdourWkizQEAu9opvQ
-	(envelope-from <netdev+bounces-265247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 09:10:02 +0100
+	id eFWjFmQxrWl1zQEAu9opvQ
+	(envelope-from <netdev+bounces-265248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 09:20:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C6A22F01D
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 09:10:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BEEE22F05C
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 09:20:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A39AA3009F3F
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 08:09:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B76C230074EE
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 08:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B24035B633;
-	Sun,  8 Mar 2026 08:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E2F35F169;
+	Sun,  8 Mar 2026 08:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6FQpLZQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YaWn5wlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A833F392
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 08:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772957394; cv=none; b=CxLSWJ8bVHDIP8t55+oHISVZZewDC9FR/E+243Vosfl9Oa9o0npeNHdTpF41Y3tzWaZ9r8wicETsc9ySOEe20wO8B2s6nHhzw/t6tZckiZyW9+HLFCLKo8q7g1IobP7x778WHe6tfbYKgr9ir31UblH5agpEYzmjrz6BvdyGIf4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772957394; c=relaxed/simple;
-	bh=T84R6cI1MJ/+B2oTkZeb5Sa6hCo7L+FXa1foD5Ik3eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dAUdbn6mHzeMQ3ulaEBVTdkeYkwwoxaHVCKHL9mEa1jQyNQrQke2cmQjT589ZahW8cMWJdNgKDyBm6056ug/u4555MpR1627X6SBmwiUbaH7r0JDsLmMDbTam5kx3CBw3NJzYy9vMkoNNrrolgIlkVCOGPtr4u/Em6gsOfbs03k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6FQpLZQ; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA8A35F16A
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 08:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772958045; cv=pass; b=eXqj/Pzn/nwfxJnq5m2u+NIXVSz5mgPkq/3EY2yoPHvQb+RETGvzu+1xm3ELBUgzDgdWl2v/Ak4NgrHtPSE6tKA6pBlzzhIQNhaT+t3zghYD3iVO22vQBybOGfKSPijG4qYDwaFXs2we1PEWtNpcVX4yzJb7dqoxqtgqWF6Y9ec=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772958045; c=relaxed/simple;
+	bh=O2G/bkfsud423MmsppQXKc+ycMoO20aFsuHK3LCDSms=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Njio48zWgC6cHzLrtcm7rNvA/3ab1IH5YaJp41fKgT+VTjpgoVVnRkD4fJtANAV+jCslgIRJlFD1n8tPKMd8jrlNTonA5SXWCHTcTHz6AkVaLEbcxKkbPWbWnyFTCrwZmwDTk4MPmQmd8cCaLFG4iyLRytacYXLfxwbChM1uVFQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YaWn5wlD; arc=pass smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4852f8ac7e9so12181205e9.1
-        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 00:09:51 -0800 (PST)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3598df39444so4472364a91.2
+        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 00:20:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772958043; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Zpg35irQhSrXYUs3WQkG7HMh4xEcnqVikTeoAY3RLJlYNM9rQPmf56N/hKoJNNVq6h
+         +cBJ+37Az4V4fDwAp+UkVSNYGSZMSoUXZzb3KlOYxvO5G08izNguxRGdFjvNG6asnYvK
+         HduJYvw+CT/qL56ukvO0gOUrQsxlBb0h3r9doDCzfl/XjThoIlVORZruM/uUbpOJoiDr
+         vqozpRgobjI3ehR2Cy+Xt8qnTSuSbObLO6JlB3SENgKFvZYmW6upnYqzwqsDbXOUVakM
+         W1xHTS91lcZ057eYNhARAHxog47c1eZIiLABoVKKsC+sN7DruUtWpsKuoHOD8RFsqTVR
+         +IXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lxw2yV7ExBCkr6Opf3XJKAnjnMc+8VXZSgtjVb/aJRo=;
+        fh=jj0krVOL48i/LPqZlhWj5NnEAXBY2wSmRBDFGC+Yywg=;
+        b=jPFp8wKsr37MgW4hstVOolcC4CD1wcl8mD9s1Ed/Mik0ayWOPjWqyQ9EC518h0P9hT
+         k3UU4EaLGwSsRkV3vVwrdlamAuGgGS4oKb0o1xn8zU6KQgO0dUikyZmRKNQejUxpcDR+
+         Za6mej5y5Ta1n7TrEfAaTqHQbFhR/XQrYq799d5nIvagu2BhV813lCdBhRj48rpTwb5s
+         LFSYlTHFA4sep3kfCWK/nr6gQnwtAlnvTtoZGT25UXksZ/QFvnKRLNcxrvMSeZJ1B/WM
+         Pk9LC7yDV/20Orf+2xw8SKnca7GWzbFozDtoltPr2VD3DH6KL4yz2vwenAhaqeOoJnCe
+         OeAQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772957390; x=1773562190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KX89tRV4k/l6PowmZKpcFrv5YzWfDgSVXktS5ny3fb4=;
-        b=Y6FQpLZQP5GOsmcqTuc6sk92NEqR2qaqCIgCNbxSiJempopnMWhAv9+kplwbKG2P/h
-         YSZ7w9grHsSJDO/f2/lOpXMrC6WfrZz248r516Cnx6UJaNfAzUqyRUuUO/RlqksGI8Vq
-         RgZEfxidb+J9ua1MVOsV02rTWM/S8b/xqioDnHquGonQfPHGk0HSWGFhaXl2MJsOnpSf
-         Au9Z5jPWSgJNGJY6wu1wRvAIjlf4V9mPOKFNpbYF8KyaWQBpzLTKW9GobAaHj+4qyxIr
-         s2A4Sk1fY1MKlb/YDM+0Ss5olC7h8YPrcyKBxRmV6bsrq0iMCIxmHmaAhagAZrcjQy2R
-         RI1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772957390; x=1773562190;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772958043; x=1773562843; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KX89tRV4k/l6PowmZKpcFrv5YzWfDgSVXktS5ny3fb4=;
-        b=sEDF5M5GVCjJyTBwSgpPzMtxNUFjGAqhcwxz8g81gteAs6hUcopSacAYJJfUUXBkvr
-         n+4FIRiibV4iJt192naYJnCq/7Wtb8nrDmGkwVThzpp3m9mE6qQJIZKlvpSRSczxw8KX
-         xIPyswAuUWMh2WKNclYVUbldpIuYxxHFrb5w4T/CqxVESKyuXgE45WpkI0ieNYnC5wAu
-         9UuuOAPjYllur8PVx4CbTgNVmJbzdaGU8bf6yD82apwuquYewbOMB8c1eoIivpt73mH7
-         Y+HjF4orWFVMtmSxYlte/2dmWxtMt545sb/9bdRrTxEs86/AzHL1lp+5zyesyf4YEqcD
-         +gJg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8A/6dp+TXWtF1GRZ9POy+Ju2ZDskErmuEgzD5FYZ2GNlnMlAKozYx8MqV7HB/CNbUfd8cJeo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC4Cokgb3IL13EYRLG5COVoyppy2FU+b+zLpaTYLIalknRpoKy
-	AZVWLOejsqwigb+AYMm8oh6D18tV8fmkQbfr/2pyW/68V76VFs2npdGz
-X-Gm-Gg: ATEYQzxPjQrGlxBxpv0lDoVzgnBOi4XpoH9MJcHF4TJiCB3AZ3SsChTTNLSZtyALa7F
-	6c2XTsFNE78xSsKEHpe7V+jgeIRvzhLeNurhRlnRferCcqX41TJXyuKGQfwb7u9AbsRwqaEHcUj
-	BbUtOBYucw4AAdKwy1Ssywvb8oLjF9KnitnIlKqjkMalP3ntVVolKhgvTgGyt2NB11UF7R1hWH3
-	HKIL++PEJRV5smcDbhHsxvX+sLoPDSxwBoWuneIxtfxnNAfVCokMoliOF17KfI567mZq2/NWV30
-	Id+jN9FEiZ83M7pY9Au/liWOOrYovQc+RBzXh2rKVLmSHaZtixXDYyJhp6s9INaXXtbW3wRqKTF
-	V8FQ5im8y5VlkEpVgyjXYpedAqsp5gDK3hlW6Csy8ZaRnrOXV/hhSlX/YTBNcq0EqSB7L+j9WOg
-	lVZjLMRV4hWJ/yC9AlMSMypKlstvv2UoQf9wBMe2lmotrqY4wacS9c2BbRANEAeajhF7KBc9o=
-X-Received: by 2002:a05:600c:64cf:b0:485:35a4:939f with SMTP id 5b1f17b1804b1-48535a4a174mr23838325e9.28.1772957389598;
-        Sun, 08 Mar 2026 00:09:49 -0800 (PST)
-Received: from fedora.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4853044d849sm141294585e9.11.2026.03.08.00.09.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Mar 2026 00:09:48 -0800 (PST)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sagi Maimon <maimon.sagi@gmail.com>
-Subject: [PATCH v2] ptp: ocp: Add support for Xilinx-based Adva TimeCard variant
-Date: Sun,  8 Mar 2026 10:09:40 +0200
-Message-ID: <20260308080944.5200-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        bh=lxw2yV7ExBCkr6Opf3XJKAnjnMc+8VXZSgtjVb/aJRo=;
+        b=YaWn5wlD4T8o1iBhG7gdk8HKKvv8NqqNaDu7tyyrcij2xpXL/fQFpfppHmZRUk3JRA
+         sIdoyqsRPd4gaaQ8Cuj2AYaywoT0QGo6CEM8PXiXkgpNb1QS3Td5zHb794JtkY1cOysD
+         vdy/X0F5AAC3ex9ajR8ExYlzNlUWEEe2avqdE3XC2ywL6ume0nvK9WL/CaZ/lg3DI0U+
+         CLXZbTxoVA6gDD8dnVEYaPJDCcvdhhxdlKX3l0qQJpLqxU+SLFxxv2GdTAAk5qo5NS+v
+         hBoiK4T6ey/2ooC3RkN0wZ5m2kbhac5cYb4m+CY2ycTLiYGRb8MxTSCCTApvr7buxApx
+         lQDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772958043; x=1773562843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lxw2yV7ExBCkr6Opf3XJKAnjnMc+8VXZSgtjVb/aJRo=;
+        b=HzjjIy+W7U2n9uRB8vu6ujzMo9Zd3oTV4hYJRZW2Kx9zzG550I8DwuKd59Y4i5Qy9p
+         JVANSdje6rpARJHwXduesXdN9pCe3dO1uRtQ2a+OhTjqavwQX3pfnfbp7kzE+EoXc3Zz
+         hIrxUZ74ULB+kdjKWOqLUDhUFdYsif0wBEZEhxl5AaEthk7Ly+idVej6dyP1Y7Vx5mUO
+         ikV5c/VEEKKKSik81ubsteZq1qIwr/DM+tAzxJXNPRxAMcEwHbpia/HfLJIUHq0M4v4T
+         T7nFvfBKNvlRlt4mj0waL78JXTlSnQjhInB6xxhAcmEgywOD88sJGjlaySG2yhsIay+Q
+         sa2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVpDRwk6DdYAS/fHbzmbg+1oigagLpIflADwmgeGFpEU4bZkUEQS+QAUipMv6dCyza8ChRH5tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzowviY5e5l+dreIZezOPrUGrScCHg6FjzsQDj6ZPse8PcfjomX
+	TzUkiGBHtF0X9ynOHyNCIXaw54YL2v+fgbpBLSonHt+HvN18XOVAPEaQ4uJOPVCASsoUi2rx0no
+	3R1k2FzCYVXuQG8qyqAgh4tGpvj8d9Bg=
+X-Gm-Gg: ATEYQzyaCo+4feiws1nMsK3+rfT/3KFWHfXUTDGBI1uM+hE0jd52ryBlJnB3e/XTA1h
+	0hvQVutptLGLj2167GTAP5R3LQ1FHdSGWGp6IW7XS2LQ0dMqJBpIx1aX8I6w1yqEtmNGXO2ywDw
+	svRMglVsuz2GZFrp81wJoN55EE7J0JydsKpsvU1igB6B21FLKLHCrfNkm5rsi7BE+1R0bDpfoVg
+	44H5sPLqqleInjT2qcLRRulA8qLaZ7+/qkRH2xpEoYXkSwdP5bw6AruAJO7vE2RAI9h0dXwgsu4
+	lnlv8ShT
+X-Received: by 2002:a17:90b:240e:b0:359:c7ef:97bc with SMTP id
+ 98e67ed59e1d1-359c7ef9b32mr3016172a91.22.1772958043117; Sun, 08 Mar 2026
+ 00:20:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 08C6A22F01D
+References: <20260308070925.58939-1-nashuiliang@gmail.com> <CANn89iJYiyp4dwA+Ye=7ySgQZaPnL=XfoQ4S4eXM-gs3pP+keA@mail.gmail.com>
+In-Reply-To: <CANn89iJYiyp4dwA+Ye=7ySgQZaPnL=XfoQ4S4eXM-gs3pP+keA@mail.gmail.com>
+From: chuang <nashuiliang@gmail.com>
+Date: Sun, 8 Mar 2026 16:20:31 +0800
+X-Gm-Features: AaiRm53zKEEa72ne44DdeX45TbxT5T1UmO7VHS3nnSgRPmNEu3XSj31cK8zOSj8
+Message-ID: <CACueBy4KyU8DjwtLM6pzjQNTbiy2M+ZhZdO7Ag=ssqWq00CJ7w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: reduce RFS/ARFS flow updates by checking
+ LLC affinity
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4BEEE22F05C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-265247-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265248-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,fomichev.me,google.com,gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.957];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maimonsagi@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nashuiliang@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.971];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add support for the Adva TimeCard model built on a Xilinx-based design.
-This patch enables detection and integration of the new hardware within
-the existing OCP timecard framework.
+Hi,
 
-The Xilinx variant relies on the shared driver infrastructure, requiring
-only small, targeted additions to accommodate its specific
-characteristics.
+On Sun, Mar 8, 2026 at 3:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Sun, Mar 8, 2026 at 8:10=E2=80=AFAM Chuang Wang <nashuiliang@gmail.com=
+> wrote:
+> >
+> > The current implementation of rps_record_sock_flow() updates the flow
+> > table every time a socket is processed on a different CPU. In high-load
+> > scenarios, especially with Accelerated RFS (ARFS), this triggers
+> > frequent flow steering updates via ndo_rx_flow_steer.
+> >
+> > For drivers like mlx5 that implement hardware flow steering, these
+> > constant updates lead to significant contention on internal driver lock=
+s
+> > (e.g., arfs_lock). This contention often becomes a performance
+> > bottleneck that outweighs the steering benefits.
+> >
+> > This patch introduces a cache-aware update strategy: the flow record is
+> > only updated if the flow migrates across Last Level Cache (LLC)
+> > boundaries. This minimizes expensive hardware reconfigurations while
+> > preserving cache locality for the application.
+> >
+> > Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+> > ---
+> >  include/net/rps.h | 17 +--------------
+> >  net/core/dev.c    | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 55 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/net/rps.h b/include/net/rps.h
+> > index e33c6a2fa8bb..2cd8698a79d5 100644
+> > --- a/include/net/rps.h
+> > +++ b/include/net/rps.h
+> > @@ -55,22 +55,7 @@ struct rps_sock_flow_table {
+> >
+> >  #define RPS_NO_CPU 0xffff
+> >
+> > -static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+> > -{
+> > -       unsigned int index =3D hash & rps_tag_to_mask(tag_ptr);
+> > -       u32 val =3D hash & ~net_hotdata.rps_cpu_mask;
+> > -       struct rps_sock_flow_table *table;
+> > -
+> > -       /* We only give a hint, preemption can change CPU under us */
+> > -       val |=3D raw_smp_processor_id();
+> > -
+> > -       table =3D rps_tag_to_table(tag_ptr);
+> > -       /* The following WRITE_ONCE() is paired with the READ_ONCE()
+> > -        * here, and another one in get_rps_cpu().
+> > -        */
+> > -       if (READ_ONCE(table[index].ent) !=3D val)
+> > -               WRITE_ONCE(table[index].ent, val);
+> > -}
+> > +void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash);
+> >
+> >  static inline void _sock_rps_record_flow_hash(__u32 hash)
+> >  {
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 203dc36aaed5..770cfb6fe06b 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -5175,6 +5175,60 @@ static int get_rps_cpu(struct net_device *dev, s=
+truct sk_buff *skb,
+> >         return cpu;
+> >  }
+> >
+> > +/**
+> > + * rps_record_cond - Determine if RPS flow table should be updated
+> > + * @old_val: Previous flow record value
+> > + * @new_val: Target flow record value
+> > + *
+> > + * Returns true if the record needs an update.
+> > + */
+> > +static inline bool rps_record_cond(u32 old_val, u32 new_val)
+> > +{
+> > +       u32 old_cpu =3D old_val & ~net_hotdata.rps_cpu_mask;
+> > +       u32 new_cpu =3D new_val & ~net_hotdata.rps_cpu_mask;
+> > +
+> > +       if (old_val =3D=3D new_val)
+> > +               return false;
+> > +
+> > +       /* Force update if the recorded CPU is invalid or has gone offl=
+ine */
+> > +       if (old_cpu >=3D nr_cpu_ids || !cpu_active(old_cpu))
+> > +               return true;
+> > +
+> > +       /*
+> > +        * Force an update if the current task is no longer permitted
+> > +        * to run on the old_cpu.
+> > +        */
+> > +       if (!cpumask_test_cpu(old_cpu, current->cpus_ptr))
+> > +               return true;
+> > +
+> > +       /*
+> > +        * If CPUs do not share a cache, allow the update to prevent
+> > +        * expensive remote memory accesses and cache misses.
+> > +        */
+> > +       if (!cpus_share_cache(old_cpu, new_cpu))
+> > +               return true;
+> > +
+> > +       return false;
+> > +}
+> > +
+> > +void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+> > +{
+> > +       unsigned int index =3D hash & rps_tag_to_mask(tag_ptr);
+> > +       u32 val =3D hash & ~net_hotdata.rps_cpu_mask;
+> > +       struct rps_sock_flow_table *table;
+> > +
+> > +       /* We only give a hint, preemption can change CPU under us */
+> > +       val |=3D raw_smp_processor_id();
+> > +
+> > +       table =3D rps_tag_to_table(tag_ptr);
+> > +       /* The following WRITE_ONCE() is paired with the READ_ONCE()
+> > +        * here, and another one in get_rps_cpu().
+> > +        */
+> > +       if (rps_record_cond(READ_ONCE(table[index].ent), val))
+> > +               WRITE_ONCE(table[index].ent, val);
+> > +}
+> > +EXPORT_SYMBOL(rps_record_sock_flow);
+> > +
+> >  #ifdef CONFIG_RFS_ACCEL
+> >
+> >  /**
+> > --
+> > 2.47.3
+> >
+>
+> Interesting idea but:
+>
+> 1) Some of us do not use CONFIG_RFS_ACCEL yet.
 
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
----
-Addressed comments from Simon Horman and Vadim Fedorenko:
- - https://www.spinics.net/lists/netdev/msg1160388.html
- - https://www.spinics.net/lists/netdev/msg1160386.html
-Changes since v1:
- - Removed duplicated Adva init functions; 
-   unified logic with variant‑specific data.
- ---
- drivers/ptp/ptp_ocp.c | 341 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 325 insertions(+), 16 deletions(-)
+Points 1 and 3 are noted. If this approach is acceptable, I can
+implement it as a selectable option (e.g., using a static key) to
+toggle the LLC-aware strategy.
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index d88ab2f86b1b..c43ce18dfb42 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -35,6 +35,7 @@
- 
- #define PCI_VENDOR_ID_ADVA			0xad5a
- #define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
-+#define PCI_DEVICE_ID_ADVA_TIMECARD_X1	0x0410
- 
- static struct class timecard_class = {
- 	.name		= "timecard",
-@@ -72,6 +73,20 @@ struct ptp_ocp_servo_conf {
- 	u32	servo_drift_i;
- };
- 
-+/*
-+ * Combined servo + board-variant parameters for ADVA boards.
-+ * Embedded in the resource table .extra so a single ptp_ocp_adva_board_init()
-+ * can handle both ADVA and ADVA-X1 without per-variant init functions.
-+ */
-+struct ptp_ocp_adva_info {
-+	struct ptp_ocp_servo_conf	servo;
-+	u32				flash_start;
-+	const struct ocp_sma_op		*sma_op;
-+	u8				signals_nr;
-+	u8				freq_in_nr;
-+	const struct ocp_attr_group	*attr_groups;
-+};
-+
- #define OCP_CTRL_ENABLE		BIT(0)
- #define OCP_CTRL_ADJUST_TIME	BIT(1)
- #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
-@@ -420,12 +435,17 @@ static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
- 
- static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
- 
-+static const struct ocp_sma_op ocp_adva_sma_op;
-+static const struct ocp_sma_op ocp_adva_x1_sma_op;
-+
- static const struct ocp_attr_group fb_timecard_groups[];
- 
- static const struct ocp_attr_group art_timecard_groups[];
- 
- static const struct ocp_attr_group adva_timecard_groups[];
- 
-+static const struct ocp_attr_group adva_timecard_x1_groups[];
-+
- struct ptp_ocp_eeprom_map {
- 	u16	off;
- 	u16	len;
-@@ -1020,11 +1040,225 @@ static struct ocp_resource ocp_adva_resource[] = {
- 	},
- 	{
- 		.setup = ptp_ocp_adva_board_init,
--		.extra = &(struct ptp_ocp_servo_conf) {
--			.servo_offset_p = 0xc000,
--			.servo_offset_i = 0x1000,
--			.servo_drift_p = 0,
--			.servo_drift_i = 0,
-+		.extra = &(struct ptp_ocp_adva_info) {
-+			.servo = {
-+				.servo_offset_p = 0xc000,
-+				.servo_offset_i = 0x1000,
-+				.servo_drift_p = 0,
-+				.servo_drift_i = 0,
-+			},
-+			.flash_start  = 0xA00000,
-+			.sma_op       = &ocp_adva_sma_op,
-+			.signals_nr   = 2,
-+			.freq_in_nr   = 2,
-+			.attr_groups  = adva_timecard_groups,
-+		},
-+	},
-+	{ }
-+};
-+
-+static struct ocp_resource ocp_adva_x1_resource[] = {
-+	{
-+		OCP_MEM_RESOURCE(reg),
-+		.offset = 0x01000000, .size = 0x10000,
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts0),
-+		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 0,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts1),
-+		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts2),
-+		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 2,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts3),
-+		.offset = 0x01110000, .size = 0x10000, .irq_vec = 15,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 3,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts4),
-+		.offset = 0x01120000, .size = 0x10000, .irq_vec = 16,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 4,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	/* Timestamp for PHC and/or PPS generator */
-+	{
-+		OCP_EXT_RESOURCE(pps),
-+		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 5,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[0]),
-+		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[1]),
-+		.offset = 0x010E0000, .size = 0x10000, .irq_vec = 12,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 2,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[2]),
-+		.offset = 0x010F0000, .size = 0x10000, .irq_vec = 13,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 3,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[3]),
-+		.offset = 0x01100000, .size = 0x10000, .irq_vec = 14,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 4,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_ext),
-+		.offset = 0x01030000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_clk),
-+		.offset = 0x01040000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(tod),
-+		.offset = 0x01050000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(image),
-+		.offset = 0x00020000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_select),
-+		.offset = 0x00130000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map1),
-+		.offset = 0x00140000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map2),
-+		.offset = 0x00220000, .size = 0x1000,
-+	},
-+	{
-+		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
-+		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
-+		.extra = &(struct ptp_ocp_serial_port) {
-+			.baud = 9600,
-+		},
-+	},
-+	{
-+		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
-+		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
-+		.extra = &(struct ptp_ocp_serial_port) {
-+			.baud = 115200,
-+		},
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[0]),
-+		.offset = 0x01200000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[1]),
-+		.offset = 0x01210000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[2]),
-+		.offset = 0x01220000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[3]),
-+		.offset = 0x01230000, .size = 0x10000,
-+	},
-+	{
-+		OCP_SPI_RESOURCE(spi_flash),
-+		.offset = 0x00310000, .size = 0x10000, .irq_vec = 9,
-+		.extra = &(struct ptp_ocp_flash_info) {
-+			.name = "xilinx_spi", .pci_offset = 0,
-+			.data_size = sizeof(struct xspi_platform_data),
-+			.data = &(struct xspi_platform_data) {
-+				.num_chipselect = 1,
-+				.bits_per_word = 8,
-+				.num_devices = 1,
-+				.force_irq = true,
-+				.devices = &(struct spi_board_info) {
-+					.modalias = "spi-nor",
-+				},
-+			},
-+		},
-+	},
-+	{
-+		OCP_I2C_RESOURCE(i2c_ctrl),
-+		.offset = 0x00150000, .size = 0x10000, .irq_vec = 7,
-+		.extra = &(struct ptp_ocp_i2c_info) {
-+			.name = "xiic-i2c",
-+			.fixed_rate = 50000000,
-+			.data_size = sizeof(struct xiic_i2c_platform_data),
-+			.data = &(struct xiic_i2c_platform_data) {
-+				.num_devices = 2,
-+				.devices = (struct i2c_board_info[]) {
-+					{ I2C_BOARD_INFO("24c02", 0x50) },
-+					{ I2C_BOARD_INFO("24mac402", 0x58),
-+					  .platform_data = "mac" },
-+				},
-+			},
-+		},
-+	},
-+	{
-+		.setup = ptp_ocp_adva_board_init,
-+		.extra = &(struct ptp_ocp_adva_info) {
-+			.servo = {
-+				.servo_offset_p = 0xc000,
-+				.servo_offset_i = 0x1000,
-+				.servo_drift_p = 0,
-+				.servo_drift_i = 0,
-+			},
-+			.flash_start  = 0x1000000,
-+			.sma_op       = &ocp_adva_x1_sma_op,
-+			.signals_nr   = 4,
-+			.freq_in_nr   = 4,
-+			.attr_groups  = adva_timecard_x1_groups,
- 		},
- 	},
- 	{ }
-@@ -1035,6 +1269,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
- 	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
- 	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
- 	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
-+	{ PCI_DEVICE_DATA(ADVA, TIMECARD_X1, &ocp_adva_x1_resource) },
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
-@@ -1137,6 +1372,34 @@ static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
- 	{ }
- };
- 
-+static const struct ocp_selector ptp_ocp_adva_x1_sma_in[] = {
-+	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
-+	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
-+	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
-+	{ .name = "TS3",    .value = 0x0040,      .frequency = 0 },
-+	{ .name = "TS4",    .value = 0x0080,      .frequency = 0 },
-+	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
-+	{ .name = "FREQ2",	.value = 0x0200,      .frequency = 0 },
-+	{ .name = "FREQ3",  .value = 0x0400,      .frequency = 0 },
-+	{ .name = "FREQ4",  .value = 0x0800,      .frequency = 0 },
-+	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
-+	{ }
-+};
-+
-+static const struct ocp_selector ptp_ocp_adva_x1_sma_out[] = {
-+	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
-+	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
-+	{ .name = "MAC",	.value = 0x0002,  .frequency = 1 },
-+	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
-+	{ .name = "GEN1",	.value = 0x0040 },
-+	{ .name = "GEN2",	.value = 0x0080 },
-+	{ .name = "GEN3",	.value = 0x0100 },
-+	{ .name = "GEN4",	.value = 0x0200 },
-+	{ .name = "GND",	.value = 0x2000 },
-+	{ .name = "VCC",	.value = 0x4000 },
-+	{ }
-+};
-+
- struct ocp_sma_op {
- 	const struct ocp_selector *tbl[2];
- 	void (*init)(struct ptp_ocp *bp);
-@@ -2639,6 +2902,14 @@ static const struct ocp_sma_op ocp_adva_sma_op = {
- 	.set_output	= ptp_ocp_sma_adva_set_output,
- };
- 
-+static const struct ocp_sma_op ocp_adva_x1_sma_op = {
-+	.tbl		= { ptp_ocp_adva_x1_sma_in, ptp_ocp_adva_x1_sma_out },
-+	.init		= ptp_ocp_sma_fb_init,
-+	.get		= ptp_ocp_sma_fb_get,
-+	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
-+	.set_output	= ptp_ocp_sma_adva_set_output,
-+};
-+
- static int
- ptp_ocp_set_pins(struct ptp_ocp *bp)
- {
-@@ -2887,18 +3158,19 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 	return ptp_ocp_init_clock(bp, r->extra);
- }
- 
--/* ADVA specific board initializers; last "resource" registered. */
-+/* ADVA board initializer; variant differences come from r->extra. */
- static int
- ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- {
--	int err;
-+	struct ptp_ocp_adva_info *info = r->extra;
- 	u32 version;
-+	int err;
- 
--	bp->flash_start = 0xA00000;
--	bp->eeprom_map = fb_eeprom_map;
--	bp->sma_op = &ocp_adva_sma_op;
--	bp->signals_nr = 2;
--	bp->freq_in_nr = 2;
-+	bp->flash_start = info->flash_start;
-+	bp->eeprom_map  = fb_eeprom_map;
-+	bp->sma_op      = info->sma_op;
-+	bp->signals_nr  = info->signals_nr;
-+	bp->freq_in_nr  = info->freq_in_nr;
- 
- 	version = ioread32(&bp->image->version);
- 	/* if lower 16 bits are empty, this is the fw loader. */
-@@ -2906,15 +3178,15 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 		version = version >> 16;
- 		bp->fw_loader = true;
- 	}
--	bp->fw_tag = 3;
-+	bp->fw_tag     = 3;
- 	bp->fw_version = version & 0xffff;
--	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-+	bp->fw_cap     = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
- 
- 	ptp_ocp_tod_init(bp);
- 	ptp_ocp_nmea_out_init(bp);
- 	ptp_ocp_signal_init(bp);
- 
--	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
-+	err = ptp_ocp_attr_group_add(bp, info->attr_groups);
- 	if (err)
- 		return err;
- 
-@@ -2923,7 +3195,7 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 		return err;
- 	ptp_ocp_sma_init(bp);
- 
--	return ptp_ocp_init_clock(bp, r->extra);
-+	return ptp_ocp_init_clock(bp, &info->servo);
- }
- 
- static ssize_t
-@@ -3982,6 +4254,43 @@ static const struct ocp_attr_group adva_timecard_groups[] = {
- 	{ },
- };
- 
-+static struct attribute *adva_timecard_x1_attrs[] = {
-+	&dev_attr_serialnum.attr,
-+	&dev_attr_gnss_sync.attr,
-+	&dev_attr_clock_source.attr,
-+	&dev_attr_available_clock_sources.attr,
-+	&dev_attr_sma1.attr,
-+	&dev_attr_sma2.attr,
-+	&dev_attr_sma3.attr,
-+	&dev_attr_sma4.attr,
-+	&dev_attr_available_sma_inputs.attr,
-+	&dev_attr_available_sma_outputs.attr,
-+	&dev_attr_clock_status_drift.attr,
-+	&dev_attr_clock_status_offset.attr,
-+	&dev_attr_ts_window_adjust.attr,
-+	&dev_attr_utc_tai_offset.attr,
-+	&dev_attr_tod_correction.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group adva_timecard_x1_group = {
-+	.attrs = adva_timecard_x1_attrs,
-+};
-+
-+static const struct ocp_attr_group adva_timecard_x1_groups[] = {
-+	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_x1_group },
-+	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal2_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal3_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq1_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq2_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq3_group },
-+	{ },
-+};
-+
- static void
- gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
- 	       const char *def)
--- 
-2.47.0
+> 2) You put a very fast path function out-of-line, why ?
 
+The reason is that tun uses sock_rps_record_flow_hash(). When I moved
+all rps_record_sock_flow and rps_record_cond modifications into
+include/net/rps.h, it triggered the following compilation errors due
+to symbol visibility:
+
+ERROR: modpost: "cpus_share_cache" [drivers/net/tun.ko] undefined!
+ERROR: modpost: "cpus_share_cache" [net/sctp/sctp.ko] undefined!
+make[2]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
+
+This arises because the patch uses cpus_share_cache() to limit the
+RFS/ARFS update frequency at the LLC level. To keep this in the fast
+path, I could move cpus_share_cache() to
+include/linux/sched/topology.h.
+
+> 3) I think the behavior should be selectable with a static key or
+> something like that.
+
+Please refer to my response to point 1.
+
+>
+> 4) Please provide benchmark results.
+
+The scenario is similar to the one described in "[RFC] problems with
+RFS on bRPC applications"[1].
+
+I attempted to enable ARFS on a Mellanox CX-6 NIC. While it performs
+well for simple workloads, performance degrades significantly when
+running a bRPC[2]  workload on a 2-node NUMA machine. After tracing, I
+identified patterns that ARFS/RFS fails to handle efficiently:
+
+- Multiple threads use epoll to read from the same socket, causing
+frequent flow updates in sock_flow_table.
+- Threads reading from the socket migrate frequently between CPUs.
+
+I tested a PoC version using a bRPC service, utilizing funccount [3]
+to monitor execution frequency and perf top to observe hotspots:
+
+Before Patch
+
+The mlx5e_rx_flow_steer frequency is over 380k/s, and queued_spin_lock
+is a major hotspot (6.30% in perf top). The application also suffers
+from a noticeable drop.
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer              387594
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer              390142
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer              386694
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer              389094
+
+# perf top hotspot:
+queued_spin_lock                         6.30%
+
+After Patch
+
+The ARFS update frequency is significantly reduced. queued_spin_lock
+is no longer a hotspot in perf top, and the application's overall
+performance has improved.
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer                      43
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer                        9
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer                    207
+
+FUNC                                     COUNT
+mlx5e_rx_flow_steer                      26
+
+1: https://lore.kernel.org/netdev/CAHCEFEwToeQe_Ey8e=3Dsf8fOmoobvrDCPsxw+hf=
+USoRawPX03+Q@mail.gmail.com/t/#u
+2: https://github.com/apache/brpc
+3: https://github.com/iovisor/bcc/blob/master/tools/funccount.py
+
+
+>
+> Thanks.
 
