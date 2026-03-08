@@ -1,164 +1,148 @@
-Return-Path: <netdev+bounces-265311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QCu8Cg2RrWkQ4gEAu9opvQ
-	(envelope-from <netdev+bounces-265311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 16:09:01 +0100
+	id 4BlSJzeUrWlH4gEAu9opvQ
+	(envelope-from <netdev+bounces-265312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 16:22:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B5D230D78
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 16:09:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E785230EE7
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 16:22:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A063B300D90D
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 15:08:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17BC9304A596
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 15:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6BF283FC8;
-	Sun,  8 Mar 2026 15:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mAAAj3Gw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4A621257F;
+	Sun,  8 Mar 2026 15:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CD527B33B
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 15:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE36A1F4181;
+	Sun,  8 Mar 2026 15:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772982535; cv=none; b=ptRd1QSTar/dwn6/YojAH1aPvqu7QoUXIIUwGmbMUdWyJkqPQgSI2/r8IAdvJAEyAXAkDy0zRefUtCHpURHhImau8FQv0MYiD6oKZbecNH73syzo/gLo7R15SPojzXkE/smJr8wUAJAyVOb0Mvf2TWp4M2vkeGH6Y4k+GuB7f0U=
+	t=1772983158; cv=none; b=IXdSjQtz5NAVM94gPWyGthdP8fPo5ProIEMegWHRnTo4Mtau0i40W01mSS3r88jcquKqdRShEdTpkJRskWuQmDpTpKwZGmDHZD5d57JefGnZjr/H2fCor8QaCMP6aWGqLfrp4URoQDwVzuUw3cJNxF6pztvv4qCkPUs9NK8/yRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772982535; c=relaxed/simple;
-	bh=mFK99LHKdUsRe+T0sCQq/VZyh7HJ7+oeMkEN2v6F0Ko=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oFYBkIrb8PX5VspOdpckhPxhmy1TuSwX80xVNx4J9ZvW16CaXkwfKGxz/Az4spaVU+p/UFtnRotZnNpUKN6SsPHTNYvVxMn1gEn+3qbCQWyp9+HShbWXd2Wruyyzi0KwuHlkEvXtf3djLtyf7TsothJIfBfS5XhNfCJiVqk/lhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mAAAj3Gw; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b95c0d77b42so79121166b.1
-        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 08:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772982532; x=1773587332; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkMvYk7sOOVr/eHkJO3RqJKUvxETsQyLKsECTZgBTXM=;
-        b=mAAAj3GwaoiN/+DzaHWynfZuZJnYGpPOTBo3A6ehJjk6lGhjmEFag55d5LB/JR0PKT
-         CUoUOe7/8n8oHZD5fjvPk/pXYjgWujNJlWPJds8sGUAZIA88HDHwPjv0mIQBDBVIMIYj
-         KJEnSsKR2tTdbhbGI3drZY0KLS1FzpDASxA/aki3f6I2YiGQyJtQsJmGJGC8XOMvi45+
-         TA7K4P/4e8DAoivaWM92LHF51vCGeYbXP7yPUyAi3uz+U8VIXL5JXkDGMxmDWpoz5wmq
-         ObsL78gM8dKQOkzU3k2LMCUAp8IeOrxoSgBbVu/eCaPQ1UJZAnCbfsjmj8+dwEHKDSQ5
-         anyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772982532; x=1773587332;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkMvYk7sOOVr/eHkJO3RqJKUvxETsQyLKsECTZgBTXM=;
-        b=oNb+ZNHhLC2ZqZo5sduVu1ANEYv48A2koNpStRNidRrc7iN2JCAceO3oUW1RBog0BN
-         5cOIj2/71QQON9i+4t8DCBZN5iHMCNXX3RvFlzHFXSYbvGmTs/YCJntDX6V3Z+63GgmD
-         lv5rBMoVccsnCtLa0I2SoAN7Zhae/p9UErLYUlGdFKVsfRNQxu2E4fdvBw5OjiA29atj
-         jpnM3VfvDfUM0Fr/8UGsS/7E23wUfifiLRpAV1/CQcj59/DZljkyPmNPSzaVwOLim4u8
-         1W0lI7/WxQCmmFsresf01BN78LLwvO2bffLT9kaNzfIFmgcZzog/9g4V6h9GYs8XiwE9
-         b9mA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcjV5vic32dR2TbRmGu5QzTYsEso/YkCKx5gMJGmW6ySYu9MoKXNIVSPBXqASC7MGYso6jN4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxnvw7/wrtkFUfddxfZ5uV5calCe9nyz0LnP3BRraQ9gSvodAA4
-	rLLt3epzc1MuXz1Zn7N2RjR0+wlqO7TMudi89CWHbnwVAc8uBGSwvU4HAhQStJq45b3kdy7U4pe
-	ULZTIXYCTqRiMFtg0Ow==
-X-Received: from edon12.prod.google.com ([2002:aa7:d04c:0:b0:660:dc70:2f35])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:f816:b0:b83:b7c5:de2c with SMTP id a640c23a62f3a-b942dbcd35dmr433671666b.10.1772982532042;
- Sun, 08 Mar 2026 08:08:52 -0700 (PDT)
-Date: Sun, 8 Mar 2026 15:08:50 +0000
-In-Reply-To: <88bd0bd2-74bd-4795-be3d-c303c75eee7e@lunn.ch>
+	s=arc-20240116; t=1772983158; c=relaxed/simple;
+	bh=acBv3VbP9SzjRO66t5HLGnGIKuxwF5A2AiO8VDY+Hb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WYVDlIw0GbJLvkMx+sIrV5b4s4Oq+sLyefuVBWd1Z/lxyjjo49yte6WcrkmqxIoMElOyBNoL4vIWFO5yEyhG0+mfh2Sp/8XHplI4/tUvXqahc3nwX4UlGc7f1AaDbF+3QtWMnSrNhRzEXagi74xGW8yKAvbDSLQjEaLddc8G3I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vzFuI-000000000ND-2gX4;
+	Sun, 08 Mar 2026 15:19:02 +0000
+Date: Sun, 8 Mar 2026 15:18:59 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next 1/2] dsa: tag_mxl862xx: set
+ dsa_default_offload_fwd_mark()
+Message-ID: <aa2TYxEHQ91SbT3A@makrotopia.org>
+References: <cover.1772853341.git.daniel@makrotopia.org>
+ <d9d8e6058e635c1fdd4689c875204d48d0235295.1772853341.git.daniel@makrotopia.org>
+ <3bee5ef1-0692-4779-832f-193017810c38@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260307104131.4c1d0de5@kernel.org> <aayWSuOM59uojtuG@google.com>
- <42407d43-00e9-4938-8d6c-70d83b0f2ac9@lunn.ch> <aayphfkModIeENp3@google.com> <88bd0bd2-74bd-4795-be3d-c303c75eee7e@lunn.ch>
-Message-ID: <aa2RAlWEKh-YUoqI@google.com>
-Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
-From: Alice Ryhl <aliceryhl@google.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 99B5D230D78
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3bee5ef1-0692-4779-832f-193017810c38@gmail.com>
+X-Rspamd-Queue-Id: 0E785230EE7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265311-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265312-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.306];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.988];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TO_DN_SOME(0.00)[]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,makrotopia.org:mid,makrotopia.org:email]
 X-Rspamd-Action: no action
 
-On Sun, Mar 08, 2026 at 03:12:55PM +0100, Andrew Lunn wrote:
-> On Sat, Mar 07, 2026 at 10:41:09PM +0000, Alice Ryhl wrote:
-> > On Sat, Mar 07, 2026 at 10:39:28PM +0100, Andrew Lunn wrote:
-> > > > > Please no duplication of existing code in Rust.
-> > > > 
-> > > > The plan is certainly to get rid of C Binder, but it was unfortunately
-> > > > not possible to get there without a transition period.
-> > > 
-> > > Dumb question....
-> > > 
-> > > Why?
+On Sat, Mar 07, 2026 at 10:57:56AM +0100, Jonas Gorski wrote:
+> Hi,
+> 
+> On 07/03/2026 04:30, Daniel Golle wrote:
+> > The MxL862xx offloads forwarding between bridged ports to the
+> > hardware, so set dsa_default_offload_fwd_mark() to avoid duplicate
+> > forwarding of packets of (eg. flooded) frames arriving at the CPU
+> > port.
 > > 
-> > The reasons for moving to a Rust implementation are discussed in the
-> > cover letter [1], and in my 2023 plumbers talk [2].
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  net/dsa/tag_mxl862xx.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/dsa/tag_mxl862xx.c b/net/dsa/tag_mxl862xx.c
+> > index 01f2158682718..c02f69de61cbb 100644
+> > --- a/net/dsa/tag_mxl862xx.c
+> > +++ b/net/dsa/tag_mxl862xx.c
+> > @@ -92,6 +92,8 @@ static struct sk_buff *mxl862_tag_rcv(struct sk_buff *skb,
+> >  	skb_pull_rcsum(skb, MXL862_HEADER_LEN);
+> >  	dsa_strip_etype_header(skb, MXL862_HEADER_LEN);
+> >  
+> > +	dsa_default_offload_fwd_mark(skb);
 > 
-> Ah, so you meant binder itself has be dual implementation for a while.
+> Does the switch (by default) also flood link local traffic (e.g. STP, LACP,
+> etc)? If not, you should not mark these as fwd offloaded.
 
-Yes, that's right.
+No, it doesn't. Testing revealed that apparently it silently consumes them.
+I assume we'll need something like
 
-> > No, it sends the same messages. The intent is for Android to move to the
-> > Rust implementation without userspace being able to tell the difference.
-> 
-> Any reason you cannot use this Rust netlink code with the C binder?
-> You can then throw away the C netlink code, no code duplication.
+if (likely(!is_link_local_ether_addr(eth_hdr(skb)->h_dest)))
+    dsa_default_offload_fwd_mark(skb);
 
-I think the benefit from that would be quite little. It would probably
-not have helped avoid commit 5e8a3d015442 ("binder: fix UAF in
-binder_netlink_report()") because that was a bug in the caller of
-binder_netlink_report(), rather than a bug in the function itself.
+similar to tag_brcm.c, right?
 
-And as for the benefit from avoiding duplication on its own, Binder's
-netlink logic is very small to begin with, so I do not think that's
-worth it either. It'll go away eventually when the entire C driver is
-deleted.
+> Is there is a bit in the header that says whether a packet was flooded or
+> trapped that you can check?
 
-Alice
+Earlier testing showed that frames arriving at the microcontroller under
+some conditions are relayed to the DSA CPU port -- and are destinguishable
+as such. However, there is not bit directly indicating whether the packet
+was (also) flooded already.
 
