@@ -1,227 +1,310 @@
-Return-Path: <netdev+bounces-265251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id RvaaHyA+rWlV0AEAu9opvQ
-	(envelope-from <netdev+bounces-265251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:15:12 +0100
+	id sAk5F98+rWmN0AEAu9opvQ
+	(envelope-from <netdev+bounces-265252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:18:23 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4BF222F1F4
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:15:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAF1A22F233
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D3DE1300E166
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 09:15:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F92E300CFDF
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 09:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA60C36074F;
-	Sun,  8 Mar 2026 09:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996D23537DA;
+	Sun,  8 Mar 2026 09:18:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzKCGzS/"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="11j/Qpgu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc0c.mail.infomaniak.ch (smtp-bc0c.mail.infomaniak.ch [45.157.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E912BF3D7;
-	Sun,  8 Mar 2026 09:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A2B25771;
+	Sun,  8 Mar 2026 09:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772961305; cv=none; b=u/RqxIabZmVagsg+Lpvl5eUIUZGbt6CrZj+pW8M2TIxYraRK7fCgan48TiLpx1pcYaAZecBbSd83tSlNghEVaXl6X/rxGibxTQG1DYfWp/WzC7+HDaS1WqbRHjSLAF4xM0UzRmaDZtqs+or/iCZt8sES4CVOWLXlwEvG0fmqdGU=
+	t=1772961498; cv=none; b=Hz9jO0CLQxNcaPCWXjM6UyqA7WWbUb1uaNPt5b67rslrY48JhXgKsBgpSYdo8DrXpmCSholm3qLCTiTt66jQbPIwy1ZMnhymXutb8XXcZsRloF+KRFw0tGSf+pvYzfnhD09R3x4WVq6QQyV1iKfVJ6YFT02sCKTVj+F05ntlPJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772961305; c=relaxed/simple;
-	bh=52QtocqDKEObTSjQNRtNF9jdSncGF37NJ1ZjaGX9/Qo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bI399Jxno9S2wOG/PgG/13ebev5XaIOdQ1NdIEBSeS2DQThuxfrfA/4EWc7QFANk4TD6624eZ74OgK/VhfOE/1/a96eVPi+Pwpae3v7TbvFMh5kNgOsB7WSWKje306DDKxB4EggxQfHzdJnXhU65UCTrIflBfj4U2dveQH6C1FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzKCGzS/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1B5C116C6;
-	Sun,  8 Mar 2026 09:15:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772961305;
-	bh=52QtocqDKEObTSjQNRtNF9jdSncGF37NJ1ZjaGX9/Qo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=MzKCGzS/azSRPm5/oQl177GlGpOoeGhcJaCKo+2Idc1YUvVXCbmYV+bQeZBPjPTwq
-	 MwEgnXbQQvLp0loNEbMy53d1Cd8GPMHcu4T8M7TJmAuhPtbR7E6fwyq9UeLTLteBJr
-	 00ZWoOfMGR/DCrCNPLqULlPUWMiOBGVN68RBw0JSL7g0UC+xhmcPvMyb9nZ3kBNwhU
-	 0ksE9hHhUprn9x1j1FYLqFoU6DvQR0ZVEvXVhOhQ+FsBaMlaUmbeLudXveVyIt8bYY
-	 pBbMHE4jxQrOeMHmBwv2vHReqMSWPB0mGq8PjxYiEhybEF/vkh+yVF4NNYBZSbsi/s
-	 6h6sJdrejS1Dw==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Shinichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long
- <longman@redhat.com>, Marco Elver <elver@google.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <87h5qr2rzi.ffs@tglx>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx>
-Date: Sun, 08 Mar 2026 10:15:01 +0100
-Message-ID: <87eclu3coa.ffs@tglx>
+	s=arc-20240116; t=1772961498; c=relaxed/simple;
+	bh=kVITkmu73zuBt8lAq/wExXmZyk2stvr6lP384AKd/38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bPk9acYGfW8nkHZaWm1DoUNQPc0qu05RLq9uFgQ89xUO6kPmqdoLlt96xMd13aR4kHDNj5STr3oQSm4sCrnN2gcWRkLw7Ntj0oY3qhMqo/fFrO5a2kewla9pcpxuWKL5Kp4/GUW7HAVKFB2kFv0plvXBiizurhr3niMjfpJyOMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=11j/Qpgu; arc=none smtp.client-ip=45.157.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fTF1D4h5CzDW6;
+	Sun,  8 Mar 2026 10:18:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1772961488;
+	bh=m3bY+fg21cYB5Zj66R09EdmA2pmMqEpsA8Gd0HDjBns=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=11j/Qpgu6MBFqiKMqGao0sejf2iX/yzq7R8Rcznz1IOLLIGZ4cNtrxIF3GC5gsBrK
+	 X2JzyzMd7F09ifZbffDYJ9mt7I0aIi0ZsEX6Uj1Va5+sCrxjmgI9sITYZyE2nCRMmf
+	 A6LnZGX+os+XX7dxLKInRXCgn3BTwOdcF5mQ6Uss=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fTF1C3bH0zBdD;
+	Sun,  8 Mar 2026 10:18:07 +0100 (CET)
+Date: Sun, 8 Mar 2026 10:18:04 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Jason Xing <kerneljasonxing@gmail.com>
+Cc: John Johansen <john.johansen@canonical.com>, 
+	Tingmao Wang <m@maowtm.org>, Justin Suess <utilityemal77@gmail.com>, 
+	Jann Horn <jannh@google.com>, linux-security-module@vger.kernel.org, 
+	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 2/9] landlock: Control pathname UNIX domain socket
+ resolution by path
+Message-ID: <20260308.AiYoh5KooBei@digikod.net>
+References: <20260215105158.28132-1-gnoack3000@gmail.com>
+ <20260215105158.28132-3-gnoack3000@gmail.com>
+ <20260217.lievaS8eeng8@digikod.net>
+ <20260220.82a8adda6f95@gnoack.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: E4BF222F1F4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260220.82a8adda6f95@gnoack.org>
+X-Infomaniak-Routing: alpha
+X-Rspamd-Queue-Id: CAF1A22F233
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-1.07 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MIXED_CHARSET(0.59)[subject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-265251-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265252-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,google.com,redhat.com,linutronix.de];
+	FREEMAIL_CC(0.00)[canonical.com,maowtm.org,gmail.com,google.com,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DMARC_NA(0.00)[digikod.net];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[digikod.net:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.963];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.240];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,digikod.net:dkim,digikod.net:mid]
 X-Rspamd-Action: no action
 
-On Sat, Mar 07 2026 at 23:29, Thomas Gleixner wrote:
-> I'll look at it more tomorrow in the hope that this rested brain
-> approach works out again.
+On Fri, Feb 20, 2026 at 03:33:28PM +0100, Günther Noack wrote:
+> +netdev, we could use some advice on the locking approach in af_unix (see below)
+> 
+> On Wed, Feb 18, 2026 at 10:37:14AM +0100, Mickaël Salaün wrote:
+> > On Sun, Feb 15, 2026 at 11:51:50AM +0100, Günther Noack wrote:
+> > > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> > > index f88fa1f68b77..3a8fc3af0d64 100644
+> > > --- a/include/uapi/linux/landlock.h
+> > > +++ b/include/uapi/linux/landlock.h
+> > > @@ -248,6 +248,15 @@ struct landlock_net_port_attr {
+> > >   *
+> > >   *   This access right is available since the fifth version of the Landlock
+> > >   *   ABI.
+> > > + * - %LANDLOCK_ACCESS_FS_RESOLVE_UNIX: Look up pathname UNIX domain sockets
+> > > + *   (:manpage:`unix(7)`).  On UNIX domain sockets, this restricts both calls to
+> > > + *   :manpage:`connect(2)` as well as calls to :manpage:`sendmsg(2)` with an
+> > > + *   explicit recipient address.
+> > > + *
+> > > + *   This access right only applies to connections to UNIX server sockets which
+> > > + *   were created outside of the newly created Landlock domain (e.g. from within
+> > > + *   a parent domain or from an unrestricted process).  Newly created UNIX
+> > > + *   servers within the same Landlock domain continue to be accessible.
+> > 
+> > It might help to add a reference to the explicit scope mechanism.
+> > 
+> > Please squash patch 9/9 into this one and also add a reference here to
+> > the rationale described in security/landlock.rst
+> 
+> Sounds good, will do.
+> 
+> 
+> > > +static void unmask_scoped_access(const struct landlock_ruleset *const client,
+> > > +				 const struct landlock_ruleset *const server,
+> > > +				 struct layer_access_masks *const masks,
+> > > +				 const access_mask_t access)
+> > 
+> > This helper should be moved to task.c and factored out with
+> > domain_is_scoped().  This should be a dedicated patch.
+> 
+> (already discussed in another follow-up mail)
+> 
+> 
+> > > +static int hook_unix_find(const struct path *const path, struct sock *other,
+> > > +			  int flags)
+> > > +{
+> > > +	const struct landlock_ruleset *dom_other;
+> > > +	const struct landlock_cred_security *subject;
+> > > +	struct layer_access_masks layer_masks;
+> > > +	struct landlock_request request = {};
+> > > +	static const struct access_masks fs_resolve_unix = {
+> > > +		.fs = LANDLOCK_ACCESS_FS_RESOLVE_UNIX,
+> > > +	};
+> > > +
+> > > +	/* Lookup for the purpose of saving coredumps is OK. */
+> > > +	if (unlikely(flags & SOCK_COREDUMP))
+> > > +		return 0;
+> > > +
+> > > +	/* Access to the same (or a lower) domain is always allowed. */
+> > > +	subject = landlock_get_applicable_subject(current_cred(),
+> > > +						  fs_resolve_unix, NULL);
+> > > +
+> > > +	if (!subject)
+> > > +		return 0;
+> > > +
+> > > +	if (!landlock_init_layer_masks(subject->domain, fs_resolve_unix.fs,
+> > > +				       &layer_masks, LANDLOCK_KEY_INODE))
+> > > +		return 0;
+> > > +
+> > > +	/* Checks the layers in which we are connecting within the same domain. */
+> > > +	dom_other = landlock_cred(other->sk_socket->file->f_cred)->domain;
+> > 
+> > We need to call unix_state_lock(other) before reading it, and check for
+> > SOCK_DEAD, and check sk_socket before dereferencing it.  Indeed,
+> > the socket can be make orphan (see unix_dgram_sendmsg and
+> > unix_stream_connect).  I *think* a socket cannot be "resurrected" or
+> > recycled once dead, so we may assume there is no race condition wrt
+> > dom_other, but please double check.  This lockless call should be made
+> > clear in the LSM hook.  It's OK to not lock the socket before
+> > security_unix_find() (1) because no LSM might implement and (2) they
+> > might not need to lock the socket (e.g. if the caller is not sandboxed).
+> > 
+> > The updated code should look something like this:
+> > 
+> > unix_state_unlock(other);
 
-There is another one of the same category. Combo patch below.
+unix_state_lock(other) of course...
 
-Thanks,
+> > if (unlikely(sock_flag(other, SOCK_DEAD) || !other->sk_socket)) {
+> > 	unix_state_unlock(other);
+> > 	return 0;
+> > }
+> > 
+> > dom_other = landlock_cred(other->sk_socket->file->f_cred)->domain;
+> > unix_state_unlock(other);
+> 
+> Thank you for spotting the locking concern!
+> 
+> @anyone from netdev, could you please advise on the correct locking
+> approach here?
+> 
+> * Do we need ot check SOCK_DEAD?
+> 
+>   You are saying that we need to do that, but it's not clear to me
+>   why.
+> 
+>   If you look at the places where unix_find_other() is called in
+>   af_unix.c, then you'll find that all of them check for SOCK_DEAD and
+>   then restart from unix_find_other() if they do actually discover
+>   that the socket is dead.  I think that this is catching this race
+>   condition scenario:
+> 
+>   * a server socket exists and is alive
+>   * A client connects: af_unix.c's unix_stream_connect() calls
+>     unix_find_other() and finds the server socket...
+>   * (Concurrently): The server closes the socket and enters
+>     unix_release_sock().  This function:
+>     1. disassociates the server sock from the named socket inode
+>        number in the hash table (=> future unix_find_other() calls
+>        will fail).
+>     2. calls sock_orphan(), which sets SOCK_DEAD.
+>   * ...(client connection resuming): unix_stream_connect() continues,
+>     grabs the unix_state_lock(), which apparently protects everything
+>     here, checks that the socket is not dead - and discovers that it
+>     IS suddenly dead.  This was not supposed to happen.  The code
+>     recovers from that by retrying everything starting with the
+>     unix_find_other() call.  From unix_release_sock(), we know that
+>     the inode is not associated with the sock any more -- so the
+>     unix_find_socket_by_inode() call should be failing on the next
+>     attempt.
+> 
+>   (This works with unix_dgram_connect() and unix_dgram_sendmsg() as
+>   well.)
+> 
+>   The comments next to the SOCK_DEAD checks are also suggesting this.
+> 
+> * What lock to use
+> 
+>   I am having trouble reasoning about what lock is used for what in
+>   this code.
 
-        tglx
----
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -10584,6 +10584,11 @@ static void mm_cid_fixup_cpus_to_tasks(s
- 
- 		/* Remote access to mm::mm_cid::pcpu requires rq_lock */
- 		guard(rq_lock_irq)(rq);
-+
-+		/* If the transit bit is set already, nothing to do anymore.  */
-+		if (cid_in_transit(pcp->cid))
-+			continue;
-+
- 		/* Is the CID still owned by the CPU? */
- 		if (cid_on_cpu(pcp->cid)) {
- 			/*
-@@ -10598,12 +10603,9 @@ static void mm_cid_fixup_cpus_to_tasks(s
- 		} else if (rq->curr->mm == mm && rq->curr->mm_cid.active) {
- 			unsigned int cid = rq->curr->mm_cid.cid;
- 
--			/* Ensure it has the transition bit set */
--			if (!cid_in_transit(cid)) {
--				cid = cid_to_transit_cid(cid);
--				rq->curr->mm_cid.cid = cid;
--				pcp->cid = cid;
--			}
-+			cid = cid_to_transit_cid(cid);
-+			rq->curr->mm_cid.cid = cid;
-+			pcp->cid = cid;
- 		}
- 	}
- 	mm_cid_complete_transit(mm, 0);
-@@ -10733,11 +10735,30 @@ void sched_mm_cid_fork(struct task_struc
- static bool sched_mm_cid_remove_user(struct task_struct *t)
- {
- 	t->mm_cid.active = 0;
--	scoped_guard(preempt) {
--		/* Clear the transition bit */
-+	/*
-+	 * If @t is current and the CID is in transition mode, then this has to
-+	 * handle both the task and the per CPU storage.
-+	 *
-+	 * If the CID has TRANSIT and ONCPU set, then mm_unset_cid_on_task()
-+	 * won't drop the CID. As @t has already mm_cid::active cleared
-+	 * mm_cid_schedout() won't drop it either.
-+	 *
-+	 * A failed fork cleanup can't have the transit bit set because the task
-+	 * never showed up in the task list or got on a CPU.
-+	 */
-+	if (t == current) {
-+		/* Invalidate the per CPU CID */
-+		this_cpu_ptr(t->mm->mm_cid.pcpu)->cid = 0;
-+		/*
-+		 * Clear TRANSIT and ONCPU, so the CID gets actually dropped
-+		 * below.
-+		 */
- 		t->mm_cid.cid = cid_from_transit_cid(t->mm_cid.cid);
--		mm_unset_cid_on_task(t);
-+		t->mm_cid.cid = cpu_cid_to_cid(t->mm_cid.cid);
- 	}
-+
-+	mm_unset_cid_on_task(t);
-+
- 	t->mm->mm_cid.users--;
- 	return mm_update_max_cids(t->mm);
- }
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -3809,7 +3809,8 @@ static __always_inline bool cid_on_task(
- 
- static __always_inline void mm_drop_cid(struct mm_struct *mm, unsigned int cid)
- {
--	clear_bit(cid, mm_cidmask(mm));
-+	if (!WARN_ON_ONCE(cid >= num_possible_cpus()))
-+		clear_bit(cid, mm_cidmask(mm));
- }
- 
- static __always_inline void mm_unset_cid_on_task(struct task_struct *t)
-@@ -3978,7 +3979,13 @@ static __always_inline void mm_cid_sched
- 		return;
- 
- 	mode = READ_ONCE(mm->mm_cid.mode);
-+
-+	/*
-+	 * Needs to clear both TRANSIT and ONCPU to make the range comparison
-+	 * and mm_drop_cid() work correctly.
-+	 */
- 	cid = cid_from_transit_cid(prev->mm_cid.cid);
-+	cid = cpu_cid_to_cid(cid);
- 
- 	/*
- 	 * If transition mode is done, transfer ownership when the CID is
-@@ -3994,6 +4001,11 @@ static __always_inline void mm_cid_sched
- 	} else {
- 		mm_drop_cid(mm, cid);
- 		prev->mm_cid.cid = MM_CID_UNSET;
-+		/*
-+		 * Invalidate the per CPU CID so that the next mm_cid_schedin()
-+		 * can't observe MM_CID_ONCPU on the per CPU CID.
-+		 */
-+		mm_cid_update_pcpu_cid(mm, 0);
- 	}
- }
- 
+It's not clear to me neither, and it looks like it's not consistent
+across protocols.
+
+>   
+>   Is it possible that the lock protecting ->sk_socket is the
+>   ->sk_callback_lock, not the unix_state_lock()?  The only callers to
+>   sk_set_socket are either sock_orphan/sock_graft (both grabbing
+>   sk_callback_lock), or they are creating new struct sock objects that
+>   they own exclusively, and don't need locks yet.
+> 
+>   Admittedly, in af_unix.c, sock_orphan() and sock_graft() only get
+>   called in contexts where the unix_state_lock() is held, so it would
+>   probably work as well to lock that, but it is maybe a more
+>   fine-grained approach to use sk_callback_lock?
+> 
+> 
+> So... how about a scheme where we only check for ->sk_socket not being
+> NULL:
+> 
+> read_lock_bh(&other->sk_callback_lock);
+> struct sock *other_sk = other->sk_socket;
+> if (!other_sk) {
+> 	read_unlock_bh(&other->sk_callback_lock);
+> 	return 0;
+> }
+> /* XXX double check whether we need a lock here too */
+> struct file *file = other_sk->file;
+> if (!other_file) {
+> 	read_unlock_bh(&other->sk_callback_lock);
+> 	return 0;
+> }
+> read_unlock_bh(&other->sk_callback_lock);
+> 
+> If this fails, that would in my understanding also be because the
+> socket has died after the path lookup.  We'd then return 0 (success),
+> because we know that the surrounding SOCK_DEAD logic will repeat
+> everything starting from the path lookup operation (this time likely
+> failing with ECONNREFUSED, but maybe also with a success, if another
+> server process was quick enough).
+> 
+> Does this sound reasonable?
+
+Actually, since commit 983512f3a87f ("net: Drop the lock in
+skb_may_tx_timestamp()"), we can just use RCU + READ_ONCE(sk_socket) +
+READ_ONCE(file).  The socket and file should only be freed after the RCU
+grace periode.  As a safeguard, this commit should be a Depends-on.
+
+However, it is safer to return -ECONNREFULED when sk_socket or file are
+NULL.
+
+I would be good to hear from netdev folks though.
+
+TIL, there is an LSM hook for sock_graft().
+
+> –Günther
+> 
 
