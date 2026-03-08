@@ -1,328 +1,252 @@
-Return-Path: <netdev+bounces-265244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +fXnOWYfrWk/ygEAu9opvQ
-	(envelope-from <netdev+bounces-265244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 08:04:06 +0100
+	id q3QaK9ggrWmaygEAu9opvQ
+	(envelope-from <netdev+bounces-265245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 08:10:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C0D22EDB1
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 08:04:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD1622EE0A
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 08:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC42F301226E
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 07:04:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B3BA3006177
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 07:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B17031B130;
-	Sun,  8 Mar 2026 07:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9ED2EE608;
+	Sun,  8 Mar 2026 07:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVVQ14S1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mr/s5HZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC86828489B
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 07:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F5A2D7BF
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 07:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772953440; cv=none; b=r50J0i8AQfjSVRfpX+KxNbh0n4fEuwE1uCz7OiRH1fEgpTkYu48zJThuMXuZ/Z/ayoP2pZHXmvgh/R8WzAK1nrjrI4D4EAtl3A8JMEWTJWC5kznvFxiU/5LmQA4hymgoL4qWeGINq7h2dut6U61PXno/XvSyXGctCp9OEvaF/Zk=
+	t=1772953814; cv=none; b=RedwB6QDxNglZdc3blzLu3ak2hWq+aEVauc/lsCghHuyt007hG/PnKXbFAHH3s9GglIlpN7JRhTJOBxbKi+bqw2tyZvYSRDR0YnLR1K9ER8cJxjNUdBv8NsolJ93nXTzWDWohMx1Xi2jx4+izfC2zyoyaA6ljpNg18v+GyI3VME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772953440; c=relaxed/simple;
-	bh=Zh1bm2G6WffKCPIN2jFLIG+MdQXeuGQ6TRbfmAtGFbg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wx6c5/Qj3PmTwkwrX5CIen3HmXvez9HfgzmuCxrzl0Jf2rDPG+zFZiArprTqQdpQPdDSL9TVQT9hyXkbP2Qa/fHTXgSzmEeVXAw+UGqqfFOjddHbTPzIe7DChCUFrHi4bXoOuHqja3hE3DmswTVnJOdIZxTNXPDeC7bXslC/BTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVVQ14S1; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1772953814; c=relaxed/simple;
+	bh=0ds3TvVp9Y0y3g1MolUjIlnDaEg4EeYjjW9KPAhlBQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LoEEEdlDx/hDl3f5yjUc3bNyclYJ8Y8zywc7K5HvE/KukoR6K4lkw/a8qnNnjkQb+NRIrwgxms9DuSM9HYDfCrJ3uJwPgdFeK4zIcweA8vHCe5hieV0tKxWUq/FLbvNwyMLoPZF0qiajBq+KzmReBSP6F51yx6AET3VA64WEsT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mr/s5HZQ; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-439c56e822eso4956500f8f.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 23:03:58 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ae4988e039so48567255ad.1
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 23:10:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772953437; x=1773558237; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uex+bKRQKHrL7xt0CITOz3u6A+gWG+tnnaXJC6V2/0g=;
-        b=LVVQ14S1EoOU4ymyVEyBlNQx56G8RYINnMKt2AA4LKebuH0NKefUVy1O52y1FYzbUz
-         C2Ln200Cq/DGaW7JUxZ+5ERpD0NQMSvwmADAjBW0vIina49PhzEsRSp4hqU8Uags9GFO
-         r42hFPmzy/RBG6slzMQIsR57LhxIxc9us/rK2Fc60TDp7JNA/H0fAMIZaviJ7Q2/Z5Ls
-         zJprEJ6OkM5I1H2rwU01ovMFTv/wywdqPGstlv20P/8/TqALX/iqkS9QHvDVxlDQTmHO
-         4iYo3sz3PZWopZ0bdCsowLQlpG2+v+FX7fNjIHBqounU83jVPYmlr4HfwrdqyETtkdCR
-         k63Q==
+        d=gmail.com; s=20230601; t=1772953812; x=1773558612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IvG+tAEOxjAJfsrmxdX9V5/bQEDskvpKd6MJkmnCi6U=;
+        b=mr/s5HZQI8pC4SK2PYYM/Sr3A+rZCjv78UQtkwInJiDp7i6BqYJXW3OOOQG9Vkwnz9
+         AOIsrUVOdVk9IkNGA1ZTjgP/omsbHew52vHrYpcvRj88ckCODnsFFoPmdxlKE/ceoBpg
+         W7uWZQ2bboxis2tRJ3ufYnE3FGbU+rELqFEecefoLZNRqAcK9TTrrRj5bUUuiLcU91Ey
+         SYcSHIDkspr2E23gSzVYCszZuke0W44PjgRSgI70IfUUzTxFQquDCE5EydSpzPEI+p1I
+         uJYsX5aYuYWeOmqStx1+NwTdf33g1jIleQ2lAdjuwxbxPMboryNBb3OYxoimHAKtUVT8
+         DF/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772953437; x=1773558237;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uex+bKRQKHrL7xt0CITOz3u6A+gWG+tnnaXJC6V2/0g=;
-        b=on1/7hP2VIBaHYMUOHIcvMfwH9oieE3QLN39J7QA8O/PeZDDORJbBcUqguuENcIQ+O
-         c9KLpxNrEx/gXbc/YOSyStK6MpLZ3uRpvY4JCSdjB/BvBIsX2xDq5YZtiAy5PDjv0Zwu
-         tPVU7HzKBOtEt8NqCJIS3yo0FORNNHLLB2ANzRqdjoutbF2N+BaVejxNj8obnlh3OB6q
-         MTp2fCs4c4Z4oILd2cNRh4tqvnsh1sHOX3Q2iTeyJfDfryVlwTHoYxRjvI1F9/i/VbYa
-         S2Nkj8RSyljHcaofXLs1DNFJ3O+VbIlOc1ofMEHpg3r/mjjyab02VPzr0QHGSMPsrJq2
-         z1fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcrpnxdP2u0rW15GyVsQxnYghj65CFt3ZtlWPSlD9f+qpHaDpn11d+TJqQxNn6XLMcqECbHwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHQSSH6rtzOEIpIS5V/+sNBeIdHV3iqGq1Sxmzfbcfw4ITnDr/
-	j6tfQCe52YAp3evoJJ0aHe2lvFSjiTtO0N10vdWCqPRzGayDwF/R74dw
-X-Gm-Gg: ATEYQzxgR7yCB3Wphku7QD6aom4tn87LNywRsn4PFbyzFDRf0Lalf/FjJow0FMaRMn+
-	2RMzw8lN8ZVqyCgHvwBFQ9GW7u0uXd+POszZrTe4S1GIc4/AbOG0S4zlFTcjOOxuAbXVQnI29gB
-	rh0gaE/pZZwmvj6ShT20qCqCTolW9nH/XjGZeDq9h5IYbLC2sCRNpaBxeqKwM1WeyALBPh0HV/7
-	bJfnhPnuDID9pzOnG12iRdj4wdtOVFdaorWPHp80UO1FfHfyfRa7qsQ9uPNi6hnF2EqJzDOasSn
-	YkJRd0mAmhNKFxz1jR6khuec8KElC3wZxQOO6rhbV2fDO0bPTSqD4jJNBQmJ12wAoe83m0odLU8
-	E1zoRtgXWVBuS/AQO4Rdxh4yLkt9GHOhEGiKOcjOXXDvUZWhD2ItGgCs2fN1IFsnsMYxH48/iM5
-	05UJSJClVPj7bYKnXqqlmWDnjphFxoG4OnsqQFFNak+TdTbI2Doypc6ZH+aw==
-X-Received: by 2002:a5d:5f93:0:b0:439:b791:f920 with SMTP id ffacd0b85a97d-439da656af4mr13244466f8f.17.1772953436851;
-        Sat, 07 Mar 2026 23:03:56 -0800 (PST)
-Received: from [10.221.200.186] ([165.85.126.96])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae36785sm15614890f8f.27.2026.03.07.23.03.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Mar 2026 23:03:56 -0800 (PST)
-Message-ID: <6f3c34dc-af62-4f54-b56f-4aa6e8f1c690@gmail.com>
-Date: Sun, 8 Mar 2026 09:03:58 +0200
+        d=1e100.net; s=20230601; t=1772953812; x=1773558612;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IvG+tAEOxjAJfsrmxdX9V5/bQEDskvpKd6MJkmnCi6U=;
+        b=KmENDAbHmrNnCtVXY+FhMCOaVeSD9qLyogrubkEwfyBg+aOz128dkMdl/3obnmrVcl
+         5qStNjcKmvltj9Fc7sblxQ31/gbaJfFFVd6TH/QDFQAzQ42YbRYs7FxIdvVsoJDxyMCY
+         N/YOw+iax8+lOlWcK7RO+xKV+ZvL/CaIln9TxVG3AA1Sej8pQG/wWq8xGO994iDEiZdD
+         qX/XeJuUtmYSVEap0hrYooBYmdWc26HOyr1pphjMdBbNSM6KhhVn4RdOkdEBvITpnOrP
+         BZL9rPVohPOHxhrMSoIcRf14esceh1AYF6ymbKCkYcJS7A4QOnzLWIxgowJ4rrx98v20
+         hirw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlxZKYaDBIss8Dl03gdMfXFRzNCJ5z8x4H00iSZUU+pAndCm0hmOWqB3TeXWdn4HF3X0WDdUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkQiWhFhNU8Q3M+YQUTMtejSPksrcAkum3ieCSzUOnCrz0egPC
+	uuxsCldT7E+NvBkEUiB9MkeZwhTdByHAtBhO/9pgdAjCXvGeXh+la6Ik
+X-Gm-Gg: ATEYQzwvdJ45auytOVewxEXH3ednGhn3yOsd3PMMBxQ66K0PH1WNiXWzlIPath15iUN
+	yHx8sFkEz5kRr/9pjdXOZxsl+2UmnfCFVap7xWI9I4/Xh626d1/5NiONnXfy5rbLUjAKWN7WjuA
+	3M3VM1HlqdIA9NJvnPuYkHGW8+Ut1sl9DPdZ7TH/ypLYV7i4AMxhsILjw5ZBSLLZKhgzO5GTBYW
+	WtaUrDkzcHRjf1jL//Ta53C6KOHCBklwPe5buWa7FS7QiSfRcPMc6ABRaQAceWGVTvlaPTW5Lzf
+	K/5gbRXjnLtDOnZtIKspk5ql07JO4cHntJdEtRyY7RcvHvIHSHvsoHm0oQpanbvgCvcLWnnBR43
+	gnBrIFLDyZ79xRJL8JQSKSKcst1MhEfF++kDJSXb+tYVX3Ag9jIvGJ6ztrnESo/Fu/4lGeLoKOP
+	JmcYgLb5KoZiQCIv2wdZzk195xy2T7xmrPyA2y0OFVtNSyAwIdegvfKbgErTc=
+X-Received: by 2002:a17:902:d48d:b0:2ae:7f85:33d1 with SMTP id d9443c01a7336-2ae8286dc43mr72245585ad.0.1772953812451;
+        Sat, 07 Mar 2026 23:10:12 -0800 (PST)
+Received: from localhost.localdomain ([2409:8929:1733:8137:18a2:98d0:7c4b:4d56])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e97924sm73472115ad.27.2026.03.07.23.10.08
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 07 Mar 2026 23:10:12 -0800 (PST)
+From: Chuang Wang <nashuiliang@gmail.com>
+To: 
+Cc: Chuang Wang <nashuiliang@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: reduce RFS/ARFS flow updates by checking LLC affinity
+Date: Sun,  8 Mar 2026 15:09:16 +0800
+Message-ID: <20260308070925.58939-1-nashuiliang@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/mlx5e: Precompute xdpsq assignments for
- mlx5e_xdp_xmit()
-To: Finn Dayton <Finnius.Dayton@spacex.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "kuba@kernel.org" <kuba@kernel.org>, "hawk@kernel.org" <hawk@kernel.org>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "sdf@fomichev.me" <sdf@fomichev.me>, "saeedm@nvidia.com"
- <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
- "tariqt@nvidia.com" <tariqt@nvidia.com>,
- "mbloch@nvidia.com" <mbloch@nvidia.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <60E0EC79-4E2B-4874-9CEB-6558706A910A@spacex.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <60E0EC79-4E2B-4874-9CEB-6558706A910A@spacex.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 45C0D22EDB1
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4DD1622EE0A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-265244-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nashuiliang@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.973];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.983];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+The current implementation of rps_record_sock_flow() updates the flow
+table every time a socket is processed on a different CPU. In high-load
+scenarios, especially with Accelerated RFS (ARFS), this triggers
+frequent flow steering updates via ndo_rx_flow_steer.
 
+For drivers like mlx5 that implement hardware flow steering, these
+constant updates lead to significant contention on internal driver locks
+(e.g., arfs_lock). This contention often becomes a performance
+bottleneck that outweighs the steering benefits.
 
-On 02/03/2026 7:52, Finn Dayton wrote:
-> mlx5e_xdp_xmit() currently selects the xdpsq (send queue) using
-> smp_processor_id() (i.e. cpu id). When doing XDP_REDIRECT from a cpu
-> with id >= priv->channels.num, however, mlx5e_xdp_xmit() returns -ENXIO
-> and the redirect fails.
-> 
-> Previous discussion proposed using modulo or while loop subtraction
-> in mlx5e_xdp_xmit() to map cpu id to send queue, but these approaches
-> introduce hot path overhead on modern systems where the number of
-> logical cores >> the number of XDP send queues (xdpsq).
-> 
-> The below approach precomputes per-cpu priv->xdpsq assignments when
-> channels are (re)configured and does a constant-time lookup in
-> mlx5e_xdp_xmit().
-> 
-> Because multiple CPUs may now map to the same xdpsq (whenever cpu count
-> exceeds channel count), we serialize writes in xdp_xmit with a tx_lock.
-> 
-> Link: https://lore.kernel.org/all/610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com/
-> Link: https://lore.kernel.org/all/474c1f71-3a5c-4fe5-a01e-80f2ba95fd7e@bytedance.com/
-> Signed-off-by: Finn Dayton <finnius.dayton@spacex.com>
-> ---
-> v2:
-> - Removed unnecessary guards
-> - Improved variable naming and placement
-> - Change mapping from cpu -> index to cpu -> xdpsq
-> - Call smp_wmb() after updates to mapping
-> 
+This patch introduces a cache-aware update strategy: the flow record is
+only updated if the flow migrates across Last Level Cache (LLC)
+boundaries. This minimizes expensive hardware reconfigurations while
+preserving cache locality for the application.
 
-Thanks for your patch. Sorry for the delayed feedback.
+Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+---
+ include/net/rps.h | 17 +--------------
+ net/core/dev.c    | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+), 16 deletions(-)
 
-Were you able to do some basic packet-rate testing for it?
-Any noticeable impact?
-
-A few nits below.
-
->   drivers/net/ethernet/mellanox/mlx5/core/en.h  |  4 +++
->   .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 17 ++++++-------
->   .../net/ethernet/mellanox/mlx5/core/en_main.c | 25 +++++++++++++++++++
->   3 files changed, 36 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> index ea2cd1f5d1d0..713dc7f9bae3 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> @@ -493,6 +493,8 @@ struct mlx5e_xdpsq {
->   	u16                        pc;
->   	struct mlx5_wqe_ctrl_seg   *doorbell_cseg;
->   	struct mlx5e_tx_mpwqe      mpwqe;
-> +	/* serialize writes by multiple CPUs to this send queue */
-> +	spinlock_t                 tx_lock;
->   
->   	struct mlx5e_cq            cq;
->   
-> @@ -898,6 +900,8 @@ struct mlx5e_priv {
->   	struct mlx5e_selq selq;
->   	struct mlx5e_txqsq **txq2sq;
->   	struct mlx5e_sq_stats **txq2sq_stats;
-> +	/* selects the xdpsq during mlx5e_xdp_xmit() */
-> +	struct mlx5e_xdpsq * __percpu *send_queue_ptr;
->   
->   #ifdef CONFIG_MLX5_CORE_EN_DCB
->   	struct mlx5e_dcbx_dp       dcbx_dp;
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> index 80f9fc10877a..1db83a69055c 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> @@ -845,7 +845,6 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   	struct mlx5e_priv *priv = netdev_priv(dev);
->   	struct mlx5e_xdpsq *sq;
->   	int nxmit = 0;
-> -	int sq_num;
->   	int i;
->   
->   	/* this flag is sufficient, no need to test internal sq state */
-> @@ -854,14 +853,12 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   
->   	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
->   		return -EINVAL;
-> -
-> -	sq_num = smp_processor_id();
-> -
-> -	if (unlikely(sq_num >= priv->channels.num))
-> -		return -ENXIO;
-> -
-> -	sq = priv->channels.c[sq_num]->xdpsq;
-> -
-> +	/* Per-CPU xdpsq mapping, rebuilt on channel (re)configuration while XDP TX is disabled */
-
-Line too long?
-
-> +	sq = *this_cpu_ptr(priv->send_queue_ptr);
-> +	/* The number of queues configured on a netdev may be smaller than the
-> +	 * CPU pool, so two CPUs might map to this queue. We must serialize writes.
-> +	 */
-> +	spin_lock(&sq->tx_lock);
->   	for (i = 0; i < n; i++) {
->   		struct mlx5e_xmit_data_frags xdptxdf = {};
->   		struct xdp_frame *xdpf = frames[i];
-> @@ -941,7 +938,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   
->   	if (flags & XDP_XMIT_FLUSH)
->   		mlx5e_xmit_xdp_doorbell(sq);
-> -
-> +	spin_unlock(&sq->tx_lock);
->   	return nxmit;
->   }
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index b6c12460b54a..434db74f096b 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -1505,6 +1505,7 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
->   	sq->stop_room = param->is_mpw ? mlx5e_stop_room_for_mpwqe(mdev) :
->   					mlx5e_stop_room_for_max_wqe(mdev);
->   	sq->max_sq_mpw_wqebbs = mlx5e_get_max_sq_aligned_wqebbs(mdev);
-> +	spin_lock_init(&sq->tx_lock);
->   
->   	param->wq.db_numa_node = cpu_to_node(c->cpu);
->   	err = mlx5_wq_cyc_create(mdev, &param->wq, sqc_wq, wq, &sq->wq_ctrl);
-> @@ -3283,10 +3284,27 @@ static void mlx5e_build_txq_maps(struct mlx5e_priv *priv)
->   	smp_wmb();
->   }
->   
-> +static void mlx5e_build_xdpsq_maps(struct mlx5e_priv *priv)
-> +{
-> +	/* Build mapping from CPU id to XDP send queue, used by
-> +	 * mlx5e_xdp_xmit() to determine which send queue to transmit packet on.
-> +	 */
-> +	int cpu;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		int send_queue_idx = cpu % priv->channels.num;
-> +		struct mlx5e_xdpsq *sq = priv->channels.c[send_queue_idx]->xdpsq;
-
-maintain RCT.
-
-> +		*per_cpu_ptr(priv->send_queue_ptr, cpu) = sq;
-> +	}
-> +	/* Publish the new CPU->xdpsq map before re-enabling XDP TX */
-> +	smp_wmb();
-> +}
-> +
->   void mlx5e_activate_priv_channels(struct mlx5e_priv *priv)
->   {
->   	mlx5e_build_txq_maps(priv);
->   	mlx5e_activate_channels(priv, &priv->channels);
-> +	mlx5e_build_xdpsq_maps(priv);
->   	mlx5e_xdp_tx_enable(priv);
->   
->   	/* dev_watchdog() wants all TX queues to be started when the carrier is
-> @@ -6262,8 +6280,14 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
->   	if (!priv->fec_ranges)
->   		goto err_free_channel_stats;
->   
-> +	priv->send_queue_ptr = alloc_percpu(struct mlx5e_xdpsq *);
-> +	if (!priv->send_queue_ptr)
-> +		goto err_free_fec_ranges;
-> +
->   	return 0;
->   
-> +err_free_fec_ranges:
-> +	kfree(priv->fec_ranges);
->   err_free_channel_stats:
->   	kfree(priv->channel_stats);
->   err_free_tx_rates:
-> @@ -6290,6 +6314,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
->   	if (!priv->mdev)
->   		return;
->   
-> +	free_percpu(priv->send_queue_ptr);
-
-keep symmetric to the order in mlx5e_priv_init.
-
->   	kfree(priv->fec_ranges);
->   	for (i = 0; i < priv->stats_nch; i++)
->   		kvfree(priv->channel_stats[i]);
+diff --git a/include/net/rps.h b/include/net/rps.h
+index e33c6a2fa8bb..2cd8698a79d5 100644
+--- a/include/net/rps.h
++++ b/include/net/rps.h
+@@ -55,22 +55,7 @@ struct rps_sock_flow_table {
+ 
+ #define RPS_NO_CPU 0xffff
+ 
+-static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+-{
+-	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
+-	u32 val = hash & ~net_hotdata.rps_cpu_mask;
+-	struct rps_sock_flow_table *table;
+-
+-	/* We only give a hint, preemption can change CPU under us */
+-	val |= raw_smp_processor_id();
+-
+-	table = rps_tag_to_table(tag_ptr);
+-	/* The following WRITE_ONCE() is paired with the READ_ONCE()
+-	 * here, and another one in get_rps_cpu().
+-	 */
+-	if (READ_ONCE(table[index].ent) != val)
+-		WRITE_ONCE(table[index].ent, val);
+-}
++void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash);
+ 
+ static inline void _sock_rps_record_flow_hash(__u32 hash)
+ {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 203dc36aaed5..770cfb6fe06b 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5175,6 +5175,60 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 	return cpu;
+ }
+ 
++/**
++ * rps_record_cond - Determine if RPS flow table should be updated
++ * @old_val: Previous flow record value
++ * @new_val: Target flow record value
++ *
++ * Returns true if the record needs an update.
++ */
++static inline bool rps_record_cond(u32 old_val, u32 new_val)
++{
++	u32 old_cpu = old_val & ~net_hotdata.rps_cpu_mask;
++	u32 new_cpu = new_val & ~net_hotdata.rps_cpu_mask;
++
++	if (old_val == new_val)
++		return false;
++
++	/* Force update if the recorded CPU is invalid or has gone offline */
++	if (old_cpu >= nr_cpu_ids || !cpu_active(old_cpu))
++		return true;
++
++	/*
++	 * Force an update if the current task is no longer permitted
++	 * to run on the old_cpu.
++	 */
++	if (!cpumask_test_cpu(old_cpu, current->cpus_ptr))
++		return true;
++
++	/*
++	 * If CPUs do not share a cache, allow the update to prevent
++	 * expensive remote memory accesses and cache misses.
++	 */
++	if (!cpus_share_cache(old_cpu, new_cpu))
++		return true;
++
++	return false;
++}
++
++void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
++{
++	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
++	u32 val = hash & ~net_hotdata.rps_cpu_mask;
++	struct rps_sock_flow_table *table;
++
++	/* We only give a hint, preemption can change CPU under us */
++	val |= raw_smp_processor_id();
++
++	table = rps_tag_to_table(tag_ptr);
++	/* The following WRITE_ONCE() is paired with the READ_ONCE()
++	 * here, and another one in get_rps_cpu().
++	 */
++	if (rps_record_cond(READ_ONCE(table[index].ent), val))
++		WRITE_ONCE(table[index].ent, val);
++}
++EXPORT_SYMBOL(rps_record_sock_flow);
++
+ #ifdef CONFIG_RFS_ACCEL
+ 
+ /**
+-- 
+2.47.3
 
 
