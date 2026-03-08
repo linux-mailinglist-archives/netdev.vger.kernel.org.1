@@ -1,304 +1,194 @@
-Return-Path: <netdev+bounces-265255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJDdMUFCrWkM0QEAu9opvQ
-	(envelope-from <netdev+bounces-265255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:32:49 +0100
+	id 0UjuHMZIrWnN0wEAu9opvQ
+	(envelope-from <netdev+bounces-265256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 11:00:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2986E22F354
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 10:32:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3EBE22F436
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 11:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD478300C91B
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 09:32:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D9A43002E55
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 10:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC29535B650;
-	Sun,  8 Mar 2026 09:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CA7145348;
+	Sun,  8 Mar 2026 10:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uPJMd4l5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="R/29zoFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012028.outbound.protection.outlook.com [52.101.43.28])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011056.outbound.protection.outlook.com [52.101.52.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0E12D3ED2;
-	Sun,  8 Mar 2026 09:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD88267386;
+	Sun,  8 Mar 2026 10:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.56
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772962327; cv=fail; b=YHL+nc6ya5RxOV9XWkcwx7Q1VedUASxwo/tomx6HvyC7BplUir1VTsZ2Xs/noRNP4CIzj9WAOZ4Lp0Zbu1AJwBIXGkFj1FV8Ok74JgIJFA2qtaB+6kxsoGuYm8gvWG/1hCwuXpM/YySWXssoEoSaBLvS3WOvbLDBBVBQVCmiYis=
+	t=1772964035; cv=fail; b=DLNJMFSx4+1PrbJ2Ot3bs4kx98lpjafAxYdG4xBvxSVDbe1aMluSaseoBx5PoUkHN5GwaW3UX3Ic+TbU8OIFAgpZqHVcUGus/aJama/0mbW3nTNzxP1gpyz9NEIeDKz9ePAsN9HNVS72KoD3n8vBJuElyi5YN9ufZDI8yddUGbc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772962327; c=relaxed/simple;
-	bh=mPD0M5Xy9DA5n2TfEanp9FQBbc8WQp0ZLLUyk+5buuA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TNqnx+JMokJqye06M36myacqmYQZVYbzmfMtxAShUWUXq/GrHPAF9e2OM0pTLlzTraDw4TaQrPKQMDDsXuot1wTY7fk1cqgUA3vNcxOGfSN7NsuuaLRDZcGcESic98pcnUCowFhdKWzDd+Ld9IRyG87X2T/xhGMVwKNX+4aj/uU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uPJMd4l5; arc=fail smtp.client-ip=52.101.43.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1772964035; c=relaxed/simple;
+	bh=ukEqim9tNNLcDR+oWXh9lCgUSprSxIFsRs//W7lpZP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=a0EO6sOhGxaAwubQUS8NzlQsmbKJ61OT36W60lFH6yZLnE4oJmkI44teWfnU2wWZBzy+KCUVQXwWIC5NkaStdMCYNRcWBrNWitB09Jm2I561WdZa7F1F3d1mZWarDP9vNhJfmsGeodx1cdBf3usth5WY7tevvOdv78ITh4Bz/xg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=R/29zoFT; arc=fail smtp.client-ip=52.101.52.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vkmCo4xQ05BfIKIOUp9oWPcZTXEZyQmdfP1XmaEGP/jjPjacnDHJPgq47pH11zXF45vFD9ZxPXNSNQxkTCnGiTeijYIefr8Ji4MOtkW0j6Z7YQXrsUz1RktG4gwG/UxwSOHsfuFilv1DJCt0hgHHs5K4mQcnqSKDSZyG76wPRPNw6GOjdBQcWRpB4aLHe5ixPsDVVoTQjbgCTT5Oe5aqfK/jMYeTctIycMFDGn0v7L1YLqboMXjlouR6hfWShChyGg+bxz+bjBDg6vQidUUwEPq3MWDYcd+7EwnEXxP6pTEd8e0o7Kjf0vwJsFkUa+LDVMoOOIj6aNgps3Dnat+J6w==
+ b=sOak8S1WDGdq8QYu3M5MYsEKPCbPry5PUJwWJVyZktoAIfwaqCCJxWwnbU+emLqDwYOzKg1YZMGYxVRf3GrreV+yv8HGQ28rMvq8ZJa03m+pVBdKLKF5W9LgAjt2oWnPyTOiLAiyF3i9QHqXOkZVnrrDt4vJEa7mP+00Na+hpjhhCXGHUzp3lj4w47gORosqoa4xKRhv0PTOwJFp7MzA0Q17cnVOYwrzJnAK8f32XNOXw11lQfBfs+qGtJIuQa4rMsQWPJmMlzTzrX/9enKk/lwrIF6+AG5ruUTOV0i4CqCkXvcBO84SBFb4WSrSQfdVSKP7VnY+yH6/FHOmH+vO8w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FQZ7GvZ3YSDloFfWmU+Wl7lcVNVVg498Swlr0jqv2GA=;
- b=GHY5hRXPfTmqRa1RqajiLIPQkml77dM5VSnHLLccbX3Lrb1rZ3T2Volwiyq357Qlt5XoyO8HnPXFLvdrl5fENX+OzqF+dz2pfL0y8AOeUshHD+DYjdlYonvoT6g+vRPOH7W/lxMxinMuRwo1stVa0oayI+Je0TIPGLqX4L5Oom9kKiTdjaLsZLGaUALmW49xzlz9EaYoNSJOdj9mMQU+EScCuUVGxjpc1FYXLIPg5kcx51BFS/AKYdSJLvqgjxKlC8So6PI1SSnelKZuDfm8Ty9uSCisADR+/YUiYr8vzCZ0/qZV0QpJ+ZP6de4IguoD8oMC7M599V+xvch0GU1ykA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=cIdMfLacpj/bvakjJKDqp2pha9Ot/CB6Xz3LCvvwC5Y=;
+ b=CgROvbzrEZyRzFJujo0odlPmvVsGfBQXGeADb+Y6OQUTzUB15MvvUpB2AGT+vzvHeR+SXZQABMzdD7BUVpOZmI1AAY49ODdSpbCa1P5w3/5M0eZL5ga+vI2t32uJJcu4X5BmAtJe3eRzhkI8BdACdxZtDsooB2dS2iJI8wtUkzyCx+7xyj+72Bgdg/P66D+M55LJBHgfftKxXFR0TlDNUHHD69hr3qCtA0Hogypno9zKgebjsGeGD1TZFwOM6sSoqknfiMpqQNLI3vjXIo9CtOel7JWAnwlZHyunCU394I1ezFLAgxeliIXt7/uLh7E3BfxyzG0TLyudi6X5+pUJLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FQZ7GvZ3YSDloFfWmU+Wl7lcVNVVg498Swlr0jqv2GA=;
- b=uPJMd4l5DxY4YtMp0kHElYv0ialo4mdeFAk4BHqxBhH0dQYFIlZ/XOIZKSZOWOUKxFvP1qbgjVmvRLOAm1pppqwd5Ak5/OGkN9nJFZ573/ZNMbe9j45F7PoJ6ZQHRJ/yMI1BQxa32DgedzUc5j76R130X+krn9wLv3SVXdaXPCY=
-Received: from BL0PR02CA0053.namprd02.prod.outlook.com (2603:10b6:207:3d::30)
- by PH7PR12MB5973.namprd12.prod.outlook.com (2603:10b6:510:1d8::12) with
+ bh=cIdMfLacpj/bvakjJKDqp2pha9Ot/CB6Xz3LCvvwC5Y=;
+ b=R/29zoFTWUReaM63CmyKO1ULCQbiGzll8jV8ETvQXEg/5PcMB/yznC96HgkXRuhsVUq81MQGKwbJ1+nzJj6hXX7M2J5YxQACKn9WRElt6/ER/wqNx+ptTotfqqP83ZZmQtNzfl5x5g9UoEMPDbjB3FhgtndZB55lWwLzAd/w/8aTYlKm9vAXAywTyXF76qGIRJDuQqEKWUFpLHU6n3AfMBHPQjnEZGma4b6J4WWzkFbDaAQ7vOvMRgbc8u6+Az3C6hgipCWpZPb4mHEJZA03ugI6p/C8mZCUhaGXthGZN1kgzn7pC/0bSgmvKHkjBq/x+qu1zklUNL2G3AV3QhxteA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by IA1PR12MB6530.namprd12.prod.outlook.com (2603:10b6:208:3a5::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Sun, 8 Mar
- 2026 09:29:37 +0000
-Received: from BL6PEPF00022573.namprd02.prod.outlook.com
- (2603:10b6:207:3d:cafe::41) by BL0PR02CA0053.outlook.office365.com
- (2603:10b6:207:3d::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.23 via Frontend Transport; Sun,
- 8 Mar 2026 09:29:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL6PEPF00022573.mail.protection.outlook.com (10.167.249.41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Sun, 8 Mar 2026 09:29:37 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sun, 8 Mar
- 2026 04:29:34 -0500
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>, "Raju
- Rangoju" <Raju.Rangoju@amd.com>
-Subject: [PATCH net-next v2 2/2] amd-xgbe: add PCI power management for S0i3 support
-Date: Sun, 8 Mar 2026 14:58:51 +0530
-Message-ID: <20260308092851.1510214-3-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260308092851.1510214-1-Raju.Rangoju@amd.com>
-References: <20260308092851.1510214-1-Raju.Rangoju@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.9; Sun, 8 Mar
+ 2026 10:00:30 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9700.003; Sun, 8 Mar 2026
+ 10:00:30 +0000
+Date: Sun, 8 Mar 2026 12:00:20 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Mehul Rao <mehulrao@gmail.com>
+Cc: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	petrm@nvidia.com, netdev@vger.kernel.org, stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: nexthop: fix percpu use-after-free in
+ remove_nh_grp_entry
+Message-ID: <20260308100020.GA1582491@shredder>
+References: <20260306233821.196789-1-mehulrao@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306233821.196789-1-mehulrao@gmail.com>
+X-ClientProxiedBy: TL0P290CA0007.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::11) To DS0PR12MB7900.namprd12.prod.outlook.com
+ (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022573:EE_|PH7PR12MB5973:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0225eca4-e104-4264-a2c5-08de7cf53790
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|IA1PR12MB6530:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45259f5b-1d8c-4a69-c918-08de7cf98803
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|82310400026|1800799024;
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	AW/HgYNM36PtSaQjRXigPxLFbiZIUW+Xl3DEAb8ucIdBjSUyfLv2LRe9wKaD8kk1Tp7C6TlI1A3Jkrc2I0TjwNneOpTduDb3zV64mNTRAnNBuneBqubSzMbKdANgcX54XN7UwttZt+EMhZjyXT2VcXj/paZ/lSYxQ3/7RAo5m6f2XQTD143ZSjrNMLjD+vZ1HllYe7jE7UTgIWUY9b0tVHDIi/LTZ35SyBIhkDdVdS5vgByosReQMP1gAi6oipVRzEhlXoZvYCWcoz7ohZHTsWfgST6uc/E/JiieXpl6KDgjJ509PIFQgDE44MHnhgiaHLnC03VvMrP2649q+vcmM0N4w/RUgAwpJh67FrfuBvsybfcS29EqK9jGAKM8ObIr6kQyBF+hmyPlSpC+CTPOY0K8s9BCVsU3IA0S1YiLGXctPfpldC9T0kguaFlqQjrrXK2DoTVmEiSDnrTa/40delo+0U/eKVRYouPWRK3jp+vP+YEb99IZXXvEnxZ/nEnNMB0P8JYUEuTlDS/GE0FxvtWU+KvUO8dVOJc+ySN4PntVo32bsHZ3VjSaU74Ils7x8M2MpvZzbh9zufXXNqblmOroBYxmJp9Mg4oFJcN6kq7sM6Ij8o59fMDupeyPCUKLX/7q2l+mdyHqP9ssdUXzX/HsuqzLLviHUCzcf3hhmLKIq2HW+v1DUZ1Nr88PF3Co7EXeLkyrys47T1Plq6P1tQwEzjfAAf92pbS5Rjt8P743CQHOLNQy47940swOps55wL5AdVZyjYcGEAHeNK5+7w==
+	dgsrEf2misCE9LLVPGFFZpUaPUMBe5KBF0LsH5qTBnVxz97JRJoRqBv9U05I+ulMZP14S1YdmulS7mf6GDx/1jLlEIuwCyT9Q2jhegF+gpTDpDxkF2oVmuiHOcewBAHXXH8x/z6N4ki7JNaZPMf6bIBDEySZHdOKqUG29IzrTcoJbhWF+jeG8F7klzR1zn98e+AiEJcYbmL7AN6fO/4iszHp8tvlLZCjgqjY7ClWD35fYm7PjGKSqc99z9dbRCdkkFlsj49MA1UILrgaaUGCBcFSNEuN3yna/4B4BnlFw5VILcjInrYHWyNqHlM7LA5DzGA7LTKRuUOWm696vyAvecXsagryIxqUICRu9chuRaidp1hO8TJe6tjcRPlBP/txNQpHPssM8OVHnhvHmuUUfDUuY6eGMk0xUx1LsR7zMbzdRf4YutqOA9hKL2spr1ALkxsRMsxpHipfs8kOZbUe5Hz+j1BqjSRkhAFDtnQsit2BiwUOJKyhaoQ5hh/UFe092bnemXEvHivpE0VkUbPiy2vJM+GRxUz/yF7bJ0oYyZZ7m7t+N24aDVUyOOp2hUZ+M9g1RdZlPc2P0KHy2VR4R0BO2rXS91I+//Mdcu3s+UlIJIBZYNm8NUNYr6ZDTpTY9wLrtKWJA4Qk69Q72QNBr6F383qPjnLK3rbUVZAiZz4rCI5bfXeDFoEpjtqTLv80C7fiFaJIO0HILefgW+VBFnKN5PsUoiYCx/yDKbv3Z3o=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Nx9XXMny6POmdDAgIToKS6QJXEzW3BJNPrqXTLown8viLz0LTwHkY6La5dR11CdMlmqGX/1IYXEsWgWwGs+OY5TZNJ5K+ZdRM8ECVmr9M4cmTpOGgJpUnqdC7+7PbFOOl2VRigmbR7sp1AyMzRB55lRLhSdouxWYAlqYbSzzGWdDeUrPbQWZkpvciCfmHrvaaOy2ZBhZFsB+H/Xeg2zMf73ofg6KqVPJl+pMLFkabA2ejNDB7OonuKG05e9p2Qux2tq+Dbt3ka4IBWcScwvtdPkm8wdTfIyo9CmZspJRRAeMw0jLZ4QMuiU8LwUHGON94KzjKkJqllCk9KQHDOcAeew8higuCiYXEAdPfR5nI0U9lDENNfHNqkc3SNGiTX+t7+kmiBLyGE9jeKBLJYD+r2rAYuHo1kMBhUMpJPpwZ6RQ8gLx25brGJZrmi2xqO8O
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2026 09:29:37.3805
+	=?us-ascii?Q?/PK3cAvnuPMjt6XAk5u+1SbC2cK604OPXnhafQ8KiKcjb9RKPlA7mr6vrYi3?=
+ =?us-ascii?Q?kvwdPtIRZcslgqO+n5+XRVStCFAvR4kTtIGEOcz07sIp/LqzC+D707AXDWEg?=
+ =?us-ascii?Q?oB5aoIW1dSfr8vyLWdLP8x0m+cmBPw/kZGU5VKfXNHtRDBuHGLogz1Cu0saf?=
+ =?us-ascii?Q?ySckMQMvMVTNwK1t9juffA04MsZ2cIuBCDZhFRcIfRBYY2DrUhOwLr5PoX7E?=
+ =?us-ascii?Q?TklOAZot2/cWKJken2yh4zrlvh3pXXg6ECxhGxTIC/ArGMNHJNRLqVX2nCv/?=
+ =?us-ascii?Q?gxnLqT0UAlKreRHu3klNXbPbJFlOnAYHRePZQ4okWxmOTvEINPw5lPR2W+PP?=
+ =?us-ascii?Q?8kWKkLplyurA0KfitrREl+BntCYSHLJewOkOnVfmRJ+VAD1VvA+80aZGmcNk?=
+ =?us-ascii?Q?VZkWRVK1fOqYVXOv3sN0xWrX+nrL2V711tDMeQK8kUmYRgMIhdQE9Dfgvz+K?=
+ =?us-ascii?Q?B4cu0ZocOH/a7n1Rq4SOImmabEQI+RJTjCXcTwqqrN4kb2/QMS9yXzmL2OPj?=
+ =?us-ascii?Q?UcnKp1wQgtm4ndUtSTuEwCVTSV6lZWN/t4NifVm8TpdXlAxShbgaRrbZROk8?=
+ =?us-ascii?Q?fYcO84kbGN8sCvLmUkUVzPzRzyhEEzMjq9JFAAAHypXfc7oMGvZ22O5LLKXg?=
+ =?us-ascii?Q?iOG5RaevxevckQ5t91HrlAryPvXQRNAry8b4MO8Xv3O05qa2e5YfDaXABREM?=
+ =?us-ascii?Q?p6NFNfeNPbQulSUXrONW6RDNr+Y7MThgh9RqLsNgABtAOhD7+dUkJXv3v/Ju?=
+ =?us-ascii?Q?37CFlETUJkMSChdBxVdNKa0arYtA8sJRb3nc258rVm1MLmYXjV8W1n5XEmfT?=
+ =?us-ascii?Q?OU+JwXe8LeD46oViLwaXvl8xEbSHJKRRTmXcWeSH+DBIoOPyp40gSfQwvt4M?=
+ =?us-ascii?Q?Oz7aRj5nC4BNlodgZXs8KB445WgTrHi0CXs7nRGqiVd0MrUtaDgQbb/FENdz?=
+ =?us-ascii?Q?A5/j65TJoUrvrq5lsh/k/x87UpHIIhcqoolfVQFbdfAA6VQBxE5O8EWB0E06?=
+ =?us-ascii?Q?UenGwfJCAB2gYUnSXqxMX9zoMzD6IrGu4ElFIbcz15ys1f+qVQaufkxH5BFD?=
+ =?us-ascii?Q?9vgu5GHx4FC7knVkNSAieGZ5uNOBW98Mj0lReLjEt2GqOELzzg8RrdT6d7My?=
+ =?us-ascii?Q?+ICYN77JapWg1S5eilfHWlXPx7zn0PlyMdlrRJOezwt9VCaGQJdLbAOiyodZ?=
+ =?us-ascii?Q?EPGAk5ydcivwY//QzUG20YxNu0zXNOrj8ysf4fVHafiTwU9cJDaP04R9ZWDi?=
+ =?us-ascii?Q?UGOUDxZHLisJQ+s0RhAnszXlYQ1scSC7I/w4gilwXEltAT7+rJy54OlRijbU?=
+ =?us-ascii?Q?c692m93BQNadVWdUIKiOPq5LP9qyjgRHEvfAltzpRiP6+YMug4h7A9vSbDE8?=
+ =?us-ascii?Q?S7Hmo/GMxjNjveJ3zXFGHZLkMXhp5U+kjqx0VxGu3bWRwzOxG6Yrdt04nGF3?=
+ =?us-ascii?Q?Hi7gznQbxeQrFXqjiYizZfspDEx9XtUeseQbdv4KhpzzSbyHf90XOmCXHccJ?=
+ =?us-ascii?Q?JA2VuHmTZMOV66NM8gIMQEZUFPXJt8u30EiTkIR3RdIvGqUpDpUzY9s1ipwC?=
+ =?us-ascii?Q?BKdLwFcOsXybuUgTmcCz8HBb8TByY3cTJFesn3ekbRsZPt4xvnxfYcz1fnq7?=
+ =?us-ascii?Q?PfDHUTKU5qBdWIrWZhpWeQRvm0EmjRvFwto0bspjj6nFjJKmuMBzATZmDW1j?=
+ =?us-ascii?Q?mU1Y0h5yHcbALrray+E3btAwiXT0KbHUC+bs8BKI9hx2NNtoEZ/QkbuCygvT?=
+ =?us-ascii?Q?lDgCsdSKaA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45259f5b-1d8c-4a69-c918-08de7cf98803
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2026 10:00:30.5847
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0225eca4-e104-4264-a2c5-08de7cf53790
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022573.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5973
-X-Rspamd-Queue-Id: 2986E22F354
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3+FrEoxeXE4HWNDqnaLf9B1ebGxfE9MvekOoymMtd1z8ak/HInOSzFQX1Xr66tQ+85vnhjAT4qo4lBZkCbd0ag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6530
+X-Rspamd-Queue-Id: D3EBE22F436
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265255-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265256-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.947];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:email,fib_nexthops.sh:url]
 X-Rspamd-Action: no action
 
-The current suspend/resume implementation does not correctly handle PCI
-device power state transitions, which prevents AMD platforms from
-reaching the deepest suspend state (S0i3) when the amd-xgbe driver is
-enabled.
+On Fri, Mar 06, 2026 at 06:38:20PM -0500, Mehul Rao wrote:
+> When removing a nexthop from a group, remove_nh_grp_entry() publishes
+> the new group via rcu_assign_pointer() then immediately frees the
+> removed entry's percpu stats with free_percpu(). However, the
+> synchronize_net() grace period in the caller remove_nexthop_from_groups()
+> runs after the free. RCU readers that entered before the publish still
+> see the old group and can dereference the freed stats via
+> nh_grp_entry_stats_inc() -> get_cpu_ptr(nhge->stats), causing a
+> use-after-free on percpu memory.
+> 
+> Fix by deferring the free_percpu() until after synchronize_net() in the
+> caller. Removed entries are chained via nh_list onto a local deferred
+> free list. After the grace period completes and all RCU readers have
+> finished, the percpu stats are safely freed.
+> 
+> Fixes: f4676ea74b85 ("net: nexthop: Add nexthop group entry stats")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Mehul Rao <mehulrao@gmail.com>
 
-In particular, the amd_pmc driver reports:
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-  "Last suspend didn't reach deepest state"
-
-when this device is present.
-
-Implement proper PCI power management operations following the standard
-PCI PM model so that the device can be cleanly powered down and resumed.
-
-Suspend path:
-- Power down the network interface
-- Put the PHY into low-power mode
-- Disable bus mastering to prevent DMA activity
-- Save PCI configuration space
-- Disable the PCI device
-- Disable wake from D3 (S0i3 does not require Wake-on-LAN)
-- Set the device to D3hot
-
-Resume path:
-- Restore the PCI power state to D0
-- Restore PCI configuration space
-- Enable the PCI device
-- Re-enable bus mastering
-- Re-enable device interrupts
-- Clear the PHY low-power mode
-- Power up the network interface
-
-This allows systems using amd-xgbe to reach the deepest suspend state
-when entering modern standby (S0i3).
-
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
-Changes since v1:
- - Added a new helper function xgbe_pci_synchronize_irqs() that
-   synchronizes all registered IRQs to ensure that no pending IRQs are
-   left when the device is suspended.
-
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 67 ++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-index 9e09b269cb1d..dbdd791380a4 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-@@ -360,19 +360,67 @@ static void xgbe_pci_remove(struct pci_dev *pdev)
- 	xgbe_free_pdata(pdata);
- }
- 
-+static void xgbe_pci_synchronize_irqs(struct xgbe_prv_data *pdata)
-+{
-+	unsigned int i;
-+
-+	/* Synchronize main device interrupt */
-+	synchronize_irq(pdata->dev_irq);
-+
-+	/* Synchronize ECC interrupt if separate from main device interrupt */
-+	if (pdata->vdata->ecc_support && pdata->dev_irq != pdata->ecc_irq)
-+		synchronize_irq(pdata->ecc_irq);
-+
-+	/* Synchronize I2C interrupt if separate from main device interrupt */
-+	if (pdata->vdata->i2c_support && pdata->dev_irq != pdata->i2c_irq)
-+		synchronize_irq(pdata->i2c_irq);
-+
-+	/* Synchronize AN interrupt if separate from main device interrupt */
-+	if (pdata->dev_irq != pdata->an_irq)
-+		synchronize_irq(pdata->an_irq);
-+
-+	/* Synchronize per-channel DMA interrupts */
-+	if (pdata->per_channel_irq) {
-+		for (i = 0; i < pdata->channel_count; i++)
-+			synchronize_irq(pdata->channel[i]->dma_irq);
-+	}
-+}
-+
- static int xgbe_pci_suspend(struct device *dev)
- {
- 	struct xgbe_prv_data *pdata = dev_get_drvdata(dev);
- 	struct net_device *netdev = pdata->netdev;
-+	struct pci_dev *pdev = to_pci_dev(dev);
- 	int ret = 0;
- 
- 	if (netif_running(netdev))
- 		ret = xgbe_powerdown(netdev);
- 
-+	/* Disable all device interrupts to prevent spurious wakeups */
-+	XP_IOWRITE(pdata, XP_INT_EN, 0x0);
-+
-+	/* Ensure no IRQ handlers are still executing before powering down.
-+	 * This prevents race conditions where an IRQ handler could access
-+	 * invalid register state after the device is disabled.
-+	 */
-+	xgbe_pci_synchronize_irqs(pdata);
-+
-+	/* Set PHY to low-power mode */
- 	pdata->lpm_ctrl = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_CTRL1);
- 	pdata->lpm_ctrl |= MDIO_CTRL1_LPOWER;
- 	XMDIO_WRITE(pdata, MDIO_MMD_PCS, MDIO_CTRL1, pdata->lpm_ctrl);
- 
-+	/* Disable bus mastering to prevent DMA activity */
-+	pci_clear_master(pdev);
-+
-+	/* Save PCI configuration state and disable device */
-+	pci_save_state(pdev);
-+	pci_disable_device(pdev);
-+
-+	/* Disable wake from D3 - required for S0i3 deep sleep */
-+	pci_wake_from_d3(pdev, false);
-+	pci_set_power_state(pdev, PCI_D3hot);
-+
- 	return ret;
- }
- 
-@@ -380,10 +428,29 @@ static int xgbe_pci_resume(struct device *dev)
- {
- 	struct xgbe_prv_data *pdata = dev_get_drvdata(dev);
- 	struct net_device *netdev = pdata->netdev;
-+	struct pci_dev *pdev = to_pci_dev(dev);
- 	int ret = 0;
- 
-+	/* Restore PCI power state */
-+	pci_set_power_state(pdev, PCI_D0);
-+
-+	/* Restore PCI configuration state */
-+	pci_restore_state(pdev);
-+
-+	/* Enable PCI device */
-+	ret = pci_enable_device(pdev);
-+	if (ret) {
-+		dev_err(dev, "pci_enable_device failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	/* Re-enable bus mastering */
-+	pci_set_master(pdev);
-+
-+	/* Re-enable all device interrupts */
- 	XP_IOWRITE(pdata, XP_INT_EN, 0x1fffff);
- 
-+	/* Clear PHY low-power mode */
- 	pdata->lpm_ctrl &= ~MDIO_CTRL1_LPOWER;
- 	XMDIO_WRITE(pdata, MDIO_MMD_PCS, MDIO_CTRL1, pdata->lpm_ctrl);
- 
--- 
-2.34.1
-
+Do you have a reproducer? I would like to understand why we don't see it
+in the torture tests (e.g., ipv4_torture) in fib_nexthops.sh.
 
