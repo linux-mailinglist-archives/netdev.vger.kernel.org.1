@@ -1,164 +1,269 @@
-Return-Path: <netdev+bounces-265234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265235-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id PIXqNKkZrWn5yAEAu9opvQ
-	(envelope-from <netdev+bounces-265234-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:39:37 +0100
+	id NmQeO7AdrWnoyQEAu9opvQ
+	(envelope-from <netdev+bounces-265235-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:56:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FFD222EBE0
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:39:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD7F22ECD9
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 07:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C710A301159D
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 06:39:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9ADE2300DF6F
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 06:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28A92FFDEB;
-	Sun,  8 Mar 2026 06:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C19313556;
+	Sun,  8 Mar 2026 06:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nR1tP1MD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011061.outbound.protection.outlook.com [40.107.208.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFAF2D6401
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 06:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772951972; cv=none; b=c5Ybp6Y2pOzQfGRWcNpfyfyKqFtyG3ceyQrlDkLeSYIqaObTodxTbUwyV/4CydSlTh/VO1L+LzxIo9e3Z2HabIz5M6j/qj/bA/lWM+Yrg+juHQ4m2krb/sxZqCyQopXPk374rqzUQmC7cdsFa/caXzYkE3lyWLmy+1u1WVcskj8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772951972; c=relaxed/simple;
-	bh=uNLIHze9mlx4oh6ofrENJDypOEscvSBNiXd1v5Pwm8s=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=mnWy2Y9Je6guXNr11wS5WjhQ/ILul8e0Yym/ey9tz+ApMFNHHNdnBrXFDnYA4IJ7Eq+29DHwyxTS5uymoY0lCUrtE+IyKEaGq12JGR3mp6jT96fwkRxChP8ydyGkNcz23KHR2s0uf2B26dEAtY/KtZgdkywRPpbr5pRDdQwS4fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-679dda090fbso175837764eaf.2
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 22:39:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772951970; x=1773556770;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PXqz6ZgCdOp3HYkESBSwuN66nDli/XUoxf/iWpvSR1Y=;
-        b=EXQps0d4ssrfZi2WKOCFRKoQJdvCG84N2YrERbubWUqGqk4TZ0n0Lvx/5VbG7aQqJS
-         fvxaVIZRsSxF8kojVFlolezuKzYk9pLTUbEcL8nsah6Hhuhq2mNDxwWoYaC/zah8R8xV
-         MDqECgx8/Y5s8TWO2LsTHfII5oezyArvI2gl9Vne3tWGZKPXQymkwem17R33DcKZvIFb
-         NWbB2wB5ZTk/lcSqkAv7SWSwDbUSS7ZpD7y2ZB3mlAHrVxwggOS7ov4scaTMZtMsIxSk
-         R1TsYoBNxpdDzEZKCTC+i+Tvs8HucsSXqtYLqZxlD9rE9ER67b9kE84Q9GEHfwSRMVlq
-         O55w==
-X-Forwarded-Encrypted: i=1; AJvYcCVFlAW11UHvBLoXo3Z+FcStSAZ/98pNfhEw2+6Cezi0YuktGJG5cp+2udxDJ59BKLTe9JbXw6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVhuwIomLBBLmuIs5roYcFs1QAm12sloIT9STyl28nLZFD3Byy
-	7eCJuy36R891Na8I90aSzDnFGz5XS3QlDO2WsfP9GU4Kv/qWoj3YchMQE/7fSrtQMFrG1Qp5s60
-	aBFqfHoB0EJ2SXdHmZgv6FB6LX20gzjkpPNNZZI5nfzT/mG7q2ysJrGCwiYg=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930892D7DF8;
+	Sun,  8 Mar 2026 06:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772953005; cv=fail; b=ApeHK3Q4/gCweEJiH5Cj8uyKmb5cJ7HTM/TRhEhpHkosXYMhauMpUcN2kC81VpbpVS4ngin4Ol8hTMbNbrHzcpugK9+ymDcsJchzfRttFGMjoi+cwSYmYFQt/Wh/nr8bvSi3PuY4mtK7e/8uuXPHGP4x8kyx5s1wqb8FPg0qmO4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772953005; c=relaxed/simple;
+	bh=/3dyUuyqDv6dAvmGWBcbRmZwCHN0oaBpDh1u35hLukA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jQ7X+Fr4IrF/Hmkl7DGs9MFp8xUYbwa8oqN/Qd2Oeo3GrvaFZKCQFO9wQI+5z33ViPrrHYx2GOgEH5n2eooCK6EzqlYBLFzfjzuqtNk93D4Iquy4TOjK0EiStodTc50DWictbQkwYhWoT9HRk1z4XyDur2cVQs9d3KUvxGsUFOM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nR1tP1MD; arc=fail smtp.client-ip=40.107.208.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V3n1zAwJ7MImwhMX2r0iQNEHgPipMFPXyjyLbmeW2XjuSQbn0XrfUBp5fODmOIxeCspF0WJ4hYLiNUbxvCvy8ZBT3glaSEAXJibijz8T1s8NEVdeFa0YF2YBSzZ9fH9ieF7tB1YD3bNXdWxxw1KVFgc7Yf/s9x59cJSRvfWilx1973lzliXdNj8nu0fMHGNwCug3+yUDWD1uhDpu9JNeLAdKVJ3zCERCvCYROXOdpmT9ShZ44n5yCnn/eZ3WY89Bf0oBdUTyzvz5aA8BDMyVrLt37MK+ATij0EPjjop9cCDU+KraKm1B6yGMV3sEvy3eCz0LUROq6VEtKP8kNaOX1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CvC8Sk2+/TkVmEPWoQMinDPf13Fe4/0/pydQr191+EY=;
+ b=s1yiQOMQ+8wuahZGy9Gx2CI0ohHEe117Zi3UKya/XQvZNjvmXY2MGBNGLuQ6DF4ML1pm8wQCxd+8GVpMxZXazffydL9BDZ8UkWP0A6qY2GfLvGnGCbmEgccWySq26ei89I/MIgab9ZRaprVjN1DPVb6EvyEfZAEazg7WllbVPFZ/2lsgw6CRJQi9i2Mg44ZKVlqQRbk/aX1SFxnNtEkO2vfs4nejM9fPOOOVTj9Tx30Le1g+O69PXpnv2VkMSoooERIQ0lypxmi3DGDIAOKKfrDYpFuB2XoBe6qnAPzkem+De7zdYjUMo18ojymWo8MS16+q7kqkq2aOq/FS184YvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CvC8Sk2+/TkVmEPWoQMinDPf13Fe4/0/pydQr191+EY=;
+ b=nR1tP1MD1WOJ8uJb9QMPf/NcWulEf2qyCLGFvlzVqf7Wn8rl90ArLWN4lL29VDSANnpSIbmMYKsVUXH8BwpxAb4rkx7jEpyvS2dFhAJL8PXKUg9N/fbIJ2AOlY8OBA9J62JZ7GKl+rDTbZ5b3V3KDhd73CiO/e5Pf4ZhRQiaYAxmvHp6N3VSSzIEQPoQms+RiOHTX8+V7jN1hf5I3RHAkvJkGkZ2oAfkOcAFasMsROOF8ob/35UTQoWEeLfBxti0YErcso81K4MCvjVVW/5fn+pMs35EruEFX7K8ohndNJkPo9HFqfEzlL3ISzFm6n00BvWpCJ8dALbir6H3KNA7Og==
+Received: from BY5PR20CA0023.namprd20.prod.outlook.com (2603:10b6:a03:1f4::36)
+ by IA1PR12MB8407.namprd12.prod.outlook.com (2603:10b6:208:3d9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.9; Sun, 8 Mar
+ 2026 06:56:39 +0000
+Received: from SJ1PEPF00002318.namprd03.prod.outlook.com
+ (2603:10b6:a03:1f4:cafe::1e) by BY5PR20CA0023.outlook.office365.com
+ (2603:10b6:a03:1f4::36) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.22 via Frontend Transport; Sun,
+ 8 Mar 2026 06:56:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ1PEPF00002318.mail.protection.outlook.com (10.167.242.228) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Sun, 8 Mar 2026 06:56:38 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 7 Mar
+ 2026 22:56:26 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Sat, 7 Mar 2026 22:56:25 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Sat, 7 Mar 2026 22:56:22 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Mark Bloch <mbloch@nvidia.com>,
+	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Shay Drory
+	<shayd@nvidia.com>, Alexei Lazar <alazar@nvidia.com>
+Subject: [PATCH mlx5-next 0/8] mlx5-next updates 2026-03-08
+Date: Sun, 8 Mar 2026 08:55:51 +0200
+Message-ID: <20260308065559.1837449-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4b94:b0:662:fbdd:1adb with SMTP id
- 006d021491bc7-67b9bc8875emr5077737eaf.25.1772951970585; Sat, 07 Mar 2026
- 22:39:30 -0800 (PST)
-Date: Sat, 07 Mar 2026 22:39:30 -0800
-In-Reply-To: <695e9924.050a0220.1c677c.0371.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69ad19a2.a70a0220.52840.0001.GAE@google.com>
-Subject: Re: [syzbot] [netfilter?] WARNING in nf_hook_entry_head (2)
-From: syzbot <syzbot+6f6a1d20567a8d6b2a58@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 1FFD222EBE0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002318:EE_|IA1PR12MB8407:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13155311-db56-4ea0-45c9-08de7cdfd8a6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|1800799024|7416014|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	X0lRjM+CfMDj78HvtPrCaYT8bTs9G9FX24BPtHXX7ZAAAPzVQcGIszgkWGbFRqctYcGn/25dXsL3oVFsqYNv3dSBauWUkb4oWDXWNWSQEQdWk+2CvAHglkyqA17KXyv7yhW3a5bDnHuzp58hEd+jJSKt/LuV6qIG9omUQ60ly/myL8pu/IIXU/YWFkFJSWDfiubeqog6TuY5dfFhFGeA6o1pMsApFr6mq8NVKSZOOXw1G7qZvgWIeg0p1S0E2mlTLl6GOgVVGh+JsholhxAYCol0GOJfYQMgJLeZcK8q83l3JELiup/TtDoZyPYNTW2KaY1hK+f1TLycTv00EgnuinGp6zyW7MyARCGv2P3Gt1zpyJProP6N3zfnl07HE0yN7V7E2WBxyQ9p/Zvhl5fL/x71zPRgxgB5ezyxmYd6Zx1+Tfm4SyUffZLV3mfuURhms7oScH4KXv92axzxw4N+RLJl61ihfK0VU2rJ3q4TnemKfckSytmjXlH6jG1yM3fQYLYN4PsBR5oDA2z1WhQsbTU5jbHRlSvSRsOqQIiz4PpFhAyHQs2szjquj7zZe+64JWZKmMJp2umm0GkK09wqiY2lRpaasnZB/67sw2UROSb/QWjz8HXsWhrHj1wZQLe2g1n35UmNqcw2hcHKfsnf1dYH5jGxXUVoqpbuDueBMZmvmNzi3Y6adqEjZdZLrx8NTDdD+NVprZUXXKSGUyon/ZnXVIlbCDGNzmqpSBT3W1nErud0ZBLZtW7T94hwrNCs0euaXpkYviqeN7RIGNRA4A==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(7416014)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	m2xqJmhWv0v3R+dMzEF2uvKbyuqfPm0J5Sx4ULy6KjfRw7kFTycqLnklgxcm5ZH1HPdbaBrwauM65J9luGJwIWmJrUICZuJv5AOVlVMrAUtXKi5RQ/+l+rjiN8CVYyEaSbHBA8fFkxqBLwJoB0ndNhSoiXfXEyPj5wZN2pUlSgpS2L/iVU0DzdP/PIB1nv90uAFt5D9C2F5/MlGvkHJvCw0vFTM5z113/GQVc8+zYzxMpydi/TIhColy4sfixYqQe2N1E1dSCuU5bZaxJRUgwiZeQQY7SA1d+7RuekC4Qyv0Q6YJdrikRNn3kUJH5UdyQf5LpkGmE+qrZAyA+uY82vVbTfujRK4/ZH5JdE5Xx8Z87jd2AkVRkthKyt0wk2QWl3PiU3yVblS7l5PoLoNs7avT+qujPO++dnaF/W4eyQB6s3ix8TNaf1ICiQXJJVDi
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2026 06:56:38.7375
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13155311-db56-4ea0-45c9-08de7cdfd8a6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002318.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8407
+X-Rspamd-Queue-Id: 3CD7F22ECD9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=779072223d02a312];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265234-lists,netdev=lfdr.de,6f6a1d20567a8d6b2a58];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265235-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.865];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,syzkaller.appspot.com:url]
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-syzbot has found a reproducer for the following issue on:
+Hi,
 
-HEAD commit:    c113d5e32678 Merge branch 'net-spacemit-a-few-error-handli..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=176fca02580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=779072223d02a312
-dashboard link: https://syzkaller.appspot.com/bug?extid=6f6a1d20567a8d6b2a58
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1457075a580000
+This series contains mlx5 shared updates as preparation for upcoming
+features.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a1a0aa684791/disk-c113d5e3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6d0461aed5ba/vmlinux-c113d5e3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/05b26502bb1f/bzImage-c113d5e3.xz
+First patch by Alex contains IFC changes as preparation for an upcoming
+feature.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6f6a1d20567a8d6b2a58@syzkaller.appspotmail.com
+Patches 2 and up by Shay introduce mlx5 infrastructure for SD switchdev
+and LAG support.
+Detailed description by Shay below.
 
-------------[ cut here ]------------
-1
-WARNING: net/netfilter/core.c:329 at nf_hook_entry_head+0x23e/0x2c0 net/netfilter/core.c:329, CPU#1: kworker/u8:6/166
-Modules linked in:
-CPU: 1 UID: 0 PID: 166 Comm: kworker/u8:6 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-Workqueue: netns cleanup_net
-RIP: 0010:nf_hook_entry_head+0x23e/0x2c0 net/netfilter/core.c:329
-Code: 4c 89 f8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df 80 3c 08 00 74 08 4c 89 ff e8 ed 82 69 f8 4d 39 37 74 36 e8 43 41 ff f7 90 <0f> 0b 90 31 db 48 89 d8 5b 41 5e 41 5f 5d c3 cc cc cc cc cc e8 29
-RSP: 0018:ffffc900030a7820 EFLAGS: 00010293
-RAX: ffffffff89c657eb RBX: ffff8880358c4000 RCX: ffff88801f3a3d00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffff88801f3a3d00 R09: 0000000000000006
-R10: 000000000000000a R11: 0000000000000000 R12: ffff888068070000
-R13: 0000000000000005 R14: ffff888068070000 R15: ffff8880358c4108
-FS:  0000000000000000(0000) GS:ffff888125561000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f5f121e9e80 CR3: 0000000029e2a000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __nf_unregister_net_hook+0x74/0x6f0 net/netfilter/core.c:491
- nft_unregister_flowtable_ops net/netfilter/nf_tables_api.c:8905 [inline]
- __nft_unregister_flowtable_net_hooks net/netfilter/nf_tables_api.c:8920 [inline]
- __nft_release_hook net/netfilter/nf_tables_api.c:11904 [inline]
- __nft_release_hooks net/netfilter/nf_tables_api.c:11918 [inline]
- nf_tables_pre_exit_net+0x64a/0x900 net/netfilter/nf_tables_api.c:12069
- ops_pre_exit_list net/core/net_namespace.c:161 [inline]
- ops_undo_list+0x187/0x940 net/core/net_namespace.c:234
- cleanup_net+0x56b/0x800 net/core/net_namespace.c:704
- process_one_work kernel/workqueue.c:3275 [inline]
- process_scheduled_works+0xb02/0x1830 kernel/workqueue.c:3358
- worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+Regards,
+Tariq
+
+This series adds shared infrastructure to enable Socket Direct (SD)
+single-netdev switchdev transition and LAG support in subsequent patches.
+
+Currently, LAG is not supported in Socket Direct configurations, and
+BlueField-3/4 utilizing SD for North-South traffic operates with two
+distinct eSwitches per physical port. This forces the use of separate
+IPs and MAC addresses for each NUMA node, complicating network
+configuration and requiring firmware to handle MPFS with different
+inner and outer packets for communication.
+
+The goal is to expose a single external IP address (single MAC address)
+per physical port while maintaining SD's bandwidth and latency benefits.
+This means having a single eswitch per physical port managing all
+physical ports via merged eswitch with multiple vports. This enables
+single FDB creation which will result in a single RDMA device to be used by
+DOCA/HWS/OVS.
+
+To achieve this, the LAG infrastructure needs changes since the current
+implementation assumes a fixed mapping between device indices and LAG
+ports, which breaks with SD's multi-device-per-port model.
+
+This series prepares the groundwork by:
+
+1. Adding IFC bits for silent mode query and VHCA RX destination type,
+   needed for SD device coordination and cross-VHCA traffic steering.
+
+2. Converting the LAG pf array to xarray and using xa_alloc for dynamic
+   index management. This decouples LAG indexing from physical device
+   indices, allowing flexible device membership.
+
+3. Convert peer_miss_rule array to xarray, key with vhca_id.
+
+4. Introducing LAG variant of device index helpers that produce unique
+   identifiers even when multiple devices share the same physical port.
+
+5. Adding VHCA RX flow destination support for steering traffic to a
+   specific VHCA's receive path.
+
+6. Moving LAG demux table ownership to the LAG layer with APIs for
+   SW-only LAG modes where firmware cannot create the demux table.
+
+A follow-up series will build on this infrastructure to implement:
+- SD single-netdev switchdev mode transition with shared FDB
+  corresponded to the SD group.
+- LAG support enabling bonding of SD groups
+
+Since the follow-up series is large (~20 patches), the shared code
+between RDMA and net is sent in advance to avoid overloading the
+shared branch tree.
+
+Alexei Lazar (1):
+  net/mlx5: Add IFC bits for shared headroom pool PBMC support
+
+Shay Drory (6):
+  net/mlx5: Add silent mode set/query and VHCA RX IFC bits
+  net/mlx5: LAG, replace pf array with xarray
+  net/mlx5: E-switch, modify peer miss rule index to vhca_id
+  net/mlx5: LAG, replace mlx5_get_dev_index with LAG sequence number
+  net/mlx5: Add VHCA RX flow destination support for FW steering
+  {net/RDMA}/mlx5: Add LAG demux table API and vport demux rules
+
+Tariq Toukan (1):
+  net/mlx5: LAG, use xa_alloc to manage LAG device indices
+
+ drivers/infiniband/hw/mlx5/ib_rep.c           |  24 +-
+ drivers/infiniband/hw/mlx5/main.c             |  21 +-
+ drivers/infiniband/hw/mlx5/mlx5_ib.h          |   1 -
+ .../mellanox/mlx5/core/diag/fs_tracepoint.c   |   3 +
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  14 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 103 ++-
+ .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |  17 +-
+ .../ethernet/mellanox/mlx5/core/lag/debugfs.c |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.c | 684 ++++++++++++++----
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.h |  49 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/mp.c  |  20 +-
+ .../ethernet/mellanox/mlx5/core/lag/mpesw.c   |  15 +-
+ .../mellanox/mlx5/core/lag/port_sel.c         |  28 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.c  |   2 +-
+ include/linux/mlx5/fs.h                       |  10 +-
+ include/linux/mlx5/lag.h                      |  21 +
+ include/linux/mlx5/mlx5_ifc.h                 |  26 +-
+ 19 files changed, 849 insertions(+), 207 deletions(-)
+ create mode 100644 include/linux/mlx5/lag.h
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+base-commit: 385a06f74ff7a03e3fb0b15fb87cfeb052d75073
+-- 
+2.44.0
+
 
