@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-265288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFLqHi5qrWkU2wEAu9opvQ
-	(envelope-from <netdev+bounces-265288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 13:23:10 +0100
+	id 2VYkDSxtrWme2wEAu9opvQ
+	(envelope-from <netdev+bounces-265289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 13:35:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC46C230319
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 13:23:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AB99230343
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 13:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F10A300A52A
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 12:23:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9404300C5A5
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 12:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9024C313E17;
-	Sun,  8 Mar 2026 12:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBC03624B3;
+	Sun,  8 Mar 2026 12:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n2p9BBhI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pLlyJ8Px"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B67730AACB
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 12:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554691C2AA
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 12:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772972587; cv=none; b=aksdNR2cDz9MCiSjpPrGAn/LvrgUYJH/I4Qd6hsvQXS0aCsOpdt0PyxSQFhTG94orgVMvBCr24QASkNx3N5r+xrE8ucfETRilRSTE92LC73/whrNsJd87kPK1uNJ2bL219jbnzqAWjurUhSVnoxQYRDBRya1nHuXRJpffpk9tBQ=
+	t=1772973352; cv=none; b=Ieatt5I+GTBhrEkwbeobt1wBwGU1cEu2A/hIKF1x/9hZC+EHpDrzkbfcS1nPpm/v0Rfk4IsV3G/81CUpYVOS3NSRfz0kjls1M3UYpXzxog5P7hapxeswmtYodr6XCdstApHjcDdlc3nGTAo+D5QCg2Wlvev60cClFVadq37M1ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772972587; c=relaxed/simple;
-	bh=FK7DVf+XgG7j7P07fhgc9JBXj7geT5T9WTBx8XFG1rQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=egb2PfdORyJpsch23dANf6/20oiG8jcCfDihbQ+99UAJM9JVu4PItLnts+DaIUCWqAERHysUciAVhNg0zJgC8b3aQMVDSjGUiOAYnJS8oE1SdbNPTUT2/0+gfs3hUj7Zhf5pmEIUKeMU+GgOhMtbiYn15XtdP2ng7XkIG607KGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n2p9BBhI; arc=none smtp.client-ip=209.85.160.202
+	s=arc-20240116; t=1772973352; c=relaxed/simple;
+	bh=BLP4EHMTJo7ud6x3h8Y19JZoYsVURv94CowOFwFYz1w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U6sbqcHTdfzTuoP39l3Acq7+Sjcm99BifYR5eneLaI02WEPgG9V+3m63exEqvatsFq+dqXKRiHjPcF6YNaAiK8lFlRtqIdQpGR0stTwNguFyElwuCCZAACcGAGMAqmeTEsbF22ichMGaMr31AVVfIDkJIa7DlYAaJ04l0zgPYTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pLlyJ8Px; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-509162597f9so16385791cf.2
-        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 05:23:05 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-509159f57e0so22414971cf.3
+        for <netdev@vger.kernel.org>; Sun, 08 Mar 2026 05:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772972585; x=1773577385; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772973350; x=1773578150; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=EqiPiGDZb24MhgyV2QYoX1JsUxwMRDXoHROoecNkYjY=;
-        b=n2p9BBhIk4KlYJ/BnzFkWvNIO6iXX7FNSL+EWdupOgjnXbHBFVdEsNydNVu/+iyWkC
-         i1nMWc8MjfAbNME4iEZm5a2UDalh+1pHAub8IY4jAYRDzRxgCzpitK60MDbyrZfdkb+l
-         XiMnjgAtKhET4XZBr+jNQo8HrpjM6JRlUEeSQCQWr9CImwh6yatZjPIfH418yp6nnqtP
-         Wg1+I45QJ89pIyPDvndcrzP1oX7kTKhv4KhTF9QueG1o+RCox8LuPzUmjYM4f02kZbc2
-         dSJRnqUUfSrNr65UOhLY5d3w6xA8ZoBa3k3TPtrsYl8k7WeWZG0iZyFU5qdZwAH9e8/j
-         Vfdg==
+        bh=lcMOggaXpxvb+Fj/Bqdg+kK6E9wWEk+cp48WrjgSzTE=;
+        b=pLlyJ8PxRqADY5+KgapdERjtT/uAG+8pdGQXuRbzTJ1AV5YcrvcRW6eRUK7S4d09j9
+         iuAsc9Y3OdWDwc2XLR1fCX7rhKq2E9OrfC1J6xFNDXDP/42AqVD/CNZqFQJ1inBslBT7
+         18U8yHrAtHDZANXvy944q0fgE1W8cxMaYUj2SDSxdgV5RGES/+mRxomx6p807yCzZvMu
+         4EOfIVojr1JqpE+mU4sqQ8hyRcF4DA4+sVcNnAKew9oHb6ix4ECWz40ht1kFcoUk0O6v
+         qZ0A0b3JeaG9ycXHGOkLCTEUX3xd5qUZN/2926MJdDCtig5elTu8dloIYDtOH+GFcl7Z
+         NVKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772972585; x=1773577385;
+        d=1e100.net; s=20230601; t=1772973350; x=1773578150;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EqiPiGDZb24MhgyV2QYoX1JsUxwMRDXoHROoecNkYjY=;
-        b=GnMlJu/GP+eI9uFoo7Bb6kfgMLGeIXRGBMwA3gZy2xu1Z+K2l9Ore94ZbVsTt5jHsv
-         OaUnxqajyD9swp8QKXfH5T6KqCsE3vrYh77tvoJhm0xP7Y+Wu2ZEWkZXGZCbGcVefaie
-         8uQ6UpDtyFOazeulHHijRUrOVhC5VzIdP92tToAfliejP+KGwr8B/SSOja9coYHLsEWo
-         DHxfDcWxYWU2wPK65Q8osMMbQaD+4zJLqzFRJU6M2igeS6jMkXAZqSMYaihLtDOn9Mjj
-         hzPXJto2peHEavBQvZ2uddT9h9OvW4+NY0GqB7p8SIDeCQD4A6pH+O9KPYg91CcN3EeH
-         Lbmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWPsxHaqg/Y5z0cFw5vrPnigrTYJaYqhd2vWyJPqRxskN/t1lrFhj7R46lxNlh1FY6rcnAX9U8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweDqYStR1RDiVDXjhJzW4bfiIpoQfaVapvrs8AK+oLYkmZSjdj
-	S7kk905lIUDWYEchDRZr/2Cq5Oc4CVcEVXwbiAlhYueeO2FW7lF3MjTyMlmAwZbitn4TewSn0Lb
-	75u8JKTjzHbHUVA==
-X-Received: from qtbki10.prod.google.com ([2002:a05:622a:770a:b0:509:17d2:9620])
+        bh=lcMOggaXpxvb+Fj/Bqdg+kK6E9wWEk+cp48WrjgSzTE=;
+        b=ArGw/VitsHO5PqErM4UPEE9sjFliKVJJ0T7SAzImM7yntXV6nt5/PrryubHUxPj8ZE
+         qUxnMsTY2PRybuxyu8qgUN9TFnQjQnwGndDysYlk2+AeyGY8Phf2sb6wM4phnjtFXmAO
+         nfSO8tJsUytI4FNAhFTuQtrzyzrtGATPwBpMBhOp1WcsHMujCsdz/lvNSOvV05BoVDdh
+         p8JHJAR2F61i9grJjDtLT4FCsNTw88LYWJfFY33xWMvGEJhcb01OBD3PUpxEaE7zRdJa
+         SRkzD/QPIfYD+U4AK7X1uS5vIL+usVyRJXQ6YKHaiBXCQ7KZX4PqvbKP2FM3EC6B0owi
+         ng9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXryADrd0VG5gKdiHh2dpMlWL1NHumQ/xahcfkhNVISi9onlC6oIh7qX3psYwwq3q52EljuuOg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHVXqwf/k4+Mx4OthkgkUlIZmtkt028x7hd8zxB3lDt8LvFfmX
+	MDfVh1SAHrRalnNts+fELLx5/MaiOHTAw7l3bQS0T+14QwNj7hXIW+/odWWvJnFROSu6UOJPAOh
+	2RdcBRyLgiMh+3A==
+X-Received: from qttt15-n1.prod.google.com ([2002:a05:622a:aa0f:10b0:503:301c:93fc])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7c4d:0:b0:505:e4ab:ce7 with SMTP id d75a77b69052e-508f46c8ac7mr102293221cf.10.1772972584927;
- Sun, 08 Mar 2026 05:23:04 -0700 (PDT)
-Date: Sun,  8 Mar 2026 12:23:02 +0000
+ 2002:a05:622a:1308:b0:506:9944:8cfe with SMTP id d75a77b69052e-508f46c90e3mr104817931cf.15.1772973350149;
+ Sun, 08 Mar 2026 05:35:50 -0700 (PDT)
+Date: Sun,  8 Mar 2026 12:35:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260308122302.2895067-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: move tp->chrono_type next tp->chrono_stat[]
+Message-ID: <20260308123549.2924460-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: inline tcp_chrono_start()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,77 +82,131 @@ Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
 	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: EC46C230319
+X-Rspamd-Queue-Id: 6AB99230343
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265288-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265289-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.988];
+	NEURAL_HAM(-0.00)[-0.991];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-chrono_type is currently in tcp_sock_read_txrx group, which
-is supposed to hold read-mostly fields.
+tcp_chrono_start() is small enough, and used in TCP sendmsg()
+fast path (from tcp_skb_entail()).
 
-But chrono_type is mostly written in tx path, it should
-be moved to tcp_sock_write_tx group, close to other
-chrono fields (chrono_stat[], chrono_start).
+Note clang is already inlining it from functions in tcp_output.c.
 
-Note this adds holes, but data locality is far more important.
+Inlining it improves performance and reduces bloat :
 
-Use a full u8 for the time being, compiler can generate
-more efficient code.
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/2 grow/shrink: 1/0 up/down: 1/-84 (-83)
+Function                                     old     new   delta
+tcp_skb_entail                               280     281      +1
+__pfx_tcp_chrono_start                        16       -     -16
+tcp_chrono_start                              68       -     -68
+Total: Before=25192434, After=25192351, chg -0.00%
+
+Note that tcp_chrono_stop() is too big.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/tcp.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/tcp.h     | 25 ++++++++++++++++++++++++-
+ net/ipv4/tcp_output.c | 24 ------------------------
+ 2 files changed, 24 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index f72eef31fa23cc584f2f0cefacdc35cae43aa52d..c44cf9ae8d16f5cc7808a6ca78c1dad03354dccf 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -228,8 +228,7 @@ struct tcp_sock {
- 	u32	sacked_out;	/* SACK'd packets			*/
- 	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
- 	u8	scaling_ratio;	/* see tcp_win_from_space() */
--	u8	chrono_type : 2,	/* current chronograph type */
--		repair      : 1,
-+	u8	repair      : 1,
- 		tcp_usec_ts : 1, /* TSval values in usec */
- 		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
- 		is_cwnd_limited:1,/* forward progress limited by snd_cwnd? */
-@@ -264,6 +263,7 @@ struct tcp_sock {
- 				 * total number of data bytes sent.
- 				 */
- 	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
-+	u8	chrono_type;	/* current chronograph type */
- 	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
- 	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
- 	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index a6464142380696e4948a836145ac7aca4ca3ec15..392a1de0d3703b3535431bfd90732186bede3bd7 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2160,7 +2160,30 @@ enum tcp_chrono {
+ 	__TCP_CHRONO_MAX,
+ };
+ 
+-void tcp_chrono_start(struct sock *sk, const enum tcp_chrono type);
++static inline void tcp_chrono_set(struct tcp_sock *tp, const enum tcp_chrono new)
++{
++	const u32 now = tcp_jiffies32;
++	enum tcp_chrono old = tp->chrono_type;
++
++	if (old > TCP_CHRONO_UNSPEC)
++		tp->chrono_stat[old - 1] += now - tp->chrono_start;
++	tp->chrono_start = now;
++	tp->chrono_type = new;
++}
++
++static inline void tcp_chrono_start(struct sock *sk, const enum tcp_chrono type)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++
++	/* If there are multiple conditions worthy of tracking in a
++	 * chronograph then the highest priority enum takes precedence
++	 * over the other conditions. So that if something "more interesting"
++	 * starts happening, stop the previous chrono and start a new one.
++	 */
++	if (type > tp->chrono_type)
++		tcp_chrono_set(tp, type);
++}
++
+ void tcp_chrono_stop(struct sock *sk, const enum tcp_chrono type);
+ 
+ /* This helper is needed, because skb->tcp_tsorted_anchor uses
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index f0ebcc7e287173be6198fd100130e7ba1a1dbf03..00ffb09d2c624ffb82488fd57dc5daca8a31c96f 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2904,30 +2904,6 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
+ 	return false;
+ }
+ 
+-static void tcp_chrono_set(struct tcp_sock *tp, const enum tcp_chrono new)
+-{
+-	const u32 now = tcp_jiffies32;
+-	enum tcp_chrono old = tp->chrono_type;
+-
+-	if (old > TCP_CHRONO_UNSPEC)
+-		tp->chrono_stat[old - 1] += now - tp->chrono_start;
+-	tp->chrono_start = now;
+-	tp->chrono_type = new;
+-}
+-
+-void tcp_chrono_start(struct sock *sk, const enum tcp_chrono type)
+-{
+-	struct tcp_sock *tp = tcp_sk(sk);
+-
+-	/* If there are multiple conditions worthy of tracking in a
+-	 * chronograph then the highest priority enum takes precedence
+-	 * over the other conditions. So that if something "more interesting"
+-	 * starts happening, stop the previous chrono and start a new one.
+-	 */
+-	if (type > tp->chrono_type)
+-		tcp_chrono_set(tp, type);
+-}
+-
+ void tcp_chrono_stop(struct sock *sk, const enum tcp_chrono type)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
 -- 
 2.53.0.473.g4a7958ca14-goog
 
