@@ -1,318 +1,161 @@
-Return-Path: <netdev+bounces-265302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265303-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DsFF0F2rWkC3QEAu9opvQ
-	(envelope-from <netdev+bounces-265302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:14:41 +0100
+	id 4JiTKoF2rWkC3QEAu9opvQ
+	(envelope-from <netdev+bounces-265303-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:15:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08FF2305AC
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:14:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22ADB2305DB
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 14:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98B853012C78
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 13:12:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 46FAD3006F33
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 13:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E80736212B;
-	Sun,  8 Mar 2026 13:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53199382F09;
+	Sun,  8 Mar 2026 13:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlNiHoGP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QyfGYFnx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3F8332636;
-	Sun,  8 Mar 2026 13:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784D83806C0
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 13:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772975557; cv=none; b=QhiavOZkWV+jHNt7mMFj7sbFCQOpaUiQQVavwxE62l0DTi9Sd1XWdD+OIhdOfZkBGC/C92cRkbuNUG1XgrdckLuxdTRp2XPZlNEzd98LUZLAZk5YFC0ZqphkMCPx2H9sTxhccIuMWJw21gMaPyTabKiJSUqQK39PssUBwKXkXqo=
+	t=1772975737; cv=none; b=VYqxSff1KxCMoVl+jLXgxKYDpmYgZ4x/TdZ1Dyfm53Wd8O68Ou0BrR/5oaMoJunSSEp3xoCDBGngWPkN1N33bbi8CdGwdYWQhzJDLBKX/W7Zlq8VhXqKNcIUwMXuau8PR5rNgV0dta46nyTHJ0TvJTmb/bU2nlVnQ0scTCIQZ3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772975557; c=relaxed/simple;
-	bh=pi+jA2SaVz5VZQibrNj7aQIvOkEoJMAlD8C/xK4hfM8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zl9NesPJU+8XwabMx8uIlT41WuruCivEowfPpjJNSOTr0m/wsoh1jT9/ihtoNVsJmDTF0zDcEOdb8jP/LH8u7hhFpQg95QqAUVKQ6Xl4L67UC2PUKcDQ2J3xFFlCUlAzqJB7npnuxuO01N9gN5nV6az9CYPrkEldD2ZY5A6v+zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PlNiHoGP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4BC5C2BC9E;
-	Sun,  8 Mar 2026 13:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772975554;
-	bh=pi+jA2SaVz5VZQibrNj7aQIvOkEoJMAlD8C/xK4hfM8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PlNiHoGPXFH/PUPlGpfolQhpwNpMQNvkdtwZag3oFUv9yxJKSsrvfVvfCabh8Ek1n
-	 /NGHB9Rk/mvSETTFfzJFm7LWxSg6Sc9IPcN1V6A//FDTYTOsIHdCd9wvRdJZJ1jrU0
-	 7mmeL4pY9VaQIGJDaCWdsPWHTxLu3K4x98rm8hWr0yaJ279WuhjvC1Ahz3AUtcWuDJ
-	 LH38KxV+9E2BTPiN9SlpqsbQ6XbjvEyenU4UpV0XdZWPLaKQHfX6DjS+KnkKgcpvkF
-	 W+emIAlo5mNHklXqKP1uoYaqHFl3VFpdXCUVchlIse5//TVsLGpkgwWA4ceYa2lkYV
-	 pBnoCRbo7pY3Q==
-From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v3 3/3] selftests: rss_drv: Add RSS indirection table resize tests
-Date: Sun,  8 Mar 2026 14:12:17 +0100
-Message-ID: <20260308131218.3172332-4-bjorn@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260308131218.3172332-1-bjorn@kernel.org>
-References: <20260308131218.3172332-1-bjorn@kernel.org>
+	s=arc-20240116; t=1772975737; c=relaxed/simple;
+	bh=0GOur689d8dOGKE+EPgs3lS+HUhqtViQTTFNzlXpRPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNiw3ozqUicHS98LLb1LFYWqv3Lgh02sIjW4bGiKpkOBknviY50B3MlXzMLb2SnEa0/EBUXCzHIPW8t9spoINH4omGaeg68ZJ/n6/91xV4W2InMm587XapBrb/zCQEduXgyDeevkj3NGSpW/0Yt4FGR3JZ+5BeC+0az2X/+gf3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QyfGYFnx; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772975736; x=1804511736;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=0GOur689d8dOGKE+EPgs3lS+HUhqtViQTTFNzlXpRPo=;
+  b=QyfGYFnx/GtZCu0Kgq3CKSrIHc8lNMWQxHRn9xJHftGBwCarjisFSH2v
+   D4fZDcw+uYtdWFsU4RMl82beTFQRgs4ounXMpx+izztHQFusF5Ou1DLYU
+   XcjJI9XjXYkhdxJ7eWrCF7EQpmRgNkuqkQyOUU3O1y3HXP0sXAVPcQrCi
+   Xo/3OBwhvGo+ArvOdy56PG1QH02cDB3qEu6ZhcMWGBEKT2HsGMRF40XO/
+   2+zTeo6WSXyFEty3ipRnQ+aMtvw2VC1/OIpmxwQgcYlvR1mkCGE8rgWRg
+   vm35zrUeh6bf+Yt2aV9uXW4ypK6I6tpMsNwz0hU6a/tNAOxjSJ9mE/Qcm
+   A==;
+X-CSE-ConnectionGUID: bIM0KEXWSvGzFF9GrJoA8w==
+X-CSE-MsgGUID: kIgCtzVhR2WtxARFT+J8Uw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11722"; a="85492799"
+X-IronPort-AV: E=Sophos;i="6.23,108,1770624000"; 
+   d="scan'208";a="85492799"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2026 06:15:35 -0700
+X-CSE-ConnectionGUID: /tG/f+c1SiSvDmqnEDYYUA==
+X-CSE-MsgGUID: 6/tRRvMmT16I5XnQZRCMDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,108,1770624000"; 
+   d="scan'208";a="224432011"
+Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 08 Mar 2026 06:15:32 -0700
+Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vzDyj-0000000037s-1ceF;
+	Sun, 08 Mar 2026 13:15:29 +0000
+Date: Sun, 8 Mar 2026 21:15:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Philipp Zabel <p.zabel@pengutronix.de>
+Subject: Re: [PATCH net-next 2/5] net: phy: make mdio_device.c part of libphy
+Message-ID: <202603082137.KWkiQ4Ij-lkp@intel.com>
+References: <8600cf79-7604-43c1-8cc0-306e58e31153@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B08FF2305AC
+In-Reply-To: <8600cf79-7604-43c1-8cc0-306e58e31153@gmail.com>
+X-Rspamd-Queue-Id: 22ADB2305DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.93 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265303-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,kernel.org,redhat.com,davemloft.net,google.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265302-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.972];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.937];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,broadcom.com:email,lib.py:url,rss_drv.py:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
 X-Rspamd-Action: no action
 
-Add resize tests to rss_drv.py. Devices without dynamic table sizing
-are skipped via _require_dynamic_indir_size().
+Hi Heiner,
 
-resize_periodic: set a periodic table (equal 4), shrink channels to
-fold, grow back to unfold. Check the exact pattern is preserved. Has
-main and non-default context variants.
+kernel test robot noticed the following build errors:
 
-resize_nonperiodic_reject: set a non-periodic table (equal N), verify
-that channel reduction is rejected.
+[auto build test ERROR on net-next/main]
 
-Tested-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Björn Töpel <bjorn@kernel.org>
----
- .../selftests/drivers/net/hw/rss_drv.py       | 163 +++++++++++++++++-
- 1 file changed, 159 insertions(+), 4 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-phy-move-mdio_device-reset-handling-functions-in-the-code/20260308-053505
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/8600cf79-7604-43c1-8cc0-306e58e31153%40gmail.com
+patch subject: [PATCH net-next 2/5] net: phy: make mdio_device.c part of libphy
+config: sparc64-randconfig-002-20260308 (https://download.01.org/0day-ci/archive/20260308/202603082137.KWkiQ4Ij-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260308/202603082137.KWkiQ4Ij-lkp@intel.com/reproduce)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_drv.py b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-index 2d1a33189076..9763760f8306 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_drv.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_drv.py
-@@ -5,9 +5,9 @@
- Driver-related behavior tests for RSS.
- """
- 
--from lib.py import ksft_run, ksft_exit, ksft_ge
--from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx
--from lib.py import defer, ethtool
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge
-+from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx, ksft_raises
-+from lib.py import defer, ethtool, CmdExitFailure
- from lib.py import EthtoolFamily, NlError
- from lib.py import NetDrvEnv
- 
-@@ -45,6 +45,18 @@ def _maybe_create_context(cfg, create_context):
-     return ctx_id
- 
- 
-+def _require_dynamic_indir_size(cfg, ch_max):
-+    """Skip if the device does not dynamically size its indirection table."""
-+    ethtool(f"-X {cfg.ifname} default")
-+    ethtool(f"-L {cfg.ifname} combined 2")
-+    small = len(_get_rss(cfg)['rss-indirection-table'])
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    large = len(_get_rss(cfg)['rss-indirection-table'])
-+
-+    if small == large:
-+        raise KsftSkipEx("Device does not dynamically size indirection table")
-+
-+
- @ksft_variants([
-     KsftNamedVariant("main", False),
-     KsftNamedVariant("ctx", True),
-@@ -76,11 +88,154 @@ def indir_size_4x(cfg, create_context):
-         _test_rss_indir_size(cfg, test_max, context=ctx_id)
- 
- 
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_periodic(cfg, create_context):
-+    """Test that a periodic indirection table survives channel changes.
-+
-+    Set a non-default periodic table ([3, 2, 1, 0] x N) via netlink,
-+    reduce channels to trigger a fold, then increase to trigger an
-+    unfold. Using a reversed pattern (instead of [0, 1, 2, 3]) ensures
-+    the test can distinguish a correct fold from a driver that silently
-+    resets the table to defaults. Verify the exact pattern is preserved
-+    and the size tracks the channel count.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+
-+    # Set a non-default periodic pattern via netlink
-+    rss = _get_rss(cfg, context=ctx_id)
-+    orig_size = len(rss['rss-indirection-table'])
-+    pattern = [3, 2, 1, 0] * (orig_size // 4)
-+    req = {'header': {'dev-index': cfg.ifindex}, 'indir': pattern}
-+    if ctx_id:
-+        req['context'] = ctx_id
-+    else:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+    cfg.ethnl.rss_set(req)
-+
-+    # Shrink — should fold
-+    ethtool(f"-L {cfg.ifname} combined 4")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_ge(orig_size, len(indir), "Table did not shrink")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Folded table has wrong pattern")
-+
-+    # Grow back — should unfold
-+    ethtool(f"-L {cfg.ifname} combined {ch_max}")
-+    rss = _get_rss(cfg, context=ctx_id)
-+    indir = rss['rss-indirection-table']
-+
-+    ksft_eq(len(indir), orig_size, "Table size not restored")
-+    ksft_eq(indir, [3, 2, 1, 0] * (len(indir) // 4),
-+            "Unfolded table has wrong pattern")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_reject(cfg, create_context):
-+    """Test that a non-periodic table blocks channel reduction.
-+
-+    Set equal weight across all queues so the table is not periodic
-+    at any smaller size, then verify channel reduction is rejected.
-+    An additional context with a periodic table is created to verify
-+    that validation catches the non-periodic one even when others
-+    are fine.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    # Create an extra context with a periodic (foldable) table so that
-+    # the validation must iterate all contexts to find the bad one.
-+    extra_ctx = _maybe_create_context(cfg, True)
-+    ethtool(f"-X {cfg.ifname} context {extra_ctx} equal 2")
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("main", False),
-+    KsftNamedVariant("ctx", True),
-+])
-+def resize_nonperiodic_no_corruption(cfg, create_context):
-+    """Test that a failed resize does not corrupt table or channel count.
-+
-+    Set a non-periodic table, attempt a channel reduction (which must
-+    fail), then verify both the indirection table contents and the
-+    channel count are unchanged.
-+    """
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ch_max = channels.get('combined-max', 0)
-+    qcnt = channels['combined-count']
-+
-+    if ch_max < 4:
-+        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
-+
-+    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
-+
-+    _require_dynamic_indir_size(cfg, ch_max)
-+
-+    ctx_id = _maybe_create_context(cfg, create_context)
-+    ctx_ref = f"context {ctx_id}" if ctx_id else ""
-+
-+    ethtool(f"-X {cfg.ifname} {ctx_ref} equal {ch_max}")
-+    if not create_context:
-+        defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    rss_before = _get_rss(cfg, context=ctx_id)
-+
-+    with ksft_raises(CmdExitFailure):
-+        ethtool(f"-L {cfg.ifname} combined 2")
-+
-+    rss_after = _get_rss(cfg, context=ctx_id)
-+    ksft_eq(rss_after['rss-indirection-table'],
-+            rss_before['rss-indirection-table'],
-+            "Indirection table corrupted after failed resize")
-+
-+    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+    ksft_eq(channels['combined-count'], ch_max,
-+            "Channel count changed after failed resize")
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
-     with NetDrvEnv(__file__) as cfg:
-         cfg.ethnl = EthtoolFamily()
--        ksft_run([indir_size_4x], args=(cfg, ))
-+        ksft_run([indir_size_4x, resize_periodic,
-+                  resize_nonperiodic_reject,
-+                  resize_nonperiodic_no_corruption], args=(cfg, ))
-     ksft_exit()
- 
- 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603082137.KWkiQ4Ij-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns-usb3.o: in function `bcm_ns_usb3_mdio_driver_init':
+>> drivers/phy/broadcom/phy-bcm-ns-usb3.c:241: undefined reference to `mdio_driver_register'
+   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns-usb3.o: in function `bcm_ns_usb3_mdio_driver_exit':
+>> drivers/phy/broadcom/phy-bcm-ns-usb3.c:241: undefined reference to `mdio_driver_unregister'
+   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns2-pcie.o: in function `ns2_pci_phy_driver_init':
+>> drivers/phy/broadcom/phy-bcm-ns2-pcie.c:82: undefined reference to `mdio_driver_register'
+   sparc64-linux-ld: drivers/phy/broadcom/phy-bcm-ns2-pcie.o: in function `ns2_pci_phy_driver_exit':
+>> drivers/phy/broadcom/phy-bcm-ns2-pcie.c:82: undefined reference to `mdio_driver_unregister'
+
+
+vim +241 drivers/phy/broadcom/phy-bcm-ns-usb3.c
+
+af850e14a7ae49 drivers/phy/broadcom/phy-bcm-ns-usb3.c Rafał Miłecki 2017-06-08  240  
+36a94760c98954 drivers/phy/broadcom/phy-bcm-ns-usb3.c Rafał Miłecki 2020-11-13 @241  mdio_module_driver(bcm_ns_usb3_mdio_driver);
+e5666281d9eadb drivers/phy/phy-bcm-ns-usb3.c          Rafał Miłecki 2016-08-12  242  
+
 -- 
-2.53.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
