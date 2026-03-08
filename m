@@ -1,345 +1,192 @@
-Return-Path: <netdev+bounces-265217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265218-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wVW7OS/nrGlSvwEAu9opvQ
-	(envelope-from <netdev+bounces-265217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 04:04:15 +0100
+	id 8yiDA0TorGmLvwEAu9opvQ
+	(envelope-from <netdev+bounces-265218-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 04:08:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125A322E5E1
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 04:04:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3342E22E64A
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 04:08:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 624A43013A62
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 03:04:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B837301C3EF
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 03:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710CF26FA60;
-	Sun,  8 Mar 2026 03:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B2391E7C2E;
+	Sun,  8 Mar 2026 03:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f4TXWEQn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J1Us7Weu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07ECD15C158
-	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 03:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772939052; cv=none; b=A/qKOe+Q7NDXtNg+zVzunFU2q4SKmBq9Qw6xn71bDhh2l62uhxuF/xQ4XgvX0M/rW0NAdKhjOSK1ZAkgq463BJSZrXyj8gszZOkPbOtqnkrs+eNlwpoT+rIjDX6E72Qhm8+m/oPDJffc0pC7gzVcAp+jWOZzw8faqW7C6sTItOQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772939052; c=relaxed/simple;
-	bh=XBgtC2Z1aWz9LzFI/MKRAZS5MLNBxHcIhTQT8nTe7bE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BfTxoSghj7yVWBJhg2cJcKnOaR97Ey6EOSa/ukSTP2ivuPyvG51Dtaau1db1zLJf5x8m48ZS11ijGZnvS+rjtv80C3X2EjgewfzhyjDGniuUgp3woh1RUXoWCWYvmAB71VoWEIcLfSxjwE4fK97yYyaZXllykrqRoIsG6AJGWy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f4TXWEQn; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F95F223DC9
+	for <netdev@vger.kernel.org>; Sun,  8 Mar 2026 03:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772939329; cv=pass; b=g/E9E4TCrXSCfPB+d94VsUPoafmuovcMbcb1dztA9/Z32+CIJ5X1Oc6iC3B6UCGZRkPwT3O4kYPVevDYfC/dB8UVmyTqZ11zuQ51FpJ4uCh3+7KghTGGMGXpjAbYukElV3GWA0y5ANtEwwvJwANchGzAxciM4NqyOCnwkqB0Z7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772939329; c=relaxed/simple;
+	bh=urYB0CUwxtHfVVQokjPh2rco2JxICNlUyjAd+lTINpc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VwApTdTolwv5qEaQASugXCV5uEGwLTl1dLA/y5By+DdvPzNHPQwKDWi0mgzjfhivKLQllKH1UEwk/5rfr4P31xPbVY2qK8HOfQ+bXcztRwBlQ3AW6UrrOW0G/rRaezi/k/xxI75GVTUZQlstZFW+khhAUOaYLANITfBUGus02L4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J1Us7Weu; arc=pass smtp.client-ip=74.125.82.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae53ec06b0so326228915ad.0
-        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 19:04:10 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2be06c02f66so3396766eec.1
+        for <netdev@vger.kernel.org>; Sat, 07 Mar 2026 19:08:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772939326; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QUygbz23mfrZhiDb3rfqJQy2mebCgl3M00WuweKk3bU26NftM8CPxwshzIkBH8KUQZ
+         DIjlTKrvAWoJfjLrO3G8yLHYvHT0CNSfSGxCmlzSChzp/VapK+laQcG3EfdtLrOC1Y5k
+         vBVHUrtA9fHpi2+79lOxvAupxApAy5d/XyXmPoJ6BERJr1mXo/SsJMgU6slS95vYVfqJ
+         aX0V7bj5jy7o4DCaj/f7n9RjZywxZUpVQJ1KlvDz/hCVrq9Ep65FZ7MGe/cC6c/8kM3s
+         ZEHp/ZVYB5LnHnx9Oah7zhFWBB2kfL97YWY6oMODLg6glUPevSbzyEAmZFTBmVF3+Lcr
+         UI2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vL+kYgBcVaHGMpKP/KOcO6tTjJs1gho5KzlvMYmWcNg=;
+        fh=4uf+hzWxbO7gMBF3CfX6pFyPzR+0KfyD3nrzbUSXrcs=;
+        b=CdmBU2GcCrjFbKccfNM3azUOMJ6XlnPGyx4T2praZQtdqTJ1glsAS2Miu8IU78eLWs
+         BW7L8MyDWJhshNeI7nowdLNWmk22NUlTPfxMeaaXHGQHSMiN2sDTUpRwQfdZDcixEjgA
+         i1B2NL5ysF7CY9n0qwFzQa5A90sDrjvVKKW/Qr51rJ2gdIupT5NNF1sx59us+Cz5f5jG
+         JTSZBRyVL9g9o1tT6KBEbNsOybcBXfGs2X4sOa1F+44Zv/E5AeeY9d6ClWLyyJgvL+Fi
+         xtZ5ect8LoUNAIlgcLaIOjkjhT1NRBj/rpQECiXdsAsx3QZSsg4/Y09GDmxXKIVxgPOT
+         ITeQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772939050; x=1773543850; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0IaoSMc50PrI1R6KkavQYENP3Zw/o1AejA056RqEjsA=;
-        b=f4TXWEQnoQ5sMo6Do0vTSGCSv2Y0bKiT+nkWYkDLBko0Ix1InP+n+Ip9sPcCIJAPm0
-         rTcwBy7Qatt7Tn4Ak9vDQSICYQDY1pkZrnNUd8cufmj9Nov63IbSFzi0ICH8QQu8pLL1
-         8oEc8eZn7Lms4yj4lLQZX8rsozg1K2Xn8L57ZOH/32YgYbGVG7DMOKh00+y0Xm4aJbCz
-         D4qkoJx+oJ8kwOWwko/W39bHa+rT7KCc6rgjSHlVQD+VBNJIJAa7X3vzRsaApwbgLfm7
-         sCPAvkYgMZXYZ+3O+oo6ciRyDSZaQ43dINWVelVZhYIfKTyXqK7yxm+bG44dHjSLNnRl
-         UUQg==
+        d=google.com; s=20230601; t=1772939326; x=1773544126; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vL+kYgBcVaHGMpKP/KOcO6tTjJs1gho5KzlvMYmWcNg=;
+        b=J1Us7Weu7b7VsgEqwi0gceR9u5/vHGzd5NLbhchn/jFYlN6vybCGW3Vf0+6X9d5qYu
+         1MSq6v+J1j7LGrlTiQAfvEqHcNRL48rgl06e14UIaNA3FjfaGsGm0p74WnNN7y/2Ulue
+         mrWXCYYUlzbPYdYNZ2e3aZkScAt6rZc+Bm2dYsF1XTUQXP/uxvRbnqa18teueLmgtXGt
+         9vXlhvEEO4fBMOSXXqUXILN21Sftrywg98GXEo0KNPM6o2ZJjOf9+iFuNNwk3iIPMm8G
+         oiMyPH9WodYKrrdjKfS05kz0bns/oKNRsSmZfjAlNPX/IWodqTX98gKKt+NWpwVD1Kg8
+         lIRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772939050; x=1773543850;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0IaoSMc50PrI1R6KkavQYENP3Zw/o1AejA056RqEjsA=;
-        b=mI5uvrS682YNzZBVlqo0TbmZYhQEQCKIQYQ6mSLrY3STl1KW/g+lmM3ToHkN51GWr7
-         JkNSpMJ9mqtupjhix8GFWEKd3avLHhVAn2dB67wTs3cvDdZTOfulQsKO+MIjXIXjeR82
-         Pyo9YnHGA66QNPPsEpl8XrcuBAZ3GSgvxSPsQM+/pl7QZ2gcK6PyvWF3NQ7tDdFnPEQK
-         QIzwBR4J0YtddDjad4PJfx1mfyTVSm5cVWZG20Xp6VDROlNE1w5A2Vv+y7A8jOEIkh75
-         N08mj3B2smjsdI2lnV2CcwuaIiFYdjFyCMAx6Jx5C+4KIeN7FC+MUrabkhY6I/Iw2X/A
-         7z4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXOK/5jku8+AbG0C2KulJSnAdr0R5Egjbr8AKVNHe2zACZ9j+qSnDdsLEirnhmHsnGAlpPzoIY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbF0M/6alJBD4IiF6Z1mmUyWT2//7SOdQI0dk6tW8nRbbGkmYS
-	+VP+fVGNPv38vSld9dJXhy0fEOENIAFvEkZ50qPkv/2jZHyVzEK1x4++5p9ITFsai1Eho+Sz+Mu
-	P3cocHQ==
-X-Received: from pliy16.prod.google.com ([2002:a17:903:3d10:b0:2ae:3bfd:19bd])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f78a:b0:2a9:43a9:d371
- with SMTP id d9443c01a7336-2ae8243b302mr62778905ad.37.1772939050187; Sat, 07
- Mar 2026 19:04:10 -0800 (PST)
-Date: Sun,  8 Mar 2026 03:04:00 +0000
+        d=1e100.net; s=20230601; t=1772939326; x=1773544126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vL+kYgBcVaHGMpKP/KOcO6tTjJs1gho5KzlvMYmWcNg=;
+        b=AK20o7onb8NkvH1J2mVY21JhTeOHX8FXID29ezoxFmSLYAi3iHq/+o7ak7TIgQLK+1
+         apt2iIDXup+AClLaBFUG7OFR/8Oj5mADkGGa6ihZnM7u9xlHVZmfIzcOwcTq7STXHZBQ
+         whpNsDvTTmRGEbRCN4rV8EHO8U63gmvnnP0iZtdoH+A83WgGnrcJ0vSKW9Aa/e3nJzgv
+         IrKeGhxGZMyynk0fTyVpIy962uHckNBnjJVi6os/yJcq0h+8OukQxcWIIXkNhlpoqpNJ
+         soKdfFSqecD0BV76KBM85zTI3fGcSUBQIXbt4J1EYoM9Q6+TQvkz+W8mQE6W+n6hCrEV
+         rDNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsJn7cb4hyQtwnFJ/3oryCVrAbfcMSv8mYPssdxhsuLtsQt+Gg4p31gA9+UsW+Sy0Me9yGYe0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy04FFNQ9WKIc4zDdPNM/8mg5Fk9cxrR6/bCscNjPSlh8dXbfYK
+	rMwgHwPJbUJBOADOqTcE9wqPB9ldbLtuuig7sQl82om0K8//oWSdRHBgYq2qU1p4F0L0WYzVxCB
+	Zk3oVk4VCmZs84mRslQmbnoIj1dVSbWMboKPaEDeGxNE86lpir2AFqHb9
+X-Gm-Gg: ATEYQzyGt9dj1nZ/qhGR4tLzzMa1whggt7qoycoOonh3ZOAylbBkym/zdRN721hm2pM
+	RNd9jre2YQvPxGm0nKEXe8AOc49ecp3NaXfte4XcgkoOuaDXB3ZR5PSW6TcXId18mATt2GzWXhj
+	UfTuScaP0c9CRAxbv0OuBk/GqSCO9g7+80p7zG9x7Zwotw3MCfXsvSrMgoIzjlmemZP0Yg3T/dk
+	7m3dVtqkNDi2GqVFcy5xchBlvfAS80VfZX/YE6wLlowoUkeX4nIUeQHWDmA1K/MiO7/b/Mdti58
+	GUIhsr1f62jgh0Dy8D+VpYBsfjysfwTofzAfk2IACIQNxaJT8+rc/9X0XFMIHMt5iCXqw3tD
+X-Received: by 2002:a05:7022:117:b0:123:3407:1066 with SMTP id
+ a92af1059eb24-128c2e8f192mr3059142c88.43.1772939325636; Sat, 07 Mar 2026
+ 19:08:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260308030406.1825938-1-kuniyu@google.com>
-Subject: [PATCH v1 net] af_unix: Give up GC if MSG_PEEK intervened.
+MIME-Version: 1.0
+References: <20260307024709.718395-3-kuniyu@google.com> <202603072124.nNhJgNnw-lkp@intel.com>
+In-Reply-To: <202603072124.nNhJgNnw-lkp@intel.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Igor Ushakov <sysroot314@gmail.com>
+Date: Sat, 7 Mar 2026 19:08:34 -0800
+X-Gm-Features: AaiRm530dp8zNSZFQaweLHDEXy6u7qeD2gjLWLlfefoma-wEY34m8E-f-DzfMgs
+Message-ID: <CAAVpQUCFHWPYown66QVTaNDeVWERg0a99gcc3WBQeikXdUy1=w@mail.gmail.com>
+Subject: Re: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes with
+ exceptions from tb6_gc_hlist.
+To: kernel test robot <lkp@intel.com>
+Cc: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	Kui-Feng Lee <thinker.li@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 125A322E5E1
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3342E22E64A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265217-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265218-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lists.linux.dev,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.973];
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Igor Ushakov reported that GC purged the receive queue of
-an alive socket due to a race with MSG_PEEK with a nice repro.
+On Sat, Mar 7, 2026 at 5:38=E2=80=AFAM kernel test robot <lkp@intel.com> wr=
+ote:
+>
+> Hi Kuniyuki,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on net/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/=
+ipv6-Remove-permanent-routes-from-tb6_gc_hlist-when-all-exceptions-expire/2=
+0260307-104803
+> base:   net/main
+> patch link:    https://lore.kernel.org/r/20260307024709.718395-3-kuniyu%4=
+0google.com
+> patch subject: [PATCH v1 net 2/2] ipv6: Don't remove permanent routes wit=
+h exceptions from tb6_gc_hlist.
+> config: powerpc-currituck_defconfig (https://download.01.org/0day-ci/arch=
+ive/20260307/202603072124.nNhJgNnw-lkp@intel.com/config)
+> compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project c=
+32caeec8158d634bb71ab8911a6031248b9fc47)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20260307/202603072124.nNhJgNnw-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202603072124.nNhJgNnw-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>    In file included from net/core/sock.c:133:
+>    In file included from include/net/xfrm.h:26:
+> >> include/net/ip6_fib.h:557:35: error: no member named 'ipv6' in 'struct=
+ net'
+>      557 |         gc_args.timeout =3D READ_ONCE(net->ipv6.sysctl.ip6_rt_=
+gc_interval),
+>          |                                     ~~~  ^
 
-This is the exact same issue previously fixed by commit
-cbcf01128d0a ("af_unix: fix garbage collect vs MSG_PEEK").
-
-After GC was replaced with the current algorithm, the cited
-commit removed the lock dance in unix_peek_fds() and
-reintroduced the same issue.
-
-The problem is that MSG_PEEK bumps a file refcount without
-interacting with GC.
-
-Consider an SCC containing sk-A and sk-B, where sk-A is
-close()d but can be recv()ed via sk-B.
-
-The bad thing happens if sk-A is recv()ed with MSG_PEEK from
-sk-B and sk-B is close()d while GC is checking unix_vertex_dead()
-for sk-A and sk-B.
-
-  GC thread                    User thread
-  ---------                    -----------
-  unix_vertex_dead(sk-A)
-  -> true   <------.
-                    \
-                     `------   recv(sk-B, MSG_PEEK)
-              invalidate !!    -> sk-A's file refcount : 1 -> 2
-
-                               close(sk-B)
-                               -> sk-B's file refcount : 2 -> 1
-  unix_vertex_dead(sk-B)
-  -> true
-
-Initially, sk-A's file refcount is 1 by the inflight fd in sk-B
-recvq.  GC thinks sk-A is dead because the file refcount is the
-same as the number of its inflight fds.
-
-However, sk-A's file refcount is bumped silently by MSG_PEEK,
-which invalidates the previous evaluation.
-
-At this moment, sk-B's file refcount is 2; one by the open fd,
-and one by the inflight fd in sk-A.  The subsequent close()
-releases one refcount by the former.
-
-Finally, GC incorrectly concludes that both sk-A and sk-B are dead.
-
-One option is to restore the lock dance in unix_peek_fds(), but
-we can resolve this more elegantly thanks to the new algorithm.
-
-We actually do not need to synchronise MSG_PEEK with the dead
-SCC detection.  Even if the sequence above occurs, we can just
-give up garbage-collecting the SCC if we can detect the race.
-
-Let's notify GC when MSG_PEEK occurs and let it defer the SCC
-to the next run.
-
-This way no locking is needed on the MSG_PEEK side, and we can
-avoid imposing a penalty on every MSG_PEEK unnecessarily.
-
-Note that we can retry within unix_scc_dead() if MSG_PEEK is
-detected, but we do not do so to avoid hung task splat from
-abusive MSG_PEEK calls.
-
-Fixes: 118f457da9ed ("af_unix: Remove lock dance in unix_peek_fds().")
-Reported-by: Igor Ushakov <sysroot314@gmail.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/unix/af_unix.c |  2 ++
- net/unix/af_unix.h |  1 +
- net/unix/garbage.c | 71 ++++++++++++++++++++++++++++------------------
- 3 files changed, 46 insertions(+), 28 deletions(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 7eaa5b187fef..b23c33df8b46 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1958,6 +1958,8 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
- {
- 	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
-+
-+	unix_peek_fpl(scm->fp);
- }
- 
- static void unix_destruct_scm(struct sk_buff *skb)
-diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
-index c4f1b2da363d..8119dbeef3a3 100644
---- a/net/unix/af_unix.h
-+++ b/net/unix/af_unix.h
-@@ -29,6 +29,7 @@ void unix_del_edges(struct scm_fp_list *fpl);
- void unix_update_edges(struct unix_sock *receiver);
- int unix_prepare_fpl(struct scm_fp_list *fpl);
- void unix_destroy_fpl(struct scm_fp_list *fpl);
-+void unix_peek_fpl(struct scm_fp_list *fpl);
- void unix_schedule_gc(struct user_struct *user);
- 
- /* SOCK_DIAG */
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 816e8fa2b062..468fb0ee463f 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -318,6 +318,21 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
- 	unix_free_vertices(fpl);
- }
- 
-+static bool gc_in_progress;
-+static bool unix_fd_peeked;
-+
-+void unix_peek_fpl(struct scm_fp_list *fpl)
-+{
-+	if (!fpl->count_unix)
-+		return;
-+
-+	if (!READ_ONCE(gc_in_progress))
-+		return;
-+
-+	/* Invalidate the final refcnt check in unix_vertex_dead(). */
-+	WRITE_ONCE(unix_fd_peeked, true);
-+}
-+
- static bool unix_vertex_dead(struct unix_vertex *vertex)
- {
- 	struct unix_edge *edge;
-@@ -351,6 +366,32 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
- 	return true;
- }
- 
-+static LIST_HEAD(unix_visited_vertices);
-+static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-+
-+static bool unix_scc_dead(struct list_head *scc, bool fast)
-+{
-+	struct unix_vertex *vertex;
-+	bool scc_dead = true;
-+
-+	WRITE_ONCE(unix_fd_peeked, false);
-+
-+	list_for_each_entry_reverse(vertex, scc, scc_entry) {
-+		/* Don't restart DFS from this vertex. */
-+		list_move_tail(&vertex->entry, &unix_visited_vertices);
-+
-+		/* Mark vertex as off-stack for __unix_walk_scc(). */
-+		if (!fast)
-+			vertex->index = unix_vertex_grouped_index;
-+
-+		if (scc_dead)
-+			scc_dead = unix_vertex_dead(vertex);
-+	}
-+
-+	/* If MSG_PEEK intervened, defer this SCC to the next round. */
-+	return scc_dead && !READ_ONCE(unix_fd_peeked);
-+}
-+
- static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
- {
- 	struct unix_vertex *vertex;
-@@ -404,9 +445,6 @@ static bool unix_scc_cyclic(struct list_head *scc)
- 	return false;
- }
- 
--static LIST_HEAD(unix_visited_vertices);
--static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
--
- static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 				     unsigned long *last_index,
- 				     struct sk_buff_head *hitlist)
-@@ -474,9 +512,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 	}
- 
- 	if (vertex->index == vertex->scc_index) {
--		struct unix_vertex *v;
- 		struct list_head scc;
--		bool scc_dead = true;
- 
- 		/* SCC finalised.
- 		 *
-@@ -485,18 +521,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 		 */
- 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
- 
--		list_for_each_entry_reverse(v, &scc, scc_entry) {
--			/* Don't restart DFS from this vertex in unix_walk_scc(). */
--			list_move_tail(&v->entry, &unix_visited_vertices);
--
--			/* Mark vertex as off-stack. */
--			v->index = unix_vertex_grouped_index;
--
--			if (scc_dead)
--				scc_dead = unix_vertex_dead(v);
--		}
--
--		if (scc_dead) {
-+		if (unix_scc_dead(&scc, false)) {
- 			unix_collect_skb(&scc, hitlist);
- 		} else {
- 			if (unix_vertex_max_scc_index < vertex->scc_index)
-@@ -550,19 +575,11 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 	while (!list_empty(&unix_unvisited_vertices)) {
- 		struct unix_vertex *vertex;
- 		struct list_head scc;
--		bool scc_dead = true;
- 
- 		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
- 		list_add(&scc, &vertex->scc_entry);
- 
--		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
--			list_move_tail(&vertex->entry, &unix_visited_vertices);
--
--			if (scc_dead)
--				scc_dead = unix_vertex_dead(vertex);
--		}
--
--		if (scc_dead) {
-+		if (unix_scc_dead(&scc, true)) {
- 			cyclic_sccs--;
- 			unix_collect_skb(&scc, hitlist);
- 		}
-@@ -577,8 +594,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 		   cyclic_sccs ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC);
- }
- 
--static bool gc_in_progress;
--
- static void unix_gc(struct work_struct *work)
- {
- 	struct sk_buff_head hitlist;
--- 
-2.53.0.473.g4a7958ca14-goog
-
+Oops, I missed ip6_fib.h is included from many places.
+I'll guard the GC functions with ifdef CONFIG_IPV6.
 
