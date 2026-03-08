@@ -1,131 +1,200 @@
-Return-Path: <netdev+bounces-265335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 58w1FLfOrWnZ7gEAu9opvQ
-	(envelope-from <netdev+bounces-265335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 20:32:07 +0100
+	id wM0DLYbXrWl+8AEAu9opvQ
+	(envelope-from <netdev+bounces-265336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 21:09:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49738231EB2
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 20:32:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A2C232142
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 21:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B36C1300A648
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 19:25:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA0D83012266
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 20:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2DAC38E12F;
-	Sun,  8 Mar 2026 19:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A493563D6;
+	Sun,  8 Mar 2026 20:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFE5F4FA;
-	Sun,  8 Mar 2026 19:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F0E33BBCD;
+	Sun,  8 Mar 2026 20:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772997949; cv=none; b=T61UGYGDwh4GerewbJoPawnOpKj2OAtdNwBmtPgERsoOdW3r18jMRUrM9TkM1G1p51S9AosJzZ8CJyEi7tkHzr5Pb1MAu5hxnDDWtwJPtKWjzzLjYyfDk5mlMvLmLdmVP4+3F8ekpfCJiDV2GFG0mMiTzMMqVhXrxrOTymjUtWE=
+	t=1773000456; cv=none; b=gXTjuc6O1PoP0Mbb2Klwq9STaCCH90XWwt+TzhCSCm2uRXuK7eX17g8z/mWtDVOjReFVzdlG3gGGU13J+DN2bNHaQ2ChPtSXV4VO+taIMN1F355zai9ghg4GmlE9aC+mTYIGZhM7mSJ1Tdr4gvEJzGTwFSDPS3zftxd3wgNpgQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772997949; c=relaxed/simple;
-	bh=EozQiSK5Ib3FOB1QloyQqe2rY0Z6fW3umZrG7hgNO7Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gzrk4q3GYARzfr7yXGvTtNMbI7oDy5C8S9oLyRargeNeM4CdtBoGtURdhfpyWWnp0leU91EzAkH4cV/nq8mcoZGb9dLrhhOedOSzgs//A2BE9cT6uZP5JqHP+mIGJoW7oMBh+rwHVzYP8l6rzd1OO1wlNbiKEuUs+qBCsWhbtho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com; spf=pass smtp.mailfrom=perches.com; arc=none smtp.client-ip=216.40.44.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=perches.com
-Received: from omf04.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay03.hostedemail.com (Postfix) with ESMTP id 5C544B9DD1;
-	Sun,  8 Mar 2026 19:25:40 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf04.hostedemail.com (Postfix) with ESMTPA id 0977B20024;
-	Sun,  8 Mar 2026 19:25:33 +0000 (UTC)
-Message-ID: <8c4c5d0c5d014d5cc19eb10906ca1bd83ffb3ce5.camel@perches.com>
-Subject: Re: [PATCH v2 phy-next 24/24] MAINTAINERS: add regexes for linux-phy
-From: Joe Perches <joe@perches.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, Neil
- Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, 
-	freedreno@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, 	spacemit@lists.linux.dev,
- UNGLinuxDriver@microchip.com
-Date: Sun, 08 Mar 2026 12:25:32 -0700
-In-Reply-To: <20260308191017.kcyi7ka5pktq5jl4@skbuf>
-References: <20260308114009.2546587-1-vladimir.oltean@nxp.com>
-	 <20260308114009.2546587-25-vladimir.oltean@nxp.com>
-	 <ca170cbaf2f8bcbc89bbda68914d8e0d7640f0e7.camel@perches.com>
-	 <20260308191017.kcyi7ka5pktq5jl4@skbuf>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1773000456; c=relaxed/simple;
+	bh=fLKyKGq63ZCK3PVesUP/vodqbMzixzFiK4TbxvT27P4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=nzlYY0LbhGD+QzqLuEIc9uUVnycGUqWTAyFMtdtxcdn/05aohKoU6z+IW12TrLWTAAYWX62vsEgqXy46/WkPdkcmKaheHiJY9lYuJF8tdqGt2MtRsv8uv+s7lFG+c0kTploIkE2gikFdiUrWzlBmyyFWRD87bA5kLEK9qjSt8OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [10.190.130.87])
+	by mtasvr (Coremail) with SMTP id _____wB3Lrzf1q1pqukdAQ--.16979S3;
+	Mon, 09 Mar 2026 04:06:56 +0800 (CST)
+Received: from 12321260$zju.edu.cn ( [10.190.130.87] ) by
+ ajax-webmail-mail-app1 (Coremail) ; Mon, 9 Mar 2026 04:06:55 +0800
+ (GMT+08:00)
+Date: Mon, 9 Mar 2026 04:06:55 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Fan Wu" <12321260@zju.edu.cn>
+To: "Andrew Lunn" <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	heiko@sntech.de, romain.perier@gmail.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: Re: Re: [PATCH] net: ethernet: arc: fix use-after-free in probe
+ error path
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250620(94335109) Copyright (c) 2002-2026 www.mailtech.cn zju.edu.cn
+In-Reply-To: <1bb942f0-d512-4834-bf01-49f9a9d7fd77@lunn.ch>
+References: <20260304025303.145493-1-fanwu01@zju.edu.cn>
+ <b6ac1471-e33a-41d3-9e67-e6463612f05b@lunn.ch>
+ <54c76f66.7eea7.19ccca93975.Coremail.12321260@zju.edu.cn>
+ <1bb942f0-d512-4834-bf01-49f9a9d7fd77@lunn.ch>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Stat-Signature: j8cqfom7pfzfp6zpqz8ke1a1p9xdohfr
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18gVnVCxP9qO8FnxW5XHh2uO0wk84Ax7lg=
-X-HE-Tag: 1772997933-957601
-X-HE-Meta: U2FsdGVkX19ggjHhHzzB2ejeghViKyEU9/Qc1eCdZCBrv+N9xtOnahsspQvZ8jvhU2ga3Lye0QXeOR98rNiSHF/UgohYf3IygLBOBYTY3HQsWda9w1srC+kwAojgNxclR4J1W5hHzgzTrnHExi0J9Fc+5gWFMN63B5g6NiaVGlRxjf7RCVqIBOUj+j4kfyNff6yNQVlLB9e5ila4JDaBwgnDeOVtLtdUQTLLqec4LVPoU+hx+wN3fz8KEXlTs4FZTBiefRKJUZNU0NA/J0kpLWihVSYofGti+NOBrHO1dop4vyrejFOtF51kvKEWWm2P
-X-Rspamd-Queue-Id: 49738231EB2
+Message-ID: <25daeba9.7f281.19ccf0f59f3.Coremail.12321260@zju.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID:yy_KCgBn4Nnf1q1p1fKIBg--.30948W
+X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/1tbiAg8EDWmsf4oVgwADsh
+X-CM-DELIVERINFO: =?B?ui4qEQXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
+	sfnYTMMGvVyEqe86yjUAhfmuZw2WnZegpMf+SOFXz9Fe3OtH2NOZxdZRk3YOwYazlePWQx
+	OfbQzA1pDniT4tK90dCAOI9aDl/2e0ak3u7pYSLUVVAK1/h6/Lh5AHiAharkZg==
+X-Coremail-Antispam: 1Uk129KBj93XoWxWr4fZFy5uw1kGw13AFWkGrX_yoWrCw4DpF
+	WDKasYkF4DJF10yws7Ga1FkFykA3yxJr45C3s5Jw1DZw15Xa4IkryIgrW5uFy3urWDGw1a
+	qr40v34kXayDAFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUHIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r1j6r4UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8JVW8Jr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjx
+	CEc2xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAF
+	wI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0x
+	vY0x0EwIxGrwACjcxG0xvY0x0EwIxGrVCF72vEw4AK0wACY4xI67k04243AVAKzVAKj4xx
+	M4xvF2IEb7IF0Fy26I8I3I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJwCE64xvF2IEb7IF0Fy7YxBIdaVFxhVjvjDU0xZFpf9x07j1iiDUUUUU=
+X-Rspamd-Queue-Id: B6A2C232142
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [7.34 / 15.00];
-	URIBL_BLACK(7.50)[perches.com:mid];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265336-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[perches.com];
-	TAGGED_FROM(0.00)[bounces-265335-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	GREYLIST(0.00)[pass,body];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	DMARC_NA(0.00)[zju.edu.cn];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_SPAM(0.00)[0.360];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	HAS_X_PRIO_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@perches.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,lunn.ch,sntech.de,gmail.com,lists.infradead.org];
+	NEURAL_HAM(-0.00)[-0.991];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c15:e001:75::/64:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[perches.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
-X-Rspamd-Action: add header
-X-Spam: Yes
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:email,davemloft.net:email,zju.edu.cn:mid,zju.edu.cn:email]
+X-Rspamd-Action: no action
 
-On Sun, 2026-03-08 at 21:10 +0200, Vladimir Oltean wrote:
-> On Sun, Mar 08, 2026 at 11:40:44AM -0700, Joe Perches wrote:
-> > Perhaps if matching only the include uses:
-> > (/ is escaped because get_maintainer is stupid)
-> > something like:
-> >=20
-> > K:	include\s*\<linux\/phy\/phy(?:-common-props|-provider)?\.h\>
+SGkgQW5kcmV3LAoKVGhhbmtzIGZvciB0aGUgZGV0YWlsZWQgZXhwbGFuYXRpb27igJR0aGF0IG1h
+a2VzIGEgbG90IG9mIHNlbnNlLgoKSSBhZ3JlZSB0aGUgZGV2bSBjb252ZXJzaW9uIGlzIG5vdCB0
+aGUgcmlnaHQgYXBwcm9hY2ggZm9yIHRoaXMgdHJlZS4gSSdsbCBwcmVwYXJlIGEgdjIgcGF0Y2gg
+dGFyZ2V0aW5nIG5ldCB0aGF0IGltcGxlbWVudHMgYSBtaW5pbWFsIGhhcmR3YXJlLWxldmVsIGZp
+eC4KCkZvbGxvd2luZyB5b3VyIGFkdmljZSwgSSB3aWxsIG1ha2Ugc3VyZSB0aGUgaW50ZXJydXB0
+cyBhcmUgcHV0IGludG8gYSBrbm93biBkaXNhYmxlZCBhbmQgY2xlYXJlZCBzdGF0ZSBpbiBhcmNf
+ZW1hY19wcm9iZSgpIGJlZm9yZSB3ZSByZXF1ZXN0IHRoZSBJUlEuIFRoaXMgd2lsbCBjb21wbGV0
+ZWx5IGVsaW1pbmF0ZSB0aGUgcG9zc2liaWxpdHkgb2YgYW4gSVJRIGRlbGl2ZXJ5IGFnYWluc3Qg
+YSBmcmVlZCBuZGV2IGR1cmluZyB0aGUgcHJvYmUgZXJyb3IgcGF0aCB0ZWFyZG93bi4KCkkgd2ls
+bCB1cGRhdGUgdGhlIGNoYW5nZWxvZyBhY2NvcmRpbmdseSB0byBub3RlIHRoYXQgdGhpcyByYWNl
+IGhhcyBiZWVuIHRoZXJlIGZyb20gdGhlIGJlZ2lubmluZyBhbmQgZW5zdXJlIHRoZSBwcm9wZXIg
+Rml4ZXM6IHRhZyBpcyBhZGRlZCBmb3IgdGhlIHN0YWJsZSBiYWNrcG9ydHMuCgpUaGFua3MsIApG
+YW4gV3UKCgo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZXMtLS0tLQo+IEZyb206ICJBbmRyZXcgTHVu
+biIgPGFuZHJld0BsdW5uLmNoPgo+IFNlbmQgdGltZTpNb25kYXksIDA5LzAzLzIwMjYgMDE6NTk6
+NDYKPiBUbzog5ZC05YehIDwxMjMyMTI2MEB6anUuZWR1LmNuPgo+IENjOiBuZXRkZXZAdmdlci5r
+ZXJuZWwub3JnLCBkYXZlbUBkYXZlbWxvZnQubmV0LCBrdWJhQGtlcm5lbC5vcmcsIGVkdW1hemV0
+QGdvb2dsZS5jb20sIHBhYmVuaUByZWRoYXQuY29tLCBhbmRyZXcrbmV0ZGV2QGx1bm4uY2gsIGhl
+aWtvQHNudGVjaC5kZSwgcm9tYWluLnBlcmllckBnbWFpbC5jb20sIGxpbnV4LWFybS1rZXJuZWxA
+bGlzdHMuaW5mcmFkZWFkLm9yZywgbGludXgtcm9ja2NoaXBAbGlzdHMuaW5mcmFkZWFkLm9yZywg
+c3RhYmxlQHZnZXIua2VybmVsLm9yZwo+IFN1YmplY3Q6IFJlOiBSZTogW1BBVENIXSBuZXQ6IGV0
+aGVybmV0OiBhcmM6IGZpeCB1c2UtYWZ0ZXItZnJlZSBpbiBwcm9iZSBlcnJvciBwYXRoCj4gCj4g
+T24gU3VuLCBNYXIgMDgsIDIwMjYgYXQgMDQ6NTY6MDhQTSArMDgwMCwg5ZC05YehIHdyb3RlOgo+
+ID4gWW91IGFyZSByaWdodCB0aGF0IG5vcm1hbCBkZXZpY2UgaW50ZXJydXB0IGdlbmVyYXRpb24g
+aXMgZW5hYmxlZCBpbiBhcmNfZW1hY19vcGVuKCkgdmlhIFJfRU5BQkxFLCBzbyB3ZSBjZXJ0YWlu
+bHkgZG9uJ3QgZXhwZWN0IHJlZ3VsYXIgUlgvVFggdHJhZmZpYyBpbnRlcnJ1cHRzIGR1cmluZyBw
+cm9iZS4KPiA+IAo+ID4gTXkgbWFpbiBjb25jZXJuIGhlcmUgaXMgdGhlIGxpZmV0aW1lIG9yZGVy
+aW5nIGluIHRoZSBlcnJvciBwYXRoLiBhcmNfZW1hY19wcm9iZSgpIGluc3RhbGxzIHRoZSBJUlEg
+aGFuZGxlciB2aWEgZGV2bV9yZXF1ZXN0X2lycSguLi4sIG5kZXYpLCBidXQgaWYgZW1hY19yb2Nr
+Y2hpcF9wcm9iZSgpIGZhaWxzIGxhdGVyLCBpdCBleHBsaWNpdGx5IGNhbGxzIGZyZWVfbmV0ZGV2
+KG5kZXYpIHdlbGwgYmVmb3JlIHRoZSBkZXZyZXMgY2xlYW51cCByb3V0aW5lIHJ1bnMuCj4gPiAK
+PiA+IEluIHRoYXQgc3BlY2lmaWMgZ2FwLCBpZiBhbiBJUlEgaXMgc29tZWhvdyBkZWxpdmVyZWTi
+gJRwZXJoYXBzIGZyb20gYSBwZW5kaW5nL2xhdGNoZWQgbGluZSBsZWZ0IGJ5IHRoZSBmaXJtd2Fy
+ZS9ib290bG9hZGVyLCBvciBvdGhlciBub24tdHJhZmZpYyBhbm9tYWxpZXPigJRhcmNfZW1hY19p
+bnRyKCkgd2lsbCBpbW1lZGlhdGVseSBkZXJlZmVyZW5jZSBkZXZfaWQgYXMgYSBzdHJ1Y3QgbmV0
+X2RldmljZSAqLiBTaW5jZSBuZGV2IGhhcyBhbHJlYWR5IGJlZW4gbWFudWFsbHkgZnJlZWQsIHRo
+aXMgcmVzdWx0cyBpbiBhIFVBRi4KPiA+IAo+ID4gU28gd2hpbGUgSSBjb21wbGV0ZWx5IGFncmVl
+IHRoaXMgaXNuJ3QgYSBub3JtYWwgcHJlLW9wZW4gdHJhZmZpYyBwYXRoLCB0aGUgbWl4ZWQgbGlm
+ZXRpbWUgbWFuYWdlbWVudCAobWFuYWdlZCBJUlEgdnMuIG1hbnVhbCBuZXRkZXYgZnJlZSkgc3Rp
+bGwgY3JlYXRlcyBhIHJlYWwgcmFjZSB3aW5kb3cuCj4gPiAKPiA+IFN3aXRjaGluZyB0byBkZXZt
+X2FsbG9jX2V0aGVyZGV2KCkgcHV0cyBib3RoIHJlc291cmNlcyB1bmRlciBkZXZyZXMgbWFuYWdl
+bWVudCwgcGVybWFuZW50bHkgZml4aW5nIHRoaXMgdGVhcmRvd24gb3JkZXJpbmcgaXNzdWUuIEkg
+d291bGQgYmUgaGFwcHkgdG8gc2VuZCBhIHYyIGFuZCByZXdvcmQgdGhlIGNvbW1pdCBsb2cgdG8g
+ZW1waGFzaXplIHRoaXMgYXMgYSBwb3RlbnRpYWwgcmFjZSB3aW5kb3cgYW5kIGEgaGFyZGVuaW5n
+IGZpeC4gTGV0IG1lIGtub3cgd2hhdCB5b3UgdGhpbmsuCj4gCj4gaHR0cHM6Ly93d3cua2VybmVs
+Lm9yZy9kb2MvaHRtbC9sYXRlc3QvcHJvY2Vzcy9tYWludGFpbmVyLW5ldGRldi5odG1sI2NsZWFu
+LXVwLXBhdGNoZXMKPiAKPiAgIDEuNy40LiBDbGVhbi11cCBwYXRjaGVzwrYKPiAKPiAgIE5ldGRl
+diBkaXNjb3VyYWdlcyBwYXRjaGVzIHdoaWNoIHBlcmZvcm0gc2ltcGxlIGNsZWFuLXVwcywgd2hp
+Y2ggYXJlCj4gICBub3QgaW4gdGhlIGNvbnRleHQgb2Ygb3RoZXIgd29yay4gRm9yIGV4YW1wbGU6
+Cj4gCj4gICBBZGRyZXNzaW5nIGNoZWNrcGF0Y2gucGwsIGFuZCBvdGhlciB0cml2aWFsIGNvZGlu
+ZyBzdHlsZSB3YXJuaW5ncwo+IAo+ICAgQWRkcmVzc2luZyBMb2NhbCB2YXJpYWJsZSBvcmRlcmlu
+ZyBpc3N1ZXMKPiAKPiAgIENvbnZlcnNpb25zIHRvIGRldmljZS1tYW5hZ2VkIEFQSXMgKGRldm1f
+IGhlbHBlcnMpCj4gCj4gICBUaGlzIGlzIGJlY2F1c2UgaXQgaXMgZmVsdCB0aGF0IHRoZSBjaHVy
+biB0aGF0IHN1Y2ggY2hhbmdlcyBwcm9kdWNlCj4gICBjb21lcyBhdCBhIGdyZWF0ZXIgY29zdCB0
+aGFuIHRoZSB2YWx1ZSBvZiBzdWNoIGNsZWFuLXVwcy4KPiAKPiAKPiBTb21lIHBlcmNlbnRhZ2Ug
+b2YgZGV2bV8gY29udmVyc2F0aW9uIHBhdGNoZXMgYnJlYWsgZHJpdmVycy4gV2UKPiBSZXZpZXdl
+cnMgbmVlZCB0byBsb29rIGF0IGFsbCBzdWNoIHBhdGNoZXMgYW5kIHRyeSB0byBkZXRlY3Qgc3Vj
+aAo+IGJyZWFrYWdlLiBJbiBnZW5lcmFsLCBpdCBpcyBub3Igd29ydGggaXQuIEhlbmNlIHdlIGdl
+bmVyYWxseSByZWplY3QKPiBwYXRjaGVzIGxpa2UgdGhpcy4KPiAKPiBUaGlzIGlzIGhvd2V2ZXIg
+c2xpZ2h0bHkgZGlmZmVyZW50LiBJdCBsb29rcyBsaWtlIHRoaXMgZHJpdmVyIHdhcwo+IGJyb2tl
+biBmcm9tIHRoZSBiZWdpbm5pbmcuIFRoZSByYWNlIHlvdSBwb2ludCBvdXQgaGFzIGFsd2F5cyBi
+ZWVuCj4gdGhlcmUuIFRoYXQgaXMgc29tZXRoaW5nIHdvcnRoIHBvaW50aW5nIG91dCBpbiB0aGUg
+Y29tbWl0IG1lc3NhZ2UuCj4gCj4gQnV0IHRha2UgYSBzdGVwIGJhY2suIFRoaW5rIGFib3V0IGlu
+dGVycnVwdCBoYW5kbGluZyBpbiBnZW5lcmFsLiBEbwo+IHlvdSB0aGluayBpdCBpcyBnb29kIHBy
+YWN0aWNlIHRvIHJlcXVlc3QgaW50ZXJydXB0cyBiZWZvcmUgY29uZmlndXJpbmcKPiB0aGUgaGFy
+ZHdhcmUgYWJvdXQgd2hhdCBpbnRlcnJ1cHRzIGl0IHdpbGwgZGVsaXZlcj8KPiAKPiBJZiB0aGUg
+ZHJpdmVyIHdyb3RlIHRvIFJfRU5BQkxFIGluIHByb2JlLCBiZWZvcmUgcmVxdWVzdGluZyB0aGUK
+PiBpbnRlcnJ1cHQsIGVuYWJsZWQgdGhlIG5lZWRlZCBpbnRlcnJ1cHRzIGluIG9wZW4sIGRpc2Fi
+bGVkIHRoZQo+IGludGVycnVwdHMgaW4gY2xvc2UsIHRoZSBkaWZmZXJlbnQgbGlmZXRpbWVzIHdv
+dWxkIG5vdCBtYXR0ZXIuCj4gCj4gU28sIGZvciBzdGFibGUsIHBsZWFzZSBhZGQgY29kZSB0byBw
+dXQgaW50ZXJydXB0cyBpbnRvIGEgd2VsbCBrbm93bgo+IHN0YXRlIGJlZm9yZSByZXF1ZXN0aW5n
+IHRoZSBpbnRlcnJ1cHQuIFBsZWFzZSB1c2UgdGhlIG5ldCB0cmVlLCBhbmQKPiBhZGQgYSBGaXhl
+czogdGFnLgo+IAo+IFlvdSBjYW4gc3VibWl0IHRoaXMgcGF0Y2ggdG8gbmV0LW5leHQsIGJ1dCB3
+ZSBtaWdodCByZWplY3QgaXQsIGJlY2F1c2UKPiBvZiB0aGUgcG9saWN5LiBJZiB5b3UgYXJlIHdv
+cmtpbmcgb24gdGhpcyBkcml2ZXIsIGFkZGluZyBvdGhlcgo+IGZlYXR1cmVzLCB0aGlzIHBhdGNo
+IGlzIHBhcnQgb2YgYSBiaWdnZXIgcGF0Y2hzZXQsIHdlIGFyZSBtb3JlIGxpa2VseQo+IHRvIGFj
+Y2VwdCBpdC4KPiAKPiAgICAgQW5kcmV3Cj4gCj4gLS0tCj4gcHctYm90OiBjcgo=
 
-> Why is get_maintainer stupid?
-
-The get_maintainer code used to match keywords is
-
-	    foreach my $line (keys %keyword_hash) {
-		if ($text =3D~ m/$keyword_hash{$line}/x) {
-
-so it seems the first / in the K: <foo> regex would terminate
-the match.
-
-It might have been better to use a different delimiter.
-Maybe:
-
-		if ($text =3D~ m{$keyword_hash{$line}}/x
 
