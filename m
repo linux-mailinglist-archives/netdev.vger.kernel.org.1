@@ -1,163 +1,249 @@
-Return-Path: <netdev+bounces-265325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265326-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGN1G125rWk+6gEAu9opvQ
-	(envelope-from <netdev+bounces-265325-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 19:01:01 +0100
+	id 6PB6Lj/BrWnq6wEAu9opvQ
+	(envelope-from <netdev+bounces-265326-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 19:34:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD1523181A
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 19:01:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1064231B11
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 19:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4AC77300F9ED
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 18:00:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC32A3004433
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 18:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A939B393DCA;
-	Sun,  8 Mar 2026 18:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0823806B3;
+	Sun,  8 Mar 2026 18:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dTMvt5zr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="i9sgN2Rz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012038.outbound.protection.outlook.com [40.107.209.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ECD393DFD;
-	Sun,  8 Mar 2026 18:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772992804; cv=none; b=uu63+p2/J5tIIX6BT/Z7937kSe8pKmqQjMXf4HvL+IutOYeXl4Q8OMr1NPyIw3/ns972QS6bBAT75UW/jNDMw5qSB1flO1QMgNneOdm8Xvq2Nqwlt6Uh5jDJ67v7yZ4aav+dclYFPINjNodTV8IHWqeCvC560Mrfqm1ez/L7nhw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772992804; c=relaxed/simple;
-	bh=woG6B0/Edt9gQwKF22OCwrjWBOFo8sGZFZLQ6kxGX8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eCQLUMb2kXesyvpdNmTJ0BGX82z9j2wXYZ3mXCz/2j3BetdYQBcJZWEv8j+tZ71a31FsUxblyPXcZgzpKGHdg29bF8Rf6LaG0irMJfXp2Mx3bE+AWWhBj3bvcf/4kf56vTSewSSX4lZBhvH9tXevrmSdJx752hcZbSrjeym6XVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dTMvt5zr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=COX7CpTb/27v5+RAJjpmWzEICJkLOwS/U54SdgdwvJ0=; b=dT
-	Mvt5zreya8sYFTIdBVn+u2Cr+TZpKI2sHjC2eOz50+u7Z9bcgWi9rBmOKKmEgNT9xNvbN2WV71V+Y
-	MTg2bknSvJlEcZlhzC8/RD+LOfjFVJwRy0Suiwp0bqKJXu0GL9C9yJfORHH9scM7YznnM23vGIC03
-	WMxQMzpeato1q7o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vzIPq-00Ajv8-GI; Sun, 08 Mar 2026 18:59:46 +0100
-Date: Sun, 8 Mar 2026 18:59:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?5ZC05Yeh?= <12321260@zju.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	heiko@sntech.de, romain.perier@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: Re: [PATCH] net: ethernet: arc: fix use-after-free in probe
- error path
-Message-ID: <1bb942f0-d512-4834-bf01-49f9a9d7fd77@lunn.ch>
-References: <20260304025303.145493-1-fanwu01@zju.edu.cn>
- <b6ac1471-e33a-41d3-9e67-e6463612f05b@lunn.ch>
- <54c76f66.7eea7.19ccca93975.Coremail.12321260@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F8A299922;
+	Sun,  8 Mar 2026 18:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772994873; cv=fail; b=u0rhZyT3gIUBER0bBAGMdgEzkAKPiCHgm4jqGtCh3N2SclDUbwi7NwLCNsU6rR/XxLw54eku0O6sAu4w7rGuuH947y+tYz3nZG730fPqxbcnN9MEbjoqo2K5omHi79LKTCsKtUHTSUTJlGDN9M65fAXjSjw0WGbdEDQQdKQFCBU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772994873; c=relaxed/simple;
+	bh=xXKrKOIhWcTtphC8XScYOnKLu/YmhOHar2xXJlDngNc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ejJtuzTfq4343Oy8dwNDzj/kbvmune4CV+VIcaZVHeec/hcFVnv7xJzMlB6+MP5defCcJne1U0Chl24l+WmBNcepnNfYDE9jOFLgrBct9njh8Ve3AfZPT/RvOkFdJK5+ET9avvLvtn6BOT922K+/PMJOyiwyzNavH/lNstNIGsc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=i9sgN2Rz; arc=fail smtp.client-ip=40.107.209.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YUqb7E1x2IEHdPnL93c2fioSp+ld4RzkVZHx3BG3kjCaVZ96HO3Linl+qKB7YnXHVcTuiH3mVlf2m7XkG7gKO5JWiXji744emVOJRVSw5yPzNPr3MVil5iYzDpq3Bq3ZcOxZGoP1V0J+bgHnwsVr0blv03t35lDC0GA1mGCV99/jTWubFj3ofcbhT9KwLxveA6yEdNFhOVQICS6iSTLYJySVFc7g+8A3RvUwH4P7RM93uj1drGtBnRjJ4hmep6ey8iI1q+Ndbq6VZsIlivLhjc8KyAuOXBRse6yYO+boKw5bh6hjVi/fW+cZlj/LbULHhEblxjCK+pGILuznc13JFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zYsg3zndjLn1TPPMR7TsRMg+hPN5YpEGVRusmc+wB/I=;
+ b=xHQQyfqGFVDFNJYNH9mG8FVH1S91Q3CeXZ1nuzXcwKwERxi9aTrBB4YvOwl047GFq5oGnfWYXmp+aiR78732EUVfnDsQxrN0WE4kLQoEFIfzctacDRVsXBDzBb4qy3/8+iP6X5afxJa7h4K2l02cqb7P0BaJV6X6Wg90jjMAIYm0IOotEA+3KDMWSBYeUJZEAUak/5peY6DS1/1ufBGF1ChoPV3LXAiLdBR3AvHgfx8KK3sZmP8Iad4u6e+FP/3nM8vmGsVwgNNFRZt3p0fWL+qBcxhdvEA1zacyQmZwSGfN470Y4sRrtIvnu0uK8n4Bkh3xuGnYIora8u/PX9k89w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zYsg3zndjLn1TPPMR7TsRMg+hPN5YpEGVRusmc+wB/I=;
+ b=i9sgN2Rz42HX/LdWdS2cQH9jVzip4hTX8jE1EcsDjPHk8y7iFue34IY5wzRjg0Q82mWeixbvi5NJQjiTJX1CqA6TFM2oj5nvjRp6haRG1E4g1VVWIG6CGOSeDFGocuHUBgSt+ig5aZ27d7nHwVIRMFZInIWd1OKs9+sE1GZcg291NsbGuz2DW7z7VW1F/zW/2YWrAjnFuYSoH1nOD/rFntcgSvAMOB2Fwd9B1eCXuVPGgUsj4GMohPtSm/G6fiZaI/U2DrgGmBistnk1CeTc+FoWbrCT4hLmsTLOv+VXShxEcHT1ifBtvGbkMKhJkO/a3Utfn64VU8uoeK1Ym7HCDg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by IA1PR12MB6330.namprd12.prod.outlook.com (2603:10b6:208:3e4::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.9; Sun, 8 Mar
+ 2026 18:34:29 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de%5]) with mapi id 15.20.9700.010; Sun, 8 Mar 2026
+ 18:34:29 +0000
+Message-ID: <a10faf04-36c2-4070-ac8b-86b110e6976c@nvidia.com>
+Date: Sun, 8 Mar 2026 20:34:26 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH mlx5-next 8/8] {net/RDMA}/mlx5: Add LAG demux table API
+ and vport demux rules
+To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Saeed Mahameed <saeedm@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Shay Drory <shayd@nvidia.com>,
+ Alexei Lazar <alazar@nvidia.com>
+References: <20260308065559.1837449-1-tariqt@nvidia.com>
+ <20260308065559.1837449-9-tariqt@nvidia.com>
+ <20260308085248.2427feed@kernel.org>
+Content-Language: en-US
+From: Mark Bloch <mbloch@nvidia.com>
+In-Reply-To: <20260308085248.2427feed@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0384.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f7::18) To CH3PR12MB7548.namprd12.prod.outlook.com
+ (2603:10b6:610:144::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <54c76f66.7eea7.19ccca93975.Coremail.12321260@zju.edu.cn>
-X-Rspamd-Queue-Id: CAD1523181A
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|IA1PR12MB6330:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e02b911-9129-417e-48c8-08de7d415528
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	dQjK/FlfIjC6XYlj62DxX0Cpt6Gt9RcpOuzoZlLiVyak27DSUDMcseMX/1TfcG5k+OC72baNGMajkcivgjrKhmoGZUop9PiaomthCgDSQnZ23ZR6pfm8JzZDanRMHQxqdBfcoxuw/sYcZJZWreGg1VTPPqbNZYcfAnb0Uc5/u5lLv9jxUNHA59BVaY8NKv5t/IhYldzNWOcc+zv810a22tI5Zb3hzkcKBVA3OnFetkENqO68JO57NEgmglMLiuCNDJxYiu5GggcBHJa4ZwyfIRW+ZTJFKrzzhYMKbULDsuaffXO3HxCBURu8vtcm9VFvPCmCNJUAOcha6p52PwLi1m84e6naOfqGdBcAfkOUpsw/LgfYuPCaeNXHGcHxOIlwn+huSN6pmwePbNZw3H+QVOms9zHIhxGoDK4Z713ETg2QCWZcH6TIiPSmte8OcNU3KyrPtm5vo/M/MIfuNbLSE2OoRdHTvzCfluSYLAE8r8kYZQAvtmlywSm2qm/FivH5vYw0enDF+ASLlIEkNs+/iAHOApR54KsH4/TuIUYQkprdD08Atm/ZtDnyt8oeiuznEbdqokD6OB9ny7+CahePIu1Xxnt4NxfUs4TwmAdY2dKwXCwow2QHSu7ah43CAzuDguN/OCBuaC0mAylh5gF9Liaw8XWY53d4WeW2tu0fnj425Q5Ir7K7e29hTe0/vBW0Iynhf40KTt/nS1HnbbMkCcJU1UnVnEx+u08HKXI712M=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cDY4djRCcXQ4aVJ6K0ZCUVRhSXlRcElDczJnNXBTTCtONFpOSHJBY1hxbmxt?=
+ =?utf-8?B?VzkyZHJxZ2xCYzZ3ZW80OFhrZVhjVVNNSmdVY0pHcThLeHJaczhlYkZOdEpC?=
+ =?utf-8?B?NlNKWHkyU2RoSEpsZVdVL0VPOU5aYUE1bm9xclYvNDJFYjVVQVpzYXl6WGc4?=
+ =?utf-8?B?S1poVHRJYzdZWWNGSWtuK0hqZlAxTXVjL2FKdWVTVlNoQUpVbFl2OHRrV04w?=
+ =?utf-8?B?UklmaFZ0UlhzZlovTkFXT3RJaXZOaGFFZGljT1NBZVFYZnlnU2VLUkhjQVhN?=
+ =?utf-8?B?SmVER2krb0YydUVjdUZFTW1kd3hSc2JtTWFPUnZwb0JwWi82MHNYODB4azg1?=
+ =?utf-8?B?em92eWJlb0k0Rm9aOUhpRlYzU3BFVXhMYTlYRlNrU3JXaEZDRVF6QVRYRlRQ?=
+ =?utf-8?B?NjB2RitDNWxsRERHd1VBd2Q2R1Yvd3U5b05EWk1TMHk0blFhZkt4TlMrMTRE?=
+ =?utf-8?B?dlczK2xxaDFhcEFiRS9WR0pFZFl6ckRMT3FVSWpURVZ6RFFUc1hqTDNhckMx?=
+ =?utf-8?B?TXFXTm9RQXpCeTVtMkxXL1NlN3Y5TEpOYTBpTDV5em4reS84cjdBZ1IxaHRT?=
+ =?utf-8?B?VTRZT2JuNUFQVE8zSFo4SW9zNWt4ZzFRaTIvOEJ2eEZGK09Wb2FPWW4vSmdp?=
+ =?utf-8?B?QWhmKys1enVFY1g5OHQ2VGNiMCtGcFdBVXNqWWE0SWZVeGZkN2ZHTFBXOG54?=
+ =?utf-8?B?N29iSlJKNGozQU9ud28vY3Iwc08xbFI5czN5aDB1RzBKL2gxdFpIZklodTQ1?=
+ =?utf-8?B?U0thQlB2dzVqZ3c5bDJ4NVY1L3JkZUF2NTM3VzM1YlJUdzZNVWpUUHVyN29Q?=
+ =?utf-8?B?bllkdDNiaHJla1pYTlEwMW9QdnJIdmg5TjNFQUdSWmU1UUFWU1N0WnAzWVRt?=
+ =?utf-8?B?aEdnMTZERmlPblRGdGNvSEhvdFVPZFFjYkNQWGFyUUtqQW9nemlGcW9kejVq?=
+ =?utf-8?B?ZXhDbENvWHZ1ajk5TU96bHhneFRUV0cwWXkxai8zclJ1aHFXdmZRdnZGMi83?=
+ =?utf-8?B?REFFdVc0em9FcUpoUU8rRE5renhkSXE1RDF0MFM5dloyUHFrUkM0elZ6WFF4?=
+ =?utf-8?B?VXBPSi9zRUJHT3VETHdJckc5OG5VbktSQjJRdEt5YVZpK1lxV2NuczNpS2hx?=
+ =?utf-8?B?SGY2RTh2OGtpN2R6dlJ3QStqNm8rdEdiR3J6Z09Oa1dwUWNwMGxIaWQvMjI5?=
+ =?utf-8?B?QlhKVTN1aTdEZFQwWW9BV013T29DT1NhOXhFL01PalQxQWV4cFNZRXJwaVdW?=
+ =?utf-8?B?Q1JhQXRQbUh5ZlZjY2dnQWxpVzVHQmdISmxMcHh1RU9wYVp0dWdDTGFad2Zx?=
+ =?utf-8?B?cmRnbXkwZG41UWp5bHAvbWpta1dXN0hVQkY4Q3IwcXlYb1pid3RBanB4ZU5m?=
+ =?utf-8?B?Si95M0VLQVNFSHk2MStWbUF3TEVyRHJmdkRERC96RGZ4UkRaV1Zuem94M1hr?=
+ =?utf-8?B?TUg1NUFTemlrazJON0dnNXhuTyt3clU0SzZkMVJyNGNlZDA1NFQ3WFlMb095?=
+ =?utf-8?B?dWpQUjJnYWJmTGpoM1ppT1BsQ29pSHdoQkttWmUzazQrQnA2cS9iQkN0VmlX?=
+ =?utf-8?B?dmxMYzNMSlF1RU5DRWh0ZjJDRmhqL3JKUHJDOXJlUG5qa1owdlRhKzhWUmV4?=
+ =?utf-8?B?VGIwWTFRenF3czRVMzZaczdndE1VZ0hXNHVwODNkTDV2cTdBd21sQVRsV1R4?=
+ =?utf-8?B?VUJSUHA1WU51V21Yd2JpejF1a2ZaL3ByU0xnekp4dGJiSzdZci81TGNLSzRr?=
+ =?utf-8?B?OFJ1U0FHZklsYy9TZUkwNVpURGxJK21nbmRrM2E4N2NLb3JlSTFxamR5VjAx?=
+ =?utf-8?B?blY1UEVVVXdtaHV5WTFrK0RIeE03MnRDVUU1UXZDYWJGYTdOWFZEUlFhYnpx?=
+ =?utf-8?B?a2hqSzU0elJOd2t3NHEvVE55T0paRk12UzZtVktoZ0FIUjJDcnBicjBnS0Qx?=
+ =?utf-8?B?ZXU2Zzd5Z1NLZmdDdlh5MFIvbjdyOWV1RWZhSkV1TDFFUmh0dFUrMnRLLy9C?=
+ =?utf-8?B?TlF3Qkl5Qi9VMndvWDNHczNsaDBPdFJyc2RLTGFGZGViMGxqSGNXbk5IQmJM?=
+ =?utf-8?B?U2ZCUlV5c2VxZHhVZ0psQkI3SmNMeUxRQ01sSUNrOW5LTVRLaWJqb21jU1VI?=
+ =?utf-8?B?Ykg5eHFERlFTTTViaENIZ3NrV0RhV0w1bWxnTWVMSm5MWitsZnB4cXQrUjY5?=
+ =?utf-8?B?TWNXOVRMYWlLRXdOUS9Kb3I2VyswL2prejlDRllrMEI2ZTZvajFsSnNKdmhv?=
+ =?utf-8?B?dlgxVDF4TUY2d21PWjhTQytCTDVHeUZsMERMWkhOQVB1eHZ0cUlhb3p4VUlh?=
+ =?utf-8?B?azVWc0t5cjNaKytWZHhyWDl2OFY3anBNWEk3RDRmbmhyTlpuVWNDQT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e02b911-9129-417e-48c8-08de7d415528
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2026 18:34:29.0744
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LpOLbSofB6pbb0mEFiMOF9R/Jxyk7HzJU96CMwWqdhSYapTfPq+ToDBTLJG6eNFLgogocFOD62jXMAzHFVweyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6330
+X-Rspamd-Queue-Id: C1064231B11
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265325-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,lunn.ch,sntech.de,gmail.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-265326-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.981];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid]
 X-Rspamd-Action: no action
 
-On Sun, Mar 08, 2026 at 04:56:08PM +0800, 吴凡 wrote:
-> You are right that normal device interrupt generation is enabled in arc_emac_open() via R_ENABLE, so we certainly don't expect regular RX/TX traffic interrupts during probe.
+
+
+On 08/03/2026 17:52, Jakub Kicinski wrote:
+> On Sun, 8 Mar 2026 08:55:59 +0200 Tariq Toukan wrote:
+>> +struct mlx5_flow_handle *
+>> +mlx5_esw_lag_demux_rule_create(struct mlx5_eswitch *esw, u16 vport_num,
+>> +			       struct mlx5_flow_table *lag_ft)
+>> +{
+>> +	struct mlx5_flow_spec *spec = kvzalloc(sizeof(*spec), GFP_KERNEL);
+>> +	struct mlx5_flow_destination dest = {};
+>> +	struct mlx5_flow_act flow_act = {};
+>> +	struct mlx5_flow_handle *ret;
+>> +	void *misc;
+>> +
+>> +	if (!spec)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	if (!mlx5_eswitch_vport_match_metadata_enabled(esw)) {
+>> +		kfree(spec);
+>> +		return ERR_PTR(-EOPNOTSUPP);
+>> +	}
+>> +
+>> +	misc = MLX5_ADDR_OF(fte_match_param, spec->match_criteria,
+>> +			    misc_parameters_2);
+>> +	MLX5_SET(fte_match_set_misc2, misc, metadata_reg_c_0,
+>> +		 mlx5_eswitch_get_vport_metadata_mask());
+>> +	spec->match_criteria_enable = MLX5_MATCH_MISC_PARAMETERS_2;
+>> +
+>> +	misc = MLX5_ADDR_OF(fte_match_param, spec->match_value,
+>> +			    misc_parameters_2);
+>> +	MLX5_SET(fte_match_set_misc2, misc, metadata_reg_c_0,
+>> +		 mlx5_eswitch_get_vport_metadata_for_match(esw, vport_num));
+>> +
+>> +	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_FWD_DEST;
+>> +	dest.type = MLX5_FLOW_DESTINATION_TYPE_VHCA_RX;
+>> +	dest.vhca.id = MLX5_CAP_GEN(esw->dev, vhca_id);
+>> +
+>> +	ret = mlx5_add_flow_rules(lag_ft, spec, &flow_act, &dest, 1);
+>> +	kfree(spec);
+>> +	return ret;
+>> +}
 > 
-> My main concern here is the lifetime ordering in the error path. arc_emac_probe() installs the IRQ handler via devm_request_irq(..., ndev), but if emac_rockchip_probe() fails later, it explicitly calls free_netdev(ndev) well before the devres cleanup routine runs.
-> 
-> In that specific gap, if an IRQ is somehow delivered—perhaps from a pending/latched line left by the firmware/bootloader, or other non-traffic anomalies—arc_emac_intr() will immediately dereference dev_id as a struct net_device *. Since ndev has already been manually freed, this results in a UAF.
-> 
-> So while I completely agree this isn't a normal pre-open traffic path, the mixed lifetime management (managed IRQ vs. manual netdev free) still creates a real race window.
-> 
-> Switching to devm_alloc_etherdev() puts both resources under devres management, permanently fixing this teardown ordering issue. I would be happy to send a v2 and reword the commit log to emphasize this as a potential race window and a hardening fix. Let me know what you think.
+> drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c:1512:12-13: WARNING kvmalloc is used to allocate this memory at line 1502
+> drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c:1532:11-12: WARNING kvmalloc is used to allocate this memory at line 1502
+Hi Jakub,
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#clean-up-patches
+Thanks for catching this. We’ll address it.
 
-  1.7.4. Clean-up patches¶
+Also, I saw IA flagged issues con
+“net/mlx5: LAG, replace pf array with xarray”.
+Just for context, lag_lock is already a known problematic
+area for us, and we do have plans to remove it. I ran the
+review prompts locally in ORC mode, so I assume I saw the
+same comments as NIPA.
 
-  Netdev discourages patches which perform simple clean-ups, which are
-  not in the context of other work. For example:
+So the issue raised there is not really a new one. lag_lock
+already has some known issues today, but we do not expect to
+hit this particular case in practice, since by the time
+execution reaches mdev removal, the LAG should already have
+been destroyed and the netdevs already removed for the driver
+internal structures.
 
-  Addressing checkpatch.pl, and other trivial coding style warnings
-
-  Addressing Local variable ordering issues
-
-  Conversions to device-managed APIs (devm_ helpers)
-
-  This is because it is felt that the churn that such changes produce
-  comes at a greater cost than the value of such clean-ups.
-
-
-Some percentage of devm_ conversation patches break drivers. We
-Reviewers need to look at all such patches and try to detect such
-breakage. In general, it is nor worth it. Hence we generally reject
-patches like this.
-
-This is however slightly different. It looks like this driver was
-broken from the beginning. The race you point out has always been
-there. That is something worth pointing out in the commit message.
-
-But take a step back. Think about interrupt handling in general. Do
-you think it is good practice to request interrupts before configuring
-the hardware about what interrupts it will deliver?
-
-If the driver wrote to R_ENABLE in probe, before requesting the
-interrupt, enabled the needed interrupts in open, disabled the
-interrupts in close, the different lifetimes would not matter.
-
-So, for stable, please add code to put interrupts into a well known
-state before requesting the interrupt. Please use the net tree, and
-add a Fixes: tag.
-
-You can submit this patch to net-next, but we might reject it, because
-of the policy. If you are working on this driver, adding other
-features, this patch is part of a bigger patchset, we are more likely
-to accept it.
-
-    Andrew
-
----
-pw-bot: cr
+Mark
 
