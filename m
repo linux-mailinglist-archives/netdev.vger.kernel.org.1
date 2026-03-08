@@ -1,248 +1,157 @@
-Return-Path: <netdev+bounces-265307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265308-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3msAIASLrWn+4AEAu9opvQ
-	(envelope-from <netdev+bounces-265307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 15:43:16 +0100
+	id Wh3qFmCMrWkl4QEAu9opvQ
+	(envelope-from <netdev+bounces-265308-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 15:49:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2443230BAF
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 15:43:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990F8230BD2
+	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 15:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D28A300D17F
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 14:43:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 517F0300F9DE
+	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 14:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7872512DE;
-	Sun,  8 Mar 2026 14:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9D81DE8BE;
+	Sun,  8 Mar 2026 14:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="KJIwxlGW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B/LqFbQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B324B640;
-	Sun,  8 Mar 2026 14:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FC516FF37;
+	Sun,  8 Mar 2026 14:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772980993; cv=none; b=NpCDi9jJeuvoJWugDxMZ3AFJgbkPqBI2/8IrBPb1+OLKNzGHshdvcGqtd9ATFGDMPARjJ0XpfJE6hVGC+uustUdUyp19bOrslW0sXKRCRHSAOUdz68v16FeOdOiFAXxUfzJ7YOwtUlog0wCQepPK6KbzzCIy09vZGUJKJJA15Yw=
+	t=1772981339; cv=none; b=Nl6Mol6cUIzO5rDAhBMvpXvkXZkNKVJMbLHq/i/Oci14Ho47maJdeV4k4Qv3R0TPdIG/fjteZaRNjtOyul5S0xxZDKoDC8fyyL+z7zNZxM3o5LXQuBOtixvYeRnSrSQXgW3L2kF/KifCrDACEvCGTKlpsueAWAojbvOqqDISqJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772980993; c=relaxed/simple;
-	bh=VHqO/1tDQXmHHWssGWnPwminlmEdPs2EWuCGTKD/2O8=;
+	s=arc-20240116; t=1772981339; c=relaxed/simple;
+	bh=HLIezFGjthTiazzaQbHers6OpMSLq2BXvtIHV2couLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ac5tZ7ijQOE+KWqG3y9E9SgEsBwAplC+K4sSKJiBQal3TEs3O3cvHX6Jl2nqqlrhEPqSjGRGJq71/hZKpmzydRIxw0ypNSxb0nJiGK8dR4JiaxwSeNAiVj/wbI/Iu5FMkD1ZgOiPQh8Ryd51vpOBzKioFwSSU8XmXDfgNJoBslI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=KJIwxlGW; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-transfer-encoding:content-disposition
-	:content-type:content-type:mime-version:references:message-id
-	:subject:subject:from:from:date:date:received; s=oak1; t=
-	1772980982; x=1773844983; bh=VHqO/1tDQXmHHWssGWnPwminlmEdPs2EWuC
-	GTKD/2O8=; b=KJIwxlGWr5LFt8uufjFmkUMxMUJdgifZgVie/S1xutMWQuYpaVW
-	DGmlTDhevW/Mf3FGRyVaJdbzR7GCt6o6LiZaojlUTeibV0DFlIPJuaYiquTELZuL
-	7fzUDem+B7VW7yycml/nw2Laedy2EEP9AIDhyxgzwYt7b7KDCPX32w3rG5gnfpPa
-	Ecbsv6ut2knxGrqInsPq+ermsdohS/Q3cTCTBa6BWt35+YlVENNE/nZFmYqACzDc
-	fHvunwa5KuR+6JdvX3NDqGQtPr8fIXCIMzjXR81DLEUFFA4Nmek5khdptOMqRVaK
-	/KEzTdTVPvJRBeDZzv91uakPNPgyxbICyGg==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Sun, 08 Mar 2026 15:43:00 +0100 (CET)
-Date: Sun, 8 Mar 2026 15:42:58 +0100
-From: Antony Antony <antony@phenome.org>
-To: Yan Yan <evitayan@google.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org, Nathan Harold <nharold@google.com>
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 8/8] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <aa2K8pXXipCH8cke@Antony2201.local>
-References: <cover.1769509130.git.antony.antony@secunet.com>
- <b7b1bee9456ac4ada8941c93c2cc17f07d0b1912.1769509131.git.antony.antony@secunet.com>
- <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
- <aaF_SAQj4WT8jRaO@krikkit>
- <CADHa2dCF=Cq2SMYgjHcs71VedwYaDmUXPWnNbv=46+11Mz0otA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b4bFQDkFR8SJzsCwmn/Wtg7gkjg6XzCBRSTfmlkCZq5mCdblbQjpjqV0WIY46VkcTSJLq7fFvmWnApJGbNLhibNf2EfLKM05he+ppZvXzqANwdXLklPpDpZfC5Ibh79UHNP3YeJQ8ChYoVicUFsuU2IeZUtsf2PMpQWBpRsiJ5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B/LqFbQe; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NoufFNuXq8Byu4dS79mqi0hwD0Fo6SoBh2B9SVZGGoY=; b=B/LqFbQeT04a4EPag8mSo8lmse
+	H+6vjj67wKDrAquwPoKem58ibERr7Ox16dzIc7wD2oRSyex3GVzrhQy1Xo++7TRI02GWiuj6wfghV
+	g0+8d/nKzdnzNU+7JR5B1Xkpm5YBRGjVZ1GgCvJRGHbNp2F0t5WGxgjKuAfudB7g1ViM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vzFQu-00Air6-UD; Sun, 08 Mar 2026 15:48:40 +0100
+Date: Sun, 8 Mar 2026 15:48:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
+	Todd Kjos <tkjos@android.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/4] rust: netlink: add raw netlink abstraction
+Message-ID: <f93ee07b-5dfd-4748-a7f2-814539e60d81@lunn.ch>
+References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
+ <20260306-binder-netlink-v1-1-daceb5bc83f2@google.com>
+ <081b1f16-5c8b-4a18-a9f1-d56e757de4c0@lunn.ch>
+ <aayYhgy3pRxFWbr7@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADHa2dCF=Cq2SMYgjHcs71VedwYaDmUXPWnNbv=46+11Mz0otA@mail.gmail.com>
-X-Rspamd-Queue-Id: C2443230BAF
+In-Reply-To: <aayYhgy3pRxFWbr7@google.com>
+X-Rspamd-Queue-Id: 990F8230BD2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265307-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265308-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[queasysnail.net,secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.990];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netlink.rs:url,lunn.ch:dkim,lunn.ch:mid]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 03:14:21PM -0800, Yan Yan via Devel wrote:
-> > Anything that we leave as implicit copy will have to be "forever"
-> > implicitly copied with this new MIGRATE_STATE op -- unless we find a
-> > way to pass a new "clear these properties" flag (probably via a list
-> > of XFRMA_* attribute names)
-
-that is a limitation we should avoid. It would be nice to extend it
-over time. We have been there before and it is a pain point. So it is
-worth investigating alternatives if there is momentum here, otherwise
-I would keep it simple:)
-
-> That is true. I also have the concern that if all updatable attributes
-> follow the "omit-to-clear" pattern, we lose the extensibility. Thus
-> ideally we should switch to an "omit-to-inherit" model for some, if
-> not all, attributes to ensure that adding new SA properties doesn't
-> break backward compatibility.
-
-Here is my proposal. I extended the code and am testing it now; I hope
-to send out v6 soon.
-
-How would omit-to-inherit look in practice? Specify almost all XFRMA
-attributes supported in XFRM_MSG_NEWSA, minus some immutable ones.
-The immutable attributes that come to mind are:
-
-    - XFRMA_ALG_*      : crypto must not change during the life of an SA;
-                         also *swan userspace does not keep this in memory
-                         after the SA is installed, which is correct
-                         behaviour.
-    - XFRMA_SA_DIR     : direction is fixed at SA creation.
-    - XFRMA_SEC_CTX    : security context is immutable.
-
-currently supported attributes, using omit-to-inherit semantics:
-
-    sentinel value to clear, omit to inherit:
-    - XFRMA_ENCAP              : encap_type=0 to clear
-    - XFRMA_OFFLOAD_DEV        : ifindex=0 to clear
-
-omit to inherit; send attr with value 0/0 to clear:
-    - XFRMA_SET_MARK / XFRMA_SET_MARK_MASK
-    - XFRMA_MARK               : omit-to-inherit old_mark; note XFRMA_MARK
-                                 serves dual purpose -- old_mark in the
-                                 fixed header is the SA lookup key, and
-                                 XFRMA_MARK attribute sets the new mark.
-
-set to zero to move from NAT to no-NAT; inherit when absent:
-    - XFRMA_NAT_KEEPALIVE_INTERVAL
-    - XFRMA_MTIMER_THRESH
-
-omit to inherit; send 0 to clear:
-    - XFRMA_TFCPAD             : TFC padding
-    - XFRMA_SA_EXTRA_FLAGS     : e.g. DONT_ENCAP_DSCP, OSEQ_MAY_WRAP;
-                                 yes, these can change.
-    - XFRMA_IF_ID              : xfrm interface ID; relevant when the SA
-                                 moves to a different xfrm interface.
-    - XFRMA_COADDR             : Care-of Address (Mobile IPv6).
-
-    - XFRMA_REPLAY_ESN_VAL / XFRMA_REPLAY_VAL : may be later replay type 
-      should not change.
-
-
-Basic migration supported via fixed header fields (new_* fields):
-    - src and dst address family
-    - src and/or dst address
-    - reqid
-
-I also added old_mark to the SA lookup alongside the SPI, so the SA
-can be uniquely identified when marks are in use. XFRMA_MARK can then
-be used to set the new mark value independently.
-
-regards,
--antony
-
+> We can make a kernel::net module (rust/kernel/net/) and put it there
+> instead? I guess netlink.rs can also be a submodule of that.
 > 
-> On Fri, Feb 27, 2026 at 3:26 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
-> >
-> > 2026-02-26, 17:44:51 -0800, Yan Yan via Devel wrote:
-> > > Hi Antony,
-> > >
-> > > May I request that we also support updating the XFRMA_SET_MARK as part
-> > > of the new XFRM_MSG_MIGRATE_STATE message?
-> > >
-> > > In Android, the primary use case for migration is switching the
-> > > underlying physical network for an IPsec tunnel (e.g. VPN, Wifi
-> > > calling). Currently, due to the limits of XFRM_MSG_MIGRATE, we are
-> > > forced to use a separate UPDSA call to update the set-mark. Supporting
-> > > XFRMA_SET_MARK within the migrate message would allow us to update the
-> > > addresses and the routing mark together in one atomic call.
-> > >
-> > > Regarding the logic, I believe the set-mark can follow the same
-> > > omit-to-clear pattern as XFRMA_ENCAP and XFRMA_OFFLOAD_DEV.
-> >
-> > I think this raises a wider question: clearly definining and
-> > documenting which attributes need to be explicitly provided
-> > ("omit-to-clear" as you write), and which will be implicitly copied.
-> >
-> > Currently it looks like we copy:
-> >  - all the crypto stuff (aalg/aead/etc)
-> >  - security context stuff
-> >  - coaddr
-> >  - replay/replay_esn
-> >  - pcpu_num, if_id, tfcpad
-> >  - dir
-> >  - mark
-> >  - extra_flags
-> >
-> > but not
-> >  - nat_keepalive_interval
-> >  - offload
-> >  - encap
-> >
-> > [gathered from a quick read of xfrm_state_clone_and_setup + the
-> > definition of xfrma_policy]
-> >
-> > Anything that we leave as implicit copy will have to be "forever"
-> > implicitly copied with this new MIGRATE_STATE op -- unless we find a
-> > way to pass a new "clear these properties" flag (probably via a list
-> > of XFRMA_* attribute names), but then we could also implement that
-> > with the existing MIGRATE code.
-> >
-> > --
-> > Sabrina
+> Hmm ... but I'm currently using genlmsg_new() / nlmsg_free(), and I
+> assume the other use-cases do not go through those methods, since they
+> sound netlink specific.
 > 
-> 
-> 
-> --
-> --
-> Best,
-> Yan
-> -- 
-> Devel mailing list -- devel@lists.linux-ipsec.org
-> To unsubscribe send an email to devel-leave@lists.linux-ipsec.org
+> To be honest, I'm new to the kernel's networking stack, so I probably
+> can't design Rust wrapper for sk_buff that supports all those different
+> usecases without someone walking me through how it works. It may or may
+> not be best to write a netlink-specific struct now and expand it later.
+
+At its core, an skbuff represents a block of memory. Normally that
+memory would be packet data flowing through the network stack. You can
+append to the front and back of the data in the buffer. You can add
+the buffer to linked lists, there are reference counting operations,
+so the buffer can have multiple users, there are places you can store
+per protocol data, and places you can store data while within one
+protocol layer, etc.
+
+When using sk_buff for packet data, you are generally on a fast path,
+so much of the code is in header files as inline functions. This is
+going to make rust binding harder, my current understanding is that it
+is hard to make use of such functions from rust.
+
+However, for netlink, its is slow path code, it seems like all the
+functions you need to call are in object files, not inline headers.
+
+I also suspect, but don't know, that the netlink upper API is disjoint
+to the packet handling upper API. How you allocate a skbuff for
+netlink is different to packet data. It is very likely an error if you
+try to transmit out an interface an skbuff allocated for netlink
+usage, etc.
+
+So, maybe you can have a base definition of skbuff in rust/kernel/net,
+and build on top of that to make a netlink specific skbuff, with a
+limited list of methods which can access it, those needed for netlink?
+Make use of the Rust type system? And leave the messy fast path packet
+data things for somebody else.
+
+     Andrew
 
