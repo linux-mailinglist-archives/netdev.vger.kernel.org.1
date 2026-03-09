@@ -1,240 +1,246 @@
-Return-Path: <netdev+bounces-265545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLTZB4PGrmlwIwIAu9opvQ
-	(envelope-from <netdev+bounces-265545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:09:23 +0100
+	id MAhmND3Grmn2IgIAu9opvQ
+	(envelope-from <netdev+bounces-265549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:08:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F1C239725
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:09:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C642396AB
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:08:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CF403045034
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:04:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 80AFD3019CBA
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB533ACF1E;
-	Mon,  9 Mar 2026 13:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20753C1998;
+	Mon,  9 Mar 2026 13:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pTqojE8O"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rNwMOjtf";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FEzM9As/";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rNwMOjtf";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FEzM9As/"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011008.outbound.protection.outlook.com [52.101.52.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774BA1D90DF;
-	Mon,  9 Mar 2026 13:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773061464; cv=fail; b=htQxzFskDq6WkSAIPCgFGoIoaGguzXURrRig3pEhtuKSt5Dxku4/YLmqGSGYS06JZwut1VlRY2T/YjOSGFxGllBxA1bcp2N37FDYMqmhSaI9qnDIVPxCdeRN0MfRfwXid1HVbAYRwGxT5DLiKAGLTX6vKn1RS6dUodp9XUq9F5g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773061464; c=relaxed/simple;
-	bh=MNyY/rEzkqlIPYA5fX+2YVaHixVYPpD8KnFYhOcPHPM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VeQIZoBUBV2LQ4R0qJFOh/V4WQudqfKfMA385AFejCe3bAbkURMKnaGpipheZZHf241eVo+mxTiy3vY7HdVUw7cLDPVFKb5yjuHJTGhIIfZ2F2xy/Qcvylsg8VmEKShtems98qjeU5P4rzYIOCAv8kZONHk8ZzfoxtCmNY20cig=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pTqojE8O; arc=fail smtp.client-ip=52.101.52.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GQZj2TeagzpofvPlOxYRwU0pm//ruaj2WKVONF3bMgagtm0xE28BWiqmBDew9W2p2sFsQt3qkARfD1fxVGTthkC/4u9DDXhcHuUmvavd+6yZmW6IuYAXKSVxPpQu7+hAOjCuO2vEn/jCvcS1ho6OHX0NX9WlVxeKPu1gvxwOWRL4LiGhGsatxz1QnNe+BDNaYALf8478xdm6twHAd1AQsdCLS69YTDyh7F5luM2+T1hIO9xo88roVa0P51bU0qtHECH2X7idSbr+DgtTAKvh/ylowFOgYA0VhqImMO+zubToCj3ZdnBBlCMflwK1ls97oy/RbpqUCI5w2GVQLKwUdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yv1qp4m1Be/IRQXkM1RtrDTWGUZ7tKUIiZzDC55RYe0=;
- b=Y8Uky3aaoh7I1OK004Ayn7YinivGGnkhxJQidYPGPbqr95m0rSTHd2pm0XwsqX50MRhkjaXJJqk6GoZeWF+ykISiXEHQxT6lcAEI90bo8crEmHzhFIExuMvuK0OP5mbVtrNBVWW7/QxDpAJXBVFqH+U7CxiGx6WP8enqqCsUeO6kfHFa5PR8SUwez1w2MMJHu+u7ChSRtMRuSReIfEs7bdVib2tqBMpgnjlDzc2dhfqOlJjiBIikEVhXzjsQnisbXwZk9GLgcmxpeU29Cp3DyvnPH3XYilpVvUq2A/4pGWwVSBtZwVAqoz6glLg/PfvYW7TMyIKkXkj1j4r4Kmubdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yv1qp4m1Be/IRQXkM1RtrDTWGUZ7tKUIiZzDC55RYe0=;
- b=pTqojE8OQLN2k32m9fQ6EsPZzoZZzjhR09XA7nBlSvNkGYPKUojkHv2aB+9Kr3x/f9W4kbzFEJkkrXJu7XmaaE8W8fxngsrbKINvic2oxqYtOm9axenUIypsviQRy/jQnThXzHvAFx9c83HjJtJoV6QhIVA5KIYn+UTV47wR3RMzrUP7HyT35fFIrhS/I2NvunyvBLzxdnCUumZiLAAduRTyY0yirDgiIiOe0L9yP4M6RYxUaWWfHGv/N00y4iABmN6zPATVS6Tp32mUrHfBDnlD6GF8wT9MklpOvnvIQOfPOayCnzTgKDPf/sahvtYdWkn9rcM8UuzaazyEhaYU4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by IA0PR12MB7649.namprd12.prod.outlook.com (2603:10b6:208:437::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Mon, 9 Mar
- 2026 13:04:17 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%6]) with mapi id 15.20.9700.010; Mon, 9 Mar 2026
- 13:04:15 +0000
-Message-ID: <ffed5999-71b3-48cf-a669-2004696dfd6d@nvidia.com>
-Date: Mon, 9 Mar 2026 14:04:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 4/5] net/mlx5e: RX, Fix XDP multi-buf frag counting
- for striding RQ: manual merge
-To: Matthieu Baerts <matttbe@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>, Amery Hung <ameryhung@gmail.com>,
- Nimrod Oren <noren@nvidia.com>, Mark Brown <broonie@kernel.org>,
- linux-next@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-References: <20260305142634.1813208-1-tariqt@nvidia.com>
- <20260305142634.1813208-5-tariqt@nvidia.com>
- <9f5282ed-ddda-4d7c-b033-5b6d544d6cf4@kernel.org>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <9f5282ed-ddda-4d7c-b033-5b6d544d6cf4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0285.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e6::19) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288223B8D77
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 13:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773061685; cv=none; b=kQ6/c/sqyxUBZwiHDaEvg9DbyH5lLz7+fsvh5oqQ3uMXCaYxxIcqUsgIKIWRk2a6IzGaZOI3m6K5YXrSxPE82v/A6XMvajsgw5/AGQ9hDaOYBaTb+OUAuHGEvQ64j8wUct0ewuI4KpH+TdLT3h73fIfP1vIa4Qrm2UbuxboqxN4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773061685; c=relaxed/simple;
+	bh=VmtQMizc3J7dUfCn3/AItybu61OpLCH4tZu4e1DabLM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MWROJkCPIVdEKP6laOA0iqlapjjBVzxJtQ8cjC1j19yQ1FKWsKjyuBXe6BkiukfoTEFr4bCRUDHv0ikU0qtCT+mRYfs35LfiqGD6FIki8Ge4fn8O7DMeq7yEOqWooeE1oqEzFK839G4oWFuI35H6G0kg3prJOLmI5hI/7yJkTRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rNwMOjtf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FEzM9As/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rNwMOjtf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FEzM9As/; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3B94B5BDC1;
+	Mon,  9 Mar 2026 13:07:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773061679; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s8Gbb+QyvkymgKzYqTMRAYUwowRbogok9A3auqid1ng=;
+	b=rNwMOjtfjgDcwDa1efHPhSyvNLv8yMw2i7hhdv5D9EGNjlmPIGTbrmeh81UB03BCW5Nu5e
+	MKjP/TjnjwKFpHXgZtnGTJVurNz7JXoS1SGqb0OkuSO1pu4XJEm05Gsyhu4tSw51EQUYLr
+	FdynHuKnFWZfIJag84bA+29+UpreJTs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773061679;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s8Gbb+QyvkymgKzYqTMRAYUwowRbogok9A3auqid1ng=;
+	b=FEzM9As/oC08PhzOQcLwTvHdXh4eqMcZkb0hgc9fhe6WxMFLvauZ3ITnXOIuxjmcbA1tlm
+	GO+6eD5iyE9yahBw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773061679; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s8Gbb+QyvkymgKzYqTMRAYUwowRbogok9A3auqid1ng=;
+	b=rNwMOjtfjgDcwDa1efHPhSyvNLv8yMw2i7hhdv5D9EGNjlmPIGTbrmeh81UB03BCW5Nu5e
+	MKjP/TjnjwKFpHXgZtnGTJVurNz7JXoS1SGqb0OkuSO1pu4XJEm05Gsyhu4tSw51EQUYLr
+	FdynHuKnFWZfIJag84bA+29+UpreJTs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773061679;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s8Gbb+QyvkymgKzYqTMRAYUwowRbogok9A3auqid1ng=;
+	b=FEzM9As/oC08PhzOQcLwTvHdXh4eqMcZkb0hgc9fhe6WxMFLvauZ3ITnXOIuxjmcbA1tlm
+	GO+6eD5iyE9yahBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B042A3EEF3;
+	Mon,  9 Mar 2026 13:07:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bgkPKC7GrmnscAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 09 Mar 2026 13:07:58 +0000
+Message-ID: <532259b4-f488-49ad-9d7e-29fed10d8092@suse.de>
+Date: Mon, 9 Mar 2026 14:07:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|IA0PR12MB7649:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35ef0cba-7342-478a-fd14-08de7ddc5dbc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	KVMp2W/2gOT6PUCe+kf7hjZAgFfoBqAlnNTfePfYE70Fb74KkQE8MzSgonoKmVHVWw0Xk3wIDbfD+i6Y/OrgNQMPcQZY5wGPtbAMaM04IRZadcsiChuinHDe28l5QHh4wU3vPUhpia+FVN6zyJsup+HkcMRZOt/hYDC5ccqq46nCxcHI/2zRC1nnX+OxYt26RCFt142o6gs8e/+yeUYKCyhAI9b7P7vexPkXS/stK8fWPuEHxS0MUMzmlhtbdjDQ3gLolsq4DWLan0PZgZp3YVQ7mQ57tZ/3NgVGHNwypLQ7TI+0yHVk7MJAwU7D4sFsZOWqiR1ONV7i4uqj27IX+klOsQ3/b2w3JfTfhWcdPlbC2M+BbPI9wu5W/ag50J1xuu1RPziQWhe5SJtD+T48knZAdeLuDJCsxuYPGbH1sA932z1bySK0Q7EK9E7p3vE7raPi7tbhb5jzD4y4FnegtXOy5uatPnjUo247IS4IKf4m1wpWFvq5rssD6hEy2EyrTCuEi0zsK857zLDh8hrIS7FdkntA30P8Ugo+PuVHWGo35Jyb0GXbTJQ2ydO8FVaiZFw8xZpMNpQn2MSu0ma8dDzlURYqgDH+Rlsoy0wUfkbZM0I7pasiqiwkpHPoV5k3+2xtXMP/863z+wXjKn6N6GYli2MtMMpSCkS7jSp01EI3oy7LQaUdTARM9LMMtHZ+nEZqJbyW4NLup6RSogMOm6PHvEpXLw+U7HS6sJZe5Cc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VmcxNldxTjZEazJlQWtLMlpLWWxmbnZMUG9nTElwbWxXNktpR2FpZXg3M0V2?=
- =?utf-8?B?OTl3amZBL2xhVGdCRVRXbkhiS3FiMUN4ejhZWUNoWmRCYS9Salk2NTRob0FY?=
- =?utf-8?B?VWlBc3VLbXZlakVCN0JIcXhKRTl2R1JHbUJtZ3Z2RmhzRkZPOVdHVUF6Z1Rj?=
- =?utf-8?B?V2Y2ZFV6THovQk9NeUl5UmdFdkN5TmUxK2JNM3gzUWJaemRxTXhRaGVNek1p?=
- =?utf-8?B?OThSSjNzTWFRaXByM2JQT2JDKzgvZGpoeGdGWG5kaTc4blZybzF0K09lTDBw?=
- =?utf-8?B?ckFkREZpK3NPZDNYVnVlVCt5Ymp4VTFwekRIeUZneEFQN0NOV2hZd0xTWjZj?=
- =?utf-8?B?bnAyVkZjeW9zeG5HQ1BYYkJBTmZPNHM2Yi9ubHpGUEJ0dXhDR05uYlB2S0xG?=
- =?utf-8?B?K3dtRHJwd1F5RWY3a0FiMEZmNW5KQWg0QjNIYTdvMGFnZzZJdUxjbWdGZGpz?=
- =?utf-8?B?NXBTVEZXcVRlOVR1dnJlVWJxNWRtdjVQVUpZTDhOYzRSZzFjMVY2WHFYY3p1?=
- =?utf-8?B?TUVYS3NRdk1TU3laMy81N29Fc1ppb05kWFh5TDRUQWx2cmMzTVliSWFiZTJL?=
- =?utf-8?B?d1hQK3E2dFRWYzF0bGw3dG15K2FWZ0I5M1dkR2NjZXdZMjRZVDRVeHExTGZ1?=
- =?utf-8?B?U0Z3VXhmMFphQjdoR2ZoTlVjZlB1anNwQXVsNERNVkF1MjB0b09WczZMSWkv?=
- =?utf-8?B?S2JXMWtmQUYxaWhabHFOZnhrU043TGRKbUlKTnZTRm9BcmpmZG8zbW84d2wy?=
- =?utf-8?B?SVFIY1ZHTTZreWJZZjRSUlNoak9wR2FPSE9kR3VWQU1KaWNrNlp2elVNaGRW?=
- =?utf-8?B?NmdpaElBYzJ4MzhnZ2JrNTJINEZMTFpWc1EvVUdlT0V6NE1PZjZPUndPOFNl?=
- =?utf-8?B?cjB6bG5sZHIrV09iTk9wVGVKcU9PTThkOENma0FYMHVNUmN5L3ZJTDJkWU8z?=
- =?utf-8?B?VTl4UWZqME9Odis3aWNiRHR2b3lNWnpZNTRscjlPUUtveGFSRUFqSzlnN1RW?=
- =?utf-8?B?TDVSN1VQanhsUEtpRE1CdE8rb0c2cHR4WUlJZkYrUlY3QnowQjRvVUlVTHlR?=
- =?utf-8?B?UHlTWU9jTno1ZHQwYlpDY1NvcnU2cTBuMGhRTmlWdGdGWkx0cUszbXVuL2lS?=
- =?utf-8?B?NGdkSG5kWjFOaDRKQ2hZL0VqK0pIOEZxUUpzY0RJeTh3SGdzc1VBcGo4enVk?=
- =?utf-8?B?aS83ekIxcEdWTzV6VktrTkpHUDF1T0p5cUtBR3ErbURZOWdvQVN3N0xGcWF0?=
- =?utf-8?B?YXNIT0NTaTkwd0JBOUQ2Mk9aay82Ymtka2FtTXd6V3pKSUV6ZlpDWENOZ2Rl?=
- =?utf-8?B?ZnBpN1Q5L0hzQVIweDNFR0ZKcWNvQWtZeEJJUDAxQnhHN2FVbkg1S1JZOHow?=
- =?utf-8?B?bElDQnNKOEI2b3VnM0lheGdqMGNnN2QySDJwaEQzY004Y05HZXlVamFMMGsv?=
- =?utf-8?B?NEM5REJwcXYxYWpZUGFUOXhYZ2d6YnQyaWFIci9XbHIreWRSUjgwSUlnY2p1?=
- =?utf-8?B?RzE3RExaQ0E5cEl5cHdURkdMV3FXejY1Zi9EcnY1cmVieUd6NnA0QWJ5dERx?=
- =?utf-8?B?dUdGaUR4dzlsZ3ZCK01kQXBRa0dGWjZMN2t3ejVUMVQraHFhYkJUZlNMcHFK?=
- =?utf-8?B?SWp3SnlCenpIYUhlTzlpSnhvQVdVWEljSDZQcUZlRHY3MHNuMHBHNEhkRFdT?=
- =?utf-8?B?YlJCM2sxQWhjcjJjMzlRcmxXMDhVcEVKcm1URVRoNjVNYmRFRXRkMExSdWNo?=
- =?utf-8?B?VVk4RlRBN3EwWGNiQlRKeVVQMGhDK2NhS3d2TTBrN3UxUGhHVDJKUmJPWVdy?=
- =?utf-8?B?K3FRaldNU205MUJMa1czOThWODlUVG9ZSVd3cnN2eVhEd1BQWXE2S0t4c3F6?=
- =?utf-8?B?ZUpsU2NMVEU0VEhLVXhueFUzVHNJZHVQM1phcDBJSGx5Tzd5T3VMak9NZFVv?=
- =?utf-8?B?WEVnM1FtOUVHZXZCeXBkOW10ZUVYdWJnWDZMTkVRb1VIYXBncnVYNW5mc0ha?=
- =?utf-8?B?Z1NZUTRqa1BhNG8vZ0dTY0VsVGZZcWxSVmpxODh4OUM3ZG5FVnVoZWd2TjRl?=
- =?utf-8?B?NXRRVlhLOEtybkFMK2pZWSt4ckZHUmtQWHhQQURIRkhQTDdhcGFrR1pWbUZq?=
- =?utf-8?B?dnVuZkE0dm5PTUhnNFF2SHBsZVJZMktmNGxVS0hiaWh6cVArWE5YV3hHcVFE?=
- =?utf-8?B?ejVBSFZDUzE3NUxwenFOaFdLR0cxdUpTUGxaQlVTbE93M0M1VzlIQjhieXA0?=
- =?utf-8?B?ZG5JQjBCSkttWllPdVNQbVRIYklhMDlIMldNaUZHcS9NR1MxN3dlcGRvWTFp?=
- =?utf-8?B?NnR0VjM3SGpEZHpzdUNOVVdPdGNyRy81R2dGV084MmNHSzU4WE9lZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35ef0cba-7342-478a-fd14-08de7ddc5dbc
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2026 13:04:15.4376
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uiVmwRK5owNHacGzBF11HSZJdbukwGd8YNobGX9p0EDPKdef5DnOk93TntlGuD1bdlpI3IvR0WiDi+yo1L7GAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7649
-X-Rspamd-Queue-Id: 77F1C239725
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/10 net-next] Convert CONFIG_IPV6 to built-in and remove
+ stubs
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org
+References: <20260309022013.5199-1-fmancera@suse.de>
+ <48ccec3f-dbc8-45c8-afda-e4f7e8f150d6@kernel.org>
+ <cd87ed46-b774-4896-b25e-4806eec9e0b3@suse.de>
+ <6c005900-3461-4e3c-a396-b2984735af9b@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <6c005900-3461-4e3c-a396-b2984735af9b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 70C642396AB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265545-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,google.com,redhat.com,lunn.ch,davemloft.net];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265549-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.932];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,wikipedia.org:url,suse.de:dkim,suse.de:mid,ietf.org:url]
 X-Rspamd-Action: no action
 
-Hi Matthieu,
 
-On 09.03.26 13:52, Matthieu Baerts wrote:
-> Hi Tariq, Dragos,
-> 
-> +cc: linux-next
-> 
-> On 05/03/2026 15:26, Tariq Toukan wrote:
->> From: Dragos Tatulea <dtatulea@nvidia.com>
+
+On 3/9/26 1:43 PM, Krzysztof Kozlowski wrote:
+> On 09/03/2026 12:38, Fernando Fernandez Mancera wrote:
+>> On 3/9/26 11:22 AM, Krzysztof Kozlowski wrote:
+>>> On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
+>>>> Historically, the Linux kernel has supported compiling the IPv6 stack as
+>>>> a loadable module. While this made sense in the early days of IPv6
+>>>> adoption, modern deployments and distributions overwhelmingly either
+>>>> build IPv6 directly into the kernel (CONFIG_IPV6=y) or disable it
+>>>> entirely (CONFIG_IPV6=n). The modular IPv6 use-case provides little to
+>>>> no practical benefit today.
+>>>
+>>> It does. We all use generic kernels, thus it is one configuration for
+>>> all boards and some setups have IPv6 and some not. The ones without IPv6
+>>> just don't use that module.
+>>>
 >>
->> XDP multi-buf programs can modify the layout of the XDP buffer when the
->> program calls bpf_xdp_pull_data() or bpf_xdp_adjust_tail(). The
->> referenced commit in the fixes tag corrected the assumption in the mlx5
->> driver that the XDP buffer layout doesn't change during a program
->> execution. However, this fix introduced another issue: the dropped
->> fragments still need to be counted on the driver side to avoid page
->> fragment reference counting issues.
+>> While I understand this, I would like to clarify that IMHO IPv6 isn't a
+>> secondary protocol and it is fundamental to modern networking. This is
 > 
-> FYI, we got a small conflict when merging 'net' in 'net-next' in the
-> MPTCP tree due to this patch applied in 'net':
+> Not for end user devices. None of my devices - neither routers, nor
+> embedded boards, nor mobile phone from 5G provider - receive IPv6
+> address, thus for them it is not fundamental.
 > 
->   db25c42c2e1f ("net/mlx5e: RX, Fix XDP multi-buf frag counting for striding RQ")
-> 
-> and this one from 'net-next':
-> 
->   dff1c3164a69 ("net/mlx5e: SHAMPO, Always calculate page size")
-> 
-> ----- Generic Message -----
-> The best is to avoid conflicts between 'net' and 'net-next' trees but if
-> they cannot be avoided when preparing patches, a note about how to fix
-> them is much appreciated.
-> 
-Apologies for this. Will take note next time.
 
-> The conflict has been resolved on our side [1] and the resolution we
-> suggest is attached to this email. Please report any issues linked to
-> this conflict resolution as it might be used by others. If you worked on
-> the mentioned patches, don't hesitate to ACK this conflict resolution.
-> ---------------------------
-> 
-> Rerere cache is available in [2].
-> 
-> [1] https://github.com/multipath-tcp/mptcp_net-next/commit/9cbb5f8a4a18
-Conflict resolution from [1] seems good.
+I am not so sure about this. Many if not most modern routers provide 
+IPv6 support and as I said it is enabled as built-in in openWRT since 
+[1]. For mobile phones they probably use IPv6 when connected to routers 
+but even 5G providers are using IPv6. They are working on IPv6-only 
+deployments with NAT64 too [2].
 
-Acked-by: Dragos Tatulea <dtatulea@nvidia.com>
+[1] 
+https://github.com/openwrt/openwrt/commit/0c8f0186d58468024db96a5ab0ca36a4d400d408
+
+[2] https://www.ietf.org/archive/id/draft-ma-v6ops-5g-ipv6only-01.html
+
+> I agree it is fundamental for your cloud machines and network backbone
+> which you are targeting, but this patchset completely ignores other
+> users calling their use-cases "little practical benefit"! Try running
+> Amiga machine...
+> 
+> There is no even bloatometer stats for these defconfigs so we can see
+> the impact.
+> 
+
+Sure. I can provide them.
+
+>> why I believe it should be built-in by default. Currently OpenWRT,
+>> Debian ARM and others already ships the kernel with CONFIG_IPV6=y. I
+>> know that Alpine and Yocto doesn't do that for arm64.
+> 
+> Maybe there are other reasons why distro should not choose it as module
+> (like module load calls on ipv6 packets) but that was not explained here.
+> 
+> Arch Linux Rpi kernel on arm64 has IPV6=6 and the module itself is 650
+> kB. That's noticeable for smaller arm64 boards.
+> 
+> For arm it would be even more noticeable as some have 256 MB RAM like
+> first Rpi.
+> 
+>>
+>> I guess the most critical one here is Yocto but if the developer of the
+>> embedded device is sure they won't use IPv6 at all, they should turn it off.
+>>
+>> At the same time, Alpine ships software that enable IPV6 and is
+>> frequently loaded as a module. So the only remaining concern would be
+>> the boot partition size. I don't really have a solution for that problem.
+>>
+>> I think that the infrastructure for allowing IPV6=m is bug-prone and it
+>> impacts performance. Forcing the use of indirect function calls in core
+>> networking, Netfilter or BPF datapaths seems like a heavy tax to me.
+>>
+>>> Also, with these generic kernels (so again all machines are using same
+>>> ones, e.g. distro) users can easily blacklist the module.
+>>>
+>>
+>> FWIW; users can still boot with kernel command line parameter
+>> ipv6.disable=1 and then IPV6 will be administratively disabled.
+> 
+> It's not the same. You enabled it on amiga_defconfig and do you
+> understand what sort of machine is that? The newest have 16 MB RAM, many
+> much less like 2 MB, and ipv6 module on m68k is 400 kB, so pretty
+> significant change.
+> 
+
+Fair enough. Of course I am not familiar with all the architectures 
+affected. This feedback is more than welcome and it might make a lot of 
+sense to disable IPv6 on Amiga and probably different architectures. By 
+the way if by Amiga you mean [3] then I believe it should be disabled.
+
+[3] https://en.wikipedia.org/wiki/Amiga
 
 Thanks,
-Dragos
+Fernando.
+
 
