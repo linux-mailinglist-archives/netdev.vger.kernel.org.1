@@ -1,231 +1,183 @@
-Return-Path: <netdev+bounces-265755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBZbNec2r2kPQQIAu9opvQ
-	(envelope-from <netdev+bounces-265755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:08:55 +0100
+	id uLr2IoI3r2kPQQIAu9opvQ
+	(envelope-from <netdev+bounces-265756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:11:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A97241605
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:08:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB5D2416FA
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7558301778A
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:07:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1A05311011D
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F9F34D395;
-	Mon,  9 Mar 2026 21:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xaszhAmx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C56410D0C;
+	Mon,  9 Mar 2026 21:08:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE642344DA0
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 21:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773090446; cv=pass; b=sR7JWmdvnjjYNHt6jEbsJLhYOxP1szH1ht2f16PtHEuL/Eh73EN46ljJIZxOpl3BxZPvRBPu01j343AkVhXHQ2R78QknDGKhLE1d5YGIG/RCOlatHbF5FSDiNKz4rBhb+kUfUsSw8apIgKHJTqF0UFCnGBfsF6X9KGpTAp8QP9c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773090446; c=relaxed/simple;
-	bh=li5zRm0PCIdD9+rnwJEWNTPoNBVilP716lWSslWOnLI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bdzKV1K6CPlEwsvv6AaCN/yywPisqRn1NEQwIC2cFonCryE1hCzBU8ZYVWd+ccJ3cLvsP9mMMH3Ow8j8R1binxRqexmq5XxyxpZZ8TdhtsOdeuKALAKD4/bfgmSqN/SmFIis3Yp3wGfuCziKvipoa9GnuWkhrBp7kHhTQwe7Bs0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xaszhAmx; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506a321cc53so135148411cf.3
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 14:07:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773090444; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z3dHMpZuDV3cUI0vYFMT/X015yapfS7YTBVzLzVHIDKGmoo3b+yG6jwVTr+/44N2E5
-         ylMzc0DPmk3NTmzsGbQ1ux8Nv9SM9kSs99elqtngco/ZD37gJfyvL9JozUyWcj4C5RKD
-         VucjS9gQWXN2Hoj3v0bWqePUpGvFRblk0VqA+hEvX1RwRFUPefjtTIsJo9DpFMdcE6nO
-         IcHPr4sB7kX7xGhS5+bGvKSnJyCGQJ7VrDlI9m7zD82Km+Yc0BGic0TPYntU12lpSKtJ
-         wMdLHB27My8quNDoPziUEHkHZwoNMphdUnsvkctHoaRK0AIUX3ij3AGuAwOggt8spuuO
-         Donw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MsTvWw67aOb0oOmOhkeZzyjLA633HBf89IElKjS1YC8=;
-        fh=mK+DTs/Bg0SotNI/0fsRvMkpcQXcDi1pSGR6iiIQVVI=;
-        b=BPWV+gzKWU688S01lgMOx9dGYn3M4K6eUrCAVXeTanImbgIXDI5aH7lxun3tBv79Zy
-         /okY1RKLBEUhkVtQkGJADF4qj4GDm6bCN3CAPcBxv7oda0iNjmYfY+fPLSJUPh0TlHWM
-         lsPkyCKzrAV1IoQ21vYPeluUJoW/abzJ6Fwk9H9E5x1TpSIlcdccxH9CV3k/D5z3Kddd
-         vyvsg5oOeQCawIGqfIL+F1GeefkEKWHC5dpTsfzQK003cdfQAALirtmu3tf3iYHmUoBk
-         gR69ct39sn38uCqOOa8zKmEyXoVbsY4eS3ElbPouKUxK8MYf1nImTULVy1b2u9wWJnws
-         QTbQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773090444; x=1773695244; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MsTvWw67aOb0oOmOhkeZzyjLA633HBf89IElKjS1YC8=;
-        b=xaszhAmx9Ku1YaQ5/tSGcVJn7tJpjcmgSHf1aKcDTrWG1pNn9aCsN4QgQDoPDYjhKf
-         3WX6Zv52WADxz+vjCKZai0n+nJkBgiRS2QUF/E4S5foeXTgL23fLjFAPGtwcMbWziLBf
-         juMtBHB3owF38zyLWXb0JOCnlV1V8/ju9whbb0srT3+3LoLxrTsbvSgQfFeuV1tg8CkS
-         wGy35/2N6eCnJFqmKnNEc11fjnxT0UI+8h8T6wmRq9EhmgV8/qpzd4nZx0SloPj1lOV0
-         y7Nt/CetKYb5r3dyPxj9I0/PGYK6CYH/amsVgZpl5AgiZ0GoETH8ZMopAqlum8KwUbHx
-         fS9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773090444; x=1773695244;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MsTvWw67aOb0oOmOhkeZzyjLA633HBf89IElKjS1YC8=;
-        b=fSyUloOeHbU5iu29Twv6ohkaduw0cjsFiH4bh+k9lZMmRER2BCktcIBgpEVti5K4oQ
-         EPsJHqGwY728UyQ8u64EDVC9ZJYVY7fmqqH52oNcQDjSXrZ3a3uQJ7ty0dTHBenibvSa
-         BDa6TZyoAHFNWhi1IZUFcBOUR6bKFWt/O9nLwyYy7jDhE/TKcJNgujWONupj/ePXePL9
-         rjv9KzqUlFJ2r4w/evW/PbqGEXsk+PpQ4uDuVfibjgVuqMRYteVjMQvGeV+4+8tVSQO+
-         0rj/Qvi4F9FM/aE+RDLIXqWQjCdGZVEqE8nxqLF2wbAnc3+1eQmhuEhFlSfbgLSz+WD7
-         2Syg==
-X-Gm-Message-State: AOJu0YyVv8EYTWno1g6CxhwKixQMMlyRq7plQxpjodQ5vhPalHEyfw26
-	zmV6qH0tDQMN6BzGvnfUogqCpho4CRwy/FDaKE9F4rhVh1Mak8H06g7rCYV83vFbUIck+7CuCk2
-	cNnjew/3Wtn7kkaftj6F3jiFdFfaJ5/xWHUIRE68Q
-X-Gm-Gg: ATEYQzxlJiqwV712nJV6rMj/gz1N9xBtTyWmZ77tVmIqKwuoBuAjn3DQw+Dcmju891B
-	nIQN5dcGbVBEOYfY8BlzKr/gKN7ga5et8OX150CcD5rgEPF86W0zQ/k3rfh03dz/jhJGehIb92e
-	rr6tPZpc3/AREbzjxJ/LJiM+Uz+yI845+crR0+8Al89l5gFAm9TKY7zqIo54cHV5DJYtDEJYh2y
-	s+bWBIOkGl3CwcoUiDUSougXT1cU1jg6/QFXJbFv4RpmSVifNlpctBYdEeiwQwKDtCfzMjEXltV
-	V1w6y0lr
-X-Received: by 2002:a05:622a:58e:b0:4ff:c0da:5a06 with SMTP id
- d75a77b69052e-508f46fa9famr156377851cf.20.1773090443382; Mon, 09 Mar 2026
- 14:07:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FA841C0D6;
+	Mon,  9 Mar 2026 21:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773090534; cv=none; b=gInsFePxG3eUddmBJLFPbhX2tNw5CsXZSJqMNQiYUG/m1fbuCyqZCdlMaERlPL5uv2ZemgR2ceQ+Goirjgu8AL4JV67gxylTEEOArsrSOT536Mjj1H+4+SnH2pxs4Ugt065FRQGTONVMeiMS92OTObzlMMXVgiOKIzBFwYxWBvI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773090534; c=relaxed/simple;
+	bh=3mUNslYFdO+m+1W2BzjORrkvq4Fe6bwLyUt25LRjKok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eapqB0GQpkaC+I0Mn+Lz9T0Svrs8bLwZWtIc0pxPVkdE7CjbiCiVwpNKZNAyfkazCaiZJBVNjEqZmKFnZKAwlB977+W35ovea76elYWskCpFZ7rBuKzWdoIVmd1KUc3Ls2vBSKZiz8kx+6Z5j0z/qFDbOhdZDUMiRXmxHXPangA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id DA0746047A; Mon, 09 Mar 2026 22:08:49 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 00/10] netfilter: updates for net
+Date: Mon,  9 Mar 2026 22:08:35 +0100
+Message-ID: <20260309210845.15657-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-3-edumazet@google.com>
- <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
-In-Reply-To: <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Mar 2026 22:07:12 +0100
-X-Gm-Features: AaiRm522fbFDh3HXv_2VmST3M28bKNoQ-2QhB6oqWRGhzDGsAr4W1LWp1rHyU2k
-Message-ID: <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
-Subject: Re: Long delay in freeing skbs
-To: Tony Battersby <tonyb@cybernetics.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, eric.dumazet@gmail.com, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jason Xing <kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 27A97241605
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2EB5D2416FA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265756-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
-	TAGGED_FROM(0.00)[bounces-265755-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.981];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cybernetics.com:email,msgid.link:url]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,strlen.de:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 9, 2026 at 10:00=E2=80=AFPM Tony Battersby <tonyb@cybernetics.c=
-om> wrote:
->
-> I have some out-of-tree code that was broken by commit e20dfbad8aab
-> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
-> retested with 7.0-rc3 with the same results.  I'm not sure if the change
-> in behavior that I am seeing is expected or if it is a bug, so I thought
-> I would ask.  Omitting irrelevant details, my kernel code does the
-> following:
->
-> 1) allocate a buffer
-> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
-> 3) wait for the I/O to complete
-> 4) wait for the buffer page refcounts to drop back to their values for
-> idle I/O
-> 5) reuse the buffer for more I/O
->
-> Step 4 is necessary in this case due to some of those irrelevant details
-> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
-> seems to keep the page refcounts elevated long after the I/O has
-> completed (hours or longer), presumably because the deferred skb free
-> isn't happening for a long time.  So:
->
-> 1) Is this long delay expected, or is this a bug?
->
-> 2) If the delay is expected, is there a way for me to force the network
-> system to process the deferred skb frees on request?  e.g. write to a
-> file in /sys, or call a kernel function to flush the deferred frees?
->
-> Worst case is that I can redesign my code to kfree() the buffer if it is
-> busy and allocate a new one, and let the old buffer be freed
-> asynchronously when the skb is freed at some indeterminate time in the
-> future.
->
-> Thanks,
-> Tony Battersby
+Hi,
 
+The following patchset contains Netfilter fixes for *net*:
 
-If you are using zero copy, please look at:
+Due to a large influx of bug fixes on netfilter-devel@ I am sending
+an earlier PR to have more time to go through the remaining patches
+without getting a 20+ patch PR.
 
-Maybe you should make sure your code is compatible with it.
+1) syzbot managed to add/remove devices to a flowtable, due to a bug in
+   the flowtable netdevice notifier this gets us a double-add and
+   eventually UaF when device is removed again (we only expect one
+   entry, duplicate remains past net_device end-of-life).
+   From Phil Sutter, bug added in 6.16.
 
-commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Mon Feb 16 19:36:53 2026 +0000
+2) Yiming Qian reports another nf_tables transaction handling bug:
+   in some cases error unwind misses to undo certain set elements,
+   resulting in refcount underflow and use-after-free, bug added in 6.4.
 
-    net: do not delay zero-copy skbs in skb_attempt_defer_free()
+3) Jenny Guanni Qu found out-of-bounds read in pipapo set type.
+   While the value is never used, it still rightfully triggers KASAN
+   splats.  Bug exists since this set type was added in 5.6.
 
-    After the blamed commit, TCP tx zero copy notifications could be
-    arbitrarily delayed and cause regressions in applications waiting
-    for them.
+4) a few x_tables modules contain copypastry tcp option parsing code which
+    can read 1 byte past the option area.  This bug is ancient, fix from
+    David Dull.
 
-    Signed-off-by: Eric Dumazet <edumazet@google.com>
-    Fixes: e20dfbad8aab ("net: fix napi_consume_skb() with alien skbs")
-    Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-    Reviewed-by: Willem de Bruijn <willemb@google.com>
-    Link: https://patch.msgid.link/20260216193653.627617-1-edumazet@google.=
-com
-    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+5) nfnetlink_queue leaks kernel memory if userspace provides bad
+   NFQA_VLAN/NFQA_L2HDR attributes.  From Hyunwoo Kim, bug stems from
+   from 4.7 days.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 699c401a5eae9c497a42b6bdd8593af7890529f4..dc47d3efc72ed86dce5e382d505=
-eda7bc863669a
-100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -7266,10 +7266,15 @@ void skb_attempt_defer_free(struct sk_buff *skb)
- {
-        struct skb_defer_node *sdn;
-        unsigned long defer_count;
--       int cpu =3D skb->alloc_cpu;
-        unsigned int defer_max;
-        bool kick;
-+       int cpu;
+6) nfnetlink_cthelper has incorrect loop restart logic which may result
+   in reading one pointer past end of array. From 3.6 days, fix also from
+   Hyunwoo Kim.
 
-+       /* zero copy notifications should not be delayed. */
-+       if (skb_zcopy(skb))
-+               goto nodefer;
-+
-+       cpu =3D skb->alloc_cpu;
-        if (cpu =3D=3D raw_smp_processor_id() ||
-            WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
-            !cpu_online(cpu)) {
+7-9) fix access bugs in the ctnetlink expectation handling.
+     Problem is that while RCU prevents the referenced nf_conn entry
+     from going way, nf_conn entries have an extension area that can
+     only be safely accessed if the cpu holds a reference to the
+     conntrack.  Else the extension area can be free'd at any time.
+     Fix is to grab references before the accesses happen.
+     These bugs are old, v3.10 resp. even pre-git days.
+     All fixes from Hyunwoo Kim.
+
+10) xt_IDLETIMER v0 extension must reject working with timers added
+    by revision v1, else we get list corruption. Bug added in v5.7.
+    From Yifan Wu, Juefei Pu and Yuan Tan via Xin Lu.
+
+Please, pull these changes from:
+The following changes since commit c113d5e32678c8de40694b738000a4a2143e2f81:
+
+  Merge branch 'net-spacemit-a-few-error-handling-fixes' (2026-03-06 18:58:36 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-03-09
+
+for you to fetch changes up to a29b6cda03c1a4175468953c87a6c7db8766df7e:
+
+  netfilter: xt_IDLETIMER: reject rev0 reuse of ALARM timer labels (2026-03-09 14:40:00 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-26-03-09
+
+----------------------------------------------------------------
+David Dull (1):
+  netfilter: x_tables: guard option walkers against 1-byte tail reads
+
+Florian Westphal (1):
+  netfilter: nf_tables: always walk all pending catchall elements
+
+Hyunwoo Kim (5):
+  netfilter: nfnetlink_queue: fix entry leak in bridge verdict error path
+  netfilter: nfnetlink_cthelper: fix OOB read in nfnl_cthelper_dump_table()
+  netfilter: ctnetlink: fix use-after-free in ctnetlink_dump_exp_ct()
+  netfilter: ctnetlink: fix use-after-free of exp->master in single expectation GET
+  netfilter: ctnetlink: fix use-after-free of exp->master in expectation dump
+
+Jenny Guanni Qu (1):
+  netfilter: nft_set_pipapo: fix stack out-of-bounds read in pipapo_drop()
+
+Phil Sutter (1):
+  netfilter: nf_tables: Fix for duplicate device in netdev hooks
+
+Yuan Tan (1):
+  netfilter: xt_IDLETIMER: reject rev0 reuse of ALARM timer labels
+
+ net/netfilter/nf_conntrack_netlink.c | 52 ++++++++++++++++++++++++++--
+ net/netfilter/nf_tables_api.c        |  4 +--
+ net/netfilter/nfnetlink_cthelper.c   |  8 ++---
+ net/netfilter/nfnetlink_queue.c      |  4 ++-
+ net/netfilter/nft_chain_filter.c     |  2 +-
+ net/netfilter/nft_set_pipapo.c       |  3 +-
+ net/netfilter/xt_IDLETIMER.c         |  6 ++++
+ net/netfilter/xt_dccp.c              |  4 +--
+ net/netfilter/xt_tcpudp.c            |  6 ++--
+ 9 files changed, 72 insertions(+), 17 deletions(-)
+
+-- 
+2.52.0
 
