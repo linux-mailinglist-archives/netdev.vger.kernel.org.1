@@ -1,340 +1,117 @@
-Return-Path: <netdev+bounces-265559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265560-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGgaIqzRrmlhJAIAu9opvQ
-	(envelope-from <netdev+bounces-265559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:57:00 +0100
+	id mInXFfvQrmlhJAIAu9opvQ
+	(envelope-from <netdev+bounces-265560-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E6A23A2A6
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:56:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E492123A184
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D204B317C2E8
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:51:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8255B301FB80
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0E03BFE2B;
-	Mon,  9 Mar 2026 13:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97FE3BFE2D;
+	Mon,  9 Mar 2026 13:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gZPy3hYT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x1Swie5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E328038F93A;
-	Mon,  9 Mar 2026 13:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A3B1F63D9;
+	Mon,  9 Mar 2026 13:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773064213; cv=none; b=qj7WtHks3MeJQKHkosreRUI0oy3V9rGtFKpSrT+fJ4hjZf5uJbMnrKhKTzeYMVG29N9CL0tRcfbyJHKfFrojkmtVEYOI8DPBNKC4oeALkQ74Y+7a5CD/5P16+gTgDNpmJHmMxYvnUWmxteyTR1vDjSwlRXH0Xb5VHV51UA8ViRg=
+	t=1773064433; cv=none; b=czlVjJhwpOuieQDdWeYNvjmLeXX0+LUPQftTIevAoJD8sN7nkLPmbrwFTZQR2kMV01+cgOTv6/KHeJJfRWUQAuPCC43O+R9dzfWYrwAU/zrLT0yF72VnsiUh9NpGP1epRuUc4YA5z4N1MKkUJQJNRgmB462CgKaiTQoscy0OaXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773064213; c=relaxed/simple;
-	bh=c5rbStFtRclgiSzvw6Wajg3dT9AmwlIozEnmfYWKfDI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LOt8b1HBryQ4Wh+4uXfNx+l1IylAME3wDWgkSoONQ6DvaS/dJQ1EMDzAQeFcxQTGMI+jwAtVwUYC/XcuOUy3sIdIQSrNG6XsNg2ONHyDLiusJ9/npjOMAUY1fBcgWAYKcFjVFz/3h9k9y3bTyvUaKW+hj7H/SAnfY6ZuPIl3I0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gZPy3hYT; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 629DEZjp3370975;
-	Mon, 9 Mar 2026 06:49:41 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=a
-	kjPAeN4UU1pVhpAh0/pX4vkrwNQX9jrXGKG4Tjn5g8=; b=gZPy3hYTAezuffUcl
-	PtZCaze4fk8R2QRzEel6u08j/AzRqKhZ5jlgBiRkZyTsaiqyRgs5Sle4TD4jHZBr
-	WWwfTBc5TKOQ8+zW7Vh5EvObtVIsbQ3qrdCZI7yQfSSlddK7tKAvT/3OW/0TkTD8
-	3DjzGUu28rzlGgv9hi76UwxodEXgBeWc1Jx/toEcWg8Zyfo6CozxvZsw1dfMNhVc
-	86/GVwAUgw4/jGNBGDrJMJ2Pt5V+qma2VFvCORaufi3h+NbBkBBNUUX8v1uPZsdc
-	CDIAQQ8FW/h7QOxlZ2f583RJgTGwGfjqeP0ilZu7vtu8H0ednm3bFOItIDOM7aep
-	0mISg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4crj8quqj5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 06:49:41 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 9 Mar 2026 06:49:40 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 9 Mar 2026 06:49:40 -0700
-Received: from naveenm-PowerEdge-T630 (unknown [10.29.37.44])
-	by maili.marvell.com (Postfix) with ESMTP id BAED73F7068;
-	Mon,  9 Mar 2026 06:49:34 -0700 (PDT)
-Date: Mon, 9 Mar 2026 19:19:33 +0530
-From: Naveen Mamindlapalli <naveenm@marvell.com>
-To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
-CC: <netdev@vger.kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman
-	<horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-        Tariq Toukan
-	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        Maxime Chevallier <maxime.chevallier@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        Ido Schimmel <idosch@nvidia.com>,
-        Danielle Ratson <danieller@nvidia.com>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, Russell King <linux@armlinux.org.uk>
-Subject: Re: [RFC net-next v2 0/6] ethtool: Generic loopback support
-Message-ID: <aa7P7UUUG1p5RVwO@naveenm-PowerEdge-T630>
-References: <20260308124016.3134012-1-bjorn@kernel.org>
+	s=arc-20240116; t=1773064433; c=relaxed/simple;
+	bh=Mfd4iO1noQXPtnG//uexNXdm8nYzeOXS+33r5GU1V30=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZRuKL3+jS1673PiK1X0VlOgvl4YHdKrAlVrngfyrA2YLnfk2G3WNRuTLBu0Ld6OpmUaZQDT64RtESOp3gz4h47ukUF5G5s9XLadtPy3TBqg62DDmEZTi1DWaaujgK1wq4u4TQXagHpS1d1AM3xLSZ7xLLMzCsHMYPtfzn6yfwgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x1Swie5i; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ER+LBnfMBOV109rdAYY/rcfnHDt99STW6FsM8jpfTAQ=; b=x1Swie5iENhZwo2ZWItamlfzeg
+	g9KIwxwLoMlCVAyOwqh/vGPIou/Ldczxvz9J1r2zFOqx1k2UlvMYHVtg+XPRwnh4KiEv26e8juYq9
+	A9ML7Q5BdfB0Qdvvcyn46+MYrvZsn8stKnl7fNbR8eOhCi+DmwDho1EMbHZmKgZH3WEo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vzb36-00As3H-QR; Mon, 09 Mar 2026 14:53:32 +0100
+Date: Mon, 9 Mar 2026 14:53:32 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
+Cc: rafal@milecki.pl, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: bgmac: scope bgmac_enet_suspend() and
+ bgmac_enet_resume() to CONFIG_PM
+Message-ID: <b410053e-9b3d-4f6c-91d8-f7ebf5f796f1@lunn.ch>
+References: <20260309090238.719428-1-pengpeng.hou@isrc.iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260308124016.3134012-1-bjorn@kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDEyNSBTYWx0ZWRfXxbwr9nYX6sci
- p92XabexOPDjwsQ4MZLYO+zMNC1zLXtqdkoUF2BDD7DSnYd9C8r8smSW75FKMqDU+BxaQdF+7Wh
- 0WDpyRgbA/mj1eGCeCaqwaA4rhtShvzKqiPV4ql52Z5KhSzbxPBhU1JkpnWjCtD+TLFWqfTuwzw
- Sur2PdcB8+4E+4xaarZLVcjfOYeWfgCqiKf17/d2dvp95rDcp74cME7VFkYkl4FFu0zM9KzY4RC
- WhBSXEm9Y8ID6WUrfNn9V7pwnq5R6kKZKxBtFjsLtKZfC/eqhDr6clJzvrFQs29Fx16ivOBpKkP
- 3LWS07rCuW48qWykMWkB7pQVtPnF5addflmM6zF4O/bpVtOhe7ml9e37gDjpWYELcrnzOfnJsda
- Obqdu72gmLztUMvnHpJjIataXEWBfCxyeTFOXtQHS55mpOlYNJ90AENh4Kiobs/K/Q5cUbR2uNG
- LdROTsFl9BBpHLjb/VQ==
-X-Proofpoint-GUID: JfkpMwsJt62-ifdgQzfmh_TYGH4Kb4Cr
-X-Proofpoint-ORIG-GUID: JfkpMwsJt62-ifdgQzfmh_TYGH4Kb4Cr
-X-Authority-Analysis: v=2.4 cv=WbwBqkhX c=1 sm=1 tr=0 ts=69aecff5 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=8nJEP1OIZ-IA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
- a=M5GUcnROAAAA:8 a=P-IC7800AAAA:8 a=Q-fNiiVtAAAA:8 a=wHvoYhKdVLinnAuvZsgA:9
- a=3ZKOabzyN94A:10 a=wPNLvfGTeEIA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
- a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-09_03,2026-03-09_01,2025-10-01_01
-X-Rspamd-Queue-Id: E2E6A23A2A6
+In-Reply-To: <20260309090238.719428-1-pengpeng.hou@isrc.iscas.ac.cn>
+X-Rspamd-Queue-Id: E492123A184
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265559-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-265560-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch,bootlin.com,broadcom.com,marvell.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,loopback_drv.py:url];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[naveenm@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	NEURAL_HAM(-0.00)[-0.974];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid]
 X-Rspamd-Action: no action
 
-On 2026-03-08 at 18:10:06, Björn Töpel (bjorn@kernel.org) wrote:
-> Hi!
+On Mon, Mar 09, 2026 at 09:02:38AM +0000, Pengpeng Hou wrote:
+> In current linux.git (1954c4f01220), bgmac_enet_suspend() and
+> bgmac_enet_resume() are defined and declared unconditionally. However,
+> their only in-tree callers are within the platform driver's PM callbacks
+> in bgmac-platform.c, which are already guarded by #ifdef CONFIG_PM.
 > 
-> Background
-> ==========
-> 
-> This is the v2 RFC of the CMIS loopback series, reworked based on
-> feedback from v1 [1].
-> 
-> The main change is that loopback is no longer bolted onto the existing
-> module interface. Instead, it gets its own netlink commands
-> (LOOPBACK_GET/SET) with a generic component/name/direction model that
-> can represent loopback points across the entire data path -- MODULE,
-> PHY, MAC, and PCS. This series wires up MODULE/CMIS as the first user;
-> the other component types return -EOPNOTSUPP for now.
-> 
-> The Common Management Interface Specification (CMIS) defines four
-> diagnostic loopback types, characterized by location (Host or Media
-> Side) and signal direction:
-> 
->  - Host Side Input (Rx->Tx) -- near-end
->  - Host Side Output (Tx->Rx) -- far-end
->  - Media Side Input (Rx->Tx) -- near-end
->  - Media Side Output (Tx->Rx) -- far-end
-> 
-> Support is detected via Page 13h Byte 128, and loopback is controlled
-> via Page 13h Bytes 180-183 (one byte per type, one bit per lane).
-> 
-> The CMIS helpers work entirely over get/set_module_eeprom_by_page, so
-> any driver that already has EEPROM page access gets module loopback
-> without new ethtool_ops or driver changes.
-> 
-> Implementation
-> ==============
-> 
-> Patch 1/6 ethtool: Add loopback netlink UAPI definitions
->   Adds the YAML spec and generated UAPI header for the new
->   LOOPBACK_GET/SET commands. Each loopback entry carries a component
->   type, optional id, name string, supported directions bitmask, and
->   current direction.
-> 
-> Patch 2/6 ethtool: Add loopback GET/SET netlink implementation
->   Implements GET/SET dispatch in a new loopback.c. GET collects
->   entries from each subsystem. SET switches on the component and
->   calls the right handler per entry. No components are wired yet.
-> 
-> Patch 3/6 ethtool: add CMIS loopback helpers for module loopback control
->   Adds cmis_loopback.c with the MODULE component handlers. GET reads
->   Page 13h and appends one entry per supported loopback point
->   ("cmis-host" and/or "cmis-media"). SET resolves name to control
->   byte indices and enforces mutual exclusivity -- switching directions
->   first disables the active one in a separate EEPROM write, then
->   enables the new one.
-> 
-> Patch 4/6 selftests: drv-net: Add loopback driver test
->   Adds loopback_drv.py with generic tests that work on any device
->   with module loopback support: enable/disable, direction switching,
->   idempotent enable, and rejection while interface is up.
-> 
-> Patch 5/6 netdevsim: Add module EEPROM simulation via debugfs
->   Adds get/set_module_eeprom_by_page to netdevsim, backed by a
->   256-page x 128-byte array exposed via debugfs. This enables
->   testing the CMIS loopback path without hardware.
-> 
-> Patch 6/6 selftests: drv-net: Add CMIS loopback netdevsim test
->   Adds loopback_nsim.py with netdevsim-specific tests that seed the
->   EEPROM via debugfs: capability reporting, EEPROM byte verification,
->   and error paths for unsupported or missing CMIS support.
-> 
-> Limitations
-> ===========
-> 
-> Only MODULE/CMIS is wired up. PHY, MAC, and PCS loopback are defined
-> in the UAPI but not yet implemented.
-> 
-> No per-lane support -- loopback is all-or-nothing (0xFF/0x00) across
-> lanes.
-> 
-> Extending to PHY/MAC/PCS
-> =========================
-> 
-> PHY loopback can walk phy_link_topology to enumerate PHYs by phyindex
-> and call phy_loopback() directly. MAC and PCS loopback can route
-> through phylink via new mac_set_loopback()/pcs_set_loopback()
-> callbacks. Drivers that don't use phylink could add new ethtool_ops.
-> The dispatch framework already handles all component types.
-> 
-> Open questions
-> ==============
-> 
->  - Is this the right extensibility model? I'd appreciate input from
->    other NIC vendors on whether component/name/direction is flexible
->    enough for their loopback implementations. Also, from the PHY/port
->    folks (Maxime, Russell)!
+> Match the helper scope to their callers by wrapping the definitions in
+> CONFIG_PM and providing no-op stubs in the header. This fixes the
+> config-scope mismatch and avoids unnecessary code inclusion when
+> power management is disabled.
 
-Hi Bjorn,
+Please use pm_ptr() instead. You should then be able to remove all
+#ifdef CONFIG_PM. That is better for build testing.
 
-The component/name/direction model in v2 fits our hardware well.
+    Andrew
 
-I am working on loopback support for Marvell OcteonTX2.
-The MAC (RPM block) supports a PCS-level loopback. In addition,
-the on-chip SerDes (GSERM) is managed by embedded firmware and
-supports three more loopback modes:
-  NED (Near-End Digital) -- digital domain, before the analog front-end
-  NEA (Near-End Analog) -- through the full analog front-end
-  FED (Far-End Digital) -- line-side traffic looped back
-
-Since the GSERM is not a phylib phy_device, both the MAC PCS
-loopback and the SerDes loopbacks fall under the MAC component
-in your model.
-
-Mapped to the v2 model:
-  component  name         supported    description
-  MAC        mac          near-end     PCS-level loopback
-  MAC        serdes-ned   near-end     digital only
-  MAC        serdes-nea   near-end     analog
-  MAC        serdes-fed   far-end      line-side
-
-The SerDes NED and NEA both have the same (component, direction).
-Both are (MAC, near-end) -- but exercise fundamentally different
-hardware paths. The name field distinguishes them as per your model,
-
-I can work on MAC + SerDes loopback driver support for CN10K and
-post patches on top of your series once MAC component dispatch is
-in place.
-
-Thanks,
-Naveen
-
-> 
->  - The MODULE id field is currently unused. For multi-module setups it
->    could serve as a port selector. It could also help detect module
->    swaps -- a hash of the CMIS vendor serial number (Page 00h, Bytes
->    168-183), vendor name, and part number would give userspace a
->    stable identifier to verify the module hasn't changed since
->    loopback was configured. Worth adding now, or defer until there's a
->    concrete user?
-> 
->  - Are patches 5-6 (netdevsim EEPROM simulation + netdevsim-specific
->    tests) worth carrying? They drive the CMIS Page 13h registers from
->    debugfs, which gives good coverage without hardware, but it's
->    another netdevsim surface to maintain. If the consensus is that the
->    generic driver tests (patch 4) are sufficient, I'm happy to drop
->    them.
-> 
-> Related work
-> ============
-> 
-> [1] CMIS loopback v1
->   https://lore.kernel.org/netdev/20260219130050.2390226-1-bjorn@kernel.org/
-> [2] New loopback modes
->   https://lore.kernel.org/netdev/20251024044849.1098222-1-hkelam@marvell.com/
-> [3] PHY loopback
->   https://lore.kernel.org/netdev/20240911212713.2178943-1-maxime.chevallier@bootlin.com/
-> [4] bnxt_en: add .set_module_eeprom_by_page() support
->   https://lore.kernel.org/netdev/20250310183129.3154117-8-michael.chan@broadcom.com/
-> 
-> 
-> Björn Töpel (6):
->   ethtool: Add loopback netlink UAPI definitions
->   ethtool: Add loopback GET/SET netlink implementation
->   ethtool: add CMIS loopback helpers for module loopback control
->   selftests: drv-net: Add loopback driver test
->   netdevsim: Add module EEPROM simulation via debugfs
->   selftests: drv-net: Add CMIS loopback netdevsim test
-> 
->  Documentation/netlink/specs/ethtool.yaml      | 115 ++++++
->  drivers/net/netdevsim/ethtool.c               |  79 ++++
->  drivers/net/netdevsim/netdevsim.h             |  11 +
->  include/linux/ethtool.h                       |  28 ++
->  .../uapi/linux/ethtool_netlink_generated.h    |  52 +++
->  net/ethtool/Makefile                          |   2 +-
->  net/ethtool/cmis_loopback.c                   | 338 ++++++++++++++++++
->  net/ethtool/loopback.c                        | 248 +++++++++++++
->  net/ethtool/netlink.c                         |  20 ++
->  net/ethtool/netlink.h                         |   8 +
->  .../selftests/drivers/net/hw/loopback_drv.py  | 227 ++++++++++++
->  .../selftests/drivers/net/hw/loopback_nsim.py | 249 +++++++++++++
->  12 files changed, 1376 insertions(+), 1 deletion(-)
->  create mode 100644 net/ethtool/cmis_loopback.c
->  create mode 100644 net/ethtool/loopback.c
->  create mode 100755 tools/testing/selftests/drivers/net/hw/loopback_drv.py
->  create mode 100755 tools/testing/selftests/drivers/net/hw/loopback_nsim.py
-> 
-> 
-> base-commit: 0bcac7b11262557c990da1ac564d45777eb6b005
-> -- 
-> 2.53.0
-> 
-> 
+---
+pw-bot: cr
 
