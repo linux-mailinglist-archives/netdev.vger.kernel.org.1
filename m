@@ -1,148 +1,172 @@
-Return-Path: <netdev+bounces-265767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBkxCoM4r2kPQQIAu9opvQ
-	(envelope-from <netdev+bounces-265767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:15:47 +0100
+	id 6BDbK9g9r2mDSgIAu9opvQ
+	(envelope-from <netdev+bounces-265777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:38:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2272417FA
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:15:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B70C241CFA
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2550B3024097
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:15:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 459EB3112066
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DED3321C8;
-	Mon,  9 Mar 2026 21:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CA4344056;
+	Mon,  9 Mar 2026 21:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m96HXZe9"
+	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="qWDNv+x5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1312DC76A;
-	Mon,  9 Mar 2026 21:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB4E220F2D
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 21:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773090944; cv=none; b=qTVh9QtJH4sPkCjJgoGUnHP/nAHIzKZexxx94l7qUSFOT0YgN6/aNT+0sjK1bRx45rfLTqudMfcXqy1B2P7h+IgNSOaoUF65KlzwO7a5RshmMwsxStOsM0z51hQBfIilaFIe5mJhEsEGQDISDVizGlhAr7eyda0gHTqLUFBR+Ek=
+	t=1773092080; cv=none; b=p7ptbC6yzrPy7X0craNxWS0S78Bp3vWtO4MDub+xKO9ZV8FEPybVCQFj4NyXsIsuPBRJM68TR4f4Ndu5TrVwILEXmz/+Gzu/Es17sDUM1G96ByHEknJcSb7jY//TKL2OeHISlCAr+jrEdwbzO9yLPDD4pzwbZBhr2SBltlt2I/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773090944; c=relaxed/simple;
-	bh=1SLWt3kNQVmBa0BAC0We3pmsqqPe9pEv9TGD/Shmn/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=osV4iKjOcXgzg6nyoRnuVKAJ/krYIfvVr0aJCuZ2BWJi9VFEdbCx3+D7HTCQMqMvEnGrA14l/k03zVEMlvVOdUnJ+A5weEJGPpULz9i8aGPfjCNbLwz9TOSLjw1tmdFicMfV0+9Ul41zQvNRPocgDYPMYpjdOrcxx3OX02IrAdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m96HXZe9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8740FC4CEF7;
-	Mon,  9 Mar 2026 21:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773090944;
-	bh=1SLWt3kNQVmBa0BAC0We3pmsqqPe9pEv9TGD/Shmn/Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m96HXZe99VZsI9lqK4m4KF2X9XEh+yeQyR+MOiEqx75XEax6b8+Hr+NTOwmNgaqmn
-	 vq9BPMlWhar+u+SsZAHmuDJPjbmr7ZdSwytpGvR+nnZLSI0KcZbVPznFOh1lYas4CB
-	 XSs3Syl23N09gpC4N9WPIn49Yzr63NCLWULeXMSSf3JGOppJehgUwH1K76v8YwjvN+
-	 bGNo/4VSdiXiLNc75RmTtFHKGmVzwzlbRZFpcoV79l9yH15vOp1+7AM8BiGl1Ql77/
-	 iYWzn/T3qgnLG4t/QqdWTEh2BHpbv4Lc1uSzlygh22ys3c44VDuv71i3LK1AlucFzY
-	 C+gdWVwXM/l2g==
-Date: Mon, 9 Mar 2026 14:15:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?UTF-8?B?QmVub8OudA==?= Monin
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Paolo Valerio"
- <pvalerio@redhat.com>, "Alexandre Belloni" <alexandre.belloni@bootlin.com>
-Subject: Re: [PATCH net-next 1/2] net: macb: implement
- ethtool_ops.get|set_channels()
-Message-ID: <20260309141542.5a8403eb@kernel.org>
-In-Reply-To: <DGYEXIY7VNHX.1IUJHFGOJ1B9S@bootlin.com>
-References: <20260305-macb-set-channels-v1-0-28e3a96a3dc3@bootlin.com>
-	<20260305-macb-set-channels-v1-1-28e3a96a3dc3@bootlin.com>
-	<20260306190948.44d23f8f@kernel.org>
-	<DGYEXIY7VNHX.1IUJHFGOJ1B9S@bootlin.com>
+	s=arc-20240116; t=1773092080; c=relaxed/simple;
+	bh=Ok6eF+GftazIxpYrdRG70Q2VyR3xpD0Cdi9/4UF5+l8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tZgmpIUA7VYTDXV3Zi7Rxz0CBO1n29vNFbftfotfMfr0Q9jwPST+rHiy9SZXtNWBu+og0O0hG9Yzbh5NdpSST7QUzXcJCOtroZSXHJMT1fVOEO9zjdlMpqdMSWaTuRBYx7IHcjlNdY9+ws8jHVYV6BiCEFVJosZCb2NIVEWvOGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=qWDNv+x5; arc=none smtp.client-ip=72.215.153.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
+Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id Yjth4GmSgi4SVCY0; Mon, 09 Mar 2026 17:18:35 -0400 (EDT)
+X-Barracuda-Envelope-From: tonyb@cybernetics.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
+X-ASG-Whitelist: Client
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
+	bh=juwwqoR0TQdvhEwmLjJNiRO2kvCT0d1TyAi3AmiRBWo=;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
+	Content-Language:Subject:MIME-Version:Date:Message-ID; b=qWDNv+x5oxQ+jfTee9vw
+	slKh615rjUJI6lzUt6SBZFXwWYnTHpKw0q6CiRSTJAi362LkMciIfahxjUoETZZVJMMasF0K7SYk3
+	rBLzpbPGMADnMztqPd3b/V9UmQd+BrOcRF4iaIxR1CnwORe+jjNDrfXojloG2dCjZw64ZD2lYI=
+Received: from [10.157.2.224] (HELO [192.168.200.1])
+  by cybernetics.com (CommuniGate SPEC SMTP 8.0.5)
+  with ESMTPS id 14451450; Mon, 09 Mar 2026 17:18:35 -0400
+Message-ID: <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
+Date: Mon, 9 Mar 2026 17:18:35 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Long delay in freeing skbs
+Content-Language: en-US
+X-ASG-Orig-Subj: Re: Long delay in freeing skbs
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, eric.dumazet@gmail.com,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>
+References: <20251106202935.1776179-1-edumazet@google.com>
+ <20251106202935.1776179-3-edumazet@google.com>
+ <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
+ <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
+From: Tony Battersby <tonyb@cybernetics.com>
+In-Reply-To: <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: BD2272417FA
+Content-Transfer-Encoding: 8bit
+X-Barracuda-Connect: UNKNOWN[10.10.4.126]
+X-Barracuda-Start-Time: 1773091115
+X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at cybernetics.com
+X-Barracuda-Scan-Msg-Size: 2352
+X-Barracuda-BRTS-Status: 1
+X-ASG-Debug-ID: 1773091115-1cf43940a6bfa00001-BZBGGp
+X-Rspamd-Queue-Id: 3B70C241CFA
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[cybernetics.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[cybernetics.com:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265767-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[cybernetics.com:+];
+	TAGGED_FROM(0.00)[bounces-265777-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tonyb@cybernetics.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cybernetics.com:dkim,cybernetics.com:email,cybernetics.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, 09 Mar 2026 18:04:06 +0100 Th=C3=A9o Lebrun wrote:
-> On Sat Mar 7, 2026 at 4:09 AM CET, Jakub Kicinski wrote:
-> > On Thu, 05 Mar 2026 18:20:14 +0100 Th=C3=A9o Lebrun wrote: =20
-> >> +	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE))
-> >> +		return -EOPNOTSUPP; =20
-> >
-> > Why not set max to 1 in this case? =20
->=20
-> With !QUEUE_DISABLE, we only know how to run with all queues enabled.
-> It doesn't imply that max_num_queues =3D=3D 1.
->=20
-> MACB_CAPS_QUEUE_DISABLE means that the field QUEUE_DISABLE (BIT0) in the
-> per-queue register RBQP disables queue Rx. If we don't have that
-> capability we can have multiple queues (if HW supports it) but we must
-> always run with all enabled.
+On 3/9/26 17:07, Eric Dumazet wrote:
+> On Mon, Mar 9, 2026 at 10:00 PM Tony Battersby <tonyb@cybernetics.com> wrote:
+>> I have some out-of-tree code that was broken by commit e20dfbad8aab
+>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
+>> retested with 7.0-rc3 with the same results.  I'm not sure if the change
+>> in behavior that I am seeing is expected or if it is a bug, so I thought
+>> I would ask.  Omitting irrelevant details, my kernel code does the
+>> following:
+>>
+>> 1) allocate a buffer
+>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
+>> 3) wait for the I/O to complete
+>> 4) wait for the buffer page refcounts to drop back to their values for
+>> idle I/O
+>> 5) reuse the buffer for more I/O
+>>
+>> Step 4 is necessary in this case due to some of those irrelevant details
+>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
+>> seems to keep the page refcounts elevated long after the I/O has
+>> completed (hours or longer), presumably because the deferred skb free
+>> isn't happening for a long time.  So:
+>>
+>> 1) Is this long delay expected, or is this a bug?
+>>
+>> 2) If the delay is expected, is there a way for me to force the network
+>> system to process the deferred skb frees on request?  e.g. write to a
+>> file in /sys, or call a kernel function to flush the deferred frees?
+>>
+>> Worst case is that I can redesign my code to kfree() the buffer if it is
+>> busy and allocate a new one, and let the old buffer be freed
+>> asynchronously when the skb is freed at some indeterminate time in the
+>> future.
+>>
+>> Thanks,
+>> Tony Battersby
+>
+> If you are using zero copy, please look at:
+>
+> Maybe you should make sure your code is compatible with it.
+>
+> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Mon Feb 16 19:36:53 2026 +0000
+>
+>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
+>
+>     After the blamed commit, TCP tx zero copy notifications could be
+>     arbitrarily delayed and cause regressions in applications waiting
+>     for them.
+>
+The I/O is being sent by a userspace program via the SCSI generic driver
+(drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't see
+any mention of zero copy in iscsi_tcp.c.
 
-Oh, I see! Perhaps just a comment over the check to inform the reader
-that the lack of capabilities means all rx queues must be enabled.
+Tony
 
-> >> +	if (running) {
-> >> +		ret =3D macb_open(bp->dev);
-> >> +		if (ret) {
-> >> +			bp->num_queues =3D old_count;
-> >> +			netif_set_real_num_queues(bp->dev, old_count, old_count);
-> >> +			macb_open(bp->dev); =20
-> >
-> > both macb_open() calls may fail under memory pressure
-> > For new functionality we ask drivers to allocate all necessary
-> > resources upfront then just swap them in and reconfigure HW =20
->=20
-> The main reason we want to set queue count is memory savings. If we take
-> the Mobileye EyeQ5 SoC, it has a small 32MiB RAM alias usable for DMA.
-> If we waste it on networking we have less available for the remaining
-> peripherals. Is there some way we could avoid upfront allocations?
-
-We've been asking everyone to follow the "pre-allocate resources
-paradigm" for a few years now. It has huge benefits for system
-reliability. If you don't want to complicate code at this stage
-you can support configuring queue count only when the device is down.
-But the ask will keep coming back, any time you try to do the close+open
 
