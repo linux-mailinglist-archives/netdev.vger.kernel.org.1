@@ -1,214 +1,186 @@
-Return-Path: <netdev+bounces-265557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDwDG2jPrmnEIwIAu9opvQ
-	(envelope-from <netdev+bounces-265557-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:47:20 +0100
+	id KKyMEiXRrmlhJAIAu9opvQ
+	(envelope-from <netdev+bounces-265558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7411F239F64
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:47:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F0623A1F2
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 05995301221D
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:46:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B72623003EED
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9488E3CE49E;
-	Mon,  9 Mar 2026 13:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8AA7FBAC;
+	Mon,  9 Mar 2026 13:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVr69GD8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y965fEoh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CF73B8BA2;
-	Mon,  9 Mar 2026 13:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773064006; cv=none; b=hbOb0e2ZFhyy7OHmfLEhF6WAD/0Vf/BHg2CfDvebegzzntr/g5oidbCYbJj5lpq4cYfse/+5gMFzLKbKwUAEenVJrj0hfrqHDczg7G6y8eGNunclGWZr4lQjANfdWiSrPcJmsMCRGdSsakj3jwiZe09BkanfNWTqJbIJWpFmz/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773064006; c=relaxed/simple;
-	bh=w0QUYZum+m+R/ZMJD9ICvWbnwxxvrz4NQJRGvdgYc+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OS94GinChKh1M1pwP5cNfLlXU6oLtX0Jd1ZQ+G2iSmNSnKEjsV6h5A67C8e/vg87ZktdfN8BAGWxArASYOu0bPaTWmID97jvWFXvX9drsXeobc5kkWjUIZDi7xDOZe2lDt0lEFgbKZ8TGnf6sA3B2nW/DkXb5QBpI9ju3zJA93s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVr69GD8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FF8FC4CEF7;
-	Mon,  9 Mar 2026 13:46:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773064005;
-	bh=w0QUYZum+m+R/ZMJD9ICvWbnwxxvrz4NQJRGvdgYc+w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BVr69GD85TMcTAfG+a8utDGbnLRZpnfsgk6oAEieKIf3SbpafBvF3+irOxH5364Mf
-	 5pQjiP3OB9FC6sxDF6sRahqD3JxDLeM/LKZhytQKKexcd9nKBgdJPKEyw8sk8hmBqZ
-	 6Umeng6LJPjNhP9ijAtZ1GLP3fQirKriMZIBcjz1MV/Ly4Ym8+L+fbakf0sGYzf2HZ
-	 3zIBqoZorFxzO8i8L6kszr5AnLvTpWYNSPn5PmXLkOowtVs0WINaH4TFDGQhbj2jWW
-	 Xu+fRiMPtxXfm3CsyrGqKEUJHR4HPp+HrebcbqvJ0J7zXXW7tbIaDGtBQ28EmTK0dV
-	 febooG99fQKig==
-Date: Mon, 9 Mar 2026 13:46:27 +0000
-From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Dimitri Sivanich <dimitri.sivanich@hpe.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 11/16] mm/memory: inline unmap_page_range() into
- __zap_vma_range()
-Message-ID: <737a88b8-8221-44e6-aa90-3be326bc8612@lucifer.local>
-References: <20260227200848.114019-1-david@kernel.org>
- <20260227200848.114019-12-david@kernel.org>
- <a5765cac-69d6-4314-82d5-80ee363906de@lucifer.local>
- <bc5cfcc4-5e51-4da1-9ce9-ea0831bec400@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72E43BED05
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 13:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773064160; cv=pass; b=S8UczVV1zh6BjVq4bcaefQ5qX8Amab87rAT7tqqA2AelZUia7hp3INc/I2wFHubHr9ADcgpJoPYR3gYN1HuHbcevm3tZNOGnhJ1A3PiNjtTgcLWdCHqgt5kZiAiUv0Lfq07T4rzwg4gGainWP8o1Zvaonw2kSPW5VRU2aRa2r/4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773064160; c=relaxed/simple;
+	bh=qmJ8yWcyKlJWNdkyNrEUCLckeECFCLJMFol+0LQbLyE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pim9KPnY8e4G6VloxzPzBDrBo1HzMCLUb0fWjFsFsah6ZfCBE2gMqijnyHWl3dZRe3QgvU3Rdt01ue62FVHkYj4wMYES2acCAQTMZ49l/6yvKGXLUK2mke2pcmR45CUxoQ1KVOHU1ex413HEqPkFAglsovWC/4+XukpopFdukKM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y965fEoh; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-509006c070eso20763781cf.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 06:49:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773064156; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X4mipkNCA7CPN7dvo8ar3Dj3ggIJl+VKa536x/eJrOU/S0KXoZ3tcgE2+NWiCmwFbV
+         MBsi+ADBxCw6WEWzRXJvOAsZlfck16dErBkKxqPx8YH8L4ExWsac5wqboXLRW/go7UUD
+         e2WonPa7f8MvLEuSwPnPQ3dHncf1ssnAviQz8iETTOorG8IVvY4eqJeFgw5ak2+W2yVP
+         6fO6q24UuH8rU7M1m4Auc1mF3CTNU2I7KSDZTYC+StEbvKYDar7cusC+BgscVELkrGoz
+         wrxLzVt6r0CufBrN/rhvfBUxvkvHNRUlzI5o+VHljYhBAhbq/TmnnYHPTUm+P8MumT+r
+         0k6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
+        fh=w4FjuWbVD7fChl2ClScQaAusCUH1Jd1VuT05ZPR+B+s=;
+        b=BqfyTLAprc1A0CzWtL9OWGJqBZFnrwvjoyWz8cE8iKzOh3qe4wKObpuVN8XvTqmtGh
+         jcHfCnYzv5SkxsmDxDS1eEFee++Q/lj7ChDmqJiFP9UI1KcV5EvGMqf/4z+gwmaapFPf
+         tiCdavfjxYZ9Yh6mvpMHf9W4McwXAMegd6A71noOjhlSDeYhMdpPCP33oxMTwRwlz26L
+         Az5OBTEqTUyfw9p3J+FYb2WoQ/OfiHbJBF+9ME0Y3FA5k0Dguy3NQaJAcel2U4thjSZU
+         vcQ+JriCKGjQL+R5UfgYBH7thtimTquBCDCAFbAdQ+cacvmawK0hhO+CbShVQc3SzVwE
+         1V8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773064156; x=1773668956; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
+        b=y965fEohyXvZDmWKZBiGdurYN9Sf9n8Uzs4YtqeWfcsKzpv91TEL1MgZGflQbWqfqH
+         aFSLA9L6VQ8HJ5+qACkCrcR5zTBWSM0y3jK3cLR2z8Wiu5pBI9MFjOqAbFlBkyNow9NJ
+         PSvE27AdEMd+seR9lYMA8HclO37NzkTLfm8NKrMX2ODb47qno+5uMb3t9Bdqdk7ihmWz
+         BFyo20PMTrScKY0ixGSIuvoro2iM1v+QWxFisqhH1ULHprIMmEKvScILTEWi5PyvT5fl
+         0gMYsa+3aeREuf3Vnvx/7zyYBWyQoCTV4UEu4jENLc4G7LC3dky3uwcYdcJXdwpWwqEh
+         df+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773064156; x=1773668956;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
+        b=E2KPy2Lw2qZqWVFDAge0m41VYiR/ru81tvzX1snZXyxh0pob5MeScHiw4F9eRJPz5Y
+         qQnZRsXwb/tzLXFRZT297zl2STSpRCcZgEbzOVjiuFt7tQn0q0K748FAbdpTzN+1n4Bs
+         mfxihp/DYUkrv7crLVGQK5ORhwHNq8rfkYEGzFcXhUQWwqn9wp4jo+0C/sYDMoafF4J0
+         MiO9VtoRi39WDZp7M6XtZxPaE2mfNs6ZoyjTIdYUuIDOh7zbdj2kTEEoVHMNnssqaUyX
+         MwxK/fxKcbWRmGmtpMREz8I1+eLQrfor1+u5cKx25xsimF2OXBHESAiSk0YdQb42Z877
+         2YoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVouZmKhzFqzoIjAXEoi0gJI1omyLt27T/0cT7Y2SwHcQs+T0uwInkJgO+hTpJuw3PGLM6dHGw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwe9KwoW1Zu8kuS9NbaQG58+FYrfsTvchiVZfTwLDwEhoevtAH
+	xH8Cr6p9IJVkwDvF5TovxhoQhottxx9fUcS2V1rPZLzWXqxpVDOvTHBagPaSbicXATrAODsaOo4
+	qdoP8/chsF47+SPCCIj72LG9QXMtaLVluf/rEjelE
+X-Gm-Gg: ATEYQzzm8DX/aeq4BvY/CLE7oeyY5J0Cgxbl/5sgz7EaDrDYAoUZ8eXR1RM8xz5v//w
+	VeKVyh5/aQmS5aNQn3Tmvv/Qt0fgEkonKuIed6HyjHkKNE0RfFjkDPrBceCuzEYb4h/a00CYIwK
+	KdWPHUbaOl/1YjjiCBYkLi1rrsoYxmK+npB+EIrq8Kmtsv6lxDz/afuaeshL7CzIXHRZaqY8OM9
+	KY+UeRPdl/c1AV/xRDOfnL60lBIxRAf32Fin1AfRphggxs4/xuGmmFRKsZRfFi/DiGau+VAel9y
+	gn9vdPI=
+X-Received: by 2002:ac8:7dc5:0:b0:509:1c90:e188 with SMTP id
+ d75a77b69052e-5091c90eb70mr31419001cf.57.1773064155692; Mon, 09 Mar 2026
+ 06:49:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc5cfcc4-5e51-4da1-9ce9-ea0831bec400@kernel.org>
-X-Rspamd-Queue-Id: 7411F239F64
+References: <20260309122055.1226507-1-edumazet@google.com> <20260309134355.GC606826@noisy.programming.kicks-ass.net>
+In-Reply-To: <20260309134355.GC606826@noisy.programming.kicks-ass.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 9 Mar 2026 14:49:04 +0100
+X-Gm-Features: AaiRm532DRiWlNXZEZMQzOHPOvkptGPx7jSZp6vcrfT7r-L3EFUNGs6O935Oxkw
+Message-ID: <CANn89iKmqhKH6pUkRiSG3u6gtpDaPBTVj739dgf3dh8uZHX3HA@mail.gmail.com>
+Subject: Re: [PATCH] locking/local_lock: Reduce local_[un]lock_nested_bh() overhead
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Marco Elver <elver@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A7F0623A1F2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-265557-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,gmail.com,kernel.org,redhat.com,google.com];
+	TAGGED_FROM(0.00)[bounces-265558-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[74];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.963];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lucifer.local:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,infradead.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026 at 02:16:26PM +0100, David Hildenbrand (Arm) wrote:
-> On 3/6/26 13:29, Lorenzo Stoakes (Oracle) wrote:
-> > On Fri, Feb 27, 2026 at 09:08:42PM +0100, David Hildenbrand (Arm) wrote:
-> >> Let's inline it into the single caller to reduce the number of confusing
-> >> unmap/zap helpers.
-> >>
-> >> Get rid of the unnecessary BUG_ON().
-> >>
-> >> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+On Mon, Mar 9, 2026 at 2:44=E2=80=AFPM Peter Zijlstra <peterz@infradead.org=
+> wrote:
+>
+> On Mon, Mar 09, 2026 at 12:20:55PM +0000, Eric Dumazet wrote:
+>
+> > diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
+> > index b8830148a8591c17c22e36470fbc13ff5c354955..40c2da54a0b720265be7b63=
+27e0922a49befd8fc 100644
+> > --- a/include/linux/local_lock.h
+> > +++ b/include/linux/local_lock.h
+> > @@ -94,12 +94,19 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_=
+t __percpu,
+> >                   local_unlock_irqrestore(_T->lock, _T->flags),
+> >                   unsigned long flags)
 > >
-> > Small nits below, but overall LGTM so:
+> > +#if defined(WARN_CONTEXT_ANALYSIS) || defined(CONFIG_PREEMPT_RT) || \
+> > +    defined(CONFIG_DEBUG_LOCK_ALLOC)
+> >  #define local_lock_nested_bh(_lock)                          \
+> >       __local_lock_nested_bh(__this_cpu_local_lock(_lock))
 > >
-> > Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
+> >  #define local_unlock_nested_bh(_lock)                                \
+> >       __local_unlock_nested_bh(__this_cpu_local_lock(_lock))
 > >
-> >> ---
-> >>  mm/memory.c | 32 ++++++++++++--------------------
-> >>  1 file changed, 12 insertions(+), 20 deletions(-)
-> >>
-> >> diff --git a/mm/memory.c b/mm/memory.c
-> >> index 394b2e931974..1c0bcdfc73b7 100644
-> >> --- a/mm/memory.c
-> >> +++ b/mm/memory.c
-> >> @@ -2056,25 +2056,6 @@ static inline unsigned long zap_p4d_range(struct mmu_gather *tlb,
-> >>  	return addr;
-> >>  }
-> >>
-> >> -static void unmap_page_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
-> >> -		unsigned long addr, unsigned long end,
-> >> -		struct zap_details *details)
-> >> -{
-> >> -	pgd_t *pgd;
-> >> -	unsigned long next;
-> >> -
-> >> -	BUG_ON(addr >= end);
-> >> -	tlb_start_vma(tlb, vma);
-> >> -	pgd = pgd_offset(vma->vm_mm, addr);
-> >> -	do {
-> >> -		next = pgd_addr_end(addr, end);
-> >> -		if (pgd_none_or_clear_bad(pgd))
-> >> -			continue;
-> >> -		next = zap_p4d_range(tlb, vma, pgd, addr, next, details);
-> >> -	} while (pgd++, addr = next, addr != end);
-> >> -	tlb_end_vma(tlb, vma);
-> >> -}
-> >> -
-> >>  static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
-> >>  		unsigned long start, unsigned long end,
-> >>  		struct zap_details *details)
-> >> @@ -2100,7 +2081,18 @@ static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
-> >>  			return;
-> >>  		__unmap_hugepage_range(tlb, vma, start, end, NULL, zap_flags);
-> >>  	} else {
-> >> -		unmap_page_range(tlb, vma, start, end, details);
-> >> +		unsigned long next, cur = start;
-> >
-> > VERY nitty, but generally current is abbreviated to curr not cur.
-> >
+> > +#else
+> > +static inline void local_lock_nested_bh(local_lock_t *_lock) {}
+> > +static inline void local_unlock_nested_bh(local_lock_t *__lock) {}
+> > +#endif
 >
-> The following might not be fully expressive (but simple to grep):
+> This isn't going to work; WARN_CONTEXT_ANALYSIS is unconditional on
+> clang >=3D 22.1
 >
-> $ git grep "cur_" | wc -l
-> 24261
-> $ git grep "curr_" | wc -l
-> 9288
+> How come that this isn't DCEd properly?
 
-Lol hmm...
+BTW I wonder if the following WARN_CONTEXT_ANALYSIS should be
+CONFIG_WARN_CONTEXT_ANALYSIS
 
->
-> Tells me that "cur" is rather common.
->
-> > It's not a big deal, but why not addr?
->
-> Good question, I can just do that. :)
-
-Thanks!
-
->
-> --
-> Cheers,
->
-> David
-
-Cheers, Lorenzo
+include/linux/local_lock_internal.h:318:#if defined(WARN_CONTEXT_ANALYSIS)
+include/linux/local_lock_internal.h:337:#else  /* WARN_CONTEXT_ANALYSIS */
+include/linux/local_lock_internal.h:339:#endif /* WARN_CONTEXT_ANALYSIS */
 
