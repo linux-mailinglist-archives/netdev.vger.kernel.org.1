@@ -1,228 +1,195 @@
-Return-Path: <netdev+bounces-265495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGJUO/qvrmkSHwIAu9opvQ
-	(envelope-from <netdev+bounces-265495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:33:14 +0100
+	id cGTRHWixrmkSHwIAu9opvQ
+	(envelope-from <netdev+bounces-265496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:39:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD881237F80
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:33:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A40C238044
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D63D03004607
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:33:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 140563009F1D
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220AE3921DE;
-	Mon,  9 Mar 2026 11:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD3A395244;
+	Mon,  9 Mar 2026 11:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A8ZBQm4Y"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="ReNa8CA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC2D348895;
-	Mon,  9 Mar 2026 11:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0642E3859CC;
+	Mon,  9 Mar 2026 11:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773055988; cv=none; b=uSAf8xIf9H3arQ8ohHXPieHs+aMTmppRz6EDHnR+I+Nko1SJ9hG5jLF4AhOg1aGf/wgRHseCDr+0FcbeexSZZrLg+qZS/sjVzJVyC0RMExzM/mpd5/Pq3+H6Hh9LO+mjbswiU/CzBM6jxdTxWiHIwFTHH46hizPOVKDA7R2RyI4=
+	t=1773056354; cv=none; b=r04nELrZHJCjsU95pgVeGiVykycPO5oWTI72dQBZqziU0mh5+ogoTvwznUOhZFmV1j0u1HQBn5n6t9Zgo7dE8r7fGbj0Nh+QysHDwtiVhRywWyGe66aKgHVYrFX+rc6nUL5tTE08GrITlYfHC6A9RsSupLnyvi9Yvk/9jY7w/64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773055988; c=relaxed/simple;
-	bh=AKCAbuLRzj7y6b1d0tDPtiMEd5ifxgA2YFBIgU0E/sc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Tl+mZOKr3SmuIbox/Rwucdd5APHB9xckWv4KIYIF0MYadyQgcDwLrd/DSNCNSHzZNtTzzlsrCqa+cWQk8+RVW96T6rkWDxNlQZzUA2oU73H3q8K5H6INZhbLGPWiyhr0wdQgVrZgkmR7s4O9vi9g57BAns41mYtqdf+v2oZvNeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A8ZBQm4Y; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=AKCAbuLRzj7y6b1d0tDPtiMEd5ifxgA2YFBIgU0E/sc=; b=A8ZBQm4YtOrAWDy3uWqgBFPFZz
-	1SyTQH9xXR0mwlyS73T2bY0A56Hpf26in3z6Aq3xAEwSW1eYYqianmjAoIBqEXgbLCd9Li7HxZ2KI
-	Uvxi+7jT6qEeggq1eZprn9lQX54Gln9jJ+DWHZDgudF01+/trqiF9kiFcwdbEbUBfRA35b/f9nqm8
-	XvtcFIuBIZBcuu5NWdHs4irLta/OdkVZu7waBgXcNEZi17Exb2B+3pgm9CV6m3NXjjaHTUUDPlMod
-	/sEZPEpp/YOdtB9IO2JyGoaML/+XkzSHHMjzG6z/+x6dO+IGr/CoNaHLr0kxDrEK2rvv0ndXosocm
-	5YgpZAlQ==;
-Received: from [195.11.108.100] (helo=freeip.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vzYr7-0000000C0Bh-2w3n;
-	Mon, 09 Mar 2026 11:33:01 +0000
-Message-ID: <a19eee737d210b1ccf2201099170f0e84147b6c0.camel@infradead.org>
-Subject: Re: [PATCH 00/10 net-next] Convert CONFIG_IPV6 to built-in and
- remove stubs
-From: David Woodhouse <dwmw2@infradead.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Fernando Fernandez Mancera
-	 <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org
-Date: Mon, 09 Mar 2026 11:33:00 +0000
-In-Reply-To: <48ccec3f-dbc8-45c8-afda-e4f7e8f150d6@kernel.org>
-References: <20260309022013.5199-1-fmancera@suse.de>
-	 <48ccec3f-dbc8-45c8-afda-e4f7e8f150d6@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-EToEoS2i5RW6iMmy/3ZM"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1773056354; c=relaxed/simple;
+	bh=5wcvCYm4HHzLJw2WvxFlYjuoO1klr3Nn61CGh1huo1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Goyiz6VQK40zbK3ZFV7M3AfupZTUWx8mYsYsQof/1FuloZjNrNwPS1y/eB53LWEwUj7rjDW+6hMPkb222u2FZDQyaLhyNs8mRYTUXXuWlhB5h42pTdzmBGNqJKY6T1v6bO+YBwLV0cZgklrYjQhT8pztczlLhlHYhZY0Le244ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=ReNa8CA9; arc=none smtp.client-ip=1.95.21.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=QDbKOGxN4PHx6EtTLUjCVghLu0chB+6hYRk0Dgw70a4=;
+	b=ReNa8CA9Dyp39tOul0dfqS43vql9OB0zurpitLuBZxebO8nlL85/1fWqcRJ5nE
+	S/wlDABtWT3zTPjerccbf81L7KscRiPRXRuHDnIc5rg86gY0XNaKYH8D4E36SeuM
+	BGLaSxwUUKk817t7tfEH8MBVxCsmQL8YKG0MDbJ4HC5E0=
+Received: from [7.247.167.131] (unknown [])
+	by gzsmtp1 (Coremail) with UTF8SMTPA id Mc8vCgD3_7SWsK5pgQ5iAg--.2659S2;
+	Mon, 09 Mar 2026 19:35:51 +0800 (CST)
+Message-ID: <4b8a6182-da50-4edb-a34a-b75ed784f1e2@yeah.net>
+Date: Mon, 9 Mar 2026 19:35:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Rspamd-Queue-Id: BD881237F80
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE
+ is cleared and napi_tx is false
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, netdev@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20260307035110.7121-1-xietangxin@yeah.net>
+ <CACGkMEtBS3M6P9xFM-kfPHyjwHgvCrfHM5H1242AQPi54ETqEw@mail.gmail.com>
+From: xietangxin <xietangxin@yeah.net>
+In-Reply-To: <CACGkMEtBS3M6P9xFM-kfPHyjwHgvCrfHM5H1242AQPi54ETqEw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Mc8vCgD3_7SWsK5pgQ5iAg--.2659S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXw4rXFy8Zw4DGryxJFWkJFb_yoW5uFy5pr
+	4rKayYqF4kJ3yxAFsaqw4kGryjvan5Jr43Grs5Wr13C3s8uFy5Jr4I9rWUua98uFs5Z342
+	qw4Fgry2gryqyFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jOKsUUUUUU=
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiNhdXi2musJew3gAA3z
+X-Rspamd-Queue-Id: 6A40C238044
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265495-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	HAS_ATTACHMENT(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-265496-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[yeah.net];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.965];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yeah.net:+];
+	NEURAL_HAM(-0.00)[-0.938];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,infradead.org:dkim,infradead.org:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,yeah.net:dkim,yeah.net:email,yeah.net:mid]
 X-Rspamd-Action: no action
 
 
---=-EToEoS2i5RW6iMmy/3ZM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2026-03-09 at 11:22 +0100, Krzysztof Kozlowski wrote:
-> On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
-> > Historically, the Linux kernel has supported compiling the IPv6 stack a=
-s
-> > a loadable module. While this made sense in the early days of IPv6
-> > adoption, modern deployments and distributions overwhelmingly either
-> > build IPv6 directly into the kernel (CONFIG_IPV6=3Dy) or disable it
-> > entirely (CONFIG_IPV6=3Dn). The modular IPv6 use-case provides little t=
-o
-> > no practical benefit today.
->=20
-> It does. We all use generic kernels, thus it is one configuration for
-> all boards and some setups have IPv6 and some not. The ones without IPv6
-> just don't use that module.
->=20
-> Also, with these generic kernels (so again all machines are using same
-> ones, e.g. distro) users can easily blacklist the module.
+On 3/9/2026 11:42 AM, Jason Wang wrote:
+> On Sat, Mar 7, 2026 at 11:53 AM xietangxin <xietangxin@yeah.net> wrote:
+>>
+>> A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
+>> and the device's IFF_XMIT_DST_RELEASE flag is cleared
+>> (e.g., during the configuration of tc route filter rules).
+>>
+>> When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
+>> expects the driver to hold the reference to skb->dst until the packet
+>> is fully transmitted and freed. In virtio_net with napi_tx=N,
+>> skbs may remain in the virtio transmit ring for an extended period.
+>>
+>> If the network namespace is destroyed while these skbs are still pending,
+>> the corresponding dst_ops structure has freed. When a subsequent packet
+>> is transmitted, free_old_xmit() is triggered to clean up old skbs.
+>> It then calls dst_release() on the skb associated with the stale dst_entry.
+>> Since the dst_ops (referenced by the dst_entry) has already been freed,
+>> a UAF kernel paging request occurs.
+>>
+>> fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
+>> the dst reference before the skb is queued in virtio_net.
+>>
+>> Call Trace:
+>>  Unable to handle kernel paging request at virtual address ffff80007e150000
+>>  CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc1+ #6 PREEMPT
+>>   ...
+>>   percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
+>>   dst_release+0xe0/0x110  net/core/dst.c:177
+>>   skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
+>>   sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
+>>   dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
+>>   napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
+>>   __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_net]
+>>   free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
+>>   start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
+>>   ...
+>>
+>> Reproduction Steps:
+>> NETDEV="enp3s0"
+>>
+>> config_qdisc_route_filter() {
+>>     tc qdisc del dev $NETDEV root
+>>     tc qdisc add dev $NETDEV root handle 1: prio
+>>     tc filter add dev $NETDEV parent 1:0 protocol ip prio 100 route to 100 flowid 1:1
+>>     ip route add 192.168.1.100/32 dev $NETDEV realm 100
+>> }
+>>
+>> test_ns() {
+>>     ip netns add testns
+>>     ip link set $NETDEV netns testns
+>>     ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
+>>     ip netns exec testns ping -c 1 10.0.32.1
+>>     ip netns del testns
+>> }
+>>
+>> config_qdisc_route_filter
+>>
+>> test_ns
+>> sleep 2
+>> test_ns
+>>
+>> Signed-off-by: xietangxin <xietangxin@yeah.net>
+>> ---
+> 
+> This is needed for stable I think.
+> 
+> And do we need to fix tun_net_xmit() as well?
+> 
+> Thanks
+Hi Jason,
 
-Perhaps it's time for CONFIG_LEGACY_IP to be buildable as a module
-instead, in preparation for its deprecation?
+I have analyzed the tun driver and concluded that it don't suffer from this UAF issue.
 
---=-EToEoS2i5RW6iMmy/3ZM
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The netns containing a tun interface cannot be destroyed until all processes
+holding the tun file descriptor have exited. When the file descriptor is closed,
+tun_chr_close() is called, which immediately free all skbs in the tx_ring.
+This happens before cleanup_net() destroys the dst_ops. Therefore, no skbs referencing freeed dst_ops.
+Unlike virtio_net, where skbs can remain in the TX queue even if the ns is deleted.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDMwOTExMzMw
-MFowLwYJKoZIhvcNAQkEMSIEIHvrXKFsCu74MeRjQNiB4uhzcVoopl8zIoVkqGfL+fqcMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAptW0cUFj1xRP
-T5HlU7oE/y0NnVTGAa64UT4ZfBuS4tSVck1daj/uTgQug0sufMDU8XsqS9mFG52UDD6JJDiSo0sR
-qfKULGVOjTXYhQ/l5K7HUQh/+X2YvvxBLMyuAQU8+B6afszUOuEaTWlA1ersVOi72RE0aIaKsCm8
-+cpfOjJ2iHSR6Aavkt2yvVw0a0/Ek5tBPtv2c0EhfKXT+C++o4KU8z8nMKPIKgSEN/SxhXRAoKRB
-5UoKeKvNrwyUUydI8YLXLPjMw1/PR6pZFDG0Nggdz5LVEV4JlAfNHtBesPLPYv7ekwJZtoGCV8Vv
-F8m4rU+XalmgqdiRqlAdm49PT9pfGMgHof7JXAT5fQLZPCOagIwliH5wOkGHJrIgMWDJAQM+18Oi
-Sr4DluQZGJZASVMw0gwc9skpCejVBaSlfJlgu5Tg7+QhnHZ9R+MkwzF7c02g7Ibd7VEkCDZMAYIg
-og7GYLKCdHu8EMB+jCMLFv2LpqiJUCwL8cYTR5gBiVI6YaPxrp/CBLKSu5p8NkIQL1bMC/iujmEb
-YwOtvHASvVEQCnxJuW5RD4fTbzTPf9vtffwuUX8WVIIIR5NsD5dNL6uiQjQ4l8plnsGLzphU6nmj
-uYqttPVivfKWnYHujphKAqau9hUhidDBtRtdhEbsaVdBPSLoS6UmmbUvU7sb2bEAAAAAAAA=
+I believe the fix is only necessary for virtio_net. What do you think?
 
+Best regards,
 
---=-EToEoS2i5RW6iMmy/3ZM--
+Tangxin Xie
+
 
