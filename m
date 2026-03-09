@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-265656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OM1kBA//rmkLLgIAu9opvQ
-	(envelope-from <netdev+bounces-265656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:10:39 +0100
+	id 0JHVLH3/rmkLLgIAu9opvQ
+	(envelope-from <netdev+bounces-265658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:12:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC4D23D69F
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:10:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B9723D70B
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4EEE312E508
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 17:04:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E69AD307B650
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 17:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF612D0610;
-	Mon,  9 Mar 2026 17:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15BC3B895D;
+	Mon,  9 Mar 2026 17:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="inLTl2t0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVuu04LI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6D32BEFF5
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 17:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2DD2C0268
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 17:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773075855; cv=none; b=LM1uv12BYgxokg4gAQxycsVpHDY6XO2nMI8laFc9yqVvYcGc22X4YRbr7ohAqayXDSob+63sqpEErJtm4rsimJvnkvB28l7MXEz374h0inNEg9jZf/zVqEQfodhQCUvDZSJbYu+/2dujOSGwcDd8uAtZA2rflgSG0iSDm1QrSmI=
+	t=1773075892; cv=none; b=ZFbWPsgV5FWbYt81qe0tpWPfHd+Hq2I5gS08e8Va2gyh9uBM8hBPCO6M1DFPR5IdaLS1bFkIAMy5cDE2GedGzUIhK9LPtyF7O3pu5fn3WcZkTQy5jYtiuU2jOPtWOGJM5Px4bHpxf3/HPUbUPGbuGCebb1IpEQ/k7HheaLWXgJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773075855; c=relaxed/simple;
-	bh=IalBsRFpE5x5/xFaVHrbb4x+6gUF1qCnEMvJ6Qfnoas=;
+	s=arc-20240116; t=1773075892; c=relaxed/simple;
+	bh=/dIZrM5IUttYsSyyQTMorm0yElUCp9TuGSDmE5kDcdU=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uwBzFd0Pieh1k7af7T+HW+AhuEu5oslp9ejjivAJm6lv+yYZi8ztsl9vP6UJaBWnF++NBvyj8PnHDaAwMH+gkAX5rc6UCV4vJCwODXVWajGrLn5jqermhhpsegdN2IXAxpJHWmPawqq70gckvTrODghXCtw5Njfc4VMioCoZCho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=inLTl2t0; arc=none smtp.client-ip=209.85.221.53
+	 In-Reply-To:Content-Type; b=H/ENlYVpsx+2iP+XG6OAvBWIyBPmbIafwyAYXsffUnaied2Ms9bx6Mq/fgLDyOLrbj+mPPjbyi0jSeHAVsEOuDlUduyAKaMbYQQJzrnkuVqunSwNMo9EpQd2vtlL+dEPuNJx0lDtX1NsOU0PPe0OY1DkNHw1uKqScT1qYTgGH1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KVuu04LI; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-439b9b190easo5661143f8f.2
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 10:04:11 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48534b59cf3so12693965e9.2
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 10:04:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773075850; x=1773680650; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773075888; x=1773680688; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=pR5q5r3Mes7TJAyUzECgg8kfuz01nC9/URwKM/qNQHw=;
-        b=inLTl2t0adVHlFsNLFOyYc6KwwSqajwuQr5apUbnnM9ZpgpjSXeSpDUF2+7CC2KBsO
-         Q0mKWCcFWlNPyALGIfoCm15bMgrliDvbqH3ZlJRbquSinVlPiRn6O9wEuwm/fF2wz/3i
-         5rXZTJkBy6fFXQensOsSDqx/yhrlG7kaFI5kFcw57dPcBudTD/guE/4vw7weMjKLD2SS
-         cn1uregf8biES+SB2Y2/GZZVPU4oKrtHDOvc9Z+BJbIeSqv1E7lr2nW1sXShkM6IhWVK
-         ux5KOu3gBPIoPtJ72bwXr2sMNYOiKaDEvjD0Wts27QEfCq6XnkbUJKqxx7V5wOiUK9Mb
-         PtZA==
+        bh=EjqtMmTP6qLcmK14ISsOFqL48TISXYv0ejZVuQlmDiE=;
+        b=KVuu04LIzBcrXS8Qv2YGmaAZKHlNy/Pw/EBzYhuFrf43rd0oesqY0zbpHtY6OERqqG
+         HWr8R15kFzUjuaYfq+mhKk4ULaisDyx/xn/GyC7f+Fc8vhWJOK/brMzRJ9z+0bVYaKsb
+         LchZaUJHepnJZVTKnD9lxawN3EKEQHQ36tizAvHkx5sfYX3b8sKnjW8MqH92Wk4TuEiq
+         Fk7UoHw0TW9NChdRNnVEs5/X2Q/P2dnD4gso3iiFJt6QWghaPWU/SYvjxU7ywKCwyWr0
+         ge6CutE7K1zS4kyiIYOaNnBs4Fbqi+5/S+zMNSiYjEkE5DSDcfTgBDHMyzwryt49mcME
+         KMDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773075850; x=1773680650;
+        d=1e100.net; s=20230601; t=1773075888; x=1773680688;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pR5q5r3Mes7TJAyUzECgg8kfuz01nC9/URwKM/qNQHw=;
-        b=l2OcdboPGnp78cja+2ZvyMN/i5BXaCRkP+qCd+m9yLBmy4WQAHTKIfdQQ2dD558CSM
-         w67LPbumWQDBUaSq3LRBjVxZJKPK4ATzWipzxMSKywkadftP5B+hXHUF5/Xj4ZpFx44S
-         gDZrGcza9j5HDwGaw4NZY0qlCIMRfrtghkMTt8adF6JTG/WpNyBRRp2tAAjdr8N2pvvn
-         KxWZFAsyJ+GOfpivmohGHzxpD2GGRfPUio2AeDSh3u2w+BajlQPQcH6udD6w6w4h2oGa
-         Wq/Xy0atYL4LZ5NcnFt20RSukDJ5TwL4sx8qD/Xe4cQ5fX57OVeNOhmhenYI58bAkTni
-         xbbA==
-X-Gm-Message-State: AOJu0Yw+D07P9whRSaPqh0h4fvvP+Ph7eSfxKess2nKmhZwcGALWXbt5
-	8A0XHgMfk7paBsNPa4etGG5c6/ONKPpSddBKQoDo0VA/1FiMhTjprphK
-X-Gm-Gg: ATEYQzxDKUXRuUZRR7vdMpzJK6m+wzXAmQd1Fzssik4suufYoZ3EDMpa3IDnyPXHkNy
-	WNBqsrePKEb8GG1hNVZef5cNEMd6AJBDvTIXip/zSQFvGzBrGDVXM/vYgWYfo1rYE1g5lU0VePz
-	bJBfxWCzSIs5fKwSEPwhO+6X3M2/pQZYCERIdHj3RXn4uEpnf9FZPllQbKuIAJ9+zbcZO6PHiHK
-	bTmGOys2B0rVK5JuOpF4tQzUE1sF5ZwbC9Ms7b79CShvXDqchBNxLDafQyeN6zxOVJeNJqMNRBU
-	EfxqCZS9bXvbp378z2ez1NKrNnKDhzLAAz/HwRSqRXpvLZZCSprZxyoKw5qlR1nW5LnN6vgNA8d
-	Xf29tbqLdHTsmLnIEieWBC5llaMG4MPV9XJOIJ8pS7RBdCKccew9pFQHNtGa5g3cNcSaCDlSt+5
-	0yWRJuTbsU2pBNsetJF4WNZIXBF2n19uqDIXq5CipQeLy4wizyxqLi/oXuJ3DR/wbC83bzEH/ra
-	kzpXP5xr7KDLO3S1kLEi7u1K85pfRPUlfrOLa5qu/Dh8MJ2h+ZYZFeOP3VKlcg=
-X-Received: by 2002:a05:6000:2482:b0:439:ad2d:99f1 with SMTP id ffacd0b85a97d-439da86ed01mr19072989f8f.54.1773075849398;
-        Mon, 09 Mar 2026 10:04:09 -0700 (PDT)
+        bh=EjqtMmTP6qLcmK14ISsOFqL48TISXYv0ejZVuQlmDiE=;
+        b=vqNrgwOjSBqI7/anPuxqsi5vzgGODHHs6tzrN8yUKn8aJdaZ+vMy9jQrBcp8tYthET
+         kL9JksS5Qu7iUS/E7j5uEOKrSpUEoODbWjknQ7vAmD3RobkofFD/cUNhxq9AiPzKH/3g
+         tqbYmbZKuMLeKJ8wlrZja6SzMXU6xvtDYl0bkkZkMQRwvS6/TimWfyuwMDofoKXtZ+aV
+         iyckud80KA6nrU+xdtIRzs25dXVrKHa/ZDJCvC4iImC+adGAPsAuMkaRQ6Fd5fTgNjaX
+         jKKkqck8Un8cgpPTEaLboZ2uJ5zbRoJNo4wihxJQTvznggbeAhuJ9IhZSjiZoxctKjDl
+         FfLw==
+X-Gm-Message-State: AOJu0YwC7bd5/u9fw07VpV30EP8xw1508GvJNDZTPKMLu5EhOWCkmgUE
+	XzmxhzbuMuoCbwv5gh/DlT1im17bhRQxzSqQadZy4vbyhkCDM9KZ1kn8
+X-Gm-Gg: ATEYQzya5+Px4Orv0rIyx9gxStrdHKBJ/NdPIcwnSrPbopS0EtP15CsMiqzG69itGRk
+	6YLFhR00TGTpS9Ez+iGs6isibFKIXHErngNNt2Wn/6+S85NcxjX9Xekhf2IiNssMdYj7Dhi62Cy
+	jqQImWZQIfaxaXUe/1fLliT/O9pdoCamAM2VfB8McpqMmEUSlYTRekeCHq3PcNQFoVXRVTwGXcQ
+	rerXaWRJ3R5vl0yqDMeqbKysLREnrhk/0mdwEVhHNaqx9sHx0uZYVHFefFdE3gMVTcoAKtlJdap
+	DIYs0z52UyP1HWLQ5q3Diq3j7Ax/jtJDnbTc7wTcdnmzH5wC0ZzBgkiOsDcrGnG7lOr267st9dQ
+	br8paF9eaL3KlVQ77DlauqHfY76U5GyEr0UFLwWFnG5fSwBSVBUeJBUCJqu7K+MbR+QIbDTuE2i
+	cpzHcuaEZyogXR62g4zik/Z0dhNSBxod0NVKxnLVhGKXHhib+40mv8mCEgt20WbkzmSVustwNqM
+	SYmrfYr5JOVHIZYJBe1f5xnK/8afDDgBVDRfm5Y0Tf4AiC0/Ya4d97pSZJRq6o=
+X-Received: by 2002:a05:600c:34d0:b0:477:5cc6:7e44 with SMTP id 5b1f17b1804b1-48526923c5cmr193755105e9.11.1773075887324;
+        Mon, 09 Mar 2026 10:04:47 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f46:ce00:5f9:7f3c:5f9a:2a3d? (p200300ea8f46ce0005f97f3c5f9a2a3d.dip0.t-ipconnect.de. [2003:ea:8f46:ce00:5f9:7f3c:5f9a:2a3d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dad8d968sm26937481f8f.6.2026.03.09.10.04.08
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541a9e549sm4543125e9.12.2026.03.09.10.04.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Mar 2026 10:04:09 -0700 (PDT)
-Message-ID: <b6161c64-68ac-4524-82ec-5b7d81b86dbc@gmail.com>
-Date: Mon, 9 Mar 2026 18:04:08 +0100
+        Mon, 09 Mar 2026 10:04:46 -0700 (PDT)
+Message-ID: <b15b378a-fda2-44b9-9d63-bf82919b71b2@gmail.com>
+Date: Mon, 9 Mar 2026 18:04:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,8 +85,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH v2 net-next 3/5] net: phy: move (of_)mdio_find_bus to
- mdio_bus_provider.c
+Subject: [PATCH v2 net-next 4/5] net: phy: move registering mdio_bus_class and
+ mdio_bus_type to libphy
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -105,19 +105,19 @@ Content-Language: en-US
 In-Reply-To: <9d5724bc-e525-4f8f-b3f8-b16dd5a1164e@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AFC4D23D69F
+X-Rspamd-Queue-Id: 51B9723D70B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-265656-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265658-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
@@ -128,132 +128,95 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Functionality outside libphy shouldn't access mdio_bus_class directly.
-So move both functions to the provider side. This is a step towards
-making mdio_bus_class private to libphy.
+The MDIO consumer side shouldn't register class and bus_type.
+Therefore move this to libphy.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/mdio_bus.c          | 44 -----------------------------
- drivers/net/phy/mdio_bus_provider.c | 44 +++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 44 deletions(-)
+ drivers/net/phy/mdio_bus.c   | 23 -----------------------
+ drivers/net/phy/phy_device.c | 13 +++++++++++++
+ 2 files changed, 13 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index a30c679feec..c9a495390d2 100644
+index c9a495390d2..9fb47332602 100644
 --- a/drivers/net/phy/mdio_bus.c
 +++ b/drivers/net/phy/mdio_bus.c
-@@ -276,50 +276,6 @@ const struct class mdio_bus_class = {
+@@ -905,28 +905,5 @@ const struct bus_type mdio_bus_type = {
  };
- EXPORT_SYMBOL_GPL(mdio_bus_class);
+ EXPORT_SYMBOL(mdio_bus_type);
  
--/**
-- * mdio_find_bus - Given the name of a mdiobus, find the mii_bus.
-- * @mdio_name: The name of a mdiobus.
-- *
-- * Return: a reference to the mii_bus, or NULL if none found. The
-- * embedded struct device will have its reference count incremented,
-- * and this must be put_deviced'ed once the bus is finished with.
-- */
--struct mii_bus *mdio_find_bus(const char *mdio_name)
+-static int __init mdio_bus_init(void)
 -{
--	struct device *d;
+-	int ret;
 -
--	d = class_find_device_by_name(&mdio_bus_class, mdio_name);
--	return d ? to_mii_bus(d) : NULL;
+-	ret = class_register(&mdio_bus_class);
+-	if (!ret) {
+-		ret = bus_register(&mdio_bus_type);
+-		if (ret)
+-			class_unregister(&mdio_bus_class);
+-	}
+-
+-	return ret;
 -}
--EXPORT_SYMBOL(mdio_find_bus);
 -
--#if IS_ENABLED(CONFIG_OF_MDIO)
--/**
-- * of_mdio_find_bus - Given an mii_bus node, find the mii_bus.
-- * @mdio_bus_np: Pointer to the mii_bus.
-- *
-- * Return: a reference to the mii_bus, or NULL if none found. The
-- * embedded struct device will have its reference count incremented,
-- * and this must be put once the bus is finished with.
-- *
-- * Because the association of a device_node and mii_bus is made via
-- * of_mdiobus_register(), the mii_bus cannot be found before it is
-- * registered with of_mdiobus_register().
-- *
-- */
--struct mii_bus *of_mdio_find_bus(struct device_node *mdio_bus_np)
+-static void __exit mdio_bus_exit(void)
 -{
--	struct device *d;
--
--	if (!mdio_bus_np)
--		return NULL;
--
--	d = class_find_device_by_of_node(&mdio_bus_class, mdio_bus_np);
--	return d ? to_mii_bus(d) : NULL;
+-	class_unregister(&mdio_bus_class);
+-	bus_unregister(&mdio_bus_type);
 -}
--EXPORT_SYMBOL(of_mdio_find_bus);
--#endif
 -
- static void mdiobus_stats_acct(struct mdio_bus_stats *stats, bool op, int ret)
+-subsys_initcall(mdio_bus_init);
+-module_exit(mdio_bus_exit);
+-
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("MDIO bus/device layer");
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index d1cbcfc3d2a..0edff47478c 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3913,6 +3913,14 @@ static int __init phy_init(void)
  {
- 	preempt_disable();
-diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
-index 4b063740574..d50fe6eb4b0 100644
---- a/drivers/net/phy/mdio_bus_provider.c
-+++ b/drivers/net/phy/mdio_bus_provider.c
-@@ -440,3 +440,47 @@ void mdiobus_free(struct mii_bus *bus)
- 	put_device(&bus->dev);
+ 	int rc;
+ 
++	rc = class_register(&mdio_bus_class);
++	if (rc)
++		return rc;
++
++	rc = bus_register(&mdio_bus_type);
++	if (rc)
++		goto err_class;
++
+ 	rtnl_lock();
+ 	ethtool_set_ethtool_phy_ops(&phy_ethtool_phy_ops);
+ 	phylib_register_stubs();
+@@ -3941,6 +3949,9 @@ static int __init phy_init(void)
+ 	phylib_unregister_stubs();
+ 	ethtool_set_ethtool_phy_ops(NULL);
+ 	rtnl_unlock();
++	bus_unregister(&mdio_bus_type);
++err_class:
++	class_unregister(&mdio_bus_class);
+ 
+ 	return rc;
  }
- EXPORT_SYMBOL(mdiobus_free);
-+
-+/**
-+ * mdio_find_bus - Given the name of a mdiobus, find the mii_bus.
-+ * @mdio_name: The name of a mdiobus.
-+ *
-+ * Return: a reference to the mii_bus, or NULL if none found. The
-+ * embedded struct device will have its reference count incremented,
-+ * and this must be put_deviced'ed once the bus is finished with.
-+ */
-+struct mii_bus *mdio_find_bus(const char *mdio_name)
-+{
-+	struct device *d;
-+
-+	d = class_find_device_by_name(&mdio_bus_class, mdio_name);
-+	return d ? to_mii_bus(d) : NULL;
-+}
-+EXPORT_SYMBOL(mdio_find_bus);
-+
-+#if IS_ENABLED(CONFIG_OF_MDIO)
-+/**
-+ * of_mdio_find_bus - Given an mii_bus node, find the mii_bus.
-+ * @mdio_bus_np: Pointer to the mii_bus.
-+ *
-+ * Return: a reference to the mii_bus, or NULL if none found. The
-+ * embedded struct device will have its reference count incremented,
-+ * and this must be put once the bus is finished with.
-+ *
-+ * Because the association of a device_node and mii_bus is made via
-+ * of_mdiobus_register(), the mii_bus cannot be found before it is
-+ * registered with of_mdiobus_register().
-+ *
-+ */
-+struct mii_bus *of_mdio_find_bus(struct device_node *mdio_bus_np)
-+{
-+	struct device *d;
-+
-+	if (!mdio_bus_np)
-+		return NULL;
-+
-+	d = class_find_device_by_of_node(&mdio_bus_class, mdio_bus_np);
-+	return d ? to_mii_bus(d) : NULL;
-+}
-+EXPORT_SYMBOL(of_mdio_find_bus);
-+#endif
+@@ -3953,6 +3964,8 @@ static void __exit phy_exit(void)
+ 	phylib_unregister_stubs();
+ 	ethtool_set_ethtool_phy_ops(NULL);
+ 	rtnl_unlock();
++	bus_unregister(&mdio_bus_type);
++	class_unregister(&mdio_bus_class);
+ }
+ 
+ subsys_initcall(phy_init);
 -- 
 2.53.0
 
