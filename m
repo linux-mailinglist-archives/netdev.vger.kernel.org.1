@@ -1,293 +1,359 @@
-Return-Path: <netdev+bounces-265711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sO56LFwXr2nHNgIAu9opvQ
-	(envelope-from <netdev+bounces-265711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:54:20 +0100
+	id eNKRGbgYr2nHNgIAu9opvQ
+	(envelope-from <netdev+bounces-265712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 20:00:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075C123EE52
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:54:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFFEE23F0D2
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 20:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58347314B2FA
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 18:48:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB1543016EF5
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 18:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65673ED11D;
-	Mon,  9 Mar 2026 18:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2809D3ED11D;
+	Mon,  9 Mar 2026 18:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ClR3M7Aw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CHtwdsu4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E36B2745E;
-	Mon,  9 Mar 2026 18:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD932877CB
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 18:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773082072; cv=none; b=hmlszjIsjkwO8k2M3NNeRv+VsLrZZGVU0qo2sNj3tnDyXf4KGmNmkw27GmXDKfl0rH+1yrKR61Q1SAvde4pthd5aL6Ba2F3nbzSYIe8kpc7V8C2189LY4yIyBMIe7IRfyOmrG/WxpRSUlGV7oG7GgMuyjGzJF+F6Bz9Y2z9Q+CE=
+	t=1773082733; cv=none; b=cl5qVbRNYnwwrhhcAXYmOj7iCbSMXi40ZC7xZ6z0Adivh7VID+uvybC+cw1ZYXQNaVWbDphnUHprohnaDtK3mjk4kuS/8mXIqmyvjFkgVko/fxbaLKUcMRsGyHpUZB3knO+Fyl28O2ZtgKqYQMMCehNXBnI4JmGuDZ3z5ePOtkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773082072; c=relaxed/simple;
-	bh=xsB/r3qOE/OQ+/BJxTSb5dND+3sonmeJ5XkT+x8aITE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nm1eJuprJ4IezuU/5MOLWCPTbnAthTrKgQ3EM35wu7f9a41d8znhwHv96tlP2205EJT8Bo9n+YaSA1NIGPK7anTkB454L80nsjrSOg15CJv49a8CIoSkTDLvHZNwuQ1x+O210wHNPQIXlMZNQ7qlgyGz7C5qjTnMM+9QjEI0C/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ClR3M7Aw; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id E574F20612;
-	Mon,  9 Mar 2026 19:47:49 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1v00vC2oOZ5v; Mon,  9 Mar 2026 19:47:49 +0100 (CET)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 27C7020538;
-	Mon,  9 Mar 2026 19:47:49 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 27C7020538
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773082069;
-	bh=+zNliWaMa9sPXEJu+7k/iqbvxt1hislj2AXZOyaP+dM=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=ClR3M7Aw4XHgT0gOz1DTKc0OkA0vUwPSvoloU9etS2u97S7hVsAAt4jx+D62jMnS0
-	 qUsaKkIu5x9aRmw8Q1rpAgQTrZ/T/dSfxvW5T7Yobf+NEeMRRnLpQbdrMdGHPin7+B
-	 CiO1aXkeEgv6broce58KRhcSYwc36aPviVyYzZz+/Qp12+x68XS5miR4jUtg6CzvvP
-	 Xpg7l3GIMv8KaPnhgBHN60xa9rjN3LQYVxEkh7N5m++2nbYcVbnc3cHEJzxt2FuCXy
-	 7stY15i8xNbFAqW8g6w0ow2IrQjVWQqch+VtRNB/IMyoJsPCoxHEv5d/0tHwlTjsWZ
-	 QocRZZumqPDKA==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 9 Mar
- 2026 19:47:47 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Masahide
- NAKAMURA <nakam@linux-ipv6.org>, Paul Moore <paul@paul-moore.com>, Stephen
- Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek
-	<omosnace@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<selinux@vger.kernel.org>, <linux-doc@vger.kernel.org>, Chiachang Wang
-	<chiachangwang@google.com>, Yan Yan <evitayan@google.com>,
-	<devel@linux-ipsec.org>
-Subject: [PATCH ipsec-next v6 14/14] xfrm: docs: add documentation for XFRM_MSG_MIGRATE_STATE
-Date: Mon, 9 Mar 2026 19:47:36 +0100
-Message-ID: <migrate-state-v6-14-9df9764ddb9e@secunet.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <migrate-state-v6-0-9df9764ddb9e@secunet.com>
-References: <migrate-state-v6-0-9df9764ddb9e@secunet.com>
+	s=arc-20240116; t=1773082733; c=relaxed/simple;
+	bh=oaC0Y6yFR9ESJZQPEZvsoBpEfy3GPCv4OTBLP8W9OLs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZiTNjBSzE1nTsp3ZrLB5/iUbPkhIjYUc+jCQdzLi4S5afBw3ETtrcYNW6K1lZO17pnqsp8vDA2Y9mEl/V2AJyzDxBR2tMYS5Sp+WKmMWsbwCYNN28znBDaIMaiImAX03fT7vZ+vlH5h/VVu2mKNO2gP++LAeV4Ly9JJKedB71ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CHtwdsu4; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3598c05c806so8143817a91.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 11:58:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773082731; x=1773687531; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wvQTEM4gpRBzF78qIxSQmneMDQkv9OFclc59SzAyapA=;
+        b=CHtwdsu42esDsLbQNfSb9Q5HYR/OqpeGlXYuVwl5MQ22EmG+K2np5denDK8aNK7kJ4
+         NAFbwpEOzIbLNLWifqk11kof4d+1UxIdw9z0Jb26iJnnto0Ijt382YIO49abnkn/8pI7
+         cPmQWVpKidJMQCTkeAe82v4/qEBh/wJh5lJbuGGnGwqgO7tNZCO+DyJmvQoN6CRjuVLr
+         DcgCA7R4pz4cvIeKu0rPzfKaa9JIQnQ4cbzL96WYrHS3a/oEPs7MuswMbOMeW6nuMMOs
+         CJ40s8/8jeSUa2lVv0mW7sISdOwz/F6BH0+Gtwij0vJZGtVilrYWJofZb1BcktfdkVN+
+         eRLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773082731; x=1773687531;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wvQTEM4gpRBzF78qIxSQmneMDQkv9OFclc59SzAyapA=;
+        b=tj3rvASUAErXYDVfpjnvGIHvzB397+bQTCRhCS0xVjYOXT93EfYTonu7//noBCTMHR
+         X1ceQ3goieWfRa9UQi1S2/Yee4LYGaKqsPWrMRqxQBa2Pe4SeTk8VyQ50+NH95T8SbsK
+         2Qs+9B/obRrmSsn+raEotzHMkfKiNiJ0l6ZchNGkUs9P+xHQwo1ttXmmo6xaQjSc4WOS
+         ws90E0s+Zro/R+w+CPxJ0t2BbbfPguUod0/QPWYdconYpbaLgQbW1vS8mvxREGBBED8L
+         e2d0ULDmMZDiq8q9Ystf7Qd5F9LwAdvRR9pL1JHMZiAYlkxJM/uAPd8eq9XvP/vG9vMS
+         OUHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXHqlJMs8EIYHPbeNhj3Pt38YexlQGb+udnf+YAaAhKZn5QdB6pM6q4c3cqtzrH+v/CiG8JGU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFhOiOyNmv+oA3nmmYcfki1JCqd+w/4rU1/ABBmX6Hm2Yjb72G
+	I146yCpi1J+E3X483zRJNALOC4vDYJ2Nz+ywX4j7sQ9wsvdJRtPgoQguoc+NLnmYolBwzqiz3By
+	OtUzewg==
+X-Received: from pjvn18.prod.google.com ([2002:a17:90a:de92:b0:359:8e86:237f])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d8a:b0:359:9a60:44c8
+ with SMTP id 98e67ed59e1d1-359be32a1f9mr10684232a91.30.1773082730872; Mon, 09
+ Mar 2026 11:58:50 -0700 (PDT)
+Date: Mon,  9 Mar 2026 18:58:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.14.2
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-02.secunet.de
- (10.32.0.172)
-X-Rspamd-Queue-Id: 075C123EE52
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260309185823.3502204-1-kuniyu@google.com>
+Subject: [PATCH v2 net] af_unix: Give up GC if MSG_PEEK intervened.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, Linus Torvalds <torvalds@linuxfoundation.org>, 
+	netdev@vger.kernel.org, Igor Ushakov <sysroot314@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: BFFEE23F0D2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265711-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org];
+	TAGGED_FROM(0.00)[bounces-265712-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,linuxfoundation.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:email,secunet.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add documentation for the new XFRM_MSG_MIGRATE_STATE netlink message,
-which migrates a single SA identified by SPI and mark without involving
-policies.
+Igor Ushakov reported that GC purged the receive queue of
+an alive socket due to a race with MSG_PEEK with a nice repro.
 
-The document covers the motivation and design differences from the
-existing XFRM_MSG_MIGRATE, the SA lookup mechanism, supported attributes
-with their omit-to-inherit semantics, and usage examples.
+This is the exact same issue previously fixed by commit
+cbcf01128d0a ("af_unix: fix garbage collect vs MSG_PEEK").
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+After GC was replaced with the current algorithm, the cited
+commit removed the locking dance in unix_peek_fds() and
+reintroduced the same issue.
+
+The problem is that MSG_PEEK bumps a file refcount without
+interacting with GC.
+
+Consider an SCC containing sk-A and sk-B, where sk-A is
+close()d but can be recv()ed via sk-B.
+
+The bad thing happens if sk-A is recv()ed with MSG_PEEK from
+sk-B and sk-B is close()d while GC is checking unix_vertex_dead()
+for sk-A and sk-B.
+
+  GC thread                    User thread
+  ---------                    -----------
+  unix_vertex_dead(sk-A)
+  -> true   <------.
+                    \
+                     `------   recv(sk-B, MSG_PEEK)
+              invalidate !!    -> sk-A's file refcount : 1 -> 2
+
+                               close(sk-B)
+                               -> sk-B's file refcount : 2 -> 1
+  unix_vertex_dead(sk-B)
+  -> true
+
+Initially, sk-A's file refcount is 1 by the inflight fd in sk-B
+recvq.  GC thinks sk-A is dead because the file refcount is the
+same as the number of its inflight fds.
+
+However, sk-A's file refcount is bumped silently by MSG_PEEK,
+which invalidates the previous evaluation.
+
+At this moment, sk-B's file refcount is 2; one by the open fd,
+and one by the inflight fd in sk-A.  The subsequent close()
+releases one refcount by the former.
+
+Finally, GC incorrectly concludes that both sk-A and sk-B are dead.
+
+One option is to restore the locking dance in unix_peek_fds(),
+but we can resolve this more elegantly thanks to the new algorithm.
+
+The point is that the issue does not occur without the subsequent
+close() and we actually do not need to synchronise MSG_PEEK with
+the dead SCC detection.
+
+When the issue occurs, close() and GC touch the same file refcount.
+If GC sees the refcount being decremented by close(), it can just
+give up garbage-collecting the SCC.
+
+Therefore, we only need to signal the race during MSG_PEEK with
+a proper memory barrier to make it visible to the GC.
+
+Let's use seqcount_t to notify GC when MSG_PEEK occurs and let
+it defer the SCC to the next run.
+
+This way no locking is needed on the MSG_PEEK side, and we can
+avoid imposing a penalty on every MSG_PEEK unnecessarily.
+
+Note that we can retry within unix_scc_dead() if MSG_PEEK is
+detected, but we do not do so to avoid hung task splat from
+abusive MSG_PEEK calls.
+
+Fixes: 118f457da9ed ("af_unix: Remove lock dance in unix_peek_fds().")
+Reported-by: Igor Ushakov <sysroot314@gmail.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v5->v6: added this patch
+v2: Use seqcount_t for proper memory barrier
+v1: https://lore.kernel.org/netdev/20260308030406.1825938-1-kuniyu@google.com/
 ---
- Documentation/networking/xfrm/index.rst            |   1 +
- .../networking/xfrm/xfrm_migrate_state.rst         | 129 +++++++++++++++++++++
- 2 files changed, 130 insertions(+)
+ net/unix/af_unix.c |  2 ++
+ net/unix/af_unix.h |  1 +
+ net/unix/garbage.c | 75 +++++++++++++++++++++++++++++-----------------
+ 3 files changed, 50 insertions(+), 28 deletions(-)
 
-diff --git a/Documentation/networking/xfrm/index.rst b/Documentation/networking/xfrm/index.rst
-index 7d866da836fe76642d36d8bf9a9c11757427453f..90191848f8db907148d610e14572f4ba43390114 100644
---- a/Documentation/networking/xfrm/index.rst
-+++ b/Documentation/networking/xfrm/index.rst
-@@ -9,5 +9,6 @@ XFRM Framework
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 7eaa5b187fef..b23c33df8b46 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1958,6 +1958,8 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
+ static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
+ {
+ 	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
++
++	unix_peek_fpl(scm->fp);
+ }
  
-    xfrm_device
-    xfrm_proc
-+   xfrm_migrate_state
-    xfrm_sync
-    xfrm_sysctl
-diff --git a/Documentation/networking/xfrm/xfrm_migrate_state.rst b/Documentation/networking/xfrm/xfrm_migrate_state.rst
-new file mode 100644
-index 0000000000000000000000000000000000000000..a218dd6510ca17df3f5a88adb55b9a7de26e6c35
---- /dev/null
-+++ b/Documentation/networking/xfrm/xfrm_migrate_state.rst
-@@ -0,0 +1,129 @@
-+.. SPDX-License-Identifier: GPL-2.0
+ static void unix_destruct_scm(struct sk_buff *skb)
+diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
+index c4f1b2da363d..8119dbeef3a3 100644
+--- a/net/unix/af_unix.h
++++ b/net/unix/af_unix.h
+@@ -29,6 +29,7 @@ void unix_del_edges(struct scm_fp_list *fpl);
+ void unix_update_edges(struct unix_sock *receiver);
+ int unix_prepare_fpl(struct scm_fp_list *fpl);
+ void unix_destroy_fpl(struct scm_fp_list *fpl);
++void unix_peek_fpl(struct scm_fp_list *fpl);
+ void unix_schedule_gc(struct user_struct *user);
+ 
+ /* SOCK_DIAG */
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 816e8fa2b062..5c9692c98d23 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -318,6 +318,21 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
+ 	unix_free_vertices(fpl);
+ }
+ 
++static bool gc_in_progress;
++static seqcount_t unix_peek_seq = SEQCNT_ZERO(unix_peek_seq);
 +
-+=====================
-+XFRM SA Migrate State
-+=====================
++void unix_peek_fpl(struct scm_fp_list *fpl)
++{
++	if (!fpl->count_unix)
++		return;
 +
-+Overview
-+========
++	if (!READ_ONCE(gc_in_progress))
++		return;
 +
-+``XFRM_MSG_MIGRATE_STATE`` migrates a single SA, looked up using SPI and
-+mark, without involving policies. Unlike ``XFRM_MSG_MIGRATE``, which couples
-+SA and policy migration and allows migrating multiple SAs in one call, this
-+interface identifies the SA unambiguously via SPI and supports changing
-+the reqid, addresses, encapsulation, and other SA-specific parameters.
++	/* Invalidate the final refcnt check in unix_vertex_dead(). */
++	raw_write_seqcount_barrier(&unix_peek_seq);
++}
 +
-+Because IKE daemons such as strongSwan manage policies independently of
-+the kernel, this interface allows precise per-SA migration without
-+requiring policy involvement. Optional XFRM attributes follow an
-+omit-to-inherit model.
+ static bool unix_vertex_dead(struct unix_vertex *vertex)
+ {
+ 	struct unix_edge *edge;
+@@ -351,6 +366,36 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
+ 	return true;
+ }
+ 
++static LIST_HEAD(unix_visited_vertices);
++static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
 +
-+SA Identification
-+=================
++static bool unix_scc_dead(struct list_head *scc, bool fast)
++{
++	struct unix_vertex *vertex;
++	bool scc_dead = true;
++	unsigned int seq;
 +
-+The struct is defined in ``include/uapi/linux/xfrm.h``. The SA is looked
-+up using ``xfrm_state_lookup()`` with ``id.spi``,
-+``id.daddr``, ``id.proto``, ``id.family``, and ``old_mark``::
++	seq = read_seqcount_begin(&unix_peek_seq);
 +
-+    struct xfrm_user_migrate_state {
-+        struct xfrm_usersa_id id;       /* spi, daddr, proto, family */
-+        xfrm_address_t        new_daddr;
-+        xfrm_address_t        new_saddr;
-+        __u16                 new_family;
-+        __u16                 reserved;
-+        __u32                 new_reqid;
-+        struct xfrm_mark      old_mark; /* SA lookup */
-+    };
++	list_for_each_entry_reverse(vertex, scc, scc_entry) {
++		/* Don't restart DFS from this vertex. */
++		list_move_tail(&vertex->entry, &unix_visited_vertices);
 +
-+Supported Attributes
-+====================
++		/* Mark vertex as off-stack for __unix_walk_scc(). */
++		if (!fast)
++			vertex->index = unix_vertex_grouped_index;
 +
-+The following fields in ``xfrm_user_migrate_state`` are always explicit
-+and are not inherited from the existing SA. Passing zero is not equivalent
-+to "keep unchanged" — zero is used as-is:
++		if (scc_dead)
++			scc_dead = unix_vertex_dead(vertex);
++	}
 +
-+- ``new_daddr`` - new destination address
-+- ``new_saddr`` - new source address
-+- ``new_family`` - new address family
-+- ``new_reqid`` - new reqid (0 = no reqid)
++	/* If MSG_PEEK intervened, defer this SCC to the next round. */
++	if (read_seqcount_retry(&unix_peek_seq, seq))
++		return false;
 +
-+The following netlink attributes are also accepted. Omitting an attribute
-+inherits the value from the existing SA (omit-to-inherit).
++	return scc_dead;
++}
 +
-+.. list-table::
-+   :widths: 30 70
-+   :header-rows: 1
-+
-+   * - Attribute
-+     - Description
-+   * - ``XFRMA_MARK``
-+     - Mark on the migrated SA (``struct xfrm_mark``). Absent inherits
-+       ``old_mark``. To use no mark on the new SA, send ``XFRMA_MARK``
-+       with ``{0, 0}``.
-+   * - ``XFRMA_ENCAP``
-+     - UDP encapsulation template; only ``UDP_ENCAP_ESPINUDP`` is supported.
-+       Set ``encap_type=0`` to remove encap.
-+   * - ``XFRMA_OFFLOAD_DEV``
-+     - Hardware offload configuration. Set ``ifindex=0`` to remove offload.
-+   * - ``XFRMA_SET_MARK``
-+     - Output mark on the migrated SA; pair with ``XFRMA_SET_MARK_MASK``.
-+       Send 0 to clear.
-+   * - ``XFRMA_NAT_KEEPALIVE_INTERVAL``
-+     - NAT keepalive interval in seconds. Requires encap. Send 0 to clear.
-+       Automatically cleared when encap is removed; setting a non-zero
-+       value without encap returns ``-EINVAL``.
-+   * - ``XFRMA_MTIMER_THRESH``
-+     - Mapping maxage threshold. Requires encap. Send 0 to clear.
-+       Automatically cleared when encap is removed; setting a non-zero
-+       value without encap returns ``-EINVAL``.
-+
-+The following SA properties are immutable and cannot be changed via
-+``XFRM_MSG_MIGRATE_STATE``: algorithms (``XFRMA_ALG_*``), replay state,
-+direction (``XFRMA_SA_DIR``), and security context (``XFRMA_SEC_CTX``).
-+
-+Migration Steps
-+===============
-+
-+#. Install a block policy to drop traffic on the affected selector.
-+#. Remove the old policy.
-+#. Call ``XFRM_MSG_MIGRATE_STATE`` for each SA.
-+#. Reinstall the policies.
-+#. Remove the block policy.
-+
-+Block Policy and IV Safety
-+--------------------------
-+
-+Installing a block policy before migration is required to prevent
-+traffic leaks and IV reuse.
-+
-+AES-GCM IV uniqueness is critical: reusing a (key, IV) pair allows
-+an attacker to recover the authentication subkey and forge
-+authentication tags, breaking both confidentiality and integrity.
-+
-+``XFRM_MSG_MIGRATE_STATE`` atomically deletes the old SA and installs
-+the new one with the sequence counter and replay window copied. The
-+block policy ensures no outgoing packets are sent in the migration
-+window, preventing IV reuse under the same key.
-+
-+Feature Detection
-+=================
-+
-+Userspace can probe for kernel support by sending a minimal
-+``XFRM_MSG_MIGRATE_STATE`` message with a non-existent SPI:
-+
-+- ``-ENOPROTOOPT``: not supported (``CONFIG_XFRM_MIGRATE`` not enabled)
-+- any other error: supported
-+
-+Error Handling
-+==============
-+
-+If the target SA tuple (daddr, SPI, proto, family) is occupied by an existing
-+unrelated SA, the operation returns ``-EEXIST``. In this case both the old and
-+the new SA are gone. The old SA cannot be restored as doing so would risk
-+duplicate sequence number and IV reuse, which must not occur. Userspace should
-+handle ``-EEXIST``, for example by re-establishing the SA at the IKE level.
-+
-+If the multicast notification (``XFRMNLGRP_MIGRATE``) fails to send,
-+the migration itself has already completed successfully and the new SA
-+is installed. The operation returns success, 0, with an extack warning,
-+but listeners will not receive the migration event.
-
+ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
+ {
+ 	struct unix_vertex *vertex;
+@@ -404,9 +449,6 @@ static bool unix_scc_cyclic(struct list_head *scc)
+ 	return false;
+ }
+ 
+-static LIST_HEAD(unix_visited_vertices);
+-static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
+-
+ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
+ 				     unsigned long *last_index,
+ 				     struct sk_buff_head *hitlist)
+@@ -474,9 +516,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
+ 	}
+ 
+ 	if (vertex->index == vertex->scc_index) {
+-		struct unix_vertex *v;
+ 		struct list_head scc;
+-		bool scc_dead = true;
+ 
+ 		/* SCC finalised.
+ 		 *
+@@ -485,18 +525,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
+ 		 */
+ 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+ 
+-		list_for_each_entry_reverse(v, &scc, scc_entry) {
+-			/* Don't restart DFS from this vertex in unix_walk_scc(). */
+-			list_move_tail(&v->entry, &unix_visited_vertices);
+-
+-			/* Mark vertex as off-stack. */
+-			v->index = unix_vertex_grouped_index;
+-
+-			if (scc_dead)
+-				scc_dead = unix_vertex_dead(v);
+-		}
+-
+-		if (scc_dead) {
++		if (unix_scc_dead(&scc, false)) {
+ 			unix_collect_skb(&scc, hitlist);
+ 		} else {
+ 			if (unix_vertex_max_scc_index < vertex->scc_index)
+@@ -550,19 +579,11 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
+ 	while (!list_empty(&unix_unvisited_vertices)) {
+ 		struct unix_vertex *vertex;
+ 		struct list_head scc;
+-		bool scc_dead = true;
+ 
+ 		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
+ 		list_add(&scc, &vertex->scc_entry);
+ 
+-		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+-			list_move_tail(&vertex->entry, &unix_visited_vertices);
+-
+-			if (scc_dead)
+-				scc_dead = unix_vertex_dead(vertex);
+-		}
+-
+-		if (scc_dead) {
++		if (unix_scc_dead(&scc, true)) {
+ 			cyclic_sccs--;
+ 			unix_collect_skb(&scc, hitlist);
+ 		}
+@@ -577,8 +598,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
+ 		   cyclic_sccs ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC);
+ }
+ 
+-static bool gc_in_progress;
+-
+ static void unix_gc(struct work_struct *work)
+ {
+ 	struct sk_buff_head hitlist;
 -- 
-2.47.3
+2.53.0.473.g4a7958ca14-goog
 
 
