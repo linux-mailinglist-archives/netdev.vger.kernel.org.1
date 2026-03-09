@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-265537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YCZoAiLBrmmRIgIAu9opvQ
-	(envelope-from <netdev+bounces-265537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:46:26 +0100
+	id EN90LT/CrmmRIgIAu9opvQ
+	(envelope-from <netdev+bounces-265538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:51:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD272391D7
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:46:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFF22392DD
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 505D8302512C
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:46:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB3A830AA539
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBD03BD65D;
-	Mon,  9 Mar 2026 12:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3580F3BED3D;
+	Mon,  9 Mar 2026 12:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxA47OZn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awEHbyIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411803BE166
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 12:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AF83BD64F
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 12:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773060352; cv=none; b=R5Y6SKrlhcjTIyUJ18IDzdMYZm0LnU5qls2MhStFcOSa4wkdfGQL35Oi7iCZK47L77yCZP0/rjaTZsarX0uVWpR+7HZgr1QR1PwHZS14u2Wywzxttqin2kvnuweV8W8R3PjRq5rDzXTgdyn68UzRpfGwyfxvfpG3zhHSvksLJhg=
+	t=1773060355; cv=none; b=sTUlfsO4ZnloAKqA5KidUibS58Pq1Ro13+wBlWkb4464cy+AzAZ6rTAkRU7my0JcGNm/1YQZa+rtZC/FuhI6UPhHTH0tYXKCWZvIrYM4nfTVTIdopo4hqx/KUcSoSv+Qima8JIWAKBeYVqIerJ10K/gCH5ftrY1uIAIla1szfj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773060352; c=relaxed/simple;
-	bh=tC/vnqhpyr5u7JUYEaBg+0egv5ZlzByVSdGqiOYaWxY=;
+	s=arc-20240116; t=1773060355; c=relaxed/simple;
+	bh=msrA7wGjRRGTCwCsfx7ePt2yNBhyVAifse7Q2+9fCm0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ML2CpkKeQ6GUEBteHd1tONorWZgtjwNnyrJSjvQABnogXXvDyVokXQDb+j2aQKlzbeJ+22TYZJQVBJNSXFBXIgTkvafqRERg6xd9e8NilKBax8PdCX08Fp36cVoVEy7NMCikeP5X9HQyBXEfAD0cUBGURPZ5m6oZjQ/Nt8aOXBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxA47OZn; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=LAy5emHHAmIc2Dp7LG/ctjPOS3f7JABD95KvMZTGK/qaielyoTQ7U/2SFCfH2XiboEXFjBFefDZawxZI2qZbSrnRYGDdWY1JWOLEGWx12Qj8xgmV+wSOR3DsEVcg4RvWRlwAfUEsJXZEJj5T/V0jc1tEVCDi5HP/MyaOSLSgZSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=awEHbyIp; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3590042fa8eso7238835a91.1
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 05:45:50 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c7382731edfso3375494a12.1
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 05:45:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773060350; x=1773665150; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773060352; x=1773665152; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a80maZyNKc4ouURWN2d+H67wXFOguPB/alLVdRyxTyY=;
-        b=mxA47OZnovcrdhYuZHUc9eAqPCKWiZU94Vuruij/dANKbefVWCGrARq3hvQzZ/CLQf
-         FfUElz41O6/SFvUAordAGqd/01Str+AmA1EfyFs2o7+3aRNpvxOkNAQ/kP/p2Ye5fsw7
-         vNgPEHLwoouBxagSn2mbW4a3NSVpQQsNO9ChHqhWERk/4rvw0vwmuGiFobPqHhwNiOti
-         dZ6rpwzOp6Uklis9I5WcEYfs/toDF5FVNLnQ+JNp9Rs1FWGg0sHWzyh/ybemcHqGeEDz
-         XgEAE6CIFxDcl2/5IVVmZ9btLM7tjkZG48qxvbNhJOsBZ8kUGPoMs3cvJxVNe7dwPml8
-         QGDA==
+        bh=TQsAUyUgurtuYPOjOt9kS2ZoheMJQ/CgpVDQoe0FZmA=;
+        b=awEHbyIphba0IKRzVQ8WeBRDsxVx+4o0gw7U+SZzzkV3PAs84V2TmVieNA0HmDckuI
+         HfDrGy6HDaDSKmz+mD2kx3KfhKsE14/Vgi+CgYtOP/vblX1rWORcq20Pf4J0qD3fZy1w
+         o03KtrtpSvVRL1NoWaabUwm/J9eO0yhrLwsOVdROU5I5pQO0zzsYsuUZYWvZAxKCI/yo
+         u+EzgXRVqacbt1kmfN5zA02UJ9Xm8xcY/KRMr3YBqSxiiGl9zQM5uBzNDP6tDrm+uBk0
+         ZK62u6PgxldMn2HZXQ6NDf33M6BiT154b9IVhUJjS/ldZR7/yj4HM5h/4PQ2u9Aj0740
+         HA8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773060350; x=1773665150;
+        d=1e100.net; s=20230601; t=1773060352; x=1773665152;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=a80maZyNKc4ouURWN2d+H67wXFOguPB/alLVdRyxTyY=;
-        b=IBkaGMm/Yabi1hHJ1ktCzTHeLIzISqc9LaUnvVsdpzB1AnEIKqov8mh2UIG5/hYiB3
-         fJQER1XxISqsm/bGO4UOhFu8H+DMYdPb/7ANODyfnqM4IElJBC/VXSD/Xug24LJ/P+fm
-         vfgmOKdXdiV4YURE4Yhv0rwZjO1WQOR7loix4T7r3njBz1e/4z7qiQbVY2Kw6Ue4LxUe
-         exRJ9Awj2W0DolqK2h3k6lZhDpVriW3/ZaGSw2hQJIzlSf51kGPyDQX+ff9WQs7dATTS
-         RqNTL7ZeBj+D44L9J2NN8P0TkG/ExACOI4NTGvZdQNqBWMbcfe75HblSVfFJGWnMG1xs
-         JMvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmdxqWVVtekGGoG8/AfTSUrWLYt2qtsMbxfZuINbVvpik9k6lZfwSj9XdlgoJSi8kfd44Ahl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7VYYXSquqHPbHJYHe7e+MttjYi0pyIY4lXxd7ayewhhC0z4N4
-	WyLnCd0XU3D681Cpt+T7jH4Qw/pKPGaPIO7T95SoWqvWSZjcPXhWwoiq
-X-Gm-Gg: ATEYQzytsI6BqVOWlyBVV1mAM9wXd0M/NdvN0uzyrh3Iq14vP5UhVHgWNUXXhgmEZZD
-	wCBwjhSEi2JUoYTwjvjlcDyciXjah3NGzLgtPKmm6iRXipeiRn6/z7sOaRVh/BYb0yhc6f6TOiO
-	04dyFtclQFPVTJgp/X3Qc/BopKrRuC0HKhbbSe9CAgmnLY7TXI0e1kzvZ3eDcvhx+MV9Kq7VxjJ
-	7hX5MlSgmqwFnLz21xrBD+aAZXkb0EKP7GetEK3BDInMTrLpsSSjn5dNxegpCxZjSmKZS8LqTJs
-	jTZ90trp+pF6b+XRVlrS35ayXOMG56WUltaMcEc36a1Y1PJLMXZDju+M0102wt5mehBIsloGUdy
-	gdlWt7te1VtiBiPWr/M/ljHW5Hyx+KLS/IDwk3D+8RcjlDVoS1J+4QMdxoxEIZqUbpTWbFcGeKF
-	K0dSBNpkTrfyDIVneEtIrTgfV+gZj+VqjDn6thWMO4BUDqYf6fNVvclw9vqPTRR90gJGTBvIY=
-X-Received: by 2002:a17:90b:51:b0:359:7b9a:2cf4 with SMTP id 98e67ed59e1d1-359be12f79amr10744481a91.0.1773060349682;
-        Mon, 09 Mar 2026 05:45:49 -0700 (PDT)
+        bh=TQsAUyUgurtuYPOjOt9kS2ZoheMJQ/CgpVDQoe0FZmA=;
+        b=X7RPHMtqiPIbSnuuQYjg/hqWKQNPOOha5ZDZbWhkgfgh1E9gIgBVFJlDH3WNGW2P65
+         QwOdyceJQDHfs8S+25idjh0n0lvpILtkQS21OJP38GUtkWOtiWCbLzvUxnkr5tleoeH5
+         MyBavxkgxyCNcc5o4tJqcraLEDVn3vaIuecVq/pej5IlSs+l5Z2Y0bpmdwID70+PByVH
+         qhpXEuvjf8oYjNtPCIWtrVb0WYNsRCBLxdx+zrZkJSOSM0RPmNYOpQiWOtYGcXsVNmOg
+         AN+4ur+81eUi8bowzaj5OpqXu1Ibrf1kQgvtFkux9FcTemilb3qyxWrzaN/eq2Gs78Bi
+         HtNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUiDKoQMkhjbcJqgundQT8nPAX9QQbLVvExgHveoZusmPnLeM4+6JlVUXagUrva593nOKmF7k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGp5zNjuq3cngJb1ByvG3CpV5HM2a+kQcMlI3WfBb+m/3doz7G
+	C/pTNP1809StSc7uvh6zLXqsZKytZuZPtioyj3ylTz8d0svzif1dxxF6
+X-Gm-Gg: ATEYQzzUJScYWsrHp9/vx2hmFntmmhsKv4fSlX0S5vIv8NBu/AutMdef1r+J5Fu1OIJ
+	Pdz7aC9LOZD8Cx8vLdGCItnjtm0kHFXCXesEgifKY0JwUph5WHpIcKaD5EIxRwlE7Hu5H3zsWB/
+	JAc/ByVUkNlDFK4kFw7Ik/uM8N7ZkgYzXepSACA1JTAh1XUjExjs1KWpoj5jOrKUF6IgAqgUueO
+	H/TvIJ7E7CRqHlCg8jgBpu5rGIOB6rrrUZFiirJvih0jSkMfrcBCZdSynhgk/5GeeyJwwz5pk7c
+	rYv9dQKr8lNxMOeh5CzJm7wcWjLdvDVzqvIeXqK5aK5EU8TsXSBo/icdD7A3bbd54scxhcAsQjw
+	ew+bWJYAlfVEGhQQ6hNSZEriiNY06Kynjm1LUwyv5XRU4KSXSBeb+pp+B4dl4b4rv84RGKG1gPG
+	YLcbECf2+1vjB4dt6tXSliWv5IKsPsNKprp3qrSnMneQGViQPrlV/F5zsL72hx
+X-Received: by 2002:a05:6a20:d807:b0:398:8546:c3e1 with SMTP id adf61e73a8af0-3988546ca4bmr4730270637.62.1773060352201;
+        Mon, 09 Mar 2026 05:45:52 -0700 (PDT)
 Received: from ubuntu24-04.. (120-51-71-230.tokyo.ap.gmo-isp.jp. [120.51.71.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e183596sm9178830a12.27.2026.03.09.05.45.47
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e183596sm9178830a12.27.2026.03.09.05.45.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 05:45:49 -0700 (PDT)
+        Mon, 09 Mar 2026 05:45:51 -0700 (PDT)
 From: sawara04.o@gmail.com
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -87,9 +87,9 @@ To: davem@davemloft.net,
 Cc: Kyoji Ogasawara <sawara04.o@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [PATCH v2 net-next 1/2] net/smc: fix indentation in smcr_buf_type section
-Date: Mon,  9 Mar 2026 21:45:39 +0900
-Message-ID: <20260309124541.22723-2-sawara04.o@gmail.com>
+Subject: [PATCH v2 net-next 2/2] net/smc: Add documentation for limit_smc_hs and hs_ctrl
+Date: Mon,  9 Mar 2026 21:45:40 +0900
+Message-ID: <20260309124541.22723-3-sawara04.o@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260309124541.22723-1-sawara04.o@gmail.com>
 References: <20260309124541.22723-1-sawara04.o@gmail.com>
@@ -100,14 +100,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DBD272391D7
+X-Rspamd-Queue-Id: 4CFF22392DD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -116,64 +116,69 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265537-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265538-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sawara04o@gmail.com,netdev@vger.kernel.org];
 	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	NEURAL_HAM(-0.00)[-0.993];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 From: Kyoji Ogasawara <sawara04.o@gmail.com>
 
-smcr_buf_type section used inconsistent indentation compared
-with the rest of this document.
+Document missing SMC sysctl parameters limit_smc_hs and hs_ctrl
 
 Signed-off-by: Kyoji Ogasawara <sawara04.o@gmail.com>
 ---
- Documentation/networking/smc-sysctl.rst | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ Documentation/networking/smc-sysctl.rst | 27 +++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-index 904a910f198e..17b8314c0e5e 100644
+index 17b8314c0e5e..3bbc5739f8ac 100644
 --- a/Documentation/networking/smc-sysctl.rst
 +++ b/Documentation/networking/smc-sysctl.rst
-@@ -23,17 +23,17 @@ autocorking_size - INTEGER
- 	Default: 64K
+@@ -111,3 +111,30 @@ smcr_max_recv_wr - INTEGER
+ 	like before having this control.
  
- smcr_buf_type - INTEGER
--        Controls which type of sndbufs and RMBs to use in later newly created
--        SMC-R link group. Only for SMC-R.
-+	Controls which type of sndbufs and RMBs to use in later newly created
-+	SMC-R link group. Only for SMC-R.
- 
--        Default: 0 (physically contiguous sndbufs and RMBs)
-+	Default: 0 (physically contiguous sndbufs and RMBs)
- 
--        Possible values:
+ 	Default: 48
++
++limit_smc_hs - INTEGER
++	Whether to limit SMC handshake for newly created sockets.
++
++	When enabled, SMC listen path applies handshake limitation based on
++	handshake worker congestion and queued SMC handshake load.
++
 +	Possible values:
- 
--        - 0 - Use physically contiguous buffers
--        - 1 - Use virtually contiguous buffers
--        - 2 - Mixed use of the two types. Try physically contiguous buffers first.
--          If not available, use virtually contiguous buffers then.
-+	- 0 - Use physically contiguous buffers
-+	- 1 - Use virtually contiguous buffers
-+	- 2 - Mixed use of the two types. Try physically contiguous buffers first.
-+	  If not available, use virtually contiguous buffers then.
- 
- smcr_testlink_time - INTEGER
- 	How frequently SMC-R link sends out TEST_LINK LLC messages to confirm
++
++	- 0 - Disable handshake limitation
++	- 1 - Enable handshake limitation
++
++	Default: 0 (disable)
++
++hs_ctrl - STRING
++	Select the SMC handshake control profile by name.
++
++	This string refers to the name of a user-implemented
++	BPF struct_ops instance of type smc_hs_ctrl.
++
++	The selected profile controls whether SMC options are advertised
++	during TCP SYN/SYN-ACK handshake.
++
++	Only available when CONFIG_SMC_HS_CTRL_BPF is enabled.
++	Write an empty string to clear the current profile.
++
++	Default: empty string
+\ No newline at end of file
 -- 
 2.43.0
 
