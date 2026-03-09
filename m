@@ -1,362 +1,169 @@
-Return-Path: <netdev+bounces-265622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNXBMxrwrmkWKQIAu9opvQ
-	(envelope-from <netdev+bounces-265622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:06:50 +0100
+	id H334AP/wrmnGKgIAu9opvQ
+	(envelope-from <netdev+bounces-265623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:10:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE9D23C6D8
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:06:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5252323C7DE
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5140A3061538
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:59:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17CA1319965C
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 16:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE793E5EC7;
-	Mon,  9 Mar 2026 15:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHAbe4aY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059C13D5226;
+	Mon,  9 Mar 2026 16:04:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7DD3E556F
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125DA3E5EC7;
+	Mon,  9 Mar 2026 16:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773071962; cv=none; b=LcEKkLmuyj/89MRj125VBXdmcaMjSVnhr9cTntwlXmMM1AlSf1V9BKBqy3mh024TLkUBI1tx02U/6oJ2l7o8ETH2VieHm6g7AL49iSdQBWCYDesM9BxUMYjeeF6EoF6YpUEUAtwo7iC/XBb6WRN2PpuvWr3lXm0xOo+0ElTrlYI=
+	t=1773072257; cv=none; b=AlFVG52CfGfxOz/zFBNOx07K5aAYKOvKkFDx03rPpEh2V+FVNx+b9/TCvA4eGVKVwQGY0LgnmvoxMinBSI9P13ISE3crUsdIisJdLIs/cHDI2b329GtdgRTG5f9g9mjyvfHhPz0r/NsvEgtLBDtC+/oDNOUqJOAzXxtCB72wG7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773071962; c=relaxed/simple;
-	bh=lPqkw/giSEVhhB4XxhbF67RO08+rKdZ8faKS90IIt2w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ortusbxCgXtASNf0e9LHJj7ugxLKtIhdi8Kb6kOv3tzA9MdUP09IBt7jLriRVtfYwlsZcJIhgnNXiJqIUDeYESZCgTZIDMb6qzL0mgT0FEc8lFoRjqP3doQA8nJhacUgBbR9lRwibdJ3OC+HuPqIApUYDQi3gPHzxhjlBR1amY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHAbe4aY; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2addb31945aso85491295ad.1
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 08:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773071960; x=1773676760; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7PxMDgkvJf2sOnKzb29tD1hrzKH7WJBADnay5nniLmY=;
-        b=dHAbe4aYkqRqqtca2dK8qPI9OXgK9jgkFP/Zox285yN9FGxWTZc/0qe5a95oM9av/Q
-         Bvfckb54U9e93mxzppwVR1QlSJZ/XRrW38bzMoCXMmfYYg9sHvZ/SWNvNkXItQal4RnT
-         YvyHWxwneKlL7i+twMqn2kzpQrQCEoe/2ej3EoFyfGHnHAd1EUfmwEj27pnXuMtg++CM
-         VX2hfdctoH4KBE4mYuWC9pwgKYknC5uHPc0EzSuRuAiRtAyw0jrQS0znPS9jgoXHfwl6
-         DT+YblALdjacoM23bvM74B7N6iL7Je7D5K/8ylnr09z9WVxrWyKIj6brAO9hBh3EfroE
-         HEQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773071960; x=1773676760;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7PxMDgkvJf2sOnKzb29tD1hrzKH7WJBADnay5nniLmY=;
-        b=fpEiL/b1RcCXlbv3nnJ5YdNYPRRRQwK0uoW5FrTkU4dzTH9GaGwGKmLWl5c/Fw61Tv
-         iTjXlEbX7oSN3s/v/bfJg368MjP+yB24Js9G2eJNd2oxMZrvSGVUTzNOaX5JmZo7jvem
-         LNiV33rdCIdewM3bS1gnspUZJgTegeLaxJ8qsogoJPJP2rmHiwpKaqWRdL4tDTrTga6q
-         c3loD8OW1363OxuZpcR9QSx9VH7hWkWUZcvG0UCu6nsi5YHMFzrMhQyKPQKkYyC55aez
-         9OwUuFn0DkDgNIrEgettkae1OLwMaT7WTzrkMJQ3FCjjig9+SubFQxiHpkr83lqaO/WQ
-         6vvA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8LUReR2JAqmRiBLHl5AMw9bXnb0+sHqApYpPQb377atEGQ5d68Rb5o8FQLBx5joSbgMshyMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0DzHlcR+wryGHqsybX9lu2M8yMImVNOMOm8PC9BJxXWOceyPs
-	Z+fmb9DDfiEpdtUGAay0uQS4xZa71YtuwnU8Cip28O6r2PAyKFHGaeDV
-X-Gm-Gg: ATEYQzxU/W8Jmr2/HppmzJo85XPaDlTDpBKM7rWYxnVE4mG4Y8vt14kmAAj9Tz6UpcA
-	RLEojLhcgI/Kv0az3XZT9WAhHQNYqQV1wn0DCHCj5HMrVZyTb0dkpCi9WEFc3LfgMTrlW2RPjDq
-	Hg2l+QjCSquEgN/I7AflEtMMbb6NTScLGsuFf2Gca6rK6cxzxi8IbnpVAlE6Hs0xeiR9zvmrUhl
-	G7gjTRsAV90hHgoZP/CaqkWvW+eXmdma70EVQB2kDP1FY4rpy0e3jb0dc9bI0+TNvhLrfD3TK5Q
-	4NZGQ296UiV1UKPn+oEDKgd7zrXfg1h6rTxTOKGbS5pSIdPnwE5USoN3wl6Puv8W0d3yB4Lcyhg
-	aSWgrLOMmSyBHPYQJ94/vRwhi7IJtEbwaa2XMh66Ah4aRVdybi8PY5gkHY/FW/1cOrWzrxdVYOu
-	ZkrbVbNAXqnI/HFdDSexFMM4uq0iGenAGLiXpFOJTe7e4sJl1/qeINPuVn1oq1q/ywGctmS7p2o
-	5pydzo=
-X-Received: by 2002:a17:902:e545:b0:2ae:5c3d:b07d with SMTP id d9443c01a7336-2ae824bd5b7mr114036545ad.57.1773071959398;
-        Mon, 09 Mar 2026 08:59:19 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:9c3b:4864:d890:cdd5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f74e4fsm122403265ad.58.2026.03.09.08.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 08:59:18 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: mingo@kernel.org,
-	tglx@kernel.org,
-	jiayuan.chen@shopee.com,
-	kees@kernel.org,
-	netdev@vger.kernel.org,
-	dan.carpenter@linaro.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-Subject: [PATCH v2] atm: lec: fix use-after-free in sock_def_readable()
-Date: Mon,  9 Mar 2026 21:29:08 +0530
-Message-ID: <20260309155908.508768-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773072257; c=relaxed/simple;
+	bh=YQIh3iNHCHXWcQVEVV2uLPxl6ztZn3Z0aolgOoSBPTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=F4MVxdTq8RqQhyhRZHNWSHHcJ09qa4HZ1yE7dCJ93Lp7rejF/MdUHllQ1xM+x1tmUvgKKLVsjMoK7z08orAUip5LyOUqYCeFRbYrRZbxz2AsoH9gPqn3tzAd9Ah3DmVWJJHTK2NA9rAo8K4/T4grRD4O0RWOzaL8921TWEmjOb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vzd5M-000000005at-3Ohq;
+	Mon, 09 Mar 2026 16:04:00 +0000
+Date: Mon, 9 Mar 2026 16:03:57 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jonas Gorski <jonas.gorski@gmail.com>
+Subject: [PATCH] selftests: net: local_termination: test link-local protocols
+Message-ID: <a085c707b3085eea58850f125c51a8868c5fb6f1.1773072062.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4AE9D23C6D8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 5252323C7DE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,shopee.com,vger.kernel.org,linaro.org,gmail.com,syzkaller.appspotmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-265622-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-265623-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,nxp.com,makrotopia.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.398];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,syzkaller.appspot.com:url]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[local_termination.sh:url,makrotopia.org:mid,makrotopia.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-A race condition exists between lec_atm_close() setting priv->lecd
-to NULL and concurrent access to priv->lecd in send_to_lecd(),
-lec_handle_bridge(), and lec_atm_send(). When the socket is freed
-via RCU while another thread is still using it, a use-after-free
-occurs in sock_def_readable() when accessing the socket's wait queue.
+Add tests to local_termination.sh to verify that link-local frames
+arrive. On some switches the DSA driver uses bridges to connect the
+user ports to their CPU ports. More "intelligent" switches typically
+don't forward link-local frames, but may trap them to an internal
+microcontroller. The driver may have to change trapping rules, so
+link-local frames end up on the DSA CPU ports instead of being
+silently dropped or trapped to the internal microcontroller of the
+switch.
 
-The root cause is that lec_atm_close() clears priv->lecd without
-any synchronization, while callers dereference priv->lecd without
-any protection against concurrent teardown.
+Add two tests which help to validate this has been done correctly:
+ - Link-local STP BPDU should always arrive at the Linux netdev
+ - Link-local LLDP should arrive at standalone ports (and the test
+   should be skipped on bridged ports similar to how it is done
+   for the IEEE1588v2/PTP tests)
 
-Fix this by converting priv->lecd to an RCU-protected pointer:
-- Mark priv->lecd as __rcu in lec.h
-- Use rcu_assign_pointer() in lec_atm_close() and lecd_attach()
-  for safe pointer assignment
-- Use rcu_access_pointer() for NULL checks that do not dereference
-  the pointer in lec_start_xmit(), lec_push(), send_to_lecd() and
-  lecd_attach()
-- Use rcu_read_lock/rcu_dereference/rcu_read_unlock in send_to_lecd(),
-  lec_handle_bridge() and lec_atm_send() to safely access lecd
-- Use rcu_assign_pointer() followed by synchronize_rcu() in
-  lec_atm_close() to ensure all readers have completed before
-  proceeding. This is safe since lec_atm_close() is called from
-  vcc_release() which holds lock_sock(), a sleeping lock.
-- Remove the manual sk_receive_queue drain from lec_atm_close()
-  since vcc_destroy_socket() already drains it after lec_atm_close()
-  returns.
-
-v2: Switch from spinlock + sock_hold/put approach to RCU to properly
-    fix the race. The v1 spinlock approach had two issues pointed out
-    by Eric Dumazet:
-    1. priv->lecd was still accessed directly after releasing the
-       lock instead of using a local copy.
-    2. The spinlock did not prevent packets being queued after
-       lec_atm_close() drains sk_receive_queue since timer and
-       workqueue paths bypass netif_stop_queue().
-
-Note: Syzbot patch testing was attempted but the test VM terminated
-    unexpectedly with "Connection to localhost closed by remote host",
-    likely due to a QEMU AHCI emulation issue unrelated to this fix.
-    Compile testing with "make W=1 net/atm/lec.o" passes cleanly.
-
-Reported-by: syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f50072212ab792c86925
-Link: https://lore.kernel.org/all/20260309093614.502094-1-kartikey406@gmail.com/T/ [v1]
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- net/atm/lec.c | 70 +++++++++++++++++++++++++++++++++------------------
- net/atm/lec.h |  2 +-
- 2 files changed, 46 insertions(+), 26 deletions(-)
+ .../net/forwarding/local_termination.sh       | 25 +++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index fb93c6e1c329..32adf28663a0 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -154,10 +154,19 @@ static void lec_handle_bridge(struct sk_buff *skb, struct net_device *dev)
- 					/* 0x01 is topology change */
+diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
+index 1f2bf6e818477..9bc9d25e71368 100755
+--- a/tools/testing/selftests/net/forwarding/local_termination.sh
++++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+@@ -100,6 +100,15 @@ PTP_1588_IPV6_PDELAY_REQ=" \
+ 00 00 3e 37 63 ff fe cf 17 0e 00 01 00 01 05 7f \
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+ 00 00 00 00 00 00"
++LINK_LOCAL_STP_BPDU=" \
++01:80:c2:00:00:00 00:00:de:ad:be:ef 00 26 42 42 03 \
++00 00 00 00 00 80 00 aa bb cc dd ee ff 00 00 00 00 \
++80 00 aa bb cc dd ee ff 80 01 00 00 14 00 02 00 \
++0f 00"
++LINK_LOCAL_LLDP=" \
++01:80:c2:00:00:0e 00:00:de:ad:be:ef 88:cc 02 07 04 \
++00 11 22 33 44 55 04 05 05 65 74 68 30 06 02 00 \
++78 00 00"
  
- 		priv = netdev_priv(dev);
--		atm_force_charge(priv->lecd, skb2->truesize);
--		sk = sk_atm(priv->lecd);
--		skb_queue_tail(&sk->sk_receive_queue, skb2);
--		sk->sk_data_ready(sk);
-+		struct atm_vcc *vcc;
+ # Disable promisc to ensure we don't receive unknown MAC DA packets
+ export TCPDUMP_EXTRA_FLAGS="-pl"
+@@ -213,7 +222,15 @@ run_test()
+ 	mc_route_destroy $rcv_if_name
+ 	mc_route_destroy $send_if_name
+ 
++	ip maddress add 01:80:c2:00:00:00 dev $rcv_if_name
++	send_raw $send_if_name "$LINK_LOCAL_STP_BPDU"
++	ip maddress del 01:80:c2:00:00:00 dev $rcv_if_name
 +
-+		rcu_read_lock();
-+		vcc = rcu_dereference(priv->lecd);
-+		if (vcc) {
-+			atm_force_charge(vcc, skb2->truesize);
-+			sk = sk_atm(vcc);
-+			skb_queue_tail(&sk->sk_receive_queue, skb2);
-+			sk->sk_data_ready(sk);
-+		} else {
-+			dev_kfree_skb(skb2);
-+		}
-+		rcu_read_unlock();
- 	}
- }
- #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-@@ -216,7 +225,7 @@ static netdev_tx_t lec_start_xmit(struct sk_buff *skb,
- 	int is_rdesc;
- 
- 	pr_debug("called\n");
--	if (!priv->lecd) {
-+	if (!rcu_access_pointer(priv->lecd)) {
- 		pr_info("%s:No lecd attached\n", dev->name);
- 		dev->stats.tx_errors++;
- 		netif_stop_queue(dev);
-@@ -449,10 +459,19 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
- 				break;
- 			skb2->len = sizeof(struct atmlec_msg);
- 			skb_copy_to_linear_data(skb2, mesg, sizeof(*mesg));
--			atm_force_charge(priv->lecd, skb2->truesize);
--			sk = sk_atm(priv->lecd);
--			skb_queue_tail(&sk->sk_receive_queue, skb2);
--			sk->sk_data_ready(sk);
-+			struct atm_vcc *vcc;
+ 	if [ $skip_ptp = false ]; then
++		ip maddress add 01:80:c2:00:00:0e dev $rcv_if_name
++		send_raw $send_if_name "$LINK_LOCAL_LLDP"
++		ip maddress del 01:80:c2:00:00:0e dev $rcv_if_name
 +
-+			rcu_read_lock();
-+			vcc = rcu_dereference(priv->lecd);
-+			if (vcc) {
-+				atm_force_charge(vcc, skb2->truesize);
-+				sk = sk_atm(vcc);
-+				skb_queue_tail(&sk->sk_receive_queue, skb2);
-+				sk->sk_data_ready(sk);
-+			} else {
-+				dev_kfree_skb(skb2);
-+			}
-+			rcu_read_unlock();
- 		}
- 	}
- #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-@@ -468,23 +486,16 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
+ 		ip maddress add 01:1b:19:00:00:00 dev $rcv_if_name
+ 		send_raw $send_if_name "$PTP_1588_L2_SYNC"
+ 		send_raw $send_if_name "$PTP_1588_L2_FOLLOW_UP"
+@@ -304,7 +321,15 @@ run_test()
+ 		"$smac > $UNKNOWN_MACV6_MC_ADDR3, ethertype IPv6 (0x86dd)" \
+ 		true "$test_name"
  
- static void lec_atm_close(struct atm_vcc *vcc)
- {
--	struct sk_buff *skb;
- 	struct net_device *dev = (struct net_device *)vcc->proto_data;
- 	struct lec_priv *priv = netdev_priv(dev);
- 
--	priv->lecd = NULL;
-+	rcu_assign_pointer(priv->lecd, NULL);
-+	synchronize_rcu();
- 	/* Do something needful? */
- 
- 	netif_stop_queue(dev);
- 	lec_arp_destroy(priv);
- 
--	if (skb_peek(&sk_atm(vcc)->sk_receive_queue))
--		pr_info("%s closing with messages pending\n", dev->name);
--	while ((skb = skb_dequeue(&sk_atm(vcc)->sk_receive_queue))) {
--		atm_return(vcc, skb->truesize);
--		dev_kfree_skb(skb);
--	}
--
- 	pr_info("%s: Shut down!\n", dev->name);
- 	module_put(THIS_MODULE);
- }
-@@ -510,12 +521,14 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
- 	     const unsigned char *mac_addr, const unsigned char *atm_addr,
- 	     struct sk_buff *data)
- {
-+	struct atm_vcc *vcc;
- 	struct sock *sk;
- 	struct sk_buff *skb;
- 	struct atmlec_msg *mesg;
- 
--	if (!priv || !priv->lecd)
-+	if (!priv || !rcu_access_pointer(priv->lecd))
- 		return -1;
++	check_rcv $rcv_if_name "Link-local STP BPDU" \
++		"> 01:80:c2:00:00:00" \
++		true "$test_name"
 +
- 	skb = alloc_skb(sizeof(struct atmlec_msg), GFP_ATOMIC);
- 	if (!skb)
- 		return -1;
-@@ -532,18 +545,27 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
- 	if (atm_addr)
- 		memcpy(&mesg->content.normal.atm_addr, atm_addr, ATM_ESA_LEN);
- 
--	atm_force_charge(priv->lecd, skb->truesize);
--	sk = sk_atm(priv->lecd);
-+	rcu_read_lock();
-+	vcc = rcu_dereference(priv->lecd);
-+	if (!vcc) {
-+		rcu_read_unlock();
-+		kfree_skb(skb);
-+		return -1;
-+	}
+ 	if [ $skip_ptp = false ]; then
++		check_rcv $rcv_if_name "Link-local LLDP" \
++			"> 01:80:c2:00:00:0e" \
++			true "$test_name"
 +
-+	atm_force_charge(vcc, skb->truesize);
-+	sk = sk_atm(vcc);
- 	skb_queue_tail(&sk->sk_receive_queue, skb);
- 	sk->sk_data_ready(sk);
- 
- 	if (data != NULL) {
- 		pr_debug("about to send %d bytes of data\n", data->len);
--		atm_force_charge(priv->lecd, data->truesize);
-+		atm_force_charge(vcc, data->truesize);
- 		skb_queue_tail(&sk->sk_receive_queue, data);
- 		sk->sk_data_ready(sk);
- 	}
- 
-+	rcu_read_unlock();
- 	return 0;
- }
- 
-@@ -618,7 +640,7 @@ static void lec_push(struct atm_vcc *vcc, struct sk_buff *skb)
- 
- 		atm_return(vcc, skb->truesize);
- 		if (*(__be16 *) skb->data == htons(priv->lecid) ||
--		    !priv->lecd || !(dev->flags & IFF_UP)) {
-+		    !rcu_access_pointer(priv->lecd) || !(dev->flags & IFF_UP)) {
- 			/*
- 			 * Probably looping back, or if lecd is missing,
- 			 * lecd has gone down
-@@ -753,12 +775,12 @@ static int lecd_attach(struct atm_vcc *vcc, int arg)
- 		priv = netdev_priv(dev_lec[i]);
- 	} else {
- 		priv = netdev_priv(dev_lec[i]);
--		if (priv->lecd)
-+		if (rcu_access_pointer(priv->lecd))
- 			return -EADDRINUSE;
- 	}
- 	lec_arp_init(priv);
- 	priv->itfnum = i;	/* LANE2 addition */
--	priv->lecd = vcc;
-+	rcu_assign_pointer(priv->lecd, vcc);
- 	vcc->dev = &lecatm_dev;
- 	vcc_insert_socket(sk_atm(vcc));
- 
-diff --git a/net/atm/lec.h b/net/atm/lec.h
-index be0e2667bd8c..ec85709bf818 100644
---- a/net/atm/lec.h
-+++ b/net/atm/lec.h
-@@ -91,7 +91,7 @@ struct lec_priv {
- 						 */
- 	spinlock_t lec_arp_lock;
- 	struct atm_vcc *mcast_vcc;		/* Default Multicast Send VCC */
--	struct atm_vcc *lecd;
-+	struct atm_vcc __rcu *lecd;
- 	struct delayed_work lec_arp_work;	/* C10 */
- 	unsigned int maximum_unknown_frame_count;
- 						/*
+ 		check_rcv $rcv_if_name "1588v2 over L2 transport, Sync" \
+ 			"ethertype PTP (0x88f7).* PTPv2.* msg type *: sync msg" \
+ 			true "$test_name"
 -- 
-2.43.0
-
+2.53.0
 
