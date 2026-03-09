@@ -1,229 +1,265 @@
-Return-Path: <netdev+bounces-265437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WIT3CMWVrmnRGQIAu9opvQ
-	(envelope-from <netdev+bounces-265437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:41:25 +0100
+	id UI31LFqWrmnRGQIAu9opvQ
+	(envelope-from <netdev+bounces-265438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:43:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1EE2365AB
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:41:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 206E423666B
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68C073040022
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:39:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC2F83033FA2
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D58637B3EE;
-	Mon,  9 Mar 2026 09:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D0A37B024;
+	Mon,  9 Mar 2026 09:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="B3llQGDV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D0377ECC
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D345D378D8C;
+	Mon,  9 Mar 2026 09:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773049144; cv=none; b=bXsRE3YDCubU6uUn6qUE/XVzr7bsdYEoL+O0kz9ws8D4ROTrbH7xhRVWLlw/tv/ovYNs8H2BqvoEs+1VwM0VA0qRWF2Ui7Ku6zLYEoFjWn6U7n2rYDFfVsZaKCmXmYvH9smVzeDfF/e4ZEAco01XsUDZWUD5XEC+Vuz5RcIAlug=
+	t=1773049173; cv=none; b=n6z6PROVAvyulFcGYGKWGl0j8xBBMO2X0IPIY/I5ELyDkZi4J2wTO2HVZxi+IEsdevR9zZmUJ9dtiMRnliB3cxh+po4ZKPO3Q4Vmz9kFyOpKGrfPsHcuEsj+18GEeF9Ii92ZQhB6/QHAMzNJ+//27tMHS+uMf9A5qg/84TnJZz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773049144; c=relaxed/simple;
-	bh=mhcSW5ofChxPY7nazYhgsZIcrw+YsIdHRnnge4PT+XE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=VhL8mZO3CEZ6o6NKxCNI64zTTL1JSIEHh+zhSw7B5aV4+ED2xVj/izY/FMv5Qjc8R+1SXTEvuTAvwPE6RN6DEhKPvzdZrVYsLfCjzL0FCCGvk/8DS16VuvbHoXUw2hAgvlEsNa048WXuMVP4q86aBJTamj3x4uQwsAS746L+IhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7d74cd7b1e3so2952260a34.1
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:39:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773049142; x=1773653942;
-        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8fulRvnbfDto4isKubtnsqcm+jpd2DtUBe+QZPggWKQ=;
-        b=g54PBqpBPs5bQkVd/pcwnvUnm4k1U8iDU7b6jsf8U3Mmm2qlvEIvgABrVRhqnXYsMJ
-         h9qvrMKt1VdWD0jm0qWJ+h/gYnit3T1GFYva6SVLPQS9jUdliMeE5Rc03Ss5KRmELV2p
-         y+vxM43PN/N9h1fQ4PxgqVG1n2Zids7u28MUKdwwLT0y3Coany0+pN+duOR970xOt/j0
-         Fbc/xo0AYTMAIkGtl1/KbCsrCWaA+QO0YADCHo8pkPCxlBtbYqOOUN+0qLGRD6cALfaJ
-         EFW/0009lFVWgO5F8Ezyy7MlA0fL42ba4ORcE1UUe8wG62P0MTGvaaKZgzEl2fAUGP0o
-         FRLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdjh++8hiZ9l5mHwG4h8JDacaJ7qOQ1iE14zT9fqr5WdJ2AxKFelHrVf00iABOUIiNGPBMin0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yytqv/8n8XNenK2uNecdTMheRzxgKf4GZ9n58gOAwEwC92j+Mm+
-	CDXG0TmZyybglNeU5o7DcXYIR6l6IHbCI4GkjWenv61L3vy04j1obKVWerpsBUp+k1jrmMP+qeQ
-	HGwKGUzWJVg7NT6ck9OldbRFur4ZBqdsFdtAEBNhC9lKdq4OofVEus8wM2w0=
+	s=arc-20240116; t=1773049173; c=relaxed/simple;
+	bh=USaxOJqUlJvq9yWbxsgQP4FNKfav2RWvTmVjdVa1vSA=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=R4c5t1jcWRvAxT9M/WzZJH5M1gZUeX2HdfjHetiP1aU0LUxcDWz7X+ihgNtcHNuwXjzCJ1rFTUmX0Un67ND17+c/SCn5xtv39canXSqQH6X29fIpXl0Owi+MfhE4NPa0cJK5+Q2kn75kMUaRS3kJCatgEN+bQNhW7WnoE29j1Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=B3llQGDV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YwtMUAZTUX+DedK7frl0afLmUEjjoTcHhOmPYx1WSBI=; b=B3llQGDVnKBI167hb5R/sRWnqa
+	XNblndQ4QAjWq40iQY+qavBoLNgznejSKQ6pbEycaLtS9rKuOVcBo2GC1XwWwhMamhvm6d/70kyQx
+	h/RzR41NkGqCtEQlSeThx+US5hqAJ4F3UcwGGJpu5mBLlz7IeMocfdITFlzkX91KkQdLmMZEz6aqG
+	i5ceQGtTndqz99qHLQCrwJbHaWoul//DTHYl51fpO+3j0hUK4oZA3fMigKit5UUPJ2lr4rdhQISN2
+	64FfreYxvLBQiLvYvFvBirwXB5gTIpYBkXcQOzhBmBf9jDLxC/aZPpAAIPJP14sxx9kQI4DRIr+o2
+	Ud+7kbvQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57936 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vzX55-000000003U4-2RSB;
+	Mon, 09 Mar 2026 09:39:19 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vzX54-0000000CVrw-2jfu;
+	Mon, 09 Mar 2026 09:39:18 +0000
+In-Reply-To: <aa6VEsmBK-S9eNYU@shell.armlinux.org.uk>
+References: <aa6VEsmBK-S9eNYU@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	s32@nxp.com,
+	Samuel Holland <samuel@sholland.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Yao Zi <me@ziyao.cc>
+Subject: [PATCH net-next v2 1/7] net: stmmac: provide plat_dat->dma_cfg in
+ stmmac_plat_dat_alloc()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f023:b0:679:a5a6:8331 with SMTP id
- 006d021491bc7-67b9bd6c368mr6747365eaf.64.1773049142109; Mon, 09 Mar 2026
- 02:39:02 -0700 (PDT)
-Date: Mon, 09 Mar 2026 02:39:02 -0700
-In-Reply-To: <hsaps6s7nptbzfp2mdx3b7ah3u2e6ydxj4ww2hho3ou3l7la6m@b3fw343ncpja>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69ae9536.050a0220.310d8.001e.GAE@google.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in
- sock_def_readable (2)
-From: syzbot <syzbot+f50072212ab792c86925@syzkaller.appspotmail.com>
-To: jiayuan.chen@linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8B1EE2365AB
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vzX54-0000000CVrw-2jfu@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 09 Mar 2026 09:39:18 +0000
+X-Rspamd-Queue-Id: 206E423666B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=c5c49ee0942d1cdb];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265437-lists,netdev=lfdr.de,f50072212ab792c86925];
-	MISSING_XM_UA(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265438-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.891];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.324];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,golang.org:url,localhost:email,syzkaller.appspot.com:url]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email]
 X-Rspamd-Action: no action
 
-Hello,
+plat_dat->dma_cfg is unconditionally required for the operation of the
+driver, so it would make sense to allocate it along with the plat_dat.
 
-syzbot tried to test the proposed patch but the build/boot failed:
+On Arm64, sizeof(*plat_dat) has recently shrunk from 880 to 816 bytes
+and sizeof(*plat_dat->dma_cfg) has shrunk from 32 to 20 bytes.
 
-failed to copy syz-execprog to VM: failed to run ["scp" "-P" "48817" "-F" "=
-/dev/null" "-o" "UserKnownHostsFile=3D/dev/null" "-o" "IdentitiesOnly=3Dyes=
-" "-o" "BatchMode=3Dyes" "-o" "StrictHostKeyChecking=3Dno" "-o" "ConnectTim=
-eout=3D10" "/syzkaller/jobs/linux/gopath/src/github.com/google/syzkaller/bi=
-n/linux_amd64/syz-execprog" "root@localhost:/syz-execprog"]: exit status 25=
-5
+Given that dma_cfg is required, and it is now less than a cache line,
+It doesn't make sense to allocate this separateny, so place it at the
+end of struct plat_stmmacenet_data, and set plat_dat->dma_cfg to point
+at that to avoid mass changes.
 
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 5 -----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 4 ----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c | 4 ----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 5 -----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 8 +-------
+ include/linux/stmmac.h                                | 1 +
+ 7 files changed, 4 insertions(+), 25 deletions(-)
 
-
-syzkaller build log:
-go env (err=3D<nil>)
-AR=3D'ar'
-CC=3D'gcc'
-CGO_CFLAGS=3D'-O2 -g'
-CGO_CPPFLAGS=3D''
-CGO_CXXFLAGS=3D'-O2 -g'
-CGO_ENABLED=3D'1'
-CGO_FFLAGS=3D'-O2 -g'
-CGO_LDFLAGS=3D'-O2 -g'
-CXX=3D'g++'
-GCCGO=3D'gccgo'
-GO111MODULE=3D'auto'
-GOAMD64=3D'v1'
-GOARCH=3D'amd64'
-GOAUTH=3D'netrc'
-GOBIN=3D''
-GOCACHE=3D'/syzkaller/.cache/go-build'
-GOCACHEPROG=3D''
-GODEBUG=3D''
-GOENV=3D'/syzkaller/.config/go/env'
-GOEXE=3D''
-GOEXPERIMENT=3D''
-GOFIPS140=3D'off'
-GOFLAGS=3D''
-GOGCCFLAGS=3D'-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=3D0=
- -ffile-prefix-map=3D/tmp/go-build3224921581=3D/tmp/go-build -gno-record-gc=
-c-switches'
-GOHOSTARCH=3D'amd64'
-GOHOSTOS=3D'linux'
-GOINSECURE=3D''
-GOMOD=3D'/syzkaller/jobs/linux/gopath/src/github.com/google/syzkaller/go.mo=
-d'
-GOMODCACHE=3D'/syzkaller/jobs/linux/gopath/pkg/mod'
-GONOPROXY=3D''
-GONOSUMDB=3D''
-GOOS=3D'linux'
-GOPATH=3D'/syzkaller/jobs/linux/gopath'
-GOPRIVATE=3D''
-GOPROXY=3D'https://proxy.golang.org,direct'
-GOROOT=3D'/usr/local/go'
-GOSUMDB=3D'sum.golang.org'
-GOTELEMETRY=3D'local'
-GOTELEMETRYDIR=3D'/syzkaller/.config/go/telemetry'
-GOTMPDIR=3D''
-GOTOOLCHAIN=3D'auto'
-GOTOOLDIR=3D'/usr/local/go/pkg/tool/linux_amd64'
-GOVCS=3D''
-GOVERSION=3D'go1.26.0'
-GOWORK=3D''
-PKG_CONFIG=3D'pkg-config'
-
-git status (err=3D<nil>)
-HEAD detached at 7c9658af8505
-nothing to commit, working tree clean
-
-
-tput: No value for $TERM and no -T specified
-tput: No value for $TERM and no -T specified
-Makefile:31: run command via tools/syz-env for best compatibility, see:
-Makefile:32: https://github.com/google/syzkaller/blob/master/docs/contribut=
-ing.md#using-syz-env
-go list -f '{{.Stale}}' -ldflags=3D"-s -w -X github.com/google/syzkaller/pr=
-og.GitRevision=3D7c9658af8505abccd5bf5890cc8a8e6d9826eaa0 -X github.com/goo=
-gle/syzkaller/prog.gitRevisionDate=3D20260223-092328"  ./sys/syz-sysgen | g=
-rep -q false || go install -ldflags=3D"-s -w -X github.com/google/syzkaller=
-/prog.GitRevision=3D7c9658af8505abccd5bf5890cc8a8e6d9826eaa0 -X github.com/=
-google/syzkaller/prog.gitRevisionDate=3D20260223-092328"  ./sys/syz-sysgen
-make .descriptions
-tput: No value for $TERM and no -T specified
-tput: No value for $TERM and no -T specified
-Makefile:31: run command via tools/syz-env for best compatibility, see:
-Makefile:32: https://github.com/google/syzkaller/blob/master/docs/contribut=
-ing.md#using-syz-env
-bin/syz-sysgen
-touch .descriptions
-GOOS=3Dlinux GOARCH=3Damd64 go build -ldflags=3D"-s -w -X github.com/google=
-/syzkaller/prog.GitRevision=3D7c9658af8505abccd5bf5890cc8a8e6d9826eaa0 -X g=
-ithub.com/google/syzkaller/prog.gitRevisionDate=3D20260223-092328"  -o ./bi=
-n/linux_amd64/syz-execprog github.com/google/syzkaller/tools/syz-execprog
-mkdir -p ./bin/linux_amd64
-g++ -o ./bin/linux_amd64/syz-executor executor/executor.cc \
-	-m64 -O2 -pthread -Wall -Werror -Wparentheses -Wunused-const-variable -Wfr=
-ame-larger-than=3D16384 -Wno-stringop-overflow -Wno-array-bounds -Wno-forma=
-t-overflow -Wno-unused-but-set-variable -Wno-unused-command-line-argument -=
-static-pie -std=3Dc++17 -I. -Iexecutor/_include   -DGOOS_linux=3D1 -DGOARCH=
-_amd64=3D1 \
-	-DHOSTGOOS_linux=3D1 -DGIT_REVISION=3D\"7c9658af8505abccd5bf5890cc8a8e6d98=
-26eaa0\"
-/usr/bin/ld: /tmp/cc2JgryH.o: in function `Connection::Connect(char const*,=
- char const*)':
-executor.cc:(.text._ZN10Connection7ConnectEPKcS1_[_ZN10Connection7ConnectEP=
-KcS1_]+0x386): warning: Using 'gethostbyname' in statically linked applicat=
-ions requires at runtime the shared libraries from the glibc version used f=
-or linking
-./tools/check-syzos.sh 2>/dev/null
-
-
-
-Tested on:
-
-commit:         1f318b96 Linux 7.0-rc3
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc5c49ee0942d1cd=
-b
-dashboard link: https://syzkaller.appspot.com/bug?extid=3Df50072212ab792c86=
-925
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-=
-1~exp1~20251221153213.50), Debian LLD 21.1.8
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=3D1528375a5800=
-00
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index fc13bfb47783..0b32560cd059 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -1251,11 +1251,6 @@ static int intel_eth_pci_probe(struct pci_dev *pdev,
+ 	if (!plat->mdio_bus_data)
+ 		return -ENOMEM;
+ 
+-	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+-				     GFP_KERNEL);
+-	if (!plat->dma_cfg)
+-		return -ENOMEM;
+-
+ 	plat->safety_feat_cfg = devm_kzalloc(&pdev->dev,
+ 					     sizeof(*plat->safety_feat_cfg),
+ 					     GFP_KERNEL);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index ada6c6ef1f5c..51b1562f84d1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -513,10 +513,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (!plat->mdio_bus_data)
+ 		return -ENOMEM;
+ 
+-	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+-	if (!plat->dma_cfg)
+-		return -ENOMEM;
+-
+ 	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+ 	if (!ld)
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c
+index 8b45b9cf7202..d245546b90db 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c
+@@ -218,10 +218,6 @@ motorcomm_default_plat_data(struct pci_dev *pdev)
+ 	if (!plat->mdio_bus_data)
+ 		return NULL;
+ 
+-	plat->dma_cfg = devm_kzalloc(dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+-	if (!plat->dma_cfg)
+-		return NULL;
+-
+ 	plat->axi = devm_kzalloc(dev, sizeof(*plat->axi), GFP_KERNEL);
+ 	if (!plat->axi)
+ 		return NULL;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index f0160ff54a59..87f43811faa0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7730,6 +7730,8 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
+ 	if (!plat_dat)
+ 		return NULL;
+ 
++	plat_dat->dma_cfg = &plat_dat->__dma_cfg;
++
+ 	/* Set the defaults:
+ 	 * - phy autodetection
+ 	 * - determine GMII_Address CR field from CSR clock
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 270ad066ced3..836fed7d60ab 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -134,11 +134,6 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
+ 	if (!plat->mdio_bus_data)
+ 		return -ENOMEM;
+ 
+-	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+-				     GFP_KERNEL);
+-	if (!plat->dma_cfg)
+-		return -ENOMEM;
+-
+ 	plat->safety_feat_cfg = devm_kzalloc(&pdev->dev,
+ 					     sizeof(*plat->safety_feat_cfg),
+ 					     GFP_KERNEL);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index c34998486293..1aed48fe0db6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -548,13 +548,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 				     &plat->multicast_filter_bins);
+ 	}
+ 
+-	dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*dma_cfg),
+-			       GFP_KERNEL);
+-	if (!dma_cfg) {
+-		ret = ERR_PTR(-ENOMEM);
+-		goto error_put_mdio;
+-	}
+-	plat->dma_cfg = dma_cfg;
++	dma_cfg = plat->dma_cfg;
+ 
+ 	of_property_read_u32(np, "snps,pbl", &dma_cfg->pbl);
+ 	if (!dma_cfg->pbl)
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 965ada809fdf..919196713c05 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -306,5 +306,6 @@ struct plat_stmmacenet_data {
+ 	int msi_tx_base_vec;
+ 	const struct dwmac4_addrs *dwmac4_addrs;
+ 	unsigned int flags;
++	struct stmmac_dma_cfg __dma_cfg;
+ };
+ #endif
+-- 
+2.47.3
 
 
