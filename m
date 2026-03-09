@@ -1,273 +1,220 @@
-Return-Path: <netdev+bounces-265420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKWGIP+Qrmk7GQIAu9opvQ
-	(envelope-from <netdev+bounces-265420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:21:03 +0100
+	id wNwtMJSSrml0GQIAu9opvQ
+	(envelope-from <netdev+bounces-265421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:27:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A062360EB
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:21:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E25623625D
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4EEDB30071E0
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:21:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19DB430626FD
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BAF378805;
-	Mon,  9 Mar 2026 09:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B0D3793AB;
+	Mon,  9 Mar 2026 09:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xToV7xoJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fexixnws"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3D9377EC6
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773048061; cv=none; b=qVdDSPOHki77+vQUFTR4MAz+1NwWtGzbZyuG0hJxD0tLLgdLY+pyZ+QKxX8g8wi8m7EATwFKALyuWGbeUCY7g7R1mxdQrJvqOUDbkqdZR7CXoGvm0fCCq7lpgBPPN+phrcWBj7lpAB+vSZ6573yHm8c9emuPiIEAC7ZNgvS0Bo4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773048061; c=relaxed/simple;
-	bh=k9nqtEUnD+Ki/qC4dN9ywETUDsDAQwSjaoAAHPgXt5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AwYj3OPdfle+wkkmGYx9SAVnIpt3Gm7bu2Ma75MUqqVqdvWe3JZhknKOYiHXRVcjieRamQ2IaC19LZtyc2eeTAwHHAfEvn//JmwpIP3/j4bPzdAZc10PDN3S3yQ62ola92mT7RrhJYk4o3B6qT+rFeSfe8ByQ+LEzRDlcc5SLEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xToV7xoJ; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 9 Mar 2026 17:20:36 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773048046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lzoMzJT3wD8V7gz73ke5OvICidefQs02jJDZPODB0DE=;
-	b=xToV7xoJXFwNNXPgC87E7QiyXn72WmfSj4BI1HxYe3MzrZVml5ujWoh5NbXvyMZopV8A1j
-	ksdqjVPz5ek1Kgo5Bji1RluuNGnGeIi2uxLDEPMY0wSOKSuXq55izAkb0pUhTBSUpd7ic9
-	/lAZoeM38RL1HeVK12qs4aezIoHPijE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: syzbot <syzbot+f50072212ab792c86925@syzkaller.appspotmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in
- sock_def_readable (2)
-Message-ID: <hsaps6s7nptbzfp2mdx3b7ah3u2e6ydxj4ww2hho3ou3l7la6m@b3fw343ncpja>
-References: <69ad7ccb.a00a0220.b130.0003.GAE@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082FB378802
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773048173; cv=pass; b=avq66NOCQt5j/xi8kaBURqx/XDpzqGqojIo3GDEqlLi3VOaMzjyliBmHg++CicYiksdzkWg02RLHxap2G7Ucua2FZgFM7oXpdHp95LYF0CO4AghZCB5g0j4Lmso5hwiUVP2+amZKczNNl+Jbz1ROdDyoMSotIlDZubFz2jEcTns=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773048173; c=relaxed/simple;
+	bh=upio09NojrFHMRimK65FKWysiVde+qA9+o9ztExC8qM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GUmqyA/4y0Xm3D7Ayk/BBZr5cilwEKy6ja7dAfVlK8YQKc24bXEVHHNLqaICxm1boCs6j0CGZl3uYc5Dt0h4uUXVcUYewIsWfh80PSOYnvSaTS9lVxrVt736Xe9mBp6wnYr/onkQK1l71pMc7vkHhcYdjzHJCzcqsQqEaGeGZJM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fexixnws; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-506a747448dso102119651cf.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:22:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773048171; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cqv55Vw51tTscOVloEaxKApLrhQ4vPUT9wPRZdA/B95vlef5nb9XtVKLXLwKOO3B2f
+         k3pGxY97QPd501ZdCpjuxpahBfAyIl8J9r7zjvHJ4CM2dzlKrr6feWN4MeNhc0ZeR9ze
+         ott57+w3Gs+jmgibHpFFMulI0tH1Zz/w7nu5paqNELMRwLOKbY2vE1aBxNOhsrrnI9AX
+         QbamSstSnOosXcZQuHPjv9nfP9Xd8QDP+1MiP4u1ce167njzhRIrMrw0x5cAnvxbgRG5
+         jiiInH2Nk51qF8Uhvbt+sY/wNR6ttyZLTObOVko0JFR7b9vpWzIqux1+CHD6WOZAiuKY
+         9oRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=N7fC3bjKwQcF/Me1NQG71BV/tCAMZf7S0tDB0ddNnBM=;
+        fh=6mNe/Pjj4YaM+2peoPL1+h3eOme+i3QCNe7VOf7U//E=;
+        b=YA6yzT1e3bKO+4mTTG1yUZfUMHOuHWDy9d08TqmLnkxDEURoNO1ltN/lbDy4Nuph/E
+         wWTyReZsaOWL44GI9SEDJq+Ivkc6shk7qnUsjfqDDdZTithBpVb50Gtr1WdlTK/2B5Az
+         NCNA3tb6uazvW5tIrAn+hr6VLIk1HVL85+GsNdEcbteQf7zgMlb4hXURfipvmGDebtGk
+         31bgjF47HYO08mlrAQTzoS+YmxVYSVW65pehKv3WTTq/B4TUiZpk7PddpdlT0Sk5a8Ky
+         DVQatoctbk+UiFeCt1n9qeguGeqjU1zZj+ltYQtIRxNCDSM/xwH5nnybas66RFV47Zwh
+         yvDA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773048171; x=1773652971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N7fC3bjKwQcF/Me1NQG71BV/tCAMZf7S0tDB0ddNnBM=;
+        b=fexixnwskWyap/xV0vuQW1vre2lrsKvrlUl4bS1mgw54DXmcLrk0oZJimMGz8kIarm
+         Q3ELG5dzOKm6C5zpFk+F5FrL5QJFHGhnDCU13/B0yhT2a8HHxfZdOsbSRnyxhoxB/S0D
+         yllytPkipre5Wq8gYM4/c85/LFZQS03gacEkv6bbKbQlyp/u1c4E/Ze0EbH1Oy/6i2Sy
+         jeZiBBTSt1G8SRsAwldNqm5V/4Cebb0t36JrukuhrGTxwKAUc576eJXoYXIrEFAXM3l/
+         Ba2HHiCLRMVQou9gdxUyP9Vpzh8HzjcDumT2c8HlRaCLamc/1Sp2sIrSQBmKd3860kcW
+         DCXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773048171; x=1773652971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=N7fC3bjKwQcF/Me1NQG71BV/tCAMZf7S0tDB0ddNnBM=;
+        b=G4Pw4hynUBlLLjzXhpgJIhwkbtABlx/k96x3XV6O9JM383FosRB5Yh1lyd4JIwVkoi
+         M3b6XTdYdUvN6LcAqIOxO89Ug2XJ/MEDn+fsKnN2iEqAjvtNhFd8ETRH/bf3BkadskCc
+         s4ikB+AKLVdrhwViz6eEYbB4KhtdxDK2c0pKvjLOav2sJZgZCxANW2ZdJS+ningbCqPG
+         lOCVIOPpfZmypwIKB7y9HblW8k/SnDlBvkGrLFjKoQe1J7svWOjt+wUvv/+eoO+x8tLk
+         sAVNw+n08xNSzz3kQO7jKrcb+21pxPH36hMWvgnP9Rk5742jYzl9NxINXIu0gwy4ICW8
+         h6sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHrF3FJjUvZKdIO/ULwJClT6QgqITOju2jnvjBrumhSiS5RwQNM4tcgRImGxCDi3Li9NgNxVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGYmw3jsuM70ajbY0B0/XUgQy5JfX2BdMb/0pSFLlF3w9Io1pd
+	mnwBBlc/cRsNQIPIbIPcTTNDN3oMfamub79eJiJVP5NBa8xGQv4TalF5eH4olfpgX5ZUSKWAVy4
+	efm04pjcaVU6ZVFhtcNtBuoHioUfQoZVunLkii4G4
+X-Gm-Gg: ATEYQzzdSokOb8I3Q1yohz6M61no/Fk+ec5zexfP37glGDv1TKlFRg2J2oziLn5vTP/
+	sVhfgdWsN4kwtMFmL6E950lmt6dPwrn6P5S4v0Lf1h8LdUlYGtMmj998nO3ZMLhsSlI7Y6Yb2h4
+	SoyboUBdSoejKxx0Zp9/FML3BzLTHOP+XIqVruCfhIBYNvm0AlI/JVTSTYTvP/VPHIAM7hN9/wl
+	Hp2pI5WvVDZXPEJe8jpzKi+0DFI0aVYptJ1Eyozkh19MsIB/fMmbC2bBTUi8PCqwMrxY4uEdywE
+	hC21H2kdG+cfIrE9rQ==
+X-Received: by 2002:a05:622a:7c91:b0:509:882:9e72 with SMTP id
+ d75a77b69052e-5090882e153mr50961191cf.1.1773048170529; Mon, 09 Mar 2026
+ 02:22:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69ad7ccb.a00a0220.b130.0003.GAE@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: D9A062360EB
+References: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com> <20260309-tcp_rfc7323_retract_wnd_rfc-v3-1-4c7f96b1ec69@gmail.com>
+In-Reply-To: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-1-4c7f96b1ec69@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 9 Mar 2026 10:22:39 +0100
+X-Gm-Features: AaiRm515VzWer9rfQTDKEwoECAFtXOyO-47wB6RLAYk2qz4MnRNOLIFCZe96lfc
+Message-ID: <CANn89i+38t+PpB5duS_-FX_=PwyCQaN2HYohocJBAvZ7Cd8-KQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/6] tcp: implement RFC 7323 window retraction
+ receiver requirements
+To: gmbnomis@gmail.com
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, David Ahern <dsahern@kernel.org>, 
+	Jon Maloy <jmaloy@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>, mfreemon@cloudflare.com, 
+	Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	mptcp@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1E25623625D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265421-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265420-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,cloudflare.com,vger.kernel.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.991];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
 	TO_DN_SOME(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.974];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-#syz test
+On Mon, Mar 9, 2026 at 9:03=E2=80=AFAM Simon Baatz via B4 Relay
+<devnull+gmbnomis.gmail.com@kernel.org> wrote:
+>
+> From: Simon Baatz <gmbnomis@gmail.com>
+>
+> By default, the Linux TCP implementation does not shrink the
+> advertised window (RFC 7323 calls this "window retraction") with the
+> following exceptions:
+>
+> - When an incoming segment cannot be added due to the receive buffer
+>   running out of memory. Since commit 8c670bdfa58e ("tcp: correct
+>   handling of extreme memory squeeze") a zero window will be
+>   advertised in this case. It turns out that reaching the required
+>   memory pressure is easy when window scaling is in use. In the
+>   simplest case, sending a sufficient number of segments smaller than
+>   the scale factor to a receiver that does not read data is enough.
+>
+> - Commit b650d953cd39 ("tcp: enforce receive buffer memory limits by
+>   allowing the tcp window to shrink") addressed the "eating memory"
+>   problem by introducing a sysctl knob that allows shrinking the
+>   window before running out of memory.
+>
+> However, RFC 7323 does not only state that shrinking the window is
+> necessary in some cases, it also formulates requirements for TCP
+> implementations when doing so (Section 2.4).
+>
+> This commit addresses the receiver-side requirements: After retracting
+> the window, the peer may have a snd_nxt that lies within a previously
+> advertised window but is now beyond the retracted window. This means
+> that all incoming segments (including pure ACKs) will be rejected
+> until the application happens to read enough data to let the peer's
+> snd_nxt be in window again (which may be never).
+>
+> To comply with RFC 7323, the receiver MUST honor any segment that
+> would have been in window for any ACK sent by the receiver and, when
+> window scaling is in effect, SHOULD track the maximum window sequence
+> number it has advertised. This patch tracks that maximum window
+> sequence number rcv_mwnd_seq throughout the connection and uses it in
+> tcp_sequence() when deciding whether a segment is acceptable.
+>
+> rcv_mwnd_seq is updated together with rcv_wup and rcv_wnd in
+> tcp_select_window(). If we count tcp_sequence() as fast path, it is
+> read in the fast path. Therefore, rcv_mwnd_seq is put into rcv_wnd's
+> cacheline group.
+>
+> The logic for handling received data in tcp_data_queue() is already
+> sufficient and does not need to be updated.
+>
+> Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
 
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index 7e6fc2bd40ac..7d99ba8ba3b4 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -139,6 +139,7 @@ static void lec_handle_bridge(struct sk_buff *skb, struct net_device *dev)
- 	 */
- 	buff = skb->data + skb->dev->hard_header_len;
- 	if (*buff++ == 0x42 && *buff++ == 0x42 && *buff++ == 0x03) {
-+		struct atm_vcc *vcc;
- 		struct sock *sk;
- 		struct sk_buff *skb2;
- 		struct atmlec_msg *mesg;
-@@ -154,10 +155,18 @@ static void lec_handle_bridge(struct sk_buff *skb, struct net_device *dev)
- 					/* 0x01 is topology change */
+...
 
- 		priv = netdev_priv(dev);
--		atm_force_charge(priv->lecd, skb2->truesize);
--		sk = sk_atm(priv->lecd);
--		skb_queue_tail(&sk->sk_receive_queue, skb2);
--		sk->sk_data_ready(sk);
-+
-+		rcu_read_lock();
-+		vcc = rcu_dereference(priv->lecd);
-+		if (vcc) {
-+			atm_force_charge(vcc, skb2->truesize);
-+			sk = sk_atm(vcc);
-+			skb_queue_tail(&sk->sk_receive_queue, skb2);
-+			sk->sk_data_ready(sk);
-+		} else {
-+			dev_kfree_skb(skb2);
-+		}
-+		rcu_read_unlock();
- 	}
- }
- #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-@@ -216,7 +225,7 @@ static netdev_tx_t lec_start_xmit(struct sk_buff *skb,
- 	int is_rdesc;
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index f0ebcc7e287173be6198fd100130e7ba1a1dbf03..c86910d147f2394bf414d7691=
+d8f90ed41c1b0e3 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -293,6 +293,7 @@ static u16 tcp_select_window(struct sock *sk)
+>                 tp->pred_flags =3D 0;
+>                 tp->rcv_wnd =3D 0;
+>                 tp->rcv_wup =3D tp->rcv_nxt;
+> +               tcp_update_max_rcv_wnd_seq(tp);
 
- 	pr_debug("called\n");
--	if (!priv->lecd) {
-+	if (!rcu_access_pointer(priv->lecd)) {
- 		pr_info("%s:No lecd attached\n", dev->name);
- 		dev->stats.tx_errors++;
- 		netif_stop_queue(dev);
-@@ -440,6 +449,7 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
- 		if (br_fdb_test_addr_hook(dev, mesg->content.proxy.mac_addr)) {
- 			/* hit from bridge table, send LE_ARP_RESPONSE */
- 			struct sk_buff *skb2;
-+			struct atm_vcc *lecd;
- 			struct sock *sk;
+Presumably we do not need  tcp_update_max_rcv_wnd_seq() here ?
 
- 			pr_debug("%s: entry found, responding to zeppelin\n",
-@@ -449,10 +459,18 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
- 				break;
- 			skb2->len = sizeof(struct atmlec_msg);
- 			skb_copy_to_linear_data(skb2, mesg, sizeof(*mesg));
--			atm_force_charge(priv->lecd, skb2->truesize);
--			sk = sk_atm(priv->lecd);
--			skb_queue_tail(&sk->sk_receive_queue, skb2);
--			sk->sk_data_ready(sk);
-+
-+			rcu_read_lock();
-+			lecd = rcu_dereference(priv->lecd);
-+			if (lecd) {
-+				atm_force_charge(lecd, skb2->truesize);
-+				sk = sk_atm(lecd);
-+				skb_queue_tail(&sk->sk_receive_queue, skb2);
-+				sk->sk_data_ready(sk);
-+			} else {
-+				dev_kfree_skb(skb2);
-+			}
-+			rcu_read_unlock();
- 		}
- 	}
- #endif /* IS_ENABLED(CONFIG_BRIDGE) */
-@@ -472,7 +490,8 @@ static void lec_atm_close(struct atm_vcc *vcc)
- 	struct net_device *dev = (struct net_device *)vcc->proto_data;
- 	struct lec_priv *priv = netdev_priv(dev);
-
--	priv->lecd = NULL;
-+	rcu_assign_pointer(priv->lecd, NULL);
-+	synchronize_rcu();
- 	/* Do something needful? */
-
- 	netif_stop_queue(dev);
-@@ -510,15 +529,25 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
- 	     const unsigned char *mac_addr, const unsigned char *atm_addr,
- 	     struct sk_buff *data)
- {
-+	struct atm_vcc *vcc;
- 	struct sock *sk;
- 	struct sk_buff *skb;
- 	struct atmlec_msg *mesg;
-
--	if (!priv || !priv->lecd)
-+	if (!priv)
-+		return -1;
-+
-+	rcu_read_lock();
-+	vcc = rcu_dereference(priv->lecd);
-+	if (!vcc) {
-+		rcu_read_unlock();
- 		return -1;
-+	}
- 	skb = alloc_skb(sizeof(struct atmlec_msg), GFP_ATOMIC);
--	if (!skb)
-+	if (!skb) {
-+		rcu_read_unlock();
- 		return -1;
-+	}
- 	skb->len = sizeof(struct atmlec_msg);
- 	mesg = (struct atmlec_msg *)skb->data;
- 	memset(mesg, 0, sizeof(struct atmlec_msg));
-@@ -532,18 +561,19 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
- 	if (atm_addr)
- 		memcpy(&mesg->content.normal.atm_addr, atm_addr, ATM_ESA_LEN);
-
--	atm_force_charge(priv->lecd, skb->truesize);
--	sk = sk_atm(priv->lecd);
-+	atm_force_charge(vcc, skb->truesize);
-+	sk = sk_atm(vcc);
- 	skb_queue_tail(&sk->sk_receive_queue, skb);
- 	sk->sk_data_ready(sk);
-
- 	if (data != NULL) {
- 		pr_debug("about to send %d bytes of data\n", data->len);
--		atm_force_charge(priv->lecd, data->truesize);
-+		atm_force_charge(vcc, data->truesize);
- 		skb_queue_tail(&sk->sk_receive_queue, data);
- 		sk->sk_data_ready(sk);
- 	}
-
-+	rcu_read_unlock();
- 	return 0;
- }
-
-@@ -618,7 +648,8 @@ static void lec_push(struct atm_vcc *vcc, struct sk_buff *skb)
-
- 		atm_return(vcc, skb->truesize);
- 		if (*(__be16 *) skb->data == htons(priv->lecid) ||
--		    !priv->lecd || !(dev->flags & IFF_UP)) {
-+		    !rcu_access_pointer(priv->lecd) ||
-+		    !(dev->flags & IFF_UP)) {
- 			/*
- 			 * Probably looping back, or if lecd is missing,
- 			 * lecd has gone down
-@@ -753,12 +784,12 @@ static int lecd_attach(struct atm_vcc *vcc, int arg)
- 		priv = netdev_priv(dev_lec[i]);
- 	} else {
- 		priv = netdev_priv(dev_lec[i]);
--		if (priv->lecd)
-+		if (rcu_access_pointer(priv->lecd))
- 			return -EADDRINUSE;
- 	}
- 	lec_arp_init(priv);
- 	priv->itfnum = i;	/* LANE2 addition */
--	priv->lecd = vcc;
-+	rcu_assign_pointer(priv->lecd, vcc);
- 	vcc->dev = &lecatm_dev;
- 	vcc_insert_socket(sk_atm(vcc));
-
-diff --git a/net/atm/lec.h b/net/atm/lec.h
-index be0e2667bd8c..ec85709bf818 100644
---- a/net/atm/lec.h
-+++ b/net/atm/lec.h
-@@ -91,7 +91,7 @@ struct lec_priv {
- 						 */
- 	spinlock_t lec_arp_lock;
- 	struct atm_vcc *mcast_vcc;		/* Default Multicast Send VCC */
--	struct atm_vcc *lecd;
-+	struct atm_vcc __rcu *lecd;
- 	struct delayed_work lec_arp_work;	/* C10 */
- 	unsigned int maximum_unknown_frame_count;
- 						/*
+Otherwise patch looks good, thanks.
 
