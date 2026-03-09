@@ -1,216 +1,201 @@
-Return-Path: <netdev+bounces-265529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265530-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YCZnFzO+rmlEIgIAu9opvQ
-	(envelope-from <netdev+bounces-265529-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:33:55 +0100
+	id gBBDBEq+rmlEIgIAu9opvQ
+	(envelope-from <netdev+bounces-265530-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:34:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B18238E7C
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:33:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A009238E9A
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:34:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEC8231E46C4
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:24:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D83F6309F6A4
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377433A9D9A;
-	Mon,  9 Mar 2026 12:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvW4+5jG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2588A3A785A;
+	Mon,  9 Mar 2026 12:24:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CD33A7834;
-	Mon,  9 Mar 2026 12:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEF11E98E3;
+	Mon,  9 Mar 2026 12:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773059034; cv=none; b=QMn8snAqNI07Dc9XNo8ZkSa6+7I2bQ/F/T7m1h+0dTqICjGDzoXkogVt725+pp2roW5LNCzapvmcynufTj7ZnbaDzpX44f8YKHU1JVjVX4JeKrbp/xyb9iFfq09GwBmuzArvexptrCVCBNxaooVv/mk56y81yzZ9qsqnnU2Cuh0=
+	t=1773059050; cv=none; b=kvXIWB5CLiZRuaykR8CY/Tgb99kqDYkikwoqYM0qu7ZtRe+xGTL/Vg1vYNCLa9so5nNs1Y8iD3CtIqxFWK4G1URUZi8iPJuAWAc2VrFYYR+XuqUVpUw/14JnQTXvmrqGhVdnD2oK4KUdXyY1+GaphigbGGaf8mN/3sxHwkWniwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773059034; c=relaxed/simple;
-	bh=Py+g6qnSgfEWX6Iy57JwP3p1Ze1RcHqTVF7eH+A0Jhk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxnc78KH1VCZkM4/Qr2YTqTyik039zIQwnnXXxnjo9guFlrsw3Jq6lgZOQyoz2j8t/feVFdnNn1N3XreOau6QHugJaWdjbVR9kwACJ7h/pPU463AJmAoCvwGVyXoP3sfsGjTRaqjSOYTvr1/gwJnwKPTBmv/vsP5+EmkOk/yD4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvW4+5jG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11CD8C2BC9E;
-	Mon,  9 Mar 2026 12:23:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773059033;
-	bh=Py+g6qnSgfEWX6Iy57JwP3p1Ze1RcHqTVF7eH+A0Jhk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PvW4+5jGrvqEwqTJgwKyHWnHCD4CDRJ/u0vWGwgMRhHQYFXpnPbSqrG+0BB/qCigK
-	 0rjDo7Wbe/D/FtdJEth+OLeRQNISEeO9zfkJDjL0iFSQ+MjzesPDa+YhQCM7uRjj8M
-	 bYI3GGrKrQhaLcBsA1wbHipEKP6czfMaWYy1dFu9rs7SgNLeHk6pmbyiiQatCeYSK+
-	 nVBxHPOid2BywQf1QS/xk8+7vM5bjB36WH+hi+GGkOaR1/M1TneLJI/yLTeiaEe9kR
-	 505lQlqcTSIio85UBYbLQL7OSLtFP1syJxfq+LY8AKNvuB5it3nCV0QLaqS+6X+15c
-	 KXgvvhib5oFeg==
-Message-ID: <0ae4d678-5676-4523-bae3-5ad73b526e27@kernel.org>
-Date: Mon, 9 Mar 2026 13:23:45 +0100
+	s=arc-20240116; t=1773059050; c=relaxed/simple;
+	bh=LUgbnMDubIMF2fzTLKKDX/tpGuFbuCrDzvX/ed+YwAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c6Eygi11evLLE7EaWR9xPOtqB+o/jPdCCwzfdEvdhdFspiEQgzBuGU3ovUcIQ03S6n16NOu/vYXR3EKDciYHBcbJOBfvDUlikSFBnaWqwMggPu71SJZPMH7fW5xY792djDCZoGV60o3HBTiDQ4cfin+1/FonsM1ViEVAWzlzhCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vzZeS-000000004Dn-164q;
+	Mon, 09 Mar 2026 12:24:00 +0000
+Date: Mon, 9 Mar 2026 12:23:56 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next 1/2] dsa: tag_mxl862xx: set
+ dsa_default_offload_fwd_mark()
+Message-ID: <aa673K_QfgcA7nfi@makrotopia.org>
+References: <cover.1772853341.git.daniel@makrotopia.org>
+ <d9d8e6058e635c1fdd4689c875204d48d0235295.1772853341.git.daniel@makrotopia.org>
+ <3bee5ef1-0692-4779-832f-193017810c38@gmail.com>
+ <aa2TYxEHQ91SbT3A@makrotopia.org>
+ <CAOiHx=n9_asSiAhB=aZKRenh6BsBAYP_3i7WxfBsbUBDz3BrWw@mail.gmail.com>
+ <aa4OJ7hkqoR6oDxZ@makrotopia.org>
+ <CAOiHx==-3Wa54Y+CbkVjwqDwjHk4Rf-uy9ujwc77tQn3kbN9sQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jiri Slaby <jirislaby@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx>
- <87v7f61cnl.ffs@tglx> <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
- <87pl5ds88r.ffs@tglx>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <87pl5ds88r.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D5B18238E7C
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOiHx==-3Wa54Y+CbkVjwqDwjHk4Rf-uy9ujwc77tQn3kbN9sQ@mail.gmail.com>
+X-Rspamd-Queue-Id: 6A009238E9A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265529-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.990];
+	TAGGED_FROM(0.00)[bounces-265530-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.421];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,local_termination.sh:url]
 X-Rspamd-Action: no action
 
-Hi Thomas,
+On Mon, Mar 09, 2026 at 09:07:07AM +0100, Jonas Gorski wrote:
+> On Mon, Mar 9, 2026 at 1:02 AM Daniel Golle <daniel@makrotopia.org> wrote:
+> >
+> > On Sun, Mar 08, 2026 at 09:15:42PM +0100, Jonas Gorski wrote:
+> > > On Sun, Mar 8, 2026 at 4:19 PM Daniel Golle <daniel@makrotopia.org> wrote:
+> > > >
+> > > > On Sat, Mar 07, 2026 at 10:57:56AM +0100, Jonas Gorski wrote:
+> > > > > Hi,
+> > > > >
+> > > > > On 07/03/2026 04:30, Daniel Golle wrote:
+> > > > > > The MxL862xx offloads forwarding between bridged ports to the
+> > > > > > hardware, so set dsa_default_offload_fwd_mark() to avoid duplicate
+> > > > > > forwarding of packets of (eg. flooded) frames arriving at the CPU
+> > > > > > port.
+> > > > > >
+> > > > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > > > > ---
+> > > > > >  net/dsa/tag_mxl862xx.c | 2 ++
+> > > > > >  1 file changed, 2 insertions(+)
+> > > > > >
+> > > > > > diff --git a/net/dsa/tag_mxl862xx.c b/net/dsa/tag_mxl862xx.c
+> > > > > > index 01f2158682718..c02f69de61cbb 100644
+> > > > > > --- a/net/dsa/tag_mxl862xx.c
+> > > > > > +++ b/net/dsa/tag_mxl862xx.c
+> > > > > > @@ -92,6 +92,8 @@ static struct sk_buff *mxl862_tag_rcv(struct sk_buff *skb,
+> > > > > >     skb_pull_rcsum(skb, MXL862_HEADER_LEN);
+> > > > > >     dsa_strip_etype_header(skb, MXL862_HEADER_LEN);
+> > > > > >
+> > > > > > +   dsa_default_offload_fwd_mark(skb);
+> > > > >
+> > > > > Does the switch (by default) also flood link local traffic (e.g. STP, LACP,
+> > > > > etc)? If not, you should not mark these as fwd offloaded.
+> > > >
+> > > > No, it doesn't. Testing revealed that apparently it silently consumes them.
+> > > > I assume we'll need something like
+> > > >
+> > > > if (likely(!is_link_local_ether_addr(eth_hdr(skb)->h_dest)))
+> > > >     dsa_default_offload_fwd_mark(skb);
+> > > >
+> > > > similar to tag_brcm.c, right?
+> > >
+> > > Yepp, that would have been my suggestion :-)
+> >
+> > Ok, I'll do that then.
+> >
+> > >
+> > > > > Is there is a bit in the header that says whether a packet was flooded or
+> > > > > trapped that you can check?
+> > > >
+> > > > Earlier testing showed that frames arriving at the microcontroller under
+> > > > some conditions are relayed to the DSA CPU port -- and are destinguishable
+> > > > as such. However, there is not bit directly indicating whether the packet
+> > > > was (also) flooded already.
+> > >
+> > > So you know if they were copied to the cpu port due to some rules, but
+> > > not if they were snooped or trapped?
+> >
+> > I haven't found any details about that documented, and all I can say
+> > is that in some cases (some of the IEEE1588v2 frames generated by the
+> > local_termination.sh selftest, for example) the microcontroller seems
+> > to send an additional copy of the frame to the DSA CPU port using
+> > fields of the 8-byte tag which usually aren't used -- and that's why I
+> > even noticed them. The initial driver now merged upstream disabled the
+> > microcontroller SDMA and FMDA, effectively disconnecting it from the
+> > switch datapath, so it would shut up, and this effect can now longer
+> > be observed.
+> >
+> > Now, when testing if link-local frames would be forwarded I noticed
+> > that there is a set of default rules instatiated after reset which
+> > trap link-local frames to the microcontroller port. I suppose it could
+> > also be setup to snoop instead of trap by manually erasing these PCE
+> > rules and setting new ones instead. In this case, however, there would
+> > be no way to tell from the frame received on the DSA CPU port if the
+> > frame had also been sent to the microcontroller.
+> 
+> For dynamic configuration you would probably need to then check the
+> destination address, check if snooping or trapping is configured for
+> it, and then set (not) mark offloaded accordingly. While linux allows
+> you do dynamically configure some of the groups between
+> flooding/trapping, I'm not sure if this is propagated via dsa or even
+> switchdev.
+> 
+> I suggest sticking to the default of trapping and not marking as
+> offloaded. It's much easier to flood in software if needed than the
+> other way round.
 
-On 09/03/2026 09:43, Thomas Gleixner wrote:
-> On Sun, Mar 08 2026 at 18:23, Matthieu Baerts wrote:
->> 08 Mar 2026 17:58:26 Thomas Gleixner <tglx@kernel.org>:
->>> So I'm back to square one. I go and do what I should have done in the
->>> first place. Write a debug patch with trace_printks and let the people
->>> who can actually trigger the problem run with it.
->>
->> Happy to test such debug patches!
-> 
-> See below.
-> 
-> Enable the tracepoints either on the kernel command line:
-> 
->     trace_event=sched_switch,mmcid:*
-> 
-> or before starting the test case:
-> 
->     echo 1 >/sys/kernel/tracing/events/sched/sched_switch/enable
->     echo 1 >/sys/kernel/tracing/events/mmcid/enable
-> 
-> I added a 50ms timeout into mm_cid_get() which freezes the trace and
-> emits a warning. If you enable panic_on_warn and ftrace_dump_on_oops,
-> then it dumps the trace buffer once it hits the warning.
-> 
-> Either kernel command line:
-> 
->    panic_on_warn ftrace_dump_on_oops
-> 
-> or
-> 
->   echo 1 >/proc/sys/kernel/panic_on_warn
->   echo 1 >/proc/sys/kernel/ftrace_dump_on_oops
-> 
-> That should provide enough information to decode this mystery.
-
-Thank you for the debug patch and the clear instructions. I managed to
-reproduce the issue with the extra debug. The ouput is available here:
-
-  https://github.com/user-attachments/files/25841808/issue-617-debug.txt.gz
-
-Just in case, the kernel config file that was used:
-
-
-https://github.com/user-attachments/files/25841873/issue-617-debug.config.gz
-
-Please tell me if it is an issue to download these files from GitHub.
-The output file has 10k+ lines.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+Yeah, I'll do that and right now I'm trying to come up with a set of
+PCE rules which allow for link-local frames to even arrive at the
+CPU port at all (which would allow software flooding or even doing
+anything with them on the CPU)
 
