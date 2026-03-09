@@ -1,236 +1,169 @@
-Return-Path: <netdev+bounces-265392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDGjF897rmnoFAIAu9opvQ
-	(envelope-from <netdev+bounces-265392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 08:50:39 +0100
+	id iH0/OCt8rmnoFAIAu9opvQ
+	(envelope-from <netdev+bounces-265393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 08:52:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AA823508A
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 08:50:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD8F2350EC
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 08:52:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9F243033E4A
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 07:49:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 012FC30067AD
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 07:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD464369985;
-	Mon,  9 Mar 2026 07:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DIY1YApT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689C43624AB;
+	Mon,  9 Mar 2026 07:50:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D4C368954
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 07:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE54C368954;
+	Mon,  9 Mar 2026 07:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773042552; cv=none; b=PIlxDlh8MMvq1PV3L8Nt5AtHCBTxV34rnXZjBPZ76HOaFMPybrjN9AOTQ4jw0hxtkj6BJhKhkw0QaR7Mgi5XwU6YEF52lorge772dwdbNrYnH69tsqwvktmb6MPwIgRDr/I3NHR4oFSzNpUF7vQzVVgIXL2jetO2hTxtZZrruuE=
+	t=1773042647; cv=none; b=P2e5tBtwwFNyLm0iqQM/xVnEzUK4ja1y1x1PJGiZow96QWzORcNYnRoTsae+B1WUK4fD8Wwot4f98oHFPycRz/z6Ft86Z6L4u2GNjYcKwrGuM6SMBp3WB27V+hG3PkfeG3Aq2skrEDyfHSQJMzisFhp5NX+SIPwzMf/3ST4lUAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773042552; c=relaxed/simple;
-	bh=BK4w5zW2pmkFpleQWkhZHxMFzScEqMW5tGEXIvdyQDw=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=LOzLljAVeWbtw2mRKzxbX2/p3OAp7m+zx91kBohdJde7QZvWf82tFeCyZvDv+HPwIVQdtqbb9JxvtdlloHXNcMegPxBYqdiiNik4ffudI3TYFkq/FbS1otOMbpxPFn1pyJ/6CM6WC8/DV0Jy77pIRSEB+uvsJRwsxgb+gDpnxb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DIY1YApT; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773042647; c=relaxed/simple;
+	bh=WgM63bkMNCNibkQpWs8bsqpc4csyCLfir2TlPmhqIvA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sI4mC0zhzqEp8V9iocSSti9iJB1A16dEjqDbjUQM9+bmTb6Z4N9W0TtvRRm/hAiG8vYTTf/Ziy9dKETgWHeUFu44io9GqTV3fSJJO89zMrkQvF9j9WpnAfF2REeUwxviOPBkbtcZsyda1aLDTobqJS96Ih6XA1Bl/Uz/lliLYoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from localhost.localdomain (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowABX7A+0e65pV0fwCQ--.52086S2;
+	Mon, 09 Mar 2026 15:50:12 +0800 (CST)
+From: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
+To: andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	18291782795@163.com,
+	pengpeng@iscas.ac.cn
+Subject: [PATCH] net: dsa: scope dsa_user_suspend() and 
+Date: Mon,  9 Mar 2026 07:49:19 +0000
+Message-Id: <20260309074919.715092-1-pengpeng.hou@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773042538;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OCSi7v9xxHe6xaQA7QoLIUaLr3gtY2UScb9IicHrzKY=;
-	b=DIY1YApTPAmh2yqbiET3733BiWelpy9U/WwuQtXrce/3cvcg2c8zS0buSnCk62q3MvR1n6
-	fapihjKpNeRvKoLWA52fRkX/W15XUINzyrnRjGaXo05xcYnVDhFkFfFA+sghZz+puu/vjE
-	S+e/k2RssYQ2w4g9/oinrEIGjEhp8KM=
-Date: Mon, 09 Mar 2026 07:48:54 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <ade7f1a6d89525cb0545ac12603edb8e448f9493@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v2] net/smc: fix NULL dereference and UAF in
- smc_tcp_syn_recv_sock()
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org,
- syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com, "Eric Dumazet"
- <edumazet@google.com>, "D. Wythe" <alibuda@linux.alibaba.com>, "Dust Li"
- <dust.li@linux.alibaba.com>, "Sidraya Jayagond" <sidraya@linux.ibm.com>,
- "Wenjia Zhang" <wenjia@linux.ibm.com>, "Mahanta Jambigi"
- <mjambigi@linux.ibm.com>, "Tony Lu" <tonylu@linux.alibaba.com>, "Wen Gu"
- <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260309060611.GA130186@j66a10360.sqa.eu95>
-References: <20260309023846.18516-1-jiayuan.chen@linux.dev>
- <20260309060611.GA130186@j66a10360.sqa.eu95>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 20AA823508A
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABX7A+0e65pV0fwCQ--.52086S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uryUGFWDGrykXFWxJF1rtFb_yoW8ArW8p3
+	W8Wr43trW7Jryq9rW8u348Wa9aqw4Fk34xGrZ5G3sxCa98Jr1xCr4rA3W5ur1jkrW5WrW5
+	tF9rK3s8AF15Wa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9vb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkI
+	wI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI48JMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU5918JUUUUU==
+X-CM-SenderInfo: pshqw1hhqjhx1rx6x21ufox2xfdvhtffof0/
+X-Rspamd-Queue-Id: AFD8F2350EC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265392-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,163.com,iscas.ac.cn];
+	TAGGED_FROM(0.00)[bounces-265393-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.968];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng.hou@isrc.iscas.ac.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.610];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,827ae2bfb3a3529333e9];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,appspotmail.com:email,alibaba.com:email,syzkaller.appspot.com:url]
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,isrc.iscas.ac.cn:mid,iscas.ac.cn:email]
 X-Rspamd-Action: no action
 
-March 9, 2026 at 14:06, "D. Wythe" <alibuda@linux.alibaba.com mailto:alib=
-uda@linux.alibaba.com?to=3D%22D.%20Wythe%22%20%3Calibuda%40linux.alibaba.=
-com%3E > wrote:
+From: pengpeng@iscas.ac.cn
 
+In current linux.git (1954c4f01220), the helpers dsa_user_suspend()
+and dsa_user_resume() are defined and declared unconditionally. However,
+their only in-tree callers are within dsa_switch_suspend() and
+dsa_switch_resume() in net/dsa/dsa.c, which are already guarded by
+CONFIG_PM_SLEEP.
 
-[...]
-> >  Reproducer was verified with mdelay injection and smc_run,
-> >  the issue no longer occurs with this patch applied.
-> >=20=20
->=20>  [1] https://syzkaller.appspot.com/bug?extid=3D827ae2bfb3a3529333e9
-> >=20=20
->=20>  Fixes: 8270d9c21041 ("net/smc: Limit backlog connections")
-> >  Reported-by: syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com
-> >  Closes: https://lore.kernel.org/all/67eaf9b8.050a0220.3c3d88.004a.GA=
-E@google.com/T/
-> >  Suggested-by: Eric Dumazet <edumazet@google.com>
-> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> >  ---
-> >  v2:
-> >  - Use rcu_read_lock() + refcount_inc_not_zero() instead of
-> >  read_lock_bh(sk_callback_lock) + sock_hold(), since this
-> >  is the TCP handshake hot path and read_lock_bh is too
-> >  expensive under SYN flood.
-> >  - Set SOCK_RCU_FREE on SMC listen socket to ensure
-> >  RCU-deferred freeing.
-> >=20=20
->=20>  v1: https://lore.kernel.org/netdev/20260307032158.372165-1-jiayuan=
-.chen@linux.dev/
-> >  ---
-> >  net/smc/af_smc.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >=20=20
->=20>  diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> >  index d0119afcc6a1..72ac1d8c62d4 100644
-> >  --- a/net/smc/af_smc.c
-> >  +++ b/net/smc/af_smc.c
-> >  @@ -131,7 +131,13 @@ static struct sock *smc_tcp_syn_recv_sock(const=
- struct sock *sk,
-> >  struct smc_sock *smc;
-> >  struct sock *child;
-> >=20=20
->=20>  + rcu_read_lock();
-> >  smc =3D smc_clcsock_user_data(sk);
-> >  + if (!smc || !refcount_inc_not_zero(&smc->sk.sk_refcnt)) {
-> >  + rcu_read_unlock();
-> >  + return NULL;
-> >  + }
-> >  + rcu_read_unlock();
-> >=20=20
->=20>  if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_h=
-s) >
-> >  sk->sk_max_ack_backlog)
-> >  @@ -153,11 +159,13 @@ static struct sock *smc_tcp_syn_recv_sock(cons=
-t struct sock *sk,
-> >  if (inet_csk(child)->icsk_af_ops =3D=3D inet_csk(sk)->icsk_af_ops)
-> >  inet_csk(child)->icsk_af_ops =3D smc->ori_af_ops;
-> >  }
-> >  + sock_put(&smc->sk);
-> >  return child;
-> >=20=20
->=20>  drop:
-> >  dst_release(dst);
-> >  tcp_listendrop(sk);
-> >  + sock_put(&smc->sk);
-> >  return NULL;
-> >  }
-> >=20=20
->=20>  @@ -2691,6 +2699,7 @@ int smc_listen(struct socket *sock, int back=
-log)
-> >  write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
-> >  goto out;
-> >  }
-> >  + sock_set_flag(sk, SOCK_RCU_FREE);
-> >=20
->=20This RCU approach looks good to me. Since SOCK_RCU_FREE is now enable=
-d,
-> other callers of smc_clcsock_user_data() should also follow this
-> RCU-based pattern. It will eventually allow us to completely remove the
-> annoying sk_callback_lock.
->=20
->=20D. Wythe
->=20
+Match the helper scope to their callers by wrapping the definitions in
+"#ifdef CONFIG_PM_SLEEP" and providing no-op stubs in the header. This
+fixes the config-scope mismatch and reduces unnecessary code footprint
+when PM_SLEEP is disabled.
 
+Signed-off-by: pengpeng@iscas.ac.cn
+---
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@
+-int dsa_user_suspend(struct net_device *user_dev)
++#ifdef CONFIG_PM_SLEEP
++int dsa_user_suspend(struct net_device *user_dev)
+ {
+ 	struct dsa_port *dp = dsa_user_to_port(user_dev);
+@@
+ int dsa_user_resume(struct net_device *user_dev)
+ {
+ 	struct dsa_port *dp = dsa_user_to_port(user_dev);
+@@
+ 
+ 	return 0;
+ }
++#endif
+ 
+ int dsa_user_create(struct dsa_port *port)
+ {
+diff --git a/net/dsa/user.h b/net/dsa/user.h
+--- a/net/dsa/user.h
++++ b/net/dsa/user.h
+@@
+ int dsa_user_create(struct dsa_port *dp);
+ void dsa_user_destroy(struct net_device *user_dev);
++#ifdef CONFIG_PM_SLEEP
+ int dsa_user_suspend(struct net_device *user_dev);
+ int dsa_user_resume(struct net_device *user_dev);
++#else
++static inline int dsa_user_suspend(struct net_device *user_dev)
++{
++	return 0;
++}
++
++static inline int dsa_user_resume(struct net_device *user_dev)
++{
++	return 0;
++}
++#endif
+ int dsa_user_register_notifier(void);
+ void dsa_user_unregister_notifier(void);
 
-Hi=20D. Wythe,
-
-Thanks for the suggestion. I agree that converting all smc_clcsock_user_d=
-ata()
-callers to RCU is a reasonable direction, and it would allow us to eventu=
-ally
-remove the sk_callback_lock dependency for sk_user_data access.
-
-However, I'd prefer to keep this patch focused on fixing the specific bug=
- in
-smc_tcp_syn_recv_sock(), since it needs to be backported to stable trees.
-Mixing a bug fix with broader refactoring makes backporting harder and in=
-creases
-the risk of regressions.
-
-Also, converting the other callers is not entirely trivial. For example:
-
-- smc_fback_state_change/data_ready/write_space/error_report():
-  the sk_callback_lock there protects not only sk_user_data but also the
-  consistency of the saved callback pointers (e.g.,smc->clcsk_state_chang=
-e).
-  Switching to RCU requires careful ordering analysis against the write s=
-ide
-  in smc_fback_restore_callbacks(). Additionally, fallback sockets would =
-also
-  need SOCK_RCU_FREE.
-
-- smc_clcsock_data_ready():
-  the sock_hold() would need to become refcount_inc_not_zero() to handle =
-the
-  case where the refcount has already reached zero.
-
-I'd like to address these conversions in a follow-up patch series.
-
-What do you think?
-
-> >=20
->=20> sk->sk_max_ack_backlog =3D backlog;
-> >  sk->sk_ack_backlog =3D 0;
-> >  sk->sk_state =3D SMC_LISTEN;
-> >  --=20
->=20>  2.43.0
-> >
->
 
