@@ -1,210 +1,217 @@
-Return-Path: <netdev+bounces-265629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCI9AjL0rmnZKgIAu9opvQ
-	(envelope-from <netdev+bounces-265629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:24:18 +0100
+	id MBf8JZvzrmnZKgIAu9opvQ
+	(envelope-from <netdev+bounces-265631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:21:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E34F23CA8F
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:24:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110FB23CA25
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EF3F302F73A
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 16:19:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A2D6300795A
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 16:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F284B3C2774;
-	Mon,  9 Mar 2026 16:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2DB3CC9FB;
+	Mon,  9 Mar 2026 16:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Et6WcKsC"
+	dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b="0W3ncEka"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012042.outbound.protection.outlook.com [40.93.195.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDF23E51DF
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 16:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773073167; cv=fail; b=Lr0F14BVNkczXt8eVG7I/reqeLFd5NZNEe7RNvmvbax0UTy+WC/7ypc7mnQU7QdqmlWdYt7rr/hU9SY1Ahc/ZBTD6XtCkRpfeAAso5je/V7oRuPLzTHwXCESRfThAVt4+VbePxC2iwPNXwvyS6jTnspSpiVisbNWE4Wd1NmEVAg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773073167; c=relaxed/simple;
-	bh=biVFWiPHQqffUgAMgPslCMRR0swUiYukiftTnCwWBM4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jEWrMa8aKHXtz+xb/MUqEFC5rzDOCgN4Mh3z7a3dNfQQ2f7+9LNPcSd5X60Kl/ibObdoPo+B0AkN6huednAHElSNUi/R6snfLvLr6piIhPk4m510e1YQuHA73TYrcUOUIPrOivGWo1VCug3LYroGM+znHE0F1aLOj+BmPs848ww=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Et6WcKsC; arc=fail smtp.client-ip=40.93.195.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G57pp+7uvh2Ih09QInLxmAdM2AvmyTmleyFZp2xVpUnjyrLxtISdfQfsjypBOSNypTf6AKN0S5WzTS0UrO5KvpAPK2Z/2LyEk2jRFpnJL5SCVuA3LK6J/dXjvRzieezPdKpzFsv6nWJNGC20d1KfSQZQnkGFYhdcQKRiq7nv/Z8od5VhR2oCtwSiMZju9lXDBB7uXgGVIpj6dmbXI4YkScKjcmf6H07OAMHbxoUyfyg5AhNgKzK0csyh6t+50BYF6e5gOxNR5mmiCx57jDfxjkl1dxv1f+Yub0XRM8l+pqXxqaKKNrnzlXYQfxuvKistFLQnFB3sBmdrEjmt+YujSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=biVFWiPHQqffUgAMgPslCMRR0swUiYukiftTnCwWBM4=;
- b=vUZ6zjjkVvF9dvDnSbXtpTAYW8Hr8+hIoNxOwIqMP+5sza88ppYx4Jq1IyozKRGySFKme0m5SyY4neZZ3QnL5s3DnRp9ZZmutI076i7Gi/qktrWdVK9uc/zD0ViF5If9HceKmzWV8xQMF9Ef8FLgWhj2+C4TUoK65y80Twe28zTQZq2IJp5+uz8sdlprE93m2/YggKonbKwHfYcMYNBaolGTAnqHw9Vh7HjhVEH6ysnUH/RsPcDgS3cuD6RvuCo21C832ujoFq12KS45/3eZFNC0XIT8pHt4Wrx7ifzj6yU+6v0tUHfejQvau4eeoQnfu8tpfAe2boCSIF07waQbYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=biVFWiPHQqffUgAMgPslCMRR0swUiYukiftTnCwWBM4=;
- b=Et6WcKsCSHGdpRiSaFcULq24bSSAoHBaKKHzl/qF0973ZyK9wd+vc04TUhOTQbFC4W76bueCu0DBB0JM6V9vyXq5Y2NDnaQLiFule/ZrT80XA9tzhZuBEqWtpnulZGIGvWXQvPZfmw2qADJagq4/XpbeeGnRxaHyZg7yFwFEJAIWWOgofjTWylKeFZuRTT1b7am1kE/ArcDR9iafXDSjtZd5whqqSamtNdkqRfksscihsBfRDgdAWRB/SSnx/+XYfscAiv7WeQVibH9/XV6D5+aZrOIk2+45kMTPMU7kLNQfrsSSG4AFbhP2ngZED6ITs6N21HEyPQzaKQRGqirTRg==
-Received: from DS5PPF266051432.namprd12.prod.outlook.com
- (2603:10b6:f:fc00::648) by IA0PPFA8EB66EE9.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bde) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.6; Mon, 9 Mar
- 2026 16:19:21 +0000
-Received: from DS5PPF266051432.namprd12.prod.outlook.com
- ([fe80::40ba:2995:ae48:aaeb]) by DS5PPF266051432.namprd12.prod.outlook.com
- ([fe80::40ba:2995:ae48:aaeb%4]) with mapi id 15.20.9700.009; Mon, 9 Mar 2026
- 16:19:20 +0000
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: "kuba@kernel.org" <kuba@kernel.org>
-CC: "pabeni@redhat.com" <pabeni@redhat.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, "edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "sd@queasysnail.net" <sd@queasysnail.net>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH net v3 0/3] macsec: Add support for VLAN filtering in
- offload mode
-Thread-Topic: [PATCH net v3 0/3] macsec: Add support for VLAN filtering in
- offload mode
-Thread-Index: AQHcrXtpmGA/fY6jDEuE2Ksy/FqtSbWh6vSAgAR7CYA=
-Date: Mon, 9 Mar 2026 16:19:20 +0000
-Message-ID: <d68d087152e11b2aa9948f84339a5e164a666d5f.camel@nvidia.com>
-References: <20260306151004.2862198-1-cratiu@nvidia.com>
-	 <20260306115353.28f322e0@kernel.org>
-In-Reply-To: <20260306115353.28f322e0@kernel.org>
-Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS5PPF266051432:EE_|IA0PPFA8EB66EE9:EE_
-x-ms-office365-filtering-correlation-id: 07c57071-fc34-4095-c6dc-08de7df79ebb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
-x-microsoft-antispam-message-info:
- jbx9MkZnAozuewhyIrkdbPsKL6/jq5oX1Lnl5laOVD5PnvXBaQ32Rm3OdQaL84OWc6Kbdx88yMKR+yIBnYzPkfXOO/taf1LCtF/9LIUhWlDY8uqqaX46tqO+zjl0p0iDLPhymuicJKf4zlRCqcS18PCRB3g7YbeM5AVHils0E60g2JYxcKOTsYa1cQJKyRDKNv7puBitKDl8S0ByrvodzCQJA34W0Ucnfamch0lQPu318Kmwy6qaU99VCmb5PnvpDb34EpI6VHo6MqeqADZo0mEMTOEilKsp3tAp8rUeX6rIdn52wTqAaIU181NNysCExOATplOVaH9lwMXA6QISgJx+kzA0ZsVLJYv2243mWDyMcEJk4x3FLi2Ealri63MkWKhwyOxe3bsA/1UGuvbI9RE2NXFRflZIznHHiI5hbl6DuujIeqhNsTsBcvBbDjKkuHz+kCJoal/7qBSWUKfXB8UmUqLVIZA6QV+lyjb9Xt9TCBlg1VrWUFborm60xfWK120HkVbekVxW0jBtQR+soro8Mj2D4YeB9cRCwFLTZhqBKMA2bVAfzJ9Z9W72K69KOcwdDJWUjs22DLlaochbLhph3Iq9DJ78cK0xf3YJvJk+rblggHte8a5fBKH2E1125MTxYWUaukkeAChV61gtdggqaMMWLxn4b00E3DoXWlJ0LilVnHY0LICv7oeyYWgXVaFxBgSOACNGZoHTMdRT6bEmQQOf3IrzuazQfOj4X19Icsx8pKfxUuknHRyrYWk4NkHEW7FHzxfvz34hnDzPwOb5gBsLhihVgEUHcneflVU=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS5PPF266051432.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?K1drOWxkRVBMNjhiNXpyRHU1MlZvR1k0enpIRUdibWlFOEZyZGNoRjBJdDJD?=
- =?utf-8?B?WGsybUlRVEZ2dUtzZ0dhRFQySGVIY1dINlRZNWw2a2xVL2xVUDNSbHhseTZL?=
- =?utf-8?B?SkVWMXd0d3VvMmsvZ2ZWcngxbVFJZ001ZFdGQ1ZNdXFDb21acXpKU200dVY5?=
- =?utf-8?B?ZHM4R3d4V29ibi83OEtNT3dVQ0I2WWJoc2JwMjQ2TktMRlc3ZW1NSlg2bmFK?=
- =?utf-8?B?WkNnYVAxWWtVa003S3JJZVB5UjExMzFUcGttdjVtSEVYUGZyZlZVeDU1azR2?=
- =?utf-8?B?d3ExZzFaSzM3U01kMEVUeE1Tc0JWQ3VPVXZwWU1NMW54NVdXZDl6MFpxcW5t?=
- =?utf-8?B?SnJkb3AwUzJxVjNQZEhLZTcyeGt0NzdsQ2VRZkRwWEk1cFVXTDZKS1NSbXdv?=
- =?utf-8?B?Y3BFMmtOV0MwYjRhZkZGbWhIOVNTUnlodHdCU3poWmY2ODkxcDB0cDk1K3Iv?=
- =?utf-8?B?Wno0N2xGaXJocDg1bzFNL3c1clJKZTlSSzRyam13WE5JL3VxelVsQlFRVlhZ?=
- =?utf-8?B?Q01wT2szZW00cC9iZVhRUXpEYVptb0xMUGxQV0dtaVFTUmo3L0pid3BucDY2?=
- =?utf-8?B?ZHFCYkRyWStNVVNtM09PUXFUUkJXa09KOFRiTUc0NnBPaDVJc1J6NU5tVXFB?=
- =?utf-8?B?RUttUFhFc2hIVHBGYUlTd1g2d3c5d3NMSjdYRGVMdGpCT0NYeWs3Qyt2cDd6?=
- =?utf-8?B?WGpOaTZMTm5VbEE1MU1YckRlbWU3Y2NvNDJmaVhKRnNabnlmMmF2SW8yK2dQ?=
- =?utf-8?B?amQvOEhPMHpmYmNxMGd6T3RVTFBqQlRjaEhUemxvdmZnbTNzMzYwMWpOaXFm?=
- =?utf-8?B?anRnTXhmUWRCVTgrc0EzbS9WRVVqdTlzNnZKbnJWVnRzRTVTY3hwS1E4SlJa?=
- =?utf-8?B?MUF0K01DeWJjK3pZRVFmQURwbkkyYTlJRXR0NXY4YkV5TTVCbWFkb1Mvekx6?=
- =?utf-8?B?SitEOGIvNXM0L1BpZ0JSY2o3cEFReXFISmVxY3BJdjJWeVc4WEZqT2l5K3R1?=
- =?utf-8?B?UVgvRFZIays2dUN2RUNGQWhwSmVlL3BXeTd2cDZaaHZWbTdTNjdNb2oxUWZB?=
- =?utf-8?B?S3Qwa1VhZmM5U1pzdXpTNXQ1eE1VcnlEOWFxZW5wNktmd0NGbTRDVHovQWdn?=
- =?utf-8?B?UFBsMm04UmFKSWJwZzQzZDRxZ0pya0wrOEFPdjNVZVh4UklraGhRU0M3QWtX?=
- =?utf-8?B?Wko2SS9yTGM3SEdPYkhiR1B3eHBjaUw2TXlaeHcxcEswWWUxZ1BZckxDbmN6?=
- =?utf-8?B?ZW0xWUJ6UXppdDB5dm41cHZWUlQ5VmdWeENWb0N4OTU2QXdHL3gwRkpldVVo?=
- =?utf-8?B?SkFwNmYwUU80cE1hWkVoUFhJY2xML3pwNWRKNXA4YXg1L1dXdGdyWUVPa2F6?=
- =?utf-8?B?bUkzbVNmNXIvYVVyL3hjNUM2OWR4Rlo3ako3WUU1dkNGR0pFY2NOeXpWczBG?=
- =?utf-8?B?c0dOWmJrcWNTQVJnRlI0RmFiTTlJU2RUS1pIbEtiNVVoSU5NaUJnakcvWG9Y?=
- =?utf-8?B?VC95ck8ybFdLOXI3TzRzbkRHanVLYXFabEpsakRnRVhsKzhpUllFdTFTTno2?=
- =?utf-8?B?ZjNxZ3FGN042Q08zeWNGR2NNQkV1V2VRdDFUVjdHNzBYaTB6MHE3bEp3KzhB?=
- =?utf-8?B?ZFY4c2tTd01UOCtFeEtLR1A5RklOK2hvYWNzQ3lRRUNVY0xHUDZFcHlxamNW?=
- =?utf-8?B?blNENkFRMGQyeStPMHJPMFpjdWNBZWx6bjZoSzU0YnZrdUk0aFgwckRpRVcr?=
- =?utf-8?B?Zjd5a3V4OXBEQkFYYzVsNTJCdnRxK0sxbWxOZUhtQjdhMGlNU1NqcjE1bzNt?=
- =?utf-8?B?UXphVDU5ZlZ5N0xzTyswNTZJeVJqRmNTdlMzeVNsNExYNVNjdTFWYlZ0K0k4?=
- =?utf-8?B?WWVLWTk3YlJ2TkJsT2NmTFcwaWJ1NytjZ1ZDd0ZyTHEzeEl5M25UODRqMFBP?=
- =?utf-8?B?WWIwemd3QllhcWM0a1c2cVZHckdCVmJqaDRCbEVlNC9tNk9pbVBST0VqcHA1?=
- =?utf-8?B?bEhsQitTcXEwNGl5SmR0QjRQRFVMclNsZ2NrbHZBQmVRL2MxYVNzS0t3czlu?=
- =?utf-8?B?VGcwT0dJZkVWQzVDK29aY0hTWG9zUGxyZjNlcFZ0dGhocGNIMVlRaTZjMzli?=
- =?utf-8?B?K2hPRk5TTnNSS3ZwcnF3VHU2UWZuQUVzazZHYXdZUndZZVcvR1FyVmQvSkh3?=
- =?utf-8?B?MmlaREVwKzE1Q2lCYSs5NHp4MGYwU1Nna1liTVpqV3pMRXk4NjBORDllb1M3?=
- =?utf-8?B?RzUzeXZDaTdadXRIdk5kK3ljdVlPalZVcjFYVXVJVVZrM1VaY0hRT1dHOUVq?=
- =?utf-8?B?ZFpCdld4STF1WUlDYjk3R3pNbXppSUVDd21KU3E3TEVxK2QzajFJQT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <983E36C74A67A4458325C330F563690B@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284D91925BC
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 16:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773073299; cv=none; b=Xq2zGfY9Dc9j3bbgxs/24MzrabRE4ufrgUWID2nBOn9YLSnL/f2n4849nqCN+oqypaXJJWKEQEULDASm1SvJg4h3ONrpkXbZqqxY0a6FxUudSHw1u7el0ycdp2DUb+dhzfVw9RugvQ6Ig5wuzhR1fHG+r2nVc/Ogomse5PW5yb4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773073299; c=relaxed/simple;
+	bh=td74bMx8ZXiHQfNV+QzmTZxdoVL+td/b5gqEqpcrNW8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=tBszx9DpHBQRscA/Uj/fKFAg0vuLNroyD3HOxMFB1g9JVX7XceJyxF8S0nXJR4nE4SNLNk+6i+I+oQKGM/40BoEDCRXLh7vfbZUmZbxx4U+getEICM6V9bUzqkof6yDl47Bk2cHIFKguOdchhKtikb6kD78A2h90z+XmBUnLR8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b=0W3ncEka; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-89a06bc2f1bso134023896d6.1
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 09:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20230601.gappssmtp.com; s=20230601; t=1773073295; x=1773678095; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k907me6g0lW0BSeww/pGmw3mgtqq3eewfWPpggfLHN8=;
+        b=0W3ncEkak6FmKdEAn7axM9i9i9wM5esprQoKh2aufozwfj0y74EEcJcTJ214MYhQwq
+         CEzSD4TVDx5sc/bPeyA5h4mc2Ac+e/F1zTsU4TUizNErQqKh83Uuo7ghiSXTIUrR/Gaw
+         j84Q93kWQyx7iDLtuKl5gpYdhwPKVONGZaz+f7NJ0c6H/wm/ZEbPsKp4sdsKhhauAfiM
+         KFSfR4UxUi7VDLVEslX6NJ01a9qtoclhy0KFnhR5y+Y7VMIL3RqXS0nyoL+f5da+nvhD
+         7TjCdKqP8ZUr6ZKuVcknIH09oP379ZBdhMNI2qHoDv97wRqrwiIjJPdDoCqsLhCI1MIV
+         Fv7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773073295; x=1773678095;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k907me6g0lW0BSeww/pGmw3mgtqq3eewfWPpggfLHN8=;
+        b=s5m/IrjlYP+ANxrlPq9FdlSyPtKBVvO8p2ejZpPAwHecXtZgm9KXY0kZIS6APOx+Oz
+         DUCJYSP1FhEIzx2wINtlVZ3i3vp0nR9o6u9mSRgTrXXsyATSfJGs/2c+7YDS7kJijIXD
+         MwcfAG6nm9cWxRzHaKihaxBNPbHg2owx7+01Ps6gZ9N7gphVmvyJEWtnGNmuBEjDkzDi
+         so9o6Oh9dbVMU9yR/OAQ+2Fmbzzb8wZneMJ5GaWWum4JWtu8i0uUKOjNeyAggRq4/vDg
+         0g1HGhGWwN7ahL6pJYjqvVe3+drt/pPEr+ScCg+6YcSJXvv3a5OkrP7sECtglGZN/ESj
+         MQKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUJUTKdFLgDsfwxom5Lz3O3xukDb7sW3EVjA7s9R37skJJK3V8+ZnWrFvyJfL9Z9/f9dakP8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKfKzxHNdxpNt4Dsbb9Hq5ewu+XKzmpaOV3rcvuEAUym0gEwtp
+	HgotSQaQUQZS5hXJigBZm0ALl87h34ToBbaA1uneirTaiPsGk5IMHjAqrMwmboKZ5dKMopIZolu
+	MjqcH
+X-Gm-Gg: ATEYQzzXWeUtt8WelF4D6OzbuT6Od1+laPGhEYIXiF4LP/Ny0AtHzi5NNcTlbUZEFMN
+	QPgPXzo2JmXpvM+jQF1cAtH3dI7zv2+Tds6oS4oeIugAccv2dG6GIMbvSKXra5JVdSzGO8PY1PU
+	IgAujTUcCMzcurDFBDoY6VRr8vc7epZr0h3HpBMXoDLiIw8Wk1g+I6RGYjPRmtM3bTenp4y4EOW
+	5m8m/xOG40okPhO2JwB5xwLAngv5uFP7lV6YiE4tTXwzcUysw8Rt8JGsiPcKA58ucLaACGrKX91
+	cqdDlEZ44Shka4L8D2GKSDbKmaBpWwFi7PuA53TYLm8BhPi0/weCivPnpnjXaV331cqPpEx5Bss
+	UR4SWdwYdwysnstGbhW8EwWWNhO10n+be4QxZgBNpDj63+9Jkm7TVBqgTBhHzSRAV/cgkGrtq0e
+	7+KMbbdHnm0Wj7CvqTGf5m8k4QA6QzwjfHGw==
+X-Received: by 2002:a05:6214:262d:b0:899:f601:788b with SMTP id 6a1803df08f44-89a30a1799bmr185913076d6.3.1773073294650;
+        Mon, 09 Mar 2026 09:21:34 -0700 (PDT)
+Received: from localhost ([140.174.219.137])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a57bf772csm988956d6.24.2026.03.09.09.21.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 09:21:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS5PPF266051432.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07c57071-fc34-4095-c6dc-08de7df79ebb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Mar 2026 16:19:20.6537
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pUxrXkmdl7Y33eJ5+QWbjDYkSXib4ab4SarZOB597coAFjofpaRk8MLxhO81uEKiit4tflkYv3mD+2KRwIQauQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPFA8EB66EE9
-X-Rspamd-Queue-Id: 5E34F23CA8F
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 09 Mar 2026 12:21:32 -0400
+Message-Id: <DGYE0XY2UKQV.2COXLK9T9HG9S@etsalapatis.com>
+Cc: "daniel@iogearbox.net" <daniel@iogearbox.net>, "ast@kernel.org"
+ <ast@kernel.org>, "andrii@kernel.org" <andrii@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH bpf v2] bpf: fix constant blinding bypass for
+ PROBE_MEM32 stores
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "CyFun" <xcyfun@protonmail.com>, "bpf@vger.kernel.org"
+ <bpf@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <ymj6l4pBrhKjzHeR2XYjQcvWswW_741UgkR05M3iYsrzxzhD-3AfAZ1rNJ5k1b6ex0tosQAorJP38DfNDkyqbhkY-DD6RW_qTfuJ0z86psE=@protonmail.com>
+In-Reply-To: <ymj6l4pBrhKjzHeR2XYjQcvWswW_741UgkR05M3iYsrzxzhD-3AfAZ1rNJ5k1b6ex0tosQAorJP38DfNDkyqbhkY-DD6RW_qTfuJ0z86psE=@protonmail.com>
+X-Rspamd-Queue-Id: 110FB23CA25
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265629-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:replyto,nvidia.com:mid,peer.sh:url];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
-	HAS_REPLYTO(0.00)[cratiu@nvidia.com];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[protonmail.com,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[etsalapatis.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265631-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[etsalapatis-com.20230601.gappssmtp.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_EQ_FROM(0.00)[]
+	NEURAL_HAM(-0.00)[-0.990];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:email]
 X-Rspamd-Action: no action
 
-T24gRnJpLCAyMDI2LTAzLTA2IGF0IDExOjUzIC0wODAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
-Cj4gT24gRnJpLCA2IE1hciAyMDI2IDE3OjEwOjAxICswMjAwIENvc21pbiBSYXRpdSB3cm90ZToN
-Cj4gPiBUaGlzIHNob3J0IHNlcmllcyBhZGRzIHN1cHBvcnQgZm9yIFZMQU5zIGluIG1hY3NlYyBk
-ZXZpY2VzIHdoZW4NCj4gPiBvZmZsb2FkDQo+ID4gbW9kZSBpcyBlbmFibGVkLiBUaGlzIGFsbG93
-cyBWTEFOIG5ldGRldnMgb24gdG9wIG9mIG1hY3NlYyBuZXRkZXZzDQo+ID4gdG8NCj4gPiBmdW5j
-dGlvbiwgd2hpY2ggYWNjaWRlbnRhbGx5IHVzZWQgdG8gYmUgdGhlIGNhc2UgaW4gdGhlIHBhc3Qs
-IGJ1dA0KPiA+IHdhcw0KPiA+IGJyb2tlbi4gVGhpcyBzZXJpZXMgYWRkcyBiYWNrIHByb3BlciBz
-dXBwb3J0Lg0KPiA+IA0KPiA+IG5ldGRldnNpbSB3YXMgZXh0ZW5kZWQgdG8gc3VwcG9ydCBWTEFO
-cyBhbmQgdGhlcmUncyBhbHNvIGEgc2VsZnRlc3QNCj4gPiBmb3INCj4gPiB0aGUgbmV3IGZ1bmN0
-aW9uYWxpdHkuDQo+IA0KPiBJIHRoaW5rIGl0J3MgdHJpZ2dlcmluZyB0aGUgd2FybmluZyB5b3Ug
-YWRkZWQsIGluIG1vc3Qgb2YgdGhlIHRlc3RzOg0KPiANCj4gW8KgwqAgMjAuOTczNzEwXVvCoCBU
-MTk0XSBXQVJOSU5HOiBkcml2ZXJzL25ldC9uZXRkZXZzaW0vbmV0ZGV2LmM6MTIzNA0KPiBhdCBu
-c2ltX2Rlc3Ryb3krMHgxMjgvMHg3YjAgW25ldGRldnNpbV0sIENQVSMwOiBwZWVyLnNoLzE5NA0K
-DQpSaWdodCwgaXQgc2VlbXMgdGhlIGZ1enppbmcgdGVzdCBhZGRzIGEgYnVuY2ggb2YgVkxBTnMg
-dGhlbiBkZXN0cm95cw0KdGhlIG5ldHNpbSBkZXZzLiBJdCBkb2Vzbid0IG1ha2Ugc2Vuc2UgdG8g
-aGF2ZSB0aG9zZSB3YXJuaW5ncyBhbnl3YXksDQppdCdzIG9rIHRvIG5vdCBjbGVhbiB1cCB0aGUg
-VkxBTiBmaWx0ZXJzIGZyb20gYSBkZXZpY2UgYmVmb3JlDQpkZXN0cm95aW5nIGl0LCB0aGV5J3Jl
-IG5vdCBhIHJlc291cmNlLCB0aGV5J3JlIGEgc2V0dGluZy4gSSdsbCByZW1vdmUNCnRoZSB3YXJu
-aW5ncyBpbiB0aGUgbmV4dCB2ZXJzaW9uLg0KDQpDb3NtaW4uDQo=
+On Fri Mar 6, 2026 at 4:03 AM EST, CyFun wrote:
+> To: bpf@vger.kernel.org
+> Cc: daniel@iogearbox.net, ast@kernel.org, andrii@kernel.org, netdev@vger.=
+kernel.org
+> Subject: [PATCH bpf v2] bpf: fix constant blinding bypass for PROBE_MEM32=
+ stores
+>
+> BPF_ST | BPF_PROBE_MEM32 immediate stores are not handled by
+> bpf_jit_blind_insn(), allowing user-controlled 32-bit immediates to
+> survive unblinded into JIT-compiled native code when bpf_jit_harden >=3D =
+1.
+>
+> The root cause is that convert_ctx_accesses() rewrites BPF_ST|BPF_MEM
+> to BPF_ST|BPF_PROBE_MEM32 for arena pointer stores during verification,
+> before bpf_jit_blind_constants() runs during JIT compilation. The
+> blinding switch only matches BPF_ST|BPF_MEM (mode 0x60), not
+> BPF_ST|BPF_PROBE_MEM32 (mode 0xa0). The instruction falls through
+> unblinded.
+>
+> Add BPF_ST|BPF_PROBE_MEM32 cases to bpf_jit_blind_insn() alongside the
+> existing BPF_ST|BPF_MEM cases. The blinding transformation is identical:
+> load the blinded immediate into BPF_REG_AX via mov+xor, then convert
+> the immediate store to a register store (BPF_STX).
+>
+> The rewritten STX instruction must preserve the BPF_PROBE_MEM32 mode so
+> the architecture JIT emits the correct arena addressing (R12-based on
+> x86-64). Cannot use the BPF_STX_MEM() macro here because it hardcodes
+> BPF_MEM mode; construct the instruction directly instead.
+>
+
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+
+Though:
+
+> Fixes: 6082b6c328b5 ("bpf: Recognize addr_space_cast instruction in the v=
+erifier.")
+> Signed-off-by: s4ch <xcyfun@protonmail.com>
+
+IIRC pseudonyms are not allowed on the SOB line so you will probably have t=
+o update it.
+
+> ---
+> v2: Rebased onto current bpf tree (commit 56145d237385).
+>     v1 had a malformed diff header that caused CI to reject it.
+> ---
+>  kernel/bpf/core.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>
+> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> index 3ece2da55..bb2fa75de 100644
+> --- a/kernel/bpf/core.c
+> +++ b/kernel/bpf/core.c
+> @@ -1422,6 +1422,24 @@ static int bpf_jit_blind_insn(const struct bpf_ins=
+n *from,
+>  		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
+>  		*to++ =3D BPF_STX_MEM(from->code, from->dst_reg, BPF_REG_AX, from->off=
+);
+>  		break;
+> +
+> +	case BPF_ST | BPF_PROBE_MEM32 | BPF_DW:
+> +	case BPF_ST | BPF_PROBE_MEM32 | BPF_W:
+> +	case BPF_ST | BPF_PROBE_MEM32 | BPF_H:
+> +	case BPF_ST | BPF_PROBE_MEM32 | BPF_B:
+> +		*to++ =3D BPF_ALU64_IMM(BPF_MOV, BPF_REG_AX, imm_rnd ^
+> +				      from->imm);
+> +		*to++ =3D BPF_ALU64_IMM(BPF_XOR, BPF_REG_AX, imm_rnd);
+> +		/* Cannot use BPF_STX_MEM() here: it hardcodes BPF_MEM
+> +		 * mode which would lose BPF_PROBE_MEM32 and break the
+> +		 * arena addressing in the architecture JIT. */
+> +		*to++ =3D (struct bpf_insn) {
+> +			.code  =3D BPF_STX | BPF_PROBE_MEM32 | BPF_SIZE(from->code),
+> +			.dst_reg =3D from->dst_reg,
+> +			.src_reg =3D BPF_REG_AX,
+> +			.off   =3D from->off,
+> +		};
+> +		break;
+>  	}
+>  out:
+>  	return to - to_buff;
+> --
+> 2.53.0
+
 
