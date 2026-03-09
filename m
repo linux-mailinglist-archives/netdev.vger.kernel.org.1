@@ -1,99 +1,104 @@
-Return-Path: <netdev+bounces-265462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265463-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKzGJOuhrmk9HAIAu9opvQ
-	(envelope-from <netdev+bounces-265462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:33:15 +0100
+	id 8GUZLP6hrmk9HAIAu9opvQ
+	(envelope-from <netdev+bounces-265463-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:33:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE59F23728A
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 341A723729A
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA635302E7F2
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:33:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D57D63033393
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FFD389449;
-	Mon,  9 Mar 2026 10:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F0B3921E5;
+	Mon,  9 Mar 2026 10:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="la3xhSvj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vyzANQdV"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="lZxAT+f6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zQACgtbv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C8B3793DA
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6E83921C4
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773052380; cv=none; b=SooLPhF9O24Y5qWrqxS4RgZXPM9g15caZmzHjcQBJ5D++o4u+Sr9ZQpzUcFr0uR48ZNPo2zz3+lyCI3veDRQH9525jla5B0Zm1L0DRLnTdGxqZ8E4b+4hyfZq5r7/RlRjeWlFJ0ab7zI8Vp5wAAIhhQVhpK+MTfks1NBrnVbfIk=
+	t=1773052381; cv=none; b=BXsoR5VdWBsY2DsXfBAXo3pnG6zYKEwKAYXqCAEXwxS9v+vOYEEeH4fymvT0KaSNo+V3IH6VdufCVHwFzeiAi4RvuRHgZfPJX9P959RlX6KeMIE9Fy6UH4rTH39HUKXCCcqjPb7itcEt+YTzporPQ8DnalFtoK4ZLlRavfxdDFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773052380; c=relaxed/simple;
-	bh=X6l1OokI6VEvNJkRokHXQY/QHXwpiARv87fl+/Zs5nI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHZDpXRfF8Rpv2axOtm2tykYizySJJTvh4ZF7k+HaKsbjZz9PlOroPcPgDz9mfvC9LViJNCbXBIOMw0jhMYT0UR39+Ja6oEk8nXbBWmPhswnAbvxaz2bRqqe8IQp8oYnhsJtyV6Qb2rm0FpHFg7XV6icb3FbI7Aka+KXQGamsYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=la3xhSvj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vyzANQdV; arc=none smtp.client-ip=202.12.124.151
+	s=arc-20240116; t=1773052381; c=relaxed/simple;
+	bh=jefWBt4NYKhq3u3tnav0lkMPv9RrhRskSg4/phaG9hw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jkppZvMQB2ypB7soeETJg0zhi4dYMigigXcSyjpqAdK5LIGuuLRs67UJ1yqTvhmAG0nBYpYdipBg/2cV8dIhGQHFjm5exCvlqGKGSE9jmrXBz1A4FY48W1KqSsEojhQNpizKHHD1D5IbQxkVnuHgr8LBGGUuadHv1mH4YRZtV0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=lZxAT+f6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zQACgtbv; arc=none smtp.client-ip=202.12.124.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 6F4C71D000F5;
-	Mon,  9 Mar 2026 06:32:54 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Mon, 09 Mar 2026 06:32:54 -0400
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 070507A0033;
+	Mon,  9 Mar 2026 06:32:57 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Mon, 09 Mar 2026 06:32:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm2; t=1773052374; x=1773138774; bh=SthNO5dZ3A
-	bm0i3A1LbT8zk/J7BPjc794X8HTu7LV50=; b=la3xhSvjzuh8liQavQwwHd0+e7
-	UWt1ekdqYEeKqLvfjp4AMRVa0AJBuVXB7zlf78Cy0BRWzZlMupPxC8h7x2VITPsS
-	a4j+ayA/AeQv6AiMbzko4dbPJkzUbh0EYgymVmO5V/cgthuXgLezD/cZzMdh6hM4
-	t8xNmn7OqbBc+3Ldy3JE6aLehHgeRMYjkD01enpgXyJ4fp/0JEiMmivJ54pQKg1G
-	6N8HRPxIzNtoyiHEOZuuXE5kZ/9yMK1Rh/VT5WWmR79kGeKBC6cZrhFVkX1cKN7N
-	iqX8o5n8E7jWtunljyF5koEPCsi0/hRB2wchX7u1fXQf+F99/ycktDWXnDfg==
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773052376; x=
+	1773138776; bh=HdKEmYbbCvTn9xF0RzIm4l92ZjSTGhnZDw23SoHhmQY=; b=l
+	ZxAT+f6kQ1syyGHtuAJPCpgm4cvpkl8L2V56yhiqLKMY35OaOqVAoAlQDnN8Kpkm
+	0bC79KpqJ+T3o6lnVWXMjk6P7qd/CB6Q10c6/jBuigJEGky1vgEE44zOwdHyIUH1
+	TJ33Gv/0TB+4/vISKAZ9ilOz789oIUGgFR+who8WGtlHGuLhetXYfMV5zWWvDoMx
+	duw3y6d3F+ei4lrM+l7ozOIroBWM5qQLM00pRj7xdRjA7/ymVgEucGqzGfdK7Nxw
+	Mk0Xa8M1Gen3E3L5QgEydHUAAnzoOqS4fX4CXvHL4xA4/RFfDEqJfTGy7mRLCa8Y
+	yY5nGpEW4gQNmiHzvqzXw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1773052374; x=1773138774; bh=SthNO5dZ3Abm0i3A1LbT8zk/J7BPjc794X8
-	HTu7LV50=; b=vyzANQdVxY82i55Ajf6L0lI3j/G/0hhsaaVuo15XGi4XGJYnFQu
-	dYR5B1iiVe7my+sonRPG4DzLa7ENk7uJxOwgL/CiBurP5ljl3LtdXkVnMh3ZkF5U
-	SbDPQ9EqOOSnk2x02mez7/qXR3+HIvZTrnTWzcHel9yUrvmvuG5Fwc6Tasvsfjda
-	adYGODCrG9vDLCsNe9YX1KsaPUsq3h0ewaP7/VJ7UMpYrbof0vsptc+ARn6Fc04p
-	Rg6L8f/Fp3lKrRz1VaxuE+3TlQo9js5CSwmSLeHZ6YWbM6ycGRkw0l70vwtclu55
-	ifb19BRYUi2MAwPEk5hF1+NtXLYDdbVfTiA==
-X-ME-Sender: <xms:1KGuaXgFhQ-rjrRAa5d8x1gIag09MbpCo2xrlwR24zvQSGiAxeePoA>
-    <xme:1KGuafdxw4eP-41ANc5-Ww1haHWBw7C_SDxxex8LZuw70X9pZ9PdWceYT5B3oB8u5
-    0DIuBJyvF68Xb4pwo88C53TDchtJW3YSvK9NkqOIklqQC7zsaWasg>
-X-ME-Received: <xmr:1KGuaamDOjAnmJICmznan1kic6OkApozOQSZbVdXh6Y3n_j6Vg3e2TFamhL3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvjeejkeelucetufdoteggodetrf
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1773052376; x=1773138776; bh=H
+	dKEmYbbCvTn9xF0RzIm4l92ZjSTGhnZDw23SoHhmQY=; b=zQACgtbvS1awyt0fb
+	AMRh9m26y29qci8iu/IRCj6JNp6zgoa6B/XMOhVWDZqv9NvMYmpm7Xxyla3L0CjZ
+	cONSRtdrrDJq+zQMAZNu4vML24FSnuJ6+qPwSDHpOT7eYDDkTyni5JwEYixwI5WR
+	PobEqFT9dCpEvvZBjoN2absF9vunmfdwIcLo7Joitt4/3xX7UlfAs25lgWLWElEC
+	BcE90JUfFd0iZh90wcDrWdNc7/yMg87YI5ODDHvwvg4JnN4qgOSG+IbHgoJW5M0k
+	f7xYt6/k9n3KSg/M38Bao0M9A9H025rM++KTY7wWYohWnsGFUNQIgpHPkgxFvgi6
+	JhOyA==
+X-ME-Sender: <xms:2KGuaWUAyxUJaWjzwVsPUXpzekBBqCXaN1D0j8OQdvit09c36WKIOg>
+    <xme:2KGuaeA2fOsfRTFgSPuCiWoknK8bmeYHJQmvh678yvYmwa7GqsM2t4yQOczzcBba0
+    TAGofDs3d27lli2eTkK9VoNBAxLTsdS1D78sauUbS0Q5fVRwib_w-g>
+X-ME-Received: <xmr:2KGuad6wmzv3HPiFAuKWLT799RkNhS_XUjOSHU84nQiz0bF1DBBqGA2CsVOn>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvjeejkeekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepjedtuefgffekjeefheekieeivdejhedvudffveefteeuffehgeettedvhfff
-    veffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdr
-    tghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrgh
-    drrghupdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhlrdhnvght
-X-ME-Proxy: <xmx:1KGuaYvLLCR3O2o_Hn_2GNEO2mUXKjKbKbNKpVmv2chW7R-o6fZAxw>
-    <xmx:1KGuaQ8fKHdolzFxp5Vzws8vHvwzWGEeMnA0P71C2Plo8a23ujGejA>
-    <xmx:1KGuaaPdcfFVctC2hj10RRNIqFZ9p8l5eouhW6GgEQb7ylHiCOrvIg>
-    <xmx:1KGuaWGN9ftV-LrWxwAEZVpNMLeASwNYyGsJCCvVhlc9xr3I1dgqUA>
-    <xmx:1qGuab1zhmHhWCPx0NBMYKkUg8mTrlFDUDcDPUygf_7gT_EdEMChUpWC>
+    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
+    udfghefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
+    thdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdroh
+    hrghdrrghupdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhlrdhnvght
+X-ME-Proxy: <xmx:2KGuaRypBu661XvxiWGNfep5AA92BFhTTJwUnu7QzekXQvJXF_JSZg>
+    <xmx:2KGuacy7pyV_LNGUS6-hxoXjFHZOS4zDJ9xPKmsGuska670NLYAxOA>
+    <xmx:2KGuaRxo1UhN6_t6QA6uFo8oo1Es70kNoC-OokS0RhNuuKZHRa2zYQ>
+    <xmx:2KGuaeY4TDWV85oKSOC8nLecE0kBUB12CLS7ZoryF0ojCFCEriGSFA>
+    <xmx:2KGuaVJAFUU7FuEEfXMdXRATIczfP-OeXuRS6sXkLdMmJNWF5eKmdh09>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Mar 2026 06:32:52 -0400 (EDT)
+ 9 Mar 2026 06:32:56 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next 00/10] xfrm: fix most sparse warnings
-Date: Mon,  9 Mar 2026 11:32:33 +0100
-Message-ID: <cover.1773051558.git.sd@queasysnail.net>
+Subject: [PATCH ipsec-next 01/10] xfrm: state: fix sparse warnings on xfrm_state_hold_rcu
+Date: Mon,  9 Mar 2026 11:32:34 +0100
+Message-ID: <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.2
+In-Reply-To: <cover.1773051558.git.sd@queasysnail.net>
+References: <cover.1773051558.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,7 +106,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EE59F23728A
+X-Rspamd-Queue-Id: 341A723729A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -112,7 +117,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265462-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265463-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	DMARC_NA(0.00)[queasysnail.net];
@@ -122,7 +127,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_THREE(0.00)[4];
 	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.990];
+	NEURAL_HAM(-0.00)[-0.988];
 	RCVD_COUNT_FIVE(0.00)[6];
 	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	TAGGED_RCPT(0.00)[netdev];
@@ -132,30 +137,35 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-This series fixes most of the sparse warnings currently reported about
-RCU pointers for files under net/xfrm. There's no actual bug in the
-current code, we only need to use the correct helpers in each context.
+In all callers, x is not an __rcu pointer. We can drop the annotation to
+avoid sparse warnings:
 
-Sabrina Dubroca (10):
-  xfrm: state: fix sparse warnings on xfrm_state_hold_rcu
-  xfrm: state: fix sparse warnings in xfrm_state_init
-  xfrm: state: fix sparse warnings around XFRM_STATE_INSERT
-  xfrm: state: add xfrm_state_deref_prot to state_by* walk under lock
-  xfrm: remove rcu/state_hold from xfrm_state_lookup_spi_proto
-  xfrm: state: silence sparse warnings during netns exit
-  xfrm: policy: fix sparse warnings in xfrm_policy_{init,fini}
-  xfrm: policy: silence sparse warning in xfrm_policy_unregister_afinfo
-  xfrm: add rcu_access_pointer to silence sparse warning for
-    xfrm_input_afinfo
-  xfrm: avoid RCU warnings around the per-netns netlink socket
+net/xfrm/xfrm_state.c:58:39: warning: incorrect type in argument 1 (different address spaces)
+net/xfrm/xfrm_state.c:58:39:    expected struct refcount_struct [usertype] *r
+net/xfrm/xfrm_state.c:58:39:    got struct refcount_struct [noderef] __rcu *
+net/xfrm/xfrm_state.c:1166:42: warning: incorrect type in argument 1 (different address spaces)
+net/xfrm/xfrm_state.c:1166:42:    expected struct xfrm_state [noderef] __rcu *x
+net/xfrm/xfrm_state.c:1166:42:    got struct xfrm_state *[assigned] x
+(repeated for each caller)
 
- include/net/netns/xfrm.h |   2 +-
- net/xfrm/xfrm_input.c    |   5 +-
- net/xfrm/xfrm_policy.c   |  10 ++--
- net/xfrm/xfrm_state.c    | 115 +++++++++++++++++++++------------------
- net/xfrm/xfrm_user.c     |  25 ++++++---
- 5 files changed, 90 insertions(+), 67 deletions(-)
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+---
+ net/xfrm/xfrm_state.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 98b362d51836..7a68c594ce37 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -53,7 +53,7 @@ static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
+ static HLIST_HEAD(xfrm_state_gc_list);
+ static HLIST_HEAD(xfrm_state_dev_gc_list);
+ 
+-static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
++static inline bool xfrm_state_hold_rcu(struct xfrm_state *x)
+ {
+ 	return refcount_inc_not_zero(&x->refcnt);
+ }
 -- 
 2.51.2
 
