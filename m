@@ -1,167 +1,135 @@
-Return-Path: <netdev+bounces-265554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265555-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHcdMhHPrmnEIwIAu9opvQ
-	(envelope-from <netdev+bounces-265554-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:45:53 +0100
+	id CJplAtzOrmnEIwIAu9opvQ
+	(envelope-from <netdev+bounces-265555-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:45:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B036239F20
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:45:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F473239EDA
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 062F4310BD5D
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:42:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2FE430158B0
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F793C1977;
-	Mon,  9 Mar 2026 13:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F91E3BFE5E;
+	Mon,  9 Mar 2026 13:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BjrmkW3Z"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ChsA1u7/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909413BD623;
-	Mon,  9 Mar 2026 13:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBA038BF87;
+	Mon,  9 Mar 2026 13:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773063755; cv=none; b=dfSG6mhMSyX6VWnnfPsmxl4J+e+vzU4LPYP33uddc1CoGSRdvHSIunK9QfAfB2moo9KwNj9Hj5x85YSC+7c2EGIlPQtdxa2mTgM6qYKtU4cl61LFWZlo/FkZ9uMBBmuWAaynytE26UjO7QvAkiTQPsZjA7n8e/m0aXNc2x1gF0c=
+	t=1773063848; cv=none; b=umG/gcPKgPKLqy70jgAU3/uw4fLiW5I1R7VU5WTsaep5wxOgGNWC5tMmpMbnJkLMpZ/kcUbRcxUHsBfnOOMm4hcXP6fp0gc0OdsRNjWhnyz2MGPF1UGPg2k6pQ2PakLLLpRVi00/bd9vezfLPtA/s8ghkVD5+YSPwJ9jxTouYfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773063755; c=relaxed/simple;
-	bh=Fdl8FJojdFPF1FUx1e+Rv2JUkktdlZW2eiayHkO7iv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=UasuXBd//dyIvDJfsbWupVfNwtnFxFXzszV9vdjVs+wCOdEyKx+Jqqz3Uzi5ELrOOMGol8vWsrDJwahnDNn62TDDwjVvTG7YbUEmnlBEmQGofIDZ1wq5xmGjn6I3M7sNtQv4w5pb9rRFfAJCayj7U7PDLdgcsGMMb+B1927+l6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BjrmkW3Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C506C4CEF7;
-	Mon,  9 Mar 2026 13:42:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773063755;
-	bh=Fdl8FJojdFPF1FUx1e+Rv2JUkktdlZW2eiayHkO7iv4=;
-	h=Date:From:To:Cc:Subject:From;
-	b=BjrmkW3Zr2SH+Wm7b+tx8B/mPCsCp2tpivIfWmZAE33S/KEoG2bNi9NmR4sXz4OBO
-	 cWIR6eSbASwSZFExdk+TNwIbuh0QN7O+nodVGuJnsRbsrENjFMKPtuvV751oGjgKOb
-	 1aogQzKswagsChUTcC4HFFGE+bHYYNoB+GaSIfW3feqzuV01nc3u/6eTVUDNIYo4if
-	 GcBDy/R5GSchddRNd7bQ5LEtVO73dbUkOgIoCMPl3oGdUUBYl9HGJD0tKJYAnvhqbl
-	 35LEjNRiT5N+NX7WX9zhU2DYOKxb03tARqg0GquVsLYowT/jhC3mIUaS8ab/8jlqH6
-	 QDGhBGhtYbzew==
-Date: Mon, 9 Mar 2026 13:42:30 +0000
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <aa7ORohmf67EKihj@sirena.org.uk>
+	s=arc-20240116; t=1773063848; c=relaxed/simple;
+	bh=5kJQogRZBW3Er5b0nNBRNiUdi359L4TCi+FN2N+XQTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cogPrK9KC7mvUj3MoOEtX4ex9YaWim8LIJh6mAyRHTOqcFNNWdt1Ec/1vC32E7caB3ypOqW+mJYzMreCWa9+pc59OQwjTgoFIcuj+6MC3viLOFs4v1MLV/6PiN4V1U5ej6M1rUXOkQVvd20QQjCn6f8rL29b/KtTbIpdz6D4u8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ChsA1u7/; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=kFLbOMw//S4QUuAdZUf1MLolkl75tvPL0uBSQam12vs=; b=ChsA1u7/t8pUpXioGIjYHkAuPL
+	gR5iXJ9hBUHGmikLiDQOwbq+Q3DfYNx0dhGrutfMG1Nd4K8u+6mCTOPx/QuppTIxv9hSMMCvxKaG2
+	vz8YBq+ObVoVR6O1vTSKAtv0hRPcz4irv+t1mKdhtWf7msB9jp7HRtWNHiZNXm8apeYrmf/DcYgod
+	wwl23L0qspalSpWJyxyWITPw3STLJ99fijRlbFAVAaSj9GImxYL+vmNXVdOyz94DaKy4SUOwg/kMd
+	St2WTmsOr6BbmjsGLA8eYhtJ27Osu3Jsg4K9i7qDNW9FSBDhx/pR0GjlJJnMNZSrYYrBGfpvGA6p4
+	rqqRhGtQ==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vzatu-00000005bV0-0JfA;
+	Mon, 09 Mar 2026 13:44:02 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id D8B5F300FB6; Mon, 09 Mar 2026 14:43:55 +0100 (CET)
+Date: Mon, 9 Mar 2026 14:43:55 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Elver <elver@google.com>
+Subject: Re: [PATCH] locking/local_lock: Reduce local_[un]lock_nested_bh()
+ overhead
+Message-ID: <20260309134355.GC606826@noisy.programming.kicks-ass.net>
+References: <20260309122055.1226507-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ySJF7kGR7n2ojKAD"
-Content-Disposition: inline
-X-Rspamd-Queue-Id: 2B036239F20
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MAILLIST(-0.15)[generic];
-	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265554-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.936];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Action: no action
-
-
---ySJF7kGR7n2ojKAD
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260309122055.1226507-1-edumazet@google.com>
+X-Rspamd-Queue-Id: 6F473239EDA
+X-Rspamd-Server: lfdr
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,gmail.com,kernel.org,redhat.com,google.com];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	TAGGED_FROM(0.00)[bounces-265555-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,noisy.programming.kicks-ass.net:mid,infradead.org:dkim]
+X-Rspamd-Action: no action
 
-Hi all,
+On Mon, Mar 09, 2026 at 12:20:55PM +0000, Eric Dumazet wrote:
 
-Today's linux-next merge of the net-next tree got a conflict in:
+> diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
+> index b8830148a8591c17c22e36470fbc13ff5c354955..40c2da54a0b720265be7b6327e0922a49befd8fc 100644
+> --- a/include/linux/local_lock.h
+> +++ b/include/linux/local_lock.h
+> @@ -94,12 +94,19 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_t __percpu,
+>  		    local_unlock_irqrestore(_T->lock, _T->flags),
+>  		    unsigned long flags)
+>  
+> +#if defined(WARN_CONTEXT_ANALYSIS) || defined(CONFIG_PREEMPT_RT) || \
+> +    defined(CONFIG_DEBUG_LOCK_ALLOC)
+>  #define local_lock_nested_bh(_lock)				\
+>  	__local_lock_nested_bh(__this_cpu_local_lock(_lock))
+>  
+>  #define local_unlock_nested_bh(_lock)				\
+>  	__local_unlock_nested_bh(__this_cpu_local_lock(_lock))
+>  
+> +#else
+> +static inline void local_lock_nested_bh(local_lock_t *_lock) {}
+> +static inline void local_unlock_nested_bh(local_lock_t *__lock) {}
+> +#endif
 
-  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+This isn't going to work; WARN_CONTEXT_ANALYSIS is unconditional on
+clang >= 22.1
 
-between commit:
-
-  db25c42c2e1f9 ("net/mlx5e: RX, Fix XDP multi-buf frag counting for stridi=
-ng RQ")
-
-=66rom the net tree and commit:
-
-  dff1c3164a692 ("net/mlx5e: SHAMPO, Always calculate page size")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 268e208847577,8fb57a4f36dd8..0000000000000
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@@ -1971,12 -1977,13 +1973,12 @@@ mlx5e_skb_from_cqe_mpwrq_nonlinear(stru
-  			return NULL; /* page/packet was consumed by XDP */
-  		}
- =20
- -		nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
- -		if (unlikely(nr_frags_free)) {
- -			frag_page -=3D nr_frags_free;
- +		new_nr_frags =3D sinfo->nr_frags;
- +		nr_frags_free =3D old_nr_frags - new_nr_frags;
- +		if (unlikely(nr_frags_free))
-- 			truesize -=3D (nr_frags_free - 1) * PAGE_SIZE +
-+ 			truesize -=3D (nr_frags_free - 1) * page_size +
-  				ALIGN(pg_consumed_bytes,
-  				      BIT(rq->mpwqe.log_stride_sz));
- -		}
- =20
-  		len =3D mxbuf->xdp.data_end - mxbuf->xdp.data;
- =20
-
---ySJF7kGR7n2ojKAD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmuzkUACgkQJNaLcl1U
-h9CF4AgAgEzpN8P7HDKLKz3jWKWCIkbEixssWOKt0d5kjiF1/hLAo5wUeoLaovSp
-yDv3ZP1DthcYDy2Dcmkq2cW5Bud9G1HFwlc84zO627R8/XI1CFA/zuJrNRAAqMYM
-xvn2Am3rreMTGZvDKbvNT+d6/Cplklr0TjUTYg4w42WoI5y6Z0Y3LjvYNUGLWlXF
-tSzD4GK2a7/tAEAwSBKd1RuUz5igvW4ye9enHf6Yvml8RzbwBr0bhBcLxqCw5rDF
-q0qyuHh2nBJE6qXGDv9GVvWObbFeeW/k+4B7N3AtOGPYnUUh0tA4Hwex9E399tQf
-QuGNsekrPuUYPfMZ2jR9Kv8zVcaNWA==
-=KVdP
------END PGP SIGNATURE-----
-
---ySJF7kGR7n2ojKAD--
+How come that this isn't DCEd properly?
 
