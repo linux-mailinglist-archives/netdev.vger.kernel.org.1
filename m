@@ -1,114 +1,159 @@
-Return-Path: <netdev+bounces-265769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265773-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNV7Htk5r2kPQQIAu9opvQ
-	(envelope-from <netdev+bounces-265769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:21:29 +0100
+	id +Mb3EWc7r2kPQQIAu9opvQ
+	(envelope-from <netdev+bounces-265773-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:28:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D65224191A
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:21:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE53241AB5
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D649030244C7
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:21:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BDE13059A9A
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA7330EF6C;
-	Mon,  9 Mar 2026 21:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYSj+h9z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B12F340A6A;
+	Mon,  9 Mar 2026 21:22:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CB425A2B4
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 21:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C007344056;
+	Mon,  9 Mar 2026 21:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773091287; cv=none; b=Zk9S+AjI9MOXvE5CmxYE899o/oviJ4bLhOuFGS4XgXoQMkbhYuceU0Refxw9qhULAHJ9J8Q1OGWY8aTlR602BIb+41PWYeVkE+vok2U4Ks4IPjAdi4YwX66iDjKV9tVwjkcxK1Up4qBpQbnJigrudDv7s6TQNz7f0E4ICGGHmLs=
+	t=1773091334; cv=none; b=Wksg1DOLNM1nXxsfjxgLdjDs8QI4d40bMEQKcBIiijkup+Aca6Ya/fVH+Ch6/uUgF/GIFojQGRkCET3Szw2JYjJDM/yjIN78d1e7+HcmYWU0hOkAS6cpVI239gk9UVxsxF0ZbVG6fRcdhRjLqjku6crMMaI52Tz4y/y1kDf11VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773091287; c=relaxed/simple;
-	bh=oe9ddW4pLbC7lONtqKIRzyfPji7D5xo0kfNqyHjFWnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l/U+xk1h9mL84USMCyXZSWXxb88itjIuVsAGktNcWWdqILoq35k6I8R0Mie66FV079cCnc2h5ukX3WCWHd87WSfMUHWOePuITl5/K8lYHk9q6MsKAu+//o5DjZMXfCIY+UTw1Cl19xvAau0+eX87v+TJTTLGUFvxLTvlz5aCWSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYSj+h9z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D53EC4CEF7;
-	Mon,  9 Mar 2026 21:21:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773091287;
-	bh=oe9ddW4pLbC7lONtqKIRzyfPji7D5xo0kfNqyHjFWnI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uYSj+h9zYUbUy5/w5ZnNU5AiRYrtoqxr3z3I9ntmG3XdDTtOGJknHkeCsZ7QWsKw9
-	 ysWOh81mPvfWSfmRzApGyIj4hql3weofWoT3TaY8Cx8uW0G0X+qHwj2P4xSCbMSpEO
-	 AG2wziet9/04roW2zHsjaI1EcbKq38IAnlCv9tLcUugvsoWH8+J/MgqLqwc/3ZHgb8
-	 5jTkJqoCfvsQohJbVDVNiv4JiCfhjZXM5DzgyXyWy2gkPhtKmcIICpHIn4Co4qB5NV
-	 DIEkTR7WWLM/yUomnHESX6hPijsmsGLLvJJZpBr7Z9uVvV5vFO/lwjvNTl4LIgC6sS
-	 qjMfT9BX586eQ==
-Date: Mon, 9 Mar 2026 14:21:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "pabeni@redhat.com" <pabeni@redhat.com>, Dragos Tatulea
- <dtatulea@nvidia.com>, "edumazet@google.com" <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "sd@queasysnail.net" <sd@queasysnail.net>,
- "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH net v3 0/3] macsec: Add support for VLAN filtering in
- offload mode
-Message-ID: <20260309142126.2fe0cd73@kernel.org>
-In-Reply-To: <678c4e9e9f2e54e47e67005e1a230641300e40dd.camel@nvidia.com>
-References: <20260306151004.2862198-1-cratiu@nvidia.com>
-	<20260306115353.28f322e0@kernel.org>
-	<20260306115405.0febac64@kernel.org>
-	<678c4e9e9f2e54e47e67005e1a230641300e40dd.camel@nvidia.com>
+	s=arc-20240116; t=1773091334; c=relaxed/simple;
+	bh=d90gpbBPC3PluRAYfjB6TkGxh4phVO9cEThq8OWp0l4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GEFelsmCSCZH6SPViFnn1zbtfYLbAruTmWHdOhva3Z0kPPqo/ENjW/dbOfOBM6OBlcnl3BFdc+/R2Bexh71nL+DR8nmhCVyukqNA+LvUd1G54bmz7HzPCTAHVptF1D/3d+VllWTYyCirkKW6rRRYThqITy76V/rjdePehPj0bMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 5A05E60D39; Mon, 09 Mar 2026 22:22:10 +0100 (CET)
+Date: Mon, 9 Mar 2026 22:22:10 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce
+ nf_flow_vlan_push()
+Message-ID: <aa86Ai1FRuJzthEF@strlen.de>
+References: <20260227162955.122471-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4D65224191A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227162955.122471-1-ericwouds@gmail.com>
+X-Rspamd-Queue-Id: AAE53241AB5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265769-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265773-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[strlen.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.943];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,strlen.de:mid]
 X-Rspamd-Action: no action
 
-On Mon, 9 Mar 2026 16:23:22 +0000 Cosmin Ratiu wrote:
-> What's your request here?
-> Would you like me to move that test out of netdevsim and have it work
-> with real devices as well? Or just add the VLAN part as a separate test
-> somewhere? Or we leave it like this and keep it in mind for future
-> tests.
+Eric Woudstra <ericwouds@gmail.com> wrote:
 
-The first option - adding a test that can run on real HW as well as
-netdevsim will increase the code the test exercises by an order of
-magnitude.
+Hi Eric
+
+> With double vlan tagged packets in the fastpath, getting the error:
+> 
+> skb_vlan_push got skb with skb->data not at mac header (offset 18)
+> 
+> Introduce nf_flow_vlan_push(), that can correctly push the inner vlan
+> in the fastpath. It is closedly modelled on existing nf_flow_pppoe_push()
+> 
+> Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+  
+> +static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
+> +{
+> +	if (skb_vlan_tag_present(skb)) {
+> +		struct vlan_hdr *vhdr;
+> +
+> +		if (skb_cow_head(skb, VLAN_HLEN))
+> +			return -1;
+> +
+> +		__skb_push(skb, VLAN_HLEN);
+> +		skb_reset_network_header(skb);
+> +
+> +		vhdr = (struct vlan_hdr *)(skb->data);
+> +		vhdr->h_vlan_TCI = htons(id);
+> +		vhdr->h_vlan_encapsulated_proto = skb->protocol;
+> +		skb->protocol = proto;
+> +	} else {
+> +		__vlan_hwaccel_put_tag(skb, proto, id);
+> +	}
+
+I did not apply this because I'm not sure if this preserves correct tag
+order.  Can you clarify?
+
+Lets consider vlan-offload-doesn't-exist case.
+
+First loop pushes vlan tag 1, we get:
+
+  [vlan1][inet]
+
+2nd items pushes vlan tag 2, we get:
+  [vlan2][vlan1][inet]
+
+Now lets consider with-offload.  We have one tag only, so we get 1 skb with hwaccel
+tag in the sk_buff.  This is fine, HW will insert it for us.
+
+But now lets consider two tags:
+
+First loop pushes vlan1, we get the vlan1 tag in sk_buff vlan info.
+Packet is: [inet].
+
+2nd loop pushes vlan2, we get:
+	[vlan2][inet].
+
+Now, when packet is transmitted, where will the HW insert the tag?
+
+[vlan1][vlan2][inet]?
+Or will this be [vlan2][vlan1][inet]?
+
+reading though the SW-side (no hw support), it seems it will do the right
+thing (i.e.. the hw tag gets added as the inner tag, right before inet
+and not added as outermost tag.
+
+Can you confirm thats the case?
+
+Sorry for not responding sooner, there are lots of patches atm and
+I forgot about this one when I yanked it off the previous pull request
+at the last second.
 
