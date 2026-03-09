@@ -1,201 +1,208 @@
-Return-Path: <netdev+bounces-265526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKpWAWy8rmn6IQIAu9opvQ
-	(envelope-from <netdev+bounces-265526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:26:20 +0100
+	id CD5tH/K8rmn6IQIAu9opvQ
+	(envelope-from <netdev+bounces-265527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:28:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0319B238CA0
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:26:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD807238D38
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:28:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 44A42300C6FD
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:13:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02EC230E34E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682B63A63E8;
-	Mon,  9 Mar 2026 12:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CBD3A6419;
+	Mon,  9 Mar 2026 12:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ImDKAILR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB52A2D8760
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 12:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451D1394462
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 12:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773058425; cv=none; b=q0qDYQE1S/YfhMZbqil99IwnsKgl+yX+aaJbhd7ef+LGypkRkFyRIhzwe1fe30cGkivelFt6s2hcZy9ku1ILEgHYKjp8hpAq1PZugjzPREWOOwJ46vucq7sOZ+TBdIh2xn3ECgKz4FWeMMBddERQZEBWJt+VafHSKt+GDPZneqg=
+	t=1773058866; cv=none; b=j9f2KyAt55dTf/Y9vgHtF23vIV0ueyB3d3+ZLFCWtiyYulehdkjDqMoYuxpR7Hqa8kTQRuOOHpETJrmJb1k2bbyGzfnC9iXs/P71q0dbWigiN44iV+wNeHYrD8zID74a9o9/ny81giIX2GmmOPr44dBWVdwqvaeix8L1GkFJF80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773058425; c=relaxed/simple;
-	bh=PSve9+OZ0uIyrVvrL+k8kYaMyjyZV5bNHKf4r6mYMjg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sknKlnhYReEo90nukrGO1bv0QJWETtsxz9vTvb1G1OYGD2UmOBEmoflXq87n+tR2fDK9+Owa9ZvB+s6i+gMg/au9DRR5Kr33nxvpJa7u0g8BYcexdhyQKQJTnO3+0RFVcBrbktt33HvDGvS3cxjyliWfh7KOw3EegpgcGmup6Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-672c40f3873so198184909eaf.2
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 05:13:43 -0700 (PDT)
+	s=arc-20240116; t=1773058866; c=relaxed/simple;
+	bh=IXJ56yPXbvL2wW+2gxV0vy87UMfMk13puqoL7+gO+5I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RzerlKtc0CVFvOdf4S/8cvkIc2yTqo8eCUMSUE5Ph5IcwGUjkWVudYPjbk7McR/ogLCYX9v20lzyUW+ABNAeE5TRQuePyn12DG56H6jqCK2nizOQ8Yskgo87Rww7iVHfSYHGNIRF6U7vER6Dcy7aMq0AEmfrdOvnN3XOnRJ5Fcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ImDKAILR; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cd81506677so739081685a.1
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 05:21:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773058863; x=1773663663; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3t3G3LLvnJvm54uG+Cb7TCQpAwcUxU8pPUqv0rVI43I=;
+        b=ImDKAILR2dGqPvEbDcVnPAEAk+AJC5WH2NPIpitKzNpcvRzl/pzcRkXRwUIze+Z0BO
+         kjT9egjxDFK7ZngALH67vQXHffLdDBJRhiMRWEx9tcE6LQlsOaXbiEeKu0JVkVj/jwe9
+         r7ZC27Qe3log08gxipebwr7OwNx0u+BeGV3hgPuLY2HYfYphTw583Ln/nR7IaDUApsnb
+         rdojSfdI7TI+zfUSnBobgJswlfwH3p437bmbztIEZJGfptyfTEkMz0mwB/gG7X5TFcl+
+         923HWK72FRvrAff44J3aAZAut9XOuLa8QCZwI4rM0f8UDpFnn0QldUGDZS/FqbPeHqCm
+         3krQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773058423; x=1773663223;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1773058863; x=1773663663;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=TqsjNRI5k7LetfZtjLKtuc4uxl4nwGBY89RPRBdE1pE=;
-        b=TgWCZL8qK+1iS2//oB+GoQ4Oxho5az9aOYeFhKDI7y+b4gsa4bN3TE7fwGjCSiV6rs
-         DdI5/rEnmT/Hn32LY9VHOcepjmomHWp5ldXoDp/DBQwxpCUi7VP66zLj5dtmySAAQexE
-         epZZW0wscv4boki5asJE5WxNa2rSjrJwWZDfiSI6PYYDNyKixknxYzAsqQWUKd5GSdY9
-         SinMns4sZHeGAo7lmFg+73xR/MpzjR/yFRa8/eOXKbcUJtDnVNVt9WaECYbKG1znK0To
-         zNd5Er+l3gkCN6ruwI4GE3z9t1YnUCpPybVshoSZ5LZLYob1tH7pNCMmlV4SlPufZGEk
-         Adgg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGTsJtFH7PfbQ8vkUBh5Kak95qweIYsWQq1GaUR9J5dzgFkpH7vUf7rqSmEquVBphXKmOCIsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZbrbEu6Xhrevmdd5QOY9oVXslud6pb219PqhCzPIWAMLySolu
-	uLYgfNiucowAHm8obZiW6CxNUd7RJ3qhnJnawhldGS22MnS5fA6oYUGvTtUBRz26bct99h9gX2l
-	P/rPoCFnuDIvd3DFKLeU1cfl2M57VvqYB8/rDAoq9Y5t2fongLWZsmhtIlRs=
+        bh=3t3G3LLvnJvm54uG+Cb7TCQpAwcUxU8pPUqv0rVI43I=;
+        b=ftYCY8U9V113SFBiKQa7/3NeH0sWSLK8GzgVPVIqx8p4TS4ddXCImJW+wr5AphLpNK
+         MX14qDlwW7jvhexz4d8OKC3kQcVEzijOo9ylYhM6Cj7YqYsVE3G+9N1LLbilYkENqVxw
+         GOc3BjjrMKZ1CHxPRepOlni71Umn7KWjwDRMTppmIH7FZ9QTI7Mv1LQoH2I5TmVUV+rj
+         KezxLRI2Kf0Bq3VixrvB+0WZql0E4DG2hZXvF/9iW5Fq5KqUi4XstEB0NLb/kF4FAahN
+         jZL2YLd63zkPpT20OiFQDIM5JCi3I8osC5Q7IhXTMSJ0W4/mNidWfXTgo0T0x/+7sIHB
+         P1/A==
+X-Forwarded-Encrypted: i=1; AJvYcCW2DmB9FkKWeun0w1ueDK8eUAvjbbq6sd5KHIwU5EuOhxuP2XYRMlAjSqvHP2LDkdoQB6ze1hc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHRQGYic6SwpYR0qf940dtFWlYPRQvAqoF2XvJzck9qoY9gPfP
+	xGbZ7AtL/JZQUB+DxaBHv6g8B1A6sDMQKWzgrSrzsp53ziJo3cUj6ehvKiDTTpoFwCGeXJPOmbX
+	stt3Iw+IcS0snnA==
+X-Received: from qknvj10.prod.google.com ([2002:a05:620a:708a:b0:8cd:8684:7bbf])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:480c:b0:8cb:4d05:aa43 with SMTP id af79cd13be357-8cd6d52bb78mr1252756285a.59.1773058862989;
+ Mon, 09 Mar 2026 05:21:02 -0700 (PDT)
+Date: Mon,  9 Mar 2026 12:20:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:c92:b0:67b:adbe:c3cb with SMTP id
- 006d021491bc7-67badbec51bmr3811015eaf.56.1773058422821; Mon, 09 Mar 2026
- 05:13:42 -0700 (PDT)
-Date: Mon, 09 Mar 2026 05:13:42 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69aeb976.a70a0220.52840.0015.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: null-ptr-deref Write in send_to_lecd
-From: syzbot <syzbot+e1d2b89a60c8bb9a7f33@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260309122055.1226507-1-edumazet@google.com>
+Subject: [PATCH] locking/local_lock: Reduce local_[un]lock_nested_bh() overhead
+From: Eric Dumazet <edumazet@google.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Marco Elver <elver@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 0319B238CA0
+X-Rspamd-Queue-Id: DD807238D38
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=976ba5a93c4add9e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,redhat.com,google.com,linutronix.de,infradead.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-265526-lists,netdev=lfdr.de,e1d2b89a60c8bb9a7f33];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.938];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,appspotmail.com:email,googlegroups.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,goo.gl:url,syzkaller.appspot.com:url]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265527-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.995];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello,
+On !PREEMPT_RT and !LOCKDEP kernels, local_[un]lock_nested_bh()
+are supposed to be NOP.
 
-syzbot found the following issue on:
+This is not exactly true after 7ff495e26a39 ("local_lock: Move
+this_cpu_ptr() notation from internal to main header") due to
+this_cpu_ptr() being evaluated even if its result it not used.
 
-HEAD commit:    014441d1e4b2 Merge tag 'i2c-for-7.0-rc3' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11230d52580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=976ba5a93c4add9e
-dashboard link: https://syzkaller.appspot.com/bug?extid=e1d2b89a60c8bb9a7f33
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+This prevents some tail call optimizations.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+After this patch we have gains in networking fast paths:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c6996386f74c/disk-014441d1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/50d7e742ec37/vmlinux-014441d1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8b042e15289c/bzImage-014441d1.xz
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux
+add/remove: 0/0 grow/shrink: 0/36 up/down: 0/-644 (-644)
+Function                                     old     new   delta
+tcp_sigpool_end                               79      71      -8
+skb_attempt_defer_free                       457     449      -8
+ppp_xmit_process                             179     171      -8
+ppp_write                                    411     403      -8
+ppp_output_wakeup                            135     127      -8
+napi_skb_cache_get_bulk                      440     432      -8
+napi_consume_skb                             409     401      -8
+dst_cache_set_ip6                            203     195      -8
+dst_cache_set_ip4                            135     127      -8
+cpu_map_enqueue                              193     185      -8
+bq_enqueue                                   263     255      -8
+__netdev_alloc_skb                           377     369      -8
+__netdev_alloc_frag_align                    155     147      -8
+__napi_kfree_skb                             136     128      -8
+napi_skb_free_stolen_head                    199     190      -9
+input_action_end_bpf                        1083    1072     -11
+napi_alloc_skb                               275     263     -12
+__napi_alloc_frag_align                       59      45     -14
+xdp_build_skb_from_zc                        590     574     -16
+tcp_v4_send_ack                             1129    1113     -16
+sch_frag_xmit_hook                          1260    1244     -16
+flush_backlog                                507     491     -16
+dst_cache_get_ip6                             99      83     -16
+dst_cache_get_ip4                             90      74     -16
+do_xdp_generic                               932     916     -16
+__napi_build_skb                             591     575     -16
+__dev_flush                                  115      99     -16
+__cpu_map_flush                               85      69     -16
+dst_cache_get                                 55      38     -17
+tcp_v4_send_reset                           2682    2658     -24
+mptcp_subflow_delegate                       955     931     -24
+__alloc_skb                                  988     964     -24
+mptcp_napi_poll                              310     281     -29
+nat_keepalive_work_single                   1385    1335     -50
+gro_cells_receive                            320     244     -76
+process_backlog                              486     404     -82
+Total: Before=25812320, After=25811676, chg -0.00%
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e1d2b89a60c8bb9a7f33@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-BUG: KASAN: null-ptr-deref in atomic_add include/linux/atomic/atomic-instrumented.h:104 [inline]
-BUG: KASAN: null-ptr-deref in atm_force_charge include/linux/atmdev.h:261 [inline]
-BUG: KASAN: null-ptr-deref in send_to_lecd+0x2ef/0x5e0 net/atm/lec.c:535
-Write of size 4 at addr 0000000000000140 by task dhcpcd/28797
-
-CPU: 1 UID: 101 PID: 28797 Comm: dhcpcd Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- kasan_report+0xdf/0x1e0 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:186 [inline]
- kasan_check_range+0x10f/0x1e0 mm/kasan/generic.c:200
- instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
- atomic_add include/linux/atomic/atomic-instrumented.h:104 [inline]
- atm_force_charge include/linux/atmdev.h:261 [inline]
- send_to_lecd+0x2ef/0x5e0 net/atm/lec.c:535
- lec_arp_resolve net/atm/lec.c:1791 [inline]
- lec_start_xmit+0x1252/0x2070 net/atm/lec.c:285
- __netdev_start_xmit include/linux/netdevice.h:5292 [inline]
- netdev_start_xmit include/linux/netdevice.h:5301 [inline]
- xmit_one net/core/dev.c:3871 [inline]
- dev_hard_start_xmit+0x121/0x7d0 net/core/dev.c:3887
- sch_direct_xmit+0x1b2/0xc60 net/sched/sch_generic.c:347
- qdisc_restart net/sched/sch_generic.c:412 [inline]
- __qdisc_run+0x52d/0x1b10 net/sched/sch_generic.c:420
- qdisc_run include/net/pkt_sched.h:120 [inline]
- qdisc_run include/net/pkt_sched.h:117 [inline]
- __dev_xmit_skb net/core/dev.c:4196 [inline]
- __dev_queue_xmit+0x196d/0x4800 net/core/dev.c:4802
- dev_queue_xmit include/linux/netdevice.h:3384 [inline]
- packet_xmit+0x243/0x310 net/packet/af_packet.c:275
- packet_snd net/packet/af_packet.c:3076 [inline]
- packet_sendmsg+0x32f4/0x53c0 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- sock_write_iter+0x524/0x5a0 net/socket.c:1195
- do_iter_readv_writev+0x6ee/0x920 fs/read_write.c:829
- vfs_writev+0x360/0xe10 fs/read_write.c:1059
- do_writev+0x28a/0x340 fs/read_write.c:1105
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f53f6e3c407
-Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-RSP: 002b:00007fff9cf80170 EFLAGS: 00000202 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007f53f6db2780 RCX: 00007f53f6e3c407
-RDX: 0000000000000002 RSI: 00007fff9cf801d0 RDI: 0000000000000003
-RBP: 0000000000000188 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007fff9cf80210
-R13: 0000562512791790 R14: 00007fff9cf80260 R15: 00007fff9cf90430
- </TASK>
-==================================================================
-
-
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
+Cc: Marco Elver <elver@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/linux/local_lock.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
+index b8830148a8591c17c22e36470fbc13ff5c354955..40c2da54a0b720265be7b6327e0922a49befd8fc 100644
+--- a/include/linux/local_lock.h
++++ b/include/linux/local_lock.h
+@@ -94,12 +94,19 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_t __percpu,
+ 		    local_unlock_irqrestore(_T->lock, _T->flags),
+ 		    unsigned long flags)
+ 
++#if defined(WARN_CONTEXT_ANALYSIS) || defined(CONFIG_PREEMPT_RT) || \
++    defined(CONFIG_DEBUG_LOCK_ALLOC)
+ #define local_lock_nested_bh(_lock)				\
+ 	__local_lock_nested_bh(__this_cpu_local_lock(_lock))
+ 
+ #define local_unlock_nested_bh(_lock)				\
+ 	__local_unlock_nested_bh(__this_cpu_local_lock(_lock))
+ 
++#else
++static inline void local_lock_nested_bh(local_lock_t *_lock) {}
++static inline void local_unlock_nested_bh(local_lock_t *__lock) {}
++#endif
++
+ DEFINE_LOCK_GUARD_1(local_lock_nested_bh, local_lock_t __percpu,
+ 		    local_lock_nested_bh(_T->lock),
+ 		    local_unlock_nested_bh(_T->lock))
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+base-commit: 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
+prerequisite-patch-id: f6002c357582927a383603a22e69bc0d7a5b9528
+-- 
+2.53.0.473.g4a7958ca14-goog
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
