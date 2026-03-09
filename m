@@ -1,168 +1,278 @@
-Return-Path: <netdev+bounces-265417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265418-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNQ0JCyNrmnlFwIAu9opvQ
-	(envelope-from <netdev+bounces-265417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:04:44 +0100
+	id OEKaLDOPrmnVGAIAu9opvQ
+	(envelope-from <netdev+bounces-265418-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:13:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E86EF235DAA
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:04:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318F3235F82
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B18D30440BA
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:03:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C44A3044BB5
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4F5374176;
-	Mon,  9 Mar 2026 09:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354223783C5;
+	Mon,  9 Mar 2026 09:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jHru3esd";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="G/+mXK6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690FD374194;
-	Mon,  9 Mar 2026 09:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E5D376BF2
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773046987; cv=none; b=XAZNXjCBQAOuozKWXBClivahB5lNDaMcfpYCpPbWocAxtYDn1JryNnK47x25x8Bu77NGdTIeYRg6PBml2AWP/5o9zf0rtKQhuYrpj46Yz3DHCy4/7r0SzsuoFjoHYkgH/Jy8Udh4ft2tXVXM0da68OhePtKQenlMv7qaQdP1/mg=
+	t=1773047535; cv=none; b=rO0mKqZNaONUXUrQ0Wn+kc/8vCdOz/Tyb2CJ2nq9R5ns7teeeH/Qvf/ADtrwpyFU8u6vMBSlOEs3fSqNUWICOqKO4ymINl4rd4DzKWhlVxP93VyuFDChgsCDvA5BkL8iwKTapTbcXykGQAiC4Mo7UxySwoTgR9dw6dZyh5QyVRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773046987; c=relaxed/simple;
-	bh=pBdLTrtwUzVYFA9w1OGA6k2+fdXxmfG+7rq34JocsuU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OivxL9xORSKqXsm14URR5abhQ5Jhe4A9QSGsgpGUmhHKMUD5RZ3n2w755XvnVulWXXXKjW0ZXJMJHSfZfSUPA2ujWtVazD5jIalvec6ZsQnmmAfrkOH0C2KKWgB8PyHT2HqXBMGXt5cRzj0AN3u3OLWjVxKPgUat+53G7Oe0Tfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowACnOQ2wjK5pE7jxCQ--.45897S2;
-	Mon, 09 Mar 2026 17:02:41 +0800 (CST)
-From: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
-To: rafal@milecki.pl,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
-Subject: [PATCH] net: bgmac: scope bgmac_enet_suspend() and bgmac_enet_resume() to CONFIG_PM
-Date: Mon,  9 Mar 2026 09:02:38 +0000
-Message-Id: <20260309090238.719428-1-pengpeng.hou@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1773047535; c=relaxed/simple;
+	bh=Q2J+r2dSfTS2w9RcAxTqCjJw6if9TEPXLD0Hi1LfNcA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N6H4Y2wBsTUcBkSrAUemcJrsee+mGNedNuSlsDXQdCG2anzuOiOtdXYBxkygGEL1SAOxtYROLoBthlTtaDHEbtQewUNZGn045lWJ2UY8xUWykh62VZSsn1oTKFcv1wAeIcYy3hziGW5d20l6swQKOVjtaLk9m5Rzc04H+mGi7fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jHru3esd; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=G/+mXK6b; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6298WcmY2663851
+	for <netdev@vger.kernel.org>; Mon, 9 Mar 2026 09:12:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=xbMtvtdOfLDdatvp+5lzCch6
+	oMIueR07h2NcUioWpFw=; b=jHru3esdNzuncTNwyW211a+aJdCkYiYxILsoZN+3
+	1GwgTcHiMn/ymHOV08WINAfoWlfYw32mmtmF+Seo9nDBKL/8faTBqtOibVjY8T1b
+	dgaY0uA7GYpKzy2BlixGrj6mN62goEwdjRuKoxo3BmtDppXIOIRCT3W6eZFhNujG
+	NUVHihFT8lC0N4D4b9D4sUu9vqiYV7661k24lzZtWboU4mtxwP07+llelKSKDhOL
+	XCCcln8fcMYU0Dbq9i5aXPPkIr1kAbbwT4ojrN+2XxrTTpUirMmL8EjgT/DODPGl
+	DyxQTsHS6r2QOpA4ooTD4DOGq2QorD2Gt3YNLkNIxsnfsg==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cr9cpn05v-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 09:12:11 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8cd7774be64so1054483485a.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:12:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773047531; x=1773652331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xbMtvtdOfLDdatvp+5lzCch6oMIueR07h2NcUioWpFw=;
+        b=G/+mXK6b4p/ttPLc96rKIpLQx0rVatRsBeSzjF6/+gelzgZLV8+rTlRRrKkr1lDudb
+         x0XHory0GhLkH1EV4a5PpiAhY/TRwdi7lNPcuiJaJ+eroKu8I+pq8tKeZgoO9rnO8mAj
+         3GPZSRLFlKEjh4bUiOLnU4Ym4fqojvyKGzTYir5jZPGDnijSdwEZ2I//IX31gXkKEP1s
+         foFFG9rGEYwaClVPqGjcfc2PF6ChTLabjzpl33wxEpXkGgIb9BiIr8BItfX961bdKraS
+         oWN7XpKgf9b1/RiiDTdP5u2dcwofel7MwuTc+xl6KxLC9uT0LhYultFFB/xZ4sey9DTv
+         tyfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773047531; x=1773652331;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xbMtvtdOfLDdatvp+5lzCch6oMIueR07h2NcUioWpFw=;
+        b=Q/JDSgN9FCxdueuwWQKOHzuWWqNsUygDt5JCQgYViEk05XhmyLAeL5MNEqgzOfz34f
+         dW7sSvMOIx6KZnJ3mRKpvIASoRkeer5EnaC4tQhvXxVt2ICfsF6bCN5MTRivUgD1esLe
+         RN34CbixrAZJclnRBU9WcmBJwKUdiJ6lhhl54T4W5aZk9Z0gvMSGNjgFPx+hMJibMaDZ
+         wH9X4uOXGuoc/TwKU8PhLzkMRgCp92S0M2UMIfXMX/lq5cHIJJJokPFC+VNUOUOK680E
+         H+mdG4PL0UujR+25clYAiWEuCn93/m0JXiVMDoLuPs/JnsqIs3c4BgtNbAYK2n84gCtQ
+         jNFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWO0BuaR63H1GU2TMRdWTAFQqNg7EegvtFhWX1yrwJlWitf2hPjTZ11ywetUpdOYth4XcZBFJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMrEERUHTC/NKxPoU86Hf2vxXcTKT+kh4cSGWgaKBL2VH6Saw6
+	K9QTsxo1i5KmkFY7MClcMAw1qL6N4UPu00cRWp8oMogWXBoRzmwgr6cRrdOPEbnxML3os2+gjzX
+	k2HBoI/599++mOpwxKrZ8f95ROlKbXmas0u9S6W43uxzK19ijBPT5s/SSRM4=
+X-Gm-Gg: ATEYQzwopPlJWYaHfUClIPnZuk2SMcNwojkzqnyw+UbcID9qZKKBR5R2vEDORcOTuMR
+	mq0BBUy2McyfZoI+QLbdwd3uqNrfGwQb8Vj6+VZKPVOjx5C38GTlXMkQ8PAiQVa4LeTk8qEtI+c
+	TQDniNTmTJC8pmJl5cbBS7ftw0FKuKIi62TWTbiS5bhCOBIIeTn7fi4UrozY+cNVXBI4unPUnvS
+	sVGMpv6vFXf/S83pO1Oh9iNYr4KfYSZQtJs2+TgFq3gSH7cTpU8KNPJobx5Fm+9eskp9c/WaaqY
+	v+IN7YT1BMSzBNBnwzKHocUI9DEfA6cXoCAedWevfxs8QLQ7zSuROSqCLO5cEA75caEy6c0aR8E
+	g2SlTrY8qR9octNj2nF5kiwkzCQyIMI6Ouz4RrrkHP2+WHBQ40oOjvA==
+X-Received: by 2002:a05:620a:700a:b0:8c9:f9c1:5ed with SMTP id af79cd13be357-8cd6d4d541dmr1304567885a.63.1773047530882;
+        Mon, 09 Mar 2026 02:12:10 -0700 (PDT)
+X-Received: by 2002:a05:620a:700a:b0:8c9:f9c1:5ed with SMTP id af79cd13be357-8cd6d4d541dmr1304566385a.63.1773047530429;
+        Mon, 09 Mar 2026 02:12:10 -0700 (PDT)
+Received: from trex (110.red-81-38-138.dynamicip.rima-tde.net. [81.38.138.110])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae483desm23179497f8f.34.2026.03.09.02.12.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 02:12:09 -0700 (PDT)
+From: Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>
+X-Google-Original-From: Jorge Ramirez <JorgeRamirez-Ortiz>
+Date: Mon, 9 Mar 2026 10:12:06 +0100
+To: Sumit Garg <sumit.garg@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+        dikshita.agarwal@oss.qualcomm.com, bod@kernel.org, mchehab@kernel.org,
+        elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jjohnson@kernel.org, mathieu.poirier@linaro.org,
+        trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+        pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+        tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH 11/14] media: qcom: Switch to generic PAS TZ APIs
+Message-ID: <aa6O5tir4kVIe0eZ@trex>
+References: <20260306105027.290375-1-sumit.garg@kernel.org>
+ <20260306105027.290375-12-sumit.garg@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowACnOQ2wjK5pE7jxCQ--.45897S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyfCFWDWrWUKw45trW7CFg_yoW8Zw1Up3
-	yUJrWUCw48Jr1jga18JFW8CF15twn3t34DWa43J3yrZ3Z8tw17JF48Ka1fXrsYyrW8Gr4a
-	yF1jy3s3ua98GaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GFWl42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUe2-eDUUUU
-X-CM-SenderInfo: pshqw1hhqjhx1rx6x21ufox2xfdvhtffof0/
-X-Rspamd-Queue-Id: E86EF235DAA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306105027.290375-12-sumit.garg@kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDA4NCBTYWx0ZWRfX/BD9Ip+4yjXl
+ 43opNGvGl/oFOBRkeDE6TUg9XHhK5IBcxl6a4mxam56kr06dFHGuqkpgtOv57QAc9CSMt9TL7Gt
+ mRQh2fnXURvcx5cK+i1mOuy+r09MNtJ3zazBdmAoS16CsMoJGQbDqrp2ALlQ8ltXwXhx8Nd3+xZ
+ Ug8fv/kVDA6BjCVlAH9r1zNOzkaz6wF80jFrT+HREgUCIbQdWYaVeUipsqrdWmHYp8lbUIR0Cgs
+ aqBVpGxFQ1cW8nJygtdLBH3d9bv7AxshugGtTdpiydkb3Fuqdz2pQqVGUjXhSYZLHR1tSSiAZVd
+ 5ULp/M2qC5foNxtA9JcV1HnmmIsWeyTLe5L/WcEMWJmLl93VBWrdomyylvBiepLVabdYiTC/Tpe
+ A0bZySYMEJrgD1GWpIsJz6KJpnU3+oQpNJZ7KmgpOnQf8L5XGumcEuBWf1+Oqye0p5EAFuCaVZg
+ pBjrIj+qzE9O0c4bV4Q==
+X-Proofpoint-ORIG-GUID: M9EUvlnIoo8YMSlDUvyyRB0QJWIU2Gwn
+X-Proofpoint-GUID: M9EUvlnIoo8YMSlDUvyyRB0QJWIU2Gwn
+X-Authority-Analysis: v=2.4 cv=e7sLiKp/ c=1 sm=1 tr=0 ts=69ae8eeb cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=P2IcWdTxk7sEx2G8DnB30w==:17
+ a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=zah51VvIpe4vvf6E17kA:9 a=CjuIK1q_8ugA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-09_03,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
+ clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2603090084
+X-Rspamd-Queue-Id: 318F3235F82
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265417-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265418-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng.hou@isrc.iscas.ac.cn,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.626];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[jorge.ramirez@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	NEURAL_HAM(-0.00)[-0.987];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,isrc.iscas.ac.cn:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-In current linux.git (1954c4f01220), bgmac_enet_suspend() and
-bgmac_enet_resume() are defined and declared unconditionally. However,
-their only in-tree callers are within the platform driver's PM callbacks
-in bgmac-platform.c, which are already guarded by #ifdef CONFIG_PM.
+On 06/03/26 16:20:24, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> 
+> Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
+> TZ service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/media/platform/qcom/iris/iris_firmware.c |  9 +++++----
+>  drivers/media/platform/qcom/venus/firmware.c     | 11 ++++++-----
+>  2 files changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
+> index 5f408024e967..b3c5281aea91 100644
+> --- a/drivers/media/platform/qcom/iris/iris_firmware.c
+> +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
+> @@ -4,6 +4,7 @@
+>   */
+>  
+>  #include <linux/firmware.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/firmware/qcom/qcom_scm.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_reserved_mem.h>
+> @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
+>  	if (ret)  {
+>  		dev_err(core->dev, "auth and reset failed: %d\n", ret);
+>  		return ret;
+> @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
+>  						     cp_config->cp_nonpixel_size);
+>  		if (ret) {
+>  			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
+> -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
+>  			return ret;
+>  		}
+>  	}
+> @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
+>  
+>  int iris_fw_unload(struct iris_core *core)
+>  {
+> -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
+>  }
+>
 
-Match the helper scope to their callers by wrapping the definitions in
-CONFIG_PM and providing no-op stubs in the header. This fixes the
-config-scope mismatch and avoids unnecessary code inclusion when
-power management is disabled.
+are the calls to set_remote_state required?
+0 is not the IRIS/VENUS remote processor.
 
-Signed-off-by: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
----
-diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
---- a/drivers/net/ethernet/broadcom/bgmac.c
-+++ b/drivers/net/ethernet/broadcom/bgmac.c
-@@
- EXPORT_SYMBOL_GPL(bgmac_enet_remove);
- 
-+#ifdef CONFIG_PM
- int bgmac_enet_suspend(struct bgmac *bgmac)
- {
- 	if (!netif_running(bgmac->net_dev))
- 		return 0;
-@@
- }
- EXPORT_SYMBOL_GPL(bgmac_enet_suspend);
- 
- int bgmac_enet_resume(struct bgmac *bgmac)
- {
- 	int rc;
-@@
- }
- EXPORT_SYMBOL_GPL(bgmac_enet_resume);
-+#endif
-diff --git a/drivers/net/ethernet/broadcom/bgmac.h b/drivers/net/ethernet/broadcom/bgmac.h
---- a/drivers/net/ethernet/broadcom/bgmac.h
-+++ b/drivers/net/ethernet/broadcom/bgmac.h
-@@
- struct bgmac *bgmac_alloc(struct device *dev);
- int bgmac_enet_probe(struct bgmac *bgmac);
- void bgmac_enet_remove(struct bgmac *bgmac);
- void bgmac_adjust_link(struct net_device *net_dev);
- int bgmac_phy_connect_direct(struct bgmac *bgmac);
-+#ifdef CONFIG_PM
- int bgmac_enet_suspend(struct bgmac *bgmac);
- int bgmac_enet_resume(struct bgmac *bgmac);
-+#else
-+static inline int bgmac_enet_suspend(struct bgmac *bgmac)
-+{
-+	return 0;
-+}
-+
-+static inline int bgmac_enet_resume(struct bgmac *bgmac)
-+{
-+	return 0;
-+}
-+#endif
- 
- struct mii_bus *bcma_mdio_mii_register(struct bgmac *bgmac);
- void bcma_mdio_mii_unregister(struct mii_bus *mii_bus);
+If it is legacy, maybe they can be phased out?
 
+
+>  int iris_set_hw_state(struct iris_core *core, bool resume)
+>  {
+> -	return qcom_scm_set_remote_state(resume, 0);
+> +	return qcom_pas_set_remote_state(resume, 0);
+>  }
+> diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
+> index 1de7436713ed..3a38ff985822 100644
+> --- a/drivers/media/platform/qcom/venus/firmware.c
+> +++ b/drivers/media/platform/qcom/venus/firmware.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/of_reserved_mem.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/of_device.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/firmware/qcom/qcom_scm.h>
+>  #include <linux/sizes.h>
+>  #include <linux/soc/qcom/mdt_loader.h>
+> @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
+>  	int ret;
+>  
+>  	if (core->use_tz) {
+> -		ret = qcom_scm_set_remote_state(resume, 0);
+> +		ret = qcom_pas_set_remote_state(resume, 0);
+>  		if (resume && ret == -EINVAL)
+>  			ret = 0;
+>  		return ret;
 
