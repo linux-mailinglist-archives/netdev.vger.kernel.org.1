@@ -1,266 +1,269 @@
-Return-Path: <netdev+bounces-265472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHUsEI+irmk9HAIAu9opvQ
-	(envelope-from <netdev+bounces-265472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:35:59 +0100
+	id 0HYMLwWjrmk9HAIAu9opvQ
+	(envelope-from <netdev+bounces-265473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:37:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0EA0237329
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:35:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B7B237393
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA3BE304F20A
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:33:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 15000306415B
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6AA23803C9;
-	Mon,  9 Mar 2026 10:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308E63921F1;
+	Mon,  9 Mar 2026 10:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="F0rlH0zl";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cfTt2LRH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mp9Beew4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06753793DA
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773052398; cv=none; b=T4D+Gez+LQ4ih6YWPR2HpNUaNNwXq45vjr+wpImFTTGOKIg7AHBHC5LCbiWaCyFvP9A65kPHj8OLxHP6c4ClMivBCI2o35PW1/cPKebJBgGXKSW/npPaP43fqP/Z9isVADn60N1N7xpYexDwSN7rC651f6XN6j9aEc3ckfl3fug=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773052398; c=relaxed/simple;
-	bh=Rp4GBk8Zur9oSE8s+OsFnfgIMoXfjHODDFxqEAI+0+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLpTveU5TjtykhXF2st8F1JP0y73odd/0/t5hqlQVIE00mt8/87PbuZj4hPc+0to180s7MMI87BzfENF9ZPgd0zsr3DPwUcC76wzLpOl5cq89SwSV3/lor2+xpNkFpWBQbO39fm0BDZXwJ5zoUlKl0/VPUKcK1izfrgProZqSKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=F0rlH0zl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cfTt2LRH; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id EBD257A0119;
-	Mon,  9 Mar 2026 06:33:16 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 09 Mar 2026 06:33:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1773052396; x=
-	1773138796; bh=d3owRFBkRApo1R7jmjIfWshF74adbRS4/XOceeoqThw=; b=F
-	0rlH0zl2QVNI2WkYwVmj7BTpsxakO+qNS7cV/yHO0RpFzKc9nMLrEv9eSPfoxJnp
-	VEEERaAdraWbfztZjLzBzvgpnG4C+rg1DpSZ4/C0loAJ1NnZ0a9T+neOVUns9o1T
-	s6HXKDn1UATlS1diAn+D5RaXAD6BcvS85cC62qw2eEDnK0whLuPM9k4AsUhhteIt
-	ai/7O1SPCiMq+hg/dbyEcSaci+3F3Xi4oHbj84vaKGCB/MQHFlie6OubE67KgJ3E
-	MZtg/Bvtsz2lbHlIah1HBpMl3fBWw5cD860M7uc0/s0dJ+0YW3AwedzkwVnasz7p
-	23Azbx6e1YJRAh19JDQuw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1773052396; x=1773138796; bh=d
-	3owRFBkRApo1R7jmjIfWshF74adbRS4/XOceeoqThw=; b=cfTt2LRHOpCPxkq1F
-	yZ/k4VTWisPzd3/32c1e5Nr2sRrGDrGIKzl/LIOs1/x0JV1mnotyC1HF+X8yg5Ns
-	PIS6ne9LsbREsBG33bqUK3VDSOAVFp+FY336Lu415EwTfdJH0/LNma/xq0kuj3W2
-	IMBeYwb8fatWtuv/QN3LSYzE+6fx8Velqia3NerReM0ky2U77AwXN80O4HNLKxHK
-	/o/8BKHxhD35zzTxHpDuBHMs9PXulqrGFWKhs2xi3JYzZZxfdiu4+6HGodk9SmeQ
-	m0SABvp/3bkiG7+EqmnyuxdIm1T/E3dQsJ+EZssj8FL9D+/HjrDAX9QfuyelUjIf
-	HqDNg==
-X-ME-Sender: <xms:7KGuaWPLyz-f3r2-LLg6MXXRkh4oBPNuFDGWPYNQqh1cJEkaztUXNA>
-    <xme:7KGuaQbZWuolz6fPrvqFxVH15lmekMtmY0ljbeLZs9r0PIwKfnekSuvxJOrCrzGlr
-    jJLLyjvFDtYgoZgPwda6EpcUaqp6CcVSIz5aaRIcQdu8r5OtWqoj9A>
-X-ME-Received: <xmr:7KGuaQzfHDWyE4uGjOgUmLg27zNaYLtf8q_t3oJ7gJZy_ibJpKA9YN3bx4KC>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvjeejkeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
-    udfghefgnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
-    thdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdroh
-    hrghdrrghupdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhlrdhnvght
-X-ME-Proxy: <xmx:7KGuabKm7K_drfjGl1UJAQcvHI84Agvdw9VG-f778b8D3jTBrjkKsQ>
-    <xmx:7KGuaap4sTBYzMgUmlIeBIDb952dgLeX6U_m-h2_J62bt6cDrRjldQ>
-    <xmx:7KGuaaJGUlzBayWgJrJy52nGnqUPB8UnzNplCbW3F45S7UnTxBpG6g>
-    <xmx:7KGuafRb6wgqMtQYOI00Eg0v6hAI2CCdbRvCr27GM9IWF8VEW3CamA>
-    <xmx:7KGuacBsZ4spGF5VwTDcZWJCy2_ZvKu4gNBYURIvS-IpO_PSRaecy2rd>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Mar 2026 06:33:16 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next 10/10] xfrm: avoid RCU warnings around the per-netns netlink socket
-Date: Mon,  9 Mar 2026 11:32:43 +0100
-Message-ID: <6d736a2ef85c47f901f6d3a51a7744d52c50b417.1773051558.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <cover.1773051558.git.sd@queasysnail.net>
-References: <cover.1773051558.git.sd@queasysnail.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC45339020F
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773052441; cv=pass; b=Ifn3Ps3a9FwenLJ4YPHQ1yJslxLKTO6RaHRq7GnNN7eCZawdNoqXuS7SMHUPfc/J2f3NDcGXMI9qhy4A33vcMZtuX/+N+u72UpJDysV+trv7HUboBA3B8OpBnL9D8QjDAJXbXxN4tMEV2SGoaGdyUoLZ09D7HhQyXcTliwot6+w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773052441; c=relaxed/simple;
+	bh=9iFdKyLEWvGmcSzHqSf5jIIGrROnq1G+xy/6b2xjmV8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kKhN+U0fHplWV5duuaWKgD2wFGv9eKBxbOJKPN91RaxA/mYvtgGul2XO3XEqBHhCsGmmPrFbQfWzBj4syPl1ZgQWo0sZss500KvhRsXGkYVs5VmgXnsmLNw0MFTuHRBgkDwdz8MQ4Ui9iFf1W/jBqOoQJYpXO3pQa+UsF1DH3vY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mp9Beew4; arc=pass smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-79902e1fb71so3704447b3.3
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 03:33:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773052439; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Zw+ZYclSfmC9h2oqFiaKrgQmpI+Km3pihqZk9sPdytSn2RDXgsgbcvOR71kZAHf0w/
+         /MNypWWbr8vTY1cIh+RSkJsb8sofYMkdardstVi5/4FcNeb8XUk/P8W4+6xbgg0A6aM1
+         /uP6LzxwyohsPZHzVnKaWzOmNOh2/hzR4qxYyzt4SXyqiG1Tvlu8AgeV2524Yu8pW/cg
+         FuSRPYuN3ti5Hqczs4Tc2L3h4/oD4OCzLyaNqtri7dDrWpVZQ1rM+Y2T9iankqwGp2/1
+         A0bp9YAyj3qQVEFud9hDA+WEqjhdi74Ny1MtpoDK/5+tkATyJp8fXcJJypeMFL/kw1Q/
+         j18A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=s+J+xWUFgRZVNBpjwC90S46f1y9jy0SkM4UDUpgCess=;
+        fh=14mIkBwO9XAkxVd7+HHsLbVdYt8L5/aPGu540H3cLxg=;
+        b=SJ3fOJXblC8Xo3J0W1nT2GTLrZorSVAY4aByguuvTVgVJ+3V17/tJDcNMXjCjgRcbZ
+         nA0ly/RCkhaS0bPLvqlhIFwejaxCn0HedXYWubdkL/RNYh/XADvTwflLRZgqtGYfuP7R
+         DauzWaxi/JmbxwUwHHtA66k2XDY/mMUmV8VPh3frGG+XB8eg2XwVjzfsjKRkXchIEq53
+         JmoPTEi09DqEt7fPywi1cK2QP6PJQXhiRoFp63UM2/P6DoU7DjbJoMYWWVhtbhxND6xH
+         VJzWCYeVQzmwv/DYJxngwxRA/KNx8BhdqyMxU9FL+B5XsJ0JS6M8Kz4si/XCKmuq1QWe
+         /vOA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773052439; x=1773657239; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s+J+xWUFgRZVNBpjwC90S46f1y9jy0SkM4UDUpgCess=;
+        b=Mp9Beew4slVN272QfoHhMhut0gZpehBiYnp/cn1PrUqe0XbADjrczFHaxP6tw8x2Gn
+         vvJSYGjs9nQmfuHceS+431+bqyMGh0S182FQqdTKNwoKNXTsbiY8VKe7dwR8dvX4SyZU
+         hyebapj4GAjueicgHzXKYHYxAFTwDqLCvmySYRm6c7/jqLOL9qCRscW1LZXfBPMXkyT0
+         cIRfvRuLT3b8yxUNqvVrj7KPcQQK7ai134hkGusN2SMoXFxYFnyUjnk3NDCyv62EvnYV
+         p67PdjUB9c3JwPreMTCKHqzW7rjnGZAXGtnC4sme1LHjbwJlyDi15p+Di7bBxBVc0R4s
+         5p9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773052439; x=1773657239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=s+J+xWUFgRZVNBpjwC90S46f1y9jy0SkM4UDUpgCess=;
+        b=w86GNv0gSXuFuEGdHWHGKg0Eboft12hXaPS+F8RUUX9dP5aR2vugrpzqv95zFYrizD
+         iT/8dmkU3mqlLmSuvKS0AukKSkC5HphKvIJNOy8a9PT/ESOFfFjJjpIRZqyKngwNr4rT
+         0vID5Bhr7CcLTfQnfii6jFBE8kBCOrWszyGPWAReODhUClXVzq5A+uFTlzDxQZMd4B9u
+         hebuM53GJS/sM8ht+KvIL9v0C6aApUY91rDgYmS2lDMU6nxw9zoW9ApVIDPlktNvKO3L
+         gVuLNVPWB2NbNQ5211kCrjY4Vqy+g1cNUhCDyIvYeyGR8Ldq1ZqA/RR6aqC1ws+V2T9V
+         i0yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKbFNxGEjNqRGYz0fYFSVRU1+yKm09/2cH2XQTV67/ybbuq2ykSh3af9YbAZKfzbtaPum4QVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylkemgX4SD/e7wUDviLPJEFVaFNjw8izmzli7WPvRM5yo4xoUv
+	eLO7DiJ0N1mMwudf7mUy8cLtzOeLYLfEaBDWhherTNm+ouKM39lcclYd1dmcHQdZSWLEAjlVj1g
+	Prj8K7ApfSvmPuKV22o3FzvwSEv2HL4w=
+X-Gm-Gg: ATEYQzzl3im2q9uXFQ95lF1vEQDaGiR7IRJHBWh7LthBbiwQf9ob69NHMtWpLDnpQiX
+	NMCZx1ThKPpN5Uq8Wel/jk3s1mNx3EZwCa60SoFpXOPFJG/IiV31VcQMWUuiLYw7D/ix7iMS/1X
+	dujvai6nOrzkzibfPmQgD89dH0ivGTXlYodGz9AiHXSVABbKkw+ew7v146QnS7bL7n0xEyAPtmk
+	vBvLJFEXvbZyOe2J8tvLVMPI7A9+dwe69fuMC4ghwgcCS2at2FpTXRGNvkkDsprd2hPBgfo21I/
+	VhClplC2xVPoWyhQ7OL7kg4TtmwNY+D6uh5FOS0FG4dSybESpen3xUtCMCOzemh7BtH8QvtH
+X-Received: by 2002:a05:690c:6983:b0:799:266:83dc with SMTP id
+ 00721157ae682-79902668d56mr7841717b3.8.1773052438692; Mon, 09 Mar 2026
+ 03:33:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B0EA0237329
+References: <20260309093614.502094-1-kartikey406@gmail.com>
+ <CANn89i+pYiuKdtqU-kBvD2e8BaDfYzAtzLZJ88SgSD_D9CDL+Q@mail.gmail.com> <CANn89iL9-MyJ2fmtWRXTYG_56wEjK+ptOpYRjtRJjKtw3xv+2w@mail.gmail.com>
+In-Reply-To: <CANn89iL9-MyJ2fmtWRXTYG_56wEjK+ptOpYRjtRJjKtw3xv+2w@mail.gmail.com>
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+Date: Mon, 9 Mar 2026 16:03:46 +0530
+X-Gm-Features: AaiRm513lr0DjqjsG2XnphuJ2tMxDv1Pi8eEuzMtObGTt-Wki_JUxP__EaA8ZY8
+Message-ID: <CADhLXY767VTS0ac0UBhCrzKnh=GPkMXM3yrEbiS7ETcfHzfo8A@mail.gmail.com>
+Subject: Re: [PATCH] atm: lec: fix use-after-free in sock_def_readable()
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	kees@kernel.org, mingo@kernel.org, tglx@kernel.org, jiayuan.chen@shopee.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 27B7B237393
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265472-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-265473-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.988];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.951];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-net->xfrm.nlsk is used in 2 types of contexts:
- - fully under RCU, with rcu_read_lock + rcu_dereference and a NULL check
- - in the netlink handlers, with requests coming from a userspace socket
+On Mon, Mar 9, 2026 at 3:29=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Mon, Mar 9, 2026 at 10:55=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Mar 9, 2026 at 10:36=E2=80=AFAM Deepanshu Kartikey
+> > <kartikey406@gmail.com> wrote:
+> > >
+> > > A race condition exists between lec_atm_close() setting priv->lecd =
+=3D NULL
+> > > and concurrent access to priv->lecd in send_to_lecd(), lec_handle_bri=
+dge(),
+> > > and lec_atm_send(). When the socket is freed via RCU while another th=
+read
+> > > is still using it, a use-after-free occurs in sock_def_readable() whe=
+n
+> > > accessing the socket's wait queue.
+> > >
+> > > The root cause is that lec_atm_close() clears priv->lecd without hold=
+ing
+> > > lec_arp_lock, while callers dereference priv->lecd without any protec=
+tion
+> > > against concurrent teardown.
+> > >
+> > > Fix this by:
+> > > - Protecting priv->lecd =3D NULL in lec_atm_close() with lec_arp_lock=
+ to
+> > >   synchronize with callers that already hold the lock (e.g. lec_arp_r=
+esolve)
+> > > - Using sock_hold/sock_put in send_to_lecd() to pin the socket while =
+in
+> > >   use. This is safe because send_to_lecd() is called under lec_arp_lo=
+ck
+> > >   by lec_arp_resolve(), preventing concurrent NULL assignment of lecd=
+.
+> > > - Using lec_arp_lock + sock_hold/sock_put in lec_handle_bridge() and
+> > >   lec_atm_send() where the lock is not held by the caller, with prope=
+r
+> > >   skb cleanup on early exit to avoid memory leaks.
+> > >
+> > > Note: Patch testing via syzbot was attempted but the test VM crashed
+> > > due to a QEMU AHCI emulation assertion failure (hw/ide/core.c:934)
+> > > unrelated to this fix. The QEMU crash is caused by syzbot's disk I/O
+> > > fuzzing triggering a known QEMU NCQ emulation bug, not by this patch.
+> > > Compile testing with "make W=3D1 net/atm/lec.o" passes cleanly.
+> > >
+> > > Reported-by: syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
+> > > Closes: https://syzkaller.appspot.com/bug?extid=3Df50072212ab792c8692=
+5
+> > > Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+> > > ---
+> > >  net/atm/lec.c | 31 +++++++++++++++++++++++++++----
+> > >  1 file changed, 27 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/net/atm/lec.c b/net/atm/lec.c
+> > > index fb93c6e1c329..7e051174a92b 100644
+> > > --- a/net/atm/lec.c
+> > > +++ b/net/atm/lec.c
+> > > @@ -131,6 +131,7 @@ static void lec_handle_bridge(struct sk_buff *skb=
+, struct net_device *dev)
+> > >  {
+> > >         char *buff;
+> > >         struct lec_priv *priv;
+> > > +       unsigned long flags;
+> > >
+> > >         /*
+> > >          * Check if this is a BPDU. If so, ask zeppelin to send
+> > > @@ -154,10 +155,19 @@ static void lec_handle_bridge(struct sk_buff *s=
+kb, struct net_device *dev)
+> > >                                         /* 0x01 is topology change */
+> > >
+> > >                 priv =3D netdev_priv(dev);
+> > > -               atm_force_charge(priv->lecd, skb2->truesize);
+> > > +               spin_lock_irqsave(&priv->lec_arp_lock, flags);
+> > > +               if (!priv->lecd) {
+> > > +                       spin_unlock_irqrestore(&priv->lec_arp_lock, f=
+lags);
+> > > +                       kfree_skb(skb2);
+> > > +                       return;
+> > > +               }
+> > >                 sk =3D sk_atm(priv->lecd);
+> > > +               sock_hold(sk);
+> > > +               spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
+> >
+> > What prevents priv->lecd to be NULL after you released priv->lec_arp_lo=
+ck ?
+>
+> More generally, lec_atm_close() clears the sk_receive_queue.
+>
+> So allowing providers to queue more packets would be wrong.
+>
+> So really a better fix is needed.
 
-In the 2nd case, net->xfrm.nlsk is guaranteed to stay non-NULL and the
-object is alive, since we can't enter the netns destruction path while
-the user socket holds a reference on the netns.
+Thank you for the review Eric.
 
-After adding the __rcu annotation to netns_xfrm.nlsk (which silences
-sparse warnings in the RCU users and __net_init code), we need to tell
-sparse that the 2nd case is safe. Add a helper for that.
+You are correct on both points.
 
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- include/net/netns/xfrm.h |  2 +-
- net/xfrm/xfrm_user.c     | 25 +++++++++++++++++--------
- 2 files changed, 18 insertions(+), 9 deletions(-)
+1. After releasing lec_arp_lock, priv->lecd can be set to NULL
+   by lec_atm_close() concurrently. I should have saved a local
+   copy of priv->lecd before releasing the lock.
 
-diff --git a/include/net/netns/xfrm.h b/include/net/netns/xfrm.h
-index 23dd647fe024..b73983a17e08 100644
---- a/include/net/netns/xfrm.h
-+++ b/include/net/netns/xfrm.h
-@@ -59,7 +59,7 @@ struct netns_xfrm {
- 	struct list_head	inexact_bins;
- 
- 
--	struct sock		*nlsk;
-+	struct sock		__rcu *nlsk;
- 	struct sock		*nlsk_stash;
- 
- 	u32			sysctl_aevent_etime;
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 403b5ecac2c5..88fdbdc099a3 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -35,6 +35,15 @@
- #endif
- #include <linux/unaligned.h>
- 
-+static struct sock *xfrm_net_nlsk(const struct net *net, const struct sk_buff *skb)
-+{
-+	/* get the source of this request, see netlink_unicast_kernel */
-+	const struct sock *sk = NETLINK_CB(skb).sk;
-+
-+	/* sk is refcounted, the netns stays alive and nlsk with it */
-+	return rcu_dereference_protected(net->xfrm.nlsk, sk->sk_net_refcnt);
-+}
-+
- static int verify_one_alg(struct nlattr **attrs, enum xfrm_attr_type_t type,
- 			  struct netlink_ext_ack *extack)
- {
-@@ -1727,7 +1736,7 @@ static int xfrm_get_spdinfo(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	err = build_spdinfo(r_skb, net, sportid, seq, *flags);
- 	BUG_ON(err < 0);
- 
--	return nlmsg_unicast(net->xfrm.nlsk, r_skb, sportid);
-+	return nlmsg_unicast(xfrm_net_nlsk(net, skb), r_skb, sportid);
- }
- 
- static inline unsigned int xfrm_sadinfo_msgsize(void)
-@@ -1787,7 +1796,7 @@ static int xfrm_get_sadinfo(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	err = build_sadinfo(r_skb, net, sportid, seq, *flags);
- 	BUG_ON(err < 0);
- 
--	return nlmsg_unicast(net->xfrm.nlsk, r_skb, sportid);
-+	return nlmsg_unicast(xfrm_net_nlsk(net, skb), r_skb, sportid);
- }
- 
- static int xfrm_get_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -1807,7 +1816,7 @@ static int xfrm_get_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (IS_ERR(resp_skb)) {
- 		err = PTR_ERR(resp_skb);
- 	} else {
--		err = nlmsg_unicast(net->xfrm.nlsk, resp_skb, NETLINK_CB(skb).portid);
-+		err = nlmsg_unicast(xfrm_net_nlsk(net, skb), resp_skb, NETLINK_CB(skb).portid);
- 	}
- 	xfrm_state_put(x);
- out_noput:
-@@ -1897,7 +1906,7 @@ static int xfrm_alloc_userspi(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 	}
- 
--	err = nlmsg_unicast(net->xfrm.nlsk, resp_skb, NETLINK_CB(skb).portid);
-+	err = nlmsg_unicast(xfrm_net_nlsk(net, skb), resp_skb, NETLINK_CB(skb).portid);
- 
- out:
- 	xfrm_state_put(x);
-@@ -2542,7 +2551,7 @@ static int xfrm_get_default(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	r_up->out = net->xfrm.policy_default[XFRM_POLICY_OUT];
- 	nlmsg_end(r_skb, r_nlh);
- 
--	return nlmsg_unicast(net->xfrm.nlsk, r_skb, portid);
-+	return nlmsg_unicast(xfrm_net_nlsk(net, skb), r_skb, portid);
- }
- 
- static int xfrm_get_policy(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -2608,7 +2617,7 @@ static int xfrm_get_policy(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		if (IS_ERR(resp_skb)) {
- 			err = PTR_ERR(resp_skb);
- 		} else {
--			err = nlmsg_unicast(net->xfrm.nlsk, resp_skb,
-+			err = nlmsg_unicast(xfrm_net_nlsk(net, skb), resp_skb,
- 					    NETLINK_CB(skb).portid);
- 		}
- 	} else {
-@@ -2781,7 +2790,7 @@ static int xfrm_get_ae(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	err = build_aevent(r_skb, x, &c);
- 	BUG_ON(err < 0);
- 
--	err = nlmsg_unicast(net->xfrm.nlsk, r_skb, NETLINK_CB(skb).portid);
-+	err = nlmsg_unicast(xfrm_net_nlsk(net, skb), r_skb, NETLINK_CB(skb).portid);
- 	spin_unlock_bh(&x->lock);
- 	xfrm_state_put(x);
- 	return err;
-@@ -3483,7 +3492,7 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			goto err;
- 		}
- 
--		err = netlink_dump_start(net->xfrm.nlsk, skb, nlh, &c);
-+		err = netlink_dump_start(xfrm_net_nlsk(net, skb), skb, nlh, &c);
- 		goto err;
- 	}
- 
--- 
-2.51.2
+2. The deeper issue is that lec_atm_close() drains sk_receive_queue
+   but my spinlock approach does not prevent new packets from being
+   queued after the drain, since timer and workqueue paths like
+   lec_arp_work bypass netif_stop_queue().
 
+I think the correct fix would be to use RCU:
+- Mark priv->lecd as __rcu in lec.h
+- Use rcu_assign_pointer() in lec_atm_close() and lecd_attach()
+- Use rcu_read_lock/rcu_dereference in all send paths
+- Use synchronize_rcu() in lec_atm_close() before draining
+  the queue, ensuring all senders have completed before drain
+
+This way synchronize_rcu() guarantees no new packets can be
+queued after the drain begins.
+
+Does this approach look correct to you?
+
+Deepanshu Kartikey
 
