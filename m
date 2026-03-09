@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-265500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EA21KOK2rmnMIAIAu9opvQ
-	(envelope-from <netdev+bounces-265500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:02:42 +0100
+	id lBvHDkG3rmklIQIAu9opvQ
+	(envelope-from <netdev+bounces-265501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:04:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33DD2385FD
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:02:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF87E238657
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:04:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D513317E38C
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:55:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 483D2304AD9A
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24213ACA78;
-	Mon,  9 Mar 2026 11:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BB33A640F;
+	Mon,  9 Mar 2026 11:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1jbZsRR1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WHB4Atuo"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9534E39E6C4;
-	Mon,  9 Mar 2026 11:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEAF24DCF9;
+	Mon,  9 Mar 2026 11:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773057310; cv=none; b=C/9WYE4coDSiSdPTuvXWoB37/hGP8RxAZUVCbfVFhbz4FR2Wh2jtw7ySaKsqUtlmKy8bCgF+8ekYcZPUDOmu6FQRvnlyx1JDYjG1QpCF8ZU9KlIbMjaAX2PCHl0aYqrBAUXvv9runtNONvF7By8Q+QJQXBVn75+GlZdikXo5XqI=
+	t=1773057500; cv=none; b=Kx693llf8RB/jx39cEZYnAeqR8u+k9CQ0GxOGD9QfLkNEhD0JzMtARoXwcwvG8ghcV19+e34Q9Mz+Gz1x03zkq6cUxhwoyyoIGnevPHjy2bWDwU/+taZeH2GoYqA6j65AHAGX7o7fPcOje62Z1rIVyblnjtU/pO700rSf8vSK8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773057310; c=relaxed/simple;
-	bh=ckaf/5AMYgmZRCMc0oEia9HI+HTLwdDXnMGSI4hSDEc=;
+	s=arc-20240116; t=1773057500; c=relaxed/simple;
+	bh=5UhEkPknfnsB5jTbLVpmF3G52xxS28ffrxg3XyafvTE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tTOWfcHHOd7vg5WF2n/HT1iPTobPHL0U+bxdVINqK9vjQb1h2MHZYdfyuj1eHd6UH/MAXTZgrD2cOHVHgk6HG25y0P9GbXcsyk9uK75r3QHfe7JGhEbfO/DYPkrx2D0ybQCOAeoxysMHSljORjZvJL7rdQiFbH55KiN+5sPH0fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1jbZsRR1; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=KpAGV9exJqxyqG6LVKyorkp+twaDC6if81RiNey1CqJe5zFYcS73EAYsc6m9l0xBjrCvV2QIVRivvoM3eR7EqZOONln6aEorZ3Wemdajj31RCQEGMPLs4EthRzMHeIuN+hhpd71EkYlBglz3eVEUYJZv1PWbNtNhys0PDZ6l3/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WHB4Atuo; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,23 +40,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lJFjImxwxadvi+gU8vmzxMQ1ibYsL7sINkxIQOwwhVs=; b=1jbZsRR11GlAwZM7SeLNq1W/zr
-	dnjnW3DZXltJqVd8gPjpmuDHLe0EdnqKkg5+/baGDhE9S1t+3NfOiAoL7DyNpNpUO3WtVajQy7IaV
-	96EJ8jAbkFga/HLi5DePrp+zikjPXo/LmDgBUdDMf7GnVxi7QqUHGGu5Qhi9vFPQg2fZOhxP98ItD
-	mSI7KK+DQCHSyOHt8v3ybXpIHreqEUHXC0xsvxuWjkb70NwcjAuVxbfhtIroivo2g7ZOw2VMUQCkQ
-	050q/FJWAmKIengysoKh1XuNSEw2n3xS/3YbAglYWYvM8/b43oIQMa8nlY96l3BuClCbL8XbuYgSI
-	S4zh7gOA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32802)
+	bh=yYsZBJ4GMFIpxA0RqdxTm5oDj/CJzJ+geYC1kQuf9ZA=; b=WHB4Atuobao0lAn8MjHVJj8567
+	IXNy73+/GweBMyUdXZQY5m0teZ5wrje4SFRI/RceHS6J5lW+UWC7XmOo9VWzM2dRN065UqU2Qrwki
+	JlhuOqv9EKf3OEMZiXOxVRBQBruDdmnwTnuNA+OxVTcl9I8R7SKn7aNOYYORHvnnDW7wH7zpytk0k
+	Rtxs7wKQk46X7+x79o+94tGUKPS5YIjz2I0qeggCqRudcIy7AEuESQZOydgt/ZxAEmPGwl2N9TaHM
+	iTEmW9d2YRuT7HRinFWL7AJPyhme0q/v5xF9RmCRQ14g2wBe+0pH0YI8kN3tiuoIHmrf+ZdwUVxSf
+	y6FKQEvw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35154)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1vzZC4-000000003jq-0FdH;
-	Mon, 09 Mar 2026 11:54:40 +0000
+	id 1vzZFD-000000003kV-0QuQ;
+	Mon, 09 Mar 2026 11:57:55 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vzZBt-000000004Hi-2Zlz;
-	Mon, 09 Mar 2026 11:54:29 +0000
-Date: Mon, 9 Mar 2026 11:54:29 +0000
+	id 1vzZF9-000000004Hq-3KeJ;
+	Mon, 09 Mar 2026 11:57:51 +0000
+Date: Mon, 9 Mar 2026 11:57:51 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Inochi Amaoto <inochiama@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -86,11 +86,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
 	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v8 2/3] net: stmmac: platform: Add
- snps,dwmac-5.40a IP compatible string
-Message-ID: <aa609dEmUQYVXzta@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v8 3/3] net: stmmac: Add glue layer for Spacemit
+ K3 SoC
+Message-ID: <aa61v7MQoYq10Jes@shell.armlinux.org.uk>
 References: <20260309004305.315018-1-inochiama@gmail.com>
- <20260309004305.315018-3-inochiama@gmail.com>
+ <20260309004305.315018-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,9 +99,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260309004305.315018-3-inochiama@gmail.com>
+In-Reply-To: <20260309004305.315018-4-inochiama@gmail.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Rspamd-Queue-Id: F33DD2385FD
+X-Rspamd-Queue-Id: CF87E238657
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265500-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265501-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
@@ -124,10 +124,10 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.193];
+	NEURAL_HAM(-0.00)[-0.198];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
@@ -135,11 +135,20 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,armlinux.org.uk:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,shell.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 08:42:43AM +0800, Inochi Amaoto wrote:
-> Add compatible string for 5.40a version that can avoid to define some
-> platform data in the glue layer.
-> 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+On Mon, Mar 09, 2026 at 08:42:44AM +0800, Inochi Amaoto wrote:
+> +static int spacemit_dwmac_update_irq_config(struct spacmit_dwmac *dwmac,
+> +					    struct stmmac_resources *stmmac_res)
+> +{
+> +	unsigned int mask = CTRL_WAKE_IRQ_EN;
+> +	unsigned int val = stmmac_res->wol_irq >= 0 ? CTRL_WAKE_IRQ_EN : 0;
+
+This looks like the last thing I can spot that needs to be addressed.
+netdev wants to see "reverse christmas tree" local variable
+declarations.
+
+Please reverse the order of these two declarations to achieve that.
+
+With that fixed:
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
