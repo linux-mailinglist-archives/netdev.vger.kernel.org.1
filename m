@@ -1,249 +1,231 @@
-Return-Path: <netdev+bounces-265540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMsaDnzDrmmRIgIAu9opvQ
-	(envelope-from <netdev+bounces-265540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:56:28 +0100
+	id GJLHLhvDrmmRIgIAu9opvQ
+	(envelope-from <netdev+bounces-265541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:54:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B09239448
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:56:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A242393CB
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3681B30B221B
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:52:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 24DFE302C31D
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527A43BED7A;
-	Mon,  9 Mar 2026 12:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD823BED34;
+	Mon,  9 Mar 2026 12:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldURGgjZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KnE2JS/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0627B27CCE0;
-	Mon,  9 Mar 2026 12:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A733B5301;
+	Mon,  9 Mar 2026 12:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773060742; cv=none; b=M6kIqSFTHvxXzO6g7iFmMFq5wC3427dydMNe1EkNzWcp9XA/rQu0HCB7yEPtapK6XSgoiztOr6zjY+J86fF5NAPywJNqlyianfjSBbhsgJiDP+4hB9zF0bfCcI8/EHkj0fGvG5PF82vxtympZVI4ZcIvq01eg6LJPcuOV24SvC8=
+	t=1773060880; cv=none; b=u9kC9Ldv0Zw3l3UPNkh6K1kui1+c5Qz6XD3UtXyN4Mby8W7G9afUnDwJHSmBw4dfGIsuNEqc4YPASJKkSf7o8y9H4NXS4b+FCQulLxDOBY3jVsLMkBuAsQFPoJ5LUeJbLjxQ4Chk3RLfe786y5qpKLT/OPNm4P5tp/KZbVNWAgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773060742; c=relaxed/simple;
-	bh=y/jG+6uQ1t0ozNKeVUtujZ0ZKaA2GN0iLu+iflTIVOA=;
+	s=arc-20240116; t=1773060880; c=relaxed/simple;
+	bh=JEs2IWfmscrKw+t0H8dNptKKC8kR/QKpS4L+iYAFxzc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lEMbGy0V46WQYHZLuKG33Yp66YltdT7TK0yeCxYYihdOmwK5bjfibByGSykUguZBILs6CsdToLIBF6nz5CVojHgUjW4aQ3MrOqsBBs/xzgNDsvaEmHS2GZeFy4+OkVijW33rQLYqbpGmTrwemTZqRAOv44CuqX9k7iwQ0cJpS7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldURGgjZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF6D6C4CEF7;
-	Mon,  9 Mar 2026 12:52:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773060741;
-	bh=y/jG+6uQ1t0ozNKeVUtujZ0ZKaA2GN0iLu+iflTIVOA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ldURGgjZsupuiOEO8szY33Gv/w+ULtozZoSBSo5IQVXqhoQhUcsCx0Zgys2VjhVIf
-	 XnKGHJhLZPWQk2hRodapK9iZ9+DPqAAg0di8KkMwUHFnWOwwYk3LrPq3XWv4D60fSm
-	 lBg6JImoLkDIgNjxuRpw4o1D/geJl7QjJcuo5jLAfBr8zU2ewgEU9W7V0yDQLNLwgT
-	 gzl+2ZHX3B0pqhwOxlUt0ECHEBrtLS2ysXNPuXRjkNt6xAjHCcBqhSasV3YANLhMgG
-	 5Ax23x/6raTJ/TFoxxfBwyEg6rBi70TldCa80OBwAp5X/nN7ymxdq8RVZfj+Ury4Lp
-	 kpMXnSdk5N14g==
-Message-ID: <9f5282ed-ddda-4d7c-b033-5b6d544d6cf4@kernel.org>
-Date: Mon, 9 Mar 2026 13:52:11 +0100
+	 In-Reply-To:Content-Type; b=mCgCT0cLHyVb0iWnx/WeXO5j+GrpMLTLZphQDq6qI7oDAPDYEJO2izaezNsXzu9ZGh7dwZYFK67yTmF7abrmY1jBv5iVVSwCt54FpF3ttdTcrQGKMvpRWfhpAQfmjwm8ZS4ctHUCU8lgKsefJsONK48ECjWyGSKNLkJs30iyHkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KnE2JS/Z; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 50C9E4E425D9;
+	Mon,  9 Mar 2026 12:54:36 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 231675FFB8;
+	Mon,  9 Mar 2026 12:54:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CD71D10369B92;
+	Mon,  9 Mar 2026 13:54:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773060874; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=ZR9GAoP8GpYeY6MkEWjSdSANaRmKWabJF46IrFRn1Rs=;
+	b=KnE2JS/ZI7dVsvlB0zYO641VEYu0fTPBI6o2A4cgrTRwMEN2aU5gDTdAjNB0+W86lC1F1l
+	BGmz5tSb8p2zExVVHVpSCD3XgdSOB30Z6E15x3qxTMM361tk4IbQ3QZPccTfzzXtXV9X4M
+	i+VO61uF9NVrGBHsQQa/SAI4By/eVagw39Vq5phVrNa4K4fO/TgwgoVdO5wIzUXlyl52nE
+	iHgg5yNFnCFAaxpvLc0Dc33EMFdb850TR2zIZCwMS+T+yCMLSCUcgLduvWs1uWYY/0hdIL
+	8ySEFnz6RucXDfeDMHEw5NBhZZYQEShfGdlPaA6rsKLGkdYrnZi7W2x77bL76g==
+Message-ID: <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
+Date: Mon, 9 Mar 2026 13:54:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 4/5] net/mlx5e: RX, Fix XDP multi-buf frag counting
- for striding RQ: manual merge
-To: Tariq Toukan <tariqt@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>, Amery Hung <ameryhung@gmail.com>,
- Nimrod Oren <noren@nvidia.com>, Mark Brown <broonie@kernel.org>,
- linux-next@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-References: <20260305142634.1813208-1-tariqt@nvidia.com>
- <20260305142634.1813208-5-tariqt@nvidia.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Content-Language: fr
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260305142634.1813208-5-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
+ KSZ8463 global irq
+To: olteanv@gmail.com
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
+ pascal.eberhard@se.com, miquel.raynal@bootlin.com,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
+ Tristram.Ha@microchip.com
+References: <20260304-ksz8463-ptp-v6-0-3f4c47954c71@bootlin.com>
+ <20260304-ksz8463-ptp-v6-1-3f4c47954c71@bootlin.com>
+ <20260305095656.vlyaztv6nbdqrmil@skbuf>
+ <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
+ <20260305125149.ejju5ptrkviqi3sm@skbuf>
+ <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
+ <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 91B09239448
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 42A242393CB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265540-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,google.com,redhat.com,lunn.ch,davemloft.net];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265541-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Tariq, Dragos,
+Hi Vladimir,
 
-+cc: linux-next
 
-On 05/03/2026 15:26, Tariq Toukan wrote:
-> From: Dragos Tatulea <dtatulea@nvidia.com>
+On 3/6/26 2:10 AM, Tristram.Ha@microchip.com wrote:
+>> On 3/5/26 1:51 PM, Vladimir Oltean wrote:
+>>> On Thu, Mar 05, 2026 at 01:39:29PM +0100, Bastien Curutchet wrote:
+>>>> Hi Vladimir,
+>>>>
+>>>> On 3/5/26 10:56 AM, Vladimir Oltean wrote:
+>>>>> On Wed, Mar 04, 2026 at 11:18:52AM +0100, Bastien Curutchet (Schneider
+>> Electric) wrote:
+>>>>>> @@ -2890,14 +2899,18 @@ static irqreturn_t ksz_irq_thread_fn(int irq,
+>> void *dev_id)
+>>>>>>             unsigned int nhandled = 0;
+>>>>>>             struct ksz_device *dev;
+>>>>>>             unsigned int sub_irq;
+>>>>>> -  u8 data;
+>>>>>> +  u16 data;
+>>>>>>             int ret;
+>>>>>>             u8 n;
+>>>>>>             dev = kirq->dev;
+>>>>>> -  /* Read interrupt status register */
+>>>>>> -  ret = ksz_read8(dev, kirq->reg_status, &data);
+>>>>>> +  /*
+>>>>>> +   * Most of the KSZ switches have a 8-bits long interrupt status
+>>>>>> +   * register, but the KSZ8463 has a 16-bits long one. The overread here
+>>>>>> +   * is safe because we only iterate over kirq->nirqs in the below loop.
+>>>>>
+>>>>> FWIW, this isn't the only thing making an overread "safe".
+>>>>> If the adjacent register also has "clear on read" semantics, that's not
+>>>>> good.
+>>>>>
+>>>>> I can't tell whether that's the case here, though. There are just too
+>>>>> many hardware variations to check for. I just wanted to point out that
+>>>>> the reasoning is incomplete.
+>>>>>
+>>>> You're right, I hadn't thought about the 'clear on read' case.
+>>>>
+>>>> I'll use ksz_read16() only for the KSZ8463 to be 100% sure it won't break
+>>>> anything for other switches.
+>>>
+>>> I'm still on the fence on whether to say this or not, because I don't
+>>> really want to get so involved in internal driver bookkeeping, but...
+>>> this driver is just becoming a hell to review, even if I want to
+>>> concentrate exclusively on correct API use, like I try to do.
+>>>> Linus Walleij has added a new ks8995 driver, which has some overlap with
+>>> the common ksz driver for the KSZ8 family. Now he wants to remove the
+>>> overlapping device support:
+>>> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-0-
+>> a7fc63fe1916@kernel.org/
+>>>
+>>> Maybe we should go the other way around, migrate KSZ8 support to the
+>>> ks8995 driver instead? The common ksz driver is becoming just extremely
+>>> convoluted to handle all hardware variations. Would it help in any way
+>>> to maintain cleaner code paths, what do you think?
+>>
+>> I agree, this driver is extremely convoluted because of all the
+>> different hardware it handles. It wasn't easy to fit PTP support for the
+>> KSZ8463 into it. And I encountered the same kind of difficulties when
+>> adding periodic output support (I have another series ready for this
+>> once this PTP support will be merged).
+>>
+>> Regarding migrating the KSZ8 support into the ksz8995, I think we would
+>> quickly hit the same pain points than in ksz_common. Even inside the
+>> KSZ8 family we can find a quite big amount of differences between the
+>> switches. For instance, both KSZ8463 and KSZ8563 support PTP, they share
+>> lots of common registers but their interrupt scheme is very different.
+>>
+>> I've added Tristram in Cc:, who works at Microchip. Maybe, Tristram, you
+>> have some insights about which switches could share code if we decide to
+>> split the big ksz_common into several drivers ?
+>   
+> Although KSZ8463 uses 16-bit register for its interrupt operation, the
+> bits that are necessary for actual operation are all in the high byte, so
+> it is possible to simulate using 8-bit register for interrupt operation
+> just like the other switches.
 > 
-> XDP multi-buf programs can modify the layout of the XDP buffer when the
-> program calls bpf_xdp_pull_data() or bpf_xdp_adjust_tail(). The
-> referenced commit in the fixes tag corrected the assumption in the mlx5
-> driver that the XDP buffer layout doesn't change during a program
-> execution. However, this fix introduced another issue: the dropped
-> fragments still need to be counted on the driver side to avoid page
-> fragment reference counting issues.
+> Note also the previous interrupt code only works for KSZ9477 and LAN937X
+> families of switches, which have interrupts for each port.  The older
+> switches like KSZ8863, KSZ8895, and KSZ8795 all have only one global
+> interrupt and need change to work in this framework.
+> 
+> These switches have link change interrupt bits for external ports, so it
+> is easy to simulate them as port interrupts.  But KSZ8463 only has 1 bit
+> for link, so it is necessary to add some special code to return a value of
+> 3 to indicate both ports have link change.
+> 
+> KSZ8463 is based from KSZ8863 so it should have about the same 8-bit
+> register definitions as KSZ8863.  But when it was designed it had a
+> companion chip that operates as a 16-bit network controller.  Because of
+> that all register definitions are described in 16-bit.
+> 
+> I need to try your patches to see how it works regarding to the PTP
+> interrupts.
+> 
+> Regarding to the old ks8995 driver I think it was a simple SPI driver to
+> start the KSZ8995 switch, which is an older version of KSZ8895.  It was
+> used to locate under the PHY drivers.  I did not know it was upgraded to
+> become a full DSA driver and is now trying to expand to the other
+> switches.
+> 
 
-FYI, we got a small conflict when merging 'net' in 'net-next' in the
-MPTCP tree due to this patch applied in 'net':
+I have a new iteration ready. It uses only the high byte of the 
+interrupt registers for the KSZ8463, which keeps unchanged the current 
+8-bit accesses logic.
 
-  db25c42c2e1f ("net/mlx5e: RX, Fix XDP multi-buf frag counting for striding RQ")
+Shall I send it ? Or would you like more time to think/discuss about 
+whether we should split ksz_common into several drivers ?
 
-and this one from 'net-next':
 
-  dff1c3164a69 ("net/mlx5e: SHAMPO, Always calculate page size")
-
------ Generic Message -----
-The best is to avoid conflicts between 'net' and 'net-next' trees but if
-they cannot be avoided when preparing patches, a note about how to fix
-them is much appreciated.
-
-The conflict has been resolved on our side [1] and the resolution we
-suggest is attached to this email. Please report any issues linked to
-this conflict resolution as it might be used by others. If you worked on
-the mentioned patches, don't hesitate to ACK this conflict resolution.
----------------------------
-
-Rerere cache is available in [2].
-
-[1] https://github.com/multipath-tcp/mptcp_net-next/commit/9cbb5f8a4a18
-[2] https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/0bbafdd
-
-(...)
-
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> index efcfcddab376..40e53a612989 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-
-(...)
-
-> @@ -1975,13 +1974,12 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->  			return NULL; /* page/packet was consumed by XDP */
->  		}
->  
-> -		nr_frags_free = old_nr_frags - sinfo->nr_frags;
-> -		if (unlikely(nr_frags_free)) {
-> -			frag_page -= nr_frags_free;
-> +		new_nr_frags = sinfo->nr_frags;
-> +		nr_frags_free = old_nr_frags - new_nr_frags;
-> +		if (unlikely(nr_frags_free))
->  			truesize -= (nr_frags_free - 1) * PAGE_SIZE +
-
-The conflict is in the context: this line above has been modified on
-'net-next' (s/PAGE_SIZE/page_size/), while the ones above it have been
-modified on 'net'.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
----
-diff --cc drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 8fb57a4f36dd,268e20884757..f5c0e2a0ada9
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@@ -1977,13 -1971,12 +1973,12 @@@ mlx5e_skb_from_cqe_mpwrq_nonlinear(stru
-  			return NULL; /* page/packet was consumed by XDP */
-  		}
-  
-- 		nr_frags_free = old_nr_frags - sinfo->nr_frags;
-- 		if (unlikely(nr_frags_free)) {
-- 			frag_page -= nr_frags_free;
-+ 		new_nr_frags = sinfo->nr_frags;
-+ 		nr_frags_free = old_nr_frags - new_nr_frags;
-+ 		if (unlikely(nr_frags_free))
- -			truesize -= (nr_frags_free - 1) * PAGE_SIZE +
- +			truesize -= (nr_frags_free - 1) * page_size +
-  				ALIGN(pg_consumed_bytes,
-  				      BIT(rq->mpwqe.log_stride_sz));
-- 		}
-  
-  		len = mxbuf->xdp.data_end - mxbuf->xdp.data;
-  
-
+Best regards,
+Bastien
 
