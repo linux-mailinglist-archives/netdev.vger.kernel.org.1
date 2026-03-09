@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-265366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLT+CPA0rmkuAgIAu9opvQ
-	(envelope-from <netdev+bounces-265366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:48:16 +0100
+	id KMW0HLM1rmkuAgIAu9opvQ
+	(envelope-from <netdev+bounces-265365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:51:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC412335EF
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:48:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB88233633
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 07F7C3003713
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 02:47:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E7E5305F3D4
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 02:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691BC25A2DD;
-	Mon,  9 Mar 2026 02:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFA6280336;
+	Mon,  9 Mar 2026 02:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="k70LotyG"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jonrO4fN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A967C27B347;
-	Mon,  9 Mar 2026 02:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8145279903;
+	Mon,  9 Mar 2026 02:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773024437; cv=none; b=Poehfai01merTBJp9QxUO6Ujdt8r2nU74hXaKhTZCSC0h0hnPJzCzroRxaEqViPGm8CPCDffOnrzvrPFOM5ZAS+qYDI/esMIKPOgsA8W0Ajq0PWv7qHTl9mjaTFnnEJzcty+67vDCJb/xyHYK0J+OK7q1Zqw10tm5g+bj2+Fcm4=
+	t=1773024428; cv=none; b=H8gHrwrBrlOOdAegxZWcJZu/d6zwTwvAsLH0VlTzkfQcTQ9ksBsrVM87XZr9BlDNbyz873/VwBU4wOWHOj5WELAaktKZqHcwoYs7ySBdDMc0ZkwVC2O9YMPuoLX2cZIDlR5v80qV0SWMfJvLBX2ptKOBwCJlcJf14DcMqF5rNXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773024437; c=relaxed/simple;
-	bh=Wo6H6oBb195n17cYoqzF2DfVf6lMUJFEbMJZUc0uq5A=;
+	s=arc-20240116; t=1773024428; c=relaxed/simple;
+	bh=00o2hAyhJxUc5Smp0yKOtW1lunKu+6CR+lu0EvimHVs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZR97LQ+NSPB7aouAgn44vBAYJN/vm1avy2gUUkXDYEH97PRp4D/lxx5lFgJp0HdXd/AxJqxn30Z+CVraQL18NlL1x0gJeNJrTPDrY9mSbfSgJDibqy24XLwe94yx18B0znapihNBKH9lp5ySZj3ja8ri9igrZZ+2oLUjGJDpJvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=k70LotyG; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=E5XoYdxFei8kerQ1hKAskT/b/tQ+fy0sQ5AWLCx/ly0g+snbE/MifqiBF0IyyNSu+RZgHpAw7io+exkiX7VizYM7aHOIiux9wMpzBY3B7UgU6gwclELjAoLlzZPA6P7jdGA/CAxPTVLtN2cxrWQJac3Ub2tz6OY5zOwzNPctfyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jonrO4fN; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628LkgLb1319922;
-	Sun, 8 Mar 2026 19:46:53 -0700
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628Ng7v13507751;
+	Sun, 8 Mar 2026 19:46:58 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=f
-	F6qPbj0Ssp7huoiNgwVmrs1hcR7r6uAvCgbUTaH5wY=; b=k70LotyG28Z/us9au
-	3OoEqm5W6ROjLczKa3zDgrJU8KTRDFIG+lRmvYp92vCswcqXiqsf4jE71TNrnSUe
-	twA+UTo2U0SD0v5Q63YFfm1ou1Bapa5D8oJwsMa4SZR6rocxiDHfDaDxa3bc5hnk
-	V8LBQ9gTvwg8UaeB9nZx6mcPSwjPKLs43N2VuepP44yUnvJf1v+/HvYvjDGP6r1Z
-	EktqJr3rLaW1q9BVayCnRRX6MNS8n0a/KIXLOTRLDdNKKo5C87ercqU2fMsZSe13
-	OexvVv5LJuoanuxyA5sNqzo6ZpEUG3Hu0N4CXD4oykJImlDYfJD0DWzWpayDTA7f
-	sDBMw==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=S
+	6Ey/ZmBzedhUx+dGm4/mezYe+oopquIu4Dd9mGe3rw=; b=jonrO4fNOeW+xNqCt
+	TvJXxSth0pAz+6sQjrZ7S8FN2f4NsyW2OqbjYev80JiWcZ+FgK2UkL+sk0mFa+r0
+	pP9aa1YGjJrHKA9qweTJ8mFz8rdiXPZnPqHeFODRe5s9X4wNBebiDgbPnZeRVujd
+	QuZdR6BimveCV0nPKmQfWnM0KLyr8CoNdXj/2q1e5cYZQBAbbiQ9fVn4aoTwKTw1
+	GjYxaex8YmQUxetIJX0GpOrgTmx0mbdHHT4mAmGt8ju5L7hBGVXPY36cRk7DneDF
+	VMch3fbroVdD1SANRDfytRYeVjAHtGxZixWfTcW+NvNghZWDj7c9RR1Q8JnU5+2t
+	yGAaQ==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4crmdnj93t-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4crj8qtf83-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 08 Mar 2026 19:46:53 -0700 (PDT)
+	Sun, 08 Mar 2026 19:46:57 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 8 Mar 2026 19:46:52 -0700
+ 15.2.1544.25; Sun, 8 Mar 2026 19:46:57 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 8 Mar 2026 19:46:52 -0700
+ Transport; Sun, 8 Mar 2026 19:46:57 -0700
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id B92FB3F707D;
-	Sun,  8 Mar 2026 19:46:47 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id DAFF23F707D;
+	Sun,  8 Mar 2026 19:46:52 -0700 (PDT)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -69,9 +69,9 @@ CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
         <shshitrit@nvidia.com>, "Ratheesh
  Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH v3 net-next 4/5] octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM entries
-Date: Mon, 9 Mar 2026 08:16:18 +0530
-Message-ID: <20260309024619.898211-5-rkannoth@marvell.com>
+Subject: [PATCH v3 net-next 5/5] octeontx2-af: Add support for loading custom KPU profile from filesystem
+Date: Mon, 9 Mar 2026 08:16:19 +0530
+Message-ID: <20260309024619.898211-6-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260309024619.898211-1-rkannoth@marvell.com>
 References: <20260309024619.898211-1-rkannoth@marvell.com>
@@ -83,25 +83,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: w2Cwgja8YkJ7H7e6UOryU4LDEIz86GqD
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDAyNCBTYWx0ZWRfXzmHWW35PcvkX
- Kn22QaZhCzqWO1KtYIjQmmW3vk+7s/VXGtUmYJpY/JwKnR6PzyhqYy0iOLC131D9oIDNa/J8lPI
- uQeie0JqVm/A91sY8P2Jxyd5KjARewat30/NqCo0DsQb6F6arRlozhtDpjdi0EL558W1hnPRxHz
- V3IG1ls5eFPceuQ7tFwLWs5uL3rNchjqmqZKJp9sNvqe20zqst/nsbF51DkmeTvIc348lqHCOMn
- TnxQmQchKdswFKh7vd/MMgwb5yCgDdJyNxEcKGP1cfR9QXnOQ595KWJCFEWcAvBmIndROnUkVAj
- BpIcjDDWK8mBkmUDQgTvh6hRx+DpKHBXWvEfJibQLdsP2pr3V4eeFi05LniCYn99Wuxy0DgMh6C
- n+COp3EVuthz+DI/SmVidptJkRYmxS35278n0/rdxdq3l2qGt3aP33xPadTAiDhGf0/Wj6BiJ3A
- YTgdJqdzt3yW8fxn01g==
-X-Authority-Analysis: v=2.4 cv=K6Qv3iWI c=1 sm=1 tr=0 ts=69ae349d cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDAyNCBTYWx0ZWRfXxNfaDTHSmyeL
+ f8N00ywIp1SfPZ2R7uEnUcXlQEg7lX6aLEjSTeys7tWha7gFAqQvgVhD6HfdzGwc/l/xGP1V/Y0
+ O2PpOrHUiWlImG9aidKrY0xZvyfwC3dePSCgNZKlq6PWpVk3lWSWwYgGZNfa3kwLxmfWUIkfHC2
+ E8x6h9kQAnwLGIRrqsrxw27bxDyiTn+Io7hnhUb7UnwWGbKV8AXdMtIfXihoEZCFRJ/+qDMEydP
+ hSAKUjM3LlY8889AVr/ZCH7HISWFDsSfKctfiW1P/jBoaJKAXLdnXwgt8qAeQ0eJFxqWEJOhVwb
+ wRUEFlt79wBMix29+GfqcxnnnVHomj9tBsuX6w65sOJwv/zpEcXsRmE6bLvPosBuEOq9pmW7li1
+ V6JZFljutzYtFv6Z6xU9JciMX8+wP1VFhW/hr+0GWAkzjOQR0J9N8kN7Xw5bF9hxsWirDhZLbGf
+ XLZ9v+UxAoEfxIT/oTg==
+X-Proofpoint-GUID: lJq_dLBQy5mO-UbHKh252YpoMeQt88FN
+X-Proofpoint-ORIG-GUID: lJq_dLBQy5mO-UbHKh252YpoMeQt88FN
+X-Authority-Analysis: v=2.4 cv=WbwBqkhX c=1 sm=1 tr=0 ts=69ae34a1 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=WDb9-8Tz2aN2ynPxKakA:9
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=wlbaZ-2X3v7ZcC-DwWoA:9
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: w2Cwgja8YkJ7H7e6UOryU4LDEIz86GqD
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-09_01,2026-03-06_02,2025-10-01_01
-X-Rspamd-Queue-Id: 2DC412335EF
+X-Rspamd-Queue-Id: BCB88233633
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -118,7 +118,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-265366-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265365-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -128,634 +128,409 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-Improve MCAM utilization by tying default (broadcast, multicast,
-promisc, ucast) entry lifetime to NIX LF usage.
+Flashing updated firmware on deployed devices is cumbersome. Provide a
+mechanism to load a custom KPU (Key Parse Unit) profile directly from
+the filesystem at module load time.
 
-- On NIX LF alloc (e.g. kernel or DPDK), allocate default MCAM entries
-  if missing; on NIX LF free, release them so they return to the pool.
-- Add NIX_LF_DONT_FREE_DFT_IDXS so the kernel PF driver can free the
-  NIX LF without releasing default entries (e.g. across suspend/resume).
-- When NIX LF is used by DPDK, default entries are allocated on first
-  use and freed when the LF is released if NIX_LF_DONT_FREE_DFT_IDXS is
-  not set
+When the rvu_af module is loaded with the kpu_profile parameter, the
+specified profile is read from /lib/firmware/kpu and programmed into
+the KPU registers. Add npc_kpu_profile_cam2 for the extended cam format
+used by filesystem-loaded profiles and support ptype/ptype_mask in
+npc_config_kpucam when profile->from_fs is set.
+
+Usage:
+  1. Copy the KPU profile file to /lib/firmware/kpu.
+  2. Build OCTEONTX2_AF as a module.
+  3. Load: insmod rvu_af.ko kpu_profile=<profile_name>
 
 Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 108 +++++++++++----
- .../ethernet/marvell/octeontx2/af/cn20k/npc.h |   1 +
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  16 ++-
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 128 +++++++++++++-----
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
- 6 files changed, 191 insertions(+), 69 deletions(-)
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  14 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   5 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 180 +++++++++++++++---
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ 4 files changed, 169 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 348a72c4ee43..8dad272fd069 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -808,6 +808,11 @@ npc_cn20k_enable_mcam_entry(struct rvu *rvu, int blkaddr,
- 	u64 cfg, hw_prio;
- 	u8 kw_type;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+index cefc5d70f3e4..5928c4d3cc8b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+@@ -265,6 +265,19 @@ struct npc_kpu_profile_cam {
+ 	u16 dp2_mask;
+ } __packed;
  
-+	if (index < 0 || index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %d\n", index);
-+		return;
++struct npc_kpu_profile_cam2 {
++	u8 state;
++	u8 state_mask;
++	u16 dp0;
++	u16 dp0_mask;
++	u16 dp1;
++	u16 dp1_mask;
++	u16 dp2;
++	u16 dp2_mask;
++	u8 ptype;
++	u8 ptype_mask;
++} __packed;
++
+ struct npc_kpu_profile_action {
+ 	u8 errlev;
+ 	u8 errcode;
+@@ -290,6 +303,7 @@ struct npc_kpu_profile {
+ 	int action_entries;
+ 	struct npc_kpu_profile_cam *cam;
+ 	struct npc_kpu_profile_action *action;
++	struct npc_kpu_profile_cam2 *cam2;
+ };
+ 
+ /* NPC KPU register formats */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index a466181cf908..1efc53b63b67 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -553,8 +553,8 @@ struct npc_kpu_profile_adapter {
+ 	const char			*name;
+ 	u64				version;
+ 	const struct npc_lt_def_cfg	*lt_def;
+-	const struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
+-	const struct npc_kpu_profile	*kpu; /* array[kpus] */
++	struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
++	struct npc_kpu_profile	*kpu; /* array[kpus] */
+ 	union npc_mcam_key_prfl {
+ 		struct npc_mcam_kex		*mkex;
+ 					/* used for cn9k and cn10k */
+@@ -564,6 +564,7 @@ struct npc_kpu_profile_adapter {
+ 	bool				custom;
+ 	size_t				pkinds;
+ 	size_t				kpus;
++	bool				from_fs;
+ };
+ 
+ #define RVU_SWITCH_LBK_CHAN	63
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 352dc5f1d5b9..05aabe26f030 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1583,8 +1583,12 @@ static void npc_config_kpucam(struct rvu *rvu, int blkaddr,
+ 			      const struct npc_kpu_profile_cam *kpucam,
+ 			      int kpu, int entry)
+ {
++	const struct npc_kpu_profile_cam2 *kpucam2 = (void *)kpucam;
++	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
+ 	struct npc_kpu_cam cam0 = {0};
+ 	struct npc_kpu_cam cam1 = {0};
++	u64 *val = (u64 *)&cam1;
++	u64 *mask = (u64 *)&cam0;
+ 
+ 	cam1.state = kpucam->state & kpucam->state_mask;
+ 	cam1.dp0_data = kpucam->dp0 & kpucam->dp0_mask;
+@@ -1596,6 +1600,14 @@ static void npc_config_kpucam(struct rvu *rvu, int blkaddr,
+ 	cam0.dp1_data = ~kpucam->dp1 & kpucam->dp1_mask;
+ 	cam0.dp2_data = ~kpucam->dp2 & kpucam->dp2_mask;
+ 
++	if (profile->from_fs) {
++		u8 ptype = kpucam2->ptype;
++		u8 pmask = kpucam2->ptype_mask;
++
++		*val |= FIELD_PREP(GENMASK_ULL(57, 56), ptype & pmask);
++		*mask |= FIELD_PREP(GENMASK_ULL(57, 56), ~ptype & pmask);
 +	}
 +
- 	enable ? set_bit(index, npc_priv.en_map) :
- 		clear_bit(index, npc_priv.en_map);
+ 	rvu_write64(rvu, blkaddr,
+ 		    NPC_AF_KPUX_ENTRYX_CAMX(kpu, entry, 0), *(u64 *)&cam0);
+ 	rvu_write64(rvu, blkaddr,
+@@ -1610,6 +1622,7 @@ u64 npc_enable_mask(int count)
+ static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
+ 				    const struct npc_kpu_profile *profile)
+ {
++	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
+ 	int entry, num_entries, max_entries;
+ 	u64 entry_mask;
  
-@@ -1053,6 +1058,11 @@ void npc_cn20k_config_mcam_entry(struct rvu *rvu, int blkaddr, int index,
- 	int kw = 0;
- 	u8 kw_type;
+@@ -1621,10 +1634,15 @@ static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
  
-+	if (index < 0 || index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %d\n", index);
-+		return;
-+	}
+ 	max_entries = rvu->hw->npc_kpu_entries;
+ 
++	WARN(profile->cam_entries > max_entries,
++	     "KPU%u: err: hw max entries=%u, input entries=%u\n",
++	     kpu,  rvu->hw->npc_kpu_entries, profile->cam_entries);
 +
- 	/* Disable before mcam entry update */
- 	npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, false);
+ 	/* Program CAM match entries for previous KPU extracted data */
+ 	num_entries = min_t(int, profile->cam_entries, max_entries);
+ 	for (entry = 0; entry < num_entries; entry++)
+ 		npc_config_kpucam(rvu, blkaddr,
++				  adapter->from_fs ? (void *)&profile->cam2[entry] :
+ 				  &profile->cam[entry], kpu, entry);
  
-@@ -1132,6 +1142,11 @@ void npc_cn20k_copy_mcam_entry(struct rvu *rvu, int blkaddr, u16 src, u16 dest)
- 	int bank, i, sb, db;
- 	int dbank, sbank;
- 
-+	if (src >= mcam->total_entries || dest >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index src=%u dest=%u\n", src, dest);
-+		return;
-+	}
-+
- 	dbank = npc_get_bank(mcam, dest);
- 	sbank = npc_get_bank(mcam, src);
- 	npc_mcam_idx_2_key_type(rvu, src, &src_kwtype);
-@@ -1190,11 +1205,24 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 	int kw = 0, bank;
- 	u8 kw_type;
- 
-+	if (index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %u\n", index);
-+		return;
-+	}
-+
- 	npc_mcam_idx_2_key_type(rvu, index, &kw_type);
- 
- 	bank = npc_get_bank(mcam, index);
- 	index &= (mcam->banksize - 1);
- 
-+	cfg = rvu_read64(rvu, blkaddr,
-+			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0));
-+	entry->action = cfg;
-+
-+	cfg = rvu_read64(rvu, blkaddr,
-+			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 1));
-+	entry->vtag_action = cfg;
-+
- 	cfg = rvu_read64(rvu, blkaddr,
- 			 NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index,
- 								 bank, 1)) & 3;
-@@ -1244,7 +1272,7 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 									bank,
- 									0));
- 		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
--		goto read_action;
-+		return;
- 	}
- 
- 	for (bank = 0; bank < mcam->banks_per_entry; bank++, kw = kw + 4) {
-@@ -1289,17 +1317,6 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
- 	}
- 
--read_action:
--	/* 'action' is set to same value for both bank '0' and '1'.
--	 * Hence, reading bank '0' should be enough.
--	 */
--	cfg = rvu_read64(rvu, blkaddr,
--			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 0));
--	entry->action = cfg;
--
--	cfg = rvu_read64(rvu, blkaddr,
--			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 1));
--	entry->vtag_action = cfg;
+ 	/* Program this KPU's actions */
+@@ -1678,26 +1696,50 @@ static void npc_prepare_default_kpu(struct rvu *rvu,
+ 	npc_cn20k_update_action_entries_n_flags(rvu, profile);
  }
  
- int rvu_mbox_handler_npc_cn20k_mcam_write_entry(struct rvu *rvu,
-@@ -1671,8 +1688,8 @@ int npc_mcam_idx_2_key_type(struct rvu *rvu, u16 mcam_idx, u8 *key_type)
++static int npc_alloc_kpu_cam2_n_action(struct rvu *rvu, int kpu_num,
++				       int num_entries)
++{
++	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
++	struct npc_kpu_profile *kpu;
++
++	kpu = &adapter->kpu[kpu_num];
++
++	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
++				 sizeof(*kpu->cam2), GFP_KERNEL);
++	if (!kpu->cam2)
++		return -ENOMEM;
++
++	kpu->action = devm_kcalloc(rvu->dev, num_entries,
++				   sizeof(*kpu->action), GFP_KERNEL);
++	if (!kpu->action)
++		return -ENOMEM;
++
++	return 0;
++}
++
+ static int npc_apply_custom_kpu(struct rvu *rvu,
+-				struct npc_kpu_profile_adapter *profile)
++				struct npc_kpu_profile_adapter *profile,
++				bool from_fs)
+ {
+ 	size_t hdr_sz = sizeof(struct npc_kpu_profile_fwdata), offset = 0;
+ 	struct npc_kpu_profile_action *action;
++	struct npc_kpu_profile_fwdata *sfw;
+ 	struct npc_kpu_profile_fwdata *fw;
++	struct npc_kpu_profile_cam2 *cam2;
+ 	struct npc_kpu_profile_cam *cam;
+ 	struct npc_kpu_fwdata *fw_kpu;
+-	int entries;
++	int entries, ret;
+ 	u16 kpu, entry;
  
- 	/* mcam_idx should be less than (2 * bank depth) */
- 	if (mcam_idx >= npc_priv.bank_depth * 2) {
--		dev_err(rvu->dev, "%s: bad params\n",
--			__func__);
-+		dev_err(rvu->dev, "%s: bad params mcam_idx=%u\n",
-+			__func__, mcam_idx);
+ 	if (is_cn20k(rvu->pdev))
+ 		return npc_cn20k_apply_custom_kpu(rvu, profile);
+ 
+-	fw = rvu->kpu_fwdata;
+-
+ 	if (rvu->kpu_fwdata_sz < hdr_sz) {
+ 		dev_warn(rvu->dev, "Invalid KPU profile size\n");
+ 		return -EINVAL;
+ 	}
++
++	fw = rvu->kpu_fwdata;
+ 	if (le64_to_cpu(fw->signature) != KPU_SIGN) {
+ 		dev_warn(rvu->dev, "Invalid KPU profile signature %llx\n",
+ 			 fw->signature);
+@@ -1731,31 +1773,80 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
  		return -EINVAL;
  	}
  
-@@ -4024,6 +4041,13 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 	void *val;
- 	int i, j;
- 
-+	for (int i = 0; i < ARRAY_SIZE(ptr); i++) {
-+		if (!ptr[i])
-+			continue;
++	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
++	if (!sfw)
++		return -ENOMEM;
 +
-+		*ptr[i] = USHRT_MAX;
++	memcpy(sfw, fw, sizeof(*sfw));
++
+ 	profile->custom = 1;
+-	profile->name = fw->name;
++	profile->name = sfw->name;
+ 	profile->version = le64_to_cpu(fw->version);
+-	profile->mcam_kex_prfl.mkex = &fw->mkex;
+-	profile->lt_def = &fw->lt_def;
++	profile->mcam_kex_prfl.mkex = &sfw->mkex;
++	profile->lt_def = &sfw->lt_def;
++
++	/* Binary blob contains ikpu actions entries at start of data[0] */
++	if (from_fs) {
++		action = (struct npc_kpu_profile_action *)(fw->data + offset);
++
++		if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
++			return -ENOMEM;
++
++		memcpy((void *)profile->ikpu, action, sizeof(ikpu_action_entries));
++		offset += sizeof(ikpu_action_entries);
 +	}
-+
- 	if (!npc_priv.init_done)
- 		return 0;
  
-@@ -4039,7 +4063,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
- 				 pcifunc);
- 
--			*ptr[0] = USHRT_MAX;
- 			return -ESRCH;
- 		}
- 
-@@ -4059,7 +4082,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
- 				 pcifunc);
- 
--			*ptr[3] = USHRT_MAX;
- 			return -ESRCH;
- 		}
- 
-@@ -4079,7 +4101,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 __func__,
- 				 npc_dft_rule_name[i], pcifunc);
- 
--			*ptr[j] = USHRT_MAX;
- 			continue;
- 		}
- 
-@@ -4174,7 +4195,7 @@ int rvu_mbox_handler_npc_get_dft_rl_idxs(struct rvu *rvu, struct msg_req *req,
- 	return 0;
- }
- 
--static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
- {
- 	return is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)) ||
- 		is_lbk_vf(rvu, pcifunc);
-@@ -4182,9 +4203,10 @@ static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
- 
- void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- {
--	struct npc_mcam_free_entry_req free_req = { 0 };
-+	struct npc_mcam *mcam = &rvu->hw->mcam;
-+	struct rvu_npc_mcam_rule *rule, *tmp;
- 	unsigned long index;
--	struct msg_rsp rsp;
-+	int blkaddr;
- 	u16 ptr[4];
- 	int rc, i;
- 	void *map;
-@@ -4209,7 +4231,7 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__,
- 				npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
-@@ -4223,7 +4245,7 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__,
- 				npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
-@@ -4237,21 +4259,47 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, i);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__, npc_dft_rule_name[i],
- 				pcifunc);
- 	}
- 
- free_rules:
-+	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
-+	if (blkaddr < 0)
-+		return;
- 
--	free_req.hdr.pcifunc = pcifunc;
--	free_req.all = 1;
--	rc = rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
--	if (rc)
--		dev_err(rvu->dev,
--			"%s: Error deleting default entries (pcifunc=%#x\n",
--			__func__, pcifunc);
-+	for (int i = 0; i < 4; i++) {
-+		if (ptr[i] == USHRT_MAX)
+ 	for (kpu = 0; kpu < fw->kpus; kpu++) {
+ 		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
+-		if (fw_kpu->entries > KPU_MAX_CST_ENT)
+-			dev_warn(rvu->dev,
+-				 "Too many custom entries on KPU%d: %d > %d\n",
+-				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
+-		entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
+-		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
+-		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
++		if (!from_fs) {
++			if (fw_kpu->entries > KPU_MAX_CST_ENT)
++				dev_warn(rvu->dev,
++					 "Too many custom entries on KPU%d: %d > %d\n",
++					 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
++			entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
++			cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
++			offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
++			action = (struct npc_kpu_profile_action *)(fw->data + offset);
++			offset += fw_kpu->entries * sizeof(*action);
++			if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
++				dev_warn(rvu->dev,
++					 "Profile size mismatch on KPU%i parsing.\n",
++					 kpu + 1);
++				return -EINVAL;
++			}
++			for (entry = 0; entry < entries; entry++) {
++				profile->kpu[kpu].cam[entry] = cam[entry];
++				profile->kpu[kpu].action[entry] = action[entry];
++			}
 +			continue;
-+
-+		mutex_lock(&mcam->lock);
-+		npc_mcam_clear_bit(mcam, ptr[i]);
-+		mcam->entry2pfvf_map[ptr[i]] = NPC_MCAM_INVALID_MAP;
-+		npc_cn20k_enable_mcam_entry(rvu, blkaddr, ptr[i], false);
-+		mcam->entry2target_pffunc[ptr[i]] = 0x0;
-+		mutex_unlock(&mcam->lock);
-+
-+		rc = npc_cn20k_idx_free(rvu, &ptr[i], 1);
-+		if (rc)
-+			dev_err(rvu->dev,
-+				"%s:%d Error deleting default entries (pcifunc=%#x) mcam_idx=%u\n",
-+				__func__, __LINE__, pcifunc, ptr[i]);
-+	}
-+
-+	mutex_lock(&mcam->lock);
-+	list_for_each_entry_safe(rule, tmp, &mcam->mcam_rules, list) {
-+		for (int i = 0; i < 4; i++) {
-+			if (ptr[i] != rule->entry)
-+				continue;
-+
-+			list_del(&rule->list);
-+			kfree(rule);
-+			break;
 +		}
-+	}
-+	mutex_unlock(&mcam->lock);
- }
- 
- int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-index b168ecfbc5c8..0fa56f5382b4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-@@ -345,5 +345,6 @@ int npc_mcam_idx_2_subbank_idx(struct rvu *rvu, u16 mcam_idx,
- 			       int *sb_off);
- const u32 *npc_cn20k_search_order_get(bool *restricted_order, u32 *sz);
- int npc_cn20k_search_order_set(struct rvu *rvu, u32 arr[32], int cnt);
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc);
- 
- #endif /* NPC_CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index dc42c81c0942..e07fbf842b94 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1009,6 +1009,7 @@ struct nix_lf_free_req {
- 	struct mbox_msghdr hdr;
- #define NIX_LF_DISABLE_FLOWS		BIT_ULL(0)
- #define NIX_LF_DONT_FREE_TX_VTAG	BIT_ULL(1)
-+#define NIX_LF_DONT_FREE_DFT_IDXS	BIT_ULL(2)
- 	u64 flags;
- };
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index ef5b081162eb..bd671b553df5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -16,6 +16,7 @@
- #include "cgx.h"
- #include "lmac_common.h"
- #include "rvu_npc_hash.h"
-+#include "cn20k/npc.h"
- 
- static void nix_free_tx_vtag_entries(struct rvu *rvu, u16 pcifunc);
- static int rvu_nix_get_bpid(struct rvu *rvu, struct nix_bp_cfg_req *req,
-@@ -1684,10 +1685,16 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 	if (is_sdp_pfvf(rvu, pcifunc))
- 		intf = NIX_INTF_TYPE_SDP;
- 
-+	if (is_cn20k(rvu->pdev)) {
-+		rc = npc_cn20k_dft_rules_alloc(rvu, pcifunc);
-+		if (rc)
-+			goto free_mem;
-+	}
++		entries = fw_kpu->entries;
++		dev_info(rvu->dev,
++			 "Loading %u entries on KPU%d\n", entries, kpu);
 +
- 	err = nix_interface_init(rvu, pcifunc, intf, nixlf, rsp,
- 				 !!(req->flags & NIX_LF_LBK_BLK_SEL));
- 	if (err)
--		goto free_mem;
-+		goto free_dft;
- 
- 	/* Disable NPC entries as NIXLF's contexts are not initialized yet */
- 	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
-@@ -1699,6 +1706,10 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 
- 	goto exit;
- 
-+free_dft:
-+	if (is_cn20k(rvu->pdev))
-+		npc_cn20k_dft_rules_free(rvu, pcifunc);
-+
- free_mem:
- 	nix_ctx_free(rvu, pfvf);
- 	rc = -ENOMEM;
-@@ -1775,6 +1786,9 @@ int rvu_mbox_handler_nix_lf_free(struct rvu *rvu, struct nix_lf_free_req *req,
- 
- 	nix_ctx_free(rvu, pfvf);
- 
-+	if (is_cn20k(rvu->pdev) && !(req->flags & NIX_LF_DONT_FREE_DFT_IDXS))
-+		npc_cn20k_dft_rules_free(rvu, pcifunc);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index c2ca5ed1d028..352dc5f1d5b9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -165,12 +165,20 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
- 
- 		switch (type) {
- 		case NIXLF_BCAST_ENTRY:
-+			if (bcast == USHRT_MAX)
-+				return -EINVAL;
- 			return bcast;
- 		case NIXLF_ALLMULTI_ENTRY:
-+			if (mcast == USHRT_MAX)
-+				return -EINVAL;
- 			return mcast;
- 		case NIXLF_PROMISC_ENTRY:
-+			if (promisc == USHRT_MAX)
-+				return -EINVAL;
- 			return promisc;
- 		case NIXLF_UCAST_ENTRY:
-+			if (ucast == USHRT_MAX)
-+				return -EINVAL;
- 			return ucast;
- 		default:
++		cam2 = (struct npc_kpu_profile_cam2 *)fw_kpu->data;
++		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam2);
+ 		action = (struct npc_kpu_profile_action *)(fw->data + offset);
+ 		offset += fw_kpu->entries * sizeof(*action);
+ 		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
+ 			dev_warn(rvu->dev,
+-				 "Profile size mismatch on KPU%i parsing.\n",
++				 "profile size mismatch on kpu%i parsing.\n",
+ 				 kpu + 1);
  			return -EINVAL;
-@@ -237,12 +245,8 @@ void npc_enable_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
- 	int bank = npc_get_bank(mcam, index);
- 	int actbank = bank;
- 
--	if (is_cn20k(rvu->pdev)) {
--		if (index < 0 || index >= mcam->banksize * mcam->banks)
--			return;
--
-+	if (is_cn20k(rvu->pdev))
- 		return npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, enable);
--	}
- 
- 	index &= (mcam->banksize - 1);
- 	for (; bank < (actbank + mcam->banks_per_entry); bank++) {
-@@ -1113,7 +1117,7 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		index = mcam_index;
- 	}
- 
--	if (index >= mcam->total_entries)
-+	if (index < 0 || index >= mcam->total_entries)
- 		return;
- 
- 	bank = npc_get_bank(mcam, index);
-@@ -1158,16 +1162,18 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		/* If PF's promiscuous  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf,
-+							  index, blkaddr, alg_idx);
- 
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 						 nixlf, NIXLF_ALLMULTI_ENTRY);
- 		/* If PF's allmulti  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf,
-+							  index, blkaddr, alg_idx);
- 	}
- }
- 
-@@ -1212,8 +1218,13 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- {
- 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
-+	int type = NIXLF_UCAST_ENTRY;
- 	int index, blkaddr;
- 
-+	/* only CGX or LBK interfaces have default entries */
-+	if (is_cn20k(rvu->pdev) && !npc_is_cgx_or_lbk(rvu, pcifunc))
-+		return;
-+
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
-@@ -1221,8 +1232,11 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 	/* Ucast MCAM match entry of this PF/VF */
- 	if (npc_is_feature_supported(rvu, BIT_ULL(NPC_DMAC),
- 				     pfvf->nix_rx_intf)) {
-+		if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+			type = NIXLF_PROMISC_ENTRY;
-+
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
--						 nixlf, NIXLF_UCAST_ENTRY);
-+						 nixlf, type);
- 		npc_enable_mcam_entry(rvu, mcam, blkaddr, index, enable);
- 	}
- 
-@@ -1232,9 +1246,13 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 	if ((pcifunc & RVU_PFVF_FUNC_MASK) && !rvu->hw->cap.nix_rx_multicast)
- 		return;
- 
-+	type = NIXLF_BCAST_ENTRY;
-+	if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+		type = NIXLF_PROMISC_ENTRY;
-+
- 	/* add/delete pf_func to broadcast MCE list */
- 	npc_enadis_default_mce_entry(rvu, pcifunc, nixlf,
--				     NIXLF_BCAST_ENTRY, enable);
-+				     type, enable);
- }
- 
- void rvu_npc_disable_default_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
-@@ -1244,6 +1262,9 @@ void rvu_npc_disable_default_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 
- 	npc_enadis_default_entries(rvu, pcifunc, nixlf, false);
- 
-+	if (is_cn20k(rvu->pdev) && is_vf(pcifunc))
-+		return;
-+
- 	/* Delete multicast and promisc MCAM entries */
- 	npc_enadis_default_mce_entry(rvu, pcifunc, nixlf,
- 				     NIXLF_ALLMULTI_ENTRY, false);
-@@ -1301,6 +1322,10 @@ void rvu_npc_disable_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 	if (blkaddr < 0)
- 		return;
- 
-+	/* only CGX or LBK interfaces have default entries */
-+	if (is_cn20k(rvu->pdev) && !npc_is_cgx_or_lbk(rvu, pcifunc))
-+		return;
-+
- 	mutex_lock(&mcam->lock);
- 
- 	/* Disable MCAM entries directing traffic to this 'pcifunc' */
-@@ -1345,6 +1370,8 @@ void rvu_npc_free_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 	/* Free all MCAM counters owned by this 'pcifunc' */
- 	npc_mcam_free_all_counters(rvu, mcam, pcifunc);
- 
-+	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
-+
- 	/* Delete MCAM entries owned by this 'pcifunc' */
- 	list_for_each_entry_safe(rule, tmp, &mcam->mcam_rules, list) {
- 		if (rule->owner == pcifunc && !rule->default_rule) {
-@@ -1355,7 +1382,6 @@ void rvu_npc_free_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 
- 	mutex_unlock(&mcam->lock);
- 
--	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
- }
- 
- static void npc_program_mkex_rx(struct rvu *rvu, int blkaddr,
-@@ -2504,33 +2530,58 @@ void npc_mcam_clear_bit(struct npc_mcam *mcam, u16 index)
- static void npc_mcam_free_all_entries(struct rvu *rvu, struct npc_mcam *mcam,
- 				      int blkaddr, u16 pcifunc)
- {
-+	u16 dft_idxs[NPC_DFT_RULE_MAX_ID] = {[0 ... NPC_DFT_RULE_MAX_ID - 1] = USHRT_MAX};
- 	u16 index, cntr;
-+	bool dft_rl;
- 	int rc;
- 
-+	npc_cn20k_dft_rules_idx_get(rvu, pcifunc,
-+				    &dft_idxs[NPC_DFT_RULE_BCAST_ID],
-+				    &dft_idxs[NPC_DFT_RULE_MCAST_ID],
-+				    &dft_idxs[NPC_DFT_RULE_PROMISC_ID],
-+				    &dft_idxs[NPC_DFT_RULE_UCAST_ID]);
-+
- 	/* Scan all MCAM entries and free the ones mapped to 'pcifunc' */
- 	for (index = 0; index < mcam->bmap_entries; index++) {
--		if (mcam->entry2pfvf_map[index] == pcifunc) {
--			mcam->entry2pfvf_map[index] = NPC_MCAM_INVALID_MAP;
--			/* Free the entry in bitmap */
--			npc_mcam_clear_bit(mcam, index);
--			/* Disable the entry */
--			npc_enable_mcam_entry(rvu, mcam, blkaddr, index, false);
--
--			/* Update entry2counter mapping */
--			cntr = mcam->entry2cntr_map[index];
--			if (cntr != NPC_MCAM_INVALID_MAP)
--				npc_unmap_mcam_entry_and_cntr(rvu, mcam,
--							      blkaddr, index,
--							      cntr);
--			mcam->entry2target_pffunc[index] = 0x0;
--			if (is_cn20k(rvu->pdev)) {
--				rc = npc_cn20k_idx_free(rvu, &index, 1);
--				if (rc)
--					dev_err(rvu->dev,
--						"Failed to free mcam idx=%u pcifunc=%#x\n",
--						index, pcifunc);
-+		if (mcam->entry2pfvf_map[index] != pcifunc)
-+			continue;
-+
-+		mcam->entry2pfvf_map[index] = NPC_MCAM_INVALID_MAP;
-+
-+		dft_rl = false;
-+		if (is_cn20k(rvu->pdev)) {
-+			if (dft_idxs[NPC_DFT_RULE_BCAST_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_MCAST_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_PROMISC_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_UCAST_ID] == index) {
-+				dft_rl = true;
- 			}
  		}
 +
-+		/* Free the entry in bitmap.*/
-+		if (!dft_rl)
-+			npc_mcam_clear_bit(mcam, index);
-+
-+		/* Disable the entry */
-+		npc_enable_mcam_entry(rvu, mcam, blkaddr, index, false);
-+
-+		/* Update entry2counter mapping */
-+		cntr = mcam->entry2cntr_map[index];
-+		if (cntr != NPC_MCAM_INVALID_MAP)
-+			npc_unmap_mcam_entry_and_cntr(rvu, mcam,
-+						      blkaddr, index,
-+						      cntr);
-+		mcam->entry2target_pffunc[index] = 0x0;
-+		if (is_cn20k(rvu->pdev)) {
-+			if (dft_rl)
-+				continue;
-+
-+			rc = npc_cn20k_idx_free(rvu, &index, 1);
-+			if (rc)
-+				dev_err(rvu->dev,
-+					"Failed to free mcam idx=%u pcifunc=%#x\n",
-+					index, pcifunc);
++		profile->kpu[kpu].cam_entries = entries;
++		profile->kpu[kpu].action_entries = entries;
++		ret = npc_alloc_kpu_cam2_n_action(rvu, kpu, entries);
++		if (ret) {
++			dev_warn(rvu->dev,
++				 "profile entry allocation failed for kpu=%d for %d entries\n",
++				 kpu, entries);
++			return -EINVAL;
 +		}
++
+ 		for (entry = 0; entry < entries; entry++) {
+-			profile->kpu[kpu].cam[entry] = cam[entry];
++			profile->kpu[kpu].cam2[entry] = cam2[entry];
+ 			profile->kpu[kpu].action[entry] = action[entry];
+ 		}
  	}
+@@ -1853,7 +1944,10 @@ void npc_load_kpu_profile(struct rvu *rvu)
+ 	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
+ 	const char *kpu_profile = rvu->kpu_pfl_name;
+ 	const struct firmware *fw = NULL;
+-	bool retry_fwdb = false;
++	int len, ret;
++	char *path;
++
++	profile->from_fs = false;
+ 
+ 	/* If user not specified profile customization */
+ 	if (!strncmp(kpu_profile, def_pfl_name, KPU_NAME_LEN))
+@@ -1866,27 +1960,53 @@ void npc_load_kpu_profile(struct rvu *rvu)
+ 	 * Firmware database method.
+ 	 * Default KPU profile.
+ 	 */
+-	if (!request_firmware_direct(&fw, kpu_profile, rvu->dev)) {
+-		dev_info(rvu->dev, "Loading KPU profile from firmware: %s\n",
+-			 kpu_profile);
++
++#define PDIR "kpu/"
++	len = strlen(kpu_profile) + sizeof(PDIR);
++	path = kmalloc(len, GFP_KERNEL);
++	if (!path)
++		return;
++
++	strscpy(path, PDIR, len);
++	strcat(path, kpu_profile);
++	if (!request_firmware_direct(&fw, path, rvu->dev)) {
++		dev_info(rvu->dev, "Loading KPU profile from filesystem: %s\n",
++			 path);
+ 		rvu->kpu_fwdata = kzalloc(fw->size, GFP_KERNEL);
+ 		if (rvu->kpu_fwdata) {
+ 			memcpy(rvu->kpu_fwdata, fw->data, fw->size);
+ 			rvu->kpu_fwdata_sz = fw->size;
+ 		}
+ 		release_firmware(fw);
+-		retry_fwdb = true;
+-		goto program_kpu;
++		kfree(path);
++
++		ret = npc_apply_custom_kpu(rvu, profile, true);
++		kfree(rvu->kpu_fwdata);
++		rvu->kpu_fwdata = NULL;
++
++		/* If an error occurs during firmware loading from filesystem, there is no way
++		 * to revert as we modified default profile memory. In this case, User should delete
++		 * the corrupted firmware image, reboot the device and copy corrected firmware.
++		 * This decision not to rollback is to save memory.
++		 */
++		if (ret) {
++			rvu->kpu_fwdata_sz = 0;
++			dev_err(rvu->dev,
++				"Loading KPU profile from filesystem failed\n");
++			return;
++		}
++
++		profile->from_fs = true;
++		return;
+ 	}
++	kfree(path);
+ 
+-load_image_fwdb:
+ 	/* Loading the KPU profile using firmware database */
+ 	if (npc_load_kpu_profile_fwdb(rvu, kpu_profile))
+ 		goto revert_to_default;
+ 
+-program_kpu:
+ 	/* Apply profile customization if firmware was loaded. */
+-	if (!rvu->kpu_fwdata_sz || npc_apply_custom_kpu(rvu, profile)) {
++	if (!rvu->kpu_fwdata_sz || npc_apply_custom_kpu(rvu, profile, false)) {
+ 		/* If image from firmware filesystem fails to load or invalid
+ 		 * retry with firmware database method.
+ 		 */
+@@ -1900,10 +2020,6 @@ void npc_load_kpu_profile(struct rvu *rvu)
+ 			}
+ 			rvu->kpu_fwdata = NULL;
+ 			rvu->kpu_fwdata_sz = 0;
+-			if (retry_fwdb) {
+-				retry_fwdb = false;
+-				goto load_image_fwdb;
+-			}
+ 		}
+ 
+ 		dev_warn(rvu->dev,
+@@ -1927,6 +2043,7 @@ void npc_load_kpu_profile(struct rvu *rvu)
+ 
+ static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
+ {
++	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 	int num_pkinds, num_kpus, idx;
+ 
+@@ -1958,6 +2075,11 @@ static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
+ 
+ 	for (idx = 0; idx < num_kpus; idx++)
+ 		npc_program_kpu_profile(rvu, blkaddr, idx, &rvu->kpu.kpu[idx]);
++
++	if (profile->from_fs) {
++		rvu_write64(rvu, blkaddr, NPC_AF_PKINDX_TYPE(54), 0x03);
++		rvu_write64(rvu, blkaddr, NPC_AF_PKINDX_TYPE(58), 0x03);
++	}
  }
  
-@@ -3917,13 +3968,22 @@ void rvu_npc_clear_ucast_entry(struct rvu *rvu, int pcifunc, int nixlf)
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	struct rvu_npc_mcam_rule *rule;
- 	int ucast_idx, blkaddr;
-+	u8 type;
- 
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
- 
-+	type = NIXLF_UCAST_ENTRY;
-+	if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+		type = NIXLF_PROMISC_ENTRY;
-+
- 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
--					     nixlf, NIXLF_UCAST_ENTRY);
-+					     nixlf, type);
-+
-+	/* In cn20k, default rules are freed before detach rsrc */
-+	if (ucast_idx < 0)
-+		return;
- 
- 	npc_enable_mcam_entry(rvu, mcam, blkaddr, ucast_idx, false);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..81b088f5a016 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1053,7 +1053,6 @@ irqreturn_t otx2_pfaf_mbox_intr_handler(int irq, void *pf_irq)
- 	/* Clear the IRQ */
- 	otx2_write64(pf, RVU_PF_INT, BIT_ULL(0));
- 
--
- 	mbox_data = otx2_read64(pf, RVU_PF_PFAF_MBOX0);
- 
- 	if (mbox_data & MBOX_UP_MSG) {
-@@ -1729,7 +1728,7 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	mutex_lock(&mbox->lock);
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
--		free_req->flags = NIX_LF_DISABLE_FLOWS;
-+		free_req->flags = NIX_LF_DISABLE_FLOWS | NIX_LF_DONT_FREE_DFT_IDXS;
- 		if (otx2_sync_mbox_msg(mbox))
- 			dev_err(pf->dev, "%s failed to free nixlf\n", __func__);
- 	}
-@@ -1803,7 +1802,7 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
- 	/* Reset NIX LF */
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
--		free_req->flags = NIX_LF_DISABLE_FLOWS;
-+		free_req->flags = NIX_LF_DISABLE_FLOWS | NIX_LF_DONT_FREE_DFT_IDXS;
- 		if (!(pf->flags & OTX2_FLAG_PF_SHUTDOWN))
- 			free_req->flags |= NIX_LF_DONT_FREE_TX_VTAG;
- 		if (otx2_sync_mbox_msg(mbox))
-@@ -1926,7 +1925,6 @@ int otx2_alloc_queue_mem(struct otx2_nic *pf)
- 	struct otx2_qset *qset = &pf->qset;
- 	struct otx2_cq_poll *cq_poll;
- 
--
- 	/* RQ and SQs are mapped to different CQs,
- 	 * so find out max CQ IRQs (i.e CINTs) needed.
- 	 */
+ void npc_mcam_rsrcs_deinit(struct rvu *rvu)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+index 62cdc714ba57..ab89b8c6e490 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+@@ -596,6 +596,7 @@
+ #define NPC_AF_INTFX_KEX_CFG(a)		(0x01010 | (a) << 8)
+ #define NPC_AF_PKINDX_ACTION0(a)	(0x80000ull | (a) << 6)
+ #define NPC_AF_PKINDX_ACTION1(a)	(0x80008ull | (a) << 6)
++#define NPC_AF_PKINDX_TYPE(a)		(0x80010ull | (a) << 6)
+ #define NPC_AF_PKINDX_CPI_DEFX(a, b)	(0x80020ull | (a) << 6 | (b) << 3)
+ #define NPC_AF_KPUX_ENTRYX_CAMX(a, b, c) \
+ 		(0x100000 | (a) << 14 | (b) << 6 | (c) << 3)
 -- 
 2.43.0
 
