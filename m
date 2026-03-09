@@ -1,148 +1,129 @@
-Return-Path: <netdev+bounces-265407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKAKNguDrmlfFQIAu9opvQ
-	(envelope-from <netdev+bounces-265407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:21:31 +0100
+	id 2McFCl2DrmlwFgIAu9opvQ
+	(envelope-from <netdev+bounces-265408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:22:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B05B235701
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:21:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF96E23574E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:22:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 934A2300CC2F
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:21:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 57D293003367
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A176936CE01;
-	Mon,  9 Mar 2026 08:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEB036BCDE;
+	Mon,  9 Mar 2026 08:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I19jCDYJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZcgMHH6k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8F436C5BE;
-	Mon,  9 Mar 2026 08:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD9A366DAE;
+	Mon,  9 Mar 2026 08:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773044474; cv=none; b=N3oyM+TAXvj8B9elaIMT151q+sUxSAWxoXOGLzSG6XWbZ82QkQj2j2eYgDlR61mCCya93T+s+Ev/Dmj5TYG/p1sSD1kEC3dFYS892bJbeE612701jE0e17gju9tpcHVaJMdpVAie7cfRlq/yKdFmWPYNltV/DNfjJwh1RIbJRog=
+	t=1773044567; cv=none; b=c7sAmFlkNs9dT4OLm0pYTaJeLCgeey8IXhGy2pfAXb13HOCJpCsiTC4Rt2DN3X1YYTtLI437Ejku/lDSBde1/wUT2jfIRdrfQ0qRC1B5PZCeyVI9b8zo2s9t+mMQu9OSuztElv1np0o2DeE00I52zuNa1/5aeflaXWEf+qaIyFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773044474; c=relaxed/simple;
-	bh=yhDqd3a87e0Dyr+suaVKTSgT4WU4nLbz7GbcxD4ET/U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=c2ii9VJoV7feh+rEwMddPsFnp/eFEXDk+mGytKn1e33hYO9Jx8tpu1lMvcYV/0OBpyLfWyL0NhSCQeltvncozBUWVz6+2GAM5SN9Qkn8mFp4ZJfANdaUfB2aU12/+r7+RaYtNq6EActZEhboQADSJoCLHLnwufG8y7sPJc+kodo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I19jCDYJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C301EC4CEF7;
-	Mon,  9 Mar 2026 08:21:13 +0000 (UTC)
+	s=arc-20240116; t=1773044567; c=relaxed/simple;
+	bh=dwOb26n+ndlLmoZCocyESbjisGLEC0JSCWvIfFI6yw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DfbdBGXUqdLWaU9Ikrsj/Zn/IpJy+0ieEW+6bkiOW+HAv60e8Iu5q6aE87EJKDfIpT5vwQvTVr/IHD9jsicNR+tYcXOeugkpRvrvgUAuOxm7n+LLLuowVJBaqrEBHuZt0k8dmnr4HzKOGq3bsFZs+il3XX+vOCR4zuOOPfnxZBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZcgMHH6k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C222C4CEF7;
+	Mon,  9 Mar 2026 08:22:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773044474;
-	bh=yhDqd3a87e0Dyr+suaVKTSgT4WU4nLbz7GbcxD4ET/U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=I19jCDYJqZhAIlH9R/nUB7vJw7pmZNyHC+7qf6gBViEdlimOYRShV/Dfkiub1UJpk
-	 otVYFLrPDI4KtvWslKCiJcsi5/NpLMgNfgCxFc3N+cXCgUyybRCOxbnddVxwRoVSvw
-	 jAHPYgd9j4fz0+DC1V0vHOQoNG9VNIAzWcQPq+WWUebmvhgXgtcnnYk1d6Lwzb44LX
-	 OB8sAn630r1xnSGZh+6YTN0CjTk0EyA/gw4YP07cmHKfuLDAU8N1i+sBEjmnk+aX64
-	 qNg8UUBdME2wFxGsxrYTQDbLCnvgYdlzRohOr0UtVXFYfD5fTiBHOHRM8hjvJ65IA+
-	 wJ5kL65I0bCLQ==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, Jakub
- Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Tariq
- Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>
-Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
- Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Russell King <linux@armlinux.org.uk>
-Subject: Re: [RFC net-next v2 2/6] ethtool: Add loopback GET/SET netlink
- implementation
-In-Reply-To: <19aa42c1-4e3c-4722-84bd-a21b53ad3993@bootlin.com>
-References: <20260308124016.3134012-1-bjorn@kernel.org>
- <20260308124016.3134012-3-bjorn@kernel.org>
- <19aa42c1-4e3c-4722-84bd-a21b53ad3993@bootlin.com>
-Date: Mon, 09 Mar 2026 09:21:11 +0100
-Message-ID: <87eclth0qw.fsf@all.your.base.are.belong.to.us>
+	s=k20201202; t=1773044567;
+	bh=dwOb26n+ndlLmoZCocyESbjisGLEC0JSCWvIfFI6yw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZcgMHH6kZRxZ3Z3gIfrcXaU70ljJsobap+10i7s1uhAKE0HNV7LZTtuLyqMBSq743
+	 sEaWBEhQWdn++wyX8tXqzbpLj5ULAG+Xkt2bTC5mwzFNK19VHLpoklWqctbFnu3/vN
+	 GZdEWROgicL5ggyxtpQnUfLj6kVh3YtTdcqIx5N6KKZENM0SXR/ld2ZQfTSLHkhTt7
+	 RtSfm8Phe/oRR/i6nmcW/dKbYUj3IpDw4yYoAR2dQIoifeIz9FBJjT9+KjR3OEIk2q
+	 UU0brJgOKXG8HELuUeVqH9yAV15ULGV4YgEZe8HlG3wV9iMkFrhdM4gR86EhNghxZu
+	 oNFHQJM8nor2A==
+Received: from johan by xi.lan with local (Exim 4.98.2)
+	(envelope-from <johan@kernel.org>)
+	id 1vzVsy-000000003bl-2fnF;
+	Mon, 09 Mar 2026 09:22:44 +0100
+Date: Mon, 9 Mar 2026 09:22:44 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tobias Waldekranz <tobias@waldekranz.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: mdio: mvusb: drop redundant device reference
+Message-ID: <aa6DVKUgvkW9r80K@hovoldconsulting.com>
+References: <20260305104722.16217-1-johan@kernel.org>
+ <20260306191923.4ae5a6e1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 3B05B235701
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306191923.4ae5a6e1@kernel.org>
+X-Rspamd-Queue-Id: BF96E23574E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.07 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.59)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265407-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[bootlin.com,vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.966];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265408-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johan@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.977];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,hovoldconsulting.com:mid]
 X-Rspamd-Action: no action
 
-Maxime Chevallier <maxime.chevallier@bootlin.com> writes:
+On Fri, Mar 06, 2026 at 07:19:22PM -0800, Jakub Kicinski wrote:
+> On Thu,  5 Mar 2026 11:47:22 +0100 Johan Hovold wrote:
+> >  	ret = of_mdiobus_register(mdio, dev->of_node);
+> >  	if (ret)
+> > -		goto put_dev;
+> > +		return ret;
+> >  
+> >  	return 0;
+> > -
+> > -put_dev:
+> > -	usb_put_dev(mvusb->udev);
+> > -	return ret;
+> 
+> better still:
+> 
+> 	return of_mdiobus_register(mdio, dev->of_node);
+> 
+> and you can remove int ret; as well
 
-> Hi Bj=C3=B6rn,
->
-> On 08/03/2026 13:40, Bj=C3=B6rn T=C3=B6pel wrote:
->> Add the kernel-side ETHTOOL_MSG_LOOPBACK_GET,
->> ETHTOOL_MSG_LOOPBACK_SET, and ETHTOOL_MSG_LOOPBACK_NTF handlers using
->> the standard ethnl_request_ops infrastructure.
->>=20
->> GET collects loopback entries from per-component helpers via
->> loopback_get_entries(). SET parses the nested entry attributes,
->> dispatches each to loopback_set_one(), and only sends a notification
->> when the state is changed.
->>=20
->> No components are wired yet.
->>=20
->> Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
->
-> At a first glance, what I see is that you're using the GET ->doit method
-> to retrieve an array of loopback entries. The pefered approach in that
-> case is to use the GET ->dumpit command instead, issueing a netlink DUMP
-> request to list all available loopback entities on a given netdev.
->
-> If you want some reference on that, take a look at the phy.c + the
-> 'perphy' helpers in net/ethtool/netlink.c
->
-> The idea is that you can pass a netdev ifindex in the header of the DUMP
-> request, which you can use to dump all loopbacks the passed netdev.
->
-> You can also check the ethtool code itself, you'll see that when you use
-> the "ethtool --show-phys eth0" command for example, it issues a DUMP
-> request to the kernel.
+I tend to prefer explicit error paths as combining the two at the end of
+a function is a common source of errors where drivers fail to clean up
+before returning.
 
-Ah, got it! Thanks!
+But I'll drop ret in a v2.
 
-> I'll continue the review w.r.t the actual content of the messages :)
-
-...and thank you!
-
-
-Bj=C3=B6rn
+Johan
 
