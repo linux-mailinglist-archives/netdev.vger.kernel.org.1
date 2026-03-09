@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-265617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265616-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id K8yrKTDvrmlcKgIAu9opvQ
-	(envelope-from <netdev+bounces-265617-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:02:56 +0100
+	id aMImBCHurmkWKQIAu9opvQ
+	(envelope-from <netdev+bounces-265616-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:58:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1495C23C5CF
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:02:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683F523C43E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:58:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6067E304EEA5
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:53:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0488D3091094
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26DC3DEAC3;
-	Mon,  9 Mar 2026 15:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89A03E0C61;
+	Mon,  9 Mar 2026 15:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cK4+famf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wHNmozOQ"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="oN+wpO4h";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="H49ozuFx"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998122765ED
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9793DEAE2
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773071602; cv=none; b=Hq9FohjsWt7/IHdU+zzMHO26KqKqtNTygd3mZF5vyVggSA/uKPVbopPRblphp9m1o8FCIIJFfHHnqRDmFpyF9O45rkXP1vnvNc4Yr0Ft9m3mvFOv1JbV8JfAuViF1SgJRau1T0KjOPNw79cvrEmoWn8nI8fCagjutuP8LIWCXXU=
+	t=1773071601; cv=none; b=HV1uubzg/9mm3wKbX6/7WQwNnKYfx7wy30IzzHh9bTBhT27EWgiWXbaGjc/JuYcEvTBkV+OG8+Pu7DvXpGs/YDiRf6w0fOBOVhI/sK65/xu9oN7ZCA6hBWHIM0PJEwb17WvqyUHDArVRJo3jXZSehDPzB4Ho6QdPfcnd32yGO94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773071602; c=relaxed/simple;
-	bh=0moZuIIVKhiNdE8AMancfee0t2wWrTHWZjD+WNsA5rA=;
+	s=arc-20240116; t=1773071601; c=relaxed/simple;
+	bh=NVRaZdAtqm5pwMlygo6QViY6BFmQoxpsCJjfzKwLwhc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eG3utdGPprREFQzWRbhGh4g2jX1iinwcha+08alcin3fWpFVxcMFfqovNjAwGAS6+6U6uQERChF+rrESMkm/o033qdX1xE5ETUVYjuyqEZovDnBBzsl5JYs96EoAy/uvftIwj92ReDHIiLbIoLNeW+dIT97aXQvxO3RExPdSscI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cK4+famf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wHNmozOQ; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version:Content-Type; b=irGecDfuN7bzVFH50h9nIAM78kaN0Cbl6M9OmKyb+CMo/xtXuWbymkix2lfo2Uv2EZrMc0upK8cICRlQR9vGFqEVhEeDLr/xwEtvfnVT5ITFhBLVJrlyQcdF5kpNWXENEqgYGGwy+dxIk8FH3cDh6/oXdFQfmS2DbLeXR6P6PeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=oN+wpO4h; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=H49ozuFx; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
@@ -42,21 +42,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZpKJajSg47trmuiFfdjwj5PtlDnAE9hC08KW1UlgkUc=;
-	b=cK4+famfTJx+Yc0UWAAnNNB6rXhUnJrxf2t4Ukgym0/6gqIAWHG0TiYDvSmKm2/++lOmGs
-	jjhBTQeG0V4uzCUPV6vNPS4sx0H7kPJ4bk2W5uENAmLC9Nw6R4fyGZZMR2onaiYYVfoMzH
-	FCFTy+p0w80fPLuf4YIPMp5ogwAZVH0v1NkCmix9nzhUE+K4m91Nh5UZT+cyEzxRxGzHue
-	/Wul1UiN5wyBEVcak9aOzkRw6r3mUxZWbu9g8I4Ysa7z//9ksXSn+37Ym1jM5Z9DuUfJ1P
-	xfc2AorrP7zfXMEwq+M0dsxrUE6GurMZ5ToOzl4dVX+yxFkbvBeASakxFFTXvg==
+	bh=YnBuRTHtOxWFgPG/kWjm6m6fYQ2Teh+YiPWuWimeTTA=;
+	b=oN+wpO4hoECPk11+v4x8v5Icx7EYWNnvxk/6P5oC9x7jDP9p+reNlexpkNJW44VV6JZSqn
+	AL7Al6YZVsqUnOOndnucwaAu13YDKQOK9nbg/I60wnkodpMuIid88SdYtiSFbNC7OMYyjQ
+	p7mJHVwMzw9PyvacYNZTEPa1aWnlbuCWDsgASUiEkNCkdo690vmzdu57wIvVh3AkHBt0iE
+	5EqAd1a9OGNLBJnGxM9O7gC/pPjU8GgCqCrWihIbk73Pf6g+wttsZmLsuEs75cSiqg60s1
+	NX2Nby7s3TKCt3Kgrl5qULbJh2sUBxK+LP9UXa335msycB1o351rHxByYygIfg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1773071598;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZpKJajSg47trmuiFfdjwj5PtlDnAE9hC08KW1UlgkUc=;
-	b=wHNmozOQVOonrJWGAKFBdpwl8Oc/ZXEHpUIsd0Y+EqP8n7/9TPH0wqf0EP0X2fgHdSdyhF
-	LP04pa50LvCFsEAQ==
+	bh=YnBuRTHtOxWFgPG/kWjm6m6fYQ2Teh+YiPWuWimeTTA=;
+	b=H49ozuFxGvUymnhSGCfMzoJBFkVIiFIvz8uQrrrT53gQIJCGm6RxFUstSOpa5AObOEBfxt
+	fFYvmKf8xJ0+gYCA==
 To: netdev@vger.kernel.org
 Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	"(JC), Jayachandran" <j-rameshbabu@ti.com>,
@@ -72,9 +72,9 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Richard Cochran <richardcochran@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH RFC net-next v2 1/2] hsr: Allow to send a specific port and with HSR header
-Date: Mon,  9 Mar 2026 16:52:35 +0100
-Message-ID: <20260309-hsr_ptp-v2-1-798262aad3a4@linutronix.de>
+Subject: [PATCH RFC net-next v2 2/2] af_packet: Add port specific handling for HSR
+Date: Mon,  9 Mar 2026 16:52:36 +0100
+Message-ID: <20260309-hsr_ptp-v2-2-798262aad3a4@linutronix.de>
 In-Reply-To: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
 References: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
 Precedence: bulk
@@ -85,19 +85,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1495C23C5CF
+X-Rspamd-Queue-Id: 683F523C43E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
 	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265617-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265616-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[linutronix.de,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
@@ -106,556 +106,360 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.984];
+	NEURAL_HAM(-0.00)[-0.985];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-HSR forwards all packets it received on slave port 1 to slave port 2 and
-one of the two copies to the user (master) interface.
-In terms of PTP this is not good because the latency introduced by
-forwarding makes the timestamp in the PTP packet inaccurate.
-The PTP packets should not forwarded like regular packets.
+linuxptp/ ptp4l uses a AF_PACKET with a RAW socket to send and receive
+PTP packets. Extend the interface with the ability to bind the socket to
+one of the two HSR ports and a flag for sendmsg() to indicate that the
+packet already contains a HSR header.
 
-This is addressed by adding a skb extension to received PTP packet
-(over a slave interface). Those packets won't be forwarded on the other
-port slave port. Instead both copies with the HSR header will be
-injected into the master port so userspace can consume it.
-For the TX side (received over master port) the same facility is used to
-send the packet over the specified slave port and either use the
-provided HSR header or generate one by the stack.
+Once PACKET_HSR_BIND_PORT is set, the socket will be bound to requested
+slave port. All incoming packets without a set port will be discarded.
+This limits receiving packet to PTP only packets since only those get
+the tagging by the HSR stack.
 
-The added skb extension is struct hsr_ptp_ext.
+For the control message used by sendmsg(), type PACKET_HSR_INFO is added
+with PACKET_HSR_INFO_HAS_HDR as the only option. If this is used, the
+skb will be known as containing the HSR header. This option can only be
+used if the socket is bound to a specific HSR port.
 
-Receive (slave ports):
-- The 'port' member is set to HSR_PT_SLAVE_A/ HSR_PT_SLAVE_B to denote the
-  port which received the packet. The 'header' member is always false.
-  This information is only added to PTP packets.
-- The received packet is injected into the master port with its HSR
-  header. Both copies are injected, duplicates are not removed.
-
-Send (master port):
-- The 'port' member is set to HSR_PT_SLAVE_A/ HSR_PT_SLAVE_B to denote
-  the port on which the packet has to be sent.
-- The 'header' can be set to true to denote that the packet already
-  contains a HSR header and the stack must not add the system's header
-  to it. Otherwise (if false) the stack will add a HSR header.
-  If a header is already provided then some checks/ actions are skipped
-  such MAC-assignment or node status update.
-- Cloning a TX skb requires to assign socket information and tx_flags/
-  tskey to associate the timestamp with the skb.
+To lower the impact for non-PTP-HSR/PRP user, a static branch is used to
+to avoid a compare & branch if the socket was not bound to a hsr-slave
+device. If CONFIG_HSR is not set, the compiler will be smart enough to
+remove the code entirely (keeping only PACKET_HSR_BIND_PORT for
+getsockopt()).
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- include/linux/if_hsr.h |  81 +++++++++++++++++++++++++++++++++
- include/linux/skbuff.h |   3 ++
- net/core/skbuff.c      |   4 ++
- net/hsr/Kconfig        |   1 +
- net/hsr/hsr_device.c   |   7 +++
- net/hsr/hsr_forward.c  | 118 ++++++++++++++++++++++++++++++++++++++++++++-=
-----
- net/hsr/hsr_framereg.h |   1 +
- net/hsr/hsr_slave.c    |  35 ++++++++++++---
- 8 files changed, 235 insertions(+), 15 deletions(-)
+ include/uapi/linux/if_packet.h |   9 +++
+ net/packet/af_packet.c         | 167 +++++++++++++++++++++++++++++++++++++=
+++++
+ net/packet/internal.h          |   1 +
+ 3 files changed, 177 insertions(+)
 
-diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
-index f4cf2dd36d193..33fc11f895d3f 100644
---- a/include/linux/if_hsr.h
-+++ b/include/linux/if_hsr.h
-@@ -22,6 +22,11 @@ enum hsr_port_type {
- 	HSR_PT_PORTS,	/* This must be the last item in the enum */
- };
+diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
+index 6cd1d7a41dfb7..3443eeac8470e 100644
+--- a/include/uapi/linux/if_packet.h
++++ b/include/uapi/linux/if_packet.h
+@@ -60,6 +60,7 @@ struct sockaddr_ll {
+ #define PACKET_FANOUT_DATA		22
+ #define PACKET_IGNORE_OUTGOING		23
+ #define PACKET_VNET_HDR_SZ		24
++#define PACKET_HSR_BIND_PORT		25
 =20
-+struct hsr_ptp_ext {
-+	u8	port;
-+	u8	header;
-+};
+ #define PACKET_FANOUT_HASH		0
+ #define PACKET_FANOUT_LB		1
+@@ -74,6 +75,14 @@ struct sockaddr_ll {
+ #define PACKET_FANOUT_FLAG_IGNORE_OUTGOING     0x4000
+ #define PACKET_FANOUT_FLAG_DEFRAG	0x8000
+=20
++/* For HSR, bind port */
++#define PACKET_HSR_BIND_PORT_AB		0
++#define PACKET_HSR_BIND_PORT_A		1
++#define PACKET_HSR_BIND_PORT_B		2
++/* HSR, CMSG */
++#define PACKET_HSR_INFO			1
++#define PACKET_HSR_INFO_HAS_HDR		1
 +
- /* HSR Tag.
-  * As defined in IEC-62439-3:2010, the HSR tag is really { ethertype =3D 0=
-x88FB,
-  * path, LSDU_size, sequence Nr }. But we let eth_header() create { h_dest,
-@@ -45,6 +50,60 @@ struct net_device *hsr_get_port_ndev(struct net_device *=
-ndev,
- 				     enum hsr_port_type pt);
- int hsr_get_port_type(struct net_device *hsr_dev, struct net_device *dev,
- 		      enum hsr_port_type *type);
-+
-+static inline bool hsr_skb_has_header(struct sk_buff *skb)
-+{
-+	struct hsr_ptp_ext *ptp_ext;
-+
-+	ptp_ext =3D skb_ext_find(skb, SKB_EXT_HSR);
-+	if (!ptp_ext)
-+		return false;
-+	return ptp_ext->header;
-+}
-+
-+static inline unsigned int hsr_skb_has_port(struct sk_buff *skb)
-+{
-+	struct hsr_ptp_ext *ptp_ext;
-+
-+	if (!skb)
-+		return 0;
-+
-+	ptp_ext =3D skb_ext_find(skb, SKB_EXT_HSR);
-+	if (!ptp_ext)
-+		return 0;
-+	return ptp_ext->port;
-+}
-+
-+static inline bool hsr_skb_get_header_port(struct sk_buff *skb, bool *head=
-er,
-+					   enum hsr_port_type *port_type)
-+{
-+	struct hsr_ptp_ext *ptp_ext;
-+
-+	*port_type =3D HSR_PT_NONE;
-+	*header =3D false;
-+
-+	ptp_ext =3D skb_ext_find(skb, SKB_EXT_HSR);
-+	if (!ptp_ext)
-+		return false;
-+
-+	*port_type =3D ptp_ext->port;
-+	*header =3D ptp_ext->header;
-+	return true;
-+}
-+
-+static inline bool hsr_skb_add_header_port(struct sk_buff *skb, bool heade=
-r,
-+					   enum hsr_port_type port)
-+{
-+	struct hsr_ptp_ext *ptp_ext;
-+
-+	ptp_ext =3D skb_ext_add(skb, SKB_EXT_HSR);
-+	if (!ptp_ext)
-+		return false;
-+	ptp_ext->port =3D port;
-+	ptp_ext->header =3D header;
-+	return true;
-+}
-+
- #else
- static inline bool is_hsr_master(struct net_device *dev)
- {
-@@ -68,6 +127,28 @@ static inline int hsr_get_port_type(struct net_device *=
-hsr_dev,
- {
- 	return -EINVAL;
+ struct tpacket_stats {
+ 	unsigned int	tp_packets;
+ 	unsigned int	tp_drops;
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 72d0935139f0f..98322ad57a234 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -82,6 +82,7 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/mutex.h>
++#include <linux/if_hsr.h>
+ #include <linux/if_vlan.h>
+ #include <linux/virtio_net.h>
+ #include <linux/errqueue.h>
+@@ -284,6 +285,94 @@ static int packet_xmit(const struct packet_sock *po, s=
+truct sk_buff *skb)
+ 	return dev_direct_xmit(skb, packet_pick_tx_queue(skb));
  }
+=20
++#if IS_ENABLED(CONFIG_HSR)
 +
-+static inline bool hsr_skb_has_header(struct sk_buff *skb)
++static DEFINE_STATIC_KEY_FALSE(hsr_ptp_support_enabled);
++
++static inline bool packet_add_ptp_settings(struct sk_buff *skb,
++					   bool header, unsigned int port)
++{
++	if (!static_branch_unlikely(&hsr_ptp_support_enabled))
++		return true;
++
++	if (!port)
++		return true;
++
++	return hsr_skb_add_header_port(skb, header, port);
++}
++
++static inline bool packet_filter_hsr_port(struct packet_sock *po, struct s=
+k_buff *skb)
++{
++	unsigned int req_port;
++	bool req_hdr;
++
++	if (!static_branch_unlikely(&hsr_ptp_support_enabled))
++		return false;
++
++	if (!po->hsr_bound_port)
++		return false;
++
++	if (!hsr_skb_get_header_port(skb, &req_hdr, &req_port))
++		return true;
++
++	if (req_port =3D=3D po->hsr_bound_port)
++		return false;
++	return true;
++}
++
++static int packet_cmsg_send(struct msghdr *msg, struct packet_sock *po,
++			    bool *hsr_has_hdr)
++{
++	struct cmsghdr *cmsg;
++	int ret =3D -EINVAL;
++	u32 val;
++
++	if (!static_branch_unlikely(&hsr_ptp_support_enabled))
++		return 0;
++
++	for_each_cmsghdr(cmsg, msg) {
++		if (!CMSG_OK(msg, cmsg))
++			goto out;
++		if (cmsg->cmsg_level !=3D SOL_PACKET)
++			continue;
++		if (cmsg->cmsg_type !=3D PACKET_HSR_INFO)
++			continue;
++		if (cmsg->cmsg_len !=3D CMSG_LEN(sizeof(u32)))
++			goto out;
++
++		val =3D *(u32 *)CMSG_DATA(cmsg);
++		if (val !=3D PACKET_HSR_INFO_HAS_HDR)
++			goto out;
++		if (!po->hsr_bound_port)
++			goto out;
++
++		*hsr_has_hdr =3D true;
++	}
++	ret =3D 0;
++out:
++	return ret;
++}
++
++#else
++
++static bool packet_add_ptp_settings(struct sk_buff *skb,
++				    bool header, unsigned int port)
++{
++	return true;
++}
++
++static bool packet_filter_hsr_port(struct packet_sock *po, struct sk_buff =
+*skb)
 +{
 +	return false;
 +}
 +
-+static inline unsigned int hsr_skb_has_port(struct sk_buff *skb)
++static int packet_cmsg_send(struct msghdr *msg, struct packet_sock *po,
++			    bool *hsr_has_hdr)
 +{
 +	return 0;
 +}
-+
-+static inline bool hsr_skb_get_header_port(struct sk_buff *skb, bool *head=
-er,
-+					   enum hsr_port_type *port_type)
-+{
-+	return false;
-+}
-+
-+static inline bool hsr_skb_add_header_port(struct sk_buff *skb, bool heade=
-r,
-+					   enum hsr_port_type port)
-+{
-+	return true;
-+}
- #endif /* CONFIG_HSR */
-=20
- #endif /*_LINUX_IF_HSR_H_*/
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index daa4e4944ce3f..75ddf7f41b8ee 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -5004,6 +5004,9 @@ enum skb_ext_id {
- #endif
- #if IS_ENABLED(CONFIG_CAN)
- 	SKB_EXT_CAN,
 +#endif
-+#if IS_ENABLED(CONFIG_HSR)
-+	SKB_EXT_HSR,
- #endif
- 	SKB_EXT_NUM, /* must be last */
- };
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 0e217041958a8..d1de7c9d02639 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -60,6 +60,7 @@
- #include <linux/errqueue.h>
- #include <linux/prefetch.h>
- #include <linux/bitfield.h>
-+#include <linux/if_hsr.h>
- #include <linux/if_vlan.h>
- #include <linux/mpls.h>
- #include <linux/kcov.h>
-@@ -5143,6 +5144,9 @@ static const u8 skb_ext_type_len[] =3D {
- #if IS_ENABLED(CONFIG_CAN)
- 	[SKB_EXT_CAN] =3D SKB_EXT_CHUNKSIZEOF(struct can_skb_ext),
- #endif
-+#if IS_ENABLED(CONFIG_HSR)
-+	[SKB_EXT_HSR] =3D SKB_EXT_CHUNKSIZEOF(struct hsr_ptp_ext),
-+#endif
- };
++
+ static struct net_device *packet_cached_dev_get(struct packet_sock *po)
+ {
+ 	struct net_device *dev;
+@@ -2131,6 +2220,9 @@ static int packet_rcv(struct sk_buff *skb, struct net=
+_device *dev,
+ 	if (!net_eq(dev_net(dev), sock_net(sk)))
+ 		goto drop;
 =20
- static __always_inline unsigned int skb_ext_total_length(void)
-diff --git a/net/hsr/Kconfig b/net/hsr/Kconfig
-index fcacdf4f0ffc3..973f8b03aeb11 100644
---- a/net/hsr/Kconfig
-+++ b/net/hsr/Kconfig
-@@ -5,6 +5,7 @@
++	if (packet_filter_hsr_port(po, skb))
++		goto drop;
++
+ 	skb->dev =3D dev;
 =20
- config HSR
- 	tristate "High-availability Seamless Redundancy (HSR & PRP)"
-+	select SKB_EXTENSIONS
- 	help
- 	  This enables IEC 62439 defined High-availability Seamless
- 	  Redundancy (HSR) and Parallel Redundancy Protocol (PRP).
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index d1bfc49b5f017..f755f3c85d89d 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -230,6 +230,13 @@ static netdev_tx_t hsr_dev_xmit(struct sk_buff *skb, s=
-truct net_device *dev)
- 	master =3D hsr_port_get_hsr(hsr, HSR_PT_MASTER);
- 	if (master) {
- 		skb->dev =3D master->dev;
-+
-+		/* Only HSR (not PRP) skb may include a header. The network
-+		 * header is only set to the ethernet header.
-+		 */
-+		if (hsr_skb_has_header(skb))
-+			skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
-+
- 		skb_reset_mac_header(skb);
- 		skb_reset_mac_len(skb);
- 		spin_lock_bh(&hsr->seqnr_lock);
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index aefc9b6936ba0..6fb83a36a44d8 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -12,11 +12,25 @@
- #include <linux/skbuff.h>
- #include <linux/etherdevice.h>
- #include <linux/if_vlan.h>
-+#include <net/sock.h>
- #include "hsr_main.h"
- #include "hsr_framereg.h"
+ 	if (dev_has_header(dev)) {
+@@ -2260,6 +2352,9 @@ static int tpacket_rcv(struct sk_buff *skb, struct ne=
+t_device *dev,
+ 	if (!net_eq(dev_net(dev), sock_net(sk)))
+ 		goto drop;
 =20
- struct hsr_node;
++	if (packet_filter_hsr_port(po, skb))
++		goto drop;
++
+ 	if (dev_has_header(dev)) {
+ 		if (sk->sk_type !=3D SOCK_DGRAM)
+ 			skb_push(skb, skb->data - skb_mac_header(skb));
+@@ -2731,6 +2826,7 @@ static int tpacket_snd(struct packet_sock *po, struct=
+ msghdr *msg)
+ 	int len_sum =3D 0;
+ 	int status =3D TP_STATUS_AVAILABLE;
+ 	int hlen, tlen, copylen =3D 0;
++	bool hsr_has_hdr =3D false;
+ 	long timeo;
 =20
-+static void hsr_parse_req_master(struct hsr_frame_info *frame,
-+				 unsigned int *port,
-+				 bool *header)
-+{
-+	*port =3D HSR_PT_NONE;
-+	*header =3D false;
+ 	mutex_lock(&po->pg_vec_lock);
+@@ -2775,6 +2871,10 @@ static int tpacket_snd(struct packet_sock *po, struc=
+t msghdr *msg)
+ 		err =3D sock_cmsg_send(&po->sk, msg, &sockc);
+ 		if (unlikely(err))
+ 			goto out_put;
 +
-+	if (!frame->skb_std)
-+		return;
-+
-+	hsr_skb_get_header_port(frame->skb_std, header, port);
-+}
-+
- /* The uses I can see for these HSR supervision frames are:
-  * 1) Use the frames that are sent after node initialization ("HSR_TLV.Typ=
-e =3D
-  *    22") to reset any sequence_nr counters belonging to that node. Usefu=
-l if
-@@ -343,7 +357,10 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_fra=
-me_info *frame,
- 		hsr_set_path_id(frame, hsr_ethhdr, port);
- 		return skb_clone(frame->skb_hsr, GFP_ATOMIC);
- 	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
--		return skb_clone(frame->skb_std, GFP_ATOMIC);
-+		skb =3D skb_clone(frame->skb_std, GFP_ATOMIC);
-+		if (hsr_skb_has_port(skb))
-+			skb_set_owner_w(skb, frame->skb_std->sk);
-+		return skb;
++		err =3D packet_cmsg_send(msg, po, &hsr_has_hdr);
++		if (unlikely(err))
++			goto out_put;
  	}
 =20
- 	/* Create the new skb with enough headroom to fit the HSR tag */
-@@ -365,6 +382,15 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_fra=
-me_info *frame,
- 	memmove(dst, src, movelen);
- 	skb_reset_mac_header(skb);
+ 	if (po->sk.sk_socket->type =3D=3D SOCK_RAW)
+@@ -2863,6 +2963,10 @@ static int tpacket_snd(struct packet_sock *po, struc=
+t msghdr *msg)
+ 				goto out_status;
+ 			}
+ 		}
++		if (!packet_add_ptp_settings(skb, hsr_has_hdr, po->hsr_bound_port)) {
++			err =3D -ENOMEM;
++			goto out_status;
++		}
 =20
-+	if (hsr_skb_has_port(skb)) {
-+		/* Packets are bound to a port and the sender may expect time
-+		 * information.
-+		 */
-+		skb_shinfo(skb)->tx_flags =3D skb_shinfo(frame->skb_std)->tx_flags;
-+		skb_shinfo(skb)->tskey =3D skb_shinfo(frame->skb_std)->tskey;
-+		skb_set_owner_w(skb, frame->skb_std->sk);
-+	}
+ 		if (vnet_hdr_sz) {
+ 			if (virtio_net_hdr_to_skb(skb, vnet_hdr, vio_le())) {
+@@ -2950,6 +3054,7 @@ static int packet_snd(struct socket *sock, struct msg=
+hdr *msg, size_t len)
+ 	int offset =3D 0;
+ 	struct packet_sock *po =3D pkt_sk(sk);
+ 	int vnet_hdr_sz =3D READ_ONCE(po->vnet_hdr_sz);
++	bool hsr_has_hdr =3D false;
+ 	int hlen, tlen, linear;
+ 	int extra_len =3D 0;
+=20
+@@ -2988,6 +3093,10 @@ static int packet_snd(struct socket *sock, struct ms=
+ghdr *msg, size_t len)
+ 		err =3D sock_cmsg_send(sk, msg, &sockc);
+ 		if (unlikely(err))
+ 			goto out_unlock;
 +
- 	/* skb_put_padto free skb on error and hsr_fill_tag returns NULL in
- 	 * that case
++		err =3D packet_cmsg_send(msg, po, &hsr_has_hdr);
++		if (unlikely(err))
++			goto out_unlock;
+ 	}
+=20
+ 	if (sock->type =3D=3D SOCK_RAW)
+@@ -3047,6 +3156,10 @@ static int packet_snd(struct socket *sock, struct ms=
+ghdr *msg, size_t len)
+ 	}
+=20
+ 	skb_setup_tx_timestamp(skb, &sockc);
++	if (!packet_add_ptp_settings(skb, hsr_has_hdr, po->hsr_bound_port)) {
++		err =3D -ENOMEM;
++		goto out_free;
++	}
+=20
+ 	if (!vnet_hdr.gso_type && (len > dev->mtu + reserve + extra_len) &&
+ 	    !packet_extra_vlan_len_allowed(dev, skb)) {
+@@ -3166,6 +3279,11 @@ static int packet_release(struct socket *sock)
+ 		fanout_release_data(f);
+ 		kvfree(f);
+ 	}
++
++#if IS_ENABLED(CONFIG_HSR)
++	if (po->hsr_bound_port)
++		static_branch_dec(&hsr_ptp_support_enabled);
++#endif
+ 	/*
+ 	 *	Now the socket is dead. No more input will appear.
  	 */
-@@ -387,12 +413,23 @@ struct sk_buff *prp_create_tagged_frame(struct hsr_fr=
-ame_info *frame,
- 		}
- 		return skb_clone(frame->skb_prp, GFP_ATOMIC);
- 	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
--		return skb_clone(frame->skb_std, GFP_ATOMIC);
-+		skb =3D skb_clone(frame->skb_std, GFP_ATOMIC);
-+		if (hsr_skb_has_port(skb))
-+			skb_set_owner_w(skb, frame->skb_std->sk);
-+		return skb;
+@@ -4044,6 +4162,40 @@ packet_setsockopt(struct socket *sock, int level, in=
+t optname, sockptr_t optval,
+ 		packet_sock_flag_set(po, PACKET_SOCK_QDISC_BYPASS, val);
+ 		return 0;
  	}
-=20
- 	skb =3D skb_copy_expand(frame->skb_std, skb_headroom(frame->skb_std),
- 			      skb_tailroom(frame->skb_std) + HSR_HLEN,
- 			      GFP_ATOMIC);
-+	if (hsr_skb_has_port(skb)) {
-+		/* Packets are bound to a port and the sender may expect time
-+		 * information.
-+		 */
-+		skb_shinfo(skb)->tx_flags =3D skb_shinfo(frame->skb_std)->tx_flags;
-+		skb_shinfo(skb)->tskey =3D skb_shinfo(frame->skb_std)->tskey;
-+		skb_set_owner_w(skb, frame->skb_std->sk);
-+	}
- 	return prp_fill_rct(skb, frame, port);
- }
-=20
-@@ -420,7 +457,7 @@ static void hsr_deliver_master(struct sk_buff *skb, str=
-uct net_device *dev,
- static int hsr_xmit(struct sk_buff *skb, struct hsr_port *port,
- 		    struct hsr_frame_info *frame)
- {
--	if (frame->port_rcv->type =3D=3D HSR_PT_MASTER) {
-+	if (frame->port_rcv->type =3D=3D HSR_PT_MASTER && !frame->has_foreign_hea=
-der) {
- 		hsr_addr_subst_dest(frame->node_src, skb, port);
-=20
- 		/* Address substitution (IEC62439-3 pp 26, 50): replace mac
-@@ -518,12 +555,18 @@ bool hsr_drop_frame(struct hsr_frame_info *frame, str=
-uct hsr_port *port)
-  */
- static void hsr_forward_do(struct hsr_frame_info *frame)
- {
-+	unsigned int req_tx_port;
-+	bool req_tx_keep_header;
- 	struct hsr_port *port;
--	struct sk_buff *skb;
- 	bool sent =3D false;
-=20
-+	hsr_parse_req_master(frame, &req_tx_port, &req_tx_keep_header);
++	case PACKET_HSR_BIND_PORT:
++	{
++#if IS_ENABLED(CONFIG_HSR)
++		int old_val;
++		int val;
 +
- 	hsr_for_each_port(frame->port_rcv->hsr, port) {
- 		struct hsr_priv *hsr =3D port->hsr;
-+		unsigned int skb_rx_port =3D 0;
-+		struct sk_buff *skb =3D NULL;
++		if (optlen !=3D sizeof(val))
++			return -EINVAL;
++		if (copy_from_sockptr(&val, optval, sizeof(val)))
++			return -EFAULT;
 +
- 		/* Don't send frame back the way it came */
- 		if (port =3D=3D frame->port_rcv)
- 			continue;
-@@ -542,6 +585,38 @@ static void hsr_forward_do(struct hsr_frame_info *fram=
-e)
- 		if ((port->dev->features & NETIF_F_HW_HSR_DUP) && sent)
- 			continue;
-=20
-+		/* RX PTP packets have the received port recorded */
-+		if (frame->skb_hsr)
-+			skb =3D frame->skb_hsr;
-+		else if (frame->skb_prp)
-+			skb =3D frame->skb_prp;
-+
-+		skb_rx_port =3D hsr_skb_has_port(skb);
-+		if (skb_rx_port) {
-+			/* No PTP forwarding */
-+			if (port->type !=3D HSR_PT_MASTER)
-+				continue;
-+
-+			skb =3D skb_clone(skb, GFP_ATOMIC);
-+			/* Inject the PTP packet into the master interface
-+			 * with HSR headers.
-+			 */
-+			goto inject_into_stack;
++		old_val =3D !!po->hsr_bound_port;
++		switch (val) {
++		case PACKET_HSR_BIND_PORT_AB:
++			po->hsr_bound_port =3D 0;
++			break;
++		case PACKET_HSR_BIND_PORT_A:
++			po->hsr_bound_port =3D HSR_PT_SLAVE_A;
++			break;
++		case PACKET_HSR_BIND_PORT_B:
++			po->hsr_bound_port =3D HSR_PT_SLAVE_B;
++			break;
++		default:
++			return -EINVAL;
 +		}
-+
-+		/* PTP TX packets have an outgoing port specified */
-+		if (req_tx_port !=3D HSR_PT_NONE && req_tx_port !=3D port->type)
-+			continue;
-+		/* PTP TX packets may already have a HSR header which needs to
-+		 * be preserved
-+		 */
-+		if (req_tx_keep_header) {
-+			skb =3D skb_clone(frame->skb_std, GFP_ATOMIC);
-+			if (skb)
-+				skb_set_owner_w(skb, frame->skb_std->sk);
-+			goto inject_into_stack;
++		if (old_val !=3D !!po->hsr_bound_port) {
++			if (po->hsr_bound_port)
++				static_branch_inc(&hsr_ptp_support_enabled);
++			else
++				static_branch_dec(&hsr_ptp_support_enabled);
 +		}
-+
- 		/* Don't send frame over port where it has been sent before.
- 		 * Also for SAN, this shouldn't be done.
- 		 */
-@@ -569,6 +644,7 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
- 		else
- 			skb =3D hsr->proto_ops->get_untagged_frame(frame, port);
-=20
-+inject_into_stack:
- 		if (!skb) {
- 			frame->port_rcv->dev->stats.rx_dropped++;
- 			continue;
-@@ -633,6 +709,13 @@ int hsr_fill_frame_info(__be16 proto, struct sk_buff *=
-skb,
- 	struct hsr_port *port =3D frame->port_rcv;
- 	struct hsr_priv *hsr =3D port->hsr;
-=20
-+	if (frame->has_foreign_header) {
-+		frame->skb_std =3D skb;
-+
-+		WARN_ON_ONCE(port->type !=3D HSR_PT_MASTER);
-+		WARN_ON_ONCE(skb->mac_len < sizeof(struct hsr_ethhdr));
 +		return 0;
++#endif
 +	}
- 	/* HSRv0 supervisory frames double as a tag so treat them as tagged. */
- 	if ((!hsr->prot_version && proto =3D=3D htons(ETH_P_PRP)) ||
- 	    proto =3D=3D htons(ETH_P_HSR)) {
-@@ -658,7 +741,16 @@ int prp_fill_frame_info(__be16 proto, struct sk_buff *=
-skb,
- 			struct hsr_frame_info *frame)
- {
- 	/* Supervision frame */
--	struct prp_rct *rct =3D skb_get_PRP_rct(skb);
-+	struct prp_rct *rct;
-+
-+	if (frame->has_foreign_header) {
-+		struct hsr_port *port =3D frame->port_rcv;
-+
-+		frame->skb_std =3D skb;
-+		WARN_ON_ONCE(port->type !=3D HSR_PT_MASTER);
-+		return 0;
-+	}
-+	rct =3D skb_get_PRP_rct(skb);
-=20
- 	if (rct &&
- 	    prp_check_lsdu_size(skb, rct, frame->is_supervision)) {
-@@ -697,10 +789,15 @@ static int fill_frame_info(struct hsr_frame_info *fra=
-me,
- 	if (port->type =3D=3D HSR_PT_INTERLINK)
- 		n_db =3D &hsr->proxy_node_db;
-=20
--	frame->node_src =3D hsr_get_node(port, n_db, skb,
--				       frame->is_supervision, port->type);
--	if (!frame->node_src)
--		return -1; /* Unknown node and !is_supervision, or no mem */
-+	if (hsr_skb_has_header(skb))
-+		frame->has_foreign_header =3D true;
-+
-+	if (!frame->has_foreign_header) {
-+		frame->node_src =3D hsr_get_node(port, n_db, skb,
-+					       frame->is_supervision, port->type);
-+		if (!frame->node_src)
-+			return -1; /* Unknown node and !is_supervision, or no mem */
-+	}
-=20
- 	ethhdr =3D (struct ethhdr *)skb_mac_header(skb);
- 	frame->is_vlan =3D false;
-@@ -739,7 +836,8 @@ void hsr_forward_skb(struct sk_buff *skb, struct hsr_po=
-rt *port)
- 	if (fill_frame_info(&frame, skb, port) < 0)
- 		goto out_drop;
-=20
--	hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
-+	if (!frame.has_foreign_header)
-+		hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
- 	hsr_forward_do(&frame);
- 	rcu_read_unlock();
- 	/* Gets called for ingress frames as well as egress from master port.
-diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
-index c65ecb9257348..fc0341b158f67 100644
---- a/net/hsr/hsr_framereg.h
-+++ b/net/hsr/hsr_framereg.h
-@@ -27,6 +27,7 @@ struct hsr_frame_info {
- 	bool is_local_dest;
- 	bool is_local_exclusive;
- 	bool is_from_san;
-+	bool has_foreign_header;
- };
-=20
- void hsr_del_self_node(struct hsr_priv *hsr);
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index 44f83c8c56a79..cd2092527c780 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -44,8 +44,7 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buf=
-f **pskb)
-=20
- 	if (hsr_addr_is_self(port->hsr, eth_hdr(skb)->h_source)) {
- 		/* Directly kill frames sent by ourselves */
--		kfree_skb(skb);
--		goto finish_consume;
-+		goto finish_free_consume;
+ 	default:
+ 		return -ENOPROTOOPT;
  	}
-=20
- 	/* For HSR, only tagged frames are expected (unless the device offloads
-@@ -65,8 +64,7 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buf=
-f **pskb)
- 	if ((!hsr->prot_version && protocol =3D=3D htons(ETH_P_PRP)) ||
- 	    protocol =3D=3D htons(ETH_P_HSR)) {
- 		if (!pskb_may_pull(skb, ETH_HLEN + HSR_HLEN)) {
--			kfree_skb(skb);
--			goto finish_consume;
-+			goto finish_free_consume;
- 		}
-=20
- 		skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
-@@ -81,10 +79,37 @@ static rx_handler_result_t hsr_handle_frame(struct sk_b=
-uff **pskb)
- 		hsr_forward_skb(skb, port);
- 		spin_unlock_bh(&hsr->seqnr_lock);
- 	} else {
-+		struct hsr_ethhdr *hsr_ethhdr;
-+
-+		/* PTP packets are not supposed to be forwarded via HSR/ PRP
-+		 * as-is. The latency introduced by forwarding renders
-+		 * the time information useless.
-+		 * Instead attach the port information on which it was
-+		 * received, forward both copies to userland and let it deal
-+		 * with it.
-+		 */
-+		if ((!hsr->prot_version && protocol =3D=3D htons(ETH_P_PRP)) ||
-+		    protocol =3D=3D htons(ETH_P_HSR)) {
-+			/* HSR */
-+			hsr_ethhdr =3D (struct hsr_ethhdr *)skb_mac_header(skb);
-+			if (hsr_ethhdr->hsr_tag.encap_proto =3D=3D htons(ETH_P_1588)) {
-+				if (!hsr_skb_add_header_port(skb, false, port->type))
-+					goto finish_free_consume;
-+			}
-+		} else {
-+			if (protocol =3D=3D htons(ETH_P_1588)) {
-+				if (!hsr_skb_add_header_port(skb, false, port->type))
-+					goto finish_free_consume;
-+			}
+@@ -4164,6 +4316,21 @@ static int packet_getsockopt(struct socket *sock, in=
+t level, int optname,
+ 	case PACKET_QDISC_BYPASS:
+ 		val =3D packet_sock_flag(po, PACKET_SOCK_QDISC_BYPASS);
+ 		break;
++	case PACKET_HSR_BIND_PORT:
++		switch (po->hsr_bound_port) {
++		case 0:
++			val =3D PACKET_HSR_BIND_PORT_AB;
++			break;
++		case HSR_PT_SLAVE_A:
++			val =3D PACKET_HSR_BIND_PORT_A;
++			break;
++		case HSR_PT_SLAVE_B:
++			val =3D PACKET_HSR_BIND_PORT_B;
++			break;
++		default:
++			return -EINVAL;
 +		}
-+
- 		hsr_forward_skb(skb, port);
++		break;
+ 	default:
+ 		return -ENOPROTOOPT;
  	}
-=20
--finish_consume:
-+	return RX_HANDLER_CONSUMED;
-+
-+finish_free_consume:
-+	kfree_skb(skb);
- 	return RX_HANDLER_CONSUMED;
-=20
- finish_pass:
+diff --git a/net/packet/internal.h b/net/packet/internal.h
+index b76e645cd78d1..24d63275d432f 100644
+--- a/net/packet/internal.h
++++ b/net/packet/internal.h
+@@ -114,6 +114,7 @@ struct packet_sock {
+ 	unsigned long		flags;
+ 	int			ifindex;	/* bound device		*/
+ 	u8			vnet_hdr_sz;
++	u8			hsr_bound_port;
+ 	__be16			num;
+ 	struct packet_rollover	*rollover;
+ 	struct packet_mclist	*mclist;
 
 --=20
 2.53.0
