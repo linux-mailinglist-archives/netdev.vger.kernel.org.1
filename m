@@ -1,122 +1,110 @@
-Return-Path: <netdev+bounces-265349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265350-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCc7MCIvrmlrAQIAu9opvQ
-	(envelope-from <netdev+bounces-265349-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:23:30 +0100
+	id 0PW0DFAvrmlrAQIAu9opvQ
+	(envelope-from <netdev+bounces-265350-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:24:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 452A3233359
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:23:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D0E323337E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 03:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C83BF304652F
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 02:21:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE50B304CA44
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 02:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEBE22F177;
-	Mon,  9 Mar 2026 02:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7FB23D7F5;
+	Mon,  9 Mar 2026 02:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cMQ6tUDe";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="To29WtR6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VaGOCi7+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xZgwHgfP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VojIJZfP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aAnGoOV7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VojIJZfP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aAnGoOV7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF8B23183B
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 02:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF402367BA
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 02:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773022878; cv=none; b=Sy2D5QrFQchugnh9yFtPuHADMeX5TuyIM25hoeBiyrIkv1o5AYVQZd+VogJQJIu/vc6aeyUn6lXkoxMbAOhzwHPoYOuB0o54xeaOXxxoam3A6j9+J5RlBKsC5E4gOSs2OyXdnhVe16cCKTLNoNQsOdCL6V81K2jqi+chhDX1bt4=
+	t=1773022884; cv=none; b=TkNmzwKm8h/BMNJR3RQi9fSCJkwvJsa5mqWoXDw+A+HgAgWaADSm9bv0lzOdT7fQ54Eens6P9MVIZt60yMOgexMIR/QuLwxdGkDZB3E2olLEDsTbKQgLdTVICFaVggsnQjrnG/yfRSyKgu7/gaELh+jkAWBi8uSLE8lOFnmLtEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773022878; c=relaxed/simple;
-	bh=fjIkHMBX/IponQHGFR9TlaW+i0c+pmaMFOQSCSrNePU=;
+	s=arc-20240116; t=1773022884; c=relaxed/simple;
+	bh=OIRfkaoNzggXYpBCUkWVXR9+xE7941HUKvLtLHsuCz8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Skni7ww4zBNFedjHDds/mcuOkP9PAuivtZWDzqIhd2jXBXmmLFIPtOl0Dm8foLtMrgdm727SLulROr6yTt2jhPwyi7N5u/aQCEd6gKg8BQCKYRrIeRM1QlaWTc8HripmzdPTwzFdp95jsJxi3mUK8ziTtbBPhnRw5Gaeq7GH1S0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cMQ6tUDe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=To29WtR6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VaGOCi7+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xZgwHgfP; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=OMqj7Er2CPjKm90hSYTusQXfSCnFMIRpXTT1CfELOLJDUfv/HHjxGbD1ME35EMl0LzbzDf/C7o7E0w1hN0OFRcic64s45oii8IDHYtG6Qmn09GSfCECArr7O35nDp/CqoRguaz5zOxk237XkNEomV1zd19Cpbg90EPn9cGAKhBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VojIJZfP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aAnGoOV7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VojIJZfP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aAnGoOV7; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F00C65BD22;
-	Mon,  9 Mar 2026 02:21:14 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 446265BDFC;
+	Mon,  9 Mar 2026 02:21:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773022875; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1773022880; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LeCovzApJDAHD+9aWO9A6V+G2ZCSxX2KgRDA/JYU19s=;
-	b=cMQ6tUDe00lmSjqBPRQa3rmLKC/HLG/mJNE40B6YkMxsBzHysxJtvEkxfgMb2e/nOoWriX
-	e5YBUUZJ6yvdBPC7qjnXOFm2zwemGbB6F0amsH074+bvIMXsrusNhQGEKmGiKWcFishc+m
-	9rw1Ld7rCcsXUIvj/Rk7V/8Jy4uq7uU=
+	bh=0VvMHwtTYAAkAZwzh/poi9RgA65ojFgMGR6saMO0SmY=;
+	b=VojIJZfPjV/QdkMTm9pxrknRk6fo8e76MrXi/4K1ISj+/3Xy1052VKBhtocXMtelOcFOJ0
+	vgyjb4q2bA0qKKzC8m9hPzsAbLvR1uCjLSSlr6INO/p7UBQRALRNe+zCjLooEUKQRRHw0e
+	8Q2effn/WtAQ9enI5VopEjsD78IP3C0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773022875;
+	s=susede2_ed25519; t=1773022880;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LeCovzApJDAHD+9aWO9A6V+G2ZCSxX2KgRDA/JYU19s=;
-	b=To29WtR68MBfb7E9C+cFQ4n6kPf/klqu2cFgsaxxrNX8ewcZXLSa2NU7sRe7CAQsr7Kz8H
-	umwnZuNN1MjbttAQ==
+	bh=0VvMHwtTYAAkAZwzh/poi9RgA65ojFgMGR6saMO0SmY=;
+	b=aAnGoOV79+pK/NprzyU2AXyWQPW2H7vMM2rxD+7vq3qniGEt/86zt/yFdx14+OCdPK2p8l
+	Gz47p1sgIs0dd+Dw==
 Authentication-Results: smtp-out2.suse.de;
-	none
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=VojIJZfP;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=aAnGoOV7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773022874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1773022880; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LeCovzApJDAHD+9aWO9A6V+G2ZCSxX2KgRDA/JYU19s=;
-	b=VaGOCi7+b1JwiGUkqRU04k8ZJph28CFlersb76Q7XsWMfKtEPkhkhK34J0fJQIEqDAwHDQ
-	36HfmG+Zt7YVwqmPBGBnmOeqO+7+28qoCp+cIBXhvL7Ef9b4Avkvmq0rgNHU7GxNtr+6LJ
-	bFnTo39qn19rjP+2MtVjtnh12r1oOkE=
+	bh=0VvMHwtTYAAkAZwzh/poi9RgA65ojFgMGR6saMO0SmY=;
+	b=VojIJZfPjV/QdkMTm9pxrknRk6fo8e76MrXi/4K1ISj+/3Xy1052VKBhtocXMtelOcFOJ0
+	vgyjb4q2bA0qKKzC8m9hPzsAbLvR1uCjLSSlr6INO/p7UBQRALRNe+zCjLooEUKQRRHw0e
+	8Q2effn/WtAQ9enI5VopEjsD78IP3C0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773022874;
+	s=susede2_ed25519; t=1773022880;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LeCovzApJDAHD+9aWO9A6V+G2ZCSxX2KgRDA/JYU19s=;
-	b=xZgwHgfPSmGFZfj0jg1lnhSEb8l9F9G77ADmcSvbt1bNpeuGtTAEwKZhiMy/TEm2LdB55V
-	DcBNLaz5xW7YSlDw==
+	bh=0VvMHwtTYAAkAZwzh/poi9RgA65ojFgMGR6saMO0SmY=;
+	b=aAnGoOV79+pK/NprzyU2AXyWQPW2H7vMM2rxD+7vq3qniGEt/86zt/yFdx14+OCdPK2p8l
+	Gz47p1sgIs0dd+Dw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8A03B3EC6D;
-	Mon,  9 Mar 2026 02:21:13 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 982DA3EC6D;
+	Mon,  9 Mar 2026 02:21:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0CwrHpkurmk0MgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 09 Mar 2026 02:21:13 +0000
+	id GD6mIZ8urmk0MgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 09 Mar 2026 02:21:19 +0000
 From: Fernando Fernandez Mancera <fmancera@suse.de>
 To: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Fernando Fernandez Mancera <fmancera@suse.de>,
 	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	bpf@vger.kernel.org (open list:BPF [GENERAL] (Safe Dynamic Programs and Tools))
-Subject: [PATCH 02/10 net-next] ipv6: replace IS_BUILTIN(CONFIG_IPV6) with IS_ENABLED(CONFIG_IPV6)
-Date: Mon,  9 Mar 2026 03:19:35 +0100
-Message-ID: <20260309022013.5199-3-fmancera@suse.de>
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH 03/10 net-next] ipv6: remove dynamic ICMPv6 sender registration infrastructure
+Date: Mon,  9 Mar 2026 03:19:36 +0100
+Message-ID: <20260309022013.5199-4-fmancera@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260309022013.5199-1-fmancera@suse.de>
 References: <20260309022013.5199-1-fmancera@suse.de>
@@ -128,216 +116,202 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
-X-Spam-Score: -1.30
+X-Spam-Score: -3.01
 X-Spam-Level: 
-X-Rspamd-Queue-Id: 452A3233359
+X-Rspamd-Queue-Id: 7D0E323337E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,suse.de,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265349-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265350-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[suse.de:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.980];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-As IPv6 is built-in only, it does not make sense to continue using
-IS_BUILTIN(CONFIG_IPV6). Therefore, replace it with IS_ENABLED() when
-necessary and drop it if it isn't valid anymore.
+As IPv6 is built-in only, there is no need to maintain the sender
+registration infrastructure used to allow built-in subsystems to send
+ICMPv6 messages when IPv6 was compiled as a module.
 
-Notice that there is still one instance related to ICMPv6, as it
-requires more changes it will be handle separately.
+Drop the registration mechanism and the __icmpv6_send() sender
+implementation. While icmpv6_send() users could be converted to
+icmp6_send() that doesn't seems necessary as none of them are using the
+force_saddr parameter.
 
 Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
- include/linux/indirect_call_wrapper.h |  2 +-
- include/net/ip6_fib.h                 |  2 +-
- net/core/filter.c                     | 14 +++++++-------
- net/ipv6/ip6_fib.c                    |  2 +-
- net/ipv6/ip6_offload.c                |  4 ++--
- net/ipv6/route.c                      |  6 +++---
- 6 files changed, 15 insertions(+), 15 deletions(-)
+ include/linux/icmpv6.h | 26 ++----------------------
+ net/ipv6/icmp.c        |  6 ------
+ net/ipv6/ip6_icmp.c    | 46 +++---------------------------------------
+ 3 files changed, 5 insertions(+), 73 deletions(-)
 
-diff --git a/include/linux/indirect_call_wrapper.h b/include/linux/indirect_call_wrapper.h
-index dc272b514a01..0e4340ecd857 100644
---- a/include/linux/indirect_call_wrapper.h
-+++ b/include/linux/indirect_call_wrapper.h
-@@ -57,7 +57,7 @@
-  * builtin, this macro simplify dealing with indirect calls with only ipv4/ipv6
-  * alternatives
-  */
+diff --git a/include/linux/icmpv6.h b/include/linux/icmpv6.h
+index e3b3b0fa2a8f..bb000dc571f0 100644
+--- a/include/linux/icmpv6.h
++++ b/include/linux/icmpv6.h
+@@ -21,32 +21,10 @@ typedef void ip6_icmp_send_t(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ 		const struct in6_addr *force_saddr,
+ 		const struct inet6_skb_parm *parm);
 -#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- #define INDIRECT_CALL_INET(f, f2, f1, ...) \
- 	INDIRECT_CALL_2(f, f2, f1, __VA_ARGS__)
- #elif IS_ENABLED(CONFIG_INET)
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 88b0dd4d8e09..39c98c3d8ac5 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -580,7 +580,7 @@ static inline bool fib6_metric_locked(struct fib6_info *f6i, int metric)
- void fib6_info_hw_flags_set(struct net *net, struct fib6_info *f6i,
- 			    bool offload, bool trap, bool offload_failed);
+-static inline void __icmpv6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+-				 const struct inet6_skb_parm *parm)
+-{
+-	icmp6_send(skb, type, code, info, NULL, parm);
+-}
+-static inline int inet6_register_icmp_sender(ip6_icmp_send_t *fn)
+-{
+-	BUILD_BUG_ON(fn != icmp6_send);
+-	return 0;
+-}
+-static inline int inet6_unregister_icmp_sender(ip6_icmp_send_t *fn)
+-{
+-	BUILD_BUG_ON(fn != icmp6_send);
+-	return 0;
+-}
+-#else
+-extern void __icmpv6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+-			  const struct inet6_skb_parm *parm);
+-extern int inet6_register_icmp_sender(ip6_icmp_send_t *fn);
+-extern int inet6_unregister_icmp_sender(ip6_icmp_send_t *fn);
+-#endif
  
--#if IS_BUILTIN(CONFIG_IPV6) && defined(CONFIG_BPF_SYSCALL)
-+#if IS_ENABLED(CONFIG_IPV6) && defined(CONFIG_BPF_SYSCALL)
- struct bpf_iter__ipv6_route {
- 	__bpf_md_ptr(struct bpf_iter_meta *, meta);
- 	__bpf_md_ptr(struct fib6_info *, rt);
-diff --git a/net/core/filter.c b/net/core/filter.c
-index a77d23fe2359..62cae2bcc562 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7584,7 +7584,7 @@ BPF_CALL_5(bpf_tcp_check_syncookie, struct sock *, sk, void *, iph, u32, iph_len
- 		ret = __cookie_v4_check((struct iphdr *)iph, th);
- 		break;
- 
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	case 6:
- 		if (unlikely(iph_len < sizeof(struct ipv6hdr)))
- 			return -EINVAL;
-@@ -7654,7 +7654,7 @@ BPF_CALL_5(bpf_tcp_gen_syncookie, struct sock *, sk, void *, iph, u32, iph_len,
- 		mss = tcp_v4_get_syncookie(sk, iph, th, &cookie);
- 		break;
- 
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	case 6:
- 		if (unlikely(iph_len < sizeof(struct ipv6hdr)))
- 			return -EINVAL;
-@@ -8020,7 +8020,7 @@ static const struct bpf_func_proto bpf_tcp_raw_gen_syncookie_ipv4_proto = {
- BPF_CALL_3(bpf_tcp_raw_gen_syncookie_ipv6, struct ipv6hdr *, iph,
- 	   struct tcphdr *, th, u32, th_len)
+ static inline void icmpv6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info)
  {
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	const u16 mss_clamp = IPV6_MIN_MTU - sizeof(struct tcphdr) -
- 		sizeof(struct ipv6hdr);
- 	u32 cookie;
-@@ -8072,7 +8072,7 @@ static const struct bpf_func_proto bpf_tcp_raw_check_syncookie_ipv4_proto = {
- BPF_CALL_2(bpf_tcp_raw_check_syncookie_ipv6, struct ipv6hdr *, iph,
- 	   struct tcphdr *, th)
- {
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	if (__cookie_v6_check(iph, th) > 0)
- 		return 0;
- 
-@@ -11958,7 +11958,7 @@ BPF_CALL_1(bpf_skc_to_tcp_timewait_sock, struct sock *, sk)
- 		return (unsigned long)sk;
- #endif
- 
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	if (sk && sk->sk_prot == &tcpv6_prot && sk->sk_state == TCP_TIME_WAIT)
- 		return (unsigned long)sk;
- #endif
-@@ -11981,7 +11981,7 @@ BPF_CALL_1(bpf_skc_to_tcp_request_sock, struct sock *, sk)
- 		return (unsigned long)sk;
- #endif
- 
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	if (sk && sk->sk_prot == &tcpv6_prot && sk->sk_state == TCP_NEW_SYN_RECV)
- 		return (unsigned long)sk;
- #endif
-@@ -12244,7 +12244,7 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
- 		ops = &tcp_request_sock_ops;
- 		min_mss = 536;
- 		break;
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	case htons(ETH_P_IPV6):
- 		ops = &tcp6_request_sock_ops;
- 		min_mss = IPV6_MIN_MTU - 60;
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index a6e58a435735..0fc6ef4a48b1 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -2763,7 +2763,7 @@ static void ipv6_route_native_seq_stop(struct seq_file *seq, void *v)
- 	rcu_read_unlock();
+-	__icmpv6_send(skb, type, code, info, IP6CB(skb));
++	icmp6_send(skb, type, code, info, NULL, IP6CB(skb));
  }
  
--#if IS_BUILTIN(CONFIG_IPV6) && defined(CONFIG_BPF_SYSCALL)
-+#if IS_ENABLED(CONFIG_IPV6) && defined(CONFIG_BPF_SYSCALL)
- static int ipv6_route_prog_seq_show(struct bpf_prog *prog,
- 				    struct bpf_iter_meta *meta,
- 				    void *v)
-diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
-index bd7f780e37a5..d8072ad6b8c4 100644
---- a/net/ipv6/ip6_offload.c
-+++ b/net/ipv6/ip6_offload.c
-@@ -286,7 +286,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
- 
- 	if (likely(proto == IPPROTO_TCP))
- 		pp = tcp6_gro_receive(head, skb);
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	else if (likely(proto == IPPROTO_UDP))
- 		pp = udp6_gro_receive(head, skb);
+ int ip6_err_gen_icmpv6_unreach(struct sk_buff *skb, int nhs, int type,
+@@ -58,7 +36,7 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info);
+ static inline void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
+ {
+ 	struct inet6_skb_parm parm = { 0 };
+-	__icmpv6_send(skb_in, type, code, info, &parm);
++	icmp6_send(skb_in, type, code, info, NULL, &parm);
+ }
  #endif
-@@ -346,7 +346,7 @@ INDIRECT_CALLABLE_SCOPE int ipv6_gro_complete(struct sk_buff *skb, int nhoff)
  
- 	if (likely(ops == &net_hotdata.tcpv6_offload))
- 		return tcp6_gro_complete(skb, nhoff);
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- 	if (ops == &net_hotdata.udpv6_offload)
- 		return udp6_gro_complete(skb, nhoff);
- #endif
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 08cd86f49bf9..e206777785d4 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6826,7 +6826,7 @@ void __init ip6_route_init_special_entries(void)
-   #endif
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 813d2e9edb8b..8e8d7bd84a4c 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -1288,13 +1288,8 @@ int __init icmpv6_init(void)
+ 	if (inet6_add_protocol(&icmpv6_protocol, IPPROTO_ICMPV6) < 0)
+ 		goto fail;
+ 
+-	err = inet6_register_icmp_sender(icmp6_send);
+-	if (err)
+-		goto sender_reg_err;
+ 	return 0;
+ 
+-sender_reg_err:
+-	inet6_del_protocol(&icmpv6_protocol, IPPROTO_ICMPV6);
+ fail:
+ 	pr_err("Failed to register ICMP6 protocol\n");
+ 	return err;
+@@ -1302,7 +1297,6 @@ int __init icmpv6_init(void)
+ 
+ void icmpv6_cleanup(void)
+ {
+-	inet6_unregister_icmp_sender(icmp6_send);
+ 	inet6_del_protocol(&icmpv6_protocol, IPPROTO_ICMPV6);
  }
  
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- DEFINE_BPF_ITER_FUNC(ipv6_route, struct bpf_iter_meta *meta, struct fib6_info *rt)
+diff --git a/net/ipv6/ip6_icmp.c b/net/ipv6/ip6_icmp.c
+index 233914b63bdb..e43ea9492332 100644
+--- a/net/ipv6/ip6_icmp.c
++++ b/net/ipv6/ip6_icmp.c
+@@ -7,47 +7,8 @@
  
-@@ -6921,7 +6921,7 @@ int __init ip6_route_init(void)
- 	if (ret)
- 		goto out_register_late_subsys;
+ #include <net/ipv6.h>
  
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- 	ret = bpf_iter_register();
- 	if (ret)
-@@ -6961,7 +6961,7 @@ int __init ip6_route_init(void)
+-#if IS_ENABLED(CONFIG_IPV6)
++#if IS_ENABLED(CONFIG_IPV6) && IS_ENABLED(CONFIG_NF_NAT)
  
- void ip6_route_cleanup(void)
+-#if !IS_BUILTIN(CONFIG_IPV6)
+-
+-static ip6_icmp_send_t __rcu *ip6_icmp_send;
+-
+-int inet6_register_icmp_sender(ip6_icmp_send_t *fn)
+-{
+-	return (cmpxchg((ip6_icmp_send_t **)&ip6_icmp_send, NULL, fn) == NULL) ?
+-		0 : -EBUSY;
+-}
+-EXPORT_SYMBOL(inet6_register_icmp_sender);
+-
+-int inet6_unregister_icmp_sender(ip6_icmp_send_t *fn)
+-{
+-	int ret;
+-
+-	ret = (cmpxchg((ip6_icmp_send_t **)&ip6_icmp_send, fn, NULL) == fn) ?
+-	      0 : -EINVAL;
+-
+-	synchronize_net();
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(inet6_unregister_icmp_sender);
+-
+-void __icmpv6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+-		   const struct inet6_skb_parm *parm)
+-{
+-	ip6_icmp_send_t *send;
+-
+-	rcu_read_lock();
+-	send = rcu_dereference(ip6_icmp_send);
+-	if (send)
+-		send(skb, type, code, info, NULL, parm);
+-	rcu_read_unlock();
+-}
+-EXPORT_SYMBOL(__icmpv6_send);
+-#endif
+-
+-#if IS_ENABLED(CONFIG_NF_NAT)
+ #include <net/netfilter/nf_conntrack.h>
+ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
  {
--#if IS_BUILTIN(CONFIG_IPV6)
-+#if IS_ENABLED(CONFIG_IPV6)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- 	bpf_iter_unregister();
+@@ -60,7 +21,7 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
+ 
+ 	ct = nf_ct_get(skb_in, &ctinfo);
+ 	if (!ct || !(READ_ONCE(ct->status) & IPS_NAT_MASK)) {
+-		__icmpv6_send(skb_in, type, code, info, &parm);
++		icmp6_send(skb_in, type, code, info, NULL, &parm);
+ 		return;
+ 	}
+ 
+@@ -76,11 +37,10 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
+ 	orig_ip = ipv6_hdr(skb_in)->saddr;
+ 	dir = CTINFO2DIR(ctinfo);
+ 	ipv6_hdr(skb_in)->saddr = ct->tuplehash[dir].tuple.src.u3.in6;
+-	__icmpv6_send(skb_in, type, code, info, &parm);
++	icmp6_send(skb_in, type, code, info, NULL, &parm);
+ 	ipv6_hdr(skb_in)->saddr = orig_ip;
+ out:
+ 	consume_skb(cloned_skb);
+ }
+ EXPORT_SYMBOL(icmpv6_ndo_send);
  #endif
+-#endif
 -- 
 2.53.0
 
