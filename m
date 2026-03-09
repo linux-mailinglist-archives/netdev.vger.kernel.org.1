@@ -1,245 +1,240 @@
-Return-Path: <netdev+bounces-265566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ING8H3DWrmlhJAIAu9opvQ
-	(envelope-from <netdev+bounces-265566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:17:20 +0100
+	id SCGtFmnYrmmKJQIAu9opvQ
+	(envelope-from <netdev+bounces-265567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:25:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4CC823A5BB
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:17:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD6223A7B7
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A28B30214D8
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 14:16:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4538B31E1F01
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 14:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686403B8945;
-	Mon,  9 Mar 2026 14:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B233CF66E;
+	Mon,  9 Mar 2026 14:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X5Pq2wBX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YbyhW1le"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E16617A305
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 14:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773065818; cv=none; b=NNokkkIfc4nhqGuLmkI2IUCKDQWC8F/DPQ6E8lNwFNft8hKEtppaTAFHCiMf2eSxAtyQQx5Xv19MrsXJb872C3m7M67AyKJTCQ9XPWhtatKBBgxN1WbRJ+WNzOPITfdIRe1ah8s1z/FIVwRHbklLuJpMOoBTUo3f/yaan7/6BZM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773065818; c=relaxed/simple;
-	bh=8liySUEDGYrpUI1rMgWcIxLKUNWyHE5MJ7BpW1iSeNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1cm1OH0x6rQJkPCZHO3z4pg/nvLJXMDNjZUbFSbGqMsTW5lZC6ZqSBHAH8SM2QqulkhWkfrqYCOAnkmK4E/V/I9HpBwXp/fURrJueo5Q5/oD84rLPnMLGGYRanpVnWlHJyRzeaJ3oCnYCZNi8UCjAIqHDmjDLvaaSrXIr0p8c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X5Pq2wBX; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 9F70C4E425D5;
-	Mon,  9 Mar 2026 14:16:54 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6CE825FFB8;
-	Mon,  9 Mar 2026 14:16:54 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B71C910369A24;
-	Mon,  9 Mar 2026 15:16:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773065813; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=B6Sfd+3RAw+T1+wBoUFyStbgtRDwov9ZbOCNeaAw/iE=;
-	b=X5Pq2wBXmLmNdseOmRz8sJ1oQbGCKF/UO0qIGck3B8QYoU4lPzZnRkCriDP+scGSrLw0p8
-	1hh3Q4mDb3f5VbnqPjfcqncqGVvwY36KjcSr/N30fE7lQDnXVTK+YF8qci7NGGN8OBEAL8
-	IgO+lbuiq5tfdzHj3RZjKzNHNYGtugJWUyY3nEOk1TpeVzwgdbZwP4sEIBD9zqTXOXuZTP
-	prlcO0ODgdF0rLSeU4eeWUzlaC0cmUOsoFQzutXbtad10TnqyGPAsxV0tsg3kNMCPbBf1W
-	ZIHKEKCP90/uerxYc/VjRKkLl9xAcVAUz06AEQ0Z1LuMkhmy9sXl7kDqIaGqDQ==
-Message-ID: <456697d6-c0d8-4edf-abd2-85062f4b25ab@bootlin.com>
-Date: Mon, 9 Mar 2026 15:16:45 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A724D3B4E96
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 14:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773065918; cv=pass; b=LJBIzuY9HYifhFc4UrbCcRajEhlso53rKs0AUMMqWsPbkU+6gFBCcZ/Uvlw1+71TMW2RED2L2ofcpy0T9HqvLC5bf/ZhTZZbk0LyRAwHed1MytdNiCAX4GuVbmR0OEtLKhcj6UnU6QmQ9LHYWc7Za6zAnm0zorKVugmtvTz+rrY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773065918; c=relaxed/simple;
+	bh=pXApf3ivqeAKsxMfGi4H6L6RX5gAiJ4RCgXo4mAGGG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BmwNYeo5ROpH0Yw0k4bW93lg3bxmCXnPi/o3XifpOgO41WbBiAVSdywx5bQ/FXLHqVLtHYsaW17jKRIo/TZd0hF3zkzDzVd/jq3wlXj6i7Whdl8ESubjM8OrbjK0+s5rT8lrj453EGwGuHqt/r/sr1BU+hcipyc1zdTXbYTgzY8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YbyhW1le; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50919fc3a14so12791301cf.2
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 07:18:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773065917; cv=none;
+        d=google.com; s=arc-20240605;
+        b=itoIYrhGhC0SOZGORnQpSztedGxkEPdEcGyvnRf37yxNdqNInDCjbdPoK3A/QKboEw
+         rmKVY8qHHvUtJYmbEB9w7WXGtXgvHGPe91rLVX3074wNwd5gP06ggeI5rdtrrJMJ/kp/
+         crBq2NpOqPSqMVwV0E8uR4/SMm9eAloiAnVZfGaXwZMHqb+JqCPVGP9aBlhdiorpfUPF
+         PgWtp6F3/VAmiTapzFXIkGteH6ZnrQkNPrp+87Hh3gKkVJMSA5J0Lw3rkEF/iTdH4dJF
+         MSZKDl/whFDaIIsukiHaVuCmhV5wnQT44T60tEXLEkvd0zEKJwr66+zZaYAs7NnJNbsG
+         3KYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iPk/1KZXvsYmN7WqqIwr0XmaqxpBnF1UEIKXnct92mA=;
+        fh=9NZLpaR1HtBbiQpAKClLJRbgVS7efNaOMVm0TB+feNo=;
+        b=ELzfs3xJAv7ngwmfkcS95sJTks2SaJBG5P6goph/mdAjUYNTEBUcyphUg3NBaQ2008
+         FuRt1fdXPjUldJNu460ZSrN3PjiOUH6FAzGRChulF+3L62mV+b+5aknQl+iO6H33DBz+
+         E0T7Set1eUVbQupdCt34lagu/yC4EAqhqjvChrQhMkRgIgrRGAk37eZyl+Jyc/EvaVtN
+         AZmfgw3C+cN6oZXx5+su/crfnFGvEBbCg7uO8lEqtt+TpvpwApr6Ropd7YbONmDb0aY1
+         ogMedtCapqnhlagMnhVaIVcols6W/lthgapYIR0DGRfZazbO7U6e2USF2sszOHvPvrVj
+         IeoQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773065917; x=1773670717; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iPk/1KZXvsYmN7WqqIwr0XmaqxpBnF1UEIKXnct92mA=;
+        b=YbyhW1leQbAbnvPA/0WyH9F/hBD9Q9cZyyCwxmL8N3fw0DM0kO93uyeDU9HqS0Ugvl
+         ZYDqGQa1IGep7vuzCgmi/FOhhhyulqOscwSuHv+3Y+9hJZRAB0JyKtiuJ2YKwRosGKh2
+         s0RtmsTuO439vN5qjBkMp05fC9FfNvHezvP4OMW2uYNuwrtK5ieHYg1lnfAeJJ9ic/q1
+         QBtd/I1gAYU/f/DPzNr22oU40NPIwrKfAZg6P3lalCjcbcbt+FORKr3ii/wOIbxcRl0b
+         6Z1t0RjFXeJd6kvMJG0r+9JRZDOeBV9HnA3/RtsosYD/Oq05ryHjvSrXbJb3FnOKVenU
+         NFNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773065917; x=1773670717;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iPk/1KZXvsYmN7WqqIwr0XmaqxpBnF1UEIKXnct92mA=;
+        b=iZv/llymBTQMpHcXjBonzm0LEvJnNA7MvzDgt8HikSdDt7pPln6lemzJ/50iHPL37V
+         gq4e3RNjdiX3XOMqNQahjI1stEbZa4oWd13ayI8IYxzPoYeeqEtU/MqaH8DhEP8Z3ZjA
+         SM9eJIGNIpE5teVA1QqYQX6qig0+YdpRsa9adtzj3JLUirJx5vy8oFpM4vGJwHv9N1RI
+         BVvH7g2UFtMSmaKWpuPbeeF+oE6VOhWMGuMP7gt9T81+OjbdoGzVxaeZo6MA2yLOjPRm
+         nzIZc5FiHUZfg9J73xHq6zvAJAqTuiVc6vI6S7b98zp3yXnhCAV+HsoV6aP505vSKDyh
+         E2Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPQhRCP0HcZqEX6Reksu5f9MW78g+al77nvbyfJwPt2bQki9RBG8BdyWJM15cgaP0oRNnRhKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg2RrT4HgzGvVXG3oVwzQGnqd/X9AFfNyPcU+75SeS/3vFSmsm
+	a5sBsWd59pUCmXmwYmXQV97rUJ4kUqJpDsqnXeVSHn77mv0MqQ8FkqCHbxft2M/dD/+yXX4AkXC
+	AjHzs8AExTIIVmgRSvlPCUctKO1Z0v92zvy9664Jt
+X-Gm-Gg: ATEYQzz/iJO0roqVZjfGs9lHuU4QCtSUDIhOEJumkcF6joWG4eIRAYWKlwfPlO18wfw
+	TzOM+m1dQQFp6MPQQA4Cn4R785zax8JGjX0CPdYS7BIpt6NO/DOB5hZPYt8MpIG3sSN7Miasbde
+	b4+2xEmeXqZlLkyy+UhG7iNrlwvmRIZbywHMhDIxMH+Aw2qI0TfGVXIsg4exljY3kmCg0BZ2fRx
+	3BO+XOOU6L/JAa6VGRM0JINIoPBeQ9ryrYRg/IBH7pqsMztBC28KR36bBeom63o4cWerZy03KIY
+	kgI2hh4=
+X-Received: by 2002:a05:622a:10a:b0:506:1d7a:7250 with SMTP id
+ d75a77b69052e-508f49a4a3cmr148744761cf.66.1773065915381; Mon, 09 Mar 2026
+ 07:18:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next v2 1/6] ethtool: Add loopback netlink UAPI
- definitions
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
- Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Russell King <linux@armlinux.org.uk>
-References: <20260308124016.3134012-1-bjorn@kernel.org>
- <20260308124016.3134012-2-bjorn@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260308124016.3134012-2-bjorn@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: D4CC823A5BB
+References: <20260309122055.1226507-1-edumazet@google.com> <20260309134355.GC606826@noisy.programming.kicks-ass.net>
+ <CANn89iJTw1Wu8jOGuvGKnWixo86LSRXNzgKkj2A=csrYvj9KfQ@mail.gmail.com>
+In-Reply-To: <CANn89iJTw1Wu8jOGuvGKnWixo86LSRXNzgKkj2A=csrYvj9KfQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 9 Mar 2026 15:18:23 +0100
+X-Gm-Features: AaiRm53p9-wu3eda_3WFiPrfIRjvD90DHLNSCsCr1tV9FXq2X6u4mCU7l32-23E
+Message-ID: <CANn89i+7Pqf9pdZtic3kesKakv9+5TOgfWSce=M065wNmaBHsg@mail.gmail.com>
+Subject: Re: [PATCH] locking/local_lock: Reduce local_[un]lock_nested_bh() overhead
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Marco Elver <elver@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: CDD6223A7B7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265566-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,gmail.com,kernel.org,redhat.com,google.com];
+	TAGGED_FROM(0.00)[bounces-265567-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.991];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-0.996];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-Hi,
-
-On 08/03/2026 13:40, Björn Töpel wrote:
-> Add the netlink YAML spec and auto-generated UAPI header for a unified
-> loopback interface covering MAC, PCS, PHY, and pluggable module
-> components.
-> 
-> Each loopback point is described by a nested entry attribute
-> containing:
-> 
->  - component  where in the path (MAC, PCS, PHY, MODULE)
->  - name       subsystem label, e.g. "cmis-host" or "cmis-media"
->  - id         optional instance selector (e.g. PHY id, port id)
->  - supported  bitmask of supported directions
->  - direction  NEAR_END, FAR_END, or 0 (disabled)
-> 
-> Signed-off-by: Björn Töpel <bjorn@kernel.org>
-> ---
->  Documentation/netlink/specs/ethtool.yaml      | 115 ++++++++++++++++++
->  .../uapi/linux/ethtool_netlink_generated.h    |  52 ++++++++
->  2 files changed, 167 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 4707063af3b4..05ebad6ae4e0 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -211,6 +211,39 @@ definitions:
->          name: discard
->          value: 31
->  
-> +  -
-> +    name: loopback-component
-> +    type: enum
-> +    doc: |
-> +      Loopback component. Identifies where in the network path the
-> +      loopback is applied.
-> +    entries:
-> +      -
-> +        name: mac
-> +        doc: MAC loopback
-> +      -
-> +        name: pcs
-> +        doc: PCS loopback
-> +      -
-> +        name: phy
-> +        doc: PHY loopback
-> +      -
-> +        name: module
-> +        doc: Pluggable module (e.g. CMIS (Q)SFP) loopback
-
-Should we also add "serdes" ?
-
-> +  -
-> +    name: loopback-direction
-> +    type: flags
-> +    doc: |
-> +      Loopback direction flags. Used as a bitmask in supported, and as
-> +      a single value in direction.
-> +    entries:
-> +      -
-> +        name: near-end
-> +        doc: Near-end loopback; host-loop-host
-> +      -
-> +        name: far-end
-> +        doc: Far-end loopback; line-loop-line
+On Mon, Mar 9, 2026 at 3:03=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Mon, Mar 9, 2026 at 2:44=E2=80=AFPM Peter Zijlstra <peterz@infradead.o=
+rg> wrote:
+> >
+> > On Mon, Mar 09, 2026 at 12:20:55PM +0000, Eric Dumazet wrote:
+> >
+> > > diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
+> > > index b8830148a8591c17c22e36470fbc13ff5c354955..40c2da54a0b720265be7b=
+6327e0922a49befd8fc 100644
+> > > --- a/include/linux/local_lock.h
+> > > +++ b/include/linux/local_lock.h
+> > > @@ -94,12 +94,19 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_loc=
+k_t __percpu,
+> > >                   local_unlock_irqrestore(_T->lock, _T->flags),
+> > >                   unsigned long flags)
+> > >
+> > > +#if defined(WARN_CONTEXT_ANALYSIS) || defined(CONFIG_PREEMPT_RT) || =
+\
+> > > +    defined(CONFIG_DEBUG_LOCK_ALLOC)
+> > >  #define local_lock_nested_bh(_lock)                          \
+> > >       __local_lock_nested_bh(__this_cpu_local_lock(_lock))
+> > >
+> > >  #define local_unlock_nested_bh(_lock)                               =
+ \
+> > >       __local_unlock_nested_bh(__this_cpu_local_lock(_lock))
+> > >
+> > > +#else
+> > > +static inline void local_lock_nested_bh(local_lock_t *_lock) {}
+> > > +static inline void local_unlock_nested_bh(local_lock_t *__lock) {}
+> > > +#endif
+> >
+> > This isn't going to work; WARN_CONTEXT_ANALYSIS is unconditional on
+> > clang >=3D 22.1
+> >
+> > How come that this isn't DCEd properly?
+>
+> It might be partially done.
+>
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 0e217041958a83d2a3c18de2965808442546c49b..50455951dc38668b0cbbcccdb=
+2c5ce726e3c4da9
+> 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -7498,3 +7498,12 @@ struct vlan_type_depth
+> __vlan_get_protocol_offset(const struct sk_buff *skb,
+>         };
+>  }
+>  EXPORT_SYMBOL(__vlan_get_protocol_offset);
 > +
->  attribute-sets:
->    -
->      name: header
-> @@ -1903,6 +1936,60 @@ attribute-sets:
->          name: link
->          type: nest
->          nested-attributes: mse-snapshot
-> +  -
-> +    name: loopback-entry
-> +    doc: Per-component loopback configuration entry.
-> +    attr-cnt-name: __ethtool-a-loopback-entry-cnt
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        type: unused
-> +        value: 0
-> +      -
-> +        name: component
-> +        type: u32
-> +        enum: loopback-component
-> +        doc: Loopback component
-> +      -
-> +        name: id
-> +        type: u32
-> +        doc: |
-> +          Optional component instance identifier. Required for PHY,
-> +          optional for MODULE, omitted for MAC and PCS.
+> +void ericeric(void);
+> +void ericeric(void)
+> +{
+> +       local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+> +       local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+> +       local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+> +       local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+> +}
+>
+> objdump --disassemble=3Dericeric -r net/core/skbuff.o
+>
+> net/core/skbuff.o:     file format elf64-x86-64
+>
+>
+> Disassembly of section .text:
+>
+> 000000000000fe40 <ericeric>:
+>     fe40: f3 0f 1e fa          endbr64
+>     fe44: e8 00 00 00 00        call   fe49 <ericeric+0x9>
+> fe45: R_X86_64_PLT32 __fentry__-0x4
+>     fe49: 65 48 8b 05 00 00 00 mov    %gs:0x0(%rip),%rax        # fe51
+> <ericeric+0x11>
+>     fe50: 00
+> fe4d: R_X86_64_PC32 this_cpu_off-0x4
+>     fe51: 2e e9 00 00 00 00    cs jmp fe57 <ericeric+0x17>
+> fe53: R_X86_64_PLT32 __x86_return_thunk-0x4
+>
+> Disassembly of section .init.text:
 
-it doesn't have to be required for PHY. The current idea is that if you
-don't pass any PHY index when issueing a PHY-targetting command, then it
-means you're targetting net_device->phydev, that is the PHY device
-attached to the netdev (if any).
+Same for
 
-I think we can keep that behaviour, as systems with multiple PHYs are
-not very common.
++
++void ericeric(void);
++void ericeric(void)
++{
++       raw_cpu_read_long(this_cpu_off);
++       raw_cpu_read_long(this_cpu_off);
++}
 
-> +      -
-> +        name: name
-> +        type: string
-> +        doc: |
-> +          Subsystem-specific name for the loopback point within the
-> +          component.
-
-We'll need to be careful about keeping this subsystem-specific and not
-driver-specific :)
-
-> +      -
-> +        name: supported
-> +        type: u32
-> +        enum: loopback-direction
-> +        enum-as-flags: true
-> +        doc: Bitmask of supported loopback directions
-> +      -
-> +        name: direction
-> +        type: u32
-> +        enum: loopback-direction
-> +        doc: Current loopback direction, 0 means disabled
-
-no need for an u32 for 3 different values I think :)
-
-Maxime
-
+I am guessing __raw_cpu_read() is forcing the asm ?
 
