@@ -1,309 +1,190 @@
-Return-Path: <netdev+bounces-265523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8M3lFZq7rmmxIQIAu9opvQ
-	(envelope-from <netdev+bounces-265523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:22:50 +0100
+	id YOohOei7rmn6IQIAu9opvQ
+	(envelope-from <netdev+bounces-265525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:24:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E408B238BC3
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:22:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F412238BFD
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5B203164B5D
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:11:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2323C30E95A2
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 12:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4761E3ACF13;
-	Mon,  9 Mar 2026 12:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB7A3A4F2E;
+	Mon,  9 Mar 2026 12:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2NWOGvqC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsgKK1Ci"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12883A9DB0;
-	Mon,  9 Mar 2026 12:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F263A9015
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 12:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773058250; cv=none; b=mwDW1SIRMf1crZ2GnIm/Cide8Tmd9jg1cC1yYWfW3YqchBoojzyB/Mnnh8OFH94aW7IBLFZTaiGpqaSMqgfDSpqtFNfRcag1hVPG7IqccSreJlROt9dzdOyxO+2q+20zJmerGzMQq82FaRyn/T310iIorpp/Slx7IWQKd8q6jSs=
+	t=1773058369; cv=none; b=Snb+PUpFON8bKG+UQiR6prJ1zNGGUFZLX+mt0UQTxJLh2pJnln3VuOU9ZyPHIhO16Mz8UBRLTRt6HXWXGL6sbWFMURIWieshPfxHvzB1pBh/O4ne0OcIp48luBscFst07rnruaAbU2ji+JpLV4yBuLZPBlYM5PYisOqTfNqc1jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773058250; c=relaxed/simple;
-	bh=CxC4gPRhEx+EnX12NY8NGaQLgGbGEevJeK1eAo6Pdx8=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BaTmNTdflAbQClw8uSbmOwtJMkmm//xznwJDDV506wCrxxY4wK853BLyZnyHWBIHJeRCpoQe4NT79O4XoRd20ArOlPta/BPALxiR7c5RGdjRtTl9aBYGLA7HGDEVHEgypeTg4sf8b1DuS5qFJrIPIHsPg6wJT2C2KmF2lljBcFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2NWOGvqC; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773058248; x=1804594248;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=CxC4gPRhEx+EnX12NY8NGaQLgGbGEevJeK1eAo6Pdx8=;
-  b=2NWOGvqCrWmKyOaoW0poa4Qn4kmGMB4zgxHwpXKtREZknqadw8xotM3D
-   DVTpiF/s/7o8X6NLstnYMz9mh1WUydpsq7moB2n0zbLgskaDhRGlhbhyP
-   jGWkkfi7OU1Y9riZ/zXFlFVhJVlL9xUiEVzgtMc4/rOBuXbFSy8Flxq+6
-   9AKxiC6mUXB+fyS8j/OTr/TQnd/3zfnA/C6Uf5bAzgFT988/WZQFlZ0Ol
-   oH6ru05H4GdnN6c7jLTwtN/xhT3sB1O78O6ov7HWVDYqJ2HUrV3VYUA8J
-   JvltMza6bwRnwBnWuhKtjkP4w1myjl42yFUEwj8+wzPlq6hlxEGYhhyBs
-   g==;
-X-CSE-ConnectionGUID: lABlYgOLRx6xa1tNtlPVIg==
-X-CSE-MsgGUID: cDPRv21cQ2igkbk4b9k7Pg==
-X-IronPort-AV: E=Sophos;i="6.23,109,1770620400"; 
-   d="scan'208";a="61927052"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 05:10:47 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Mon, 9 Mar 2026 05:10:07 -0700
-Received: from [10.205.29.43] (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 9 Mar 2026 05:10:04 -0700
-Message-ID: <1d70dd8d53f976d5f189d4154049129ef0df0c38.camel@microchip.com>
-Subject: Re: [PATCH net-next 5/8] net: dsa: lan9645x: add bridge support
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung Huh
-	<woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Mon, 9 Mar 2026 13:09:53 +0100
-In-Reply-To: <20260303145130.rbp3qycr3eh5ifcp@skbuf>
-References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
-	 <20260303-dsa_lan9645x_switch_driver_base-v1-5-bff8ca1396f5@microchip.com>
-	 <20260303145130.rbp3qycr3eh5ifcp@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1773058369; c=relaxed/simple;
+	bh=mK8ba0zQUtMMWmfrPH0LzLNN7RK7BfVtsz0sSCJ89DQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L3bn7hwvFXb5Y3RKv5idEVmsz2s0TRR4RaZNb890OoCyv6kmxbobhS0X/o+R9Hxw10o5e5bIrQ81LWIhMxQSGLJVXgAi4ULuvE1nPjOaP2tiNBGvAibBa5IH+4JPMgmTdSlaFrMfzSDxFseR+VQHduy0nn90MTPMXRNP8Mk5S1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XsgKK1Ci; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-89a465bd7edso9258916d6.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 05:12:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773058367; x=1773663167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RmEaX9ELRnGJqvenm9+FC9k70ngtQcC8pzYFVYzrDy0=;
+        b=XsgKK1CivjPd+LsM2k2pMNNI1ZJrMd3ikINEN6TjMbV6ub8S4mJBfpboH0YEPBwjEG
+         CRt5ysonyHXell4RuHCY95D4sHa6opv8oLQ0mgYYSP8quhVpVhM26u1yLKGiTeNq3+K1
+         P+YY1V/P97WRXGxP6Pdg+mejMjyySXZTt7ns/cyKaNx25lSgTTCeBvkCrZrFgjt3E6sX
+         1yP5LtqH7QQn8Jq5CkDO4ONtQu45XrnqAJG8hyy4hyV09vMLQv2wQclFs3RxUUUZYnaC
+         KEIQBRHGoRe9dxQCnl9ue475aHhtOCrwWf/xp/ODncuUEqOjJYZMX62rEvPPny3PRm7C
+         Q2fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773058367; x=1773663167;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RmEaX9ELRnGJqvenm9+FC9k70ngtQcC8pzYFVYzrDy0=;
+        b=uz0vZX6tbstdFft+QkiMmPkIlQ4lBd6JlYpnTkoWGAaskvMbhrRJg/jdeybVqqG48c
+         WhOohBYVSVKC4r9qc9IfqofqZD6D/kxQFPQtaHYyHn3UbMRxlYMwmL3xP4whBBzaF+/i
+         Qfk2PrCzJUmYxIwYM4mXoTxLZepfcJVjqlhpADB4pF6QjqVojKxpfvDT4frCrj0F8+y+
+         j9nggh1Z0lBGMU1zdfVk2AQEXwWPNg94+aTk0HRWQq3jXeEqRLSjoCoX1I45rkYgES0L
+         ofEU27qQvMMmMTBnCcRSH+5e1T9iyHrqJmfB2LAUoAya2q00MnxlE+QJKLt3UTCD19D9
+         PHHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzF7NZiABdYDRy5DZDUzi/GHsQpDlSSUpZjaO3JcwJDpBEEYOiRkZifHwCmtcp+r69tfCw3iI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7WqagS6xjyQHAn5SIqpcmYxvKGLEMunuOSYXth/uQpWI0KGJ8
+	GwDvDVDZ7xLrjuSjP14UR8AzGxF4p2XCLWyhk+w+traxPV/nQXTY/yW8
+X-Gm-Gg: ATEYQzxl9/NohZ0qNZjVLd8S9o9DIKpnzzGvxtWO5N/UVfJrSbX6qGh6CuY9Qsmwl1o
+	QF0d3pKM6gK8xHvYPiOmhqCtweY0S3ZSoKQ+vT2IIqvMv7wjQxhPSbsyC/S4OK6DjhyWnYJClz+
+	dDhsl0KZWxaImcjosz3JtlEUhk7NhFxRbWhsIptDOxNlt/AaHgNbQWPDws+ULGV9Lc9uDOTfybv
+	ujQ0RawQuecmemM3sAlY3MUbOFA7aAUNY7rY1u7QLeRnXt2EvWmFYjL99Zi05UxZKT89uDnvj1M
+	4CxQFSx1F0Qx8o6ZoYM87Qwd5vMCmc1EL6CKqj/5BebVXF/JbmM0Iaie9b52QT0iGQReegVrl/k
+	0gIrafcjAR7QHEl/hj6A/lle/YeuWcVmU1c4jLa/IhwO1KnF2iErxISRJ/A5V8WC7wS1uULFJwL
+	AAezUDFYyiY8Ytc67gk+LDTktrjqS2wZA8WMWoRmEDE6W1W6vrQXUMofFws/ZzkpU=
+X-Received: by 2002:ad4:5d42:0:b0:899:f24d:1243 with SMTP id 6a1803df08f44-89a30a9e980mr164604486d6.37.1773058367505;
+        Mon, 09 Mar 2026 05:12:47 -0700 (PDT)
+Received: from cr-x-redhat96-client-2.fyre.ibm.com ([129.41.87.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a316d86ddsm72715236d6.26.2026.03.09.05.12.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 05:12:46 -0700 (PDT)
+From: Chelsy Ratnawat <chelsyratnawat2001@gmail.com>
+To: leitao@debian.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org
+Cc: davem@davemloft.net,
+	pabeni@redhat.com,
+	john.ogness@linutronix.de,
+	netdev@vger.kernel.org,
+	Chelsy Ratnawat <chelsyratnawat2001@gmail.com>
+Subject: [PATCH] netconsole: Fix compiler warnings when PRINTK_EXECUTION_CTX is disabled
+Date: Mon,  9 Mar 2026 05:12:33 -0700
+Message-ID: <20260309121233.135231-1-chelsyratnawat2001@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: E408B238BC3
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3F412238BFD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265523-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,linutronix.de,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.985];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265525-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:dkim,microchip.com:email,microchip.com:mid]
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chelsyratnawat2001@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.993];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, 2026-03-03 at 16:51 +0200, Vladimir Oltean wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> On Tue, Mar 03, 2026 at 01:22:31PM +0100, Jens Emil Schulz =C3=98stergaar=
-d wrote:
-> > Add support for hardware offloading of the bridge. We support a single
-> > bridge device.
-> >=20
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Signed-off-by: Jens Emil Schulz =C3=98stergaard <jensemil.schulzosterga=
-ard@microchip.com>
-> > ---
-> >  drivers/net/dsa/microchip/lan9645x/lan9645x_main.c | 196 +++++++++++++=
-++++++++
-> >  drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  11 ++
-> >  drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |   2 +
-> >  3 files changed, 209 insertions(+)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drive=
-rs/net/dsa/microchip/lan9645x/lan9645x_main.c
-> > index 739013f049d0..b6efaf669a3f 100644
-> > --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> > +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> > @@ -171,6 +171,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
-> >               return err;
-> >       }
-> >=20
-> > +     mutex_init(&lan9645x->fwd_domain_lock);
-> > +
-> >       /* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
-> >       lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
-> >              ANA_AGGR_CFG_AC_DMAC_ENA,
-> > @@ -288,6 +290,192 @@ static void lan9645x_port_phylink_get_caps(struct=
- dsa_switch *ds, int port,
-> >       lan9645x_phylink_get_caps(ds->priv, port, config);
-> >  }
-> >=20
-> > +static int lan9645x_set_ageing_time(struct dsa_switch *ds, unsigned in=
-t msecs)
-> > +{
-> > +     u32 age_secs =3D max(1, msecs / 1000 / 2);
->=20
-> s/1000/MSEC_PER_SEC/
->=20
+The netconsole change that started using nbcon_write_context for CPU
+and task information assumes CONFIG_PRINTK_EXECUTION_CTX is enabled.
 
-I will change this.
+However, when this option is disabled, struct nbcon_write_context does
+not contain the cpu and comm fields, causing compilation failures:
 
-> > +     struct lan9645x *lan9645x =3D ds->priv;
-> > +
-> > +     /* Entry is must suffer two aging scans before it is removed, so =
-an
->=20
-> "An entry must suffer (...), so it is aged"
+  error: 'struct nbcon_write_context' has no member named 'cpu'
+  error: 'struct nbcon_write_context' has no member named 'comm'
 
-I will change this.
+Guard access to these fields and fall back to raw_smp_processor_id()
+and current->comm when PRINTK_EXECUTION_CTX is disabled.
 
->=20
-> > +      * entry is aged after 2*AGE_PERIOD, and the unit is in seconds.
-> > +      * An age period of 0 disables automatic aging.
-> > +      */
-> > +     lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(age_secs),
-> > +             ANA_AUTOAGE_AGE_PERIOD,
-> > +             lan9645x, ANA_AUTOAGE);
-> > +     return 0;
-> > +}
-> > +
-> > +static int lan9645x_port_pre_bridge_flags(struct dsa_switch *ds, int p=
-ort,
-> > +                                       struct switchdev_brport_flags f=
-lags,
-> > +                                       struct netlink_ext_ack *extack)
-> > +{
-> > +     if (flags.mask &
-> > +         ~(BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD))
-> > +             return -EINVAL;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void lan9645x_port_pgid_set(struct lan9645x *lan9645x, u16 pgid=
-,
-> > +                                int chip_port, bool enabled)
-> > +{
-> > +     u32 reg_msk, port_msk;
-> > +
-> > +     WARN_ON(chip_port > CPU_PORT);
-> > +
-> > +     port_msk =3D ANA_PGID_PGID_SET(enabled ? BIT(chip_port) : 0);
-> > +     reg_msk =3D ANA_PGID_PGID_SET(BIT(chip_port));
-> > +
-> > +     lan_rmw(port_msk, reg_msk, lan9645x, ANA_PGID(pgid));
-> > +}
-> > +
-> > +static void lan9645x_port_set_learning(struct lan9645x *lan9645x, int =
-port,
-> > +                                    bool enabled)
-> > +{
-> > +     struct lan9645x_port *p;
-> > +
-> > +     lan_rmw(ANA_PORT_CFG_LEARN_ENA_SET(enabled), ANA_PORT_CFG_LEARN_E=
-NA,
-> > +             lan9645x, ANA_PORT_CFG(port));
->=20
-> Actually, the port may be in an STP state where learning shouldn't be
-> enabled, when this function is called. Enabling the "learning" bridge
-> port flag shouldn't change that.
->=20
+Fixes: 79ba362b4337 ("netconsole: Use printk context for CPU and task information")
+Signed-off-by: Chelsy Ratnawat <chelsyratnawat2001@gmail.com>
+---
+ drivers/net/netconsole.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-Thank you, I will check stp_state before writing to HW, similar to=C2=A0
-set_stp_state.
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 3c9acd6e49e8..bbd39b2e7a36 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1494,17 +1494,30 @@ static void populate_configfs_item(struct netconsole_target *nt,
+ static int sysdata_append_cpu_nr(struct netconsole_target *nt, int offset,
+ 				 struct nbcon_write_context *wctxt)
+ {
++	int cpu;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	cpu = wctxt->cpu;
++#else
++	cpu = raw_smp_processor_id();
++#endif
++
+ 	return scnprintf(&nt->sysdata[offset],
+ 			 MAX_EXTRADATA_ENTRY_LEN, " cpu=%u\n",
+-			 wctxt->cpu);
++			 cpu);
+ }
+ 
+ static int sysdata_append_taskname(struct netconsole_target *nt, int offset,
+ 				   struct nbcon_write_context *wctxt)
+ {
++	const char *comm;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	comm = wctxt->comm;
++#else
++	comm = current->comm;
++#endif
+ 	return scnprintf(&nt->sysdata[offset],
+ 			 MAX_EXTRADATA_ENTRY_LEN, " taskname=%s\n",
+-			 wctxt->comm);
++			 comm);
+ }
+ 
+ static int sysdata_append_release(struct netconsole_target *nt, int offset)
+-- 
+2.47.3
 
-> > +
-> > +     p =3D lan9645x_to_port(lan9645x, port);
-> > +     p->learn_ena =3D enabled;
-> > +}
-> > +
-> > +static int lan9645x_port_bridge_flags(struct dsa_switch *ds, int port,
-> > +                                   struct switchdev_brport_flags f,
-> > +                                   struct netlink_ext_ack *extack)
-> > +{
-> > +     struct lan9645x *l =3D ds->priv;
->=20
-> Could we have some consistency in variable naming throughout the driver,
-> at least for the main private structure? I don't have an issue with it
-> being called l, it's just that I would prefer it being called the same
-> everywhere.
->=20
-
-I will use lan9645x everywhere.
-
-> > +
-> > +     if (WARN_ON(port =3D=3D l->npi))
-> > +             return -EINVAL;
-> > +
-> > +     if (f.mask & BR_LEARNING)
-> > +             lan9645x_port_set_learning(l, port, !!(f.val & BR_LEARNIN=
-G));
-> > +
-> > +     if (f.mask & BR_FLOOD)
-> > +             lan9645x_port_pgid_set(l, PGID_UC, port, !!(f.val & BR_FL=
-OOD));
-> > +
-> > +     if (f.mask & BR_MCAST_FLOOD) {
-> > +             bool ena =3D !!(f.val & BR_MCAST_FLOOD);
-> > +
-> > +             lan9645x_port_pgid_set(l, PGID_MC, port, ena);
-> > +             lan9645x_port_pgid_set(l, PGID_MCIPV4, port, ena);
-> > +             lan9645x_port_pgid_set(l, PGID_MCIPV6, port, ena);
-> > +     }
-> > +
-> > +     if (f.mask & BR_BCAST_FLOOD)
-> > +             lan9645x_port_pgid_set(l, PGID_BC, port,
-> > +                                    !!(f.val & BR_BCAST_FLOOD));
-> > +
-> > +     return 0;
-> > +}
-> > diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drive=
-rs/net/dsa/microchip/lan9645x/lan9645x_port.c
-> > index 038868ae0a32..b60c64458957 100644
-> > --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> > +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> > @@ -15,6 +15,8 @@ int lan9645x_port_init(struct lan9645x *lan9645x, int=
- port)
-> >               ANA_PORT_CFG_LEARN_ENA,
-> >               lan9645x, ANA_PORT_CFG(p->chip_port));
-> >=20
-> > +     p->learn_ena =3D false;
-> > +
->=20
-> This is already zero-initialized memory.
-
-Removed.
-
->=20
-> >       lan9645x_port_set_maxlen(lan9645x, port, ETH_DATA_LEN);
-> >=20
-> >       lan9645x_phylink_port_down(lan9645x, port);
-> >=20
-> > --
-> > 2.52.0
-> >=20
-
-
-
-Thanks,
-Emil
 
