@@ -1,144 +1,165 @@
-Return-Path: <netdev+bounces-265483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265484-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wO9vIcOtrmkSHwIAu9opvQ
-	(envelope-from <netdev+bounces-265483-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:23:47 +0100
+	id IKEcO/WtrmkSHwIAu9opvQ
+	(envelope-from <netdev+bounces-265484-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:24:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014CF237DFC
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:23:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54AEE237E14
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:24:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 490FA30902E8
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:18:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A18330484FC
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF6B37C0FE;
-	Mon,  9 Mar 2026 11:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CED3914F0;
+	Mon,  9 Mar 2026 11:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Oru6S4l4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wvfZG1rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D153352C22;
-	Mon,  9 Mar 2026 11:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6800F37AA7B;
+	Mon,  9 Mar 2026 11:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773055104; cv=none; b=ae0TW4SEMMFnQWxSjqhxMTTaP+UE5O+jUJNhl7s7Z9l7wck3uctrBU4FJFx6ZK7l/3jm1o2fHWBEOqro3SjvsRF9E4ZHQjwTaQfpAcGYlW+MMbjx/1nanvGsTZw6uIV0AD5Hkc+nq6UwVdySBFm6xS3yY7oTtP0ZK7HquISdyNg=
+	t=1773055147; cv=none; b=r9+KlEwbXaEQAgVXOFRSDxuNthOyeUn3csRRw6iRojF6hHulUqZ6VLqGxq6r7RKZ898uyqX5G3sTKTM/94oLB0Jj7UckFAGbVgwgaoMhV3U32UD5ShLy2Cbfkq8f4+XdzBft14x8t2SvghkqY2YFauxkRrFY3IYo1cWKAqhfcyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773055104; c=relaxed/simple;
-	bh=n5UlwxmMeYfIU0Vd6l8rlLL17BMj+86T/MaEHpPU7gw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mOpBoBsCT8QEmdMSk3/ITj0h0G6wYqkU26KiuJNCKsSpoppPg7GWbT0769I+gcjH/Ybwisae9NazTOtCbYHEeEDkoBm4avMHI+ixXv2wf5sM4x+TVxPm0p5I21QT50dzRW1Fr1gFJFhCzYNkcBE+xDNDcsatoHMYgRSZwGtqLSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Oru6S4l4; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Vcn9sXKUQjTbx8US5qzXWB2GYmzPdG2jA4kyqPRT4W4=;
-	b=Oru6S4l43cTV335z03g06bLfT+l/1tCwZrkDlibmTAMjmN0Cq/kzg+8K7O/ws9hCSN3AS6usL
-	4aXtWB7xNhq9+p4wasUWHZB69EDzeXTejWzsnGdA+HQBntHspndXIo8CzTguck8lgE+tsN+cMEn
-	LSrAhBZSnhrzL+nh6VLDR9U=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fTvWV1GTlzpSwC;
-	Mon,  9 Mar 2026 19:13:10 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 68F1740561;
-	Mon,  9 Mar 2026 19:18:18 +0800 (CST)
-Received: from kwepemq200017.china.huawei.com (7.202.195.228) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 9 Mar 2026 19:18:18 +0800
-Received: from [10.67.109.91] (10.67.109.91) by kwepemq200017.china.huawei.com
- (7.202.195.228) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 9 Mar
- 2026 19:18:17 +0800
-Message-ID: <83b7b096-987c-4fdd-a8d2-a5758a537347@huawei.com>
-Date: Mon, 9 Mar 2026 19:18:16 +0800
+	s=arc-20240116; t=1773055147; c=relaxed/simple;
+	bh=e26ewyP62DlFaEtzlW6Dl1fgaD9Iukz1/0N5Y+85zqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=bh4nTD4qXCOjGnYy8mUHYPqs0iv8nd8zQhnoSVXrLs2oZKsP3ELYSmMOaMort9T5k8fqfGpnYn7jRGeg/jYBDZW7qFleJyGxuW7tbb0eBjP6UfMvz2FWwO3jgsE6oEfxD3l14NAJO75hxoyL0xDod4dN+7xm5Qqt4/cXURMMRj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wvfZG1rj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yui9egGse2WyJ/Faqva38aIhxCIDPEytRtxU4GnJ77g=; b=wvfZG1rjT6sX1Sw3kQvMN9aRHn
+	ISBTN32eHE03RWdjodVFcW9hPL5KC0J3f3eti+P5yKxyHcj7Q9YcnyNRmSbs4sXl8bdR7BdliqJ4y
+	o0oBi77ChBO9m1gWcHdT2TVaIxOgVMlvPacKhMxGkCLs1r9HsOr9wXJr4tQ/xbzJ6Dejv6PPd+Tth
+	DrsjItGVepXlYJ/WCvwdWwlsSbr3WGZOLh0QCuih+H4CVlq6Zczkx4tMDpD5HxUbJO5iVvltw1Ee+
+	iRuaDZ0UJLxFlzTSGReKohXXEQD2OlWnNj1kOfa4SOeOOXIf4fboTi1YM+zzwT0pidN/JwfLQZtrc
+	wY2ZwMrQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47002)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vzYdY-000000003f5-0xCe;
+	Mon, 09 Mar 2026 11:19:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vzYdW-000000004Gf-08bF;
+	Mon, 09 Mar 2026 11:18:58 +0000
+Date: Mon, 9 Mar 2026 11:18:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH RFC net-next v3 0/8] net: stmmac: improve PCS support
+Message-ID: <aa6sofjFxyi2nkpr@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next] dpaa2-switch: Add depend on FSL_DPAA2_ETH to
- FSL_DPAA2_SWITCH
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260303013814.338989-1-caixinchen1@huawei.com>
- <gjtjhvka6azuahiga6o5a4dgg2gm7dae3io5fbvjjmbovgxrfr@pqgfhzon6tbb>
-Content-Language: en-US
-From: Cai Xinchen <caixinchen1@huawei.com>
-In-Reply-To: <gjtjhvka6azuahiga6o5a4dgg2gm7dae3io5fbvjjmbovgxrfr@pqgfhzon6tbb>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemq200017.china.huawei.com (7.202.195.228)
-X-Rspamd-Queue-Id: 014CF237DFC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 54AEE237E14
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265483-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[caixinchen1@huawei.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265484-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.978];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.125];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Yes, it is better solution. I will send v2. Thank you.
+This series is the next of the three part series sorting out the PCS
+support in stmmac, building on part 2:
 
-On 3/4/2026 6:23 PM, Ioana Ciornei wrote:
-> On Tue, Mar 03, 2026 at 01:38:14AM +0000, Cai Xinchen wrote:
->> When CONFIG_FSL_DPAA2_ETH=n, dpaa2 cannot be compiled. Thus Add
->> depend on FSL_DPAA2_ETH to FSL_DPAA2_SWITCH in Kconfig
-> There is no code dependency between the dpaa2-switch driver and the
-> dpaa2-eth one, just a compile time one dictated by how
-> freescale/Makefile includes the dpaa2/ folder.
->
-> How about we always include the folder and let dpaa2/Makefile handle
-> what objects to include depending on the individual Kconfig options?
-> Something like the diff below:
->
-> --- a/drivers/net/ethernet/freescale/Makefile
-> +++ b/drivers/net/ethernet/freescale/Makefile
-> @@ -22,6 +22,5 @@ ucc_geth_driver-objs := ucc_geth.o ucc_geth_ethtool.o
->   obj-$(CONFIG_FSL_FMAN) += fman/
->   obj-$(CONFIG_FSL_DPAA_ETH) += dpaa/
->
-> -obj-$(CONFIG_FSL_DPAA2_ETH) += dpaa2/
-> -
-> +obj-y += dpaa2/
->   obj-y += enetc/
->
-> And I just realised that commit 84cba72956fd ("dpaa2-switch: integrate
-> the MAC endpoint support") included dpaa2-mac.o in the driver switch
-> objects but didn't amend the Kconfig to specify that PCS_LYNX, PHYLINK
-> and FSL_XGMAC_MDIO should be selected. Could you please also fix that as
-> a separate patch? Otherwise, I can take care of it.
->
-> Thanks!
+	net: stmmac: qcom-ethqos: further serdes reorganisation
+
+Similar patches have been posted previously. This series does away with
+the common SerDes PHY support, instead using a flag to indicate whether
+2500Mbps mode is supported (STMMAC_FLAG_SERDES_SUPPORTS_2500M.) At this
+time, I have no plans to resurect the common SerDes PHY support - the
+generic PHY layer implementations are just too random to consider that,
+and I certainly do not want the extra work of fixing that.
+
+I've also changed the last patch which prints warnings when qcom-ethqos
+changes the PCS state - this will now indicate in a readable form
+whether the ANE or SGMRAL bits have changed state, rather than having
+to refer back to the definitions in the code or the databook.
+
+I am hoping that - subject to this working for qcom-ethqos - we can
+drop this last patch in the final submission, along with the
+dwmac_ctrl_ane() and ethqos_pcs_set_inband() functions and associated
+definitions. This will also mean that stmmac will finally be driving
+the PCS correctly from a phylink point of view.
+
+v3:
+- move printing after register write in v2 series patch 7.
+- reorder patches from v2 and add a new patch: 4, 5, 1, 3, 2,
+  new patch, 6, 7.
+- the new patch enables use of phylink's inband mode for SGMII with
+  qcom-ethqos, so the last patch reporting PCS configuration changes
+  should now be silent.
+
+If the last patch is now silent upon testing, I will replace that
+with a patch which removes ethqos_pcs_set_inband() and
+stmmac_pcs_ctrl_ane().
+
+ drivers/net/ethernet/stmicro/stmmac/common.h       |   4 -
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |   3 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  12 +-
+ .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   8 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 156 +++++++++++++++++++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   |  29 +++-
+ include/linux/stmmac.h                             |   1 +
+ 10 files changed, 198 insertions(+), 46 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
