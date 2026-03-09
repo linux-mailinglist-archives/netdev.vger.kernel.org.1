@@ -1,278 +1,386 @@
-Return-Path: <netdev+bounces-265418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265419-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEKaLDOPrmnVGAIAu9opvQ
-	(envelope-from <netdev+bounces-265418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:13:23 +0100
+	id MAhyMgyRrmk7GQIAu9opvQ
+	(envelope-from <netdev+bounces-265419-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:21:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 318F3235F82
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:13:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED44236118
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:21:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C44A3044BB5
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:12:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD66230484F2
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354223783C5;
-	Mon,  9 Mar 2026 09:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC4A378800;
+	Mon,  9 Mar 2026 09:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jHru3esd";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="G/+mXK6b"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="d4bw/dK6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E5D376BF2
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EAE377EC6
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773047535; cv=none; b=rO0mKqZNaONUXUrQ0Wn+kc/8vCdOz/Tyb2CJ2nq9R5ns7teeeH/Qvf/ADtrwpyFU8u6vMBSlOEs3fSqNUWICOqKO4ymINl4rd4DzKWhlVxP93VyuFDChgsCDvA5BkL8iwKTapTbcXykGQAiC4Mo7UxySwoTgR9dw6dZyh5QyVRo=
+	t=1773047946; cv=none; b=bPP24XH4kXc+sVDomLGXzqYB7LDsvdXGePT1/tOHeaGKCJsf7cVkzayIkxHftvsT9MaCWD/dcnOEExdeZw5QFFAj0IvJw27Ks0nicJHkXoK5CFY1qc/LSsNCmXO+BBkZ5/w+y3n8nzpx95H/Yti1o2yKLcivzMqxM/2wt5yjWr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773047535; c=relaxed/simple;
-	bh=Q2J+r2dSfTS2w9RcAxTqCjJw6if9TEPXLD0Hi1LfNcA=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N6H4Y2wBsTUcBkSrAUemcJrsee+mGNedNuSlsDXQdCG2anzuOiOtdXYBxkygGEL1SAOxtYROLoBthlTtaDHEbtQewUNZGn045lWJ2UY8xUWykh62VZSsn1oTKFcv1wAeIcYy3hziGW5d20l6swQKOVjtaLk9m5Rzc04H+mGi7fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jHru3esd; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=G/+mXK6b; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6298WcmY2663851
-	for <netdev@vger.kernel.org>; Mon, 9 Mar 2026 09:12:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=xbMtvtdOfLDdatvp+5lzCch6
-	oMIueR07h2NcUioWpFw=; b=jHru3esdNzuncTNwyW211a+aJdCkYiYxILsoZN+3
-	1GwgTcHiMn/ymHOV08WINAfoWlfYw32mmtmF+Seo9nDBKL/8faTBqtOibVjY8T1b
-	dgaY0uA7GYpKzy2BlixGrj6mN62goEwdjRuKoxo3BmtDppXIOIRCT3W6eZFhNujG
-	NUVHihFT8lC0N4D4b9D4sUu9vqiYV7661k24lzZtWboU4mtxwP07+llelKSKDhOL
-	XCCcln8fcMYU0Dbq9i5aXPPkIr1kAbbwT4ojrN+2XxrTTpUirMmL8EjgT/DODPGl
-	DyxQTsHS6r2QOpA4ooTD4DOGq2QorD2Gt3YNLkNIxsnfsg==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cr9cpn05v-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 09:12:11 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8cd7774be64so1054483485a.0
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:12:11 -0700 (PDT)
+	s=arc-20240116; t=1773047946; c=relaxed/simple;
+	bh=CncL9gUcdJL6wlW5tkcGvRzvFuDGtQP6+c+HDcnsN/A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=FpzvGq7PxJHWDzP5wyJ+WbVahTWpckGi0VoGl8f4U6NazhoMcxdKuoIovM7WcT7XzzzIvUsOv1UkaiG48ZlvPNtscnUf1xxYPUzxf3tvV1uDgJEriRUatG2qDsn2BDzJQXzT3pQb80vmx2fvYF0OEcn47yQW7OjoenZef4A9rNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=d4bw/dK6; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-439b790af67so4612803f8f.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:19:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773047531; x=1773652331; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xbMtvtdOfLDdatvp+5lzCch6oMIueR07h2NcUioWpFw=;
-        b=G/+mXK6b4p/ttPLc96rKIpLQx0rVatRsBeSzjF6/+gelzgZLV8+rTlRRrKkr1lDudb
-         x0XHory0GhLkH1EV4a5PpiAhY/TRwdi7lNPcuiJaJ+eroKu8I+pq8tKeZgoO9rnO8mAj
-         3GPZSRLFlKEjh4bUiOLnU4Ym4fqojvyKGzTYir5jZPGDnijSdwEZ2I//IX31gXkKEP1s
-         foFFG9rGEYwaClVPqGjcfc2PF6ChTLabjzpl33wxEpXkGgIb9BiIr8BItfX961bdKraS
-         oWN7XpKgf9b1/RiiDTdP5u2dcwofel7MwuTc+xl6KxLC9uT0LhYultFFB/xZ4sey9DTv
-         tyfw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1773047940; x=1773652740; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kNiLR6YNrMRtTldTWTQRiLTdnMm5k8O8M4DvpvHP74I=;
+        b=d4bw/dK6zVqZDdZTt12+IDmKf/RFmlRClqU3NCeMemKHCYqMLQGLcBHuqQc2BcWOeD
+         MXOLsFYj6TQwgG9d1ew4SkOgDEe3IxZWa8agXhd6YzzlHAvxlPV7zRMucd8EK5v6aeJX
+         euk/7xwAo8P7CEl3x9SHefS77U8Yxi0nmtZNqbpt2kkmWh1GnCE/QKraHW/3x9H3z+eu
+         Hgh8UVKxo75IMc3SnJVjy3eWFqYuMZouwGJ3APuDh1aMYpa7dmq2cnpGcTxaxURf3yju
+         ms2CccJlDvP945saycvwiiUZr1WiiL7+9v2UEYTcmobp9tF3vIAtjiGYalZ6Cr3d5R/U
+         YqKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773047531; x=1773652331;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xbMtvtdOfLDdatvp+5lzCch6oMIueR07h2NcUioWpFw=;
-        b=Q/JDSgN9FCxdueuwWQKOHzuWWqNsUygDt5JCQgYViEk05XhmyLAeL5MNEqgzOfz34f
-         dW7sSvMOIx6KZnJ3mRKpvIASoRkeer5EnaC4tQhvXxVt2ICfsF6bCN5MTRivUgD1esLe
-         RN34CbixrAZJclnRBU9WcmBJwKUdiJ6lhhl54T4W5aZk9Z0gvMSGNjgFPx+hMJibMaDZ
-         wH9X4uOXGuoc/TwKU8PhLzkMRgCp92S0M2UMIfXMX/lq5cHIJJJokPFC+VNUOUOK680E
-         H+mdG4PL0UujR+25clYAiWEuCn93/m0JXiVMDoLuPs/JnsqIs3c4BgtNbAYK2n84gCtQ
-         jNFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWO0BuaR63H1GU2TMRdWTAFQqNg7EegvtFhWX1yrwJlWitf2hPjTZ11ywetUpdOYth4XcZBFJQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMrEERUHTC/NKxPoU86Hf2vxXcTKT+kh4cSGWgaKBL2VH6Saw6
-	K9QTsxo1i5KmkFY7MClcMAw1qL6N4UPu00cRWp8oMogWXBoRzmwgr6cRrdOPEbnxML3os2+gjzX
-	k2HBoI/599++mOpwxKrZ8f95ROlKbXmas0u9S6W43uxzK19ijBPT5s/SSRM4=
-X-Gm-Gg: ATEYQzwopPlJWYaHfUClIPnZuk2SMcNwojkzqnyw+UbcID9qZKKBR5R2vEDORcOTuMR
-	mq0BBUy2McyfZoI+QLbdwd3uqNrfGwQb8Vj6+VZKPVOjx5C38GTlXMkQ8PAiQVa4LeTk8qEtI+c
-	TQDniNTmTJC8pmJl5cbBS7ftw0FKuKIi62TWTbiS5bhCOBIIeTn7fi4UrozY+cNVXBI4unPUnvS
-	sVGMpv6vFXf/S83pO1Oh9iNYr4KfYSZQtJs2+TgFq3gSH7cTpU8KNPJobx5Fm+9eskp9c/WaaqY
-	v+IN7YT1BMSzBNBnwzKHocUI9DEfA6cXoCAedWevfxs8QLQ7zSuROSqCLO5cEA75caEy6c0aR8E
-	g2SlTrY8qR9octNj2nF5kiwkzCQyIMI6Ouz4RrrkHP2+WHBQ40oOjvA==
-X-Received: by 2002:a05:620a:700a:b0:8c9:f9c1:5ed with SMTP id af79cd13be357-8cd6d4d541dmr1304567885a.63.1773047530882;
-        Mon, 09 Mar 2026 02:12:10 -0700 (PDT)
-X-Received: by 2002:a05:620a:700a:b0:8c9:f9c1:5ed with SMTP id af79cd13be357-8cd6d4d541dmr1304566385a.63.1773047530429;
-        Mon, 09 Mar 2026 02:12:10 -0700 (PDT)
-Received: from trex (110.red-81-38-138.dynamicip.rima-tde.net. [81.38.138.110])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae483desm23179497f8f.34.2026.03.09.02.12.07
+        d=1e100.net; s=20230601; t=1773047940; x=1773652740;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kNiLR6YNrMRtTldTWTQRiLTdnMm5k8O8M4DvpvHP74I=;
+        b=Vsbysr/l7oB0atmW62flWSO/2zcH9/Gcf3K7GieWdjqZCmycNU0sWkdQeK1TkQjD8D
+         HYH/mE+f/oQMaJ2jxdHr4rEHP0xNRTscirLb+LwoQcsS+7LhjqIheYiFmsrGHOxN7hSv
+         BgO0HEFqGN+PouxcZ2tsX8HcWGCyabvkDq6cl2awSvZLLjUJhDZoUkNbAAfiDpYetxRb
+         p9Jj0+rj6BPTgTjeM1TI/ZbUfbHFeNkx35sYtjGhez3REtHbaInw4PpQGj4P5vCi2hlE
+         k4M/hAKPriluD3SPVdHWckpX5S/n164Qs8s5Jqf6AYMoYtFH/52ihF9OsFyco0NBA/ke
+         bdyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxh9vFqLRafuNZMZQXCFm5IJWsOHO0lgZKstrsbv4DZIHsAF9jM0TuuhdDd/XXzdam5+jBrIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBvlMOGqn+z9w7g26QW5kK0/UBkgwxatFXTMj9kUlvSsRpaR8Z
+	kLOP7eJnQN+NSx+J4cVjzYslE2gGAp1BaKk/v1aH1nZVnAolTTVf9W4Ns3Swj8Ybdko=
+X-Gm-Gg: ATEYQzx++JyKCQBVRmdUH6WBm176te8Lkodo/Q6eHhXTsP0j1FWyPHKV0Gdx7sVtAe9
+	eTpnyd9tyduMx6X0A9RrFxx9/RVQ0MmxDa+sncDnp+K4ROyYGt21aY0wJ0K7PFvEsqCLDRL0R8v
+	TcSjSMyZ9D4D2ajL1hzwIjkwkMyF6ykjswskhi9duLlMS6o5pkfj9HCOv8nKRcBGjOgM9z7oMfG
+	6sbLprh5spDqd75uFCUygBXie4S9JD9AqCfsM7MNAWfaXp53oVQebrfAb1K8wl5VR0iyTolPPDZ
+	QXBKb4qYAIQp4z5rb6RIxIlozHRx5icqel/GaA50Sl2OYZT59eftVGqKYZp88ndbiJcow0D/C7C
+	pre7jE3vrW9IKRCmRFmfQ0rAX8CgYUhvVSNZsRDFxUqoCyF/TT4J5gE3ycGom8HkO5l4wl/Qy0N
+	nKsHu47aarwZFbwYc=
+X-Received: by 2002:a05:6000:603:b0:439:909f:c5a3 with SMTP id ffacd0b85a97d-439da3277d9mr17145973f8f.4.1773047939930;
+        Mon, 09 Mar 2026 02:18:59 -0700 (PDT)
+Received: from localhost ([195.52.25.213])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dada9116sm23029936f8f.14.2026.03.09.02.18.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 02:12:09 -0700 (PDT)
-From: Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>
-X-Google-Original-From: Jorge Ramirez <JorgeRamirez-Ortiz>
-Date: Mon, 9 Mar 2026 10:12:06 +0100
-To: Sumit Garg <sumit.garg@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        linux-media@vger.kernel.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, andersson@kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        dikshita.agarwal@oss.qualcomm.com, bod@kernel.org, mchehab@kernel.org,
-        elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        jjohnson@kernel.org, mathieu.poirier@linaro.org,
-        trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-        pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-        tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH 11/14] media: qcom: Switch to generic PAS TZ APIs
-Message-ID: <aa6O5tir4kVIe0eZ@trex>
-References: <20260306105027.290375-1-sumit.garg@kernel.org>
- <20260306105027.290375-12-sumit.garg@kernel.org>
+        Mon, 09 Mar 2026 02:18:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260306105027.290375-12-sumit.garg@kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDA4NCBTYWx0ZWRfX/BD9Ip+4yjXl
- 43opNGvGl/oFOBRkeDE6TUg9XHhK5IBcxl6a4mxam56kr06dFHGuqkpgtOv57QAc9CSMt9TL7Gt
- mRQh2fnXURvcx5cK+i1mOuy+r09MNtJ3zazBdmAoS16CsMoJGQbDqrp2ALlQ8ltXwXhx8Nd3+xZ
- Ug8fv/kVDA6BjCVlAH9r1zNOzkaz6wF80jFrT+HREgUCIbQdWYaVeUipsqrdWmHYp8lbUIR0Cgs
- aqBVpGxFQ1cW8nJygtdLBH3d9bv7AxshugGtTdpiydkb3Fuqdz2pQqVGUjXhSYZLHR1tSSiAZVd
- 5ULp/M2qC5foNxtA9JcV1HnmmIsWeyTLe5L/WcEMWJmLl93VBWrdomyylvBiepLVabdYiTC/Tpe
- A0bZySYMEJrgD1GWpIsJz6KJpnU3+oQpNJZ7KmgpOnQf8L5XGumcEuBWf1+Oqye0p5EAFuCaVZg
- pBjrIj+qzE9O0c4bV4Q==
-X-Proofpoint-ORIG-GUID: M9EUvlnIoo8YMSlDUvyyRB0QJWIU2Gwn
-X-Proofpoint-GUID: M9EUvlnIoo8YMSlDUvyyRB0QJWIU2Gwn
-X-Authority-Analysis: v=2.4 cv=e7sLiKp/ c=1 sm=1 tr=0 ts=69ae8eeb cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=P2IcWdTxk7sEx2G8DnB30w==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=EUspDBNiAAAA:8 a=zah51VvIpe4vvf6E17kA:9 a=CjuIK1q_8ugA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-09_03,2026-03-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
- suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
- definitions=main-2603090084
-X-Rspamd-Queue-Id: 318F3235F82
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=840703edd9f3f1e1e79a02bb78a8d4f69f696b0531524c2c45c8075436e0;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Mon, 09 Mar 2026 10:18:50 +0100
+Message-Id: <DGY51AQLSNAD.3LE77TJER4LGF@baylibre.com>
+Cc: "Vinod Koul" <vkoul@kernel.org>, "Neil Armstrong"
+ <neil.armstrong@linaro.org>, <dri-devel@lists.freedesktop.org>,
+ <freedreno@lists.freedesktop.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-can@vger.kernel.org>,
+ <linux-gpio@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-rockchip@lists.infradead.org>,
+ <linux-samsung-soc@vger.kernel.org>, <linux-sunxi@lists.linux.dev>,
+ <linux-tegra@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <spacemit@lists.linux.dev>,
+ <UNGLinuxDriver@microchip.com>, "Andrzej Hajda" <andrzej.hajda@intel.com>,
+ "Robert Foss" <rfoss@kernel.org>, "Laurent Pinchart"
+ <Laurent.pinchart@ideasonboard.com>, "Jonas Karlman" <jonas@kwiboo.se>,
+ "Jernej Skrabec" <jernej.skrabec@gmail.com>, "Maarten Lankhorst"
+ <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
+ <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Andy Yan"
+ <andy.yan@rock-chips.com>, "Marc Kleine-Budde" <mkl@pengutronix.de>,
+ "Vincent Mailhol" <mailhol@kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Alexandre Belloni"
+ <alexandre.belloni@bootlin.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Markus Schneider-Pargmann" <msp@baylibre.com>,
+ "Geert Uytterhoeven" <geert+renesas@glider.be>, "Magnus Damm"
+ <magnus.damm@gmail.com>
+Subject: Re: [PATCH v2 phy-next 14/24] phy: introduce
+ phy_get_max_link_rate() helper for consumers
+From: "Markus Schneider-Pargmann" <msp@baylibre.com>
+To: <vladimir.oltean@nxp.com>, <linux-phy@lists.infradead.org>
+X-Mailer: aerc 0.21.0
+References: <20260308114009.2546587-1-vladimir.oltean@nxp.com>
+ <20260308114009.2546587-15-vladimir.oltean@nxp.com>
+In-Reply-To: <20260308114009.2546587-15-vladimir.oltean@nxp.com>
+X-Rspamd-Queue-Id: 5ED44236118
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-1.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265418-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	TAGGED_FROM(0.00)[bounces-265419-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jorge.ramirez@oss.qualcomm.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[kernel.org,linaro.org,lists.freedesktop.org,lists.infradead.org,vger.kernel.org,lists.linux.dev,microchip.com,intel.com,ideasonboard.com,kwiboo.se,gmail.com,linux.intel.com,suse.de,ffwll.ch,rock-chips.com,pengutronix.de,bootlin.com,tuxon.dev,baylibre.com,glider.be];
+	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[msp@baylibre.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 06/03/26 16:20:24, Sumit Garg wrote:
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> 
-> Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
-> TZ service allows to support multiple TZ implementation backends like QTEE
-> based SCM PAS service, OP-TEE based PAS service and any further future TZ
-> backend service.
-> 
-> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> ---
->  drivers/media/platform/qcom/iris/iris_firmware.c |  9 +++++----
->  drivers/media/platform/qcom/venus/firmware.c     | 11 ++++++-----
->  2 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
-> index 5f408024e967..b3c5281aea91 100644
-> --- a/drivers/media/platform/qcom/iris/iris_firmware.c
-> +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
-> @@ -4,6 +4,7 @@
->   */
->  
->  #include <linux/firmware.h>
-> +#include <linux/firmware/qcom/qcom_pas.h>
->  #include <linux/firmware/qcom/qcom_scm.h>
->  #include <linux/of_address.h>
->  #include <linux/of_reserved_mem.h>
-> @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
->  		return -ENOMEM;
->  	}
->  
-> -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
-> +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
->  	if (ret)  {
->  		dev_err(core->dev, "auth and reset failed: %d\n", ret);
->  		return ret;
-> @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
->  						     cp_config->cp_nonpixel_size);
->  		if (ret) {
->  			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
-> -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
-> +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
->  			return ret;
->  		}
->  	}
-> @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
->  
->  int iris_fw_unload(struct iris_core *core)
->  {
-> -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
-> +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
->  }
+--840703edd9f3f1e1e79a02bb78a8d4f69f696b0531524c2c45c8075436e0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+
+Hi,
+
+On Sun Mar 8, 2026 at 12:39 PM CET, vladimir.oltean wrote:
+> Consumer drivers shouldn't dereference struct phy, not even to get to
+> its attributes.
 >
+> We have phy_get_bus_width() as a precedent for getting the bus_width
+> attribute, so let's add phy_get_max_link_rate() and use it in DRM and
+> CAN drivers.
+>
+> In CAN drivers, the transceiver is acquired through devm_phy_optional_get=
+()
+> and NULL is given by the API as a non-error case, so the PHY API should
+> also tolerate NULL coming back to it. This means we can further simplify
+> the call sites that test for the NULL quality of the transceiver.
 
-are the calls to set_remote_state required?
-0 is not the IRIS/VENUS remote processor.
+Thanks for adding this.
 
-If it is legacy, maybe they can be phased out?
+>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> Cc: Andrzej Hajda <andrzej.hajda@intel.com>
+> Cc: Neil Armstrong <neil.armstrong@linaro.org>
+> Cc: Robert Foss <rfoss@kernel.org>
+> Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>
+> Cc: Jonas Karlman <jonas@kwiboo.se>
+> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
+> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Cc: David Airlie <airlied@gmail.com>
+> Cc: Simona Vetter <simona@ffwll.ch>
+> Cc: Andy Yan <andy.yan@rock-chips.com>
+> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+> Cc: Vincent Mailhol <mailhol@kernel.org>
+> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Cc: Markus Schneider-Pargmann <msp@baylibre.com>
+> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+>
+> v1->v2: make phy_get_bus_width() NULL-tolerant to simplify CAN callers
+> ---
+>  drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c | 4 ++--
+>  drivers/gpu/drm/bridge/synopsys/dw-dp.c             | 2 +-
+>  drivers/net/can/at91_can.c                          | 3 +--
+>  drivers/net/can/flexcan/flexcan-core.c              | 3 +--
+>  drivers/net/can/m_can/m_can_platform.c              | 3 +--
 
+For m_can:
+Acked-by: Markus Schneider-Pargmann <msp@baylibre.com>
 
->  int iris_set_hw_state(struct iris_core *core, bool resume)
+Best
+Markus
+
+>  drivers/net/can/rcar/rcar_canfd.c                   | 3 +--
+>  drivers/phy/phy-core.c                              | 9 +++++++++
+>  include/linux/phy/phy.h                             | 6 ++++++
+>  8 files changed, 22 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c b/driver=
+s/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> index a8b6ae58cb0a..ed7ed82ddb64 100644
+> --- a/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> +++ b/drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c
+> @@ -1300,7 +1300,7 @@ static u32 cdns_mhdp_get_training_interval_us(struc=
+t cdns_mhdp_device *mhdp,
+> =20
+>  static void cdns_mhdp_fill_host_caps(struct cdns_mhdp_device *mhdp)
 >  {
-> -	return qcom_scm_set_remote_state(resume, 0);
-> +	return qcom_pas_set_remote_state(resume, 0);
+> -	unsigned int link_rate;
+> +	u32 link_rate;
+> =20
+>  	/* Get source capabilities based on PHY attributes */
+> =20
+> @@ -1308,7 +1308,7 @@ static void cdns_mhdp_fill_host_caps(struct cdns_mh=
+dp_device *mhdp)
+>  	if (!mhdp->host.lanes_cnt)
+>  		mhdp->host.lanes_cnt =3D 4;
+> =20
+> -	link_rate =3D mhdp->phy->attrs.max_link_rate;
+> +	link_rate =3D phy_get_max_link_rate(mhdp->phy);
+>  	if (!link_rate)
+>  		link_rate =3D drm_dp_bw_code_to_link_rate(DP_LINK_BW_8_1);
+>  	else
+> diff --git a/drivers/gpu/drm/bridge/synopsys/dw-dp.c b/drivers/gpu/drm/br=
+idge/synopsys/dw-dp.c
+> index 4ab6922dd79c..79c72ee8e263 100644
+> --- a/drivers/gpu/drm/bridge/synopsys/dw-dp.c
+> +++ b/drivers/gpu/drm/bridge/synopsys/dw-dp.c
+> @@ -536,7 +536,7 @@ static int dw_dp_link_parse(struct dw_dp *dp, struct =
+drm_connector *connector)
+> =20
+>  	link->revision =3D link->dpcd[DP_DPCD_REV];
+>  	link->rate =3D min_t(u32, min(dp->plat_data.max_link_rate,
+> -				    dp->phy->attrs.max_link_rate * 100),
+> +				    phy_get_max_link_rate(dp->phy) * 100),
+>  			   drm_dp_max_link_rate(link->dpcd));
+>  	link->lanes =3D min_t(u8, phy_get_bus_width(dp->phy),
+>  			    drm_dp_max_lane_count(link->dpcd));
+> diff --git a/drivers/net/can/at91_can.c b/drivers/net/can/at91_can.c
+> index 58da323f14d7..7749da0a58f6 100644
+> --- a/drivers/net/can/at91_can.c
+> +++ b/drivers/net/can/at91_can.c
+> @@ -1125,8 +1125,7 @@ static int at91_can_probe(struct platform_device *p=
+dev)
+> =20
+>  	can_rx_offload_add_timestamp(dev, &priv->offload);
+> =20
+> -	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +	priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	if (at91_is_sam9263(priv))
+>  		dev->sysfs_groups[0] =3D &at91_sysfs_attr_group;
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
+xcan/flexcan-core.c
+> index f5d22c61503f..093e48b8da58 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -2210,8 +2210,7 @@ static int flexcan_probe(struct platform_device *pd=
+ev)
+>  	priv->reg_xceiver =3D reg_xceiver;
+>  	priv->transceiver =3D transceiver;
+> =20
+> -	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +	priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
+>  		priv->irq_boff =3D platform_get_irq(pdev, 1);
+> diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_c=
+an/m_can_platform.c
+> index 56da411878af..2a0f163a683a 100644
+> --- a/drivers/net/can/m_can/m_can_platform.c
+> +++ b/drivers/net/can/m_can/m_can_platform.c
+> @@ -131,8 +131,7 @@ static int m_can_plat_probe(struct platform_device *p=
+dev)
+>  		goto probe_fail;
+>  	}
+> =20
+> -	if (transceiver)
+> -		mcan_class->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +	mcan_class->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+> =20
+>  	priv->base =3D addr;
+>  	priv->mram_base =3D mram_addr;
+> diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rca=
+r_canfd.c
+> index eaf8cac78038..9062db48d477 100644
+> --- a/drivers/net/can/rcar/rcar_canfd.c
+> +++ b/drivers/net/can/rcar/rcar_canfd.c
+> @@ -1884,8 +1884,7 @@ static int rcar_canfd_channel_probe(struct rcar_can=
+fd_global *gpriv, u32 ch,
+>  	priv->transceiver =3D transceiver;
+>  	priv->channel =3D ch;
+>  	priv->gpriv =3D gpriv;
+> -	if (transceiver)
+> -		priv->can.bitrate_max =3D transceiver->attrs.max_link_rate;
+> +	priv->can.bitrate_max =3D phy_get_max_link_rate(transceiver);
+>  	priv->can.clock.freq =3D fcan_freq;
+>  	dev_info(dev, "can_clk rate is %u\n", priv->can.clock.freq);
+> =20
+> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
+> index 0d0be494cfd7..737a760d97d1 100644
+> --- a/drivers/phy/phy-core.c
+> +++ b/drivers/phy/phy-core.c
+> @@ -647,6 +647,15 @@ void phy_set_bus_width(struct phy *phy, int bus_widt=
+h)
 >  }
-> diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
-> index 1de7436713ed..3a38ff985822 100644
-> --- a/drivers/media/platform/qcom/venus/firmware.c
-> +++ b/drivers/media/platform/qcom/venus/firmware.c
-> @@ -12,6 +12,7 @@
->  #include <linux/of_reserved_mem.h>
->  #include <linux/platform_device.h>
->  #include <linux/of_device.h>
-> +#include <linux/firmware/qcom/qcom_pas.h>
->  #include <linux/firmware/qcom/qcom_scm.h>
->  #include <linux/sizes.h>
->  #include <linux/soc/qcom/mdt_loader.h>
-> @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
->  	int ret;
->  
->  	if (core->use_tz) {
-> -		ret = qcom_scm_set_remote_state(resume, 0);
-> +		ret = qcom_pas_set_remote_state(resume, 0);
->  		if (resume && ret == -EINVAL)
->  			ret = 0;
->  		return ret;
+>  EXPORT_SYMBOL_GPL(phy_set_bus_width);
+> =20
+> +u32 phy_get_max_link_rate(struct phy *phy)
+> +{
+> +	if (!phy)
+> +		return 0;
+> +
+> +	return phy->attrs.max_link_rate;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_get_max_link_rate);
+> +
+>  /**
+>   * _of_phy_get() - lookup and obtain a reference to a phy by phandle
+>   * @np: device_node for which to get the phy
+> diff --git a/include/linux/phy/phy.h b/include/linux/phy/phy.h
+> index a7e2432ca1ae..34b656084caf 100644
+> --- a/include/linux/phy/phy.h
+> +++ b/include/linux/phy/phy.h
+> @@ -57,6 +57,7 @@ int phy_notify_disconnect(struct phy *phy, int port);
+>  int phy_notify_state(struct phy *phy, union phy_notify state);
+>  int phy_get_bus_width(struct phy *phy);
+>  void phy_set_bus_width(struct phy *phy, int bus_width);
+> +u32 phy_get_max_link_rate(struct phy *phy);
+>  #else
+>  static inline struct phy *phy_get(struct device *dev, const char *string=
+)
+>  {
+> @@ -256,6 +257,11 @@ static inline int phy_get_bus_width(struct phy *phy)
+>  static inline void phy_set_bus_width(struct phy *phy, int bus_width)
+>  {
+>  }
+> +
+> +static inline u32 phy_get_max_link_rate(struct phy *phy)
+> +{
+> +	return 0;
+> +}
+>  #endif /* IS_ENABLED(CONFIG_GENERIC_PHY) */
+> =20
+>  #endif /* __PHY_CONSUMER_H */
+
+
+--840703edd9f3f1e1e79a02bb78a8d4f69f696b0531524c2c45c8075436e0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iKMEABYKAEsWIQSJYVVm/x+5xmOiprOFwVZpkBVKUwUCaa6QehsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIRHG1zcEBiYXlsaWJyZS5jb20ACgkQhcFWaZAVSlO3
+cwEAzFZFZ21Yi1E3bmSFVrYlzos6oRC2RIJXE4meDDVCTjUA/2INMu045NS1yRGm
+V6PI/m62S0rUjMso1TupNVful6QE
+=gdIq
+-----END PGP SIGNATURE-----
+
+--840703edd9f3f1e1e79a02bb78a8d4f69f696b0531524c2c45c8075436e0--
 
