@@ -1,192 +1,195 @@
-Return-Path: <netdev+bounces-265614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265615-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKmrIETwrmmFKgIAu9opvQ
-	(envelope-from <netdev+bounces-265614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:07:32 +0100
+	id qJK+GijvrmkWKQIAu9opvQ
+	(envelope-from <netdev+bounces-265615-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:02:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAAE23C72B
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:07:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1946123C5AF
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 17:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1708E3011528
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:52:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A99330451E9
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8103CC9E6;
-	Mon,  9 Mar 2026 15:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5E63DBD71;
+	Mon,  9 Mar 2026 15:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AKJEFNEc"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1fpsnCs/";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="039FDwXS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053D32765ED;
-	Mon,  9 Mar 2026 15:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998D73DEAC3
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773071534; cv=none; b=cZWhmritvDRhQs/QHk13zzgkj1zL/FYNPTiohvlN9ikbQtf+j42wsT5LaE89IXGyFiq5iiMY/mexn1lRZJCUMHDLKIop18ea5fTHPnHpOmXyH1CsVLP0cKjLL+B0PYWwOlvotXNbtxLyjzWaYHAHXa42NghlNBDCRYjaKZc9JbE=
+	t=1773071601; cv=none; b=ZatHedi5QGMYt1LYggbNJmP8y2AOfpWkpmwFWH00Jz8EbFrBMXRhrn3vUefa6U3S2eJ8erPcUcYFkK4Db7Mc+8gHeYjyhONK9YfdauFkJ3Ql1WQgBrqhA83kOvBVuipRkNV7cQyhgOkqsIRnLOeX+aONaF+2MVFOFUrpW01TRTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773071534; c=relaxed/simple;
-	bh=mZGaIhlbKCzQALuhXRNQkznQD6emqCoT86PETfpqCVo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sHJ66SktwMuNYcFyQihI9RSPGxkAynghsiy/6mP9cyHzBB/LnJzFWfQTssvlaFfw0XJ8lJYSFBP/z9DyFbOJg10QElXQ4n+YD5krlHLYKX1QN6WIoEhM17gBV0BIkWN9SHXmYKCHG9ImqHdo7cyvZlw+NN0XSvaSlkgX5DYYfSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AKJEFNEc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A8ACC4CEF7;
-	Mon,  9 Mar 2026 15:52:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773071533;
-	bh=mZGaIhlbKCzQALuhXRNQkznQD6emqCoT86PETfpqCVo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AKJEFNEcM0HG6cc3ZTXqKPN6pZyqmxMxWcPf0MAKjNiXVTiufotLk0c1FPa1hIKGe
-	 EX3s1ogmSl300XhdbkPZXLbRcZe81mjBZ1/W/iPXc6vDgp/ZvC62MNAeBKuxaQMVE6
-	 W3vf7e9COdkuQ6gE/xrMx9DZlR3E+3qQoOEHoMNE+of5ju37MvRlIsVVh2oln3mIW2
-	 Aw+/WcHiDjgr4fV8pSOr2e3i1O20kepoTj+TiKp8PURMqwQPIaj3DWfBTcjbNJnQYP
-	 eegWPy7hAV8I+xWc/HKjPnyGaW6ID/Y5/64N7yCRFuVmP2i+XV3pn+Bt8QWWC6KSq/
-	 UMRnnl6AcE3Uw==
-Message-ID: <46c10f63-0915-4d7b-934b-8293a7230efb@kernel.org>
-Date: Mon, 9 Mar 2026 16:52:07 +0100
+	s=arc-20240116; t=1773071601; c=relaxed/simple;
+	bh=EfeZDEosO+M6F5G/FvLk1SeYgv7uuiq7H7B8kLk2A+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kikkw5HXo2pMjkQDliqec87tIpOcPK7w47Frh8eIZWBnOK0BLBvU5Q+bJuX/wn7vGn7se75V+nzdXnWUrqx0annBZ3iwgl5c7E2SWTc42dRhy3Kj1DLPLOaMho6x/0vALAqH6Hxc9TV7dOiq603XnTPNOEpJ5FTpHswufdLIwnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1fpsnCs/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=039FDwXS; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1773071597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pQqyjVzSdrj/c3AeSvqR8huj83ceHJGRgwiMHxVNx9g=;
+	b=1fpsnCs/nVlu+/mtml5kFFlhh7PhbFnnK0H6iP+Aj1U0hhec0Jna8K86ND1Em3bJuu/3+q
+	hE0/EylhJgXs4o7VKoR4kCkFZGFOcVjrmmGax3CylpPuLc542AXaLOx2wRwekuuLJF5Nk5
+	8RJ4+CPwgUwAIxKaf5xzAo1f6L0n/q4eBQZQIaBhgJ3vKjEnusH4dXDeotgNIx6wpFnghm
+	8ngVP7YbKHk7leI3oy1oXBKpaGLe0RKxLdyLBvCeZ0TeRbEF6fNJD3GqulQBTrY1HJ4NjH
+	8F3rGSynasBTx49B1tuSZk96AVFv2AgTJsnXLPYCmLnyOG+ZgdURBx4TKH4lgg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1773071597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pQqyjVzSdrj/c3AeSvqR8huj83ceHJGRgwiMHxVNx9g=;
+	b=039FDwXSyDlxxuMBBMlMit9QBGmJTv6t/hZXwxoR9gpuFq0qxGX6BpdmW+lQTuEFq/Be9T
+	jVq3y1cvy4LL0jBQ==
+To: netdev@vger.kernel.org
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"(JC), Jayachandran" <j-rameshbabu@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [PATCH RFC net-next v2 0/2] hsr: Add additional info to send/ receive skbs
+Date: Mon,  9 Mar 2026 16:52:34 +0100
+Message-ID: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] arm64: dts: qcom: Add Arduino Monza (VENTUNOQ) board
- support
-To: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>,
- andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: richardcochran@gmail.com, geert+renesas@glider.be, arnd@arndb.de,
- dmitry.baryshkov@oss.qualcomm.com, ebiggers@kernel.org,
- michal.simek@amd.com, luca.weiss@fairphone.com, sven@kernel.org,
- prabhakar.mahadev-lad.rj@bp.renesas.com, kuninori.morimoto.gx@renesas.com,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, m.facchin@arduino.cc,
- r.mereu@arduino.cc, loic.poulain@oss.qualcomm.com
-References: <20260309152420.1404349-1-srinivas.kandagatla@oss.qualcomm.com>
- <20260309152420.1404349-5-srinivas.kandagatla@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260309152420.1404349-5-srinivas.kandagatla@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CEAAE23C72B
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260204-hsr_ptp-1f6380f1d35f
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1946123C5AF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265614-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,glider.be,arndb.de,oss.qualcomm.com,kernel.org,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org,arduino.cc];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265615-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[msgid.link:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linutronix.de,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
+	NEURAL_HAM(-0.00)[-0.990];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 09/03/2026 16:24, Srinivas Kandagatla wrote:
-> +		};
-> +	};
-> +
-> +
-> +	vdc_3v3: regulator-vdc-3v3 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "vdc_3v3";
-> +		regulator-min-microvolt = <3300000>;
-> +		regulator-max-microvolt = <3300000>;
-> +	};
-> +
-> +	vdc_1v8: regulator-vdc-1v8 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "vdc_1v8";
-> +		regulator-min-microvolt = <1800000>;
-> +		regulator-max-microvolt = <1800000>;
-> +	};
-> +
-> +	vdc_5v: vdc-5v {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "vdc_5v";
-> +		regulator-min-microvolt = <5000000>;
-> +		regulator-max-microvolt = <5000000>;
-> +		gpio = <&tlmm 49 GPIO_ACTIVE_HIGH>;
-> +		enable-active-high;
-> +		regulator-always-on;
-> +		startup-delay-us = <20000>;
-> +	};
-> +
-> +	vreg_nvme: m2-vreg-3p3 {
+I am trying to extend linuxptp to support PTP over a HSR network.
 
-You have kind of random regulator names. Some are regulators, some are
-nothing and some are vregs.
+This is the kernel side of the changes. In short PTP over HSR sends its
+packets to a multicast address and every node needs to forward the PTP
+packet (SYNC and FOLLOW-UP for instance) within the HSR ring.
+In order to achieve this, the HSR stack must not duplicate and forward
+the PTP packets as it would other packets. The delay caused by the
+duplication and forwarding adds overhead which in turn makes the timing
+information within the PTP packet inaccurate.
 
-Please use name for all fixed regulators which matches current format
-recommendation: 'regulator-[0-9]v[0-9]'
+My current approach is to open the hsr0 device from userland and send
+and receive the PTP packets individually on both slave interfaces. I
+added additional hints to the af_packet interface, which is used by
+linuxptp, to be able send a packet on a specific interface (A or B) and
+also to have the information recorded for received packets.
+Additionally, the PTP-timestamps which arrive on the slave interface are
+forwarded to the hsr interface.
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/regulator/fixed-regulator.yaml
+This solves the following:
+- Forwarding a SYNC and a FOLLOW_UP packet.
+  Userland receives a SYNC, FOLLOW_UP and timestamp packet from port A.
+  The received port is known and recorded. The SYNC packet and the
+  updated FOLLOW_UP packet can then be forwarded on port B. The update
+  is based on the time spent during the forward so the forwarding delay
+  is accounted for.
+  In this scenario the HSR header is used from the original sender of
+  the SYNC and FOLLOW_UP header and the stack must not prepand the
+  system's HSR header nor replace the provided header.
+
+- Sending PDELAY_REQ and PDELAY_RESP*
+  These packets are only exchanged between the two nodes directly
+  connected and they must not be forwarded within the HSR ring.
+  These packets are sent as PTP packets and the HSR stack must prepand
+  system's HSR header including a sequence number.
+  This logic is also used for SYNC packet if the node acts as a GM.
+
+This has been tested in a pure software environment and in an HW-assited
+environment where the HW is able to duplicate and deduplicate packets
+but does not do it for PTP packets.
+It has not been tested within an enviroment where the HW is able to
+forward the PTP packet and correctly update the timming information.
+
+---
+v1=E2=80=A6v2: https://patch.msgid.link/20260204-hsr_ptp-v1-0-b421c69a77da@=
+linutronix.de
+- Added PRP support
+- skb extention is used instead of extending struct skb_shared_info
+- in af_packet
+  - packet_sendmsg_spkt() is no longer extended
+  - jump labels are used to avoid the overhead if there no socket that
+    is using this HSR extension.
+
+---
+Sebastian Andrzej Siewior (2):
+      hsr: Allow to send a specific port and with HSR header
+      af_packet: Add port specific handling for HSR
+
+ include/linux/if_hsr.h         |  81 ++++++++++++++++++++
+ include/linux/skbuff.h         |   3 +
+ include/uapi/linux/if_packet.h |   9 +++
+ net/core/skbuff.c              |   4 +
+ net/hsr/Kconfig                |   1 +
+ net/hsr/hsr_device.c           |   7 ++
+ net/hsr/hsr_forward.c          | 118 ++++++++++++++++++++++++++---
+ net/hsr/hsr_framereg.h         |   1 +
+ net/hsr/hsr_slave.c            |  35 +++++++--
+ net/packet/af_packet.c         | 167 +++++++++++++++++++++++++++++++++++++=
+++++
+ net/packet/internal.h          |   1 +
+ 11 files changed, 412 insertions(+), 15 deletions(-)
+---
+base-commit: 3daa4f5dc6cc1ac1ab2f95b5b4c16bc5fb87f48f
+change-id: 20260204-hsr_ptp-1f6380f1d35f
 
 Best regards,
-Krzysztof
+--=20
+Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+
 
