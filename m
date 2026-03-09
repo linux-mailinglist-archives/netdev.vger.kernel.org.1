@@ -1,189 +1,218 @@
-Return-Path: <netdev+bounces-265688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265689-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMyHAbESr2nJNQIAu9opvQ
-	(envelope-from <netdev+bounces-265688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:34:25 +0100
+	id wJmEEnMTr2kiNgIAu9opvQ
+	(envelope-from <netdev+bounces-265689-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:37:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EA023EA14
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:34:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B333823EB0E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 19:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F1E57300F179
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 18:34:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18181301F996
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 18:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA52347BDD;
-	Mon,  9 Mar 2026 18:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F237346FBC;
+	Mon,  9 Mar 2026 18:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3Fgdbvro"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R37WumJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98E532BF42
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 18:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773081255; cv=pass; b=jZIj2ga3vP5qbJ6at2BMZR9RdNIatFe5CSPtZluEHpipyumrH/dI19yuKzI5F1tovv20FOkJChbOZA+rufxFLXxIufw5VHoc+cKdwfY0SUsvSELuq5fgg6NSWEIq5S5x6U83GC3nARp/WWjD3JEAnbph/BtlDF/zxNnEykBedBM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773081255; c=relaxed/simple;
-	bh=Th/Vm5yJvjJFlnWx4DiQQq3OKW9BqqV7UtSysK0C5T4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EWOoVNqlVbjBYHos/aiI2Dgq4UoSwpvIRJcOYYQ1A01VDfx0BzeIWVA2flxHypsbD9NJg+GUhntetjGaeQAK08Tkscm/cXXBwusGEaB9hibDPRgzBNVf3ad7wP/fDDDA4ANbyddwBtyKawaPoOwHrtQnzefyQJZmOv9cam9KQNQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3Fgdbvro; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-79902e1fb71so11304817b3.3
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 11:34:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773081253; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X8+/RWxWKmh6bLDnuwUwTFxUFX6NTCf0uiX9wz29v4XznY5sXdVCt4bvrl7qsezOWA
-         eGpfQZHYCr3nv3youXADOtn0qH9x4jKyR/UwzPtzd0JFWYiCzKt3j9rjwr3gjSf0p9JR
-         LZhzl9RD7aFD2FNXRE68ph0QoZh9J2mrYqbtDgRCtT2rGrN3jQRet4sWy5FBQphmu2V/
-         0yidy5NHbzxwk20Adj6VE1ToMY2ZInpX3+ujy1rUOQJg/hiNnYgLXN+ofqfdtPGJy9va
-         QxyKmSbe3nTmwVqKhG1GmFaj0PAVEhJXOdda9SqzgNfwq6pQKH+cwWDT1HV088MhlOfB
-         a1Eg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tIkDbd45e1YDVubOvjwhJvyku4GXAKAJYDkkxfPowjE=;
-        fh=H0Ppw6+i6JRudBxd1INF0FCU86zK4YZDdVM4+aggkU0=;
-        b=GE0Ij/2bFmR90cHVDWryvfFUDrOvtyt/FPwDAEQszLPT+tOBaURrccwU6iBYR4wI0N
-         tiVYoHF6OG8/buxpo2J9vaDMrqQpFh+dy4crQGN7xECZOEARWdq/MZB5MLTDBscRYs/W
-         JeFhZj4OmXMa3jBsVUYrJmsDgUzDWdbrZUSKkwSQtEj6hC26oq0HUZglATIsd8Yd9eKV
-         4LXH3VtqC2LgHGVYFvtoKLVKGfk4RZ6iyQYu29KRhDEACL/hXrFfZ9G5qiPWKEjR7D6A
-         khnKfBgMiehe09f6s2oVMB3jJYiYT4uNBoYctFZRh7yFs+n3HmOJPtQEsOSN8/Y5Pv8D
-         SeOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D559340A59
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 18:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773081307; cv=none; b=Hps0XyJV0V2r2OdmsypPGbzMrmqvGCsoTMpNZ9zc3FGTLH03Ys9NpW0MK3LxF4V30Gh3bWay3eF8IrlShkYwl/ufYJ9lAV8lK+cR8/GNSSufJ7DDQQsXyvbZSLfREy5KF1mn8tlDoTcQjYBBIt5WiiLNg1QI00PLlp5EWdWuWS8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773081307; c=relaxed/simple;
+	bh=GYLyb5hpy2e2Yo7c3xeWEYb5pENWyLeOyEwMHsX72R8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C8nDAIGlfzjQwAiZAbBFJdRyiO2RnrDQBqodTkuUzt3hpboeBxqZ8Xc86S53MYuFdPbL6/0NP/pc0gIcGVkUvNkNhjS0dTLFbZeKDfQJs2G+MCQjrrBH/d2N1ZYg10TMnC0sUB3DCCmPrqgnV16+31MD0ncCS+Wy5cT5awkhKyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R37WumJw; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-79852e01cd1so5652077b3.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 11:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773081253; x=1773686053; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tIkDbd45e1YDVubOvjwhJvyku4GXAKAJYDkkxfPowjE=;
-        b=3FgdbvroRB4h+7A3rEt3vOCAlv8EegipA5HHgVsNLDCDiLaRT7kYLVEFvTRFV8ePdR
-         SBCmjfVxyG2uy+kDKjrU/Ii1VmDr5Zp3pxERTIElpfVnr6q1wIb4QbsJxWg3Y0mol7AX
-         NzpJkqeM08TAV1cknLhVr56fl99TYPr4TJZJHQb3vgLZvW81WtnkzK1HV25nIHQih7c/
-         ReH6U+BjWF/0vAc+2LRLlC2R9FbeNqjv0/WjQWYuyznzCG6D1GJALIGexO2UMFD37foz
-         e4BAZ5Ib6JLHScPGqUrG6bq35RAAuyJP+YXSKMN8+H8ACoDOvC/oFT1oirJDLYOoP/U0
-         aa+w==
+        d=gmail.com; s=20230601; t=1773081305; x=1773686105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eVpgFgXoeruYouAkfc0JEALekSnCLZeaR3hMoMDJ/8c=;
+        b=R37WumJwdVMl+cjBBPON0SzRv5Ro5iTnUY+L3WcIChw58LfiR8bJ4W47ewBf727MYy
+         rWfhcn+QzAg552StHHxw/JbLMgTIA+TGn7J7rUxh9C910pS/6wyPcaAynEjeI8Itsd1B
+         3yCNdGfMBk+hlwFdnbflAoWd9gH2Qjz7LeY8EBsTSvHEK+T09e+5N8v5LQ0ZijbrMJFf
+         933MUPjVeMPomGhd/pfu7DH+rPryYFhRd2qMQ/08Pjsrn8Ziqhopu/0ZPcHONeJDEYp3
+         cFNQnUSd06TeH3ogJCno1JcHWK6/SX8Z+HIk3zL6pICMFCYalrxaMoWliXAyCkFBRUGP
+         rBfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773081253; x=1773686053;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tIkDbd45e1YDVubOvjwhJvyku4GXAKAJYDkkxfPowjE=;
-        b=BbLINeC/vCcOFCMccyDLWoSJnWXvoU6s56+Ls1yrVPCMlke6ItcFuSWX/HfNOlcLwm
-         MJaPCW1r1jDm35UrvqgFLPdF2n1E8QULtN03OovkqT14c4AmRy9l7PFvO80cqjlyJD/U
-         Fiy//zJi3LmCvpfdxGO2PMWdItwHVL442eiZrYtqaZLMQpOKMwSNlrf1SPOezVDk2p61
-         ejuNhlwQlYzUtK0IiekDZIaF+f+eqg8sqjBF0jodJqFLcbEpmb4D0IuJX2tYOJrtiMOH
-         YIG+mY6Ihh8+gJKsUIUVGn784u7LbFsON9bvcP4jqiyL8mUQewaGkztzHRdbMciwgygA
-         Yikg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvTiVuh9eL1VXUZY0nvQBiUE884JCioANg2MZdePTIjHGBjnvsyERxLeutAs6Lvb3I2ZvQByk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTQmvXHRjbJvuXAvrcr4dGYRvpN1DT4LE9sM3Yi2XgpEsik2hi
-	kiYkSU4dow7ftG2OibBaYOp/XNTGjOj21LH5h2Zr2ldLy0zd4KF+5hEDXKYecBys8rSoqx14jYJ
-	99anYhuDelcqUjJb84yJFJ8W780h368mPAi+HL8hB
-X-Gm-Gg: ATEYQzwx4oT+LK4mKXKKuabanu4FqpAszJcvaCL5gLSyFPgNXYrlUOr3B828IVd+lQd
-	AwFTK+4iK+3I72mvXBW8YK8EQ25GAvKOliF5Rl2sK4kZBNNotZTyR2ElfGgxc9Sxido6HL0B3Kp
-	uLtsygaf9h1Xq4Crl2MKyDxkDSn9lgIOtA3iCiEA2+T+wtVsPKKf5tEy/p7vwtIoDuBwnfwtmZ2
-	68vSovukmfQPV7AeAMqy6IAAh6DeJPsz6CGSV3EWnm5KluFvnIcMwhPUjrscHdcGQvLsWzPd+Ik
-	avb4ZPAuupHyMYQBXtpc6Q==
-X-Received: by 2002:a05:690c:450f:b0:797:a9d0:f0b7 with SMTP id
- 00721157ae682-798dd717e41mr118562797b3.38.1773081252866; Mon, 09 Mar 2026
- 11:34:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773081305; x=1773686105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eVpgFgXoeruYouAkfc0JEALekSnCLZeaR3hMoMDJ/8c=;
+        b=K0xIxefWtLC06LDPO+Y2BAc1/BbRJwf+791uGcMhlC9ZXPUo3A+MoLLEjtxXqGvL73
+         Acfsg2w5jUiFrQRAJdapndTkZvCldqVhj/FE6817eJk55wwrWOtSaQfIGbEBntC2zJVH
+         xFbvf/l7sFfW9ewii6gWRGmy76Sbp5zawstOq1gILb1wszoca1tM8Pof0YMPqFtMvcmF
+         5kiqTJELJ0gS5qmyRJB4+eIXHVFQ/p6MM3pT7OtDpRGwGZ2/gDVbKOaCm5DoVHrdmEVW
+         CTSYFpTdRpm4nPUd0X69QciuoSIvKO1xwmjB5FEUs8DKLMOy3omyxUcBzaTcIna2O4lj
+         AOlA==
+X-Gm-Message-State: AOJu0YzF6c6fzgZXnFRTrFgyc4nPcCoSF5pM8nVqSBTUeKYRR56MN/pz
+	xVoSvTCElzWIU/fypHSfwVdsDEai8XOzXDR/Ass7DuaysE/sJPFBODkHCqW6LQZAgZo=
+X-Gm-Gg: ATEYQzyFCO22JkKRkQh9b9eDvWtO2/j5/7Z4lTIOJkTfrKT0APsMNClthMVdpz9iO2W
+	rQMQ6JNB7n4tUFavjT+wfb5XnKA6JbNtdBNDWrjCpE5DH4cH/073rNcPoE2fxY+ZwXufaR/0ceJ
+	3xRSCubQNlpSZ60fEvk0cXZcHHaJ3XW+VGnPP28Rlg8KfZI5zbs6IEJrjwXIOithWgk6w1lspoC
+	tpdHsRvC0WmYyrpnb76Y/vmFrVgq2pTDhfrIUQRnNvW0xPcSkQFFaxIbxFNll4zZoxsLLu4bzTr
+	ie2YCFTFnKu0m1InlN5mYCueHwfvf3uUI5bTRysb4n3WROP/Xb3UGMS+HQUX8+vwljyNJPAbfFK
+	55U4KzZtdL+xP7FkAxW8y/9hmWQlAkFYNGmk+/bQkn0anpnJX7NkfcQtc9flqE7vk8TRoKyMThi
+	Viz37TQ8AtPlr1JaGQQEhJTWxB
+X-Received: by 2002:a05:690c:f09:b0:798:7879:1ad2 with SMTP id 00721157ae682-798dd7bf509mr98414337b3.7.1773081305110;
+        Mon, 09 Mar 2026 11:35:05 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff:54::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a515d1csm2573917b3.4.2026.03.09.11.35.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 11:35:04 -0700 (PDT)
+From: Wei Wang <weibunny.kernel@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Wei <dw@davidwei.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Wei Wang <weibunny@fb.com>
+Subject: [PATCH v3 net-next 0/5] psp: Add support for dev-assoc/disassoc 
+Date: Mon,  9 Mar 2026 11:34:48 -0700
+Message-ID: <20260309183454.2872967-1-weibunny.kernel@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307133601.3863071-1-edumazet@google.com>
-In-Reply-To: <20260307133601.3863071-1-edumazet@google.com>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Mon, 9 Mar 2026 15:34:01 -0300
-X-Gm-Features: AaiRm50kHhT1fFacOlxCSltURRrlLPpNX_C4Smiwr326cuuFlAfC8WfjCt55tg4
-Message-ID: <CA+NMeC-3dP2EnD2cCH+n6enQvXa+23NNFeZ8+DDm89zbM3MkNA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: refine indirect call mitigation in tc_wrapper.h
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Pedro Tammela <pctammela@mojatatu.ai>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 79EA023EA14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B333823EB0E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265689-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265688-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,mojatatu.ai];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,mojatatu.com:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fb.com:email]
 X-Rspamd-Action: no action
 
-On Sat, Mar 7, 2026 at 10:36=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Some modern cpus disable X86_FEATURE_RETPOLINE feature,
-> even if a direct call can still be beneficial.
->
-> Even when IBRS is present, an indirect call is more expensive
-> than a direct one:
->
-> Direct Calls:
->   Compilers can perform powerful optimizations like inlining,
->   where the function body is directly inserted at the call site,
->   eliminating call overhead entirely.
->
-> Indirect Calls:
->   Inlining is much harder, if not impossible, because the compiler
->   doesn't know the target function at compile time.
->   Techniques like Indirect Call Promotion can help by using
->   profile-guided optimization to turn frequently taken indirect calls
->   into conditional direct calls, but they still add complexity
->   and potential overhead compared to a truly direct call.
->
-> In this patch, I split tc_skip_wrapper in two different
-> static keys, one for tc_act() (tc_skip_wrapper_act)
-> and one for tc_classify() (tc_skip_wrapper_cls).
->
-> Then I enable the tc_skip_wrapper_cls only if the count
-> of builtin classifiers is above one.
->
-> I enable tc_skip_wrapper_act only it the count of builtin
-> actions is above one.
->
-> In our production kernels, we only have CONFIG_NET_CLS_BPF=3Dy
-> and CONFIG_NET_ACT_BPF=3Dy. Other are modules or are not compiled.
->
-> Tested on AMD Turin cpus, cls_bpf_classify() cost went
-> from 1% down to 0.18 %, and FDO will be able to inline
-> it in tcf_classify() for further gains.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+From: Wei Wang <weibunny@fb.com>
 
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+The main purpose of this feature is to associate virtual devices like
+veth or netkit with a real PSP device, so we could provide PSP
+functionality to the application running with virtual devices.
+
+A typical deployment that works with this feature is as follows:
+     Host Namespace:
+     psp_dev_local  ←──physically linked──→ psp_dev_peer
+	  (PSP device)
+	       │
+	       │ BPF on psp_dev_local ingress: bpf_redirect_peer() to nk_guest
+	       │
+	  nk_host / veth_host
+	       │
+	       │ BPF on nk_host ingress: bpf_redirect_neigh() to psp_dev_local
+	       │
+      Guest Namespace (netns):
+	       │
+	  nk_guest / veth_guest
+	  ★ PSP application run here
+
+      Remote Namespace (_netns):
+	  psp_dev_peer
+	  ★ PSP server application runs here
+
+Note:
+The general requirement for this feature to work:
+For PSP to work correctly, the egress device at validate_xmit_skb()
+time must have psp_dev matching the association's psd. Any device
+stacking or traffic redirection that changes the egress device will
+cause either:
+1. TX validation failure (SKB_DROP_REASON_PSP_OUTPUT) - fail-safe
+2. RX policy failure after tx-assoc - packets without PSP extension
+   are rejected by receiver expecting encrypted traffic
+
+Here are a few examples that this feature would not work:
+- Bonding with load balancing in round-robin, XOR, 802.3ad mode across
+  multiple PSP devices, or mixed PSP and non-PSP devices
+- Bonding with active-backup mode might work without PSP migration for
+  failover case.
+- ipvlan/macvlan in bridge mode would not work given packets are
+  loopbacked locally without going through the PSP device.
+
+Changes since v2:
+- Change the newly added parameter to psp_device_get_and_lock() to
+  admin in patch 1. Introduce 2 device check functions:
+  - psp_device_get_locked_admin() for dev-set and key-rotate
+  - psp_device_get_locked() for all other operations
+  Flip the logic for checking the dev_assoc_list accordingly in patch 2.
+- Move psp_nl_notify_dev() before removing the dev from assoc_dev_list
+  in psp_nl_dev_disassoc_doit() and correct the typo in commit msg in
+  patch 2.
+- Remove the threading and subprocess and some comment updates in patch 5. 
+
+Changes since v1:
+- Update the first 4 patches to reflect the latest changes in
+  https://lore.kernel.org/netdev/20260302053315.1919859-1-dw@davidwei.uk/
+- Update patch 9 to add a param to NetDrvContEnv to control the loading
+  of the tx forwarding bpf program
+
+Wei Wang (5):
+  psp: add admin/non-admin version of psp_device_get_locked
+  psp: add new netlink cmd for dev-assoc and dev-disassoc
+  psp: add a new netdev event for dev unregister
+  selftests/net: Add bpf skb forwarding program
+  selftest/net: psp: Add test for dev-assoc/disassoc
+
+ Documentation/netlink/specs/psp.yaml          |  68 ++-
+ include/net/psp/types.h                       |  15 +
+ include/uapi/linux/psp.h                      |  13 +
+ net/psp/psp-nl-gen.c                          |  36 +-
+ net/psp/psp-nl-gen.h                          |   4 +
+ net/psp/psp.h                                 |   2 +-
+ net/psp/psp_main.c                            |  90 +++-
+ net/psp/psp_nl.c                              | 298 +++++++++++++-
+ .../drivers/net/hw/nk_redirect.bpf.c          |  60 +++
+ .../selftests/drivers/net/lib/py/env.py       |  54 ++-
+ tools/testing/selftests/drivers/net/psp.py    | 387 +++++++++++++++++-
+ 11 files changed, 997 insertions(+), 30 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+
+-- 
+2.52.0
+
 
