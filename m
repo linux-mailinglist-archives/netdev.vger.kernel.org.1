@@ -1,118 +1,84 @@
-Return-Path: <netdev+bounces-265599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKd8H8vormlRKAIAu9opvQ
-	(envelope-from <netdev+bounces-265599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:35:39 +0100
+	id AGkmFuLprmlRKAIAu9opvQ
+	(envelope-from <netdev+bounces-265600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:40:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270C323BC7B
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:35:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C15B523BE10
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B5383044805
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:25:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D9C9305B374
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5563E5599;
-	Mon,  9 Mar 2026 15:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597393D6488;
+	Mon,  9 Mar 2026 15:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SLxY740e";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Wl/oIEIj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="s9ZQZH2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0D43D903D
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA10E3BD63F;
+	Mon,  9 Mar 2026 15:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773069881; cv=none; b=Jqe57LXzsIOGBJHMPYbvIXuhrhG95s30HAs5AP0sGoHSL0S/Zo+Omew4SFgIh+zqFTpUCmmPu71mwXeO44iZTDk73sxY/iFC0wIAjbdzJD3oQDgVvCXO84pgId/5g4Sw8BKKXbn+hlevXRDiB6oE5dtgzCV2rPWLl3fQLWoMeS4=
+	t=1773070081; cv=none; b=jWA/PUcZwjAyPeStZWOhtzZBbKJe+r+3xjHDUOkqFWyrzG+P3v31/VdHilMF6lK5c0PLrcZya2ozza1ePm0jy83Xym4srY1mYES9VEz4d3D2bcHpv+ZuoUtNqSUJnXpKxA6BPLYsW1ABducjzqaGW5oWD/DE9EtdZaf+2WMICTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773069881; c=relaxed/simple;
-	bh=F9n0ftLKGlM6JU8PeQyKHdnuFLu0ujL0nGM4mPk+Qlk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A9QOIm2wZMT9xt17WVKc2GsZHlllN6bFsBplVzJ4Ofn8PF49q5sIXBARYd+GtzJ5T3CCa43njJf7CIR7o8O/kUgRHwlKik0PHytKsmiYjPhKJDX6C9aJaYJPtpSNQ1zwIwghNIiNpSrt32gaPt89csJHEjdJePYSHEnk6aIj0Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SLxY740e; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Wl/oIEIj; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 629A6fg12195131
-	for <netdev@vger.kernel.org>; Mon, 9 Mar 2026 15:24:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=fT0QxTs3w4o
-	nOwpcb/N6xWIFXq4k74USa4Ia+RJ4IcI=; b=SLxY740eFeMHXel3oQxGTx/vPOK
-	ts6zQHxpSRpSOu5czImJIHPnK6ylFHpIb0Y4gSDSJeuMIrw/oV6U6Lq1pPkj62l8
-	HvXJ3JdLuVInwI9U9XFozvYpvJk9dKWOwWcUBYbprdrWE+fsPKSf0YcFE5fNIkt8
-	nYzhCxeyVJIKZhjmrBMkKri63WgVbUyT1KxOkBEs+xJ8v2P9HKG6eMXuoAT6VeDr
-	HVuSFxuymdMwRfsBywCv9MXm6fl5OTd7BNWyky20kd1oysVxVRn2HkM1y0onnlTL
-	brJAsia8VZepycP9mXshbkryi3kLhxbHDwxDNa75/B+gsCjF1qy/RFh48eA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4csv5u90fu-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 15:24:39 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8cd722c1a69so1415667285a.0
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 08:24:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773069879; x=1773674679; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fT0QxTs3w4onOwpcb/N6xWIFXq4k74USa4Ia+RJ4IcI=;
-        b=Wl/oIEIjkvaMJU9P5akmev2x3UEGnOFsSNaIC0L+VVkqiJI+XRW/Xe86klFNxrt1es
-         Xis4VjPiHpxZI4gWw9Itt2mc28aZOjhJIFcI94blq/wKbNQR7Sz9m8+xPViWb05ow6wx
-         NX4GIVjzBR/iKeVZUWngWX/cxHQjWnopD2v5b+8xDtPFWZ1gEgO2rD+yUXDbLrwudYTh
-         HaYgofe2Ol00lK+YNhboonJfW4ncCs8Xc3chqW9h+wGRAc1D8lKN7yJ6/7yrF1smVyuK
-         4U1BuG7xiP+VQD2Ra0B25+iI45kekPn4Lda3ZFVPiTb1aCUJTzZNiPaq0stJCylDk0WK
-         hEcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773069879; x=1773674679;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fT0QxTs3w4onOwpcb/N6xWIFXq4k74USa4Ia+RJ4IcI=;
-        b=MLpxU+65YPb8ZZufAIgggdnwrlD1hk/dQyp17Fy08B8MnwCPr6xYF2eDiH9vpK8yJ8
-         lPFwUBFETzcne+QXzsE+f04EALIu45I9Dx8yzhBrEhURX892ny5hw3KO15uH0DHGyiTu
-         jNDcWLBniIweMmQ/moQIaBluRPuZQqk+a8iI4U4ctmVQBeMdM3Lp1NTNuaDzTWx4vDZ5
-         fpKL4sF9vbiowKaydL8V07LdQAgVJVKYRqFunp+/ZGkVVuBHSoHN8sbj8uYx0jBTivGu
-         zB3eSEpjG6K3lo2L77BXc65SlveizeqAKQyAAhaYCIIj5MOT0eoZm9Py2Rv0rCYIccP0
-         m2Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWI8kKRXFR0eXI7IzB5kMEC5hQThVXrZcWmy2yQOejfWl3ayFHn/UO33VzRwLSuNee6HHNTBpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6hhKMGMK2whxoi1/F9lLgLgXn/HSNhFRNcIyjL5RMim41JFnF
-	VlN50NfcTMAVb9ylEHMt8F03SDpIAmntMh0mf8gUMealHClf2zV+HlZsHNOXm5REMgmmGtdfBQa
-	Qhb34AuoLVnLcH4EPaY+C++e4gfEHkQvSuigPTP63N+Nr245N9hMBhidOD3g=
-X-Gm-Gg: ATEYQzxsLyohOPYFQdpB9ZXQM9W+PSapQmx4A/ofS4utX1241EZxtatR4cBdnCTpv7h
-	WvyyHNci044g+gbPniyxL+EeSjhf1p+565LD7CEs5OSrolyOEqacEhySsY2F7Wn/H4598aBdnEN
-	TOvEjoSNb78CcO0S5ketkhpPS3d3GmmonUWeoLQf1wWOYSskJ+DNd/f+xgqFADaJFkzSWp9UzUs
-	T2ZdF/wV4/AIQ/LlcGl7RysEdw/RxusadCN3anxlIA8hBgJMn+zbZVvhla+VDgvCQyZKEaENl3r
-	q8ecp2XRgV/5QAZv4OAReDOsXvlWWE5EUZL5oFP9ljByoy8PkFWj+5yvn+RMxA0O+T23CD7matp
-	iv5d5ZCmOnyB7elEhHdwFrzLkl/VTTxBUNryVishYmCT9HycRa+8nu5s=
-X-Received: by 2002:a05:620a:480c:b0:8c9:fb0e:ca43 with SMTP id af79cd13be357-8cd6d3868aamr1381785585a.24.1773069878690;
-        Mon, 09 Mar 2026 08:24:38 -0700 (PDT)
-X-Received: by 2002:a05:620a:480c:b0:8c9:fb0e:ca43 with SMTP id af79cd13be357-8cd6d3868aamr1381782185a.24.1773069878230;
-        Mon, 09 Mar 2026 08:24:38 -0700 (PDT)
-Received: from localhost.localdomain ([5.133.47.210])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4853a59fc36sm192812515e9.9.2026.03.09.08.24.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 08:24:37 -0700 (PDT)
-From: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-To: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: richardcochran@gmail.com, geert+renesas@glider.be, arnd@arndb.de,
-        dmitry.baryshkov@oss.qualcomm.com, ebiggers@kernel.org,
-        michal.simek@amd.com, luca.weiss@fairphone.com, sven@kernel.org,
-        prabhakar.mahadev-lad.rj@bp.renesas.com,
-        kuninori.morimoto.gx@renesas.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, m.facchin@arduino.cc, r.mereu@arduino.cc,
-        loic.poulain@oss.qualcomm.com,
-        Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
-Subject: [PATCH 7/7] arm64: defconfig: Enable configs for Arduino VENTUNOQ
-Date: Mon,  9 Mar 2026 15:24:18 +0000
-Message-ID: <20260309152420.1404349-8-srinivas.kandagatla@oss.qualcomm.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260309152420.1404349-1-srinivas.kandagatla@oss.qualcomm.com>
-References: <20260309152420.1404349-1-srinivas.kandagatla@oss.qualcomm.com>
+	s=arc-20240116; t=1773070081; c=relaxed/simple;
+	bh=IFIWbREGAMnygUVA2aDFulI54BA3WY6OzUD1lZbiR0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NmK3acfud+t4eY1LhhaCVu7KLFHsuLqmOv61VfUO6z3YrlZID4GBKCNly9lwyhEs+zokcY9D7kerBNPWmSqCExESK1Q8NCssAg93A9hkdgUdsmX6Zf7DFtf93Lu6lY+AngF4E0vJrcXd2jcHfNGh8wO9UqDP4QOmGGerG+a1jkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=s9ZQZH2+; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id D057CC4287A;
+	Mon,  9 Mar 2026 15:28:18 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5E8645FFB8;
+	Mon,  9 Mar 2026 15:27:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A33F110369BCA;
+	Mon,  9 Mar 2026 16:27:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773070076; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=DSqMKqpddZ8yuL8H0OlJEpMFVH7t73hFQ48oSathkpk=;
+	b=s9ZQZH2+oyDEcrV1s8ZC9r5vgvl90jL1MuZ+/PL8RNnYqCwAhsWcx1oAZwohmPCI6OfTWC
+	MWpz36qHPBw79vtiN829ZoCM2lSJOExj8YSEhEhhFjjPmi2lu1ci+A8YIQQuSiWnfOe3wQ
+	t3dJMDjcy7RA4eIyq6R85TQBqFLO8L614TlhQxChAfu3gHnxGozERL26RHr0oyAQ4HEW/G
+	2MPeeEdvrLD6tg1hZ3eZkVoJQiOAfuSL62w2fNjLppPos362CQwAh6xjM70+zwChY5Oky7
+	df+5Fs9hUxEmB4bdygdZkWK9U9HTfW6oBjp/FAVNpSOFdje0uLSAxdRjdZ/fWA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+Subject: [PATCH net-next v7 00/10] net: phy_port: SFP modules representation and phy_port listing
+Date: Mon,  9 Mar 2026 16:27:36 +0100
+Message-ID: <20260309152747.702373-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,91 +86,238 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: klncD6a0ON3O8aGfyBhhmPKt_ZA87YQm
-X-Proofpoint-ORIG-GUID: klncD6a0ON3O8aGfyBhhmPKt_ZA87YQm
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDEzOSBTYWx0ZWRfX36/81Ome5Hrs
- M6e6GTUl5lGmTHqi7k5CiLNLVPQYB75P0w7AVJnj8uDZPQr08ouxOfpzgvatEIu1gEU2f3j8HXh
- PRqpWDP4ADTbCdszuj3Xi7S6KwHqdF79GOoJJGxdghD2ggXVrRwS/MKYB7WE7/5UTFuibvdUywO
- 6xj8eypma68iubftE4SJhxV7ENAvCc7SmtNcoI5esfSdfR4VNLMRMkQ+rqxkPP9785BbjFZf4zt
- 79VfjKnku1ezU+WFz5F4+JN9wzhopehxI9vj/02h6p32oFe7RMguRUfSnkRad4UL3MuJ0lBvS6P
- 69rhYiI62zRbmpU+3UouuXWIFuEl1+++TYiPPkD1UBCXJzQilyymP+mwBNgwcLyTe19uA+G9Qdo
- vpNORp/jjUSebQMnuD2FSsM0RoQ3k78jEtCjq61oqntzaSgagoIETr999UiyTpNFVr1wk/Xx0D0
- 7y4aEGQYKjPsOA9laXQ==
-X-Authority-Analysis: v=2.4 cv=Xr/3+FF9 c=1 sm=1 tr=0 ts=69aee637 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=ZsC4DHZuhs/kKio7QBcDoQ==:17
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=EUspDBNiAAAA:8
- a=rO3wVDe-YCVyVCuK1RsA:9 a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-09_04,2026-03-09_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 priorityscore=1501 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603090139
-X-Rspamd-Queue-Id: 270C323BC7B
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: C15B523BE10
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,glider.be,arndb.de,oss.qualcomm.com,kernel.org,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org,arduino.cc];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265599-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TAGGED_FROM(0.00)[bounces-265600-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[srinivas.kandagatla@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Enable ETHERNET PHY and Analog codec configs required for Arduino
-VENTUNOQ board.
+Hello everyone,
 
-Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
----
- arch/arm64/configs/defconfig | 2 ++
- 1 file changed, 2 insertions(+)
+Here's V7 for the phy_port netlink interface (get-only for now). Changes
+are some cleanup-path adjustments and the use of the correct netlink cmd
+in the dump messages.
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 4ed70ab7ee85..aefb8a81b78a 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -416,6 +416,7 @@ CONFIG_MARVELL_88Q2XXX_PHY=y
- CONFIG_MICREL_PHY=y
- CONFIG_MICROSEMI_PHY=y
- CONFIG_AT803X_PHY=y
-+CONFIG_QCA808X_PHY=m
- CONFIG_REALTEK_PHY=y
- CONFIG_ROCKCHIP_PHY=y
- CONFIG_DP83867_PHY=y
-@@ -1145,6 +1146,7 @@ CONFIG_SND_SOC_ES7241=m
- CONFIG_SND_SOC_ES8316=m
- CONFIG_SND_SOC_ES8328_I2C=m
- CONFIG_SND_SOC_GTM601=m
-+CONFIG_SND_SOC_MAX98090=m
- CONFIG_SND_SOC_MSM8916_WCD_ANALOG=m
- CONFIG_SND_SOC_MSM8916_WCD_DIGITAL=m
- CONFIG_SND_SOC_PCM3168A_I2C=m
+It builds on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
+
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
+
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
+
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
+
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Vacant: yes
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
+
+- Get Combo-ports supported modes, on each port :
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: yes
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Vacant: no
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Changelog :
+
+Changes in V7:
+ - Changed the port cleanup path to use list_for_each_entry_continue_reverse
+ - Adjusted the cleanup path in phylink for the port vacant state
+ - Pass the right cmd for the netlink dump message
+
+Changes in V6:
+V6: https://lore.kernel.org/r/20260304145444.442334-1-maxime.chevallier@bootlin.com
+ - Added some comments in th mod_port cleanup
+ - changed some kmalloc to kmalloc_obj
+ - Removed some phy_link_topo_del_port that wasn't needed
+
+Changes in V5:
+V5: https://lore.kernel.org/r/20260205092317.755906-1-maxime.chevallier@bootlin.com
+ - Fixed a check on a potentially un-initialized pointer, reported by
+   Simon
+ - Fixed a documentation formatting issue
+ - Remove a stray pr_info
+ - Rebased on net-next
+
+Changes in V4:
+V4 : https://lore.kernel.org/netdev/20260203172839.548524-1-maxime.chevallier@bootlin.com/
+ - Add a cleanup patch for the of port parsing
+ - Added a match to sync the port's linkmodes with the PHY's for OF
+   ports
+ - Added RTNL assert in the port_get topo helper
+ - nullify the bus port for phylink support
+ - Fix some typos
+
+Changes in V3:
+V3: https://lore.kernel.org/netdev/20260201151249.642015-1-maxime.chevallier@bootlin.com/
+ - Remove the sfp bus ops for nophy, and use .module_start() as
+   suggested by Russell
+ - Added missing cleanup for the topology, as per AI review
+ - Fixed a few typos as per Romain's review
+ - Changed "occupied" to "vacant" as per Romain's review
+ - Added missing checks for null ports, per AI review
+
+Changes in V2:
+V2: https://lore.kernel.org/netdev/20260128204526.170927-1-maxime.chevallier@bootlin.com/
+ - Fix the cleanup path of phy_link_topo_add_phy, as per AI review
+ - Fix the cleanup path of phy_sfp_probe, as per AI review
+ - Fix the call-site of the disconnect_nophy sfp bus ops, per AI review
+ - Fix the netdev-less case uin phylink, per AI review
+ - Fix the prototype of phy_link_topo_get_port for the stubs
+ - Dropped patch 11. It ended-up breaking 'allnoconfig', so instead we
+   built a phy_interface_names array in net/ethtool/netlink.c
+ - Fix an ethool-netlink spec discrepancy with the type of an attribute
+ - Fix the size computation in the netlink port API
+ - Fix the cleanup path in the netlink port API
+
+V1: https://lore.kernel.org/netdev/20260127134202.8208-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (10):
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP busses
+  net: phy: Create SFP phy_port before registering upstream
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phylink: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a MII port's vacant state
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  35 ++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 146 ++++++-
+ drivers/net/phy/phy_link_topology.c           |  82 +++-
+ drivers/net/phy/phylink.c                     | 132 +++++-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  39 ++
+ include/linux/phy_port.h                      |   6 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/core/dev.c                                |   1 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/netlink.c                         |  26 ++
+ net/ethtool/netlink.h                         |   8 +
+ net/ethtool/port.c                            | 376 ++++++++++++++++++
+ 17 files changed, 929 insertions(+), 28 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
 -- 
-2.47.3
+2.49.0
 
 
