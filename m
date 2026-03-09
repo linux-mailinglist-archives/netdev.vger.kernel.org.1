@@ -1,60 +1,65 @@
-Return-Path: <netdev+bounces-265782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CWWICtNr2noTgIAu9opvQ
-	(envelope-from <netdev+bounces-265782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:43:55 +0100
+	id gLVICXFOr2noTgIAu9opvQ
+	(envelope-from <netdev+bounces-265783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:49:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4FB2424EA
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:43:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8DC2425D1
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12D88308CBE6
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 22:43:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A20063006F33
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 22:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650E638BF8F;
-	Mon,  9 Mar 2026 22:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB134F479;
+	Mon,  9 Mar 2026 22:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4/qKMMw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7DyK7VM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032A37D130;
-	Mon,  9 Mar 2026 22:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB995246766;
+	Mon,  9 Mar 2026 22:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773096214; cv=none; b=onQ8pTd1Wa3FXKXTpT8s2ftmuuUHYJS2WJwg7MIorSETwCHYTh7jEzGzZpqrjmJYS25OIi35JBnFD0eba/+WKiP4dHoCODJ2au3YqGY5MeV1scZwjxJeFWZYFzSUrNU6EbElpf7NQZaH5XgROcTujx5shXMR99aH6WCFtjiL8oI=
+	t=1773096559; cv=none; b=EgTMt/pKSvfmQns408FdtT5caiu/k9x4lWz8Mct4oD5Ne3gVipQa0nNNOKv32rfJCjcXISaJx37cGRzTrhnk+9WVtcBxDCilcrAL9gtdu323GDp7XA9TWDS+KM78uz9LBKWHFgulYSIWl+puyaUmdoqjOGyJGSZKac81BJ++2GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773096214; c=relaxed/simple;
-	bh=V38z9eqXI0xiuUXgdMom4+2ldVRgsTJ3Ln2d6Dyn0oQ=;
+	s=arc-20240116; t=1773096559; c=relaxed/simple;
+	bh=C7JCDAPGl9ETtf4IVv0zfsB8t20cm/jyipVBZRK/JvM=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HhyJsNqoUCd0x7h+1Wyofm/vGS9nGT7Z9XCfRTR6Cp02PYR3DI/+uSe6InC3cTMtwbI1pR//U1mM3WeiXZCyqMstXG5eReV/woo5p5FGJn3pAV58ZUJVdezPRUJF0ctbBDbRwwk8Imz4fKoBRNaAVZrMdP3O28TvQyHwttCNWpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4/qKMMw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB6EC4CEF7;
-	Mon,  9 Mar 2026 22:43:33 +0000 (UTC)
+	 Content-Type:MIME-Version; b=qi77W6kqftQWRor5jxVfxlmgJU6MZKKVA6QTBKrpyxWx8q/nl3FWb4P9DdAFdw6FEvLVipm2+NYaql9hcczYqIkfSaYvzQTGfBoeeTFRrbcuiUul0eoo2OWvFJaquGw1e/b0WY1eXX81oMpQjUqoV3rIegzcriRhfj+bXqSTlpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7DyK7VM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43702C4CEF7;
+	Mon,  9 Mar 2026 22:49:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773096213;
-	bh=V38z9eqXI0xiuUXgdMom4+2ldVRgsTJ3Ln2d6Dyn0oQ=;
+	s=k20201202; t=1773096558;
+	bh=C7JCDAPGl9ETtf4IVv0zfsB8t20cm/jyipVBZRK/JvM=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=U4/qKMMw7SX+m77wuUqNZtFnNoNRfw4ImCXMLqW7KpwNIxQLLSPe+/CucHdN9p3zX
-	 LWqnI6oNrqDvw4vdRg46JyiATwEBqR2Yymbq/yYOqosvxqRYl0pHVCsOMGZ2QZRRON
-	 pVD872iIHob9mJuIYJFkiCRgiLk8KL1EGstlSVZ/7rDk+liuhmRg6Lv/MUcsHum3Tx
-	 PGs5S/AP+nBhlobqMxX06aUYbVn3hfkDauJxsXHGtu61A7sM+ZVxiZKGc42P+vfqCn
-	 ORbx6TnVWENTR33DDvJQfp0hhKyL0RKb2cUJtuO5P8oF1U+Mf0cdKi/D0IWc3FbDrC
-	 Hz54mipyu8Tcw==
-Message-ID: <1e617ee5e6003994d41a0a270ed1f6b17ac75f8d.camel@kernel.org>
-Subject: Re: [PATCH v23 00/22] Type2 device basic support
+	b=n7DyK7VMoJGZkj6EWg5OO7nAcSF7fhiHBuWAyRKT2boiUJhsQbTQkMXF3F0hFALRq
+	 Mk8itPyysEzfzFOnyAtiIJRsabj5Gwv+w/MkMUF+p/XZi4bkE+1TisaQAwh5KFn3u/
+	 qjTWRoAtyj594XFp+i9T2eBuzw8FUFssxNSHDTqsB3JxOTsOXlQgnAVqu2QCwtheVU
+	 sphSdrp5iBL1TYwpY9WwJm38uGQO6J/MKeTschzY6GGP1rVwUZOOLGwylbKllJP752
+	 TWNfv+pjHzANbbaCv7uF4H8Mu/h9BAWQ2dk5xXbVNZeeT7y1mUTqZ1wTNeXxI2kRtl
+	 WmlwHfeUpS6QA==
+Message-ID: <ac50b18c99f5863f456d2d486454df8eebe35719.camel@kernel.org>
+Subject: Re: [PATCH v23 08/22] cxl/hdm: Add support for getting region from
+ committed decoder
 From: PJ Waskiewicz <ppwaskie@kernel.org>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org, 
-	netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, 	dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-Date: Mon, 09 Mar 2026 15:43:33 -0700
-In-Reply-To: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>, "Cheatham, Benjamin"
+	 <benjamin.cheatham@amd.com>, alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, 	edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, 	edumazet@google.com,
+ dave.jiang@intel.com
+Date: Mon, 09 Mar 2026 15:49:17 -0700
+In-Reply-To: <28148dcf-3cdc-439b-900a-a3f672a28ad1@amd.com>
 References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
+	 <20260201155438.2664640-9-alejandro.lucero-palau@amd.com>
+	 <03ab7820-a6e0-4655-bae7-61d2d0b7dfd6@amd.com>
+	 <28148dcf-3cdc-439b-900a-a3f672a28ad1@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
@@ -64,96 +69,112 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: DC4FB2424EA
+X-Rspamd-Queue-Id: AB8DC2425D1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265782-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265783-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ppwaskie@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amd.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:email]
 X-Rspamd-Action: no action
 
-Hi Alejandrom
+On Thu, 2026-02-12 at 09:16 +0000, Alejandro Lucero Palau wrote:
+>=20
+> On 2/11/26 22:11, Cheatham, Benjamin wrote:
+> > On 2/1/2026 9:54 AM, alejandro.lucero-palau@amd.com=C2=A0wrote:
+> > > From: Alejandro Lucero <alucerop@amd.com>
+> > >=20
+> > > A Type2 device configured by the BIOS can already have its HDM
+> > > committed. Add a cxl_get_committed_decoder() function for cheking
+> > > so after memdev creation. A CXL region should have been created
+> > > during memdev initialization, therefore a Type2 driver can ask
+> > > for
+> > > such a region for working with the HPA. If the HDM is not
+> > > committed,
+> > > a Type2 driver will create the region after obtaining proper HPA
+> > > and DPA space.
+> > >=20
+> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> > > ---
+> > > =C2=A0 drivers/cxl/core/hdm.c | 39
+> > > +++++++++++++++++++++++++++++++++++++++
+> > > =C2=A0 include/cxl/cxl.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 3 +++
+> > > =C2=A0 2 files changed, 42 insertions(+)
+> > >=20
+> > > diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
+> > > index 6e516c69b2d2..a172ce4e9b19 100644
+> > > --- a/drivers/cxl/core/hdm.c
+> > > +++ b/drivers/cxl/core/hdm.c
+> > > @@ -686,6 +686,45 @@ int cxl_dpa_alloc(struct
+> > > cxl_endpoint_decoder *cxled, u64 size)
+> > > =C2=A0=C2=A0	return devm_add_action_or_reset(&port->dev,
+> > > cxl_dpa_release, cxled);
+> > > =C2=A0 }
+> > > =C2=A0=20
+> > > +static int find_committed_endpoint_decoder(struct device *dev,
+> > > const void *data)
+> > > +{
+> > > +	struct cxl_endpoint_decoder *cxled;
+> > > +	struct cxl_port *port;
+> > > +
+> > > +	if (!is_endpoint_decoder(dev))
+> > > +		return 0;
+> > > +
+> > > +	cxled =3D to_cxl_endpoint_decoder(dev);
+> > > +	port =3D cxled_to_port(cxled);
+> > > +
+> > > +	return cxled->cxld.id =3D=3D port->hdm_end;
+> > Is this the way you're supposed to check if a decoder is committed?
+> > The doc comment for @hdm_end in
+> > struct cxl_port says it's just the last allocated decoder. If
+> > allocated decoders are always committed then
+> > I'm fine with this, otherwise I think you'd want to a register read
+> > or something to find the commit state.
+>=20
+>=20
+> Hi Ben,
+>=20
+>=20
+> Yes, I think you are right. This works in my tests and it is safe=20
+> because I check the region does exist before using it. But the error=20
+> inside sfc should then not be fatal for cxl sfc initialization and=20
+> fallback to the other cxl initialization possibility.
+>=20
 
-On Sun, 2026-02-01 at 15:54 +0000, alejandro.lucero-palau@amd.com
-wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
->=20
-> This patchset should be applied on the cxl next branch using the base
-> specified at the end of this cover letter.
->=20
-> Dependencies on Dan's work has gone and also on Terry's as the only
-> patch required is now in next. The other dependency is on Smita
-> patchset
-> but it does not exist such a dependency as that work will not avoid
-> the
-> problem with Type2 and DAX/hmem if soft reserved memory. This needs
-> to
-> be solved by the BIOS and Type2 UEFI driver for populating the
-> CXL.mem
-> range as EFI_RESERVED_TYPE instead of default EFI_CONVENTIONAL_MEMORY
-> with the EFI_MEMORY_SP attribute. There exists though a dependency on
-> one Smita's patches:
->=20
-> [PATCH v5 3/7] cxl/region: Skip decoder reset on detach for
-> autodiscovered regions
->=20
-> This is needed for the default behaviour with current BIOS
-> configuration
-> where the HDM Type2 decoders will be kept unreset when driver
-> unloads.
-> This is the main change introduced in v23: committed decoders will
-> not
-> be reset. Previous v22 functionality supported first driver load
-> finding
-> committed decoders but resetting them at unload and supporting
-> uncommitted decoders in next driver loads. This will be suported in
-> follow-up works.
->=20
-> v23 changes:
->=20
-> =C2=A0 patch 11: fixing minor issues and droping change in
-> 	=C2=A0=C2=A0=C2=A0 should_emulate_decoders (Jonathan Cameron)
->=20
-> =C2=A0 patch13: refactoring unregister_region for safety type in Type2 AP=
-I
->=20
-> =C2=A0 sfc changes: slight modifications to error path
->=20
+So I'm running into this situation I think.
 
-I've been able to mostly get these to work on a very boiled down
-driver.  I still need to port these into my full driver stack, but
-moving that whole stack (multiple drivers) each time a new API is
-proposed was becoming a blocker.  So I have a very basic driver that is
-testing the interface against our HW for now.
+When you're testing, are you surviving a reload of the driver?  Right
+now, I can load and successfully create the region0 device.  However,
+following the same teardown path in SFC, I cannot reload my driver
+afterwards and map the region.  I get:
 
-I have a slight issue that I'll address in Patch 8, or at least ask.
+cxl_port endpoint5: failed to attach decoder5 to region0: -6  (ENXIO)
+<driver> 0000:c1:00.0: CXL found committed decoder without a region
+<driver> 0000:c1:00.0: CXL init failed
 
-In the meantime, I'll start moving things over to our full stack to try
-and get the same level of replication.
-
-I'm hopeful I can start adding Tested-by:'s to the patches very soon.
+I'd be surprised if SFC in its current patch state would survive this
+same insmod/rmmod/insmod test.
 
 -PJ
 
