@@ -1,166 +1,180 @@
-Return-Path: <netdev+bounces-265340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ee3ZLsj4rWlb+QEAu9opvQ
-	(envelope-from <netdev+bounces-265340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 23:31:36 +0100
+	id ZBcnDToOrmnh/AEAu9opvQ
+	(envelope-from <netdev+bounces-265341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 01:03:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542D1232730
-	for <lists+netdev@lfdr.de>; Sun, 08 Mar 2026 23:31:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63472232CF7
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 01:03:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA6B8301C3C2
-	for <lists+netdev@lfdr.de>; Sun,  8 Mar 2026 22:22:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5EA0300C90E
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 00:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441B634C14C;
-	Sun,  8 Mar 2026 22:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122B6B67E;
+	Mon,  9 Mar 2026 00:03:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1B51DE8BE;
-	Sun,  8 Mar 2026 22:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56606186A;
+	Mon,  9 Mar 2026 00:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773008545; cv=none; b=XiPQ897q5YcKhwCBWmWXV8ph3Aid/93nf7n5QspfGzVLVFyJ/5JVw8tVy9J1opydiemuGpcMFfkOLPBJgPr7zNBYBOi7WDhg2sU3JbhCa04V/rmbKlRzAC+p0SaMf2HJc7iIUg8aMwwJJ22XAkuUFKABJuKEdpWvsFDqOzdQKH4=
+	t=1773014583; cv=none; b=Fx6LMyrEMrM6XzeTy0/BTWFSEXfkRb5LuAzFSkaGhZ+/8oMnYNxK4gWmvzNw1ugbKtXxpF1hzRBpz5RxcnMh6vdzDC++EO4zoQAvHJe0rmyIYvBnjopbXujR/P28JHW9KkKJ+8HcQu1gjjwY7Smf6MyhItmQ1/uxsYhf9/OSI80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773008545; c=relaxed/simple;
-	bh=n8fdsNpksQMyzDLZEkSIk2mSFJWH1PAnAyRdAAkVywk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CMgBcMVhsuOLuwMxHF54Ytpp1e+83IjoZ62tEipsmr/13AbztmpOxwvt53sKRW1xQZHHB+joRtvphzzSRahATe/CPQdh+op/9FvQd9XbKXIlDU8FXpTD0G21edL8cL6+vpeMa+2Fra8odSRkPK1Vyd849vKOrxTepFiTEbrbYAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com; spf=pass smtp.mailfrom=perches.com; arc=none smtp.client-ip=216.40.44.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=perches.com
-Received: from omf03.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay06.hostedemail.com (Postfix) with ESMTP id 42DD81B91B3;
-	Sun,  8 Mar 2026 22:22:21 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf03.hostedemail.com (Postfix) with ESMTPA id BD6C56000E;
-	Sun,  8 Mar 2026 22:22:14 +0000 (UTC)
-Message-ID: <9fd14d166e860f26febfbc9061a6dcae6a166961.camel@perches.com>
-Subject: Re: [PATCH v2 phy-next 24/24] MAINTAINERS: add regexes for linux-phy
-From: Joe Perches <joe@perches.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, Neil
- Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, 
-	freedreno@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, 	spacemit@lists.linux.dev,
- UNGLinuxDriver@microchip.com
-Date: Sun, 08 Mar 2026 15:22:13 -0700
-In-Reply-To: <20260308205623.5trrqdmdrzj744hi@skbuf>
-References: <20260308114009.2546587-1-vladimir.oltean@nxp.com>
-	 <20260308114009.2546587-25-vladimir.oltean@nxp.com>
-	 <ca170cbaf2f8bcbc89bbda68914d8e0d7640f0e7.camel@perches.com>
-	 <20260308191017.kcyi7ka5pktq5jl4@skbuf>
-	 <8c4c5d0c5d014d5cc19eb10906ca1bd83ffb3ce5.camel@perches.com>
-	 <20260308205623.5trrqdmdrzj744hi@skbuf>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1773014583; c=relaxed/simple;
+	bh=okjOl5hqGWKw2Jj2qL8BUGNJ9MGbbh4vM9Pou79Cguo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UZW7om0q2A6lVnBWRes2oYvPF+YAyYmReg0WLgna/A+HRe6JYuiugMzZzNyCdPluuMTUrT3yMsYQ/0o+zDzVvFuXJEYU8zu+e3rR0qTWD68UbG2pwbjneKh9B/HQ5hKtXxoXg+HJVqF9obeKIHK1iZRsZ0HwWRLBhaY8zyvIPYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vzO5D-000000001iH-0rTL;
+	Mon, 09 Mar 2026 00:02:51 +0000
+Date: Mon, 9 Mar 2026 00:02:47 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
+	Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next 1/2] dsa: tag_mxl862xx: set
+ dsa_default_offload_fwd_mark()
+Message-ID: <aa4OJ7hkqoR6oDxZ@makrotopia.org>
+References: <cover.1772853341.git.daniel@makrotopia.org>
+ <d9d8e6058e635c1fdd4689c875204d48d0235295.1772853341.git.daniel@makrotopia.org>
+ <3bee5ef1-0692-4779-832f-193017810c38@gmail.com>
+ <aa2TYxEHQ91SbT3A@makrotopia.org>
+ <CAOiHx=n9_asSiAhB=aZKRenh6BsBAYP_3i7WxfBsbUBDz3BrWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Stat-Signature: zgtxuwsb3363ai68tf6p7s8zp8seinzy
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX19wsONHcaef5rI729O90pckRr9dLrQEYXs=
-X-HE-Tag: 1773008534-677296
-X-HE-Meta: U2FsdGVkX19zIqgNUKb+c+5Mu7Q3C+Gpl/B+X8eI5i6bGv7WE3zpj355qMm6YCbRSW7Vrhs2aumEBIt791syA8wOI3oaCj+46xwg3qNvWJkp2gLycZfqNtZEDdNuGCB0y349Wog5E09dSEbmxlYo3wEry6L0kQTHpHQi1eemnMz3eHRJ8lW0g+PBe0pZnw/seBVjwauSFyG+tNp9GhFkZXlt5WBWbJRv4eXsvXAwTvZLp/ToUvk9BlaA2J9NhuyWc4djQ+wNnPyIbjEf3YbjCt97pmlbZeZatO9Oxpnpbki4SgQq7YX4GOxv15JoA/1s08cXIoR5CaQiUuDxwOWahT02urVywBVxEzsYACoHDQg9R+OY8J92EbaYAELi/zOh
-X-Rspamd-Queue-Id: 542D1232730
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOiHx=n9_asSiAhB=aZKRenh6BsBAYP_3i7WxfBsbUBDz3BrWw@mail.gmail.com>
+X-Rspamd-Queue-Id: 63472232CF7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [7.34 / 15.00];
-	URIBL_BLACK(7.50)[perches.com:mid];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[perches.com];
-	TAGGED_FROM(0.00)[bounces-265340-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	GREYLIST(0.00)[pass,body];
+	TAGGED_FROM(0.00)[bounces-265341-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	NEURAL_SPAM(0.00)[0.278];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@perches.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.404];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[perl.org:url,perches.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
-X-Rspamd-Action: add header
-X-Spam: Yes
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,makrotopia.org:mid,makrotopia.org:email,local_termination.sh:url]
+X-Rspamd-Action: no action
 
-On Sun, 2026-03-08 at 22:56 +0200, Vladimir Oltean wrote:
-> On Sun, Mar 08, 2026 at 12:25:32PM -0700, Joe Perches wrote:
-> > On Sun, 2026-03-08 at 21:10 +0200, Vladimir Oltean wrote:
-> On Sun, Mar 08, 2026 at 11:40:44AM -0700, Joe Perches wrote:
-> > > Perhaps if matching only the include uses:
-> > > > (/ is escaped because get_maintainer is stupid)
-> > > > something like:
-> > > >=20
-> > > > K:	include\s*\<linux\/phy\/phy(?:-common-props|-provider)?\.h\>
->=20
-> > > Why is get_maintainer stupid?
-> >=20
-> > The get_maintainer code used to match keywords is
-> >=20
-> 	    foreach my $line (keys %keyword_hash) {
-> 		if ($text =3D~ m/$keyword_hash{$line}/x) {
-> >=20
-> > so it seems the first / in the K: <foo> regex would terminate
-> > the match.
-> >=20
-> > It might have been better to use a different delimiter.
-> > Maybe:
-> >=20
-> 		if ($text =3D~ m{$keyword_hash{$line}}/x
->=20
-> So why does it match in my example?
+On Sun, Mar 08, 2026 at 09:15:42PM +0100, Jonas Gorski wrote:
+> On Sun, Mar 8, 2026 at 4:19 PM Daniel Golle <daniel@makrotopia.org> wrote:
+> >
+> > On Sat, Mar 07, 2026 at 10:57:56AM +0100, Jonas Gorski wrote:
+> > > Hi,
+> > >
+> > > On 07/03/2026 04:30, Daniel Golle wrote:
+> > > > The MxL862xx offloads forwarding between bridged ports to the
+> > > > hardware, so set dsa_default_offload_fwd_mark() to avoid duplicate
+> > > > forwarding of packets of (eg. flooded) frames arriving at the CPU
+> > > > port.
+> > > >
+> > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > > ---
+> > > >  net/dsa/tag_mxl862xx.c | 2 ++
+> > > >  1 file changed, 2 insertions(+)
+> > > >
+> > > > diff --git a/net/dsa/tag_mxl862xx.c b/net/dsa/tag_mxl862xx.c
+> > > > index 01f2158682718..c02f69de61cbb 100644
+> > > > --- a/net/dsa/tag_mxl862xx.c
+> > > > +++ b/net/dsa/tag_mxl862xx.c
+> > > > @@ -92,6 +92,8 @@ static struct sk_buff *mxl862_tag_rcv(struct sk_buff *skb,
+> > > >     skb_pull_rcsum(skb, MXL862_HEADER_LEN);
+> > > >     dsa_strip_etype_header(skb, MXL862_HEADER_LEN);
+> > > >
+> > > > +   dsa_default_offload_fwd_mark(skb);
+> > >
+> > > Does the switch (by default) also flood link local traffic (e.g. STP, LACP,
+> > > etc)? If not, you should not mark these as fwd offloaded.
+> >
+> > No, it doesn't. Testing revealed that apparently it silently consumes them.
+> > I assume we'll need something like
+> >
+> > if (likely(!is_link_local_ether_addr(eth_hdr(skb)->h_dest)))
+> >     dsa_default_offload_fwd_mark(skb);
+> >
+> > similar to tag_brcm.c, right?
+> 
+> Yepp, that would have been my suggestion :-)
 
-Not sure really.  But it does match exactly.
-Maybe the regex code scans forward until the last /
-as the / character is not a "real" metacharacter.
+Ok, I'll do that then.
 
-I added some test code and it produced:
+> 
+> > > Is there is a bit in the header that says whether a packet was flooded or
+> > > trapped that you can check?
+> >
+> > Earlier testing showed that frames arriving at the microcontroller under
+> > some conditions are relayed to the DSA CPU port -- and are destinguishable
+> > as such. However, there is not bit directly indicating whether the packet
+> > was (also) flooded already.
+> 
+> So you know if they were copied to the cpu port due to some rules, but
+> not if they were snooped or trapped?
 
-line:	<+#include <linux/phy/phy.h>>
-kw:	<(?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)>
-test:	<^[+-].*(?:linux/phy/phy\.h|phy-props\.h|phy-provider\.h)>
-match:	<+#include <linux/phy/phy.h>
+I haven't found any details about that documented, and all I can say
+is that in some cases (some of the IEEE1588v2 frames generated by the
+local_termination.sh selftest, for example) the microcontroller seems
+to send an additional copy of the frame to the DSA CPU port using
+fields of the 8-byte tag which usually aren't used -- and that's why I
+even noticed them. The initial driver now merged upstream disabled the
+microcontroller SDMA and FMDA, effectively disconnecting it from the
+switch datapath, so it would shut up, and this effect can now longer
+be observed.
 
-From https://perldoc.perl.org/perlrequick
-
-Not all characters can be used 'as is' in a match.
-Some characters, called metacharacters, are considered special,
-and reserved for use in regex notation. The metacharacters are
-
-{}[]()^$.|*+?\
-
-A metacharacter can be matched literally by putting a backslash before it:
-
-"2+2=3D4" =3D~ /2+2/;    # doesn't match, + is a metacharacter
-"2+2=3D4" =3D~ /2\+2/;   # matches, \+ is treated like an ordinary +
-'C:\WIN32' =3D~ /C:\\WIN/;                       # matches
-"/usr/bin/perl" =3D~ /\/usr\/bin\/perl/;  # matches
-
-In the last regex, the forward slash '/' is also backslashed, because it is=
- used to delimit the regex.
+Now, when testing if link-local frames would be forwarded I noticed
+that there is a set of default rules instatiated after reset which
+trap link-local frames to the microcontroller port. I suppose it could
+also be setup to snoop instead of trap by manually erasing these PCE
+rules and setting new ones instead. In this case, however, there would
+be no way to tell from the frame received on the DSA CPU port if the
+frame had also been sent to the microcontroller.
 
