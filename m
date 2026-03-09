@@ -1,190 +1,176 @@
-Return-Path: <netdev+bounces-265665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGTzIfcFr2knLwIAu9opvQ
-	(envelope-from <netdev+bounces-265665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:40:07 +0100
+	id ADQOGGwFr2knLwIAu9opvQ
+	(envelope-from <netdev+bounces-265666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:37:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1319523DBDA
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:40:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B17D423DB96
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 18:37:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A98AD302C6F7
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 17:37:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 58A27300850D
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 17:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C832F068C;
-	Mon,  9 Mar 2026 17:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8062C11D5;
+	Mon,  9 Mar 2026 17:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="RVEWjUQT"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="iWg1g/um"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA2D2EFDBA
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 17:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E5B3C1970
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 17:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773077839; cv=none; b=S6C9nOS9F7SxxXHN+kDoWh6X9g28r8NYZfgEQ8F5bK4/oBB41QIokzEyziGKAkiYgrWylJEjkxSUg6sQNE1NsPT4mjr9HecDFyvTBPSp7LtKnLp/ccMlxhohVi8RBJC0OZz91llxZOT6P9irTHjYFCFoLsUD4DLVfE+hNxNzifY=
+	t=1773077864; cv=none; b=nj8/0lZo0JlRoIQwQl4FUbj1/BeCKfTwoepuwiQpLCp2UzCEBsFOKpHJ/qxAIYo4mEby4t/2HOyDpDukbwltB1BlEPRa5Qc1icMTlJ9WHt8B6cPSmbsRXx62elYbmqR0us3lAChQk3lsHl4GVYqlIaI2e7IXjbiu0NUpm6pmzno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773077839; c=relaxed/simple;
-	bh=lhdWjsxTf2lIiRTeEMbmfr0YCXcVg4omPfLb4PUw7Eg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PY473EmQIScDzyQVk3bDTF11wJ89HEIEg83OJbs54FpZOvx//WiLq/V+NS3bY04vwdICD273fZvBd9WPY6z6StdPz6xYH9ThgLLYZ8sRckJYmCLtVscWqGsS5pzbUDEoqNgXb4XMz2Kg0CmBUhRg7YMfZjwcHDAE7dy5LjGwAwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=RVEWjUQT; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1773077827; x=1773941828; bh=lhdW
-	jsxTf2lIiRTeEMbmfr0YCXcVg4omPfLb4PUw7Eg=; b=RVEWjUQTTR5FxAqcw156
-	si/Kbx/QslZYnj6lcserrtQqNkXIgOByQQRQ52nnoR3enNHypXVeSaX7o9o2rmjs
-	OUHMCsjJQ/i6Ih7gUdmNbde3eOZU4VIUg/P8RLLA4kXSxXkJ1thO7TEfVq7NnPHc
-	OrQrK2RJo3GQJfVzc/v7jZJaTQuvMML1JEH65fzTd9l7jntJ2AIGaO7hSq8Z+mah
-	H/idFu/cbT3pwYRwi8NbYMMSz+yiPfUK8mOt29KgCP4sDZJop00Hl0uG8IYxem+t
-	aykyPon0skFuguyZ+v41JFrs3/cTjGYU1msGQYr+33xYVH4aT6xW+I1/70W80ngj
-	Zw==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Mon, 09 Mar 2026 18:37:06 +0100 (CET)
-Date: Mon, 9 Mar 2026 18:37:04 +0100
-From: Antony Antony <antony@phenome.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, chopps@labn.net, horms@kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, herbert@gondor.apana.org.au,
-	steffen.klassert@secunet.com, Hao Long <me@imlonghao.com>
-Subject: Re: [PATCH ipsec v2] xfrm: iptfs: fix skb_put() panic on non-linear
- skb during reassembly
-Message-ID: <aa8FQEdKU9lNnGDv@Antony2201.local>
-References: <20260304140935.19783-1-fmancera@suse.de>
+	s=arc-20240116; t=1773077864; c=relaxed/simple;
+	bh=ysL0+edsEeHwORWLhMDT+N4iqIQ5jciud+DCRLHgnOQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WNLmtyz9XgseoFddkRWQyHgJsrlgFIiLVX4tOvk+zSRHFlqNuHfKCC1YfAg4LoLh6x3OdOSJp5v0Cko7oJb6ZdLjiccbE8H+HTypREPOtNAmHWyoDSaqoldKvfof7NSTpARmG2xd56r+93KE1NTXrwvuUUqTFRzsXtzLAMuBnhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=iWg1g/um; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-5ffc6a96665so1322161137.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 10:37:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773077859; x=1773682659; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W27N/znVmIDSI8tzJ4IRCYxWcWYYknXf+V7AqJORcfk=;
+        b=iWg1g/umiyF2fFuozSpkaW1uV/k9hqmO61A22Pttgp1UD60vbz6oO/WbQpNZyClDdx
+         CYRuGxnJerx3YSmof6xL7I3Om51aFUc9b15jlCdeIR/XpJAe6oKo35RFlg01A7Tu30wU
+         ZAVRFH0aXZtcVvw4r1lWclseU1S7lSHuqmiMu38wxvvj88CotDTIX0SQ8TYJ6GLd8uGt
+         kH5wfZZK6O1SPcN5G9RY9dfz0nCp/GCGm1DFHYVweot+2I/noJYSjutWCIJwQrMyJ3vM
+         veYMD7fCfZCD7lDXpib5377WDHDs2olTo0xPpRb7ljQUdvXyxVW/5A5EuXgNFK2yInZ0
+         zZJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773077859; x=1773682659;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W27N/znVmIDSI8tzJ4IRCYxWcWYYknXf+V7AqJORcfk=;
+        b=SqQ7StLf3YK9MaFoW5h9oD407BLTeO6mTfARWvFiFH3etqN2t51A6f3TqsJ8Z/0JD7
+         lKUuwFxsb6HXRcOUfE2HUkyx5s2TqU9KCysjPeqYIoOqoiwOiD2D5/VEGG8v3YTL0J48
+         V5ArstG5plc/Cb9K0c7bwKwRWfAiBzVfqRBuZ36VHt4Jpv0lTjk1syJnoQ1NS4QK5CJO
+         oPLtOVlaOE2/t4/ERvJkE1mo9+vrWOFdSFE/O8LOmwDdlqEB+1PF/d65mzJHSBT2pyo8
+         J5essTAzfQCFljbVQgB5RWZ7iyhUtVK9VBotinUtlT1aYeSZ2XnmnHQ3eR7+f0dhpJH8
+         mUfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTwp17AjZ7Dxj6yPDQ1vUxF9w+sBXDpDc0BZyjRYaiY+T46bVZgyy3OG/l+zyBjAFrnPpPkDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhnDDtrI6i58IZKeDvCLKWwnS1Ek9T8PL3To/Sb0aS+/hJs3xZ
+	vdk58HaLAaHY1BtvSeN0zYfVfMtp5ZfNFTYrAl7yRr0gEG/IRsOHPBf39CdyL3IZiQ==
+X-Gm-Gg: ATEYQzyFYYDqacgdAyhb5kRzXmzEELf79qlK5yvVeDQLDPPA0JApjX9kuwRHQbv3je/
+	NT6m9DRyuL/hgGgMvjDMMTbl6W79x2AuimrLjsfMSWfrd45tNWqXJHV53WuIH9MswKVG7lAQM3X
+	/3tqJvqQF6yWXvlFhtRt9cuKm81FRCJWEskWl5uY+nDdgxxwglP9/pQVadQIdxQIlYXyhKIwtL2
+	mf1qrnQxqfz2OHZJGvCy7HWQs/zFqCBe33JF5oRX/wK6d2ndou/hFAk/+7KEB12ULe0CqJJrFK1
+	uwEaMAN7v3PQC6UyXoLABvMGNghvXJc1PD7VV2kv3ovroQliG/fy987Ww6Cu7vkQPQB0BHhvZ7w
+	2PVLlE5aH98qDyaFf2UnKaopt7pKgO2YgQ4KlrI15p1B6/MuxD8pCySRK7zJz6w+lWnG0keQ5Lb
+	2tX2K0kT8dVM+O5q0gwEIyXjORVPxXLZM=
+X-Received: by 2002:a67:f343:0:b0:5ff:eae7:bd5d with SMTP id ada2fe7eead31-5ffeae7c791mr3068946137.22.1773077859249;
+        Mon, 09 Mar 2026 10:37:39 -0700 (PDT)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94e7b12e0a6sm9050337241.0.2026.03.09.10.37.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 10:37:39 -0700 (PDT)
+Message-ID: <e9487cc0-38d2-4080-8633-60b0f2a61ca5@mojatatu.com>
+Date: Mon, 9 Mar 2026 14:37:33 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260304140935.19783-1-fmancera@suse.de>
-X-Mutt-References: <20260304140935.19783-1-fmancera@suse.de>
-X-Mutt-Fcc: ~/sent
-X-Rspamd-Queue-Id: 1319523DBDA
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/sched: refine indirect call mitigation in
+ tc_wrapper.h
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Victor Noguiera <victor@mojatatu.com>,
+ Pedro Tammela <pctammela@mojatatu.ai>
+References: <20260307133601.3863071-1-edumazet@google.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20260307133601.3863071-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B17D423DB96
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265665-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,mojatatu.ai];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265666-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:email]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pctammela@mojatatu.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mojatatu.com:mid,mojatatu.com:email,mojatatu-com.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 03:09:35PM +0100, Fernando Fernandez Mancera wrote:
-> In iptfs_reassem_cont(), IP-TFS attempts to append data to the new inner
-> packet 'newskb' that is being reassembled. First a zero-copy approach is
-> tried if it succeeds then newskb becomes non-linear.
+On 07/03/2026 10:36, Eric Dumazet wrote:
+> Some modern cpus disable X86_FEATURE_RETPOLINE feature,
+> even if a direct call can still be beneficial.
 > 
-> When a subsequent fragment in the same datagram does not meet the
-> fast-path conditions, a memory copy is performed. It calls skb_put() to
-> append the data and as newskb is non-linear it triggers
-> SKB_LINEAR_ASSERT check.
+> Even when IBRS is present, an indirect call is more expensive
+> than a direct one:
+> 
+> Direct Calls:
+>    Compilers can perform powerful optimizations like inlining,
+>    where the function body is directly inserted at the call site,
+>    eliminating call overhead entirely.
+> 
+> Indirect Calls:
+>    Inlining is much harder, if not impossible, because the compiler
+>    doesn't know the target function at compile time.
+>    Techniques like Indirect Call Promotion can help by using
+>    profile-guided optimization to turn frequently taken indirect calls
+>    into conditional direct calls, but they still add complexity
+>    and potential overhead compared to a truly direct call.
+> 
+> In this patch, I split tc_skip_wrapper in two different
+> static keys, one for tc_act() (tc_skip_wrapper_act)
+> and one for tc_classify() (tc_skip_wrapper_cls).
+> 
+> Then I enable the tc_skip_wrapper_cls only if the count
+> of builtin classifiers is above one.
+> 
+> I enable tc_skip_wrapper_act only it the count of builtin
+> actions is above one.
+> 
+> In our production kernels, we only have CONFIG_NET_CLS_BPF=y
+> and CONFIG_NET_ACT_BPF=y. Other are modules or are not compiled.
+> 
+> Tested on AMD Turin cpus, cls_bpf_classify() cost went
+> from 1% down to 0.18 %, and FDO will be able to inline
+> it in tcf_classify() for further gains.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I wonder if linearizing has a performance penalty? Did you test that?
-
-I tried to reproduce it but had no luck so far. It seems the NICs I tested,
-CX4 and virtio, veth, deliver the inner packet as a linear skb.
-
-Any tricks to force Mellanox CX4 and virtio to deliver
-non-linear skbs?
-
--antony
-
-> 
->  Oops: invalid opcode: 0000 [#1] SMP NOPTI
->  [...]
->  RIP: 0010:skb_put+0x3c/0x40
->  [...]
->  Call Trace:
->   <IRQ>
->   iptfs_reassem_cont+0x1ab/0x5e0 [xfrm_iptfs]
->   iptfs_input_ordered+0x2af/0x380 [xfrm_iptfs]
->   iptfs_input+0x122/0x3e0 [xfrm_iptfs]
->   xfrm_input+0x91e/0x1a50
->   xfrm4_esp_rcv+0x3a/0x110
->   ip_protocol_deliver_rcu+0x1d7/0x1f0
->   ip_local_deliver_finish+0xbe/0x1e0
->   __netif_receive_skb_core.constprop.0+0xb56/0x1120
->   __netif_receive_skb_list_core+0x133/0x2b0
->   netif_receive_skb_list_internal+0x1ff/0x3f0
->   napi_complete_done+0x81/0x220
->   virtnet_poll+0x9d6/0x116e [virtio_net]
->   __napi_poll.constprop.0+0x2b/0x270
->   net_rx_action+0x162/0x360
->   handle_softirqs+0xdc/0x510
->   __irq_exit_rcu+0xe7/0x110
->   irq_exit_rcu+0xe/0x20
->   common_interrupt+0x85/0xa0
->   </IRQ>
->   <TASK>
-> 
-> Fix this by checking if the skb is non-linear. If it is, linearize it by
-> calling skb_linearize(). As the initial allocation of newskb originally
-> reserved enough tailroom for the entire reassembled packet we do not
-> need to check if we have enough tailroom or extend it.
-> 
-> Fixes: 5f2b6a909574 ("xfrm: iptfs: add skb-fragment sharing code")
-> Reported-by: Hao Long <me@imlonghao.com>
-> Closes: https://lore.kernel.org/netdev/DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com/
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
-> v2: adjusted fixes tag and dropped skb_is_nonlinear() as skb_linearize()
-> is enough.
-> ---
->  net/xfrm/xfrm_iptfs.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> index 050a82101ca5..c96bec84bfa6 100644
-> --- a/net/xfrm/xfrm_iptfs.c
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -901,6 +901,12 @@ static u32 iptfs_reassem_cont(struct xfrm_iptfs_data *xtfs, u64 seq,
->  	    iptfs_skb_can_add_frags(newskb, fragwalk, data, copylen)) {
->  		iptfs_skb_add_frags(newskb, fragwalk, data, copylen);
->  	} else {
-> +		if (skb_linearize(newskb)) {
-> +			XFRM_INC_STATS(xs_net(xtfs->x),
-> +				       LINUX_MIB_XFRMINBUFFERERROR);
-> +			goto abandon;
-> +		}
-> +
->  		/* copy fragment data into newskb */
->  		if (skb_copy_seq_read(st, data, skb_put(newskb, copylen),
->  				      copylen)) {
-> -- 
-> 2.53.0
-> 
-> 
-
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
 
