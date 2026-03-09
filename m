@@ -1,172 +1,123 @@
-Return-Path: <netdev+bounces-265777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BDbK9g9r2mDSgIAu9opvQ
-	(envelope-from <netdev+bounces-265777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:38:32 +0100
+	id EIWbKdA5r2kPQQIAu9opvQ
+	(envelope-from <netdev+bounces-265768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:21:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B70C241CFA
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:38:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD8F241913
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 459EB3112066
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:34:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7D0FF30244D8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CA4344056;
-	Mon,  9 Mar 2026 21:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603A92DC76A;
+	Mon,  9 Mar 2026 21:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="qWDNv+x5"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Qc2xbnpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB4E220F2D
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 21:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41AC025A2B4;
+	Mon,  9 Mar 2026 21:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773092080; cv=none; b=p7ptbC6yzrPy7X0craNxWS0S78Bp3vWtO4MDub+xKO9ZV8FEPybVCQFj4NyXsIsuPBRJM68TR4f4Ndu5TrVwILEXmz/+Gzu/Es17sDUM1G96ByHEknJcSb7jY//TKL2OeHISlCAr+jrEdwbzO9yLPDD4pzwbZBhr2SBltlt2I/w=
+	t=1773091278; cv=none; b=EhHpxgm4/cuXTn4HbETIftlAulCQL2+qrpM57juB5PGXbR18n6WMT56eZFuilwFiP7e3FEgy9ZZG5ymrO2bi1ZY+IPU6ISy2OPXVWVGuAtVdWpmrJV7+VstvCJ4Lnwji8idVBurHrLla48brgxIecW4+sM6IySdPPU4ABelZ+yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773092080; c=relaxed/simple;
-	bh=Ok6eF+GftazIxpYrdRG70Q2VyR3xpD0Cdi9/4UF5+l8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tZgmpIUA7VYTDXV3Zi7Rxz0CBO1n29vNFbftfotfMfr0Q9jwPST+rHiy9SZXtNWBu+og0O0hG9Yzbh5NdpSST7QUzXcJCOtroZSXHJMT1fVOEO9zjdlMpqdMSWaTuRBYx7IHcjlNdY9+ws8jHVYV6BiCEFVJosZCb2NIVEWvOGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=qWDNv+x5; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id Yjth4GmSgi4SVCY0; Mon, 09 Mar 2026 17:18:35 -0400 (EDT)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=juwwqoR0TQdvhEwmLjJNiRO2kvCT0d1TyAi3AmiRBWo=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
-	Content-Language:Subject:MIME-Version:Date:Message-ID; b=qWDNv+x5oxQ+jfTee9vw
-	slKh615rjUJI6lzUt6SBZFXwWYnTHpKw0q6CiRSTJAi362LkMciIfahxjUoETZZVJMMasF0K7SYk3
-	rBLzpbPGMADnMztqPd3b/V9UmQd+BrOcRF4iaIxR1CnwORe+jjNDrfXojloG2dCjZw64ZD2lYI=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate SPEC SMTP 8.0.5)
-  with ESMTPS id 14451450; Mon, 09 Mar 2026 17:18:35 -0400
-Message-ID: <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Mon, 9 Mar 2026 17:18:35 -0400
+	s=arc-20240116; t=1773091278; c=relaxed/simple;
+	bh=nd/1n3VdfhJSGBvD3Xr7ncEBlNZMS5jiyOT7E7O689s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CZzOwiPtmVOMcfdo44+gjvYIeTDJ89E5rc43+fCRseAJnS/pii6TgAryhWOrwjlSvkdCAu42Pte1/H+1u1W3/YF5y0t/ZzAl5orFIEr1vhzSt+f4MjvJ8DxblzBaQkud1C/HceFM8AQFezK+zrl5sG85qjEeRn282RDUSmqW1fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Qc2xbnpi; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id 20C6220B710C; Mon,  9 Mar 2026 14:21:17 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 20C6220B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1773091277;
+	bh=MAn2K1+Ub1L02MCyhWyLXhSTj3Aa/+L+stijV3Wcpio=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Qc2xbnpikdM32h2rEuHMDmolnS1QrTX7KFoRuOO3/T7xn4NKWsro5hzwMsMosXWk8
+	 hEdKlc2vPYB/OR8MbnA1EuTU6tdV1jK3tzEvKIMEzyUW15cB9l67HvAppiDEkdFaHX
+	 2J+b5I4s/G4xFJwy5YXgJKuWWoGQ1RdJEBLuyY20=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	paulros@microsoft.com
+Subject: [PATCH net-next,V4, 0/3] add ethtool COALESCE_RX_CQE_FRAMES/NSECS and use it in MANA driver
+Date: Mon,  9 Mar 2026 14:20:42 -0700
+Message-ID: <20260309212106.764156-1-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Long delay in freeing skbs
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: Long delay in freeing skbs
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, eric.dumazet@gmail.com,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>
-References: <20251106202935.1776179-1-edumazet@google.com>
- <20251106202935.1776179-3-edumazet@google.com>
- <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
- <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
-From: Tony Battersby <tonyb@cybernetics.com>
-In-Reply-To: <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1773091115
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 2352
-X-Barracuda-BRTS-Status: 1
-X-ASG-Debug-ID: 1773091115-1cf43940a6bfa00001-BZBGGp
-X-Rspamd-Queue-Id: 3B70C241CFA
+X-Rspamd-Queue-Id: 3BD8F241913
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cybernetics.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[cybernetics.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[cybernetics.com:+];
-	TAGGED_FROM(0.00)[bounces-265777-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265768-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@linux.microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tonyb@cybernetics.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cybernetics.com:dkim,cybernetics.com:email,cybernetics.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/9/26 17:07, Eric Dumazet wrote:
-> On Mon, Mar 9, 2026 at 10:00 PM Tony Battersby <tonyb@cybernetics.com> wrote:
->> I have some out-of-tree code that was broken by commit e20dfbad8aab
->> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
->> retested with 7.0-rc3 with the same results.  I'm not sure if the change
->> in behavior that I am seeing is expected or if it is a bug, so I thought
->> I would ask.  Omitting irrelevant details, my kernel code does the
->> following:
->>
->> 1) allocate a buffer
->> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
->> 3) wait for the I/O to complete
->> 4) wait for the buffer page refcounts to drop back to their values for
->> idle I/O
->> 5) reuse the buffer for more I/O
->>
->> Step 4 is necessary in this case due to some of those irrelevant details
->> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
->> seems to keep the page refcounts elevated long after the I/O has
->> completed (hours or longer), presumably because the deferred skb free
->> isn't happening for a long time.  So:
->>
->> 1) Is this long delay expected, or is this a bug?
->>
->> 2) If the delay is expected, is there a way for me to force the network
->> system to process the deferred skb frees on request?  e.g. write to a
->> file in /sys, or call a kernel function to flush the deferred frees?
->>
->> Worst case is that I can redesign my code to kfree() the buffer if it is
->> busy and allocate a new one, and let the old buffer be freed
->> asynchronously when the skb is freed at some indeterminate time in the
->> future.
->>
->> Thanks,
->> Tony Battersby
->
-> If you are using zero copy, please look at:
->
-> Maybe you should make sure your code is compatible with it.
->
-> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Mon Feb 16 19:36:53 2026 +0000
->
->     net: do not delay zero-copy skbs in skb_attempt_defer_free()
->
->     After the blamed commit, TCP tx zero copy notifications could be
->     arbitrarily delayed and cause regressions in applications waiting
->     for them.
->
-The I/O is being sent by a userspace program via the SCSI generic driver
-(drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't see
-any mention of zero copy in iscsi_tcp.c.
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
-Tony
+Add two parameters for drivers supporting Rx CQE Coalescing.
+
+ETHTOOL_A_COALESCE_RX_CQE_FRAMES:
+Maximum number of frames that can be coalesced into a CQE.
+
+ETHTOOL_A_COALESCE_RX_CQE_NSECS:
+Time out value in nanoseconds after the first packet arrival in a
+coalesced CQE to be sent.
+
+Also implement in MANA driver with the new parameter and
+counters.
+
+
+Haiyang Zhang (3):
+  net: ethtool: add ethtool COALESCE_RX_CQE_FRAMES/NSECS
+  net: mana: Add support for RX CQE Coalescing
+  net: mana: Add ethtool counters for RX CQEs in coalesced type
+
+ Documentation/netlink/specs/ethtool.yaml      |  8 ++
+ Documentation/networking/ethtool-netlink.rst  | 10 ++
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 93 +++++++++++++------
+ .../ethernet/microsoft/mana/mana_ethtool.c    | 75 ++++++++++++++-
+ include/linux/ethtool.h                       |  6 +-
+ include/net/mana/mana.h                       | 17 +++-
+ .../uapi/linux/ethtool_netlink_generated.h    |  2 +
+ net/ethtool/coalesce.c                        | 14 ++-
+ 8 files changed, 189 insertions(+), 36 deletions(-)
+
+-- 
+2.34.1
 
 
