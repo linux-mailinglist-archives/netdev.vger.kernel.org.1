@@ -1,434 +1,871 @@
-Return-Path: <netdev+bounces-265414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNKOLgyJrmnKFgIAu9opvQ
-	(envelope-from <netdev+bounces-265414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:47:08 +0100
+	id kI5nBtuKrmmzFwIAu9opvQ
+	(envelope-from <netdev+bounces-265415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:54:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C0C8235A81
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:47:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B65C235B65
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 943FE3034570
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:43:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F00583016531
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00EC3101CE;
-	Mon,  9 Mar 2026 08:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D579734C145;
+	Mon,  9 Mar 2026 08:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvJhrhdh"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QVvimQWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F23093C3;
-	Mon,  9 Mar 2026 08:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A404337699
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 08:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773045832; cv=none; b=AAmuIBCuhISA+E+TDEaikBoadfVqzmIg4/IPNVMHTwswa43TWd6B23wY5mOrDIpqAPY+YsQFeGlXmnHAixEyS1xdk1G4SUeC53LlsZ9Ks7xmddaw9Cjs99liwKYJEw9CL/+f+l9pNg/UcT0RDzCpMxSbj4E5q7XCuXa3zcUDhe0=
+	t=1773046446; cv=none; b=E7WJq8i66xMty1PqGM+fZgaJQfs9rBPkF0m1ys2gmC0kYecZYp7C/jpuZ1pbiYWGnOdN4jSxFI7R7jBa98WoasYsdIYwl12hq76khPakpCgqHGGNG3WM8kb5lBy06RJsdpmcIaNP41jigCdr/fWa0l2CflWzOCAEbAWndHvqBfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773045832; c=relaxed/simple;
-	bh=R0Tj8WHPpvIY04QiJfIurzlhzjfV000u26yyDgGvweo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ns9l44uiBiNooKuBXvbOtWpf2QAsUGZLfWOsXnSW9RZcFATx7B8tSsDjWMBv+3IohYv9HaJ6vgtKX7AnUEp276Y1GzTRyw3XFd/xkV8MipYHMlUG4aygOZtVJsXT+amKiPVJpfJ83vCnfhNjQI6ZrZigvWOf4ed1JT58+BbDudY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvJhrhdh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B812EC4CEF7;
-	Mon,  9 Mar 2026 08:43:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773045832;
-	bh=R0Tj8WHPpvIY04QiJfIurzlhzjfV000u26yyDgGvweo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LvJhrhdhbQozIAuWAlqXW3bj0cWo8FxnOWgkdMke7eRZtRR20Tv8o5cECmuZmGYK+
-	 dBqhRaiCqlkEO0AdOUsxXmyF4MqENquSuSHBmz2RU47VGIJdubddTYCV9qRakBnbje
-	 O5unNYzBed62xZ5MFgbrtjoTo28MBcjxmyBaGbRFpwxHRYoVzlpO3sSOS8ggVcqOFq
-	 HbmwYbvG57oSLBYDozAq6nXOliqgesdIs76MP+Pa/lkgzIW3gkLP7SsXzNAn8IT0FP
-	 Rwr0N9MBjMJld+itIy9r6hlCbW/vmJHmxt5o5a088yXOn46IJZ0xMCwU1Mzza1obzD
-	 X5xgE1A2esdCQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jiri Slaby
- <jirislaby@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
- Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Shinichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org, Michal
- =?utf-8?Q?Koutn=C3=BD?=
- <MKoutny@suse.com>, Waiman Long <longman@redhat.com>, Marco Elver
- <elver@google.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx>
- <87v7f61cnl.ffs@tglx> <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-Date: Mon, 09 Mar 2026 09:43:48 +0100
-Message-ID: <87pl5ds88r.ffs@tglx>
+	s=arc-20240116; t=1773046446; c=relaxed/simple;
+	bh=i3Nj8E6UhszizDSji7rHIC6TRykAvIZZfmr1L25nTaw=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=bvDN5pVb5lcZy7OnWvq0+ogiWurN6BQyihNfxSguDxyxGb8k6vwa8Z4AxRmDPEm+1/B4W1odIOcc6c2Ow0Y9/qJXjAQ1VZMKTcHmbUaNjdgb8Yu1K2MktoQjeTm490hqz3tJ+aQfCbjkSRdj+/iAv2PNwnRvP8Ph+UWdvNkuPkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QVvimQWI; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773046438; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=TQxb7UjyfUxsjLc75wBpFZ+fKGVnvyZuh+h9VIYi2iA=;
+	b=QVvimQWIalKaxNyb6Stgl1JbX99wLITcOTOF9CQPAn0f1P8flr7dhm2+os9ZTWC+UBnXpDQ5Vc/EF5qtrCihJO180p4lVVi+gfFPhk22p7QMjF6BQfkHrMt/LQ4onkp0O6gMmxg/jrSmiayTzjE8IVStT14Asbwr+ddHkbFHfEw=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-WqvjC_1773046437 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 09 Mar 2026 16:53:57 +0800
+Message-ID: <1773046268.140821-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v28 4/8] eea: create/destroy rx,tx queues for netdevice open and stop
+Date: Mon, 9 Mar 2026 16:51:08 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20260302024604.25354-1-xuanzhuo@linux.alibaba.com>
+ <20260302024604.25354-5-xuanzhuo@linux.alibaba.com>
+ <e6c3b053-75d7-46b5-9fd0-ac6de498456f@redhat.com>
+In-Reply-To: <e6c3b053-75d7-46b5-9fd0-ac6de498456f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 2C0C8235A81
+X-Rspamd-Queue-Id: 6B65C235B65
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-4.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MISSING_MIME_VERSION(2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265415-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265414-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.230];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sun, Mar 08 2026 at 18:23, Matthieu Baerts wrote:
-> 08 Mar 2026 17:58:26 Thomas Gleixner <tglx@kernel.org>:
->> So I'm back to square one. I go and do what I should have done in the
->> first place. Write a debug patch with trace_printks and let the people
->> who can actually trigger the problem run with it.
+On Thu, 5 Mar 2026 11:16:32 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+> On 3/2/26 3:46 AM, Xuan Zhuo wrote:
+> > Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA=
+).
+> >
+> > This commit introduces the implementation for the netdevice open and
+> > stop.
+> >
+> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> > Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+> > Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/ethernet/alibaba/eea/Makefile  |   4 +-
+> >  drivers/net/ethernet/alibaba/eea/eea_net.c | 530 ++++++++++++++++++++-
+> >  drivers/net/ethernet/alibaba/eea/eea_net.h |  45 ++
+> >  drivers/net/ethernet/alibaba/eea/eea_pci.c | 182 ++++++-
+> >  drivers/net/ethernet/alibaba/eea/eea_pci.h |  13 +
+> >  drivers/net/ethernet/alibaba/eea/eea_rx.c  | 254 ++++++++++
+> >  drivers/net/ethernet/alibaba/eea/eea_tx.c  | 104 ++++
+> >  7 files changed, 1127 insertions(+), 5 deletions(-)
+> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+> >  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+> >
+> > diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/et=
+hernet/alibaba/eea/Makefile
+> > index 91f318e8e046..fa34a005fa01 100644
+> > --- a/drivers/net/ethernet/alibaba/eea/Makefile
+> > +++ b/drivers/net/ethernet/alibaba/eea/Makefile
+> > @@ -3,4 +3,6 @@ obj-$(CONFIG_EEA) +=3D eea.o
+> >  eea-y :=3D eea_ring.o \
+> >  	eea_net.o \
+> >  	eea_pci.o \
+> > -	eea_adminq.o
+> > +	eea_adminq.o \
+> > +	eea_tx.o \
+> > +	eea_rx.o
+> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/e=
+thernet/alibaba/eea/eea_net.c
+> > index 31cb9ca5b408..2ebf0053d05e 100644
+> > --- a/drivers/net/ethernet/alibaba/eea/eea_net.c
+> > +++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> > @@ -18,6 +18,453 @@
+> >
+> >  #define EEA_SPLIT_HDR_SIZE 128
+> >
+> > +static irqreturn_t eea_irq_handler(int irq, void *data)
+> > +{
+> > +	struct eea_irq_blk *blk =3D data;
+> > +
+> > +	napi_schedule_irqoff(&blk->napi);
+> > +
+> > +	return IRQ_HANDLED;
+> > +}
+> > +
+> > +static void eea_free_irq_blk(struct eea_net *enet)
+> > +{
+> > +	struct eea_irq_blk *blk;
+> > +	u32 num;
+> > +	int i;
+> > +
+> > +	if (!enet->irq_blks)
+> > +		return;
+> > +
+> > +	num =3D enet->edev->rx_num;
+> > +
+> > +	for (i =3D 0; i < num; i++) {
+> > +		blk =3D &enet->irq_blks[i];
+> > +
+> > +		if (blk->ready)
+> > +			eea_pci_free_irq(blk);
+> > +
+> > +		blk->ready =3D false;
+> > +	}
+> > +
+> > +	kvfree(enet->irq_blks);
+> > +	enet->irq_blks =3D NULL;
+> > +}
+> > +
+> > +static int eea_alloc_irq_blks(struct eea_net *enet, u32 num)
+> > +{
+> > +	struct eea_device *edev =3D enet->edev;
+> > +	struct eea_irq_blk *blk, *irq_blks;
+> > +	int i, err;
+> > +
+> > +	irq_blks =3D kvcalloc(num, sizeof(*blk), GFP_KERNEL);
+> > +	if (!irq_blks)
+> > +		return -ENOMEM;
+> > +
+> > +	enet->irq_blks =3D irq_blks;
+> > +
+> > +	for (i =3D 0; i < num; i++) {
+> > +		blk =3D &irq_blks[i];
+> > +		blk->idx =3D i;
+> > +
+> > +		/* vec 0 is for error notify. */
+> > +		blk->msix_vec =3D i + 1;
+> > +
+> > +		err =3D eea_pci_request_irq(edev, blk, eea_irq_handler);
+> > +		if (err)
+> > +			goto err_free_irq_blk;
+> > +
+> > +		blk->ready =3D true;
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +err_free_irq_blk:
+> > +	eea_free_irq_blk(enet);
+> > +	return err;
+> > +}
+> > +
+> > +static int eea_update_queues(struct eea_net *enet)
+> > +{
+> > +	return netif_set_real_num_queues(enet->netdev, enet->cfg.tx_ring_num,
+> > +					 enet->cfg.rx_ring_num);
+> > +}
+> > +
+> > +void eea_init_ctx(struct eea_net *enet, struct eea_net_init_ctx *ctx)
+> > +{
+> > +	memset(ctx, 0, sizeof(*ctx));
+> > +
+> > +	ctx->netdev =3D enet->netdev;
+> > +	ctx->edev =3D enet->edev;
+> > +	ctx->cfg =3D enet->cfg;
+> > +}
+> > +
+> > +static void eea_bind_q_and_cfg(struct eea_net *enet,
+> > +			       struct eea_net_init_ctx *ctx)
+> > +{
+> > +	struct eea_irq_blk *blk;
+> > +	struct eea_net_rx *rx;
+> > +	struct eea_net_tx *tx;
+> > +	int i;
+> > +
+> > +	enet->cfg =3D ctx->cfg;
+> > +	enet->rx =3D ctx->rx;
+> > +	enet->tx =3D ctx->tx;
+> > +
+> > +	for (i =3D 0; i < ctx->cfg.rx_ring_num; i++) {
+> > +		blk =3D &enet->irq_blks[i];
+> > +
+> > +		rx =3D ctx->rx[i];
+> > +		tx =3D &ctx->tx[i];
+> > +
+> > +		rx->enet =3D enet;
+> > +		rx->napi =3D &blk->napi;
+> > +		rx->ering->msix_vec =3D blk->msix_vec;
+> > +
+> > +		tx->enet =3D enet;
+> > +		tx->ering->msix_vec =3D blk->msix_vec;
+> > +
+> > +		blk->rx =3D rx;
+> > +	}
+> > +}
+> > +
+> > +static void eea_unbind_q_and_cfg(struct eea_net *enet,
+> > +				 struct eea_net_init_ctx *ctx)
+> > +{
+> > +	struct eea_irq_blk *blk;
+> > +	struct eea_net_rx *rx;
+> > +	int i;
+> > +
+> > +	ctx->cfg =3D enet->cfg;
+> > +	ctx->rx =3D enet->rx;
+> > +	ctx->tx =3D enet->tx;
+> > +
+> > +	enet->rx =3D NULL;
+> > +	enet->tx =3D NULL;
+> > +
+> > +	for (i =3D 0; i < ctx->cfg.rx_ring_num; i++) {
+> > +		blk =3D &enet->irq_blks[i];
+> > +
+> > +		rx =3D ctx->rx[i];
+> > +
+> > +		rx->napi =3D NULL;
+> > +
+> > +		blk->rx =3D NULL;
+> > +	}
+> > +}
+> > +
+> > +static void eea_free_rxtx_q_mem(struct eea_net_init_ctx *ctx)
+> > +{
+> > +	struct eea_net_rx *rx;
+> > +	struct eea_net_tx *tx;
+> > +	int i;
+> > +
+> > +	for (i =3D 0; i < ctx->cfg.rx_ring_num; i++) {
+> > +		rx =3D ctx->rx[i];
+> > +		tx =3D &ctx->tx[i];
+> > +
+> > +		eea_free_rx(rx, &ctx->cfg);
+> > +		eea_free_tx(tx, &ctx->cfg);
+> > +	}
+> > +
+> > +	kvfree(ctx->rx);
+> > +	kvfree(ctx->tx);
+> > +}
+> > +
+> > +/* alloc tx/rx: struct, ring, meta, pp, napi */
+> > +static int eea_alloc_rxtx_q_mem(struct eea_net_init_ctx *ctx)
+> > +{
+> > +	struct eea_net_rx *rx;
+> > +	struct eea_net_tx *tx;
+> > +	int err, i;
+> > +
+> > +	ctx->tx =3D kvcalloc(ctx->cfg.tx_ring_num, sizeof(*ctx->tx), GFP_KERN=
+EL);
+> > +	if (!ctx->tx)
+> > +		return -ENOMEM;
+> > +
+> > +	ctx->rx =3D kvcalloc(ctx->cfg.rx_ring_num, sizeof(*ctx->rx), GFP_KERN=
+EL);
+> > +	if (!ctx->rx)
+> > +		goto err_free_tx;
+> > +
+> > +	ctx->cfg.rx_sq_desc_size =3D sizeof(struct eea_rx_desc);
+> > +	ctx->cfg.rx_cq_desc_size =3D sizeof(struct eea_rx_cdesc);
+> > +	ctx->cfg.tx_sq_desc_size =3D sizeof(struct eea_tx_desc);
+> > +	ctx->cfg.tx_cq_desc_size =3D sizeof(struct eea_tx_cdesc);
+> > +
+> > +	ctx->cfg.tx_cq_desc_size /=3D 2;
+> > +
+> > +	if (!ctx->cfg.split_hdr)
+> > +		ctx->cfg.rx_sq_desc_size /=3D 2;
+> > +
+> > +	for (i =3D 0; i < ctx->cfg.rx_ring_num; i++) {
+> > +		rx =3D eea_alloc_rx(ctx, i);
+> > +		if (!rx)
+> > +			goto err_free;
+> > +
+> > +		ctx->rx[i] =3D rx;
+> > +
+> > +		tx =3D ctx->tx + i;
+> > +		err =3D eea_alloc_tx(ctx, tx, i);
+> > +		if (err)
+> > +			goto err_free;
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +err_free:
+> > +	for (i =3D 0; i < ctx->cfg.rx_ring_num; i++) {
+> > +		rx =3D ctx->rx[i];
+> > +		tx =3D ctx->tx + i;
+> > +
+> > +		eea_free_rx(rx, &ctx->cfg);
+> > +		eea_free_tx(tx, &ctx->cfg);
+> > +	}
+> > +
+> > +	kvfree(ctx->rx);
+> > +
+> > +err_free_tx:
+> > +	kvfree(ctx->tx);
+> > +	return -ENOMEM;
+> > +}
+> > +
+> > +static int eea_hw_active_ring(struct eea_net *enet)
+> > +{
+> > +	return eea_adminq_create_q(enet, /* qidx =3D */ 0,
+> > +				   enet->cfg.rx_ring_num +
+> > +				   enet->cfg.tx_ring_num, 0);
+> > +}
+> > +
+> > +static int eea_hw_unactive_ring(struct eea_net *enet)
+> > +{
+> > +	int err;
+> > +
+> > +	err =3D eea_adminq_destroy_all_q(enet);
+> > +	if (err)
+> > +		netdev_warn(enet->netdev, "unactive rxtx ring failed.\n");
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +/* stop rx napi, stop tx queue. */
+> > +static void eea_stop_rxtx(struct net_device *netdev)
+> > +{
+> > +	struct eea_net *enet =3D netdev_priv(netdev);
+> > +	int i;
+> > +
+> > +	netif_tx_disable(netdev);
+> > +
+> > +	for (i =3D 0; i < enet->cfg.rx_ring_num; i++)
+> > +		enet_rx_stop(enet->rx[i]);
+> > +
+> > +	netif_carrier_off(netdev);
+> > +}
+> > +
+> > +static void eea_start_rxtx(struct eea_net *enet)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i =3D 0; i < enet->cfg.rx_ring_num; i++)
+> > +		enet_rx_start(enet->rx[i]);
+> > +
+> > +	netif_tx_start_all_queues(enet->netdev);
+> > +	netif_carrier_on(enet->netdev);
+> > +
+> > +	enet->started =3D true;
+> > +}
+> > +
+> > +static int eea_netdev_stop(struct net_device *netdev)
+> > +{
+> > +	struct eea_net *enet =3D netdev_priv(netdev);
+> > +	struct eea_net_init_ctx ctx;
+> > +
+> > +	/* This function can be called during device anomaly recovery. To
+> > +	 * prevent duplicate stop operations, the `started` flag is introduced
+> > +	 * for checking.
+> > +	 */
+> > +
+> > +	if (!enet->started) {
+> > +		netdev_warn(netdev, "eea netdev stop: but dev is not started.\n");
+> > +		return 0;
+> > +	}
+> > +
+> > +	eea_stop_rxtx(netdev);
+> > +	eea_hw_unactive_ring(enet);
+> > +	eea_unbind_q_and_cfg(enet, &ctx);
+> > +	eea_free_rxtx_q_mem(&ctx);
+> > +
+> > +	enet->started =3D false;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int eea_netdev_open(struct net_device *netdev)
+> > +{
+> > +	struct eea_net *enet =3D netdev_priv(netdev);
+> > +	struct eea_net_init_ctx ctx;
+> > +	int err;
+> > +
+> > +	if (enet->link_err) {
+> > +		netdev_err(netdev, "netdev open err, because link error: %d\n",
+> > +			   enet->link_err);
+> > +		return -EBUSY;
+> > +	}
+> > +
+> > +	eea_init_ctx(enet, &ctx);
+> > +
+> > +	err =3D eea_alloc_rxtx_q_mem(&ctx);
+> > +	if (err)
+> > +		goto err_done;
+> > +
+> > +	eea_bind_q_and_cfg(enet, &ctx);
+> > +
+> > +	err =3D eea_update_queues(enet);
+> > +	if (err)
+> > +		goto err_free_q;
+> > +
+> > +	err =3D eea_hw_active_ring(enet);
+> > +	if (err)
+> > +		goto err_free_q;
+> > +
+> > +	eea_start_rxtx(enet);
+> > +
+> > +	return 0;
+> > +
+> > +err_free_q:
+> > +	eea_unbind_q_and_cfg(enet, &ctx);
+> > +	eea_free_rxtx_q_mem(&ctx);
+> > +
+> > +err_done:
+> > +	return err;
+> > +}
+> > +
+> > +/* resources: ring, buffers, irq */
+> > +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_c=
+tx *ctx)
+> > +{
+> > +	struct eea_net_init_ctx ctx_old =3D {0};
+> > +	int err, error;
+> > +
+> > +	if (!netif_running(enet->netdev) || !enet->started) {
+> > +		enet->cfg =3D ctx->cfg;
+> > +		return 0;
+> > +	}
+> > +
+> > +	err =3D eea_alloc_rxtx_q_mem(ctx);
+> > +	if (err) {
+> > +		netdev_warn(enet->netdev,
+> > +			    "eea reset: alloc q failed. stop reset. err %d\n",
+> > +			    err);
+> > +		return err;
+> > +	}
+> > +
+> > +	eea_stop_rxtx(enet->netdev);
+> > +	eea_hw_unactive_ring(enet);
+> > +
+> > +	eea_unbind_q_and_cfg(enet, &ctx_old);
+> > +	eea_bind_q_and_cfg(enet, ctx);
+> > +
+> > +	err =3D eea_update_queues(enet);
+> > +	if (err) {
+> > +		netdev_err(enet->netdev,
+> > +			   "eea reset: set real num queues failed. err %d\n",
+> > +			   err);
+> > +		goto err_bind_old;
+> > +	}
+> > +
+> > +	err =3D eea_hw_active_ring(enet);
 >
-> Happy to test such debug patches!
+> AFAICS the need for admins queue destroy and recreation on cfg change is
+> what prevents a safe configuration swap (together with irq allocation,
+> see below). Could you instead keep the admin queue always alive i.e.
+> with maximum number of erings configured, and just enable/them as needded?
+>
+> If not, please document explicitly the constraint in the commit message.
 
-See below.
+Generally, during I/O queue reconstruction, the admin queue is not rebuilt.
+However, in HA scenarios=E2=80=94which represent a special case=E2=80=94
+the DPU notifies the driver to request re-initialization. In this specific
+situation, the admin queue will also be rebuilt.
 
-Enable the tracepoints either on the kernel command line:
+>
+> [...]
+> > @@ -140,14 +591,65 @@ static struct eea_net *eea_netdev_alloc(struct ee=
+a_device *edev, u32 pairs)
+> >  	enet->edev =3D edev;
+> >  	edev->enet =3D enet;
+> >
+> > +	err =3D eea_alloc_irq_blks(enet, pairs);
+> > +	if (err) {
+>
+> I'm likely lost, but AFAICS eea_alloc_irq_blks() is invoked only here,
+> and allocates edev->rx_num interrupts. rx_num is the number of RX
+> channel at device probe time.
+>
+> set_channels can later change such value, i.e. increasing it. But I
+> don't see other irqs allocated.
 
-    trace_event=sched_switch,mmcid:*
 
-or before starting the test case:
+No, set_channels just change enet.cfg.rx_num, edev->rx_num is readonly.
 
-    echo 1 >/sys/kernel/tracing/events/sched/sched_switch/enable
-    echo 1 >/sys/kernel/tracing/events/mmcid/enable
+Thanks.
 
-I added a 50ms timeout into mm_cid_get() which freezes the trace and
-emits a warning. If you enable panic_on_warn and ftrace_dump_on_oops,
-then it dumps the trace buffer once it hits the warning.
-
-Either kernel command line:
-
-   panic_on_warn ftrace_dump_on_oops
-
-or
-
-  echo 1 >/proc/sys/kernel/panic_on_warn
-  echo 1 >/proc/sys/kernel/ftrace_dump_on_oops
-
-That should provide enough information to decode this mystery.
-
-Thanks,
-
-        tglx
----
- include/trace/events/mmcid.h |  138 +++++++++++++++++++++++++++++++++++++++++++
- kernel/sched/core.c          |   10 +++
- kernel/sched/sched.h         |   20 +++++-
- 3 files changed, 165 insertions(+), 3 deletions(-)
-
---- /dev/null
-+++ b/include/trace/events/mmcid.h
-@@ -0,0 +1,138 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM mmcid
-+
-+#if !defined(_TRACE_MMCID_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_MMCID_H
-+
-+#include <linux/sched.h>
-+#include <linux/tracepoint.h>
-+
-+DECLARE_EVENT_CLASS(mmcid_class,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("mm=%p cid=%08x", __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_class, mmcid_getcid,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid)
-+);
-+
-+DEFINE_EVENT(mmcid_class, mmcid_putcid,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_task_class,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(t, mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	t	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->t	= t;
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("t=%p mm=%p cid=%08x", __entry->t, __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_task_class, mmcid_task_update,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(t, mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_cpu_class,
-+
-+	TP_PROTO(unsigned int cpu, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(cpu, mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( unsigned int,	cpu	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->cpu	= cpu;
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("cpu=%u mm=%p cid=%08x", __entry->cpu, __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_cpu_class, mmcid_cpu_update,
-+
-+	TP_PROTO(unsigned int cpu, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(cpu, mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_user_class,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	TP_ARGS(t, mm),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	t	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	users	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->t	= t;
-+		__entry->mm	= mm;
-+		__entry->users	= mm->mm_cid.users;
-+	),
-+
-+	TP_printk("t=%p mm=%p users=%u", __entry->t, __entry->mm, __entry->users)
-+);
-+
-+DEFINE_EVENT(mmcid_user_class, mmcid_user_add,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	TP_ARGS(t, mm)
-+);
-+
-+DEFINE_EVENT(mmcid_user_class, mmcid_user_del,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	     TP_ARGS(t, mm)
-+);
-+
-+#endif
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -86,6 +86,7 @@
- #include <linux/sched/rseq_api.h>
- #include <trace/events/sched.h>
- #include <trace/events/ipi.h>
-+#include <trace/events/mmcid.h>
- #undef CREATE_TRACE_POINTS
- 
- #include "sched.h"
-@@ -10569,7 +10570,9 @@ static inline void mm_cid_transit_to_tas
- 		unsigned int cid = cpu_cid_to_cid(t->mm_cid.cid);
- 
- 		t->mm_cid.cid = cid_to_transit_cid(cid);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 		pcp->cid = t->mm_cid.cid;
-+		trace_mmcid_cpu_update(task_cpu(t), t->mm, pcp->cid);
- 	}
- }
- 
-@@ -10602,7 +10605,9 @@ static void mm_cid_fixup_cpus_to_tasks(s
- 			if (!cid_in_transit(cid)) {
- 				cid = cid_to_transit_cid(cid);
- 				rq->curr->mm_cid.cid = cid;
-+				trace_mmcid_task_update(rq->curr, rq->curr->mm, cid);
- 				pcp->cid = cid;
-+				trace_mmcid_cpu_update(cpu, mm, cid);
- 			}
- 		}
- 	}
-@@ -10613,7 +10618,9 @@ static inline void mm_cid_transit_to_cpu
- {
- 	if (cid_on_task(t->mm_cid.cid)) {
- 		t->mm_cid.cid = cid_to_transit_cid(t->mm_cid.cid);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 		pcp->cid = t->mm_cid.cid;
-+		trace_mmcid_cpu_update(task_cpu(t), t->mm, pcp->cid);
- 	}
- }
- 
-@@ -10685,6 +10692,7 @@ static bool sched_mm_cid_add_user(struct
- {
- 	t->mm_cid.active = 1;
- 	mm->mm_cid.users++;
-+	trace_mmcid_user_add(t, mm);
- 	return mm_update_max_cids(mm);
- }
- 
-@@ -10727,6 +10735,7 @@ void sched_mm_cid_fork(struct task_struc
- 	} else {
- 		mm_cid_fixup_cpus_to_tasks(mm);
- 		t->mm_cid.cid = mm_get_cid(mm);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 	}
- }
- 
-@@ -10739,6 +10748,7 @@ static bool sched_mm_cid_remove_user(str
- 		mm_unset_cid_on_task(t);
- 	}
- 	t->mm->mm_cid.users--;
-+	trace_mmcid_user_del(t, t->mm);
- 	return mm_update_max_cids(t->mm);
- }
- 
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -75,6 +75,7 @@
- #include <linux/delayacct.h>
- #include <linux/mmu_context.h>
- 
-+#include <trace/events/mmcid.h>
- #include <trace/events/power.h>
- #include <trace/events/sched.h>
- 
-@@ -3809,6 +3810,7 @@ static __always_inline bool cid_on_task(
- 
- static __always_inline void mm_drop_cid(struct mm_struct *mm, unsigned int cid)
- {
-+	trace_mmcid_putcid(mm, cid);
- 	clear_bit(cid, mm_cidmask(mm));
- }
- 
-@@ -3817,6 +3819,7 @@ static __always_inline void mm_unset_cid
- 	unsigned int cid = t->mm_cid.cid;
- 
- 	t->mm_cid.cid = MM_CID_UNSET;
-+	trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 	if (cid_on_task(cid))
- 		mm_drop_cid(t->mm, cid);
- }
-@@ -3838,6 +3841,7 @@ static inline unsigned int __mm_get_cid(
- 		return MM_CID_UNSET;
- 	if (test_and_set_bit(cid, mm_cidmask(mm)))
- 		return MM_CID_UNSET;
-+	trace_mmcid_getcid(mm, cid);
- 	return cid;
- }
- 
-@@ -3845,9 +3849,17 @@ static inline unsigned int mm_get_cid(st
- {
- 	unsigned int cid = __mm_get_cid(mm, READ_ONCE(mm->mm_cid.max_cids));
- 
--	while (cid == MM_CID_UNSET) {
--		cpu_relax();
--		cid = __mm_get_cid(mm, num_possible_cpus());
-+	if (cid == MM_CID_UNSET) {
-+		ktime_t t0 = ktime_get();
-+
-+		while (cid == MM_CID_UNSET) {
-+			cpu_relax();
-+			cid = __mm_get_cid(mm, num_possible_cpus());
-+			if (ktime_get() - t0 > 50 * NSEC_PER_MSEC) {
-+				tracing_off();
-+				WARN_ON_ONCE(1);
-+			}
-+		}
- 	}
- 	return cid;
- }
-@@ -3874,6 +3886,7 @@ static inline unsigned int mm_cid_conver
- static __always_inline void mm_cid_update_task_cid(struct task_struct *t, unsigned int cid)
- {
- 	if (t->mm_cid.cid != cid) {
-+		trace_mmcid_task_update(t, t->mm, cid);
- 		t->mm_cid.cid = cid;
- 		rseq_sched_set_ids_changed(t);
- 	}
-@@ -3881,6 +3894,7 @@ static __always_inline void mm_cid_updat
- 
- static __always_inline void mm_cid_update_pcpu_cid(struct mm_struct *mm, unsigned int cid)
- {
-+	trace_mmcid_cpu_update(smp_processor_id(), mm, cid);
- 	__this_cpu_write(mm->mm_cid.pcpu->cid, cid);
- }
- 
+>
+> Also the irq handler takes a direct pointer to the napi struct, as
+> opposed to Jakub's suggestion of using a ptr to a p
+>
+> > +		dev_err(edev->dma_dev,
+> > +			"eea_alloc_irq_blks failed with pairs %d\n", pairs);
+> > +		free_netdev(netdev);
+> > +		return NULL;
+> > +	}
+> > +
+> >  	return enet;
+> >  }
+> >
+> > +static void eea_update_ts_off(struct eea_device *edev, struct eea_net =
+*enet)
+> > +{
+> > +	u64 ts;
+> > +
+> > +	ts =3D eea_pci_device_ts(edev);
+> > +
+> > +	enet->hw_ts_offset =3D ktime_get_real() - ts;
+> > +}
+> > +
+> > +static int eea_net_reprobe(struct eea_device *edev)
+> > +{
+> > +	struct eea_net *enet =3D edev->enet;
+> > +	int err =3D 0;
+> > +
+> > +	enet->edev =3D edev;
+> > +
+> > +	if (!enet->adminq.ring) {
+> > +		err =3D eea_create_adminq(enet, edev->rx_num + edev->tx_num);
+> > +		if (err)
+> > +			return err;
+> > +	}
+> > +
+> > +	err =3D eea_alloc_irq_blks(enet, edev->rx_num);
+> > +	if (err) {
+> > +		eea_destroy_adminq(enet);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	eea_update_ts_off(edev, enet);
+> > +
+> > +	if (edev->ha_reset_netdev_running) {
+> > +		rtnl_lock();
+> > +		enet->link_err =3D 0;
+> > +		err =3D eea_netdev_open(enet->netdev);
+> > +		rtnl_unlock();
+> > +	}
+> > +
+> > +	return err;
+> > +}
+> > +
+> >  int eea_net_probe(struct eea_device *edev)
+> >  {
+> >  	struct eea_net *enet;
+> >  	int err =3D -ENOMEM;
+> >
+> > +	if (edev->ha_reset)
+> > +		return eea_net_reprobe(edev);
+> > +
+> >  	enet =3D eea_netdev_alloc(edev, edev->rx_num);
+> >  	if (!enet)
+> >  		return -ENOMEM;
+> > @@ -168,6 +670,7 @@ int eea_net_probe(struct eea_device *edev)
+> >  	if (err)
+> >  		goto err_reset_dev;
+> >
+> > +	eea_update_ts_off(edev, enet);
+> >  	netif_carrier_off(enet->netdev);
+> >
+> >  	netdev_dbg(enet->netdev, "eea probe success.\n");
+> > @@ -179,10 +682,29 @@ int eea_net_probe(struct eea_device *edev)
+> >  	eea_destroy_adminq(enet);
+> >
+> >  err_free_netdev:
+> > +	eea_free_irq_blk(enet);
+> >  	free_netdev(enet->netdev);
+> >  	return err;
+> >  }
+> >
+> > +static void eea_net_ha_reset_remove(struct eea_net *enet,
+> > +				    struct eea_device *edev,
+> > +				    struct net_device *netdev)
+> > +{
+> > +	rtnl_lock();
+> > +	edev->ha_reset_netdev_running =3D false;
+> > +	if (netif_running(enet->netdev)) {
+> > +		eea_netdev_stop(enet->netdev);
+> > +		enet->link_err =3D EEA_LINK_ERR_HA_RESET_DEV;
+> > +		edev->ha_reset_netdev_running =3D true;
+> > +	}
+> > +	rtnl_unlock();
+> > +
+> > +	eea_device_reset(edev);
+> > +	eea_destroy_adminq(enet);
+> > +	eea_free_irq_blk(enet);
+> > +}
+> > +
+> >  void eea_net_remove(struct eea_device *edev)
+> >  {
+> >  	struct net_device *netdev;
+> > @@ -191,12 +713,16 @@ void eea_net_remove(struct eea_device *edev)
+> >  	enet =3D edev->enet;
+> >  	netdev =3D enet->netdev;
+> >
+> > +	if (edev->ha_reset) {
+> > +		eea_net_ha_reset_remove(enet, edev, netdev);
+> > +		return;
+> > +	}
+> > +
+> >  	unregister_netdev(netdev);
+> > -	netdev_dbg(enet->netdev, "eea removed.\n");
+> >
+> >  	eea_device_reset(edev);
+> > -
+> >  	eea_destroy_adminq(enet);
+> > +	eea_free_irq_blk(enet);
+> >
+> >  	free_netdev(netdev);
+> >  }
+> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/e=
+thernet/alibaba/eea/eea_net.h
+> > index ab487bc88af2..0398e781dfdb 100644
+> > --- a/drivers/net/ethernet/alibaba/eea/eea_net.h
+> > +++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
+> > @@ -18,6 +18,8 @@
+> >  #define EEA_VER_MINOR		0
+> >  #define EEA_VER_SUB_MINOR	0
+> >
+> > +struct eea_tx_meta;
+> > +
+> >  struct eea_net_tx {
+> >  	struct eea_net *enet;
+> >
+> > @@ -101,6 +103,18 @@ struct eea_net_cfg {
+> >  	u8 tx_cq_desc_size;
+> >
+> >  	u32 split_hdr;
+> > +
+> > +	struct hwtstamp_config ts_cfg;
+> > +};
+> > +
+> > +struct eea_net_init_ctx {
+> > +	struct eea_net_cfg cfg;
+> > +
+> > +	struct eea_net_tx *tx;
+> > +	struct eea_net_rx **rx;
+> > +
+> > +	struct net_device *netdev;
+> > +	struct eea_device *edev;
+> >  };
+> >
+> >  enum {
+> > @@ -109,6 +123,17 @@ enum {
+> >  	EEA_LINK_ERR_LINK_DOWN,
+> >  };
+> >
+> > +struct eea_irq_blk {
+> > +	struct napi_struct napi;
+> > +	u16 msix_vec;
+> > +	bool ready;
+> > +	struct eea_net_rx *rx;
+> > +	char irq_name[32];
+> > +	int irq;
+> > +	int idx;
+> > +
+> > +};
+> > +
+> >  struct eea_net {
+> >  	struct eea_device *edev;
+> >  	struct net_device *netdev;
+> > @@ -121,6 +146,8 @@ struct eea_net {
+> >  	struct eea_net_cfg cfg;
+> >  	struct eea_net_cfg cfg_hw;
+> >
+> > +	struct eea_irq_blk *irq_blks;
+> > +
+> >  	u32 link_err;
+> >
+> >  	bool started;
+> > @@ -134,4 +161,22 @@ struct eea_net {
+> >  int eea_net_probe(struct eea_device *edev);
+> >  void eea_net_remove(struct eea_device *edev);
+> >
+> > +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_c=
+tx *ctx);
+> > +void eea_init_ctx(struct eea_net *enet, struct eea_net_init_ctx *ctx);
+> > +int eea_queues_check_and_reset(struct eea_device *edev);
+> > +
+> > +/* rx apis */
+> > +void enet_rx_stop(struct eea_net_rx *rx);
+> > +void enet_rx_start(struct eea_net_rx *rx);
+> > +
+> > +void eea_free_rx(struct eea_net_rx *rx, struct eea_net_cfg *cfg);
+> > +struct eea_net_rx *eea_alloc_rx(struct eea_net_init_ctx *ctx, u32 idx);
+> > +
+> > +/* tx apis */
+> > +int eea_poll_tx(struct eea_net_tx *tx, int budget);
+> > +netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev=
+);
+> > +
+> > +void eea_free_tx(struct eea_net_tx *tx, struct eea_net_cfg *cfg);
+> > +int eea_alloc_tx(struct eea_net_init_ctx *ctx, struct eea_net_tx *tx, =
+u32 idx);
+> > +
+> >  #endif
+> > diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/e=
+thernet/alibaba/eea/eea_pci.c
+> > index 97efac753cfb..e42b0298eebb 100644
+> > --- a/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> > +++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> > @@ -13,6 +13,9 @@
+> >
+> >  #define EEA_PCI_DB_OFFSET 4096
+> >
+> > +#define EEA_PCI_CAP_RESET_DEVICE 0xFA
+> > +#define EEA_PCI_CAP_RESET_FLAG BIT(1)
+> > +
+> >  struct eea_pci_cfg {
+> >  	__le32 reserve0;
+> >  	__le32 reserve1;
+> > @@ -51,6 +54,7 @@ struct eea_pci_device {
+> >  	void __iomem *reg;
+> >  	void __iomem *db_base;
+> >
+> > +	struct work_struct ha_handle_work;
+> >  	char ha_irq_name[32];
+> >  	u8 reset_pos;
+> >  };
+> > @@ -67,6 +71,11 @@ struct eea_pci_device {
+> >  #define cfg_read32(reg, item) ioread32(cfg_pointer(reg, item))
+> >  #define cfg_readq(reg, item) readq(cfg_pointer(reg, item))
+> >
+> > +/* Due to circular references, we have to add function definitions her=
+e. */
+> > +static int __eea_pci_probe(struct pci_dev *pci_dev,
+> > +			   struct eea_pci_device *ep_dev);
+> > +static void __eea_pci_remove(struct pci_dev *pci_dev, bool flush_ha_wo=
+rk);
+> > +
+> >  const char *eea_pci_name(struct eea_device *edev)
+> >  {
+> >  	return pci_name(edev->ep_dev->pci_dev);
+> > @@ -250,6 +259,150 @@ void eea_pci_active_aq(struct eea_ring *ering, in=
+t msix_vec)
+> >  				    cfg_read32(ep_dev->reg, aq_db_off));
+> >  }
+> >
+> > +void eea_pci_free_irq(struct eea_irq_blk *blk)
+> > +{
+> > +	irq_update_affinity_hint(blk->irq, NULL);
+> > +	free_irq(blk->irq, blk);
+> > +}
+> > +
+> > +int eea_pci_request_irq(struct eea_device *edev, struct eea_irq_blk *b=
+lk,
+> > +			irqreturn_t (*callback)(int irq, void *data))
+> > +{
+> > +	struct eea_pci_device *ep_dev =3D edev->ep_dev;
+> > +	int irq;
+> > +
+> > +	snprintf(blk->irq_name, sizeof(blk->irq_name), "eea-q%d@%s", blk->idx,
+> > +		 pci_name(ep_dev->pci_dev));
+> > +
+> > +	irq =3D pci_irq_vector(ep_dev->pci_dev, blk->msix_vec);
+> > +
+> > +	blk->irq =3D irq;
+> > +
+> > +	return request_irq(irq, callback, IRQF_NO_AUTOEN, blk->irq_name, blk);
+> > +}
+> > +
+> > +static void eea_ha_handle_reset(struct eea_pci_device *ep_dev)
+> > +{
+> > +	struct eea_device *edev;
+> > +	struct pci_dev *pci_dev;
+> > +	u16 reset;
+> > +	int err;
+> > +
+> > +	if (!ep_dev->reset_pos) {
+> > +		eea_queues_check_and_reset(&ep_dev->edev);
+> > +		return;
+> > +	}
+> > +
+> > +	edev =3D &ep_dev->edev;
+> > +
+> > +	pci_read_config_word(ep_dev->pci_dev, ep_dev->reset_pos, &reset);
+> > +
+> > +	/* clear bit */
+> > +	pci_write_config_word(ep_dev->pci_dev, ep_dev->reset_pos, 0xFFFF);
+> > +
+> > +	if (reset & EEA_PCI_CAP_RESET_FLAG) {
+> > +		dev_warn(&ep_dev->pci_dev->dev, "recv device reset request.\n");
+> > +
+> > +		pci_dev =3D ep_dev->pci_dev;
+> > +
+> > +		/* The pci remove callback may hold this lock. If the
+> > +		 * pci remove callback is called, then we can ignore the
+> > +		 * ha interrupt.
+> > +		 */
+> > +		if (mutex_trylock(&edev->ha_lock)) {
+> > +			edev->ha_reset =3D true;
+> > +
+> > +			__eea_pci_remove(pci_dev, false);
+> > +			err =3D __eea_pci_probe(pci_dev, ep_dev);
+> > +			if (err)
+> > +				dev_err(&ep_dev->pci_dev->dev,
+> > +					"ha: re-setup failed.\n");
+>
+> AI still notes:
+> ---
+> What happens if __eea_pci_probe() fails during HA reset recovery? Jakub
+> Kicinski's AI review in v25 noted that when probe fails after remove
+> succeeded, the device is left in a removed state with no error beyond this
+> single dev_err() message.
+>
+> The function returns 1 (from the implicit flow) indicating success, even
+> though reprobe failed and the device is now non-functional. Should this
+> check
+> for errors and at minimum log the failure state more prominently?
+>
+> Reference:
+> https://lore.kernel.org/netdev/20260204040054.1698677-2-kuba@kernel.org/
+> ---
+>
 
