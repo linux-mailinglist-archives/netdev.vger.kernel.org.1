@@ -1,166 +1,261 @@
-Return-Path: <netdev+bounces-265474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265475-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKlAAgWmrmkFHQIAu9opvQ
-	(envelope-from <netdev+bounces-265474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:50:45 +0100
+	id 4LYRKmSnrmkFHQIAu9opvQ
+	(envelope-from <netdev+bounces-265475-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:56:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC882375E2
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:50:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 413772376E5
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C88AF304302C
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:47:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AAACF3004D12
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F88E3939A5;
-	Mon,  9 Mar 2026 10:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADC9393DE9;
+	Mon,  9 Mar 2026 10:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="alSYCNSh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DtdmIMfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111B338F947
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773053233; cv=pass; b=fPzJr2sDjl6iqUpeIM46WPHBqs4N+BSuHUGtBpPAsdL2l56ibJKB9H+mb/dck/CqEZUmsEdTFwwzQIVFKx05qBLnkA4vF2gHGCT0tbahoSjelMcKVEF+BDTQnwIFvErdfZTxVnj6asiUh+E8r50b/X+pCPy5PNQ6BI4GPKxZeFE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773053233; c=relaxed/simple;
-	bh=WaGNRP8zBcq+FN96X1EiSW9HiX0AA+iytSmfZgPgEiI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u724M7SqSeypL1NyDRrQi/UoiDjT3DoxAq6/GRWVkJbD30DpbMEgQTOcWhJmDKxh8zYUNbrAm0Qlz424uNdhd/IlP/JhOBOieHy7L4pK2k2lyaOG+EqktliAl/LFwE1xgqJEEfpETKXUVBwe6PdVFUkPc3PadR42ud68Dtdpih8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=alSYCNSh; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-79898953985so63285057b3.1
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 03:47:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773053231; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jnQY1VI4kdI6tMGjgvlyVzkWXcjl7BnRtc+tqsFnI2cfVShpvhyTFyJs4XzQcqkIzf
-         cVutp25cqI+vrDSVpxqYdhivi3liR51jKvkDtLreeNjY/A4zZj4Lj9/OQaJGGOZpbH6Z
-         geQ0ieL2fzYZaa/EWewy0n3qJTvba9RIBNDJEAqOgl3GbH7CWpBJemmx9BIjKZsjs8iL
-         xsBi49/w27M5t3zlP1DtSIoji2ZFyEKuUtiCdjW8Bi2nx3lG/sFvzoXgutGEoLwXFJ+Y
-         Kxk+/6yTPOg1IWbO+lITvtXrEarWQ+0kuu5BXJgIVMQtHhEldHzRbaUarZXPlUSmlaCg
-         OyXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WaGNRP8zBcq+FN96X1EiSW9HiX0AA+iytSmfZgPgEiI=;
-        fh=V/X30X7HjtLxDTkjnjWF30ljdSkoK61JR2uxzB9Bb8I=;
-        b=Hj0USO0nFUak1gy+MZ+i8EY1PmtkdMgfDA4pnwnKBG+Ms95Yl0QR5uNjnW7/+QKF1w
-         Iz6+bOoqKL8MLPsPYCaPhGd2XCu257pBCZHFk3bsnA/CFw2fHiQg/FoJZk4ul0asDNYb
-         Q7XfwrdniX6/lTBXBirD7AhkE/EpmzzF3kr9UOgqqcUDnvLHeDwHTSRsNPPsKo/PwwaO
-         cIJ1Wwvl78hiypeS2TRcVVZKWRrhKX0bWqPJYhVW8/8VWLvshT9TB3Uez5Hbg7pWP+Ym
-         ih5b5qjnqpxiccsA6FIfhOwu6CddbvDicGxc3CMhFLyxGFx2wf+uZ7c/R+L1uqGTlFs8
-         TayA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773053231; x=1773658031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WaGNRP8zBcq+FN96X1EiSW9HiX0AA+iytSmfZgPgEiI=;
-        b=alSYCNShrDmE37FWShOjhdt91KxEtlZs0wXmwGLxbNJmXHljBdLwFqr65D/eJn/W8p
-         SkMyWzGPC4MvVuNiG6qpfafM7fB6yxFxDpjU8+WqLRDCPh79aiud16E2FMA95ZWNr15n
-         KogLHXsirPpAhQiHibxFs6cSb+fmeUtKvJcZ0QeTMeFOLXdEYjbeVwqHUyMLiogtvzxe
-         wynDYRdo7Ko4XvhnZZlZEeDSeR1zIK1YgY3AkA/79Z7DXfuqeRnepoTPZmoUdA0R8gZ7
-         5c26IiVE8yYO5SGgb70GpPJmXTfKrHhnGFV4+optegmmGEPB3KjH6ZrAUEn117mb5CkX
-         Jgpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773053231; x=1773658031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WaGNRP8zBcq+FN96X1EiSW9HiX0AA+iytSmfZgPgEiI=;
-        b=hGfFw05YQ3far4kFaiY4goPsGjDPkcDSoWsysKyvjGA0t9StqLGaKhqN26ozZ1T58j
-         U+l5mxSOnNWwR9XVgEKfIep2F5QP8Y3FeNXUZP9SEIaNuvvhOgFdez/FgOeZzXtg0CdL
-         NRSvM8o7TTCG6LdxwV1LOcjsPuNSHj1GM1bL846wcbnQ+2xZjG+GJn5lBExMmnlPaS0l
-         PlsvSM+whMFsDNAY1MII4Vb4KWKeLLJSiFZXkiSdUad1KhROkW88a3Obw9NDNdma1Z2L
-         0LS3uKm/r/SeHviMUvFyw/XWK3Lm1wQBl5JuFm7KVfB8JOT10amMTVe/S376+R7LzGk5
-         Th9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVjYDqTtszgQWWIdw11TJb2aFCYXuwETko/YL4/vgceQ6J1RJyKUqjLiyNENdqKbo93q5dwE3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxQNDn4FFW0j5CVuFQfhSPIDaYvZCaKJCUZgcbuIYm9UmaakmN
-	TjIhmJgfcWXYb/cugkjuAdbLbnpBHujbD8ue+O8gYRxVZ68VCr89Q0MDM+IYhPUPFWgAqP584w7
-	SGWmhS2j1Vz10nHBxohQQaIpqH5mpYis=
-X-Gm-Gg: ATEYQzzPi9tOwoMg5cM4sC8Fe/pgS/hpvmw6ns95ASfWquf0lvoDZaB8tM/L0IqCNnh
-	evJpwezJjeDK5yQFJE0HvoUCer1JP1eRwbuQSN22xLt1Txo6znIfuJ0z1Kke1PuKzstYrQWn30K
-	/EruLLkVkOAPzISb7fCTcYH/VhXk1ZLiMgsy0SRTzC86Ch2Rl1h1n3o7o3catlei7qqt/ZRcHeC
-	BRi+fc6mZLfc6IMRi8TbWKa+6M2keUgdg7riA13rmHazfxFAsLAjzmbnL6xugU1wIZSfb65l3ZM
-	RwCaaCXozHCozgpA
-X-Received: by 2002:a05:690c:f03:b0:798:740f:6af1 with SMTP id
- 00721157ae682-798dd6e9b55mr95462887b3.24.1773053231166; Mon, 09 Mar 2026
- 03:47:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7493392C4C
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 10:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773053789; cv=none; b=iGYfP2yuQkDPhrvbZahuwe86Sib04vWSqqtBNtuL1u/Q7BaSjzntIV7bcDvj9Xkj9lLCG62aPZ7rCjDkDzLRDnp+zmpz8f3h91i+9SmiwYl7VMx0cdywNUATmoubINQhB9Lnfb9gdqJcENHWrliIB452oQR09sZqMoENAfOWmlk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773053789; c=relaxed/simple;
+	bh=+dc6Lnwo5YZ7/3JzHek9nuMZRXBo/9cGU84S0tcDqyQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=PxIUqr3ThT6vGa+7JdI2uAKR4N+nFO1pQXL+hJ6AAe3gLKQQpxCRDhgGJR8GhU3drv6YnzzZCa5PLgHhIgNYIJy2YVNWVIGf5uoP6svTanX9fx1dU4WBIzTzVFW8svtD45RRzTiHHkELKgfyC7pomZnctx5cKtGColmggitHf0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DtdmIMfW; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 27EA04E4251A;
+	Mon,  9 Mar 2026 10:56:24 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E800E5FFB8;
+	Mon,  9 Mar 2026 10:56:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6F6610369B53;
+	Mon,  9 Mar 2026 11:56:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773053782; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Gzr14tOSv8CsjphFxN1CH5k+Wd2mUuktsUCoITd4ydI=;
+	b=DtdmIMfWFsDTwbpFaa3qJVfmdBivebdRRUV51CDLf68QcJQzLcX+IavHOIfxbdSVrrMKt7
+	ZwDbzNremPKThMvqMoRwZR91Fo6ApLa8JiihVvdiR0BZVSvIUFxpsCTBTzarb/2yeaydfH
+	MNxvGdWPARLwMwnoagBOsgx9JmWKm82GX+Wcltws1g4JD05nDSMZAROegGaBFnWTUhtb1j
+	8LokKLNO7jqwaIHUJOzMk1vw+9IWXHfFm2kJNpllgQXNvUfUi1SpcgkUOocFx/0ZAmluZj
+	kkWuAp5IVHqr7+l4B655xMReNyVuN7AyFESyLpY/2Xr04B9guY2YagSrSsjytw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260305013852.3769-1-dqfext@gmail.com> <20260306170411.49912ae1@kernel.org>
-In-Reply-To: <20260306170411.49912ae1@kernel.org>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Mon, 9 Mar 2026 18:46:59 +0800
-X-Gm-Features: AaiRm52EFkMctGTRXJyZVgZys-IhjRENIU0NTzUX9qDahsc4Ed7hvqKpp3xPVQc
-Message-ID: <CALW65jatv71b7G6jpr4g-6j520RjLBDJMH8uta5MPJHmEM1S1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] net: pppoe: implement GRO/GSO support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-ppp@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Felix Fietkau <nbd@nbd.name>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 5CC882375E2
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 09 Mar 2026 11:56:17 +0100
+Message-Id: <DGY73WJ12XE3.32N9A9PF2QBKJ@bootlin.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, "Vladimir Kondratiev"
+ <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
+To: "Maxime Chevallier" <maxime.chevallier@bootlin.com>,
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>,
+ "Richard Cochran" <richardcochran@gmail.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next 8/8] net: macb: add Tx zero-copy AF_XDP support
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com>
+ <20260304-macb-xsk-v1-8-ba2ebe2bdaa3@bootlin.com>
+ <74089907-d7d3-4242-92a5-909812779932@bootlin.com>
+ <DGVVCKPUZVSQ.3U7SG8TTTA1CM@bootlin.com>
+ <d9643b78-66e6-4f04-9e94-426b99ed250d@bootlin.com>
+In-Reply-To: <d9643b78-66e6-4f04-9e94-426b99ed250d@bootlin.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 413772376E5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265474-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265475-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[bootlin.com,microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.948];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	NEURAL_HAM(-0.00)[-0.993];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,gnu.org:url]
 X-Rspamd-Action: no action
 
-Hi Jakub,
+Hello Maxime,
 
-On Sat, Mar 7, 2026 at 9:04=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Fri Mar 6, 2026 at 6:53 PM CET, Maxime Chevallier wrote:
+> On 06/03/2026 18:18, Th=C3=A9o Lebrun wrote:
+>> Hello!
+>>=20
+>> On Fri Mar 6, 2026 at 1:48 PM CET, Maxime Chevallier wrote:
+>>> On 04/03/2026 19:24, Th=C3=A9o Lebrun wrote:
+>>>> Add a new buffer type (to `enum macb_tx_buff_type`). Near the end of
+>>>> macb_tx_complete(), we go and read the XSK buffers using
+>>>> xsk_tx_peek_release_desc_batch() and append those buffers to our Tx
+>>>> ring.
+>>>>
+>>>> Additionally, in macb_tx_complete(), we signal to the XSK subsystem
+>>>> number of bytes completed and conditionally mark the need_wakeup
+>>>> flag.
+>>>>
+>>>> Lastly, we update XSK wakeup by writing the TCOMP bit in the per-queue
+>>>> IMR register, to ensure NAPI scheduling will take place.
+>>>>
+>>>> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
+>>>> ---
+>>>
+>>> [...]
+>>>
+>>>> +static void macb_xdp_xmit_zc(struct macb *bp, unsigned int queue_inde=
+x, int budget)
+>>>> +{
+>>>> +	struct macb_queue *queue =3D &bp->queues[queue_index];
+>>>> +	struct xsk_buff_pool *xsk =3D queue->xsk_pool;
+>>>> +	dma_addr_t mapping;
+>>>> +	u32 slot_available;
+>>>> +	size_t bytes =3D 0;
+>>>> +	u32 batch;
+>>>> +
+>>>> +	guard(spinlock_irqsave)(&queue->tx_ptr_lock);
+>>>> +
+>>>> +	/* This is a hard error, log it. */
+>>>> +	slot_available =3D CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx=
+_ring_size);
+>>>> +	if (slot_available < 1) {
+>>>> +		netif_stop_subqueue(bp->dev, queue_index);
+>>>> +		netdev_dbg(bp->dev, "tx_head =3D %u, tx_tail =3D %u\n",
+>>>> +			   queue->tx_head, queue->tx_tail);
+>>>> +		return;
+>>>> +	}
+>>>> +
+>>>> +	batch =3D min_t(u32, slot_available, budget);
+>>>> +	batch =3D xsk_tx_peek_release_desc_batch(xsk, batch);
+>>>> +	if (!batch)
+>>>> +		return;
+>>>> +
+>>>> +	for (u32 i =3D 0; i < batch; i++) {
+>>>> +		struct xdp_desc *desc =3D &xsk->tx_descs[i];
+>>>> +
+>>>> +		mapping =3D xsk_buff_raw_get_dma(xsk, desc->addr);
+>>>> +		xsk_buff_raw_dma_sync_for_device(xsk, mapping, desc->len);
+>>>> +
+>>>> +		macb_xdp_submit_buff(bp, queue_index, (struct macb_tx_buff){
+>>>> +			.ptr =3D NULL,
+>>>> +			.mapping =3D mapping,
+>>>> +			.size =3D desc->len,
+>>>> +			.mapped_as_page =3D false,
+>>>> +			.type =3D MACB_TYPE_XSK,
+>>>> +		});
+>>>> +
+>>>> +		bytes +=3D desc->len;
+>>>> +	}
+>>>> +
+>>>> +	/* Make newly initialized descriptor visible to hardware */
+>>>> +	wmb();
+>>>> +	spin_lock(&bp->lock);
+>>>> +	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
+>>>> +	spin_unlock(&bp->lock);
+>>>
+>>> this lock is also taken in interrupt context, this should probably use =
+a
+>>> irqsave/restore variant. Now, there are a few other parts of this drive=
+r
+>>> that use a plain spin_lock() call and except for the paths that actuall=
+y
+>>> run in interrupt context, they don't seem correct to me :(
+>>=20
+>> I almost sent a reply agreeing with you, but actually here is the
+>> exhaustive `spin_lock(&bp->lock)` list:
+>>=20
+>>    #   Function                Context
+>>    ------------------------------------------
+>>    1   gem_wol_interrupt()     irq
+>>    2   macb_interrupt()        irq
+>>    3   macb_wol_interrupt()    irq
+>>    4   macb_tx_error_task()    workqueue/user
+>>    5   macb_tx_restart()       napi/softirq
+>>    6   macb_xdp_xmit_zc()      napi/softirq
+>>    7   macb_start_xmit()       user
+>>    8   macb_xdp_submit_frame() user
+>>=20
+>> And all contexts are safe because it always is this sequence in non-IRQ
+>> contexts (#4-8):
+>>=20
+>>    spin_lock_irqsave(&queue->tx_ptr_lock, flags);
+>>    spin_lock(&bp->lock);
+>>    spin_unlock(&bp->lock);
+>>    spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
 >
-> Please add some selftests.
+> Is it because of the guard statement ?
+>
+>   guard(spinlock_irqsave)(&queue->tx_ptr_lock);
+>
+> It really doesn't make it obvious that this is how it plays out :(
 
-I haven't written a kselftest before. What tests should I include?
+Yes! A guard does an operation when called and one at scope end (in our
+case at the end of macb_xdp_xmit_zc()). That way we don't forget the
+cleanup, and we can do early returns without a list of labels and
+gotos (and mess up along the way).
 
-I think I can add a local ppp server and client over veth, and test
-the connection with ping and iperf3.
+It uses the __attribute__((cleanup(cleanup_function))) compiler feature,
+that is aliased to `__cleanup()` in the kernel.
+https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-cleanup
+https://elixir.bootlin.com/linux/v6.19.6/source/include/linux/compiler_attr=
+ibutes.h#L76
 
-> --
-> pw-bot: cr
+Guard definition for `spinlock_irqsave`:
+https://elixir.bootlin.com/linux/v6.19.6/source/include/linux/spinlock.h#L5=
+85-L588
+(delving into those macros is not recommended)
 
-Regards,
-- Qingfang
+Code documentation is good:
+https://elixir.bootlin.com/linux/v6.19.6/source/include/linux/cleanup.h#L10
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
