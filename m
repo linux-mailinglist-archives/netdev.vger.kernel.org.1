@@ -1,181 +1,164 @@
-Return-Path: <netdev+bounces-265778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNGLN+c/r2mYSwIAu9opvQ
-	(envelope-from <netdev+bounces-265778-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:47:19 +0100
+	id YFZCBytJr2krTgIAu9opvQ
+	(envelope-from <netdev+bounces-265779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:26:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DBE4241D97
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 22:47:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B49B024234B
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 23:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC5593037D71
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 21:47:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B9B330219F8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 22:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E102C0303;
-	Mon,  9 Mar 2026 21:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE82038F940;
+	Mon,  9 Mar 2026 22:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="n9ySCdok"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/4Ury2o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC71C18871F
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 21:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8705A38F245
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 22:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773092837; cv=none; b=fkGw4viz1Vjwh/x3/mr46vhUK17hHJfAAEXoYV6RY3QxFwrZ0wKhL5G2srLqJqzBiOT3yknteFOWxYnkVbSNah8AE4KcX5F64c8waHiwDDWK9NPclR3a8eFKIcHksnHAlF3Eu/JU/rN8/UhQAVBJBIO5/Fl7aT820vnkuqQVxNE=
+	t=1773095207; cv=none; b=e7bEilWG7wukJSBuJyx6yleNAaLxBoNp7Ri8ewRbl+hzkyUfqOYOQPkq+1RlH4ggtsAMZ/IAjWEZTZBeoBLQG88n5C9PxEMuPgjg2j8VD2g6ZtgkbPlHAgwcAKji61NzZHYjhYbdEAnpB1cxwbypfgGLSezk0d7yC6m6B0RkGik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773092837; c=relaxed/simple;
-	bh=n2ResMgKZ5qR2/oPHB/TAsovK03SthZFanAYgIrnoOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TxbIZrkclNBXQ+uTCaFbyWe/gZ0ceJGYUQM5igwoZsDhJ9NgWkYnfmTljXygnpA1Za1Yv+LcygJ5KhKkm0lmtjs2uxCguFbzjQiqsPo9Sg4G2ZDGnyJb73ibufO9DesUj5aiQFRsyQgcGox7aP2K/dEEgdWT86eQy1N+00rrvIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=n9ySCdok; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id S8y4b9Id9kXXUoJM; Mon, 09 Mar 2026 17:47:12 -0400 (EDT)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=0AcrpPbZG7LzixIV6utLwE3BLP2ZvhqSvrs7tOKnr5M=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
-	Content-Language:Subject:MIME-Version:Date:Message-ID; b=n9ySCdokk0ZXXI/pV/He
-	ry8/UC9+nAA5o57tXZb/CPApQmDyqm/hWVPqGUUD9aY5AfwVO3w4ez8leotu4YiCQ4utJWRIHpJSj
-	OLXdkX/vI1Etnr4HowSUQwuQmLhZ8Uwa97Gim7iN4+cvqjqi0WNA9QvQPPVbCw0+kVlrIPvil8=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate SPEC SMTP 8.0.5)
-  with ESMTPS id 14451565; Mon, 09 Mar 2026 17:47:12 -0400
-Message-ID: <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Mon, 9 Mar 2026 17:47:12 -0400
+	s=arc-20240116; t=1773095207; c=relaxed/simple;
+	bh=i0GRJfSHh/D61KwItNe6fb7adZHJMaGkMix9ht+i3A0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Re1OlPiSMdvQtdj4U727PWtjmng2i6Dowl7fHjVbUJRFOUcHQ2qKXDITk5cXP5xRVXZJ+Jyd7j0vI5M8rpZzz9JNORlnK0I7SZIBjD6a+bvAsWIkRNobhp5DwgVFaqkFRJ1OX/xwIkPqr1cosQN3OtnmdBiGJ+yayKdEv84Wj7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/4Ury2o; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8cd8c6e365eso126964085a.0
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 15:26:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773095205; x=1773700005; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b0qmAnC6DnZWfkO5AOHdxhn/T13J7DQN3esTSP9cxW4=;
+        b=C/4Ury2oopotKm4qQe5ULNnB41cyLLpNkR2VwqK3MczAcqUb7MHZ3lNd9wt1yUxOn3
+         ULpsbAx/v0MrbHPh/ZGuR7E40U0dMcJmHVbFmaR3zidTpKjvVW/c/CvxhnzlKaQEd9TH
+         QdSKViAMLpfz//6F6jKX2EnCw3POpeKqmL0hkH+6vUeLeyZA/UDwUq3XDPald81m0RTT
+         Cf63g7mzXZfoLx3G0PrWF1Zx1OvY7IFNSNW6+pmu6h2fwuMfAKgjGQODZ0XItscgWkxW
+         qxXwJqZ9WH0zT4grYRuzGrDqi50x/RsHV2rWHk8xLPrGAEytC1OOAnw9JTdQ1LARc9Ox
+         BEew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773095205; x=1773700005;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b0qmAnC6DnZWfkO5AOHdxhn/T13J7DQN3esTSP9cxW4=;
+        b=ogYI34O9ytCsCoNW9G95RceK8xCrTbxpKdrUm4yLRfKm2Mo7alMc1jS61sWbqMvVr7
+         CbY4cNiBweD0LxKXfqP5LMjQwvfDogTongIfczFzXpBwHgtWkrxJjQZxtZa/ZrKMGMd2
+         qbDSIpaRuyZ3Y5WuyoQni223K7xOZr6mMgWyFBt/sFa/eDwUNheXf+h5qqLu/05P4AUl
+         YS57EfmInt5p4Hs4UxuBxU8jxoWja2kD085JvMVcQYgnzI8307zkXRaBZFLr+TDK/sVx
+         WsFJaLQjQoe67DHa0wBzIaBMKOmTa1RXas9wnzvB1c0SGPOh8X1eg2607XdtUtouOesJ
+         jBew==
+X-Forwarded-Encrypted: i=1; AJvYcCUwqv8Yhm3AXaNUsHIhy64HZf7JNcg0baXBBspVqV/qc9M5Dsp0o4bwWbpfUmBbufLh0snkJQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJCjpVOTrNB0ikz8DzsztFbZUmkj5zTzZnZ+JgtSKV70yriYsj
+	o2pxPdZATVY863bnhnfIwEYTiR+MU+1zCPAVuPLwQ96r50Crz5yNUYMn
+X-Gm-Gg: ATEYQzw8GZutNmWtbHovhxkdYoAfCEcexhPuchDPsHPshVhKA0EzfE2Iz9LS5wjyWph
+	PmKJa09OmXluir6Ex/otmX2cCVDh0Ouh8Dy5XR4Xk/Dx+y5AMU8myJB+MFg74Zx3KG/mGGSz198
+	KNApWTjzH7D3wG6/56by7hO5APCX3/OQd/FuyiLh2eODQsSdL903yaVRAhJm3OCvolTgot52b1G
+	q4ne1qQFvDb5nfFo5mgfBTHh2g5ENpeZl6WAMv/NRJA3zMEX4xeiAxNg0f3nO3Xn/ioyrWrSji+
+	2sI/3Qc/wqB01G6BYG+QUSe7RgpIufQFKZtpifDST2GraxyFp6ESRUQJ52xI19xZYVwYVO/WwGU
+	a8G0eLcK528gqIAEOxhsfxMVIjIwMh1DVz8fVHtsRbozeblBqIfKbc3pN9aqKC5To2KjuQgU/Mc
+	t8u99J+sIPdBJVkp5nzZoY73YxIfwDg7Wr1Q==
+X-Received: by 2002:a05:620a:c55:b0:8cb:4289:6c1a with SMTP id af79cd13be357-8cd6d549b1fmr1572894885a.75.1773095205343;
+        Mon, 09 Mar 2026 15:26:45 -0700 (PDT)
+Received: from localhost ([2001:19f0:8001:1b2d:5400:5ff:fefa:a95d])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd866f7074sm325445485a.6.2026.03.09.15.26.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 15:26:44 -0700 (PDT)
+Date: Tue, 10 Mar 2026 06:26:07 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Yao Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	Shangjuan Wei <weishangjuan@eswincomputing.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Chen-Yu Tsai <wens@kernel.org>, Boon Khai Ng <boon.khai.ng@altera.com>, 
+	Quentin Schulz <quentin.schulz@cherry.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, spacemit@lists.linux.dev, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v8 3/3] net: stmmac: Add glue layer for Spacemit
+ K3 SoC
+Message-ID: <aa9I4pIZs5-TDdXo@inochi.infowork>
+References: <20260309004305.315018-1-inochiama@gmail.com>
+ <20260309004305.315018-4-inochiama@gmail.com>
+ <aa62FTHMOJGhVKTv@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Long delay in freeing skbs
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: Long delay in freeing skbs
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, eric.dumazet@gmail.com,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>
-References: <20251106202935.1776179-1-edumazet@google.com>
- <20251106202935.1776179-3-edumazet@google.com>
- <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
- <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
- <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com>
- <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
-From: Tony Battersby <tonyb@cybernetics.com>
-In-Reply-To: <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1773092832
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Barracuda-BRTS-Status: 0
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 2814
-X-ASG-Debug-ID: 1773092832-1cf43940a6c05f0001-BZBGGp
-X-Rspamd-Queue-Id: 3DBE4241D97
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa62FTHMOJGhVKTv@shell.armlinux.org.uk>
+X-Rspamd-Queue-Id: B49B024234B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cybernetics.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[cybernetics.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[cybernetics.com:+];
-	TAGGED_FROM(0.00)[bounces-265778-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265779-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[armlinux.org.uk,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,ziyao.cc,cqsoftware.com.cn,nxp.com,bp.renesas.com,eswincomputing.com,bootlin.com,altera.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tonyb@cybernetics.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cybernetics.com:dkim,cybernetics.com:email,cybernetics.com:mid]
+	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/9/26 17:24, Eric Dumazet wrote:
-> On Mon, Mar 9, 2026 at 10:18 PM Tony Battersby <tonyb@cybernetics.com> wrote:
->> On 3/9/26 17:07, Eric Dumazet wrote:
->>> On Mon, Mar 9, 2026 at 10:00 PM Tony Battersby <tonyb@cybernetics.com> wrote:
->>>> I have some out-of-tree code that was broken by commit e20dfbad8aab
->>>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
->>>> retested with 7.0-rc3 with the same results.  I'm not sure if the change
->>>> in behavior that I am seeing is expected or if it is a bug, so I thought
->>>> I would ask.  Omitting irrelevant details, my kernel code does the
->>>> following:
->>>>
->>>> 1) allocate a buffer
->>>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
->>>> 3) wait for the I/O to complete
->>>> 4) wait for the buffer page refcounts to drop back to their values for
->>>> idle I/O
->>>> 5) reuse the buffer for more I/O
->>>>
->>>> Step 4 is necessary in this case due to some of those irrelevant details
->>>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
->>>> seems to keep the page refcounts elevated long after the I/O has
->>>> completed (hours or longer), presumably because the deferred skb free
->>>> isn't happening for a long time.  So:
->>>>
->>>> 1) Is this long delay expected, or is this a bug?
->>>>
->>>> 2) If the delay is expected, is there a way for me to force the network
->>>> system to process the deferred skb frees on request?  e.g. write to a
->>>> file in /sys, or call a kernel function to flush the deferred frees?
->>>>
->>>> Worst case is that I can redesign my code to kfree() the buffer if it is
->>>> busy and allocate a new one, and let the old buffer be freed
->>>> asynchronously when the skb is freed at some indeterminate time in the
->>>> future.
->>>>
->>>> Thanks,
->>>> Tony Battersby
->>> If you are using zero copy, please look at:
->>>
->>> Maybe you should make sure your code is compatible with it.
->>>
->>> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
->>> Author: Eric Dumazet <edumazet@google.com>
->>> Date:   Mon Feb 16 19:36:53 2026 +0000
->>>
->>>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
->>>
->>>     After the blamed commit, TCP tx zero copy notifications could be
->>>     arbitrarily delayed and cause regressions in applications waiting
->>>     for them.
->>>
->> The I/O is being sent by a userspace program via the SCSI generic driver
->> (drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't see
->> any mention of zero copy in iscsi_tcp.c.
-> Set /proc/sys/net/core/skb_defer_max to 0 ?
+On Mon, Mar 09, 2026 at 11:59:17AM +0000, Russell King (Oracle) wrote:
+> >  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 +
+> >  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+> >  .../ethernet/stmicro/stmmac/dwmac-spacemit.c  | 227 ++++++++++++++++++
+> 
+> One last point, please add another patch which adds a MAINTAINERS entry
+> for this file, so you can be Cc'd with future stmmac developments.
+> 
+> Thanks.
+> 
 
-Thanks; I should have grepped the docs harder.
+OK, I will add a MAINTAINERS entry for both this file and
+binding file.
 
-That seems to work if I do it before sending the I/O but not after the
-I/O has completed.  So I presume it would decrease performance?
-
-Tony
-
+Regards,
+Inochi
 
