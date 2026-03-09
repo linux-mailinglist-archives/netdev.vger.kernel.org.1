@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-265398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iK7KHCB/rmlfFQIAu9opvQ
-	(envelope-from <netdev+bounces-265398-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:04:48 +0100
+	id WKtkFSJ/rmnPFQIAu9opvQ
+	(envelope-from <netdev+bounces-265399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:04:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0DE235423
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:04:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1567F235438
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 09:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6E953023A72
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:03:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8713B302DE25
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 08:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4B236BCCE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED75F36BCD2;
 	Mon,  9 Mar 2026 08:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vhjxp+Tz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="it9EN7WQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1755363C63;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F91364024;
 	Mon,  9 Mar 2026 08:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773043426; cv=none; b=D1e4HZK3n59WHZ9f2qHn52ODD+NRu2Gj1rA0MlsKgQiUehWt5eh17+/4RR1VB8H7WejJf48qY/IT9Oo0J+r0X+yqoZj4d7b+KVB6pi0L1O+ClO4X8NqW3Cn8+upxOnb9L2w1a8uCK9B5L491ye8NepIeGQF0nAAzddNAZ09Bh44=
+	t=1773043426; cv=none; b=qvSeIzs85Oi3g/EU0hs6/L4QCouzi2EXPclzImv7SepexnAjt4VzOOgsNwINw7Czx99OqPz9LzKuR4PKLMwvUP0jbZugJEi4ExUPvaxhcOAKM2murogQmnh2r7ZaV7JgIbvtVBqPsP0sLqPlV5VD+uYIvsQzLEQK1zagDh3rwKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773043426; c=relaxed/simple;
-	bh=U6eOZs3iNxBCZqrgik+0s/86JK4oBEk09rxPxv6C1jc=;
+	bh=PF4BYVQIZV4oiBVr6sVA/qCdRg+/Hpu3GxmXH0vlCp4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=O1OI1Md9Nz9xlujJ+bagvEJpng3jUleXB5jFT9BcG+lwmER4vX4bOmwAj5hEPvuVqYdKWeM1SdPvYvGxzRSck7O3/j1n1+w3srrpbtugiAbxiZ6ZWQg/z3SJ/D430d09v5Hs1jkj9ryxDNVXg93td2eG5pthSFzyj0IavX0629I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vhjxp+Tz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6EB55C2BC87;
+	 In-Reply-To:To:Cc; b=GNreYX4b5I+C8PggwE0j3BWckXNpgG8f9qVeFVRvPy5yUl70FnaxftnkTpeYc6sEDXS4MdfpbJ7LPkvSXIIVmrDkFnFmCsYGm1dPh0Sv5h5pys4mGEvIdaVbgDlIy+MB4FTTwJK0D4rpQLd5mUMe8igljxnohowBMDUPuX2I/VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=it9EN7WQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D273C2BCAF;
 	Mon,  9 Mar 2026 08:03:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1773043426;
-	bh=U6eOZs3iNxBCZqrgik+0s/86JK4oBEk09rxPxv6C1jc=;
+	bh=PF4BYVQIZV4oiBVr6sVA/qCdRg+/Hpu3GxmXH0vlCp4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Vhjxp+TzGcrl9Uu+gCftb9lUUbQwVQq3qygNlH4kUhLqY827Ph0rKVqKGnjPfgfqH
-	 NQLCgWuLPGkZOB1Cz6aIa3a29sRLeUX3Xmo/4j8sb31WL4vSN87TkcxOhkg6T8ptB0
-	 8IQNtKBjZqADri0bWm8qgqfFWMjbXMeej1e8yThK7JMCLbHLkN1wwM1VWbXJGEUzf2
-	 jZASe+9elgTFryZ3gc6a3vLm8KmoJuQOn/Ne3AuuXcpWOu1aXLSNhrWGxs65Vk0+BO
-	 PTT0wDcJzNLQflk399xUD4I+RsqxjBHbCD9s6G0zBRb0CU+IG832svcsdP5sqmxSlV
-	 p0bKeHKK+GhXQ==
+	b=it9EN7WQc94rTb5cRGgCpBpC+cj2zX5hDKm3THKsESfenOxz/IpKyLewL9fmP2SY9
+	 wh0Ix3wtBOLd1aWKnypJ6OIUAdIEv5uhAoIVMS4eYicq2eVnVWmhPo6Rlrzy3rn0YW
+	 FNILMNJbDBgzhhxA4Zc5g0xCcSi7cEhyNEKqcHW1Z87vjIdfpeLCh3f74616n+Z3Wo
+	 vlFiJhFoVzQt57qJtPjbWAea/Wi5p4V9GU4fWbW9GmFByJvQtWTKeJ8jtI18AHsnc/
+	 QWPM3OnTWZ5ExHYEMlFTpbSF4onM83wPdbKyiGtmhDneu+UjDtKCamRSYiRE925LMT
+	 cvPg6lxa6V7Kg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D591EF36FB;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE93EF3709;
 	Mon,  9 Mar 2026 08:03:46 +0000 (UTC)
 From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Mon, 09 Mar 2026 09:02:27 +0100
-Subject: [PATCH net-next v3 2/6] mptcp: keep rcv_mwnd_seq in sync with
- subflow rcv_wnd
+Date: Mon, 09 Mar 2026 09:02:28 +0100
+Subject: [PATCH net-next v3 3/6] tcp: increase LINUX_MIB_BEYOND_WINDOW for
+ SKB_DROP_REASON_TCP_OVERWINDOW
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-2-4c7f96b1ec69@gmail.com>
+Message-Id: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-3-4c7f96b1ec69@gmail.com>
 References: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com>
 In-Reply-To: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -76,18 +76,18 @@ Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  mptcp@lists.linux.dev, Simon Baatz <gmbnomis@gmail.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773043425; l=1316;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773043425; l=994;
  i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=ChftbPgxBgowAH5jlThlLmD2ZcIdQ5MNv0dOVMZk0bc=;
- b=ebwxj9jswhY7N+FX93x/tqn0TUOf6ljdixhMtvB9X8ZTBTSLzUET9CMuG0w7U6djoehuAO9z1
- K6f847zwt1VANVMgE8WgLKsGJzlx1Qb2yKGdLXsQZf0vswy9hFLWe/W
+ bh=h0fO7UL8KcWCVKdqBvyw3pkMf8DPB6tVI+LGsyguBYs=;
+ b=7/WazVRQuzI6bzee3cpoq4pYjQNWmvWmXipOZLpR8MPj4XIv7lRXuRQWQjerVzWTs5qLbOt68
+ aOgylmzR+b7Brk0uC/+a/cKqwVA5l/sUSkIdC1L1EFb4zNj/dvghxMD
 X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
  pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
 X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
  auth_id=641
 X-Original-From: Simon Baatz <gmbnomis@gmail.com>
 Reply-To: gmbnomis@gmail.com
-X-Rspamd-Queue-Id: ED0DE235423
+X-Rspamd-Queue-Id: 1567F235438
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
@@ -103,14 +103,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-265398-lists,netdev=lfdr.de,gmbnomis.gmail.com];
+	TAGGED_FROM(0.00)[bounces-265399-lists,netdev=lfdr.de,gmbnomis.gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.969];
+	NEURAL_HAM(-0.00)[-0.970];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
@@ -124,41 +124,29 @@ X-Rspamd-Action: no action
 
 From: Simon Baatz <gmbnomis@gmail.com>
 
-MPTCP shares a receive window across subflows and applies it at the
-subflow level by adjusting each subflow's rcv_wnd when needed.  With
-the new TCP tracking of the maximum advertised window sequence,
-rcv_mwnd_seq must stay consistent with these subflow-level rcv_wnd
-adjustments.
+Since commit 9ca48d616ed7 ("tcp: do not accept packets beyond
+window"), the path leading to SKB_DROP_REASON_TCP_OVERWINDOW in
+tcp_data_queue() is probably dead. However, it can be reached now when
+tcp_max_receive_window() is larger than tcp_receive_window(). In that
+case, increment LINUX_MIB_BEYOND_WINDOW as done in tcp_sequence().
 
 Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
 ---
- net/mptcp/options.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/ipv4/tcp_input.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index 43df4293f58bfbd8a8df6bf24b9f15e0f9e238f6..8a1c5698983cff3082d68290626dd8f1e044527f 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -1076,6 +1076,7 @@ static void rwin_update(struct mptcp_sock *msk, struct sock *ssk,
- 	 * resync.
- 	 */
- 	tp->rcv_wnd += mptcp_rcv_wnd - subflow->rcv_wnd_sent;
-+	tcp_update_max_rcv_wnd_seq(tp);
- 	subflow->rcv_wnd_sent = mptcp_rcv_wnd;
- }
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 2e1b237608150c2e9c9baf73cf047ed0823ca555..e6b2f4be7723db14acf2ae528df17b6d106b9da9 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -5678,6 +5678,7 @@ static void tcp_data_queue(struct sock *sk, struct sk_buff *skb)
+ 	if (!before(TCP_SKB_CB(skb)->seq,
+ 		    tp->rcv_nxt + tcp_receive_window(tp))) {
+ 		reason = SKB_DROP_REASON_TCP_OVERWINDOW;
++		NET_INC_STATS(sock_net(sk), LINUX_MIB_BEYOND_WINDOW);
+ 		goto out_of_window;
+ 	}
  
-@@ -1338,8 +1339,9 @@ static void mptcp_set_rwin(struct tcp_sock *tp, struct tcphdr *th)
- 		 */
- 		rcv_wnd_new = rcv_wnd_old;
- 		win = rcv_wnd_old - ack_seq;
--		tp->rcv_wnd = min_t(u64, win, U32_MAX);
--		new_win = tp->rcv_wnd;
-+		new_win = min_t(u64, win, U32_MAX);
-+		tp->rcv_wnd = new_win;
-+		tcp_update_max_rcv_wnd_seq(tp);
- 
- 		/* Make sure we do not exceed the maximum possible
- 		 * scaled window.
 
 -- 
 2.53.0
