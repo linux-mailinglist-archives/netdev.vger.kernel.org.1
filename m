@@ -1,280 +1,160 @@
-Return-Path: <netdev+bounces-265476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QK4TJpqprmntHQIAu9opvQ
-	(envelope-from <netdev+bounces-265476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:06:02 +0100
+	id wPjKHMCprmntHQIAu9opvQ
+	(envelope-from <netdev+bounces-265477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:06:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014ED2378B1
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C90D22378D1
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABD583059F00
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:02:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 849463003EA8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6DA359A6E;
-	Mon,  9 Mar 2026 11:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7848031196C;
+	Mon,  9 Mar 2026 11:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vC2gtTyo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kQnBDvz0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DC2265621
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 11:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773054143; cv=pass; b=fAktcild4/Cbbd7amNdDdM88kenKtXbkjfS9PXDYl39LWIDaW+MjiwgmoNZkQbwvQcZH43S4UJWVOyYp4DoQWl8uYq48tuDbdSSN2U4sClbmcAXmnQig0V9Igin6nY2/Qgnv/creAeBDL2IjmILMah4EQyw/0YoUzp9Xr0AKcwE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773054143; c=relaxed/simple;
-	bh=XwB4W79h4EipZ5BDPQF5kv7I7YerrBXYb/tggnn4SnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GoC5ZrNirRfG8h0kQRSxYb4XoVNLK1wYKONBDHrqzgxsLleBCbeSYDlqqV5zrJTGW7K3bT+Ep+nG0O47tgKVBvvMPA2foXds2m5n768FVAAlv37lNXPBHyDFdZ/k3rbAzjjWZTd177jeSIAzO6oV/sHiHAx4e1YbGbLCAh7Hi0c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vC2gtTyo; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5069b3e0c66so163130791cf.1
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 04:02:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773054140; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bKlkI5XNJsGANHVJgxyic6K6TQN5XIJVT+Qudgs9DjU4v35wGNk4oOO92mMwe7m0he
-         qhe26NSArNFaYV+D8eUQZrXpvk3ed5M1enBwJQpBNyFWN25GffnKPYDYgUimL5VhFA0r
-         pB/vK0cE1AbHqaO+4RpEurg1SnhDEzav5xVZ9aR//g7yRsJ0uKEh67+n5N17eExw1KoC
-         Ac28AjU6mkSdS10PsWo99lDoKlOwtr7CVgdKBbg2NBdwB4YJPOpp09BYWcxogOUGABWR
-         bmivBkZLW+c9ggDZMa/Uoak+Q5L1Kqdbbz2Tm+hX0n5xdaKJbjpol8KgsFtrz84ncwXa
-         PfgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4OFoeHoBVPxd+zNA6iAcyedJj3Gl8BuvYYv/ihYHZiI=;
-        fh=WFIThbeZ7NV9vIw9uzzmQeo74cR6sMfeH9YVsQJSWmg=;
-        b=IC1QeToq0Eg/6RIIy/3Yhuq/gIu20D0trwzqZZJN1fAxkU0hbEVCazUZvSkm4m81CT
-         VT3q/eDPXZLIoSFJjqIU0qj2RFNf2e2C+w2S9RpgfO+emTN2Px/htFKPZaoiYvfOgZvF
-         yGisYjdAuD5a/9Iu8wgJkf61rtjayIvhEQBV2PSg8opzXMQpiw9qI4p4ebPZxx0JiZwH
-         O0O2lXlBOaFVLECMe+oIt92uzUgxkg4AC16rpm4SH1Y84ppJHnmiP0epyGXuETieUwwX
-         cW6ucIWtPoMQ+utsGtbafWxiBhxXlW7wnyfuqxXujHFSceL6uUS1m3VMXPKhXbnGGR0S
-         nJvw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773054140; x=1773658940; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4OFoeHoBVPxd+zNA6iAcyedJj3Gl8BuvYYv/ihYHZiI=;
-        b=vC2gtTyoEXKZaBDyFFMpXyRmPQbbLM6Z9IhhswenjceNz1T2z+5RdiF7Ie4PbS+i4I
-         55T6/naLmuQBawvhp86x7PYHGaIIBoJ+4aGM63Xz/xanUuEcIdrM1j9lJ8qu9hoh/on3
-         X3UxB+K5b3BKVX/sd3Pzm3L87NRsKMpnoYyhjxlT4WrCkANlI1hqRycMLfqt34uqZrU7
-         4G0gZfESWyBgIOlO2dMSr/Tiu/0SUqcRyxNjNt763xtSQpsRd1R21Y7ZUFP6SCC31mfw
-         o+fHEhpvLp+AyU3QaYkdKa1ZLydyoHYUtEGTeJHQ/O4M9Yhyhwm6imGwXu+zlRcv/CcC
-         mTAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773054140; x=1773658940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4OFoeHoBVPxd+zNA6iAcyedJj3Gl8BuvYYv/ihYHZiI=;
-        b=DseRT63QYeuhizvdUAi+pQ2ii2GJqkC9BYO4s2W0ycyeD8qaaSX/IruT96DIjT/X94
-         YSJGv37yf7mq9VoJyPUe1M+f7gOe15qh8/lxcPABU8sJgVYpY5hMtFZAjZiWgbHokxh4
-         8PAnSLBKUcMnDD3E/1wTPyVoCatNh59GvPmKUfqDVPzWk1hFPPKhXD7ihZU69R+ply/G
-         bmzC2fR4mvQg/cihilPXhB2947op/Dq6L7x5PgZ+3nDkkTDad4WAIIXwad+6YdfokknR
-         S0FdDuLGq2K21gl1DuVpT/B4ymcqCX8qBvUKlcGz1F9WaaKnftqD0PtLHycVWZ2qfk48
-         QVxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXihnrLH7TBjHLpmMFVYg0n4UolGRescYq3y9QNgsYj92U/gY+Y0WK5S/q6eR2iJrLytsV58n0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx18Rlv9rbZhaYFmsmh57T5GeC95F6q2glu+/phfIb4EkEE7Byt
-	vCCIRO1z0aelx5z84UoP8Juatvw3uTtnaGwTcMGchRfrEhs7AgCWD/PfyHvHqTTjDczNs1/Tj5k
-	AhipeqZoX3Om5dcrUsLQV98mBLLFqgwd2Q1N1Vof+
-X-Gm-Gg: ATEYQzxmye3+mMWXQjJ4qSCLRG+nC2gFNcsh1Xhui/rYeP6Z9RmUrrQja0f47Lr9pbG
-	1LgHWg/dE5CwjydE+rY97Q0gvh826bVvXKRYD+smKcU7VhYhpA8ppQ1I3utClIvJwdQBuOcmlu5
-	xbgW5PoOXZR8K2TLzBU/w7lRq2R1h7G49AzPm5lUjzT3Mh5bh7Q38ohQuR+uJnVnyIuVmz0Jj0g
-	WDbSGv1dfFLPdrn8CZLqFl/8xMluKJ5PdmsJApSdPl841rCEtvJV9jZCUCRKi/ARCYxJ6yp1aSz
-	1jZMQXky4MgVH/2dEQ==
-X-Received: by 2002:a05:622a:1ba4:b0:4ff:b32b:cdf9 with SMTP id
- d75a77b69052e-508f4abdc05mr125096481cf.14.1773054139560; Mon, 09 Mar 2026
- 04:02:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790BC1A682D;
+	Mon,  9 Mar 2026 11:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773054168; cv=none; b=MsmoEjt6UZzjL+oeYM2IFUodOHc28ctC3zleQ2e+Ms9iQM0uVEki+7QS/RfF1vR67IpiFUJyw0LLiEZsS0tlYmSGHcXPUDz2Wor+5Ze6xImd6gWwrcJKVcQqg/Muovtgz7VeQjjaGj/kWlSfDqz3jz2ka3BkqL4OJxIS/r95cus=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773054168; c=relaxed/simple;
+	bh=0hux6s+q2IE32ojAatIIWOV4BuOR0FWWO5Z/4OpA4Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f/+Ym8i4wBAqcpQQ+tzu5mll+Tr0+Vg+PeIZaO5jWLvXNseUfmW0nsbGX7IQ0uZezBmf5fZ7VyFdSr3xqfISA7R/tZIZdsmDqKzTQC/2nqcpanWMRm4m9j9NqcQMIXsZ6x/MKNZn4fuxmTC06FyTcOi2RLKqGX/I2xPk+xr5ipo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kQnBDvz0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sAkRjP9jYISvdMSyBJJw0ajApQvAkfVgmNZbtMfYkuE=; b=kQnBDvz0laLdm0pWRVN8e4/E3s
+	IgESKlZ6AMDuT1IePF3BZzZWkfTma4/fS3zWrngtkKycV66UO8DR32Z8ppv8fNyqJB2NcNvhn0/oA
+	b37FxopH4vF7Q8NVEulkxinLjgcyzw6sEVaMb1BnM3FvouqcBdLAoibT5BK39sQNi8URpXjSpHNmJ
+	PFh5V5zYBHZKMSKE2tfdnaiq4OQw1KvkuoQNg+Scb/k1AF//X2KqmHkEDJeNaz1l4fBH1e/fAV9Qs
+	hER0s+tKnKBpcebWKfkEibAqcTdfrKVvcFI0lO1YB1A22xf72DsEBrDHexqtpnCLr5Oj9q66wM82z
+	XPom7/Xg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46846)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vzYNj-000000003dG-0zT3;
+	Mon, 09 Mar 2026 11:02:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vzYNg-000000004FS-1Hwk;
+	Mon, 09 Mar 2026 11:02:36 +0000
+Date: Mon, 9 Mar 2026 11:02:36 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC net-next v2 0/7] net: stmmac: improve PCS support
+Message-ID: <aa6ozPBP_OlayFs9@shell.armlinux.org.uk>
+References: <aafxqCvJ_XY4YbWw@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309093614.502094-1-kartikey406@gmail.com>
- <CANn89i+pYiuKdtqU-kBvD2e8BaDfYzAtzLZJ88SgSD_D9CDL+Q@mail.gmail.com>
- <CANn89iL9-MyJ2fmtWRXTYG_56wEjK+ptOpYRjtRJjKtw3xv+2w@mail.gmail.com> <CADhLXY767VTS0ac0UBhCrzKnh=GPkMXM3yrEbiS7ETcfHzfo8A@mail.gmail.com>
-In-Reply-To: <CADhLXY767VTS0ac0UBhCrzKnh=GPkMXM3yrEbiS7ETcfHzfo8A@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Mar 2026 12:02:08 +0100
-X-Gm-Features: AaiRm531uVkPBkyGAvfq6NzMDzObr_h98c2ax54upbdgWloqs6mH_BBT_qJGVSM
-Message-ID: <CANn89iL_-FMpLET0qWz9ASa6M5E3EYbfpkQnM2tREV7Vru7Vqg@mail.gmail.com>
-Subject: Re: [PATCH] atm: lec: fix use-after-free in sock_def_readable()
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	kees@kernel.org, mingo@kernel.org, tglx@kernel.org, jiayuan.chen@shopee.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 014ED2378B1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aafxqCvJ_XY4YbWw@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: C90D22378D1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265476-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265477-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.980];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_SPAM(0.00)[0.124];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:url]
 X-Rspamd-Action: no action
 
-On Mon, Mar 9, 2026 at 11:34=E2=80=AFAM Deepanshu Kartikey
-<kartikey406@gmail.com> wrote:
->
-> On Mon, Mar 9, 2026 at 3:29=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Mon, Mar 9, 2026 at 10:55=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Mon, Mar 9, 2026 at 10:36=E2=80=AFAM Deepanshu Kartikey
-> > > <kartikey406@gmail.com> wrote:
-> > > >
-> > > > A race condition exists between lec_atm_close() setting priv->lecd =
-=3D NULL
-> > > > and concurrent access to priv->lecd in send_to_lecd(), lec_handle_b=
-ridge(),
-> > > > and lec_atm_send(). When the socket is freed via RCU while another =
-thread
-> > > > is still using it, a use-after-free occurs in sock_def_readable() w=
-hen
-> > > > accessing the socket's wait queue.
-> > > >
-> > > > The root cause is that lec_atm_close() clears priv->lecd without ho=
-lding
-> > > > lec_arp_lock, while callers dereference priv->lecd without any prot=
-ection
-> > > > against concurrent teardown.
-> > > >
-> > > > Fix this by:
-> > > > - Protecting priv->lecd =3D NULL in lec_atm_close() with lec_arp_lo=
-ck to
-> > > >   synchronize with callers that already hold the lock (e.g. lec_arp=
-_resolve)
-> > > > - Using sock_hold/sock_put in send_to_lecd() to pin the socket whil=
-e in
-> > > >   use. This is safe because send_to_lecd() is called under lec_arp_=
-lock
-> > > >   by lec_arp_resolve(), preventing concurrent NULL assignment of le=
-cd.
-> > > > - Using lec_arp_lock + sock_hold/sock_put in lec_handle_bridge() an=
-d
-> > > >   lec_atm_send() where the lock is not held by the caller, with pro=
-per
-> > > >   skb cleanup on early exit to avoid memory leaks.
-> > > >
-> > > > Note: Patch testing via syzbot was attempted but the test VM crashe=
-d
-> > > > due to a QEMU AHCI emulation assertion failure (hw/ide/core.c:934)
-> > > > unrelated to this fix. The QEMU crash is caused by syzbot's disk I/=
-O
-> > > > fuzzing triggering a known QEMU NCQ emulation bug, not by this patc=
-h.
-> > > > Compile testing with "make W=3D1 net/atm/lec.o" passes cleanly.
-> > > >
-> > > > Reported-by: syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
-> > > > Closes: https://syzkaller.appspot.com/bug?extid=3Df50072212ab792c86=
-925
-> > > > Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
-> > > > ---
-> > > >  net/atm/lec.c | 31 +++++++++++++++++++++++++++----
-> > > >  1 file changed, 27 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/net/atm/lec.c b/net/atm/lec.c
-> > > > index fb93c6e1c329..7e051174a92b 100644
-> > > > --- a/net/atm/lec.c
-> > > > +++ b/net/atm/lec.c
-> > > > @@ -131,6 +131,7 @@ static void lec_handle_bridge(struct sk_buff *s=
-kb, struct net_device *dev)
-> > > >  {
-> > > >         char *buff;
-> > > >         struct lec_priv *priv;
-> > > > +       unsigned long flags;
-> > > >
-> > > >         /*
-> > > >          * Check if this is a BPDU. If so, ask zeppelin to send
-> > > > @@ -154,10 +155,19 @@ static void lec_handle_bridge(struct sk_buff =
-*skb, struct net_device *dev)
-> > > >                                         /* 0x01 is topology change =
-*/
-> > > >
-> > > >                 priv =3D netdev_priv(dev);
-> > > > -               atm_force_charge(priv->lecd, skb2->truesize);
-> > > > +               spin_lock_irqsave(&priv->lec_arp_lock, flags);
-> > > > +               if (!priv->lecd) {
-> > > > +                       spin_unlock_irqrestore(&priv->lec_arp_lock,=
- flags);
-> > > > +                       kfree_skb(skb2);
-> > > > +                       return;
-> > > > +               }
-> > > >                 sk =3D sk_atm(priv->lecd);
-> > > > +               sock_hold(sk);
-> > > > +               spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
-> > >
-> > > What prevents priv->lecd to be NULL after you released priv->lec_arp_=
-lock ?
-> >
-> > More generally, lec_atm_close() clears the sk_receive_queue.
-> >
-> > So allowing providers to queue more packets would be wrong.
-> >
-> > So really a better fix is needed.
->
-> Thank you for the review Eric.
->
-> You are correct on both points.
->
-> 1. After releasing lec_arp_lock, priv->lecd can be set to NULL
->    by lec_atm_close() concurrently. I should have saved a local
->    copy of priv->lecd before releasing the lock.
->
-> 2. The deeper issue is that lec_atm_close() drains sk_receive_queue
->    but my spinlock approach does not prevent new packets from being
->    queued after the drain, since timer and workqueue paths like
->    lec_arp_work bypass netif_stop_queue().
->
-> I think the correct fix would be to use RCU:
-> - Mark priv->lecd as __rcu in lec.h
-> - Use rcu_assign_pointer() in lec_atm_close() and lecd_attach()
-> - Use rcu_read_lock/rcu_dereference in all send paths
-> - Use synchronize_rcu() in lec_atm_close() before draining
->   the queue, ensuring all senders have completed before drain
->
-> This way synchronize_rcu() guarantees no new packets can be
-> queued after the drain begins.
->
-> Does this approach look correct to you?
+On Wed, Mar 04, 2026 at 08:47:36AM +0000, Russell King (Oracle) wrote:
+> Resending this as the original RFC now conflicts with net-next.
+> 
+> This series is the next of the three part series sorting out the PCS
+> support in stmmac, building on part 2, which was posted yesterday:
+> 
+> 	net: stmmac: qcom-ethqos: further serdes reorganisation
+> 
+> Similar patches have been posted previously. This series does away with
+> the common SerDes PHY support, instead using a flag to indicate whether
+> 2500Mbps mode is supported (STMMAC_FLAG_SERDES_SUPPORTS_2500M.) At this
+> time, I have no plans to resurect the common SerDes PHY support - the
+> generic PHY layer implementations are just too random to consider that,
+> and I certainly do not want the extra work of fixing that.
 
-This would be good, make sure lec_atm_close() is allowed to sleep.
+I'm intending to tweak this patch series slightly. First, reordering
+the patches, moving patches 4 and 5 to the beginning of the series,
+followed by patch 1, 3 and 2.
 
-If this is vcc_destroy_socket(), maybe sk_receive_queue purging
-already happens there.
+The first two add support for reading the SGMII status from hardware
+which we don't currently use, then we add support for BASE-X and
+start using it for 2500BASE-X for qcom-ethqos. This should result in
+no change at this point.
+
+Next, I'm intending to add a new patch which sets
+plat_dat->mdio_bus_data->default_an_inband = true; which will enable
+in-band mode, and thus start using the SGMII link state. This will
+be used where the inband caps indicates both the PHY and PCS suport
+inband. For 2500BASE-X, because the PCS reports a value of 0x01,
+that will switch phylink automatically out of inband mode.
+
+This should mean that phylink will switch to inband mode for SGMII,
+and outband for 2500BASE-X, which will eliminate the PCS configuration
+change done by qcom-ethqos.
+
+I've also changed the "report PCS configuration changes" as I
+suggested, although this should no longer trigger.
+
+I'll post this shortly.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
