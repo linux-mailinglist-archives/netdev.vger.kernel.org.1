@@ -1,182 +1,172 @@
-Return-Path: <netdev+bounces-265445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IVyKICWrmnRGQIAu9opvQ
-	(envelope-from <netdev+bounces-265445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:44:32 +0100
+	id oBjpDeSWrmnRGQIAu9opvQ
+	(envelope-from <netdev+bounces-265446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:46:12 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFD32366BF
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E4023674E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6BDDA302C349
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:41:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 09C7630073D8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8198237C11B;
-	Mon,  9 Mar 2026 09:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2E9377ECC;
+	Mon,  9 Mar 2026 09:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FkTPo2MR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDWEgzDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F8437AA89
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC51936BCE6
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773049301; cv=none; b=bP2odVpVng8/pvbnl2x5uCe4c4AgVjOvWYZROd0ne1qpfq2RX1+lKHLlxhvIIT2RmBfPQaA+GZGY3T51OSr6bxkTcnpvZ3ksj2YLTMq3OuBtdw4dS3Faj2PbIUHHXpRgICqhpUKZtb8eskrYdc7XOJbdFh5DZ+7E90RY4a1ucCE=
+	t=1773049378; cv=none; b=F1my0p2tkPvOExycUeIrU+D9jj4NghCvJfhyiIwgZUTkKW1bmcvO/tVSMFzlt5x3JWyw09m8Ms5v3MoQl/Aym5IvV9XxyIGh/UOCCNCrcwBSkkGfHM1NHL/Pt5i3xx50FbkF18CeTYLwmhtTJvCFpeOsWV71p4434CEpAk+e4uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773049301; c=relaxed/simple;
-	bh=5qaV2q4pL4ot0coh84TNIQEWsyE133PJ4M1w0fQW6k0=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=J3TjxkKjLLl8fMsM3R15xyHdAyM7R48oSCkObdFySLH/ZpOF6+QLjq3LeZm9oU6AWZuIUsFpSLYVX7nz3lRlV4+wi85LHmx7ngvQml55Gl4AZDjC2ROPu6xwDp3w9ye80XGAg1W/qsk6GF4smZD4WbyFWUFBRE4zcqfv9OsJRjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FkTPo2MR; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773049378; c=relaxed/simple;
+	bh=pkydFzExz4VmpYdXrHgKl21IUtCYf2hHYXeNoAbDH94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ObSx1JajgEVKCebej5OI3fsttNBLyPlCtjDF8kPAQrQFBfHHGNErnjo4S2nJ4olsrLVNcMrjJDyAQQBS2/oYPOkAvkrXCysOHdNOo4CQ7ClEVattd6Oh9Fu5Cb+7QSeG3zLz3ezhu7FL3bt1O/fYnVUqGsJNUeeU6W4iOo2hF9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDWEgzDu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4477C4CEF7;
+	Mon,  9 Mar 2026 09:42:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773049378;
+	bh=pkydFzExz4VmpYdXrHgKl21IUtCYf2hHYXeNoAbDH94=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CDWEgzDuHBfreL7mHfjTW1vU1lkvTSiwMiQECLZYLMgImzCzAPhlaVB7w/NO3gR9u
+	 vt5wi+9TdXEWis9ViqWhgf8S/9OlVfVBVP3us2cEbmYlBZEQVovG/PyLL6Rnf+v9K7
+	 nrJnqgJPOWiCEuvdTOYTXJ2cgrPA1YmNx12Nq5qDsQyDg15Obn5/b06vspwEfQCRJu
+	 CJGpKf0Rb9Un24mc0uVuFNtnMyfcqXpvm+jlR8AQ0neBrJRIiI+wP/qDXQss1N7LzW
+	 lJriJ/0OqbY4qFbrJ5sim6h3Pxl+CnhPZAx2c3bapuOSuwVDfymDMhGf0h4+Ha2lQB
+	 Acqtsskbru+0g==
+Message-ID: <4e45407b-5c6b-4832-b403-ea62b1e4bcb5@kernel.org>
+Date: Mon, 9 Mar 2026 10:42:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773049286;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5emj4rOfumDjHAmcTR+t41Tv9z3bI+XmVMG7Ky6EkAY=;
-	b=FkTPo2MR19B58eVh8+3LZBCUd7zwWHqxeTz3T2VBhTvPP8ocz7kSApX1gdTjQlS0eJ9Wj5
-	ll8UF6xmpQAc8VytGAlNNg1ltOVX8IoEiUB0S5ZrJHx+zN2YDuc7bGJSEv0uCmzzMqkTD9
-	UMfQN5K9JClVTonM9c8b3MHj3s2TFUU=
-Date: Mon, 09 Mar 2026 09:41:20 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <903543b24e6e124ff970340e265185af176880f6@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v5 0/2] net,bpf: fix null-ptr-deref in
- xdp_master_redirect() for bonding and add selftest
-To: "Eric Dumazet" <edumazet@google.com>
-Cc: netdev@vger.kernel.org, razor@blackwall.org, jiayuan.chen@shopee.com,
- "Jay Vosburgh" <jv@jvosburgh.net>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, "Jakub Kicinski"
- <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
- <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>,
- "Andrii Nakryiko" <andrii@kernel.org>, "Eduard Zingerman"
- <eddyz87@gmail.com>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Song
- Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "KP
- Singh" <kpsingh@kernel.org>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
- <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Sebastian Andrzej
- Siewior" <bigeasy@linutronix.de>, "Clark Williams"
- <clrkwllms@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>, "Jussi
- Maki" <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-In-Reply-To: <CANn89i+SCJmUuQo2pSVv_4YhjvXGvnGDH_HNo2XY6KxDX1Kcgg@mail.gmail.com>
-References: <20260309030702.128520-1-jiayuan.chen@linux.dev>
- <CANn89i+SCJmUuQo2pSVv_4YhjvXGvnGDH_HNo2XY6KxDX1Kcgg@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 3EFD32366BF
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] page_pool: store detach_time as ktime_t to avoid
+ false-negatives
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, ilias.apalodimas@linaro.org
+References: <20260307204022.1897614-1-kuba@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20260307204022.1897614-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: A5E4023674E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265445-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,shopee.com,jvosburgh.net,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,google.com,linutronix.de,goodmis.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265446-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
+	NEURAL_HAM(-0.00)[-0.970];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-March 9, 2026 at 15:46, "Eric Dumazet" <edumazet@google.com mailto:edumaz=
-et@google.com?to=3D%22Eric%20Dumazet%22%20%3Cedumazet%40google.com%3E > w=
-rote:
 
 
->=20
->=20On Mon, Mar 9, 2026 at 4:07 AM Jiayuan Chen <jiayuan.chen@linux.dev> =
-wrote:
->=20
->=20>=20
->=20> syzkaller reported a kernel panic [1] with the following crash stac=
-k:
-> >=20
->=20>  Call Trace:
-> >  BUG: unable to handle page fault for address: ffff8ebd08580000
-> >  PF: supervisor write access in kernel mode
-> >  PF: error_code(0x0002) - not-present page
-> >  PGD 11f201067 P4D 11f201067 PUD 0
-> >  Oops: Oops: 0002 [#1] SMP PTI
-> >  CPU: 2 UID: 0 PID: 451 Comm: test_progs Not tainted 6.19.0+ #161 PRE=
-EMPT_RT
-> >  RIP: 0010:bond_rr_gen_slave_id+0x90/0xd0
-> >  RSP: 0018:ffffd3f4815f3448 EFLAGS: 00010246
-> >  RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffff8ebc8728b17e
-> >  RDX: 0000000000000000 RSI: ffffd3f4815f3538 RDI: ffff8ebc8abcce40
-> >  RBP: ffffd3f4815f3460 R08: 0000000000000000 R09: 0000000000000000
-> >  R10: 0000000000000000 R11: 0000000000000000 R12: ffffd3f4815f3538
-> >  R13: ffff8ebc8abcce40 R14: ffff8ebc8728b17f R15: ffff8ebc8728b170
-> >  CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >  CR2: ffff8ebd08580000 CR3: 000000010a808006 CR4: 0000000000770ef0
-> >  PKRU: 55555554
-> >  Call Trace:
-> >  <TASK>
-> >  bond_xdp_get_xmit_slave+0xc0/0x240
-> >  xdp_master_redirect+0x74/0xc0
-> >  bpf_prog_run_generic_xdp+0x2f2/0x3f0
-> >  do_xdp_generic+0x1fd/0x3d0
-> >  __netif_receive_skb_core.constprop.0+0x30d/0x1220
-> >  __netif_receive_skb_list_core+0xfc/0x250
-> >  netif_receive_skb_list_internal+0x20c/0x3d0
-> >  ? eth_type_trans+0x137/0x160
-> >  netif_receive_skb_list+0x25/0x140
-> >  xdp_test_run_batch.constprop.0+0x65b/0x6e0
-> >  bpf_test_run_xdp_live+0x1ec/0x3b0
-> >  bpf_prog_test_run_xdp+0x49d/0x6e0
-> >  __sys_bpf+0x446/0x27b0
-> >  __x64_sys_bpf+0x1a/0x30
-> >  x64_sys_call+0x146c/0x26e0
-> >  do_syscall_64+0xd3/0x1510
-> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> >=20
->=20Please, can you always provide symbols in such traces ?
-> You can use scripts/decode_stacktrace.sh to make the trace really
-> nice, instead of ugly.
->=20
+On 07/03/2026 21.40, Jakub Kicinski wrote:
+> While testing other changes in vng I noticed that
+> nl_netdev.page_pool_check flakes. This never happens in real CI.
+> 
+> Turns out vng may boot and get to that test in less than a second.
+> page_pool_detached() records the detach time in seconds, so if
+> vng is fast enough detach time is set to 0. Other code treats
+> 0 as "not detached". detach_time is only used to report the state
+> to the user, so it's not a huge deal in practice but let's fix it.
+> Store the raw ktime_t (nanoseconds) instead. A nanosecond value
+> of 0 is practically impossible.
+> 
+> Fixes: 69cb4952b6f6 ("net: page_pool: report when page pool was destroyed")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: hawk@kernel.org
+
+LGTM -- after addressing in build errors... likely a missing include?
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
 
-Hi=20Eric,
+> CC: ilias.apalodimas@linaro.org
+> ---
+>   include/net/page_pool/types.h | 2 +-
+>   net/core/page_pool_user.c     | 4 ++--
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index 0d453484a585..cdd95477af7a 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -247,7 +247,7 @@ struct page_pool {
+>   	/* User-facing fields, protected by page_pools_lock */
+>   	struct {
+>   		struct hlist_node list;
+> -		u64 detach_time;
+> +		ktime_t detach_time;
+>   		u32 id;
+>   	} user;
+>   };
+> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+> index c82a95beceff..fb4ca27358cd 100644
+> --- a/net/core/page_pool_user.c
+> +++ b/net/core/page_pool_user.c
+> @@ -245,7 +245,7 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
+>   		goto err_cancel;
+>   	if (pool->user.detach_time &&
+>   	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_DETACH_TIME,
+> -			 pool->user.detach_time))
+> +			 ktime_to_seconds(pool->user.detach_time)))
 
-Thank you for the suggestion. I didn't include the fully decoded stack=20
-trace=20in the cover letter because the syzkaller report already contains=
-=20
-the=20complete information. You can find it here if needed:
+Hmm.. is this ktime_to_seconds even defined?
 
-https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D15448952580000
-https://syzkaller.appspot.com/bug?extid=3D80e046b8da2820b6ba73
+A quick look tells me that we could use:
+
+  ktime_divns(pool->user.detach_time, NSEC_PER_SEC)
+
+
+>   		goto err_cancel;
+>   
+>   	if (pool->mp_ops && pool->mp_ops->nl_fill(pool->mp_priv, rsp, NULL))
+> @@ -337,7 +337,7 @@ int page_pool_list(struct page_pool *pool)
+>   void page_pool_detached(struct page_pool *pool)
+>   {
+>   	mutex_lock(&page_pools_lock);
+> -	pool->user.detach_time = ktime_get_boottime_seconds();
+> +	pool->user.detach_time = ktime_get_boottime();
+>   	netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_CHANGE_NTF);
+>   	mutex_unlock(&page_pools_lock);
+>   }
+
 
