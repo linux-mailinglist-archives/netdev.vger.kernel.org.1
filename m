@@ -1,102 +1,98 @@
-Return-Path: <netdev+bounces-265433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DMRMcmVrmnqGQIAu9opvQ
-	(envelope-from <netdev+bounces-265433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:41:29 +0100
+	id 4KG4LuuUrmnqGQIAu9opvQ
+	(envelope-from <netdev+bounces-265435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:37:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2834C2365BF
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:41:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E780236424
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 10:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB6D0303EA82
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:36:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7E2A83017325
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 09:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D5737AA7B;
-	Mon,  9 Mar 2026 09:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2103337BE6D;
+	Mon,  9 Mar 2026 09:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="l3j7yCL8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKzkLlBn"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010025.outbound.protection.outlook.com [52.101.193.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48935379EC1;
-	Mon,  9 Mar 2026 09:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.25
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773048974; cv=fail; b=EIMO3hqjxJHPkN8vlnfoxZS4Ga2OTIkczCmiWavciR+p9POl4GgU2DdC+N41qa8/WKG18kTSJH9z4o24j6i2cuhVn06vNGdtUVNZOYRu37cRZyBtVE7MlSehM4DiEGD0HIyqAr0+E+9thtjErycoVqXHDArJ8fIG/yOWFkMHXUw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773048974; c=relaxed/simple;
-	bh=Lg+s4E4b4KmXNSgWcHmO1NffddwCOxedqZKIPZdoWXA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dpt1tz+40UNIBRJj0eMqHCRNJagK0l4W6g38xazUv6SXkUQX2J7K1VGuiSR0nBhop0Lg107bbwMWVwx4ex4J4rEJN1kubP8Lba4Rocy2SSXwXv6OY3Iq3ODxPLb/y+LazJnPdEgvYsfOokokiXJ/MA+JqsDiH4cQr9fLfXLGaKo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=l3j7yCL8; arc=fail smtp.client-ip=52.101.193.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DyOASkcrf48dnpHKXo5MnOKXMmi3M59b54dT3l2TmpHYo3RvNOvnZ2ARCMbDfIugJBXxAfjOWexNa/WWkgjG+pCbGM3uP+Uil29+coYmUjzq9oakVnvWYcKdsuYRc16BcVr19hwBIm0F8Ys0jJmqO8U2iR6EPTlfGdopZrSz5h+1d5DwI83FxZVb7y8WD0b29YMTOUM+3WNQ9A5iTJudzeqnCvBpVrTZ0Iee40s1Dd5KnvBkcZlaRiO3RcquX0yYVE8WMDQ/s82H4ZOflVO/37jxze6odiYuo93pexCk8uuhpzAfd40m6AMwIzu2XIZkHi+7AMzKz8f1uO50AffnFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G4Ydhu+Oh7eE1JCKNbwKHPhZMVS/kSBkltKVVihbos4=;
- b=uRFT8UTOtkaP36SLSgiqgm1dqLLWh48r04bD8mhtr3VwyXvXuxIpUsbRQTq8LljxeqX8mZ9uL/AqIfLC2nSjPJ0+dfrpMO1ki1A60Gas2ECwNd97vjnCkA6hpBDXMQSjV5MNDt8NrhdfWRUd86MKMimLCq8Yu3cOIGoQ/lq7TpG4LXlEEkhlnw2erbPJQyuqTtLw5N2XBf/LX0x/dg+QxUYscZBkVqri0YJjYzPEDPA34YqNPqwuiWW5fJcLLYXUE1HG0U7Jwp46Pmn48YBRm27sLD29ASmOR1cTkXMK1SIXRtDCbuILikZgrClxaHA+iEDfaSlYyOdFpx14dBk76g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G4Ydhu+Oh7eE1JCKNbwKHPhZMVS/kSBkltKVVihbos4=;
- b=l3j7yCL8T6JvutrtOSbQP77PK8I4ynkS3S0+RpszkGWkoE+1Z6uHDj0wP1nFSRgTZfic3ChZnNFNktJ+ho44uvJLhHURjcxUXrhRL1YbgWaippuE4JkOcuvDlQD5e5UjcAPVkX6XAA3vB6vHr2MRyybL3bgc8jxNojwzZ4jkOT77WjwnWLPhWVSg829/dcpemg1Zi+LjR7PBw9NbA9BYXQdll8ajjQMqVO0LlS2AWDFE5PFKGnvKT/7unlIqbV0x+l2MwZn/xYcT7FjzWQlt9f8eX0IC0i/+rbim7ieL/mkZM6n8iIfUTWOfuAIPiPcvUhyipToXEMvmYXCI+0/Ewg==
-Received: from SJ0PR03CA0084.namprd03.prod.outlook.com (2603:10b6:a03:331::29)
- by SJ1PR12MB6099.namprd12.prod.outlook.com (2603:10b6:a03:45e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Mon, 9 Mar
- 2026 09:36:08 +0000
-Received: from MWH0EPF000A6733.namprd04.prod.outlook.com
- (2603:10b6:a03:331:cafe::c3) by SJ0PR03CA0084.outlook.office365.com
- (2603:10b6:a03:331::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.24 via Frontend Transport; Mon,
- 9 Mar 2026 09:36:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- MWH0EPF000A6733.mail.protection.outlook.com (10.167.249.25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Mon, 9 Mar 2026 09:36:07 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 9 Mar
- 2026 02:35:36 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Mon, 9 Mar 2026 02:35:35 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Mon, 9 Mar 2026 02:35:31 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, "Saeed
- Mahameed" <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Mark Bloch <mbloch@nvidia.com>,
-	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Shay Drory
-	<shayd@nvidia.com>, Alexei Lazar <alazar@nvidia.com>
-Subject: [PATCH mlx5-next V2 9/9] net/mlx5: Expose MLX5_UMR_ALIGN definition
-Date: Mon, 9 Mar 2026 11:34:35 +0200
-Message-ID: <20260309093435.1850724-10-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260309093435.1850724-1-tariqt@nvidia.com>
-References: <20260309093435.1850724-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B527237B03C
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 09:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773048987; cv=none; b=HIGpLYrlgEGzzoCZwX8+D+RN3vOi8z7uNhB3gKqyJuoRjaC3VhVnHf5taWHfseAdA3ZqC6PRMPHWIhjnvuS0osQmuLggCcygsVR99allj4+z0qLM5R2Te27QaxFwDHZNMqnpY8x7xv+VNFETB9gtp9CbYe3JgHZWJtYky7tl0SY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773048987; c=relaxed/simple;
+	bh=ypmchPzWdWCXurOig2tSNh0Z8PppuUuNea8YyM8AKbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tP2uE5QnODECmqYT1iUVqv/VAKTRrOSYI/DEHNUIt6bQbi5DZgM8ui47GeutIn2wOldjaENL38ENnkeE8dxcUfeon/cqRtBZF0cjTWpdYVvt+yQsobP6Fk3sJxp2KYtl2nzUmn+7wyddRqAsCXzxTOA712Q5QaSncOjPrGgNEXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aKzkLlBn; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-824c9da9928so6446812b3a.3
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 02:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773048984; x=1773653784; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qykwMTP7A/5/YRIqOnHVxjHodm+EkvbjSmx3/8PuSRI=;
+        b=aKzkLlBnyT/ldcl/l10CQoVeFMIJ42czPRY5AB3hO83TqFanNiwS2i3vVN/Z13yMcu
+         6QydQGFR4bqUJBE7Pi0U2SBNE7H1ri6ZnX4kRtLwOEfclytBdxSkInqg88N6x3al1v9j
+         +4ylRDIAiSWVfpA5RhcJ+jilv63ohs0Ajty9hW1aapujAZGAixCJxEE7w+zdvxbdsp1+
+         IE2uRf7zyfSenp4++D0YSih94BK+NGWdZaRMbZbisFLavjyMQg/B/3v82XTNQhobonAW
+         H7i2pDA+7LZT/JiUQT7LnON5r9XpCBIsiyul+CcOHvuS+8v8JdKnxgVFKlYoEs1jXadM
+         tbqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773048984; x=1773653784;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qykwMTP7A/5/YRIqOnHVxjHodm+EkvbjSmx3/8PuSRI=;
+        b=UrvEnePmdvYwUtxr+EdYJKuLvdxquIqtc+/EneCCD1jmf1u+EQC8PULyRKx+JeBPkm
+         mXbuorBMzAsmVH1Qmug4x4NilagT3RtAkSu6gs3Ty9AZ2K3H3NaWIMrGW5tPc8lxpELY
+         k1k/pv/nO1fu+8s/f2FgPoSksBGWDBzFjhmmTnXxsEg3jigGi3rM7zOnuiv4UbtDnNP0
+         woCs+HvbswS+6rj0uef+1t5BWu8rqshftc7SNbQPE8F9d3HSC1XDMQAlQOgneE0Dbfmk
+         Zt97wjPhu7lCIFhMEYMjGupL4xahUw/zLfsSFWFoUawGKKeT/CHUzDoYs2NoiC5KVIzE
+         uYjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVc5PR7/2kD/Q7ZjRva5xeH3LpZSWvb4k2W3XGSLXLFvvvkeDuy5ekAWPpjpLWhxG6KLIGq1TI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa0USu8XmfBm3q1YZ7dkqIFOYyhgVwIgYf0GEdNB6my8yov55O
+	XPZZi96ggD0TafR+LfbwL9gknyOF3dz9w70OlVPJ/nzLK0ekwa0uGeyz
+X-Gm-Gg: ATEYQzw8zQi1c55AhVZgcF0NagQxWI4cCs98/H0LEdbnUtKZ5eMQT85dy3nXMck5pWs
+	Pz55IGnIwv69XUdaOLMpTLLYWPkwQ4WU9fDHJe4CcAsbrX5Hz8TNHu0bUhDNcgFtxehGV8Of/e3
+	cExueHMpXbJqeXlOu0VqBvreuYyblx6sBBS49u/2cGfjgQNroJcRj2yPb2S6ixVdV1q99vPFCnj
+	Ys0qmosabYQDoavM3R7PoUQJyD0mpCzMTkm4NMnggeiOZ3NEvgTGKva8AmaKum8+qi+rVML1rhF
+	GACUmpF3HQqDajx2YjNrr7Kds7eFn4uQt8ycu5IXmCvy6nmourwzpD1S4MFgdSRzLGqHcix3hZn
+	IJveGnXxQU0oBPIMi0qjEduXVlgJvGsxsxNIyfuoxHXiKwNTqKrII3LeBpAdFwPEpooUI2Hz9xj
+	sEVqkHlzj80guzNWR7rMfi2qVtdLvefomCeyd6hseUa8JtxWrGA3Xthlhb6cJlvTIt0debIE1nB
+	Bgajvw=
+X-Received: by 2002:a05:6a00:7586:b0:81e:a228:f0c9 with SMTP id d2e1a72fcca58-829a2dbab9fmr7308186b3a.19.1773048984020;
+        Mon, 09 Mar 2026 02:36:24 -0700 (PDT)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:cd95:c52c:1e0b:3ab7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a48b437fsm9487994b3a.52.2026.03.09.02.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 02:36:23 -0700 (PDT)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kees@kernel.org
+Cc: mingo@kernel.org,
+	tglx@kernel.org,
+	jiayuan.chen@shopee.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
+Subject: [PATCH] atm: lec: fix use-after-free in sock_def_readable()
+Date: Mon,  9 Mar 2026 15:06:14 +0530
+Message-ID: <20260309093614.502094-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,100 +100,166 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6733:EE_|SJ1PR12MB6099:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48dccbe6-fc9f-49c1-74e3-08de7dbf4aad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	0kAZaLuTxyl3fvibiPM3RekZeKgDkeRYmKXsd0b4phaqRI4Bjj9LPKQL1dlZodBTWS+N6yNF45ZQAPOIPWVBSIEl08FCm7olNjYHR9PLYuA1Zr1Ivz8YT5E+x4u1/Iopj/VBpamvtW1UkYX7mhgk2xOKTs3QsBxd8NrGohvQv/iYS3rcWjyd5lWkDpvebTwALdkObEktFiHErgqqKXKXeeerjFMBUg7IAT25S9PFmAxq4kd/1Sa3+dY/FE8nQ6Wzr6+a5or97+3R68c495BZ3+/RBMOwzmngcLm5Ru3YDZL8xs3OfRqdLKrA6vWSCmBe6w4wdJAMGCIXQwUL6CBKVJH2vfWQCotGv0NvkkKBNMST7lNz0xEHKHfcjXMq/IU13u8VjiCGVDURMJotK82ou98Z9ndWb1N7QU2f0f/aeb2pd1KTTKNeVAES25e9ulroW9RnP9QlHS+GAwnIivLw6pZDnmMzz4Y0lZypSA/xDi78E+dnNS0yimqJQ2i/3JZgsgHwp25ro69pJ+iWsVz715GeHsAB1QXNqm/RoENzXwUpdOZBs/qZ/J2xGXY6ocph8vWGfdubT3+oL0kcfGmoDI0NlwSAD3CRYiQPRiV9FdtiI9FMr0TnPNlglWSwjv7vqhJH2/zRSOWkre7b7e44L/0Qvu2k6cuXkO/4k05dXtZVOwolfybKG0PSsciTKMfk79YvMpHsN4LqYOObLjlYqnZ+zerihm9F23U/yLedzAXMSDrkMAyD6fLYeY9WsexbVfHm4IKBpo8u01vpgIjPrg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	5Ob6o//8Ls3SzB8/1pVqox1rK9Pu+rFgOYx7ZKbkJGqoxM7QXwA6jM8LlfLjkJRjh8hmaaiBdBQHW2ljgftH8AzTksLdIYkkZtz7ak/bSxsmOvMHUzH2TYYOWzwW7occ680jzHxmR5frURGNcyK0bHPg9fd7vkjHK7urfT7f2Bq2CRvyhCLu1ekv3hW3wvhAKD82B4ncwnjgoSm/1CM6xXSgT16DOnKXk1IL+FFLHaa8ahSy9PH02yb0PcIH1cbDd3Ji1tRhFAUr7pz1jh/NrEMpQXhkz8HbTCKAW5d0ncwtctVeIDezNCPqN7kLlA+/neKA6Tqlnoen3sKh1YyfRJeLZQ45z++pMVouJl0w0TA+GfbChzSNYRGN64uN4ircIgD/WlQP6FlomOg/XawSwot5m0iD8SGB1t+gPvPNnIxqr7AcO5O0Zi6SJ2KQ1leY
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2026 09:36:07.7400
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48dccbe6-fc9f-49c1-74e3-08de7dbf4aad
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6733.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6099
-X-Rspamd-Queue-Id: 2834C2365BF
+X-Rspamd-Queue-Id: 2E780236424
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,shopee.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-265433-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-265435-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,f50072212ab792c86925];
+	NEURAL_HAM(-0.00)[-0.993];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-Expose HW constant value in a shared header, to be used by core/EN
-drivers.
+A race condition exists between lec_atm_close() setting priv->lecd = NULL
+and concurrent access to priv->lecd in send_to_lecd(), lec_handle_bridge(),
+and lec_atm_send(). When the socket is freed via RCU while another thread
+is still using it, a use-after-free occurs in sock_def_readable() when
+accessing the socket's wait queue.
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+The root cause is that lec_atm_close() clears priv->lecd without holding
+lec_arp_lock, while callers dereference priv->lecd without any protection
+against concurrent teardown.
+
+Fix this by:
+- Protecting priv->lecd = NULL in lec_atm_close() with lec_arp_lock to
+  synchronize with callers that already hold the lock (e.g. lec_arp_resolve)
+- Using sock_hold/sock_put in send_to_lecd() to pin the socket while in
+  use. This is safe because send_to_lecd() is called under lec_arp_lock
+  by lec_arp_resolve(), preventing concurrent NULL assignment of lecd.
+- Using lec_arp_lock + sock_hold/sock_put in lec_handle_bridge() and
+  lec_atm_send() where the lock is not held by the caller, with proper
+  skb cleanup on early exit to avoid memory leaks.
+
+Note: Patch testing via syzbot was attempted but the test VM crashed
+due to a QEMU AHCI emulation assertion failure (hw/ide/core.c:934)
+unrelated to this fix. The QEMU crash is caused by syzbot's disk I/O
+fuzzing triggering a known QEMU NCQ emulation bug, not by this patch.
+Compile testing with "make W=1 net/atm/lec.o" passes cleanly.
+
+Reported-by: syzbot+f50072212ab792c86925@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=f50072212ab792c86925
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
 ---
- drivers/infiniband/hw/mlx5/mr.c | 1 -
- include/linux/mlx5/device.h     | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ net/atm/lec.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/infiniband/hw/mlx5/mr.c b/drivers/infiniband/hw/mlx5/mr.c
-index 665323b90b64..ff56948597dd 100644
---- a/drivers/infiniband/hw/mlx5/mr.c
-+++ b/drivers/infiniband/hw/mlx5/mr.c
-@@ -51,7 +51,6 @@ enum {
- };
+diff --git a/net/atm/lec.c b/net/atm/lec.c
+index fb93c6e1c329..7e051174a92b 100644
+--- a/net/atm/lec.c
++++ b/net/atm/lec.c
+@@ -131,6 +131,7 @@ static void lec_handle_bridge(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	char *buff;
+ 	struct lec_priv *priv;
++	unsigned long flags;
  
- #define MLX5_MR_CACHE_PERSISTENT_ENTRY_MIN_DESCS 4
--#define MLX5_UMR_ALIGN 2048
+ 	/*
+ 	 * Check if this is a BPDU. If so, ask zeppelin to send
+@@ -154,10 +155,19 @@ static void lec_handle_bridge(struct sk_buff *skb, struct net_device *dev)
+ 					/* 0x01 is topology change */
  
- static void
- create_mkey_callback(int status, struct mlx5_async_work *context);
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 25c6b42140b2..07a25f264292 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -293,6 +293,7 @@ enum {
- 	MLX5_UMR_INLINE			= (1 << 7),
- };
+ 		priv = netdev_priv(dev);
+-		atm_force_charge(priv->lecd, skb2->truesize);
++		spin_lock_irqsave(&priv->lec_arp_lock, flags);
++		if (!priv->lecd) {
++			spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
++			kfree_skb(skb2);
++			return;
++		}
+ 		sk = sk_atm(priv->lecd);
++		sock_hold(sk);
++		spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
++		atm_force_charge(priv->lecd, skb2->truesize);
+ 		skb_queue_tail(&sk->sk_receive_queue, skb2);
+ 		sk->sk_data_ready(sk);
++		sock_put(sk);
+ 	}
+ }
+ #endif /* IS_ENABLED(CONFIG_BRIDGE) */
+@@ -441,7 +451,7 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
+ 			/* hit from bridge table, send LE_ARP_RESPONSE */
+ 			struct sk_buff *skb2;
+ 			struct sock *sk;
+-
++			unsigned long flags;
+ 			pr_debug("%s: entry found, responding to zeppelin\n",
+ 				 dev->name);
+ 			skb2 = alloc_skb(sizeof(struct atmlec_msg), GFP_ATOMIC);
+@@ -449,10 +459,19 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
+ 				break;
+ 			skb2->len = sizeof(struct atmlec_msg);
+ 			skb_copy_to_linear_data(skb2, mesg, sizeof(*mesg));
+-			atm_force_charge(priv->lecd, skb2->truesize);
++			spin_lock_irqsave(&priv->lec_arp_lock, flags);
++			if (!priv->lecd) {
++				spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
++				kfree_skb(skb2);
++				break;
++			}
+ 			sk = sk_atm(priv->lecd);
++			sock_hold(sk);
++			spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
++			atm_force_charge(priv->lecd, skb2->truesize);
+ 			skb_queue_tail(&sk->sk_receive_queue, skb2);
+ 			sk->sk_data_ready(sk);
++			sock_put(sk);
+ 		}
+ 	}
+ #endif /* IS_ENABLED(CONFIG_BRIDGE) */
+@@ -471,8 +490,11 @@ static void lec_atm_close(struct atm_vcc *vcc)
+ 	struct sk_buff *skb;
+ 	struct net_device *dev = (struct net_device *)vcc->proto_data;
+ 	struct lec_priv *priv = netdev_priv(dev);
++	unsigned long flags;
  
-+#define MLX5_UMR_ALIGN (2048)
- #define MLX5_UMR_FLEX_ALIGNMENT 0x40
- #define MLX5_UMR_MTT_NUM_ENTRIES_ALIGNMENT (MLX5_UMR_FLEX_ALIGNMENT / sizeof(struct mlx5_mtt))
- #define MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT (MLX5_UMR_FLEX_ALIGNMENT / sizeof(struct mlx5_klm))
++	spin_lock_irqsave(&priv->lec_arp_lock, flags);
+ 	priv->lecd = NULL;
++	spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
+ 	/* Do something needful? */
+ 
+ 	netif_stop_queue(dev);
+@@ -534,6 +556,7 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
+ 
+ 	atm_force_charge(priv->lecd, skb->truesize);
+ 	sk = sk_atm(priv->lecd);
++	sock_hold(sk);
+ 	skb_queue_tail(&sk->sk_receive_queue, skb);
+ 	sk->sk_data_ready(sk);
+ 
+@@ -543,7 +566,7 @@ send_to_lecd(struct lec_priv *priv, atmlec_msg_type type,
+ 		skb_queue_tail(&sk->sk_receive_queue, data);
+ 		sk->sk_data_ready(sk);
+ 	}
+-
++	sock_put(sk);
+ 	return 0;
+ }
+ 
 -- 
-2.44.0
+2.43.0
 
 
