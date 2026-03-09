@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-265459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uODAI2ufrmm2GwIAu9opvQ
-	(envelope-from <netdev+bounces-265459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:22:35 +0100
+	id 4EkaL+Ofrmm2GwIAu9opvQ
+	(envelope-from <netdev+bounces-265460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:24:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8F0236F78
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:22:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 678AC236FC9
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 11:24:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9B28F300729B
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:22:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F7713043D3F
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 10:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069B936BCE6;
-	Mon,  9 Mar 2026 10:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448CE38F65F;
+	Mon,  9 Mar 2026 10:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f0X7oB6i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VyxrtNLr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BD922759C;
-	Mon,  9 Mar 2026 10:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ADB256C84;
+	Mon,  9 Mar 2026 10:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773051747; cv=none; b=kCnyISOxoVKLqasOc1B20EwMWAuYS8XmXo6y1AlUIIUw6QMa1J9g3Yoj+k7WANBl6SaFuZLFKVF/+sYASuBMjw+H32NCph2RyOWeRSzTi+EyhDSxV8HqYFe9GGI92ArUT6TrCodxhn1Qda6BW3iq9Ym39Lxlv01Sl1Pm7brlHdI=
+	t=1773051865; cv=none; b=FjZALrB+tn2A8lnDjKor/8ZNb52frpoiCXDadez1G3/1c+nmSKOMUqymnv3IB+pSkop4FJXNXce/kzLFgQjnmPJXAiP10mWgXglkd4MtcS9lW2zuLNm2jkQ4b512MezJmKGahg67dNm8ix7+BmWyzMgv+paajjiDtnqm6Y05nNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773051747; c=relaxed/simple;
-	bh=kXKb1J+6pry8GUW4hH+8aUUpyZrR0VDDH+5QU4fvJgU=;
+	s=arc-20240116; t=1773051865; c=relaxed/simple;
+	bh=BvtwtwcwSfVKcyfpQtaLtqIA+tgqr1RTHQjVXI2Vme4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o8joyQwsjh1Ud1mXPVoHdudHmkCLuGV2IHMxXfKn0z+8Wh75M5/71ZmLL+uoo6InFWdYwSWTaJ5obTsl1bG8wGtzhxIELYEiKUASVk0QFhOzXOXrgrij19W/vV3Y/UVWm1a/oyZCWpv1yXr9TMf2lq9c6qXJR0l06xbx0Q7q9ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f0X7oB6i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98754C4CEF7;
-	Mon,  9 Mar 2026 10:22:25 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=nf44ujCLCXoRRlbycuyQjTGGyjXxU+ku6q8dhmwfcZoGBlEHVPYr0GYKRlJYwxa4rj8MZg3zoZEUKiUDD2PwQOwC6xMtHi1Mi9b8f3hiV2yk8U2GAYnRuOdOsZQB2s6WoEyO5XmlQn5cvaLy6rlBxaE8xtxtt+ezFwfFdF2zDz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VyxrtNLr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2071CC4CEF7;
+	Mon,  9 Mar 2026 10:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773051747;
-	bh=kXKb1J+6pry8GUW4hH+8aUUpyZrR0VDDH+5QU4fvJgU=;
+	s=k20201202; t=1773051864;
+	bh=BvtwtwcwSfVKcyfpQtaLtqIA+tgqr1RTHQjVXI2Vme4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f0X7oB6i210FzjhF1XAuwyatiWlmrQLB+FPMXqwznU5jEcH2NLCVM8rWfdLzRGdAw
-	 89EKQ5yvGsrFZTfspDJELA/YWxRnhAXZoM/T3JCtCW5NNwNddItfYrUOKJ77fzgOOq
-	 Ze6cRm6TNpAjza0iEPsIBPSOVkxCmpPQ40QIJyv2MqqQoNogOF3tzmH8WNu9djEL8R
-	 CtNfuYRIEomVtE1WRYeon4QOmPI7YzLH6KBdS8JHA5lsXZVhocXa+y48kzSqL5vcJV
-	 GVtoYF2qGRpR9wE8vtM2Z0Wa1cbqaJhMfumvNeQ/PGCaFFAswFLjzNe8CTbCvLHkfd
-	 Wn+yZ7ALyixhw==
-Message-ID: <48ccec3f-dbc8-45c8-afda-e4f7e8f150d6@kernel.org>
-Date: Mon, 9 Mar 2026 11:22:23 +0100
+	b=VyxrtNLruvKU9Vq3Qy2KtTqc+zYLfcjs4YIvhrvgiJb5gtOY46oVjmEXXf7YinaVE
+	 5khuGRS3qY3UVL3hy3wmqnxBqvI1CB9WN5omD4S1iOusTrEMAErj8IVjZpI2iwTydl
+	 kp1MAotDxje3JrxOzGaxEaQpq2ccXBvx6bQYBMFVG4QmeEjqOMPkj/eShoCuRfouBI
+	 VHIUcd0fANbygZgY+He3mnYpd8yx4sU8KIp4XiAdUHQzAwOv9Gh9kd8B65S5RAaXQY
+	 fNJ2en5dg5ao95Rm8vU1c8tDOfIl9ck6y/pl+8clVoNNZR7PoKKxzwBPVU5Skak+rq
+	 q5HmKfWfPwj6w==
+Message-ID: <01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org>
+Date: Mon, 9 Mar 2026 11:24:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,12 +53,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10 net-next] Convert CONFIG_IPV6 to built-in and remove
- stubs
+Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in only
+ and clean up Kconfigs
 To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org
+Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Selvin Xavier <selvin.xavier@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Simon Horman <horms@kernel.org>, Saurav Kashyap <skashyap@marvell.com>,
+ Javed Hasan <jhasan@marvell.com>,
+ "maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <GR-QLogic-Storage-Upstream@marvell.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>, Varun Prakash
+ <varun@chelsio.com>, Alexander Aring <aahringo@redhat.com>,
+ David Teigland <teigland@redhat.com>,
+ Andreas Gruenbacher <agruenba@redhat.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, David Ahern <dsahern@kernel.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, David Howells <dhowells@redhat.com>,
+ Marc Dionne <marc.dionne@auristor.com>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+ Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Eric Biggers <ebiggers@kernel.org>, Michal Simek <michal.simek@amd.com>,
+ Luca Weiss <luca.weiss@fairphone.com>, Sven Peter <sven@kernel.org>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+ Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+ Andrew Morton <akpm@linux-foundation.org>, David Gow <david@davidgow.net>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ryota Sakamoto <sakamo.ryota@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Kir Chou <note351@hotmail.com>,
+ Kuan-Wei Chiu <visitorckw@gmail.com>, Vikas Gupta
+ <vikas.gupta@broadcom.com>,
+ Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+ Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+ =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>,
+ "open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
+ "open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
+ "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
+ "open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <linux-scsi@vger.kernel.org>,
+ "open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
+ "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
+ "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
+ "open list:NETFILTER" <coreteam@netfilter.org>,
+ "open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
+ "open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
+ "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
 References: <20260309022013.5199-1-fmancera@suse.de>
+ <20260309022013.5199-2-fmancera@suse.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,53 +156,114 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20260309022013.5199-1-fmancera@suse.de>
+In-Reply-To: <20260309022013.5199-2-fmancera@suse.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8F8F0236F78
+X-Rspamd-Queue-Id: 678AC236FC9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265459-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux-m68k.org,ziepe.ca,kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,HansenPartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
+	TAGGED_FROM(0.00)[bounces-265460-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.930];
+	RCPT_COUNT_GT_50(0.00)[68];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:email]
 X-Rspamd-Action: no action
 
 On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
-> Historically, the Linux kernel has supported compiling the IPv6 stack as
-> a loadable module. While this made sense in the early days of IPv6
-> adoption, modern deployments and distributions overwhelmingly either
-> build IPv6 directly into the kernel (CONFIG_IPV6=y) or disable it
-> entirely (CONFIG_IPV6=n). The modular IPv6 use-case provides little to
-> no practical benefit today.
+> Configuring IPV6 as a module provides little or no benefit and requires
+> time and resources to maintain. Therefore, drop the support for it.
+> 
+> Change CONFIG_IPV6 from tristate to bool. Remove all Kconfig
+> dependencies across the tree that explicitly checked for IPV6=m. Adjust
+> all the default configurations from CONFIG_IPV6=m to CONFIG_IPV6=y. In
+> addition, remove MODULE_DESCRIPTION(), MODULE_ALIAS(), MODULE_AUTHOR()
+> and MODULE_LICENSE().
+> 
+> This is also replacing module_init() by fs_initcall().
+> 
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+>  arch/arm64/configs/defconfig                | 2 +-
+>  arch/m68k/configs/amiga_defconfig           | 2 +-
+>  arch/m68k/configs/apollo_defconfig          | 2 +-
+>  arch/m68k/configs/atari_defconfig           | 2 +-
+>  arch/m68k/configs/bvme6000_defconfig        | 2 +-
+>  arch/m68k/configs/hp300_defconfig           | 2 +-
+>  arch/m68k/configs/mac_defconfig             | 2 +-
+>  arch/m68k/configs/multi_defconfig           | 2 +-
+>  arch/m68k/configs/mvme147_defconfig         | 2 +-
+>  arch/m68k/configs/mvme16x_defconfig         | 2 +-
+>  arch/m68k/configs/q40_defconfig             | 2 +-
+>  arch/m68k/configs/sun3_defconfig            | 2 +-
+>  arch/m68k/configs/sun3x_defconfig           | 2 +-
+>  drivers/infiniband/Kconfig                  | 1 -
+>  drivers/infiniband/hw/ocrdma/Kconfig        | 2 +-
+>  drivers/infiniband/ulp/ipoib/Kconfig        | 2 +-
+>  drivers/net/Kconfig                         | 9 ---------
+>  drivers/net/ethernet/broadcom/Kconfig       | 2 +-
+>  drivers/net/ethernet/chelsio/Kconfig        | 2 +-
+>  drivers/net/ethernet/mellanox/mlxsw/Kconfig | 1 -
+>  drivers/net/ethernet/netronome/Kconfig      | 1 -
+>  drivers/scsi/bnx2fc/Kconfig                 | 1 -
+>  drivers/scsi/bnx2i/Kconfig                  | 1 -
+>  drivers/scsi/cxgbi/cxgb3i/Kconfig           | 2 +-
+>  drivers/scsi/cxgbi/cxgb4i/Kconfig           | 2 +-
+>  fs/dlm/Kconfig                              | 2 +-
+>  fs/gfs2/Kconfig                             | 2 +-
+>  net/bridge/Kconfig                          | 1 -
+>  net/ipv4/Kconfig                            | 9 ++++-----
+>  net/ipv6/Kconfig                            | 6 +-----
+>  net/ipv6/af_inet6.c                         | 8 +-------
+>  net/l2tp/Kconfig                            | 1 -
+>  net/netfilter/Kconfig                       | 8 --------
+>  net/rxrpc/Kconfig                           | 2 +-
+>  net/sctp/Kconfig                            | 1 -
+>  net/tipc/Kconfig                            | 1 -
+>  36 files changed, 28 insertions(+), 65 deletions(-)
+> 
+> diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+> index b67d5b1fc45b..0651a771f5c1 100644
+> --- a/arch/arm64/configs/defconfig
+> +++ b/arch/arm64/configs/defconfig
+> @@ -140,7 +140,7 @@ CONFIG_IP_MULTICAST=y
+>  CONFIG_IP_PNP=y
+>  CONFIG_IP_PNP_DHCP=y
+>  CONFIG_IP_PNP_BOOTP=y
+> -CONFIG_IPV6=m
+> +CONFIG_IPV6=y
+>  CONFIG_NETFILTER=y
+>  CONFIG_BRIDGE_NETFILTER=m
+>  CONFIG_NF_CONNTRACK=m
 
-It does. We all use generic kernels, thus it is one configuration for
-all boards and some setups have IPv6 and some not. The ones without IPv6
-just don't use that module.
+No, I don't want IPV6. It is allowed as module if some users need, but
+it's heavy bloat added to each person's build testing setup. Kernel
+image is already huge and barely fits boot partitions when built with
+KASAN and I do want a generic image with KASAN.
 
-Also, with these generic kernels (so again all machines are using same
-ones, e.g. distro) users can easily blacklist the module.
+It must stay module for me. Alternatively, drop it, but then some users
+will be really affected.
 
 Best regards,
 Krzysztof
