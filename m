@@ -1,226 +1,178 @@
-Return-Path: <netdev+bounces-265585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SImzIOXjrmmsJwIAu9opvQ
-	(envelope-from <netdev+bounces-265585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:14:45 +0100
+	id YCf/D67mrmlfKAIAu9opvQ
+	(envelope-from <netdev+bounces-265591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:26:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFAB823B778
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:14:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB6423B9E3
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 16:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73467306E615
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:10:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87CBE321D49E
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 15:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48E73D75BB;
-	Mon,  9 Mar 2026 15:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0AE3DFC89;
+	Mon,  9 Mar 2026 15:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Vp6uUlqC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM1kNg2n";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Vp6uUlqC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hM1kNg2n"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="N16O0awR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D03D412B
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 15:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BFF3CE4B2;
+	Mon,  9 Mar 2026 15:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773069041; cv=none; b=NNOOwjLm3aW/gJ6GPkw5ub3U4BRxCFy+kwQP4o2w9ky6MnxOIXH+bvQMg3n/Pv2MFxvmXKtNkEmGz8csE5h+FDvxyMAZMSM3GLUrKRasW0Oq7AzExUUkTm4ARbRlTAVV7yGLHK4CsrZnIrfXtfpU0JJ8tesC7/GrQWUvq0unoYY=
+	t=1773069640; cv=none; b=rzTdV+8UQUrGIBDD06xdO7mQAX/vk0UU5HKQxPPPZbO2j/sy9tn2gDMsbidat/yYHQUQ49atnbsg9dsyl0tYPfzx7nKmZQQZ8XHzF2z6f+H1h7E2EFn3mLxhAS45InmWPcy7FdEF17KCrdLZGaGhSkXdc8O6TgqDiRgu1o4nF7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773069041; c=relaxed/simple;
-	bh=FJ5QRyc0Mi7LX+9SN/owBTv48MK1EeTX/3eUuCRTMTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tp3CJvgqn5Pf5FqGQbJG3A+SdTIKJVyWrt7dqKkI7cE5Rm2NV9gcI3iHw2w25oMqdZ6HRzWp4jiqoxr0N/8vNkN9UPB/S6C8n5cHtknZHdQ4HyQzU+I1rtpHhCCsbMeaPyziXZkzRlyaTr3qeB5zq+3fUtxi3kHCefWPMp1s9II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Vp6uUlqC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM1kNg2n; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Vp6uUlqC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hM1kNg2n; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AAF814D231;
-	Mon,  9 Mar 2026 15:10:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773069038; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Fhwnjjyyy0wyFYIZTD5wvdqT3pYi9L5F9iUpNgbxrc=;
-	b=Vp6uUlqC1LYJS+tncQL7e2PFZGqa5At9PoRDEn19qZOkVEkW8gQaZul6PT8qPCopNn1li8
-	oJ34idPrQnNDWHzxnBlKWzjeUe7YVMGSyZCMXgaeHk/ilLvAckO6zpOF/g3GY9AZe48swj
-	wU0ZyXXT2OUDFADHOQY8TqNyOK2FBMk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773069038;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Fhwnjjyyy0wyFYIZTD5wvdqT3pYi9L5F9iUpNgbxrc=;
-	b=hM1kNg2nLWMGckaUFoxxPA/IikwK1PzGZ3ZuZON8UpgwgJNMdJKr8BIyvJGuagIz0terUD
-	vIqMWjOpzqFGNpDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773069038; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Fhwnjjyyy0wyFYIZTD5wvdqT3pYi9L5F9iUpNgbxrc=;
-	b=Vp6uUlqC1LYJS+tncQL7e2PFZGqa5At9PoRDEn19qZOkVEkW8gQaZul6PT8qPCopNn1li8
-	oJ34idPrQnNDWHzxnBlKWzjeUe7YVMGSyZCMXgaeHk/ilLvAckO6zpOF/g3GY9AZe48swj
-	wU0ZyXXT2OUDFADHOQY8TqNyOK2FBMk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773069038;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Fhwnjjyyy0wyFYIZTD5wvdqT3pYi9L5F9iUpNgbxrc=;
-	b=hM1kNg2nLWMGckaUFoxxPA/IikwK1PzGZ3ZuZON8UpgwgJNMdJKr8BIyvJGuagIz0terUD
-	vIqMWjOpzqFGNpDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2343B3EF6D;
-	Mon,  9 Mar 2026 15:10:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id teXBBO7irmnudAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 09 Mar 2026 15:10:38 +0000
-Message-ID: <dc670a8c-1245-4949-bf7f-53e8a1c5070a@suse.de>
-Date: Mon, 9 Mar 2026 16:10:28 +0100
+	s=arc-20240116; t=1773069640; c=relaxed/simple;
+	bh=y30ItdlDiXroLPPL9UoZq2MYbzDl9/X7mDaprO+A4j8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z05FNFZnPZ3nfjKBeIID/rUKxwnp7A1VaIkr8seOxKzutleK7kbH1S/elDyhrjRKypau10HjRPgP7ls6QardVGkOA5Q4rhmnJvGAk8HBpkckTeYmr+FvSkoY9sLJwRrgOJ2ESvzKbR7S+KlodVZHtlhnPZHFaON2FAVCfL9Hxps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=N16O0awR; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
+	Content-Type; bh=SQcC4wUPkVhzHGo+Ki6zloWaUldoEUcF03QYWsdomuo=; b=N16O0awRUUY9
+	+aBa1dbBqcF5sO2z3fW0NIypMhl8+T88B2Lw5QABnHKxJn7uRB/WPDt1200YmvN7LHT0aYQjVhVMy
+	L1F6yygRVlx2tl7s6gSftn3xt4aDMerbKqAP161Y4BM2FaXdEb64206z71LIZCeNt58FiQK0tiFX+
+	8WoVJJZ2sXMdcCrodUHv9CV2r0ny3e6sBnh7DkzS36yoaf70GyA/KDXdtio2LWlj45NkIEcMRK3Ud
+	CsnBvXQLmF9xLZykGNMUDUTue4Z/sqytzbC2sdfj+lT7di95uYcqgQUIlbkOG/0YKvXxnuuOZMrOM
+	4rAcCNvZ5W521mXjCG+aOA==;
+Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
+	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aleksey.oladko@virtuozzo.com>)
+	id 1vzcNS-006Tet-2I;
+	Mon, 09 Mar 2026 16:20:09 +0100
+Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 629FKGDa565237
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 9 Mar 2026 15:20:16 GMT
+Received: (from root@localhost)
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 629FKEHT565236;
+	Mon, 9 Mar 2026 15:20:14 GMT
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>, Aaron Conole <aconole@redhat.com>,
+        Ilya Maximets <imaximet@redhat.com>,
+        Eelco Chaudron <echaudro@redhat.com>,
+        Stefano Brivio <sbrivio@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dev@openvswitch.org,
+        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Subject: [PATCH net v4 0/5] selftests: net: fix false failures due to missing features and host interference
+Date: Mon,  9 Mar 2026 15:20:08 +0000
+Message-ID: <20260309152013.565216-1-aleksey.oladko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10 net-next] Convert CONFIG_IPV6 to built-in and remove
- stubs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, dsahern@kernel.org
-References: <20260309022013.5199-1-fmancera@suse.de>
- <20260309074758.0ea95a18@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260309074758.0ea95a18@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: EFAB823B778
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: ABB6423B9E3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265585-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265591-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.982];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.949];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,ovs-dpctl.py:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pmtu.sh:url,pmtu-test.sh:url,in_netns.sh:url]
 X-Rspamd-Action: no action
 
-On 3/9/26 3:47 PM, Jakub Kicinski wrote:
-> On Mon,  9 Mar 2026 03:19:33 +0100 Fernando Fernandez Mancera wrote:
->> Historically, the Linux kernel has supported compiling the IPv6 stack as
->> a loadable module. While this made sense in the early days of IPv6
->> adoption, modern deployments and distributions overwhelmingly either
->> build IPv6 directly into the kernel (CONFIG_IPV6=y) or disable it
->> entirely (CONFIG_IPV6=n). The modular IPv6 use-case provides little to
->> no practical benefit today.
-> 
-> Have you tested this? Every single VM config we have in CI dies with:
-> 
+Hi,
 
-Hi Jakub,
+This series addresses several issues in the networking kselftests
+that cause false-positive failures depending on the host environment,
+kernel configuration, or library versions.
 
-I did and I just booted a VM with the series. I just discovered that it 
-dies with virtme-ng. Changing the fs_initcall() to device_initcall() 
-fixes it so this is likely a race condition.. probably due to loopback?
+The main focus of these changes is to isolate tests from the host
+environment (using namespaces) and to ensure proper fallback or
+skipping when dependencies are missing.
 
-Sorry about the noise. I do not understand why this didn't happen on my 
-libvirt setup but it did happen on virtme-ng.
+Summary of changes:
+1. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
+   is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
+   instead of assuming the configuration was successful.
+2-4. Move reuseport test into dedicated network namespaces. This prevents
+   failures caused by port conflicts with host processes or interference
+   from host firewall rules.
+5. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
+   test, preventing failures on systems where kernel.io_uring_disabled
+   is set.
 
-Well, if there is consensus that we want to go ahead with this, I will 
-address this on the V2.
+Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
 
-Thanks for letting me know.
-Fernando.
+Changes in v2:
+- Fixed a typo by adding the missing backslash in Makefile
+- Added a Fixes: tag to the appropriate commit as requested
+- Link to v1: https://lore.kernel.org/linux-kselftest/20260120230558.328423-1-aleksey.oladko@virtuozzo.com
 
-> [    0.774671][    T1] Oops: general protection fault, probably for non-canonical address 0xdffffc0000000187: 0000 [#1] SMP KASAN
-> [    0.775165][    T1] KASAN: null-ptr-deref in range [0x0000000000000c38-0x0000000000000c3f]
-> [    0.775165][    T1] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.0.0-rc2-virtme #1 PREEMPT(full)
-> [    0.775165][    T1] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> [    0.775165][    T1] RIP: 0010:ipv6_add_dev+0x32/0x1e0
-> [    0.775165][    T1] Code: fb 48 83 ec 08 e8 0e 48 a8 ff 85 c0 0f 84 65 01 00 00 48 8d bb 39 0c 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 54 01 00 00
-> [    0.775165][    T1] RSP: 0018:ffa0000000017d10 EFLAGS: 00010216
-> [    0.775165][    T1] RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-> [    0.775165][    T1] RDX: 0000000000000187 RSI: 0000000000000008 RDI: 0000000000000c39
-> [    0.775165][    T1] RBP: 0000000000000100 R08: ffffffffa3eed8dc R09: fffffbfff4f10288
-> [    0.775165][    T1] R10: fffffbfff4f10289 R11: 0000000000000001 R12: dffffc0000000000
-> [    0.775165][    T1] R13: dffffc0000000000 R14: ff11000001f1cc00 R15: ffffffffa8216a90
-> [    0.775165][    T1] FS:  0000000000000000(0000) GS:ff1100008707a000(0000) knlGS:0000000000000000
-> [    0.775165][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    0.775165][    T1] CR2: ff11000036a1e000 CR3: 000000003453b001 CR4: 0000000000771ef0
-> [    0.775165][    T1] PKRU: 55555554
-> [    0.775165][    T1] Call Trace:
-> [    0.775165][    T1]  <TASK>
-> [    0.775165][    T1]  addrconf_init+0xa9/0x160
-> [    0.775165][    T1]  inet6_init+0x287/0x410
-> [    0.775165][    T1]  do_one_initcall+0xd7/0x4a0
-> [    0.775165][    T1]  ? trace_event_raw_event_initcall_level+0x210/0x210
-> [    0.775165][    T1]  ? __kmalloc_noprof+0x2c5/0x730
-> [    0.775165][    T1]  kernel_init_freeable+0x57d/0x620
-> [    0.775165][    T1]  ? rest_init+0x200/0x200
-> [    0.775165][    T1]  kernel_init+0x1e/0x170
-> [    0.775165][    T1]  ? _raw_spin_unlock_irq+0x33/0x50
-> [    0.775165][    T1]  ret_from_fork+0x472/0x6b0
-> [    0.775165][    T1]  ? arch_exit_to_user_mode_prepare.isra.0+0x140/0x140
-> [    0.775165][    T1]  ? __switch_to+0x538/0xcf0
-> [    0.775165][    T1]  ? rest_init+0x200/0x200
-> [    0.775165][    T1]  ret_from_fork_asm+0x11/0x20
-> [    0.775165][    T1]  </TASK>
-> [    0.775165][    T1] Modules linked in:
-> [    0.816998][    T1] ---[ end trace 0000000000000000 ]---
-> [    0.818082][    T1] RIP: 0010:ipv6_add_dev+0x32/0x1e0
-> [    0.819103][    T1] Code: fb 48 83 ec 08 e8 0e 48 a8 ff 85 c0 0f 84 65 01 00 00 48 8d bb 39 0c 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 54 01 00 00
-> [    0.822985][    T1] RSP: 0018:ffa0000000017d10 EFLAGS: 00010216
-> [    0.824176][    T1] RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-> [    0.825749][    T1] RDX: 0000000000000187 RSI: 0000000000000008 RDI: 0000000000000c39
-> [    0.827317][    T1] RBP: 0000000000000100 R08: ffffffffa3eed8dc R09: fffffbfff4f10288
-> [    0.828892][    T1] R10: fffffbfff4f10289 R11: 0000000000000001 R12: dffffc0000000000
-> [    0.830460][    T1] R13: dffffc0000000000 R14: ff11000001f1cc00 R15: ffffffffa8216a90
-> [    0.832037][    T1] FS:  0000000000000000(0000) GS:ff1100008707a000(0000) knlGS:0000000000000000
-> [    0.833800][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    0.835095][    T1] CR2: ff11000036a1e000 CR3: 000000003453b001 CR4: 0000000000771ef0
-> [    0.836670][    T1] PKRU: 55555554
-> [    0.837358][    T1] Kernel panic - not syncing: Fatal exception
-> [    0.838351][    T1] ---[ end Kernel panic - not syncing: Fatal exception ]---
+Changes in v3:
+- renamed pmtu.sh to pmtu-test.sh and used pmtu.sh as the name
+  of the wrapper. 
+- since the test now runs in a dedicated netns, updates the ovs
+  test case to correctly move network interfaces into the target
+  namespace.
+- Link to v2: https://lore.kernel.org/linux-kselftest/f7t1pj9v8h7.fsf@redhat.com/T/#t
+
+Changes in v4:
+- dropped the patch "selftests: net: fib_tests: skip rp_filter test if
+  cls_basic is unavailable" since the test environment is expected to
+  have all mandatory config options enabled.
+- moved isolation logic from in_netns.sh wrapper to unshare() call in
+  reuseport_ tests
+- Link to v3: https://lore.kernel.org/linux-kselftest/20260306000127.519064-1-aleksey.oladko@virtuozzo.com/T/#t
+
+Aleksei Oladko (4):
+  selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
+  selftests: net: run reuseport in an isolated netns
+  selftests: net: rename pmtu.sh to pmtu-test.sh
+  selftests: net: io_uring_zerocopy: enable io_uring for the test
+
+Konstantin Khorenko (1):
+  selftests: net: run pmtu.sh in netns to avoid host firewall
+    interference
+
+ tools/testing/selftests/net/Makefile          |    1 +
+ .../selftests/net/io_uring_zerocopy_tx.sh     |    9 +
+ .../selftests/net/openvswitch/ovs-dpctl.py    |    2 +-
+ tools/testing/selftests/net/pmtu-test.sh      | 2492 +++++++++++++++++
+ tools/testing/selftests/net/pmtu.sh           | 2492 +----------------
+ tools/testing/selftests/net/reuseport_bpf.c   |   11 +
+ .../testing/selftests/net/reuseport_bpf_cpu.c |   10 +
+ .../selftests/net/reuseport_bpf_numa.c        |   10 +
+ .../selftests/net/reuseport_dualstack.c       |   11 +
+ 9 files changed, 2547 insertions(+), 2491 deletions(-)
+ create mode 100755 tools/testing/selftests/net/pmtu-test.sh
+
+-- 
+2.43.0
 
 
