@@ -1,63 +1,96 @@
-Return-Path: <netdev+bounces-265499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265500-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFRhImC0rmkSHwIAu9opvQ
-	(envelope-from <netdev+bounces-265499-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:52:00 +0100
+	id EA21KOK2rmnMIAIAu9opvQ
+	(envelope-from <netdev+bounces-265500-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:02:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B95423837D
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 12:52:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33DD2385FD
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 13:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8318B303C531
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:49:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D513317E38C
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 11:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5B13A0E85;
-	Mon,  9 Mar 2026 11:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24213ACA78;
+	Mon,  9 Mar 2026 11:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="CC/c5xLJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1jbZsRR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7A9363C67;
-	Mon,  9 Mar 2026 11:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9534E39E6C4;
+	Mon,  9 Mar 2026 11:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773056951; cv=none; b=KSKUd6WrrVgCQRQi3wUX1tHRtHloh2RzV3O1tiBIQd185AyCWlh8KsT7sCOl0w05ljRyb8/AhhCD+tcjsOpqd7r5A86SrlQpsPzfhrScAprdH5sNMAjBfpIu+0brBLZX62qPk+03/iZGdOXbMLs3B1wVdfR6tupEeQ93saaCyyc=
+	t=1773057310; cv=none; b=C/9WYE4coDSiSdPTuvXWoB37/hGP8RxAZUVCbfVFhbz4FR2Wh2jtw7ySaKsqUtlmKy8bCgF+8ekYcZPUDOmu6FQRvnlyx1JDYjG1QpCF8ZU9KlIbMjaAX2PCHl0aYqrBAUXvv9runtNONvF7By8Q+QJQXBVn75+GlZdikXo5XqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773056951; c=relaxed/simple;
-	bh=obQesHjTuGhDPBJexa2y8wWPRcB8s0PhWfaj0ISSGlg=;
+	s=arc-20240116; t=1773057310; c=relaxed/simple;
+	bh=ckaf/5AMYgmZRCMc0oEia9HI+HTLwdDXnMGSI4hSDEc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EalmE+jbmSWFIfBKB7c2VpA2I59uA7oQZLLNQDGqNCVM4qyxvfE5byNmLecN3PSSy+WMK9qEhgui3ArgrfRsJ2Ki50kYGzF4xv/PAmd2sX4kxdERaWdGy066nY5KVoON6MkBMoCEl8JUjHY77vJgANjpGtqo5Kp4tqKXg+Wmyso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=CC/c5xLJ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id C970120B6F00; Mon,  9 Mar 2026 04:49:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C970120B6F00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1773056944;
-	bh=cxVRrtJ71QEmYzTtxLKbAa1noqi4UA66TYgCcNfu/wA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CC/c5xLJ6lvrk8s1aRfhuZpo+kr1NGLmtQscc+e1g+CR+63OhbqJDJurfTSVAUTdL
-	 bhHh4taR1Y5p4mDeAe/hpqzUtQoRiThE1CF4X2oXYb2QxJWQLvTQXlXw0aJpZc3SA6
-	 trDyaKoyYUup559O/FS1lyT/sivsxNIyo5nJQnbo=
-Date: Mon, 9 Mar 2026 04:49:04 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: pabeni@redhat.com, linux-kernel@vger.kernel.org, yury.norov@gmail.com,
-	kys@microsoft.com, decui@microsoft.com, kees@kernel.org,
-	longli@microsoft.com, dipayanroy@linux.microsoft.com,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, kotaranov@microsoft.com,
-	andrew+netdev@lunn.ch, linux-hyperv@vger.kernel.org,
-	edumazet@google.com, haiyangz@microsoft.com,
-	ssengar@linux.microsoft.com, shradhagupta@linux.microsoft.com,
-	horms@kernel.org, shirazsaleem@microsoft.com, wei.liu@kernel.org
-Subject: Re: [net-next] net: mana: Expose hardware diagnostic info via debugfs
-Message-ID: <aa6zsEiJahwMKjKt@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260305205252.470089-1-ernis@linux.microsoft.com>
- <20260307032228.1379456-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tTOWfcHHOd7vg5WF2n/HT1iPTobPHL0U+bxdVINqK9vjQb1h2MHZYdfyuj1eHd6UH/MAXTZgrD2cOHVHgk6HG25y0P9GbXcsyk9uK75r3QHfe7JGhEbfO/DYPkrx2D0ybQCOAeoxysMHSljORjZvJL7rdQiFbH55KiN+5sPH0fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1jbZsRR1; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lJFjImxwxadvi+gU8vmzxMQ1ibYsL7sINkxIQOwwhVs=; b=1jbZsRR11GlAwZM7SeLNq1W/zr
+	dnjnW3DZXltJqVd8gPjpmuDHLe0EdnqKkg5+/baGDhE9S1t+3NfOiAoL7DyNpNpUO3WtVajQy7IaV
+	96EJ8jAbkFga/HLi5DePrp+zikjPXo/LmDgBUdDMf7GnVxi7QqUHGGu5Qhi9vFPQg2fZOhxP98ItD
+	mSI7KK+DQCHSyOHt8v3ybXpIHreqEUHXC0xsvxuWjkb70NwcjAuVxbfhtIroivo2g7ZOw2VMUQCkQ
+	050q/FJWAmKIengysoKh1XuNSEw2n3xS/3YbAglYWYvM8/b43oIQMa8nlY96l3BuClCbL8XbuYgSI
+	S4zh7gOA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32802)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vzZC4-000000003jq-0FdH;
+	Mon, 09 Mar 2026 11:54:40 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vzZBt-000000004Hi-2Zlz;
+	Mon, 09 Mar 2026 11:54:29 +0000
+Date: Mon, 9 Mar 2026 11:54:29 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Yao Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Quentin Schulz <quentin.schulz@cherry.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v8 2/3] net: stmmac: platform: Add
+ snps,dwmac-5.40a IP compatible string
+Message-ID: <aa609dEmUQYVXzta@shell.armlinux.org.uk>
+References: <20260309004305.315018-1-inochiama@gmail.com>
+ <20260309004305.315018-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,80 +99,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260307032228.1379456-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 0B95423837D
+In-Reply-To: <20260309004305.315018-3-inochiama@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: F33DD2385FD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265500-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265499-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,ziyao.cc,cqsoftware.com.cn,nxp.com,bp.renesas.com,eswincomputing.com,bootlin.com,altera.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,gmail.com,microsoft.com,kernel.org,linux.microsoft.com,davemloft.net,lunn.ch,google.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.193];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,armlinux.org.uk:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,shell.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026 at 07:22:28PM -0800, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On Mon, Mar 09, 2026 at 08:42:43AM +0800, Inochi Amaoto wrote:
+> Add compatible string for 5.40a version that can avoid to define some
+> platform data in the glue layer.
 > 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net: mana: Expose hardware diagnostic info via debugfs
-> 
-> This commit adds debugfs entries to expose hardware configuration and
-> diagnostic information for the MANA driver. It creates device-level and
-> port-level debugfs entries to aid in debugging initialization and runtime
-> operations.
- 
-> Do these debugfs entries get recreated on every suspend/resume cycle?
-No. Thankyou for pointing out Jakub.
-I'll  make this change in next version.
-> 
-> Both mana_gd_query_max_resources() and mana_gd_verify_vf_version() are
-> called from mana_gd_setup() during device initialization. On suspend,
-> mana_gd_suspend() calls mana_gd_cleanup() which doesn't remove these
-> debugfs entries. When mana_gd_resume() calls mana_gd_setup() again, it
-> attempts to create the same debugfs entries a second time.
-> 
-> This means debugfs_start_creating() in fs/debugfs/inode.c will print an
-> error for each duplicate file:
-> 
->     "'num_msix_usable' already exists in 'mana/<slot>/'"
->     "'max_num_queues' already exists in 'mana/<slot>/'"
->     "'gdma_protocol_ver' already exists in 'mana/<slot>/'"
->     "'pf_cap_flags1' already exists in 'mana/<slot>/'"
-> 
-> This produces 4 error messages in dmesg on every suspend/resume cycle,
-> contradicting the commit message's goal of operating "without adding
-> noise to dmesg."
-> 
-> Should these device-level entries be removed during suspend (in
-> mana_gd_cleanup or mana_gd_suspend), or should their creation be moved
-> to mana_gd_probe where they're only created once?
-Right. I will remove the entries during suspend and re-create them in
-resume. 
-> 
-> [ ... ]
-> -- 
-> pw-bot: cr
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
