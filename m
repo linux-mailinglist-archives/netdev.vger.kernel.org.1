@@ -1,293 +1,341 @@
-Return-Path: <netdev+bounces-265569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265570-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PYrCDLcrmm/JQIAu9opvQ
-	(envelope-from <netdev+bounces-265569-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:41:54 +0100
+	id GEOcJmjdrmm/JQIAu9opvQ
+	(envelope-from <netdev+bounces-265570-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:47:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6316023ABE5
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:41:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBDC23AD2E
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 15:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 105923023ABA
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 14:39:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D5563070B28
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 14:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424773D34BE;
-	Mon,  9 Mar 2026 14:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944123D34B4;
+	Mon,  9 Mar 2026 14:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ZVFWCKMb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dz8f/N1N";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ar0IgOPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CD53D333F;
-	Mon,  9 Mar 2026 14:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0273D3323
+	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 14:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773067169; cv=none; b=S44O9F+DWzTq2ZRWI4mvkbgvEoXMOLFfPFi4dWJhzto1GyCRO/LtF3FWhyJNerJ+JQUA1I2Y8JrXnm9WcODEyxFsfXW0bMDwLYGdZLgRGVcvEfN3riWvz2o+pcEB5GDEHPhr37iVd7YJthpf+VM8u2M69eW6ssgTIrDjNY3jcS4=
+	t=1773067452; cv=none; b=XkPaprS6IJUdHR3HkQE6oR+5DqhFPFUTSXPhBA2mgX+RhRwxORL/0E3lip/bXnL4Sapl6UaTRimR+Bo2znEEQr9YEXtDUJy3g3qAfxurdmX7GCKk8qVIjNBr2NrZJqG1uLF2QmGtW2FQ5mAbiDp7oOqK7UBa5Bxw6Yd1K5ppEzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773067169; c=relaxed/simple;
-	bh=vEGqJZE1lPr9QHjRXPzO2buTz3L2sa5tLp4g2Uq552w=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hQzcqvYJehVz8vRAREmvg5ZwfOrN+YjpI4dh5/OuZJy5SjWGO1ug02dQ5hwcH99GuAxdr+aV3xisb/GnTXOurfZtiqIgQukLeGcBASxYn/5ovhlnt2OrliXzjSlRgBoDrho/LMa5ycEBd2Co7Lir1Bsj2cxMpuT2vx61sXJlRxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ZVFWCKMb; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 227FD20B6F00; Mon,  9 Mar 2026 07:39:27 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 227FD20B6F00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1773067167;
-	bh=HoAderCUdnqh6fe8vbOhFK5KQ8A5DAYUy9/rXRzl4aY=;
-	h=From:To:Subject:Date:From;
-	b=ZVFWCKMbv1IZd5r8IbZcJdo4fu0/nNsQ0H+i53DIh6TzfQLpVY8qBGkRGrNeFA2cp
-	 HxmYraxZcr40qaSF9TIbgZbySPHKI1HC9i3Xp4iDMZBmnh2zoqqyK9uZnEbN7V8M2U
-	 MDUwYtcvOiCB0dVaitGOWyvjfLWSOlrX6O7LOB00=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	yury.norov@gmail.com,
-	kees@kernel.org,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v2] net: mana: Expose hardware diagnostic info via debugfs
-Date: Mon,  9 Mar 2026 07:38:28 -0700
-Message-ID: <20260309143840.675606-1-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1773067452; c=relaxed/simple;
+	bh=5NO1hU1Oefm6nIwyB2pD2DLzIlZ3cmHQvRpdrggXgtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oGjNIa4FZGQru5WrCfqmKp9pemlnT74h+eMKxE7nZKQtdcSMgmRlYo19zvZactW8YRZxvmEuMhQhDmuE5E0/T3lyQCvlRzWY2vAZlANHv925ESZ+BBPuF6jZFUC+BUuNJ1G9EH4veiP2gkUCWlgbKAD1lJ7TJvebaD4u6G4oNFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dz8f/N1N; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ar0IgOPY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773067450;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=a/uMdXFoof/63RJmIZwfaTJCSi7vsqZIL7+vHP9FG8I=;
+	b=dz8f/N1NatnRilfGsMc1mK0JmWRgGieg1aIq3xpdFgmstFtem/JUc89PJUeC5ZJc2winvi
+	aXnkHvRLkKjRSgLaFRP3+EARl60eqPlop+Xl76CfyYxxQxIP4YwWQCO9iNqZMdwlT7+CYt
+	7OaJpbRL5wN9Q0ozYVCZrUJTW+LAis4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-Oyjqt7uFPlqwKVm-kkSgMQ-1; Mon, 09 Mar 2026 10:44:08 -0400
+X-MC-Unique: Oyjqt7uFPlqwKVm-kkSgMQ-1
+X-Mimecast-MFC-AGG-ID: Oyjqt7uFPlqwKVm-kkSgMQ_1773067448
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-439b4e653d2so7295920f8f.1
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 07:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773067447; x=1773672247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a/uMdXFoof/63RJmIZwfaTJCSi7vsqZIL7+vHP9FG8I=;
+        b=ar0IgOPY430V1+eViz7aCvBFRXLTJZmWw8Su9MaCjaxD1ktFqrhEVkz7zGec8Yylt+
+         sGcL2YnAzRCRiq3Y0w7JwtMbrOfuEOtN+GyPB3cVmDS84TPScTWBZ2vjWHnz7ZUmlccf
+         K4Rbj6E4SuGfKk95PD0Erd4HBOtfgv+YNeoeFlTP29apUkZWqAQFUjv/Jkrkgp9V7jwe
+         pwH4BMd5WUNp5rNfdmsQXpvsq5cIawoTx49T3IxRvtfI2nsISI/lHxjP0ch2MoUgpYoH
+         x1/neMNYUyiUGe2rQKein00djGmTyTdIpelz3xt/pGuMPE3i8UF7fMs1iTx+F9j80rLM
+         XeOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773067447; x=1773672247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a/uMdXFoof/63RJmIZwfaTJCSi7vsqZIL7+vHP9FG8I=;
+        b=j7Oi21OWsw1TQqDrM+5iuCpYrO/6c4//hgV0k/RNSYnH+MNaLx8PhIUAsYn4FhTfcD
+         RBmHRpbg4Jjofv+9vCZER7Qx+MhIaTXFn71eRSgCbgA9xSDWchohAxoY5Pff+zQhbV4o
+         iIi1mUMzEcHgjWlVLUXEZ1YIRp92pn10yEfGUf++hvZBNF0w47v944XtLeOS36sVFrrg
+         4m4kzJMsasVYGIxAKNf2AdSNPU/9YGYBjGQA8u7k3r5fW2TWeIx8NRL6HiIlDPAJk74L
+         V3RLe7a7GaK7uU75DGfI/R3zuLlR0Dy49apwzHhPrrOLd95xoDFn+Ili/Sc898kd41r1
+         O+ZA==
+X-Gm-Message-State: AOJu0YyHpdaMTIQTCWJandU39jTU1dfUrdngFn4ZFwS9HmuX2lwA1Nq6
+	S1jSwJaWEh0j1R7I4InRuaE8Haltaw/PxDZZdcGASCAxwSpWIZICY8kXv9l50XZc5JzjHTgr812
+	1oqqtz4vfYsqsm0BU5wvd0GFr4aeo8jsU+PTzm7I3Hlp3UC7HPaYPFFTN37M7kyNrLt0aSws/Ay
+	HvV8jEVmLh0B/qZCrLEU9oddydL3bney9aFGRMoa/kxg==
+X-Gm-Gg: ATEYQzxtagMLxS/S1HQfPs4ImMjxXrEwJzdtS2phnH7HEaGj1EeA2IdZgV7AGHzOJH+
+	9WN7mtBVtDnPMtrbes5Oqa8z4pz18j+1z15Ma2D3XEwB10PnIzyueStEZHGbmw+Y9RWjH6Q7Yi+
+	BFQbFGpHqD003GG/pC7Bl1a7Xx0+LjtRWDOT6MAW/80YimUiqhS1xbSm6ouiAq84HUY0tr5yMYm
+	i2S2Yc/CoD+nf4u41nWLwkHq7Xfw/51d92FTOhbuYsQN9wpQwZ/NvcHreiuFW1V9RUkDTCi0ZrA
+	ghlL0Vn+xTpNzVpm3Jk1e6wybT8FUyX5QeAkZun4p6AIbCKCUgBOIC5edJF2fgW8yyBx0V2XVYa
+	WHUbp22gJGJ86saM+IEJr2CkPcUiJ7NZfgsxv8ReHAFIQhf1mEs8PhBgXf0E=
+X-Received: by 2002:a05:6000:2dc5:b0:439:d750:431a with SMTP id ffacd0b85a97d-439da89bbd1mr20056418f8f.42.1773067446577;
+        Mon, 09 Mar 2026 07:44:06 -0700 (PDT)
+X-Received: by 2002:a05:6000:2dc5:b0:439:d750:431a with SMTP id ffacd0b85a97d-439da89bbd1mr20056354f8f.42.1773067446025;
+        Mon, 09 Mar 2026 07:44:06 -0700 (PDT)
+Received: from localhost (net-93-146-155-42.cust.vodafonedsl.it. [93.146.155.42])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dad8d973sm25616647f8f.3.2026.03.09.07.44.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 07:44:05 -0700 (PDT)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next v4 0/8] net: macb: Add XDP support and page pool integration
+Date: Mon,  9 Mar 2026 15:43:45 +0100
+Message-ID: <20260309144353.1213770-1-pvalerio@redhat.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6316023ABE5
+X-Rspamd-Queue-Id: 2CBDC23AD2E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265569-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265570-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.microsoft.com:dkim,linux.microsoft.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add debugfs entries to expose hardware configuration and diagnostic
-information that aids in debugging driver initialization and runtime
-operations without adding noise to dmesg.
+Tested on Raspberry Pi 5.
+With rpi5 is not possible to test the !RSC case. It would be nice
+to test it, as it potentially changes the offset of the first frame
+(hw shifts of NET_IP_ALIGN bytes on rx).
 
-Device-level entries (under /sys/kernel/debug/mana/<slot>/):
-  - num_msix_usable, max_num_queues: Max resources from hardware
-  - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
-  - num_vports, bm_hostmode: Device configuration
+All the changes are intended for gem only.
 
-Per-vPort entries (under /sys/kernel/debug/mana/<slot>/vportN/):
-  - port_handle: Hardware vPort handle
-  - max_sq, max_rq: Max queues from vPort config
-  - indir_table_sz: Indirection table size
-  - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
-    Last applied steering configuration parameters
+The series consists of two main changes:
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
----
-Changes in v2:
-* Add debugfs_remove_recursice for gc>mana_pci_debugfs in
-  mana_gd_suspend to handle multiple duplicates creation in
-  mana_gd_setup and mana_gd_resume path.
-* Move debugfs creation for num_vports and bm_hostmode out of
-  if(!resuming) condition since we have to create it again even for
-  resume.
-* Recreate mana_pci_debugfs in mana_gd_resume.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 21 +++++++++++++
- drivers/net/ethernet/microsoft/mana/mana_en.c | 31 +++++++++++++++++++
- include/net/mana/gdma.h                       |  1 +
- include/net/mana/mana.h                       |  8 +++++
- 4 files changed, 61 insertions(+)
+- Migration from netdev_alloc_skb() to page pool allocation model,
+  enabling skb recycling.
+  This also adds support for multi-descriptor frame reception,
+  removing the previous single-descriptor approach and avoiding
+  potentially large contiguous allocations for e.g. jumbo frames
+  with CONFIG_PAGE_SIZE_4KB.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index aef8612b73cb..43fb366dc183 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -152,6 +152,11 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	if (gc->max_num_queues > gc->num_msix_usable - 1)
- 		gc->max_num_queues = gc->num_msix_usable - 1;
- 
-+	debugfs_create_u32("num_msix_usable", 0400, gc->mana_pci_debugfs,
-+			   &gc->num_msix_usable);
-+	debugfs_create_u32("max_num_queues", 0400, gc->mana_pci_debugfs,
-+			   &gc->max_num_queues);
-+
- 	return 0;
- }
- 
-@@ -1222,6 +1227,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 		return err ? err : -EPROTO;
- 	}
- 	gc->pf_cap_flags1 = resp.pf_cap_flags1;
-+	gc->gdma_protocol_ver = resp.gdma_protocol_ver;
-+
-+	debugfs_create_x64("gdma_protocol_ver", 0400, gc->mana_pci_debugfs,
-+			   &gc->gdma_protocol_ver);
-+	debugfs_create_x64("pf_cap_flags1", 0400, gc->mana_pci_debugfs,
-+			   &gc->pf_cap_flags1);
-+
- 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
- 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
- 		if (err) {
-@@ -2128,6 +2140,9 @@ int mana_gd_suspend(struct pci_dev *pdev, pm_message_t state)
- 
- 	mana_gd_cleanup(pdev);
- 
-+	debugfs_remove_recursive(gc->mana_pci_debugfs);
-+	gc->mana_pci_debugfs = NULL;
-+
- 	return 0;
- }
- 
-@@ -2140,6 +2155,12 @@ int mana_gd_resume(struct pci_dev *pdev)
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 	int err;
- 
-+	if (gc->is_pf)
-+		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
-+	else
-+		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
-+							  mana_debugfs_root);
-+
- 	err = mana_gd_setup(pdev);
- 	if (err)
- 		return err;
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index ea71de39f996..1117ae16b065 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1263,6 +1263,9 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
- 	apc->port_handle = resp.vport;
- 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
- 
-+	apc->vport_max_sq = *max_sq;
-+	apc->vport_max_rq = *max_rq;
-+
- 	return 0;
- }
- 
-@@ -1409,6 +1412,11 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 
- 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
- 		    apc->port_handle, apc->indir_table_sz);
-+
-+	apc->steer_rx = rx;
-+	apc->steer_rss = apc->rss_state;
-+	apc->steer_update_tab = update_tab;
-+	apc->steer_cqe_coalescing = req->cqe_coalescing_enable;
- out:
- 	kfree(req);
- 	return err;
-@@ -3110,6 +3118,24 @@ static int mana_init_port(struct net_device *ndev)
- 	eth_hw_addr_set(ndev, apc->mac_addr);
- 	sprintf(vport, "vport%d", port_idx);
- 	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-+
-+	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
-+			   &apc->port_handle);
-+	debugfs_create_u32("max_sq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_sq);
-+	debugfs_create_u32("max_rq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_rq);
-+	debugfs_create_u32("indir_table_sz", 0400, apc->mana_port_debugfs,
-+			   &apc->indir_table_sz);
-+	debugfs_create_u32("steer_rx", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rx);
-+	debugfs_create_u32("steer_rss", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rss);
-+	debugfs_create_u32("steer_update_tab", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_update_tab);
-+	debugfs_create_u32("steer_cqe_coalescing", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_cqe_coalescing);
-+
- 	return 0;
- 
- reset_apc:
-@@ -3598,6 +3624,11 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 
- 	ac->bm_hostmode = bm_hostmode;
- 
-+	debugfs_create_u16("num_vports", 0400, gc->mana_pci_debugfs,
-+			   &ac->num_ports);
-+	debugfs_create_u8("bm_hostmode", 0400, gc->mana_pci_debugfs,
-+			  &ac->bm_hostmode);
-+
- 	if (!resuming) {
- 		ac->num_ports = num_ports;
- 
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index ec17004b10c0..917945f0e3dc 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -440,6 +440,7 @@ struct gdma_context {
- 	struct gdma_dev		mana_ib;
- 
- 	u64 pf_cap_flags1;
-+	u64 gdma_protocol_ver;
- 
- 	struct workqueue_struct *service_wq;
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index a078af283bdd..83f6de67c0cc 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -563,6 +563,14 @@ struct mana_port_context {
- 
- 	/* Debugfs */
- 	struct dentry *mana_port_debugfs;
-+
-+	/* Cached vport/steering config for debugfs */
-+	u32 vport_max_sq;
-+	u32 vport_max_rq;
-+	u32 steer_rx;
-+	u32 steer_rss;
-+	u32 steer_update_tab;
-+	u32 steer_cqe_coalescing;
- };
- 
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
+- XDP support: Initial XDP implementation supporting major
+  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
+  the ndo_xdp_xmit function for packet redirection.
+
+The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
+NETDEV_XDP_ACT_NDO_XMIT capabilities.
+
+Some numbers (Andrew)
+=====================
+
+  Initially reported numbers (Mbps, w/ drops on the rx side):
+  
+  https://lore.kernel.org/netdev/b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch/
+  
+  The numbers are essentially always the same with these two packet sizes.
+  cpu0 doesn't appear overloaded. Not sure if there's a bottlneck at the
+  interface level on my hw, but it seems cpu can handle more.
+  
+  Second test run (with no drops on the rx side):
+  
+  tx side: iperf3 sending UDP (256B) packets roughly at line rate (no drops
+  on the receiving side).
+  
+  rx side:
+  - fixed cpu frequency
+  - single rxq on cpu 0
+  - iperf3 server on cpu 1-3
+  - average w/ mpstat 20s interval 20s count
+  
+  Baseline:
+  
+  Average:     CPU    %usr    %sys    %soft  %idle
+  Average:     all    3.64   15.05     0.87  80.42
+  Average:       0    0.05    0.15    10.23  89.56
+  Average:       1    4.20   16.98     0.00  78.81
+  Average:       2    3.67   15.53     0.00  80.79
+  Average:       3    4.07   16.83     0.00  79.09
+  
+  Page pool:
+  
+  Average:     CPU    %usr    %sys    %soft  %idle
+  Average:     all    3.76   14.91     0.74  80.57
+  Average:       0    0.05    0.12     7.81  91.98
+  Average:       1    3.88   15.53     0.00  80.58
+  Average:       2    4.35   17.23     0.00  78.42
+  Average:       3    4.22   16.63     0.00  79.11
+
+
+Previous versions
+=================
+
+  - v3: https://lore.kernel.org/netdev/20260302115232.1430640-1-pvalerio@redhat.com/
+  - v2: https://lore.kernel.org/netdev/20260223182632.1681809-1-pvalerio@redhat.com/
+  - v1: https://lore.kernel.org/netdev/20260115222531.313002-1-pvalerio@redhat.com/
+  - RFC v2: https://lore.kernel.org/netdev/20251220235135.1078587-1-pvalerio@redhat.com/
+  - RFC v1: https://lore.kernel.org/netdev/20251119135330.551835-1-pvalerio@redhat.com/
+
+
+v3 -> v4
+========
+  - Remove inline from gem_rx_data_len() (Paolo Abeni)
+  - Rate limit the netdev_{err,warn} in gem_rx() and gem_rx_refill() with to avoid log 
+    flooding under error conditions (Paolo Abeni)
+  - Fix missing newline in netdev_err() for MTU validation in ndo_change_mtu (Paolo Abeni)
+
+v2 -> v3
+========
+  - Drop mog_init_rings() call in macb_open() reintroduced by mistake while
+    rebasing (Jakub Kicinski)
+  - Move [5/8] down in the series (was [6/8])
+  - s/void/sk_buff for the skb parameter instead of updating the documentation
+    because of its void type as this seems to better fit the scope of the
+    patch (Jakub Kicinski)
+  - Move [6/8] down in the series (was [7/8])
+  - Remove misleading check on tx buff type (MACB_TYPE_SKB) to improve
+    clarity as all buffers are MACB_TYPE_SKB (Jakub Kicinski)
+  - Update commit message to better fit with the patch content
+  - Move [7/8] up in the series (was [5/8]) as XDP_TX has now been folded in
+    this patch honoring the advertised features (Jakub Kicinski)
+  - explicitly return 0 in gem_create_page_pool() instead of err (Jakub Kicinski)
+  - Revisit gem_xdp_valid_mtu() and related helpers lifting the dependency with
+    bp->rx_headroom. It now always uses XDP_PACKET_HEADROOM (Jakub Kicinski)
+  - Use xdp_return_frame() in workqueue context (Jakub Kicinski)
+  - macb_tx_error_task() now locks tx_ptr_lock (Jakub Kicinski)
+  - Remove redundant check for clarity (Jakub Kicinski)
+  - Take into account head adjustment in macb_xdp_submit_frame() while syncing
+    in the XDP_TX path and for the XDP_PASS codepath.
+  - Some helpers renaming for clarity
+  - Do not to leave bp->prog pointer in gem_setup_xdp dangling on failure
+  - Revisit rx_buffer_size to better handle the RSC/non-RSC case
+  - Return error in ndo_xdp_xmit if the interface is not operating
+  - Handle packets count in macb_tx_complete() for the xdp case
+
+v1 -> v2
+========
+  - Fix potential NULL pointer dereference in gem_rx() when receiving an
+    unexpected non-starting frame without an active skb (Jakub Kicinski).
+  - Make sure to release both the pending skb and the current buff in fragment
+    overflow error path (Jakub Kicinski).
+  - Reuse the existing page pool instead of creating a new one in HRESP error
+    recovery (Jakub Kicinski).
+  - s/page/buffer/ in netdev_err() print out (Théo Lebrun)
+  - Ensure pending queue->skb is released in gem_free_rx_buffers() (Théo Lebrun).
+  - Use NET_SKB_PAD for the headroom when no xdp program is attached
+  - Add netdev to pp_params (for pp stats)
+  - Move ip_summed handling when RX_EOF is set as RX_SUM may not be reliable when
+    RX_EOF is not set.
+  - Sync for device no longer relies on PP_FLAG_DMA_SYNC_DEV reducing the
+    sync size.
+  - Introduce rx_ip_align field in struct macb
+  - Fix incorrect DMA direction for page pool when attaching XDP program by 
+    restoring close/open sequence as in a previous version (Jakub Kicinski).
+  - Rename release_buff() to macb_tx_release_buff() for clarity (Théo Lebrun).
+  - Do not unmap dma for XDP_TX buffers by ensuring tx_buff->mapping is zero for
+    MACB_TYPE_XDP_TX buff_type (Jakub Kicinski).
+  - Always return memory to pool on xdp_convert_buff_to_frame()
+    failure (Jakub Kicinski).
+  - Remove skip_xdp label (Théo, this is a bit different from your suggestion,
+    let me know if you have a strong preference here)
+
+RFC v2 -> v1
+============
+  - Removed bp->macbgem_ops.mog_init_rings(bp) call from macb_open()
+  - Fixed includes (remove unneeded, moved one from header to macb_main.c)
+  - Reverse xmas tree ordering (gem_rx, gem_rx_refill)
+  - print_hex_dump_debug() instead of print_hex_dump()
+  - Replaced rx frame length check with MACB_BIT(RX_EOF) for data_len
+    calculation
+  - Removed NET_IP_ALIGN handling in rx buffer size calculation
+  - Updated debug format string to include rx_headroom and total size
+  - Changed types to unsigned int in helper functions and variable
+  - Removed unneeded line break
+
+RFC v1 -> RFC v2
+================
+  - Squashed 1/6 and 2/6
+  - Reworked rx_buffer_size computation. It no longer takes into
+    accounts extra room.
+  - A bunch of renaming (rx_offset => rx_headroom, removed MACB_MAX_PAD,
+    MACB_PP_HEADROOM => XDP_PACKET_HEADROOM, data => ptr, xdp_q => xdp_rxq,
+    macb_xdp() => gem_xdp(), macb_xdp_xmit() => gem_xdp_xmit())
+  - Deduplicated buffer size computation in gem_xdp_valid_mtu()
+    and gem_xdp_setup()
+  - gem_xdp_setup() no longer close()/open()
+  - Renaming from rx_skbuff to rx_buff is now got split in a separate commit
+  - Open-coded gem_page_pool_get_buff()
+  - Added missing rx_buff re-initialization in the error path during rx
+  - Page pool creation failure now fails the device open
+  - Moved xdp buff preparation inside gem_xdp_run()
+  - Added missing rcu_access_pointer()
+  - Turned return value in -EOPNOTSUPP for macb_xdp() on failure
+  - moved tx_skb to tx_buff renaming to a separate commit
+  - Removed some unneeded code and set MACB_TYPE_SKB for lp->rm9200_txq[desc].type as well
+  - Replaced !!addr with a dedicated bool in macb_xdp_submit_frame()
+
+Paolo Valerio (7):
+  net: macb: rename rx_skbuff into rx_buff
+  net: macb: Add page pool support handle multi-descriptor frame rx
+  net: macb: use the current queue number for stats
+  net: macb: make macb_tx_skb generic
+  net: macb: generalize tx buffer handling
+  net: macb: add XDP support for gem
+  net: macb: introduce ndo_xdp_xmit support
+
+Théo Lebrun (1):
+  net: macb: move Rx buffers alloc from link up to open
+
+ drivers/net/ethernet/cadence/Kconfig     |   1 +
+ drivers/net/ethernet/cadence/macb.h      |  43 +-
+ drivers/net/ethernet/cadence/macb_main.c | 931 ++++++++++++++++++-----
+ 3 files changed, 758 insertions(+), 217 deletions(-)
+
 -- 
-2.34.1
+2.53.0
 
 
