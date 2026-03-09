@@ -1,186 +1,340 @@
-Return-Path: <netdev+bounces-265558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKyMEiXRrmlhJAIAu9opvQ
-	(envelope-from <netdev+bounces-265558-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:45 +0100
+	id YGgaIqzRrmlhJAIAu9opvQ
+	(envelope-from <netdev+bounces-265559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:57:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F0623A1F2
-	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:54:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E6A23A2A6
+	for <lists+netdev@lfdr.de>; Mon, 09 Mar 2026 14:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B72623003EED
-	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:49:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D204B317C2E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Mar 2026 13:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8AA7FBAC;
-	Mon,  9 Mar 2026 13:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0E03BFE2B;
+	Mon,  9 Mar 2026 13:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y965fEoh"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gZPy3hYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72E43BED05
-	for <netdev@vger.kernel.org>; Mon,  9 Mar 2026 13:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773064160; cv=pass; b=S8UczVV1zh6BjVq4bcaefQ5qX8Amab87rAT7tqqA2AelZUia7hp3INc/I2wFHubHr9ADcgpJoPYR3gYN1HuHbcevm3tZNOGnhJ1A3PiNjtTgcLWdCHqgt5kZiAiUv0Lfq07T4rzwg4gGainWP8o1Zvaonw2kSPW5VRU2aRa2r/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773064160; c=relaxed/simple;
-	bh=qmJ8yWcyKlJWNdkyNrEUCLckeECFCLJMFol+0LQbLyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pim9KPnY8e4G6VloxzPzBDrBo1HzMCLUb0fWjFsFsah6ZfCBE2gMqijnyHWl3dZRe3QgvU3Rdt01ue62FVHkYj4wMYES2acCAQTMZ49l/6yvKGXLUK2mke2pcmR45CUxoQ1KVOHU1ex413HEqPkFAglsovWC/4+XukpopFdukKM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y965fEoh; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-509006c070eso20763781cf.0
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 06:49:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773064156; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X4mipkNCA7CPN7dvo8ar3Dj3ggIJl+VKa536x/eJrOU/S0KXoZ3tcgE2+NWiCmwFbV
-         MBsi+ADBxCw6WEWzRXJvOAsZlfck16dErBkKxqPx8YH8L4ExWsac5wqboXLRW/go7UUD
-         e2WonPa7f8MvLEuSwPnPQ3dHncf1ssnAviQz8iETTOorG8IVvY4eqJeFgw5ak2+W2yVP
-         6fO6q24UuH8rU7M1m4Auc1mF3CTNU2I7KSDZTYC+StEbvKYDar7cusC+BgscVELkrGoz
-         wrxLzVt6r0CufBrN/rhvfBUxvkvHNRUlzI5o+VHljYhBAhbq/TmnnYHPTUm+P8MumT+r
-         0k6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
-        fh=w4FjuWbVD7fChl2ClScQaAusCUH1Jd1VuT05ZPR+B+s=;
-        b=BqfyTLAprc1A0CzWtL9OWGJqBZFnrwvjoyWz8cE8iKzOh3qe4wKObpuVN8XvTqmtGh
-         jcHfCnYzv5SkxsmDxDS1eEFee++Q/lj7ChDmqJiFP9UI1KcV5EvGMqf/4z+gwmaapFPf
-         tiCdavfjxYZ9Yh6mvpMHf9W4McwXAMegd6A71noOjhlSDeYhMdpPCP33oxMTwRwlz26L
-         Az5OBTEqTUyfw9p3J+FYb2WoQ/OfiHbJBF+9ME0Y3FA5k0Dguy3NQaJAcel2U4thjSZU
-         vcQ+JriCKGjQL+R5UfgYBH7thtimTquBCDCAFbAdQ+cacvmawK0hhO+CbShVQc3SzVwE
-         1V8g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773064156; x=1773668956; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
-        b=y965fEohyXvZDmWKZBiGdurYN9Sf9n8Uzs4YtqeWfcsKzpv91TEL1MgZGflQbWqfqH
-         aFSLA9L6VQ8HJ5+qACkCrcR5zTBWSM0y3jK3cLR2z8Wiu5pBI9MFjOqAbFlBkyNow9NJ
-         PSvE27AdEMd+seR9lYMA8HclO37NzkTLfm8NKrMX2ODb47qno+5uMb3t9Bdqdk7ihmWz
-         BFyo20PMTrScKY0ixGSIuvoro2iM1v+QWxFisqhH1ULHprIMmEKvScILTEWi5PyvT5fl
-         0gMYsa+3aeREuf3Vnvx/7zyYBWyQoCTV4UEu4jENLc4G7LC3dky3uwcYdcJXdwpWwqEh
-         df+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773064156; x=1773668956;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vNp1Q4QjClPdUPSYq7I0yBZG2Zy5Dy7h66HjTmS8OpY=;
-        b=E2KPy2Lw2qZqWVFDAge0m41VYiR/ru81tvzX1snZXyxh0pob5MeScHiw4F9eRJPz5Y
-         qQnZRsXwb/tzLXFRZT297zl2STSpRCcZgEbzOVjiuFt7tQn0q0K748FAbdpTzN+1n4Bs
-         mfxihp/DYUkrv7crLVGQK5ORhwHNq8rfkYEGzFcXhUQWwqn9wp4jo+0C/sYDMoafF4J0
-         MiO9VtoRi39WDZp7M6XtZxPaE2mfNs6ZoyjTIdYUuIDOh7zbdj2kTEEoVHMNnssqaUyX
-         MwxK/fxKcbWRmGmtpMREz8I1+eLQrfor1+u5cKx25xsimF2OXBHESAiSk0YdQb42Z877
-         2YoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVouZmKhzFqzoIjAXEoi0gJI1omyLt27T/0cT7Y2SwHcQs+T0uwInkJgO+hTpJuw3PGLM6dHGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwe9KwoW1Zu8kuS9NbaQG58+FYrfsTvchiVZfTwLDwEhoevtAH
-	xH8Cr6p9IJVkwDvF5TovxhoQhottxx9fUcS2V1rPZLzWXqxpVDOvTHBagPaSbicXATrAODsaOo4
-	qdoP8/chsF47+SPCCIj72LG9QXMtaLVluf/rEjelE
-X-Gm-Gg: ATEYQzzm8DX/aeq4BvY/CLE7oeyY5J0Cgxbl/5sgz7EaDrDYAoUZ8eXR1RM8xz5v//w
-	VeKVyh5/aQmS5aNQn3Tmvv/Qt0fgEkonKuIed6HyjHkKNE0RfFjkDPrBceCuzEYb4h/a00CYIwK
-	KdWPHUbaOl/1YjjiCBYkLi1rrsoYxmK+npB+EIrq8Kmtsv6lxDz/afuaeshL7CzIXHRZaqY8OM9
-	KY+UeRPdl/c1AV/xRDOfnL60lBIxRAf32Fin1AfRphggxs4/xuGmmFRKsZRfFi/DiGau+VAel9y
-	gn9vdPI=
-X-Received: by 2002:ac8:7dc5:0:b0:509:1c90:e188 with SMTP id
- d75a77b69052e-5091c90eb70mr31419001cf.57.1773064155692; Mon, 09 Mar 2026
- 06:49:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E328038F93A;
+	Mon,  9 Mar 2026 13:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773064213; cv=none; b=qj7WtHks3MeJQKHkosreRUI0oy3V9rGtFKpSrT+fJ4hjZf5uJbMnrKhKTzeYMVG29N9CL0tRcfbyJHKfFrojkmtVEYOI8DPBNKC4oeALkQ74Y+7a5CD/5P16+gTgDNpmJHmMxYvnUWmxteyTR1vDjSwlRXH0Xb5VHV51UA8ViRg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773064213; c=relaxed/simple;
+	bh=c5rbStFtRclgiSzvw6Wajg3dT9AmwlIozEnmfYWKfDI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LOt8b1HBryQ4Wh+4uXfNx+l1IylAME3wDWgkSoONQ6DvaS/dJQ1EMDzAQeFcxQTGMI+jwAtVwUYC/XcuOUy3sIdIQSrNG6XsNg2ONHyDLiusJ9/npjOMAUY1fBcgWAYKcFjVFz/3h9k9y3bTyvUaKW+hj7H/SAnfY6ZuPIl3I0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gZPy3hYT; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 629DEZjp3370975;
+	Mon, 9 Mar 2026 06:49:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=a
+	kjPAeN4UU1pVhpAh0/pX4vkrwNQX9jrXGKG4Tjn5g8=; b=gZPy3hYTAezuffUcl
+	PtZCaze4fk8R2QRzEel6u08j/AzRqKhZ5jlgBiRkZyTsaiqyRgs5Sle4TD4jHZBr
+	WWwfTBc5TKOQ8+zW7Vh5EvObtVIsbQ3qrdCZI7yQfSSlddK7tKAvT/3OW/0TkTD8
+	3DjzGUu28rzlGgv9hi76UwxodEXgBeWc1Jx/toEcWg8Zyfo6CozxvZsw1dfMNhVc
+	86/GVwAUgw4/jGNBGDrJMJ2Pt5V+qma2VFvCORaufi3h+NbBkBBNUUX8v1uPZsdc
+	CDIAQQ8FW/h7QOxlZ2f583RJgTGwGfjqeP0ilZu7vtu8H0ednm3bFOItIDOM7aep
+	0mISg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4crj8quqj5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Mar 2026 06:49:41 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 9 Mar 2026 06:49:40 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 9 Mar 2026 06:49:40 -0700
+Received: from naveenm-PowerEdge-T630 (unknown [10.29.37.44])
+	by maili.marvell.com (Postfix) with ESMTP id BAED73F7068;
+	Mon,  9 Mar 2026 06:49:34 -0700 (PDT)
+Date: Mon, 9 Mar 2026 19:19:33 +0530
+From: Naveen Mamindlapalli <naveenm@marvell.com>
+To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
+CC: <netdev@vger.kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman
+	<horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+        Tariq Toukan
+	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+        Hariprasad Kelam <hkelam@marvell.com>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Danielle Ratson <danieller@nvidia.com>, <linux-kernel@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, Russell King <linux@armlinux.org.uk>
+Subject: Re: [RFC net-next v2 0/6] ethtool: Generic loopback support
+Message-ID: <aa7P7UUUG1p5RVwO@naveenm-PowerEdge-T630>
+References: <20260308124016.3134012-1-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309122055.1226507-1-edumazet@google.com> <20260309134355.GC606826@noisy.programming.kicks-ass.net>
-In-Reply-To: <20260309134355.GC606826@noisy.programming.kicks-ass.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Mar 2026 14:49:04 +0100
-X-Gm-Features: AaiRm532DRiWlNXZEZMQzOHPOvkptGPx7jSZp6vcrfT7r-L3EFUNGs6O935Oxkw
-Message-ID: <CANn89iKmqhKH6pUkRiSG3u6gtpDaPBTVj739dgf3dh8uZHX3HA@mail.gmail.com>
-Subject: Re: [PATCH] locking/local_lock: Reduce local_[un]lock_nested_bh() overhead
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Marco Elver <elver@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: A7F0623A1F2
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260308124016.3134012-1-bjorn@kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDEyNSBTYWx0ZWRfXxbwr9nYX6sci
+ p92XabexOPDjwsQ4MZLYO+zMNC1zLXtqdkoUF2BDD7DSnYd9C8r8smSW75FKMqDU+BxaQdF+7Wh
+ 0WDpyRgbA/mj1eGCeCaqwaA4rhtShvzKqiPV4ql52Z5KhSzbxPBhU1JkpnWjCtD+TLFWqfTuwzw
+ Sur2PdcB8+4E+4xaarZLVcjfOYeWfgCqiKf17/d2dvp95rDcp74cME7VFkYkl4FFu0zM9KzY4RC
+ WhBSXEm9Y8ID6WUrfNn9V7pwnq5R6kKZKxBtFjsLtKZfC/eqhDr6clJzvrFQs29Fx16ivOBpKkP
+ 3LWS07rCuW48qWykMWkB7pQVtPnF5addflmM6zF4O/bpVtOhe7ml9e37gDjpWYELcrnzOfnJsda
+ Obqdu72gmLztUMvnHpJjIataXEWBfCxyeTFOXtQHS55mpOlYNJ90AENh4Kiobs/K/Q5cUbR2uNG
+ LdROTsFl9BBpHLjb/VQ==
+X-Proofpoint-GUID: JfkpMwsJt62-ifdgQzfmh_TYGH4Kb4Cr
+X-Proofpoint-ORIG-GUID: JfkpMwsJt62-ifdgQzfmh_TYGH4Kb4Cr
+X-Authority-Analysis: v=2.4 cv=WbwBqkhX c=1 sm=1 tr=0 ts=69aecff5 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=8nJEP1OIZ-IA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=P-IC7800AAAA:8 a=Q-fNiiVtAAAA:8 a=wHvoYhKdVLinnAuvZsgA:9
+ a=3ZKOabzyN94A:10 a=wPNLvfGTeEIA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+ a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-09_03,2026-03-09_01,2025-10-01_01
+X-Rspamd-Queue-Id: E2E6A23A2A6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265559-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,gmail.com,kernel.org,redhat.com,google.com];
-	TAGGED_FROM(0.00)[bounces-265558-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch,bootlin.com,broadcom.com,marvell.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,loopback_drv.py:url];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[naveenm@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	NEURAL_HAM(-0.00)[-0.992];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,infradead.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-On Mon, Mar 9, 2026 at 2:44=E2=80=AFPM Peter Zijlstra <peterz@infradead.org=
-> wrote:
->
-> On Mon, Mar 09, 2026 at 12:20:55PM +0000, Eric Dumazet wrote:
->
-> > diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
-> > index b8830148a8591c17c22e36470fbc13ff5c354955..40c2da54a0b720265be7b63=
-27e0922a49befd8fc 100644
-> > --- a/include/linux/local_lock.h
-> > +++ b/include/linux/local_lock.h
-> > @@ -94,12 +94,19 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_=
-t __percpu,
-> >                   local_unlock_irqrestore(_T->lock, _T->flags),
-> >                   unsigned long flags)
-> >
-> > +#if defined(WARN_CONTEXT_ANALYSIS) || defined(CONFIG_PREEMPT_RT) || \
-> > +    defined(CONFIG_DEBUG_LOCK_ALLOC)
-> >  #define local_lock_nested_bh(_lock)                          \
-> >       __local_lock_nested_bh(__this_cpu_local_lock(_lock))
-> >
-> >  #define local_unlock_nested_bh(_lock)                                \
-> >       __local_unlock_nested_bh(__this_cpu_local_lock(_lock))
-> >
-> > +#else
-> > +static inline void local_lock_nested_bh(local_lock_t *_lock) {}
-> > +static inline void local_unlock_nested_bh(local_lock_t *__lock) {}
-> > +#endif
->
-> This isn't going to work; WARN_CONTEXT_ANALYSIS is unconditional on
-> clang >=3D 22.1
->
-> How come that this isn't DCEd properly?
+On 2026-03-08 at 18:10:06, Björn Töpel (bjorn@kernel.org) wrote:
+> Hi!
+> 
+> Background
+> ==========
+> 
+> This is the v2 RFC of the CMIS loopback series, reworked based on
+> feedback from v1 [1].
+> 
+> The main change is that loopback is no longer bolted onto the existing
+> module interface. Instead, it gets its own netlink commands
+> (LOOPBACK_GET/SET) with a generic component/name/direction model that
+> can represent loopback points across the entire data path -- MODULE,
+> PHY, MAC, and PCS. This series wires up MODULE/CMIS as the first user;
+> the other component types return -EOPNOTSUPP for now.
+> 
+> The Common Management Interface Specification (CMIS) defines four
+> diagnostic loopback types, characterized by location (Host or Media
+> Side) and signal direction:
+> 
+>  - Host Side Input (Rx->Tx) -- near-end
+>  - Host Side Output (Tx->Rx) -- far-end
+>  - Media Side Input (Rx->Tx) -- near-end
+>  - Media Side Output (Tx->Rx) -- far-end
+> 
+> Support is detected via Page 13h Byte 128, and loopback is controlled
+> via Page 13h Bytes 180-183 (one byte per type, one bit per lane).
+> 
+> The CMIS helpers work entirely over get/set_module_eeprom_by_page, so
+> any driver that already has EEPROM page access gets module loopback
+> without new ethtool_ops or driver changes.
+> 
+> Implementation
+> ==============
+> 
+> Patch 1/6 ethtool: Add loopback netlink UAPI definitions
+>   Adds the YAML spec and generated UAPI header for the new
+>   LOOPBACK_GET/SET commands. Each loopback entry carries a component
+>   type, optional id, name string, supported directions bitmask, and
+>   current direction.
+> 
+> Patch 2/6 ethtool: Add loopback GET/SET netlink implementation
+>   Implements GET/SET dispatch in a new loopback.c. GET collects
+>   entries from each subsystem. SET switches on the component and
+>   calls the right handler per entry. No components are wired yet.
+> 
+> Patch 3/6 ethtool: add CMIS loopback helpers for module loopback control
+>   Adds cmis_loopback.c with the MODULE component handlers. GET reads
+>   Page 13h and appends one entry per supported loopback point
+>   ("cmis-host" and/or "cmis-media"). SET resolves name to control
+>   byte indices and enforces mutual exclusivity -- switching directions
+>   first disables the active one in a separate EEPROM write, then
+>   enables the new one.
+> 
+> Patch 4/6 selftests: drv-net: Add loopback driver test
+>   Adds loopback_drv.py with generic tests that work on any device
+>   with module loopback support: enable/disable, direction switching,
+>   idempotent enable, and rejection while interface is up.
+> 
+> Patch 5/6 netdevsim: Add module EEPROM simulation via debugfs
+>   Adds get/set_module_eeprom_by_page to netdevsim, backed by a
+>   256-page x 128-byte array exposed via debugfs. This enables
+>   testing the CMIS loopback path without hardware.
+> 
+> Patch 6/6 selftests: drv-net: Add CMIS loopback netdevsim test
+>   Adds loopback_nsim.py with netdevsim-specific tests that seed the
+>   EEPROM via debugfs: capability reporting, EEPROM byte verification,
+>   and error paths for unsupported or missing CMIS support.
+> 
+> Limitations
+> ===========
+> 
+> Only MODULE/CMIS is wired up. PHY, MAC, and PCS loopback are defined
+> in the UAPI but not yet implemented.
+> 
+> No per-lane support -- loopback is all-or-nothing (0xFF/0x00) across
+> lanes.
+> 
+> Extending to PHY/MAC/PCS
+> =========================
+> 
+> PHY loopback can walk phy_link_topology to enumerate PHYs by phyindex
+> and call phy_loopback() directly. MAC and PCS loopback can route
+> through phylink via new mac_set_loopback()/pcs_set_loopback()
+> callbacks. Drivers that don't use phylink could add new ethtool_ops.
+> The dispatch framework already handles all component types.
+> 
+> Open questions
+> ==============
+> 
+>  - Is this the right extensibility model? I'd appreciate input from
+>    other NIC vendors on whether component/name/direction is flexible
+>    enough for their loopback implementations. Also, from the PHY/port
+>    folks (Maxime, Russell)!
 
-BTW I wonder if the following WARN_CONTEXT_ANALYSIS should be
-CONFIG_WARN_CONTEXT_ANALYSIS
+Hi Bjorn,
 
-include/linux/local_lock_internal.h:318:#if defined(WARN_CONTEXT_ANALYSIS)
-include/linux/local_lock_internal.h:337:#else  /* WARN_CONTEXT_ANALYSIS */
-include/linux/local_lock_internal.h:339:#endif /* WARN_CONTEXT_ANALYSIS */
+The component/name/direction model in v2 fits our hardware well.
+
+I am working on loopback support for Marvell OcteonTX2.
+The MAC (RPM block) supports a PCS-level loopback. In addition,
+the on-chip SerDes (GSERM) is managed by embedded firmware and
+supports three more loopback modes:
+  NED (Near-End Digital) -- digital domain, before the analog front-end
+  NEA (Near-End Analog) -- through the full analog front-end
+  FED (Far-End Digital) -- line-side traffic looped back
+
+Since the GSERM is not a phylib phy_device, both the MAC PCS
+loopback and the SerDes loopbacks fall under the MAC component
+in your model.
+
+Mapped to the v2 model:
+  component  name         supported    description
+  MAC        mac          near-end     PCS-level loopback
+  MAC        serdes-ned   near-end     digital only
+  MAC        serdes-nea   near-end     analog
+  MAC        serdes-fed   far-end      line-side
+
+The SerDes NED and NEA both have the same (component, direction).
+Both are (MAC, near-end) -- but exercise fundamentally different
+hardware paths. The name field distinguishes them as per your model,
+
+I can work on MAC + SerDes loopback driver support for CN10K and
+post patches on top of your series once MAC component dispatch is
+in place.
+
+Thanks,
+Naveen
+
+> 
+>  - The MODULE id field is currently unused. For multi-module setups it
+>    could serve as a port selector. It could also help detect module
+>    swaps -- a hash of the CMIS vendor serial number (Page 00h, Bytes
+>    168-183), vendor name, and part number would give userspace a
+>    stable identifier to verify the module hasn't changed since
+>    loopback was configured. Worth adding now, or defer until there's a
+>    concrete user?
+> 
+>  - Are patches 5-6 (netdevsim EEPROM simulation + netdevsim-specific
+>    tests) worth carrying? They drive the CMIS Page 13h registers from
+>    debugfs, which gives good coverage without hardware, but it's
+>    another netdevsim surface to maintain. If the consensus is that the
+>    generic driver tests (patch 4) are sufficient, I'm happy to drop
+>    them.
+> 
+> Related work
+> ============
+> 
+> [1] CMIS loopback v1
+>   https://lore.kernel.org/netdev/20260219130050.2390226-1-bjorn@kernel.org/
+> [2] New loopback modes
+>   https://lore.kernel.org/netdev/20251024044849.1098222-1-hkelam@marvell.com/
+> [3] PHY loopback
+>   https://lore.kernel.org/netdev/20240911212713.2178943-1-maxime.chevallier@bootlin.com/
+> [4] bnxt_en: add .set_module_eeprom_by_page() support
+>   https://lore.kernel.org/netdev/20250310183129.3154117-8-michael.chan@broadcom.com/
+> 
+> 
+> Björn Töpel (6):
+>   ethtool: Add loopback netlink UAPI definitions
+>   ethtool: Add loopback GET/SET netlink implementation
+>   ethtool: add CMIS loopback helpers for module loopback control
+>   selftests: drv-net: Add loopback driver test
+>   netdevsim: Add module EEPROM simulation via debugfs
+>   selftests: drv-net: Add CMIS loopback netdevsim test
+> 
+>  Documentation/netlink/specs/ethtool.yaml      | 115 ++++++
+>  drivers/net/netdevsim/ethtool.c               |  79 ++++
+>  drivers/net/netdevsim/netdevsim.h             |  11 +
+>  include/linux/ethtool.h                       |  28 ++
+>  .../uapi/linux/ethtool_netlink_generated.h    |  52 +++
+>  net/ethtool/Makefile                          |   2 +-
+>  net/ethtool/cmis_loopback.c                   | 338 ++++++++++++++++++
+>  net/ethtool/loopback.c                        | 248 +++++++++++++
+>  net/ethtool/netlink.c                         |  20 ++
+>  net/ethtool/netlink.h                         |   8 +
+>  .../selftests/drivers/net/hw/loopback_drv.py  | 227 ++++++++++++
+>  .../selftests/drivers/net/hw/loopback_nsim.py | 249 +++++++++++++
+>  12 files changed, 1376 insertions(+), 1 deletion(-)
+>  create mode 100644 net/ethtool/cmis_loopback.c
+>  create mode 100644 net/ethtool/loopback.c
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/loopback_drv.py
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/loopback_nsim.py
+> 
+> 
+> base-commit: 0bcac7b11262557c990da1ac564d45777eb6b005
+> -- 
+> 2.53.0
+> 
+> 
 
