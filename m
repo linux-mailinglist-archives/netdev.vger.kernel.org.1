@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-266261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ld5KmVTsGmBiAIAu9opvQ
-	(envelope-from <netdev+bounces-266261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:22:45 +0100
+	id sKaSKohTsGmBiAIAu9opvQ
+	(envelope-from <netdev+bounces-266262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:23:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 296E025579C
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:22:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 277DD2557D6
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:23:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3FFEC30E11D7
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:19:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 30909309A05C
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E796A3D3CED;
-	Tue, 10 Mar 2026 17:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF393D47A5;
+	Tue, 10 Mar 2026 17:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZOu3jbw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hapoV9Uc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C7B3D1702;
-	Tue, 10 Mar 2026 17:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87E73D3CEC;
+	Tue, 10 Mar 2026 17:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773163170; cv=none; b=r+8mh0kD0LxSnoJuat6d6YSlSUvUr5hMq0ouTdIUBBxqHrHPvzHQSR+DGRSSqretRLsh8WT4k4GctCvMin23stu256bzG8kNGRM9rXz6VJdyfTY+7WEExJhqi7tCMW51q6ETIJ+Of6Ez/e0OC8xlUfi8ulth1gumRC0mMu0hDeI=
+	t=1773163176; cv=none; b=sYVAXg4QKTP2xa95cyiE1A1MfkUFPZQ96Ie2r1MyqxBdMzaKBqCj+lVjH97vYlbK5R2lxlCakevRFy0nM+XCc2FPIdcAETZYmSGT+S61dsKRHFxzLhbiZeJDFYovyoMTqKoOYntBlW3FU6ct5Q/f93HyFtUBRY1P/ziN6my7wn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773163170; c=relaxed/simple;
-	bh=l0HWcNcVkVo9YLSrRqspDdP84/kdc2LHA5rpvVoVGqQ=;
+	s=arc-20240116; t=1773163176; c=relaxed/simple;
+	bh=4Jefrf9Fj15twe5ClL92NgaOwnYD/+HOvjurslPqioo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oxu5Sqv2gxkWoRg34JqBiJujXD5qg7+KmSAOXl0AQVNzNybttVi5LY6MgE1jAF2HtY9jL1GYuuktsBKUc7mxB6fPFoznOzed2XifUFI3ff7XkITzp+U1YTqauxTXLPz2W2MIBHwXf77Tgdo5hBuuolVXMt08LaWfxwohEiv1L+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZOu3jbw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D81C2BCAF;
-	Tue, 10 Mar 2026 17:19:25 +0000 (UTC)
+	 MIME-Version; b=D+0aSc7DHeDV1Zv4MSjBjuDDqtmHMiGMVmM7IhqTdHV6wJOcn1BSqchE2YXFpuRdDm23oycSoewyUrMam2yFQUQxr66RDFQphED/dNHM6x6GsgOehXHCoqECw+dmTy6xOeOJ0fLX4T7MAB8cjgGs/kPuizyJus2JnO77Y+pwFik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hapoV9Uc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AD98C2BCB4;
+	Tue, 10 Mar 2026 17:19:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773163170;
-	bh=l0HWcNcVkVo9YLSrRqspDdP84/kdc2LHA5rpvVoVGqQ=;
+	s=k20201202; t=1773163176;
+	bh=4Jefrf9Fj15twe5ClL92NgaOwnYD/+HOvjurslPqioo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UZOu3jbwCJQybbw9ITXnq/6jm5sdEpvaO+pzakWGIN+iyNSYTLLBQrrVJbrd1idVB
-	 DybwhA0D4ougEcRqKzQY3N4YRh37XIXm03vtPrUhecWaT6kICBhAOSfcPQu6zKE0zK
-	 BbLFZDPLFdD9iHsUglpz5krTCzo8mskSRB367Xkmbx91gFSLrobe3B4okgNBfdqIR3
-	 jjom2dj3pT88Xcnvdb4uEKRdZ2N6kYYIBCP0qYrODBczDflStGNgQaJyhb0uC4J3df
-	 wV8Ojw8QDjkE2u3Avb3ERM6xrUmPVREwxR2jkYto+Hozb+H72DReSd8/Vzeg1Ra29F
-	 zVeznfyxV7fEA==
+	b=hapoV9Uci77yy+KzMxuehDevksM7h75V5zqUMWJYQyqBZMMINcYAoGBgX6R85O6BY
+	 He5priq/mvJzO57LrbW3lPt6xl65NLDzaButDFp3uOmVTKeuqoaAgU7aTW7mItY3Wl
+	 gEECSuRDwiJr94c0SfNwrYwJI3avfoOE/EvtD7r8RmFb899UaVsWQEzuRhu5tEaat1
+	 lEkECSsEWui+P2jq5BZTh6DCPWd9mt6B+glC5GELg74F+KA8au1klN0lN0GHiPtntQ
+	 mdmf2YyTyjn0SRklmQKCGQM2OBnhBBOGq0BIoIgIJBYn+0bDMvZNE5bKj6A+nglZKM
+	 nGk3slVlFnkAg==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -75,9 +75,9 @@ Cc: conor@kernel.org,
 	Abin Joseph <abin.joseph@amd.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	Ryan.Wanner@microchip.com
-Subject: [PATCH net-next v3 08/10] net: macb: clean up tsu clk rate acquisition
-Date: Tue, 10 Mar 2026 17:17:15 +0000
-Message-ID: <20260310-undefined-unfocused-805b5f2d3b37@spud>
+Subject: [PATCH net-next v3 09/10] dt-bindings: net: macb: add property indicating timer adjust mode
+Date: Tue, 10 Mar 2026 17:17:16 +0000
+Message-ID: <20260310-aviator-upswing-80e8543a2300@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260310-moneyless-dispense-7bce14b16388@spud>
 References: <20260310-moneyless-dispense-7bce14b16388@spud>
@@ -87,10 +87,10 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1291; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=pBzsAzv0f5XjXC1axq0Olq90oNiYo0A1zmrCQdWDjrw=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJkbgvRMZz1RyXH1WvCHJZxzkUWcxREP8bC0lU/neAeYM hRfYb7SUcrCIMbFICumyJJ4u69Fav0flx3OPW9h5rAygQxh4OIUgInEzGT4Z5Ta9aBIhzcmk3Ph vnTjuc1xro67WCsSdZ7HCfTq7n5wlpHhf6Jd9lSnx3qf/E61ss7fvejji/+v+B+t3DhX1VmLV0q FAQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2043; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=PwUkqjIET53ZYiiF+Rx5ytj1SfxTmti7f7XTTfzPPXc=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJkbgvReF159pbtLr/n67uzumtDNa3zro+dsFvugeHNSU XbxUf0JHaUsDGJcDLJiiiyJt/tapNb/cdnh3PMWZg4rE8gQBi5OAZjI5bmMDFPNc492vbZdwh+x 8f+OgJtLp/N+FW0wbJT/e6TO+t9R6whGhodH5xoccbyccONvPsurWTvV+r7u2uMfmCN04aGL/Jc PxUwA
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 296E025579C
+X-Rspamd-Queue-Id: 277DD2557D6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-266261-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266262-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -125,42 +125,58 @@ X-Rspamd-Action: no action
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-tsu_clk is grabbed during probe, so doesn't need to be re-grabbed here.
-pclk is mandatory, probe will fail if it is err/NULL, so there's no need
-to check it here or have a !pclk 3rd arm. Simplify gem_get_tsu_rate() to
-account for these facts.
+The GEM IP has two methods for modifying the ptp timer. The first of
+these, named "increment mode", relies on software controlling the timer
+by setting tsu_timer_incr and tsu_timer_incr_sub_nsec and performing
+once-off adjustments via the tsu_timer_adjust register. This is what the
+macb driver uses. The second mechanism, "timer adjust mode" uses the
+gem_tsu_inc_ctrl and gem_tsu_ms signals to control the timer. These
+modes are not intended to be used in parallel, but both can be possible
+on the same device and which mode is used cannot be determined from the
+compatible on all devices, because some users of the GEM IP are SoC
+FPGAs that permit configuring how the IP is wired up.
+
+Add a property to indicate that gem_tsu_inc_ctrl and gem_tsu_ms are wired
+up for timer adjust mode.
 
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ .../devicetree/bindings/net/cdns,macb.yaml        | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 6b37598ac57cd..38e75c2e097bf 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3527,16 +3527,14 @@ static unsigned int gem_get_tsu_rate(struct macb *bp)
- 	struct clk *tsu_clk;
- 	unsigned int tsu_rate;
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index a492357570edd..84c32664ccb0d 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -139,6 +139,12 @@ properties:
+       that need to be filled, before the forwarding process is activated.
+       Width of the SRAM is platform dependent, and can be 4, 8 or 16 bytes.
  
--	tsu_clk = devm_clk_get(&bp->pdev->dev, "tsu_clk");
--	if (!IS_ERR(tsu_clk))
--		tsu_rate = clk_get_rate(tsu_clk);
--	/* try pclk instead */
--	else if (!IS_ERR(bp->pclk)) {
-+	if (!IS_ERR_OR_NULL(bp->tsu_clk)) {
-+		tsu_rate = clk_get_rate(bp->tsu_clk);
-+	} else {
- 		tsu_clk = bp->pclk;
- 		tsu_rate = clk_get_rate(tsu_clk);
- 		dev_warn(&bp->pdev->dev, "devicetree missing tsu_clk, using pclk as fallback\n");
--	} else
--		return -ENOTSUPP;
-+	}
++  cdns,timer-adjust:
++    type: boolean
++    description:
++      Set when the hardware is operating in timer-adjust mode, where the timer
++      is controlled by the gem_tsu_inc_ctrl and gem_tsu_ms inputs.
 +
- 	return tsu_rate;
- }
+   '#address-cells':
+     const: 1
  
+@@ -188,6 +194,15 @@ allOf:
+       properties:
+         reg:
+           maxItems: 1
++  - if:
++      not:
++        properties:
++          compatible:
++            contains:
++              const: microchip,mpfs-macb
++    then:
++      properties:
++        cdns,timer-adjust: false
+ 
+   - if:
+       properties:
 -- 
 2.51.0
 
