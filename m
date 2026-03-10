@@ -1,251 +1,247 @@
-Return-Path: <netdev+bounces-265925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +sjDGzfYr2kLdAIAu9opvQ
-	(envelope-from <netdev+bounces-265925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:37:11 +0100
+	id SP6QLXrYr2kLdAIAu9opvQ
+	(envelope-from <netdev+bounces-265926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36E124761E
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:37:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B616D247672
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D228D3016812
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:37:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D86AB30131B3
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9FA3EDAD9;
-	Tue, 10 Mar 2026 08:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A4340FDB6;
+	Tue, 10 Mar 2026 08:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0Y3DZZx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cI2HDijV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011032.outbound.protection.outlook.com [40.107.130.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F52140B6E8
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773131826; cv=none; b=gYbUR1pqSOSps5VsdgXcs9j9qffi7YjFBSWtHSeTgBKPxobbZAhvhZ++h5iRmO5RSo/RnPfhvp2u7L9bsYilFo/Ui+qTTE6Rp73xheB7qrsUA1HBeCJ95CGJJfkyG7Kyjctyz1AFGCvXFeXYk5rxBWUXySLC177KMBB5fg20j/8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773131826; c=relaxed/simple;
-	bh=SkOW0Me5Mei+6+811W8wfI40/OJEsEajTjQbZP2i/9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VwGADJcOPJYqnEbhLTnS19pGcDG7AFDf2h6coqlNNhQxXuFFH4IN2bVZl0X5uw4hSiW5Sh/QMAubb2/RhNejGJ0R4OWuCnvoWX8XABziCLjnOWcEq4zgdIau9zksa4xqJjVgV62pJSgoTPpZTY/MqXAKQthNgzte6EuQRPIbVeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j0Y3DZZx; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-662e7450a8aso225731a12.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 01:37:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773131824; x=1773736624; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nmp2C2LK1KcB7kS8d+inf4YkPeQ+OioLOT0ROrHIx4Q=;
-        b=j0Y3DZZxqWzBx0w0jrGAC3EzKuM0bm64IyMhsaadSYJRSy9gMDrRpUrtORyP7h/yiT
-         WdNGTx9e6eAoyHsiLMifexwfVePSkN8amSjtZHsZaUTLZsCbpeBpZipYTx+Wn7E27Bex
-         NOFTjlEH+cu3YDMkMfQizQkTJJ0fHuDwcGPMB608+GjpJcyGh3Qe9wFxuDhwoOgLM0Pd
-         yCbC7fOecB2xPGK5H+yeAEIl8PqvX6gslzonNhR5qWxwhBGY7Fk3npb2zKe95yaxx+jh
-         HTXrKS5pyvAFXWe/7aGPOdz2H3PsMLmC/mpyx+pTdofMl21VsKZSnlP+fkGl1X+0h3zl
-         4HGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773131824; x=1773736624;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nmp2C2LK1KcB7kS8d+inf4YkPeQ+OioLOT0ROrHIx4Q=;
-        b=lHsvPqTZ7itGaEmMvmtTCCD78wAK+/5iJ28axmj6n4lCtwswAjg9VrwFys1oNV1Uz2
-         cNYtAgB88r+96+gvJSWW7SI6P3xQUJMuxSK2hMYAzgzwORAUEs7OaH81TQXNkZXM+NIh
-         tjL+DmsuL+NZE7kPcre+0KNy2Ad7bKzwTYcMeknZziiGoOhRKhB68M1TrMc7e6adlHzN
-         bz4ravLv1W8WDqXj8hSenxgvofjfPbM9bBsPT4Zox8FV9XA8/dD9mPvt+a9VA1KBORqT
-         7lcGwmlNv96jk56UDPJm+VbuqPtoVKVXSFeo7JIMLTUQ8rRBRWD6dIK/9JkE0XCsGhw1
-         4nHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyNyZ5yJSEjjwGBa4hpufweuu9AaBq9RVvTo9qX3ySx4ZLNdfr9fu8yktL5nbx96mkeOfx/gs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx66yMDFDoO9lVm/pYmjkLQ2ZltViQ4FASE93GmKT5feQyTjn2E
-	P4YJAWlHAfmqi+Z2yEVvJz5PsvY5oYpHvqKFnfKLyvEC1ryDzKXJVPMn
-X-Gm-Gg: ATEYQzytUkmburjCAjVUrSP8KR932EvOXpqzl6g3iaM3AeosdPYeDoU+iQYVz1Y45Um
-	NnRYIP9lOcySfyoGOJ8P+F0FM9kF57k+LMQbd+omR4xzcdD2S+dtg+xVmB78BXEt/Dt2tyYBIKK
-	3YpARd0ojktOrJ0ccSOHkngB5pKZ1n6u0WpoBDJ6hjk5lROFRWv6LSTi0yLEZ0kkbQ6oc96Naqr
-	l4nWbwNdlwtOYKvdQmPw1Kxqe3OXNp6k0hUrL1tcyMjbdhX0HUBNj+rqWbG6k7vBl+x7+I9aRnf
-	GGfVvxBgZHkgRxSZWDAdxkdQxh/6Otzl0vlqSP4T9sFLPkKNUwD1rGae9LlSqzoLRPw2Ilk9VZt
-	mWZ4kFtlcdZLoHZk38Ty6/eznF0NJAyhkSgUKHVXVJpp0tES5HfK8jHH7myEaVNlaMugNthKSbe
-	LQag9ksDhDbNyJtXwzWzZxAJ+jqNFOZlYGWNoVhUscfqUwOFavaRbD2elZ6fVPBHhzwsSsrtrHC
-	L3UPyuxdBjziqvjku8vwSLzYZKkFbaj0ocAKaIlQvTA2Iqcf7/UeTOQkFQMfVbn+uAHnQQNG2Rp
-	wAcm+VgfTtNkAiLBTZfSvuuHLQ/rzT55Ew==
-X-Received: by 2002:a05:6402:13cb:b0:660:ce49:f6d1 with SMTP id 4fb4d7f45d1cf-6619d53ce70mr7697726a12.30.1773131823379;
-        Tue, 10 Mar 2026 01:37:03 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-661a3e61eb6sm4096796a12.8.2026.03.10.01.37.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Mar 2026 01:37:02 -0700 (PDT)
-Message-ID: <76b3546a-37c5-4dab-9074-4df0cbe48524@gmail.com>
-Date: Tue, 10 Mar 2026 09:37:00 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DCF3EDAD9;
+	Tue, 10 Mar 2026 08:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773131893; cv=fail; b=unljW2e+9JjTACYHMlUI1EXrYpBLVD2t6R/8UC77Lzrxa+9ejbU/K8k7SnllrfKxPp9osbixS7CwF4cCHuAgAlKCS30w5zLK7HY4MIV9gyUN32BdGjPfixQ5qW5aOq2yAI9D7kti7goPor8q/m0QHZsgC1zuPAexp4aFPjXDQuE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773131893; c=relaxed/simple;
+	bh=cQqb0o+x09W/IvCyHAWg0sZFOHLK3BcUhP1r0oYOkIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CgSwAYKpW1nOPxWkYqr/DSZtUXsp9SZRZtDhi6xwqrEKrn7lWpmbGnwYnmkky72ahjM5qmdJvos3TwKJiYbA+PCblHMwjezVKdKaWZPFzaweIVdDybQRALz3tgSIJCPo5VWZDnKnFA2mPAXcDGDtwTWuEK5FovmlPmrcOuxVWzI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=fail (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cI2HDijV reason="signature verification failed"; arc=fail smtp.client-ip=40.107.130.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OR/11+mCfgNKg8r3o/8i0kaJ7O233jzaXp+pyjsDG1K79btBAyyyW/tP3z4RVVoqGmwzZ3xct6emxSiDFNmN6dUC4452oOMd6yJIvCW3eV2pmfi3C2teHibZqrtjHfd8h0LuPshIQW8fr4IBvexeNnedjycnBy63IuhSvogBFDgfdoZcgI988EYBXbdxPl1Zo5emkdns0uHMQyRL0QT0K4WDaMqW0ejdUnlKZrSmn2AL8xjm3jBtgbRc9DwxxqbO04DjMC+AbWHzb6sSdy3J663FWio9j8+95ItUJS+BuKIla8wAdJvoRwJN7BjqoPtLbuFZoROCZhxLNzijEVcdzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4DC/WAtPBttyO3YieGx/3i+uqZRqK9wrBUGkfPza3Tg=;
+ b=yVEAsFhF2xjP1PtHcShjo5vCoJ6YQDqj7VHEgY2pKjx7skLiBuKdLHqQ+a6RS9ZcFbt3f0LT/Hzd+m+IPfaqcYVeb54BvzvoyW7VKD5O4cKnM+2m0WQnaozt5iEgwTXSuTeb/CHoLnc0T/SFKMhEldPpyKMe1EoYGNlsaVMdHboi4NeEONv+nHjt+wEAtQlbse1TKZCPNA4VwdWm9rzOI54msFOa8hW2qr3FDgFttWNbjQrIzJKh5VUGo0CHxpXuBysaVUxyEaq8vYfWkMLXNjQwT2SnL7qRF6hUDeFTEFY3rcV/Er+8krq+7QmDCtjBgrSiycp31KUHGNUpTxVbAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4DC/WAtPBttyO3YieGx/3i+uqZRqK9wrBUGkfPza3Tg=;
+ b=cI2HDijV8u4poMLbMgSAKiqHQYao38kFB6rI6uWM4tWEOov4BdjYDHNY49qQumGNbOMDbUwQQ+LF+xEycN6t78Q3axGv7LH48QEAD9n/jY7FJSTN89awXWBXzhEQcrWEkMLe8TOGrEsLl1JnKM6lqaDrv5GSpSbNWKCz9oKH2Ze73oVH8DzcqGtggc64p4ZDhwqHSv5A5p5e5X8zk25HuUyhm8UYCBYk0NYWQbq9u5xTi7TcU4NN9DveHMoqghNdnamwm3jeySW0/edPjCgrkWUTdolrZx0uqXQnYPpjvDiY0n9zPeU/7M0KoqVgX0Vz5IKfQZLyhAP2O16eQaUtdg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by VI0PR04MB11537.eurprd04.prod.outlook.com (2603:10a6:800:2cb::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.25; Tue, 10 Mar
+ 2026 08:38:03 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9678.023; Tue, 10 Mar 2026
+ 08:38:03 +0000
+Date: Tue, 10 Mar 2026 10:37:52 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Heiko Stuebner <heiko@sntech.de>
+Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com,
+	Sandy Huang <hjc@rock-chips.com>,
+	Andy Yan <andy.yan@rock-chips.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+Subject: Re: [PATCH v3 phy-next 10/24] drm/rockchip: dw_hdmi: avoid direct
+ dereference of phy->dev.of_node
+Message-ID: <20260310083752.ms6u4qpy3snl4h6w@skbuf>
+References: <20260309190842.927634-1-vladimir.oltean@nxp.com>
+ <20260309190842.927634-11-vladimir.oltean@nxp.com>
+ <2218670.OBFZWjSADL@phil>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2218670.OBFZWjSADL@phil>
+X-ClientProxiedBy: WA2P291CA0036.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::9) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 nf-next 5/5] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
-To: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>,
- Simon Horman <horms@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Ido Schimmel <idosch@nvidia.com>, netfilter-devel@vger.kernel.org,
- bridge@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
- Phil Sutter <phil@nwl.cc>, Michal Ostrowski <mostrows@earthlink.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-References: <20260224065307.120768-1-ericwouds@gmail.com>
- <20260224065307.120768-6-ericwouds@gmail.com>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20260224065307.120768-6-ericwouds@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D36E124761E
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|VI0PR04MB11537:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9313eb4b-b391-4082-879f-08de7e8057f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|19092799006|7416014|1800799024|10070799003|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	7zpY0fGF0FZqFMnBqsVHmqIGFfq+MhYwIEKQtvt6B3eHRjhzALOhIpxh9EF6nGj1Iroa+q9xGMzJDP4On1vBSs+mlNE37hLxx202BmTFe4QS2ECrvsGE51Gcg92ciRi+hJ6GhkGUBTDQatmfMFGkCoQuQS5QehVBvh9B23EDX+QWPxS9xdH1y/9gvF/FBK/H8+zOXkgtYel3/47Lq26oKZAq5YMmqeIE9head2wiQtgL4fBQlGsR2uFxMwB89geDucdbLO20kM8rEcel84vcVNGErfur+eT3tyRaZEG8GOwBdQMulQEil+B/imwBpwbnAnFJAQY6rWT6qmgK1/v85+/MSnzsj0MxGYe9gozUmXO+EmKAwUmjc5x7A4Wr/94rtSM9o7z9InmSRfgzchtMmK01UR55Bn1NR55CBrzlGiMbA1hOdUbO/CTgqVoh6jOBxdgQyb7gW+KuwKr/EEaTz+Ba1naftgcIi1DaFqvljdKzsE1ZsdCv41VWF5tsRqjf3l4ySxGrEjrZXKjS7BIRXbr3J7cuNydsuUectf76+TmP1ajQitFbFdz6dhjiHq4J2pF3buSYgtirggdoBhBOw/JHN5Wnz0964H0ScPwdXaJ1UXaxS87oDaNfRo7EsYd7KABIobrT5H81mU6S76WUiXGkSAAj3MbUz2+rs+haJu0C6olfbO69PeJEJZOkuka4fxYrhwRUosPFeRCjbb3uzVEK5ZQ1Fw2XOipZ8UZ953I=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(7416014)(1800799024)(10070799003)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?/X9TwhBn8TlngGFdwqJeM7SRp3oOxjqQHJG3h93PXwdwM0PAsIrwLTb/Q+?=
+ =?iso-8859-1?Q?OTU/u5l1m8PcjtDtbXnSQ7OSTlR96gnL7ogDNAHpHuLNinnGuyaf29tg2y?=
+ =?iso-8859-1?Q?58/xA3TUnhxSgqHXTKm68uF8jiZUbWF3n7Y9cdmE4oKGrOoczYaQyKg9eB?=
+ =?iso-8859-1?Q?jvgtntx1JsG1x5lI6BL1Ljd+jIjIWU/tvUs0Bvm8/VNUfceMY1E/yBjRqH?=
+ =?iso-8859-1?Q?9/ku7pZtj2FFYkVYfZQovOuKNmIbRxEO07Skp9OOVyBbKfKMDf07yq8ldn?=
+ =?iso-8859-1?Q?+Wj44LU5q0AYdarTPlSaCfDhGzkEg+O94xZTgQxFvqNsPuQn1K3f9v3/lV?=
+ =?iso-8859-1?Q?sZq87629tddQm/h3xwSTBr1BEIwkDIRV1LGBJQeY8gvtLI82c8yjNCAd++?=
+ =?iso-8859-1?Q?0mB6+VXoqfnaDt/gahH2kONhmwap//YHpkbEl1QIpAVDwOJDtD/sV6CZBI?=
+ =?iso-8859-1?Q?VRltTEWOiqitXOgBtd9SYMvZZ8/tIS1h5eq4ZZo35ZSv1erJKdBv3vNVev?=
+ =?iso-8859-1?Q?rVugQfmPwZ33kv0pCsfOAIUURU5MIuysxq4umj1egNB0sJy3JbQ3gtH+l/?=
+ =?iso-8859-1?Q?Ae/RgkEkcGqEj5n3NTHuWdlG4b38B7rLTW9FOo/fm7ZNpE80iXGzLcny4R?=
+ =?iso-8859-1?Q?+mUEfpI3jLrEb01ggaQXkZ2ROraXHjsojXHx7PxYxnVCqfoKqAN+0jRKUc?=
+ =?iso-8859-1?Q?ll39zidn+kli2ld9xRSSA2MK08GPDxe3WHXr9xm9bqqyjrKqfHH6+31Cj5?=
+ =?iso-8859-1?Q?cMRGssaxqS2sxhZqd028kq5FP88tGee9yJuLByiaDh6rVY8pJmV5VHnaHm?=
+ =?iso-8859-1?Q?eSaJRFYDwAYr2ozn03EzXV8vqAMrer1dXTWxOT8Fo0mco5KVYgdgEyZrnn?=
+ =?iso-8859-1?Q?iWpnvjtbUSdV2k7E641NSIr3ysaMP+ognJivPUL8J5YBmQMegOFshhBApS?=
+ =?iso-8859-1?Q?ME67nM63aEK691+Ar/h78E0FSF0oYlSH/77kAsalpik/jydjENVrSMWnkv?=
+ =?iso-8859-1?Q?2h4klmgd3EdfsH8s+uQPuWXZGEM9jrP9QZ4Y/9P4TxQR9GgX+jTC+56ulA?=
+ =?iso-8859-1?Q?DBg+9vv+LNzU1kSsatdtGREczrbT2TUD0ONXQmwcV0wVmAfIsu4oyHaVA1?=
+ =?iso-8859-1?Q?eVl82pFfy1/MDdKEigU4OqrvLIB1KYSeCfrcPrdsQCMERCy6F1VoJWDn84?=
+ =?iso-8859-1?Q?n85F76hJ1WJ3lGmj8pvCFicS20DPeCDjYz9SN2rUEgfouT+m5qi4bccPlv?=
+ =?iso-8859-1?Q?1GfJscobDR5VEEz0yJekQreGfOaFt+7mIow64OL7MaXs5Z/oOFNmpPGa7P?=
+ =?iso-8859-1?Q?T4ECeL9sUCwq9RDmlt8g2sYvNd/5i9YPfUC8IlXca8GHsNJAuMy3mA6E/2?=
+ =?iso-8859-1?Q?iNt3x5GZLHcfqVDy/9PJWaFSox3ZiBbaDcUfwm9skOKcc4fyiXmYY2EHJ+?=
+ =?iso-8859-1?Q?Zx3QE7UC0/0NBPnjYug0wOnJ5gWXvh8Dqaj7nB7aYTRcu88q0U6XSt81yi?=
+ =?iso-8859-1?Q?JQs6IOgH1d7txktwluYzDhRNxwlrO2uXDIT6Rof+1E6CXL+O3nHJV+weNS?=
+ =?iso-8859-1?Q?V8CGER6uO5PIB9DKLCNCt8kT3pQTOnh/131tKCkJEb0v8C808G7gL8nuMQ?=
+ =?iso-8859-1?Q?PjYvkD+XSD/iYnvN/tgJsNyInPVL1KUc1Q9wc6h9VvL5/+pR0P9zTnNO9M?=
+ =?iso-8859-1?Q?/gjVf0pvAUPzn9kNEhUEsiz0vZ7nqAnkpX1AzxG6rYmE4egw98vjJ65ZxJ?=
+ =?iso-8859-1?Q?K3bSlNHEH6FRafc+17wIlBFhvEK5QYsfSH5cVV7gnxluV+ogMZWAUHiVqF?=
+ =?iso-8859-1?Q?XlQck/aLilftiqo7q0V6dXubxPq67zRJrCr+n+Aq/5FOnhoC+cg2TUFZDk?=
+ =?iso-8859-1?Q?Xm?=
+X-MS-Exchange-AntiSpam-MessageData-1: Ycz3yQtf/aP+NzPqFzdy0Ogc6SF+HawrRt4=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9313eb4b-b391-4082-879f-08de7e8057f9
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 08:38:03.1560
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EqVT2VgSBkKdIPyFRLndoMcUU0mT8iZiPoQKwY8Q6MPgw+kH+GA1YCWUTG7iTIjZ6W6EfGE76Ztq1MwGKx9K1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB11537
+X-Rspamd-Queue-Id: B616D247672
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [2.14 / 15.00];
+	R_DKIM_REJECT(1.00)[nxp.com:s=selector1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265925-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,vger.kernel.org,blackwall.org,google.com,nvidia.com,lists.linux.dev,davemloft.net,nwl.cc,earthlink.net,lunn.ch];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-265926-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_CC(0.00)[lists.infradead.org,kernel.org,linaro.org,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,microchip.com,rock-chips.com,linux.intel.com,suse.de,gmail.com,ffwll.ch];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:-];
+	NEURAL_HAM(-0.00)[-0.869];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:email,ffwll.ch:email,intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,suse.de:email,rock-chips.com:email]
 X-Rspamd-Action: no action
 
-
-
-On 2/24/26 7:53 AM, Eric Woudstra wrote:
-> In nft_do_chain_bridge() pktinfo is only fully populated for plain packets
-> and packets encapsulated in single 802.1q or 802.1ad.
+On Tue, Mar 10, 2026 at 09:24:43AM +0100, Heiko Stuebner wrote:
+> Am Montag, 9. März 2026, 20:08:28 Mitteleuropäische Normalzeit schrieb Vladimir Oltean:
+> > The dw_hdmi-rockchip driver validates pixel clock rates against the
+> > HDMI PHY's internal clock provider on certain SoCs like RK3328.
+> > This is currently achieved by dereferencing hdmi->phy->dev.of_node
+> > to obtain the provider node, which violates the Generic PHY API's
+> > encapsulation (the goal is for struct phy to be an opaque pointer).
+> > 
+> > Refactor dw_hdmi_rockchip_bind() to perform a manual phandle lookup
+> > on the "hdmi" PHY index within the controller's DT node. This provides
+> > a parallel path to the clock provider's OF node without relying on the
+> > internal structure of the struct phy handle.
+> > 
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > ---
+> > Cc: Sandy Huang <hjc@rock-chips.com>
+> > Cc: "Heiko Stübner" <heiko@sntech.de>
+> > Cc: Andy Yan <andy.yan@rock-chips.com>
+> > Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> > Cc: Maxime Ripard <mripard@kernel.org>
+> > Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> > Cc: David Airlie <airlied@gmail.com>
+> > Cc: Simona Vetter <simona@ffwll.ch>
+> > 
+> > v1->v3: none
+> > ---
 > 
-> When implementing the software bridge-fastpath and testing all possible
-> encapulations, there can be more encapsulations:
+> [...]
 > 
-> The packet could (also) be encapsulated in PPPoE, or the packet could be
-> encapsulated in an inner 802.1q, combined with an outer 802.1ad or 802.1q
-> encapsulation.
+> > @@ -588,13 +589,17 @@ static int dw_hdmi_rockchip_bind(struct device *dev, struct device *master,
+> >  		return dev_err_probe(hdmi->dev, ret, "failed to get phy\n");
+> >  	}
+> >  
+> > -	if (hdmi->phy) {
 > 
-> nft_flow_offload_eval() also examines the L4 header, with the L4 protocol
-> known from the conntrack-tuplehash. To access the header it uses
-> nft_thoff(), but for these packets it returns zero.
+> nit: a comment would be nice here. I.e. hdmi->phy being an opaque pointer
+> so checking hdmi->phy != NULL is not possible.
 > 
-> Introduce nft_set_bridge_pktinfo() to help populate pktinfo with the
-> offsets.
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
->  net/netfilter/nft_chain_filter.c | 55 +++++++++++++++++++++++++++++---
->  1 file changed, 51 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/netfilter/nft_chain_filter.c b/net/netfilter/nft_chain_filter.c
-> index d4d5eadaba9c..66ef30c60e56 100644
-> --- a/net/netfilter/nft_chain_filter.c
-> +++ b/net/netfilter/nft_chain_filter.c
-> @@ -227,21 +227,68 @@ static inline void nft_chain_filter_inet_fini(void) {}
->  #endif /* CONFIG_NF_TABLES_IPV6 */
->  
->  #if IS_ENABLED(CONFIG_NF_TABLES_BRIDGE)
-> +static int nft_set_bridge_pktinfo(struct nft_pktinfo *pkt, struct sk_buff *skb,
-> +				  const struct nf_hook_state *state,
-> +				  __be16 *proto)
-> +{
-> +	nft_set_pktinfo(pkt, skb, state);
-> +
-> +	switch (*proto) {
-> +	case htons(ETH_P_PPP_SES): {
-> +		struct ppp_hdr {
-> +			struct pppoe_hdr hdr;
-> +			__be16 proto;
-> +		} *ph, _ph;
-> +
-> +		ph = skb_header_pointer(skb, 0, sizeof(_ph), &_ph);
-> +		if (!ph) {
-> +			*proto = 0;
-> +			return -1;
-> +		}
-> +		switch (ph->proto) {
-> +		case htons(PPP_IP):
-> +			*proto = htons(ETH_P_IP);
-> +			return PPPOE_SES_HLEN;
-> +		case htons(PPP_IPV6):
-> +			*proto = htons(ETH_P_IPV6);
-> +			return PPPOE_SES_HLEN;
-> +		}
-> +		break;
-> +	}
-> +	case htons(ETH_P_8021Q): {
-> +		struct vlan_hdr *vhdr, _vhdr;
-> +
-> +		vhdr = skb_header_pointer(skb, 0, sizeof(_vhdr), &_vhdr);
-> +		if (!vhdr) {
-> +			*proto = 0;
-> +			return -1;
-> +		}
-> +		*proto = vhdr->h_vlan_encapsulated_proto;
-> +		return VLAN_HLEN;
-> +	}
-> +	}
-> +	return 0;
-> +}
-> +
->  static unsigned int
->  nft_do_chain_bridge(void *priv,
->  		    struct sk_buff *skb,
->  		    const struct nf_hook_state *state)
->  {
->  	struct nft_pktinfo pkt;
-> +	__be16 proto;
-> +	int offset;
->  
-> -	nft_set_pktinfo(&pkt, skb, state);
-> +	proto = eth_hdr(skb)->h_proto;
-> +
-> +	offset = nft_set_bridge_pktinfo(&pkt, skb, state, &proto);
->  
-> -	switch (eth_hdr(skb)->h_proto) {
-> +	switch (proto) {
->  	case htons(ETH_P_IP):
-> -		nft_set_pktinfo_ipv4_validate(&pkt, 0);
-> +		nft_set_pktinfo_ipv4_validate(&pkt, offset);
->  		break;
->  	case htons(ETH_P_IPV6):
-> -		nft_set_pktinfo_ipv6_validate(&pkt, 0);
-> +		nft_set_pktinfo_ipv6_validate(&pkt, offset);
->  		break;
->  	default:
->  		nft_set_pktinfo_unspec(&pkt);
+> With that being a "goal", I assume that information is not widely spread
+> so this would prevent the next developer trying to change it back to
+> "if (hdmi->phy)" while that handling change trickles down.
 
-Just in case, I'm sending a kind and small reminder, before it is too
-late in the cycle.
+Testing the NULL quality of "struct phy *phy" is still possible and legal.
+It means that you called an "optional" variant of phy_get(), and there
+was no PHY.
 
-Regards,
+Just that here, the ultimate intention isn't that. It is to abuse the
+struct phy to get to something completely unrelated to the PHY API.
+I wouldn't have had any problem if there was "just" a hdmi->phy NULL
+pointer check.
 
-Eric
+> apart from that:
+> 
+> Reviewed-by: Heiko Stueber <heiko@sntech.de>
 
+Thanks for the review.
 
