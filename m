@@ -1,180 +1,205 @@
-Return-Path: <netdev+bounces-265950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265951-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNaqHGXer2kzdAIAu9opvQ
-	(envelope-from <netdev+bounces-265950-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:03:33 +0100
+	id 0AvIJMDfr2nkdAIAu9opvQ
+	(envelope-from <netdev+bounces-265951-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:09:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F30247D7D
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:03:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE9A247F69
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3199303180A
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:00:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0FCFE303D5CF
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E48A369990;
-	Tue, 10 Mar 2026 09:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE6C46AF21;
+	Tue, 10 Mar 2026 09:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjfYJGaT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z7Wl+Wt+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69416436377;
-	Tue, 10 Mar 2026 09:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E5543E9C5;
+	Tue, 10 Mar 2026 09:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773133207; cv=none; b=ROjDj0avosEosB3WKwYsQyu+Ih7IOhw6rc63/k/nd0grxd+agCgUPxlemDyuRs/2uLoS2gBi+NoiGmaOL8flccjXeFs/rbDF1Wk7fw75i+AIHFQdWKgb3rrjszWH8NRreZF/M0Kc6u2UEfDj3s6Z3NYAfoGAJHZJFIbESbUzqo4=
+	t=1773133354; cv=none; b=GRLrd6FmDpALb/MK3ut1XyVRBAxMZvTCuwqChBaKSwzgIf+U/CqC2nd2fG60JV7JjQ+Pf8aWeF+x59EK3TJuJtigrprn2jqwBCPguTBSM3uLFRHPM7gWW/XCHVOWsaIKteUFoS2ve1UVmMzhOcLfBhwcDyevxcDl6kLxSgQAGBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773133207; c=relaxed/simple;
-	bh=bx403b/zRrbKVsyudjpDKxSmcDF0O3Ag34b2nfgC1jQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MXMUyk6v+2w1+sE2hHCU6LUzYUyzndqBQqqlmDlvw9VoP9Y4Br+PlOBmvVpckSx+Hm7Sj3FGx++bGoc0ankCZskcfpTwgli+vQPhJy7wVNbBJTNct9RX8SAQ0orFDRPjY3l9Aqkxn5tWvimoR+w7OKuwfp5cAVjgQb+IK8GEU0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjfYJGaT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C31BFC19423;
-	Tue, 10 Mar 2026 09:00:03 +0000 (UTC)
+	s=arc-20240116; t=1773133354; c=relaxed/simple;
+	bh=dyZoKH8XDotOwtrxv1ftKGKj6+/9NDQwSTPynUEi6wA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X9quCxnuZPEP8j8fmkzk7OX1mwXdhyK/yM4a8GGnDqn51D1upJt+kdf03ZXQRIkEZ7LDymoYYjX5e+9sD1q8zvnAQ4bzI60jaMhtqHfrJmUm0uG/uNrkdL4ZjY9WBAXKAAW1IFG7LwcxGACkecLQZlJhp7ZHe/tiV1Yhukfi6Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z7Wl+Wt+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21AE0C19423;
+	Tue, 10 Mar 2026 09:02:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773133207;
-	bh=bx403b/zRrbKVsyudjpDKxSmcDF0O3Ag34b2nfgC1jQ=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=UjfYJGaT36r5iqwTQs5p/a4GzNj9rwUkkMg9ynEkOW22RR+2pXqpRDNFEyLcYuaF/
-	 96fHUBIMf3gtm3BZhPLQk94N703UupLqiwGnPynyLS0HPDe2sdy3W4UhfgtCggHBPF
-	 f0qyIp+JCu5L0hrYwwUqjRp9hnVEVYTImlvXiWeyvG3PR8Hfl5URW5a79xJINbE3u6
-	 aKWWEKvRcwj+IO20svoSOEkoz2wvmoT0YU9B+WUig8a6ZKJy2Oxh9+7kwskYH/etNl
-	 aljrMsFN3suDlT+Bj+TmBWx9oXxXiyH4mnyjDDzPutK5sav2NMnckpXFBBclhSLKyI
-	 BORFHt/xUq/OA==
-Message-ID: <76e2b909-98db-49de-a8eb-f6f0a192f630@kernel.org>
-Date: Tue, 10 Mar 2026 10:00:01 +0100
+	s=k20201202; t=1773133354;
+	bh=dyZoKH8XDotOwtrxv1ftKGKj6+/9NDQwSTPynUEi6wA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Z7Wl+Wt+VvjrSQxXCnMiOg9eFoexHeAJCd9CBue3j/Xm20VQ7OrVrOgLExrUWVt4+
+	 Bxgd4XoH49SGxgcLJA4R28P/ymZl0WJfW+i9ZQCJ94gpF1r5/IF+I0luzFJEYigUph
+	 EFrWeE0I1JHQyMC+3hsIa72BS6kwe4YNgqKeNxxHkI3X7uV9O5Fa/V0K6itA1Sjy7U
+	 n8pW2QZPW/ksl0nGUAQbxiuVOBpY375Uf93DtNZ9ER1nWfXBgTqOZbSmefu/IZYPaa
+	 NL+whxGsACY76k5ni9twbvqhtDLOqdcmhnbDTb17t/gWMm/5sS98d9vgTg0OsW4BTZ
+	 Dy7E5ek3BS47g==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Valentin Spreckels <valentin@spreckels.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	gregkh@linuxfoundation.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-5.15] net: usb: r8152: add TRENDnet TUC-ET2G
+Date: Tue, 10 Mar 2026 05:01:33 -0400
+Message-ID: <20260310090145.2709021-33-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260310090145.2709021-1-sashal@kernel.org>
+References: <20260310090145.2709021-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-From: Jiri Slaby <jirislaby@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>, Matthieu Baerts <matttbe@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx>
- <87v7f61cnl.ffs@tglx> <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
- <87pl5ds88r.ffs@tglx> <0ae4d678-5676-4523-bae3-5ad73b526e27@kernel.org>
- <87eclsrtqg.ffs@tglx> <e846cb5f-65c4-4a9b-9f9b-593e4af526d8@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <e846cb5f-65c4-4a9b-9f9b-593e4af526d8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19.6
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F0F30247D7D
+X-Rspamd-Queue-Id: 7EE9A247F69
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265950-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265951-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MAILSPIKE_FAIL(0.00)[172.234.253.10:query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,spreckels.dev:email]
 X-Rspamd-Action: no action
 
-On 10. 03. 26, 9:56, Jiri Slaby wrote:
-> Thomas,
-> 
-> On 10. 03. 26, 9:09, Thomas Gleixner wrote:
->>     2) task is not longer in the task list w/o going through do_exit()
-> 
-> After a quick look (I have to run now, so I could be completely wrong): 
-> what about the task is not in the list *yet*. You use RCU -> 
-> for_each_process_thread(), so there could be a race with attach_pid() 
-> protected by tasklist_lock.
+From: Valentin Spreckels <valentin@spreckels.dev>
 
-Not attach_pid(), that's irrelevant here.
+[ Upstream commit 15fba71533bcdfaa8eeba69a5a5a2927afdf664a ]
 
-But one line below in copy_process(): list_add_tail().
+The TRENDnet TUC-ET2G is a RTL8156 based usb ethernet adapter. Add its
+vendor and product IDs.
 
-> thanks,
+Signed-off-by: Valentin Spreckels <valentin@spreckels.dev>
+Link: https://patch.msgid.link/20260226195409.7891-2-valentin@spreckels.dev
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## Analysis
+
+### What the commit does
+
+This commit adds USB vendor and product IDs for the TRENDnet TUC-ET2G
+USB ethernet adapter (vendor ID `0x20f4`, product ID `0xe02b`) to the
+existing `r8152` driver. The device uses the RTL8156 chipset, which is
+already fully supported by the driver.
+
+### Changes
+
+1. **`include/linux/usb/r8152.h`**: Adds `#define VENDOR_ID_TRENDNET
+   0x20f4`
+2. **`drivers/net/usb/r8152.c`**: Adds `{ USB_DEVICE(VENDOR_ID_TRENDNET,
+   0xe02b) }` to the device table
+
+### Stable kernel criteria
+
+- **New device ID to existing driver**: This is a textbook example of
+  the "NEW DEVICE IDs" exception explicitly listed in stable kernel
+  rules. The r8152 driver already exists in all stable trees, and the
+  RTL8156 chipset is already supported.
+- **Obviously correct**: Two lines — a vendor ID define and a device
+  table entry.
+- **No risk of regression**: Adding a USB device ID cannot break
+  existing functionality. It only enables matching for a new device.
+- **Small and contained**: 2 lines of actual change across 2 files.
+- **Fixes a real problem**: Without this, users with TRENDnet TUC-ET2G
+  adapters cannot use them with the r8152 driver (the device won't be
+  claimed).
+
+### Risk assessment
+
+**Zero risk.** This is the most minimal possible change — adding
+identifiers so the kernel recognizes a device. No code paths are
+changed, no logic is modified.
+
+### Verification
+
+- Confirmed `VENDOR_ID_TRENDNET` is a new define not previously in the
+  header by examining the diff context showing the existing vendor IDs.
+- The RTL8156 chipset support already exists in the r8152 driver (the
+  driver handles RTL8152/8153/8156 variants).
+- The change pattern matches dozens of similar device ID additions that
+  are routinely backported to stable (e.g., other vendor IDs already in
+  the table: Lenovo, Linksys, NVIDIA, TP-Link, D-Link, Dell, ASUS).
+- No dependencies on other commits — this is fully self-contained.
+
+**YES**
+
+ drivers/net/usb/r8152.c   | 1 +
+ include/linux/usb/r8152.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 6b107cf5f37bd..9eda892beb1f8 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10062,6 +10062,7 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_DLINK,   0xb301) },
+ 	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
+ 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
++	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
+ 	{}
+ };
+ 
+diff --git a/include/linux/usb/r8152.h b/include/linux/usb/r8152.h
+index 2ca60828f28bb..1502b2a355f98 100644
+--- a/include/linux/usb/r8152.h
++++ b/include/linux/usb/r8152.h
+@@ -32,6 +32,7 @@
+ #define VENDOR_ID_DLINK			0x2001
+ #define VENDOR_ID_DELL			0x413c
+ #define VENDOR_ID_ASUS			0x0b05
++#define VENDOR_ID_TRENDNET		0x20f4
+ 
+ #if IS_REACHABLE(CONFIG_USB_RTL8152)
+ extern u8 rtl8152_get_version(struct usb_interface *intf);
 -- 
-js
-suse labs
+2.51.0
 
 
