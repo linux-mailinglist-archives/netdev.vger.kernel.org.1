@@ -1,225 +1,272 @@
-Return-Path: <netdev+bounces-266118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cG57MrwhsGmCgAIAu9opvQ
-	(envelope-from <netdev+bounces-266118-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:50:52 +0100
+	id wD9SCCgesGlBgAIAu9opvQ
+	(envelope-from <netdev+bounces-266122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:35:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBD6250E18
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:50:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C2F250736
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 14A7D35BFF67
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:56:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D92EE347673C
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93AF3B47EA;
-	Tue, 10 Mar 2026 12:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F0F3BC664;
+	Tue, 10 Mar 2026 12:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qf6uGOi7"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="vbwNsLxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238813B38A9
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 12:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773144830; cv=pass; b=SQi6sF0Nc76tsN+QeTI36kDwuMoV1+StYeUkqoFTPWmGP1jnDjL9DbtE8DP4KhwFWDxl6PGyvT/xzB/vx5bBQxI3migvUE3ABEOkdeSQJahwKygOqNxtraewezMtbRIoJgBgFZ2NYnIwWIofugmRoU5rQ2MKLPgspKb6T9ixb88=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773144830; c=relaxed/simple;
-	bh=oBWHWl4oFG4ctqngCJNsL2W/w/X/y+8sHCgAIJblmFk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bwSoXUm2IfQFULTw2DM10aqvnw489Zh+2hS5aDMa5KVaSfCuIC+fl3kjqqavjJv0XEmUeNwyC+cXr4edIEBnOoels1q3ANqNQND9xr1NPhKYEzIPYgiyN6fWsdPpTAmewcUhD6qHGisjMaDJKX6NcjC9kkv6pFumcDErgPYV8v8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qf6uGOi7; arc=pass smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-89a0d53f3d1so84744956d6.3
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 05:13:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773144828; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cxt3sgonDV7wS1AoUtBb4TykEYJPlmUnIGZo0/3Wf1yNJrz5HXFVWPHFiBQitRT01M
-         IhQleb3Qayvl+pIGVHeXd+Jlr7yb2DCeaKhckdSM1xBorH/iokuLIbDMMR0Fdw1YAIfq
-         wpFYa77ZMbz54a7Z5L0uSkVXmtsDZW1JpGvkD5W4+yboE8MUV46Jy/VkJ6cEQEKA9ga0
-         Px3QtjNxOsSFHv6x/1lwD0mvk1OGqVjGws0YQYTt/l+RYozv7BoGy+gDesiqmqa3kVvh
-         ZM/VSgsaS+FRi9JmlSFzcfO+Z5qsqIgKKbQjs9pTY+E93/02cKyFGCGJs0RHh/riufPO
-         QEfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=aNlD1VnwwuWUuVdK0r+JEQho3gk9Img94yEEgNc2T2Y=;
-        fh=SpShyiDWPc+68xSBqGS8z3Zg9LktsyTAiqJxmANsk00=;
-        b=I8Y+F2u4vU5G/VoD2nnsNnRWA2VuJpiuUeGWGmA+FJDfl20aVkBVORFHKpv86uri8g
-         TV3CKJJ5F4ZM/3oRfii3ua3Nck3Gwx9AGD8h5KZPgZ1pOrnNVCYyvH8nspkJ9qFSfLog
-         5+SQ8TMjXvnTVHtde4hWwKtYcXPu1VzPY6y84QF3dHdRPOAP4x7SGd5BQm6vYPOIEtLl
-         KglBoA3rvBBgDoeLrxojIKOVKZ1xbwMjWrr3wYZsjA+9jSHzOoacc6II0dNIRqgcosk0
-         FJ/7aTXb4EI/qaQdGlm9St/RP6cgrwIWZV4mCCCseOADQbxuCFAk+p184OirZIjvq81g
-         q0eg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773144828; x=1773749628; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aNlD1VnwwuWUuVdK0r+JEQho3gk9Img94yEEgNc2T2Y=;
-        b=Qf6uGOi7YDhTAg2wqxZ2yfGHJ4hzAHx8ToJNEw3pxlLhDTBJbvjvysxSb7Z7xPwoko
-         V12L0oqtIM23astGiRTGta2bljIhDOuSI15VR3mN0qN14HcAWhni34g6E09MApOPR5q7
-         oAaaAMBDGNoYYMxAlZqPl1gRS6xl4isMN44PcNxmagXTeMC8jpNjYaXK3n/hnLthiTwE
-         U+XACYDeQyVL/NypQuRjBhLmAUaWxeCmZmpoRAUT0gQYsIFsayo0jHH8OLt2Nzhg9/g9
-         v4jIZwG1WKVlAStQWkO1QmpeCo3arE63uTEUoCV2eeag8nqtLbvyeiD6RQhOmL5XxUJQ
-         HY1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773144828; x=1773749628;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aNlD1VnwwuWUuVdK0r+JEQho3gk9Img94yEEgNc2T2Y=;
-        b=jcgPXXCObiQ7Xo4+OPjwUR06FkAIi9QMikDhk5EChfmya/l+Kn/XoiWClG59WjQXcY
-         eEOf/VQBqr8+FGD/Yrf9RVsnXd/ezs1B/C1c6YyheZUr9PfhrfQQFoWH0YNbnAe0Z+2Z
-         86UbhBgSUKqlV16lLtskQUyCC8zizjowEA6cT67TZ4kLun5vlOY2b2ovGF50tXr7ANTh
-         OLMd3WdabGEAqdRRy7Q9qxRlo8ZLIntO//QwzbT49/qb6rrRZWi0O3+MaIid8KxOXTJR
-         01gV8O4NKIMTO+f77T7poRJnJWVafVFLm1MsRsfsrQBnQtRBf6jBwMGliVYQ2hcdRjef
-         j9pw==
-X-Gm-Message-State: AOJu0Yw6lMhQDzSgz9BstaBmZanwLPqYCtTz5G/vdf3SEwZqRfWMEjNw
-	ZHtHFdWTbVG06F2VR7Xv968+YbRxRTLTgOm6A6JUR6EhS4hMKy0Hc4lMVmzHYjdCVyKEUNadHpZ
-	CLUtYU5FI3378fIS0ZBwzmZCJTIzvIUlNM1sK7XK4
-X-Gm-Gg: ATEYQzwzfQEUUTgg8RWhB990ZhJkoR2mYkFoo3d2cncNijcijJ4WqijiOQ+QfRADLXz
-	PxjHqno6qnaS8CfmbvDp5Y/pVPpJJlMSyXMBeJ3/GqnYGkUXvLHKwZm89oHoAVyiWhc5eFSMSS9
-	Leb918kPnYszsZbu/qbo2wewjw5vP1fN/XhQNoNyzm0C0xSpvHzDLbAdRw83fRSzobNohVmTfGu
-	9LP1Yvm78Hnx8IZuPWPOXIyVgAbsUWIwaijhWbce0Nbi0ncUEm8Gl/yVniBE8KVpqypw/YCmYUD
-	hRq1YjU=
-X-Received: by 2002:a05:6214:d08:b0:899:c803:ca2f with SMTP id
- 6a1803df08f44-89a30ace932mr206169286d6.42.1773144827562; Tue, 10 Mar 2026
- 05:13:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBBF38D696;
+	Tue, 10 Mar 2026 12:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773145058; cv=none; b=JiDwH9zWZzFXyuC3+2z7R3ir84ZzQI/IQNpCAOU1mgUmmFt5h8/Gb8cw7shhfbsrXLaa5PNXnWEKvhKfTEzrjfA/WuGy9RMWhutwxZYOP1ov7g2V8OLmTf3ljZXE7im4+1y9bgFNUgMsBSRcwIy6lhuQc2oOpk0nVm1NykHcDc0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773145058; c=relaxed/simple;
+	bh=MVAorFwASedMUQdlRsrssouaBR0ncU3LBy/pU1ACdEg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OoBGbbiTxHc6/ha/+cPa8bL84EbMhPBl2tj1ukceK/fT611UV57vg694Hk/qZK62HbVmPR7amlEKFn59yPlHJ0M6+XLtpxCacNqhcE+LV9MQzYSbWNlTz3jciiN+8pfKYSJt3EwoOglAx8e69KHz8kM9ENw7in3uVv8Ko9AwZCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=vbwNsLxe; arc=none smtp.client-ip=148.163.152.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354653.ppops.net [127.0.0.1])
+	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62A8xuEP1367922;
+	Tue, 10 Mar 2026 12:17:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	default; bh=yrMvraipRnMkORyFOvU3Oml7ZdrKvDGYUgiDs6XOkFs=; b=vbwN
+	sLxeQCoYwp2+OIKQEb6fM8s74m428M3b6xQE/hdMH8DWNdF/0rujZdIzzYN7BNlZ
+	DgM3HGyuwpPqdmXFo7jTctibYCfFKFZG8xfRvUM/Bj4rTGRvwViZpsyy4vQ8c7rC
+	zG3BY1dBAupoUYtwQDqOJtFZ9pZkip0PipUomd6zFrUlAmPfnt4selycLA3xc0P5
+	mmfa4BlX9msvS819il1sXqauwof9L3EiDd1Sn+22meSKI4kXxK3l5dnubg2h2ep0
+	5GndgMluRofoWgsOrl3lrrzBHXkDMbrtWsW582RXClwPXV9+ULgrTMIz4qeWywju
+	HEPqV5FlNGC5d1Vz0w==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4crxykgynp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Mar 2026 12:17:07 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 10 Mar 2026 12:17:01 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <eddyz87@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+        <daniel@iogearbox.net>, <davem@davemloft.net>, <edumazet@google.com>,
+        <haoluo@google.com>, <horms@kernel.org>, <john.fastabend@gmail.com>,
+        <jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-open-source@crowdstrike.com>, <martin.lau@linux.dev>,
+        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
+        <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next v4 1/2] bpf: Support new pointer param types via SCALAR_VALUE for trampolines
+Date: Tue, 10 Mar 2026 23:16:59 +1100
+Message-ID: <20260310121659.25801-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <c4f4e99f83a98179c3413dd7afe5e7e73a98e4d3.camel@gmail.com>
+References: <c4f4e99f83a98179c3413dd7afe5e7e73a98e4d3.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310120053.136594-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260310120053.136594-1-jiayuan.chen@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 10 Mar 2026 13:13:36 +0100
-X-Gm-Features: AaiRm50qCXqay-aJR-sI5Vzv5JmvJjTgCTUtA-sXdrVxWvAsiISg39w7gsRzpcw
-Message-ID: <CANn89iK-Kj7Gthff+Q8vSUDTYs9t6YZepm5uAv_2ZZJ4AkyxOw@mail.gmail.com>
-Subject: Re: [PATCH net v3] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>, 
-	syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1EBD6250E18
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: 04WPEXCH012.crowdstrike.sys (10.100.11.82) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-GUID: muf0gwpN1ymRFua10pBAXBtTyZj5PPg1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEwMDEwNiBTYWx0ZWRfX9rflOR7IFCrl
+ 21yIma0F3kFVahtBclWfwzZlWpUjCPemhbo/tINRuUODJLKM+FFZdufvJxZmhCfLNOKz46+BCTP
+ SjqGpRntpcuue3NTMs50t9Sb1MxWM/XKdZEsdiM3x9pSTVawLZjDlD6YBFTFsrQQn2zubbYGPmP
+ ZeuSGKGWkNlItQfF/iCwEGTCZnly7pkNEmlV0hJYGwklx2BvewIyOotQZnI+UPFnpDHLTlGn/vU
+ xP3vTU73KcLUcnmeAZ9jAILPjun090IzM2PmPUiI9eUnvDdAA6cwXxT4CE7PB17wQX9KkP9Qs0Q
+ RNpLsNNsUV3+kYhILzU2r8VeapNUzcA4/Y9wik+aTGLlPwD4ztcZGnCxIs+BCB6Bge3zkxMpCGh
+ qtk3cmtTeENZKA2Jo8Z3eq4qq4IJGAiOr9tx0y5toBQPzV0QXBpaTwB8vCliWD85mr/GCte3DvI
+ rEvRpIT7V1YESrV51Jw==
+X-Proofpoint-ORIG-GUID: muf0gwpN1ymRFua10pBAXBtTyZj5PPg1
+X-Authority-Analysis: v=2.4 cv=M7FA6iws c=1 sm=1 tr=0 ts=69b00bc3 cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=GCXdLZfFv8EKBZhKOxZ5:22 a=NEAV23lmAAAA:8
+ a=3kasHXYAN1gmPJuvoZgA:9
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11724
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2603100106
+X-Rspamd-Queue-Id: 96C2F250736
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266118-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,gmail.com,crowdstrike.com,linux.dev,redhat.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-266122-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,827ae2bfb3a3529333e9];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,shopee.com:email,linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:dkim,crowdstrike.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 1:01=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
->
-> Syzkaller reported a panic in smc_tcp_syn_recv_sock() [1].
->
-> smc_tcp_syn_recv_sock() is called in the TCP receive path
-> (softirq) via icsk_af_ops->syn_recv_sock on the clcsock (TCP
-> listening socket). It reads sk_user_data to get the smc_sock
-> pointer. However, when the SMC listen socket is being closed
-> concurrently, smc_close_active() sets clcsock->sk_user_data
-> to NULL under sk_callback_lock, and then the smc_sock itself
-> can be freed via sock_put() in smc_release().
->
-> This leads to two issues:
->
-> 1) NULL pointer dereference: sk_user_data is NULL when
->    accessed.
-> 2) Use-after-free: sk_user_data is read as non-NULL, but the
->    smc_sock is freed before its fields (e.g., queued_smc_hs,
->    ori_af_ops) are accessed.
->
-> The race window looks like this:
->
->   CPU A (softirq)              CPU B (process ctx)
->
->   tcp_v4_rcv()
->     TCP_NEW_SYN_RECV:
->     sk =3D req->rsk_listener
->     sock_hold(sk)
->     /* No lock on listener */
->                                smc_close_active():
->                                  write_lock_bh(cb_lock)
->                                  sk_user_data =3D NULL
->                                  write_unlock_bh(cb_lock)
->                                  ...
->                                  smc_clcsock_release()
->                                  sock_put(smc->sk) x2
->                                    -> smc_sock freed!
->     tcp_check_req()
->       smc_tcp_syn_recv_sock():
->         smc =3D user_data(sk)
->           -> NULL or dangling
->         smc->queued_smc_hs
->           -> crash!
->
+On Tue, 03 Mar 2026 16:38:57 -0800, Eduard Zingerman wrote:
+> On Wed, 2026-03-04 at 11:22 +1100, Slava Imameev wrote:
+> > On Tue, 03 Mar 2026 14:43:01, Eduard Zingerman wrote:
+> > > On Wed, 2026-03-04 at 08:49 +1100, Slava Imameev wrote:
+> > > > On 2026-03-03 20:05 UTC, Eduard Zingerman wrote:
+> > > > 
+> > > > > > @@ -6902,11 +6921,7 @@ bool btf_ctx_access(int off, int size, enum bpf_access_type type,
+> > > > > >               }
+> > > > > >       }
+> > > > > > 
+> > > > > > -     /*
+> > > > > > -      * If it's a pointer to void, it's the same as scalar from the verifier
+> > > > > > -      * safety POV. Either way, no futher pointer walking is allowed.
+> > > > > > -      */
+> > > > > > -     if (is_void_or_int_ptr(btf, t))
+> > > > > > +     if (is_ptr_treated_as_scalar(btf, t))
+> > > > > >               return true;
+> > > > > 
+> > > > > I'm probably missing a point here, but what's wrong with Alexei's
+> > > > > suggestion to do this instead:
+> > > > > 
+> > > > >         if (is_ptr_treated_as_scalar(btf, t))
+> > > > >                  return true;
+> > > > > ?
+> > > 
+> > > Uh-oh, I copy-pasted the wrong snippet, sorry.
+> > > The correct snippet is:
+> > > 
+> > >          if (btf_type_is_struct_ptr(btf, t))
+> > >                   return true;
+> > > 
+> > > With it the selftests pass (except for `float` tests noted earlier).
+> > > And regardless of selftests, the code below this point will
+> > > error out if `t` is not a pointer to struct.
+> > 
+> > I think you tested with
+> > 
+> > 	if (!btf_type_is_struct_ptr(btf, t))
+> > 		return true;
+> > 
+> > I decided on a narrower condition, as
+> > 
+> > - if (!btf_type_is_struct_ptr(btf, t)) -
+> 
+> Yes, sorry again.
+> 
+> > changes the existing selection condition from "treat only these types
+> > as scalar" to "treat as scalar any type that is not a pointer to
+> > structure". Technically both approaches cover the problem I'm trying
+> > to solve - multilevel pointer support for structures, but the latter is
+> > open-ended and changes the current approach, which checks for pointers
+> > to int and void. So I'm extending this to int, void, enum 32/64,
+> > function, and corresponding multilevel pointers to these types and
+> > multilevel pointers to structures.
+> 
+> BTF is defined for the following non-modifier types:
+> - void        [allowed already]
+> - int         [allowed already]
+> - ptr         [multi-level pointers allowed by your patch]
+> - array       [disallowed?]
+> - struct      [single level pointers allowed already,
+> - union		   multi-level allowed by your patch]
+> - enum/enum64 [allowed by your patch]
+> - func_proto  [allowed by your patch]
+> - float       [disallowed]
+> 
+> And a few not reachable from function fields (I think BTF validation
+> checks that these can't be met, but would be good to double-check.
+> If it doesn't, it should):
+> - func
+> - var
+> - datasec
+> 
+> So, effectively you disallow reading from tracing context fields of
+> type: struct (non-pointer), array, float and a few types that can't be
+> specified for struct fields.
+> 
+> Does not seem necessary, tbh.
 
+I verified whether PTR->FUNC, PTR->DATASEC, PTR->VAR can be passed to
+btf_ctx_access() in the current mainline.
 
+I added helpers that inject PTR->FUNC, PTR->DATASEC, PTR->VAR as pre or
+post calls to btf_check_meta(). In all cases, the BPF program load
+failed with errors "arg0 type FUNC / DATASEC / VAR is not a struct",
+which indicates that btf_check_meta() can indeed be called with
+PTR->FUNC, PTR->DATASEC, PTR->VAR.
 
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index 9e6af72784ba..8b3eabcdb542 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -342,8 +342,7 @@ static inline void smc_init_saved_callbacks(struct sm=
-c_sock *smc)
->
->  static inline struct smc_sock *smc_clcsock_user_data(const struct sock *=
-clcsk)
->  {
-> -       return (struct smc_sock *)
-> -              ((uintptr_t)clcsk->sk_user_data & ~SK_USER_DATA_NOCOPY);
-> +       return (struct smc_sock *)rcu_dereference_sk_user_data(clcsk);
->  }
+If the condition for pointer check is changed to
+`if (!btf_type_is_struct_ptr(btf, t))`, these BPF programs will load
+successfully with arguments set to scalar().
 
-Are you sure all smc_clcsock_user_data() callers  hold rcu_read_lock() ?
-In order to avoid surprises, I would have added a new helper.
+Do we accept this change in behavior?
 
- static inline struct smc_sock *smc_clcsock_user_data_rcu(const struct
-sock *clcsk)
-...
+Test case with invalid BTF types injection:
+https://github.com/slava-at-cs/bpf/commit/c49af6500ace4e4aceee01c570e3b067aae7e48c
 
-to allow gradual conversion ?
+Branch:
+https://github.com/slava-at-cs/bpf/commits/inject-invalid-btf/
 
-Thanks !
+To run test:
+./vmtest.sh -- ./test_progs -t verifier_btf_ctx_access
+
+The verifier log:
+=============
+0: R1=ctx() R10=fp0
+; asm volatile ("					\ @ verifier_btf_ctx_access.c:85
+0: (79) r2 = *(u64 *)(r1 +0)
+func 'bpf_fentry_test_invalid_ptr_func' arg0 type FUNC is not a struct
+invalid bpf_context access off=0 size=8
+processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+=============
+
+=============
+0: R1=ctx() R10=fp0
+; asm volatile ("					\ @ verifier_btf_ctx_access.c:85
+0: (79) r2 = *(u64 *)(r1 +0)
+func 'bpf_fentry_test_invalid_ptr_func' arg0 type DATASEC is not a struct
+invalid bpf_context access off=0 size=8
+processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+=============
+
+=============
+0: R1=ctx() R10=fp0
+; asm volatile ("					\ @ verifier_btf_ctx_access.c:85
+0: (79) r2 = *(u64 *)(r1 +0)
+func 'bpf_fentry_test_invalid_ptr_func' arg0 type VAR is not a struct
+invalid bpf_context access off=0 size=8
+processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+=============
 
