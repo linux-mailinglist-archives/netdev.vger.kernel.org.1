@@ -1,138 +1,174 @@
-Return-Path: <netdev+bounces-266157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDJ3NOYtsGlHgwIAu9opvQ
-	(envelope-from <netdev+bounces-266157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:42:46 +0100
+	id QK0jEhkpsGn/ggIAu9opvQ
+	(envelope-from <netdev+bounces-266158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:22:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41598252472
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:42:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A091B251CE0
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6E5DC30AA063
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:38:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EEBB23252DB5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E03239935E;
-	Tue, 10 Mar 2026 13:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DF729B78D;
+	Tue, 10 Mar 2026 13:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbboZny9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEWdewDM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D893928504D;
-	Tue, 10 Mar 2026 13:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F81240DFD6;
+	Tue, 10 Mar 2026 13:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773149642; cv=none; b=Gk9ySCD5/rAR5Gy3RzZ4VZBJ5YdQkLjvYY3CnURVP6azsDNuNLXl67L7AwfaW+kFIVmAg69qVzOEqgj1SgEicJMOH+W8Zq7YP/hG3GghJRlD42iVd8OxXSxWs9zv9sYp0gHdLV4jeOoeLIJgn3eLZThMvzq+Cl9pzD19ix1SKk0=
+	t=1773150065; cv=none; b=KsS5L+hvZJTb6W+ulKfG2vRe7TCdEQ+Nycw5iWKPLW5ems6GYGYMfvJ9zKApaKce5DNDPJl9PZwST1gjDCS0nCc8ZxL54zfrY6E+q167b7WZd9lVuKm7IunkZt1L0bGF4FBsEl2dngxXauV1qnFh4ubb915e9A4YRR+nfxZKmeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773149642; c=relaxed/simple;
-	bh=1YnmztTcNk3Ff+PgeiUurE/Sk941AjWRBcXze9NtmZ0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CTaqG6Qbuu27oteze+zxysGBNFSZ/btmMioft52nvKI7u8kDplNmtazy1wXjbYOnW6IAfyvScHf9HGoQcVC8rXKgOTP1RaAYz/MfYZtaBiOdpXgFIo/Pnx9zFBqS3PnIPl2BT7kNJblGVTah+KTbnSiLxbJ+eXQdz8NNZ0MSxtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbboZny9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1338AC19423;
-	Tue, 10 Mar 2026 13:33:50 +0000 (UTC)
+	s=arc-20240116; t=1773150065; c=relaxed/simple;
+	bh=qbgnKzVcS1o1VStyI7L/zkZ6zpEX5bZzA1ksRGojxGI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lER1xhtH0ndXi2kMeqpbilf29L6F6wJf7Q1XO51AhXbj1sCRPkiS2x10NqbM2N56iRdWAwRMAuyCjjqKd9A0JQklGMjql2CQ6WcbAtrpsnz5UX+kSCo59UIDlpBlyEjg9uHXWavCV0FX9RF19BQ5WZps3MLxJ+WByOjudYSmsSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEWdewDM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3A1FC19423;
+	Tue, 10 Mar 2026 13:41:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773149641;
-	bh=1YnmztTcNk3Ff+PgeiUurE/Sk941AjWRBcXze9NtmZ0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=gbboZny9vDD72Pka+n0iXs0baByjKbSZoFC4cppvyGvi6DURLPzP7/PURy6H4x0SE
-	 hZcTDQvWtiIR96dUWEkTSxfg7YW1/icauTRQtPPhn3DjatNJnXXgx9ePr2EFS/J1xE
-	 m2MZHJen8/8vAxVjX4Rh0mvAwOneBCTEICPjlkx0jZOCBN/iedVV5+9QBqwIzFk1vO
-	 tVOWY5YqoR5nPBwka2P8esnXtwU65aqvGrom7R8xo/zbp7HcZsAU1Ct1Z6jDsVgPm9
-	 q6q+cosYNG9tKwHqU9XoTXUFgoVy3XzQYbAwRSYwrOvATdzUAyZiFt5O4W3gYPYlF6
-	 gVdqFVkFvSybA==
-From: Lee Jones <lee@kernel.org>
-To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
- bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
- dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
- linux-mips@vger.kernel.org, linux-mm@kvack.org, 
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org, 
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
- Philipp Hahn <phahn-oss@avm.de>
-Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>
-In-Reply-To: <20260310-b4-is_err_or_null-v1-51-bd63b656022d@avm.de>
-References: <20260310-b4-is_err_or_null-v1-51-bd63b656022d@avm.de>
-Subject: Re: (subset) [PATCH 51/61] leds: Prefer IS_ERR_OR_NULL over manual
- NULL check
-Message-Id: <177314963081.2226692.3105447886678957300.b4-ty@kernel.org>
-Date: Tue, 10 Mar 2026 13:33:50 +0000
+	s=k20201202; t=1773150065;
+	bh=qbgnKzVcS1o1VStyI7L/zkZ6zpEX5bZzA1ksRGojxGI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vEWdewDMen/xIHS5TiUjI92QmfH3h0hi+05LmgExXH6fgoZhCKNaUs/s7Ak7BU6Fo
+	 VjJCB/a6bYO8OaghG603XHNma/JCzcNwsz4PCywUpD+/+bB5EyCouSmP8UcEcsLrvY
+	 STRA7ZfTim97BM/x+8kp5BMYmzrKaNKHoBI1baduz1Kw7iH9UlB38GoCXT5MfAjQ1J
+	 R1w4os3N3R8uQl11+5aK/2AJhNRWumCXV25nvW+HUugCEKpRnuAu+Hf+uUFelJlBT0
+	 IKD44jyMLQVNIT5UaSuvnxI5TZKAPykFFDTB5CY1q6PM4eB8b5cHv5Afx4czqDTaOq
+	 IuIZR4qCk5jsA==
+Message-ID: <a5cabf68-df88-4a5e-8075-bb10debc44f7@kernel.org>
+Date: Tue, 10 Mar 2026 14:40:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.15-dev-52d38
-X-Rspamd-Queue-Id: 41598252472
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Content-Language: fr
+To: Thomas Gleixner <tglx@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Cc: Jiri Slaby <jirislaby@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
+ =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
+References: <87v7f61cnl.ffs@tglx>
+ <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org> <87pl5ds88r.ffs@tglx>
+ <0ae4d678-5676-4523-bae3-5ad73b526e27@kernel.org> <87eclsrtqg.ffs@tglx>
+ <e846cb5f-65c4-4a9b-9f9b-593e4af526d8@kernel.org>
+ <76e2b909-98db-49de-a8eb-f6f0a192f630@kernel.org> <878qc0rofr.ffs@tglx>
+ <874imorobw.ffs@tglx> <4cad1b9a-e157-427b-9896-cf54cf6fba36@kernel.org>
+ <20260310115433.GV1282955@noisy.programming.kicks-ass.net>
+ <87y0jzrhqn.ffs@tglx>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <87y0jzrhqn.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: A091B251CE0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266157-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266158-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[56];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, 10 Mar 2026 12:49:17 +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
-> 
-> Change generated with coccinelle.
-> 
-> 
+On 10/03/2026 13:28, Thomas Gleixner wrote:
 
-Applied, thanks!
+(...)
 
-[51/61] leds: Prefer IS_ERR_OR_NULL over manual NULL check
-        commit: e68f95a51d1a8c1594b536c4d495cbea38d47561
+> I've updated the debug patch and removed the @users conditionals so it
+> keeps searching. So it should find that magic 73.
 
---
-Lee Jones [李琼斯]
+It looks like it does, thank you! I just tried this new debug patch, and
+I managed to boot 100 times without issues, while before I was getting
+it after max 20 attempts. I left the test running to boot up to 1000
+times, just in case.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
