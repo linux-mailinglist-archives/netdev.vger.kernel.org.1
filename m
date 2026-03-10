@@ -1,217 +1,196 @@
-Return-Path: <netdev+bounces-266194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266195-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJpWFN42sGkKhQIAu9opvQ
-	(envelope-from <netdev+bounces-266194-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:21:02 +0100
+	id YEjkHT07sGmDhQIAu9opvQ
+	(envelope-from <netdev+bounces-266195-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:39:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1648253369
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:21:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE2B0253BFF
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E47D3043FB9
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:47:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E56303127861
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5BF2DC76C;
-	Tue, 10 Mar 2026 14:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3F22E5B09;
+	Tue, 10 Mar 2026 14:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dx24Uj8h"
+	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="kFimgvjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E9323A564
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E9C2C1593
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773154037; cv=none; b=pTY9BNKmE4vjKEZsDzr57yfZD6H8ivCCvbTcjeXVJuKX0VHQNRkMH15ZVZ59lO6l3rj1jP2/vYN3FT/Ezj+6Nus+JaAYJAKFLKfIP9dq75pxpB9KmNr1WVn9BC/v4m6B5bXAXk809SNCGxG1WzFhLRfjVynu+AWFtDbaREBzvIc=
+	t=1773154199; cv=none; b=A8E+Q0grllQTRySgoif94z5Cvt8uecKq1yqRfdOCuQ4HIm/EeUBTKObWLJfYncngq65s5IXeGUXSEthdPzpxiGHFA/Vyme9t9HQHn5sSVMeRbxGNlHqRlaXWHV7mPTT+dB3HuLx3TnBUtnoUkuy6xqs96Tks+Zb4NJaLatecuNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773154037; c=relaxed/simple;
-	bh=BfbSFgreWiIQp6vhNWoyJ3zBM1Hl+T/lGWmkHzyJQyM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pFpQBnVrPe9P4ZV9ZpmcLCkgFWNELfv1vMqnRZfp0Cgfuo5P/gh3XKIBDRaaP6RPYO0b5XdS4A0RwqaUce4644UytEc7aK9aYSxuTU2KEwALLkERoP/D9zZp12/zjudb4I5mL6n++f29rIwDgJvgNArdhW7JZ6dCmOwU4WMbMnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dx24Uj8h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1CFDC19423;
-	Tue, 10 Mar 2026 14:47:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773154037;
-	bh=BfbSFgreWiIQp6vhNWoyJ3zBM1Hl+T/lGWmkHzyJQyM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Dx24Uj8hsLn46ThSQMA2cMAwMvcFgW5G41kDLuikgo5F+QsEFhhHVscq6NeVDMHvp
-	 GGBcIhYHAhdDdMkKRA0zL7abaq/VYSAV1gBBsCH6PwMb0evo/CPo/Opu+E8LGGpIB1
-	 wist/aS+MXSMsSTU+AVDZAtINkF1C9cDWRPObFv6atdC6tiRoTsA+cmjxH6lz2eiyh
-	 jlZGfnd9sGePZoDs7JwJOqry1PnFkMr2VvlC/HpI4dskFBRZiXIi+WTN2sAw6DWr+Y
-	 xH7jzhefqrZTaFluiQbqjGkd9LpQ4DX3lbBQKTMKnY29428YOJqaM96ljIS2K+mhWt
-	 ulM2UB5hHdSCw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 10 Mar 2026 15:46:53 +0100
-Subject: [PATCH net-next] net: airoha: select QDMA block according LAN/WAN
- configuration
+	s=arc-20240116; t=1773154199; c=relaxed/simple;
+	bh=13jB3skXnb5EoZzjoQzU/fhx4l/QhJ5tkm1Lflfm9fU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=rrpKPeLy3h8k2s8WKkFQNtUSjBxZbtrBpbf++7LbxifQllpYLlj/VJYjfqMJrfx0YKlZJlRukow/XxF4H2z7WGpgY+EMjBV7V0gt8IzfSg86FAlI8KcLo2kjjdnrkPJcVSsjrb2vlmXgAgNwII//fDSASp7k0CouEpxANZwjw/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=kFimgvjb; arc=none smtp.client-ip=72.215.153.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
+Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id AAjhizxPZdQdYoiz; Tue, 10 Mar 2026 10:49:55 -0400 (EDT)
+X-Barracuda-Envelope-From: tonyb@cybernetics.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
+X-ASG-Whitelist: Client
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
+	bh=JkzEqSuC74Jdlgasu8EnJvmuHduzqhrT8S9uzS665EM=;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:Cc:To:From:
+	Content-Language:Subject:MIME-Version:Date:Message-ID; b=kFimgvjb5hURiTvL2/9p
+	Rz1VN9lA2KzKkE1uKCxQ7JAFUVaZ2gQZPCmgBxH9DolyOA6CqwSD0r3sdnaCw8U+7JUjhfWDUJJ/4
+	hcZcukosyKaVwUA2Mnw2laMrt6COMmUuOpOH6Ew4MyenGjyMEeaBLK7T7eu6IdZJWRM6vX2UY4=
+Received: from [10.157.2.224] (HELO [192.168.200.1])
+  by cybernetics.com (CommuniGate SPEC SMTP 8.0.5)
+  with ESMTPS id 14452593; Tue, 10 Mar 2026 10:49:55 -0400
+Message-ID: <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
+Date: Tue, 10 Mar 2026 10:49:55 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-airoha-qdma-lan-wan-mode-v1-1-64ec74dea872@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MsQqEMBAFf0W2diEmYOGviMViXnRBEy+BU5D8+
- 4Urpphi5qWCrCg0dS9lfLVoik2GvqN1l7iB1Tcna+xo3GBYNKdd+ONP4UMi340zefDovLMWCAi
- OWn5lBH3+63mp9Qdg8uBtagAAAA==
-X-Change-ID: 20260310-airoha-qdma-lan-wan-mode-63d322eefef3
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: A1648253369
+User-Agent: Mozilla Thunderbird
+Subject: Re: Long delay in freeing skbs
+Content-Language: en-US
+X-ASG-Orig-Subj: Re: Long delay in freeing skbs
+From: Tony Battersby <tonyb@cybernetics.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, eric.dumazet@gmail.com,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>
+References: <20251106202935.1776179-1-edumazet@google.com>
+ <20251106202935.1776179-3-edumazet@google.com>
+ <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
+ <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
+ <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com>
+ <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
+ <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com>
+In-Reply-To: <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Barracuda-Connect: UNKNOWN[10.10.4.126]
+X-Barracuda-Start-Time: 1773154195
+X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
+X-Barracuda-BRTS-Status: 1
+X-Virus-Scanned: by bsmtpd at cybernetics.com
+X-Barracuda-Scan-Msg-Size: 3219
+X-ASG-Debug-ID: 1773154195-1cf43940a6c7700001-BZBGGp
+X-Rspamd-Queue-Id: BE2B0253BFF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[cybernetics.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[cybernetics.com:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[cybernetics.com:+];
+	TAGGED_FROM(0.00)[bounces-266195-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266194-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[tonyb@cybernetics.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Select the QDMA block used to send the traffic to host cpu according to
-LAN/WAN port confiugration:
-- QDMA0 is used for LAN devices
-- QDMA1 is used for WAN devices
+On 3/9/26 17:47, Tony Battersby wrote:
+> On 3/9/26 17:24, Eric Dumazet wrote:
+>> On Mon, Mar 9, 2026 at 10:18 PM Tony Battersby <tonyb@cybernetics.com> wrote:
+>>> On 3/9/26 17:07, Eric Dumazet wrote:
+>>>> On Mon, Mar 9, 2026 at 10:00 PM Tony Battersby <tonyb@cybernetics.com> wrote:
+>>>>> I have some out-of-tree code that was broken by commit e20dfbad8aab
+>>>>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
+>>>>> retested with 7.0-rc3 with the same results.  I'm not sure if the change
+>>>>> in behavior that I am seeing is expected or if it is a bug, so I thought
+>>>>> I would ask.  Omitting irrelevant details, my kernel code does the
+>>>>> following:
+>>>>>
+>>>>> 1) allocate a buffer
+>>>>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
+>>>>> 3) wait for the I/O to complete
+>>>>> 4) wait for the buffer page refcounts to drop back to their values for
+>>>>> idle I/O
+>>>>> 5) reuse the buffer for more I/O
+>>>>>
+>>>>> Step 4 is necessary in this case due to some of those irrelevant details
+>>>>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
+>>>>> seems to keep the page refcounts elevated long after the I/O has
+>>>>> completed (hours or longer), presumably because the deferred skb free
+>>>>> isn't happening for a long time.  So:
+>>>>>
+>>>>> 1) Is this long delay expected, or is this a bug?
+>>>>>
+>>>>> 2) If the delay is expected, is there a way for me to force the network
+>>>>> system to process the deferred skb frees on request?  e.g. write to a
+>>>>> file in /sys, or call a kernel function to flush the deferred frees?
+>>>>>
+>>>>> Worst case is that I can redesign my code to kfree() the buffer if it is
+>>>>> busy and allocate a new one, and let the old buffer be freed
+>>>>> asynchronously when the skb is freed at some indeterminate time in the
+>>>>> future.
+>>>>>
+>>>>> Thanks,
+>>>>> Tony Battersby
+>>>> If you are using zero copy, please look at:
+>>>>
+>>>> Maybe you should make sure your code is compatible with it.
+>>>>
+>>>> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
+>>>> Author: Eric Dumazet <edumazet@google.com>
+>>>> Date:   Mon Feb 16 19:36:53 2026 +0000
+>>>>
+>>>>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
+>>>>
+>>>>     After the blamed commit, TCP tx zero copy notifications could be
+>>>>     arbitrarily delayed and cause regressions in applications waiting
+>>>>     for them.
+>>>>
+>>> The I/O is being sent by a userspace program via the SCSI generic driver
+>>> (drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't see
+>>> any mention of zero copy in iscsi_tcp.c.
+>> Set /proc/sys/net/core/skb_defer_max to 0 ?
+> Thanks; I should have grepped the docs harder.
+>
+> That seems to work if I do it before sending the I/O but not after the
+> I/O has completed.  So I presume it would decrease performance?
+>
+> Tony
+>
+I found a workable solution.  When my code finds an elevated page
+refcount, it does the following:
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 18 ++++++++----------
- drivers/net/ethernet/airoha/airoha_eth.h |  1 +
- 2 files changed, 9 insertions(+), 10 deletions(-)
+for_each_online_cpu(cpu) {
+	kick_defer_list_purge(cpu);
+}
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 3e9ec5c178f86fdd055e079078a23461edf97951..b4563b5d53bbf174d45548a5efc6fdfb79d33c19 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1754,11 +1754,13 @@ static int airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
- static int airoha_dev_init(struct net_device *dev)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
--	struct airoha_qdma *qdma = port->qdma;
--	struct airoha_eth *eth = qdma->eth;
-+	struct airoha_eth *eth = port->eth;
- 	u32 fe_cpu_port;
- 	u8 ppe_id;
- 
-+	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
-+	port->qdma = &eth->qdma[!airoha_is_lan_gdm_port(port)];
-+	port->dev->irq = port->qdma->irq_banks[0].irq;
- 	airoha_set_macaddr(port, dev->dev_addr);
- 
- 	switch (port->id) {
-@@ -1782,7 +1784,7 @@ static int airoha_dev_init(struct net_device *dev)
- 		}
- 		fallthrough;
- 	default: {
--		u8 qdma_id = qdma - &eth->qdma[0];
-+		u8 qdma_id = port->qdma - &eth->qdma[0];
- 
- 		/* For PPE1 select cpu port according to the running QDMA. */
- 		fe_cpu_port = qdma_id ? FE_PSE_PORT_CDM2 : FE_PSE_PORT_CDM1;
-@@ -2866,11 +2868,10 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- }
- 
- static int airoha_alloc_gdm_port(struct airoha_eth *eth,
--				 struct device_node *np, int index)
-+				 struct device_node *np)
- {
- 	const __be32 *id_ptr = of_get_property(np, "reg", NULL);
- 	struct airoha_gdm_port *port;
--	struct airoha_qdma *qdma;
- 	struct net_device *dev;
- 	int err, p;
- 	u32 id;
-@@ -2901,7 +2902,6 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 		return -ENOMEM;
- 	}
- 
--	qdma = &eth->qdma[index % AIROHA_MAX_NUM_QDMA];
- 	dev->netdev_ops = &airoha_netdev_ops;
- 	dev->ethtool_ops = &airoha_ethtool_ops;
- 	dev->max_mtu = AIROHA_MAX_MTU;
-@@ -2913,7 +2913,6 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	dev->features |= dev->hw_features;
- 	dev->vlan_features = dev->hw_features;
- 	dev->dev.of_node = np;
--	dev->irq = qdma->irq_banks[0].irq;
- 	SET_NETDEV_DEV(dev, eth->dev);
- 
- 	/* reserve hw queues for HTB offloading */
-@@ -2934,7 +2933,7 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	port = netdev_priv(dev);
- 	u64_stats_init(&port->stats.syncp);
- 	spin_lock_init(&port->stats.lock);
--	port->qdma = qdma;
-+	port->eth = eth;
- 	port->dev = dev;
- 	port->id = id;
- 	eth->ports[p] = port;
-@@ -3034,7 +3033,6 @@ static int airoha_probe(struct platform_device *pdev)
- 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
- 		airoha_qdma_start_napi(&eth->qdma[i]);
- 
--	i = 0;
- 	for_each_child_of_node(pdev->dev.of_node, np) {
- 		if (!of_device_is_compatible(np, "airoha,eth-mac"))
- 			continue;
-@@ -3042,7 +3040,7 @@ static int airoha_probe(struct platform_device *pdev)
- 		if (!of_device_is_available(np))
- 			continue;
- 
--		err = airoha_alloc_gdm_port(eth, np, i++);
-+		err = airoha_alloc_gdm_port(eth, np);
- 		if (err) {
- 			of_node_put(np);
- 			goto error_napi_stop;
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 59ed7569f7c33620ea694ec52384a37e1917eaf8..8cfa94ec084a16d6b2d3c94c404f25904c1150e3 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -533,6 +533,7 @@ struct airoha_qdma {
- 
- struct airoha_gdm_port {
- 	struct airoha_qdma *qdma;
-+	struct airoha_eth *eth;
- 	struct net_device *dev;
- 	int id;
- 
+And that seems to take care of it, and it pushes the extra overhead to
+the slow path.
 
----
-base-commit: 89fe91c65992a37863241e35aec151210efc53ce
-change-id: 20260310-airoha-qdma-lan-wan-mode-63d322eefef3
+Thanks for your help!
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+Tony Battersby
 
 
