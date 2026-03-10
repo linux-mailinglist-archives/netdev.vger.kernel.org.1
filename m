@@ -1,85 +1,84 @@
-Return-Path: <netdev+bounces-265913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265915-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDrEKrjMr2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:08 +0100
+	id QCNGEPPMr2nWcAIAu9opvQ
+	(envelope-from <netdev+bounces-265915-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:49:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2578C2469C2
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9AB2469DF
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 251E830B55DE
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:47:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D246E304B8F1
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3067F36212D;
-	Tue, 10 Mar 2026 07:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B1A363C5F;
+	Tue, 10 Mar 2026 07:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+RGhi4f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gow9+562"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57C4361670
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A385362123
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773128822; cv=none; b=nqZ9YIm6st9LbzqRWywx5S1t5+aVkhurqk0ddXIuzTL2f1SOwP8gCiq6eZv7YgChnVmJw+w322cBaYz8GJrhqGeosX4tiGrKcv372PTzcr5fihkzITW7TlZOeELUPh5FE8FARbOr1v31tqz4cNi0hdM5WsrxnAjMomzGumZt0hA=
+	t=1773128828; cv=none; b=tJrHJv3SuR7XDTuuYwutaTfQoeNnqUpW6dPWfNipIoM+OBEUUHSdnMAl9kuWoyyDwsQvgyUiNCUnjLMqbwJ4G5Wvo8eM3tWjlFLORQ4jOmr7KDk2csOhDKN+XjtZLn7qIjL2zG/yYeSoCkiEjJx+pIKahJF3DZNYRwyo+8iwHWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773128822; c=relaxed/simple;
-	bh=ckIN5ASkuNOY9pUfpsVNZbSyJ16scvuiSr26ig8bsBM=;
+	s=arc-20240116; t=1773128828; c=relaxed/simple;
+	bh=bXnDNSFidNz36SeGMTKr9aEsO9Td+iPTz2QUPB6xp3c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lLiAmcaIXZmV/d31y/7FstpLwgt21WwV5V32u1OaSJjIp5UdaIaHyHcSEJb/89EhJ9noU8XIVGLHVqn9lvrhw6nlrfgnhT/LITct6g2Vhca8epLO+0p6OgUI8yDjV7QgxuY337YDzogl9c43sBv7ZhcJgTXIokPhDjJFBNaMM8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P+RGhi4f; arc=none smtp.client-ip=209.85.216.47
+	 In-Reply-To:To:Cc; b=ed3OHTWTrrFWnuX1luCunFXup8WF/P/XkdiATzGMy9p1EpyYnjgM/RZH7nApxjv0IVec2Hrwg0JYtQ2lIGg/v7IJEyHaOi1f3qTJc2fY4rz3MqmeZgEVRJQLUVp0+Jki8h1XczWE20N8UV04LicqZUAeT0yjABjT7415S8bSVss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gow9+562; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3599019ae92so4992088a91.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:47:00 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-359f8502ea8so65537a91.2
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:47:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773128820; x=1773733620; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773128826; x=1773733626; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=djyy+9DJ7NGUH5/yQnciZZwbkw5XEWCb6BieiKG0OKc=;
-        b=P+RGhi4fJv0WuGJifLYhB3BxBwXFLt5xBL5YYWH6dBHzWt+sixle3rMvsmTVptqP0C
-         no+jzpzltm6GldEddudb84pYSUqs+4AlhWgZ18t5QD07ALcUbmeYCQS7wMsSSYtxGIEt
-         zxFJ17TFlJ4lj8850XF+E2D9B4l0RLcJYHddcMRuisajbFMfY+J7k/Np1oxUYLEoeI18
-         roTcNXkDSwIx0SPC1hgcUZr3TF9W9wzJvp0lTKmNlH7e5QYKuAP7ItfUQT2lVjLVEhQV
-         ZS1gj0W/nS1cn/kMvXMh40ewEP4OGvs/Up3MLkHbTQsu3LzsrwhWGsMhiIgRHHgSHQwH
-         lKDg==
+        bh=3MrEEXv7Xy2jJrXRIKwxLssaRaTIm50HmDgCOhNMffI=;
+        b=Gow9+562BFRpy9U2GY8TssgH+Gaw7cOuYfzpcHt/I9pTfBraDfXUoMpUslObZ9eBQG
+         YUGImjaSUqlb9txAuu/rxdFyx5Kl4B+xQLu6gr9T6oMvmiw5dS2HULs3moEFFbASS6aT
+         /CBAEwLpm/3xJsJZRGwT4zIdAGPo4+Mreu0zucrYPQszeGNQHm3Gdt9y6MfDNTToR6KE
+         oKLqlF3kuP8zYPf99UQE70vYW15bpnWp6ODajaOg1ma+MEGtjXUfGTAzU5TnuCMd6Cmd
+         XKCNBIun0VDfKe8rTVNNMFPa1yxSOBES4x7JwuRHRiBbbwCZ4voHn2rpFy2UUd+A8FTp
+         GV3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773128820; x=1773733620;
+        d=1e100.net; s=20230601; t=1773128826; x=1773733626;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=djyy+9DJ7NGUH5/yQnciZZwbkw5XEWCb6BieiKG0OKc=;
-        b=guG7TI4PcrV5JlNDoMBaVtO0aMyDjt89Y3OzfUgaYf5Q9ldVPPwrcX/Kt3KILilM/5
-         dii7u6by8Tn/btSlkwVMIxGZnr64zR91FxLftvvfLK+XwkR6QcSM0RFaxRVsscKGq2bM
-         +ad1xEQHeW4wzvHcsFafaZ1M3i6BQkM6Mo7yGcZaptFSZRaFxqMQh+Dpu9hxwvt+rw14
-         h5Nr3j3kJqUeqJVtCbGZFkKKK5+6U0sx/NfsWMyQtv6+I7Ajk7KRqmRa50FhtCIcP4iU
-         lldVsOIgpW8ogWKjsJdY4CyXKhpjPVQy0Q/ao8kdfX922IZiMB5Cq2C28GOHi0kROtZd
-         2bUQ==
-X-Gm-Message-State: AOJu0YyUseJ5pEPDTB0jL32Yrun0u+zeZPVf7BsR4cDE/olByopBXVWs
-	q1oM3LwRWG0EUFHt2XnxRSTZvqn0NsvkmXg4KCzf0kN1w0FhXHQsWkVN
-X-Gm-Gg: ATEYQzy0T+EOIw/H6OPtix5yckSmImvqkRNmjTKXMi8aG3svORpF8u682NaY9wi0Jca
-	dnZfRTzYqRH4MOFZkb/KhZZvc2kyAOQhMJX8lOVywOqTC5cE0W9E75vCHQD0jJuoUQnP3sXq3KV
-	FWupG4W/j5ANPOV77Wt+czk9lfk+T6AOABy7sPFRR/0ArPWRs0G8egm3ym7k4WxV5aLZDTr8xvS
-	El82UBYdy+JS668yQCJCritsN83Bis9MZk5SyWjzHsXv4gvkQ8UrN38T1sUoxwtFVTQy8sGCFtp
-	yaVs+/3HYKQCAhIgu9ggVaY7ASNRxreAaRe+erRQSZdW8MY9J8dVzjK8Inmpt4oN7NBSr/8t4SJ
-	3BblTJfMcX0mAcDTiKyCfxKde5pHF3Y9iSmiE1FQCMbDZEHy1AqdLgjL1GcJ1DtO5Oeq1GdB0Hd
-	RhmtFk8xmYA3Ds6xU3frYiyNclK3mKivD7tZOPe0iGZsD29veVZEw/SKXDruCnc/roL1YppyRYT
-	GdI9SsO7VJDsoI8CzuUhWtU4HFYpItXZjrcTEPOxJE=
-X-Received: by 2002:a17:90b:3a4b:b0:359:7fe6:7e5 with SMTP id 98e67ed59e1d1-359be30aee2mr10825721a91.24.1773128819911;
-        Tue, 10 Mar 2026 00:46:59 -0700 (PDT)
+        bh=3MrEEXv7Xy2jJrXRIKwxLssaRaTIm50HmDgCOhNMffI=;
+        b=WfLrbYV02OfhQ9Qtu6w9PlOfxcu6awhqaBkqJEnXATfpczQH8jn5DX76JCtcenLJVo
+         JaR1gR8X/N+K1TE+sUigX9y2d6/13nWNsba0gz3kdfPUjyKK1X97KjJLh53jeUGFWWaD
+         LhSigYOub4rL5AmCrl9SzD+8p2HiFlb6JGO5tbAWyaIGFKJd8MmrNBYPWYRpdKm8yt3S
+         gBev5MZOKr3VKnKXeOXTcJZKZ9r4uhzMYbl4+BnpyT7r7xPLYaksgBqGNWYJHTOsAyV8
+         xo0WoQfTDZJw1jCKiiKDZMPP9EZFsVOSaexP7oPlmJD/uBYOz2GRJBUpO4K2vYfh+TPb
+         VdKg==
+X-Gm-Message-State: AOJu0YxD3FwYthAae06lD4XgABOVlnJWFPIQpb9CY33X1W1zDSTOgUYn
+	iksRwEXIWJJBTATqWUWFDoy5R4RzKPoqa8XXZCiAYtYqRYVzhN621Qgh
+X-Gm-Gg: ATEYQzyjKKhl8WBOAmLketoNcM66/V0JAonXX6nb1Sy6YXBig/6ekvyMoyvHnj+bJ1+
+	3ZV0ofyl1H50Aiqnim256dI1YBIF8Omjs7MagiPQedWKUqATGxHnFw2uDwR6XXt4YgaFjXPZa/N
+	m67Khpm9+EyvoEkis/v+skXMcjXcZCljNJkyhtjNe2x6kX1lSD5VtI8H37B65bb3By3puroz0Mq
+	xxMEkTMyOuZBovA66Mwv5qX11ZpvgmGl1yPV3Aph8D6opm028DUvPBiSbEp+S3n4/ZogC6SphdO
+	HnPWceJ1HhoBhyOy0PNIP8SsLIlUfs19v+Cnzjf8cn20911aEinR/9PNqnHAMYFqPhq4HyuuFi4
+	WZSstR09E7Lv09JMwFoG+snsBsF+TsmpNDtuCeIcLZrjMJM9UPxBJ6X8uMDeGAYWF9FA4C9F5hC
+	L5tCqebnX2qjBbB00D8BYwTBDYQEtlU3ACulb/U9KObaIKpZ/3PtbTtpuQqi6Ft1erlOihnZqht
+	tNeP3WhbhGTcoxSbBYDOfcIJxYateG1Ly2C4CIMSqI=
+X-Received: by 2002:a17:90b:5252:b0:359:9bad:13d9 with SMTP id 98e67ed59e1d1-359be29eea6mr12832642a91.15.1773128826073;
+        Tue, 10 Mar 2026 00:47:06 -0700 (PDT)
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359bc7ef38csm7260607a91.2.2026.03.10.00.46.54
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359bc7ef38csm7260607a91.2.2026.03.10.00.47.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 00:46:59 -0700 (PDT)
+        Tue, 10 Mar 2026 00:47:05 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Tue, 10 Mar 2026 15:45:06 +0800
-Subject: [PATCH net-next 2/3] failover: use ndo_set_features for failover
- offload compute
+Date: Tue, 10 Mar 2026 15:45:07 +0800
+Subject: [PATCH net-next 3/3] net: no need to disable LRO specifically
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-offload_compute-v1-2-3df79c09ea65@gmail.com>
+Message-Id: <20260310-offload_compute-v1-3-3df79c09ea65@gmail.com>
 References: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
 In-Reply-To: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
 To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -100,7 +99,7 @@ To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  bridge@lists.linux.dev, Hangbin Liu <liuhangbin@gmail.com>
 X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 2578C2469C2
+X-Rspamd-Queue-Id: AE9AB2469DF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -111,7 +110,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265913-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265915-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -133,150 +132,87 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Convert net_failover to use the ndo_set_features callback and calls
-netdev_compute_master_upper_features() to compute new offload flags
-during slave registration/unregistration.
-
-This simplifies the failover code significantly by removing the custom
-feature computation logic and relying on the centralized feature update
-mechanism. The callback is automatically invoked during feature updates
-when upper/lower device links change.
+In commit "net: use ndo_set_features to set offload features for
+bonding/bridge/team" we called netdev_change_features() in
+__netdev_upper_dev_link(), which will disable LRO automatically on lower
+device if upper device doesn't have LRO enabled. So we don't need to
+dev_disable_lro() again after netdev_upper_dev_link().
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- drivers/net/net_failover.c | 67 ++++++----------------------------------------
- include/net/net_failover.h |  7 -----
- 2 files changed, 8 insertions(+), 66 deletions(-)
+ drivers/net/bonding/bond_main.c | 3 ---
+ drivers/net/team/team_core.c    | 3 ---
+ net/8021q/vlan.c                | 2 --
+ net/bridge/br_if.c              | 2 --
+ net/hsr/hsr_slave.c             | 1 -
+ 5 files changed, 11 deletions(-)
 
-diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
-index d0361aaf25ef..10041a271bf5 100644
---- a/drivers/net/net_failover.c
-+++ b/drivers/net/net_failover.c
-@@ -300,6 +300,12 @@ static int net_failover_vlan_rx_kill_vid(struct net_device *dev, __be16 proto,
- 	return 0;
- }
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 4d32b06079ee..5b117acb1138 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2177,9 +2177,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 	}
+ #endif
  
-+static int net_failover_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, true);
-+	return 0;
-+}
-+
- static const struct net_device_ops failover_dev_ops = {
- 	.ndo_open		= net_failover_open,
- 	.ndo_stop		= net_failover_close,
-@@ -312,6 +318,7 @@ static const struct net_device_ops failover_dev_ops = {
- 	.ndo_vlan_rx_kill_vid	= net_failover_vlan_rx_kill_vid,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_features_check	= passthru_features_check,
-+	.ndo_set_features	= net_failover_set_features,
- };
- 
- #define FAILOVER_NAME "net_failover"
-@@ -373,61 +380,6 @@ static rx_handler_result_t net_failover_handle_frame(struct sk_buff **pskb)
- 	return RX_HANDLER_ANOTHER;
- }
- 
--static void net_failover_compute_features(struct net_device *dev)
--{
--	netdev_features_t vlan_features = FAILOVER_VLAN_FEATURES &
--					  NETIF_F_ALL_FOR_ALL;
--	netdev_features_t enc_features  = FAILOVER_ENC_FEATURES;
--	unsigned short max_hard_header_len = ETH_HLEN;
--	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
--					IFF_XMIT_DST_RELEASE_PERM;
--	struct net_failover_info *nfo_info = netdev_priv(dev);
--	struct net_device *primary_dev, *standby_dev;
+-	if (!(bond_dev->features & NETIF_F_LRO))
+-		dev_disable_lro(slave_dev);
 -
--	primary_dev = rcu_dereference(nfo_info->primary_dev);
--	if (primary_dev) {
--		vlan_features =
--			netdev_increment_features(vlan_features,
--						  primary_dev->vlan_features,
--						  FAILOVER_VLAN_FEATURES);
--		enc_features =
--			netdev_increment_features(enc_features,
--						  primary_dev->hw_enc_features,
--						  FAILOVER_ENC_FEATURES);
--
--		dst_release_flag &= primary_dev->priv_flags;
--		if (primary_dev->hard_header_len > max_hard_header_len)
--			max_hard_header_len = primary_dev->hard_header_len;
--	}
--
--	standby_dev = rcu_dereference(nfo_info->standby_dev);
--	if (standby_dev) {
--		vlan_features =
--			netdev_increment_features(vlan_features,
--						  standby_dev->vlan_features,
--						  FAILOVER_VLAN_FEATURES);
--		enc_features =
--			netdev_increment_features(enc_features,
--						  standby_dev->hw_enc_features,
--						  FAILOVER_ENC_FEATURES);
--
--		dst_release_flag &= standby_dev->priv_flags;
--		if (standby_dev->hard_header_len > max_hard_header_len)
--			max_hard_header_len = standby_dev->hard_header_len;
--	}
--
--	dev->vlan_features = vlan_features;
--	dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL;
--	dev->hard_header_len = max_hard_header_len;
--
--	dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
--	if (dst_release_flag == (IFF_XMIT_DST_RELEASE |
--				 IFF_XMIT_DST_RELEASE_PERM))
--		dev->priv_flags |= IFF_XMIT_DST_RELEASE;
--
--	netdev_change_features(dev);
--}
--
- static void net_failover_lower_state_changed(struct net_device *slave_dev,
- 					     struct net_device *primary_dev,
- 					     struct net_device *standby_dev)
-@@ -550,7 +502,6 @@ static int net_failover_slave_register(struct net_device *slave_dev,
+ 	res = netdev_rx_handler_register(slave_dev, bond_handle_frame,
+ 					 new_slave);
+ 	if (res) {
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 4906ea3717b1..73d4f68a7ccd 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -1191,9 +1191,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		goto err_enable_netpoll;
  	}
  
- 	net_failover_lower_state_changed(slave_dev, primary_dev, standby_dev);
--	net_failover_compute_features(failover_dev);
- 
- 	call_netdevice_notifiers(NETDEV_JOIN, slave_dev);
- 
-@@ -621,8 +572,6 @@ static int net_failover_slave_unregister(struct net_device *slave_dev,
- 
- 	dev_put(slave_dev);
- 
--	net_failover_compute_features(failover_dev);
+-	if (!(dev->features & NETIF_F_LRO))
+-		dev_disable_lro(port_dev);
 -
- 	netdev_info(failover_dev, "failover %s slave:%s unregistered\n",
- 		    slave_is_standby ? "standby" : "primary", slave_dev->name);
+ 	err = netdev_rx_handler_register(port_dev, team_handle_frame,
+ 					 port);
+ 	if (err) {
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index 2b74ed56eb16..fda3a80e9340 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -193,8 +193,6 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
+ 	vlan_group_set_device(grp, vlan->vlan_proto, vlan_id, dev);
+ 	grp->nr_vlan_devs++;
  
-@@ -736,7 +685,7 @@ struct failover *net_failover_create(struct net_device *standby_dev)
- 	/* Don't allow failover devices to change network namespaces. */
- 	failover_dev->netns_immutable = true;
- 
--	failover_dev->hw_features = FAILOVER_VLAN_FEATURES |
-+	failover_dev->hw_features = MASTER_UPPER_DEV_VLAN_FEATURES |
- 				    NETIF_F_HW_VLAN_CTAG_TX |
- 				    NETIF_F_HW_VLAN_CTAG_RX |
- 				    NETIF_F_HW_VLAN_CTAG_FILTER;
-diff --git a/include/net/net_failover.h b/include/net/net_failover.h
-index b12a1c469d1c..f0f038d113a0 100644
---- a/include/net/net_failover.h
-+++ b/include/net/net_failover.h
-@@ -30,11 +30,4 @@ struct net_failover_info {
- struct failover *net_failover_create(struct net_device *standby_dev);
- void net_failover_destroy(struct failover *failover);
- 
--#define FAILOVER_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_FRAGLIST | NETIF_F_ALL_TSO | \
--				 NETIF_F_HIGHDMA | NETIF_F_LRO)
+-	netdev_update_features(dev);
 -
--#define FAILOVER_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_RXCSUM | NETIF_F_ALL_TSO)
+ 	return 0;
+ 
+ out_unregister_netdev:
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index 030248bc94c5..0aa653a1e651 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -620,8 +620,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
+ 	if (err)
+ 		goto err5;
+ 
+-	dev_disable_lro(dev);
 -
- #endif /* _NET_FAILOVER_H */
+ 	list_add_rcu(&p->list, &br->port_list);
+ 
+ 	nbp_update_port_count(br);
+diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+index 44f83c8c56a7..4b6ab185392b 100644
+--- a/net/hsr/hsr_slave.c
++++ b/net/hsr/hsr_slave.c
+@@ -169,7 +169,6 @@ static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
+ 	res = netdev_rx_handler_register(dev, hsr_handle_frame, port);
+ 	if (res)
+ 		goto fail_rx_handler;
+-	dev_disable_lro(dev);
+ 
+ 	return 0;
+ 
 
 -- 
 Git-155)
