@@ -1,195 +1,195 @@
-Return-Path: <netdev+bounces-266028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOwFG2QCsGnOeQIAu9opvQ
-	(envelope-from <netdev+bounces-266028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:37:08 +0100
+	id uMe7KBkFsGlAegIAu9opvQ
+	(envelope-from <netdev+bounces-266030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:48:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC7F524B1EA
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:37:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3E724B93F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 40E7F30D8618
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:29:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8623832EE5C8
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA11438A71E;
-	Tue, 10 Mar 2026 11:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BC333A9C6;
+	Tue, 10 Mar 2026 11:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iaqdFc3R"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CS8ahMP3";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yYG3ZgIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F483876D0
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 11:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FA636D9F9
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 11:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773142121; cv=none; b=lZUvlyJcj9klIiZjx0dx3WJDf9kBNjM11b84FuZE89Ht/si2XgwY1/tgzBMtS1OZQhoiHDOxRnpCc+hfRwlm/zQmoDDezZnrrHYzon/3LLfiHWblDKBPOwfoDL6349JYcNmzuaJ1SGvmFI/GBha9ir8d22wDn44X2kl53nT4b1Q=
+	t=1773142410; cv=none; b=CZ7pyE16gAtiFDxW4u1H8wT/Mpeuj4f8QPqgQxw80P8yjmIRMGGy7J7eKdh0ByMpZBJjuwcoargCsh1C8tH1YXP+/gco8hSwoo/aWq0PAkU0VlIJnJz9mDZml8RA6mtQ2Z66bln7aYheVcrpEshFg6Y+vOJaL/ILCxcaj7wsFaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773142121; c=relaxed/simple;
-	bh=KQqnhr6YlAa/gpy+sTU5GHwCZhZ6qW8rmLEx/uTsI6M=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=fxmqUmJ9fTZ1W6yEjEmjN6DmNlxx0EDbUoPSbrLBwqtBOt1jx+v7EaMEnSj5nGUwPXPIdOz2FMnnrDKmgYZ/b5owksXxBRO9I2QcmlR9G+IPJqwdTZXB0a73bj/FE3YCWgOUHWaA9TmbVneNxSHQ0xgFVIovORNLMjrobPVpO2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iaqdFc3R; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1773142410; c=relaxed/simple;
+	bh=dIHsjmlfilCKFM1gyzDkRiDzOI5BIWQZ4elQ+zQMFRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qoDa/kpLr2ZtKSRyrkCNtbECWMMqzhtXtcOnNuPv6hPQ6HDH0lRN0LpFx7PSF2h9seoUe67UDOD+veYdP7lihXa6Uielk6hkgWGlCVyU91Hzx22l5ffHCGWKuFJOGOwNhpdeCVxC+J5dRsOT4mMgGCTOurdxINDVV4WuqiQm3gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CS8ahMP3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yYG3ZgIR; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6D015EC0AFD;
+	Tue, 10 Mar 2026 07:33:26 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Tue, 10 Mar 2026 07:33:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773142406; x=
+	1773228806; bh=a3pOdCIsDCr8yHAeXd52SfT4lXsZnq72VO7z4DbHxcY=; b=C
+	S8ahMP3E2DAEuiWObGeWVdUaeEzm8qvTCKANmP4r7T6ab2TuEVFavD/ZsNwgK18X
+	H9FSa+wA+1rEl7cORWOKKq+82HyNKpIfYApzqeK//yvOXd/gvlk8Oz6RtPGLFeLe
+	ze+reQ6/MXhwwOqte5PuwUA9RPoAVifAHIM+k5j5wXJkTM/sli6si70Polz7GcAZ
+	WLIugYrST3/JdM7AYX5hNmA++aXm7oyiSLDFEyMI+ycwFfRmNo1FFteknKZXRk/w
+	+HOzqelBVuXolzJLg0W+o09d0wQ3loP+MdKwiEbAQm5Hjitqr1+y/RAhWteMCxCf
+	cwJ04Jf51gfJe8YwfzPTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1773142406; x=1773228806; bh=a3pOdCIsDCr8yHAeXd52SfT4lXsZnq72VO7
+	z4DbHxcY=; b=yYG3ZgIRTlZfLmBVXywN+MKZDT6b3gm1TtEQGN/iNUwKzBbaIOx
+	9X6QqKUdZsSAabJUa6pBPxsoAgaztG2uj7Tz2ruk6hDpwAbaFKtje2PpzC7uWCn5
+	zHPAtannyp0FQBASdIOQGGWMET42Z8Ei2gX+r1X3MtbmA8OS31SANhsRiK1zGoGZ
+	vsG9a+lSZbIQWeT6FoPX/dlwGwZN9VORc4avFPzPoarTYrgnPoGtSnn0xUDdpCTA
+	cHxstr/aBgHiRkqMsci4Z1JuhN+bFGFlGhKLvbdoQxRvuWlDfm95pXqTsGMnpKrX
+	7yJipyziuZ/qz26PhNDOtET9dwi6+3hS/xA==
+X-ME-Sender: <xms:hQGwaXne1RFjU38How2Gi54DmERCLk6EgaMW4yWG35W45BdbiKn0Yg>
+    <xme:hQGwaWS9EhKwCrSLEmZ7pPFtpEPoOuK0uWs341VbZD27skUjJdxUtBQrOHay2k_6K
+    m9II1GBHxLDGpUriGf0ZR9HAbr6c6Z6Wu73mmsI1FKJYOTRjOfiUKM>
+X-ME-Received: <xmr:hQGwaRKPPWDpK-ksQah_3ftjgnSl5DvzNI3J5neLcT9tNLHyGEPrMWuorOGY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkedtleduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    eplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrth
+    esshgvtghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdr
+    rghprghnrgdrohhrghdrrghu
+X-ME-Proxy: <xmx:hQGwaUD9hORWRSA2Jjc8wLfVEzbuJKPHtCU3XzbnzCMLoeAfbTohhA>
+    <xmx:hQGwaSDnOWJH7wRR7E_R8vTnEwOi8liXMlKAgl7pr5B8Pi4vosgF-Q>
+    <xmx:hQGwaeBSby-3Ubx8JmPiLWzWCnDyPwdhXAC-SrBi-dtiEw5rM1UusQ>
+    <xmx:hQGwaVpGcRJ1tpLD9BgzfTpx--Ae6wJkAF02O1NJFtR9S88XCsvZsg>
+    <xmx:hgGwaWMIm6od4En-ybucwPDJ9r4dqN_nQ78ZIvUbSmUvb1OYfVSlrQr3>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 10 Mar 2026 07:33:25 -0400 (EDT)
+Date: Tue, 10 Mar 2026 12:33:23 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH ipsec-next 01/10] xfrm: state: fix sparse warnings on
+ xfrm_state_hold_rcu
+Message-ID: <abABg6aO9twGIk7F@krikkit>
+References: <cover.1773051558.git.sd@queasysnail.net>
+ <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
+ <20260310103135.GB12611@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773142108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QEgXSRi8An7XY2t213VJlqkfT5N4BKHBSmPFM54cjbw=;
-	b=iaqdFc3RsLQKWQKQN/Dj5JCr7ZNoeWvtHZhT7DR5h1QYm2oa4XgZvbw4/kPBEWPd89jzwA
-	0gP34tz/uVYgVBFIgPMRmTV3V7rgQhBJ19wM5DjxuFlL1/L572bIg2VeFVMWWrBNrZQNMx
-	LClaA0J8SKfUHY/P7jBfYRlDUzZRa50=
-Date: Tue, 10 Mar 2026 11:28:25 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <215d34adafe389a6792b2ca111ac3ec7ccc079ca@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v1] net/rose: fix NULL pointer dereference in
- rose_transmit_link on reconnect
-To: "Eric Dumazet" <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
- syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com, "David S. Miller"
- <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Kees Cook"
- <kees@kernel.org>, "Takamitsu Iwai" <takamitz@amazon.co.jp>, "Pwnverse"
- <stanksal@purdue.edu>, "Ingo Molnar" <mingo@kernel.org>,
- linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <CANn89iL3g7+MpkDrY8-v+Zswy5Woe_VvEMqbvHYRxQGpk_OSEQ@mail.gmail.com>
-References: <20260310101349.50993-1-jiayuan.chen@linux.dev>
- <CANn89iL3g7+MpkDrY8-v+Zswy5Woe_VvEMqbvHYRxQGpk_OSEQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: DC7F524B1EA
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260310103135.GB12611@unreal>
+X-Rspamd-Queue-Id: 1E3E724B93F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266028-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-266030-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d00f90e0af54102fb271];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,syzkaller.appspot.com:url,appspotmail.com:email,linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-March 10, 2026 at 18:24, "Eric Dumazet" <edumazet@google.com mailto:eduma=
-zet@google.com?to=3D%22Eric%20Dumazet%22%20%3Cedumazet%40google.com%3E > =
-wrote:
+2026-03-10, 12:31:35 +0200, Leon Romanovsky wrote:
+> On Mon, Mar 09, 2026 at 11:32:34AM +0100, Sabrina Dubroca wrote:
+> > In all callers, x is not an __rcu pointer. We can drop the annotation to
+> > avoid sparse warnings:
+> > 
+> > net/xfrm/xfrm_state.c:58:39: warning: incorrect type in argument 1 (different address spaces)
+> > net/xfrm/xfrm_state.c:58:39:    expected struct refcount_struct [usertype] *r
+> > net/xfrm/xfrm_state.c:58:39:    got struct refcount_struct [noderef] __rcu *
+> > net/xfrm/xfrm_state.c:1166:42: warning: incorrect type in argument 1 (different address spaces)
+> > net/xfrm/xfrm_state.c:1166:42:    expected struct xfrm_state [noderef] __rcu *x
+> > net/xfrm/xfrm_state.c:1166:42:    got struct xfrm_state *[assigned] x
+> > (repeated for each caller)
+> > 
+> > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> > ---
+> >  net/xfrm/xfrm_state.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 98b362d51836..7a68c594ce37 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -53,7 +53,7 @@ static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
+> >  static HLIST_HEAD(xfrm_state_gc_list);
+> >  static HLIST_HEAD(xfrm_state_dev_gc_list);
+> >  
+> > -static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
+> > +static inline bool xfrm_state_hold_rcu(struct xfrm_state *x)
+> >  {
+> >  	return refcount_inc_not_zero(&x->refcnt);
+> >  }
+> 
+> This change makes me wonder why we need both xfrm_state_hold_rcu() and
+> xfrm_state_hold().
 
+Commit 02efdff7e209 ("xfrm: state: use atomic_inc_not_zero to
+increment refcount") and the series around it [0] introduced the
+possibility of that refcount increment failing.
 
->=20
->=20On Tue, Mar 10, 2026 at 11:14 AM Jiayuan Chen <jiayuan.chen@linux.dev=
-> wrote:
->=20
->=20>=20
->=20> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >=20
->=20>  syzkaller reported a bug [1], and the reproducer is available at [=
-2].
-> >=20
->=20>  When rose_connect() is called a second time on an already-connecti=
-ng
-> >  socket, it overwrites rose->neighbour with the result of rose_get_ne=
-igh()
-> >  without releasing the previous reference. If rose_get_neigh() return=
-s
-> >  NULL, the socket is left in an inconsistent state: rose->state remai=
-ns
-> >  ROSE_STATE_1 from the first connect while rose->neighbour is NULL.
-> >=20
->=20>  When the socket is subsequently closed, rose_release() sees ROSE_S=
-TATE_1
-> >  and calls rose_write_internal() -> rose_transmit_link(skb, NULL), ca=
-using
-> >  a NULL pointer dereference when accessing neigh->loopback.
-> >=20
->=20>  Fix this by:
-> >  1. Releasing the old neighbour reference before attempting a reconne=
-ct
-> >  2. Resetting rose->state to ROSE_STATE_0 before the new connect atte=
-mpt,
-> >  so a failure leaves the socket in a clean state
-> >  3. Setting rose->neighbour to NULL in all error paths after
-> >  rose_neigh_put() to prevent use-after-free on subsequent reconnects
-> >=20
->=20>  [1] https://syzkaller.appspot.com/bug?extid=3Dd00f90e0af54102fb271
-> >  [2] https://gist.github.com/mrpre/9e6779e0d13e2c66779b1653fef80516
-> >=20
->=20>  Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> >  Reported-by: syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com
-> >  Closes: https://lore.kernel.org/all/69694d6f.050a0220.58bed.0027.GAE=
-@google.com/T/
-> >  Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >  ---
-> >  net/rose/af_rose.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
->=20Normally, a connect() on a socket already connected should return an =
-error.
->=20
->=20disconnect is a special operation involving AF_UNSPEC
->=20
->=20man connect
-> ...
->  Some protocol sockets (e.g., TCP sockets as well as datagram
-> sockets in the UNIX and Internet domains) may dissolve the association
-> by
->  connecting to an address with the sa_family member of sockaddr
-> set to AF_UNSPEC; thereafter, the socket can be connected to another
-> ad=E2=80=90
->  dress. (AF_UNSPEC is supported since Linux 2.2.)
->
+I can't tell you why a 10-years-old commit made some choice, but
+keeping both variants has the benefit of documenting that one
+increment is expected to never fail (because we already hold a ref on
+the object on that path) and we can skip the error handling. We don't
+want to add error handling that will never get reached, it always goes
+wrong (because it's untested) and it adds uneeded complexity to the
+code.
 
-Thanks for pointing this out. I should have checked the man page earlier.
+So I wouldn't get rid of xfrm_state_hold.
 
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index 841d62481048..ba56213e0a2a 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -811,6 +811,11 @@ static int rose_connect(struct socket *sock, struct =
-sockaddr_unsized *uaddr, int
-                goto out_release;
-        }
+[0] https://lore.kernel.org/netdev/1470737769-30438-1-git-send-email-fw@strlen.de/
 
-+       if (sk->sk_state =3D=3D TCP_SYN_SENT) {
-+               err =3D -EALREADY;
-+               goto out_release;
-+       }
-+
-        sk->sk_state   =3D TCP_CLOSE;
-        sock->state =3D SS_UNCONNECTED;
-
-
-Tested and the panic is gone. Will send v2 after the cool-down period.
+-- 
+Sabrina
 
