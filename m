@@ -1,247 +1,285 @@
-Return-Path: <netdev+bounces-265926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SP6QLXrYr2kLdAIAu9opvQ
-	(envelope-from <netdev+bounces-265926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:18 +0100
+	id uPUwMJrYr2kLdAIAu9opvQ
+	(envelope-from <netdev+bounces-265927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B616D247672
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7D42476C0
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D86AB30131B3
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:38:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 331FE3016D28
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A4340FDB6;
-	Tue, 10 Mar 2026 08:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C1A426D2E;
+	Tue, 10 Mar 2026 08:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cI2HDijV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1af9Z+Q";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJToW0IM"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011032.outbound.protection.outlook.com [40.107.130.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DCF3EDAD9;
-	Tue, 10 Mar 2026 08:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773131893; cv=fail; b=unljW2e+9JjTACYHMlUI1EXrYpBLVD2t6R/8UC77Lzrxa+9ejbU/K8k7SnllrfKxPp9osbixS7CwF4cCHuAgAlKCS30w5zLK7HY4MIV9gyUN32BdGjPfixQ5qW5aOq2yAI9D7kti7goPor8q/m0QHZsgC1zuPAexp4aFPjXDQuE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773131893; c=relaxed/simple;
-	bh=cQqb0o+x09W/IvCyHAWg0sZFOHLK3BcUhP1r0oYOkIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=CgSwAYKpW1nOPxWkYqr/DSZtUXsp9SZRZtDhi6xwqrEKrn7lWpmbGnwYnmkky72ahjM5qmdJvos3TwKJiYbA+PCblHMwjezVKdKaWZPFzaweIVdDybQRALz3tgSIJCPo5VWZDnKnFA2mPAXcDGDtwTWuEK5FovmlPmrcOuxVWzI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=fail (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cI2HDijV reason="signature verification failed"; arc=fail smtp.client-ip=40.107.130.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OR/11+mCfgNKg8r3o/8i0kaJ7O233jzaXp+pyjsDG1K79btBAyyyW/tP3z4RVVoqGmwzZ3xct6emxSiDFNmN6dUC4452oOMd6yJIvCW3eV2pmfi3C2teHibZqrtjHfd8h0LuPshIQW8fr4IBvexeNnedjycnBy63IuhSvogBFDgfdoZcgI988EYBXbdxPl1Zo5emkdns0uHMQyRL0QT0K4WDaMqW0ejdUnlKZrSmn2AL8xjm3jBtgbRc9DwxxqbO04DjMC+AbWHzb6sSdy3J663FWio9j8+95ItUJS+BuKIla8wAdJvoRwJN7BjqoPtLbuFZoROCZhxLNzijEVcdzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4DC/WAtPBttyO3YieGx/3i+uqZRqK9wrBUGkfPza3Tg=;
- b=yVEAsFhF2xjP1PtHcShjo5vCoJ6YQDqj7VHEgY2pKjx7skLiBuKdLHqQ+a6RS9ZcFbt3f0LT/Hzd+m+IPfaqcYVeb54BvzvoyW7VKD5O4cKnM+2m0WQnaozt5iEgwTXSuTeb/CHoLnc0T/SFKMhEldPpyKMe1EoYGNlsaVMdHboi4NeEONv+nHjt+wEAtQlbse1TKZCPNA4VwdWm9rzOI54msFOa8hW2qr3FDgFttWNbjQrIzJKh5VUGo0CHxpXuBysaVUxyEaq8vYfWkMLXNjQwT2SnL7qRF6hUDeFTEFY3rcV/Er+8krq+7QmDCtjBgrSiycp31KUHGNUpTxVbAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4DC/WAtPBttyO3YieGx/3i+uqZRqK9wrBUGkfPza3Tg=;
- b=cI2HDijV8u4poMLbMgSAKiqHQYao38kFB6rI6uWM4tWEOov4BdjYDHNY49qQumGNbOMDbUwQQ+LF+xEycN6t78Q3axGv7LH48QEAD9n/jY7FJSTN89awXWBXzhEQcrWEkMLe8TOGrEsLl1JnKM6lqaDrv5GSpSbNWKCz9oKH2Ze73oVH8DzcqGtggc64p4ZDhwqHSv5A5p5e5X8zk25HuUyhm8UYCBYk0NYWQbq9u5xTi7TcU4NN9DveHMoqghNdnamwm3jeySW0/edPjCgrkWUTdolrZx0uqXQnYPpjvDiY0n9zPeU/7M0KoqVgX0Vz5IKfQZLyhAP2O16eQaUtdg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by VI0PR04MB11537.eurprd04.prod.outlook.com (2603:10a6:800:2cb::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.25; Tue, 10 Mar
- 2026 08:38:03 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9678.023; Tue, 10 Mar 2026
- 08:38:03 +0000
-Date: Tue, 10 Mar 2026 10:37:52 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Heiko Stuebner <heiko@sntech.de>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com,
-	Sandy Huang <hjc@rock-chips.com>,
-	Andy Yan <andy.yan@rock-chips.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
-Subject: Re: [PATCH v3 phy-next 10/24] drm/rockchip: dw_hdmi: avoid direct
- dereference of phy->dev.of_node
-Message-ID: <20260310083752.ms6u4qpy3snl4h6w@skbuf>
-References: <20260309190842.927634-1-vladimir.oltean@nxp.com>
- <20260309190842.927634-11-vladimir.oltean@nxp.com>
- <2218670.OBFZWjSADL@phil>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2218670.OBFZWjSADL@phil>
-X-ClientProxiedBy: WA2P291CA0036.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::9) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CA4426688
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773131927; cv=none; b=dHob/rhGpOKCFuj224k+2+Y199Dei9QzkpQWUFJPS5c0iLKErfU4TqUS9QrN6tQo+pWsVZ0zZDFc0wtIiScwrjYIn3VqSaQ3YGPIm3uje4mC26Sv0hIcOyEbX8az0wM7AAU37D1awKfeok7JlWSGAUj8AyWooQfM/2Rla2n0M90=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773131927; c=relaxed/simple;
+	bh=/rgrFSztcoY371xizkvx6svBI2c3admzJK3fic/tp4c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JonwSJfrjsHpJuSCoNfgW19TNWotuSJfaoylSN1i4vo0qPn0qBlLOQjIqCZe6Zd7Ej0jwnsBX09vdvXTY0UGZ1FD14Qid5FCTakNDVyKH2sKKQns7OyWSI0Hspd4BGd+eBO3TpgVpWQziCcD4NHVk9cU2w7EH15MD3k+c3FMh44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1af9Z+Q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJToW0IM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773131922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QP4ahpcv5MGsgEHxoMenfjfsEJ72JSZI5ys4UwjgpQA=;
+	b=S1af9Z+QNDeXgcq314WdlFoJXpmrrJXGT064q8pduDhf3fXjrupX+L44X3y1REaMw10tzX
+	C39MWhAPI3oMlphkyMOuHtOMnymU54ZuSh8hPGlJCSlfnv1Rx/SdGYNlS2/6e6+664UpdM
+	xRH6Tqj5DQOsJi5cWmjihWtd1L/PlDo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-177-64hREknwMdS0oFR0T_sxbw-1; Tue, 10 Mar 2026 04:38:41 -0400
+X-MC-Unique: 64hREknwMdS0oFR0T_sxbw-1
+X-Mimecast-MFC-AGG-ID: 64hREknwMdS0oFR0T_sxbw_1773131920
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-439c12269f3so4432699f8f.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 01:38:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773131920; x=1773736720; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QP4ahpcv5MGsgEHxoMenfjfsEJ72JSZI5ys4UwjgpQA=;
+        b=DJToW0IMkk1iCXGlY+i+J6KeuFwI+ek8B4jM6vktJdK9P2jVbkqAGnKiekJkGl5Zln
+         2ZXXL5rNQ2iYtpwNu6K3+qLLcEh6N9rItR12ILkD/Qf28kMz5ZD+TncleN/vHI81Olg8
+         oyyJIJDEwPcrRUXhga2wcuhFQ1zPMCJF3PuzWkb5e15SuDXCEyvTG+ntWENYzFN734BA
+         EbeBuFy089Ey4SUrosBoYugBPoSQIBH/g1NxsBszR2uOGer2H95Ady7c2yO0I00UXBGm
+         Iqr2CD5iHcMrkiynYyVB61BfrD061ahscEaRyHG/C8lqhS+qvSpkyC1OH942RYl1uhXD
+         aDxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773131920; x=1773736720;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QP4ahpcv5MGsgEHxoMenfjfsEJ72JSZI5ys4UwjgpQA=;
+        b=O7He1nSFysaeg6gL5tp0qs7FHlC3LqL4enNyRS2vmgs4xEdNPeJC3eNtLVAwEayEAz
+         lsijXaQuy54+lQBrvotAAELzJ5JBOF6Z0DYxzowJ51Hl+w6ahfNrnDbrWYtPeD8RydGQ
+         OqSB4GuuOUvS5l5PpGraxGBpd6dj5EuapHw7ns6/K9ub6L8D/rqxribpsCiyEaM/PWJO
+         em30f0cWly7tgNOdGCGc9L8s5d4rd3C1eufu/e3MNGBjvxcwwyi3VPY+qfxep4hgmY+D
+         A8lzg4BTPsRg+KWMvyQSvzbyTKoD/PfQsrlwOS8ZBUJhFhftQBAKYO57D8+fo2PTUrPO
+         FZWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUk6BbCqoHMxogY5OaisIXo+fTs2SqOoB760LKKgA1KhTmAZ498sjtsiJlDdOnX+NYFA7bi8d4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdNgA7CujbZWECxdGSp6fQUv+TMZ6QfLsFzOSmiUpdPS80sLvJ
+	3XMU2lQz7n4sps7GJiI3Rgvf93h1t+lDt9oEGL5eNPMU/uWuZFm+RosdwMf2etU1nFdu5G5+qH3
+	QoCGMw8nJ3S8uBvIZJvod7sqn+wjp2pSNlkLIqfmoKwML+/KW5ElJAQk82Q==
+X-Gm-Gg: ATEYQzz1xK5M+EmPq/1lvcho/BQGmr5McxsEN6fvGCK6ximVliOk23yNFxR0cI0mJRu
+	iji80whik+rOo3s4z2uuMPprRdwTC8aze/+vjet5hrxFukoe19/mEjp2PloAzKHdMejIu7qJq27
+	dRmcy2Bs6GGkF0NAhA2YP5arF4QLVJov+kIHzokh4HUUAWe8KMqIKP8kR4wnC0H90Vjg7lIPmUz
+	ZUvmv7gEcL1/MKqPdz4KLzNBUtJJbdEFcSXSKMrQtsgrCrX90YUi8q/fsCM0kKLcy8/7tz6GcyR
+	7X/8N+yFyALCU50mTmNMLAHVqakk1nVH9+78AznnEt//EOBHT3bS1jqU2ecbk1cpJT+XytuVzUu
+	uHs74VpwRTCL7+wTV7ZSqYHuk6s0MKRbk/MzjomTNTofyuMwkYvodfWc6
+X-Received: by 2002:a05:6000:2403:b0:439:ac6b:dd38 with SMTP id ffacd0b85a97d-439da885d40mr25411029f8f.31.1773131920048;
+        Tue, 10 Mar 2026 01:38:40 -0700 (PDT)
+X-Received: by 2002:a05:6000:2403:b0:439:ac6b:dd38 with SMTP id ffacd0b85a97d-439da885d40mr25410968f8f.31.1773131919472;
+        Tue, 10 Mar 2026 01:38:39 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.25.224])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae46353sm39446362f8f.33.2026.03.10.01.38.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Mar 2026 01:38:38 -0700 (PDT)
+Message-ID: <9599a3fb-0c6f-4f60-be88-ceb65acad2b8@redhat.com>
+Date: Tue, 10 Mar 2026 09:38:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|VI0PR04MB11537:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9313eb4b-b391-4082-879f-08de7e8057f9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|19092799006|7416014|1800799024|10070799003|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	7zpY0fGF0FZqFMnBqsVHmqIGFfq+MhYwIEKQtvt6B3eHRjhzALOhIpxh9EF6nGj1Iroa+q9xGMzJDP4On1vBSs+mlNE37hLxx202BmTFe4QS2ECrvsGE51Gcg92ciRi+hJ6GhkGUBTDQatmfMFGkCoQuQS5QehVBvh9B23EDX+QWPxS9xdH1y/9gvF/FBK/H8+zOXkgtYel3/47Lq26oKZAq5YMmqeIE9head2wiQtgL4fBQlGsR2uFxMwB89geDucdbLO20kM8rEcel84vcVNGErfur+eT3tyRaZEG8GOwBdQMulQEil+B/imwBpwbnAnFJAQY6rWT6qmgK1/v85+/MSnzsj0MxGYe9gozUmXO+EmKAwUmjc5x7A4Wr/94rtSM9o7z9InmSRfgzchtMmK01UR55Bn1NR55CBrzlGiMbA1hOdUbO/CTgqVoh6jOBxdgQyb7gW+KuwKr/EEaTz+Ba1naftgcIi1DaFqvljdKzsE1ZsdCv41VWF5tsRqjf3l4ySxGrEjrZXKjS7BIRXbr3J7cuNydsuUectf76+TmP1ajQitFbFdz6dhjiHq4J2pF3buSYgtirggdoBhBOw/JHN5Wnz0964H0ScPwdXaJ1UXaxS87oDaNfRo7EsYd7KABIobrT5H81mU6S76WUiXGkSAAj3MbUz2+rs+haJu0C6olfbO69PeJEJZOkuka4fxYrhwRUosPFeRCjbb3uzVEK5ZQ1Fw2XOipZ8UZ953I=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(7416014)(1800799024)(10070799003)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?/X9TwhBn8TlngGFdwqJeM7SRp3oOxjqQHJG3h93PXwdwM0PAsIrwLTb/Q+?=
- =?iso-8859-1?Q?OTU/u5l1m8PcjtDtbXnSQ7OSTlR96gnL7ogDNAHpHuLNinnGuyaf29tg2y?=
- =?iso-8859-1?Q?58/xA3TUnhxSgqHXTKm68uF8jiZUbWF3n7Y9cdmE4oKGrOoczYaQyKg9eB?=
- =?iso-8859-1?Q?jvgtntx1JsG1x5lI6BL1Ljd+jIjIWU/tvUs0Bvm8/VNUfceMY1E/yBjRqH?=
- =?iso-8859-1?Q?9/ku7pZtj2FFYkVYfZQovOuKNmIbRxEO07Skp9OOVyBbKfKMDf07yq8ldn?=
- =?iso-8859-1?Q?+Wj44LU5q0AYdarTPlSaCfDhGzkEg+O94xZTgQxFvqNsPuQn1K3f9v3/lV?=
- =?iso-8859-1?Q?sZq87629tddQm/h3xwSTBr1BEIwkDIRV1LGBJQeY8gvtLI82c8yjNCAd++?=
- =?iso-8859-1?Q?0mB6+VXoqfnaDt/gahH2kONhmwap//YHpkbEl1QIpAVDwOJDtD/sV6CZBI?=
- =?iso-8859-1?Q?VRltTEWOiqitXOgBtd9SYMvZZ8/tIS1h5eq4ZZo35ZSv1erJKdBv3vNVev?=
- =?iso-8859-1?Q?rVugQfmPwZ33kv0pCsfOAIUURU5MIuysxq4umj1egNB0sJy3JbQ3gtH+l/?=
- =?iso-8859-1?Q?Ae/RgkEkcGqEj5n3NTHuWdlG4b38B7rLTW9FOo/fm7ZNpE80iXGzLcny4R?=
- =?iso-8859-1?Q?+mUEfpI3jLrEb01ggaQXkZ2ROraXHjsojXHx7PxYxnVCqfoKqAN+0jRKUc?=
- =?iso-8859-1?Q?ll39zidn+kli2ld9xRSSA2MK08GPDxe3WHXr9xm9bqqyjrKqfHH6+31Cj5?=
- =?iso-8859-1?Q?cMRGssaxqS2sxhZqd028kq5FP88tGee9yJuLByiaDh6rVY8pJmV5VHnaHm?=
- =?iso-8859-1?Q?eSaJRFYDwAYr2ozn03EzXV8vqAMrer1dXTWxOT8Fo0mco5KVYgdgEyZrnn?=
- =?iso-8859-1?Q?iWpnvjtbUSdV2k7E641NSIr3ysaMP+ognJivPUL8J5YBmQMegOFshhBApS?=
- =?iso-8859-1?Q?ME67nM63aEK691+Ar/h78E0FSF0oYlSH/77kAsalpik/jydjENVrSMWnkv?=
- =?iso-8859-1?Q?2h4klmgd3EdfsH8s+uQPuWXZGEM9jrP9QZ4Y/9P4TxQR9GgX+jTC+56ulA?=
- =?iso-8859-1?Q?DBg+9vv+LNzU1kSsatdtGREczrbT2TUD0ONXQmwcV0wVmAfIsu4oyHaVA1?=
- =?iso-8859-1?Q?eVl82pFfy1/MDdKEigU4OqrvLIB1KYSeCfrcPrdsQCMERCy6F1VoJWDn84?=
- =?iso-8859-1?Q?n85F76hJ1WJ3lGmj8pvCFicS20DPeCDjYz9SN2rUEgfouT+m5qi4bccPlv?=
- =?iso-8859-1?Q?1GfJscobDR5VEEz0yJekQreGfOaFt+7mIow64OL7MaXs5Z/oOFNmpPGa7P?=
- =?iso-8859-1?Q?T4ECeL9sUCwq9RDmlt8g2sYvNd/5i9YPfUC8IlXca8GHsNJAuMy3mA6E/2?=
- =?iso-8859-1?Q?iNt3x5GZLHcfqVDy/9PJWaFSox3ZiBbaDcUfwm9skOKcc4fyiXmYY2EHJ+?=
- =?iso-8859-1?Q?Zx3QE7UC0/0NBPnjYug0wOnJ5gWXvh8Dqaj7nB7aYTRcu88q0U6XSt81yi?=
- =?iso-8859-1?Q?JQs6IOgH1d7txktwluYzDhRNxwlrO2uXDIT6Rof+1E6CXL+O3nHJV+weNS?=
- =?iso-8859-1?Q?V8CGER6uO5PIB9DKLCNCt8kT3pQTOnh/131tKCkJEb0v8C808G7gL8nuMQ?=
- =?iso-8859-1?Q?PjYvkD+XSD/iYnvN/tgJsNyInPVL1KUc1Q9wc6h9VvL5/+pR0P9zTnNO9M?=
- =?iso-8859-1?Q?/gjVf0pvAUPzn9kNEhUEsiz0vZ7nqAnkpX1AzxG6rYmE4egw98vjJ65ZxJ?=
- =?iso-8859-1?Q?K3bSlNHEH6FRafc+17wIlBFhvEK5QYsfSH5cVV7gnxluV+ogMZWAUHiVqF?=
- =?iso-8859-1?Q?XlQck/aLilftiqo7q0V6dXubxPq67zRJrCr+n+Aq/5FOnhoC+cg2TUFZDk?=
- =?iso-8859-1?Q?Xm?=
-X-MS-Exchange-AntiSpam-MessageData-1: Ycz3yQtf/aP+NzPqFzdy0Ogc6SF+HawrRt4=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9313eb4b-b391-4082-879f-08de7e8057f9
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 08:38:03.1560
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EqVT2VgSBkKdIPyFRLndoMcUU0mT8iZiPoQKwY8Q6MPgw+kH+GA1YCWUTG7iTIjZ6W6EfGE76Ztq1MwGKx9K1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB11537
-X-Rspamd-Queue-Id: B616D247672
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v28 4/8] eea: create/destroy rx,tx queues for
+ netdevice open and stop
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Dong Yibo <dong100@mucse.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>, Dust Li
+ <dust.li@linux.alibaba.com>, netdev@vger.kernel.org
+References: <20260302024604.25354-1-xuanzhuo@linux.alibaba.com>
+ <20260302024604.25354-5-xuanzhuo@linux.alibaba.com>
+ <e6c3b053-75d7-46b5-9fd0-ac6de498456f@redhat.com>
+ <1773046268.140821-1-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <1773046268.140821-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3B7D42476C0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.14 / 15.00];
-	R_DKIM_REJECT(1.00)[nxp.com:s=selector1];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265926-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-265927-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	FREEMAIL_CC(0.00)[lists.infradead.org,kernel.org,linaro.org,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,microchip.com,rock-chips.com,linux.intel.com,suse.de,gmail.com,ffwll.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:-];
-	NEURAL_HAM(-0.00)[-0.869];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:email,ffwll.ch:email,intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,suse.de:email,rock-chips.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 09:24:43AM +0100, Heiko Stuebner wrote:
-> Am Montag, 9. März 2026, 20:08:28 Mitteleuropäische Normalzeit schrieb Vladimir Oltean:
-> > The dw_hdmi-rockchip driver validates pixel clock rates against the
-> > HDMI PHY's internal clock provider on certain SoCs like RK3328.
-> > This is currently achieved by dereferencing hdmi->phy->dev.of_node
-> > to obtain the provider node, which violates the Generic PHY API's
-> > encapsulation (the goal is for struct phy to be an opaque pointer).
-> > 
-> > Refactor dw_hdmi_rockchip_bind() to perform a manual phandle lookup
-> > on the "hdmi" PHY index within the controller's DT node. This provides
-> > a parallel path to the clock provider's OF node without relying on the
-> > internal structure of the struct phy handle.
-> > 
-> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > ---
-> > Cc: Sandy Huang <hjc@rock-chips.com>
-> > Cc: "Heiko Stübner" <heiko@sntech.de>
-> > Cc: Andy Yan <andy.yan@rock-chips.com>
-> > Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> > Cc: Maxime Ripard <mripard@kernel.org>
-> > Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> > Cc: David Airlie <airlied@gmail.com>
-> > Cc: Simona Vetter <simona@ffwll.ch>
-> > 
-> > v1->v3: none
-> > ---
+On 3/9/26 9:51 AM, Xuan Zhuo wrote:
+> On Thu, 5 Mar 2026 11:16:32 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 3/2/26 3:46 AM, Xuan Zhuo wrote:
+>>> +static int eea_netdev_open(struct net_device *netdev)
+>>> +{
+>>> +	struct eea_net *enet = netdev_priv(netdev);
+>>> +	struct eea_net_init_ctx ctx;
+>>> +	int err;
+>>> +
+>>> +	if (enet->link_err) {
+>>> +		netdev_err(netdev, "netdev open err, because link error: %d\n",
+>>> +			   enet->link_err);
+>>> +		return -EBUSY;
+>>> +	}
+>>> +
+>>> +	eea_init_ctx(enet, &ctx);
+>>> +
+>>> +	err = eea_alloc_rxtx_q_mem(&ctx);
+>>> +	if (err)
+>>> +		goto err_done;
+>>> +
+>>> +	eea_bind_q_and_cfg(enet, &ctx);
+>>> +
+>>> +	err = eea_update_queues(enet);
+>>> +	if (err)
+>>> +		goto err_free_q;
+>>> +
+>>> +	err = eea_hw_active_ring(enet);
+>>> +	if (err)
+>>> +		goto err_free_q;
+>>> +
+>>> +	eea_start_rxtx(enet);
+>>> +
+>>> +	return 0;
+>>> +
+>>> +err_free_q:
+>>> +	eea_unbind_q_and_cfg(enet, &ctx);
+>>> +	eea_free_rxtx_q_mem(&ctx);
+>>> +
+>>> +err_done:
+>>> +	return err;
+>>> +}
+>>> +
+>>> +/* resources: ring, buffers, irq */
+>>> +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
+>>> +{
+>>> +	struct eea_net_init_ctx ctx_old = {0};
+>>> +	int err, error;
+>>> +
+>>> +	if (!netif_running(enet->netdev) || !enet->started) {
+>>> +		enet->cfg = ctx->cfg;
+>>> +		return 0;
+>>> +	}
+>>> +
+>>> +	err = eea_alloc_rxtx_q_mem(ctx);
+>>> +	if (err) {
+>>> +		netdev_warn(enet->netdev,
+>>> +			    "eea reset: alloc q failed. stop reset. err %d\n",
+>>> +			    err);
+>>> +		return err;
+>>> +	}
+>>> +
+>>> +	eea_stop_rxtx(enet->netdev);
+>>> +	eea_hw_unactive_ring(enet);
+>>> +
+>>> +	eea_unbind_q_and_cfg(enet, &ctx_old);
+>>> +	eea_bind_q_and_cfg(enet, ctx);
+>>> +
+>>> +	err = eea_update_queues(enet);
+>>> +	if (err) {
+>>> +		netdev_err(enet->netdev,
+>>> +			   "eea reset: set real num queues failed. err %d\n",
+>>> +			   err);
+>>> +		goto err_bind_old;
+>>> +	}
+>>> +
+>>> +	err = eea_hw_active_ring(enet);
+>>
+>> AFAICS the need for admins queue destroy and recreation on cfg change is
+>> what prevents a safe configuration swap (together with irq allocation,
+>> see below). Could you instead keep the admin queue always alive i.e.
+>> with maximum number of erings configured, and just enable/them as needded?
+>>
+>> If not, please document explicitly the constraint in the commit message.
 > 
-> [...]
-> 
-> > @@ -588,13 +589,17 @@ static int dw_hdmi_rockchip_bind(struct device *dev, struct device *master,
-> >  		return dev_err_probe(hdmi->dev, ret, "failed to get phy\n");
-> >  	}
-> >  
-> > -	if (hdmi->phy) {
-> 
-> nit: a comment would be nice here. I.e. hdmi->phy being an opaque pointer
-> so checking hdmi->phy != NULL is not possible.
-> 
-> With that being a "goal", I assume that information is not widely spread
-> so this would prevent the next developer trying to change it back to
-> "if (hdmi->phy)" while that handling change trickles down.
+> Generally, during I/O queue reconstruction, the admin queue is not rebuilt.
+> However, in HA scenariosâ€”which represent a special caseâ€”
+> the DPU notifies the driver to request re-initialization. In this specific
+> situation, the admin queue will also be rebuilt.
 
-Testing the NULL quality of "struct phy *phy" is still possible and legal.
-It means that you called an "optional" variant of phy_get(), and there
-was no PHY.
+The above means that in HA scenarios the driver can't ensure to restore
+the status correctly right?
 
-Just that here, the ultimate intention isn't that. It is to abuse the
-struct phy to get to something completely unrelated to the PHY API.
-I wouldn't have had any problem if there was "just" a hdmi->phy NULL
-pointer check.
+At very least this info should be explicitly mentioned in the commit
+message.
 
-> apart from that:
 > 
-> Reviewed-by: Heiko Stueber <heiko@sntech.de>
+>>
+>> [...]
+>>> @@ -140,14 +591,65 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
+>>>  	enet->edev = edev;
+>>>  	edev->enet = enet;
+>>>
+>>> +	err = eea_alloc_irq_blks(enet, pairs);
+>>> +	if (err) {
+>>
+>> I'm likely lost, but AFAICS eea_alloc_irq_blks() is invoked only here,
+>> and allocates edev->rx_num interrupts. rx_num is the number of RX
+>> channel at device probe time.
+>>
+>> set_channels can later change such value, i.e. increasing it. But I
+>> don't see other irqs allocated.
+> 
+> 
+> No, set_channels just change enet.cfg.rx_num, edev->rx_num is readonly.
 
-Thanks for the review.
+Ah, I (now) see that set_channel max is cfg_hw.rx_ring_num, which in
+turn is equal to edev->rx_num.
+
+It would be useful to explicitly mention in the commit message or in the
+init code that the driver always per allocate the max possible number of
+IRQs handlers.
+
+/P
+
 
