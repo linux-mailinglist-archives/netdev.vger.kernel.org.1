@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-265912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJGPIZHMr2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265912-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:47:29 +0100
+	id GDrEKrjMr2nWcAIAu9opvQ
+	(envelope-from <netdev+bounces-265913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B8F24698E
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:47:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2578C2469C2
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CD323059FC6
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:47:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 251E830B55DE
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A02362127;
-	Tue, 10 Mar 2026 07:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3067F36212D;
+	Tue, 10 Mar 2026 07:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayD+6jEq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+RGhi4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D13363C53
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57C4361670
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773128817; cv=none; b=rYVK7T57CYIzUV8zMy+3GlLp92fmBCexgb8L5mKOOM8hanvTwZ1mEZUip/d++oek+RYUkMrtkoNegeNMlH5yyMbQL53rc+PA5QhNIvtWV5z4FrS6a4nXwn61CptTRL0C7PmzehJUpzKBzApxEJLYxIGbZQ1zzOuPBlfruLkq3Og=
+	t=1773128822; cv=none; b=nqZ9YIm6st9LbzqRWywx5S1t5+aVkhurqk0ddXIuzTL2f1SOwP8gCiq6eZv7YgChnVmJw+w322cBaYz8GJrhqGeosX4tiGrKcv372PTzcr5fihkzITW7TlZOeELUPh5FE8FARbOr1v31tqz4cNi0hdM5WsrxnAjMomzGumZt0hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773128817; c=relaxed/simple;
-	bh=o63DNLwMJ9dnH9VRG7yBQJ58q0sgrk58BDknwrX9fmY=;
+	s=arc-20240116; t=1773128822; c=relaxed/simple;
+	bh=ckIN5ASkuNOY9pUfpsVNZbSyJ16scvuiSr26ig8bsBM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WARN3xV8aPUGUaYaJvcT3phHdTx4+PsNcYxnTnvzCsJGo2I9mVW4Z4WKK3MWTmdNwW1bExXcOyw5Z/7VEY6egfYyHTuRGVnzLpCS4vvsk/aFS+9uWIlelboO3yvmrZVpNs3SKbOsdUQiqcnkppunByVlWbYwN3W1YQEtsJj+BWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ayD+6jEq; arc=none smtp.client-ip=209.85.216.46
+	 In-Reply-To:To:Cc; b=lLiAmcaIXZmV/d31y/7FstpLwgt21WwV5V32u1OaSJjIp5UdaIaHyHcSEJb/89EhJ9noU8XIVGLHVqn9lvrhw6nlrfgnhT/LITct6g2Vhca8epLO+0p6OgUI8yDjV7QgxuY337YDzogl9c43sBv7ZhcJgTXIokPhDjJFBNaMM8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P+RGhi4f; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3598b95ad7dso6906792a91.2
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:46:54 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3599019ae92so4992088a91.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:47:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773128814; x=1773733614; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773128820; x=1773733620; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZszkswRmv7zKXo3BtgB+URbNhojevOx1NtYtxreOH/Y=;
-        b=ayD+6jEqXAwFT3qihwGehyMF6KA77cxiOHOT27j9yTl063cDtkiu1kHNZOf05mBIVb
-         lShaWhgkxsh+F6MyIiiI1rVBrEzREQc6nt7XsQHYZM4mCdlLcVyAIzNqrT7ENXWyVNs9
-         ZCBxo4WD/RukRV6Be07Mse9obZavWyAdnOZBs3p88m7r92xvL/TTj5o7WhB2CDcIqmtj
-         582ogt+ZxQ7WXdbgE5bHI+FjnKQmSykB5IqN3UOSRHAitO8v3LbmBHcdFkPrphbsnzp1
-         yO/DqHG8bnikiz5GPD0E1eedabn8GoXIVU62keqL0fnbDZ1S3/bEbvOR6Vjhn5o/xt5a
-         jNfA==
+        bh=djyy+9DJ7NGUH5/yQnciZZwbkw5XEWCb6BieiKG0OKc=;
+        b=P+RGhi4fJv0WuGJifLYhB3BxBwXFLt5xBL5YYWH6dBHzWt+sixle3rMvsmTVptqP0C
+         no+jzpzltm6GldEddudb84pYSUqs+4AlhWgZ18t5QD07ALcUbmeYCQS7wMsSSYtxGIEt
+         zxFJ17TFlJ4lj8850XF+E2D9B4l0RLcJYHddcMRuisajbFMfY+J7k/Np1oxUYLEoeI18
+         roTcNXkDSwIx0SPC1hgcUZr3TF9W9wzJvp0lTKmNlH7e5QYKuAP7ItfUQT2lVjLVEhQV
+         ZS1gj0W/nS1cn/kMvXMh40ewEP4OGvs/Up3MLkHbTQsu3LzsrwhWGsMhiIgRHHgSHQwH
+         lKDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773128814; x=1773733614;
+        d=1e100.net; s=20230601; t=1773128820; x=1773733620;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ZszkswRmv7zKXo3BtgB+URbNhojevOx1NtYtxreOH/Y=;
-        b=vEE2CxYpqbSbxskVZnYU549vI++d/zKbBdcHcEanvQnskGHgaBDpn/wawGMNigFW2L
-         CbLzq+QcxRBPlO7aeksKZIYkWK436vXs1WS/lXy/YXoOUYFAmE8yGGWrzNPTnIb39Cum
-         lp6Okgk3cyXAzJK3scpeO/to5vIiW5ISV0iA5NttkBJ3l+Ukn6fCbuUbo4ZX6ydVsNWV
-         QfZ/OnYrpjJPljHeg+8j1cJ0q72vUXj3POvHA68JLJZ02jfVslxIe5v6dU2PsYY6eh8J
-         8BoBSWt41kEpjcu7GuUy17TVGI5YOg3TY/Y/lSa4Ld/gVi9g6OdLTYcN3VAIQ3b6Ll9R
-         JI8g==
-X-Gm-Message-State: AOJu0YzlVTOsWZztTq3WZ4cUMu5BUI3w4herHCTinG3BHoRrkTfFWv0u
-	ZaROYWbBLYIBCN6JhELKhjMIzugxeoDF3hlY16WVI3J3uZkekBWvrbF2
-X-Gm-Gg: ATEYQzwKDvmEqe2n9t58+jnOnoN+o+OtDi/vNDTUG9Gee2hw6L1+CdhLE9dq9XQpnZ2
-	yHqrRYJD4Pfo++zjZIDyRnwwuKi2rnS0Gox9NyEcmJ3vcjin14ikR+3Uqp3yUG1NWTBq6iiqaAM
-	8r5II4nyXTgIQzRZDFYzZrNrEsQy09ofMia3MwOSKN/T+dOyiFOy+L54VYAwWgxxJdFfmtEu6qU
-	l3uOaKeFtcfV8p/PY4NxwwuyCsifjXHCnORQFRw+g2IWaPRQNmmQTm7MKpWXOTYWIsyPVqmqLzL
-	EZG8wDBPQepWOAnJHBPUYDp8rL4l/RVP6CwjVDOVAnR74xBcw6xXrPY0s9K6nwZ4Dy41xlyRTk5
-	ljTOP+lEfi+PK6pO6wNEWFhDNUZjyVidlUKrpLfuXR44JURfWw9ackOw1hLVUuqthYaErgqAE6H
-	+9yIpc0DCf9gGF7XO1yo9TlGYKc51qkTPgwM8rtLp9ka2iRnIozeDSMXzN1VRF4cLjZxk0OZJe9
-	NBrNVpijfeDLzKPlJhlEBGTKJrIRYu1Y88xrFkbEf9jRCYrN2FFeg==
-X-Received: by 2002:a17:90b:3f8f:b0:359:f8c3:dada with SMTP id 98e67ed59e1d1-359f8c3e121mr363546a91.13.1773128813962;
-        Tue, 10 Mar 2026 00:46:53 -0700 (PDT)
+        bh=djyy+9DJ7NGUH5/yQnciZZwbkw5XEWCb6BieiKG0OKc=;
+        b=guG7TI4PcrV5JlNDoMBaVtO0aMyDjt89Y3OzfUgaYf5Q9ldVPPwrcX/Kt3KILilM/5
+         dii7u6by8Tn/btSlkwVMIxGZnr64zR91FxLftvvfLK+XwkR6QcSM0RFaxRVsscKGq2bM
+         +ad1xEQHeW4wzvHcsFafaZ1M3i6BQkM6Mo7yGcZaptFSZRaFxqMQh+Dpu9hxwvt+rw14
+         h5Nr3j3kJqUeqJVtCbGZFkKKK5+6U0sx/NfsWMyQtv6+I7Ajk7KRqmRa50FhtCIcP4iU
+         lldVsOIgpW8ogWKjsJdY4CyXKhpjPVQy0Q/ao8kdfX922IZiMB5Cq2C28GOHi0kROtZd
+         2bUQ==
+X-Gm-Message-State: AOJu0YyUseJ5pEPDTB0jL32Yrun0u+zeZPVf7BsR4cDE/olByopBXVWs
+	q1oM3LwRWG0EUFHt2XnxRSTZvqn0NsvkmXg4KCzf0kN1w0FhXHQsWkVN
+X-Gm-Gg: ATEYQzy0T+EOIw/H6OPtix5yckSmImvqkRNmjTKXMi8aG3svORpF8u682NaY9wi0Jca
+	dnZfRTzYqRH4MOFZkb/KhZZvc2kyAOQhMJX8lOVywOqTC5cE0W9E75vCHQD0jJuoUQnP3sXq3KV
+	FWupG4W/j5ANPOV77Wt+czk9lfk+T6AOABy7sPFRR/0ArPWRs0G8egm3ym7k4WxV5aLZDTr8xvS
+	El82UBYdy+JS668yQCJCritsN83Bis9MZk5SyWjzHsXv4gvkQ8UrN38T1sUoxwtFVTQy8sGCFtp
+	yaVs+/3HYKQCAhIgu9ggVaY7ASNRxreAaRe+erRQSZdW8MY9J8dVzjK8Inmpt4oN7NBSr/8t4SJ
+	3BblTJfMcX0mAcDTiKyCfxKde5pHF3Y9iSmiE1FQCMbDZEHy1AqdLgjL1GcJ1DtO5Oeq1GdB0Hd
+	RhmtFk8xmYA3Ds6xU3frYiyNclK3mKivD7tZOPe0iGZsD29veVZEw/SKXDruCnc/roL1YppyRYT
+	GdI9SsO7VJDsoI8CzuUhWtU4HFYpItXZjrcTEPOxJE=
+X-Received: by 2002:a17:90b:3a4b:b0:359:7fe6:7e5 with SMTP id 98e67ed59e1d1-359be30aee2mr10825721a91.24.1773128819911;
+        Tue, 10 Mar 2026 00:46:59 -0700 (PDT)
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359bc7ef38csm7260607a91.2.2026.03.10.00.46.48
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359bc7ef38csm7260607a91.2.2026.03.10.00.46.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 00:46:53 -0700 (PDT)
+        Tue, 10 Mar 2026 00:46:59 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Tue, 10 Mar 2026 15:45:05 +0800
-Subject: [PATCH net-next 1/3] net: use ndo_set_features to set offload
- features for bonding/bridge/team
+Date: Tue, 10 Mar 2026 15:45:06 +0800
+Subject: [PATCH net-next 2/3] failover: use ndo_set_features for failover
+ offload compute
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-offload_compute-v1-1-3df79c09ea65@gmail.com>
+Message-Id: <20260310-offload_compute-v1-2-3df79c09ea65@gmail.com>
 References: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
 In-Reply-To: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
 To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -100,18 +100,18 @@ To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  bridge@lists.linux.dev, Hangbin Liu <liuhangbin@gmail.com>
 X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: E0B8F24698E
+X-Rspamd-Queue-Id: 2578C2469C2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265912-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265913-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -133,233 +133,150 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Convert bonding, bridge, and team drivers to use ndo_set_features callback
-instead of manually calling netdev_compute_master_upper_features() during
-port add/remove operations.
+Convert net_failover to use the ndo_set_features callback and calls
+netdev_compute_master_upper_features() to compute new offload flags
+during slave registration/unregistration.
 
-This change centralizes the feature computation flow:
-
-Before:
-- netdev_master_upper_dev_link()
-- netdev_compute_master_upper_features()  <- called manually
-  - compute offload features
-  - netdev_change_features()
-    - __netdev_update_features()
-      - update other features
-
-After:
-- netdev_master_upper_dev_link()
-  - __netdev_upper_dev_link()
-    - netdev_change_features()
-      - __netdev_update_features()
-        - ndo_set_features()
-          - netdev_compute_master_upper_features()
-
-This ensures offload features are computed automatically when
-upper/lower device links change, removing the need for manual
-feature computation calls in the driver code.
-
-The netdev_change_features() call in team_uninit() is also removed
-since it calls team_port_del() for each port, which now triggers
-feature updates automatically.
+This simplifies the failover code significantly by removing the custom
+feature computation logic and relying on the centralized feature update
+mechanism. The callback is automatically invoked during feature updates
+when upper/lower device links change.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- drivers/net/bonding/bond_main.c | 11 ++++++++---
- drivers/net/team/team_core.c    | 12 ++++++++----
- net/bridge/br_device.c          |  7 +++++++
- net/bridge/br_if.c              |  4 ----
- net/core/dev.c                  |  8 ++++++--
- 5 files changed, 29 insertions(+), 13 deletions(-)
+ drivers/net/net_failover.c | 67 ++++++----------------------------------------
+ include/net/net_failover.h |  7 -----
+ 2 files changed, 8 insertions(+), 66 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 0ccf928eecde..4d32b06079ee 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1509,6 +1509,12 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
- 	return features;
- }
- 
-+static int bond_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, true);
-+	return 0;
-+}
-+
- static void bond_setup_by_slave(struct net_device *bond_dev,
- 				struct net_device *slave_dev)
- {
-@@ -2228,7 +2234,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 	}
- 
- 	bond->slave_cnt++;
--	netdev_compute_master_upper_features(bond->dev, true);
- 	bond_set_carrier(bond);
- 
- 	/* Needs to be called before bond_select_active_slave(), which will
-@@ -2483,7 +2488,6 @@ static int __bond_release_one(struct net_device *bond_dev,
- 		call_netdevice_notifiers(NETDEV_RELEASE, bond->dev);
- 	}
- 
--	netdev_compute_master_upper_features(bond->dev, true);
- 	if (!(bond_dev->features & NETIF_F_VLAN_CHALLENGED) &&
- 	    (old_features & NETIF_F_VLAN_CHALLENGED))
- 		slave_info(bond_dev, slave_dev, "last VLAN challenged slave left bond - VLAN blocking is removed\n");
-@@ -3975,7 +3979,7 @@ static int bond_slave_netdev_event(unsigned long event,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!bond->notifier_ctx) {
- 			bond->notifier_ctx = true;
--			netdev_compute_master_upper_features(bond->dev, true);
-+			netdev_change_features(bond->dev);
- 			bond->notifier_ctx = false;
- 		}
- 		break;
-@@ -5897,6 +5901,7 @@ static const struct net_device_ops bond_netdev_ops = {
- 	.ndo_add_slave		= bond_enslave,
- 	.ndo_del_slave		= bond_release,
- 	.ndo_fix_features	= bond_fix_features,
-+	.ndo_set_features	= bond_set_features,
- 	.ndo_features_check	= passthru_features_check,
- 	.ndo_get_xmit_slave	= bond_xmit_get_slave,
- 	.ndo_sk_get_lower_dev	= bond_sk_get_lower_dev,
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index b7282f5c9632..4906ea3717b1 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1247,7 +1247,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	port->index = -1;
- 	list_add_tail_rcu(&port->list, &team->port_list);
- 	team_port_enable(team, port);
--	netdev_compute_master_upper_features(team->dev, true);
- 	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
- 	__team_options_change_check(team);
- 
-@@ -1337,7 +1336,6 @@ static int team_port_del(struct team *team, struct net_device *port_dev, bool un
- 	}
- 	kfree_rcu(port, rcu);
- 	netdev_info(dev, "Port device %s removed\n", portname);
--	netdev_compute_master_upper_features(team->dev, true);
- 
+diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
+index d0361aaf25ef..10041a271bf5 100644
+--- a/drivers/net/net_failover.c
++++ b/drivers/net/net_failover.c
+@@ -300,6 +300,12 @@ static int net_failover_vlan_rx_kill_vid(struct net_device *dev, __be16 proto,
  	return 0;
  }
-@@ -1645,7 +1643,6 @@ static void team_uninit(struct net_device *dev)
- 	team_mcast_rejoin_fini(team);
- 	team_notify_peers_fini(team);
- 	team_queue_override_fini(team);
--	netdev_change_features(dev);
- }
  
- static void team_destructor(struct net_device *dev)
-@@ -1972,6 +1969,12 @@ static netdev_features_t team_fix_features(struct net_device *dev,
- 	return features;
- }
- 
-+static int team_set_features(struct net_device *dev, netdev_features_t features)
++static int net_failover_set_features(struct net_device *dev, netdev_features_t features)
 +{
 +	netdev_compute_master_upper_features(dev, true);
 +	return 0;
 +}
 +
- static int team_change_carrier(struct net_device *dev, bool new_carrier)
- {
- 	struct team *team = netdev_priv(dev);
-@@ -2007,6 +2010,7 @@ static const struct net_device_ops team_netdev_ops = {
- 	.ndo_add_slave		= team_add_slave,
- 	.ndo_del_slave		= team_del_slave,
- 	.ndo_fix_features	= team_fix_features,
-+	.ndo_set_features	= team_set_features,
- 	.ndo_change_carrier     = team_change_carrier,
+ static const struct net_device_ops failover_dev_ops = {
+ 	.ndo_open		= net_failover_open,
+ 	.ndo_stop		= net_failover_close,
+@@ -312,6 +318,7 @@ static const struct net_device_ops failover_dev_ops = {
+ 	.ndo_vlan_rx_kill_vid	= net_failover_vlan_rx_kill_vid,
+ 	.ndo_validate_addr	= eth_validate_addr,
  	.ndo_features_check	= passthru_features_check,
++	.ndo_set_features	= net_failover_set_features,
  };
-@@ -2944,7 +2948,7 @@ static int team_device_event(struct notifier_block *unused,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!port->team->notifier_ctx) {
- 			port->team->notifier_ctx = true;
--			netdev_compute_master_upper_features(port->team->dev, true);
-+			netdev_change_features(port->team->dev);
- 			port->team->notifier_ctx = false;
- 		}
- 		break;
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index f7502e62dd35..f82082050e36 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -289,6 +289,12 @@ static netdev_features_t br_fix_features(struct net_device *dev,
- 	return br_features_recompute(br, features);
+ 
+ #define FAILOVER_NAME "net_failover"
+@@ -373,61 +380,6 @@ static rx_handler_result_t net_failover_handle_frame(struct sk_buff **pskb)
+ 	return RX_HANDLER_ANOTHER;
  }
  
-+static int br_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, false);
-+	return 0;
-+}
-+
- #ifdef CONFIG_NET_POLL_CONTROLLER
- static void br_poll_controller(struct net_device *br_dev)
- {
-@@ -456,6 +462,7 @@ static const struct net_device_ops br_netdev_ops = {
- 	.ndo_add_slave		 = br_add_slave,
- 	.ndo_del_slave		 = br_del_slave,
- 	.ndo_fix_features        = br_fix_features,
-+	.ndo_set_features        = br_set_features,
- 	.ndo_fdb_add		 = br_fdb_add,
- 	.ndo_fdb_del		 = br_fdb_delete,
- 	.ndo_fdb_del_bulk	 = br_fdb_delete_bulk,
-diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-index d39571e13744..030248bc94c5 100644
---- a/net/bridge/br_if.c
-+++ b/net/bridge/br_if.c
-@@ -680,8 +680,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
- 
- 	br_mtu_auto_adjust(br);
- 
--	netdev_compute_master_upper_features(br->dev, false);
+-static void net_failover_compute_features(struct net_device *dev)
+-{
+-	netdev_features_t vlan_features = FAILOVER_VLAN_FEATURES &
+-					  NETIF_F_ALL_FOR_ALL;
+-	netdev_features_t enc_features  = FAILOVER_ENC_FEATURES;
+-	unsigned short max_hard_header_len = ETH_HLEN;
+-	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
+-					IFF_XMIT_DST_RELEASE_PERM;
+-	struct net_failover_info *nfo_info = netdev_priv(dev);
+-	struct net_device *primary_dev, *standby_dev;
 -
- 	kobject_uevent(&p->kobj, KOBJ_ADD);
- 
- 	return 0;
-@@ -734,8 +732,6 @@ int br_del_if(struct net_bridge *br, struct net_device *dev)
- 	if (changed_addr)
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, br->dev);
- 
--	netdev_compute_master_upper_features(br->dev, false);
+-	primary_dev = rcu_dereference(nfo_info->primary_dev);
+-	if (primary_dev) {
+-		vlan_features =
+-			netdev_increment_features(vlan_features,
+-						  primary_dev->vlan_features,
+-						  FAILOVER_VLAN_FEATURES);
+-		enc_features =
+-			netdev_increment_features(enc_features,
+-						  primary_dev->hw_enc_features,
+-						  FAILOVER_ENC_FEATURES);
 -
- 	return 0;
- }
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 6fc9350f0be8..ce1d9c73e6ce 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -8919,6 +8919,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
- 	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
- 				    priv);
- 
-+	/* re-compute all features after adding link */
-+	netdev_change_features(upper_dev);
-+
- 	return 0;
- 
- rollback:
-@@ -9011,6 +9014,9 @@ static void __netdev_upper_dev_unlink(struct net_device *dev,
- 	__netdev_update_lower_level(upper_dev, priv);
- 	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
- 				    priv);
-+
-+	/* re-compute all features after removing link */
-+	netdev_change_features(upper_dev);
- }
- 
- /**
-@@ -12873,8 +12879,6 @@ void netdev_compute_master_upper_features(struct net_device *dev, bool update_he
- 
- 	netif_set_tso_max_segs(dev, tso_max_segs);
- 	netif_set_tso_max_size(dev, tso_max_size);
+-		dst_release_flag &= primary_dev->priv_flags;
+-		if (primary_dev->hard_header_len > max_hard_header_len)
+-			max_hard_header_len = primary_dev->hard_header_len;
+-	}
+-
+-	standby_dev = rcu_dereference(nfo_info->standby_dev);
+-	if (standby_dev) {
+-		vlan_features =
+-			netdev_increment_features(vlan_features,
+-						  standby_dev->vlan_features,
+-						  FAILOVER_VLAN_FEATURES);
+-		enc_features =
+-			netdev_increment_features(enc_features,
+-						  standby_dev->hw_enc_features,
+-						  FAILOVER_ENC_FEATURES);
+-
+-		dst_release_flag &= standby_dev->priv_flags;
+-		if (standby_dev->hard_header_len > max_hard_header_len)
+-			max_hard_header_len = standby_dev->hard_header_len;
+-	}
+-
+-	dev->vlan_features = vlan_features;
+-	dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL;
+-	dev->hard_header_len = max_hard_header_len;
+-
+-	dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
+-	if (dst_release_flag == (IFF_XMIT_DST_RELEASE |
+-				 IFF_XMIT_DST_RELEASE_PERM))
+-		dev->priv_flags |= IFF_XMIT_DST_RELEASE;
 -
 -	netdev_change_features(dev);
- }
- EXPORT_SYMBOL(netdev_compute_master_upper_features);
+-}
+-
+ static void net_failover_lower_state_changed(struct net_device *slave_dev,
+ 					     struct net_device *primary_dev,
+ 					     struct net_device *standby_dev)
+@@ -550,7 +502,6 @@ static int net_failover_slave_register(struct net_device *slave_dev,
+ 	}
  
+ 	net_failover_lower_state_changed(slave_dev, primary_dev, standby_dev);
+-	net_failover_compute_features(failover_dev);
+ 
+ 	call_netdevice_notifiers(NETDEV_JOIN, slave_dev);
+ 
+@@ -621,8 +572,6 @@ static int net_failover_slave_unregister(struct net_device *slave_dev,
+ 
+ 	dev_put(slave_dev);
+ 
+-	net_failover_compute_features(failover_dev);
+-
+ 	netdev_info(failover_dev, "failover %s slave:%s unregistered\n",
+ 		    slave_is_standby ? "standby" : "primary", slave_dev->name);
+ 
+@@ -736,7 +685,7 @@ struct failover *net_failover_create(struct net_device *standby_dev)
+ 	/* Don't allow failover devices to change network namespaces. */
+ 	failover_dev->netns_immutable = true;
+ 
+-	failover_dev->hw_features = FAILOVER_VLAN_FEATURES |
++	failover_dev->hw_features = MASTER_UPPER_DEV_VLAN_FEATURES |
+ 				    NETIF_F_HW_VLAN_CTAG_TX |
+ 				    NETIF_F_HW_VLAN_CTAG_RX |
+ 				    NETIF_F_HW_VLAN_CTAG_FILTER;
+diff --git a/include/net/net_failover.h b/include/net/net_failover.h
+index b12a1c469d1c..f0f038d113a0 100644
+--- a/include/net/net_failover.h
++++ b/include/net/net_failover.h
+@@ -30,11 +30,4 @@ struct net_failover_info {
+ struct failover *net_failover_create(struct net_device *standby_dev);
+ void net_failover_destroy(struct failover *failover);
+ 
+-#define FAILOVER_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+-				 NETIF_F_FRAGLIST | NETIF_F_ALL_TSO | \
+-				 NETIF_F_HIGHDMA | NETIF_F_LRO)
+-
+-#define FAILOVER_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+-				 NETIF_F_RXCSUM | NETIF_F_ALL_TSO)
+-
+ #endif /* _NET_FAILOVER_H */
 
 -- 
 Git-155)
