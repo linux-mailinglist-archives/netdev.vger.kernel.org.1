@@ -1,200 +1,142 @@
-Return-Path: <netdev+bounces-265954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCdZCprjr2nkdAIAu9opvQ
-	(envelope-from <netdev+bounces-265954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:25:46 +0100
+	id cJH9Csjjr2nkdAIAu9opvQ
+	(envelope-from <netdev+bounces-265955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:26:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C3E248580
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:25:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A013A2485BA
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 682A830209E8
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:10:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B61BF303B7F1
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF5A43CEC2;
-	Tue, 10 Mar 2026 09:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DF443CEC2;
+	Tue, 10 Mar 2026 09:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="oIrOA7u5";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="PibvsG+S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQYzDU2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714474301C2
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA3643636F
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773133857; cv=none; b=bV1KWKRfPY4YrWDrX4YCSB2AOBrSxu6WZxR8Qu+lUHsY2IC1lZTiQIpYuzxvZ1I2uONhHmp7Bwd6Mha1DKPFnsVAfWihlNZk9/KFpcu9kwGioKEw8x8kjZEgXr71mszFmqDtek1TD6h+rXxNv8U4wMeMRUydIg60jvsUgUcazd4=
+	t=1773133881; cv=none; b=IlcSn81ec5LveuizKikJF1NPeaR9L2wY8aTt+eStmSmUL7TsRhn3j9zfDiIW/WFRKSkrqWPFaSl9K7VH/5chdnLwFM65J3ZhUJK5NE6QL12Jde9HnhmSOJJ1aTOeBaj/UsQwQOxdw5l0x6WNkxwi6XjThV/65/h80vTP33HlJCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773133857; c=relaxed/simple;
-	bh=iNZ/Hvg6kNomyJ/AnRPnOSqTaL0BnqgYzf62LJiPknw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VzTp4HiC5jK8IT98wkXPiIs5l0v8VFWF72bJGKGcZA+KflXg8c92R5QAtK6YdKR9z2uqe3q9W/qWHu5QnSvtIxhTXyR8ekCyl9zdgeE4OC9Pf7M367TC4tlOjv8U/ZaOHtd0Cw6P/J/I3+0OiRtXl0kpnITZIzwkEnzwB+CtjRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=oIrOA7u5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=PibvsG+S; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62A97fGn3754619
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:10:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	8htl7qpsjJQZfsq7CD+YXOG9QlNQpgsiH3AG2qg9LgU=; b=oIrOA7u5bVMJ85JZ
-	XkCp5Wycv2FltOSCIvVKOz9l8f9gGDRG2HaO8OMci7QV31xdGTEKhYozgz0TInoi
-	+cbwVFHV407cOAHrIjPcfryXQY6+d6NYezSdqMXs40wYlf/hMFhO21o7kq31wt9L
-	f/e4bBqr0HkUuo9oCTO7ZGpaOCzyBSBOiZzO5SU8tYo/Scws2z8LMhR92b8Roytg
-	jXyf+sjPrQC70QBnCh13E0XqCsak+DfLAK6lka1egimkkoupNEiNHBli2Lgf5lHP
-	jnLFlJ/J3OmiKXtEhlsoS5X4KmP0OIYpemCdV4luE5XV5uN5HuPtDlbm2Acf/6xR
-	kvkBHw==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ct477jctf-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:10:55 +0000 (GMT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-5093025ffecso8681191cf.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 02:10:55 -0700 (PDT)
+	s=arc-20240116; t=1773133881; c=relaxed/simple;
+	bh=6f6CTMROKclxCiuBLqyUInbS/438WmkNzB35QP0bqws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNlniyLkxaCTaWI7/waKKUXmkpZVa90VVKweokFJkeZk7zMI+QL3aBsmX56E2mP/RDALk+OX7ex+H2sdZB2Y1pX9+IY0rjDEj2NQSBNxy+43Gi6Crcxg6RQ7SWcX4BdR1DWElMmRvUMgEjbm+c4cfk1gcKW45w60jWB5yC/FYYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQYzDU2H; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4853a485721so2242345e9.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 02:11:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773133854; x=1773738654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8htl7qpsjJQZfsq7CD+YXOG9QlNQpgsiH3AG2qg9LgU=;
-        b=PibvsG+SqzVSWBurxFgybz1i7O5aPJ3P7/J4yvfw0K3xqr9CfTxNXMFC20nVkoTB3K
-         6V87nXb+J8osFKQOUQpXZ48RXc2V6jboOEGbASg3YKML+knXd0+Y/cVdTbUz6aZPSQxY
-         jtmlJhr+7KOxA+lYSNDay/IXc3XrE8WbU5qnzL/Fd1Ow7s21DRW/iovO1/sbHt5H5jxX
-         1nQvh8/oFJv9R2eUAb+T03G/k2NiCh9huRLCUFMedVNqlCOHVg5btVn8Xmfww5AzrCB6
-         wOi7deg/EV6pSXLBPsLtTWDxykLCwM3lIcwf7zaTiKUgPhdZ2MU35wnrDMSqKyHxPYvI
-         SSfw==
+        d=gmail.com; s=20230601; t=1773133878; x=1773738678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eRVYnrhnkOAdeAd2Kjlt1+H2Rmi0u5RX+qxn7s2d300=;
+        b=iQYzDU2H6P+NXTwOjx/QnpSDx/ci4QfglcAKffpHt+bl0/4MEDbDvW3HDa+Y6OB5GF
+         NoCynyU5dDl6GE7vL7V+wGJhr0/l/4BlEb+Tz0H2eRnrSGgo10By3rGFJYA2U25Xvgpc
+         ORl+ycxYSIqmdm/ozgZHupRVaQEVoLP5tz2ERzt536RbPZILUItHYW2l7zjZ7G9uLxGS
+         h5nnDQYmNgqGEDN4CYCL56SOw8X4Qz3stCZH+pwCXjBQvlOX6OMrAVPJUTdKT5pwFh2H
+         j1SgaDAbQzYI63HEZxvsEyZJe8KiztP23TKkk7ggQd2ten5IM2niGk1pJI1ZMMlSlvIr
+         pfKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773133854; x=1773738654;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8htl7qpsjJQZfsq7CD+YXOG9QlNQpgsiH3AG2qg9LgU=;
-        b=bNYKSI7ovf5776oOJYmu4KrllbdEeFStSBSq5Ljfy2Zp/frDohXP4JfigzSnl8FAyy
-         LFayN1WU9WvOPVfpJDlElPrOeSGDrlf2zFdrDmwg5tWafLsHJkSPJwIgvu0Fwz/KW/o4
-         VnZH9cxcJKnwsj98wW1Ux4tY1zY5RwN4tBoK7POpEAGOyVVfVDafr/4TL5QfvnUJ1cGD
-         HpupLkvbJXuR+u2VjhQr7fXfZTLHXcee+uJ2/vi9UeYwPdloEeLXtNT9Qekh4yk8RFEQ
-         D+gjHdPlMiPZy+RS8JtcMBPgKwxXEcmRS5i3hQSgCN/isOqLbtLfukRHSGVTiRCOIVJV
-         F+7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXIicGvw5xSfhtrPAbk1TImoaXXCb5en5HwkeI20If31V2qACHF5gCoiSfOWkea50coDgLW0gE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx43iO5nFQcU8SI4VBHO6wUpmSrBdlTeTcmTanE+SiFY+snXPWL
-	X4RK7iEG8k+qy20M1i4vcOdIjQqvbMYmr/M2/mq10n36P6FnYcos0ROTfEmGWFkXqdzIaWfK7dq
-	TuOVjkj31OadNSW3YUnYZ3b+MqTUt6ZhxcUukHdqJE9YBJsDro8WzsYceQYg=
-X-Gm-Gg: ATEYQzyZ3jbrBeI3hAIlZ7vkXxE4sfiO27TYpjyJhH73t3CBxqpfbAbIktkzCSDBvqa
-	dWstxMx6c3jckJiYkUHkZXaA4HiCTAl9SfSlq2xbFVgEZJ+S4Qnye5UHHHxOl0M/rJkFygsyumv
-	IRqJwmFKjVpxqSGoJCu3iWhxvKNQd4vQNzU5/nmZYOUOz+xeaWX/Ym6B07pIgcTYrrl7o/TehIP
-	d69jzA0WcYsw4kzUFS185khlq/Zgh1VKGxtraw30M+hd/otXBlhOwz52+7cnjNB8bPI4vkQ+Mto
-	kORqxTDiMVxKW/y7hgs11WzsbNIVbq3wrag6YOIuDVw2KBdZ/qCcLPE/otHsFnh5nYLUwshsOj9
-	FfMc5GsVySJARpmvXqqaKIH/BKvJ9koHUikX3LRGt4p1qSesIVu4=
-X-Received: by 2002:a05:620a:258d:b0:8cb:b062:c2ec with SMTP id af79cd13be357-8cd6d44b020mr1883780785a.29.1773133854550;
-        Tue, 10 Mar 2026 02:10:54 -0700 (PDT)
-X-Received: by 2002:a05:620a:258d:b0:8cb:b062:c2ec with SMTP id af79cd13be357-8cd6d44b020mr1883779085a.29.1773133854122;
-        Tue, 10 Mar 2026 02:10:54 -0700 (PDT)
-Received: from brgl-qcom.home ([2a01:cb1d:dc:7e00:c419:a350:1e47:af0d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485419b8526sm65155455e9.0.2026.03.10.02.10.52
+        d=1e100.net; s=20230601; t=1773133878; x=1773738678;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eRVYnrhnkOAdeAd2Kjlt1+H2Rmi0u5RX+qxn7s2d300=;
+        b=VvYwfCdWJenGJntQ1CApviutqmmi7WmTFwNw7OAkobFtkh8D0nqVatucn8rWjgIzct
+         U1dOKSF3btCfYkjI7FWmBQlfTvzkBeM1++ktoTS3uWlvAjr0lYFK+gkK2HRra+8UNdwk
+         4pp2IMBsM4GI3askOCZmieh6vzq9JvA+iqQj8lV/ES98ndjI6yGianSbW22c2XWqDkwk
+         +sgA5Eeg2+Ib1Dn0YuU9gIo99y3V/6JIHUmcGEyP3cVjOwvY0zpq3z2PJbblP+gKqVdJ
+         y9NhzT43cuof91OPl2Sfzw0sESwHM+8w31bKZvhkJwjznnPSZllRCWyDpKcLtL1046IR
+         yJ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCW/xvkARRmJAqiJewK5R3EKKlQqaSFU0y38Qld/v+8B68q6Z45P8eLbl0jrIJEbRUedhIUueW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVCBnJmXZsbGxI07B60yylEQUtAoBvi1XjTBy+r8GH4toExpRM
+	bgk7DAZXo7uDqE9Llfv1iCjbaZ3y+hpV1/ZeI17z93G/o08Bk5/GKVJVTf9MAA==
+X-Gm-Gg: ATEYQzwfKSE1e3NxXLrZEoXebQHRXx72RBClKWo4IiS+O+k+0q39QMO4I2SAhsYx3YE
+	90wE5smnjCQNfs3GRWvMyoH24SN1T5oxKVU5QavtCb5jSVk+9kAod3s25CBD3CEJaDpfSXV8iF0
+	UtDpjqqacL2gUe1L1fWQPZeB4tb3PBHw0f+q+otdPgyssRaYlKycbz9N3XNaPE1f7NcIZNrHawH
+	SdNXMcdUBY0pLUSjZ6YRK+4GpGfxT0d2LiV7SNxXeAfe12hKNsnU2NNcYuEPsP5UpyjV048KtWF
+	tYh3F9p/DDevaSbRmlZK3jVqOtYG2KtD1kHNu+4Fsb39pxz05MnbSJm7TKnxC3S3J4Pn9vXP2wB
+	KeuWQSKIw9TaZEn/SnXzafDKfubOIov/aDzHFLD5E5qRjMlA3K6uR2eYNLsKOcOiuZHas5KuvGi
+	QpRT8HAptELpojsw==
+X-Received: by 2002:a05:600c:4e8b:b0:485:358b:e7ed with SMTP id 5b1f17b1804b1-485358be94cmr73984075e9.0.1773133878274;
+        Tue, 10 Mar 2026 02:11:18 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d00a:e00:8799:3a7d:3c86:3200])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48535c7fae3sm90439885e9.1.2026.03.10.02.11.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 02:10:53 -0700 (PDT)
-From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-To: Jialu Xu <xujialu@vimux.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        brgl@kernel.org, kees@kernel.org, krzk@kernel.org, linusw@kernel.org,
-        linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] Remove <linux/of_gpio.h>
-Date: Tue, 10 Mar 2026 10:10:49 +0100
-Message-ID: <177313382930.5248.1395703981822013627.b4-ty@oss.qualcomm.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <7131965EF4C8E8BD+20260307030255.3490715-1-xujialu@vimux.org>
-References: <D5F95320CE72E20A+20260306035539.2443355-2-xujialu@vimux.org> <7131965EF4C8E8BD+20260307030255.3490715-1-xujialu@vimux.org>
+        Tue, 10 Mar 2026 02:11:17 -0700 (PDT)
+Date: Tue, 10 Mar 2026 11:11:15 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: mxl862xx: don't set user_mii_bus
+Message-ID: <20260310091115.j2aqdk3ikodffoei@skbuf>
+References: <0f0df310fd8cab57e0e5e3d0831dd057fd05bcd5.1773103271.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEwMDA3NyBTYWx0ZWRfXzAFGT36NBLAa
- 2T3mooBRIcM81GBya9x/hrsLvz8Xi8pjIjfvN71k9GkvXyyLu5BQkrD8oJy7eIUvE5pG2dQdAy+
- Mv1OdQ6ntHGF7GnI+QptxmTr2r9hSbgn9heOtBro0EzeB0sf59BL4KGzew7RS11HTiGSvtBBKJw
- WB79TO5fY5fbrxJPRDToMKY7d1p2V16+QMx+vbnEi+C/GSMGMW56H3Prn8hr7fEtKtgJY0pWiRE
- PrY6TGsQgRm8gJLVh86aRD7YaxFafMeSztAVkPpQ66AGPzojIoYDba/4pdMy0D1CDbnF+tUUOao
- xe+ONHUbyfaBQwMBHMyLpEBDkyBUwE3GHhUUunCQHZ0i7UF7qIg7i710qi7bBgpq5thui1DKxay
- EbH6798IXOajsUiqxG0CsX0PrkWKLyvixK9LN6FrzbO5UnGiVItQJNEtB5i+Ac7ZR5jETTDvoNF
- DURd6j3VYyuM/FHGZZw==
-X-Proofpoint-GUID: S78wScMTxvbo45FeMTL11epPT0AOG20A
-X-Authority-Analysis: v=2.4 cv=KLxXzVFo c=1 sm=1 tr=0 ts=69afe01f cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=-0JcDJgEzJC3EdZAtYMA:9 a=QEXdDO2ut3YA:10
- a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-ORIG-GUID: S78wScMTxvbo45FeMTL11epPT0AOG20A
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-10_01,2026-03-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 malwarescore=0 bulkscore=0 impostorscore=0 spamscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0 clxscore=1015
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603100077
-X-Rspamd-Queue-Id: 78C3E248580
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0f0df310fd8cab57e0e5e3d0831dd057fd05bcd5.1773103271.git.daniel@makrotopia.org>
+X-Rspamd-Queue-Id: A013A2485BA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email];
+	TAGGED_FROM(0.00)[bounces-265955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265954-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[bartosz.golaszewski@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-
-On Sat, 07 Mar 2026 11:00:56 +0800, Jialu Xu wrote:
-> Convert the last three NFC consumers of <linux/of_gpio.h> to the
-> GPIO descriptor API, then remove the deprecated header entirely.
+On Tue, Mar 10, 2026 at 12:41:56AM +0000, Daniel Golle wrote:
+> The PHY addresses in the MII bus are not equal to the port addresses,
+> so the bus cannot be assigned as user_mii_bus. Falling back on the
+> user_mii_bus in case a PHY isn't declared in device tree will result in
+> using the wrong (in this case: off-by-+1) PHY.
+> Remove the wrong assignment.
 > 
-> Changes in v4:
-> - Fix uninitialized reset_gpio in I2C/SPI paths by initializing it
->   to NULL in nfcmrvl_parse_dt(). (Jakub Kicinski)
-> - Fix GPIO polarity for nfcmrvl: use GPIOD_OUT_HIGH and invert
->   gpiod_set_value() arguments to match active-low reset line
->   documented in marvell,nci.yaml. (Jakub Kicinski)
-> - Fix continuation line alignment in s3fwrn5. (Jakub Kicinski)
-> 
-> [...]
+> Fixes: 23794bec1cb60 ("net: dsa: add basic initial driver for MxL862xx switches")
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
 
-Applied, thanks!
-
-[1/3] nfc: s3fwrn5: convert to gpio descriptors
-      https://git.kernel.org/brgl/c/b544927d75574330b0a8a33c113556b67df56f39
-[2/3] nfc: nfcmrvl: convert to gpio descriptors
-      https://git.kernel.org/brgl/c/253350dbf3e7fbd136905c98bd9f800fddb4fead
-[3/3] gpio: remove of_get_named_gpio() and <linux/of_gpio.h>
-      https://git.kernel.org/brgl/c/b6420bd5aa0c374331bad6c0fa2eb5f0f87cf5a0
-
-Best regards,
--- 
-Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
