@@ -1,234 +1,189 @@
-Return-Path: <netdev+bounces-265924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCWSNDXWr2kfcgIAu9opvQ
-	(envelope-from <netdev+bounces-265924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:28:37 +0100
+	id QECdGZ3Zr2kzdAIAu9opvQ
+	(envelope-from <netdev+bounces-265929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:43:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B65B247557
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:28:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 088FF24779A
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E06F13172C07
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:25:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D9C830AB8C5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976733EDADD;
-	Tue, 10 Mar 2026 08:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A2B29DB65;
+	Tue, 10 Mar 2026 08:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZvLRhApr"
+	dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b="mIO2iMDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320F43EFD21
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773131150; cv=none; b=q/NCpACnhhZWbblOLP1QGJq5TQG6B6pehiDRPsdvW7gPI1HwloJ+gOIQw3SBDsPPhEjOznUxUl0PGuhhEwmN6LMeyeh4RG3k02eoBt8B0iNaAPOvqGk4LJvkSwHcrT4Nx5oi10hT4uk0uQxg8H9u/vERKNzMKWc/s85wDyy6nJk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773131150; c=relaxed/simple;
-	bh=2QCzLp0F2pYx6+dlRlsKBe0b3nFaOmqYmIDT/PUKLd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U9R5Qcrpsw9brxzRYRTA9eT+UeUCll05hRRY7WTw+SWmP9P53J7SCc9nZzxzXUZChQz25iwcZOzuNl1E2fbmSHRkl7Hwxx40T0OXpKsCg24q9hIQZqz8ZR8fK7M0ijdCTok5QfZxV4y6dpEB9yUyF6wIkalOWfbQWjfd1VssdQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZvLRhApr; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6611e4aefdcso9879689a12.3
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 01:25:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773131147; x=1773735947; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Oly3B87PA63gHRv66eFhTHd4PtYqp9cSgK81C/xTgFU=;
-        b=ZvLRhAprredcnxq0ktx/IeNW4ILpm1nZeQiYEnsgEWvkHz3IMvWdVTbJJt97d9nBTm
-         98LoiMW+VXShfrcxWRGvGcZZGzE0iBrDQascT32v6DTZYuGgn+3Fg3l1TZRrpwl7D4TJ
-         xaasv0PN4RqciBhPbyw7rIi9nBbBS0bs3QSN7MrtA46BcoKRcz+7qUsrzyHQCWjkDpYe
-         YZ+GF4rvYl2BsfYWvAvpDu0LG45rl3U60FAHRJQqN23SXRmttlABWmNCB+5NNsvq1iUW
-         8cmr+Uk5SwIHu6hv4w5nmtoNxWWi0BeigDZF+3zvQgtRODWb++rAfvxEMbKEkiLZFYDz
-         2l2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773131147; x=1773735947;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Oly3B87PA63gHRv66eFhTHd4PtYqp9cSgK81C/xTgFU=;
-        b=qMpcnfGgrfVH5ih7f/EF9XmW566KD2PEbgn8CQlHlZ+ytwsvG/ZVjqXSeb6PssDx2T
-         /iwJMiqH8V5vrLwhmMSf6ik5H/iukUQIs1VN1Yoyx/jn2YiYjJl7LTkyrp2kmrNdNH3d
-         uNtnOsqPHg8gLdBtN6hGASelHAGUCDGptwSR6+ZD6SoPr3SB94oCy64Wx4t1Qi2SxaVS
-         Ps3hwfzjFfBrXM2ogtny3pu8hfnuOwrHcNfE7S5qehadDUXudiG+5T9eei4rjqRkIevp
-         3fsx+w8HTsqjrjR3xJPYMhg5OgnYn7SexwSzaW1vV5bnYmfoYU8ABJqbd8YkK5aKKr/+
-         H1UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKKk2NLlHntZnQRT2zjKQVGNvgr4nfZ8Zk9NbU9m/jI3LgYMNHWyuOk1rjufwyibU9vS2JMcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfOQEGoEyKUtH0/H2KpFyTfoX1L/M2c1cs+Jl9ie47eTcysGSI
-	9ydL1bIX6Z6wJNRSCG/pZuml7tjkVRm2ZE0RpFNfz7fUWnwbfHc11GyY
-X-Gm-Gg: ATEYQzxSlHGh+AouDevCzzgwL9XaPtYjGXMRzIs2N9xeUe9G7yUzPmKEt0Iy73x7v6k
-	QUlG2aGpGuQHpVsku2n5hVKPMFfRO8fAngXmepAdoO9+B078batzqAyf7owHBku6GNjzfY1zkia
-	Loislq6n6cA0Xv/fsq163QH73qJhnySoQ/1cYcXPYAjuDTnGZtOdZfhw7Ffiz1ztYv6WwE6pv/9
-	5g6WPizqh0crpgRbTWPFMlKmtUpNazpnM8LF/0H6OyDa2anYIQTPIrdfpEkImI5SXDT2Q+sC3Yu
-	AoYE7DszO9qTstT2IHDftu7Vq3Cp2lL1f/L+4RjI0yzMRRyDAYlEnHWwKgLWCLu1ohuCJMp7p9t
-	+Fy90yLrzMU1AbZrJnT7euwNmUbAyuCX5wIu+e7f0vMB4KIR8APUCYa7qp7MI5aci1RuDZy1wtJ
-	QjVTKr89xhP5SVq/22HTiwvbUG5LDMJBzq0doUcPpBqr1wuW4DrIrmr1+KXMeJhL+TklItC7n+p
-	F4E+9WvAh4TZJtfICKlSRw1EqeCo+cbc/pTQJJjzqTeVs70wbGo6jmciF9C3cgvQ8fgEC7R57Fg
-	H+VcWHM1oOrmq5M2BC5m+OIoQOpMybkKsg==
-X-Received: by 2002:a17:907:97d5:b0:b86:e938:1b3a with SMTP id a640c23a62f3a-b942dced156mr805331566b.17.1773131147211;
-        Tue, 10 Mar 2026 01:25:47 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b942f139e24sm460611466b.38.2026.03.10.01.25.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Mar 2026 01:25:46 -0700 (PDT)
-Message-ID: <5f8c4194-5066-4a55-898f-257bfdce4a6c@gmail.com>
-Date: Tue, 10 Mar 2026 09:25:46 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3723326461F;
+	Tue, 10 Mar 2026 08:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773132138; cv=pass; b=P0aj3B1J7RA/dOrE9mfCDO/rLknWG7Jj5cEdUkvASkjSm12hiuDMSQT65bvd2sYV8oG9r9gCKkhHgIaVaFWnM11eIob25njICHcj5AlNfzftJktU8d2aMKqvPf+TeTU3NNm+w5HERHZr/MPe2MqaA3Aje2I3Nl7yd1VD+sQuWOc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773132138; c=relaxed/simple;
+	bh=O+PtupKhJUb1UiVgJ52/W3koo44cp91XMGRu/Yk+jj8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jQQ0PSxc+yx3ecA5CyTMFM8618RxyRkjrJCKSOOnJYeeruivwDepF6LXT1tB7khh2S+WXfYFw/Dl05hj//WslQjGiyrVkta41aSNyaUwyOgVckBpxIcjfRBjGlpIp14bnxIRkfdhXp9VNZ4NdJnyxhPU0B0Xki3F4MZdrjT3sps=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=mIO2iMDW; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pigmoral.tech
+ARC-Seal: i=1; a=rsa-sha256; t=1773132104; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Qd3h3KFo8CtJ0BcQ9PmwEuSZGAFvxHDPBUX+IuoAi5TPTveJMtETpmnpDzBpmfdGI9S7uQXxAMF/yLZStUfAEPuHmXgt8DO7uxACbXvdhEg4o7WkqzcJsikwcFHoTZxnC0YBZgKzRTxhjeJf6jxEu3XfB4nTlUYb20BN9PJLjTs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1773132104; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=6QAKNaYZQ3oPbyfRehX2Ps756j69nJ1JrR6pbMmlzHI=; 
+	b=HYTsmRQTLlpE83eSqdybsp9GvqEVLDH7c01y1e30TPtbgarHQLNURfLP3TeuTP7KjXpE7PGTzKtwx06bVkr87hYe9yzAbvvSAENIa1Caxz4Pt1kFVx+Hb8vfMsQVKyiQ9btrdTk4VRXVnCfXUUzNfeN90mzPkYd23kFNgFbmrXU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=pigmoral.tech;
+	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
+	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1773132104;
+	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
+	h=From:From:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:To:To:Cc:Cc:Reply-To;
+	bh=6QAKNaYZQ3oPbyfRehX2Ps756j69nJ1JrR6pbMmlzHI=;
+	b=mIO2iMDWPi71XBeTyfVNIkwLFXY1LkkYQf17cONxWCj/t9GAPD85ay3yKKMETCw5
+	SLEMZTa0tq1fvD4znvgQu77PhX+vw3CVZ6NW0Acij2pfHbDF8bo+gIpivAsKMD1ZDI2
+	PkaYMQ41mXhKcT2YsYLJoSLP4t/1EsmKhD31WHfY=
+Received: by mx.zohomail.com with SMTPS id 1773132101727222.80993575966113;
+	Tue, 10 Mar 2026 01:41:41 -0700 (PDT)
+From: Junhui Liu <junhui.liu@pigmoral.tech>
+Subject: [PATCH RFC 0/8] clk: sunxi-ng: Add support for Allwinner A733 CCU
+ and PRCM
+Date: Tue, 10 Mar 2026 16:33:53 +0800
+Message-Id: <20260310-a733-clk-v1-0-36b4e9b24457@pigmoral.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce
- nf_flow_vlan_push()
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20260227162955.122471-1-ericwouds@gmail.com>
- <aa86Ai1FRuJzthEF@strlen.de>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <aa86Ai1FRuJzthEF@strlen.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 3B65B247557
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDIKGbaG5srJuck61rkGKSlmxgkGiZZpmsBFReUJSallkBNipaKcjNWSm
+ 2thYAxo8A6F8AAAA=
+X-Change-ID: 20260202-a733-clk-0d4fc00a9f9c
+To: Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@kernel.org>, 
+ Jernej Skrabec <jernej.skrabec@gmail.com>, 
+ Samuel Holland <samuel@sholland.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Junhui Liu <junhui.liu@pigmoral.tech>, Paul Walmsley <pjw@kernel.org>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773132092; l=3110;
+ i=junhui.liu@pigmoral.tech; s=20251228; h=from:subject:message-id;
+ bh=O+PtupKhJUb1UiVgJ52/W3koo44cp91XMGRu/Yk+jj8=;
+ b=LCoE9uot8A3TIPpldMu+FwiyMrSb7oaPhzcG1a5yrSDDfPFX9wLrX2xjT2hzw2TAqEHJJecU0
+ jGR11DR8AEbA5rykLaol+JTtYu8QPfSVi0wz5T9AXt5NwJoGI4cVTZb
+X-Developer-Key: i=junhui.liu@pigmoral.tech; a=ed25519;
+ pk=3vU0qIPJAH8blXmLyqBhKx+nLOjcLwwYhZXelEpw7h4=
+X-ZohoMailClient: External
+X-Rspamd-Queue-Id: 088FF24779A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[pigmoral.tech:s=zmail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-265924-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,gmail.com,sholland.org,pengutronix.de,pigmoral.tech,dabbelt.com,eecs.berkeley.edu,ghiti.fr];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[pigmoral.tech];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265929-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[pigmoral.tech:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pigmoral.tech:dkim,pigmoral.tech:email,pigmoral.tech:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+Add support for the main CCU and the PRCM module (R-CCU) found in the
+Allwinner A733 SoC. The clock architecture of the A733 is an evolution
+of the previous A523 design but introduces several significant changes.
 
+One of the key changes is the introduction of a "pll-ref" clock that
+normalizes the physical oscillator frequency (which can be 19.2MHz,
+24MHz, or 26MHz) into a consistent 24MHz reference for the entire clock
+tree. Additionally, while the A733 inherits many module clock structures
+from the A523, the MCU_CCU has been removed, and the overall clock tree
+has been expanded to support more new functional units.
 
-On 3/9/26 10:22 PM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
-> 
-> Hi Eric
-> 
->> With double vlan tagged packets in the fastpath, getting the error:
->>
->> skb_vlan_push got skb with skb->data not at mac header (offset 18)
->>
->> Introduce nf_flow_vlan_push(), that can correctly push the inner vlan
->> in the fastpath. It is closedly modelled on existing nf_flow_pppoe_push()
->>
->> Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
->> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
->   
->> +static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
->> +{
->> +	if (skb_vlan_tag_present(skb)) {
->> +		struct vlan_hdr *vhdr;
->> +
->> +		if (skb_cow_head(skb, VLAN_HLEN))
->> +			return -1;
->> +
->> +		__skb_push(skb, VLAN_HLEN);
->> +		skb_reset_network_header(skb);
->> +
->> +		vhdr = (struct vlan_hdr *)(skb->data);
->> +		vhdr->h_vlan_TCI = htons(id);
->> +		vhdr->h_vlan_encapsulated_proto = skb->protocol;
->> +		skb->protocol = proto;
->> +	} else {
->> +		__vlan_hwaccel_put_tag(skb, proto, id);
->> +	}
-> 
-> I did not apply this because I'm not sure if this preserves correct tag
-> order.  Can you clarify?
-> 
-> Lets consider vlan-offload-doesn't-exist case.
-> 
-> First loop pushes vlan tag 1, we get:
-> 
->   [vlan1][inet]
+Also update the sunxi-ng SDM (Sigma-Delta Modulation) helper to support
+a new dual-pattern register design. On the A733, the SDM enable bit has
+been moved from the main PLL register to a second pattern register
+(PATTERN1). The driver is updated to handle this register layout to
+ensure accurate frequency synthesis for "pll-audio0".
 
-Always !skb_vlan_tag_present (all vlan tags are pulled before the push
-in the fastpath), so vlan1 is always stored in skb->vlan_all.
+This is marked as RFC because the parent clocks for several instances in
+the main CCU are difficult to determine as the user manual provides
+limited information on their specific clock sources. In these cases, the
+implementation follows vendor practices and previous SoC designs,
+generally defaulting to "hosc" where documentation is lacking. In
+contrast, the bus clock gates in the PRCM (R-CCU) are explicitly defined
+based on the Memory Map in the manual, which clearly associates each
+module with its respective bus. Feedback or insights on these specific
+clock parents would be greatly appreciated.
 
-> 
-> 2nd items pushes vlan tag 2, we get:
->   [vlan2][vlan1][inet]
-> 
+This functionally relies on the RTC series for the A733 SoC [1].
 
-The second is pushed directly [vlan2][inet]. At a later moment the
-contents of skb->vlan_all is pushed by SW. Ending up with
-[vlan1][vlan2][inet].
+Link: https://lore.kernel.org/all/20260121-a733-rtc-v1-0-d359437f23a7@pigmoral.tech/ [1]
 
-> Now lets consider with-offload.  We have one tag only, so we get 1 skb with hwaccel
-> tag in the sk_buff.  This is fine, HW will insert it for us.
-> 
-> But now lets consider two tags:
-> 
-> First loop pushes vlan1, we get the vlan1 tag in sk_buff vlan info.
-> Packet is: [inet].
+---
+Junhui Liu (8):
+      dt-bindings: clk: sun60i-a733-ccu: Add allwinner A733 support
+      clk: sunxi-ng: sdm: Add dual patterns support
+      clk: sunxi-ng: a733: Add PRCM CCU
+      clk: sunxi-ng: a733: Add PLL clocks support
+      clk: sunxi-ng: a733: Add bus clocks support
+      clk: sunxi-ng: a733: Add mod clocks support
+      clk: sunxi-ng: a733: Add bus clock gates
+      clk: sunxi-ng: a733: Add reset lines
 
-Correct, so same as SW, vlan1 in skb->vlan_all.
+ .../bindings/clock/allwinner,sun60i-a733-ccu.yaml  |  107 +
+ drivers/clk/sunxi-ng/Kconfig                       |   10 +
+ drivers/clk/sunxi-ng/Makefile                      |    4 +
+ drivers/clk/sunxi-ng/ccu-sun60i-a733-r.c           |  276 +++
+ drivers/clk/sunxi-ng/ccu-sun60i-a733.c             | 2375 ++++++++++++++++++++
+ drivers/clk/sunxi-ng/ccu_sdm.c                     |   51 +-
+ drivers/clk/sunxi-ng/ccu_sdm.h                     |   32 +-
+ include/dt-bindings/clock/sun60i-a733-ccu.h        |  289 +++
+ include/dt-bindings/clock/sun60i-a733-r-ccu.h      |   39 +
+ include/dt-bindings/reset/sun60i-a733-ccu.h        |  131 ++
+ include/dt-bindings/reset/sun60i-a733-r-ccu.h      |   23 +
+ 11 files changed, 3311 insertions(+), 26 deletions(-)
+---
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+change-id: 20260202-a733-clk-0d4fc00a9f9c
 
-> 
-> 2nd loop pushes vlan2, we get:
-> 	[vlan2][inet].
-> 
-
-Correct, [vlan2][inet].
-
-> Now, when packet is transmitted, where will the HW insert the tag?
-> 
-> [vlan1][vlan2][inet]?
-> Or will this be [vlan2][vlan1][inet]?
-
-The contents of skb->vlan_all is pushed by HW. Ending up with
-[vlan1][vlan2][inet], same as SW.
-
-Hope this is enough to clarify, but you can double-check it looking at
-nf_flow_tuple_encap(). With 2 vlan tags, the contents of skb->vlan_all,
-is always vlan1, the first in the encap array, which is the outer tag.
-
-> reading though the SW-side (no hw support), it seems it will do the right
-> thing (i.e.. the hw tag gets added as the inner tag, right before inet
-> and not added as outermost tag.
-> 
-> Can you confirm thats the case?
-> 
-> Sorry for not responding sooner, there are lots of patches atm and
-> I forgot about this one when I yanked it off the previous pull request
-> at the last second.
-
+Best regards,
+-- 
+Junhui Liu <junhui.liu@pigmoral.tech>
 
 
