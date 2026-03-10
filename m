@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-265977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oH55CIfvr2nkdAIAu9opvQ
-	(envelope-from <netdev+bounces-265977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:16:39 +0100
+	id 4A0lGpPvr2nkdAIAu9opvQ
+	(envelope-from <netdev+bounces-265978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:16:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD382493A5
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:16:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D85082493B4
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:16:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D06D306E620
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:12:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE76A3076AF5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD6A43E4B8;
-	Tue, 10 Mar 2026 10:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B98144D014;
+	Tue, 10 Mar 2026 10:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JhjmPuKM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJwHwT0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6B436827B
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1612644B68D
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773137557; cv=none; b=E1B863DFg4sVMz1SDP2KoA0T9NfdrawcOQvZK7UT6Yo2qVkDc9qj6yk+/m46E1Ad/d4Gq90r7Rdrz3azPZbwa9/yjzSXvxTSuJg5YVkLbRSX1u4m9lPegF3jaSMr0BgYSXFCE+Zp/xK8p0GQ7NOH+kTIf77YahFCDC7g9pkvQAw=
+	t=1773137561; cv=none; b=R+xmmWTSJQI9S5bBXMmstX24Z5PZxPrLrDD+O79kHsBdW/MtXijKR0xIaUp4IEhxWIG+UI0aqfUU6egwX6HKA2MMJJ1mlsgTfA6D3TEbMTs/6NWkMMKB2soz2UUxoxmetpfaaWCMBuCPVAcLr3eB0h4B5z5UASf78uGqGxZSkf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773137557; c=relaxed/simple;
-	bh=9uIYTXQT/vrE0pciQl51dMj6ZKgXp6dNXbfxLZzC9zQ=;
+	s=arc-20240116; t=1773137561; c=relaxed/simple;
+	bh=IXDgAjyGns8ZHUuhsbE04eGQ4QoGzZPIewBT4PQDLDI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LeeTBPMtpfBFYbnTEeQIb+/YjJ2lgfVpFZL27SjCbjkpP0q7o9F+arwHFwdPO+34hogKhvlkuHw6oT56HLE2HRRlIMCyLPSVlqzXEwpF+0EhzvYM9VFm9cjmCOb7GIgggwqoCnsaTAZUESoI6yihc+lpTHCLabEYfDfojChbrJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JhjmPuKM; arc=none smtp.client-ip=209.85.219.48
+	 In-Reply-To:To:Cc; b=J3KGYsDH9H/KVADH5TzS0ics9RIJ18J2aiavx53FWUNEIC4BeTQYKGpwDaBPIGLIH3sDNxRCzGr/ynDq4wns1yVk8rA1GpZDfL9LATjShgtDtBOTG7XRtkhYyggQB+2DYN1Fzrh+1Pd+vCIGV2BQE9OrAD6K9JjtE7ZSVNlM/MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJwHwT0V; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-899fc9853b7so125526506d6.2
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 03:12:36 -0700 (PDT)
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-89a0ece9f14so108188306d6.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 03:12:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773137555; x=1773742355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773137559; x=1773742359; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UlnZx41UnzHPZwPjs/1q9jmp+xnPPZBychET8h2+TsY=;
-        b=JhjmPuKMC1O2WpXdp79Ob4QgpK4nrF/6QB0IdzK1Q4VdQUY/DT20ATFjZOgDpj2vN4
-         ylZ3+osXaTwN5p75ohyu0TkCmEdtxBdYcuYcsbKg26qkMoFKi9Ryv43P0k7EX43bvMC8
-         SHtwU+pjJ4cpqj1erG0+zNXgU9bAdLREBPzSAfKwmIGne3l30Ice8Gs03EeEuWFZe1i8
-         PgGAjBalqyyTrYrvxC7od+GviTSQqjEt/6HeJ2YT4NXZYG83qzFh+hOBYz0JfwrzVhHc
-         394l9FEVgcEGj+Zo3TQZRZjSPXheD9tuEC17zDZCTTDeWbofDzI1kkmXa6NuaCo39YV+
-         5p3A==
+        bh=h5nGmykeIzZqpT2d4t5X2fcZ/uaJRdZFOjoMw7bJxzg=;
+        b=TJwHwT0VXN495w+4F+l9i6bkd2b2M2j7yKudpzHmVO3Pu3HeIR5spy0bs5AZgIubI5
+         jmM2CKncQbphl3ZEgi5W3V83R8a6DIwqm747dSs9LUIpZnFOFCJU2VAaZEHOzPOZ7DfC
+         pzIiTw+rRCw1QcZxh04HMADWYJ4PvtcFRcMrJG+Ep8To/dnMRyadx4aMuIWZNyY5U+HF
+         +3NqwAMQWQgVNCwIK547zTj3P0NXz6pbeNLCvZvnW15TaWzHnRqP7/0paSOXEah3XQkl
+         T/Jd6Lw8R2+hk4InOsdjch9yYkLGlAlJA+YRJ3dA/8r6VHcBJbiZqGMJUKHxIzXXGhEI
+         X77A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773137555; x=1773742355;
+        d=1e100.net; s=20230601; t=1773137559; x=1773742359;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=UlnZx41UnzHPZwPjs/1q9jmp+xnPPZBychET8h2+TsY=;
-        b=lawR9wxgd7v2SYR0k2t0byZCUh8091V8y8YyG/bfxBcWLIGwSIevBxWymxzpDmxNsX
-         rjWQLStEHOnrvYj0OTgPvomWF8ZF02U/0t5dMDtNg1XHt7JhHta5iLCf30aN0tS7Hsua
-         bZSDX60mxkrOOYPzz29v6sU0Mw7Dd8Sdd/xO6krnMs6iK3SC4icK08xvnx0aogKE33At
-         yoxyaRb5aZFZbSsoR/+IA8CH9kB8Ts3jDvWYP+gCD2ihh9P3YbyxpK8fL7TviNP7iqV8
-         PryhE7FyCmVepXLA8u2ANFB+uskKRtSTXPPiMjRvUOI4z2ZTa2IrHvWcBTaH759Ah1rs
-         mrEQ==
-X-Gm-Message-State: AOJu0YxyT38Zv935yEJQUcUDuAOkT5gaotis42o/fbDDBabujpgm0iki
-	z67749YUerg9YS7UWPYItF/VK9kMZRk7vwntnXkm78Pm6qQUEIldMvox
-X-Gm-Gg: ATEYQzyzhq5FlTMunIaTnYdYv7r2kw5bMBxb12JJog2imND8cPoLJJ6QGuAmjDNw3R+
-	U+z0lQoAKEY8W0rpzluQwswOknlo3sCJHUk6ECqES3zmLBECyY+SkAHSOdHbv3aKbqs4laW4Qdb
-	f2NBomb5SnDnbYdD467sGrHrO77KbGUglWnAwDbQwlZuVZkDvgwqi8PWinxM4Oc0Tbac01hFSEh
-	5sdNGbtbQb/313xM5iBTKjrDbrjMVU04ofKCya8GI0kvNypoHynvFzdD2DcR6luw98X8UN3Komc
-	BZLO8KoZEwEGVZ5WUw09Ue1x7zAxK/hnOuCXiwvzDKxyPwJ/D6zM7ACuo1lQUUqtYCcoL9R4WSY
-	YxYwnP5XOKfeP/AVvMjpcoPFNT6Zt/M5WWJwRcqNVmycWm/ReFYkmmAvIdN1DQL3spIaTuBcf4g
-	gaue6R/hmjtt5Kw2kg4T8Z/rfgKQv4Cgf2
-X-Received: by 2002:a05:6214:2124:b0:89a:170b:a6fe with SMTP id 6a1803df08f44-89a30c2df79mr186373196d6.65.1773137555116;
-        Tue, 10 Mar 2026 03:12:35 -0700 (PDT)
+        bh=h5nGmykeIzZqpT2d4t5X2fcZ/uaJRdZFOjoMw7bJxzg=;
+        b=kfofpnY9lHz2MsFfrsoYZced8yNcIIlCNtFd7wt7/kwn7n9uMtMk2GkPWx+KGcru3/
+         7ARi8dYeaD98ubXlM6vBPKP7wX2g0cQ1N6fqwJXYLUQZTvw7da3K2WEg2JvaI0rbAt0i
+         fEXD6m4CACBMmqiqWCGiHMNnxKoOjae0Bov7p4hC5HpHVc2BeyJAG5gz8MGUxtfGGQHP
+         jozUX1tZ3/k0TohiDRr90s1OkSMRoXzVVkwS6YFzdlARInkHgLtTsOeDWjeTXa05v5Yc
+         PElY9AT9xLdsvRyXtzFDdfsRtmiPBfUDzhe+8bQRqZJnMNwbS/stXcF4/NOXI7fRCX/T
+         g5CA==
+X-Gm-Message-State: AOJu0YwjXhaH+mOBzEMQI7yG5QoUb/LZkrzETO+XKGuGXNNfFb1IcH9h
+	5VGBKqR0ihwwQZUlzNf5bviV7e+wIRIwvNof01SSYDnFVxKT5NhwC5o2
+X-Gm-Gg: ATEYQzw/J4OsVLvAUGA/TG+gQgqMi6+9Xa1PNX+Bp2ZEMbN0B5GEHp4In8epVIIe2V1
+	VjdByeZZ2m4LHFc/AANEZW9OFv8pfQ0ycvGB4Ht70ZtTud/kKgYtllRajEHJVwWwAthMBKKq6gv
+	Ore7Xt2ElIPFCIW25pax2zvVGMpZtKkz/6guHJLGNp0O/v6qIs1MwMrcZ/dPHuDVinVH8l4Re26
+	wQ8mwbL2h+5VxWp1LWcUOUZsf1aYqIbgElA3SVFFRhdK3MmMjiPD9kMIYgxYq6BjOY/Trz4l6zY
+	ILK8dhMfjCWD2mvZi+f6CCtaGuwpYpNe25TDF/JZ/fLPKBEwMQU++duljzzQYQJrC7vnFWGTWo4
+	m/AvVLPQUPp8su6wBDqqYTvgdvXracurlN1fIfVn5oLkCRW4fFrSoMmCFsXHkGQdo+o9hcnfFSc
+	UIAvjjqhdWVe59yHppgM1kFG/nE1WJkNXz
+X-Received: by 2002:a05:6214:2a82:b0:899:fc48:4e63 with SMTP id 6a1803df08f44-89a309770bdmr207172936d6.0.1773137558835;
+        Tue, 10 Mar 2026 03:12:38 -0700 (PDT)
 Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a57c4a0c6sm18867736d6.52.2026.03.10.03.12.31
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a57c4a0c6sm18867736d6.52.2026.03.10.03.12.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 03:12:34 -0700 (PDT)
+        Tue, 10 Mar 2026 03:12:38 -0700 (PDT)
 From: Kevin Hao <haokexin@gmail.com>
-Date: Tue, 10 Mar 2026 18:12:08 +0800
-Subject: [PATCH net-next 2/3] net: macb: Clean up the .init settings in
+Date: Tue, 10 Mar 2026 18:12:09 +0800
+Subject: [PATCH net-next 3/3] net: macb: Clean up the .usrio settings in
  macb_config instances
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -87,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-macb-cleanup-v1-2-928c1a91a7dc@gmail.com>
+Message-Id: <20260310-macb-cleanup-v1-3-928c1a91a7dc@gmail.com>
 References: <20260310-macb-cleanup-v1-0-928c1a91a7dc@gmail.com>
 In-Reply-To: <20260310-macb-cleanup-v1-0-928c1a91a7dc@gmail.com>
 To: netdev@vger.kernel.org
@@ -98,7 +98,7 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
  Kevin Hao <haokexin@gmail.com>
 X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: 8DD382493A5
+X-Rspamd-Queue-Id: D85082493B4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -114,7 +114,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265977-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265978-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -123,7 +123,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -131,183 +131,149 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-All instances of macb_config currently have the .init field set, but most
-of them use macb_init(). In fact, there is no need to duplicate this
-across all macb_config instances. Introduce a new macb_init() function
-that executes the specific .init if it is set; otherwise, it runs a
-default initialization function.
+All instances of macb_config currently have the .usrio set, but most of
+them use &macb_default_usrio. In fact, there is no need to duplicate
+this across all macb_config instances. Remove the .usrio setting from
+instances that use &macb_default_usrio, and ensure that the default is
+selected at runtime when no other value is explicitly set.
 
 Signed-off-by: Kevin Hao <haokexin@gmail.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 82d3f6017287af409d0a1908400d9967e634203e..27ec1f16c4f18c2be67f5052fd248ed17ea2281b 100644
+index 27ec1f16c4f18c2be67f5052fd248ed17ea2281b..0524109d47531785b63f1207aab9609e63de377e 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4646,7 +4646,7 @@ static int macb_clk_init(struct platform_device *pdev, struct clk **pclk,
- 					  tsu_clk);
- }
- 
--static int macb_init(struct platform_device *pdev)
-+static int macb_init_dflt(struct platform_device *pdev)
- {
- 	struct net_device *dev = platform_get_drvdata(pdev);
- 	unsigned int hw_q, q;
-@@ -4801,6 +4801,15 @@ static int macb_init(struct platform_device *pdev)
- 	return 0;
- }
- 
-+static int macb_init(struct platform_device *pdev,
-+		     const struct macb_config *config)
-+{
-+	if (config->init)
-+		return config->init(pdev);
-+	else
-+		return macb_init_dflt(pdev);
-+}
-+
- static const struct macb_usrio_config macb_default_usrio = {
- 	.mii = MACB_BIT(MII),
- 	.rmii = MACB_BIT(RMII),
-@@ -5301,7 +5310,7 @@ static int fu540_c000_init(struct platform_device *pdev)
- 	if (IS_ERR(mgmt->reg))
- 		return PTR_ERR(mgmt->reg);
- 
--	return macb_init(pdev);
-+	return macb_init_dflt(pdev);
- }
- 
- static int init_reset_optional(struct platform_device *pdev)
-@@ -5351,7 +5360,7 @@ static int init_reset_optional(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, ret, "failed to reset controller");
- 	}
- 
--	ret = macb_init(pdev);
-+	ret = macb_init_dflt(pdev);
- 
- err_out_phy_exit:
- 	if (ret)
-@@ -5376,7 +5385,7 @@ static int eyeq5_init(struct platform_device *pdev)
- 	if (ret)
- 		return dev_err_probe(dev, ret, "failed to init PHY\n");
- 
--	ret = macb_init(pdev);
-+	ret = macb_init_dflt(pdev);
- 	if (ret)
- 		phy_exit(bp->phy);
- 	return ret;
-@@ -5402,28 +5411,24 @@ static const struct macb_config fu540_c000_config = {
+@@ -5406,37 +5406,31 @@ static const struct macb_config fu540_c000_config = {
+ 	.clk_init = fu540_c000_clk_init,
+ 	.init = fu540_c000_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
+ };
  
  static const struct macb_config at91sam9260_config = {
  	.caps = MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
  static const struct macb_config sama5d3macb_config = {
  	.caps = MACB_CAPS_SG_DISABLED |
  		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
  static const struct macb_config pc302gem_config = {
  	.caps = MACB_CAPS_SG_DISABLED | MACB_CAPS_GIGABIT_MODE_AVAILABLE,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
  static const struct macb_config sama5d2_config = {
  	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
  	.dma_burst_length = 16,
--	.init = macb_init,
  	.jumbo_max_len = 10240,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
-@@ -5431,7 +5436,6 @@ static const struct macb_config sama5d2_config = {
+ 
  static const struct macb_config sama5d29_config = {
  	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_GEM_HAS_PTP,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
-@@ -5439,7 +5443,6 @@ static const struct macb_config sama5d3_config = {
- 	.caps = MACB_CAPS_SG_DISABLED | MACB_CAPS_GIGABIT_MODE_AVAILABLE |
+ static const struct macb_config sama5d3_config = {
+@@ -5444,25 +5438,21 @@ static const struct macb_config sama5d3_config = {
  		MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
  	.dma_burst_length = 16,
--	.init = macb_init,
  	.jumbo_max_len = 10240,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
-@@ -5447,7 +5450,6 @@ static const struct macb_config sama5d3_config = {
+ 
  static const struct macb_config sama5d4_config = {
  	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
  	.dma_burst_length = 4,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
-@@ -5460,7 +5462,6 @@ static const struct macb_config emac_config = {
+ static const struct macb_config emac_config = {
+ 	.caps = MACB_CAPS_NEEDS_RSTONUBR | MACB_CAPS_MACB_IS_EMAC,
+ 	.clk_init = at91ether_clk_init,
+ 	.init = at91ether_init,
+-	.usrio = &macb_default_usrio,
+ };
  
  static const struct macb_config np4_config = {
  	.caps = MACB_CAPS_USRIO_DISABLED,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
-@@ -5478,7 +5479,6 @@ static const struct macb_config zynq_config = {
+ static const struct macb_config zynqmp_config = {
+@@ -5472,14 +5462,12 @@ static const struct macb_config zynqmp_config = {
+ 	.dma_burst_length = 16,
+ 	.init = init_reset_optional,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
+ };
+ 
+ static const struct macb_config zynq_config = {
  	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_NO_GIGABIT_HALF |
  		MACB_CAPS_NEEDS_RSTONUBR,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  };
  
-@@ -5498,7 +5498,6 @@ static const struct macb_config sama7g5_gem_config = {
- 		MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
- 		MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP,
- 	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &sama7g5_usrio,
- };
- 
-@@ -5507,7 +5506,6 @@ static const struct macb_config sama7g5_emac_config = {
- 		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_MIIONRGMII |
+ static const struct macb_config mpfs_config = {
+@@ -5488,7 +5476,6 @@ static const struct macb_config mpfs_config = {
  		MACB_CAPS_GEM_HAS_PTP,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &sama7g5_usrio,
+ 	.init = init_reset_optional,
+-	.usrio = &macb_default_usrio,
+ 	.max_tx_length = 4040, /* Cadence Erratum 1686 */
+ 	.jumbo_max_len = 4040,
+ };
+@@ -5517,7 +5504,6 @@ static const struct macb_config versal_config = {
+ 	.dma_burst_length = 16,
+ 	.init = init_reset_optional,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
  };
  
-@@ -5538,7 +5536,6 @@ static const struct macb_config raspberrypi_rp1_config = {
+ static const struct macb_config eyeq5_config = {
+@@ -5527,7 +5513,6 @@ static const struct macb_config eyeq5_config = {
+ 	.dma_burst_length = 16,
+ 	.init = eyeq5_init,
+ 	.jumbo_max_len = 10240,
+-	.usrio = &macb_default_usrio,
+ };
+ 
+ static const struct macb_config raspberrypi_rp1_config = {
+@@ -5536,7 +5521,6 @@ static const struct macb_config raspberrypi_rp1_config = {
  		MACB_CAPS_GEM_HAS_PTP |
  		MACB_CAPS_EEE,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  	.jumbo_max_len = 10240,
  };
-@@ -5578,7 +5575,6 @@ static const struct macb_config default_gem_config = {
+ 
+@@ -5575,7 +5559,6 @@ static const struct macb_config default_gem_config = {
  		MACB_CAPS_JUMBO |
  		MACB_CAPS_GEM_HAS_PTP,
  	.dma_burst_length = 16,
--	.init = macb_init,
- 	.usrio = &macb_default_usrio,
+-	.usrio = &macb_default_usrio,
  	.jumbo_max_len = 10240,
  };
-@@ -5748,7 +5744,7 @@ static int macb_probe(struct platform_device *pdev)
- 		bp->phy_interface = interface;
  
- 	/* IP specific init */
--	err = macb_config->init(pdev);
-+	err = macb_init(pdev, macb_config);
- 	if (err)
- 		goto err_out_free_netdev;
+@@ -5662,7 +5645,7 @@ static int macb_probe(struct platform_device *pdev)
+ 	bp->wol = 0;
+ 	device_set_wakeup_capable(&pdev->dev, 1);
  
+-	bp->usrio = macb_config->usrio;
++	bp->usrio = macb_config->usrio ? : &macb_default_usrio;
+ 
+ 	/* By default we set to partial store and forward mode for zynqmp.
+ 	 * Disable if not set in devicetree.
 
 -- 
 2.53.0
