@@ -1,259 +1,191 @@
-Return-Path: <netdev+bounces-266170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLEtNZIysGl2hAIAu9opvQ
-	(envelope-from <netdev+bounces-266170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:02:42 +0100
+	id UBI9GrU0sGnRhAIAu9opvQ
+	(envelope-from <netdev+bounces-266171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:11:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851BC252CC1
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:02:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D532C253001
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:11:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74722330B5BD
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:02:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 72427314CCF5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F25391E4D;
-	Tue, 10 Mar 2026 14:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="P1o5e2V+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E356F391E58;
+	Tue, 10 Mar 2026 14:08:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012070.outbound.protection.outlook.com [40.107.200.70])
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3B3391E4E;
-	Tue, 10 Mar 2026 14:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773151338; cv=fail; b=dBUv9VVPQMUGIWMzNeWuivl6d0uH2DQUu4czD6tRJYtKDeEd6oT4JxqBXvrjWBK+sYV8FACvXpx7IYNzlq9KGpwVltu8noMfschPmgq/b5OhOH3d56yb0WVKhGFnx7G7J7KKwGUWePuqVFTqCvPxgEQAaYtwz/3CdaCzCGa1Ebg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773151338; c=relaxed/simple;
-	bh=2UZxsqP6vU0rLwx7dnQ09Lvs7EF/scr9RZg4jq2kzLc=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rejMrz/uk8Vm3xNWX/DDefWJiLR48+LpkcEnCmyovRsfcpn10hrymKEwRrqFD5NnmxBOto9Sj29HRrkRlS4nqAXrMFZuFihGiIAWBP5HjqbdCszrLHnzfCETSpK6IQyKu6yMHu+FVq6MdbTBbi4lhP1PyP84TDlbjBd1F+okUu8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=P1o5e2V+; arc=fail smtp.client-ip=40.107.200.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=llrGw36ELLVLhrhbCdkGWtFW4kxTZAP+MtiDFuwWQT35fVziYjlzSqP2HHVNcK3PAglY5tHMDm2GkmNE5i7btl+py+vt9deona7uxofk3EVUeAhDWj1OmYRJt8UgnAR4d4A5u08enuvHSmQ+YgxFI5uxpRG5Qo4gpNqxXp8YkxWfMKp/F+dYAXXt4zjo6VkuDvfaM4aa3ib9BFCxC/vxBO9MR+lPkm8f0KlS4rwyhPbwRXu03qiCoIllodQmH4H/fFn0v4eRQeWbF84LDkbMe2SFDZubtgvHBan2G+MOe9jGMdnUeFPlP8jVU08CJ2NtvY5yGo3jbqoogf7nLvCZsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CDK8MRD8prgGiIN+N5sAHzEQ8mwF4ycC9ynTrVMLOCs=;
- b=E7m/Nd5FASF0/9+qlhJxK8P1LmOvlC7b/kVMxd6WR6ZPA9GZftLAT3Ewp6xtSYYLrP0w6muHQMDy1d9hq9H8Q3XLX3rO/nBmCHmZVCXlJSQ0DeRonmG/XPJEmFMvUxJpDGWrId6WWXieIP9nAJW/WTxwkip0JbUuXpYKu5av88GhPcYLmsW+8WOXAVKlSfQOfpftV3rTjkE+MbsjtRPfpl06tIyLRlrFOOaJuK+jAi4/zYIRESpTGZE9w0qS7r+8ZOZ435V+EmiVsWWCbrs8huYwRxWYxZF0t4V51YkoKsxb6x3+EGLTFzxO49eZxZIXkN2rFB/kDUi+eyoFl7gTOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CDK8MRD8prgGiIN+N5sAHzEQ8mwF4ycC9ynTrVMLOCs=;
- b=P1o5e2V+MjtjvdelzhDc2Ztoct99y2ubkwrVGObE/Gi77BKir1sbNIww6Oa5s/oNBkqQXKO+Aiun0JGK7EuDMgPFjwey0RLrsEo2a2RqWjpqBClRhPOPjRoBAkkKvPyehPohJOtJA6NgMJRrBHyV0EZYOEW50A8uOxE/d5HtrjA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by CY8PR12MB7731.namprd12.prod.outlook.com (2603:10b6:930:86::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Tue, 10 Mar
- 2026 14:02:12 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d%4]) with mapi id 15.20.9700.010; Tue, 10 Mar 2026
- 14:02:12 +0000
-Message-ID: <39624055-28cf-4def-b6ac-12256b1da681@amd.com>
-Date: Tue, 10 Mar 2026 14:02:07 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 00/22] Type2 device basic support
-Content-Language: en-US
-To: PJ Waskiewicz <ppwaskie@kernel.org>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
- <1e617ee5e6003994d41a0a270ed1f6b17ac75f8d.camel@kernel.org>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <1e617ee5e6003994d41a0a270ed1f6b17ac75f8d.camel@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0067.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2af::17) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5A338B7A5;
+	Tue, 10 Mar 2026 14:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773151692; cv=none; b=LUNp4s3ui5RKUoQXIggo3TsPh03u9GHAFqL8v4w63eFg1nRda3FwRPmKh1hymGy493x+c3RIfvTmeh1KVCpr9sazjQgE+HvyXzStZhk4s8hVLpkNwZbM5+qy4AdIlIgg8EGqaqNM0er23J/QTe8mMMc/YsrEOjHvHKYyfn6VkKE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773151692; c=relaxed/simple;
+	bh=SMamLYuK7QpP5Qy11gfel2SYdZy/ey1WEVc9Se5MWz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N6ZpvP2xSCCKec1ZqBzvfTskOoUDGD1MVdJbObIthayBtIH6JNUwANVxgkaBB4Hb19Cprp913YcdDajMGLf2GBc1+GyNyUNKnFh4hUk7SBFy6vGGXfUsNi2nyxmwqUIF6rIwbNnmKVRvZeXxGm64K1gorz0tK1VjgPonICD6Axc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay10.hostedemail.com (Postfix) with ESMTP id 0EA11C0859;
+	Tue, 10 Mar 2026 14:08:05 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf14.hostedemail.com (Postfix) with ESMTPA id 847E92D;
+	Tue, 10 Mar 2026 14:07:40 +0000 (UTC)
+Date: Tue, 10 Mar 2026 10:07:50 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>
+Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL
+ check
+Message-ID: <20260310100750.303af303@gandalf.local.home>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	<20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CY8PR12MB7731:EE_
-X-MS-Office365-Filtering-Correlation-Id: b370991f-4c1a-43f3-c19e-08de7eada054
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|921020|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	XstSvagLaU5I+cRiT7jELkvybqDlsje0nPN6x/HXFzWyOSNFowkbfH+YzK/Jv6k5pXcWLf7EMBdSRCwjdCovqh467bjoh54SQdtLjciKvAyya9w52yIx81n/8uFoiBhnQyuowOVNDRqfidCTCWlniQ7fgT43kqze/aJ6qcbTzAczfi4paA19zT4hwkrw/DG3yJn2iN9gRUOqs/lE8lj5wl//f6PP/xwQDE6WRZ1dM4IopldesqLAFpoGnLBQ9m0sJ7R1xtaKQn3KAnrCIqJgNvZGvksGOjFI7Usf08LNbVpg3xYxw0eA8X5WjG8KcfYfz+irWqAVnHAcMAdIeusKUMnRo0F9wbB3XZEOZqDQ/InBe4Mq8wEoPoUPmVIEIKBDAkSfSQ6lIKfqMsUcO9n5kr2T8UGFGwker2R38tCrStX0PZ8q+8wNy6NSeYQvqknK61yVF3jw49lMu/eLaXjSV8+fHiI26QCuZX8k+YoWXswQK6Ut8iz+NPZiHsi2hy4UHI1gyNIaJ7lA4ZDoA5uvE/7qEyajb1GPJs2E+8CmnZn4LgLOwtQn15jI9S2NMsGa3udg7MVhVKGJifgvgNbeD/w+Lz20Zox4UxvwL4/EwgsWqHgA7VTRJivj7HWzI7/ryer/AxxDPI0SrbYoZz0k8fPWOueBTMsDN1aBzyAEk9PUdcmOuSpyQH8/coGQUgvLAAi0xE9VriqFDnIPc24LidisPF9QNb0qotR+bTk0kDASOVaPppULvMwoKibUzxVTM5oaVUsCt4ip1AvOoXQjFA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VkxUbjIweHFwcGVUNUM4OU1lTnRSQkcxdWlFQVBBVlhMcVFoeWYxMjVXS1Vv?=
- =?utf-8?B?RnVVaUVCSk15Y0dmV3FoRE1DSkVXOC9uTU5GazJOMXVrVDhHbnJrNElSS0tM?=
- =?utf-8?B?RUN1UUN4Uk9vV2lyRmt4ZThGcERVSExBL3ptMjdmeVpvaUhOZTUzN09EWWtX?=
- =?utf-8?B?SCtvTnNqamtwTXRVSkZma0tYOFd1cFlQalNFeFJPd0tJZi9zZHlzVkFTaXJG?=
- =?utf-8?B?VXlNTllIbUUveWNRNHI4ZkFKMXN6QmgxWFZ2QVhNNDdwdjFETXZXQWRzVFZY?=
- =?utf-8?B?UElZZTUxT3lwQXhPV3ZMVkpxTmp0RzRKbW5nSE1Cd0dIMEFPVXNRaTc5QzJK?=
- =?utf-8?B?clEwOC95czZsekZMdlJiSXllOWo4MGN2YWMxU0tSOFpIVWVmVTNNTDZ5ZzBI?=
- =?utf-8?B?a2hpbDhOaHZhV3J6UmRGc1BqU3drNjZrV0N4aCtWVjNINys2L2ovOFN4d1ky?=
- =?utf-8?B?SzIxcHNxLzlkejB6U0hqQVoyK3N1ckFDdWtEd1dhMi9OSUxnbUpXRVptM1Rr?=
- =?utf-8?B?TklMVW9CRERxWHBKN29nS29wSSsvUWxNQ3pOUHVoRndiZ252QXZDbWF2bGZp?=
- =?utf-8?B?SUc1dWU0Rjdta0ZrWEVqaklXQkd3clRkMmlkcVpPS0ZMRUcrc0RzUjlkdStM?=
- =?utf-8?B?Q29OdlhOQ1NadzRTMzhId09GYUxQNVdlNEE2N1k2NjF3T21lK1A5VUY2bml0?=
- =?utf-8?B?OUJFc1ozN1Jwek9CWjhkcDFtUUdKQkFxYlZjUmlubXV4bXlqYk50RllUTFhV?=
- =?utf-8?B?ZHBobGtmVWZDdHNQY0Rvei9JNnVqbEIya0ZCUURpbERhdURVSHZ5SGh1UU9Q?=
- =?utf-8?B?MkpKdU1MaEw3ZTcvUzl5a1UwLy9JMUNOOTFvTC9XSmVVWEMrQkN0aWlKanNJ?=
- =?utf-8?B?R1BFemMvYUsvYzdTajJFZ2UyTVhvK1F1a3lKSXBMSDVpdExRaG5OcG4yMDcw?=
- =?utf-8?B?Y1lpZjdDR1hnb3JjNEtvRDdqQVpTVFQ0M1pVTzIwZzdKbUFPeWp3Y3BaQTlq?=
- =?utf-8?B?VjJxMDBtQW9wZXRtRUhQQ0ZXRzBuTTl1VWdkbXJtcTUrTldsUzVKMXFzZ3o0?=
- =?utf-8?B?azR1QWcxR21GWk4yM2JrRlhjUEhSeGRtU0lTYm4rbCtrVytMSEc4MHlRT2pj?=
- =?utf-8?B?M3hjSzZldWJPRmV2V1ZNL0s0VDhDeXo2Sm1iS0l5U2ZyRXVHV252elRzaXRL?=
- =?utf-8?B?b0VITC9FS3NsWFVRV2JyR0trdnY5UVoybjdXbDF3ckg2SVd5bzM4MDVGMUVx?=
- =?utf-8?B?M0x0aVRFeG1lZFpWVTBhREJxMFF5bHlhNU55VkF3enpCSzd6aXRmemhER0I5?=
- =?utf-8?B?Qk5SVzkvVGp6OTlkRmthQnZ6TWJxT0J5SmMrMTBuckUzZm1jQkhzOVJwb0Ja?=
- =?utf-8?B?SUowRHlzNDhxdVMzQ1RrSlBPdEFMaCtsMUNSeTg4eEg5VTBYY0RIMjhMdWpX?=
- =?utf-8?B?ejFZNlQxNFgzOU45S1JERURFTWpNODZFVjlYV0Rvbk9Da3UxQ3h0YjE2TTZ2?=
- =?utf-8?B?WUZVamR5dm9wRzNmSzZpcjhOVE5BZmoxSE1IVWZ0bFluYmtmL2JtOHQ3Unh5?=
- =?utf-8?B?TThYSi85SjRrS3NxU3BsV0ZIV3lRbjFJQmxqNHRaY2RDcXhvdFVZYWNyVStp?=
- =?utf-8?B?Y0pLa2ZMY3JaaW9IWjYyaU53dTBVRTE4N0xaYTFOS2F1VGJPTFRNRVR4ZjRM?=
- =?utf-8?B?U2pxZjFUVU1FZ0pyVzVoOUlWZE01M3NxSWhVQXZXUDJxSDNlN3k3bjN3K0gv?=
- =?utf-8?B?dlBYaWhWWE9Ma0dTL1Y2eVdzaU12c3g5UXh4SUlyRHFST281QUxqbnVoV2pD?=
- =?utf-8?B?T21NR0lYeFA1WkVRUm9QZXNhSjJabUd1ZjNlSlZrWk05MzdIU0kvZ25DRW5t?=
- =?utf-8?B?OGdudHhJNDJTRTJqaHUyR0htQnlqeDZOa0Y3Uml4bWVVTDZMOFZabXdrbTRh?=
- =?utf-8?B?QWlTSTR3ZnRLRkNvRndnbkhRenIvWGxPWW9RaVFhenFpTkJMNWlSZVpFblJN?=
- =?utf-8?B?TGZLUCtOeWs4R2JDSnZiS214RWlselJIdWgwRFBMeWVHRTFSRHFzdlVYNTYw?=
- =?utf-8?B?SDV0OWxhYWhYWFBNL3JWTU43eFcrek9WNVV5UGdMZUtyVnRuZEJTVEdaMTJN?=
- =?utf-8?B?M1V4Vk1jb1d3NHI3ME44dWZuaHVUTkhDcVhxbmFHKy9YQzRpS2JIUEYwdnhK?=
- =?utf-8?B?cDd6b01OWWJDNWhWTUdvTXdYOUhVVXFnWDJ5c2o4OVE4bjgrTDBhN1RMRk1l?=
- =?utf-8?B?RjBRZ0kyOUoxRVNxQ3lHRUJOaXdpS3ArSjRDOWR3ZDEyTEJNTzF1ak1ocGs0?=
- =?utf-8?B?VnZ2MVlwWHRYd3FkWVlTcWNyeDRybVdockR6clJqRkdpRGp3WWl5dz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b370991f-4c1a-43f3-c19e-08de7eada054
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 14:02:12.0153
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n4mcPJ9nczKtVzmLYInKXFbPiXipv6IEYbaPNC1Sv0zLx9bcXfWXQTyOMIT7en2bEun0N6y8vRrPboyIe4uL+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7731
-X-Rspamd-Queue-Id: 851BC252CC1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: 7qtdkkf3por5hcs9du9pir5nqq8uht35
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19Z3Tx1sMlUDFHS8YYPfSOpiqPw8cg/LfU=
+X-HE-Tag: 1773151660-993833
+X-HE-Meta: U2FsdGVkX1+JWrMXdInzvBx9l2WUqahyoYUezPLaF3HICGuHpiLcos2NJHmqwFPLfM8ZBXZ6/fmTg/vlHLcqcaFGukyEZOsOE3kBaCKhhIkGksjLucUHfFRW8KX39dTkHeOQhZTWX/A0f9Y+1fWRMEQzHGhaJF2wpPshgb4yUxNCAKdeI6QYyukTSlQGbTY7Uxizi79ndrJuznFkrJ0f1Gh3JC2I5gazyCY5QhqLMJ9a9ShPFpKdZ7NDaPeyx31oXfa0p+bWWHR1R5JbGDYWhbllAgJDuEbxQsOff6UlFUV0L3hTo0f3pFVAKw4ZSe/3wUeKTGah6IcaIcnei7ziR9eK5k/ow6hfmOBOZGq2CLBxHUplOJMJzaQEF/IeU48U6bUZ8WiPpl/JDxwK03ucqBa/7oG+YB+etWyAxh+TKdi7NbCLCb6PbeExJ2cO76n2AdjJCB03SaDGNN90kGsLmA==
+X-Rspamd-Queue-Id: D532C253001
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[goodmis.org : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266170-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266171-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[amd.com:query timed out];
-	DKIM_TRACE(0.00)[amd.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
-	RSPAMD_EMAILBL_FAIL(0.00)[alucerop.amd.com:query timed out];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rostedt@goodmis.org,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[56];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.779];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:dkim,amd.com:email,amd.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goodmis.org:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+On Tue, 10 Mar 2026 12:48:41 +0100
+Philipp Hahn <phahn-oss@avm.de> wrote:
 
-On 3/9/26 22:43, PJ Waskiewicz wrote:
-> Hi Alejandrom
->
-> On Sun, 2026-02-01 at 15:54 +0000, alejandro.lucero-palau@amd.com
-> wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> This patchset should be applied on the cxl next branch using the base
->> specified at the end of this cover letter.
->>
->> Dependencies on Dan's work has gone and also on Terry's as the only
->> patch required is now in next. The other dependency is on Smita
->> patchset
->> but it does not exist such a dependency as that work will not avoid
->> the
->> problem with Type2 and DAX/hmem if soft reserved memory. This needs
->> to
->> be solved by the BIOS and Type2 UEFI driver for populating the
->> CXL.mem
->> range as EFI_RESERVED_TYPE instead of default EFI_CONVENTIONAL_MEMORY
->> with the EFI_MEMORY_SP attribute. There exists though a dependency on
->> one Smita's patches:
->>
->> [PATCH v5 3/7] cxl/region: Skip decoder reset on detach for
->> autodiscovered regions
->>
->> This is needed for the default behaviour with current BIOS
->> configuration
->> where the HDM Type2 decoders will be kept unreset when driver
->> unloads.
->> This is the main change introduced in v23: committed decoders will
->> not
->> be reset. Previous v22 functionality supported first driver load
->> finding
->> committed decoders but resetting them at unload and supporting
->> uncommitted decoders in next driver loads. This will be suported in
->> follow-up works.
->>
->> v23 changes:
->>
->>    patch 11: fixing minor issues and droping change in
->> 	    should_emulate_decoders (Jonathan Cameron)
->>
->>    patch13: refactoring unregister_region for safety type in Type2 API
->>
->>    sfc changes: slight modifications to error path
->>
-> I've been able to mostly get these to work on a very boiled down
-> driver.  I still need to port these into my full driver stack, but
-> moving that whole stack (multiple drivers) each time a new API is
-> proposed was becoming a blocker.  So I have a very basic driver that is
-> testing the interface against our HW for now.
->
-> I have a slight issue that I'll address in Patch 8, or at least ask.
->
-> In the meantime, I'll start moving things over to our full stack to try
-> and get the same level of replication.
->
-> I'm hopeful I can start adding Tested-by:'s to the patches very soon.
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
 
+Why?
 
-Hi PJ,
+> 
+> Change generated with coccinelle.
+> 
+> To: Steven Rostedt <rostedt@goodmis.org>
+> To: Masami Hiramatsu <mhiramat@kernel.org>
+> To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-trace-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  kernel/trace/fprobe.c                | 2 +-
+>  kernel/trace/kprobe_event_gen_test.c | 2 +-
+>  kernel/trace/trace_events_hist.c     | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/kernel/trace/fprobe.c b/kernel/trace/fprobe.c
+> index dcadf1d23b8a31f571392d0c49cbd22df1716b4f..a94ce810d83b90f55d1178a9bd29c78fd068df4c 100644
+> --- a/kernel/trace/fprobe.c
+> +++ b/kernel/trace/fprobe.c
+> @@ -607,7 +607,7 @@ static int fprobe_module_callback(struct notifier_block *nb,
+>  	do {
+>  		rhashtable_walk_start(&iter);
+>  
+> -		while ((node = rhashtable_walk_next(&iter)) && !IS_ERR(node))
+> +		while (!IS_ERR_OR_NULL((node = rhashtable_walk_next(&iter))))
 
+Ug, No!
 
-I'm afraid it will not be useful ... as a new approach is being followed 
-now, with some of the patches sent independently. I have already sent 5 
-in two patchsets, which I hope will be applied soon after getting 
-reviews and minor fixes. Working now on sending at least two other 
-patchsets ahead. The idea is to keep all the sfc changes to a last 
-patchset with only minor changes to the cxl core then.
+That looks so much worse than the original.
 
+-- Steve
 
-Anyway, thank you for testing this last full patchset and the feedback 
-given.
+>  			fprobe_remove_node_in_module(mod, node, &alist);
+>  
+>  		rhashtable_walk_stop(&iter);
+> diff --git a/kernel/trace/kprobe_event_gen_test.c b/kernel/trace/kprobe_event_gen_test.c
+> index 5a4b722b50451bfdee42769a6d3be39c055690d1..a1735ca273f0b756aa1fcfcdab30ddad9bc51c5f 100644
+> --- a/kernel/trace/kprobe_event_gen_test.c
+> +++ b/kernel/trace/kprobe_event_gen_test.c
+> @@ -75,7 +75,7 @@ static struct trace_event_file *gen_kretprobe_test;
+>  
+>  static bool trace_event_file_is_valid(struct trace_event_file *input)
+>  {
+> -	return input && !IS_ERR(input);
+> +	return !IS_ERR_OR_NULL(input);
+>  }
+>  
+>  /*
+> diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
+> index 73ea180cad555898693e92ee397a1c9493c7c167..59df215e1dfd9349eca1c0823ed709ec7285f766 100644
+> --- a/kernel/trace/trace_events_hist.c
+> +++ b/kernel/trace/trace_events_hist.c
+> @@ -3973,7 +3973,7 @@ trace_action_create_field_var(struct hist_trigger_data *hist_data,
+>  	 */
+>  	field_var = create_target_field_var(hist_data, system, event, var);
+>  
+> -	if (field_var && !IS_ERR(field_var)) {
+> +	if (!IS_ERR_OR_NULL(field_var)) {
+>  		save_field_var(hist_data, field_var);
+>  		hist_field = field_var->var;
+>  	} else {
+> 
 
-
->
-> -PJ
 
