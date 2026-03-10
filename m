@@ -1,187 +1,190 @@
-Return-Path: <netdev+bounces-266248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uA7YECZPsGnFhgIAu9opvQ
-	(envelope-from <netdev+bounces-266248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:04:38 +0100
+	id 4F5QG2JPsGnFhgIAu9opvQ
+	(envelope-from <netdev+bounces-266249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:05:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E76255364
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:04:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5CC0255391
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:05:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3C18317E9ED
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:02:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02AC6301F180
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9993C9445;
-	Tue, 10 Mar 2026 17:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993F03BED22;
+	Tue, 10 Mar 2026 17:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPdylzNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from mail-oa1-f65.google.com (mail-oa1-f65.google.com [209.85.160.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A6A3B6361
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 17:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773162132; cv=none; b=gizmUuhaW9WbVt7uZjLhRu3WU8fLeqacCQKVrzX3mBJ4Ub1gpmXGPtLp/bzvw8K06Jc/j3lUqK07acE03G+yhQVPC51iI5x4SY8hVwQyxRuFgwVvfYiUkwAZj2mQCaJ3MgDonDvfDKkuzYyQcFB2BlbHvAw6fTsxS/O43xeIJEE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773162132; c=relaxed/simple;
-	bh=VmCzHmrG9j2bMu3s45uDq31/hcIEsZkaQY0AfH8hzag=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=GKntGx1L0tF0wyt615vvDPmG+MxTnfzyY93OXI/9D6bZn0UVWVfgCrmP3UzQFBlACE2ycAAkKgBs4wPXVSnMWtbPhGe0I7pd2z+7tOPoNPybQLDCKElTqwUlds0ijN2MLqI+8mIaufAogqF9z2rXkFHXsAy9xQWNLXF9bp4R6YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-67ba64650d9so48240745eaf.3
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:02:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5980039937E
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 17:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773162222; cv=pass; b=AKO9RJGXygdsCPFuQKDGy8XiKAJEFpTjYPcL98gqZDsODYxAaE+KwLL4uKn1STyYZrBtv2eyy9juvnij2Ytwn9ar3JWJB92yZMOWzPvdQhSKTs+OKfH+6CRtNRvu5Z5FfcjR3yRZwGexHOvd9kHfWAiXI1S3o835UojO3ZE5wBo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773162222; c=relaxed/simple;
+	bh=MBo/+DJCBtPBAg/GOrVqvihj90PeTRm9an2hGLEYtcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bBdNPwlrAKRal4qik7AIGNu37sy2VjZKcaYYveBOlCmRdMwEa2QkoVbx/qKKD4mCXF0tdSmcO5iO9vmvNjCOoVHNR4HEAZzrPUVpunre/t0dKaBkcDVXK7+L1alFHnlmGu49n4XaNeGecNypw/6Ypvticjkyv5MjVE7OWn/LGzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YPdylzNv; arc=pass smtp.client-ip=209.85.160.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f65.google.com with SMTP id 586e51a60fabf-4174754d693so112550fac.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:03:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773162220; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a6W2ObxjA/PYGmif/FPiyGMD3Obb3tRPrfV2n9Qr+bRxrLMRxuIidi3oslH56lZXxM
+         znbg/OTH9imr7F48yr3TVX4rWGBQPBcMJt/Y8FykI3OF1pubQtNGMl/vnW+aVBDptQXq
+         z63VJijI2OhC31JAj+Ct5w43yh92Utubu/vtWIgWc3+cEYoBFSVRIPPOJzUinfYISbLl
+         sh/+ce6rjCDWohz4s4Z6O/uyZ0nv0hSQevOawhI+1FwvZV/es6di7P6c+/YJdwPj0d0C
+         DyzsM307396bPl/MUxCRswv7qFWbwsH1ujl30FTLERbBZ5t20kohBVBydgdRV8QxYBf6
+         7Xyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FR2Gqp79y8t+9qWgtj9KiChLZluaG/EMkEZUQPOEaSA=;
+        fh=m+MlybpBgAvXRatjRUI4/rwZ0BxaHes2eWqCG1qWzds=;
+        b=Wg2ecC8o5kfCzF8TkA91pXctWp51STI/tsLKmShD0zraBDlKhuu3cPMEWQZOCs/MZJ
+         zpRJBgoCdmRzvroUZZMdCyEi4gNQIMDt/eRQW5CiFF8V5TPSreJ20hFeo4V6NSG6AZYu
+         AUPrTJv+02L3qsdeB2DbizB67gr4P8c7XkVL0m/dIT/0B30a2DK6mYYViwFZB+I9rzX8
+         txTtcA3qprcUZwC8pvRQ1++5DuW5MXmNRu4hdGv9pfcT4rEOvZa2mTc6ZBblLxjesN2e
+         uo1oJ6JT4hiOZGpX/4FMHQ69wD+LhvNuHNNpwqOzmwrpE7EGEMJJx2uvQvVfxEg+9V4U
+         WULQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773162220; x=1773767020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FR2Gqp79y8t+9qWgtj9KiChLZluaG/EMkEZUQPOEaSA=;
+        b=YPdylzNvgdDGhgir0+R2aBHobWBVjIOI15tMXOoE29iPQkEpfPBTdW32FuFHIHPb7/
+         SnqR2dKPIcas87oUWvyTRGA48aj8elHRXmWrWsTkIHcRkJrGF1NyQZ9urNRUNuL7wISr
+         kUGu7If4Atf/1nGyhi4WuSeNQxFXvlgq/5MhhzdJ4EorkhSAtNueH2kIzYTgtp6T6wEh
+         gwkzB6n/2QA0sIf9S5RRTwtHSf92/M+djifAsLROby1vHpN016cJ2TGo1CrDAkWfJxUq
+         JfUrycuD8/W8jq3jfWIXUfUOniftdLQNeQQPEgleeM/7oiRA5POjW6+H0+qlSVNVaayO
+         oYdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773162130; x=1773766930;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q21Kf+JSTc9Wfjs37P9MOrHmbMi2Fg3vu9CFH4m6XNY=;
-        b=DixvO9J/gR6rN/eADU2Gv0A1ZIt0jfa9UzDyn+gGxDgRsU4ZIvZ1zeLqHSEQXqSD8Q
-         Sz52LlV5Z+A8sG+WSsJrXM/s2lf+kaj2raXJxcowJkHi4T5jt1bvL1tT0v/AdmXDpFDz
-         WGcYmM55KXSbtqb/AuGlZKjEzq2lAkz9rqsiHNLZIpk8bV+kzfJj8jvdPsOFZREsN1CP
-         fEwKbve7JEycdS+zd732D4PdTrBtVk0TG9ciNwUBjJmFKLqkGnzScY6aP5mVbJJ+1K6J
-         +uiBO+idIHAOnka18TpexNKU3jf9rVKIE5qUMnQzWi2qCeWhkRP+g44cx194UasmVRDd
-         8eAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEjt9EeF9wkN51Gth0z+hiKkuu5o6YPoVs2pnmOSCsyaIDA9HXlyTAlgosu3OClxox0MHgj+k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0g5LPadCixjYWT2fLcg9wmesA16Z7GWbds0puswO8Ik1jwR3l
-	9MjH+6LlNmMWeTX/GRdFeI7FDhBJEUcuE7gQU408I1XmEDl5TUYZzEApbrj6pIT+ZeLTkHjfK6Q
-	iOJyjcoJGyGZ5oFSnk3JmEMpXQveEVYY/fO69I9HcDACGF7bGJgQtxkAwskM=
+        d=1e100.net; s=20230601; t=1773162220; x=1773767020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FR2Gqp79y8t+9qWgtj9KiChLZluaG/EMkEZUQPOEaSA=;
+        b=JgkfESn/PPrsz1mu8YY3J4CPg52C649hBrY1HZeKjPZnT/l6P1+b/CLld0+BcM/gu1
+         HymnxogSWaVDH9z7zAT7usccupn3Lix5Y5zjApRRoSkXhjQ7DpLQIxuzE9MhqJp4zrbA
+         kfJ7nTNd2/RfG5/RsbQks7d8wsMDaAQRiQK7jAtuAbeMlQHnirQXI5KILhyLwmmiqP+G
+         t71eeLG24BodjwzE2Vpp/1CKIt47XW/srQzmwJR6QF9ofoKPBSeEC3V96rYOuujfnTu1
+         jmCCz+Rcag5p1v6z3l+XGyYCJFpMoKN02pyVr8r2WunIW0GTj/+s7r7uA2YUGX3oMqbB
+         ieeA==
+X-Gm-Message-State: AOJu0YzU8WTP+meGc370qY8jg8g3YpyIy0lL0s3Ccj3HcqfBXh1DMsag
+	G0n5uowM93VMvwD4HxihpIaMppoDB7kn08mKqBVUK1vLATB2+NHr23hFEV/HQl6lgIAao/EWPcd
+	s8TjaKY0NnNEJ429iu1Z0ZXYFuTd0M7WYN+n43Nk=
+X-Gm-Gg: ATEYQzzTin/peGvXijLYxZeJqxqBc6J46dHpYBG0IF0DKKFUv19Tq8vvfmFya//FfGw
+	0lENb6UtlOroXRksI22Q7QpKGasp6bdVgJZVe3JKq6s3aqtWYYppcTUZUjR/E/SU2zgtxE9Zdmz
+	vEhzEny7FVacJUWqlTTP/gIL8MCJdhkq5MZLbLZArrlR7tWMWyMLLG+I6VFbAm5L/mghBrIs2H+
+	c0HYZOrLuBI2cusdbq8wQfa23CJvMlWH5oV7ob6qMwlIH5MyI1H2mRpkZ9qf8MCYEjWfpZpjQ+0
+	pCBrUtiNn4ffrmERm+DQh7g=
+X-Received: by 2002:a05:6808:1a17:b0:467:272e:883 with SMTP id
+ 5614622812f47-467272e1c4fmr807969b6e.1.1773162220123; Tue, 10 Mar 2026
+ 10:03:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:cf16:0:b0:67b:a5a1:8ee0 with SMTP id
- 006d021491bc7-67ba5a19256mr5796493eaf.66.1773162129784; Tue, 10 Mar 2026
- 10:02:09 -0700 (PDT)
-Date: Tue, 10 Mar 2026 10:02:09 -0700
-In-Reply-To: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69b04e91.a70a0220.51e36.0000.GAE@google.com>
-Subject: [syzbot ci] Re: net: move netdev_compute_master_upper_features to ndo_set_features
-From: syzbot ci <syzbot+ci098fa7c1795eceac@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, bridge@lists.linux.dev, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, idosch@nvidia.com, jiri@resnulli.us, 
-	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	liuhangbin@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	razor@blackwall.org, sridhar.samudrala@intel.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <20260309183454.2872967-1-weibunny.kernel@gmail.com>
+ <20260309183454.2872967-3-weibunny.kernel@gmail.com> <f316780b-141f-4a91-b517-71034a02aef7@gmail.com>
+In-Reply-To: <f316780b-141f-4a91-b517-71034a02aef7@gmail.com>
+From: Wei Wang <weibunny.kernel@gmail.com>
+Date: Tue, 10 Mar 2026 10:03:29 -0700
+X-Gm-Features: AaiRm523LaGJbKeHRQAWksz_ehkrUNhgh7qGKr9TfYohI6FsTdYcKCGrY9Jegoo
+Message-ID: <CAGqc4nUMVyYYavr_z7eYSZ_H49XtfJTqvRJ3zyYt+2nd8D6BnQ@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 2/5] psp: add new netlink cmd for dev-assoc
+ and dev-disassoc
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Wei Wang <weibunny@fb.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: A1E76255364
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: B5CC0255391
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266248-lists,netdev=lfdr.de,ci098fa7c1795eceac];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,lists.linux.dev,davemloft.net,google.com,kernel.org,nvidia.com,resnulli.us,jvosburgh.net,vger.kernel.org,gmail.com,redhat.com,blackwall.org,intel.com];
+	TAGGED_FROM(0.00)[bounces-266249-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.916];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlesource.com:url,googlegroups.com:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-syzbot ci has tested the following series
+On Tue, Mar 10, 2026 at 7:25=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.co=
+m> wrote:
+>
+>
+>
+> On 3/9/26 2:34 PM, Wei Wang wrote:
+> >   +int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *inf=
+o)
+> > +{
+> > +     struct psp_dev *psd =3D info->user_ptr[0];
+> > +     struct psp_assoc_dev *psp_assoc_dev;
+> > +     struct net_device *assoc_dev;
+> > +     u32 assoc_ifindex;
+> > +     struct sk_buff *rsp;
+> > +     struct net *net;
+> > +     int nsid;
+> > +
+> > +     if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX) ||
+> > +         GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_NSID))
+> > +             return -EINVAL;
+> > +
+> > +     nsid =3D nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
+> > +     net =3D get_net_ns_by_id(genl_info_net(info), nsid);
+> > +     if (!net) {
+> > +             NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_NSID]=
+);
+> > +             return -EINVAL;
+> > +     }
+>
+> hmm, well I guess I still have the same comment from v2. If assoc_dev is
+> in the same netns as genl_info_net(info), then userspace would need to
+> create a self-referencing nsid to link them together. It might be a
+> better uapi to change PSP_A_DEV_NSID to an optional attribute, and if
+> not present then look for PSP_A_DEV_IFINDEX inside of genl_info_net(info)=
+.
 
-[v1] net: move netdev_compute_master_upper_features to ndo_set_features
-https://lore.kernel.org/all/20260310-offload_compute-v1-0-3df79c09ea65@gmail.com
-* [PATCH net-next 1/3] net: use ndo_set_features to set offload features for bonding/bridge/team
-* [PATCH net-next 2/3] failover: use ndo_set_features for failover offload compute
-* [PATCH net-next 3/3] net: no need to disable LRO specifically
-
-and found the following issue:
-WARNING in rtmsg_ifinfo_build_skb
-
-Full report is available here:
-https://ci.syzbot.org/series/d5001c4a-a51e-49c1-9106-624836e43ec2
-
-***
-
-WARNING in rtmsg_ifinfo_build_skb
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      52ede1bce557c66309f41ac29dd190be23ca9129
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/281e7e02-f6af-4b4a-845e-d1d5842a9301/config
-
-batman_adv: batadv0: Not using interface batadv_slave_1 (retrying later): interface not active
-hsr_slave_0: entered promiscuous mode
-hsr_slave_1: entered promiscuous mode
-------------[ cut here ]------------
-err == -EMSGSIZE
-WARNING: net/core/rtnetlink.c:4421 at rtmsg_ifinfo_build_skb+0x218/0x260, CPU#0: syz-executor/6496
-Modules linked in:
-CPU: 0 UID: 0 PID: 6496 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:rtmsg_ifinfo_build_skb+0x218/0x260
-Code: f6 ba 01 00 00 00 89 e9 e8 25 15 3a 00 4c 89 f0 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d e9 7f 3a 2e 02 cc e8 49 3b 42 f8 90 <0f> 0b 90 eb 90 89 d9 80 e1 07 fe c1 38 c1 0f 8c 95 fe ff ff 48 89
-RSP: 0018:ffffc9000637e9a0 EFLAGS: 00010293
-RAX: ffffffff89835e27 RBX: 0000000000000000 RCX: ffff8881b80a57c0
-RDX: 0000000000000000 RSI: 00000000ffffffa6 RDI: 00000000ffffffa6
-RBP: 00000000ffffffa6 R08: 0000000000000004 R09: 0000000000000004
-R10: fffff52000c6fcdc R11: 0000000000000000 R12: 1ffff110235ddc21
-R13: 0000000000000000 R14: ffff8881133dc780 R15: ffff88811aeee000
-FS:  0000555557c4a500(0000) GS:ffff88818de65000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055555e1838c8 CR3: 0000000168b80000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- rtnetlink_event+0x1b7/0x270
- notifier_call_chain+0x1be/0x400
- netdev_change_features+0x95/0xe0
- __netdev_upper_dev_link+0xb20/0xc80
- netdev_upper_dev_link+0xb0/0x100
- macsec_newlink+0xb11/0x1200
- rtnl_newlink_create+0x329/0xb70
- rtnl_newlink+0x1666/0x1be0
- rtnetlink_rcv_msg+0x7d5/0xbe0
- netlink_rcv_skb+0x232/0x4b0
- netlink_unicast+0x80f/0x9b0
- netlink_sendmsg+0x813/0xb40
- __sys_sendto+0x672/0x710
- __x64_sys_sendto+0xde/0x100
- do_syscall_64+0x14d/0xf80
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ffadf757917
-Code: 48 89 fa 4c 89 df e8 a8 56 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-RSP: 002b:00007ffd0eb79f80 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000555557c4a500 RCX: 00007ffadf757917
-RDX: 0000000000000054 RSI: 00007ffae0544670 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00007ffd0eb79fe4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007ffae0544670 R15: 0000000000000000
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Ack. I probably missed this in the previous round. Making NSID
+optional to just refer to the current user net-ns sounds good. Will
+update.
 
