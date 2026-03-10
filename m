@@ -1,253 +1,309 @@
-Return-Path: <netdev+bounces-266218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266219-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCmgKNw/sGkehgIAu9opvQ
-	(envelope-from <netdev+bounces-266218-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:59:24 +0100
+	id IFNaHpI6sGlbhQIAu9opvQ
+	(envelope-from <netdev+bounces-266219-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:36:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0182542B8
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:59:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BEB7253B33
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:36:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45C1B31ED229
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:25:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 68915302A78E
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE4331AAB8;
-	Tue, 10 Mar 2026 15:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267B938D6BA;
+	Tue, 10 Mar 2026 15:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AQHs/yr7"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MFcDj5Xj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qmd3toJ8";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MFcDj5Xj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qmd3toJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE0D30AD05
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 15:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773156343; cv=pass; b=FOoHQsfHWsZjg4wqwzIE7G/IDnK9XA/4RoSi3A0gLEUQUVg+8RGA3pOmxZw8R0lacJf4spWbd09ZX+6zClCmMYqgNYZsRBXfHyG8EwVpBPTporNhZv4mRwgjLiETwGGNbMUKBc0ujk8DiYL/YyfLn/QDd0btEJFs3s7HuU7m28g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773156343; c=relaxed/simple;
-	bh=GFx5yp5C5pnYLv7xRJ3Ffwa6mKYbZQnZ2HP/JE3CkCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rvnHALXaDouDqr9W3ToXByAia9Mz2msknNVT9Pg3S2kmIPVK9rTSryhrF6LVexK2D6ff8t/XXteBk2y0E4WImEla1iTINBVXsgCh8QJskYHn80ThAb+mxzFUUhRerXS6mhP4Ofz3Bna0ukEhqSIrGIJaBS2o9wx3rtYPbgwYyjM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AQHs/yr7; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509064418a8so37668521cf.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:25:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773156342; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DISJKkuYCxQ1A/h8eFQzQJ5O//M1EFL+pgvrqxFHGJlTQZwWKzifuEhiOSmDfBiaji
-         9QCNPF6UBpTPVpgxAHgHdVHgY2L8W9WYHHC3BVKwwcuhv3DBMgErR4DAPf4BNPbu1PfW
-         5RB01WPmqK0QwhsVxJsDXHBjJ1b62SnBThR0EdbUMDcv67eIjjm56yV6L4zISwPfYxPP
-         t3AJK+751wkBwZh0jKwyT0r5FnT8cIvxjaO6C9zW3ghD1SK4RoW9X9CjwLMQaGZgHT+6
-         1K6oJknu2hHAdNNALWXq42Nbs3bX1Iv1C4+7TfqPCpiftd8HNHhZ78p0M6KQ5HMAUzHK
-         PUKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
-        fh=mK+DTs/Bg0SotNI/0fsRvMkpcQXcDi1pSGR6iiIQVVI=;
-        b=hE1lQi4+vwyG30alcTDLr4PPQRK+Ex8NLtHE5lbCgT7QstcwnSqqCxKin4bngkl1pR
-         E5RQ5RH3VSWAea75U5m4YGK/NvltHVWsjhOxuAVTxLlo9u8HcAADAgUeWkuE5YyM7hEo
-         Fb5CBxizSJm0m7LT1zPEVHQW6xMrfImc/0GamsYr8e/gCQxQmQJa+65CZ4TCGdgE7R+B
-         K9HEpNZmdxtFDWoIYouYmbpt/xoIoxv31iSUwAFS2InePoUcnjxwg+Qgw/gF4BgAwkKF
-         HpX+3EPJP/fOlxfTup2GB36jq/7lJLwkc/G/PRtcMQDAru6vmcMf3FoPl7sZJ18sEP2q
-         lQtw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773156342; x=1773761142; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
-        b=AQHs/yr7Gvha4WeeSLnWSMlooVzJGo6GAU7UhekNH07V+/520QYqL1byWRSaDp51B/
-         d9hHwCr4bDru0nUCVMsIPmp56fW/n5xj3Y99eHbj2NKzOCdaPCLJ47VfwHGYiLAfNwwa
-         oPuz1da3kALubqjorkJ7JO56SjNRqB0aU+uqOdcQhvgN33lIHQiAQpO4+PPwkz6xanug
-         aIn5YLCE7qlo27kUYVLjV8Sc6FTYhDGS91XswwN5t2U7P4ekvOuXVmLHcqt6LSLI/g9X
-         Iesn/8K6G8pek2dqIO7BLC+r7/1VlYfpgMbhtNJS6lg5aNRUlznPsFDSRpTAiDb9mGfI
-         eFlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773156342; x=1773761142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
-        b=aD9wbmF68FF/xy3+xBfB/cTP5hkhGKTQGxY42A7OtEFxDuMs5Hn2k4rd/1oOA044cw
-         dgN3aB4AHTHV27zB7LvUUf3pjtlybLmkyvJe+qPVw2OfTEa68o32ypBcM36vKc8p2O3A
-         vrSOOG3CYajahLeyJ3UywyZBmI08KwKgHehyrFOkL9kRM5NNqMEDDBKfguOzhJEDG6R9
-         8Yr6PskZ29eI0FFIeZy5bJRv5PYVv3+hy9hjktdNGI3dQSVyGbL585dT2t3CjgNJSjQ3
-         qdr7FxBPv8Cy08xOthnEx/L1E7pS70CiggMkbZ4LRoipis+NVYLeIU+hSXXIFcXFwxI7
-         S6Xg==
-X-Gm-Message-State: AOJu0YyQ+rMDz9fpiw8ilgogxTHxrEfu85BrRwwMy9EcB5NOExN+UjWv
-	FyhsbCboTLhnk64kZy6A29NgdbxP+/VG9i+fKXwjw0k/bFsHZs17bbTp29KSu0iJvpO3UNyytH3
-	yNtdGPEaB5ES2McyRW1kDZV2Amf/+wAiYrQWGgnla
-X-Gm-Gg: ATEYQzxUDhxH25N7MY6XiTaRIRhvCc02Hh5bA8gtFDKHNY9j7N4sFaL4aiLLlWL3sla
-	Nx9MeoHALM7cTPyimFaHLZykFYAHOezgjUZNWNTpKdsJaP44PF2FcJNRHxJg3DnYlOE06hngMak
-	qieGW51t425kfZDETjIqRodCDpPlkGBLXCYovMyS98e0MMhVv/fzYmj9Hyk+GRESivCXiSS2M16
-	o6LdnDWKCk7mnXtTV48P6wN3pbSplvi8oVKW30KZo/iPFSWXmlxYABgxRFMHr+OqOhxg9Jtf7iI
-	Rr2p0ds=
-X-Received: by 2002:a05:622a:4d2:b0:509:1ffc:c538 with SMTP id
- d75a77b69052e-5091ffcc7demr69849831cf.19.1773156341020; Tue, 10 Mar 2026
- 08:25:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96A530FC1A
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 15:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773157007; cv=none; b=ZhmkqU/eSkYi2xs/PORn7ptEpENqmpIjalL2CkE9Q1o55hYdbWzeyd9R7RY+1Tr8FSCyq9fZw9fSQ/8XdjO5fwCYagaGP/IYt35t3yKHKjYUEeZegjamQRS7XABNIJKiK5Bq9tZttZfMPUoNRYHOJwbKKJN8EjAGgYtlgBoi0OA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773157007; c=relaxed/simple;
+	bh=9KrtRjXXtOAFKJsdNVur1eHXdwDCbdCwcev6Dkg4Rg0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WdWXqZhQmmfBGwlm5/4Yfe9GFurHUFfX/fSofFxR8OC4H1DZMWfTlJGIt9E665H+MQ3CpYB9CdxJsq9ZY9dKUh7FN6I5Zaxxhjsk2Q5g5PmW4T03rzQMDhSktteq/8GT+vyJTmzUzTBxX6WFNmasFBjQGTHSB0HnuI/Z18u4lvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MFcDj5Xj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qmd3toJ8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MFcDj5Xj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qmd3toJ8; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 064925BCF5;
+	Tue, 10 Mar 2026 15:36:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773157004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=iko80GsogqrJcAAR1C/xqaoYZ78eN6aT6vSrJLB0bac=;
+	b=MFcDj5XjUtiYCokhVEfU5AUjaPpNQYaI0sWJylO9FPMOKNIJqYn2L4Y2UerO+Noq10JQ7l
+	60rqmtytn9LhlfZjPDrPHcsgBdQQIPISEIQVrp8umSuOZioqeOTuLbBvR1JhSwvc70BOF8
+	PdMWohsyQPG3eyZ3mPsqwS7ZUZmcFEk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773157004;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=iko80GsogqrJcAAR1C/xqaoYZ78eN6aT6vSrJLB0bac=;
+	b=qmd3toJ86tvCAXgbh6AtMT2Z32s0pHV9peUTxgzV6iC4AILtJdctjYOG6iZTJOtJylXNai
+	ZEvbbgxYOcuqD9BA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773157004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=iko80GsogqrJcAAR1C/xqaoYZ78eN6aT6vSrJLB0bac=;
+	b=MFcDj5XjUtiYCokhVEfU5AUjaPpNQYaI0sWJylO9FPMOKNIJqYn2L4Y2UerO+Noq10JQ7l
+	60rqmtytn9LhlfZjPDrPHcsgBdQQIPISEIQVrp8umSuOZioqeOTuLbBvR1JhSwvc70BOF8
+	PdMWohsyQPG3eyZ3mPsqwS7ZUZmcFEk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773157004;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=iko80GsogqrJcAAR1C/xqaoYZ78eN6aT6vSrJLB0bac=;
+	b=qmd3toJ86tvCAXgbh6AtMT2Z32s0pHV9peUTxgzV6iC4AILtJdctjYOG6iZTJOtJylXNai
+	ZEvbbgxYOcuqD9BA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 53B683F519;
+	Tue, 10 Mar 2026 15:36:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id uHUkEYs6sGlKXwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 10 Mar 2026 15:36:43 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: rbm@suse.com,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	dsahern@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/10 net-next v2] Convert CONFIG_IPV6 to built-in and remove stubs
+Date: Tue, 10 Mar 2026 16:34:23 +0100
+Message-ID: <20260310153506.5181-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-3-edumazet@google.com>
- <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com> <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
- <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com> <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
- <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com> <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
-In-Reply-To: <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 10 Mar 2026 16:25:29 +0100
-X-Gm-Features: AaiRm50HG9WJWpUEPI5YYSq3IEMZ8J-QW64Yg0VXFJtbTjYG3Ikh2rEvM9WKrVY
-Message-ID: <CANn89iJpgABfLzXOFVzh0rjnZUvHhyqYuNTvP6_EegHgcjuY1w@mail.gmail.com>
-Subject: Re: Long delay in freeing skbs
-To: Tony Battersby <tonyb@cybernetics.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, eric.dumazet@gmail.com, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jason Xing <kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4A0182542B8
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 1BEB7253B33
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
-	TAGGED_FROM(0.00)[bounces-266218-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266219-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cybernetics.com:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,suse.de:dkim,suse.de:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 3:49=E2=80=AFPM Tony Battersby <tonyb@cybernetics.c=
-om> wrote:
->
-> On 3/9/26 17:47, Tony Battersby wrote:
-> > On 3/9/26 17:24, Eric Dumazet wrote:
-> >> On Mon, Mar 9, 2026 at 10:18=E2=80=AFPM Tony Battersby <tonyb@cybernet=
-ics.com> wrote:
-> >>> On 3/9/26 17:07, Eric Dumazet wrote:
-> >>>> On Mon, Mar 9, 2026 at 10:00=E2=80=AFPM Tony Battersby <tonyb@cybern=
-etics.com> wrote:
-> >>>>> I have some out-of-tree code that was broken by commit e20dfbad8aab
-> >>>>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
-> >>>>> retested with 7.0-rc3 with the same results.  I'm not sure if the c=
-hange
-> >>>>> in behavior that I am seeing is expected or if it is a bug, so I th=
-ought
-> >>>>> I would ask.  Omitting irrelevant details, my kernel code does the
-> >>>>> following:
-> >>>>>
-> >>>>> 1) allocate a buffer
-> >>>>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
-> >>>>> 3) wait for the I/O to complete
-> >>>>> 4) wait for the buffer page refcounts to drop back to their values =
-for
-> >>>>> idle I/O
-> >>>>> 5) reuse the buffer for more I/O
-> >>>>>
-> >>>>> Step 4 is necessary in this case due to some of those irrelevant de=
-tails
-> >>>>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
-> >>>>> seems to keep the page refcounts elevated long after the I/O has
-> >>>>> completed (hours or longer), presumably because the deferred skb fr=
-ee
-> >>>>> isn't happening for a long time.  So:
-> >>>>>
-> >>>>> 1) Is this long delay expected, or is this a bug?
-> >>>>>
-> >>>>> 2) If the delay is expected, is there a way for me to force the net=
-work
-> >>>>> system to process the deferred skb frees on request?  e.g. write to=
- a
-> >>>>> file in /sys, or call a kernel function to flush the deferred frees=
-?
-> >>>>>
-> >>>>> Worst case is that I can redesign my code to kfree() the buffer if =
-it is
-> >>>>> busy and allocate a new one, and let the old buffer be freed
-> >>>>> asynchronously when the skb is freed at some indeterminate time in =
-the
-> >>>>> future.
-> >>>>>
-> >>>>> Thanks,
-> >>>>> Tony Battersby
-> >>>> If you are using zero copy, please look at:
-> >>>>
-> >>>> Maybe you should make sure your code is compatible with it.
-> >>>>
-> >>>> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
-> >>>> Author: Eric Dumazet <edumazet@google.com>
-> >>>> Date:   Mon Feb 16 19:36:53 2026 +0000
-> >>>>
-> >>>>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
-> >>>>
-> >>>>     After the blamed commit, TCP tx zero copy notifications could be
-> >>>>     arbitrarily delayed and cause regressions in applications waitin=
-g
-> >>>>     for them.
-> >>>>
-> >>> The I/O is being sent by a userspace program via the SCSI generic dri=
-ver
-> >>> (drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't s=
-ee
-> >>> any mention of zero copy in iscsi_tcp.c.
-> >> Set /proc/sys/net/core/skb_defer_max to 0 ?
-> > Thanks; I should have grepped the docs harder.
-> >
-> > That seems to work if I do it before sending the I/O but not after the
-> > I/O has completed.  So I presume it would decrease performance?
-> >
-> > Tony
-> >
-> I found a workable solution.  When my code finds an elevated page
-> refcount, it does the following:
->
-> for_each_online_cpu(cpu) {
->         kick_defer_list_purge(cpu);
-> }
->
-> And that seems to take care of it, and it pushes the extra overhead to
-> the slow path.
->
-> Thanks for your help!
+Historically, the Linux kernel has supported compiling the IPv6 stack as
+a loadable module. While this made sense in the early days of IPv6
+adoption, modern deployments and distributions overwhelmingly either
+build IPv6 directly into the kernel (CONFIG_IPV6=y) or disable it
+entirely (CONFIG_IPV6=n). The modular IPv6 use-case offers image size
+and memory savings for specific setups, this benefit is outweighed by
+the architectural burden it imposes on the subsystems on implementation
+and maintenance.
 
-You probably could send packets over loopback interface, this should trigge=
-r
-net_rx_action() from one cpu only, this might be less disruptive, but maybe
-a bit more complicated to get it right.
+To allow core networking, BPF, Netfilter, and various device drivers to
+safely interact with a potentially unloaded IPv6 module, the kernel
+relies on indirect call structures like ipv6_stub, ipv6_bpf_stub, and
+nf_ipv6_ops, along with dynamic RCU registrations for things like ICMPv6
+senders.
 
-Another way is to setup RFS on your NIC.
+This patch series addresses this by changing CONFIG_IPV6 from a tristate
+to a boolean, enforcing that IPv6 is either built-in or disabled. This
+allows us to completely rip out the stub infrastructures and safely
+replace them with direct function calls.
 
-Documentation/networking/scaling.rst
+The bloat-o-meter report the following results for m68k, arm64, x86_64
+defconfig.
 
-Thanks.
+m68k (keep on mind that CONFIG_IPV6 is disabled now):
+add/remove: 65/938 grow/shrink: 36/254 up/down: 3022/-49692 (-46670)
+
+arm64:
+add/remove: 1251/265 grow/shrink: 81/46 up/down: 448740/-71519 (377221)
+
+x86_64:
+add/remove: 62/98 grow/shrink: 10/39 up/down: 2497/-4357 (-1860)
+
+All the patches has been independently build tested. With allmodconfig
+and allmodconfig + CONFIG_IPV6=n. In addition, net selftest has been run
+against them on virtme-ng.
+
+The series applied as a whole as been tested with allyesconfig and also
+allyesconfig + CONFIG_IPV6=n but not all patches has been independently
+tested this way.
+
+This will like need to wait for [1] and [2] to be applied to avoid
+conflicts from net tree and rebased in top of them.
+
+[1] https://lore.kernel.org/netdev/20260307-net-nd_tbl_fixes-v4-0-e2677e85628c@suse.com/
+
+[2] https://lore.kernel.org/netdev/20260308032304.1841198-1-kuniyu@google.com/
+
+Fernando Fernandez Mancera (10):
+  ipv6: convert CONFIG_IPV6 to built-in only and clean up Kconfigs
+  ipv6: replace IS_BUILTIN(CONFIG_IPV6) with IS_ENABLED(CONFIG_IPV6)
+  ipv6: remove dynamic ICMPv6 sender registration infrastructure
+  ipv6: prepare headers for ipv6_stub removal
+  drivers: net: drop ipv6_stub usage and use direct function calls
+  ipv4: drop ipv6_stub usage and use direct function calls
+  net: convert remaining ipv6_stub users to direct function calls
+  bpf: remove ipv6_bpf_stub completely and use direct function calls
+  ipv6: remove ipv6_stub infrastructure completely
+  netfilter: remove nf_ipv6_ops and use direct function calls
+
+ arch/arm64/configs/defconfig                  |   2 +-
+ arch/m68k/configs/amiga_defconfig             |  45 +-------
+ arch/m68k/configs/apollo_defconfig            |  46 +-------
+ arch/m68k/configs/atari_defconfig             |  45 +-------
+ arch/m68k/configs/bvme6000_defconfig          |  45 +-------
+ arch/m68k/configs/hp300_defconfig             |  47 +-------
+ arch/m68k/configs/mac_defconfig               |  45 +-------
+ arch/m68k/configs/multi_defconfig             |  45 +-------
+ arch/m68k/configs/mvme147_defconfig           |  45 +-------
+ arch/m68k/configs/mvme16x_defconfig           |  45 +-------
+ arch/m68k/configs/q40_defconfig               |  45 +-------
+ arch/m68k/configs/sun3_defconfig              |  45 +-------
+ arch/m68k/configs/sun3x_defconfig             |  45 +-------
+ drivers/infiniband/Kconfig                    |   1 -
+ drivers/infiniband/core/addr.c                |   3 +-
+ drivers/infiniband/hw/ocrdma/Kconfig          |   2 +-
+ drivers/infiniband/sw/rxe/rxe_net.c           |   6 +-
+ drivers/infiniband/ulp/ipoib/Kconfig          |   2 +-
+ drivers/net/Kconfig                           |   9 --
+ drivers/net/ethernet/broadcom/Kconfig         |   2 +-
+ drivers/net/ethernet/chelsio/Kconfig          |   2 +-
+ .../mellanox/mlx5/core/en/rep/neigh.c         |  12 ++-
+ .../ethernet/mellanox/mlx5/core/en/tc_tun.c   |   3 +-
+ .../mellanox/mlx5/core/en/tc_tun_encap.c      |   2 +-
+ .../mellanox/mlx5/core/en_accel/ipsec.c       |   1 -
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |   1 -
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   |   1 -
+ drivers/net/ethernet/mellanox/mlxsw/Kconfig   |   1 -
+ .../ethernet/mellanox/mlxsw/spectrum_router.c |   9 +-
+ .../ethernet/mellanox/mlxsw/spectrum_span.c   |   3 +-
+ drivers/net/ethernet/netronome/Kconfig        |   1 -
+ .../ethernet/netronome/nfp/flower/action.c    |   2 +-
+ .../netronome/nfp/flower/tunnel_conf.c        |   9 +-
+ drivers/net/ethernet/sfc/tc_counters.c        |   2 +-
+ drivers/net/ethernet/sfc/tc_encap_actions.c   |   5 +-
+ drivers/net/geneve.c                          |   1 -
+ drivers/net/gtp.c                             |   2 +-
+ drivers/net/ovpn/peer.c                       |   3 +-
+ drivers/net/ovpn/udp.c                        |   3 +-
+ drivers/net/usb/cdc_mbim.c                    |  17 +--
+ drivers/net/vrf.c                             |   3 +-
+ drivers/net/vxlan/vxlan_core.c                |  11 +-
+ drivers/net/vxlan/vxlan_multicast.c           |   6 +-
+ drivers/net/wireguard/socket.c                |   3 +-
+ drivers/net/wireless/intel/ipw2x00/ipw2100.c  |   2 +-
+ drivers/scsi/bnx2fc/Kconfig                   |   1 -
+ drivers/scsi/bnx2i/Kconfig                    |   1 -
+ drivers/scsi/cxgbi/cxgb3i/Kconfig             |   2 +-
+ drivers/scsi/cxgbi/cxgb4i/Kconfig             |   2 +-
+ fs/dlm/Kconfig                                |   2 +-
+ fs/gfs2/Kconfig                               |   2 +-
+ include/linux/icmpv6.h                        |  26 +----
+ include/linux/indirect_call_wrapper.h         |   2 +-
+ include/linux/netfilter_ipv6.h                | 102 ++----------------
+ include/net/ip.h                              |   5 -
+ include/net/ip6_fib.h                         |  34 +++++-
+ include/net/ip6_route.h                       |  26 +++++
+ include/net/ipv6.h                            |  12 +++
+ include/net/ipv6_stubs.h                      | 102 ------------------
+ include/net/ndisc.h                           |  38 +++----
+ include/net/udp_tunnel.h                      |   3 +-
+ net/bridge/Kconfig                            |   1 -
+ net/bridge/br_arp_nd_proxy.c                  |   3 +-
+ net/bridge/br_netfilter_hooks.c               |  12 +--
+ net/bridge/br_netfilter_ipv6.c                |   7 +-
+ net/core/filter.c                             |  70 ++++++------
+ net/core/lwt_bpf.c                            |  10 +-
+ net/ieee802154/6lowpan/tx.c                   |   2 +-
+ net/ipv4/Kconfig                              |   9 +-
+ net/ipv4/fib_semantics.c                      |  11 +-
+ net/ipv4/icmp.c                               |   2 +-
+ net/ipv4/nexthop.c                            |  21 ++--
+ net/ipv4/route.c                              |   2 +-
+ net/ipv4/udp.c                                |   7 +-
+ net/ipv6/Kconfig                              |   6 +-
+ net/ipv6/addrconf.c                           |  10 +-
+ net/ipv6/addrconf_core.c                      |  91 ----------------
+ net/ipv6/af_inet6.c                           |  69 ++----------
+ net/ipv6/icmp.c                               |   6 --
+ net/ipv6/ip6_fib.c                            |  10 +-
+ net/ipv6/ip6_icmp.c                           |  46 +-------
+ net/ipv6/ip6_offload.c                        |   4 +-
+ net/ipv6/ip6_output.c                         |   5 +-
+ net/ipv6/ip6_udp_tunnel.c                     |   3 +-
+ net/ipv6/ndisc.c                              |  35 +++---
+ net/ipv6/netfilter.c                          |  48 ---------
+ net/ipv6/route.c                              |  13 +--
+ net/l2tp/Kconfig                              |   1 -
+ net/mpls/af_mpls.c                            |   3 +-
+ net/netfilter/Kconfig                         |   8 --
+ net/netfilter/core.c                          |   3 -
+ net/netfilter/nf_nat_masquerade.c             |  21 +---
+ net/netfilter/nfnetlink_queue.c               |  22 +++-
+ net/netfilter/utils.c                         |   1 -
+ net/openvswitch/actions.c                     |   3 +-
+ net/rxrpc/Kconfig                             |   2 +-
+ net/sched/sch_frag.c                          |   4 +-
+ net/sctp/Kconfig                              |   1 -
+ net/tipc/Kconfig                              |   1 -
+ net/tipc/udp_media.c                          |   9 +-
+ net/xfrm/espintcp.c                           |   5 +-
+ net/xfrm/xfrm_nat_keepalive.c                 |   4 +-
+ net/xfrm/xfrm_output.c                        |   3 +-
+ 103 files changed, 328 insertions(+), 1301 deletions(-)
+ delete mode 100644 include/net/ipv6_stubs.h
+
+-- 
+2.53.0
+
 
