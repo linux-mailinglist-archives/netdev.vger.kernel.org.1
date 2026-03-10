@@ -1,222 +1,177 @@
-Return-Path: <netdev+bounces-266034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLe3M5wFsGlregIAu9opvQ
-	(envelope-from <netdev+bounces-266034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:50:52 +0100
+	id UHMlA+cQsGlxfAIAu9opvQ
+	(envelope-from <netdev+bounces-266091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:39:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873FD24BA80
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:50:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 993C924E419
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 298BF30330CD
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:49:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 789A03164D0E
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B4C38A717;
-	Tue, 10 Mar 2026 11:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6233E6DCD;
+	Tue, 10 Mar 2026 11:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="PXjZhYpl"
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="AOoKX0K7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F87238A703
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 11:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17804ADD9B;
+	Tue, 10 Mar 2026 11:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773143374; cv=none; b=AoHKXmSXCWLYBRMFRgBZzorj/TK4FeY/6qNkEC2GPWdlpCZnds8fcyqX92KV1BZbbvLiKc3LHyjvYV94IkWozoy4QDEbsIkEivYDEg6aUMVf2b2KJL1aqd4U56uD5QvWH1CvdNt+aEe9on1L9QsuemiO2ntpRo4EXucVDJDDYh4=
+	t=1773143764; cv=none; b=JQ9q/4NLp7W2cQqfXkKfeh84MywXBQzDmzKflT0hzQOe2I8d/Oa++hvUmXoi6moEFQ1yDsKCMqyIJyPET8odqNLfHxywstaZSejTxrSW0+mEPDx6ALmVCHdQPqtvlxXUMDYgLlvmBIOiEhL9Ceo5Z8T1Iv9evRrXU5Jf7DjJ0t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773143374; c=relaxed/simple;
-	bh=Zr3qcMn4OLx1slxxG1q/v6XHjn/W58Jij9qVOShgcro=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TjbURedlWcN+9mjW4gQUsru1NjVWXX/JEHuk5SzNCfIzMdWuiAUWVsQ7Z4QSmUPa+H9R7SySj+1sb8YpZ649/W8ZB/fH85hpjK6bPiLPMf6gEJsYZuMpHEBYkJkHzmR6MrlMu1a4yqEnwOH7/xgw1BHdSFry7MWLwg8XzTVwLRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=PXjZhYpl; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-466f00535cfso1998104b6e.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 04:49:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1773143372; x=1773748172; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRz2iGuRS5c9gUYKqTban2ycHL3n1P/vxXJWakDhtNM=;
-        b=PXjZhYpl/0RcIXC8chJ7scSvE5Gc0t9PMWcQuLETEA9mAUo997liJ6mkRtJLM98kvK
-         zktcoxY40FQk0tM4to7SERn5YNKhzzaYvNr30l2pBagYy1rYJA29gdPO4UnLUgIzOKQQ
-         gOWObrNLkUTL22syetszXwubcqcbJawC8B4XVal9HvVBQNcdVdChOunuk/AJXe2JstAy
-         aT7sbbbSKuJbqZblzgLp/4ACm73zNfcr0OBJPfDOlTgLPkWmykXksuk74zdVSyafdiFb
-         CcK7on7sPZ+TlthhdaWuXy/c2pH1Leuchq29jfh5IvzgB0rFWEidDmxXoiDG96KGtbZJ
-         9KaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773143372; x=1773748172;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eRz2iGuRS5c9gUYKqTban2ycHL3n1P/vxXJWakDhtNM=;
-        b=cLgojMUNnL2LOESA5I/qfHvE+rrjts7XvG8ctNWXYsX9X4Nmb9FiWxKivEFmEqn3cs
-         Q2u48MxbEMYkPUv7Lx5fsfRe+co569Qw0eD2R3Mdv3OZc4CEjkv3EgQOQDGr90heii6t
-         2boYAcpBOoYIr+0pRfys/q8Es4mrdY6LuHMu70MVM0OB2C0SV2mnlNXgVA6d4M7mSPSV
-         HEV06PLMNSmM0isyVBYIL9ShiDIJppcoFbGqsmGBMHCJlCuAS+EqfqCYvExFcdSCIJXF
-         3nGL0hE2KBwQ6afFuJgYuvmyVD8nykXxOZqImXzIrgBxdiI11YPZhRPpi0IUOQOeAPxF
-         SO7Q==
-X-Gm-Message-State: AOJu0YxxPlsX/9U0A4pNiB+l8zS2HzqDdZgfxysQqj3DsZUMrnti2Gni
-	Bsd8pRQfGtH62oZ/rwvd63iIcb19F2vmPdPcWnViuOY7xdWAp50aHUZfk6Xc2bmHrgs=
-X-Gm-Gg: ATEYQzyR3e+NFDnidKg+eEqwcCe/oOXkvMP/mNCrlMYu4uR8RH6yjR5xJsmkjMgWqns
-	ybjpnceLoP7Pb71loCFwSV060fRY08gi+2w9WTAKVTJxSTH64IL0+F1LXk7kmJbaI/geA47IZZE
-	tTYqiIPCPSpUUfoiIs7CIiIX+FEh6j2kSOUi+EhaFAHG7Q0P6Wc0sqDTwbAw1ppq7dCBuRrEiS4
-	nfnqkfRvgnrZpyNmYTTdFF++Fps9XocHVe7htL/09FTlnkRhTYaZ7fm/ozWRK2ZZMWCL8z3A9MO
-	co5lq9J1+ERdMQ4VxgWqhYUmhjDOaz7azDXrVaY592incGCr38oHPysbav+V/x7DhCAKZd9v2xE
-	P3bPoLFZbr4Rf+CM1H3YnX3pPovrtFpNWStjlP3RaZpiK7SfrJnrNao2iANZ3Hd25LNnpiWkitb
-	qAmxC+XRe+vFB4rb0Sdyh7
-X-Received: by 2002:a05:6808:171a:b0:45c:a040:e53c with SMTP id 5614622812f47-466dcb1c40cmr7605844b6e.32.1773143372180;
-        Tue, 10 Mar 2026 04:49:32 -0700 (PDT)
-Received: from localhost ([216.228.127.131])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-466dfac3472sm7496849b6e.15.2026.03.10.04.49.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 04:49:30 -0700 (PDT)
-Date: Tue, 10 Mar 2026 13:49:25 +0200
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
-	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Jussi Maki <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net v5 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-Message-ID: <abAFRbJNinhN3O5v@penguin>
-References: <20260309030702.128520-1-jiayuan.chen@linux.dev>
- <20260309030702.128520-2-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773143764; c=relaxed/simple;
+	bh=xxm4pfrA8vpE+55Nunaq1/3InG5TW5+yUEKOnNPaCHE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=JqxVHNXhY257iFy+GfDjysH0pKGCVSKvPj/jnZC1iiLOY3Ma5/tmupRSoj779EcZh6lEdUQag8Xuc/V2Z4+8FmB40wqwqpmG0n3BDN1r1J1lT2f8xCwikqlXagQ9qPmRDESe5k4q98GJpB9rvHE7avr0We5w4GJoGPUeLmtq11c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=AOoKX0K7; arc=none smtp.client-ip=212.42.244.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1773143728; bh=xxm4pfrA8vpE+55Nunaq1/3InG5TW5+yUEKOnNPaCHE=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=AOoKX0K7YgwIOUYfdO2Jfvy/6Cl9f6f71g8nP0ISDbpf5gXEqI/e/jAWidF1zCZOj
+	 Ev/h/KwY/8jSa8PTvMENmp+8ZmRNaXVOb14hDeT3aTzSGkD/xp/dsdnpugFWHOMEIM
+	 X7QdvBaRrNCU+ymRsppfpeDYok02Gjq0VELiXVzA=
+Received: from [212.42.244.71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
+	(envelope-from <phahn-oss@avm.de>)
+	id 69b006b0-b734-7f0000032729-7f0000019cb4-1
+	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:28 +0100
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Tue, 10 Mar 2026 12:55:28 +0100 (CET)
+From: Philipp Hahn <phahn-oss@avm.de>
+Date: Tue, 10 Mar 2026 12:49:26 +0100
+Subject: [PATCH 60/61] Input alps: Drop unlikely() around IS_ERR_OR_NULL()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260309030702.128520-2-jiayuan.chen@linux.dev>
-X-Rspamd-Queue-Id: 873FD24BA80
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260310-b4-is_err_or_null-v1-60-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
+ linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org, 
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
+ Philipp Hahn <phahn-oss@avm.de>
+Cc: =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1263; i=phahn-oss@avm.de;
+ h=from:subject:message-id; bh=xxm4pfrA8vpE+55Nunaq1/3InG5TW5+yUEKOnNPaCHE=;
+ b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAai8jb0hbCBoPmYA/prWl4PUOkbFdhFm9gPO
+ hWtVu2rtPaJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAGogAKCRA0LQZT0ays
+ 28GYB/9rclpgBQgsqGF0yAXWM/97auTunqqLKOGDeyV/S4nC7HDn1d4UqQoeaSmUw2DOYO4u7t3
+ FPnU9VUXE2nXM5FAQLfpjYhH7CG3jEkW4klm33iXRLo1nkpvx8klWZbYR7PMwPnVZTnxKNJmzgZ
+ kL0ECVGQ0EahRXa5TL96qA0Z3YR0RjsX+MNWafES7VGwl+HS5Artyl+8jg+/p0RFHayhxpHi2hi
+ Ftz0Ut7BpqlmrXUo0TzIlFmAGFe7tZCdcMDr5ii9ECIA4sGLz4jBK2uiDVL8YFZ25Y3k7DF6RQV
+ m+hUB3KTG86705bO5a0t2DamRuiInU805Ah5rzh9tCueh4HO
+X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
+ fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
+X-purgate-ID: 149429::1773143728-EF5C7A3D-0A534037/0/0
+X-purgate-type: clean
+X-purgate-size: 1265
+X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-Rspamd-Queue-Id: 993C924E419
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[avm.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[avm.de:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266034-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	DKIM_TRACE(0.00)[avm.de:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,linutronix.de,goodmis.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-266091-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	FROM_NEQ_ENVFROM(0.00)[phahn-oss@avm.de,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,shopee.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,blackwall.org:dkim,blackwall.org:email]
+	RCPT_COUNT_GT_50(0.00)[56];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[avm.de:dkim,avm.de:email,avm.de:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 11:06:58AM +0800, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
-> check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
-> when the bond mode is round-robin. If the bond device was never brought
-> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
-> 
-> The XDP redirect path can reach this code even when the bond is not up:
-> bpf_master_redirect_enabled_key is a global static key, so when any bond
-> device has native XDP attached, the XDP_TX -> xdp_master_redirect()
-> interception is enabled for all bond slaves system-wide. This allows the
-> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
-> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
-> reached on a bond that was never opened.
-> 
-> Fix this by adding a NULL check with unlikely() in bond_rr_gen_slave_id()
-> before dereferencing rr_tx_counter. When rr_tx_counter is NULL (bond was
-> never opened), fall back to get_random_u32() for slave selection. The
-> allocation in bond_open() is kept, with WRITE_ONCE() added to safely
-> publish the pointer to the XDP read side. A plain read suffices for the
-> !bond->rr_tx_counter guard in bond_open() itself, as bond_open() runs
-> under RTNL lock and is the only writer of rr_tx_counter.
-> 
-> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
-> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> ---
->  drivers/net/bonding/bond_main.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
+IS_ERR_OR_NULL() already uses likely(!ptr) internally. checkpatch does
+not like nesting it:
+> WARNING: nested (un)?likely() calls, IS_ERR_OR_NULL already uses
+> unlikely() internally
+Remove the explicit use of unlikely().
 
-This is Jay's patch + the unlikely change, looks good to me.
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Change generated with coccinelle.
 
-Cheers,
- Nik
+To: "Pali Rohár" <pali@kernel.org>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: linux-input@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+---
+ drivers/input/mouse/alps.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 444519078da3..b8ec87625ce3 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -4290,9 +4290,11 @@ static int bond_open(struct net_device *bond_dev)
->  	struct slave *slave;
->  
->  	if (BOND_MODE(bond) == BOND_MODE_ROUNDROBIN && !bond->rr_tx_counter) {
-> -		bond->rr_tx_counter = alloc_percpu(u32);
-> -		if (!bond->rr_tx_counter)
-> +		u32 __percpu *rr_tx_tmp = alloc_percpu(u32);
-> +
-> +		if (!rr_tx_tmp)
->  			return -ENOMEM;
-> +		WRITE_ONCE(bond->rr_tx_counter, rr_tx_tmp);
->  	}
->  
->  	/* reset slave->backup and slave->inactive */
-> @@ -4883,6 +4885,9 @@ static u32 bond_rr_gen_slave_id(struct bonding *bond)
->  	struct reciprocal_value reciprocal_packets_per_slave;
->  	int packets_per_slave = bond->params.packets_per_slave;
->  
-> +	if (unlikely(!READ_ONCE(bond->rr_tx_counter)))
-> +		return get_random_u32();
-> +
->  	switch (packets_per_slave) {
->  	case 0:
->  		slave_id = get_random_u32();
-> -- 
-> 2.43.0
-> 
+diff --git a/drivers/input/mouse/alps.c b/drivers/input/mouse/alps.c
+index f3d3b6b4e02d798e75a90333ace72a367befdbac..82e11efad7f7f02b4aaefde340f9b71fa792cf6b 100644
+--- a/drivers/input/mouse/alps.c
++++ b/drivers/input/mouse/alps.c
+@@ -1482,7 +1482,7 @@ static void alps_report_bare_ps2_packet(struct psmouse *psmouse,
+ 		/* On V2 devices the DualPoint Stick reports bare packets */
+ 		dev = priv->dev2;
+ 		dev2 = psmouse->dev;
+-	} else if (unlikely(IS_ERR_OR_NULL(priv->dev3))) {
++	} else if (IS_ERR_OR_NULL(priv->dev3)) {
+ 		/* Register dev3 mouse if we received PS/2 packet first time */
+ 		if (!IS_ERR(priv->dev3))
+ 			psmouse_queue_work(psmouse, &priv->dev3_register_work,
+
+-- 
+2.43.0
+
 
