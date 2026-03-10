@@ -1,241 +1,175 @@
-Return-Path: <netdev+bounces-266311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YbnYLPJ3sGnKjgIAu9opvQ
-	(envelope-from <netdev+bounces-266311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:58:42 +0100
+	id mEYVEZB4sGnLjgIAu9opvQ
+	(envelope-from <netdev+bounces-266312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:01:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F39F257452
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:58:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C87CC2574BB
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:01:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AADD63020869
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:58:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C519E30789FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD32F3E1D1E;
-	Tue, 10 Mar 2026 19:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F623E275F;
+	Tue, 10 Mar 2026 20:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Uew34qv7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="2n/lZfXF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KqfcngR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0A23563F6;
-	Tue, 10 Mar 2026 19:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443F51F09A8
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 20:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773172719; cv=none; b=WhBHKmhK4gYFSDS5O9HKH72st0pfNAPiNZagyyHeJgcNue884sdsifLcHpi/3x4P1iyMS/ogcAJGnLNZ2j3kG27RG0Z3YYg1YzAQ1eP6H1WBg/BtzhDWDaiPsp05/IhLTNVe8BaGNRpLE83CdbvzVZM1pM46mDbOyuiyqxsS7Og=
+	t=1773172807; cv=none; b=iXIwsO1C3nbNsPIlcgU3/aAfWrU77q768iOMu97TM6auY4PsfIRqJmnBhqN8y4kvyy4Wxu/fKP/9MjAijHtd9WL8hqALmxM634MJw2hs5W5Z7/yQ8e2+rq7PYMDIiGO4JuD9WbW6feYMB/ojkE/OLM+LBzqMGOkj4LEnFC886pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773172719; c=relaxed/simple;
-	bh=Je1rIPnGOjOPK0cgnGXu5ko559F90dtD+GO7ltgNRNQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=rq/ZQHmLSjjmQd+zzxU9oznQtOFIIrnzRi/fGj4yq5uTW8NJ+Cn/JES43gHhEIm9x11zhx49Ow9+5+d3RCX8fLMDlL+rrRvlwswluoI6kDBPMFkXfoCIFeN1USstvhAFA2Gfo3T1A3Q+0lFIoeLgOEnfFOpfOjRCQ71YhYY9YWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Uew34qv7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=2n/lZfXF; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A8FD414001D8;
-	Tue, 10 Mar 2026 15:58:37 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Tue, 10 Mar 2026 15:58:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1773172717;
-	 x=1773259117; bh=uJKac+q963i+BI7ifqs+uvHGeqpQW5n8cXoM0XhfjDE=; b=
-	Uew34qv7pCBzkvZjZTEAYpO5UWhAAZdzSCNWTcTClAmjdLTvephCfQ4dxOz5YZn0
-	/itpHBzOcLwGWlWpdtl5GgiK3xmn1WWZUapLt/Y2A/qSH0zxQpxFZ+xQxCmcjzY0
-	7OWkB2BamWqHxPOFX2QuTgO3Dc4yfVA7erBQjC+qy8CFgEbx41zhaaaepKVNmYD+
-	30dzlAGQybbtF3MBI9gtTT2L1jdgE/BuohqKWO3m3YYf87ATVRgcr6kUp+SHVTXI
-	8PLWLjwFZbSi6yjygY44WM1d9ixhk8PtIA+jBxEd2ee3ZOEgZMynp945JvKsihKz
-	OPUe8TI9ZbwDcxyykHBtJQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773172717; x=
-	1773259117; bh=uJKac+q963i+BI7ifqs+uvHGeqpQW5n8cXoM0XhfjDE=; b=2
-	n/lZfXFfXJPo3ExlsRXlx2EdHgFZYFUHbs3rFuPv0NQcZNACMjfk0KjE8kWE9yHd
-	HVU/DiLS5AOw1emAOd4rIQ3HwmePCrz+jXp2nrJN96GDVs2XfI06/nENPvr0jdEJ
-	hVgWK0rinAurdKgRXFJX+w8oGfBjJJLbEy443uRCrUqt6MnbIObk6sDjo2f6S8A1
-	tP/5wKydc5ZrVfj1yCFt05LWsRr0zM/5xfP5CbvvfeWwfeGBNAnnTLfmZbGqlra7
-	CfMxEzCI/EjOgQ2KA42mDl9z6xvgg+/FmDoP19S5rRgwz8hb4KEco5H+OzF3ah4M
-	xP0eYNCKwrCQvrX72kY5A==
-X-ME-Sender: <xms:7HewaW2EW4aIbBKTS7UK-psUE0Nw5jE1F-RBDtPxUx8dDxUD2BRztA>
-    <xme:7HewaT4k_ONcW6iKQNQx5FQE2xPGs-qrJRlGTln3pRXSgCQnpnr1UT9Jpqr5RBRdv
-    l-QRHtUMmbAW7OgzWJUPHNcHwzNv0UjRGb04YkaL6p-5QVyvZ56q5s>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeduledvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhepteefudehvedutdeugfeuveffleduheehfeehffeujeduledvheeivdffleffjedt
-    necuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgt
-    phhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepsghjohhrnhdrrg
-    hnuggvrhhsshhonhesohhsshdrqhhurghltghomhhmrdgtohhmpdhrtghpthhtohepughm
-    ihhtrhihrdgsrghrhihshhhkohhvsehoshhsrdhquhgrlhgtohhmmhdrtghomhdprhgtph
-    htthhopehkrhiihihsiihtohhfrdhkohiilhhofihskhhisehoshhsrdhquhgrlhgtohhm
-    mhdrtghomhdprhgtphhtthhopegrrghhrhhinhhgohesrhgvughhrghtrdgtohhmpdhrtg
-    hpthhtoheprghgrhhuvghnsggrsehrvgguhhgrthdrtghomhdprhgtphhtthhopeguhhho
-    figvlhhlshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhhmrghlohihsehrvgguhh
-    grthdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghp
-    thhtohepthgvihhglhgrnhgusehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:7HewaTOpEFcn6hqIyIiBheJRfEB7Vkj-PbGHEO4wX95Gn0zmQ7kxtA>
-    <xmx:7HewaeWQLgkTVfjnhbbWXXKW7aT3rAFHhhzTGXJZjc15yTdIu3YaVg>
-    <xmx:7HewaTZ912bZtZOvaA6q8xjcPqfUUQK1VTgTF43fwte6r90C4LHobw>
-    <xmx:7HewaTuF2EPmaYnp6X8GjsyTbIsZW_eJ1rEE4KSO8hmNdoO9qJXdvw>
-    <xmx:7XewaUIK6AIVkZv1GGe9EhDA9LBrlF3Jl8_SlSwh-5-51rX6_GPeSCTv>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C056E700069; Tue, 10 Mar 2026 15:58:36 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1773172807; c=relaxed/simple;
+	bh=37ogc63rPdpHxIOhvYCoihD84+aO/3EJ+XgDvcKd8IA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MfNxa67HLG8zAW0Dg1NkV2Z2LCiHSmi9iVt4TyFBv6rX2mTTfHvfc4EEgAlo2X5ZIEfczAxzYHEWR/vE7ntZ3/+gC5OUWJeX9OUElxxkkOytBX9WpvDrupneQL54v3ZSSMnwlLP5S5EWmiAMXCcquJnBKUQpxwm1mHTzyffTgGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KqfcngR1; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-439f59dfda2so648597f8f.2
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 13:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773172805; x=1773777605; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lptrZFdTw0Mmg/964QBMpRcVUiqY4xZSvMcx33nPZWE=;
+        b=KqfcngR1LO53EPTk/GoHHThdzBcK/uNgbJ+MG6/2/OufKhaXVvpVerdj2sni0SmxUz
+         JKFeBLj9NV1KP6aTH9u2sBbRFwrN2mBS1gkh1LYR8TtBtFxH5xIJ7RptoAynIMr6RVDB
+         0WvdanuBxLjhudur7Od/fEoVvSPkiK88yz9OHgfP6LU5KfaovxCOZwQ0OSVH2DLktwTR
+         +71iNZgIhLQ33EMKPi7mB6LMXoew+hsWKu+arHj2L0ndPhJX3L+ixxfH9i01WKx3g0Mc
+         FAMPAwXvbVYEI6QZhl581CeKYs8H9TodC5dnWHJoOHgp5g1UUXwIBRyYKXczj4Cgpu64
+         6EFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773172805; x=1773777605;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lptrZFdTw0Mmg/964QBMpRcVUiqY4xZSvMcx33nPZWE=;
+        b=GjSO47dcphB3pQUtkjlrCOXomsJxfSLDGy6bqIEWIRpdCepfjR3rvul69djfBhZ4ka
+         3y9ABYdR4bgcCjtwrvAOnyM1Js+VSVS4bxuDT1V1Q4UVoUKZHCBtCIk5QRwavb0A7IdM
+         AI6DJa8Yyn2X44G7Yp5hnqoxF/puzO4O3uXL0p7Y0dPJFlwpGeT+VuHJAoSQK0tIv0M+
+         CdM78tGav7+l4EJlrPbCpoP1g6NXbMpj4e9WJrR/eM4M85rjS6f78ZmqEXkukYPRNa79
+         VRhXJ9MTMOlOM5Q1sBg6AUNKLAIkiGDneGKj6yzrxOdZpRBmtqx0UZVZxOJCMS02hpXe
+         e7dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjWKZT9tQE3sE986kv+Ij990nWyFalPHJzdSjHvwk9g5euM6n5nFVs4NCednfpSARxmuzbY7w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywme6DPy1gcHal0x4FAAeRU1gMcIzvizAEo5T1/oZaE+d1YoAWs
+	1G/OGtS/hF1wEA4S4X6K0C8BjsAznsST3RuVD4c+tKKNeRexxqCeKmG0
+X-Gm-Gg: ATEYQzxoRg+BgROMLdFs6xP1izAhWExKPit82ZY7oz3ItNiZ5nEANJsE3v3dSPv7Yh6
+	4Ohz6BTKNL/ZzQ5GdJpuAQmPEs2g3EAHkvFRtdBBr20+z8zw/1hRlxI2VPjwwmbZECOE4kggTYA
+	PPUceG2/BNr1g4aHSY5OPa+IHUx+xRT9vmzz+R5+QPXAnFh0u5ZzXU3wddEv68UB9KNSXiw/LWo
+	lRTUN7AZ4tx5+WhyDHlXindkurAqj0ao/hKcNJcjOV1WK6+ez2+KOSetGeDl/cI55906KRhIePY
+	6ku9GQNPEXTYJFRQq4plKU0qMnO2q221aAAG7Hs+4FYkMQUUYtryUhiN3UosrLtXVOAmR37JRhI
+	p1/v8Wnrbl/K8WLOCNtVgsxUpHZVfIg1Ab0ZRA8GilxGpzvK3FnjeXLS8eOIgnQ+KVh+TLeE1Gr
+	c55VeQhKBNugs2QH+cGpcu3QPAnR34AhyMEr8Gxzm1Yf7BITv3xPzG19nyn6TG8Pce
+X-Received: by 2002:a05:6000:1a8f:b0:439:afea:aff2 with SMTP id ffacd0b85a97d-439f820514bmr277725f8f.23.1773172804461;
+        Tue, 10 Mar 2026 13:00:04 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f81a0480sm494267f8f.12.2026.03.10.13.00.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 13:00:04 -0700 (PDT)
+Date: Tue, 10 Mar 2026 20:00:02 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern
+ <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Florian
+ Westphal <fw@strlen.de>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH v2 net-next 07/15] udp: Remove partial csum code in RX.
+Message-ID: <20260310200002.579c7bdb@pumpkin>
+In-Reply-To: <20260305215013.2984628-8-kuniyu@google.com>
+References: <20260305215013.2984628-1-kuniyu@google.com>
+	<20260305215013.2984628-8-kuniyu@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Aes-ty0OVaaR
-Date: Tue, 10 Mar 2026 20:58:15 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Kolbj=C3=B8rn_Barmen?= <linux-m68k@kolla.no>,
- "Krzysztof Kozlowski" <krzk@kernel.org>
-Cc: "Fernando Fernandez Mancera" <fmancera@suse.de>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Selvin Xavier" <selvin.xavier@broadcom.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Ido Schimmel" <idosch@nvidia.com>,
- "Petr Machata" <petrm@nvidia.com>, "Simon Horman" <horms@kernel.org>,
- "Saurav Kashyap" <skashyap@marvell.com>,
- "Javed Hasan" <jhasan@marvell.com>,
- "maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
- <GR-QLogic-Storage-Upstream@marvell.com>,
- "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Nilesh Javali" <njavali@marvell.com>,
- "Manish Rangankar" <mrangankar@marvell.com>,
- "Varun Prakash" <varun@chelsio.com>,
- "Alexander Aring" <aahringo@redhat.com>,
- "David Teigland" <teigland@redhat.com>,
- "Andreas Gruenbacher" <agruenba@redhat.com>,
- "Nikolay Aleksandrov" <razor@blackwall.org>,
- "David Ahern" <dsahern@kernel.org>,
- "Pablo Neira Ayuso" <pablo@netfilter.org>,
- "Florian Westphal" <fw@strlen.de>, "Phil Sutter" <phil@nwl.cc>,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>,
- "Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>,
- "Xin Long" <lucien.xin@gmail.com>, "Jon Maloy" <jmaloy@redhat.com>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski@oss.qualcomm.com>,
- "Bjorn Andersson" <bjorn.andersson@oss.qualcomm.com>,
- "Dmitry Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>,
- "Eric Biggers" <ebiggers@kernel.org>,
- "Michal Simek" <michal.simek@amd.com>,
- "Luca Weiss" <luca.weiss@fairphone.com>, "Sven Peter" <sven@kernel.org>,
- "Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- "Kuninori Morimoto" <kuninori.morimoto.gx@renesas.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "David Gow" <david@davidgow.net>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Ryota Sakamoto" <sakamo.ryota@gmail.com>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "Kir Chou" <note351@hotmail.com>, "Kuan-Wei Chiu" <visitorckw@gmail.com>,
- "Vikas Gupta" <vikas.gupta@broadcom.com>,
- "Bhargava Marreddy" <bhargava.marreddy@broadcom.com>,
- "Rajashekar Hudumula" <rajashekar.hudumula@broadcom.com>,
- =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>,
- "open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
- "open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
- "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
- "open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
- <linux-scsi@vger.kernel.org>,
- "open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
- "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
- "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
- "open list:NETFILTER" <coreteam@netfilter.org>,
- "open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
- "open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
- "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
-Message-Id: <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
-In-Reply-To: <e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
-References: <20260309022013.5199-1-fmancera@suse.de>
- <20260309022013.5199-2-fmancera@suse.de>
- <01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org>
- <e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
-Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in only and
- clean up Kconfigs
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1F39F257452
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C87CC2574BB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm3,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266311-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.de,vger.kernel.org,linux-m68k.org,ziepe.ca,kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
+	TAGGED_FROM(0.00)[bounces-266312-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,strlen.de,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCPT_COUNT_GT_50(0.00)[69];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.820];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026, at 20:40, Kolbj=C3=B8rn Barmen wrote:
-> On Mon, 9 Mar 2026, Krzysztof Kozlowski wrote:
->> On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
->>
->> It must stay module for me. Alternatively, drop it, but then some use=
-rs
->> will be really affected.
->
-> I agree. If anything I would prefer to see IPv4 be made optional (and
-> modular) as well, and not as something IPv6 depends on, it's (AFAIK)
-> impossible today to build an IPv6-only Linux kernel.=20
+On Thu,  5 Mar 2026 21:49:53 +0000
+Kuniyuki Iwashima <kuniyu@google.com> wrote:
 
-My first feeling was that this is a bad idea as well. On the other hand
-I found that the default changed from =3Dm to -y over 10 years ago, all
-recent distros listed in https://github.com/nyrahul/linux-kernel-configs
-use that default (the only two exceptions are board specific builds
-of Debian and Ubuntu for linux-5.x).
+> UDP-Lite supports the partial checksum and the coverage is
+> stored in the position of the length field of struct udphdr.
+> 
+> In RX paths, udp4_csum_init() / udp6_csum_init() save the value
+> in UDP_SKB_CB(skb)->cscov and set UDP_SKB_CB(skb)->partial_cov
+> to 1 if the coverage is not full.
+> 
 
-The list does not include openwrt though, and I know that in
-previous releases, there was an optional kmod-ipv6 package
-that could be left out of an install without rebuilding
-the kernel. Configurations under 128MB are only partially
-supported there these days, so maybe it's no longer important
-for openwrt either, but it would be good to get a confirmation
-from someone doing the packaging.
+Is it worth completely removing the code that defers the udp RX checksum
+until the copy_to_user() and the corresponding TX side code that checksums
+the data being sent.
 
-For optional IPv4 support, I would expect that it's possible
-to make it a loadable module, with a significant amount of
-work and little benefit. Loading an ipv6 module without also
-loading ipv4 sounds completely unrealistic though, given
-the way the code is structured today.
 
-    Arnd
+I'm not sure what the 'killer application' was for the RX side.
+I'd guess the userspace NFS daemon - long since dead.
+
+With most modern 'performance' NICs doing checksum offload you don't
+want to 'waste' cycles doing a checksum during transmit that won't
+be needed - and you don't know the interface until much later.
+
+I also recall that pretty much only x86 actually tries to do the
+checksum and copy together - most architectures checksum the buffer
+fragments (of the iov[]) as they are copied - even though the kernel
+buffer is linear; so has to handle more fragments.
+ISTR there is a bug where 0 and ~0 get swapped.
+
+Even for x86-64 the fastest IP checksum does 12-16 bytes/clock (I think
+you can get 12 on Intel and 16 on AMD), and the copy will do 64 bytes
+per clock (on recent enough cpu and once it is started and with an
+aligned destination).
+So even there separate copy and checksum may be faster.
+The only time copy+checksum really helps is for buffers that spill
+the L1-cache - which is why I think NFS's 8k UDP datagrams are why
+the code was added at all.
+(Last time I asked about this Linus couldn't remember.)
+
+	David
 
