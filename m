@@ -1,156 +1,287 @@
-Return-Path: <netdev+bounces-265917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOgkAbTMr2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:04 +0100
+	id kFMZJh/Rr2kfcgIAu9opvQ
+	(envelope-from <netdev+bounces-265918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:06:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7ED72469BB
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:48:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13986246EFA
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:06:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B33E93029244
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:47:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 51D7D30576EC
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34282363089;
-	Tue, 10 Mar 2026 07:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198FA3E959E;
+	Tue, 10 Mar 2026 08:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9qU+g0F"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="Lu/tSzCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906283624CB
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F21E3EBF34;
+	Tue, 10 Mar 2026 08:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773128864; cv=none; b=ThRw7EllcaaNTbdEvmc5K0XLt4fzHG9u0uY5w5K72XJFVrZ4sDAuum9hEZisIwkL8NYWQrOA7HX5x/twd0zms0Soz+Em9gb5WjZUwDGIildKMbx4d+EgC6Sr9/SkZLz51d1V9LNz3wRPkt8lBBwL+Qza1M4u7/pK+RLXL9lV5FM=
+	t=1773129868; cv=none; b=MYni21z09/z9Heq6aCHFnxPqW0TP0cXOm/nldkPyht2iJifuGr5wcAb5IEUjayUSRBSSiQSa/eUKxmOug02VdfrSmQVp2PVn8abF/eMzXNqPk6mTJek3hTmn0tSBFJT5IqP6N56m5YrE2Y2H7YlLS4ejxFrI5xoY4aFwDnfnUcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773128864; c=relaxed/simple;
-	bh=CEMltqQW9u10Dc2iBNuTXi2X2wgdQ6LtEATQpEiFmIw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GosbPChvvg6LuzkC3tABALpzoaN+WcpYbxkJ8CgBCaee2r5eESrytwb3pZ0bfZLXc8L1NhjhNUPePNbdc9PvqwO+BFnu1NPwR1IytTVW9COyi0DsnZqtp2RwDhJuXQZj6PT9xeMrLYV+lHW1uP7wr5uBE0R+A3EMBf87L/p+qXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9qU+g0F; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b96d8d60303so198702366b.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:47:42 -0700 (PDT)
+	s=arc-20240116; t=1773129868; c=relaxed/simple;
+	bh=dl7cFGu/krscEUd4X4c2fSMgudGGbvCNgTfInuMm0JI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M8PPpPSKTwUxq8WLIN32TmaDlisRdSi+YsFGKyv9jV8unGZ/z3eukpfEvCFqD6p93W0ogEsoXLMhN+wBaPLbjKxkTcdNcgoAiRwKYrOFMFI+9i2aygzBDP0x1YtbXgp1XylbiFfT36WjHuZDk2MtssXOVSE6hcITJp6pxX3elUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=Lu/tSzCm; arc=none smtp.client-ip=120.232.169.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773128861; x=1773733661; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xXA6X3KJ8wqz98mCcEpEVMkHZRCBuaUnyvX8XE1PQJs=;
-        b=t9qU+g0Fg35pqzgVF0KwcUYxr5CrkQ2lw8+6R71nPpEhzSqvJLx2qzMIsHCSAP9biG
-         G1swGxvwSmr1XKQ1Y9XCk3yC8w79Hdl4AF19fXQgZRbeOJNMfvoalEopeJo9Nh2GU4ZL
-         OsgA94v9GY5pKXkAgjeGUp63996z8XRbxqXlLU4vqaWGwvckO+cDtkul+gBS78A/YuGj
-         oOI9EJSofRvcPtxFQIpFmo7VfvEtINJDGy8Ftf3fUOGU68d/3l1DrMaGWQPTdehcWNfX
-         9Vky5JNr8ybVxh7A2pFGfZ3x/pZzVDPibbZvA/dn9QqPC34Ut9rwcDT5BT4QLgb5YKVk
-         pq9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773128861; x=1773733661;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xXA6X3KJ8wqz98mCcEpEVMkHZRCBuaUnyvX8XE1PQJs=;
-        b=lipRufCnJRfJunsmHBWxnU1RIt4rzDLkNrSVI7IQPY98CVJwgSbigD8Qs0j8OJWxnR
-         nIXVA+PMeBuWjQ2K9LmNiF6Z4/W/7np8XJU+kPg/63al992qbC3cPM0Gy/5JegyEGks8
-         rDrM1PzP8P6TT4sqlWv88JCSxqMzB326Ba27t5yZ9lfyFY/7ucHsThMggh65l9ADwFdp
-         q/Q+cyUeFdhpuyb8iN4FD/R3kfyg6+laUrXPsiivbGreUOsOAdgaDj2Zrh3uUrW47lAN
-         Q1AKf7n3Igy4bxXypr6X7XwaZGILJiPEiF21U4k4CZRXafYQ1rkKFF+Ri0EAap9XfK6F
-         +f7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWEvFcO7iusan3imqK/YRSNCbBhg/OLQRNjILoV6I4WKS8VQJufR06l9sja5fyyUJlXd8MbN5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjnxEPrBuaa7k9+/d6YpEgFpKyJpyqJ7F/po9zD0REkR5FfQcQ
-	+6hYX7MznB2eZ2tSsRqN1d/U5PbCKD3HzKHYkzFGhSWteo/QrLv86hE4GefYIMKshjWZXaElj09
-	0S04dS69e9xyGOfQ3EA==
-X-Received: from ejav26.prod.google.com ([2002:a17:906:339a:b0:b94:578:d46e])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:e117:b0:b96:f7c7:6233 with SMTP id a640c23a62f3a-b96f7c76586mr210194966b.19.1773128860572;
- Tue, 10 Mar 2026 00:47:40 -0700 (PDT)
-Date: Tue, 10 Mar 2026 07:47:39 +0000
-In-Reply-To: <20260309142400.596f5010@kernel.org>
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=Lu/tSzCmsVobKT2GToBAIM84pTfLIgIg4+sPxdS9Dry+o01QeOIHVphGbqxyXTw8vKhrETrUvv4Ek
+	 7LCSZKy6Lb6ortHNiQUovnF7ToRTLlCVzoFCCOqy3OvgpFsUhSMfiqO9ByfFCKtrFW4vLZ5PivronS
+	 n7wJjoO5EF1rZ2Qo=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from China-kernel-team (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-09-12087 (RichMail) with SMTP id 2f3769afd069396-023cc;
+	Tue, 10 Mar 2026 16:04:12 +0800 (CST)
+X-RM-TRANSID:2f3769afd069396-023cc
+From: XiaoHua Wang <561399680@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org
+Cc: pablo@netfilter.org,
+	netdev@vger.kernel.org,
+	sbrivio@redhat.com,
+	XiaoHua Wang <561399680@139.com>
+Subject: [PATCH 6.1.y 1/2] netfilter: nf_tables: missing objects with no memcg accounting
+Date: Tue, 10 Mar 2026 16:02:45 +0800
+Message-Id: <20260310080246.3543546-1-561399680@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260306-binder-netlink-v1-0-daceb5bc83f2@google.com>
- <20260307104131.4c1d0de5@kernel.org> <aayWSuOM59uojtuG@google.com>
- <20260307135941.51353a4f@kernel.org> <aayrtyPKOqVGpich@google.com> <20260309142400.596f5010@kernel.org>
-Message-ID: <aa_Mm3mHmF-eFh5x@google.com>
-Subject: Re: [PATCH 0/4] Rust netlink support + use in Rust Binder
-From: Alice Ryhl <aliceryhl@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: D7ED72469BB
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 13986246EFA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[139.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265918-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265917-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[139.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[139.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FREEMAIL_CC(0.00)[netfilter.org,vger.kernel.org,redhat.com,139.com];
+	DKIM_TRACE(0.00)[139.com:-];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[561399680@139.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.974];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,139.com:mid,139.com:email]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 02:24:00PM -0700, Jakub Kicinski wrote:
-> On Sat, 7 Mar 2026 22:50:31 +0000 Alice Ryhl wrote:
-> > > > To be honest, I'm not entirely happy with what Binder is using netlink
-> > > > for either, but it is what it is.  
-> > > 
-> > > If we're both not happy let's take this opportunity to find a better
-> > > solution?  
-> > 
-> > My understanding is that userspace is already using or looking into
-> > using the netlink uapi that Binder exposes here. I don't know to what
-> > extent; it's not used *that* much yet, but it may still be tricky to
-> > change the uapi at this point.
-> 
-> Let's explore it? What user space components would need to be updated?
-> What's a better design?
+From: Pablo Neira Ayuso <pablo@netfilter.org>
 
-Well ... the thing I'm the most unhappy about is needing to have a
-userspace daemon that is notified about all transaction failures to
-begin with.
+[ Upstream commit 69e687cea79fc99a17dfb0116c8644b9391b915e ]
 
-But if you must have such a daemon, I think the netlink based API is
-an okay way to do it. You can easily add new fields in the future, and
-it implements notifications to userspace on our behalf.
+Several ruleset objects are still not using GFP_KERNEL_ACCOUNT for
+memory accounting, update them. This includes:
 
-Though using raw pids in the netlink messages is pretty ugly ... pids
-can change, and the pid namespace of the receiving proc ends up ignored.
+- catchall elements
+- compat match large info area
+- log prefix
+- meta secctx
+- numgen counters
+- pipapo set backend datastructure
+- tunnel private objects
 
-Alice
+Fixes: 33758c891479 ("memcg: enable accounting for nft objects")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+[ The function pipapo_realloc_mt() does not exist in 6.1.y,
+so the fix for pipapo_realloc_mt() was not backported. ]
+Signed-off-by: XiaoHua Wang <561399680@139.com>
+---
+ net/netfilter/nf_tables_api.c  |  2 +-
+ net/netfilter/nft_compat.c     |  6 +++---
+ net/netfilter/nft_log.c        |  2 +-
+ net/netfilter/nft_meta.c       |  2 +-
+ net/netfilter/nft_numgen.c     |  2 +-
+ net/netfilter/nft_set_pipapo.c | 10 +++++-----
+ net/netfilter/nft_tunnel.c     |  5 +++--
+ 7 files changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index ac3618395651..4bf42e4f8595 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -6177,7 +6177,7 @@ static int nft_setelem_catchall_insert(const struct net *net,
+ 		}
+ 	}
+ 
+-	catchall = kmalloc(sizeof(*catchall), GFP_KERNEL);
++	catchall = kmalloc(sizeof(*catchall), GFP_KERNEL_ACCOUNT);
+ 	if (!catchall)
+ 		return -ENOMEM;
+ 
+diff --git a/net/netfilter/nft_compat.c b/net/netfilter/nft_compat.c
+index 4f674a472bb6..37090ada8e8d 100644
+--- a/net/netfilter/nft_compat.c
++++ b/net/netfilter/nft_compat.c
+@@ -537,7 +537,7 @@ nft_match_large_init(const struct nft_ctx *ctx, const struct nft_expr *expr,
+ 	struct xt_match *m = expr->ops->data;
+ 	int ret;
+ 
+-	priv->info = kmalloc(XT_ALIGN(m->matchsize), GFP_KERNEL);
++	priv->info = kmalloc(XT_ALIGN(m->matchsize), GFP_KERNEL_ACCOUNT);
+ 	if (!priv->info)
+ 		return -ENOMEM;
+ 
+@@ -814,7 +814,7 @@ nft_match_select_ops(const struct nft_ctx *ctx,
+ 		goto err;
+ 	}
+ 
+-	ops = kzalloc(sizeof(struct nft_expr_ops), GFP_KERNEL);
++	ops = kzalloc(sizeof(struct nft_expr_ops), GFP_KERNEL_ACCOUNT);
+ 	if (!ops) {
+ 		err = -ENOMEM;
+ 		goto err;
+@@ -904,7 +904,7 @@ nft_target_select_ops(const struct nft_ctx *ctx,
+ 		goto err;
+ 	}
+ 
+-	ops = kzalloc(sizeof(struct nft_expr_ops), GFP_KERNEL);
++	ops = kzalloc(sizeof(struct nft_expr_ops), GFP_KERNEL_ACCOUNT);
+ 	if (!ops) {
+ 		err = -ENOMEM;
+ 		goto err;
+diff --git a/net/netfilter/nft_log.c b/net/netfilter/nft_log.c
+index 0e13c003f0c1..4eb59c3f42b8 100644
+--- a/net/netfilter/nft_log.c
++++ b/net/netfilter/nft_log.c
+@@ -163,7 +163,7 @@ static int nft_log_init(const struct nft_ctx *ctx,
+ 
+ 	nla = tb[NFTA_LOG_PREFIX];
+ 	if (nla != NULL) {
+-		priv->prefix = kmalloc(nla_len(nla) + 1, GFP_KERNEL);
++		priv->prefix = kmalloc(nla_len(nla) + 1, GFP_KERNEL_ACCOUNT);
+ 		if (priv->prefix == NULL)
+ 			return -ENOMEM;
+ 		nla_strscpy(priv->prefix, nla, nla_len(nla) + 1);
+diff --git a/net/netfilter/nft_meta.c b/net/netfilter/nft_meta.c
+index 6e8332192622..587ef60c8f32 100644
+--- a/net/netfilter/nft_meta.c
++++ b/net/netfilter/nft_meta.c
+@@ -888,7 +888,7 @@ static int nft_secmark_obj_init(const struct nft_ctx *ctx,
+ 	if (tb[NFTA_SECMARK_CTX] == NULL)
+ 		return -EINVAL;
+ 
+-	priv->ctx = nla_strdup(tb[NFTA_SECMARK_CTX], GFP_KERNEL);
++	priv->ctx = nla_strdup(tb[NFTA_SECMARK_CTX], GFP_KERNEL_ACCOUNT);
+ 	if (!priv->ctx)
+ 		return -ENOMEM;
+ 
+diff --git a/net/netfilter/nft_numgen.c b/net/netfilter/nft_numgen.c
+index 45d3dc9e96f2..5b4dde41ec36 100644
+--- a/net/netfilter/nft_numgen.c
++++ b/net/netfilter/nft_numgen.c
+@@ -66,7 +66,7 @@ static int nft_ng_inc_init(const struct nft_ctx *ctx,
+ 	if (priv->offset + priv->modulus - 1 < priv->offset)
+ 		return -EOVERFLOW;
+ 
+-	priv->counter = kmalloc(sizeof(*priv->counter), GFP_KERNEL);
++	priv->counter = kmalloc(sizeof(*priv->counter), GFP_KERNEL_ACCOUNT);
+ 	if (!priv->counter)
+ 		return -ENOMEM;
+ 
+diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+index 863162c82330..ad9d0bb43248 100644
+--- a/net/netfilter/nft_set_pipapo.c
++++ b/net/netfilter/nft_set_pipapo.c
+@@ -874,7 +874,7 @@ static void pipapo_lt_bits_adjust(struct nft_pipapo_field *f)
+ 		return;
+ 	}
+ 
+-	new_lt = kvzalloc(lt_size + NFT_PIPAPO_ALIGN_HEADROOM, GFP_KERNEL);
++	new_lt = kvzalloc(lt_size + NFT_PIPAPO_ALIGN_HEADROOM, GFP_KERNEL_ACCOUNT);
+ 	if (!new_lt)
+ 		return;
+ 
+@@ -1150,7 +1150,7 @@ static int pipapo_realloc_scratch(struct nft_pipapo_match *clone,
+ 		scratch = kzalloc_node(struct_size(scratch, map,
+ 						   bsize_max * 2) +
+ 				       NFT_PIPAPO_ALIGN_HEADROOM,
+-				       GFP_KERNEL, cpu_to_node(i));
++				       GFP_KERNEL_ACCOUNT, cpu_to_node(i));
+ 		if (!scratch) {
+ 			/* On failure, there's no need to undo previous
+ 			 * allocations: this means that some scratch maps have
+@@ -1324,7 +1324,7 @@ static struct nft_pipapo_match *pipapo_clone(struct nft_pipapo_match *old)
+ 	int i;
+ 
+ 	new = kmalloc(sizeof(*new) + sizeof(*dst) * old->field_count,
+-		      GFP_KERNEL);
++		      GFP_KERNEL_ACCOUNT);
+ 	if (!new)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1354,7 +1354,7 @@ static struct nft_pipapo_match *pipapo_clone(struct nft_pipapo_match *old)
+ 		new_lt = kvzalloc(src->groups * NFT_PIPAPO_BUCKETS(src->bb) *
+ 				  src->bsize * sizeof(*dst->lt) +
+ 				  NFT_PIPAPO_ALIGN_HEADROOM,
+-				  GFP_KERNEL);
++				  GFP_KERNEL_ACCOUNT);
+ 		if (!new_lt)
+ 			goto out_lt;
+ 
+@@ -1368,7 +1368,7 @@ static struct nft_pipapo_match *pipapo_clone(struct nft_pipapo_match *old)
+ 		if (src->rules > (INT_MAX / sizeof(*src->mt)))
+ 			goto out_mt;
+ 
+-		dst->mt = kvmalloc(src->rules * sizeof(*src->mt), GFP_KERNEL);
++		dst->mt = kvmalloc(src->rules * sizeof(*src->mt), GFP_KERNEL_ACCOUNT);
+ 		if (!dst->mt)
+ 			goto out_mt;
+ 
+diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
+index be741db50ffa..cdbfbd88efd1 100644
+--- a/net/netfilter/nft_tunnel.c
++++ b/net/netfilter/nft_tunnel.c
+@@ -503,13 +503,14 @@ static int nft_tunnel_obj_init(const struct nft_ctx *ctx,
+ 			return err;
+ 	}
+ 
+-	md = metadata_dst_alloc(priv->opts.len, METADATA_IP_TUNNEL, GFP_KERNEL);
++	md = metadata_dst_alloc(priv->opts.len, METADATA_IP_TUNNEL,
++				GFP_KERNEL_ACCOUNT);
+ 	if (!md)
+ 		return -ENOMEM;
+ 
+ 	memcpy(&md->u.tun_info, &info, sizeof(info));
+ #ifdef CONFIG_DST_CACHE
+-	err = dst_cache_init(&md->u.tun_info.dst_cache, GFP_KERNEL);
++	err = dst_cache_init(&md->u.tun_info.dst_cache, GFP_KERNEL_ACCOUNT);
+ 	if (err < 0) {
+ 		metadata_dst_free(md);
+ 		return err;
+-- 
+2.43.0
+
+
 
