@@ -1,246 +1,211 @@
-Return-Path: <netdev+bounces-266251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AH7YF2dQsGmBiAIAu9opvQ
-	(envelope-from <netdev+bounces-266251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:09:59 +0100
+	id CJKOLMhQsGmBiAIAu9opvQ
+	(envelope-from <netdev+bounces-266252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:11:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30642554E1
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:09:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1707E255516
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86469303525D
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:07:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB6CD303A92F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D644B3BF66E;
-	Tue, 10 Mar 2026 17:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBC53C65FE;
+	Tue, 10 Mar 2026 17:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+Hx265b"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sXOShCOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011001.outbound.protection.outlook.com [52.101.57.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DEE32ED39;
-	Tue, 10 Mar 2026 17:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773162477; cv=none; b=s4VeqmLAW4jUDrWSYaZvmmNwFstX4yPCOX7ZCKUcs0h0wNThhE49W9nW+gpHmQkWBPPnVlrGV5SY+ItVTyV7RwsLticaRlpFBV4jbgaev1VB45XHfAKingceis1AXj1n60lRgSC6jKAEdqysq1JQb9wRQyngiXx3/60duwmaEq0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773162477; c=relaxed/simple;
-	bh=+g1/ElvErcOafWKoSRaH2lOSraOgCa+U5fAhEL5DSzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r3JV07a1ah6DtMY3j8auSEmaS+cYbmATD4Ftn1IUj4j1Nvje/QFqrkG0SwAenxSqm1duzb3tFLV0VC3bLcNuUKkOQGK1wkHhLV/HIb9kRIkQQbdkAxRvW1HAnJ1A8Tei3D6mnYQK58kFD2Qt8ELv1frDW0JWkGQ1VfdNgOD6vD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+Hx265b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B21FCC19423;
-	Tue, 10 Mar 2026 17:07:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773162477;
-	bh=+g1/ElvErcOafWKoSRaH2lOSraOgCa+U5fAhEL5DSzA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V+Hx265bZ1gpSbNsKmQPNa4fMVqozvDcjAVcR+E8dC3IyBSG9vrT0HVvrVE5fxwk1
-	 gH+ime8g4QHk9iUZijQAX1k8p6iPmYjKH3K6Y3I7UlpyuN7TAsBCFe93iPefxz2oUB
-	 xjn9cMVB+o9vgeA4n8WX5GglrJjGLbztqQ/V5RuaiZxZvtFKLOnzCLf9SCzcBYHh4t
-	 VuD+PWG1u9Vzo6B5Hk9rDnI3efwktqB9Z1B+Q9gqMb0A3TyjA1usndjxOpfI+BqRtF
-	 N14WWcmlFzuDiLyLmMRCo17WdY0mSZgMmN2inJ/f1WTty39SCVpR88P/Wq4SiJYbeP
-	 tjdw7BKUbm4JA==
-Date: Tue, 10 Mar 2026 17:07:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	Frank.Li@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 net] net: enetc: safely reinitialize TX BD ring when
- it has unsent frames
-Message-ID: <20260310170752.GL461701@kernel.org>
-References: <20260309030412.2716984-1-wei.fang@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED7E23BCED;
+	Tue, 10 Mar 2026 17:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773162614; cv=fail; b=rUzpZNvgfVpRZpLOI0fsc/ZdwTTT85Mx22/kj8+FoYyIcNhcSV0pdGdTUuQPRsdlI65BntLJuAubF/YWCOurlnVOtL/TnnjCNgbEkvECVJwNb1JHe7UVjXxhxpIz1Cdr7Jpkd2MlUGSkBGy7YQZXsTXVPythhX7agGcwuktIxfA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773162614; c=relaxed/simple;
+	bh=ngt0yEIRauyscoB8fsQSkDURhR2mIun6WHg3scseUOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=McvcmwlbDdWkJEeta1VVthGpGotoe35mOYO/TdzQtj0Cy7v1XOR6XW0xaHhX7702MmS+PrXZvZ92V7KVVps7dnW/wRr97mEsP618MUI0WvwY6zhWuE3urAE8Nqjq48cx9G9vB1J86ID++rUl6E9EuBhUblWj8ZUKy4pk+bW1uIA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sXOShCOD; arc=fail smtp.client-ip=52.101.57.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DjBNQ/CVkVomg7ygyVvX9ithyr+UEp9cIzMdUdHN+j8dH6Ngzp5sHtkJUADubSOC+2CU7tkIhOZT5HuzdwJpVTrgpCovOncTp3LScGpxDVUqFlEXyzh2lMBz+Eavu4YhGH768u+F1Slz5eGZTyM+6/pTos00qmu5gFJbFKdRgo/MAoONAiGea+PzIspWUOaXm3vJt3H54iWBcmVf6hxdU5yknuOR8e85dGErrOn4C67um1gSU4PL2EIL7SJE/mSLR4sGB2Rs7J32f0+rUNXzetbfskzISk5U5AR8colZjivlf0bfNJC0ZBn3y0+c9X/zj7hhZNPSvKfisiJzZPJhcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2sc+OFQK5EUEmZJBvSVD0WSIrPqcgRLr1D3RKPuxVu0=;
+ b=tTJlisjIkK6d5e9ROQAW+jQWw2v2wktOk6Z1bp8Nw342mrZ30Vm18UxnI2WMQxuGPwSBfgSt84ix1Kh4cJdjYTDjCtTUcT4Zy1SRLI6Mjyu+2TLp96hiO1xcBnjAYKWAL0s7W6rgwN5Yg9eLhhXNoo+4/ufzIu6PbzwIzHvqapH6m1C0UVUFCn7t4aXHcsv3L1YnI9vRmLBex8QlWvbtG9wLihW4ktBXlSFUhnJ4aI4cXYCJH6DXsxr/z6ycpSKLrC3rP7UpuYLqAow47s6SspviTYQ0Toygf5MpBC/s7rcsFI99Rd5OUXAz9WS2dshpPlaBhaeQYjg2FIfMOdiOPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2sc+OFQK5EUEmZJBvSVD0WSIrPqcgRLr1D3RKPuxVu0=;
+ b=sXOShCOD9KTIWrd0ia3rmrKQ1VbQzmawW1l6BMlARQ58+xJ9QULny2qFJ3TsFJmRqJLnS08cwhaY/IpDVtY9qBn7ACamTpIjV7c0h+SS6Nk2ZUYTOoeYxDGWwurvVCKmbHXMocz3h7rtYOrxzYzdeDhrSrrRKcCA3SqhsyRdVTQ=
+Received: from BL1PR13CA0321.namprd13.prod.outlook.com (2603:10b6:208:2c1::26)
+ by BN0PR10MB5077.namprd10.prod.outlook.com (2603:10b6:408:12e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Tue, 10 Mar
+ 2026 17:10:11 +0000
+Received: from BL6PEPF0001AB4A.namprd04.prod.outlook.com
+ (2603:10b6:208:2c1:cafe::1d) by BL1PR13CA0321.outlook.office365.com
+ (2603:10b6:208:2c1::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.25 via Frontend Transport; Tue,
+ 10 Mar 2026 17:10:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
+Received: from flwvzet201.ext.ti.com (198.47.21.195) by
+ BL6PEPF0001AB4A.mail.protection.outlook.com (10.167.242.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Tue, 10 Mar 2026 17:10:09 +0000
+Received: from DFLE207.ent.ti.com (10.64.6.65) by flwvzet201.ext.ti.com
+ (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 10 Mar
+ 2026 12:10:06 -0500
+Received: from DFLE215.ent.ti.com (10.64.6.73) by DFLE207.ent.ti.com
+ (10.64.6.65) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 10 Mar
+ 2026 12:10:05 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE215.ent.ti.com
+ (10.64.6.73) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 10 Mar 2026 12:10:05 -0500
+Received: from [172.24.231.164] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.231.164])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62AHA1f73471650;
+	Tue, 10 Mar 2026 12:10:01 -0500
+Message-ID: <b6457298-12c2-4f13-9704-c0b46a34137b@ti.com>
+Date: Tue, 10 Mar 2026 22:40:00 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260309030412.2716984-1-wei.fang@nxp.com>
-X-Rspamd-Queue-Id: C30642554E1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter
+ value for PTP support
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Siddharth Vadapalli
+	<s-vadapalli@ti.com>, Michael Walle <mwalle@kernel.org>, Nishanth Menon
+	<nm@ti.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Vignesh Raghavendra
+	<vigneshr@ti.com>, Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, "MD
+ Danish Anwar" <danishanwar@ti.com>, Vishnu Singh <v-singh1@ti.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260303075819.3246032-1-c-vankar@ti.com>
+ <20260304190156.319df897@kernel.org>
+Content-Language: en-US
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <20260304190156.319df897@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4A:EE_|BN0PR10MB5077:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7e0a6d2-e0c3-45cc-ee52-08de7ec7e288
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700016|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	KZrUKFYu6CpRk59C4rDWDe69CEwN4UoxIyEYt4ypTb40uhytShEWMn33E/GWCWPv4q5cK6f+b5wSe/4tLHZGleY1B0MkA3IOSJWdIF8RkxPGyuBKAlndXfwYmIBz7iOJ7jF5ImDzIrZu8OsSjnwbvM38lfwy0f6mp2ulR9PCXa/4Rp8VJrnnc/CpJD3VE+WPlnLm6TpnDE+aKA+wdxtInlfRRLkhutW/MvyNt3q1RBLnMbwlAwy72tavfkbi7yuJqtMu1Qx9H3kt1e4Q8MQjSUTWVlF7cvspJP1mZFvRApr/Di3uQJOsQWNs27JZEWxq2kEPPpshj7bFnwMQ0SCwk2cihNXkJ0kRu31BoaUxs2V4HywZ84owi6vDIARI3JDuyiIyy0KggDmZQqmGuf5YA0VvNZ+Rtih5ciOc+83NeoU+cUELwukVr/3LmU/d1JOyD1euuIUkUKSvLdBkzh+k7pYEz8/D2TUk2MRKS7Yd4PmJsTRuuruP8+RtNkkTRrAHnxsPR1I6CpUc5ZBiJq+FhWMDkrqECzYufVC58E1aHZhxacGF7Nnya9BAVAMdRkR0BgEJyZ/SLdr3/bWg7B0r9xQlwm6NlUaoTbrPQo8YY+tYVtM8yBaO8MrPahgVsn7+gKjxWun6DY7vCfv/bfcx/pPGCQuM32uDrkygqLVs2OARjjUcLlXaEX3bdMyfUYxeAXmd/7iXP6CVsuXJLNdP+hJtD+2zXdot1wDyiWTKZFIzkcuYWbHBdFoZ6rPstoi21cnmae4PQU/fzQ0pruNaBA==
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700016)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	1CHQyfXGBZ2r+Ym9sHY2IbZBYEzpDh/iTTUn3RFdBmWe5h85QJ8p4uJUYa/ahd7g4oLFwZGIsrAVpbzkx8nfkToW7qYTO81AA6asNobURNQrVM2FCX29uibUXNuhxp3IIetPE4t1gSzK8IsgdY2sZCHPfzrXe9seTvMNhJxfLt8RUJoHUIxTj1h01IZn4wlScZP6dqpUV1QZyKsn28KwzR4mW3uEvS1e5o9tWuxb25lrcJgISRmcsLjdbK4Ps5CwUrttnpsgNVMZMtWTm3MYRjtGNgLFcJfFMvMYkNByLO8ToS34of2UM6wJjec/Byx3i/Ugu+uijAaG22yqsQxdY5e05PcEdnOin3DiYr8ckM1k/ExwhLS9Q6Ch51N5eUlnvjXasFYuf3G+y090WnVhlgnd0uC4Enood0tsFJeNuGWMpuQE16O+X16R5Px5vXmL
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2026 17:10:09.6599
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7e0a6d2-e0c3-45cc-ee52-08de7ec7e288
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB4A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB5077
+X-Rspamd-Queue-Id: 1707E255516
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266251-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-266252-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ti.com:dkim,ti.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[c-vankar@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 11:04:12AM +0800, Wei Fang wrote:
-> Currently the driver does not reset the producer index register (PIR) and
-> consumer index register (CIR) when initializing a TX BD ring. The driver
-> only reads the PIR and CIR and initializes the software indexes. If the
-> TX BD ring is reinitialized when it still contains unsent frames, its PIR
-> and CIR will not be equal after the reinitialization. However, the BDs
-> between CIR and PIR have been freed and become invalid and this can lead
-> to a hardware malfunction, causing the TX BD ring will not work perperly.
+Hello Jakub,
+
+On 05/03/26 08:31, Jakub Kicinski wrote:
+> On Tue, 3 Mar 2026 13:28:19 +0530 Chintan Vankar wrote:
+>> @@ -1888,8 +1894,8 @@ static int am65_cpsw_nuss_hwtstamp_get(struct net_device *ndev,
+>>   	cfg->flags = 0;
+>>   	cfg->tx_type = port->tx_ts_enabled ?
+>>   		      HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+>> -	cfg->rx_filter = port->rx_ts_enabled ? HWTSTAMP_FILTER_PTP_V2_EVENT |
+>> -			HWTSTAMP_FILTER_PTP_V1_L4_EVENT : HWTSTAMP_FILTER_NONE;
+>> +	cfg->rx_filter = port->rx_ts_enabled ?
+>> +			 port->rx_ts_filter : HWTSTAMP_FILTER_NONE;
 > 
-> Since the PIR and CIR are sofeware-configurable on ENETC v4. Therefore,
-> the driver must reset them if they are not equal when reinitializing
-> the TX BD ring.
+> HWTSTAMP_FILTER_NONE == 0
+> a lot of code depends on that
+> so you can just assign port->rx_ts_filter
 > 
-> However, resetting the PIR and CIR alone is insufficient, it cannot
-> completely solve the problem. When a link-down event occurs while the
-> the TX BD ring is transmitting frames, subsequent reinitialization of
-> the TX BD ring may cause it to malfunction. For example, the following
-> steps may reproduce the problem (not 100% reproducible).
+>>   
+>>   	return 0;
+>>   }
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+>> index 917c37e4e89b..595123c155db 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+>> @@ -53,6 +53,7 @@ struct am65_cpsw_port {
+>>   	struct am65_cpsw_slave_data	slave;
+>>   	bool				tx_ts_enabled;
+>>   	bool				rx_ts_enabled;
+>> +	int				rx_ts_filter;
 > 
-> 1. Unplug the cable when the TX BD ring is busy transmitting frames.
-> 2. Disable the network interface (ifconfig eth0 down).
-> 3. Re-enable the network interface (ifconfig eth0 up).
-> 4. Plug in the cable, the TX BD ring may fail to transmit packets.
-> 
-> When the link-down event occurs, enetc4_pl_mac_link_down() only clears
-> PMa_COMMAND_CONFIG[TX_EN] to disable MAC transmit data path. It doesn't
-> set PORT[TXDIS] to 1 to flush the TX BD ring. Therefore, reinitializing
-> the TX BD ring at this point is unsafe. To safely reinitialize the TX BD
-> ring after a link-down event, we checked with the NETC IP team, a proper
-> Ethernet MAC graceful stop is necessary. Therefore, add the Ethernet MAC
-> graceful stop to the link-down event handler enetc4_pl_mac_link_down().
-> 
-> Fixes: 99100d0d9922 ("net: enetc: add preliminary support for i.MX95 ENETC PF")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
-> v2:
-> 1. Remove unused register macros (ENETC_SISR and SISR_TX_BUSY)
-> 2. Remove spurious semicolon from enetc4_mac_wait_rx_empty()
-> ---
->  drivers/net/ethernet/freescale/enetc/enetc.c  |   9 ++
->  .../net/ethernet/freescale/enetc/enetc4_hw.h  |  11 ++
->  .../net/ethernet/freescale/enetc/enetc4_pf.c  | 126 ++++++++++++++++--
->  3 files changed, 132 insertions(+), 14 deletions(-)
+> given none == 0 you can just turn rx_ts_enabled from a bool into
+> an enum hwtstamp_rx_filters and maybe rename it?
+> no need to have two members in the struct for rx
 
-Hi,
+Thanks for suggesting this, I have posted a version 2 with updated
+changes at:
+https://lore.kernel.org/r/20260310160940.109822-1-c-vankar@ti.com/
 
-This is a not a small patch for a fix.
-Could you consider splitting it up a bit?
-Say one patch for the ENETC_TBPIR/ENETC_TBCIR
-portion and another for the graceful stop?
-
-> 
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-> index 70768392912c..825a5d1f2965 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> @@ -2578,6 +2578,7 @@ EXPORT_SYMBOL_GPL(enetc_free_si_resources);
->  
->  static void enetc_setup_txbdr(struct enetc_hw *hw, struct enetc_bdr *tx_ring)
->  {
-> +	struct enetc_si *si = container_of(hw, struct enetc_si, hw);
->  	int idx = tx_ring->index;
->  	u32 tbmr;
->  
-> @@ -2595,6 +2596,14 @@ static void enetc_setup_txbdr(struct enetc_hw *hw, struct enetc_bdr *tx_ring)
-
-The line above this hunk is:
-
-	/* clearing PI/CI registers for Tx not supported, adjust sw indexes */
-
-And the AI generated review reports:
-
-  This isn't a bug, but the comment now contradicts the code. The comment
-  says "clearing PI/CI registers for Tx not supported" but the code
-  immediately below clears TBPIR and TBCIR for ENETC v4 hardware.
-
-  Should the comment be updated to clarify that clearing is only
-  unsupported on ENETC rev1?
-
->  	tx_ring->next_to_use = enetc_txbdr_rd(hw, idx, ENETC_TBPIR);
->  	tx_ring->next_to_clean = enetc_txbdr_rd(hw, idx, ENETC_TBCIR);
->  
-> +	if (tx_ring->next_to_use != tx_ring->next_to_clean &&
-> +	    !is_enetc_rev1(si)) {
-> +		tx_ring->next_to_use = 0;
-> +		tx_ring->next_to_clean = 0;
-> +		enetc_txbdr_wr(hw, idx, ENETC_TBPIR, 0);
-> +		enetc_txbdr_wr(hw, idx, ENETC_TBCIR, 0);
-> +	}
-> +
->  	/* enable Tx ints by setting pkt thr to 1 */
->  	enetc_txbdr_wr(hw, idx, ENETC_TBICR0, ENETC_TBICR0_ICEN | 0x1);
->  
-
-...
-
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-
-...
-
-> @@ -801,15 +792,120 @@ static void enetc4_set_tx_pause(struct enetc_pf *pf, int num_rxbdr, bool tx_paus
->  	enetc_port_wr(hw, ENETC4_PPAUOFFTR, pause_off_thresh);
->  }
->  
-> -static void enetc4_enable_mac(struct enetc_pf *pf, bool en)
-> +static void enetc4_mac_wait_tx_empty(struct enetc_si *si, int mac)
-> +{
-> +	u32 timeout = 0;
-> +
-> +	while (!(enetc_port_rd(&si->hw, ENETC4_PM_IEVENT(mac)) &
-> +		 PM_IEVENT_TX_EMPTY)) {
-> +		if (timeout >= 100) {
-> +			dev_warn(&si->pdev->dev,
-> +				 "MAC %d TX is not empty\n", mac);
-> +			break;
-> +		}
-> +
-> +		usleep_range(100, 110);
-> +		timeout++;
-> +	}
-> +}
-
-Can this be implemented using poll_timeout_us() ?
-
-...
-
-> +static void enetc4_mac_wait_rx_empty(struct enetc_si *si, int mac)
-> +{
-> +	u32 timeout = 0;
-> +
-> +	while (!(enetc_port_rd(&si->hw, ENETC4_PM_IEVENT(mac)) &
-> +		 PM_IEVENT_RX_EMPTY)) {
-> +		if (timeout >= 100) {
-> +			dev_warn(&si->pdev->dev,
-> +				 "MAC %d RX is not empty\n", mac);
-> +			break;
-> +		}
-> +
-> +		usleep_range(100, 110);
-> +		timeout++;
-> +	}
-> +}
-
-Likewise, here.
-
-...
+Regards,
+Chintan.
 
