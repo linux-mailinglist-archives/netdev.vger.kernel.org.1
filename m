@@ -1,228 +1,174 @@
-Return-Path: <netdev+bounces-266356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLqwAFuUsGkukgIAu9opvQ
-	(envelope-from <netdev+bounces-266356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:59:55 +0100
+	id WD7SHmOVsGkukgIAu9opvQ
+	(envelope-from <netdev+bounces-266357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:04:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD165258950
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:59:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F1CD258A84
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E96393026B4D
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:59:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 531D830CE0E8
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D36F3F210F;
-	Tue, 10 Mar 2026 21:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9567F3EF665;
+	Tue, 10 Mar 2026 22:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="t3LYsIwZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hrxy2CcX"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="wUJRshA1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F25C3F2100;
-	Tue, 10 Mar 2026 21:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B97F2FDC3C
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 22:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773179979; cv=none; b=RwbyH8VcCNykqG8kBlUuynLDfcwRDxGgsbvM8ZSR4pv6fKPJsV35ppAjFBTJoRqn7ZxJviaIhTTlpIys/zDmL4dk+0FSKza3Z4XbGFeCiR+FjgYHVO9ZjCxJfbJ02VqlIIvFJDjlnrUkxyM5utFgCOcT69Dk3DZqEDF2z7JdB5M=
+	t=1773180251; cv=none; b=ovr8tQUD8btVyYpcxkxjteqv+AKe4YY4+YonjbuCJxcU8poez3lrO4BF9GpZKNt0j+YHGkadk4O1wrSf5j3NwfkNL8EhI2wFg7ZaKAWAcf1+koOFva4IN7H71UO1pQxyFZkwi0Gk6xNprxzgrq9Q3+ppooxz5bZqGCAdFcCZXP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773179979; c=relaxed/simple;
-	bh=f13w/2doTpmIhJWf4uNRNpxAIztGNJszb7YjfVlaz/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cZwxNYMsT9dinPJI6pTMnfTEsIjMPyIxddBMncxEWqEWqLcYGPUSixRb111Cg3JCaPxHBeSE5UgHCBHy5M3mlv4LKD5SP2qJO/k6x99Jjb9pPAeEZ0IyMauGHeIWHp75cif6/PWuvoIWZ8aDorFLP7cpV7aCBLHkeElgi1lDt70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=t3LYsIwZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hrxy2CcX; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id C0CC01D0013B;
-	Tue, 10 Mar 2026 17:59:36 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 10 Mar 2026 17:59:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1773179976; x=
-	1773266376; bh=HUoqezWhH6kt8wLNIqdnuF3T0mjP7eY5jUwHwQGXiXs=; b=t
-	3LYsIwZgFiyE0Ol9Q6U576l1PExPjmKZvkHznd8mfT8PrJv1NYkF9uzMoXtVIx0I
-	92iv3K5DWUnLeuPJ4CUFA1jezYJ3OtmgbLqxpIoen1HR7h+O9BX+9G6V5rIWU4ja
-	2dWODUtJDMLLdbCTljP8z/OmqgyQ81Ayj8F6wlt3zJ2VGmjG9XypsdkiI7K31qol
-	J7OSM40nid9hUvCnEDdslWTkXpT4cxGfEpddEbCiPH9aZNb+rl/4yYMwpildGxO7
-	gvxhz6L6FL0GeQEAEzsBkfl36+lXjct0JYS7vOHCqjUwRSY0geTHMU4N/VTBY7lv
-	Vd9DhxgQUH6Rpl/dSRPRg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1773179976; x=1773266376; bh=H
-	UoqezWhH6kt8wLNIqdnuF3T0mjP7eY5jUwHwQGXiXs=; b=Hrxy2CcXLOfkJaz6C
-	gdf6VZIb4MkmR78RD0TLNBybZgondCO9tsFslL556/e/Tje3EJHxYeTYx/GAsop9
-	tYCCdNpJRzQfV7+by4agLx+4NHvB1nzHEAySNIBxiynQd74fDwvrKcWTAEpyS0sJ
-	edUbe356Dc1JPjzSy2nicaGA89hCBBh8C95zKu12df0fG4AyEf9BGP1ttXciY5RX
-	GAiUnvcMqt+APqVAC6X919mnPmnP3mY8NtrF7B/oswjS+B2c8bF3QV+759+SULu2
-	JOKMOKVmUwRIQBAAa/n2e6sCObYuTgZkrfF+AazxERtCgDt6dXW6Pb1NMjt9Qtnb
-	hxKdw==
-X-ME-Sender: <xms:SJSwaR9eGJIO4o3ubbk-l511GFEUR0ZKTM_hYQPcDizzQ5SDZLnY-Q>
-    <xme:SJSwafBccaOoUCwc_TYbN3K9e6IbJ6Gi1029NcREDKwZlLFe9ntwtaE3HMtsBFF4h
-    JXJsBNLe0uvkwu-bYs0ZFD-z83LkS4cdp0Q8l6u8VT4j3ULDn8FyTs>
-X-ME-Received: <xmr:SJSwaWQBeqQ7cKTmnVsnsAx191iSEEL_mMehm2q0yDdgP0Fm9B98km5lE4Yp>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkedvudeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
-    udfghefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphht
-    thhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhksh
-    gvlhhfthgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhunhhi
-    hihusehgohhoghhlvgdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlh
-    drohhrgh
-X-ME-Proxy: <xmx:SJSwaWuOkjQJnvLI5nmXlkVglgKcRBZh_Oqh0ljCMX8P0oC2YsCFdA>
-    <xmx:SJSwaS08BzFoDbJvaVIU1XZKiQ1mYlR7IiIGEVvR5AN0guGvZn-AoQ>
-    <xmx:SJSwaXURb950NvpjIV0ct9Fj_jkvALDfv5ggWDdLHEsrv3SG6hWi-Q>
-    <xmx:SJSwadJoGfi7s0PT6XHwrRbhV7T9NKEG_7j5yedCkXPHyRMr7sB6Mw>
-    <xmx:SJSwaWKONHZjljmi82wO2uDIX2-96vEp29d0f7-9yR5H4GM9EZlfI_Ux>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 10 Mar 2026 17:59:36 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
+	s=arc-20240116; t=1773180251; c=relaxed/simple;
+	bh=X0jYres7RAKfvS4aOQk8bP0u7kzw0Dczk5OQQ6co5ZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZRYpUX6Ae/IwLch8ROa+enk1MT/iLmeILSXRKXfw26w443aHo0BJ55G8uaeVINE/xZIcOqfgfS5qxbsNnCz8y/7+r2/sxxs6XTTllojGUZbZH9ihayhdRPKDg1Q/+6COFt1qEmF1HcnbOiRHqutsJi0lh2QsaxF7IJfpCK34VKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=wUJRshA1; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2a9296b3926so103956485ad.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 15:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773180249; x=1773785049; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4rRhnGis0WZpWlPXUYX9lgom+TN8jjMQV7lIc8SULHU=;
+        b=wUJRshA1ZbgZHx8oohqXEVrapFeMWBj/BnXOTclN1O1HZ3EtKO3ONW6eyHcl2WB/hy
+         BzOX0OQIZFq0/IuIHWr4o+NjQrpBOyG3Nh+agWDO70qHOMyhA727ciM+DdS2x6eY4KSP
+         ZlzdGYzmwDjzm0t4Jjx9VBkzMVrkzt4PjdGjtCgAYoDdPwtYWdsBdDOj6CI/wH08Qg7s
+         7uVKzi3UYlfDxUng6HpUjq9nU7SSydwS332xc6uCJ3lwJSNWZYve27hn4/Zdvu7oP7Ts
+         jecmyCTqrgKxP2NLZve16Sy0TSIW/5EPAjltpksAt6/NzvLWrhMI5YHtdIUPieLrJNJZ
+         Q3qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773180249; x=1773785049;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4rRhnGis0WZpWlPXUYX9lgom+TN8jjMQV7lIc8SULHU=;
+        b=bVxkmo2eX37Y07bvE5e9oQQqaS0j6XItmsDa10yhLFEr9lGn/4zM1MZ9lkLeSDQDiG
+         8mGq5X8PjSODc0714K7TsI5yonzkV5bXLRomw3iHl84DgllfO15v0JcWLj4td6HCwH2f
+         yg6h3ydGTFMLaYL9iGgk93WS7l7Hi78W+fCthOl3G0rAbif8cYaLBiU+R9NlrUb9Xb3A
+         SXiOMo5GefNWuf6M8qxK6iOJH2gV/86BP7HNOPZPVsnp/WO1ri27Cc8z4Jd/faj3vToA
+         mURnkrjwgcur4cHK3JbuTB0LSlr38GoZVF144CRdNVlOzjXQjNsR+TAXuQ0QT6/XJPkD
+         nGLw==
+X-Gm-Message-State: AOJu0YythszU4HyVpGGv9WHcXBEIGRE98VtTpkAurmreDnuPzZQ7ikFO
+	pUA6njhNNbiAmL32CNoWavxayytysGNqjNwnXtK6e5VkCyYS6uNP2ee1eFfZdMSiK7zqpUHA+xy
+	qeaE/cpA=
+X-Gm-Gg: ATEYQzxykxoqqaA5jM7VSb1Pashy80dpeYoCMMywUJ1xnvQF7k2ycv2fRtcbcuuOq6z
+	6gHmWsmvHUwhY+MyMG8xUR5B4Cq9K/uFMcrHBOpO0mJe7fa6KtE+0EfTnZGEpoVly27E5qo8vEB
+	88SibUD4Gp9T6wVlQLMg0SYDeSZCnC9oHeNMeW7aehowvMjs/LdcVOKO+qj1cbM6llr7GzD6JaS
+	S4MIzsZqUGleRnnvOv6r69d6vnr5c0/EPpVZFjKwcCd2ynaNfGC0mH2UukJmpzbR7PLLLjtaWe6
+	PvmiGTw2NzI+Xz4ytGnW4WvFmlrpbNfmGz2jBBD4110fzFi/vJEdk7fuq3kU11PmNqdBbTmxSSQ
+	h82t6GWTJpzAaWV9gOx2Kxkk7KCvaHe2tg5O35Thu2TgupSTanvoGOGh8tsx5dDB0adqT6hmM94
+	qzPXFh
+X-Received: by 2002:a17:903:1a0f:b0:2ae:8293:7510 with SMTP id d9443c01a7336-2aeae905468mr2932715ad.54.1773180249550;
+        Tue, 10 Mar 2026 15:04:09 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:70::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aeae261077sm2560365ad.40.2026.03.10.15.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 15:04:09 -0700 (PDT)
+Date: Tue, 10 Mar 2026 15:04:08 -0700
+From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net 2/2] selftests: rtnetlink: add neighbour update test
-Date: Tue, 10 Mar 2026 22:59:17 +0100
-Message-ID: <d28f72b5b4ff4c9ecbbbde06146a938dcc4c264a.1772894876.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <cover.1772894876.git.sd@queasysnail.net>
-References: <cover.1772894876.git.sd@queasysnail.net>
+Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [RFC net-next 00/10] Add TSO map-once DMA helpers and bnxt SW
+ USO support
+Message-ID: <abCVWEkf0n8Rdce2@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>, netdev@vger.kernel.org,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+References: <20260310212209.2263939-1-joe@dama.to>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BD165258950
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260310212209.2263939-1-joe@dama.to>
+X-Rspamd-Queue-Id: 1F1CD258A84
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-266357-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266356-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[broadcom.com,vger.kernel.org,kernel.org,lunn.ch,iogearbox.net,davemloft.net,google.com,gmail.com,redhat.com,fomichev.me];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,dama-to.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-Check that protocol and flags are updated correctly for
-neighbour and pneigh entries.
+On Tue, Mar 10, 2026 at 02:21:48PM -0700, Joe Damato wrote:
+> Greetings:
+> 
+> This series extends net/tso to add a data structure and some helpers allowing
+> drivers to DMA map headers and packet payloads a single time. The helpers can
+> then be used to reference slices of shared mapping for each segment. This
+> helps to avoid the cost of repeated DMA mappings, especially on systems which
+> use an IOMMU. N per-packet DMA maps are replaced with a single map for the
+> entire GSO skb.
+> 
+> The added helpers are then used in bnxt to add support for software UDP
+> Segmentation Offloading (SW USO) for older bnxt devices which do not have
+> support for USO in hardware. Since the helpers are generic, other drivers
+> can be extended similarly.
 
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- tools/testing/selftests/net/rtnetlink.sh | 55 ++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+Sorry for the noise; just realized this implementation is buggy.
 
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 248c2b91fe42..5a5ff88321d5 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -28,6 +28,7 @@ ALL_TESTS="
- 	kci_test_fdb_get
- 	kci_test_fdb_del
- 	kci_test_neigh_get
-+	kci_test_neigh_update
- 	kci_test_bridge_parent_id
- 	kci_test_address_proto
- 	kci_test_enslave_bonding
-@@ -1160,6 +1161,60 @@ kci_test_neigh_get()
- 	end_test "PASS: neigh get"
- }
- 
-+kci_test_neigh_update()
-+{
-+	dstip=10.0.2.4
-+	dstmac=de:ad:be:ef:13:37
-+	local ret=0
-+
-+	for proxy in "" "proxy" ; do
-+		# add a neighbour entry without any flags
-+		run_cmd ip neigh add $proxy $dstip dev "$devdummy" lladdr $dstmac nud permanent
-+		run_cmd_grep $dstip ip neigh show $proxy
-+		run_cmd_grep_fail "$dstip dev $devdummy .*\(managed\|use\|router\|extern\)" ip neigh show $proxy
-+
-+		# set the extern_learn flag, but no other
-+		run_cmd ip neigh change $proxy $dstip dev "$devdummy" extern_learn
-+		run_cmd_grep "$dstip dev $devdummy .* extern_learn" ip neigh show $proxy
-+		run_cmd_grep_fail "$dstip dev $devdummy .* \(managed\|use\|router\)" ip neigh show $proxy
-+
-+		# flags are reset when not provided
-+		run_cmd ip neigh change $proxy $dstip dev "$devdummy"
-+		run_cmd_grep $dstip ip neigh show $proxy
-+		run_cmd_grep_fail "$dstip dev $devdummy .* extern_learn" ip neigh show $proxy
-+
-+		# add a protocol
-+		run_cmd ip neigh change $proxy $dstip dev "$devdummy" protocol boot
-+		run_cmd_grep "$dstip dev $devdummy .* proto boot" ip neigh show $proxy
-+
-+		# protocol is retained when not provided
-+		run_cmd ip neigh change $proxy $dstip dev "$devdummy"
-+		run_cmd_grep "$dstip dev $devdummy .* proto boot" ip neigh show $proxy
-+
-+		# change protocol
-+		run_cmd ip neigh change $proxy $dstip dev "$devdummy" protocol static
-+		run_cmd_grep "$dstip dev $devdummy .* proto static" ip neigh show $proxy
-+
-+		# also check an extended flag for non-proxy neighs
-+		if [ "$proxy" = "" ]; then
-+			run_cmd ip neigh change $proxy $dstip dev "$devdummy" managed
-+			run_cmd_grep "$dstip dev $devdummy managed" ip neigh show $proxy
-+
-+			run_cmd ip neigh change $proxy $dstip dev "$devdummy" lladdr $dstmac
-+			run_cmd_grep_fail "$dstip dev $devdummy managed" ip neigh show $proxy
-+		fi
-+
-+		run_cmd ip neigh del $proxy $dstip dev "$devdummy"
-+	done
-+
-+	if [ $ret -ne 0 ];then
-+		end_test "FAIL: neigh update"
-+		return 1
-+	fi
-+
-+	end_test "PASS: neigh update"
-+}
-+
- kci_test_bridge_parent_id()
- {
- 	local ret=0
--- 
-2.51.2
-
+Will fix and send an RFC v2, but this series is the general idea of what I'll be
+posting, for anyone interested.
 
