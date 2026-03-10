@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-266288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLXgB61gsGloigIAu9opvQ
-	(envelope-from <netdev+bounces-266288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:19:25 +0100
+	id iDX+L25gsGloigIAu9opvQ
+	(envelope-from <netdev+bounces-266289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:18:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840E925654C
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:19:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5702A25652F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5BD13002A23
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:16:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BDD3C30041DC
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4937E22423A;
-	Tue, 10 Mar 2026 18:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE60D286413;
+	Tue, 10 Mar 2026 18:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c2qJ1qBQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0uV5sFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BEC1FC10C
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 18:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EA9261B9E
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 18:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773166600; cv=none; b=ctkUNGZyRh7pGYpOB6sbeddILAqEBp6BqTrLgQRzuXo7qGX46GMOjk5x9411l4l/OpfiXKBk7ihb0uZYot2ci7z2BLAZa1CGWXMXeRAbjm813KE/pXa5pfWsTjLlz0gR2ZUX0oQ27QR1lIU7v8y6jDQ1VkWraPa/wZIgi/wleqc=
+	t=1773166699; cv=none; b=cFW36SUrKFUXLAG24hXAcLi8ZeBdZUHrtHInmbLMtj+UJq/kB8JwuDTpZEMSuWEgVFw6/VefN+OZRw+WmWepeVb/CSj5OtkvaXzfhc1DMOw2DkU5LwklH9Ry6Og8lM7IAQnTXIzwvS7A0NWVRs/X2wMFgHcvpW55LN2MOouZxCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773166600; c=relaxed/simple;
-	bh=GKzNp2kgqQHl2RlujjExvukJo989FzoE0hIn7jde2Pc=;
+	s=arc-20240116; t=1773166699; c=relaxed/simple;
+	bh=S0NmHKlyhSFgA8uUlP72LP4EgiMjzY4mLhz3uLdZL2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jvXSIRG9fZOaPzgMrOBzhZrM2nHNws9SE849uunzvs2tZNKCPLISgaWTzaYZc3Rgy/M3/iDZWHwzh250C7qXlQ/unCRWAWtzF31gBmfRa1sa+HhPzndNoEdNPhUOAcfx8dxRONySortqVnEV/hgfebG58EIPyreYWeWm+90NsZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c2qJ1qBQ; arc=none smtp.client-ip=209.85.214.173
+	 Content-Disposition; b=cT147R9domIKR/K8jwHiz9jJrcig8YhxgFJe25sTQo9BW0iNE9Jpip/UNZlbCXto6igbgFYikaenfGwUE9N7ELdrC4jc0h8D4PQ2rPgdy7TKxM7INeHoXQXG+mpiIwciYQV/Z0X8q5lCIUAbW4K/TDlqMCg15xiBw3cwZfTzSIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0uV5sFm; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ae43042ea7so108810825ad.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 11:16:39 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ab39b111b9so59311275ad.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 11:18:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773166598; x=1773771398; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773166698; x=1773771498; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IzKqCfinj2vljd4Q4U9GaPWdnYsR2TKTXccYMMQKcro=;
-        b=c2qJ1qBQV4YpzEPFzOIzbDP0QJxndLKLzK6dIdSMEKPiNvDXs8O8y8nCsbZuH3l6bA
-         pVHZzHbmvpMhj0w6/q9jx6E3XQ/5BXaEftOHFAJ5U7+a71aYk0wGAWjV0o8vkCx/hNdx
-         IfsMPjnQpllb3OfaN/lmm4WN7/hnaXy7iQvVRYveXEcaqwDGuyZF04a6fActGprZ+8sv
-         s+E0gmG6RjBNGZYYz6aRzuP9DtQfRccPGGL1hMLRjjn19VjsziniyA5SBCTAtpVCRBUU
-         Ai33inKb6essdYeaTkCMiF4my+baODFZs4GPa9+g1BC7CqzWpIahv26b5CuM5pjGYIba
-         /l9w==
+        bh=rocOqQ0GGRQ2FFD3SaYh+qh681ItNUFgfBnjMmi0fOY=;
+        b=C0uV5sFmcDnoZT2bhmpU6TDJQmUBOndQ/Gjd4Kfh35/3pb0TwLU2XLrm/uQMsCUYoR
+         ZAi2/R1vZX1HGSlyBi9o2/LlkWtn1CojPHe3y60koEssXpeC9OFcalp6OhsnKo/CSnuU
+         bdpDT/clLp/4/TXhJZ3o52pQIvdRWK1zpNaB28saEbqrFC1wWQxYZodSphQ7mJP6Ooaw
+         cbql0ZT2r85++SEqCX+rxT9PaFMGKDkobY0S7wO3f6VXLYCBoOYBPtelEl2tH1w60osy
+         t2vGnI2KqXc3XAVczLP7//rcPh5QC53Vv32yn/rCZkkI69gFCywMUwu5j6jXTMeVtEkz
+         0cjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773166598; x=1773771398;
+        d=1e100.net; s=20230601; t=1773166698; x=1773771498;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IzKqCfinj2vljd4Q4U9GaPWdnYsR2TKTXccYMMQKcro=;
-        b=de3JhqJAv1B2uSSKWRkaSktsT6z7txqk47HFcj88sGIyv9WtrffHQzaHxVFzb2Ayqg
-         4BKWWmxDs0kCejnN/kTb2XVirrl0W6kLhN3vuNwnuq5/BIVfhrN+xuKB8MOC0dBNh+UG
-         1OyJ7ZIYdA1QP3zag9ny3bdX6RDGxSHy7aSNLV10K0EK7QcmWprzvLlG/myIsyOgwPzq
-         /2r1M9tsOiAXXiLvQImi+NInTUKfWBOxH1vuUhPW2QPPUDzyuaY25r8jQydBM0DLAiqd
-         Ldqm9bSvM6hQBP5N7puyMazkkW/S8YGVQJrPAkY8u317ZxKcsljREA7wQGiYZ2F6ShWk
-         sH6w==
-X-Gm-Message-State: AOJu0YyEZH/y6EoQM9bspORuKNoDiXg1AK4y5o0GEyE24zFBaL+jFkZA
-	yOBr1Mm5ULfmB0tGl/GWy4ZzLspMZ3ZPgVRMZq5qv6VOkz0ImqMSCD+c
-X-Gm-Gg: ATEYQzxpcmDapG5Ui9C4KbZbEILsfM0XsNYRdJvfApZ49ByOFYrwsuJSguNLoP6Sszj
-	LK1CHQ7qFVbbulHVRNx8jiTEPTJOGvXp6rDPbnrYB7+c7F5LMMewv2+LBnbhkJxY0MozB9HU5Ak
-	9UTYt/xll2o2RXW3E7EF8HXTR7MW9E5XRg+5Dq72UDW2miaIvDsQUXZ77dRnBGLl2wmOKbrpJYM
-	dJ64OzGGk+HjBgIEntA79kQUeiDfH+AdDIouEUTFiePo+QPsyk2+Hqg4VMvbUsJt0AmlaNX/Scp
-	u8JxW08EESQl9JDksqMiS1V5sw2Zgn4KIvwm134CClmYNYA6T6W3EAdfclcEGwYQ1cfJtNy6RmM
-	VsD6FNwRMwckyu4t6w8ere3nUj7FHeAeRXGRQcfFzUw2akf8PmT1Skw7dra1H002BbeGSaD+FJr
-	zmzCnMfK6DaDMZ5qeFGZEzpP3U8ckSReM8pEIbCGp+eA==
-X-Received: by 2002:a17:903:2287:b0:2ad:cf11:5048 with SMTP id d9443c01a7336-2ae823a302bmr165215185ad.22.1773166598473;
-        Tue, 10 Mar 2026 11:16:38 -0700 (PDT)
+        bh=rocOqQ0GGRQ2FFD3SaYh+qh681ItNUFgfBnjMmi0fOY=;
+        b=P2gXpxhjDdC66VFh/fc+ihueYY9JsSTzpx2cEpfYZdlbX+EBOwit9YvdAZAVfLZa5v
+         bpyH+OBvgJ3XpEG2lfU2bwEV6fgA44/v8oJUxThQ0/PEY0U1QhdWw0sv6pxOd6P1odju
+         IIMSUmA7Jobyc4EYzszXYTip7cAs8mFvyF/mWKslARDC80Ys361soGsDFatrf36HlrWy
+         mieMDNWilfgWBwLPVNcNTkH4MaHHlr1yRqwTZvGXjGbSst0ukqMwHpTGM4ipVRmkhj9F
+         fCmJE9dNffTNnfYlosW+7xD3Hd8TUMG1YZFX1NiHCLuK69zysLf13yn5wmZtdYgOYEOj
+         TCLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBRv+UsuG0QTLSF0ye/4y4lBKAlEQuXrxvtaGi5U9chX/bu7D25Xe9RWbz4b49ZWTvkD7HoV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPFkdh7iAS/M1GVWur8a32xVb/1OoYuqmtsXPT6H2KGq7Igk7q
+	ajOLoEfQPwAC5IMC9wMqWJFu1fNqpL5TjI9olKShnX4cXkGU4ZEzj3U7
+X-Gm-Gg: ATEYQzyh74DpG2LlHWSH91uwZz/ggJj5HOpMvUrKnrtkRYnm431ZbGVTrVnz6myrkDA
+	RaH+iJ1PArU2Me8K5GcfGmXJC2J2yaouQSTkw+xnn/mGCALG1tCAcRkNL/tv3ay7fdvakjVoLYf
+	8SOcKIrLcXzijveDGQlfTNyAygmjE8kkv/C/c0ARh97Gtfova9OscB4zcLAG4BsAw4BoWa9IO2Y
+	sHM9s7NsKxMyWWeO3PIfewSmewE27p52oOPsRmaoF6BxSNA97o6s90xsmCdvx+T3IByVVZITyV4
+	gwp5dqMKvXEM0a5JgqGMRi0ff8REbbEhj3ZwV2Mgu+wBU+sDPXcihFK0usWTFUEz6zLxDfm358i
+	YmrGtpYLizsG5thrxPf1sJSl+SmLu/dUUBqr1N1/HLWVl6V8FfUM7KSSAarhxUAFaPWGg3H5mqu
+	hJDRX+OQkrokwu0GDEx40gPWH6Dq6WtY45+EE4jfB2GA==
+X-Received: by 2002:a17:903:1cd:b0:2ae:62c8:771a with SMTP id d9443c01a7336-2ae8241e451mr165342805ad.5.1773166697905;
+        Tue, 10 Mar 2026 11:18:17 -0700 (PDT)
 Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e97924sm162763435ad.27.2026.03.10.11.16.31
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aea4eed00fsm51159255ad.80.2026.03.10.11.18.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 11:16:37 -0700 (PDT)
-Date: Wed, 11 Mar 2026 03:16:29 +0900
+        Tue, 10 Mar 2026 11:18:17 -0700 (PDT)
+Date: Wed, 11 Mar 2026 03:18:09 +0900
 From: Hyunwoo Kim <imv4bel@gmail.com>
-To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net] xfrm: Fix work re-schedule after cancel in
- xfrm_nat_keepalive_net_fini()
-Message-ID: <abBf_R81PYmafhWv@v4bel>
+To: razor@blackwall.org, idosch@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net] bridge: cfm: Fix race condition in peer_mep deletion
+Message-ID: <abBgYT5K_FI9rD1a@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,23 +91,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Rspamd-Queue-Id: 840E925654C
+X-Rspamd-Queue-Id: 5702A25652F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266288-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266289-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -115,69 +115,74 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-After cancel_delayed_work_sync() is called from
-xfrm_nat_keepalive_net_fini(), xfrm_state_fini() flushes remaining
-states via __xfrm_state_delete(), which calls
-xfrm_nat_keepalive_state_updated() to re-schedule nat_keepalive_work.
+When a peer MEP is being deleted, cancel_delayed_work_sync() is called
+on ccm_rx_dwork before freeing. However, br_cfm_frame_rx() runs in
+softirq context under rcu_read_lock (without RTNL) and can re-schedule
+ccm_rx_dwork via ccm_rx_timer_start() between cancel_delayed_work_sync()
+returning and kfree_rcu() being called.
 
 The following is a simple race scenario:
 
-           cpu0                             cpu1
+           cpu0                                     cpu1
 
-cleanup_net() [Round 1]
-  ops_undo_list()
-    xfrm_net_exit()
-      xfrm_nat_keepalive_net_fini()
-        cancel_delayed_work_sync(nat_keepalive_work);
-      xfrm_state_fini()
-        xfrm_state_flush()
-          xfrm_state_delete(x)
-            __xfrm_state_delete(x)
-              xfrm_nat_keepalive_state_updated(x)
-                schedule_delayed_work(nat_keepalive_work);
-  rcu_barrier();
-  net_complete_free();
-  net_passive_dec(net);
-    llist_add(&net->defer_free_list, &defer_free_list);
-
-cleanup_net() [Round 2]
-  rcu_barrier();
-  net_complete_free()
-    kmem_cache_free(net_cachep, net);
-                                     nat_keepalive_work()
-                                       // on freed net
+mep_delete_implementation()
+  cancel_delayed_work_sync(ccm_rx_dwork);
+                                           br_cfm_frame_rx()
+                                             // peer_mep still in hlist
+                                             if (peer_mep->ccm_defect)
+                                               ccm_rx_timer_start()
+                                                 queue_delayed_work(ccm_rx_dwork)
+  hlist_del_rcu(&peer_mep->head);
+  kfree_rcu(peer_mep, rcu);
+                                           ccm_rx_work_expired()
+                                             // on freed peer_mep
 
 To prevent this, cancel_delayed_work_sync() is replaced with
-disable_delayed_work_sync().
+disable_delayed_work_sync() in both peer MEP deletion paths, so
+that subsequent queue_delayed_work() calls from br_cfm_frame_rx()
+are silently rejected.
 
-Fixes: f531d13bdfe3 ("xfrm: support sending NAT keepalives in ESP in UDP states")
+The cc_peer_disable() helper retains cancel_delayed_work_sync()
+because it is also used for the CC enable/disable toggle path where
+the work must remain re-schedulable.
+
+Fixes: dc32cbb3dbd7 ("bridge: cfm: Kernel space implementation of CFM. CCM frame RX added.")
 Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
- net/xfrm/xfrm_nat_keepalive.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bridge/br_cfm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepalive.c
-index ebf95d48e86c..1856beee0149 100644
---- a/net/xfrm/xfrm_nat_keepalive.c
-+++ b/net/xfrm/xfrm_nat_keepalive.c
-@@ -261,7 +261,7 @@ int __net_init xfrm_nat_keepalive_net_init(struct net *net)
+diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
+index 2c70fe47de38..118c7ea48c35 100644
+--- a/net/bridge/br_cfm.c
++++ b/net/bridge/br_cfm.c
+@@ -576,7 +576,7 @@ static void mep_delete_implementation(struct net_bridge *br,
  
- int xfrm_nat_keepalive_net_fini(struct net *net)
- {
--	cancel_delayed_work_sync(&net->xfrm.nat_keepalive_work);
-+	disable_delayed_work_sync(&net->xfrm.nat_keepalive_work);
- 	return 0;
- }
+ 	/* Empty and free peer MEP list */
+ 	hlist_for_each_entry_safe(peer_mep, n_store, &mep->peer_mep_list, head) {
+-		cancel_delayed_work_sync(&peer_mep->ccm_rx_dwork);
++		disable_delayed_work_sync(&peer_mep->ccm_rx_dwork);
+ 		hlist_del_rcu(&peer_mep->head);
+ 		kfree_rcu(peer_mep, rcu);
+ 	}
+@@ -732,7 +732,7 @@ int br_cfm_cc_peer_mep_remove(struct net_bridge *br, const u32 instance,
+ 		return -ENOENT;
+ 	}
  
+-	cc_peer_disable(peer_mep);
++	disable_delayed_work_sync(&peer_mep->ccm_rx_dwork);
+ 
+ 	hlist_del_rcu(&peer_mep->head);
+ 	kfree_rcu(peer_mep, rcu);
 -- 
 2.43.0
 
