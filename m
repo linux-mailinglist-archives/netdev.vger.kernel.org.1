@@ -1,116 +1,147 @@
-Return-Path: <netdev+bounces-266014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eAFLJx76r2mmdwIAu9opvQ
-	(envelope-from <netdev+bounces-266014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:01:50 +0100
+	id kPHgOHj+r2mmdwIAu9opvQ
+	(envelope-from <netdev+bounces-266020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:20:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB915249E30
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:01:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8AC24A6D1
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0C7F31BD386
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:56:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E0803167B07
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FF43803EA;
-	Tue, 10 Mar 2026 10:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9886A38735E;
+	Tue, 10 Mar 2026 11:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="lPBC1fQg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXLKWULT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB213359A79;
-	Tue, 10 Mar 2026 10:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BC23859DF;
+	Tue, 10 Mar 2026 11:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773140169; cv=none; b=UbnhTfXPoC3XaBOenuefHONORP6+leRPdOUw9zQxcxfI9C3kr71fdwJJYrM68P5Fx5a+W8MGrCsAoOJxXiOpIFpqh+mYGoXrcRZ8onwwtETRhzoahsWcIS0eBQIXcu64juffbDZIvsWoM/YQH9hKM/XokX5s3GOZ6oSFN447q5s=
+	t=1773141196; cv=none; b=U4y8YpZTNfRtGewwL4Bgo4W8VUbp7LWSOLf1FE7K9TwYhTu3hIsHMioxe5IsnqPGdglFnxNWM2RSG++E3sSpFTGTwPWIpn6R1r3c726roEcBKCaUM+eUjXnLYm65fWpWekYzNrGQTnjaxuQT/au3aUnet4Vsk5btrS/G7FTM5dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773140169; c=relaxed/simple;
-	bh=/lBp6VYdN5//ASX335M1MUGys4vfqnqUP+nzk5ncJ/o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=msfvjMYcCVJvE4lmqS5F3iK2mNJLIl9XqFqQs5DyUfR2KtkQlhlC3hLLTIk2t+YcnU1k2F/uc0Og1/vG5P15j/RMxfQvHeH6KkgWVdbYFMEW3Kq4hmDmwnf+Rk/GIuuQoEKyt7MpsBVekf8Mr8Hj2iCMIHBurj52uJWu2bIGp1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=lPBC1fQg; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id C2D6060255;
-	Tue, 10 Mar 2026 11:56:05 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1773140165;
-	bh=gRalR8Zg/RbrupyebA9Kwn+XfaMCu2L3sLMk2ry3pJo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lPBC1fQgTIwCuapu0V0jZoSorbgExKkfGhaVPiuHXPLenS8g4G/814+35N+hW4UmM
-	 yYGXO4p4KHxokKTDEF+DHqSnxy6SApdtVN374dlL+gsxMjZKeGr7mAtohiGx+u8b2Q
-	 bBU9XQbNtwj1ItTqQZxzrfXMGR8hGmHMFCawIOpInZZ7bE7Xwj5mrnbcFnFohFK73S
-	 HwPXdqPRb9NhQee8gKbkK0fjMrnwGbObg1izP2J8odUlwqr0pHsMehN9IUKkS6z3AV
-	 6HmBO7389lA+GMVNNavgyrmQsWrHHP+jugKyrxYF8fCRDllQgwxu/jYQyTE0QAI8EH
-	 RtI2DQ6utuzSw==
-Date: Tue, 10 Mar 2026 11:56:03 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 00/10] netfilter: updates for net
-Message-ID: <aa_4w9gXCkzQ06Nk@chamomile>
-References: <20260309210845.15657-1-fw@strlen.de>
+	s=arc-20240116; t=1773141196; c=relaxed/simple;
+	bh=QccW6cyqKoTAs/xHLg87J6mZAwKWfrQURGqDAox24ns=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mm3DrTSijPKr19gOTeL542LsC9MrgkpiJJS2vd4EP0Z4UK2pTdMG0+raIH8R3yT/km6J8bgC9iusGU4KKk9M6LnRGU8S8wlkjf5umZLTaSis19SUrcCzbiVTsUhMpr5Xvk0Rrju1MkE5aCilIV5fnEh9Dj61199gR5mRRZjYg8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXLKWULT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58609C2BC86;
+	Tue, 10 Mar 2026 11:13:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773141196;
+	bh=QccW6cyqKoTAs/xHLg87J6mZAwKWfrQURGqDAox24ns=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=AXLKWULTMoUJ2+l5Kf6I2KEA78ir7/HrEzazw+oXWdSo78dWokpjKd6m0tITl6W1e
+	 en/NIjJpFUfaCQMmv1q/WqqtfuY3pjTw5fJY/oz7P/BZ8Xe9W3DQYKEQRzhHnIbw0/
+	 DEtP1Ybe2SgtqCPlLI2G4gP9RCfbzQ3Ip6OEMsZtlPJetjQpVQ1/gn87z0H8msUdvg
+	 FxXE21LAMzd3+zs1rjuWzj0uPnq2rICCOpbB5jLhtnI/dz18k9CSZ6jQyq1eOovI9B
+	 0UrfscxqLDi3KZH+N35Ilgk60p02HnP1pHAuQXLSESBliPMy+0LiEeD9l97duuerr7
+	 Tw/S4QnaBUJWw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	Joe Damato <joe@dama.to>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.19 197/311] i40e: Fix preempt count leak in napi poll tracepoint
+Date: Tue, 10 Mar 2026 07:04:04 -0400
+Message-ID: <0a369fdef8cf09371f72d1981cb0bee70fc00703.1773140655.git.sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1773140654.git.sashal@kernel.org>
+References: <cover.1773140654.git.sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260309210845.15657-1-fw@strlen.de>
-X-Rspamd-Queue-Id: DB915249E30
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2C8AC24A6D1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266020-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-266014-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,netfilter.org:dkim]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,dama.to:email,intel.com:email,osuosl.org:email]
 X-Rspamd-Action: no action
 
-Hi,
+From: Thomas Gleixner <tglx@kernel.org>
 
-On Mon, Mar 09, 2026 at 10:08:35PM +0100, Florian Westphal wrote:
-> 7-9) fix access bugs in the ctnetlink expectation handling.
->      Problem is that while RCU prevents the referenced nf_conn entry
->      from going way, nf_conn entries have an extension area that can
->      only be safely accessed if the cpu holds a reference to the
->      conntrack.  Else the extension area can be free'd at any time.
->      Fix is to grab references before the accesses happen.
->      These bugs are old, v3.10 resp. even pre-git days.
->      All fixes from Hyunwoo Kim.
+[ Upstream commit 4b3d54a85bd37ebf2d9836f0d0de775c0ff21af9 ]
 
-I am not sure 7-9 are correct.
+Using get_cpu() in the tracepoint assignment causes an obvious preempt
+count leak because nothing invokes put_cpu() to undo it:
 
-nfct_help() is accessed via exp->master in other existing paths,
-I think these fixes are papering an underlying problem since the
-typesafe rcu infrastructure was introduced in nf_conntrack.
+  softirq: huh, entered softirq 3 NET_RX with preempt_count 00000100, exited with 00000101?
+
+This clearly has seen a lot of testing in the last 3+ years...
+
+Use smp_processor_id() instead.
+
+Fixes: 6d4d584a7ea8 ("i40e: Add i40e_napi_poll tracepoint")
+Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Reviewed-by: Joe Damato <joe@dama.to>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/intel/i40e/i40e_trace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_trace.h b/drivers/net/ethernet/intel/i40e/i40e_trace.h
+index 759f3d1c4c8f0..dde0ccd789ed1 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_trace.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_trace.h
+@@ -88,7 +88,7 @@ TRACE_EVENT(i40e_napi_poll,
+ 		__entry->rx_clean_complete = rx_clean_complete;
+ 		__entry->tx_clean_complete = tx_clean_complete;
+ 		__entry->irq_num = q->irq_num;
+-		__entry->curr_cpu = get_cpu();
++		__entry->curr_cpu = smp_processor_id();
+ 		__assign_str(qname);
+ 		__assign_str(dev_name);
+ 		__assign_bitmask(irq_affinity, cpumask_bits(&q->affinity_mask),
+-- 
+2.51.0
+
 
