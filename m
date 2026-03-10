@@ -1,115 +1,128 @@
-Return-Path: <netdev+bounces-265846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oAW4Lph8r2kXZwIAu9opvQ
-	(envelope-from <netdev+bounces-265846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:06:16 +0100
+	id wL20Cfd8r2kXZwIAu9opvQ
+	(envelope-from <netdev+bounces-265847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:07:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F48244041
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:06:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90B182440A1
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:07:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 855D430B3107
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 01:58:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AAB73010DA5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 02:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EB32FC881;
-	Tue, 10 Mar 2026 01:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3C627CCF2;
+	Tue, 10 Mar 2026 02:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HsiCudPb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urFU0dli"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672B12F25F0;
-	Tue, 10 Mar 2026 01:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AB2299923;
+	Tue, 10 Mar 2026 02:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773107925; cv=none; b=m76Ls+b79rujh0wWTLkSwiihWs9LN4L8A8T2Bywfo1e1Qwb01Ac5sDGOp1P6exCDo3Fc/8GaQJ0+uh9G0UfV74gLEKtk2JRJrBhKrAd71JKMVoHXXPHPsyBBPTgNKZcKzUhLxb3DDLvwevi0sN4A5BtQqlz89a1xHlccbS0HZB0=
+	t=1773108011; cv=none; b=nlD8VkvQzi6SW9ImmAnFHGHsKdh36wbQPVwxKhBm+TnMAbKdMEgGaBsAB4M4fmm0JZi9SXrCybIMuKYDVIawCtMzyiY/IPxYmA6b1cKR2gHl9tR0wYYoK+Nsan3dHa0zcP1ykMVrfwq/axJm/FRupj5wOI05iyzhgreP0ZoHgPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773107925; c=relaxed/simple;
-	bh=YDNxGWu2Cu9b9o0az4nb8RNC1YwXnECiDyGcqPaGOxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EgZrO0xQ9/rBmOshmToo6IURhiEG+S7RHVduH2BqJaWtQGQtVQe8dOoLxmiTXHqnXL6QklVMzGjsE1yh2BKXOk/R/temvEBEa746h6LjD5UdRo1w8l7iaGNKzcSYAjpqpXwMjoWHeInTQscalsL7s1VmAMbc9Ea54LlDJ9AQJsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HsiCudPb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28602C4CEF7;
-	Tue, 10 Mar 2026 01:58:44 +0000 (UTC)
+	s=arc-20240116; t=1773108011; c=relaxed/simple;
+	bh=CVUfq0oNNmH8kOG8d/k2R/ykQyuI1k6FMGBw8esNogM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=W3ZaCZzR5OAP5096+TmLbbRILjFppLs4k52vUtqnl1Q8CU+/ySd9AHjiE6Uwufb/Y1erMPf7Qr4MPjCxGqVKNV6F8SF0JGHOMu7Sms9c3rfh57U8zT24BlfOxMyw++j+T+3Q0H7Nq708x0BvpXYYEWsrQtso/eKsmAT55UghX7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urFU0dli; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ED7EC4CEF7;
+	Tue, 10 Mar 2026 02:00:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773107924;
-	bh=YDNxGWu2Cu9b9o0az4nb8RNC1YwXnECiDyGcqPaGOxg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HsiCudPbojaJDGOhS9r9jx81Tq6xXW2AbYNZOnmnnqn1BCG4grdb9vJUelc1/cNw+
-	 hnQTSOoSXcbIg23QYmhX79/LW2n6xnJfgB3qHinb8EP7gzbHtGwmggOep+nDh7yqoy
-	 I1r83+JeszlKYoTpISaLOXwUl2oGqnY5eaY3fAGbL+oGzWoinatvBNGQwuuZyEPrbx
-	 nkp6V/YJVn5jyW2iO5OFO3054+I3QmcsCihdOW2inGdNpDsnjAS/Fq02A1D49Qn5fv
-	 GinViF7YheiYMI7Z/wBZPWjVMNgLMgFnHRy8zzD6wmEJAsqsD0jietLKPWWVucBJpo
-	 QsbVTdPeoMPaQ==
-Date: Mon, 9 Mar 2026 18:58:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, "David S .
- Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Simon Horman
- <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira
- <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, "Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?="
- <toke@redhat.com>, eric.dumazet@gmail.com, Yunsheng Lin
- <linyunsheng@huawei.com>
-Subject: Re: [PATCH v2 net-next] net/sched: do not reset queues in graft
- operations
-Message-ID: <20260309185843.50ce9259@kernel.org>
-In-Reply-To: <20260307163430.470644-1-edumazet@google.com>
-References: <20260307163430.470644-1-edumazet@google.com>
+	s=k20201202; t=1773108011;
+	bh=CVUfq0oNNmH8kOG8d/k2R/ykQyuI1k6FMGBw8esNogM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=urFU0dli280CWEkChJxOD8QlH9xI5wGhVUi1yt6DJCP2venXDD02w6Ed8fXqx2PsK
+	 IoL5IJ1dtDQGHz+gsNSyyK/O7fsW/BjvvnA7B7uaOPxlF1eCNp0YihYbnbSzp5J7xA
+	 Jb6EJkBAXiX/8PV9kA11mxyrAAM+FuqYJ0kPd+RuG7rxMhlT7OZloxqGzFXBJO1ON+
+	 FlJnl0wrcJjBmLdqFAcJZyHd6dippuI6f3/XoSbiw9Lu5BB5Zgg2rQO1MzE84Xvdz9
+	 FWSoOJHcVP3R18Vrr/0BfMofm8prFTSC+IzjDoypuJKMbRwFrXICkRkK3g0rLu8O59
+	 IysoyDdFUIKjA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CEA43808200;
+	Tue, 10 Mar 2026 02:00:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 21F48244041
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: sfp: improve Huawei MA5671a fixup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177310800805.2022132.1612677637131215996.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Mar 2026 02:00:08 +0000
+References: <20260306125139.213637-1-noltari@gmail.com>
+In-Reply-To: <20260306125139.213637-1-noltari@gmail.com>
+To: =?utf-8?q?=C3=81lvaro_Fern=C3=A1ndez_Rojas_=3Cnoltari=40gmail=2Ecom=3E?=@codeaurora.org
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mnhagan88@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: 90B182440A1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265846-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
+	TAGGED_FROM(0.00)[bounces-265847-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,redhat.com,vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,huawei.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,codeaurora.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.543];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sat,  7 Mar 2026 16:34:30 +0000 Eric Dumazet wrote:
-> I think the problem (quadratic behavior) was added in commit
-> 2fb541c862c9 ("net: sch_generic: aviod concurrent reset and enqueue op
-> for lockless qdisc") but this does not look serious enough to deserve
-> risky backports.
+Hello:
 
-FWIW I was wondering whether with your recent llist in place we could
-retire the NOLOCK concept. So many workarounds grew around it at
-this point :( But in a naive pktgen+dummy test llist ends up dropping
-most packets. Not sure what it looks like on a more realistic setup.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  6 Mar 2026 13:29:55 +0100 you wrote:
+> With the current sfp_fixup_ignore_tx_fault() fixup we ignore the TX_FAULT
+> signal, but we also need to apply sfp_fixup_ignore_los() in order to be
+> able to communicate with the module even if the fiber isn't connected for
+> configuration purposes.
+> This is needed for all the MA5671a firmwares, excluding the FS modded
+> firmware.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] net: sfp: improve Huawei MA5671a fixup
+    https://git.kernel.org/netdev/net/c/87d126852158
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
