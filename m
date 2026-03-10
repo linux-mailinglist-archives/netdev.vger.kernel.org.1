@@ -1,201 +1,237 @@
-Return-Path: <netdev+bounces-266321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFZGK5F8sGnLjgIAu9opvQ
-	(envelope-from <netdev+bounces-266321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:18:25 +0100
+	id eHC4MZqAsGmwjwIAu9opvQ
+	(envelope-from <netdev+bounces-266322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:35:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD622577F0
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:18:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D801257E88
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:35:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 790AF3035BC7
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:17:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D71F030EEDFD
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E75903E9582;
-	Tue, 10 Mar 2026 20:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0ACE36897A;
+	Tue, 10 Mar 2026 20:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGzsBDFN"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="mQHVfkU2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yxX/flEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B8B3E92B0;
-	Tue, 10 Mar 2026 20:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C1928D8D1;
+	Tue, 10 Mar 2026 20:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773173831; cv=none; b=FdohHFYRPTsMIkck1hO6tZKK5qIUqG8EO+zyqarrll+U0QHR+7maitLlBruSPoY37bfyn01RRP8I1c+YUOYuNn20Fbw/IcqlfWhNYQN5vuJHbsmeXFw3AL9sDxq/BGv/G9e1b+34TX+iLdMs1KNOMdzuvV5voUU4fHa8lc024Ak=
+	t=1773174929; cv=none; b=gv6oqyGi3xDNzEbAOUJxEEmB3WxenXPbGM0kgxn7q57ZVfTwaVyVL7v/5UQoPOQ2euMQikbfRpff8sTZU+sSyPITXubFs1E3aC1DdVKYo+L/1/nhfd1qR3CHBe0ebc2wR92F7g9TB8aBQxQHbRnH13WM6vf7RW4m1SamVI3pRUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773173831; c=relaxed/simple;
-	bh=foU1OAkBdvYLo564dfsPQ/XRQ9g0KRuxk4aQottRw6w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CxVEydc81fcp3J/cvoGwAj6mPG97tOzvFoDGFQbHZq7CgZ0/BRO3pl5LsgyTteAGckfWxk+viFntqNAdH7oGc03i4j0MkMwkLdQMXXCl5w4yDOmCbODL9hhZ9kURf+yp1YRoUE68+sVHw8TjbV2ax0xdFt3emhESQezGfjC3wBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGzsBDFN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15746C19423;
-	Tue, 10 Mar 2026 20:17:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773173831;
-	bh=foU1OAkBdvYLo564dfsPQ/XRQ9g0KRuxk4aQottRw6w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DGzsBDFN4oxaDlyrmS739aPfmcC41gN02+eCZSyIR5ctQxAp4q80tTWUx2ol57lDI
-	 eNmJQW+2aEU4CLDFoboqPjojq/fEl0s2COJdapHG+usU95U5cJf7ofpLkwxZu6JIto
-	 Dgcci3/bYLPSr+66hpGZ5Ps0EI6cWK76o+ifmQ6T40JSyf+f65p4vCbVHfopT9tGeI
-	 9m/j0utMGGrLBvj2kPy925+UZdCOZcWbsGwG048GeuDPOCutz+LAopvf1xX8s0CFYl
-	 95TERHODXpemUVYc4tHJrA6sOX2RLFzpzziEWm6RnHzhiox4h2kyj14RxnPsYzGfI9
-	 rV0ny42Wlxk6g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 5.10] net/tcp-md5: Fix MAC comparison to be constant-time
-Date: Tue, 10 Mar 2026 13:17:08 -0700
-Message-ID: <20260310201708.120088-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1773174929; c=relaxed/simple;
+	bh=fWjPDtZYLRiHyP1hFQJoqbnIUZPfobJPRTRneeeUYZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qUat5+HxSrPpIEqGqMSbY2kj5jQGVk/SXzieDGGI2EXM3hVMuaBHKHqw8ZrlOygGvMaJp+hOZi57A5+iEwAPPybmM858Etu0ZpMtZYp66lmx3dXAQFsSSpggLr+6AzjgRytOeGO9Dl+PJSHnsGA4Rww5w5qQi8ff3FmJQJiJEn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=mQHVfkU2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yxX/flEO; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.stl.internal (Postfix) with ESMTP id 91EB71301086;
+	Tue, 10 Mar 2026 16:35:23 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Tue, 10 Mar 2026 16:35:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1773174923; x=1773182123; bh=GUHcSBjnGwnEAePyZXqYRHBRjMu3EdRP
+	nW5GkKUZ8Hg=; b=mQHVfkU2C/mSyWWIhYy4mdJQqdklBuH971WxffTsC+pYYWvP
+	oco3aNmzcq2NSRmorvumHu5VzqcfQNU53evBJiLtJ3BVEsc7riELuOEjrbfzrMx5
+	22mEXrMBl5wOHR2z95XruPLgwF0PZAj4PxuHXSslXwDxaLRBkLdFDCzmUVdD+SyN
+	+qpNyLd65CR9ncYUXdUZqq86Xv+ak9F+uxyfJ2ctMHCfH4s5HSeBu0BCkx7fjIEo
+	hJQImYXxcDfOwyJjt4mlCPjkpSlSb3fAcGX+F/knW+xQo+UVKxUbj6QuMfcB6hpD
+	C2k+bt/vpRUNeCgTCPy/F9yZS6WUrkBiohFFIg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773174923; x=
+	1773182123; bh=GUHcSBjnGwnEAePyZXqYRHBRjMu3EdRPnW5GkKUZ8Hg=; b=y
+	xX/flEOLE1Dgph3gOwfRlsHSCrNMPjT5DTVTocAYJvHeH9hJ/PQWRjdcDvXLO5X3
+	Dhps6N7mNHnNCg6ZHsO/BNEyKIU4cCbmHqIYHxx73qI6H1DNEVoohrkcM2qognwg
+	X6Qeae7ChlUatssaKSd98zzVHNtr2DborU4Ioo40Nrdx4Ftk88cffq6wOlFh5BxB
+	oLd3jEL/TXt9CAEAEa+l/mRalbfk3DRFY4A4GlQCvWMDAH6+tPWp0ZKqCGUcHSdH
+	TMwz+LrYFTB3sDUYHwHr1zWCWOxWcUcy5epu/OxqrYyPnDlf5PH54a5LzCxklFpt
+	2OanoyOOaoQL9/DS/14Kg==
+X-ME-Sender: <xms:h4CwaZ8QIsV7xI8gayVcjRp6WspDlx_s2IqtoPjstbWTxx96bkMlCA>
+    <xme:h4CwaSZn5AfkuvaKxKamTZ2Oopj4qYZuryM4C9QhmyPfgDM0DZloLBomrHjREPYGn
+    4s9kka7KrDoC6D03L6EZIMc-UU02Ao4BiHdKeiX2ujZdUXcnBvbRV4>
+X-ME-Received: <xmr:h4CwaT0r5GdKgNmE2U0AcyvlWslGnr7dz473enqzKxWVsOmdO5d6xWJQgaNj>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeduleelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepjedtpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopegrrhhnugesrghrnhgusgdruggvpdhrtg
+    hpthhtoheplhhinhhugidqmheikehksehkohhllhgrrdhnohdprhgtphhtthhopehkrhii
+    kheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfhhmrghntggvrhgrsehsuhhsvgdrug
+    gvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtohepjhhg
+    ghesiihivghpvgdrtggrpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:h4CwaaWqtTrazTIBiJ7mj7KuMn3TAZ3eMyx_sc2qWjawSLgbCVbCcA>
+    <xmx:h4CwaX1rZlL5LaUSU0CxuyVxElrkrEB6VpQbg4KERm6BzZwyKQg-sQ>
+    <xmx:h4CwaQK3Mz6YPWIzCA8eAO7yNFSQA2ImELPQmOdQEcBHeBkd1JXYZw>
+    <xmx:h4CwaawQxrSNYPNxR5geOEW7vpEIc-C1X8LxIBj5l5f_wfW3YhtKUg>
+    <xmx:i4Cwaeb4Q29w_kzh9M9QqyuUPFh32eI9JlSeW34f912Df0nvtd9DtGTc>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 10 Mar 2026 16:35:18 -0400 (EDT)
+Date: Tue, 10 Mar 2026 21:35:16 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: =?utf-8?B?S29sYmrDuHJu?= Barmen <linux-m68k@kolla.no>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Selvin Xavier <selvin.xavier@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,	Ido Schimmel <idosch@nvidia.com>,
+ Petr Machata <petrm@nvidia.com>,	Simon Horman <horms@kernel.org>,
+	Saurav Kashyap <skashyap@marvell.com>,	Javed Hasan <jhasan@marvell.com>,
+	"maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <GR-QLogic-Storage-Upstream@marvell.com>,
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	Manish Rangankar <mrangankar@marvell.com>,
+	Varun Prakash <varun@chelsio.com>,	Alexander Aring <aahringo@redhat.com>,
+	David Teigland <teigland@redhat.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Ahern <dsahern@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,	Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>,	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Eric Biggers <ebiggers@kernel.org>,	Michal Simek <michal.simek@amd.com>,
+	Luca Weiss <luca.weiss@fairphone.com>, Sven Peter <sven@kernel.org>,
+	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Gow <david@davidgow.net>,	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ryota Sakamoto <sakamo.ryota@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,	Kir Chou <note351@hotmail.com>,
+	Kuan-Wei Chiu <visitorckw@gmail.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+	Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>,
+	"open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
+	"open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
+	"open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
+	"open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <linux-scsi@vger.kernel.org>,
+	"open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
+	"open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
+	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
+	"open list:NETFILTER" <coreteam@netfilter.org>,
+	"open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
+	"open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
+	"open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
+Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in
+ only and clean up Kconfigs
+Message-ID: <abCAhAh5VnrnY0_i@krikkit>
+References: <20260309022013.5199-1-fmancera@suse.de>
+ <20260309022013.5199-2-fmancera@suse.de>
+ <01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org>
+ <e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
+ <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7AD622577F0
+In-Reply-To: <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
+X-Rspamd-Queue-Id: 5D801257E88
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266321-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266322-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[kolla.no,kernel.org,suse.de,vger.kernel.org,linux-m68k.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[70];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:dkim]
 X-Rspamd-Action: no action
 
-commit 46d0d6f50dab706637f4c18a470aac20a21900d3 upstream.
+2026-03-10, 20:58:15 +0100, Arnd Bergmann wrote:
+> On Tue, Mar 10, 2026, at 20:40, Kolbjørn Barmen wrote:
+> > On Mon, 9 Mar 2026, Krzysztof Kozlowski wrote:
+> >> On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
+> >>
+> >> It must stay module for me. Alternatively, drop it, but then some users
+> >> will be really affected.
+> >
+> > I agree. If anything I would prefer to see IPv4 be made optional (and
+> > modular) as well, and not as something IPv6 depends on, it's (AFAIK)
+> > impossible today to build an IPv6-only Linux kernel. 
+> 
+[...]
+> For optional IPv4 support, I would expect that it's possible
+> to make it a loadable module, with a significant amount of
+> work and little benefit. Loading an ipv6 module without also
+> loading ipv4 sounds completely unrealistic though, given
+> the way the code is structured today.
 
-To prevent timing attacks, MACs need to be compared in constant
-time.  Use the appropriate helper function for this.
+I played with building IPv6-only kernels some years ago. It was
+possible (at least for the reduced config I was using as a start), but
+yes, a fair amount of investigation and churn, to find all the IPv4
+common code and turn it into "generic" common code.
 
-Fixes: cfb6eeb4c860 ("[TCP]: MD5 Signature Option (RFC2385) support.")
-Fixes: 658ddaaf6694 ("tcp: md5: RST: getting md5 key from listener")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Link: https://patch.msgid.link/20260302203409.13388-1-ebiggers@kernel.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/ipv4/tcp_ipv4.c | 5 +++--
- net/ipv6/tcp_ipv6.c | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+IPv4 as a module would get us in the same mess with have with IPv6,
+let's not do that.
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 3dfa856e99267..855cca214a021 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -76,10 +76,11 @@
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
- #include <linux/inetdevice.h>
- #include <linux/btf_ids.h>
- 
-+#include <crypto/algapi.h>
- #include <crypto/hash.h>
- #include <linux/scatterlist.h>
- 
- #include <trace/events/tcp.h>
- 
-@@ -762,11 +763,11 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
- 		if (!key)
- 			goto out;
- 
- 
- 		genhash = tcp_v4_md5_hash_skb(newhash, key, NULL, skb);
--		if (genhash || memcmp(hash_location, newhash, 16) != 0)
-+		if (genhash || crypto_memneq(hash_location, newhash, 16))
- 			goto out;
- 
- 	}
- 
- 	if (key) {
-@@ -1449,11 +1450,11 @@ static bool tcp_v4_inbound_md5_hash(const struct sock *sk,
- 	 */
- 	genhash = tcp_v4_md5_hash_skb(newhash,
- 				      hash_expected,
- 				      NULL, skb);
- 
--	if (genhash || memcmp(hash_location, newhash, 16) != 0) {
-+	if (genhash || crypto_memneq(hash_location, newhash, 16)) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
- 		net_info_ratelimited("MD5 Hash failed for (%pI4, %d)->(%pI4, %d)%s L3 index %d\n",
- 				     &iph->saddr, ntohs(th->source),
- 				     &iph->daddr, ntohs(th->dest),
- 				     genhash ? " tcp_v4_calc_md5_hash failed"
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 8b9709420c052..523aa2efdc499 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -61,10 +61,11 @@
- #include <net/busy_poll.h>
- 
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
- 
-+#include <crypto/algapi.h>
- #include <crypto/hash.h>
- #include <linux/scatterlist.h>
- 
- #include <trace/events/tcp.h>
- 
-@@ -808,11 +809,11 @@ static bool tcp_v6_inbound_md5_hash(const struct sock *sk,
- 	/* check the signature */
- 	genhash = tcp_v6_md5_hash_skb(newhash,
- 				      hash_expected,
- 				      NULL, skb);
- 
--	if (genhash || memcmp(hash_location, newhash, 16) != 0) {
-+	if (genhash || crypto_memneq(hash_location, newhash, 16)) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
- 		net_info_ratelimited("MD5 Hash %s for [%pI6c]:%u->[%pI6c]:%u L3 index %d\n",
- 				     genhash ? "failed" : "mismatch",
- 				     &ip6h->saddr, ntohs(th->source),
- 				     &ip6h->daddr, ntohs(th->dest), l3index);
-@@ -1069,11 +1070,11 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
- 		key = tcp_v6_md5_do_lookup(sk1, &ipv6h->saddr, l3index);
- 		if (!key)
- 			goto out;
- 
- 		genhash = tcp_v6_md5_hash_skb(newhash, key, NULL, skb);
--		if (genhash || memcmp(hash_location, newhash, 16) != 0)
-+		if (genhash || crypto_memneq(hash_location, newhash, 16))
- 			goto out;
- 	}
- #endif
- 
- 	if (th->ack)
+But even IPV4=n, I abandonned the idea because of the work/churn vs
+benefit ratio.
 
-base-commit: aed5c3b77cd53ba74f66767b03bfb9177662af4b
 -- 
-2.53.0
-
+Sabrina
 
