@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-266185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIJOO6k1sGnRhAIAu9opvQ
-	(envelope-from <netdev+bounces-266185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:15:53 +0100
+	id KIgxN5ousGlHgwIAu9opvQ
+	(envelope-from <netdev+bounces-266186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:45:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F03253187
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:15:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A1B25259F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:45:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9795433EF618
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:42:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D19DE3073477
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030EB2F532C;
-	Tue, 10 Mar 2026 14:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353A02FD675;
+	Tue, 10 Mar 2026 14:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="N9HNTX0Z"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="avp4sTnQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
+Received: from mail-dl1-f100.google.com (mail-dl1-f100.google.com [74.125.82.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6262F363B
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95532FD1B1
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773153723; cv=none; b=OKWJkkSRQ2BBYQATHrfmXgxg5JSnh1hqOg1n/vdjHLL1Tnj5gUzMIe59g/a0/E/6/uzI/CzG+qBWLfXreEPFVxTLLMJtlqQM8ZQqtVGR6nqCtK0jAQJjJa14sltFS00g/1PI8J553pZVr2Gsu0aekZfH5GlmMpgHlAIOmUeXFaI=
+	t=1773153728; cv=none; b=O8boUnqMu13ftz0bQn2ZDtE83xVstFDT4fgg1cxxVUE9NWADwJoMZ2tD/g55ZHQzMtWbN5xLt6zuWVsx63DvJF2r2USO/fFQiyyeK6cp/dN63hjF6ytwMZjkZTQY5LvE7s6+7k1dLscI7zk1f2TWVrmmqauBBxmgQF6wvEq1hGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773153723; c=relaxed/simple;
-	bh=JmZO2t006f+QZHJsu0R74EiVdzvSVGuqYs6C6MTs2pk=;
+	s=arc-20240116; t=1773153728; c=relaxed/simple;
+	bh=YPb9n5EavagjMOwiIS/HfhVaJCMP/jsQfRaYV0mtAE4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jVfLKPAV/kMud6xC+I85Z2rr6N6m0vlt7de/Lq/tYm3kDf9Q3zZpsm9YH5lgi01be6og6FGuy0lqeQn18oZZUj3Ppwc7iDR8h57/vkRN8SzquWlG09SplM+XyclIb/WfNXefFjG2c5AFaBDJUfjRNkcssLmB3vSvmn2v1sOEHCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=N9HNTX0Z; arc=none smtp.client-ip=209.85.210.225
+	 MIME-Version; b=kCfpxgwH6nWxA2Y/eFIRQkMYDvpro9miB+9z47Lwr2v9AYXNIS32KsmMF1x/VvvkGN5fALnEjQR7j2TvK23tj/iKPX+C25sHxhe6t/9Ru15qmZpTDmJXKbX4gegFqkzYIiWetxZff9vOJgEY0uyDxk8USXvDDKPdgQJtE5MIXbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=avp4sTnQ; arc=none smtp.client-ip=74.125.82.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-82984c077b2so2682879b3a.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:42:01 -0700 (PDT)
+Received: by mail-dl1-f100.google.com with SMTP id a92af1059eb24-128e4d0cc48so218619c88.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:42:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773153721; x=1773758521;
+        d=1e100.net; s=20230601; t=1773153726; x=1773758526;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9fglAIduYBSwUmVf36Fppwhwpdzcg3ThcffBa9ythRU=;
-        b=G3alApNhWz6kluVNB1ohIGk79IYL9BOGJVdpMNZnVGxm6sVZXW6RS46jReSUCYKIT1
-         YkSFInTro+yjsOiuzRz39fL9CSv6x1AcFFUCKYNIZDQSZf50wEbrOVSA1dfE25jfOZP4
-         MyHy0GDN69cSbLb/4V6uOHWN7/0dz2KOQ7K/F1zmyDUHMlKm4aRaF3gTDQqD9sY2601t
-         eL0gqT2SwgW9JY1NqnRvN2hNs07TJ7A5WChIdB9Cg4Cwy+U/RrzUK3XJLpGQxD2K2ntU
-         sKKCospgq7z5YDXoBcssFSx3msUMuoplhwuemrsarpQuO9I6Ahg+gmhEHewMQNfM63v1
-         vW+A==
-X-Gm-Message-State: AOJu0YzMjiNp0oICRrRNIbJQz+Gup/wfdWLttfS6u/1DyPfk48DJLLTq
-	QMJqiE1rNPz3hEHYxKNXcR8FT72/qwo2CFHFKBc/XIIiLvsAuJ/Sl1FPGdBoaNyzRPGMJXWH1Qy
-	dmpNm8dHyJ3BCNxVzg1PAmTGoppNavzmvW4sFxvaPd4Vrud9oMaIL7U2NLeRb+5xVCoAaeENOD6
-	liMVsKin9qls1MVMlYfOHkFLJmB3Oftm4Vbe+E9eqF7yb//1nOCwHi2Hik68J72fRT49xI6dc3M
-	nANgGoiKiiObF7PBA==
-X-Gm-Gg: ATEYQzzl3DMKgTc5yVxpMDkUTGEAcc2P7bshgP9zrqzbKBH/Y75ZV+HbPvPVm3nN+FX
-	8JTMWKArkCfNeQA5/69UcCg7BhVSGJAqCZ6uBb4xFAPO6SyFJqyZGS8woctrwkH7gSzGb1JPtww
-	b7u8ydM2KEmJYMRlAfXcDkOHoNuADwmAhIdNaYkUuX4ig1FRfd8Vt6JRKXOPD8+Z4q8o3LfTtVk
-	0rZl+MVi4tYHe/AFtDaqhOnR2wO8RrtpBwwl9GeeL7ouRIs2rJ8YlXNlO+ss8Bl7pOEzVOz0GDm
-	nh4XjZJ7EOZjoKzzlNq9X2LCZxi/gN8ZCq4QOcHW3GlN22/JzyTcPuAQC8sfqBdubzQUEmeuohz
-	ghVIzomYYL8RxIWcCIdYRfDPJOPm8CUkq2KpoLPR2ippB+Rzpvo4xgWRluJFfNUj6csTZDG/ItW
-	70H+/cXr9qVBTQkkkovyhe2uESeFiFOC/IO1nDxDA94eGi7THaviktqq+6CtOa2RA5CA==
-X-Received: by 2002:a05:6a00:1a8c:b0:823:efa:a657 with SMTP id d2e1a72fcca58-829a2f6fbd1mr14475049b3a.40.1773153721176;
-        Tue, 10 Mar 2026 07:42:01 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-102.dlp.protect.broadcom.com. [144.49.247.102])
-        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-829a4836510sm1251335b3a.5.2026.03.10.07.42.00
+        bh=DdXbCzdkZX2AwIvcDJuSfRSk/9LbJo93uf1Mskb42JA=;
+        b=kuHr2aYFds96XrYwnPWtpGvfqgYnIwdVXSfNO/LK8LMwTpQOhko2i8EDtSrORBXsIh
+         Rniy1k9MQhdMRthe3Xro2kPQEd3PSPVwRxIB9cNiCZAz0PEx1GEIjrL12Ra7NamUrUmd
+         tWS1Lrq4Ax1fJIGDLP8VVddBzR3LlulGaqza6zdFxp62T/Umr4bUY2s6pj5PFI0GoBYx
+         vXe1lTYfnkMLsV4KO9v8c0WTROLT6wX9Fgfqw4PHFTdhfVraxCiaQvTcyRa8/WHJPuIz
+         vNq0/6gzM8UPBcZKtl4QGR/B9GD+zRFKzRHfuylwYQiGsKCzJku/0aXuBemR8j489qvi
+         +FgA==
+X-Gm-Message-State: AOJu0YxcNllD6/JmRNYXnBXAlPX6xn+5Ldpu4zgEhiZL563ug3Ie+S5/
+	rhj5JMSNWzwrl9Bz1kBd5ssg9boYngnSLovwcpLwGWYrMCN4VmpNGEQ8aN7YlMULhpI3bCIQ+gD
+	AKJcF/pntD+D6mtp0vtIBOTIi3UJd12LB2omxH/RRSNhhYgPFSPIjTKK2nHfSNvNsmYOUw4jaiR
+	n4SElsEhVDlBumdNDHHUvIXEFbmYsSUBw8CAP1nz1Nv3eW5WvxcsQoj0sqed0FhRghuUfvv0a9q
+	WUQ3U6TEJLQBY127w==
+X-Gm-Gg: ATEYQzyqPISHwn4E0x9RNr0XUsz2cnFgKO6aHWTvWSk9ei1wIgfel2+A3MtyjxQRrdr
+	zKlAgR+b5BTsS/c0xT8G5wGj0uxFyhaPstJKkiZqd0gwxAq3Rh7jyfmqzd/eO9XKOETZw5ydCBM
+	FrXcO0WsxjQ8luCxNGTdlvR85tvwEXjwOmCiMDb2g+B9FurMxMGKnmY48zJcxN7/ca0N/5BFJMj
+	9IYG5FnLfqS+IDvZUpRN+2sRwUjF/jgLMnwQXxNv9Cka4uI6GbFDRaPKdQIlNpuUtsjP7HV2f+W
+	5VHtCQp2PVLHvsRUApbv/3RiU/sZxmS9Snvlg1FP1nw7Vmc0yagRjZahLFfXF01zOpTo+aKc5Pc
+	NPYFXHJmertw7lHODWaTlo+V4/po4lJoyX+I1xLd80Ocl7WyUIxVvigQ9QHxVTkCXn1wNfe+Bym
+	4J1S4QuMQp46zu++GSCccl7Txdca4YKSuhc3uG6mskCGENyLRZ+SILzumSqrVAmHs=
+X-Received: by 2002:a05:7022:ea27:b0:123:330b:3a0 with SMTP id a92af1059eb24-128c2ddc31cmr6640346c88.14.1773153725753;
+        Tue, 10 Mar 2026 07:42:05 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-29.dlp.protect.broadcom.com. [144.49.247.29])
+        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-128c3ed481dsm1217833c88.4.2026.03.10.07.42.05
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Mar 2026 07:42:01 -0700 (PDT)
+        Tue, 10 Mar 2026 07:42:05 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ae48a21d12so68354475ad.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:42:00 -0700 (PDT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b62da7602a0so7832604a12.2
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:42:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773153719; x=1773758519; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1773153724; x=1773758524; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9fglAIduYBSwUmVf36Fppwhwpdzcg3ThcffBa9ythRU=;
-        b=N9HNTX0ZKql90+qiT4HwjCJacsGr64Npwmgr4d6nxXLLPzzJFBXT0ywE46dSFUjLJ6
-         /6g+1n9h0gyZrW3s2DGUt6YXPLMrbWxA/AWGTLSGfAjh97v39PCkLGdEUMV2n4CzcLgL
-         Bg/EE9tSVy/3r9mtAJ4TFzldI2+EtJpAb+N0c=
-X-Received: by 2002:a17:902:d581:b0:2ae:aa16:acfb with SMTP id d9443c01a7336-2aeaa16b274mr8659955ad.22.1773153719047;
-        Tue, 10 Mar 2026 07:41:59 -0700 (PDT)
-X-Received: by 2002:a17:902:d581:b0:2ae:aa16:acfb with SMTP id d9443c01a7336-2aeaa16b274mr8659515ad.22.1773153718474;
-        Tue, 10 Mar 2026 07:41:58 -0700 (PDT)
+        bh=DdXbCzdkZX2AwIvcDJuSfRSk/9LbJo93uf1Mskb42JA=;
+        b=avp4sTnQG+ff5X3C5wdwzvnTadc87nAuT7qrUJq0lMWuNWggzIF1zz4AiGnwM7S9H3
+         OtkkdEgv25Z4qZTgEsPNeap1uTpqvnuJQv/fSFXpwyRsXmKin13TBMar75qLHr2z8Ogx
+         IsgJAT/m8JeTeNs5kW3XuikBXbUfNyHxLwI48=
+X-Received: by 2002:a17:902:d48b:b0:2ae:3d7d:d903 with SMTP id d9443c01a7336-2ae824465e5mr155695425ad.18.1773153723878;
+        Tue, 10 Mar 2026 07:42:03 -0700 (PDT)
+X-Received: by 2002:a17:902:d48b:b0:2ae:3d7d:d903 with SMTP id d9443c01a7336-2ae824465e5mr155695135ad.18.1773153723437;
+        Tue, 10 Mar 2026 07:42:03 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f783cfsm157096515ad.56.2026.03.10.07.41.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f783cfsm157096515ad.56.2026.03.10.07.41.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 07:41:57 -0700 (PDT)
+        Tue, 10 Mar 2026 07:42:02 -0700 (PDT)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,12 +101,10 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	vsrama-krishna.nemani@broadcom.com,
 	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
-	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v6 03/10] bng_en: add ethtool link settings, get_link, and nway_reset
-Date: Tue, 10 Mar 2026 20:10:37 +0530
-Message-ID: <20260310144044.21672-4-bhargava.marreddy@broadcom.com>
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [PATCH net-next v6 04/10] bng_en: implement ethtool pauseparam operations
+Date: Tue, 10 Mar 2026 20:10:38 +0530
+Message-ID: <20260310144044.21672-5-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260310144044.21672-1-bhargava.marreddy@broadcom.com>
 References: <20260310144044.21672-1-bhargava.marreddy@broadcom.com>
@@ -118,952 +116,124 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 63F03253187
+X-Rspamd-Queue-Id: A1A1B25259F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266185-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266186-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Add get/set_link_ksettings, get_link, and nway_reset support.
-Report supported, advertised, and link-partner speeds across NRZ,
-PAM4, and PAM4-112 signaling modes. Enable lane count reporting.
+Implement .get_pauseparam and .set_pauseparam to support flow control
+configuration. This allows reporting and setting of autoneg, RX pause,
+and TX pause states.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnge/bnge.h     |   2 +
- .../net/ethernet/broadcom/bnge/bnge_core.c    |   1 +
- .../net/ethernet/broadcom/bnge/bnge_ethtool.c |  24 +
- .../net/ethernet/broadcom/bnge/bnge_link.c    | 793 ++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_link.h    |   7 +
- 5 files changed, 827 insertions(+)
+ .../net/ethernet/broadcom/bnge/bnge_ethtool.c | 58 +++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
-index 83ee4749cc70..e9b83c0c64b6 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-@@ -98,6 +98,8 @@ struct bnge_queue_info {
- #define BNGE_PHY_FL_NO_FCS		PORT_PHY_QCAPS_RESP_FLAGS_NO_FCS
- #define BNGE_PHY_FL_SPEEDS2		\
- 	(PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED << 8)
-+#define BNGE_PHY_FL_NO_PAUSE		\
-+	(PORT_PHY_QCAPS_RESP_FLAGS2_PAUSE_UNSUPPORTED << 8)
- 
- struct bnge_dev {
- 	struct device	*dev;
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_core.c b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-index b4090283df0f..1c14c5fe8d61 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-@@ -10,6 +10,7 @@
- #include "bnge_devlink.h"
- #include "bnge_hwrm.h"
- #include "bnge_hwrm_lib.h"
-+#include "bnge_link.h"
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION(DRV_SUMMARY);
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-index 569371c1b4f2..e4d3041db0af 100644
+index e4d3041db0af..01382ad784e3 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-@@ -11,6 +11,25 @@
+@@ -42,6 +42,62 @@ static void bnge_get_drvinfo(struct net_device *dev,
+ 	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
+ }
  
- #include "bnge.h"
- #include "bnge_ethtool.h"
-+#include "bnge_hwrm_lib.h"
-+
-+static int bnge_nway_reset(struct net_device *dev)
++static void bnge_get_pauseparam(struct net_device *dev,
++				struct ethtool_pauseparam *epause)
 +{
 +	struct bnge_net *bn = netdev_priv(dev);
 +	struct bnge_dev *bd = bn->bd;
-+	int rc = 0;
 +
-+	if (!BNGE_PHY_CFG_ABLE(bd))
++	if (bd->phy_flags & BNGE_PHY_FL_NO_PAUSE) {
++		epause->autoneg = 0;
++		epause->rx_pause = 0;
++		epause->tx_pause = 0;
++		return;
++	}
++
++	epause->autoneg = !!(bn->eth_link_info.autoneg &
++			     BNGE_AUTONEG_FLOW_CTRL);
++	epause->rx_pause = !!(bn->eth_link_info.req_flow_ctrl &
++			      BNGE_LINK_PAUSE_RX);
++	epause->tx_pause = !!(bn->eth_link_info.req_flow_ctrl &
++			      BNGE_LINK_PAUSE_TX);
++}
++
++static int bnge_set_pauseparam(struct net_device *dev,
++			       struct ethtool_pauseparam *epause)
++{
++	struct bnge_ethtool_link_info *elink_info;
++	struct bnge_net *bn = netdev_priv(dev);
++	struct bnge_dev *bd = bn->bd;
++
++	if (!BNGE_PHY_CFG_ABLE(bd) || (bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
 +		return -EOPNOTSUPP;
 +
-+	if (!(bn->eth_link_info.autoneg & BNGE_AUTONEG_SPEED))
-+		return -EINVAL;
++	elink_info = &bn->eth_link_info;
++
++	if (epause->autoneg) {
++		if (!(elink_info->autoneg & BNGE_AUTONEG_SPEED))
++			return -EINVAL;
++
++		elink_info->autoneg |= BNGE_AUTONEG_FLOW_CTRL;
++	} else {
++		if (elink_info->autoneg & BNGE_AUTONEG_FLOW_CTRL)
++			elink_info->force_link_chng = true;
++		elink_info->autoneg &= ~BNGE_AUTONEG_FLOW_CTRL;
++	}
++
++	elink_info->req_flow_ctrl = 0;
++	if (epause->rx_pause)
++		elink_info->req_flow_ctrl |= BNGE_LINK_PAUSE_RX;
++	if (epause->tx_pause)
++		elink_info->req_flow_ctrl |= BNGE_LINK_PAUSE_TX;
 +
 +	if (netif_running(dev))
-+		rc = bnge_hwrm_set_link_setting(bn, true);
++		return bnge_hwrm_set_pause(bn);
 +
-+	return rc;
++	return 0;
 +}
- 
- static void bnge_get_drvinfo(struct net_device *dev,
- 			     struct ethtool_drvinfo *info)
-@@ -24,7 +43,12 @@ static void bnge_get_drvinfo(struct net_device *dev,
- }
- 
++
  static const struct ethtool_ops bnge_ethtool_ops = {
-+	.cap_link_lanes_supported	= 1,
-+	.get_link_ksettings	= bnge_get_link_ksettings,
-+	.set_link_ksettings	= bnge_set_link_ksettings,
+ 	.cap_link_lanes_supported	= 1,
+ 	.get_link_ksettings	= bnge_get_link_ksettings,
+@@ -49,6 +105,8 @@ static const struct ethtool_ops bnge_ethtool_ops = {
  	.get_drvinfo		= bnge_get_drvinfo,
-+	.get_link		= bnge_get_link,
-+	.nway_reset		= bnge_nway_reset,
+ 	.get_link		= bnge_get_link,
+ 	.nway_reset		= bnge_nway_reset,
++	.get_pauseparam		= bnge_get_pauseparam,
++	.set_pauseparam		= bnge_set_pauseparam,
  };
  
  void bnge_set_ethtool_ops(struct net_device *dev)
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-index 0c76cbc794f7..e3d7ff9dfc83 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-@@ -7,6 +7,51 @@
- #include "bnge_link.h"
- #include "bnge_hwrm_lib.h"
- 
-+enum bnge_media_type {
-+	BNGE_MEDIA_UNKNOWN = 0,
-+	BNGE_MEDIA_CR,
-+	BNGE_MEDIA_SR,
-+	BNGE_MEDIA_LR_ER_FR,
-+	BNGE_MEDIA_KR,
-+	__BNGE_MEDIA_END,
-+};
-+
-+static const enum bnge_media_type bnge_phy_types[] = {
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR10] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASECR] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASESR] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASELR] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASEER] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR2] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR2] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASECR2] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASESR2] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASELR2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASEER2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR8] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR8] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR8] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER8] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+};
-+
- static u32 bnge_fw_to_ethtool_speed(u16 fw_link_speed)
- {
- 	switch (fw_link_speed) {
-@@ -458,3 +503,751 @@ void bnge_report_link(struct bnge_dev *bd)
- 		netdev_err(bd->netdev, "NIC Link is Down\n");
- 	}
- }
-+
-+static void bnge_get_ethtool_modes(struct bnge_net *bn,
-+				   struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_ethtool_link_info *elink_info;
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+
-+	elink_info = &bn->eth_link_info;
-+	link_info = &bd->link_info;
-+
-+	if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE)) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.supported);
-+	}
-+
-+	if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
-+	    link_info->support_pam4_auto_speeds)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+				 lk_ksettings->link_modes.supported);
-+
-+	if (~elink_info->autoneg & BNGE_AUTONEG_FLOW_CTRL)
-+		return;
-+
-+	if (link_info->auto_pause_setting & BNGE_LINK_PAUSE_RX)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (hweight8(link_info->auto_pause_setting & BNGE_LINK_PAUSE_BOTH) == 1)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (link_info->lp_pause & BNGE_LINK_PAUSE_RX)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.lp_advertising);
-+	if (hweight8(link_info->lp_pause & BNGE_LINK_PAUSE_BOTH) == 1)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.lp_advertising);
-+}
-+
-+u32 bnge_get_link(struct net_device *dev)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+
-+	return BNGE_LINK_IS_UP(bn->bd);
-+}
-+
-+static enum bnge_media_type
-+bnge_get_media(struct bnge_link_info *link_info)
-+{
-+	switch (link_info->media_type) {
-+	case PORT_PHY_QCFG_RESP_MEDIA_TYPE_DAC:
-+		return BNGE_MEDIA_CR;
-+	default:
-+		if (link_info->phy_type < ARRAY_SIZE(bnge_phy_types))
-+			return bnge_phy_types[link_info->phy_type];
-+		return BNGE_MEDIA_UNKNOWN;
-+	}
-+}
-+
-+enum bnge_link_speed_indices {
-+	BNGE_LINK_SPEED_UNKNOWN = 0,
-+	BNGE_LINK_SPEED_50GB_IDX,
-+	BNGE_LINK_SPEED_100GB_IDX,
-+	BNGE_LINK_SPEED_200GB_IDX,
-+	BNGE_LINK_SPEED_400GB_IDX,
-+	BNGE_LINK_SPEED_800GB_IDX,
-+	__BNGE_LINK_SPEED_END
-+};
-+
-+static enum bnge_link_speed_indices bnge_fw_speed_idx(u16 speed)
-+{
-+	switch (speed) {
-+	case BNGE_LINK_SPEED_50GB:
-+	case BNGE_LINK_SPEED_50GB_PAM4:
-+		return BNGE_LINK_SPEED_50GB_IDX;
-+	case BNGE_LINK_SPEED_100GB:
-+	case BNGE_LINK_SPEED_100GB_PAM4:
-+	case BNGE_LINK_SPEED_100GB_PAM4_112:
-+		return BNGE_LINK_SPEED_100GB_IDX;
-+	case BNGE_LINK_SPEED_200GB:
-+	case BNGE_LINK_SPEED_200GB_PAM4:
-+	case BNGE_LINK_SPEED_200GB_PAM4_112:
-+		return BNGE_LINK_SPEED_200GB_IDX;
-+	case BNGE_LINK_SPEED_400GB:
-+	case BNGE_LINK_SPEED_400GB_PAM4:
-+	case BNGE_LINK_SPEED_400GB_PAM4_112:
-+		return BNGE_LINK_SPEED_400GB_IDX;
-+	case BNGE_LINK_SPEED_800GB:
-+	case BNGE_LINK_SPEED_800GB_PAM4_112:
-+		return BNGE_LINK_SPEED_800GB_IDX;
-+	default:
-+		return BNGE_LINK_SPEED_UNKNOWN;
-+	}
-+}
-+
-+/* Compile-time link mode mapping table.
-+ * Indexed by [speed_idx][sig_mode][media].
-+ */
-+#define BNGE_LINK_M(speed, sig, media, lm)	\
-+	[BNGE_LINK_SPEED_##speed##_IDX]	\
-+	[BNGE_SIG_MODE_##sig]		\
-+	[BNGE_MEDIA_##media] = ETHTOOL_LINK_MODE_##lm##_Full_BIT
-+
-+static const enum ethtool_link_mode_bit_indices
-+bnge_link_modes[__BNGE_LINK_SPEED_END]
-+	       [BNGE_SIG_MODE_MAX]
-+	       [__BNGE_MEDIA_END] = {
-+	/* 50GB PAM4 */
-+	BNGE_LINK_M(50GB,  PAM4, CR,        50000baseCR),
-+	BNGE_LINK_M(50GB,  PAM4, SR,        50000baseSR),
-+	BNGE_LINK_M(50GB,  PAM4, LR_ER_FR,  50000baseLR_ER_FR),
-+	BNGE_LINK_M(50GB,  PAM4, KR,        50000baseKR),
-+
-+	/* 100GB NRZ */
-+	BNGE_LINK_M(100GB, NRZ,  CR,        100000baseCR4),
-+	BNGE_LINK_M(100GB, NRZ,  SR,        100000baseSR4),
-+	BNGE_LINK_M(100GB, NRZ,  LR_ER_FR,  100000baseLR4_ER4),
-+	BNGE_LINK_M(100GB, NRZ,  KR,        100000baseKR4),
-+
-+	/* 100GB PAM4 */
-+	BNGE_LINK_M(100GB, PAM4, CR,        100000baseCR2),
-+	BNGE_LINK_M(100GB, PAM4, SR,        100000baseSR2),
-+	BNGE_LINK_M(100GB, PAM4, LR_ER_FR,  100000baseLR2_ER2_FR2),
-+	BNGE_LINK_M(100GB, PAM4, KR,        100000baseKR2),
-+
-+	/* 100GB PAM4_112 */
-+	BNGE_LINK_M(100GB, PAM4_112, CR,        100000baseCR),
-+	BNGE_LINK_M(100GB, PAM4_112, SR,        100000baseSR),
-+	BNGE_LINK_M(100GB, PAM4_112, LR_ER_FR,  100000baseLR_ER_FR),
-+	BNGE_LINK_M(100GB, PAM4_112, KR,        100000baseKR),
-+
-+	/* 200GB PAM4 */
-+	BNGE_LINK_M(200GB, PAM4, CR,        200000baseCR4),
-+	BNGE_LINK_M(200GB, PAM4, SR,        200000baseSR4),
-+	BNGE_LINK_M(200GB, PAM4, LR_ER_FR,  200000baseLR4_ER4_FR4),
-+	BNGE_LINK_M(200GB, PAM4, KR,        200000baseKR4),
-+
-+	/* 200GB PAM4_112 */
-+	BNGE_LINK_M(200GB, PAM4_112, CR,        200000baseCR2),
-+	BNGE_LINK_M(200GB, PAM4_112, SR,        200000baseSR2),
-+	BNGE_LINK_M(200GB, PAM4_112, LR_ER_FR,  200000baseLR2_ER2_FR2),
-+	BNGE_LINK_M(200GB, PAM4_112, KR,        200000baseKR2),
-+
-+	/* 400GB PAM4 */
-+	BNGE_LINK_M(400GB, PAM4, CR,        400000baseCR8),
-+	BNGE_LINK_M(400GB, PAM4, SR,        400000baseSR8),
-+	BNGE_LINK_M(400GB, PAM4, LR_ER_FR,  400000baseLR8_ER8_FR8),
-+	BNGE_LINK_M(400GB, PAM4, KR,        400000baseKR8),
-+
-+	/* 400GB PAM4_112 */
-+	BNGE_LINK_M(400GB, PAM4_112, CR,        400000baseCR4),
-+	BNGE_LINK_M(400GB, PAM4_112, SR,        400000baseSR4),
-+	BNGE_LINK_M(400GB, PAM4_112, LR_ER_FR,  400000baseLR4_ER4_FR4),
-+	BNGE_LINK_M(400GB, PAM4_112, KR,        400000baseKR4),
-+
-+	/* 800GB PAM4_112 */
-+	BNGE_LINK_M(800GB, PAM4_112, CR,        800000baseCR8),
-+	BNGE_LINK_M(800GB, PAM4_112, SR,        800000baseSR8),
-+	BNGE_LINK_M(800GB, PAM4_112, KR,        800000baseKR8),
-+};
-+
-+#define BNGE_LINK_MODE_UNKNOWN -1
-+
-+static enum ethtool_link_mode_bit_indices
-+bnge_get_link_mode(struct bnge_net *bn)
-+{
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	struct bnge_ethtool_link_info *elink_info;
-+	enum bnge_link_speed_indices speed;
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+	enum bnge_media_type media;
-+	u8 sig_mode;
-+
-+	elink_info = &bn->eth_link_info;
-+	link_info = &bd->link_info;
-+
-+	if (link_info->phy_link_status != BNGE_LINK_LINK)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	media = bnge_get_media(link_info);
-+	if (BNGE_AUTO_MODE(link_info->auto_mode)) {
-+		speed = bnge_fw_speed_idx(link_info->link_speed);
-+		sig_mode = link_info->active_fec_sig_mode &
-+			PORT_PHY_QCFG_RESP_SIGNAL_MODE_MASK;
-+	} else {
-+		speed = bnge_fw_speed_idx(elink_info->req_link_speed);
-+		sig_mode = elink_info->req_signal_mode;
-+	}
-+	if (sig_mode >= BNGE_SIG_MODE_MAX)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	/* Since ETHTOOL_LINK_MODE_10baseT_Half_BIT is defined as 0 and
-+	 * not actually supported, the zeroes in this map can be safely
-+	 * used to represent unknown link modes.
-+	 */
-+	link_mode = bnge_link_modes[speed][sig_mode][media];
-+	if (!link_mode)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	return link_mode;
-+}
-+
-+static const u16 bnge_nrz_speed_masks[__BNGE_LINK_SPEED_END] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEED_MSK_100GB,
-+};
-+
-+static const u16 bnge_pam4_speed_masks[__BNGE_LINK_SPEED_END] = {
-+	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_50GB,
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_100GB,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_200GB,
-+};
-+
-+static const u16 bnge_nrz_speeds2_masks[__BNGE_LINK_SPEED_END] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB,
-+};
-+
-+static const u16 bnge_pam4_speeds2_masks[__BNGE_LINK_SPEED_END] = {
-+	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_SPEEDS2_MSK_50GB_PAM4,
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4,
-+	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4,
-+};
-+
-+static const u16 bnge_pam4_112_speeds2_masks[__BNGE_LINK_SPEED_END] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4_112,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4_112,
-+	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4_112,
-+	[BNGE_LINK_SPEED_800GB_IDX] = BNGE_LINK_SPEEDS2_MSK_800GB_PAM4_112,
-+};
-+
-+static enum bnge_link_speed_indices
-+bnge_encoding_speed_idx(u8 sig_mode, u32 phy_flags, u16 speed_msk)
-+{
-+	const u16 *speeds;
-+	int idx, len;
-+
-+	switch (sig_mode) {
-+	case BNGE_SIG_MODE_NRZ:
-+		if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+			speeds = bnge_nrz_speeds2_masks;
-+			len = ARRAY_SIZE(bnge_nrz_speeds2_masks);
-+		} else {
-+			speeds = bnge_nrz_speed_masks;
-+			len = ARRAY_SIZE(bnge_nrz_speed_masks);
-+		}
-+		break;
-+	case BNGE_SIG_MODE_PAM4:
-+		if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+			speeds = bnge_pam4_speeds2_masks;
-+			len = ARRAY_SIZE(bnge_pam4_speeds2_masks);
-+		} else {
-+			speeds = bnge_pam4_speed_masks;
-+			len = ARRAY_SIZE(bnge_pam4_speed_masks);
-+		}
-+		break;
-+	case BNGE_SIG_MODE_PAM4_112:
-+		speeds = bnge_pam4_112_speeds2_masks;
-+		len = ARRAY_SIZE(bnge_pam4_112_speeds2_masks);
-+		break;
-+	default:
-+		return BNGE_LINK_SPEED_UNKNOWN;
-+	}
-+
-+	for (idx = 0; idx < len; idx++) {
-+		if (speeds[idx] == speed_msk)
-+			return idx;
-+	}
-+
-+	return BNGE_LINK_SPEED_UNKNOWN;
-+}
-+
-+#define BNGE_FW_SPEED_MSK_BITS 16
-+
-+static void
-+__bnge_get_ethtool_speeds(unsigned long fw_mask, enum bnge_media_type media,
-+			  u8 sig_mode, u32 phy_flags, unsigned long *et_mask)
-+{
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	enum bnge_link_speed_indices speed;
-+	u8 bit;
-+
-+	for_each_set_bit(bit, &fw_mask, BNGE_FW_SPEED_MSK_BITS) {
-+		speed = bnge_encoding_speed_idx(sig_mode, phy_flags, 1 << bit);
-+		if (!speed)
-+			continue;
-+
-+		link_mode = bnge_link_modes[speed][sig_mode][media];
-+		if (!link_mode)
-+			continue;
-+
-+		linkmode_set_bit(link_mode, et_mask);
-+	}
-+}
-+
-+static void
-+bnge_get_ethtool_speeds(unsigned long fw_mask, enum bnge_media_type media,
-+			u8 sig_mode, u32 phy_flags, unsigned long *et_mask)
-+{
-+	if (media) {
-+		__bnge_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
-+		return;
-+	}
-+
-+	/* list speeds for all media if unknown */
-+	for (media = 1; media < __BNGE_MEDIA_END; media++)
-+		__bnge_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
-+}
-+
-+static void
-+bnge_get_all_ethtool_support_speeds(struct bnge_dev *bd,
-+				    enum bnge_media_type media,
-+				    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
-+	u32 phy_flags = bd->phy_flags;
-+
-+	if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		sp_nrz = link_info->support_speeds2;
-+		sp_pam4 = link_info->support_speeds2;
-+		sp_pam4_112 = link_info->support_speeds2;
-+	} else {
-+		sp_nrz = link_info->support_speeds;
-+		sp_pam4 = link_info->support_pam4_speeds;
-+	}
-+	bnge_get_ethtool_speeds(sp_nrz, media, BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+	bnge_get_ethtool_speeds(sp_pam4, media, BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+	bnge_get_ethtool_speeds(sp_pam4_112, media, BNGE_SIG_MODE_PAM4_112,
-+				phy_flags, lk_ksettings->link_modes.supported);
-+}
-+
-+static void
-+bnge_get_all_ethtool_adv_speeds(struct bnge_net *bn,
-+				enum bnge_media_type media,
-+				struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
-+	struct bnge_dev *bd = bn->bd;
-+	u32 phy_flags;
-+
-+	phy_flags = bd->phy_flags;
-+	sp_nrz = elink_info->advertising;
-+
-+	if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		sp_pam4 = elink_info->advertising;
-+		sp_pam4_112 = elink_info->advertising;
-+	} else {
-+		sp_pam4 = elink_info->advertising_pam4;
-+	}
-+	bnge_get_ethtool_speeds(sp_nrz, media, BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+	bnge_get_ethtool_speeds(sp_pam4, media, BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+	bnge_get_ethtool_speeds(sp_pam4_112, media, BNGE_SIG_MODE_PAM4_112,
-+				phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+}
-+
-+static void
-+bnge_get_all_ethtool_lp_speeds(struct bnge_dev *bd,
-+			       enum bnge_media_type media,
-+			       struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	u32 phy_flags = bd->phy_flags;
-+
-+	bnge_get_ethtool_speeds(link_info->lp_auto_link_speeds, media,
-+				BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
-+	bnge_get_ethtool_speeds(link_info->lp_auto_pam4_link_speeds, media,
-+				BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
-+}
-+
-+static void bnge_update_speed(u32 *delta, bool installed_media, u16 *speeds,
-+			      u16 speed_msk, const unsigned long *et_mask,
-+			      enum ethtool_link_mode_bit_indices mode)
-+{
-+	bool mode_desired = linkmode_test_bit(mode, et_mask);
-+
-+	if (!mode)
-+		return;
-+
-+	/* enabled speeds for installed media should override */
-+	if (installed_media && mode_desired) {
-+		*speeds |= speed_msk;
-+		*delta |= speed_msk;
-+		return;
-+	}
-+
-+	/* many to one mapping, only allow one change per fw_speed bit */
-+	if (!(*delta & speed_msk) && (mode_desired == !(*speeds & speed_msk))) {
-+		*speeds ^= speed_msk;
-+		*delta |= speed_msk;
-+	}
-+}
-+
-+static void bnge_set_ethtool_speeds(struct bnge_net *bn,
-+				    const unsigned long *et_mask)
-+{
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	u16 const *sp_msks, *sp_pam4_msks, *sp_pam4_112_msks = NULL;
-+	u16 *adv, *adv_pam4, *adv_pam4_112 = NULL;
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+	enum bnge_media_type media;
-+	u32 delta_pam4_112 = 0;
-+	u32 delta_pam4 = 0;
-+	u32 delta_nrz = 0;
-+	int i, m;
-+
-+	link_info = &bd->link_info;
-+	media = bnge_get_media(link_info);
-+	adv = &elink_info->advertising;
-+
-+	if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		adv_pam4 = &elink_info->advertising;
-+		adv_pam4_112 = &elink_info->advertising;
-+		sp_msks = bnge_nrz_speeds2_masks;
-+		sp_pam4_msks = bnge_pam4_speeds2_masks;
-+		sp_pam4_112_msks = bnge_pam4_112_speeds2_masks;
-+	} else {
-+		adv_pam4 = &elink_info->advertising_pam4;
-+		sp_msks = bnge_nrz_speed_masks;
-+		sp_pam4_msks = bnge_pam4_speed_masks;
-+	}
-+	for (i = 1; i < __BNGE_LINK_SPEED_END; i++) {
-+		/* accept any legal media from user */
-+		for (m = 1; m < __BNGE_MEDIA_END; m++) {
-+			bnge_update_speed(&delta_nrz, m == media,
-+					  adv, sp_msks[i], et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_NRZ][m]);
-+			bnge_update_speed(&delta_pam4, m == media,
-+					  adv_pam4, sp_pam4_msks[i], et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_PAM4][m]);
-+			if (!adv_pam4_112)
-+				continue;
-+
-+			bnge_update_speed(&delta_pam4_112, m == media,
-+					  adv_pam4_112, sp_pam4_112_msks[i],
-+					  et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_PAM4_112][m]);
-+		}
-+	}
-+}
-+
-+static void
-+bnge_fw_to_ethtool_advertised_fec(struct bnge_link_info *link_info,
-+				  struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	u16 fec_cfg = link_info->fec_cfg;
-+
-+	if ((fec_cfg & BNGE_FEC_NONE) || !(fec_cfg & BNGE_FEC_AUTONEG)) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_NONE_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+		return;
-+	}
-+	if (fec_cfg & BNGE_FEC_ENC_BASE_R)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_BASER_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (fec_cfg & BNGE_FEC_ENC_RS)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_RS_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (fec_cfg & BNGE_FEC_ENC_LLRS)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_LLRS_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+}
-+
-+static void
-+bnge_fw_to_ethtool_support_fec(struct bnge_link_info *link_info,
-+			       struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	u16 fec_cfg = link_info->fec_cfg;
-+
-+	if (fec_cfg & BNGE_FEC_NONE) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_NONE_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		return;
-+	}
-+	if (fec_cfg & BNGE_FEC_ENC_BASE_R_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_BASER_BIT,
-+				 lk_ksettings->link_modes.supported);
-+	if (fec_cfg & BNGE_FEC_ENC_RS_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_RS_BIT,
-+				 lk_ksettings->link_modes.supported);
-+	if (fec_cfg & BNGE_FEC_ENC_LLRS_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_LLRS_BIT,
-+				 lk_ksettings->link_modes.supported);
-+}
-+
-+static void bnge_get_default_speeds(struct bnge_net *bn,
-+				    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct ethtool_link_settings *base = &lk_ksettings->base;
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+
-+	link_info = &bd->link_info;
-+
-+	if (link_info->link_state == BNGE_LINK_STATE_UP) {
-+		base->speed = bnge_fw_to_ethtool_speed(link_info->link_speed);
-+		base->duplex = DUPLEX_HALF;
-+		if (link_info->duplex & BNGE_LINK_DUPLEX_FULL)
-+			base->duplex = DUPLEX_FULL;
-+		lk_ksettings->lanes = link_info->active_lanes;
-+	} else if (!elink_info->autoneg) {
-+		base->speed =
-+			bnge_fw_to_ethtool_speed(elink_info->req_link_speed);
-+		base->duplex = DUPLEX_HALF;
-+		if (elink_info->req_duplex == BNGE_LINK_DUPLEX_FULL)
-+			base->duplex = DUPLEX_FULL;
-+	}
-+}
-+
-+int bnge_get_link_ksettings(struct net_device *dev,
-+			    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct ethtool_link_settings *base = &lk_ksettings->base;
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+	enum bnge_media_type media;
-+
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, lp_advertising);
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, advertising);
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, supported);
-+	base->duplex = DUPLEX_UNKNOWN;
-+	base->speed = SPEED_UNKNOWN;
-+	link_info = &bd->link_info;
-+
-+	bnge_get_ethtool_modes(bn, lk_ksettings);
-+	media = bnge_get_media(link_info);
-+	bnge_get_all_ethtool_support_speeds(bd, media, lk_ksettings);
-+	bnge_fw_to_ethtool_support_fec(link_info, lk_ksettings);
-+	link_mode = bnge_get_link_mode(bn);
-+	if (link_mode != BNGE_LINK_MODE_UNKNOWN)
-+		ethtool_params_from_link_mode(lk_ksettings, link_mode);
-+	else
-+		bnge_get_default_speeds(bn, lk_ksettings);
-+
-+	if (bn->eth_link_info.autoneg) {
-+		bnge_fw_to_ethtool_advertised_fec(link_info, lk_ksettings);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+		base->autoneg = AUTONEG_ENABLE;
-+		bnge_get_all_ethtool_adv_speeds(bn, media, lk_ksettings);
-+		if (link_info->phy_link_status == BNGE_LINK_LINK)
-+			bnge_get_all_ethtool_lp_speeds(bd, media, lk_ksettings);
-+	} else {
-+		base->autoneg = AUTONEG_DISABLE;
-+	}
-+
-+	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
-+			 lk_ksettings->link_modes.supported);
-+	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
-+			 lk_ksettings->link_modes.advertising);
-+
-+	if (link_info->media_type == PORT_PHY_QCFG_RESP_MEDIA_TYPE_DAC)
-+		base->port = PORT_DA;
-+	else
-+		base->port = PORT_FIBRE;
-+	base->phy_address = link_info->phy_addr;
-+
-+	return 0;
-+}
-+
-+static int
-+bnge_force_link_speed(struct net_device *dev, u32 ethtool_speed, u32 lanes)
-+{
-+	u16 support_pam4_spds, support_spds2, support_spds;
-+	struct bnge_ethtool_link_info *elink_info;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_link_info *link_info;
-+	u8 sig_mode = BNGE_SIG_MODE_NRZ;
-+	struct bnge_dev *bd = bn->bd;
-+	u32 lanes_needed = 1;
-+	u16 fw_speed = 0;
-+
-+	elink_info = &bn->eth_link_info;
-+	link_info = &bd->link_info;
-+	support_pam4_spds = link_info->support_pam4_speeds;
-+	support_spds2 = link_info->support_speeds2;
-+	support_spds = link_info->support_speeds;
-+
-+	switch (ethtool_speed) {
-+	case SPEED_50000:
-+		if (((support_spds & BNGE_LINK_SPEED_MSK_50GB) ||
-+		     (support_spds2 & BNGE_LINK_SPEEDS2_MSK_50GB)) &&
-+		    lanes != 1) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_50GB;
-+			lanes_needed = 2;
-+		} else if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_50GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_50GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+		} else if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_50GB_PAM4) {
-+			fw_speed = BNGE_LINK_SPEED_50GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+		}
-+		break;
-+	case SPEED_100000:
-+		if (((support_spds & BNGE_LINK_SPEED_MSK_100GB) ||
-+		     (support_spds2 & BNGE_LINK_SPEEDS2_MSK_100GB)) &&
-+		    lanes != 2 && lanes != 1) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_100GB;
-+			lanes_needed = 4;
-+		} else if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_100GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_100GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 2;
-+		} else if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_100GB_PAM4) &&
-+			   lanes != 1) {
-+			fw_speed = BNGE_LINK_SPEED_100GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 2;
-+		} else if (support_spds2 &
-+			   BNGE_LINK_SPEEDS2_MSK_100GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_100GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+		}
-+		break;
-+	case SPEED_200000:
-+		if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_200GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_200GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 4;
-+		} else if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_200GB_PAM4) &&
-+			   lanes != 2) {
-+			fw_speed = BNGE_LINK_SPEED_200GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 4;
-+		} else if (support_spds2 &
-+			   BNGE_LINK_SPEEDS2_MSK_200GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_200GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 2;
-+		}
-+		break;
-+	case SPEED_400000:
-+		if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_400GB_PAM4) &&
-+		    lanes != 4) {
-+			fw_speed = BNGE_LINK_SPEED_400GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 8;
-+		} else if (support_spds2 &
-+			   BNGE_LINK_SPEEDS2_MSK_400GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_400GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 4;
-+		}
-+		break;
-+	case SPEED_800000:
-+		if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_800GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_800GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 8;
-+		}
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	if (!fw_speed) {
-+		netdev_err(dev, "unsupported speed!\n");
-+		return -EINVAL;
-+	}
-+
-+	if (lanes && lanes != lanes_needed) {
-+		netdev_err(dev, "unsupported number of lanes for speed\n");
-+		return -EINVAL;
-+	}
-+
-+	if (elink_info->req_link_speed == fw_speed &&
-+	    elink_info->req_signal_mode == sig_mode &&
-+	    elink_info->autoneg == 0)
-+		return -EALREADY;
-+
-+	elink_info->req_link_speed = fw_speed;
-+	elink_info->req_signal_mode = sig_mode;
-+	elink_info->req_duplex = BNGE_LINK_DUPLEX_FULL;
-+	elink_info->autoneg = 0;
-+	elink_info->advertising = 0;
-+	elink_info->advertising_pam4 = 0;
-+
-+	return 0;
-+}
-+
-+int bnge_set_link_ksettings(struct net_device *dev,
-+			    const struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	const struct ethtool_link_settings *base = &lk_ksettings->base;
-+	struct bnge_ethtool_link_info *elink_info;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+	bool set_pause = false;
-+	int rc = 0;
-+
-+	elink_info = &bn->eth_link_info;
-+	link_info = &bd->link_info;
-+
-+	if (!BNGE_PHY_CFG_ABLE(bd))
-+		return -EOPNOTSUPP;
-+
-+	if (base->autoneg == AUTONEG_ENABLE) {
-+		bnge_set_ethtool_speeds(bn,
-+					lk_ksettings->link_modes.advertising);
-+		elink_info->autoneg |= BNGE_AUTONEG_SPEED;
-+		if (!elink_info->advertising && !elink_info->advertising_pam4) {
-+			elink_info->advertising =
-+				link_info->support_auto_speeds;
-+			elink_info->advertising_pam4 =
-+				link_info->support_pam4_auto_speeds;
-+		}
-+		/* any change to autoneg will cause link change, therefore the
-+		 * driver should put back the original pause setting in autoneg
-+		 */
-+		if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
-+			set_pause = true;
-+	} else {
-+		if (base->duplex == DUPLEX_HALF) {
-+			netdev_err(dev, "HALF DUPLEX is not supported!\n");
-+			rc = -EINVAL;
-+			goto set_setting_exit;
-+		}
-+		rc = bnge_force_link_speed(dev, base->speed,
-+					   lk_ksettings->lanes);
-+		if (rc) {
-+			if (rc == -EALREADY)
-+				rc = 0;
-+			goto set_setting_exit;
-+		}
-+	}
-+
-+	if (netif_running(dev))
-+		rc = bnge_hwrm_set_link_setting(bn, set_pause);
-+
-+set_setting_exit:
-+	return rc;
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.h b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-index f22dec2899e3..70d0901b9a32 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-@@ -4,6 +4,8 @@
- #ifndef _BNGE_LINK_H_
- #define _BNGE_LINK_H_
- 
-+#include <linux/ethtool.h>
-+
- #define BNGE_PHY_CFG_ABLE(bd)		\
- 	((bd)->link_info.phy_enabled)
- 
-@@ -190,4 +192,9 @@ void bnge_report_link(struct bnge_dev *bd);
- bool bnge_support_speed_dropped(struct bnge_net *bn);
- void bnge_init_ethtool_link_settings(struct bnge_net *bn);
- int bnge_probe_phy(struct bnge_net *bn, bool fw_dflt);
-+int bnge_set_link_ksettings(struct net_device *dev,
-+			    const struct ethtool_link_ksettings *lk_ksettings);
-+int bnge_get_link_ksettings(struct net_device *dev,
-+			    struct ethtool_link_ksettings *lk_ksettings);
-+u32 bnge_get_link(struct net_device *dev);
- #endif /* _BNGE_LINK_H_ */
 -- 
 2.47.3
 
