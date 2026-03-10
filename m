@@ -1,318 +1,116 @@
-Return-Path: <netdev+bounces-266374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id LuT/LxKmsGnZlgIAu9opvQ
-	(envelope-from <netdev+bounces-266374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:15:30 +0100
+	id IKhPGlGmsGnZlgIAu9opvQ
+	(envelope-from <netdev+bounces-266375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:16:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14A28259334
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:15:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A7E8259356
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1BF5313D5EC
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:15:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52991313ADE6
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F1D32AABF;
-	Tue, 10 Mar 2026 23:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931462DB780;
+	Tue, 10 Mar 2026 23:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqEYqxDe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B371C271468
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 23:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFD515CD7E
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 23:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773184528; cv=none; b=OE9sSeqeuPQf6A3Z9/JUsUsrbvsVnhSzjOUdwIpIBD3VYpl3x4CKmFd3VN8U3aU5ZPZLisTAk2/yj2UWA8aqJpcTHWHmymDl6bat+8kBEaLB4hn3eLNLwFmUxHXH+R8QKADmZMQ7ygveyByd/uHlBHpfExZ5USfTfe2OCKFeC/w=
+	t=1773184590; cv=none; b=aaQh4prZCfVgZAPyVYsFJZYxNOmZzLK95cqZ+/zeE/2z1RUFouJxTibmHe8iXrQCiHIc7/Uchy457tGPkdtdZTsV19ZXFGCyV5zVTcSqxar1maiOwsdvkySg5Q6A1WGAg9c1F9OxjMM0QHGEgTDvpIPARYAE5rxegdB2x7bvR9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773184528; c=relaxed/simple;
-	bh=jDPt2+axzf6QmW4X7Bq1ogLhr/VgUZUOuwu6w/7LA3Y=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=PDOwqngo+mxa5CpwNMhNQdCK0PHpPdnXFI0ZXk4MyikQWxbNCXnxHZk7/5EnZI4dTbzJSjD5YUEkJ5Cpnja0+O+gsiQwexONRNfJGJxBaU5PMN5pPDCDyejiyeZ5pzjcrJ7PloWjte8CrmbvUK08duoUuEGYiQgRu009N4V5Pzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-41701418411so30016008fac.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 16:15:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773184525; x=1773789325;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2m7J15Rmijkxj/rodQsj2WND6I6uBKnU+578P4HG1Q=;
-        b=B71cCyiUN3QtAGjX9gQOdBmoC+5ekmZdEF2iRMmlJ4H2EfyuFnc4xl+PSv+OceS9wf
-         bmTyswnVOFejBC3in/xhfzIzbLPqT8TWwliXlBJd3IkUHIUypCrZX73iznaQoDo5VZMo
-         d0g4WAClaB0U7X+E2q/qhHCcUDTQxm3tfGC4EWVm3X8d9UVR62OQZ8q5fkkPXzuq52oJ
-         cPd+lopFsAi5EnWxrhSxkUypc2kPmeFyFInwa29EjQFiWnyoegnI4d746XWrK/GZGJM/
-         EY6WInMJlrDkjXI0bVkHOfyyczD733zrMnOeV8nHd9CCSCkrBdWxZJN6N61A2k+pDfPx
-         Zb6w==
-X-Forwarded-Encrypted: i=1; AJvYcCVGWIWCVE0+Ud823UlengNO2jXFHDzVdZJHYuc+a82dN13VJlWSXua+QGFazw3jMFTr6CJTqNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE5hoOK1KaKLg4/V1worDzTPUeLUzvpM5/ie846q0vjpqOjKmz
-	sWrN3aZiYeWsIxAjaRpUC0J/vz40JSz3K9si4aSeaHhfCXbICZlzgVIOPS4sx3DCNqpBiMAfrG/
-	7VvcZu8C0MY9dwCh4O86RRsgsZa0DYUIycryidLjaMcuFQMB5ev1kVKVcmCU=
+	s=arc-20240116; t=1773184590; c=relaxed/simple;
+	bh=8wexlKF2KBEDhMHyebDWrWVilOwUJmumuN4ezz2B8AM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iaNxzg0bjL9M227UTAYNQOfLty7gRt4xrOCNkd0hXHap8+hf3G0C6d/WHEpqRbYNbUVfsHanbQg0Xn83l3E5F1a1hkyU27jSYaQUO57NB7st1tSAYK+Eek0d5ZDwFyAIjQXBT0IWwozwu+k4sQIVPcJPg4E0IiLCPmKzSc4lXsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqEYqxDe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC5B0C19423;
+	Tue, 10 Mar 2026 23:16:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773184589;
+	bh=8wexlKF2KBEDhMHyebDWrWVilOwUJmumuN4ezz2B8AM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kqEYqxDeuzXbdUOAtp8Q4SxveYif25oGoNMP6le8zm6VpHOFCPU/ehhOdT2+6vHZ8
+	 m2QL9NA272q4yBLlMPApPa3EdjmyiAnN+XjrGTxFkB1tqVvRNgBv9EcCc//ZrnQLDy
+	 y6n2Uod2Gkx/PBzRhFoGwh/UnmcFpWEnKeVUx1mzfJxo8mJu5M0fdihGRVemFJVQwL
+	 2mM2H/3L+JLOaDVGpW8+Ro2nJC1A02FnpyMu7g1ObUR0GZ8wCyjJ6Dgg5sFTaZb1O0
+	 UjCXlNi22zETTATJx09G++WFUzo2OoXMJsW+Pw0TG2WD3E0HXjAEA5y0f8tPxMy+a3
+	 FalWlhoeZFx0g==
+Message-ID: <5f8d37f7-a395-4143-8580-56f7d6f77656@kernel.org>
+Date: Tue, 10 Mar 2026 17:16:29 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:460c:b0:67b:b7ff:e3b5 with SMTP id
- 006d021491bc7-67bc89918f2mr338388eaf.42.1773184525685; Tue, 10 Mar 2026
- 16:15:25 -0700 (PDT)
-Date: Tue, 10 Mar 2026 16:15:25 -0700
-In-Reply-To: <20260310120053.136594-1-jiayuan.chen@linux.dev>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69b0a60d.a00a0220.3a1cd4.0002.GAE@google.com>
-Subject: [syzbot ci] Re: net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
-From: syzbot ci <syzbot+ci146b0afba6158e88@syzkaller.appspotmail.com>
-To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
-	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
-	jiayuan.chen@linux.dev, jiayuan.chen@shopee.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sidraya@linux.ibm.com, syzbot@syzkaller.appspotmail.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 14A28259334
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] neighbour: restore protocol != 0 check in pneigh
+ update
+Content-Language: en-US
+To: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+References: <cover.1772894876.git.sd@queasysnail.net>
+ <38c61de1bb032871a886aff9b9b52fe1cdd4cada.1772894876.git.sd@queasysnail.net>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <38c61de1bb032871a886aff9b9b52fe1cdd4cada.1772894876.git.sd@queasysnail.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8A7E8259356
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.814];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266374-lists,netdev=lfdr.de,ci146b0afba6158e88];
-	TO_DN_NONE(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
+	TAGGED_FROM(0.00)[bounces-266375-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[3];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-syzbot ci has tested the following series
+On 3/10/26 3:59 PM, Sabrina Dubroca wrote:
+> Prior to commit dc2a27e524ac ("neighbour: Update pneigh_entry in
+> pneigh_create()."), a pneigh's protocol was updated only when the
+> value of the NDA_PROTOCOL attribute was non-0. While moving the code,
+> that check was removed. This is a small change of user-visible
+> behavior, and inconsistent with the (non-proxy) neighbour behavior.
+> 
+> Fixes: dc2a27e524ac ("neighbour: Update pneigh_entry in pneigh_create().")
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/core/neighbour.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
 
-[v3] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
-https://lore.kernel.org/all/20260310120053.136594-1-jiayuan.chen@linux.dev
-* [PATCH net v3] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
+good find. Thanks, Sabrina
 
-and found the following issues:
-* WARNING: suspicious RCU usage in smc_fback_error_report
-* WARNING: suspicious RCU usage in smc_fback_state_change
-* WARNING: suspicious RCU usage in smc_fback_write_space
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Full report is available here:
-https://ci.syzbot.org/series/b6883213-02f6-437e-bb3b-09fc59b0534c
-
-***
-
-WARNING: suspicious RCU usage in smc_fback_error_report
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
-C repro:   https://ci.syzbot.org/findings/f8c698ca-41b9-4ced-953c-f6c3ee405ebc/c_repro
-syz repro: https://ci.syzbot.org/findings/f8c698ca-41b9-4ced-953c-f6c3ee405ebc/syz_repro
-
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz.0.17/5970:
- #0: ffff88811a1d1d60 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- #0: ffff88811a1d1d60 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet_stream_connect+0x51/0xa0 net/ipv4/af_inet.c:749
- #1: ffff88811a1d1f08 (k-clock-AF_INET6){++..}-{3:3}, at: smc_fback_error_report+0x2d/0x140 net/smc/af_smc.c:900
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5970 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
- __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
- smc_clcsock_user_data net/smc/smc.h:345 [inline]
- smc_fback_error_report+0x135/0x140 net/smc/af_smc.c:901
- sk_error_report+0x48/0x2b0 net/core/sock.c:348
- tcp_disconnect+0x132c/0x1fa0 net/ipv4/tcp.c:3543
- __inet_stream_connect+0x32b/0xdd0 net/ipv4/af_inet.c:648
- inet_stream_connect+0x66/0xa0 net/ipv4/af_inet.c:750
- __sys_connect_file net/socket.c:2089 [inline]
- __sys_connect+0x312/0x450 net/socket.c:2108
- __do_sys_connect net/socket.c:2114 [inline]
- __se_sys_connect net/socket.c:2111 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2111
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7effcfd9c799
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe9219fa18 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007effd0015fa0 RCX: 00007effcfd9c799
-RDX: 000000000000000c RSI: 00002000000001c0 RDI: 0000000000000003
-RBP: 00007effcfe32bd9 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007effd0015fac R14: 00007effd0015fa0 R15: 00007effd0015fa0
- </TASK>
-
-
-***
-
-WARNING: suspicious RCU usage in smc_fback_state_change
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
-C repro:   https://ci.syzbot.org/findings/fb044c1b-44f5-483a-bb87-1aad71a75a03/c_repro
-syz repro: https://ci.syzbot.org/findings/fb044c1b-44f5-483a-bb87-1aad71a75a03/syz_repro
-
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-3 locks held by syz.0.17/5945:
- #0: ffff8881be8b0ee0 (sk_lock-AF_SMC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- #0: ffff8881be8b0ee0 (sk_lock-AF_SMC){+.+.}-{0:0}, at: smc_sendmsg+0x52/0x4d0 net/smc/af_smc.c:2802
- #1: ffff8881b9f04360 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- #1: ffff8881b9f04360 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x21/0x50 net/ipv4/tcp.c:1464
- #2: ffff8881b9f04508 (k-clock-AF_INET){++..}-{3:3}, at: smc_fback_state_change+0x2d/0x140 net/smc/af_smc.c:864
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5945 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
- __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
- smc_clcsock_user_data net/smc/smc.h:345 [inline]
- smc_fback_state_change+0x135/0x140 net/smc/af_smc.c:865
- tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:7000 [inline]
- tcp_rcv_state_process+0x2b23/0x4810 net/ipv4/tcp_input.c:7215
- tcp_v4_do_rcv+0x6bb/0x1430 net/ipv4/tcp_ipv4.c:1907
- sk_backlog_rcv include/net/sock.h:1185 [inline]
- __release_sock+0x265/0x3a0 net/core/sock.c:3213
- release_sock+0x5f/0x1f0 net/core/sock.c:3795
- tcp_sendmsg+0x39/0x50 net/ipv4/tcp.c:1466
- smc_sendmsg+0x250/0x4d0 net/smc/af_smc.c:2823
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9b66d9c799
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe630639c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f9b67015fa0 RCX: 00007f9b66d9c799
-RDX: 00000000200048cc RSI: 0000200000000240 RDI: 0000000000000003
-RBP: 00007f9b66e32bd9 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f9b67015fac R14: 00007f9b67015fa0 R15: 00007f9b67015fa0
- </TASK>
-
-
-***
-
-WARNING: suspicious RCU usage in smc_fback_write_space
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
-C repro:   https://ci.syzbot.org/findings/a3f8aa1e-ebea-41f3-b6e4-97d45bc19aaf/c_repro
-syz repro: https://ci.syzbot.org/findings/a3f8aa1e-ebea-41f3-b6e4-97d45bc19aaf/syz_repro
-
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz.0.17/5953:
- #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: sockopt_lock_sock net/core/sock.c:1152 [inline]
- #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: sk_setsockopt+0xe62/0x2e80 net/core/sock.c:1310
- #1: ffff8881b9ed1e08 (k-clock-AF_INET){++..}-{3:3}, at: smc_fback_write_space+0x2d/0x140 net/smc/af_smc.c:888
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5953 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
- __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
- smc_clcsock_user_data net/smc/smc.h:345 [inline]
- smc_fback_write_space+0x135/0x140 net/smc/af_smc.c:889
- sk_setsockopt+0x221f/0x2e80 net/core/sock.c:1351
- do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2318
- __sys_setsockopt net/socket.c:2347 [inline]
- __do_sys_setsockopt net/socket.c:2353 [inline]
- __se_sys_setsockopt net/socket.c:2350 [inline]
- __x64_sys_setsockopt+0x13d/0x1b0 net/socket.c:2350
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0c5f39c799
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd35759278 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f0c5f615fa0 RCX: 00007f0c5f39c799
-RDX: 0000000000000020 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007f0c5f432bd9 R08: 0000000000000004 R09: 0000000000000000
-R10: 0000200000000100 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f0c5f615fac R14: 00007f0c5f615fa0 R15: 00007f0c5f615fa0
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
