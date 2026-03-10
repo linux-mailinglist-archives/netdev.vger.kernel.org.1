@@ -1,291 +1,228 @@
-Return-Path: <netdev+bounces-265901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Or5GT3Ir2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:29:01 +0100
+	id ML8pBdvKr2nWcAIAu9opvQ
+	(envelope-from <netdev+bounces-265902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:40:11 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C9F246538
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:29:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 516E1246801
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 726F0302C6DC
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:28:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63C9A3104BB3
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58CC3E5EF5;
-	Tue, 10 Mar 2026 07:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580643803F1;
+	Tue, 10 Mar 2026 07:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECLqjXlF"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Kis8Ct9G";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="bcAl6O5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DD73451AB
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7C7286889
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773127717; cv=none; b=OyeDJuI3FDHB2qgNu6o7fMuMypS95DnMYZMtKdiIoa/blV4+AXp6kgoJ1mcQoeeTuijZM5nrhrQ6u+Zal8kB7HFMRIwfD/aTkF0Xt7GjyQpa3h6rs1VAVtZkxjPtH9w03tcPxcubK1UqNR3W9mIWwbB7Zp0i5f5y3pQWqNe6c50=
+	t=1773128034; cv=none; b=RcQSXJs62xtRuIA5DmQaP5YUtaMFqkCaqb5BZ3ax+42obzZ6CzqWrFFsHqB3tQ6n7gGOjuOrO7qCiX1s0R348Q4HaIWLywTKm0VLZLJOJMmPgNRw0DcjCu8BKk5gsGwPECWUYzS3VQQg7kqjC+Zsi0yhNDoQ/mUvktIhSaOdZ08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773127717; c=relaxed/simple;
-	bh=RaUCuVLqqaAz0qqCFRLgvY1/9vy7sYbyn9KfSGSSmFQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qDxKiIOlpj/QRX3vRSqGm8eTUAsTyCrigDSojrtchchN3kkWje/f1HKc49LTuzgf1qoH0BljqEutCwsRCnwMUwAFSl0Go4OLdrAzNyzY8LPffoylqVKxnyIbRxX9RNn7uYM68q/QqCF2VZiTT1yUyZx6v669kdchzmXiEXyLAY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ECLqjXlF; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-35982fd8910so4132339a91.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:28:36 -0700 (PDT)
+	s=arc-20240116; t=1773128034; c=relaxed/simple;
+	bh=sa8N0Q0K4fy60XBSi8KfgsBfmmSt8g8gD08mTtR33J4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aGeVlUEo6AELLsWtrutZ5A9uTHJ1lDGa/LbH8R3g+za0BxNQQG3SVmyxlCU9CutriHqGAzzw34GsaeiQjLhI+B9+T4lRwmc3QWbRdal5DoAKZk0K1DM3uzdsHXm/AXj7eEV+eI8J6du7/gF2ddz/aBJuaEh3SIFgOplRmxDgfQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Kis8Ct9G; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=bcAl6O5y; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62A5lJ9i568763
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:33:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	6jGZMz8cc7oYRoVY8qQfu8RJQuvfF597ul+4q7rukKg=; b=Kis8Ct9GRpNmKtwJ
+	DyqBDWDrEjtOX6ie7KU2k4gGiK6S1xJnr/EMX8A09/MbLt6LYEq4cHuVIFVihy36
+	hvZ8umOrJM2qHjWLwwBnZ3ME5SUkiQlmBnwHw+Fw8ZW0NAWQb2Fj9m7I3GCbc8z6
+	B1kiQa2ZhdvLozL49xc9r4EArybe3waENlPry+rHf0tlU7vkPmHnm1tFbHwGD3Q4
+	5LQl24b92P0mP1QvwbvaR8TXolpX7F5C7a42euRwpoVmvScFy06ftvc1o0cIetmk
+	skOJToP807conUhcupSLAlv2eGl0B9Y/7bdYqn/673W6OJZkkHPjgEIlLbK0nPmH
+	OT+mpg==
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ctdf8gben-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:33:51 +0000 (GMT)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-46724f3e25cso504664b6e.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:33:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773127716; x=1773732516; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=T5b7x3iexx3oDwiXrtY9eVbEYVTCyP5aQdngDqmKFek=;
-        b=ECLqjXlF79Cqdd/sG6QgiKyVNKlPBU8uIorb8iZ/ORjmuDCbSP5o4IV/r8uazk2SmP
-         CdM/m28AKep6Tx6P9cN8yd3rls0+83nN7UC3qcGj2Edk/JosScLh1RbEg8ewhgAbDLVT
-         dSLxYwwipfwBgFtxT5dw17OgpMvp/7u6TB/l0NuUW0A7cJ0ydRsE+/H4Igp9Y/Jwr7Um
-         9leWznuE0EG7JnQyASEuof1mqb7fZ3NuedyOEl72hYvddYjcvPLmDBBHCcCPvM1vWzs5
-         vj1UJYvjc5ZtZ72ns1XFK7wNm+ySQI3HAfVHf0n4YLa2aYDLqMt1vQdv34tozV+u3h6P
-         nHpA==
+        d=oss.qualcomm.com; s=google; t=1773128031; x=1773732831; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6jGZMz8cc7oYRoVY8qQfu8RJQuvfF597ul+4q7rukKg=;
+        b=bcAl6O5yLkGsL8Pk0RUBWyqxjtXa42isSmGb85Nc4p/mvgzi+SFXMpwbccDyqz+dLk
+         4EnjGKamV3M1kLvD9S34X75je9lQhHi1/WtH8ilHbDymvsyi+VlsGAJfB1luJEzAUAO2
+         CrR7dFB+SgkVwf71ohrEG55SPj73EUAR/kr9n+QRT4nY05oLVjvSKqqOsZo8aYb/Uiof
+         m1R/gjhC28DY2lek+ipXZoGcDxPFXbpjDu3uZVAGYTwAoVMOUK7VLcpWZ0JptiMjv94V
+         NZIfGZbQtVQR9K7tyXqCjGpsSXN2EuJuHaBi+Oc09BcVHUYfm5zb2YsY7XgOE9i8G4VQ
+         fB3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773127716; x=1773732516;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T5b7x3iexx3oDwiXrtY9eVbEYVTCyP5aQdngDqmKFek=;
-        b=bdB/N5GI5BQ2WXbXJwIx15P6iZUTsBiS/r3uxWfGj4jbTsuCBetGuczVTu85PmnBeo
-         mcYONTkOTZYVJacaFlo+QySbQwBF3aQk3gEtg6d8aZA19Jaj3uWmDK8Z+N94n8LZ1068
-         MGIE/L2NfB1UkVc7O7Ks6Rq7zba5T8Y2DzOKLqgtgXPj64vV5XzOjTlddgO5CPruuJ5T
-         TqaYrKo4gne82FvmozkugXSAsUI7yUroCqg94Af7dqSstGsXvbalfWp2oRl/5DpgLkxl
-         WyW67lwWT4jw+SAfcKaewlum4hIkQnslH4Qc5kOqKfiNOqOw85K5ULEZoyIIeHPFJ+Yc
-         Cbpw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4s0nOW21xxQAkOWOFkBJPjCtKmv2AcX+IppVHBgABNSSCU5KsJuRFmXdEYADQkuCwxvltn7s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIO9oAiytQqBiQdBGQ3cBRFrKRKXPgcdrRiAerBBN/NC0iWE+3
-	1SQTChKBttQKRZ5VcF4Z5fi8CecCvOZENsRQ+tBUbRW6A/hu8FiaXFey
-X-Gm-Gg: ATEYQzwleXk6R88kCGHj/zbrjnsm/Di9n/r48udmEPp/19Z6WWY6ETqC1T72T59FlAU
-	q5TIzyO1qElpr5bSeElG+OdJi7olfPO7i6evLSr31lsv7QyXdKJk0f1YZaYh7pd5uj45K0z9vdg
-	vq1YvpoMXZhce+SMuR9d8Jk7XICQSLZ7Nnz28kgxTn5ZXDsum1Rp2pBaazZzhOaBdRX4DwhWdij
-	PEwP5gdiUJ5+9Gav3agq60zarza91aRlPSAZqvnh7rSTYhmkYmN34VekmD3fAcKnYWuOLbIpNU/
-	ZtkaOSc0Ji2dECSDI6Giq2Sx/rgZFUmPFxnvVqTU+4gDnjPydEpTSb3Np9zsnNEFTbkPSyPFHBc
-	HfE/nDMQJU5f39pqFNJLrR9EU13bEP5TUL1/LWD32x2npkRDYWipuiyj/RFD/LlzP6+GWwRhKqJ
-	gvknXNWHSJ8TOKlf4vxWKo480ne56yyawdIxwK1i3H7dcoFMXT7dF0T7H2bYM+Yl8FOSRybWVaf
-	xZDBDLzjzU=
-X-Received: by 2002:a17:902:e5c6:b0:2ae:7f84:79e3 with SMTP id d9443c01a7336-2ae823840ebmr144117205ad.16.1773127715773;
-        Tue, 10 Mar 2026 00:28:35 -0700 (PDT)
-Received: from saza-a1.tail796f7.ts.net ([2001:ce8:130:e043:5f48:7c12:1017:bc82])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f8baa3sm151371455ad.65.2026.03.10.00.28.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 00:28:35 -0700 (PDT)
-From: Soichiro Ueda <the.latticeheart@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Cc: Soichiro Ueda <the.latticeheart@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Miao Wang <shankerwangmiao@gmail.com>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v3] selftests: af_unix: validate SO_PEEK_OFF advancement and reset
-Date: Tue, 10 Mar 2026 16:28:31 +0900
-Message-ID: <20260310072832.127848-1-the.latticeheart@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20230601; t=1773128031; x=1773732831;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6jGZMz8cc7oYRoVY8qQfu8RJQuvfF597ul+4q7rukKg=;
+        b=rz0mh5AK+nHQaZgKXmKnlfW6v5FDeJxtEh9oInAT864MBQqs+6guPfezkAKQyAsg/W
+         p2HNZUjQZ/PctYcqobtdxOY5XhlRnMTQQ8cEchx8FsY0USQL4D/D9gepYjSGiqzejSNX
+         oSs7ClidjiLz+YsdP5jeF6TEqyvbV4RJRMTzfsDjZktGBZDpVMdw9fS2Kx/qawlEOoRr
+         Z18ETqMDfi4byogx3S5SLTwmZC0juPt4NAMjL/XcuLWkqDRVLl+g6ujeSpJgMeal+EGb
+         WN5jDZLeEKE905jwAYpxY2RyOsVlqK5U1LOTqeGqvwUCYf5XLfIqky71ryPZAt6/wGWP
+         G7jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUW/7wTtQLLiUyLqYxJ0kOJMZvFAEWYREZGBLRfJ4q79Hb3EYk3C6oncxMqv9Dsh8TvxVGmKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznLmfqsnPMcIxHGCSib1rZMhAViO1/dftOP8CE3K8UcKxr770F
+	qmta4nqai0M5aFoAD153SqFr68krWS6uVnZmPMbUpyIFAJy/E6kTAB8BaUyWPCJaFYlCfq1MjEp
+	8UYMT0f8qx57g+8OqoIBaARCsOI4aoD/1rSlLbUps5bIfwUzKO/a+pXKLtiI=
+X-Gm-Gg: ATEYQzwO8pVVtnpeaEJydpHIm2s16++7Isv+Mq0BllQzMCZvqE9IZefxqg+cGOi4j/n
+	skibA6rTwtEl/h+z2TgMu+R67Huj/UOSF07jnIlKeBmL5VzqV81PFEe3w/L1pJ7lXDAP9gf8cdL
+	UzHQw91CKVzRy1hpYHO9bTrNNKPeRl7RDOl0GZQj0Vu+GcAXXdws1xobXoxeBjiKo/H8FPnWitX
+	nLzsQsGJLZX/riRmJf972US5VNycHjnicOO2y3ozCfir2xdoJ4ExnDRBrMx/hW81/fJXDvB9wH9
+	4dAwBQuXxARU4V6II2tybEWgolKVZ/UTXgErsZnZjY9dgxTUIUt7K5m+nGaD9l+PQAWl2fZGO2Y
+	05OrK71wygevNHwScmpSh8LPNxjdo6DFkR1fPWJFXXhLPO96vmoTYAKY=
+X-Received: by 2002:a05:6808:1189:b0:450:275b:d942 with SMTP id 5614622812f47-466dca7e59fmr7695400b6e.10.1773128031276;
+        Tue, 10 Mar 2026 00:33:51 -0700 (PDT)
+X-Received: by 2002:a05:6808:1189:b0:450:275b:d942 with SMTP id 5614622812f47-466dca7e59fmr7695383b6e.10.1773128030815;
+        Tue, 10 Mar 2026 00:33:50 -0700 (PDT)
+Received: from [192.168.86.165] ([76.176.48.107])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d755603798sm2041412a34.29.2026.03.10.00.33.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Mar 2026 00:33:50 -0700 (PDT)
+Message-ID: <e0532de0-40a6-42b9-8936-933c31251d5e@oss.qualcomm.com>
+Date: Tue, 10 Mar 2026 00:33:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C0C9F246538
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/14] firmware: qcom: Add a generic PAS service
+To: Sumit Garg <sumit.garg@kernel.org>,
+        Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+        dikshita.agarwal@oss.qualcomm.com, bod@kernel.org, mchehab@kernel.org,
+        elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jjohnson@kernel.org, mathieu.poirier@linaro.org,
+        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+        vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260306105027.290375-1-sumit.garg@kernel.org>
+ <20260306105027.290375-3-sumit.garg@kernel.org>
+ <e0a86461-c136-4371-99cf-c0b0d31443a3@oss.qualcomm.com>
+ <13091f47-938d-43fb-a8c0-4b081818b557@oss.qualcomm.com>
+ <aa5qdscMRq7abfwT@sumit-xelite>
+Content-Language: en-US
+From: Trilok Soni <trilokkumar.soni@oss.qualcomm.com>
+In-Reply-To: <aa5qdscMRq7abfwT@sumit-xelite>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEwMDA2MiBTYWx0ZWRfXzVGDWj5NJXUT
+ YhpZeyPbjo8pTkNJE0M/4rGYHfHUXIPxAxBz7kSWWvtMqMeStdfdZFrnmYrYxpKOq7q7t7izewz
+ 45RkeMm8EcdJF5SURKeFrdInnDBO0jXRqU36Y6iWAtop+qxxG4w7uxJcuUU05j6cv4LRO6Wnlc/
+ 3dl5R6eu7RIeOUfyiDbi1kP+zb1itpbd/0nrGYp/h6eorV7AeQeb0OQPWFEv0DCpUPRBB9EXqeX
+ t6LyULFmyl831mwJ8Evurp5FydVzk9SB2+u8jDH4/Cv1iDKXN5BO0KV3gETkvh/kvAURyvJ87C3
+ 9orYcLLtgx0eIot36bK8bcSr9IxlaFaZ94R6Ir+8kHMR31HJx+/28K5Jf9ASYoeL+zMqep+eJ7O
+ UC4EL4RIxSLxusT5fCC91bcQZO0OO79NvVpVL22IooW6JLa0pPkjt8O57uJhlvDh/uWSMn9hz7d
+ TX+JMpDDUnTySOEeLew==
+X-Proofpoint-ORIG-GUID: zMsnLbjudrLyfFCJmdMNKxedrvBWdjqE
+X-Proofpoint-GUID: zMsnLbjudrLyfFCJmdMNKxedrvBWdjqE
+X-Authority-Analysis: v=2.4 cv=b+W/I9Gx c=1 sm=1 tr=0 ts=69afc95f cx=c_pps
+ a=yymyAM/LQ7lj/HqAiIiKTw==:117 a=lsoD3MMNObdLvy1227ExmA==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=zqicFvc7-s5f9fRnGKsA:9 a=QEXdDO2ut3YA:10
+ a=efpaJB4zofY2dbm2aIRb:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-10_01,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603100062
+X-Rspamd-Queue-Id: 516E1246801
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265901-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	TAGGED_FROM(0.00)[bounces-265902-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim,qualcomm.com:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thelatticeheart@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[trilokkumar.soni@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Extend the so_peek_off selftest to ensure the socket peek offset is handled
-correctly after both MSG_PEEK and actual data consumption.
+On 3/8/2026 11:36 PM, Sumit Garg wrote:
+> On Fri, Mar 06, 2026 at 02:00:48PM -0800, Jeff Johnson wrote:
+>> On 3/6/2026 11:47 AM, Trilok Soni wrote:
+>>> On 3/6/2026 2:50 AM, Sumit Garg wrote:
+>>>> +MODULE_LICENSE("GPL");
+>>>> +MODULE_AUTHOR("Sumit Garg <sumit.garg@oss.qualcomm.com>");
+>>>
+>>> What is the convention for Qualcomm authored drivers? In some drivers
+>>> I find that Qualcomm doesn't add MODULE_AUTHOR. Can Qualcomm community
+>>> clarify it here. I prefer consistency here for the Qualcomm submissions. 
+>>
+>> WLAN team was told to not have MODULE_AUTHOR(), so ath10k was the last WLAN
+>> driver that had a MODULE_AUTHOR() -- ath11k and ath12k do not have one.
+> 
+> As I said in my other reply, it is quite subsystem specific.
+> 
+>>
+>> And in reality it is very rare for a given module, over time, to only have a
+>> single author. The git history contains the real authorship. So just for that
+>> reason I'd drop it.
+> 
+> Sure, but you would like the driver author to be involved in future
+> maintenence of the driver. In my experience that's how usually the kernel
+> development process works. If a separate maintainer's entry is fine then I
+> can switch to that instead.
 
-Verify that the peek offset advances by the same amount as the number of
-bytes read when performing a read with MSG_PEEK.
+I would prefer the maintainers entry than MODULE_AUTHOR.
 
-After exercising SO_PEEK_OFF via MSG_PEEK, drain the receive queue with a
-non-peek recv() and verify that it can receive all the content in the
-buffer and SO_PEEK_OFF returns back to 0.
-
-The verification after actual data consumption was suggested by Miao Wang
-when the original so_peek_off selftest was introduced.
-
-Link: https://lore.kernel.org/all/7B657CC7-B5CA-46D2-8A4B-8AB5FB83C6DA@gmail.com/
-Suggested-by: Miao Wang <shankerwangmiao@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Soichiro Ueda <the.latticeheart@gmail.com>
----
-v2 -> v3:
-- Reorder variables in peekoffeq() to follow reverse xmas tree style
-- Fix formatting by adding a missing tab
-v1 -> v2:
-- Add peekoffeq checks after MSG_PEEK to verify offset advancement
-- Unify the length in the non-peek read
-
-v2: https://lore.kernel.org/netdev/20260305070525.184945-1-the.latticeheart@gmail.com/
-v1: https://lore.kernel.org/netdev/20260122033605.148626-1-the.latticeheart@gmail.com/
-
- .../selftests/net/af_unix/so_peek_off.c       | 46 +++++++++++++++++++
- 1 file changed, 46 insertions(+)
-
-diff --git a/tools/testing/selftests/net/af_unix/so_peek_off.c b/tools/testing/selftests/net/af_unix/so_peek_off.c
-index 86e7b0fb522d..f6466a717f49 100644
---- a/tools/testing/selftests/net/af_unix/so_peek_off.c
-+++ b/tools/testing/selftests/net/af_unix/so_peek_off.c
-@@ -76,6 +76,19 @@ FIXTURE_TEARDOWN(so_peek_off)
- 		ASSERT_STREQ(str, buf);				\
- 	} while (0)
- 
-+#define peekoffeq(fd, expected)					\
-+	do {							\
-+		socklen_t optlen = sizeof(int);			\
-+		int off = -1;					\
-+		int ret;					\
-+								\
-+		ret = getsockopt(fd, SOL_SOCKET, SO_PEEK_OFF,	\
-+				 &off, &optlen);		\
-+		ASSERT_EQ(0, ret);				\
-+		ASSERT_EQ((socklen_t)sizeof(off), optlen);	\
-+		ASSERT_EQ(expected, off);			\
-+	} while (0)
-+
- #define async							\
- 	for (pid_t pid = (pid = fork(),				\
- 			  pid < 0 ?				\
-@@ -91,7 +104,12 @@ TEST_F(so_peek_off, single_chunk)
- 	sendeq(self->fd[0], "aaaabbbb", 0);
- 
- 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
-+	peekoffeq(self->fd[1], 4);
- 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
-+	peekoffeq(self->fd[1], 8);
-+
-+	recveq(self->fd[1], "aaaabbbb", 8, 0);
-+	peekoffeq(self->fd[1], 0);
- }
- 
- TEST_F(so_peek_off, two_chunks)
-@@ -100,7 +118,13 @@ TEST_F(so_peek_off, two_chunks)
- 	sendeq(self->fd[0], "bbbb", 0);
- 
- 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
-+	peekoffeq(self->fd[1], 4);
- 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
-+	peekoffeq(self->fd[1], 8);
-+
-+	recveq(self->fd[1], "aaaa", 4, 0);
-+	recveq(self->fd[1], "bbbb", 4, 0);
-+	peekoffeq(self->fd[1], 0);
- }
- 
- TEST_F(so_peek_off, two_chunks_blocking)
-@@ -111,6 +135,7 @@ TEST_F(so_peek_off, two_chunks_blocking)
- 	}
- 
- 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
-+	peekoffeq(self->fd[1], 4);
- 
- 	async {
- 		usleep(1000);
-@@ -119,24 +144,38 @@ TEST_F(so_peek_off, two_chunks_blocking)
- 
- 	/* goto again; -> goto redo; in unix_stream_read_generic(). */
- 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
-+	peekoffeq(self->fd[1], 8);
-+
-+	recveq(self->fd[1], "aaaa", 4, 0);
-+	recveq(self->fd[1], "bbbb", 4, 0);
-+	peekoffeq(self->fd[1], 0);
- }
- 
- TEST_F(so_peek_off, two_chunks_overlap)
- {
- 	sendeq(self->fd[0], "aaaa", 0);
- 	recveq(self->fd[1], "aa", 2, MSG_PEEK);
-+	peekoffeq(self->fd[1], 2);
- 
- 	sendeq(self->fd[0], "bbbb", 0);
- 
- 	if (variant->type == SOCK_STREAM) {
- 		/* SOCK_STREAM tries to fill the buffer. */
- 		recveq(self->fd[1], "aabb", 4, MSG_PEEK);
-+		peekoffeq(self->fd[1], 6);
- 		recveq(self->fd[1], "bb", 100, MSG_PEEK);
-+		peekoffeq(self->fd[1], 8);
- 	} else {
- 		/* SOCK_DGRAM and SOCK_SEQPACKET returns at the skb boundary. */
- 		recveq(self->fd[1], "aa", 100, MSG_PEEK);
-+		peekoffeq(self->fd[1], 4);
- 		recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
-+		peekoffeq(self->fd[1], 8);
- 	}
-+
-+	recveq(self->fd[1], "aaaa", 4, 0);
-+	recveq(self->fd[1], "bbbb", 4, 0);
-+	peekoffeq(self->fd[1], 0);
- }
- 
- TEST_F(so_peek_off, two_chunks_overlap_blocking)
-@@ -147,6 +186,7 @@ TEST_F(so_peek_off, two_chunks_overlap_blocking)
- 	}
- 
- 	recveq(self->fd[1], "aa", 2, MSG_PEEK);
-+	peekoffeq(self->fd[1], 2);
- 
- 	async {
- 		usleep(1000);
-@@ -155,8 +195,14 @@ TEST_F(so_peek_off, two_chunks_overlap_blocking)
- 
- 	/* Even SOCK_STREAM does not wait if at least one byte is read. */
- 	recveq(self->fd[1], "aa", 100, MSG_PEEK);
-+	peekoffeq(self->fd[1], 4);
- 
- 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
-+	peekoffeq(self->fd[1], 8);
-+
-+	recveq(self->fd[1], "aaaa", 4, 0);
-+	recveq(self->fd[1], "bbbb", 4, 0);
-+	peekoffeq(self->fd[1], 0);
- }
- 
- TEST_HARNESS_MAIN
--- 
-2.53.0
-
+---Trilok Soni
 
