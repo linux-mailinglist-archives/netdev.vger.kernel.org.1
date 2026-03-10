@@ -1,196 +1,242 @@
-Return-Path: <netdev+bounces-266195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEjkHT07sGmDhQIAu9opvQ
-	(envelope-from <netdev+bounces-266195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:39:41 +0100
+	id uNxQGmE7sGmohQIAu9opvQ
+	(envelope-from <netdev+bounces-266196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:40:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2B0253BFF
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:39:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D20DB253C3A
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E56303127861
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:50:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF4C031593C8
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3F22E5B09;
-	Tue, 10 Mar 2026 14:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD69F2FD68B;
+	Tue, 10 Mar 2026 14:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b="kFimgvjb"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XO961wR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.cybernetics.com (mail.cybernetics.com [72.215.153.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E9C2C1593
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.215.153.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059972FD1B3
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773154199; cv=none; b=A8E+Q0grllQTRySgoif94z5Cvt8uecKq1yqRfdOCuQ4HIm/EeUBTKObWLJfYncngq65s5IXeGUXSEthdPzpxiGHFA/Vyme9t9HQHn5sSVMeRbxGNlHqRlaXWHV7mPTT+dB3HuLx3TnBUtnoUkuy6xqs96Tks+Zb4NJaLatecuNQ=
+	t=1773154230; cv=none; b=pMaq1Rl/q0NxCu11kDWIvZEDp2hx6u//sX0bIt+dSdeNZquEUx50lfgldkSyFNP/3g5LkvG/FodZ3S6YmW90NIbbUHlEEEbRWsAl8hB/2vfkBg5ARlkhNizEasD/rRP5XmTbDc2RPR6nw3/akpLOxzGjn+bWeAMkn80BOZyrbMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773154199; c=relaxed/simple;
-	bh=13jB3skXnb5EoZzjoQzU/fhx4l/QhJ5tkm1Lflfm9fU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rrpKPeLy3h8k2s8WKkFQNtUSjBxZbtrBpbf++7LbxifQllpYLlj/VJYjfqMJrfx0YKlZJlRukow/XxF4H2z7WGpgY+EMjBV7V0gt8IzfSg86FAlI8KcLo2kjjdnrkPJcVSsjrb2vlmXgAgNwII//fDSASp7k0CouEpxANZwjw/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com; spf=pass smtp.mailfrom=cybernetics.com; dkim=pass (1024-bit key) header.d=cybernetics.com header.i=@cybernetics.com header.b=kFimgvjb; arc=none smtp.client-ip=72.215.153.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cybernetics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cybernetics.com
-Received: from cybernetics.com ([10.10.4.126]) by mail.cybernetics.com with ESMTP id AAjhizxPZdQdYoiz; Tue, 10 Mar 2026 10:49:55 -0400 (EDT)
-X-Barracuda-Envelope-From: tonyb@cybernetics.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.10.4.126
-X-ASG-Whitelist: Client
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cybernetics.com; s=mail;
-	bh=JkzEqSuC74Jdlgasu8EnJvmuHduzqhrT8S9uzS665EM=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:Cc:To:From:
-	Content-Language:Subject:MIME-Version:Date:Message-ID; b=kFimgvjb5hURiTvL2/9p
-	Rz1VN9lA2KzKkE1uKCxQ7JAFUVaZ2gQZPCmgBxH9DolyOA6CqwSD0r3sdnaCw8U+7JUjhfWDUJJ/4
-	hcZcukosyKaVwUA2Mnw2laMrt6COMmUuOpOH6Ew4MyenGjyMEeaBLK7T7eu6IdZJWRM6vX2UY4=
-Received: from [10.157.2.224] (HELO [192.168.200.1])
-  by cybernetics.com (CommuniGate SPEC SMTP 8.0.5)
-  with ESMTPS id 14452593; Tue, 10 Mar 2026 10:49:55 -0400
-Message-ID: <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.157.2.224
-Date: Tue, 10 Mar 2026 10:49:55 -0400
+	s=arc-20240116; t=1773154230; c=relaxed/simple;
+	bh=RoPYtFUG8FwZ4uLlgZzU1Yw3hWCPaK6Lfvnz4wxHiWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TUGake6Yhlb3d6SKfl7JtHqz4DBEtruupIJR9A9hppQT1IdDMQd+MJS17qkNHdsJd/GWZHAJzqRWvua83CjuAWnxdWqBmoczXPwMgbyjlKU5iGqEap5KXxKVmrdSi8KaNObhFVDKbohaeyUDUSSUh/uVM/lFFqaBcOBVRhuvfu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XO961wR4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso29857865e9.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:50:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1773154227; x=1773759027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/Et0VSyNULS/JjvHfrNtw0ZuSWVxV8DQ1TiD9WHcMY=;
+        b=XO961wR4k1ZLRehjjvWHqiLOP5YG6LWCZ909noZwnHQjmHblkycMBcFNPgvNltiZES
+         OwY8PfraYh/0trYoGptOdaXihAVBTfAa1qhceaCpL8nRVSyxAMvecPgUfoSCidDZcNd0
+         DYg9tTLL/uwbq0OZNfwtE2atu1h9hDs0iR2aRKxWpGeNozfbpyjFUxQczk0zM+1SOTvy
+         hTdrr/Lh6FkFUQ4BW8JO14kzqwHOJYtG5VgQt1BbrhKTPAW+dKK7rtjhj2H0qK5dugvy
+         lpoEkZKsd8Dvbtw1rApRUSr3t0ALqRwwKRPx36KenZoY9KAHaJ+yAtFzCQ6BXUvS0sd2
+         FEEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773154227; x=1773759027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g/Et0VSyNULS/JjvHfrNtw0ZuSWVxV8DQ1TiD9WHcMY=;
+        b=ODQKPhE+Z3GJLBx3Ywn0ObfKqYj0Uf6YYZbpsWrEzTFAFGyN0ahTgv8QPnOrC4C512
+         pTt7RNJQaLPVlauozgbJ8qFvh1ChovWyD4wp+TH0gX3GisV+FbbA9v+xPboNWb5hCqES
+         maLv7DHIr6ix8ghXIIJtjEGAgVXR3CGUfhe0jNiq39Ogu3R2SVmNNvIzhcte8QTlwcQA
+         5xRYEvhfbg+BIvpzkd98hrnnrfUQsCALaDSybFRnddXZKuwp8t5d7hamv00C7nQNVLPI
+         zre1Sk7MkoOsMEVzWZISqHC3waWZoaNgg6khcvvg94EPTUNWUvQB14jvnVZfAoWbx2gN
+         YWNQ==
+X-Gm-Message-State: AOJu0Yxp+zdgjCb6Fn86kKD+ImQfIl/Mjsnm6ia51KJNy8ud6Fp941HW
+	JDdlT1uy5AmwoTy1LGEI8Dfj1bT3jF6UPwsikXvcLvHydgawalrR7gOgWmRqCaiwEoG75EIfKlS
+	l6C1DVAB7hqXCQb8HIM2IwJBmozMyuo4y0UCXuzoJcYJ/+gDSkAMyp6b0LTPYZLpj
+X-Gm-Gg: ATEYQzxVQ9mn4djcmvoV+WC4xlxqpfGBK54yFEz0j1vzVtMJD7zd6H0it0dkGcpibL9
+	+pCr2sOkXmzXxIt5qg1UOskO8M8HE7qTvBJf3t57NkmiREMxfrStW/2RYfB1ZAflKu1wbzmc6sv
+	aSFExg9RYx57xmgSErZ29Q8KQQvOg/dbhFR3FHM4E/Nive+wOoYylhoA+KV8vDpsitLl0e1JWV3
+	qD5lR6PPSqy3rdD2XQqXIdABeLw7JV35rbtWs+BmJ4G1PpRmHxNadr6dinojJ7JFJ7zhINjeUlQ
+	GDxKpN7axa2jfAdQGKT9gu6fAPQ37rZMEP8jkqh0JZB9brEIbCvYpCsKqNEuGZr+v9vqKkz7QjG
+	Py+LoV0v9L17IZZrdlRHSDar9shAJ30JFUCyYLvdQDwMFQSJijbebKG4ZLUS6jTNpJCfqFCaxjH
+	rE2HolIha8eBhQ9tk+LZ1E4y8XiS6s9PLBVsA4zWFRBhdSIRE=
+X-Received: by 2002:a05:600c:4e91:b0:485:439b:683f with SMTP id 5b1f17b1804b1-485439b6923mr42931305e9.20.1773154226713;
+        Tue, 10 Mar 2026 07:50:26 -0700 (PDT)
+Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:5594:94ef:1bd6:89e8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dad8d968sm35586700f8f.6.2026.03.10.07.50.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 07:50:25 -0700 (PDT)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: netdev@vger.kernel.org
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: [PATCH net-next 0/9] pull request: ovpn 2026-03-10
+Date: Tue, 10 Mar 2026 15:49:57 +0100
+Message-ID: <20260310145006.30858-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Long delay in freeing skbs
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: Long delay in freeing skbs
-From: Tony Battersby <tonyb@cybernetics.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, eric.dumazet@gmail.com,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>
-References: <20251106202935.1776179-1-edumazet@google.com>
- <20251106202935.1776179-3-edumazet@google.com>
- <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com>
- <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
- <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com>
- <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
- <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com>
-In-Reply-To: <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Barracuda-Connect: UNKNOWN[10.10.4.126]
-X-Barracuda-Start-Time: 1773154195
-X-Barracuda-URL: https://10.10.4.122:443/cgi-mod/mark.cgi
-X-Barracuda-BRTS-Status: 1
-X-Virus-Scanned: by bsmtpd at cybernetics.com
-X-Barracuda-Scan-Msg-Size: 3219
-X-ASG-Debug-ID: 1773154195-1cf43940a6c7700001-BZBGGp
-X-Rspamd-Queue-Id: BE2B0253BFF
+X-Rspamd-Queue-Id: D20DB253C3A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cybernetics.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[cybernetics.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[cybernetics.com:+];
-	TAGGED_FROM(0.00)[bounces-266195-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266196-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tonyb@cybernetics.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[openvpn.net:dkim,openvpn.net:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/9/26 17:47, Tony Battersby wrote:
-> On 3/9/26 17:24, Eric Dumazet wrote:
->> On Mon, Mar 9, 2026 at 10:18 PM Tony Battersby <tonyb@cybernetics.com> wrote:
->>> On 3/9/26 17:07, Eric Dumazet wrote:
->>>> On Mon, Mar 9, 2026 at 10:00 PM Tony Battersby <tonyb@cybernetics.com> wrote:
->>>>> I have some out-of-tree code that was broken by commit e20dfbad8aab
->>>>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
->>>>> retested with 7.0-rc3 with the same results.  I'm not sure if the change
->>>>> in behavior that I am seeing is expected or if it is a bug, so I thought
->>>>> I would ask.  Omitting irrelevant details, my kernel code does the
->>>>> following:
->>>>>
->>>>> 1) allocate a buffer
->>>>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
->>>>> 3) wait for the I/O to complete
->>>>> 4) wait for the buffer page refcounts to drop back to their values for
->>>>> idle I/O
->>>>> 5) reuse the buffer for more I/O
->>>>>
->>>>> Step 4 is necessary in this case due to some of those irrelevant details
->>>>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
->>>>> seems to keep the page refcounts elevated long after the I/O has
->>>>> completed (hours or longer), presumably because the deferred skb free
->>>>> isn't happening for a long time.  So:
->>>>>
->>>>> 1) Is this long delay expected, or is this a bug?
->>>>>
->>>>> 2) If the delay is expected, is there a way for me to force the network
->>>>> system to process the deferred skb frees on request?  e.g. write to a
->>>>> file in /sys, or call a kernel function to flush the deferred frees?
->>>>>
->>>>> Worst case is that I can redesign my code to kfree() the buffer if it is
->>>>> busy and allocate a new one, and let the old buffer be freed
->>>>> asynchronously when the skb is freed at some indeterminate time in the
->>>>> future.
->>>>>
->>>>> Thanks,
->>>>> Tony Battersby
->>>> If you are using zero copy, please look at:
->>>>
->>>> Maybe you should make sure your code is compatible with it.
->>>>
->>>> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
->>>> Author: Eric Dumazet <edumazet@google.com>
->>>> Date:   Mon Feb 16 19:36:53 2026 +0000
->>>>
->>>>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
->>>>
->>>>     After the blamed commit, TCP tx zero copy notifications could be
->>>>     arbitrarily delayed and cause regressions in applications waiting
->>>>     for them.
->>>>
->>> The I/O is being sent by a userspace program via the SCSI generic driver
->>> (drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't see
->>> any mention of zero copy in iscsi_tcp.c.
->> Set /proc/sys/net/core/skb_defer_max to 0 ?
-> Thanks; I should have grepped the docs harder.
->
-> That seems to work if I do it before sending the I/O but not after the
-> I/O has completed.  So I presume it would decrease performance?
->
-> Tony
->
-I found a workable solution.  When my code finds an elevated page
-refcount, it does the following:
+Hello netdev team!
 
-for_each_online_cpu(cpu) {
-	kick_defer_list_purge(cpu);
-}
+This is another resend of the previous PR.
+We have addressed all raised concerns.
 
-And that seems to take care of it, and it pushes the extra overhead to
-the slow path.
 
-Thanks for your help!
+The batch includes the following changes:
+* use correct constant when declaring nlattr array in ovpn_nl_key_swap_doit
+* use bitops.h API when possible
+* send netlink notification in case of client float event
+* implement support for asymmetric peer IDs
+* consolidate memory allocations during crypto operations
+* add netlink notification check in selftests
+* add asymmetric peer IDs check in selftest
+* add FW mark check in selftest
 
-Tony Battersby
 
+Please pull or let me know of any issue!
+
+Thanks a lot.
+Antonio,
+
+The following changes since commit 52ede1bce557c66309f41ac29dd190be23ca9129:
+
+  Merge branch 'net-stmmac-further-ptp-cleanups' (2026-03-09 19:45:31 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/OpenVPN/ovpn-net-next.git tags/ovpn-net-next-20260310
+
+for you to fetch changes up to a8c63d0394d4fb73e0104a3557111ba24772a178:
+
+  ovpn: consolidate crypto allocations in one chunk (2026-03-10 15:19:05 +0100)
+
+----------------------------------------------------------------
+Included features:
+* use bitops.h API when possible
+* send netlink notification in case of client float event
+* implement support for asymmetric peer IDs
+* consolidate memory allocations during crypto operations
+* add netlink notification check in selftests
+* add FW mark check in selftest
+
+----------------------------------------------------------------
+Antonio Quartulli (1):
+      selftests: ovpn: allow compiling ovpn-cli.c with mbedtls3
+
+Qingfang Deng (1):
+      ovpn: pktid: use bitops.h API
+
+Ralf Lici (6):
+      ovpn: notify userspace on client float event
+      selftests: ovpn: add notification parsing and matching
+      ovpn: add support for asymmetric peer IDs
+      selftests: ovpn: check asymmetric peer-id
+      selftests: ovpn: add test for the FW mark feature
+      ovpn: consolidate crypto allocations in one chunk
+
+Sabrina Dubroca (1):
+      ovpn: use correct array size to parse nested attributes in ovpn_nl_key_swap_doit
+
+ Documentation/netlink/specs/ovpn.yaml              |  23 ++-
+ drivers/net/ovpn/crypto_aead.c                     | 162 ++++++++++++++++-----
+ drivers/net/ovpn/io.c                              |   8 +-
+ drivers/net/ovpn/netlink-gen.c                     |  13 +-
+ drivers/net/ovpn/netlink-gen.h                     |   6 +-
+ drivers/net/ovpn/netlink.c                         |  98 ++++++++++++-
+ drivers/net/ovpn/netlink.h                         |   2 +
+ drivers/net/ovpn/peer.c                            |   6 +
+ drivers/net/ovpn/peer.h                            |   4 +-
+ drivers/net/ovpn/pktid.c                           |  11 +-
+ drivers/net/ovpn/pktid.h                           |   2 +-
+ drivers/net/ovpn/skb.h                             |  13 +-
+ include/uapi/linux/ovpn.h                          |   2 +
+ tools/testing/selftests/net/ovpn/Makefile          |  26 +++-
+ tools/testing/selftests/net/ovpn/common.sh         |  72 +++++++--
+ tools/testing/selftests/net/ovpn/data64.key        |   6 +-
+ .../selftests/net/ovpn/json/peer0-float.json       |   9 ++
+ tools/testing/selftests/net/ovpn/json/peer0.json   |   6 +
+ .../selftests/net/ovpn/json/peer1-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer1.json   |   1 +
+ .../selftests/net/ovpn/json/peer2-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer2.json   |   1 +
+ .../selftests/net/ovpn/json/peer3-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer3.json   |   1 +
+ .../selftests/net/ovpn/json/peer4-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer4.json   |   1 +
+ .../selftests/net/ovpn/json/peer5-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer5.json   |   1 +
+ .../selftests/net/ovpn/json/peer6-float.json       |   1 +
+ tools/testing/selftests/net/ovpn/json/peer6.json   |   1 +
+ tools/testing/selftests/net/ovpn/ovpn-cli.c        |  92 ++++++++----
+ tools/testing/selftests/net/ovpn/tcp_peers.txt     |  11 +-
+ .../selftests/net/ovpn/test-close-socket.sh        |   2 +-
+ tools/testing/selftests/net/ovpn/test-mark.sh      |  95 ++++++++++++
+ tools/testing/selftests/net/ovpn/test.sh           |  66 +++++++--
+ tools/testing/selftests/net/ovpn/udp_peers.txt     |  12 +-
+ 36 files changed, 619 insertions(+), 140 deletions(-)
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer0-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer0.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer1-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer1.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer2-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer2.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer3-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer3.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer4-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer4.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer5-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer5.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer6-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer6.json
+ create mode 100755 tools/testing/selftests/net/ovpn/test-mark.sh
 
