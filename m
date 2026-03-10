@@ -1,292 +1,635 @@
-Return-Path: <netdev+bounces-265957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEzeHs/ir2nkdAIAu9opvQ
-	(envelope-from <netdev+bounces-265957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:22:23 +0100
+	id MG4KAtDlr2nkdAIAu9opvQ
+	(envelope-from <netdev+bounces-265958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:35:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AD824844A
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:22:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F30724888D
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:35:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F09EB3044670
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:19:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38BBD30FEA2F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 09:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EE743D4F5;
-	Tue, 10 Mar 2026 09:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C9643CEFC;
+	Tue, 10 Mar 2026 09:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQfUidPK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZxAhU99"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C65043CEF0
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A4F2773D8
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 09:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773134343; cv=none; b=N23+3wWM8rF6gx2eTcPxM8+R+pzMNHIDNAnERI1aG9zCH2C0WTaZBDeeOXfw2XFXlU7LlTAzHpRjFK0kw+4ioYzEKS0NjOSbDWCgyJjFwGKjoxEFkForwIQYeO1bES7WsplT/8x3hbVmjKTXdwctvqODkIVR4rzPdvxJlZ57YwU=
+	t=1773134616; cv=none; b=VWBsqn/MubciYP+qcJuUC1a8U1twXAtD9aTFw90tBufyLkoFfGhKcKqaoqezUqZ//uMCL08c8HNDyEy+OMXizlO2B43/nFkEJNv1vvZGrgU317xdMqGeTrlShBbMFwhpsGRmX2iO8hrdeheQfHHK9SOC1gBDzLPpkUUCluf4vvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773134343; c=relaxed/simple;
-	bh=8aiS45woyLbPObmU1neW/MDCFCbBy8+g/pFz7YT9EuE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tv8F89PjE3GsfdVkLiuUPZpCxW9OwVMrXNJPR25OvBEmVBp4kxdnu0joZvK+2GtVDzy6YdCnTSBPY3auYKAUZsgvk/XGmPg3xrNCUXnjzmTJ42ayE3OdEXN+kCgbkBIpPIGq5M1jNsBiczx6v0aY0VGnrenLiMflGfQn1+S9tks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TQfUidPK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773134341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iirFqLObvN+6/ZXe/vgKHSudbfwueXERpHlMHRXe7vo=;
-	b=TQfUidPKaAHhp5PezcZ93EAkJKk/KFbX0IcjH/kd7/YNRHAtZOhEhMA0qi5BnZxNFywhiH
-	R9PsTR+VXtU7eoX9Ol92u9gxP2dV19QLxMHYhmhDRKgCrYg3BmzfJc/mPX1SufxQENcS/7
-	ay77TdAfnKiWlIDPiZKNinh9/cWttOQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-ljluigEEMzmIyrWzyiiH2w-1; Tue,
- 10 Mar 2026 05:18:58 -0400
-X-MC-Unique: ljluigEEMzmIyrWzyiiH2w-1
-X-Mimecast-MFC-AGG-ID: ljluigEEMzmIyrWzyiiH2w_1773134336
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8828C1956094;
-	Tue, 10 Mar 2026 09:18:55 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.133])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3C2B530001A2;
-	Tue, 10 Mar 2026 09:18:49 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: graf@amazon.com
-Cc: vishnu.dasa@broadcom.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	arnd@arndb.de,
+	s=arc-20240116; t=1773134616; c=relaxed/simple;
+	bh=9Lu0HmgDF35hGxT9hq+thGyIOo4Sm7cPPo2Z+Tlq5qU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qO9qghJxalrIWYtlb9DJ5Cg+DDVsINbyKkwVb/E5ecpNIz0lxOjYrTKrPe4g2bvr344hm0EDuZmxb2Q6pqgzNiJkvSXNEVXukx5kUkzOCDtmYFp92TIwYy24Ur6IXEeiZWvAQ019WikAgcwVCLAOx3t/QjZv2wHpFDbZMasEZaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZxAhU99; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48534237460so26214235e9.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 02:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773134613; x=1773739413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dzhQylHT8wAXRGQEQOTRq7KArHkRVW1ay5aU+w8Fb2I=;
+        b=YZxAhU99LnFlEqUiBYy6pvNXiN1VLP2zLipygdpIRYaWVw2HthlheaNsoprF/9mWYG
+         Zr/DMhlE/pTX0NlhDtBZUv5mnRQvBYXaUCfUmAeYJQl3BcVaSx5zT5Hn5KeOKIkdJj8x
+         XQn90F5LwgGHObtdX1gzU2rwWqDuKhfghZfIyzr3rbsdrPGY1XPXBHcNulJ6ET9wf5wY
+         0Q94nxEp7V3FRlg4AhXba0CWEck5OsRz8NMiKNSzeV2DlNkd3mdAuLAg+zB/1G6u5ote
+         /egIy6Ezn+7ZuKsfyJuTyWEsTV3BJ2sCjamUqi2zWU54gIcwbMq2HetNhkzCIiTjheAc
+         dl8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773134613; x=1773739413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dzhQylHT8wAXRGQEQOTRq7KArHkRVW1ay5aU+w8Fb2I=;
+        b=oB6POw1yf+x3Y00OHrd0yNo4rDKQ1ciQGFFsyk4DA02sAs5QjuqfT9kEd6+RG2th7u
+         IMhCBm/jaE6rzk94g4FuN24BLqn3O/tNd4PumIqDqda62AAJVzKFKFsK1gS4n8aeeXTi
+         7RtP6zHWKfgmXTG+1zpXypM/WAgsEL/M9DALdLaP/ROQiA4BiBrFOudt/pBiqrWYUnGq
+         OWiaT62yOs4kANxc0TM7GkA/tRJ86QJKV3oYnQ6iLZCztF84CZrH0HN61e/l3nw8BpB4
+         HbfZtw0cwpKMlkYVJy64FCNujCAibcFkIFn3u1emn/vSqTpOXv1egE4LUDtOh4213pcL
+         kQDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXGH6JLIggcgbW/BXg/UwmmzkgSpDKY30kLMTnOGQh7qRAJitW6moURxd504Vh9Fo9l01m9OT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKbKeIyLTlY7wi0ExZx0kvTS5NT1nRkaTzu3LxV/0SI2ZFUELY
+	8tSB3JJpJz1KyyQ0Zpv1+rndqLydZMIBEQXByf1q68kRH+ZsTKPP70/6
+X-Gm-Gg: ATEYQzw++Ny+7JgIhAqwbwHZw4VcjLfTuvnLQMMnnS5z+1wepvrdk7+AWv4V2VZ/NNP
+	f66LXXmbaSHxrAZ1AMr30o3VvsYjdBWk9oDsUyDsVy++DFUpRYESZfZZFTE/Agvu6QXHNCObAMM
+	1+rIW5sHQNpilMlak34vdhArkfGxMqo1ZFs0Oh3ChpoLgXpQjDKMpZLaDUKBFfoqJjAi2PBYrlm
+	NuRHoFelbGSSfxp1Y9uuEvyrswPdMTs/X5pG7gxPSqUDaAO4TZieoLsMchmCXCo4W/OyUY4G/DO
+	tAYN9ucMjNtbCrxDdUpXk9b9l1PynuI2NlGanj1sGMU+W8dfI0JmI6xbOnqoglxOtGajXYlTvwT
+	D9PL6eijIGsh9hLz6nKd9Nj0XLBG5gQTBDr/VWtylRJwIsbmVMrjq0R+Cl2zcEGvK+kbsNKFd/g
+	PyeDat5ySD+lmpoS2b/8ZuEzfM1x3ch9EkAMn75Is+FiydHVDI63+noRWSuUmVuQ==
+X-Received: by 2002:a05:600c:8209:b0:485:3aa1:a7f1 with SMTP id 5b1f17b1804b1-4853aa1a8a8mr112106455e9.7.1773134612933;
+        Tue, 10 Mar 2026 02:23:32 -0700 (PDT)
+Received: from fedora.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485419c2930sm105111875e9.0.2026.03.10.02.23.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 02:23:32 -0700 (PDT)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+X-Google-Original-From: Sagi Maimon <sagi.maimon@adtran.com>
+To: jonathan.lemon@gmail.com,
+	vadim.fedorenko@linux.dev,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	eperezma@redhat.com,
-	gregkh@linuxfoundation.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	corbet@lwn.net,
-	nh-open-source@amazon.com,
-	bryan-bt.tan@broadcom.com,
-	syzbot@syzkaller.appspotmail.com,
-	sgarzare@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v4] vsock: add G2H fallback for CIDs not owned by H2G transport
-Date: Tue, 10 Mar 2026 10:18:43 +0100
-Message-ID: <20260310091843.101237-1-pabeni@redhat.com>
-In-Reply-To: <20260304230027.59857-1-graf@amazon.com>
-References: <20260304230027.59857-1-graf@amazon.com>
+	Sagi Maimon <sagi.maimon@adtran.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH v3] ptp: ocp: Add support for Xilinx-based Adva TimeCard variant Add support for the Adva TimeCard model built on a Xilinx-based design. This patch enables detection and integration of the new hardware within the existing OCP timecard framework. The Xilinx variant relies on the shared driver infrastructure, requiring only small, targeted additions to accommodate its specific characteristics.
+Date: Tue, 10 Mar 2026 11:23:23 +0200
+Message-ID: <20260310092328.222061-1-sagi.maimon@adtran.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: F1AD824844A
+X-Rspamd-Queue-Id: 3F30724888D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	LONG_SUBJ(3.00)[401];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-265958-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265957-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maimonsagi@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,spinics.net:url,adtran.com:mid,adtran.com:email]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Signed-off-by: Sagi Maimon <sagi.maimon@adtran.com>
 ---
-vsock: add G2H fallback for CIDs not owned by H2G transport
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202603100054.UoKwTVMf-lkp@intel.com/
+---
+Addressed comments from Simon Horman and Vadim Fedorenko:
+ - https://www.spinics.net/lists/netdev/msg1160388.html
+ - https://www.spinics.net/lists/netdev/msg1160386.html
+Changes since v2:
+ - Fix W=1 build warnings reported by kernel test robot
+ - Define SMA op structures only after full type is visible
+Changes since v1:
+ - Removed duplicated Adva init functions
+ - Unified logic with variant‑specific data
+---
 
-This commit enables G2H transport fallback for CIDs not claimed by the
-H2G transport in environments like Nitro Enclaves. It adds a per-netns
-sysctl net.vsock.g2h_fallback (default 1) and a has_remote_cid callback
-for transports to declare CID ownership.
+ drivers/ptp/ptp_ocp.c | 365 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 337 insertions(+), 28 deletions(-)
 
-> The flag was introduced 6 years ago and I am still not aware of any tool
-
-This isn't a bug, but the timing is slightly inaccurate.
-VMADDR_FLAG_TO_HOST was introduced in commit caaf95e0f23f on 2020-12-14.
-As of March 2026, this is approximately 5 years and 3 months, not 6
-years.
-
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index 533d8e75f7bb..4e40063adab4 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -179,6 +179,15 @@ struct vsock_transport {
->  	/* Addressing. */
->  	u32 (*get_local_cid)(void);
->
-> +	/* Check if this transport serves a specific remote CID.
-> +	 * For H2G transports: return true if the CID belongs to a registered
-> +	 * guest. If not implemented, all CIDs > VMADDR_CID_HOST go to H2G.
-> +	 * For G2H transports: return true if the transport can reach arbitrary
-> +	 * CIDs via the hypervisor (i.e. supports the fallback overlay). VMCI
-> +	 * does not implement this as it only serves CIDs 0 and 2.
-> +	 */
-> +	bool (*has_remote_cid)(struct vsock_sock *vsk, u32 remote_cid);
-> +
-
-The G2H transport description doesn't mention a critical consequence: G2H
-transports that do not implement has_remote_cid (like hyperv_transport)
-will never receive fallback traffic even with g2h_fallback=1, because the
-fallback branch in vsock_assign_transport() requires
-transport_g2h->has_remote_cid to be non-NULL. Should the comment clarify
-this requirement for G2H transports to participate in fallback?
-
-[ ... ]
-
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index f0ab2f13e9db..cc4b225250b9 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -545,9 +545,13 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
->   * The vsk->remote_addr is used to decide which transport to use:
->   *  - remote CID == VMADDR_CID_LOCAL or g2h->local_cid or VMADDR_CID_HOST if
->   *    g2h is not loaded, will use local transport;
-> - *  - remote CID <= VMADDR_CID_HOST or h2g is not loaded or remote flags field
-> - *    includes VMADDR_FLAG_TO_HOST flag value, will use guest->host transport;
-> - *  - remote CID > VMADDR_CID_HOST will use host->guest transport;
-> + *  - remote CID <= VMADDR_CID_HOST or remote flags field includes
-> + *    VMADDR_FLAG_TO_HOST, will use guest->host transport;
-> + *  - remote CID > VMADDR_CID_HOST and h2g is loaded and h2g claims that CID,
-> + *    will use host->guest transport;
-> + *  - h2g not loaded or h2g does not claim that CID and g2h claims the CID via
-> + *    has_remote_cid, will use guest->host transport (when g2h_fallback=1)
-> + *  - anything else goes to h2g or returns -ENODEV if no h2g is available
->   */
->  int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
->  {
-
-The commit message states this patch extends the existing behavior: "When
-no H2G transport is loaded, vsock currently routes all CIDs to the G2H
-transport...Extend that existing behavior: when an H2G transport is loaded
-but does not claim a given CID, the connection falls back to G2H in the
-same way."
-
-Does this accurately describe what the patch does?
-
-> @@ -581,11 +585,21 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
->  	case SOCK_SEQPACKET:
->  		if (vsock_use_local_transport(remote_cid))
->  			new_transport = transport_local;
-> -		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
-> +		else if (remote_cid <= VMADDR_CID_HOST ||
->  			 (remote_flags & VMADDR_FLAG_TO_HOST))
->  			new_transport = transport_g2h;
-> -		else
-> +		else if (transport_h2g &&
-> +			 (!transport_h2g->has_remote_cid ||
-> +			  transport_h2g->has_remote_cid(vsk, remote_cid)))
-> +			new_transport = transport_h2g;
-> +		else if (sock_net(sk)->vsock.g2h_fallback &&
-> +			 transport_g2h && transport_g2h->has_remote_cid &&
-> +			 transport_g2h->has_remote_cid(vsk, remote_cid)) {
-> +			vsk->remote_addr.svm_flags |= VMADDR_FLAG_TO_HOST;
-> +			new_transport = transport_g2h;
-> +		} else {
->  			new_transport = transport_h2g;
-> +		}
->  		break;
-
-The old code had `!transport_h2g` in the second else-if condition at line
--583, which routed all CID > VMADDR_CID_HOST traffic to transport_g2h when
-no H2G transport was loaded. The new code removes this check.
-
-When transport_h2g is NULL (no H2G transport loaded) and the G2H transport
-does not implement has_remote_cid (as is the case for VMCI and Hyper-V
-transports), what happens?
-
-The G2H fallback branch at line +596 requires
-`transport_g2h->has_remote_cid` to be non-NULL. If it's NULL, the
-short-circuit evaluation skips this branch and executes the final else at
-line +601, setting `new_transport = transport_h2g` (which is NULL),
-ultimately returning -ENODEV.
-
-The commit message explicitly states the intent to preserve the existing
-no-H2G fallback behavior. Does this implementation break it for G2H
-transports that do not implement the new optional has_remote_cid callback?
-
-This affects VMCI and Hyper-V environments: when no H2G transport is
-loaded, CID > 2 connections that previously fell back to G2H now get
-ENODEV.
-
-[ ... ]
-
-> @@ -2928,6 +2952,7 @@ static void vsock_net_init(struct net *net)
->  		net->vsock.mode = vsock_net_child_mode(current->nsproxy->net_ns);
->
->  	net->vsock.child_ns_mode = net->vsock.mode;
-> +	net->vsock.g2h_fallback = 1;
->  }
-
-Stefano Garzarella raised a question in v3 about the sysctl inheritance
-policy for g2h_fallback: should it inherit from the parent namespace or
-always default to 1 in all namespaces?
-
-He cc'd net maintainers (Michael, Paolo, Jakub) for guidance:
-https://lore.kernel.org/all/aahRzq5vS76rPI28@sgarzare-redhat/
-
-The current code always defaults to 1 for all namespaces (including child
-namespaces), which differs from how ns_mode is handled (which inherits
-from parent). Was there a resolution to this question?
-
-[ ... ]
-
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index 77fe5b7b066c..57f2d6ec3ffc 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -547,11 +547,18 @@ bool virtio_transport_stream_allow(struct vsock_sock *vsk, u32 cid, u32 port)
->  static bool virtio_transport_seqpacket_allow(struct vsock_sock *vsk,
->  					     u32 remote_cid);
->
-> +static bool virtio_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
-> +{
-> +	/* The CID could be implemented by the host. Always assume it is. */
-> +	return true;
-> +}
-> +
-
-The comment says "always assume it is" implemented by the host. Is this a
-verifiable fact or a design choice?
-
-The guest cannot know what CIDs the host or hypervisor can reach, so this
-is a reasonable design choice. However, it also means all unclaimed CIDs
-fall back to G2H when virtio is the G2H transport, which could silently
-create host vsock traffic for typos or invalid CIDs.
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index d88ab2f86b1b..1689ecb592f4 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -35,6 +35,7 @@
+ 
+ #define PCI_VENDOR_ID_ADVA			0xad5a
+ #define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
++#define PCI_DEVICE_ID_ADVA_TIMECARD_X1	0x0410
+ 
+ static struct class timecard_class = {
+ 	.name		= "timecard",
+@@ -72,6 +73,20 @@ struct ptp_ocp_servo_conf {
+ 	u32	servo_drift_i;
+ };
+ 
++/*
++ * Combined servo + board-variant parameters for ADVA boards.
++ * Embedded in the resource table .extra so a single ptp_ocp_adva_board_init()
++ * can handle both ADVA and ADVA-X1 without per-variant init functions.
++ */
++struct ptp_ocp_adva_info {
++	struct ptp_ocp_servo_conf	servo;
++	u32				flash_start;
++	const struct ocp_sma_op		*sma_op;
++	u8				signals_nr;
++	u8				freq_in_nr;
++	const struct ocp_attr_group	*attr_groups;
++};
++
+ #define OCP_CTRL_ENABLE		BIT(0)
+ #define OCP_CTRL_ADJUST_TIME	BIT(1)
+ #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
+@@ -293,6 +308,20 @@ struct ocp_attr_group {
+ 	const struct attribute_group *group;
+ };
+ 
++struct ocp_selector {
++	const char *name;
++	int value;
++	u64 frequency;
++};
++
++struct ocp_sma_op {
++	const struct ocp_selector *tbl[2];
++	void (*init)(struct ptp_ocp *bp);
++	u32 (*get)(struct ptp_ocp *bp, int sma_nr);
++	int (*set_inputs)(struct ptp_ocp *bp, int sma_nr, u32 val);
++	int (*set_output)(struct ptp_ocp *bp, int sma_nr, u32 val);
++};
++
+ #define OCP_CAP_BASIC	BIT(0)
+ #define OCP_CAP_SIGNAL	BIT(1)
+ #define OCP_CAP_FREQ	BIT(2)
+@@ -420,12 +449,17 @@ static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+ 
+ static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+ 
++static const struct ocp_sma_op ocp_adva_sma_op;
++static const struct ocp_sma_op ocp_adva_x1_sma_op;
++
+ static const struct ocp_attr_group fb_timecard_groups[];
+ 
+ static const struct ocp_attr_group art_timecard_groups[];
+ 
+ static const struct ocp_attr_group adva_timecard_groups[];
+ 
++static const struct ocp_attr_group adva_timecard_x1_groups[];
++
+ struct ptp_ocp_eeprom_map {
+ 	u16	off;
+ 	u16	len;
+@@ -1020,11 +1054,225 @@ static struct ocp_resource ocp_adva_resource[] = {
+ 	},
+ 	{
+ 		.setup = ptp_ocp_adva_board_init,
+-		.extra = &(struct ptp_ocp_servo_conf) {
+-			.servo_offset_p = 0xc000,
+-			.servo_offset_i = 0x1000,
+-			.servo_drift_p = 0,
+-			.servo_drift_i = 0,
++		.extra = &(struct ptp_ocp_adva_info) {
++			.servo = {
++				.servo_offset_p = 0xc000,
++				.servo_offset_i = 0x1000,
++				.servo_drift_p = 0,
++				.servo_drift_i = 0,
++			},
++			.flash_start  = 0xA00000,
++			.sma_op       = &ocp_adva_sma_op,
++			.signals_nr   = 2,
++			.freq_in_nr   = 2,
++			.attr_groups  = adva_timecard_groups,
++		},
++	},
++	{ }
++};
++
++static struct ocp_resource ocp_adva_x1_resource[] = {
++	{
++		OCP_MEM_RESOURCE(reg),
++		.offset = 0x01000000, .size = 0x10000,
++	},
++	{
++		OCP_EXT_RESOURCE(ts0),
++		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 0,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts1),
++		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 1,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts2),
++		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 2,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts3),
++		.offset = 0x01110000, .size = 0x10000, .irq_vec = 15,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 3,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts4),
++		.offset = 0x01120000, .size = 0x10000, .irq_vec = 16,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 4,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	/* Timestamp for PHC and/or PPS generator */
++	{
++		OCP_EXT_RESOURCE(pps),
++		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 5,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[0]),
++		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 1,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[1]),
++		.offset = 0x010E0000, .size = 0x10000, .irq_vec = 12,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 2,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[2]),
++		.offset = 0x010F0000, .size = 0x10000, .irq_vec = 13,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 3,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[3]),
++		.offset = 0x01100000, .size = 0x10000, .irq_vec = 14,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 4,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_MEM_RESOURCE(pps_to_ext),
++		.offset = 0x01030000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(pps_to_clk),
++		.offset = 0x01040000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(tod),
++		.offset = 0x01050000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(image),
++		.offset = 0x00020000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(pps_select),
++		.offset = 0x00130000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(sma_map1),
++		.offset = 0x00140000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(sma_map2),
++		.offset = 0x00220000, .size = 0x1000,
++	},
++	{
++		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
++		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
++		.extra = &(struct ptp_ocp_serial_port) {
++			.baud = 9600,
++		},
++	},
++	{
++		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
++		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
++		.extra = &(struct ptp_ocp_serial_port) {
++			.baud = 115200,
++		},
++	},
++	{
++		OCP_MEM_RESOURCE(freq_in[0]),
++		.offset = 0x01200000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(freq_in[1]),
++		.offset = 0x01210000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(freq_in[2]),
++		.offset = 0x01220000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(freq_in[3]),
++		.offset = 0x01230000, .size = 0x10000,
++	},
++	{
++		OCP_SPI_RESOURCE(spi_flash),
++		.offset = 0x00310000, .size = 0x10000, .irq_vec = 9,
++		.extra = &(struct ptp_ocp_flash_info) {
++			.name = "xilinx_spi", .pci_offset = 0,
++			.data_size = sizeof(struct xspi_platform_data),
++			.data = &(struct xspi_platform_data) {
++				.num_chipselect = 1,
++				.bits_per_word = 8,
++				.num_devices = 1,
++				.force_irq = true,
++				.devices = &(struct spi_board_info) {
++					.modalias = "spi-nor",
++				},
++			},
++		},
++	},
++	{
++		OCP_I2C_RESOURCE(i2c_ctrl),
++		.offset = 0x00150000, .size = 0x10000, .irq_vec = 7,
++		.extra = &(struct ptp_ocp_i2c_info) {
++			.name = "xiic-i2c",
++			.fixed_rate = 50000000,
++			.data_size = sizeof(struct xiic_i2c_platform_data),
++			.data = &(struct xiic_i2c_platform_data) {
++				.num_devices = 2,
++				.devices = (struct i2c_board_info[]) {
++					{ I2C_BOARD_INFO("24c02", 0x50) },
++					{ I2C_BOARD_INFO("24mac402", 0x58),
++					  .platform_data = "mac" },
++				},
++			},
++		},
++	},
++	{
++		.setup = ptp_ocp_adva_board_init,
++		.extra = &(struct ptp_ocp_adva_info) {
++			.servo = {
++				.servo_offset_p = 0xc000,
++				.servo_offset_i = 0x1000,
++				.servo_drift_p = 0,
++				.servo_drift_i = 0,
++			},
++			.flash_start  = 0x1000000,
++			.sma_op       = &ocp_adva_x1_sma_op,
++			.signals_nr   = 4,
++			.freq_in_nr   = 4,
++			.attr_groups  = adva_timecard_x1_groups,
+ 		},
+ 	},
+ 	{ }
+@@ -1035,6 +1283,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
+ 	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
+ 	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
+ 	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
++	{ PCI_DEVICE_DATA(ADVA, TIMECARD_X1, &ocp_adva_x1_resource) },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
+@@ -1042,12 +1291,6 @@ MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
+ static DEFINE_MUTEX(ptp_ocp_lock);
+ static DEFINE_IDR(ptp_ocp_idr);
+ 
+-struct ocp_selector {
+-	const char *name;
+-	int value;
+-	u64 frequency;
+-};
+-
+ static const struct ocp_selector ptp_ocp_clock[] = {
+ 	{ .name = "NONE",	.value = 0 },
+ 	{ .name = "TOD",	.value = 1 },
+@@ -1137,12 +1380,32 @@ static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
+ 	{ }
+ };
+ 
+-struct ocp_sma_op {
+-	const struct ocp_selector *tbl[2];
+-	void (*init)(struct ptp_ocp *bp);
+-	u32 (*get)(struct ptp_ocp *bp, int sma_nr);
+-	int (*set_inputs)(struct ptp_ocp *bp, int sma_nr, u32 val);
+-	int (*set_output)(struct ptp_ocp *bp, int sma_nr, u32 val);
++static const struct ocp_selector ptp_ocp_adva_x1_sma_in[] = {
++	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
++	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
++	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
++	{ .name = "TS3",    .value = 0x0040,      .frequency = 0 },
++	{ .name = "TS4",    .value = 0x0080,      .frequency = 0 },
++	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
++	{ .name = "FREQ2",	.value = 0x0200,      .frequency = 0 },
++	{ .name = "FREQ3",  .value = 0x0400,      .frequency = 0 },
++	{ .name = "FREQ4",  .value = 0x0800,      .frequency = 0 },
++	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
++	{ }
++};
++
++static const struct ocp_selector ptp_ocp_adva_x1_sma_out[] = {
++	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
++	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
++	{ .name = "MAC",	.value = 0x0002,  .frequency = 1 },
++	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
++	{ .name = "GEN1",	.value = 0x0040 },
++	{ .name = "GEN2",	.value = 0x0080 },
++	{ .name = "GEN3",	.value = 0x0100 },
++	{ .name = "GEN4",	.value = 0x0200 },
++	{ .name = "GND",	.value = 0x2000 },
++	{ .name = "VCC",	.value = 0x4000 },
++	{ }
+ };
+ 
+ static void
+@@ -2639,6 +2902,14 @@ static const struct ocp_sma_op ocp_adva_sma_op = {
+ 	.set_output	= ptp_ocp_sma_adva_set_output,
+ };
+ 
++static const struct ocp_sma_op ocp_adva_x1_sma_op = {
++	.tbl		= { ptp_ocp_adva_x1_sma_in, ptp_ocp_adva_x1_sma_out },
++	.init		= ptp_ocp_sma_fb_init,
++	.get		= ptp_ocp_sma_fb_get,
++	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
++	.set_output	= ptp_ocp_sma_adva_set_output,
++};
++
+ static int
+ ptp_ocp_set_pins(struct ptp_ocp *bp)
+ {
+@@ -2887,18 +3158,19 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 	return ptp_ocp_init_clock(bp, r->extra);
+ }
+ 
+-/* ADVA specific board initializers; last "resource" registered. */
++/* ADVA board initializer; variant differences come from r->extra. */
+ static int
+ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ {
+-	int err;
++	struct ptp_ocp_adva_info *info = r->extra;
+ 	u32 version;
++	int err;
+ 
+-	bp->flash_start = 0xA00000;
+-	bp->eeprom_map = fb_eeprom_map;
+-	bp->sma_op = &ocp_adva_sma_op;
+-	bp->signals_nr = 2;
+-	bp->freq_in_nr = 2;
++	bp->flash_start = info->flash_start;
++	bp->eeprom_map  = fb_eeprom_map;
++	bp->sma_op      = info->sma_op;
++	bp->signals_nr  = info->signals_nr;
++	bp->freq_in_nr  = info->freq_in_nr;
+ 
+ 	version = ioread32(&bp->image->version);
+ 	/* if lower 16 bits are empty, this is the fw loader. */
+@@ -2906,15 +3178,15 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 		version = version >> 16;
+ 		bp->fw_loader = true;
+ 	}
+-	bp->fw_tag = 3;
++	bp->fw_tag     = 3;
+ 	bp->fw_version = version & 0xffff;
+-	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
++	bp->fw_cap     = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
+ 
+ 	ptp_ocp_tod_init(bp);
+ 	ptp_ocp_nmea_out_init(bp);
+ 	ptp_ocp_signal_init(bp);
+ 
+-	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
++	err = ptp_ocp_attr_group_add(bp, info->attr_groups);
+ 	if (err)
+ 		return err;
+ 
+@@ -2923,7 +3195,7 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 		return err;
+ 	ptp_ocp_sma_init(bp);
+ 
+-	return ptp_ocp_init_clock(bp, r->extra);
++	return ptp_ocp_init_clock(bp, &info->servo);
+ }
+ 
+ static ssize_t
+@@ -3982,6 +4254,43 @@ static const struct ocp_attr_group adva_timecard_groups[] = {
+ 	{ },
+ };
+ 
++static struct attribute *adva_timecard_x1_attrs[] = {
++	&dev_attr_serialnum.attr,
++	&dev_attr_gnss_sync.attr,
++	&dev_attr_clock_source.attr,
++	&dev_attr_available_clock_sources.attr,
++	&dev_attr_sma1.attr,
++	&dev_attr_sma2.attr,
++	&dev_attr_sma3.attr,
++	&dev_attr_sma4.attr,
++	&dev_attr_available_sma_inputs.attr,
++	&dev_attr_available_sma_outputs.attr,
++	&dev_attr_clock_status_drift.attr,
++	&dev_attr_clock_status_offset.attr,
++	&dev_attr_ts_window_adjust.attr,
++	&dev_attr_utc_tai_offset.attr,
++	&dev_attr_tod_correction.attr,
++	NULL,
++};
++
++static const struct attribute_group adva_timecard_x1_group = {
++	.attrs = adva_timecard_x1_attrs,
++};
++
++static const struct ocp_attr_group adva_timecard_x1_groups[] = {
++	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_x1_group },
++	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal2_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal3_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq1_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq2_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq3_group },
++	{ },
++};
++
+ static void
+ gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
+ 	       const char *def)
+-- 
+2.47.0
 
 
