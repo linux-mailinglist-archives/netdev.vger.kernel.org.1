@@ -1,129 +1,152 @@
-Return-Path: <netdev+bounces-266134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPRUNSkcsGnufwIAu9opvQ
-	(envelope-from <netdev+bounces-266134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:27:05 +0100
+	id 4Ci3NVcksGnYgQIAu9opvQ
+	(envelope-from <netdev+bounces-266135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:01:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5295E2503A5
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:27:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883B7251345
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D25BB31E9B3B
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:07:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE6F5343838D
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 13:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82DE3DD52F;
-	Tue, 10 Mar 2026 12:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A413DE440;
+	Tue, 10 Mar 2026 12:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWyTRUX0"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="RGRpW5kA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44E53CBE82;
-	Tue, 10 Mar 2026 12:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464FC3A3819;
+	Tue, 10 Mar 2026 12:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773146409; cv=none; b=SH9obdYFxEu/mK3vcwCuDtVL6dD5r2n21Q19SIxOXDTzCBK7ejhw+ULmw8MkWTaGlMjdcxbW3ev2HHxNH5JoZ4JlHPpHyENUAmN15wwlmfRfZ+sX3JeJWKf4u1VriSBne2nlUI3QsQ6jNYZ38BZxr+fmKb1spqbGwAO2njqGXM4=
+	t=1773146475; cv=none; b=lua6NXwzOVfBN1zNk5d8wbP6TXZjWMD8ywNgp/Xf/VajkRhPvZNHRfpzqea1A1XO51OBjaIsONEO/0fqFTR6uTHTG5tFAIDodLdWGVWsN7Qu6MlR74Jz5/cSbm1xYOXaj2/n6UfQ0Tus5t20ew+KqrgPi9cFumiE9gmRVSmE/Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773146409; c=relaxed/simple;
-	bh=IK6RJArbLIh4dHU4kWnimKMjcvtkiiNjPOSaY4dgevA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=THaG912HS45yGMyaKz/S4pTdZeZ4tFrp+kamRtZT4YhlXnlF9LwU1DuqqdLkVH3+S7GLBYtqlvS7dW7dJ4yiMpKraNKvwfKyCnPPNIwaUjr33OIFsyEWLHuDoY5C2En5uVQ2p+niPEHsqaaoc32eVameiWnGfkFp2aU+hDB+cBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWyTRUX0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AC78C19423;
-	Tue, 10 Mar 2026 12:40:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773146409;
-	bh=IK6RJArbLIh4dHU4kWnimKMjcvtkiiNjPOSaY4dgevA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TWyTRUX0DNGEZfH5XTV+/AVjjv7xiVGJDynNG0IXcjP/maHWoxquAsSfPoTo1jwkK
-	 g+6icFTeZBvc0hLOFiZQBCpVobowprHg+3iXqqYGV5hUsSX0RgFGTig22dmAxC9VcE
-	 lrTv4/X851eBQPwIXcwC7nwSnUW7xYsJEhLkwJpnxNTVtw/uAMJPmMcrRIl7u3lloh
-	 +udXIgeNAYOgCIPxI2wCYpaWdWx3t9A/DL4t9ZPB2qlSEFbnU8uSSyaVNJ6skE7HpC
-	 BTF5eGC+soHVky+7wrq/QHvrhC0MB85NafzBpRUj38xr230onNr38d2bdqhFRhi1xh
-	 UWKG4Athi8QoQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF3D3808200;
-	Tue, 10 Mar 2026 12:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1773146475; c=relaxed/simple;
+	bh=PwoxdyEGpoX3hF4DbyXYXng3Q1boXI3halwpu/ThnEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xua2wWnaPg2S/wmXQKslI7xNTCb33MeraHQQ4JSSIsUu3WHGBUQw0Drf0zMkx+dJBIazEtpLnXvBNWfuh/klVdA4RT0jvBfdZqgJ11U9b90lvk4fNN1Ld6+UgJiDj5SEw3E6AftCVdcNch+YTT/GHfVgFkmAiH+zk6jplOBDjdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RGRpW5kA; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id BD43F6056B;
+	Tue, 10 Mar 2026 13:41:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1773146470;
+	bh=i2eBlqyC0qnL/uht0sn+k3w5EBoHs3CC+Po1ztioVAU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RGRpW5kAP5rbxK+ipVCJQBH8oa2lsuuVxHEqSDvgbTDNJ70aLIIbjJjm/fwMiXhS5
+	 5kRldN5R+Z6UZ7kKB7Hl15XmbAOq0Z+SCsKnTuAuyc+SZ8J9coDGl8lj3kPV+4pK/8
+	 RPHKt6QUSplhjQo3uXcexlqKRrcFY8cGQPgL/FRuUBuFrMyuE9BjjGvmD4y9lyZztI
+	 KnrxQMp/rU4FwSNZqW/KanZWCc5NzGBssXaoX5Fdc841n12eqVuX5tC3VB1uIYdV1c
+	 ntEbkvjHZG6c1bDY88dK2DIkVc4Z2NSQiK9AZv+uIo6ABlGda4mJVp/hU+O8t82qSV
+	 e3MAQ0WsFc65Q==
+Date: Tue, 10 Mar 2026 13:41:08 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net 00/10] netfilter: updates for net
+Message-ID: <abARZGTs_eP6yDu4@chamomile>
+References: <20260309210845.15657-1-fw@strlen.de>
+ <aa_4w9gXCkzQ06Nk@chamomile>
+ <abAPlfmkO7gr142k@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: add xmit recursion limit to tunnel xmit
- functions
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177314640530.2269130.10013467728563826261.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Mar 2026 12:40:05 +0000
-References: <20260306160133.3852900-2-bestswngs@gmail.com>
-In-Reply-To: <20260306160133.3852900-2-bestswngs@gmail.com>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: security@kernel.org, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xmei5@asu.edu
-X-Rspamd-Queue-Id: 5295E2503A5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <abAPlfmkO7gr142k@strlen.de>
+X-Rspamd-Queue-Id: 883B7251345
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-266134-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-266135-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[pablo.netfilter.org:query timed out];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,netfilter.org:dkim,netfilter.org:email]
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat,  7 Mar 2026 00:01:34 +0800 you wrote:
-> From: Weiming Shi <bestswngs@gmail.com>
+On Tue, Mar 10, 2026 at 01:33:25PM +0100, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > On Mon, Mar 09, 2026 at 10:08:35PM +0100, Florian Westphal wrote:
+> > > 7-9) fix access bugs in the ctnetlink expectation handling.
+> > >      Problem is that while RCU prevents the referenced nf_conn entry
+> > >      from going way, nf_conn entries have an extension area that can
+> > >      only be safely accessed if the cpu holds a reference to the
+> > >      conntrack.  Else the extension area can be free'd at any time.
+> > >      Fix is to grab references before the accesses happen.
+> > >      These bugs are old, v3.10 resp. even pre-git days.
+> > >      All fixes from Hyunwoo Kim.
+> > 
+> > I am not sure 7-9 are correct.
+> > 
+> > nfct_help() is accessed via exp->master in other existing paths,
+> > I think these fixes are papering an underlying problem since the
+> > typesafe rcu infrastructure was introduced in nf_conntrack.
 > 
-> Tunnel xmit functions (iptunnel_xmit, ip6tunnel_xmit) lack their own
-> recursion limit. When a bond device in broadcast mode has GRE tap
-> interfaces as slaves, and those GRE tunnels route back through the
-> bond, multicast/broadcast traffic triggers infinite recursion between
-> bond_xmit_broadcast() and ip_tunnel_xmit()/ip6_tnl_xmit(), causing
-> kernel stack overflow.
+> AFAICS these patchers are correct and other areas need to be fixed too.
+> I am currently auditing other conntrack helper usage for this bug
+> type.  I'm working as fast as I can given the volume of bugs coming
+> in.  I don't think that not taking these patches now is better in any
+> way.
+
+Are sure that adding refcount bump is the way to go?
+
+# git grep "nfct_help(exp->master)" net/netfilter/
+net/netfilter/nf_conntrack_expect.c:    struct nf_conn_help *master_help = nfct_help(exp->master);
+net/netfilter/nf_conntrack_expect.c:    struct nf_conn_help *master_help = nfct_help(exp->master);
+net/netfilter/nf_conntrack_helper.c:    struct nf_conn_help *help = nfct_help(exp->master);
+net/netfilter/nf_conntrack_netlink.c:   m_help = nfct_help(exp->master);
+net/netfilter/nf_conntrack_sip.c:                   nfct_help(exp->master)->helper != nfct_help(ct)->helper ||
+
+These callsites need auditing.
+
+Yes, I just wonder if this can be fixed without adding checks
+everywhere in the code, I would need a bit more time too.
+
+This report came in over the weekend.
+
+> Its possible these changes do miss a check for confirmed bit, to
+> avoid handling new, unconfirmed conntracks during object reuse.
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,v4] net: add xmit recursion limit to tunnel xmit functions
-    https://git.kernel.org/netdev/net/c/6f1a9140ecda
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Expect further patches in this area.
+>
+> But I'm not sure this is related to rcu infra usage.
+> 
+> I would not be surprised if this bug has always been there:
+> 20+ years ago, without KASAN/UBSAN it would likely have never
+> been found.
 
