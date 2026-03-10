@@ -1,205 +1,192 @@
-Return-Path: <netdev+bounces-266333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOogINWLsGkukgIAu9opvQ
-	(envelope-from <netdev+bounces-266333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:23:33 +0100
+	id Sg/rAqeLsGkukgIAu9opvQ
+	(envelope-from <netdev+bounces-266331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:22:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DB725836F
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:23:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9CE258345
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D72F306777C
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:23:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 425D03018756
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 21:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855EC3E92BE;
-	Tue, 10 Mar 2026 21:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853233C9EE6;
+	Tue, 10 Mar 2026 21:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="XehxLy1d"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="kKkUKGOQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5679D3CEB9E;
-	Tue, 10 Mar 2026 21:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534D53C873D
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 21:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773177768; cv=none; b=ZQj6jzHO4uOrUEIsub1O7OpDJ2HKg4gBfzqEtKgst9B4vT6vak2gevxUKnEYP27yqnIDHIk+/lzhzx+U/90LC/BYAJ9jX7gpcKGUh7GndNLVceSqarCh2Cgw29jyXOiItq5xmHUj34KJq8dMao5vG8PnQqUH2ByOzZiQzpzOxqA=
+	t=1773177764; cv=none; b=mhgacnm0j+vXH7gLzHhCewJ1BpdvGEYYsvCK+DYXxeRucopvCfkYfUbi9+nzYRRPkGy8i11n53gbdAYnDpUbxOYGfWWsqG3rlTxJ6FWfjmoZbt8kyB4soZ8BhFJtcP7gCq0NVbU/FBjXd59c1D/p/OkaQOHbt9acVwyqiWLJxmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773177768; c=relaxed/simple;
-	bh=uW/SHTU/bmzAxq69+5aquBUZCuf5Yy0XrivWZ/q8OEs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Vey6PaXBsbT/g2lLrKORr4n7judRAbM17OZ3+NZHdDWM4uMXPSUrWSNooKksAmQTzn6XH21aYacyXWUts43s9HvdqNsdk1CydtF8ARxO6EaA8jzO0JAAk6uDAkIBbVwjqCRDF9jh1fO08A9IzF+LQZppN1toISxCPeffCe3+ozo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=XehxLy1d; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=XehxLy1d;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 62ALICW34119410
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 10 Mar 2026 21:18:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1773177492; bh=uW/SHTU/bmzAxq69+5aquBUZCuf5Yy0XrivWZ/q8OEs=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=XehxLy1dP2hexPsyxBZBiYDt/ZKIsdMfw6dXSR0tS4w+wHD4C7MuVJdRWjblVJ4vN
-	 f1m6MVEq3Cv94mvAZbpeaPr7+ir8ONDcWdEb+OsChqmet/YhuA31w47Bmp/rKkxQ9s
-	 rMW/hB/Ky4PFf0e5UjQoOJEZFR0hLcpBMaWErYd0=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 62ALIBSw285875
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 10 Mar 2026 22:18:12 +0100
-Received: (nullmailer pid 737464 invoked by uid 1000);
-	Tue, 10 Mar 2026 21:18:10 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: =?utf-8?Q?Kolbj=C3=B8rn?= Barmen <linux-m68k@kolla.no>,
-        Krzysztof
- Kozlowski <krzk@kernel.org>,
-        Fernando Fernandez Mancera <fmancera@suse.de>,
-        Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Geert
- Uytterhoeven <geert@linux-m68k.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Selvin Xavier <selvin.xavier@broadcom.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
-        Petr Machata <petrm@nvidia.com>, Simon Horman <horms@kernel.org>,
-        Saurav Kashyap <skashyap@marvell.com>,
-        Javed Hasan <jhasan@marvell.com>,
-        "maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <GR-QLogic-Storage-Upstream@marvell.com>,
-        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Nilesh Javali <njavali@marvell.com>,
-        Manish Rangankar <mrangankar@marvell.com>,
-        Varun Prakash <varun@chelsio.com>,
-        Alexander Aring <aahringo@redhat.com>,
-        David
- Teigland <teigland@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        David Ahern <dsahern@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Xin Long <lucien.xin@gmail.com>, Jon
- Maloy <jmaloy@redhat.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Michal Simek <michal.simek@amd.com>,
-        Luca
- Weiss <luca.weiss@fairphone.com>, Sven Peter <sven@kernel.org>,
-        "Lad,
- Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Gow <david@davidgow.net>,
-        Herbert
- Xu <herbert@gondor.apana.org.au>,
-        Ryota Sakamoto <sakamo.ryota@gmail.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>, Kir
- Chou <note351@hotmail.com>,
-        Kuan-Wei Chiu <visitorckw@gmail.com>,
-        Vikas Gupta <vikas.gupta@broadcom.com>,
-        Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-        Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
-        Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>,
-        "open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
-        "open
- list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
-        "open
- list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
-        "open
- list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <linux-scsi@vger.kernel.org>,
-        "open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
-        "open
- list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
-        "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
-        "open list:NETFILTER" <coreteam@netfilter.org>,
-        "open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
-        "open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
-        "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
-Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in
- only and clean up Kconfigs
-In-Reply-To: <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com> (Arnd
-	Bergmann's message of "Tue, 10 Mar 2026 20:58:15 +0100")
-Organization: m
-References: <20260309022013.5199-1-fmancera@suse.de>
-	<20260309022013.5199-2-fmancera@suse.de>
-	<01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org>
-	<e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
-	<5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
-Date: Tue, 10 Mar 2026 22:18:10 +0100
-Message-ID: <87bjgvpenh.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1773177764; c=relaxed/simple;
+	bh=2Tsfewli6kOzAqfcjRX+wWMziPIVMge609IlrkkT7k4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=slC84On5v0lJTtv9iPQNfpSkNktOK8Kg7XouCLt6AwJLeDETZtoOcIdB6xz+G+sA0fo/JTt7DAsncImlSyELs/UQYjYgKS1OGCe82jQbVd3cMrHgdq6YqfDdsYglJCosZpjZBIfiQL4gl88U7RKP8+jy77x5r8MjDDY1/G94PSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=kKkUKGOQ; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ad21f437eeso2680675ad.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773177762; x=1773782562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ggoVKtSKOc3N38d3zUE8ZE7aHfSiZIatc4vpDvMzCD8=;
+        b=kKkUKGOQYCLRmYHkGLT0+lKG0VuOINw2LtMWynK9Gx6d5DOtgCSPEeXqlwzCyFOLSn
+         U7Gw4zj5CCNsRw9mnVYnNiFyo6htJUBO3JO+BJ3qXVRSzeP4ORh0/4sQx/x6eRE/j0EV
+         QpngqtJxeLnT0h+OXPRKBaCpezGY8mff3GO086z1v0C4Z3edYEMQ37e2tPaGAPMppI9e
+         S1RaerE+mr1lP8NSe33ye78dmT+P3k0sMObVeubMd/x9WOn5Rx/Rp6gxVRLIkralJ9Xg
+         cjH0icMbgxHe0C1fGacFQUGFOzZZthfbZpoQZa6o24/twfrgYHhxxSOMPKwusYXrsjIt
+         /F/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773177762; x=1773782562;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ggoVKtSKOc3N38d3zUE8ZE7aHfSiZIatc4vpDvMzCD8=;
+        b=ZVDoOodFz1AzbfAWQ+1B+ZWiyl0Vs1KL864E4cjbbFEdJjbP3gzmwZUJRzpXHguywE
+         +wcg17NQxVSd66A/IpALsfy5st5Azxp/uQ1ki4hYiDHsLHoHDba61mQUo0Z7NqDrl3yR
+         8DG9DUN4Ojoxs3pYHC7+JnWE73QNXq04HiHXcvtS8UaCwGIRQEsD8JhB0MRa+39wKOT+
+         ogKRmLTicjdjGfCQdJYXaZkeW6nmzKqtlUobGhgMEWdWBOhIWoxVrJG+WgPsfcZph8SF
+         joFymVexY6s/g99Dxy544lMRrWFsD84DaNoKuAy2gghlZTo3EJD8DNMt3AInHJdKhwsP
+         gZ9g==
+X-Gm-Message-State: AOJu0YxujfFBsYt6getR0TEHVQ9qdlFoBVPRaDtuXkbOCan7SoZHOyp8
+	4DNrNfbBxfo5luaAk/3bM0aGwaggD8im69TJsHtMaMjonctjNlcw2/GvPoUQqVcX2dRIFKVhX3F
+	1Qkks6/A=
+X-Gm-Gg: ATEYQzydkNqEIneAIz3gBssqueY7POo4y2YOPk4a5KObj4eXtVvh0o6F0h5AWVwDa67
+	y3DzGNISPFXlNyRSi6Wl+0T3C3wCVjl0PddLNlTHT66TK85CWqfIaePhPk8XxX/gS2Rzgb6pP7d
+	HXDTZKUDtCJbjsRNO+c56V7VSJM9SVeyJRA0cKpS7q0nrtslDsWJUkkqccSUVgIWZgj3DZUPexk
+	ygMV20vJEcGFAjKs5XW3sQOZH6l7iqIjIzvLnrqC4HEXq2PL2CPObkz239vm2pzkX4jiN9A0IAs
+	MsXC6Sga8wdFdIKmHsfGQ2suMIMjP8S4gDuyz8JrKs1P4hTfC3mleGHZt1bm8epQ8rZlg9q58Tl
+	aQ0xbjH+nTBsiclVDykTEVJhNlAQ0imTouPNRFufThgMPTpPOcRJlOUHjU4qMIBm6l3SgWhPjCR
+	8D9WCWXHjpw3sbRA==
+X-Received: by 2002:a17:903:350f:b0:2ae:478f:2ef with SMTP id d9443c01a7336-2aeaed1ea80mr1249475ad.28.1773177762359;
+        Tue, 10 Mar 2026 14:22:42 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:4::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aeae246fe5sm2091485ad.28.2026.03.10.14.22.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 14:22:41 -0700 (PDT)
+From: Joe Damato <joe@dama.to>
+To: netdev@vger.kernel.org
+Cc: michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	Joe Damato <joe@dama.to>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [RFC net-next 00/10] Add TSO map-once DMA helpers and bnxt SW USO support
+Date: Tue, 10 Mar 2026 14:21:48 -0700
+Message-ID: <20260310212209.2263939-1-joe@dama.to>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
-X-Rspamd-Queue-Id: 42DB725836F
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 6B9CE258345
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-266331-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kolla.no,kernel.org,suse.de,vger.kernel.org,linux-m68k.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
-	HAS_ORG_HEADER(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266333-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mork.no:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_CC(0.00)[broadcom.com,vger.kernel.org,dama.to,kernel.org,lunn.ch,iogearbox.net,davemloft.net,google.com,gmail.com,redhat.com,fomichev.me];
+	DMARC_NA(0.00)[dama.to];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[70];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mork.no:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama-to.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-"Arnd Bergmann" <arnd@arndb.de> writes:
+Greetings:
 
-> The list does not include openwrt though, and I know that in
-> previous releases, there was an optional kmod-ipv6 package
-> that could be left out of an install without rebuilding
-> the kernel.
+This series extends net/tso to add a data structure and some helpers allowing
+drivers to DMA map headers and packet payloads a single time. The helpers can
+then be used to reference slices of shared mapping for each segment. This
+helps to avoid the cost of repeated DMA mappings, especially on systems which
+use an IOMMU. N per-packet DMA maps are replaced with a single map for the
+entire GSO skb.
 
-The kmod-ipv6 package was dropped in 2016:
-https://github.com/openwrt/openwrt/commit/33beafa8d88e51907acba6fdece5a35f5=
-09934df
+The added helpers are then used in bnxt to add support for software UDP
+Segmentation Offloading (SW USO) for older bnxt devices which do not have
+support for USO in hardware. Since the helpers are generic, other drivers
+can be extended similarly.
 
-And IPv6 was unconditionally enabled in OpenWrt in 2022:
-https://github.com/openwrt/openwrt/commit/832e7b817221d288df76b763ca12c5853=
-65db5d8
+Early testing shows a ~4x reduction in DMA mapping calls at the same wire
+packet rate.
 
+Special care is taken to make bnxt ethtool operations work correctly: the ring
+size cannot be reduced below a minimum threshold while USO is enabled and
+growing the ring automatically re-enables USO if it was previously blocked.
 
-Bj=C3=B8rn
+Thanks,
+Joe
+
+Joe Damato (10):
+  net: tso: Introduce tso_dma_map
+  net: tso: Add tso_dma_map helpers
+  net: bnxt: Export bnxt_xmit_get_cfa_action
+  net: bnxt: Add a helper for tx_bd_ext
+  net: bnxt: Use dma_unmap_len for TX completion unmapping
+  net: bnxt: Add TX inline buffer infrastructure
+  net: bnxt: Add boilerplate GSO code
+  net: bnxt: Implement software USO
+  net: bnxt: Add SW GSO completion and teardown support
+  net: bnxt: Dispatch to SW USO
+
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 159 ++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  27 +++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  19 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c | 188 ++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |  31 +++
+ include/net/tso.h                             |  45 +++++
+ net/core/tso.c                                | 165 +++++++++++++++
+ 8 files changed, 601 insertions(+), 35 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
+
+-- 
+2.52.0
+
 
