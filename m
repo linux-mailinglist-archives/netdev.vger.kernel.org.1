@@ -1,216 +1,283 @@
-Return-Path: <netdev+bounces-265880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EwGOLGJr2lvaAIAu9opvQ
-	(envelope-from <netdev+bounces-265880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 04:02:09 +0100
+	id gJh4KP2Jr2lvaAIAu9opvQ
+	(envelope-from <netdev+bounces-265881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 04:03:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28162448EA
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 04:02:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6568124492F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 04:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9BBD7301AAAE
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:02:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D5D39303932F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4FC3B3C18;
-	Tue, 10 Mar 2026 03:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB17F3B585E;
+	Tue, 10 Mar 2026 03:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTUdtqMZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQWR9FM0";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sWr0cte2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9B23AA1BB
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 03:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773111726; cv=none; b=YspLqebYgXI1oORGUjc4tJRm7jNs8nhva8ZNNkHUYAh4aVls7ARi1t2pJio7/9LwDyKQ4yPea68YtTlUwTrneVV7IClIne/nGwPz1ACvJnBMVUBhi3KiwkTIn8qQ696uFICtdDHwQJYwotjrg0H/eoeeZZDkoyMw4FVCaSeuw8I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773111726; c=relaxed/simple;
-	bh=/HorepIizoh0hKhgpr99KvxAfLGwEIYusSEtJs8vCNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDY61EF/nlD/8G29uQM2if76q0+eikNLQufUUzJhHB16h0xo8TdP3mdTm+BPxhnoQFnJS4BVewSkL2yKS8fz3DkR6pqvDnj+lMLX7YiRtiZWiogdV0EjzYOZDEVx0D/3BVylqUXKGPomV8hglhz78J7PusKIT8QuXpNssA1kpAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTUdtqMZ; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ae4d48dc2fso39702085ad.3
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 20:02:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EA73A900B
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 03:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773111793; cv=pass; b=uVPnC+sLv2mg4xeo7+515AbS4JatpbswQtZcdFS05+s3LxOnmtX19jRxLB2w0JaMU1v8FJKww5xArg/haaVw0nqkNuK1bykiUbYyPWFyjEo9uDz72kbW0w1QqgRpESIow1YBUsd2gDb9jlYgLUFAY94xCdqskH8e6nzyWdqo/tI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773111793; c=relaxed/simple;
+	bh=0v2K0W2zP+AM5y+fHVEDnet++UbxfEr4lS8iB4tGChw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OrNQ0O8aut4c4LgVPcIA5jh52bLoJhpqUw4Hlyg52KAxBcVpOYhICu+YujIx7ThGLlXT5yVRVLApooSLywwCtU75rXXmfh9CDpOFRylrgo0TrIhTc6xjf3sy3ZooiOk21RbVNQUrolfxkHVuGL6xjf1MpwvKrKMtgEdLCz3VGDY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cQWR9FM0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sWr0cte2; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773111790;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IJQ2dCfDYTqoMx6naowXS2cizlpAXMvHukUkaPemtzc=;
+	b=cQWR9FM0esD5lI0x/aP3m6oaLBHZ4tqcStDW8lA/ktl5VviQdyZoT+jqB1mpQrckMWnKCk
+	kgImWN/SsI0ziJRCChFZlVpzNeSSQtzHrN7iWAHecx95/1Uae9HYXwMOMJNtH4DoZLzKdS
+	9XXyL+jVWB1ldPSfBYTkQ5zQaK48yyw=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-587-N8fCSn8FO4Gm_HfShRwBhw-1; Mon, 09 Mar 2026 23:03:09 -0400
+X-MC-Unique: N8fCSn8FO4Gm_HfShRwBhw-1
+X-Mimecast-MFC-AGG-ID: N8fCSn8FO4Gm_HfShRwBhw_1773111788
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3594620fe97so63165257a91.1
+        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 20:03:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773111788; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PXSph4lvvGzWxOx8CQ5vi1qJMOebUc+vZhOLa1g2K9bnVGcOHmljVtThL+Fe6RkuX0
+         g0IfT0smXF3zGUFbxDm+Z/cs9GrU1QDOngNf6aoxcn8oJpbGN1wnXebB860+ty9KJfd/
+         ntQQhS1kFV0w7tD/lNUVThP+cUwBN2Ex1tihku2o+60toPRDOSoqxIoBvfrqnlCS3CAc
+         7rFTS3TGWWK0wNz7hKiM35fM37MWTQlUZedu8VVEu9RvQ78T6O9zpWYxsFLF3YqoIqQL
+         jRTFt2Wbonys0JdppPtuOEyrcDMowC3udBcOXeb/4a4qVFuJMLezd70KrOqfyzPg6onm
+         iB0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IJQ2dCfDYTqoMx6naowXS2cizlpAXMvHukUkaPemtzc=;
+        fh=r5EDM4cMToJYj3lBzjewKBt0WGY0DWc4IQrMuphvRhA=;
+        b=dLrGz+BgTW5A0GGqLgSJbFmywqSAtbw7wY3I+AOI/HyLiV3XT9EtqMlvQ1kRuwmdvY
+         8F/6IowyWvrP1pW+bABPHMrg/DauRpEmpI5u6/89fdEByKkkf9ooWlMyEyNO0rT80ftr
+         RwtXX7MA7wXVYse9Kqe5a01FMMU2SBrMo2inrND77V7KQKR/Esq3xElz2HAf7rPgII/b
+         um0DgglqGTGaPhChnbrcWJkxhprFZte4a8rFXYdgr25Yi57n8ocWlswU47n41pUQHUYq
+         C0s5TNzcIIe3adLPmW9GH0tDuxEiJ4P88Nhw6nhUJePfxgC1vhvoSabEczjoh1WjlDl2
+         uYTQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773111724; x=1773716524; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LEwKSMSqIEpe5269DAkL86L1DhMYaTmIOzSUDoQBS/g=;
-        b=JTUdtqMZ/bVTnc0LWC9LdPJe/SsQ5os4nohO30T6eloEh10wyj8r17b17uJLmWrJw5
-         BFMUCFxxQOzwDpW5tXMH9pvHbRLZA1MzSofzxs2BQ1Y7F5vD0ZLxtvDmPK9sZenfKR+T
-         v/K+RpwofJjNvoQMrYB/c/kFgohOJP7ujqVuvHvCZI1iRB0rX7xQkcee07SyO48byioO
-         DREuJB4GbjRQwfV3yvjSPxq3K9P6n8+z3p0wJbfIraNn824b1ZuXzgsXtO4L4o4lRoH0
-         ro+vJL2BmBqfnyzhC0v6ZmQys/50kiGq0NsApmD3bexadnEoAc5n4CCJ+C43lGV+nWCe
-         FynQ==
+        d=redhat.com; s=google; t=1773111788; x=1773716588; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IJQ2dCfDYTqoMx6naowXS2cizlpAXMvHukUkaPemtzc=;
+        b=sWr0cte2dZHlh+FYl3ipIA+g4m/B4wJSqYBczc8laO/y6LCliSWBMqjc377i76/AYn
+         awSy2R6y3fvX/TO5WqZDi8FpWWWaT4sy5j4NdVADsict1/+emGmADP7wcI31HQfLETCX
+         SPDeVJS2qzaAdNmh60WTKMpW+c9SK0fkWBz0J/xELtvtXfl8u9R94jMIrSMIF0DkqvG7
+         DSiQ1bN5oomCiSBaVfbN7VwoNjkI+0CktyEmcsmQOpZxr/ljp/dO5eD/mn1ZmpEHzqRV
+         4mk/zLwZqJ2fEP0jZWb5OOB9IN5OywjE4lt5fsY8SuVlCK6z+TLvdWOfTYhzhXkqnbQp
+         AC9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773111724; x=1773716524;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LEwKSMSqIEpe5269DAkL86L1DhMYaTmIOzSUDoQBS/g=;
-        b=p3gXpSTVio0LsUHYbqWnPTGH89ZYtSAIbQcGSntNu9IwHzvgRcTDt41VwTjjXaY8pg
-         xEEp7aJLbb57IxkkpDXgrpQcC8Z9afjdKUJleyiF2n9VzVJT1TwDZCQDKJcLNWYJEvER
-         iu/XjcSNPPX9Elq5rlTaHYJ/9KAftDMbEPTDOgD4+V0KP0xeoBQMHaGjZ2Dm4dW+czCv
-         Bzpa856xRZgsjQjq1lDL6sVVmK0sX+0ssyX+b+KEbjycs8Vrdj9A1vchnqxqTBsmL0AU
-         6kCPRLJrjASGDiIfWRhaK2X8TtO1LcokZkyUAGlWUfm7okx51/Uf7wARqhJkMGuGwXr0
-         +wuA==
-X-Gm-Message-State: AOJu0YxypxBXw/cXnwTF/xkcjKPi2gBp6JrzASgc2vUdDI1NFhI5pbDH
-	wBHFLVwVegDDQNZ7M+JVUn23Q2UA1NMhaVwSb4nybuVNXkHC99HrQebj
-X-Gm-Gg: ATEYQzxgkgThwIq78T0lMCEiI5oEl0iULk/DWqso/LMfHMdm2dLDep8KmkqgxdTHope
-	COAliaWoWUWa9IgELxHwVy8x49+tZrpnIzsP+Rm5hlikVae7kBOnNL+iDgkFerxU1RUZV7Viroz
-	qqZ/dXGLEzT9kOWpDd1vPLWGCzux9uxhOlojKUDxc95NjjGwniIMLAaccGNT2v6YWozZB1Dqtxu
-	RtTP9Epb+uHYwqZOf+7ExU7H738dlVyhqjmLybFlOsmORCxIcLurUq+0B+ZNFGZ0uXWWLIzgLUM
-	kxiu+HQmHoxzym0E56uhvuJ9EEtT2stnCJYvhXgboO/DCTUyXlJ9+GpXpWxKY4/Ol/Fo3VxDAUl
-	S3ho2mk0rH8iCuT3wofiyeJ+YEOStqXWapNkTahhSKvV6rMuG8Saw0CuNv9SPuHS5pqebHsZqlO
-	bkMQdMdzMFMW07gpTdBtgzWdXTzac=
-X-Received: by 2002:a17:903:4b27:b0:2ae:6317:56e3 with SMTP id d9443c01a7336-2ae824f4d54mr124977875ad.28.1773111724083;
-        Mon, 09 Mar 2026 20:02:04 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83e9b9c6sm149702665ad.29.2026.03.09.20.01.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 20:02:02 -0700 (PDT)
-Date: Tue, 10 Mar 2026 03:01:55 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Mahesh Bandewar <maheshb@google.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv3 net 1/3] bonding: set AD_RX_PORT_DISABLED when
- disabling a port
-Message-ID: <aa-Jo1mn3Cs5FN90@fedora>
-References: <20260226125331.28147-1-liuhangbin@gmail.com>
- <20260226125331.28147-2-liuhangbin@gmail.com>
- <942584.1772155015@famine>
- <aaEB6X6WPs7EBM33@fedora>
- <949695.1772167347@famine>
- <aaE32DlfrX9S5KNT@fedora>
+        d=1e100.net; s=20230601; t=1773111788; x=1773716588;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IJQ2dCfDYTqoMx6naowXS2cizlpAXMvHukUkaPemtzc=;
+        b=u6JQJG/bprrK6osmnW90g9UDxl6GiLz1yal7oMUMJqgntZDNkSlThigUFQiqtZez01
+         La0vYPw1n6DVkpXzOjqMz4nQ3fScVLfXv7/vKGXLzAs3aUMxiqdwrhwyn6VaIMeyPwcV
+         krCzBgM+k0gyL9r9XElalMp1hWK4APju0bzRVTTW+jCT7YPx+SJVYBISYtPza9HV1qoj
+         Xckk67NiNlGbvNu/TC54501Bcj8T1w93ayY3iC281m5iacjhqWs7Uiilvf77ZSY8L4LV
+         QPNEfRTgK6mWfpwMSpkUjOzPixMcNnnCX6CrbeXeiaBA/vdK3qWgBkjtAzLADYvcL/30
+         ObXA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+M4QVbLpGqvycmdI6i5sCC3fVDszgOv/SFMnByS1oKsK7B6H0KYbHQOPtcYiKfLvrFbh/80Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx5/exAqJfDgwS9HcwPHxY7fL46AZSNA5jLK6aX7aTPg+dnIvL
+	4/n9qIuokmrLNJtzQFf+pwrLXs8bzdqF8BE9KJd/UhtWJpFihMsgOeFT8WhgGh/Ga/Kg2HsXEXl
+	9wJeub1LJtFnadwpRbipqANEquPQ7Om+nUe7Hv8EC9Q2ZKiHYzV1tXGXVdGXOPmlh4tPNNUEFDJ
+	i30cZON6/AxmdEeaMlDtlfhHFESAXQ2e0M
+X-Gm-Gg: ATEYQzxlzYANr1nJ04HiWQzKvAwt48NEcFvtlkk/PhJc4IkCKYsR4o6E3bm/m5acXi0
+	V1iYRxUmLZGg2A0xVtjTOf0iDCR1qW0Y9Eaii0ZBCu+oI56Y9kQMMN7cVCpYR3kNdEIij1eZT3h
+	phpETBXdYM6hQvxBQ3Y8jz+5mB90eiMxNOtZQrlLfdUbih4CYfT2WSM3yAmNyiTHULE1egfSCPe
+	qYDtdg2
+X-Received: by 2002:a17:90b:5410:b0:352:ba0f:fb28 with SMTP id 98e67ed59e1d1-359be23398cmr12298990a91.1.1773111788400;
+        Mon, 09 Mar 2026 20:03:08 -0700 (PDT)
+X-Received: by 2002:a17:90b:5410:b0:352:ba0f:fb28 with SMTP id
+ 98e67ed59e1d1-359be23398cmr12298960a91.1.1773111787935; Mon, 09 Mar 2026
+ 20:03:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaE32DlfrX9S5KNT@fedora>
-X-Rspamd-Queue-Id: A28162448EA
+References: <20260307035110.7121-1-xietangxin@yeah.net> <CACGkMEtBS3M6P9xFM-kfPHyjwHgvCrfHM5H1242AQPi54ETqEw@mail.gmail.com>
+ <4b8a6182-da50-4edb-a34a-b75ed784f1e2@yeah.net>
+In-Reply-To: <4b8a6182-da50-4edb-a34a-b75ed784f1e2@yeah.net>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 10 Mar 2026 11:02:55 +0800
+X-Gm-Features: AaiRm509qPpH0vS0k_Y0y1HeOHRnsQKlnDDd-ndbgXxaWrw72LfUJL_pWWgEATA
+Message-ID: <CACGkMEuguforqrFH+wy2eG-W+ufHmqA_6+LSRPTyxDC-4UYFAQ@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE
+ is cleared and napi_tx is false
+To: xietangxin <xietangxin@yeah.net>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 6568124492F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265880-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-265881-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[yeah.net];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,if3:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,yeah.net:email,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-Hi Jay,
+On Mon, Mar 9, 2026 at 7:37=E2=80=AFPM xietangxin <xietangxin@yeah.net> wro=
+te:
+>
+>
+>
+> On 3/9/2026 11:42 AM, Jason Wang wrote:
+> > On Sat, Mar 7, 2026 at 11:53=E2=80=AFAM xietangxin <xietangxin@yeah.net=
+> wrote:
+> >>
+> >> A UAF issue occurs when the virtio_net driver is configured with napi_=
+tx=3DN
+> >> and the device's IFF_XMIT_DST_RELEASE flag is cleared
+> >> (e.g., during the configuration of tc route filter rules).
+> >>
+> >> When IFF_XMIT_DST_RELEASE is removed from the net_device, the network =
+stack
+> >> expects the driver to hold the reference to skb->dst until the packet
+> >> is fully transmitted and freed. In virtio_net with napi_tx=3DN,
+> >> skbs may remain in the virtio transmit ring for an extended period.
+> >>
+> >> If the network namespace is destroyed while these skbs are still pendi=
+ng,
+> >> the corresponding dst_ops structure has freed. When a subsequent packe=
+t
+> >> is transmitted, free_old_xmit() is triggered to clean up old skbs.
+> >> It then calls dst_release() on the skb associated with the stale dst_e=
+ntry.
+> >> Since the dst_ops (referenced by the dst_entry) has already been freed=
+,
+> >> a UAF kernel paging request occurs.
+> >>
+> >> fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
+> >> the dst reference before the skb is queued in virtio_net.
+> >>
+> >> Call Trace:
+> >>  Unable to handle kernel paging request at virtual address ffff80007e1=
+50000
+> >>  CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc=
+1+ #6 PREEMPT
+> >>   ...
+> >>   percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
+> >>   dst_release+0xe0/0x110  net/core/dst.c:177
+> >>   skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
+> >>   sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
+> >>   dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
+> >>   napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
+> >>   __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_ne=
+t]
+> >>   free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
+> >>   start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
+> >>   ...
+> >>
+> >> Reproduction Steps:
+> >> NETDEV=3D"enp3s0"
+> >>
+> >> config_qdisc_route_filter() {
+> >>     tc qdisc del dev $NETDEV root
+> >>     tc qdisc add dev $NETDEV root handle 1: prio
+> >>     tc filter add dev $NETDEV parent 1:0 protocol ip prio 100 route to=
+ 100 flowid 1:1
+> >>     ip route add 192.168.1.100/32 dev $NETDEV realm 100
+> >> }
+> >>
+> >> test_ns() {
+> >>     ip netns add testns
+> >>     ip link set $NETDEV netns testns
+> >>     ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
+> >>     ip netns exec testns ping -c 1 10.0.32.1
+> >>     ip netns del testns
+> >> }
+> >>
+> >> config_qdisc_route_filter
+> >>
+> >> test_ns
+> >> sleep 2
+> >> test_ns
+> >>
+> >> Signed-off-by: xietangxin <xietangxin@yeah.net>
+> >> ---
+> >
+> > This is needed for stable I think.
+> >
+> > And do we need to fix tun_net_xmit() as well?
+> >
+> > Thanks
+> Hi Jason,
+>
+> I have analyzed the tun driver and concluded that it don't suffer from th=
+is UAF issue.
+>
+> The netns containing a tun interface cannot be destroyed until all proces=
+ses
+> holding the tun file descriptor have exited.
 
-Any comments for this?
+Note that you can close all the file descriptors but tun device is still th=
+ere.
+
+> When the file descriptor is closed,
+> tun_chr_close() is called, which immediately free all skbs in the tx_ring=
+.
+> This happens before cleanup_net() destroys the dst_ops. Therefore, no skb=
+s referencing freeed dst_ops.
+> Unlike virtio_net, where skbs can remain in the TX queue even if the ns i=
+s deleted.
+>
+> I believe the fix is only necessary for virtio_net. What do you think?
+>
+> Best regards,
+>
+> Tangxin Xie
+>
 
 Thanks
-Hangbin
-On Fri, Feb 27, 2026 at 06:21:20AM +0000, Hangbin Liu wrote:
-> > 	Such a backup interface is typically carrier up and able to send
-> > or receive packets.  The peer generally won't send packets to the backup
-> > interface, however, as no traffic is sent from the backup, and the MAC
-> > for the bond uses a different interface, so no forwarding entries will
-> > direct to the backup interface.
-> > 
-> > 	There are a couple of special cases, like LLDP, that are handled
-> > as an exception, but in general, if a peer does send packets to the
-> > backup interface (due to a switch flood, for example), they're dropped.
-> 
-> OK, this makes sense to me.
-> 
-> > 
-> > >> 	Where I'm going with this is that, when multiple aggregator
-> > >> support was originally implemented, the theory was to keep aggregators
-> > >> other than the active agg in a state such that they could be put into
-> > >> service immediately, without having to do LACPDU exchanges in order to
-> > >> transition into the appropriate state.  A hot standby, basically,
-> > >> analogous to an active-backup mode backup interface with link state up.
-> > >
-> > >This sounds good. But without LACPDU exchange, the hot standby actor and
->                          ^^ I mean with LACPDU exchange..
-> > >partner should be in collecting/distributing state. What should we do when
-> > >partner start send packets to us?
-> > 
-> > 	Did you mean "should not be in c/d state" above?  I.e., without
-> > LACPDU exchage, ... not in c/d state?
-> > 
-> > 	Regardless, as above, the situation is generally equivalent to a
-> > backup interface in active-backup mode: incoming traffic that isn't a
-> > special case is dropped.  Normal traffic (bearing the bond source MAC)
-> > isn't sent, as that would update the peer's forwarding table.
-> > 
-> > 	Nothing in the standard prohibits us from having multiple
-> > aggregators in c/d state simultaneously.  A configuration with two
-> > separate bonds, each with interfaces successfully aggregated together
-> > with their respective peers, wherein those two bonds are placed into a
-> > third bond in active-backup mode is essentially the same thing as what
-> > we're discussing.
-> 
-> In theory this looks good. But in fact, when we do failover and set the
-> previous active port to disabled via
->   - __disable_port(port)
->     - slave->rx_disabled = 1
-> 
-> This will stop the failover port back to c/d state. For example, in my
-> testing (see details in patch 03), we have 4 ports, eth0, eth1, eth2, eth3.
-> eth0 and eth1 are agg1, eth2 and eth3 are agg2. If we do failover on eth1,
-> when eth1 come up, the final state will be:
-> 
-> 3: eth0@if3: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP mode DEFAULT group default qlen 1000
->     bond_slave state BACKUP ad_aggregator_id 1 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> actor_port_prio 10
-> 
-> 4: eth1@if4: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP mode DEFAULT group default qlen 1000
->     bond_slave state BACKUP ad_aggregator_id 1 ad_actor_oper_port_state_str <active,short_timeout,aggregating> ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync> actor_port_prio 255
-> 
-> 5: eth2@if3: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP mode DEFAULT group default qlen 1000
->     bond_slave state ACTIVE ad_aggregator_id 2 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> actor_port_prio 1000
-> 
-> 6: eth3@if4: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UP mode DEFAULT group default qlen 1000
->     bond_slave state ACTIVE ad_aggregator_id 2 ad_actor_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> ad_partner_oper_port_state_str <active,short_timeout,aggregating,in_sync,collecting,distributing> actor_port_prio 255
-> 
-> 7: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
->     bond mode 802.3ad actor_port_prio ad_aggregator 2
-> 
-> So you can see the eth0 state is c/d, while eth1 state is active, aggregating.
-> Do you think it's a correct state?
-> 
-> Thanks
-> Hangbin
+
 
