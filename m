@@ -1,141 +1,223 @@
-Return-Path: <netdev+bounces-266246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266247-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHWxAOZLsGnFhgIAu9opvQ
-	(envelope-from <netdev+bounces-266246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:50:46 +0100
+	id WC2vDGlMsGnFhgIAu9opvQ
+	(envelope-from <netdev+bounces-266247-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:52:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37C9255127
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:50:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 945DC25518D
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 245FA30255C6
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:50:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84AC4300679E
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0E33CAE6D;
-	Tue, 10 Mar 2026 16:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3242F3CFF65;
+	Tue, 10 Mar 2026 16:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GkeOLw54"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="i4oc/69g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from oak.phenome.org (unknown [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCA6F507;
-	Tue, 10 Mar 2026 16:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87203CFF74;
+	Tue, 10 Mar 2026 16:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773161442; cv=none; b=jeD0SdVYo0Bu+NMMgsxAjxNSAwK99+qp6D2L5ASd6oK4BAsr6oAD5B7bPiqwNz/sV4PjxtOYhN1vH9Q6Nvp9ILV9W0b4VdpVMWO0vUyBKWuU8hGWQiLPg46Z+2JBTlbsXR+RVS/szUUk3AeQqJeYT7SM0XeESqB0kc7Py4X1bOs=
+	t=1773161533; cv=none; b=TP5dcL0q3Qw2aJqVTO6Om7SlyswP8ZdPzUUYbEMruVhkDdeNUDrV0MxQO229Gh8WN/ilvTX180yOpchbsgM7nrA6yXdD0mUakGDD8eyBVcMdBU/mP9Epj9oBmYOtKz9AHX/LcW6iIIco6R8oISNMspkReQIOIMrXCAJ66baZ0ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773161442; c=relaxed/simple;
-	bh=bQ7522YAjfcokDg565/B1onBtKzhJnol+L61sKpUeHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UMg2PJgUvYhALwF43E/KQ9DIHmWReiC6E4e0Duy4wJpCvcC3b9I1a1+2T5itbYJMHWiReKs8t9EZGOJErvv6jijBtHRDld502EkSfVZoar/0x+3SW4AtA1MSO6UmwFCZu2bedpuSwucaxqVYoa0QLrlDYyjIMFGhSBoF1lp/VN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GkeOLw54; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0465DC19423;
-	Tue, 10 Mar 2026 16:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773161442;
-	bh=bQ7522YAjfcokDg565/B1onBtKzhJnol+L61sKpUeHE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GkeOLw54ydgodijZWQyBdWuQsu3FzcHlI5YpskizEOFVYYkZKVnpvgu8SgFXohAZh
-	 9fOY6hrLV3IJ8dzcSpNio9nHMvQEZotbcDJ4p6DewMcYGDpTU3jc6VzERg6i6QUdWQ
-	 hqs1dS3jCx8ZusCZCenTrNVYyF7i43J2vsEBaM9Z7GYbLREOwKtJ7e8+/KIcAcOqQg
-	 EXTpiLX80/NjqvA/LsdhEf0TZqAK4Av6+u0hHAU2Zk+rbOZwUm1FGmE+nYY080lN2I
-	 KH4AguRhRlnYP7I1a7/M8+KDfX4QnhJqsIcYvU3f2+f1c/g+STmlb7aBhCfXtx8mDz
-	 RtPmmyEQmdEoA==
-Message-ID: <04a9571f-55d7-466a-bfcc-161f8347ef92@kernel.org>
-Date: Tue, 10 Mar 2026 10:50:41 -0600
+	s=arc-20240116; t=1773161533; c=relaxed/simple;
+	bh=qCCpDaL9t68wwaimcdy210aFh2IuYNoS23y6q1PkTPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DhMKG+t8o+dr5C/ffQWYV5W9aPMGwYSqc75BL75R25O3LQXDzfmn60DXJQPhDKbdm1zPAyNll4Nfb39mxtubl+0zRRzeBNcNlT0srvnyegkXFSeoFBQ8JUkHg1Ux5HTAuKGw6izwclkXX0bvDI59+awBJQD636iyxrnHXKMhchU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=i4oc/69g; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-disposition:content-type:content-type
+	:mime-version:references:message-id:subject:subject:from:from
+	:date:date:received; s=oak1; t=1773161525; x=1774025526; bh=qCCp
+	DaL9t68wwaimcdy210aFh2IuYNoS23y6q1PkTPU=; b=i4oc/69gTuEDw0tQ6/Ot
+	OZXHfl/aFwyS4drjBE9rjoUzKZmJ434cBW9ndUlww3DCrdJ8jFVvHv11AhsAvJw7
+	0a9F9OH35fnLJtG1wTpdJU/fClwgltJ8+UlkcCJx04XnG2YGOPTaIb8NOtD07SdZ
+	ID+r6B2s/T2CNPSrf7ZKjcyNErBmRxRV1DVKUPDWHIGXhPwl5geTF0mq2bzSjutu
+	3YShtmwUqSX3tS80rzJbklOICPt+gKCGlqtXwsYfrezK3z4Wk2mGddmexZQN2iYz
+	XN1CUc3NWwHnjra9NnC+gnTetHiMSoa8I7cK+85p4K0nbjZR4OqkBN2hoEZPx+E0
+	5A==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Tue, 10 Mar 2026 17:52:03 +0100 (CET)
+Date: Tue, 10 Mar 2026 17:52:01 +0100
+From: Antony Antony <antony@phenome.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antony Antony <antony@phenome.org>, Yan Yan <evitayan@google.com>,
+	Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org,
+	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
+	selinux@vger.kernel.org, Nathan Harold <nharold@google.com>
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 8/8] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <abBMMZWNp_zN23xL@Antony2201.local>
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <b7b1bee9456ac4ada8941c93c2cc17f07d0b1912.1769509131.git.antony.antony@secunet.com>
+ <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
+ <aaF_SAQj4WT8jRaO@krikkit>
+ <CADHa2dCF=Cq2SMYgjHcs71VedwYaDmUXPWnNbv=46+11Mz0otA@mail.gmail.com>
+ <aa2K8pXXipCH8cke@Antony2201.local>
+ <aa_750R5Jm5qPbNs@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/10 net-next v2] ipv6: prepare headers for ipv6_stub
- removal
-Content-Language: en-US
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: rbm@suse.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20260310153506.5181-1-fmancera@suse.de>
- <20260310153506.5181-5-fmancera@suse.de>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260310153506.5181-5-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B37C9255127
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa_750R5Jm5qPbNs@krikkit>
+X-Rspamd-Queue-Id: 945DC25518D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266246-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266247-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[phenome.org,google.com,secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/10/26 9:34 AM, Fernando Fernandez Mancera wrote:
-> diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-> index 39c98c3d8ac5..62a1e96bbdd4 100644
-> --- a/include/net/ip6_fib.h
-> +++ b/include/net/ip6_fib.h
-> @@ -486,11 +486,29 @@ void rt6_get_prefsrc(const struct rt6_info *rt, struct in6_addr *addr)
->  	rcu_read_unlock();
->  }
->  
-> +#if IS_ENABLED(CONFIG_IPV6)
->  int fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
->  		 struct fib6_config *cfg, gfp_t gfp_flags,
->  		 struct netlink_ext_ack *extack);
->  void fib6_nh_release(struct fib6_nh *fib6_nh);
->  void fib6_nh_release_dsts(struct fib6_nh *fib6_nh);
-> +#else
-> +static inline int fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
-> +			       struct fib6_config *cfg, gfp_t gfp_flags,
-> +			       struct netlink_ext_ack *extack)
-> +{
+On Tue, Mar 10, 2026 at 12:09:27PM +0100, Sabrina Dubroca wrote:
+> 2026-03-08, 15:42:58 +0100, Antony Antony wrote:
+> > On Fri, Feb 27, 2026 at 03:14:21PM -0800, Yan Yan via Devel wrote:
+> > > > Anything that we leave as implicit copy will have to be "forever"
+> > > > implicitly copied with this new MIGRATE_STATE op -- unless we find a
+> > > > way to pass a new "clear these properties" flag (probably via a list
+> > > > of XFRMA_* attribute names)
+> > 
+> > that is a limitation we should avoid. It would be nice to extend it
+> > over time. We have been there before and it is a pain point. So it is
+> > worth investigating alternatives if there is momentum here, otherwise
+> > I would keep it simple:)
+> 
+> Well, because it's a known pain point, we shouldn't just jump into an
+> implementation.
+> 
+> (FWIW, as a kernel-only developer, ie not involved at all in the *swan
+> code, I don't have much of an opinion on which property should behave
+> which way, just that we know what we're getting into)
 
-NL_SET_ERR_MSG(extack, "IPv6 support not enabled in kernel");
+Understandable. Partly *swan world, Android, IETF RFC guidelines, NIST et 
+al. The *swan world usually wakes late after the time the kernel
+reaches distributions.This is too late to fix kernel without breaking ABI.
+standards world has its own path. Kernel often implements that what
+makes practical sense in the moment and hard depreciate/remove ABI:)
 
-let's keep the helpful, user facing message
+I feel these days there are more interactions such as this, which is a good 
+sign!
 
-> +	return -EAFNOSUPPORT;
-> +}
-> +
-> +static inline void fib6_nh_release(struct fib6_nh *fib6_nh)
-> +{
-> +}
-> +
-> +static inline void fib6_nh_release_dsts(struct fib6_nh *fib6_nh)
-> +{
-> +}
-> +#endif
-> +
->  
->  int call_fib6_entry_notifiers(struct net *net,
->  			      enum fib_event_type event_type,
+> > > That is true. I also have the concern that if all updatable attributes
+> > > follow the "omit-to-clear" pattern, we lose the extensibility. Thus
+> > > ideally we should switch to an "omit-to-inherit" model for some, if
+> > > not all, attributes to ensure that adding new SA properties doesn't
+> > > break backward compatibility.
+> 
+> Implicit copy ("omit-to-inherit") gets us in the situation we have
+> with the old MIGRATE code, we don't have a way to _not inherit_
+> properties. Well, apparently we do, based on what Antony wrote below.
+> 
+> 
+> 
+> > Here is my proposal. I extended the code and am testing it now; I hope
+> > to send out v6 soon.
+> 
+> I think it would have been nice to postpone v6 a little bit so that
+> others had time to answer here (and avoid a respin if there's some
+> disagreement on what the behavior should be).
+> 
+> > How would omit-to-inherit look in practice? Specify almost all XFRMA
+> > attributes supported in XFRM_MSG_NEWSA, minus some immutable ones.
+> > The immutable attributes that come to mind are:
+> > 
+> >     - XFRMA_ALG_*      : crypto must not change during the life of an SA;
+> >                          also *swan userspace does not keep this in memory
+> >                          after the SA is installed, which is correct
+> >                          behaviour.
+> >     - XFRMA_SA_DIR     : direction is fixed at SA creation.
+> >     - XFRMA_SEC_CTX    : security context is immutable.
+> 
+> So we should be rejecting an attempt to pass those attributes in a
+> MIGRATE_STATE request.
 
+yes. I added it o v6.It reject all unused attributes.  
+NL_SET_ERR_MSG_ATTR(extack, attrs[i], "Unsupported attribute in 
+XFRM_MSG_MIGRATE_STATE");
+
+> > currently supported attributes, using omit-to-inherit semantics:
+> > 
+> >     sentinel value to clear, omit to inherit:
+> >     - XFRMA_ENCAP              : encap_type=0 to clear
+> 
+> That would be a new special case value for that attribute, ok.
+> 
+> >     - XFRMA_OFFLOAD_DEV        : ifindex=0 to clear
+> 
+> OFFLOAD_DEV with xuo.ifindex=0 is a valid attribute to request offload
+> and let the kernel figure out which device to use. We can't use that
+> to clear/disable offload of an SA.
+
+Good catch, thanks.
+
+Two options to fix this:
+
+Option 1: add XFRM_OFFLOAD_CLEAR to xfrm_user_offload flags in uapi xfrm.h:
+
+#define XFRM_OFFLOAD_CLEAR  (1 << 7)
+When set in XFRMA_OFFLOAD_DEV, it means remove offload rather than configure it.
+
+Option 2: add a __u32 flags field to xfrm_user_migrate_state in uapi xfrm.h.
+There is a __u16 reserved currently used for alignment, but 16 bits feels
+too small if we want to cover clearing other attributes in the future.
+A __u32 at the end of the struct avoids that constraint.
+
+I am leaning toward option 2. Any preference? 
+
+
+> For the rest, it seems that passing 0 is equivalent to omitting the
+> attribute in the current code. Except XFRMA_SA_PCPU, where we consider
+> UINT_MAX as "disable" (default value for x->pcpu_num), but we reject
+> userspace passing us that value, and XFRMA_SA_PCPU containing 0 is a
+> valid value.
+
+yes XFRMA_SA_PCPU that would be UINT_MAX.
+
+-antony
 
