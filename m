@@ -1,54 +1,96 @@
-Return-Path: <netdev+bounces-265900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +H5WGe7Hr2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:27:42 +0100
+	id 6Or5GT3Ir2nWcAIAu9opvQ
+	(envelope-from <netdev+bounces-265901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:29:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4451824650C
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:27:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C9F246538
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B7D0302AD29
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:27:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 726F0302C6DC
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5053E5EF5;
-	Tue, 10 Mar 2026 07:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58CC3E5EF5;
+	Tue, 10 Mar 2026 07:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECLqjXlF"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928C8304972;
-	Tue, 10 Mar 2026 07:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DD73451AB
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773127639; cv=none; b=D94pcmTRmUWnOfp6DzEwRWUNEG9i0j5VzQ0nP3BsDinjVq8RylTQflSZhtuA2F3vVoDnXL3jQjmLpuNQr7fdBQfUEanwZCL0EBSKrfUQ94+RCSWTyqlE8wi6YDdH96W857jbRD8rGGTTHKr3P/7sprQOehyEfTVHdsQWrkUgmpw=
+	t=1773127717; cv=none; b=OyeDJuI3FDHB2qgNu6o7fMuMypS95DnMYZMtKdiIoa/blV4+AXp6kgoJ1mcQoeeTuijZM5nrhrQ6u+Zal8kB7HFMRIwfD/aTkF0Xt7GjyQpa3h6rs1VAVtZkxjPtH9w03tcPxcubK1UqNR3W9mIWwbB7Zp0i5f5y3pQWqNe6c50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773127639; c=relaxed/simple;
-	bh=gt+IEjZVyREX0OHtB3c5uCJO6Q8mAcODIGcUtN9VhAs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OqgightNn3+e4Nb0tRNQxEpc7RgAPjuBxvazkTdoMX0nMKb6Jd5DdZOo49VudUdhGDDOisdvXOrd4U+1BK1e9gPrV+5B3UsBYF4lEgSwXT24iHdcHeA+mQvzqegQ0l9e/fv4QoYtNeg4qgt1XsNLKfeB2IMKJs4yZhJAwKHWynM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [210.73.43.101])
-	by APP-03 (Coremail) with SMTP id rQCowADX+N+zx69pfnQ6Cg--.6292S2;
-	Tue, 10 Mar 2026 15:26:43 +0800 (CST)
-From: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
-To: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1773127717; c=relaxed/simple;
+	bh=RaUCuVLqqaAz0qqCFRLgvY1/9vy7sYbyn9KfSGSSmFQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qDxKiIOlpj/QRX3vRSqGm8eTUAsTyCrigDSojrtchchN3kkWje/f1HKc49LTuzgf1qoH0BljqEutCwsRCnwMUwAFSl0Go4OLdrAzNyzY8LPffoylqVKxnyIbRxX9RNn7uYM68q/QqCF2VZiTT1yUyZx6v669kdchzmXiEXyLAY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ECLqjXlF; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-35982fd8910so4132339a91.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773127716; x=1773732516; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=T5b7x3iexx3oDwiXrtY9eVbEYVTCyP5aQdngDqmKFek=;
+        b=ECLqjXlF79Cqdd/sG6QgiKyVNKlPBU8uIorb8iZ/ORjmuDCbSP5o4IV/r8uazk2SmP
+         CdM/m28AKep6Tx6P9cN8yd3rls0+83nN7UC3qcGj2Edk/JosScLh1RbEg8ewhgAbDLVT
+         dSLxYwwipfwBgFtxT5dw17OgpMvp/7u6TB/l0NuUW0A7cJ0ydRsE+/H4Igp9Y/Jwr7Um
+         9leWznuE0EG7JnQyASEuof1mqb7fZ3NuedyOEl72hYvddYjcvPLmDBBHCcCPvM1vWzs5
+         vj1UJYvjc5ZtZ72ns1XFK7wNm+ySQI3HAfVHf0n4YLa2aYDLqMt1vQdv34tozV+u3h6P
+         nHpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773127716; x=1773732516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T5b7x3iexx3oDwiXrtY9eVbEYVTCyP5aQdngDqmKFek=;
+        b=bdB/N5GI5BQ2WXbXJwIx15P6iZUTsBiS/r3uxWfGj4jbTsuCBetGuczVTu85PmnBeo
+         mcYONTkOTZYVJacaFlo+QySbQwBF3aQk3gEtg6d8aZA19Jaj3uWmDK8Z+N94n8LZ1068
+         MGIE/L2NfB1UkVc7O7Ks6Rq7zba5T8Y2DzOKLqgtgXPj64vV5XzOjTlddgO5CPruuJ5T
+         TqaYrKo4gne82FvmozkugXSAsUI7yUroCqg94Af7dqSstGsXvbalfWp2oRl/5DpgLkxl
+         WyW67lwWT4jw+SAfcKaewlum4hIkQnslH4Qc5kOqKfiNOqOw85K5ULEZoyIIeHPFJ+Yc
+         Cbpw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4s0nOW21xxQAkOWOFkBJPjCtKmv2AcX+IppVHBgABNSSCU5KsJuRFmXdEYADQkuCwxvltn7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIO9oAiytQqBiQdBGQ3cBRFrKRKXPgcdrRiAerBBN/NC0iWE+3
+	1SQTChKBttQKRZ5VcF4Z5fi8CecCvOZENsRQ+tBUbRW6A/hu8FiaXFey
+X-Gm-Gg: ATEYQzwleXk6R88kCGHj/zbrjnsm/Di9n/r48udmEPp/19Z6WWY6ETqC1T72T59FlAU
+	q5TIzyO1qElpr5bSeElG+OdJi7olfPO7i6evLSr31lsv7QyXdKJk0f1YZaYh7pd5uj45K0z9vdg
+	vq1YvpoMXZhce+SMuR9d8Jk7XICQSLZ7Nnz28kgxTn5ZXDsum1Rp2pBaazZzhOaBdRX4DwhWdij
+	PEwP5gdiUJ5+9Gav3agq60zarza91aRlPSAZqvnh7rSTYhmkYmN34VekmD3fAcKnYWuOLbIpNU/
+	ZtkaOSc0Ji2dECSDI6Giq2Sx/rgZFUmPFxnvVqTU+4gDnjPydEpTSb3Np9zsnNEFTbkPSyPFHBc
+	HfE/nDMQJU5f39pqFNJLrR9EU13bEP5TUL1/LWD32x2npkRDYWipuiyj/RFD/LlzP6+GWwRhKqJ
+	gvknXNWHSJ8TOKlf4vxWKo480ne56yyawdIxwK1i3H7dcoFMXT7dF0T7H2bYM+Yl8FOSRybWVaf
+	xZDBDLzjzU=
+X-Received: by 2002:a17:902:e5c6:b0:2ae:7f84:79e3 with SMTP id d9443c01a7336-2ae823840ebmr144117205ad.16.1773127715773;
+        Tue, 10 Mar 2026 00:28:35 -0700 (PDT)
+Received: from saza-a1.tail796f7.ts.net ([2001:ce8:130:e043:5f48:7c12:1017:bc82])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f8baa3sm151371455ad.65.2026.03.10.00.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 00:28:35 -0700 (PDT)
+From: Soichiro Ueda <the.latticeheart@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
-Subject: [PATCH v2] net: ethernet: bgmac: use pm_ptr() to clean up PM code
-Date: Tue, 10 Mar 2026 07:26:37 +0000
-Message-Id: <20260310072637.739541-1-pengpeng.hou@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	netdev@vger.kernel.org
+Cc: Soichiro Ueda <the.latticeheart@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Miao Wang <shankerwangmiao@gmail.com>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v3] selftests: af_unix: validate SO_PEEK_OFF advancement and reset
+Date: Tue, 10 Mar 2026 16:28:31 +0900
+Message-ID: <20260310072832.127848-1-the.latticeheart@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,126 +98,194 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADX+N+zx69pfnQ6Cg--.6292S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw43Wr4ruF18Cr18CFyUWrg_yoW5Jry7p3
-	s8GrWjyr1kGFn8ta18ta1kCF1Yyw1ftr9xWFWUWw4fZas8CryxJr40qFW8Zr95AFW8JF13
-	tF1Iy3yfZFs8XFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9C14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JU6UDXUUUUU=
-X-CM-SenderInfo: pshqw1hhqjhx1rx6x21ufox2xfdvhtffof0/
-X-Rspamd-Queue-Id: 4451824650C
+X-Rspamd-Queue-Id: C0C9F246538
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265900-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265901-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng.hou@isrc.iscas.ac.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thelatticeheart@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,isrc.iscas.ac.cn:mid]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Andrew,
+Extend the so_peek_off selftest to ensure the socket peek offset is handled
+correctly after both MSG_PEEK and actual data consumption.
 
-Thanks for the tip! Using pm_ptr() is definitely a better way to handle
-this. It cleans up the code nicely and keeps the build tests happy even
-when PM is disabled.
+Verify that the peek offset advances by the same amount as the number of
+bytes read when performing a read with MSG_PEEK.
 
-In the current code, bgmac_enet_suspend() and bgmac_enet_resume() are
-always there in the core driver, but their only users in
-bgmac-platform.c were wrapped in #ifdef CONFIG_PM.
+After exercising SO_PEEK_OFF via MSG_PEEK, drain the receive queue with a
+non-peek recv() and verify that it can receive all the content in the
+buffer and SO_PEEK_OFF returns back to 0.
 
-As you suggested, I've swapped the #ifdef guards for pm_ptr() and
-marked the platform wrappers with __maybe_unused. This way, the compiler
-always sees the code, but the linker will still toss it out if power
-management isn't being used.
+The verification after actual data consumption was suggested by Miao Wang
+when the original so_peek_off selftest was introduced.
 
-Signed-off-by: Pengpeng Hou <pengpeng.hou@isrc.iscas.ac.cn>
+Link: https://lore.kernel.org/all/7B657CC7-B5CA-46D2-8A4B-8AB5FB83C6DA@gmail.com/
+Suggested-by: Miao Wang <shankerwangmiao@gmail.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Soichiro Ueda <the.latticeheart@gmail.com>
 ---
-Changes in v2:
-- Switched from #ifdef guards to pm_ptr() as Andrew suggested.
-- Cleaned up the BGMAC_PM_OPS macro and used __maybe_unused for the
-  callback functions. It looks much better now!
+v2 -> v3:
+- Reorder variables in peekoffeq() to follow reverse xmas tree style
+- Fix formatting by adding a missing tab
+v1 -> v2:
+- Add peekoffeq checks after MSG_PEEK to verify offset advancement
+- Unify the length in the non-peek read
 
- drivers/net/ethernet/broadcom/bgmac-platform.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+v2: https://lore.kernel.org/netdev/20260305070525.184945-1-the.latticeheart@gmail.com/
+v1: https://lore.kernel.org/netdev/20260122033605.148626-1-the.latticeheart@gmail.com/
 
-diff --git a/drivers/net/ethernet/broadcom/bgmac-platform.c b/drivers/net/ethernet/broadcom/bgmac-platform.c
-index 86770f1..f9c32e1 100644
---- a/drivers/net/ethernet/broadcom/bgmac-platform.c
-+++ b/drivers/net/ethernet/broadcom/bgmac-platform.c
-@@ -257,33 +257,22 @@ static void bgmac_remove(struct platform_device *pdev)
- 	bgmac_enet_remove(bgmac);
+ .../selftests/net/af_unix/so_peek_off.c       | 46 +++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/tools/testing/selftests/net/af_unix/so_peek_off.c b/tools/testing/selftests/net/af_unix/so_peek_off.c
+index 86e7b0fb522d..f6466a717f49 100644
+--- a/tools/testing/selftests/net/af_unix/so_peek_off.c
++++ b/tools/testing/selftests/net/af_unix/so_peek_off.c
+@@ -76,6 +76,19 @@ FIXTURE_TEARDOWN(so_peek_off)
+ 		ASSERT_STREQ(str, buf);				\
+ 	} while (0)
+ 
++#define peekoffeq(fd, expected)					\
++	do {							\
++		socklen_t optlen = sizeof(int);			\
++		int off = -1;					\
++		int ret;					\
++								\
++		ret = getsockopt(fd, SOL_SOCKET, SO_PEEK_OFF,	\
++				 &off, &optlen);		\
++		ASSERT_EQ(0, ret);				\
++		ASSERT_EQ((socklen_t)sizeof(off), optlen);	\
++		ASSERT_EQ(expected, off);			\
++	} while (0)
++
+ #define async							\
+ 	for (pid_t pid = (pid = fork(),				\
+ 			  pid < 0 ?				\
+@@ -91,7 +104,12 @@ TEST_F(so_peek_off, single_chunk)
+ 	sendeq(self->fd[0], "aaaabbbb", 0);
+ 
+ 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
++	peekoffeq(self->fd[1], 4);
+ 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
++	peekoffeq(self->fd[1], 8);
++
++	recveq(self->fd[1], "aaaabbbb", 8, 0);
++	peekoffeq(self->fd[1], 0);
  }
  
--#ifdef CONFIG_PM
--static int bgmac_suspend(struct device *dev)
-+static int __maybe_unused bgmac_suspend(struct device *dev)
+ TEST_F(so_peek_off, two_chunks)
+@@ -100,7 +118,13 @@ TEST_F(so_peek_off, two_chunks)
+ 	sendeq(self->fd[0], "bbbb", 0);
+ 
+ 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
++	peekoffeq(self->fd[1], 4);
+ 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
++	peekoffeq(self->fd[1], 8);
++
++	recveq(self->fd[1], "aaaa", 4, 0);
++	recveq(self->fd[1], "bbbb", 4, 0);
++	peekoffeq(self->fd[1], 0);
+ }
+ 
+ TEST_F(so_peek_off, two_chunks_blocking)
+@@ -111,6 +135,7 @@ TEST_F(so_peek_off, two_chunks_blocking)
+ 	}
+ 
+ 	recveq(self->fd[1], "aaaa", 4, MSG_PEEK);
++	peekoffeq(self->fd[1], 4);
+ 
+ 	async {
+ 		usleep(1000);
+@@ -119,24 +144,38 @@ TEST_F(so_peek_off, two_chunks_blocking)
+ 
+ 	/* goto again; -> goto redo; in unix_stream_read_generic(). */
+ 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
++	peekoffeq(self->fd[1], 8);
++
++	recveq(self->fd[1], "aaaa", 4, 0);
++	recveq(self->fd[1], "bbbb", 4, 0);
++	peekoffeq(self->fd[1], 0);
+ }
+ 
+ TEST_F(so_peek_off, two_chunks_overlap)
  {
- 	struct bgmac *bgmac = dev_get_drvdata(dev);
+ 	sendeq(self->fd[0], "aaaa", 0);
+ 	recveq(self->fd[1], "aa", 2, MSG_PEEK);
++	peekoffeq(self->fd[1], 2);
  
- 	return bgmac_enet_suspend(bgmac);
+ 	sendeq(self->fd[0], "bbbb", 0);
+ 
+ 	if (variant->type == SOCK_STREAM) {
+ 		/* SOCK_STREAM tries to fill the buffer. */
+ 		recveq(self->fd[1], "aabb", 4, MSG_PEEK);
++		peekoffeq(self->fd[1], 6);
+ 		recveq(self->fd[1], "bb", 100, MSG_PEEK);
++		peekoffeq(self->fd[1], 8);
+ 	} else {
+ 		/* SOCK_DGRAM and SOCK_SEQPACKET returns at the skb boundary. */
+ 		recveq(self->fd[1], "aa", 100, MSG_PEEK);
++		peekoffeq(self->fd[1], 4);
+ 		recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
++		peekoffeq(self->fd[1], 8);
+ 	}
++
++	recveq(self->fd[1], "aaaa", 4, 0);
++	recveq(self->fd[1], "bbbb", 4, 0);
++	peekoffeq(self->fd[1], 0);
  }
  
--static int bgmac_resume(struct device *dev)
-+static int __maybe_unused bgmac_resume(struct device *dev)
- {
- 	struct bgmac *bgmac = dev_get_drvdata(dev);
+ TEST_F(so_peek_off, two_chunks_overlap_blocking)
+@@ -147,6 +186,7 @@ TEST_F(so_peek_off, two_chunks_overlap_blocking)
+ 	}
  
- 	return bgmac_enet_resume(bgmac);
+ 	recveq(self->fd[1], "aa", 2, MSG_PEEK);
++	peekoffeq(self->fd[1], 2);
+ 
+ 	async {
+ 		usleep(1000);
+@@ -155,8 +195,14 @@ TEST_F(so_peek_off, two_chunks_overlap_blocking)
+ 
+ 	/* Even SOCK_STREAM does not wait if at least one byte is read. */
+ 	recveq(self->fd[1], "aa", 100, MSG_PEEK);
++	peekoffeq(self->fd[1], 4);
+ 
+ 	recveq(self->fd[1], "bbbb", 100, MSG_PEEK);
++	peekoffeq(self->fd[1], 8);
++
++	recveq(self->fd[1], "aaaa", 4, 0);
++	recveq(self->fd[1], "bbbb", 4, 0);
++	peekoffeq(self->fd[1], 0);
  }
  
- static const struct dev_pm_ops bgmac_pm_ops = {
--	.suspend = bgmac_suspend,
--	.resume = bgmac_resume
-+	SET_SYSTEM_SLEEP_PM_OPS(bgmac_suspend, bgmac_resume)
- };
--
--#define BGMAC_PM_OPS (&bgmac_pm_ops)
--#else
--#define BGMAC_PM_OPS NULL
--#endif /* CONFIG_PM */
- 
- static const struct of_device_id bgmac_of_enet_match[] = {
- 	{.compatible = "brcm,amac",},
-@@ -299,7 +288,7 @@ static struct platform_driver bgmac_enet_driver = {
- 	.driver = {
- 		.name  = "bgmac-enet",
- 		.of_match_table = bgmac_of_enet_match,
--		.pm = BGMAC_PM_OPS
-+		.pm = pm_ptr(&bgmac_pm_ops),
- 	},
- 	.probe = bgmac_probe,
- 	.remove = bgmac_remove,
+ TEST_HARNESS_MAIN
 -- 
+2.53.0
 
 
