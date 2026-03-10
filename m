@@ -1,338 +1,223 @@
-Return-Path: <netdev+bounces-266168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PVONPs3sGkKhQIAu9opvQ
-	(envelope-from <netdev+bounces-266168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:25:47 +0100
+	id 4CiaJY0zsGl2hAIAu9opvQ
+	(envelope-from <netdev+bounces-266169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:06:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D73825356E
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:25:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FF7252DC9
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 852273121AA6
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:01:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A30713299AAF
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28A038D6B6;
-	Tue, 10 Mar 2026 14:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7925C391E46;
+	Tue, 10 Mar 2026 14:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fVhfhchi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M+7j/zvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C5C38D6B2
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F6338D6B9
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773151302; cv=none; b=NRCzauOBGwn52OS2ANSeP8/WyLDZ32O/JFY4bMRu8nu/XXIBhIr5xSzAyKa9CnsnuKVZCNJn529IfK5YiIp5S5NduBTqdWKbphv+MrXHbSG/zKdRbsNcnHQWrvlX63PdlkYUc6WE1yLdIJQp01VLSiyM/lUZjrOYmCRL7hU55U4=
+	t=1773151326; cv=none; b=gp9WpmNZt/AELlzaIlJzA1gWiBrgG7Eat3EAe79MObjpyCtXUNUljFkObGZVV0G7M/OXBBLtp4FXwODwufp/i8A9xjEzRhOjKrpTgd+9cqd51fMT/FFYwfELrwmxCZcwoEHQO4EtdaR1HhX1LwMrsIdbDO4QHCaqSuQJivsMNto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773151302; c=relaxed/simple;
-	bh=ySQy8CSrm4/UQYQ/rVVTsVt3TBD7/hFBFDy3F0p9YuU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OiBDhgJIT2ByCTnNCfLx1XC3RUJ4GBPHtBwrenGZllR6Lrz1azTaQWLXTIf0uTyJ2vWY/Ntc6Yb16/08mkdmjFzdVe9Z6G2E0ifU37aZK3lcc6WUljzecshMmUwwAB+g6iihD9x1VUZSASyo9ySsJOQzN/vNWE6Mw7+a0ZSbF6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fVhfhchi; arc=none smtp.client-ip=209.85.216.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-3598c1ad542so5828061a91.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:01:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773151301; x=1773756101;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qRikypN/LpT75/NMboweiLacdsHYIINoiM+NXjDT2RA=;
-        b=Oo/EkHnchA3lUJQ5xTFPp88+2vAX2QWnOv2B8Wj4sR051RhW1TEsytVRbNEak6hKsS
-         T4DeBbByals3NiIPCfE/JwjlnGuD7a8I4PxX58Dp/wIoIKjaCWP4T5wWcNi5PmcGrlOz
-         mY6sm8n+RVXSc75z5uv7soAA4UymnlX/I9zXfJCpmNWvyM4OdTvUleszl0AFp4YhhCSO
-         uqRO6Y9n5zRjw2Los6JQeYpdW9RV55XF8cCGo1jNkXuw6o9Q7Gpi7Z00pkeGvd4DbWGf
-         QMeIne7K6zjjsF/MPqcs3Ir7q68ZCaOWGZt+KvEc+7PTl35eF/9Y1AmCbl93eCUhvt4Y
-         qyYw==
-X-Gm-Message-State: AOJu0Yx2GHUQn8HrNeboyKUcUAfZZqVykmj37aMXrwl0Hoslpe4/C8hm
-	5/lNuZAZP2TJ4s0njDrfUHAtLQIXwBgiVbHs37W9gPzHKo2cM2WH4tGAumBriblrT9FkQb01Oke
-	WoV4pXfibZlCkQift+8cglDJoQWQAkQ5ljsCZ1MnqxxiW+kn6HGEWI2iSW8vr/LVFt9ISuxxAb2
-	2TGxmXsTSnXEFLIKtgC7q95HW7LwN2bbTQZbNS1m7oPGySmsU0wILSb4k7fNnqGX6sZ4vnPWQ+Z
-	HdSQlYkFhHfY0dvUA==
-X-Gm-Gg: ATEYQzzsbrpkMlUY/S+RN7hO9aHnD69ArZixGwT0FaOrJt+FIbXhQrFKfX+VtK/mPmV
-	PJpvtfhBnCW4TIV3CqUtFwvRWtkb9rmvknl4YqBMxoFyq/7VvmmC8s5LqKcCGqILSsvOuPn+hy4
-	hSVmCdD3HIrC9EbNHZBB3q5XGbZzoRpIa5pmq2WFxbrimIFG36HAfOBz5rCyKzLesbcIqD0Ll8L
-	iS6cIDas2c6da+t7hOQy4FVFU9c3hkbxssFoND5k9m4vjMpztGCvwEqWyJiQEYYNzErfGan2WIC
-	CwXeTLQ8x/vosyqmkg9qVDTfTqlbDEDvLfURvIRASIJ8A2igjmtvpLKMyW7puNFz7VBj28t1Jea
-	Jg3EpTk4mI7scxWMUJKy0nUg6p5KSb0HYfM/FmHgLHlSnr5RM9RPVztVk7sHLuuqT5QO53mO6rM
-	+mz+Z59DlTc9qGAyJCJs2fXiCR3VVXvm/YLY+kF/vRPux4lwRpavkeEypMngB1Z2w=
-X-Received: by 2002:a17:90b:3f8f:b0:359:f8c3:dada with SMTP id 98e67ed59e1d1-359f8c3e121mr1397962a91.13.1773151297529;
-        Tue, 10 Mar 2026 07:01:37 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-359f05f00a1sm307151a91.1.2026.03.10.07.01.34
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Mar 2026 07:01:37 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c6e7f45e2ddso45778178a12.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:01:34 -0700 (PDT)
+	s=arc-20240116; t=1773151326; c=relaxed/simple;
+	bh=0hNNZYnPE67nF1mHX8U8sOx0nA6XVig9tZv/Hddtnw4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=t8/jj23HECPpUeN7pM1LqTHT7uIYL3rMWMrwvKKOi8WmNle+Osne4mKLLY+112NnTXrym90QjLQ3uSMZVBptzu/zGSvYdVQArzneOgVHKU5GRsh6wFQTr3EJttg4s/5HaFu9sOjynv/3ve48ZI8RSV3OzroG8GAjyiLV3fsl7ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M+7j/zvj; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-439f5abc829so364160f8f.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:02:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773151293; x=1773756093; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1773151323; x=1773756123; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ohidppn0DDN3kquQ+UkqZeq+6ADdLoEMttZZlZ8FD5Y=;
+        b=M+7j/zvjumKtUZpS4BLAjINjDMiUwYIwXyCKQbfIp14hPu8vuZF/zJkzxJzAerjkO8
+         p47igbUa4QBAx2R15MmOwyzgtZg0r4CM7C75aVcdHcsoVWQPaDWby3yaxJCe2NY60HsR
+         RcXAF49WPFdKGT9nHVR0HWlZiFeJaVgRiKxWmcMcPC4y4jCivbRvA3+z1pgStPMtYZqu
+         agCvHmtodV2ui+9J5vUDoAQwK9lp/t4Vg/wJyQsSs4tfLtYgbZt8ceJpv023lVGVSD/E
+         1tGOk5N+PxcmHKn3kCI4syOMGWby8kInpuIEFdSBid+GdsO9mhnu0Oy2FeYmYuAAajKG
+         4aHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773151323; x=1773756123;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qRikypN/LpT75/NMboweiLacdsHYIINoiM+NXjDT2RA=;
-        b=fVhfhchiEfm1FepgdjtqVX85bqOr9CPZ5hqSx2trhfa/Ox+mLz/YHMolosukaALiof
-         Jxnd+F/8L+2X5qbdieowoKk0oh9vRKs/eu1C2Zf7/fI4FsJpbdyNEvGaRgbbooiDQQjm
-         iHpnvnnMaBAUh5h2YvZgGIJXKrLRIN0qHd4ME=
-X-Received: by 2002:a05:6a00:7581:b0:827:34c2:87f5 with SMTP id d2e1a72fcca58-829a2de1a15mr10171656b3a.8.1773151293167;
-        Tue, 10 Mar 2026 07:01:33 -0700 (PDT)
-X-Received: by 2002:a05:6a00:7581:b0:827:34c2:87f5 with SMTP id d2e1a72fcca58-829a2de1a15mr10171555b3a.8.1773151291883;
-        Tue, 10 Mar 2026 07:01:31 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a465b6f7sm16885202b3a.23.2026.03.10.07.01.27
+        bh=Ohidppn0DDN3kquQ+UkqZeq+6ADdLoEMttZZlZ8FD5Y=;
+        b=dFeibSkRN8oPcy2hvI0WirvUbIOixnVddLvGhLdkOk89EfNdco9wxJzwAmoJZ12iO7
+         +fdt0ZwWQuexPmqf30NyMOr7UyNwPeNhDA864+PxkqTLCY5lGM982YeLuNPAsZxoj8Ie
+         E/MNsX+7ylBR2Fze7SMzKv1coAlsCL8WfXD4MThnDV7oTsR6yidMd3BMphwNAFcfqsPp
+         0+CEsJzohkKR44wfTeuDJp2j/1C6YRQxQ8zAgiabiXESk1OBIw3PabFGEORBvtlhGp60
+         psVbUgIAx0RfKLf20AUPFoN1USSNDWaI5wu4PfdrJCgavkKe1bFc2PWMe7FcZqGjzMIF
+         h7+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWNQ8A41TaaZ2sUuPQjZ0451gw26lMdnjgn4S3an196lgSu4+kHitov2Kdcef//5RMBzIept7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRlhCcXlFS+8G71M9Mv0ZeaT6B+0Fm3h+8qVDuxQ2tn7fnEf2D
+	xxK1tk+zY6f0BV8/ikVnxLjU0TZsCYY6c1or0O4AhBH3oVxBz2oZOfJK
+X-Gm-Gg: ATEYQzwSAfO8nW55dtwV2NxyDDVK8kM98FJ+Cy3f20ZI9FZD/2AzkEmGDFnrJ8+nTso
+	vyc8MlNG16qI4sySxYqvQaWXIOwPFpG4Qgg2ajIqCYPp0qY0Hciff5unyE5/EQiqLrQeAdii1MP
+	CKsh+xblb8Uw7AccBmtGA+du0VJty8jeju4ZwUcnXz/JWct14twALrO+oo213lx5c5SkJATsrV4
+	o4guDAfuvsaI3lyIbbblvMzkbwFY4Q4lECy+mSxfM4WRdoaT87YrYrU6QW7ECbV7ocudZbncbzB
+	c1HPVf9ge/wWuFFTKe739tYI56rxtnw3IM82Zwh46NSgxPwM1dghHMXzzpJ2XsNP+nDaBy8iAWf
+	sEcNo3R/qmacE5JPnuvgnPIAETLCK400IqI1UUwAd3UaWbxN+JZM6DvuMu8OWSGRCxxfuR8VKBv
+	7qs/0ODq+e+dCgCmhypgtQBc2TkuxlgpDof15uPW9NN8T8KTLJcDYZBn9t1NW0UkUPiUx+ymyLb
+	HYicovk9TiB
+X-Received: by 2002:a05:6000:144c:b0:439:b7c9:2ef0 with SMTP id ffacd0b85a97d-439da88cebcmr24963018f8f.33.1773151323051;
+        Tue, 10 Mar 2026 07:02:03 -0700 (PDT)
+Received: from snowdrop.snailnet.com (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439dae3f267sm34409645f8f.31.2026.03.10.07.02.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 07:01:31 -0700 (PDT)
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
+        Tue, 10 Mar 2026 07:02:02 -0700 (PDT)
+From: david.laight.linux@gmail.com
+To: Johannes Zink <j.zink@pengutronix.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gatien Chevallier <gatien.chevallier@foss.st.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v5 01/10] bng_en: add per-PF workqueue, timer, and slow-path task
-Date: Tue, 10 Mar 2026 19:30:23 +0530
-Message-ID: <20260310140032.20893-2-bhargava.marreddy@broadcom.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260310140032.20893-1-bhargava.marreddy@broadcom.com>
-References: <20260310140032.20893-1-bhargava.marreddy@broadcom.com>
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: David Laight <david.laight.linux@gmail.com>
+Subject: [PATCH resend net-next 1/1] net: stmmac: actually error requests to change the auxiliary snapshot capture channel
+Date: Tue, 10 Mar 2026 14:01:55 +0000
+Message-Id: <20260310140155.3359-1-david.laight.linux@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 0D73825356E
+X-Rspamd-Queue-Id: 22FF7252DC9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266169-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[pengutronix.de,foss.st.com,bootlin.com,lunn.ch,kernel.org,davemloft.net,google.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,gmail.com,redhat.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266168-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add a dedicated single-thread workqueue and a timer for each PF
-to drive deferred slow-path work such as link event handling and
-stats collection. The timer is stopped via timer_delete_sync()
-when interrupts are disabled and restarted on open. The open and
-close paths now start and drain these resources.
+From: David Laight <david.laight.linux@gmail.com>
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Commit 2ddd05d1d5ed ("net: stmmac: do not silently change auxiliary snapshot capture channel")
+added code that attempted to return -EBUSY to a PTP_CLK_REQ_EXTTS
+request whan a snapshot was already enabled.
+However it tested bits in 'acr_value' after they had been masked off
+so the check would never return an error.
+
+Change the code so that the test actually works.
+Note that when the commit message says:
+    Previously in case of a PTP_CLK_REQ_EXTTS request, previously active
+    auxiliary snapshot capture channels were silently dropped and the new
+    channel was activated.
+this only refers to two commits earlier (a few minutes earlier).
+Prior to that only a single fixed snapshot channel could be enabled.
+
+Note that the check will reject requests to re-enable the currently
+enabled channel.
+Plausibly the best fix is just to delete the check completely.
+
+Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 74 ++++++++++++++++++-
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  | 12 ++-
- 2 files changed, 84 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index a20dc3ca640c..edbb42efb70b 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -101,6 +101,36 @@ static int bnge_alloc_ring_stats(struct bnge_net *bn)
- 	return rc;
- }
- 
-+static void bnge_timer(struct timer_list *t)
-+{
-+	struct bnge_net *bn = timer_container_of(bn, t, timer);
-+	struct bnge_dev *bd = bn->bd;
-+
-+	if (!netif_running(bn->netdev) ||
-+	    !test_bit(BNGE_STATE_OPEN, &bd->state))
-+		return;
-+
-+	/* Periodic work added by later patches */
-+
-+	mod_timer(&bn->timer, jiffies + bn->current_interval);
-+}
-+
-+static void bnge_sp_task(struct work_struct *work)
-+{
-+	struct bnge_net *bn = container_of(work, struct bnge_net, sp_task);
-+	struct bnge_dev *bd = bn->bd;
-+
-+	netdev_lock(bn->netdev);
-+	if (!test_bit(BNGE_STATE_OPEN, &bd->state)) {
-+		netdev_unlock(bn->netdev);
-+		return;
-+	}
-+
-+	/* Event handling work added by later patches */
-+
-+	netdev_unlock(bn->netdev);
-+}
-+
- static void bnge_free_nq_desc_arr(struct bnge_nq_ring_info *nqr)
- {
- 	struct bnge_ring_struct *ring = &nqr->ring_struct;
-@@ -2507,6 +2537,9 @@ static int bnge_open_core(struct bnge_net *bn)
- 	bnge_enable_int(bn);
- 
- 	bnge_tx_enable(bn);
-+
-+	mod_timer(&bn->timer, jiffies + bn->current_interval);
-+
- 	return 0;
- 
- err_free_irq:
-@@ -2542,6 +2575,8 @@ static void bnge_close_core(struct bnge_net *bn)
- 	bnge_tx_disable(bn);
- 
- 	clear_bit(BNGE_STATE_OPEN, &bd->state);
-+
-+	timer_delete_sync(&bn->timer);
- 	bnge_shutdown_nic(bn);
- 	bnge_disable_napi(bn);
- 	bnge_free_all_rings_bufs(bn);
-@@ -2690,6 +2725,23 @@ static void bnge_init_ring_params(struct bnge_net *bn)
- 	bn->netdev->cfg->hds_thresh = max(BNGE_DEFAULT_RX_COPYBREAK, rx_size);
- }
- 
-+static struct workqueue_struct *
-+bnge_create_workqueue_thread(struct bnge_dev *bd, const char *thread_name)
-+{
-+	struct workqueue_struct *wq;
-+	char *wq_name;
-+
-+	wq_name = kasprintf(GFP_KERNEL, "%s-%s", thread_name,
-+			    dev_name(bd->dev));
-+	if (!wq_name)
-+		return NULL;
-+
-+	wq = create_singlethread_workqueue(wq_name);
-+	kfree(wq_name);
-+
-+	return wq;
-+}
-+
- int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
- {
- 	struct net_device *netdev;
-@@ -2774,6 +2826,17 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
- 	if (bd->tso_max_segs)
- 		netif_set_tso_max_segs(netdev, bd->tso_max_segs);
- 
-+	INIT_WORK(&bn->sp_task, bnge_sp_task);
-+	timer_setup(&bn->timer, bnge_timer, 0);
-+	bn->current_interval = BNGE_TIMER_INTERVAL;
-+
-+	bn->bnge_pf_wq = bnge_create_workqueue_thread(bd, "bnge_pf_wq");
-+	if (!bn->bnge_pf_wq) {
-+		netdev_err(netdev, "Unable to create workqueue.\n");
-+		rc = -ENOMEM;
-+		goto err_netdev;
-+	}
-+
- 	bn->rx_ring_size = BNGE_DEFAULT_RX_RING_SIZE;
- 	bn->tx_ring_size = BNGE_DEFAULT_TX_RING_SIZE;
- 	bn->rx_dir = DMA_FROM_DEVICE;
-@@ -2789,11 +2852,13 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
- 	rc = register_netdev(netdev);
- 	if (rc) {
- 		dev_err(bd->dev, "Register netdev failed rc: %d\n", rc);
--		goto err_netdev;
-+		goto err_free_workq;
+Resend with corrected subject and To: Richard Cochran.
+
+Found by a test for FIELD_GET() returning 'constant zero' from a
+non-constant 'reg' value.
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index 3e30172fa129..aa17335a2031 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -222,19 +222,16 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+ 		write_unlock_irqrestore(&priv->ptp_lock, flags);
+ 		break;
  	}
+-	case PTP_CLK_REQ_EXTTS: {
+-		u8 channel;
+-
++	case PTP_CLK_REQ_EXTTS:
+ 		mutex_lock(&priv->aux_ts_lock);
+ 		acr_value = readl(ptpaddr + PTP_ACR);
+-		channel = ilog2(FIELD_GET(PTP_ACR_MASK, acr_value));
+-		acr_value &= ~PTP_ACR_MASK;
  
- 	return 0;
+ 		if (on) {
+-			if (FIELD_GET(PTP_ACR_MASK, acr_value)) {
++			u32 enabled_snapshots = FIELD_GET(PTP_ACR_MASK, acr_value);
++			if (enabled_snapshots) {
+ 				netdev_err(priv->dev,
+ 					   "Cannot enable auxiliary snapshot %d as auxiliary snapshot %d is already enabled",
+-					rq->extts.index, channel);
++					rq->extts.index, ilog2(enabled_snapshots));
+ 				mutex_unlock(&priv->aux_ts_lock);
+ 				return -EBUSY;
+ 			}
+@@ -245,6 +242,7 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+ 			acr_value |= PTP_ACR_ATSEN(rq->extts.index);
+ 			acr_value |= PTP_ACR_ATSFC;
+ 		} else {
++			acr_value &= ~PTP_ACR_MASK;
+ 			priv->plat->flags &= ~STMMAC_FLAG_EXT_SNAPSHOT_EN;
+ 		}
+ 		netdev_dbg(priv->dev, "Auxiliary Snapshot %d %s.\n",
+@@ -256,7 +254,6 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+ 					 !(acr_value & PTP_ACR_ATSFC),
+ 					 10, 10000);
+ 		break;
+-	}
  
-+err_free_workq:
-+	destroy_workqueue(bn->bnge_pf_wq);
- err_netdev:
- 	free_netdev(netdev);
- 	return rc;
-@@ -2802,8 +2867,15 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
- void bnge_netdev_free(struct bnge_dev *bd)
- {
- 	struct net_device *netdev = bd->netdev;
-+	struct bnge_net *bn;
-+
-+	bn = netdev_priv(netdev);
- 
- 	unregister_netdev(netdev);
-+
-+	cancel_work_sync(&bn->sp_task);
-+	destroy_workqueue(bn->bnge_pf_wq);
-+
- 	free_netdev(netdev);
- 	bd->netdev = NULL;
- }
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index 70f1a7c24814..d2ccee725454 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -224,6 +224,12 @@ struct bnge_tpa_info {
- #define BNGE_NQ_HDL_TYPE(hdl)	(((hdl) & BNGE_NQ_HDL_TYPE_MASK) >>	\
- 				 BNGE_NQ_HDL_TYPE_SHIFT)
- 
-+enum bnge_net_state {
-+	BNGE_STATE_NAPI_DISABLED,
-+};
-+
-+#define BNGE_TIMER_INTERVAL	HZ
-+
- struct bnge_net {
- 	struct bnge_dev		*bd;
- 	struct net_device	*netdev;
-@@ -281,13 +287,17 @@ struct bnge_net {
- 	u32			stats_coal_ticks;
- 
- 	unsigned long		state;
--#define BNGE_STATE_NAPI_DISABLED	0
- 
- 	u32			msg_enable;
- 	u16			max_tpa;
- 	__be16			vxlan_port;
- 	__be16			nge_port;
- 	__be16			vxlan_gpe_port;
-+
-+	unsigned int		current_interval;
-+	struct timer_list	timer;
-+	struct workqueue_struct *bnge_pf_wq;
-+	struct work_struct	sp_task;
- };
- 
- #define BNGE_DEFAULT_RX_RING_SIZE	511
+ 	default:
+ 		break;
 -- 
-2.47.3
+2.39.5
 
 
