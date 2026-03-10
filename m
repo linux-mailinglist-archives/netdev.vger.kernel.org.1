@@ -1,165 +1,222 @@
-Return-Path: <netdev+bounces-266179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJguK4QxsGkShAIAu9opvQ
-	(envelope-from <netdev+bounces-266179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:58:12 +0100
+	id sI7kHc8ysGl2hAIAu9opvQ
+	(envelope-from <netdev+bounces-266180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:03:43 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161E8252B53
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:58:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1EC252CF0
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:03:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 28D6E33679CA
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:25:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69BD9331381E
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC9D2DC76B;
-	Tue, 10 Mar 2026 14:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF37A2BE056;
+	Tue, 10 Mar 2026 14:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1drF4fH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ba59QdOX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE26299A84
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703E540DFA5
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773152746; cv=none; b=n5zKT1Bs12xOKSxObzoIwXz5V8pzp0OyqRmNutvJcAmQpyfEMjghwe5QLVy0Ae5JuPYaeq5AxYQ52Nz8ZKVID+ifw6xjFHHH6YOk6DzXYb0Bjn8ueEFe5+Y9Q0Eu/FYtsWzo0z3j9fSwoJ7AgR3LeZJ7oCY3uw/q/VgQUlri03o=
+	t=1773152989; cv=none; b=BTMfhvljVnV8NdfWT/IdAb6CWQfN/btOMxJLOj7vLNBBqR8lTsyRxPoZYYQmhuzwlX3F7pFRjsVoFUZ3e+Jm3xi3kqMNd315Dp0eku10LlqEo/7Ok/hDuUUXQOnyKVrDVY2VKZ2WMitevRpW7E5Lc42e3cY37ne0kCy4ixuV52A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773152746; c=relaxed/simple;
-	bh=BRo1R7FLUt9wGUx965N0k9ZgMgTk3OzCILYQeQGtP6A=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YTwTVl3Mw9zF3CL1g4UC45WDWejMM6RtWjC7gYNTOrAovjT7mVS4/blcT3GpkzTRMZ66U5v7Ewb2wKqTJCkopsbArWjb4YQxvyssURnxamr3O7JTYAVbgRtD/IzW2rxV0EoD5V37zqYtkb/QZ7sCkRV2UKxaRmJg7aIZJ+hqjkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1drF4fH; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cd7aab92dfso341862885a.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773152744; x=1773757544; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Rf7g1Z7W2ajIKmG0A1EyBZJZa0v3yYkcRJRaRvtJ0q4=;
-        b=h1drF4fHLbm8AAfpMr/WgUdBfzWBXKJc20IPRae++WLQcUTCELIda7vyoAHPH4Jk+8
-         pmCAyaxP5UrZlWfORpPIjbZNSWlImQV5FgPvQaNEYqGjavLshtugDSllFBAG9FCpED5E
-         A/qWZkum03fK/bZ4ICYptCNuBkf+YIoAFtTKA4dg4y/jqoZ1PKPohF9uNL1TQZVc8sYH
-         rqFC2cO6JPumsOF1S7XJs2imS0iEVpmyTaZTxb3SXumLoDOiEgXYMeo1s7TIMnz/uIKe
-         GmVlBVR0NCJqFGjCS3/l6ldkSWYt+TJusMZCnF0D4mOOjyOmeRFmhKyHXLLqgGQPiXTI
-         +OzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773152744; x=1773757544;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rf7g1Z7W2ajIKmG0A1EyBZJZa0v3yYkcRJRaRvtJ0q4=;
-        b=wbUtg9vTyNvKw/YaH3us+FNcFjxxbhzwSvf5vt4GBjTN1HfUOTVfYZMjMlZQyXpdU8
-         ywkwPDmkvyGFA9Awg/ksbPeu1TyoCO2b8uGQ0MEykhZA/gXVFchGFlgxlqI1+noh/EHT
-         gAtGZMX1RcnAQjG+AZReiyAf/kniKnfGnCMFqj6OeAHpk3+Uu/W1Kakxs9wX/iemKThw
-         RVif4TvdXrMeSjSryuxgoae2FLv+0ajv4HbE3YQDAJO4FOcl1fW5dMtIJZ9gsYvUf3TH
-         Dr34hG6IOG7YXammIltie3S2HxJIXbwBs1EuLZRfbmw4lxAabejzCrUD6bhE4eUe36HH
-         B+/g==
-X-Forwarded-Encrypted: i=1; AJvYcCU7Z3YauG0F7BNngkGnOAnJTsFaKenjt+tZssEg0E9uD4+YkCYrzOtSrPtrKtpyukrkfV7G6ns=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPb7S+/G86TO63S5H6VUSPNnawAOlyP5ehxLc0haVOeyDFVzjV
-	ioj8j1kjudH7JlsSlR6s9KsRjP294dwtOYhFtv32v+sAgwoEgv7lXW9g
-X-Gm-Gg: ATEYQzwQgwCGp3x6ZfBJat3zMLmwF5Dbagk1IavJFiXGDptoPafMEfbQVfb5e8912DD
-	81g9yF4BCRhkwL11dxbSHuWpaII3fytSkMvuddiFyMvOIDNfIL8X9jwydY7AnfuervWdgsOQqeO
-	vLeT+l5Ud7vxx7THErZJJCBGpOlvrs/iMn+vJ05wM/1gbcR/amN3MNK/qYlOItJun8wTDZIUQYc
-	kBDUv4tOCBWfiJp/1Vgo1B3TytJyG9r/8R4r2exf1MMo4HB+YCoQ5i9m2ZFhTZLE8XBjPFw2ECp
-	c69mh11MdE+9HbuOUk9w9Q4sLGo2xkZbrZagYMMACn6dABHUpkKu9IUgmQl5FJbJPImPvDTcges
-	2FKq2jchQcEpfLKnDDudDgAPiV/c5a/r949zt+WduB/Y5EVAgVi16LPzX0hszc37RURMeWBcNNY
-	cskLMVyBEN6U90JmI1c3o3BQEezJJ8U6kaCjyhrgf6cVibrKp6OC7BcJjiSMQXKfUjFg==
-X-Received: by 2002:a05:620a:f03:b0:8cd:937f:1402 with SMTP id af79cd13be357-8cd93b5e69amr383623385a.13.1773152743986;
-        Tue, 10 Mar 2026 07:25:43 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1145:4:3c5c:86e0:6cbd:e5d8? ([2620:10d:c091:500::1:4b47])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd8d4cac0esm361001585a.36.2026.03.10.07.25.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Mar 2026 07:25:43 -0700 (PDT)
-Message-ID: <f316780b-141f-4a91-b517-71034a02aef7@gmail.com>
-Date: Tue, 10 Mar 2026 10:25:42 -0400
+	s=arc-20240116; t=1773152989; c=relaxed/simple;
+	bh=iER+Hd4+IIHZJwtIpReHWAJBLrkOCj27Ep772FXakME=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XGBkDMJ546GFkPJVZuu0BVLvaObZB4g96pnWJIekaSgdvSZVG1iZVWbZDoM7Zh5iIB8E71DCxPCF2TJU5vlaCJJcOFjrIlA11s4mnNkJTRz/NEkeSgba8cAdE3mTGnEdPa8ZGNxyhberEO6N/76OcvTq9uYrrksQjJ0AIbpVs90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ba59QdOX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773152987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G9Kl/AJsyijdHET1vAK8UKCGDRuKVXFmJTFZ6ZiROck=;
+	b=ba59QdOXRH4wjpsBqtOsLYQQ8hNSFtdlkCc8OkR74Uo+8tDD56eT0btnb1x5fRRjuHBhVv
+	3/awSNLnJsdrqNAKb6ZrZrKYvyWifnyY/6OcRrThEfBhlvLdU46RJIGQFh01SihU49d3EC
+	xQRjE9WhwVGeP+tkMALvbnNbvAZkil0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-68mKelE2NYKHcD6YgGEgEg-1; Tue,
+ 10 Mar 2026 10:29:44 -0400
+X-MC-Unique: 68mKelE2NYKHcD6YgGEgEg-1
+X-Mimecast-MFC-AGG-ID: 68mKelE2NYKHcD6YgGEgEg_1773152981
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 698581800359;
+	Tue, 10 Mar 2026 14:29:41 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.133])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 35D491800361;
+	Tue, 10 Mar 2026 14:29:35 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: longli@microsoft.com
+Cc: kotaranov@microsoft.com,
+	erick.archer@outlook.com,
+	wei.liu@kernel.org,
+	linux-hyperv@vger.kernel.org,
+	pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com,
+	haiyangz@microsoft.com,
+	kys@microsoft.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	decui@microsoft.com,
+	schakrabarti@linux.microsoft.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [net-next,v3,4/6] net: mana: Use GIC functions to allocate global EQs
+Date: Tue, 10 Mar 2026 15:29:31 +0100
+Message-ID: <20260310142931.237121-1-pabeni@redhat.com>
+In-Reply-To: <20260306213302.544681-5-longli@microsoft.com>
+References: <20260306213302.544681-5-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Daniel Zahka <daniel.zahka@gmail.com>
-Subject: Re: [PATCH v3 net-next 2/5] psp: add new netlink cmd for dev-assoc
- and dev-disassoc
-To: Wei Wang <weibunny.kernel@gmail.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: Wei Wang <weibunny@fb.com>
-References: <20260309183454.2872967-1-weibunny.kernel@gmail.com>
- <20260309183454.2872967-3-weibunny.kernel@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20260309183454.2872967-3-weibunny.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 161E8252B53
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: CC1EC252CF0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266179-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[microsoft.com,outlook.com,kernel.org,vger.kernel.org,redhat.com,linux.microsoft.com,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-266180-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url]
 X-Rspamd-Action: no action
 
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: mana: Use GIC functions to allocate global EQs
 
-On 3/9/26 2:34 PM, Wei Wang wrote:
->   +int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
-> +{
-> +	struct psp_dev *psd = info->user_ptr[0];
-> +	struct psp_assoc_dev *psp_assoc_dev;
-> +	struct net_device *assoc_dev;
-> +	u32 assoc_ifindex;
-> +	struct sk_buff *rsp;
-> +	struct net *net;
-> +	int nsid;
+Replace the GDMA global interrupt setup code with the new GIC allocation
+and release functions for managing interrupt contexts.
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index c43fd8089e77..bdc9dc437fb7 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+
+[ ... ]
+
+> @@ -2052,26 +1998,17 @@ static int mana_gd_setup_remaining_irqs(struct pci_dev *pdev)
+>  static void mana_gd_remove_irqs(struct pci_dev *pdev)
+>  {
+>  	struct gdma_context *gc = pci_get_drvdata(pdev);
+> -	struct gdma_irq_context *gic;
+>  	int irq, i;
+>
+>  	if (gc->max_num_msix < 1)
+>  		return;
+>
+> -	for (i = 0; i < gc->max_num_msix; i++) {
+> -		irq = pci_irq_vector(pdev, i);
+> -		if (irq < 0)
+> -			continue;
+> -
+> -		gic = xa_load(&gc->irq_contexts, i);
+> -		if (WARN_ON(!gic))
+> -			continue;
+> -
+> +	for (i = 0; i < (gc->msi_sharing ? gc->max_num_msix : 1); i++) {
+                                                               ^^^
+Does this loop condition leak GIC references when msi_sharing is false?
+
+When msi_sharing is false, the loop only releases the GIC at index 0.
+However, mana_gd_setup_dyn_irqs allocates GICs at indices 1 through nvec:
+
+drivers/net/ethernet/microsoft/mana/gdma_main.c:mana_gd_setup_dyn_irqs() {
+    for (i = 1; i <= nvec; i++) {
+        gic = mana_gd_get_gic(gc, false, &i);
+        ...
+    }
+}
+
+Each mana_gd_get_gic call initializes the GIC with refcount=1. These GICs
+at indices 1..nvec are never released because mana_gd_remove_irqs only
+processes index 0 when msi_sharing is false.
+
+The old code iterated over all gc->max_num_msix entries unconditionally:
+
+    for (i = 0; i < gc->max_num_msix; i++) {
+        ...
+        gic = xa_load(&gc->irq_contexts, i);
+        ...
+        free_irq(irq, gic);
+        xa_erase(&gc->irq_contexts, i);
+        kfree(gic);
+    }
+
+This ensured every allocated GIC was freed. The new code with the
+conditional loop breaks this, resulting in:
+
+1. Leaked IRQ handlers - request_irq without matching free_irq for indices
+   1..nvec
+2. Leaked gdma_irq_context memory - the GIC structures are never freed
+3. Leaked xarray entries - the entries remain in gc->irq_contexts
+
+Additionally, pci_free_irq_vectors is called immediately after the loop,
+which attempts to tear down MSI-X vectors while IRQ handlers at indices
+1..nvec are still registered. Can this trigger warnings or use-after-free
+if an interrupt fires during teardown?
+
+The next commit in the series (4475f13983ab "net: mana: Allocate interrupt
+context for each EQ when creating vPort") adds per-EQ get/put of GICs,
+but the EQ teardown only drops the EQ's reference (refcount goes from 2 to
+1). The base reference from mana_gd_setup_dyn_irqs remains unreleased.
+
+>  		/* Need to clear the hint before free_irq */
+> +		irq = pci_irq_vector(pdev, i);
+>  		irq_update_affinity_hint(irq, NULL);
+> -		free_irq(irq, gic);
+> -		xa_erase(&gc->irq_contexts, i);
+> -		kfree(gic);
 > +
-> +	if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX) ||
-> +	    GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_NSID))
-> +		return -EINVAL;
-> +
-> +	nsid = nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
-> +	net = get_net_ns_by_id(genl_info_net(info), nsid);
-> +	if (!net) {
-> +		NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_NSID]);
-> +		return -EINVAL;
-> +	}
+> +		mana_gd_put_gic(gc, false, i);
+>  	}
+>
+>  	pci_free_irq_vectors(pdev);
 
-hmm, well I guess I still have the same comment from v2. If assoc_dev is 
-in the same netns as genl_info_net(info), then userspace would need to 
-create a self-referencing nsid to link them together. It might be a 
-better uapi to change PSP_A_DEV_NSID to an optional attribute, and if 
-not present then look for PSP_A_DEV_IFINDEX inside of genl_info_net(info).
 
