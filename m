@@ -1,236 +1,284 @@
-Return-Path: <netdev+bounces-266366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJ6UIeOYsGkukgIAu9opvQ
-	(envelope-from <netdev+bounces-266366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:19:15 +0100
+	id WIv3LkmZsGkukgIAu9opvQ
+	(envelope-from <netdev+bounces-266367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:20:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D78258D74
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:19:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A269258DBA
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A0143040039
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:19:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3CE6F30AD48C
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 22:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E947136B043;
-	Tue, 10 Mar 2026 22:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEADA369223;
+	Tue, 10 Mar 2026 22:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="RBIWZwwe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Q+noIFjW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xau2eUuB"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D968A346E50;
-	Tue, 10 Mar 2026 22:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284FC33A9DB
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 22:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773181146; cv=none; b=q1aJXFscpzmHzy/e3N7fpCN4Lyt9mQ1KgtkN4eFW80cPwD11Do+I53+i/ZpicHM6Gqy0Y/Qu//UK/YqJ5WAOwArOhDCRwvxJPm5QULNzFJCTNmaL2vl6DvPtHldogrevwY5KfjdigvGSFU42dY9egd7grTKaXOqY2+x1Ilj4sMA=
+	t=1773181255; cv=none; b=kIT3Z6sbdDPPIJBCOGNadNe53tgN4h8uH8Auh2vhYrbVLJEjs30karBj9V8SrMQp+LUK2n/NoO15hSasOnc6WzPe2B6+kh1NStSrZS2mJYtp6jEMzGctDgh5dvTAtF9xa4XeJbysTLrh58J//Yoo+9eD2PRRmBI65nLfS2SpIsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773181146; c=relaxed/simple;
-	bh=iJDAvNQWfTXa/d54rND70rOy1C42f+AfmZ9GTZCuIqQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=JO6QY0WQWPDsMel5lrPEO34YhYUm2SD1yuhdpghYpl+brK2i4kH9Xh/ThMY61bCftzs+oUuxGy+hqEKhBczv8x64vWm0xnhYa765kn1diDEo+c3ItSlZNBI5Za/dN+oEVijkkl9zE8yeFzBPTkF3Km5hfWyJtrCkbRlGVXjgQXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=RBIWZwwe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Q+noIFjW; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 13189140021A;
-	Tue, 10 Mar 2026 18:19:04 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Tue, 10 Mar 2026 18:19:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1773181144;
-	 x=1773267544; bh=FRlgnoZcWgoJlJFqsFQjQT0OGLiik2V/K6MtiEBUEM4=; b=
-	RBIWZwwelBtW10J+dVYS5KxWLYY+Z5KYr67R+cWTV7oxZTv749/mXXRIVeTn+H7r
-	GxOX8R1vpM/4BWx9WXCn52aKQQf7Q+QqOKu/4RF/ZuN5lLTD5Dxx8jXeTxTNcULJ
-	3BEdBvl3GXqURyW3odtt3p8xWgE3oC/oREzqZEoAiVNOWgwpCJ7crrRUyBEhAVZI
-	vlHGARaFW1BJ7ddZSAm2xvDLFDvqHpuAAdz162Az2xtFyMkbXhTnQetXvA0XsbIl
-	Qg9mbenNjEbbMeKEwbX/P9bC5uV6xjLOmWYDgCQ+AQXOmkUkf20R8cdFbeQY7UHi
-	Bb4JfK+EU6ISGvpHgENqdA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773181144; x=
-	1773267544; bh=FRlgnoZcWgoJlJFqsFQjQT0OGLiik2V/K6MtiEBUEM4=; b=Q
-	+noIFjWXCUrp3h0mxD7ppfVOe1UO+Vk7K4a1Yt/GNMGtSs8DP//5YAWcrCudmb41
-	P7NoEAuiAb8DUoQ4IRkMSwdpQ7ToF/oD9QaaiqGkpPIEv5xx5ZdfuJw/NMB+XUCs
-	pm7bgWLAVR7hF4/p/3rFkwhdq9YUcI6nFjnbynII3Yhc7YsBmluxVnPYCalEYQ9X
-	fuIkt382YG4TL7A8i8IOOVGPgmyXabQG0wsJSxVXwid7nU+m4Rk4051k7VIRiexz
-	S/CXCKMv9bfSsmjr6OANzMJulZ5Fr4ZYuFKf/5EYs1OIgQJRRnQ7rxaT+eyOjvqR
-	QU/tn0ahtRPn9ImmbhiwQ==
-X-ME-Sender: <xms:15iwafNpRAgTuD_NUtH5iWgTrmT8y0tX5mBrGDiYjk59bTEv8kacXQ>
-    <xme:15iwaUxC5D12tx0Ymltu00MT7vho8q9aEZWYTPxyHeiLt4fWBscd_upno1egcnsud
-    tmQbBgIEJQpP5DfnjuSVUYnxaHfET5TBqOjZjB8fKVR18oRO_RWZo4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkedvvddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhepteefudehvedutdeugfeuveffleduheehfeehffeujeduledvheeivdffleffjedt
-    necuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgt
-    phhtthhopedvtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrrhhtihhnrd
-    hpvghtvghrshgvnhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohepsghjohhrnhdrrghn
-    uggvrhhsshhonhesohhsshdrqhhurghltghomhhmrdgtohhmpdhrtghpthhtohepughmih
-    htrhihrdgsrghrhihshhhkohhvsehoshhsrdhquhgrlhgtohhmmhdrtghomhdprhgtphht
-    thhopehkrhiihihsiihtohhfrdhkohiilhhofihskhhisehoshhsrdhquhgrlhgtohhmmh
-    drtghomhdprhgtphhtthhopegrrghhrhhinhhgohesrhgvughhrghtrdgtohhmpdhrtghp
-    thhtoheprghgrhhuvghnsggrsehrvgguhhgrthdrtghomhdprhgtphhtthhopeguhhhofi
-    gvlhhlshesrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhhmrghlohihsehrvgguhhgr
-    thdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:15iwaf-Kf6MeOapsmweEsqPwg3eFKiZQxijFSW0urK8Q7sozvfC3Sg>
-    <xmx:15iwacIPsJSGfO64l6EvH6QccwUWirQM-76oJVl80W02oxD_gTV-gA>
-    <xmx:15iwaSdFtRRhbAQ1DIeWCBhheGcHHYjmZ3FtJNyxsTaFVZZnTDqTQA>
-    <xmx:15iwaZbSe1UzVDHdUMe9n0Fnk2qwzCF_kNeCwUkf06zCOVeodNyh_w>
-    <xmx:2JiwaTKBIBeG4hh0HFeirOoWkHEfY8wvJ9daeDikHitZKM9-1D4LqoaB>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 173C2700065; Tue, 10 Mar 2026 18:19:03 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1773181255; c=relaxed/simple;
+	bh=avKNWTDhM6bAwEi61OcG+RVe1r6lZ8VLh2TjI3n/Zsw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PD4YR5wyINbSDPdhrEkVejzmpG5qmviHc3+Rqe1h20W7v4npMGO9+CzvZl7k/vHwJzHEhuuVvfNKnwmQ2AF5CHzxMsELC6NSho6OvHqE5ry3vl2vN0BO98kDiGfH6gjgE50+CcsroeB1OrC5fY+xp3QRZEwj88EJ35EbT0wuZR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xau2eUuB; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b21fac4e-891b-481c-9734-e95290e49097@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773181242;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=USTS8bgmtjRodpsAsHJK5v2/OgPARYxfKHdIFoQaapk=;
+	b=xau2eUuBC5kEVoNphuT/ROBU0VOnrt1SDxk9ipiW/6Zmn/Y/PUn5p17FWCJbVsrIKLJvLH
+	vg7vG/Ex3vGPJhr/9F51EwkuhTOwb1DeTTtGhBGjx1Tkgy3UCfddL3QivmJXEIDGPZITMX
+	p4Oh4YC6B6ocaDYYH4XGsxnBHim1GQI=
+Date: Tue, 10 Mar 2026 15:20:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Aes-ty0OVaaR
-Date: Tue, 10 Mar 2026 23:18:29 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-Cc: =?UTF-8?Q?Kolbj=C3=B8rn_Barmen?= <linux-m68k@kolla.no>,
- "Krzysztof Kozlowski" <krzk@kernel.org>,
- "Fernando Fernandez Mancera" <fmancera@suse.de>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Selvin Xavier" <selvin.xavier@broadcom.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Ido Schimmel" <idosch@nvidia.com>,
- "Petr Machata" <petrm@nvidia.com>, "Simon Horman" <horms@kernel.org>,
- "Saurav Kashyap" <skashyap@marvell.com>,
- "Javed Hasan" <jhasan@marvell.com>,
- "maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
- <GR-QLogic-Storage-Upstream@marvell.com>,
- "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Nilesh Javali" <njavali@marvell.com>,
- "Manish Rangankar" <mrangankar@marvell.com>,
- "Varun Prakash" <varun@chelsio.com>,
- "Alexander Aring" <aahringo@redhat.com>,
- "David Teigland" <teigland@redhat.com>,
- "Andreas Gruenbacher" <agruenba@redhat.com>,
- "Nikolay Aleksandrov" <razor@blackwall.org>,
- "David Ahern" <dsahern@kernel.org>,
- "Pablo Neira Ayuso" <pablo@netfilter.org>,
- "Florian Westphal" <fw@strlen.de>, "Phil Sutter" <phil@nwl.cc>,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>,
- "Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>,
- "Xin Long" <lucien.xin@gmail.com>, "Jon Maloy" <jmaloy@redhat.com>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski@oss.qualcomm.com>,
- "Bjorn Andersson" <bjorn.andersson@oss.qualcomm.com>,
- "Dmitry Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>,
- "Eric Biggers" <ebiggers@kernel.org>,
- "Michal Simek" <michal.simek@amd.com>,
- "Luca Weiss" <luca.weiss@fairphone.com>, "Sven Peter" <sven@kernel.org>,
- "Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- "Kuninori Morimoto" <kuninori.morimoto.gx@renesas.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "David Gow" <david@davidgow.net>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Ryota Sakamoto" <sakamo.ryota@gmail.com>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "Kir Chou" <note351@hotmail.com>, "Kuan-Wei Chiu" <visitorckw@gmail.com>,
- "Vikas Gupta" <vikas.gupta@broadcom.com>,
- "Bhargava Marreddy" <bhargava.marreddy@broadcom.com>,
- "Rajashekar Hudumula" <rajashekar.hudumula@broadcom.com>,
- =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>,
- "open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
- "open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
- "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
- "open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
- <linux-scsi@vger.kernel.org>,
- "open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
- "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
- "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
- "open list:NETFILTER" <coreteam@netfilter.org>,
- "open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
- "open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
- "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
-Message-Id: <ebebb003-f7d7-4659-8248-9d36e9c2c26b@app.fastmail.com>
-In-Reply-To: <87bjgvpenh.fsf@miraculix.mork.no>
-References: <20260309022013.5199-1-fmancera@suse.de>
- <20260309022013.5199-2-fmancera@suse.de>
- <01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org>
- <e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
- <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
- <87bjgvpenh.fsf@miraculix.mork.no>
-Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in only and
- clean up Kconfigs
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 03D78258D74
+Subject: Re: [PATCH bpf v3 5/5] bpf, sockmap: Adapt for af_unix-specific lock
+To: Michal Luczaj <mhal@rbox.co>, Jiayuan Chen <mrpre@163.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
+ <20260306-unix-proto-update-null-ptr-deref-v3-5-2f0c7410c523@rbox.co>
+ <2192e9ef-894f-4826-b296-4f90e973a31b@163.com>
+ <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 6A269258DBA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm3,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266366-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kolla.no,kernel.org,suse.de,vger.kernel.org,linux-m68k.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
+	TAGGED_FROM(0.00)[bounces-266367-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[rbox.co,163.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCPT_COUNT_GT_50(0.00)[70];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.813];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026, at 22:18, Bj=C3=B8rn Mork wrote:
-> "Arnd Bergmann" <arnd@arndb.de> writes:
->
->> The list does not include openwrt though, and I know that in
->> previous releases, there was an optional kmod-ipv6 package
->> that could be left out of an install without rebuilding
->> the kernel.
->
-> The kmod-ipv6 package was dropped in 2016:
-> https://github.com/openwrt/openwrt/commit/33beafa8d88e51907acba6fdece5=
-a35f509934df
->
-> And IPv6 was unconditionally enabled in OpenWrt in 2022:
-> https://github.com/openwrt/openwrt/commit/832e7b817221d288df76b763ca12=
-c585365db5d8
 
-Thanks for checking!
 
-Not sure what the commit log for the second one is trying to say, as
-there generally was no build failure in mainline for a long time
+On 3/6/26 6:09 AM, Michal Luczaj wrote:
+> On 3/6/26 06:01, Jiayuan Chen wrote:
+>>
+>> On 3/6/26 7:30 AM, Michal Luczaj wrote:
+>>> unix_stream_connect() sets sk_state (`WRITE_ONCE(sk->sk_state,
+>>> TCP_ESTABLISHED)`) _before_ it assigns a peer (`unix_peer(sk) = newsk`).
+>>> sk_state == TCP_ESTABLISHED makes sock_map_sk_state_allowed() believe that
+>>> socket is properly set up, which would include having a defined peer. IOW,
+>>> there's a window when unix_stream_bpf_update_proto() can be called on
+>>> socket which still has unix_peer(sk) == NULL.
+>>>
+>>>             T0 bpf                            T1 connect
+>>>             ------                            ----------
+>>>
+>>>                                   WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)
+>>> sock_map_sk_state_allowed(sk)
+>>> ...
+>>> sk_pair = unix_peer(sk)
+>>> sock_hold(sk_pair)
+>>>                                   sock_hold(newsk)
+>>>                                   smp_mb__after_atomic()
+>>>                                   unix_peer(sk) = newsk
+>>>
+>>> BUG: kernel NULL pointer dereference, address: 0000000000000080
+>>> RIP: 0010:unix_stream_bpf_update_proto+0xa0/0x1b0
+>>> Call Trace:
+>>>     sock_map_link+0x564/0x8b0
+>>>     sock_map_update_common+0x6e/0x340
+>>>     sock_map_update_elem_sys+0x17d/0x240
+>>>     __sys_bpf+0x26db/0x3250
+>>>     __x64_sys_bpf+0x21/0x30
+>>>     do_syscall_64+0x6b/0x3a0
+>>>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>>
+>>> Initial idea was to move peer assignment _before_ the sk_state update[1],
+>>> but that involved an additional memory barrier, and changing the hot path
+>>> was rejected. Then a check during proto update was considered[2], but a
+>>> follow-up discussion[3] concluded the root cause is sockmap taking a wrong
+>>> lock. Or, more specifically, an insufficient lock[4].
+>>>
+>>> Thus, teach sockmap about the af_unix-specific locking: af_unix protects
+>>> critical sections under unix_state_lock() operating on unix_sock::lock.
+>>>
+>>> [1]: https://lore.kernel.org/netdev/ba5c50aa-1df4-40c2-ab33-a72022c5a32e@rbox.co/
+>>> [2]: https://lore.kernel.org/netdev/20240610174906.32921-1-kuniyu@amazon.com/
+>>> [3]: https://lore.kernel.org/netdev/7603c0e6-cd5b-452b-b710-73b64bd9de26@linux.dev/
+>>> [4]: https://lore.kernel.org/netdev/CAAVpQUA+8GL_j63CaKb8hbxoL21izD58yr1NvhOhU=j+35+3og@mail.gmail.com/
+>>>
+>>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>>> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+>>> Fixes: c63829182c37 ("af_unix: Implement ->psock_update_sk_prot()")
+>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>> ---
+>>>    net/core/sock_map.c | 35 +++++++++++++++++++++++++++++------
+>>>    1 file changed, 29 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+>>> index 7ba6a7f24ccd..6109fbe6f99c 100644
+>>> --- a/net/core/sock_map.c
+>>> +++ b/net/core/sock_map.c
+>>> @@ -12,6 +12,7 @@
+>>>    #include <linux/list.h>
+>>>    #include <linux/jhash.h>
+>>>    #include <linux/sock_diag.h>
+>>> +#include <net/af_unix.h>
+>>>    #include <net/udp.h>
+>>>    
+>>>    struct bpf_stab {
+>>> @@ -115,19 +116,43 @@ int sock_map_prog_detach(const union bpf_attr *attr, enum bpf_prog_type ptype)
+>>>    }
+>>>    
+>>>    static void sock_map_sk_acquire(struct sock *sk)
+>>> -	__acquires(&sk->sk_lock.slock)
+>>>    {
+>>>    	lock_sock(sk);
+>>> +
+>>> +	if (sk_is_unix(sk))
+>>> +		unix_state_lock(sk);
+>>> +
+>>>    	rcu_read_lock();
+>>>    }
+>>>    
+>>
+>> This introduces a new ordering constraint: lock_sock() before
+>> unix_state_lock(). Kuniyuki flagged in the v2 review that taking
+>> lock_sock() inside unix_state_lock() in the future would create an
+>> ABBA deadlock, which is exactly why the order was settled this way. However,
+>> the thread did not reach a conclusion on whether that constraint should be
+>> documented in the code.
+>>
+>> Since there is nothing enforcing this ordering mechanically, a brief comment
+>> at sock_map_sk_acquire() would help future readers avoid introducing the
+>> inverse ordering.
+> 
+> Sure, will do.
+> 
+>>>    static void sock_map_sk_release(struct sock *sk)
+>>> -	__releases(&sk->sk_lock.slock)
+>>>    {
+>>>    	rcu_read_unlock();
+>>> +
+>>> +	if (sk_is_unix(sk))
+>>> +		unix_state_unlock(sk);
+>>> +
+>>>    	release_sock(sk);
+>>>    }
+>>>    
+>>> +static inline void sock_map_sk_acquire_fast(struct sock *sk)
+>>> +{
+>>> +	local_bh_disable();
+>>> +	bh_lock_sock(sk);
+>>> +
+>>> +	if (sk_is_unix(sk))
+>>> +		unix_state_lock(sk);
+>>> +}
+>>> +
+>>
+>>
+>> v2 and v3 differ here in a way that deserves a closer look. In v2, AF_UNIX
+>> sockets took only unix_state_lock() in the fast path, skipping
+>> bh_lock_sock() entirely:
+>>
+>> /* v2 */
+>> if (sk_is_unix(sk))
+>>     unix_state_lock(sk);
+>> else
+>>     bh_lock_sock(sk);
+>>
+>> v3 takes both for AF_UNIX sockets.
+>>
+>> bh_lock_sock() protects sock::sk_lock.slock, whereas the state that
+>> actually needs protection here — sk_state and unix_peer() — lives under
+>> unix_sock::lock. Since unix_state_lock() is already sufficient to close
+>> the race against unix_stream_connect(), is bh_lock_sock() still doing
+>> anything useful for AF_UNIX sockets in this path?
+> 
+> Yeah, good point. I think I was just trying to keep the _fast variant
+> aligned with the sleepy one. Which I agree might be unnecessary.
 
-But if nobody has bothered to revert the patch, it doesn't seem
-to have caused any problems.
+I hope the common use case should not be calling 
+bpf_map_update_elem(sockmap) only.
 
-    Arnd
+Beside, from looking at the may_update_sockmap(), I don't know if it is 
+even doable (or useful) to bpf_map_update_elem(unix_sk) in 
+tc/flow_dissector/xdp. One possible path is the SOCK_FILTER when looking 
+at unix_dgram_sendmsg() => sk_filter(). It was not the original use case 
+when the bpf_map_update_elem(sockmap) support was added iirc.
+
+The only path left is bpf_iter, which I believe was the primary use case 
+when adding bpf_map_update_elem(sockmap) support [1]. It would be nice 
+to avoid bh_lock_sock() when calling from all bpf_iter (tcp/udp/unix) 
+where lock_sock() has already been done. It is more for 
+reading-correctness though. This just came to my mind. 
+has_current_bpf_ctx() can be used to check this. sockopt_lock_sock() has 
+been using it to conditionally take lock_sock() or not. [ I would still 
+keep patch 3 though. ]
+
+[1]: https://lore.kernel.org/bpf/20200821102948.21918-1-lmb@cloudflare.com/
+
+> 
+> In a parallel thread I've asked Kuniyuki if it might be better to
+> completely drop patch 2/5, which would change how we interact with
+> sock_map_close(). Lets see how it goes.
+> 
+
+If patch 2 is dropped, lock_sock() is always needed for unix_sk?
 
