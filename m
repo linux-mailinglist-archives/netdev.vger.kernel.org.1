@@ -1,183 +1,166 @@
-Return-Path: <netdev+bounces-266207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBaDF4I9sGmohQIAu9opvQ
-	(envelope-from <netdev+bounces-266207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:49:22 +0100
+	id QHilJGIxsGkShAIAu9opvQ
+	(envelope-from <netdev+bounces-266208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:57:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F4D253F33
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:49:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFFC252B1C
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 327D531A479F
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:52:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5AD17302C289
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA91D2ED16D;
-	Tue, 10 Mar 2026 14:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8A42857EA;
+	Tue, 10 Mar 2026 14:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHWsu8ph"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmYJxjF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712632D7DD4
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 14:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1852FCC0E;
+	Tue, 10 Mar 2026 14:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773154349; cv=none; b=lTDa8BA8/3UHMhh2r8Q7eKj5VS6k1rhPNYycnuH1nNaTAD8dM4pP3MdB9O/iKBeblgAeuhva22ID7WJaQm+3Ts2fQ8m/MU4J5KN3pUIl4Bu0ppK6A6yRRVT6aZA7VXmxTAAgkQDGufzYCrEkCznR1dZatoTcgs5le/L53k7joao=
+	t=1773154587; cv=none; b=AHStr4HmYSQqIVIQqfFgKU2InmU1O47noC0MaLLyp6PJ2rgvmQXzFizsat1vUpy8R74C6WpDPm+qdBrNEhFvuHZJuasi0z4YEM/2o2WD57euZ7hDrMeJ81AE8S51dngwRNhfC6C24gyfhPDf1u2dG8leq44mh+iKaf5I4BzVW8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773154349; c=relaxed/simple;
-	bh=49n9GSYOhnZZtu5gNl2BH/2gjdOfAm+onAhmJ4jCh58=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=joSh6+wh7uK7HXoeiR9NJjoNGIhT6NYyp1aJTbDrNgWQvbhnFjwKAyE5EstpfJy7LEIZPF45rxY7+Ytb2ClxUg32G/T9aSD3mgupB6o9WgT4cgZuGD5zkdx4XN64sY1rWzZrCYJ11YNnYVggVF9Gw7oLVchvePIVcVd9q4rQsLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SHWsu8ph; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773154347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UIxw8ifz/vx6UnFqbAoU5fFu1LJG7g45kyv4F9G6+b8=;
-	b=SHWsu8phio0WY9Q/SguMHzb2aTr3y2sQi4yK47jcmjBWFGpz2rBy1C6QrpPkxqG13YCnV8
-	hpbB5BuhTbG7gJmRV7UiqgERqae73WmPOZorhii+w3uYrdDwiZQ5tvlFZ+EwfBZxIP1XCD
-	/YGLhuBKm+Iur24CSBDUR92pffstqvY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-aeIt4Q60NxWy3SkSzoovHg-1; Tue,
- 10 Mar 2026 10:52:24 -0400
-X-MC-Unique: aeIt4Q60NxWy3SkSzoovHg-1
-X-Mimecast-MFC-AGG-ID: aeIt4Q60NxWy3SkSzoovHg_1773154343
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED2221800610;
-	Tue, 10 Mar 2026 14:52:22 +0000 (UTC)
-Received: from jramaseu-thinkpadt14gen5.tpbc.csb (unknown [10.43.3.226])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1DCBA1956095;
-	Tue, 10 Mar 2026 14:52:20 +0000 (UTC)
-From: Jakub Ramaseuski <jramaseu@redhat.com>
-To: aleksandr.loktionov@intel.com
-Cc: anthony.l.nguyen@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	jramaseu@redhat.com,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	przemyslaw.korba@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: enable NETIF_F_HW_CSUM for GSO packets
-Date: Tue, 10 Mar 2026 15:52:15 +0100
-Message-ID: <20260310145215.1128416-1-jramaseu@redhat.com>
-In-Reply-To: <IA3PR11MB8986B891354A9AEBB0289BEEE546A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB8986B891354A9AEBB0289BEEE546A@IA3PR11MB8986.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1773154587; c=relaxed/simple;
+	bh=fE0Z/ubIZkvllDHDQoyXm3PyilLIY5Tu3AO0WZjDsTc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EZZD1Jg5ddu5gn8ISD3MpuPwymKvwjPw23tu2Uu3ksmRlPEoTYFdBpw6XW1Gfj/6+wSOYGzWSWQGLVDnoU4WC40kw0HcLvctezMmcSCi4/9BoSqExh1PjoMuhuZhqFq78lRWaRVh/riYXNsmn0W7DwZeWyVW+MAG6+BltNWrvms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmYJxjF5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9FAC19423;
+	Tue, 10 Mar 2026 14:56:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773154587;
+	bh=fE0Z/ubIZkvllDHDQoyXm3PyilLIY5Tu3AO0WZjDsTc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=BmYJxjF5a9dvOp3Ha8UOY28eN9Ls8Tj2k9Ht30d/cMSVQDuueoydi7eHYyhEKug0P
+	 7Nlx16fAGAVjuUcYJ2TifdA8RZUEW1WVE9bwxzk6xsX+LpY8pVoI4vRK7LSwKi5txn
+	 TXEzAkjKCCygTWwTUJXDiJ1W7J4iNz/l+AwgclQGa3Y15wLxiZd+BOIdUxRV70lpku
+	 Yb+xcr51PtPS54Gt5fizFsM4bBka1qsrUKeauVLz/PqrHs9sj2wVpJAkDrkRlREcW4
+	 KDGuvIRo5jnylDD0rRfqsWWjU9OfzKITpIrGYVmZLMxWkcDeykF04Ooym+xGP7OcEp
+	 HXaeEl2lsisxg==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v2 0/2] kthread, exit: clean up kernel thread exit paths
+Date: Tue, 10 Mar 2026 15:56:08 +0100
+Message-Id: <20260310-work-kernel-exit-v2-0-30711759d87b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: 87F4D253F33
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAgxsGkC/yWMWw6CMBQFt0Lut5fUkuBjK8aPthykosXcViQh7
+ N1WP+fkzKwUIR6RztVKgtlHP4UMeleRG0y4gX2XmbTSrWpUy59JRh4hAQ/G4hNrHPvuBO202VP
+ WXoLeL7/k5frn+LZ3uFQ65WFNBFsxwQ1lepqYIPV8qBWLa2jbvtE5QPyWAAAA
+X-Change-ID: 20260306-work-kernel-exit-2e8fd9e2c2a1
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, bpf@vger.kernel.org, kunit-dev@googlegroups.com, 
+ linux-doc@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ netfs@lists.linux.dev, io-uring@vger.kernel.org, audit@vger.kernel.org, 
+ rcu@vger.kernel.org, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-mm@kvack.org, 
+ linux-security-module@vger.kernel.org, 
+ Christian Loehle <christian.loehle@arm.com>, linux-fsdevel@vger.kernel.org, 
+ Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.15-dev-9fd7c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3309; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=fE0Z/ubIZkvllDHDQoyXm3PyilLIY5Tu3AO0WZjDsTc=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRuMBTr7bhhNqNZgWf+LzYHk0VPGot/7yk3qp6qVMf86
+ r3sWbafHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABOZtoyRof32OmMzK1MvFp3i
+ RLOjK2rOFX5Z+v3AGxeDj8ltGz5br2Fk2COsfshHNk+cZf2uoIUP/xl9bjn/zH4H6x9zpi1CQW+
+ KGQA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+X-Rspamd-Queue-Id: 7EFFC252B1C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jramaseu@redhat.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-266207-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266208-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Dear Aleksandr,
+In 28aaa9c39945 ("kthread: consolidate kthread exit paths to prevent
+use-after-free") we folded kthread_exit() into do_exit() to fix a UAF
+bug but left kthread_exit() around as an alias. Remove it.
 
-> Please update commit message with exact commands for reproduction if possible.
-that is sure to be done in v2, for now try
+While at it, rename do_exit() to task_exit() to communicate that is not
+just a private api.
 
-for the side acting as iperf3 server:
-```
-#!/bin/bash
-# tunnel creation
-# IPv4 addr         192.168.42.11/24
-# IPv6 addr         2011::11/64
-# IPv4oIP6GRE addr  192.168.44.11/24
-# IPv6oIP6GRE addr  2023::11/64
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+Christian Brauner (2):
+      kthread: remove kthread_exit()
+      tree-wide: rename do_exit() to task_exit()
 
-ip l a gre1 type ip6gre remote 2011::12 local 2011::11 dev enp65s0f0np0
-ip l s ip6tnl0 up
-ip l s ip6gre0 up
-ip l s gre1 up
-
-
-# gre tunnel addresses
-ip a a 2001:db8:1::1/64 dev gre1
-ip a a 2023::11/64 dev gre1
-ip a a 192.168.44.11/24 dev gre1
-
-# device addresses
-ip a a 2011::11/64 dev enp65s0f0np0
-ip a a 192.168.42.11/24 dev enp65s0f0np0
-
-iperf3 -s
-```
-
-for the side acting as iperf3 client:
-```
-#!/bin/bash
-# tunnel creation
-# IPv4 addr         192.168.42.12/24
-# IPv6 addr         2011::12/64
-# IPv4oIP6GRE addr  192.168.44.12/24
-# IPv6oIP6GRE addr  2023::12/64
-
-ip l a gre1 type ip6gre remote 2011::11 local 2011::12 dev enp65s0f0np0
-ip l s ip6tnl0 up
-ip l s ip6gre0 up
-ip l s gre1 up
-
-# gre tunnel addresses
-ip a a 2001:db8:1::2/64 dev gre1
-ip a a 2023::12/64 dev gre1
-ip a a 192.168.44.12/24 dev gre1
-
-# device addresses
-ip a a 2011::12/64 dev enp65s0f0np0
-ip a a 192.168.42.12/24 dev enp65s0f0np0
-
-# tests with single stream
-# test gre throughput
-iperf3 -c 192.168.44.11 -t 20 -P 1
-iperf3 -c 2023::11 -t 20 -P 1
-# test normal throughput
-iperf3 -c 192.168.42.11 -t 20 -P 1
-iperf3 -c 2011::11 -t 20 -P 1
-```
-I hope this is expected answer.
-
-Best regards,
-Jakub Ramaseuski
+ Documentation/accounting/taskstats-struct.rst                |  2 +-
+ Documentation/locking/robust-futexes.rst                     |  8 ++++----
+ Documentation/trace/kprobes.rst                              |  2 +-
+ fs/cachefiles/namei.c                                        |  2 +-
+ include/linux/kernel.h                                       |  2 +-
+ include/linux/kthread.h                                      |  1 -
+ include/linux/module.h                                       |  2 +-
+ include/linux/sunrpc/svc.h                                   |  2 +-
+ io_uring/io-wq.c                                             |  2 +-
+ io_uring/sqpoll.c                                            |  2 +-
+ kernel/acct.c                                                |  2 +-
+ kernel/auditsc.c                                             |  4 ++--
+ kernel/bpf/verifier.c                                        |  2 +-
+ kernel/exit.c                                                | 10 +++++-----
+ kernel/futex/futex.h                                         |  2 +-
+ kernel/futex/pi.c                                            |  2 +-
+ kernel/futex/syscalls.c                                      |  2 +-
+ kernel/kthread.c                                             |  8 ++++----
+ kernel/locking/rwsem.c                                       |  2 +-
+ kernel/module/main.c                                         |  2 +-
+ kernel/pid_namespace.c                                       |  2 +-
+ kernel/rcu/tasks.h                                           | 12 ++++++------
+ kernel/reboot.c                                              |  6 +++---
+ kernel/seccomp.c                                             |  8 ++++----
+ kernel/signal.c                                              |  4 ++--
+ kernel/time/posix-timers.c                                   |  2 +-
+ kernel/umh.c                                                 |  2 +-
+ kernel/vhost_task.c                                          |  2 +-
+ lib/kunit/try-catch.c                                        |  2 +-
+ mm/hugetlb.c                                                 |  2 +-
+ security/tomoyo/gc.c                                         |  2 +-
+ tools/objtool/noreturns.h                                    |  3 +--
+ tools/testing/selftests/bpf/prog_tests/tracing_failure.c     |  2 +-
+ tools/testing/selftests/bpf/progs/tracing_failure.c          |  2 +-
+ .../selftests/ftrace/test.d/dynevent/fprobe_syntax_errors.tc |  2 +-
+ .../selftests/ftrace/test.d/kprobe/kprobe_multiprobe.tc      |  2 +-
+ .../selftests/ftrace/test.d/kprobe/kprobe_syntax_errors.tc   |  2 +-
+ 37 files changed, 58 insertions(+), 60 deletions(-)
+---
+base-commit: 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
+change-id: 20260306-work-kernel-exit-2e8fd9e2c2a1
 
 
