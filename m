@@ -1,167 +1,416 @@
-Return-Path: <netdev+bounces-266123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNaoJV4esGlagAIAu9opvQ
-	(envelope-from <netdev+bounces-266123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:36:30 +0100
+	id uN1YKjIasGlAfwIAu9opvQ
+	(envelope-from <netdev+bounces-266124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:18:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D052250782
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:36:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936C724FE6A
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E41A352431F
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:58:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 07FCC317D641
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14F43BF692;
-	Tue, 10 Mar 2026 12:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7574D3C0623;
+	Tue, 10 Mar 2026 12:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="L6tk2LDG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oy51/10i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28B23BF69C
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 12:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767183C062B
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 12:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773145292; cv=none; b=MBUshDExNiwH19aXu2TFcNfqtFMUVlpXG/txnaw1mRoON+HxxYemLgmx57bXSDvMewid1CGj0gCJuTg4M+l8sWJYIZiW5FpZaurw8zixto7bwqZ0+xv/tKY1V+YJU5EBQv+sZoa9ok4SY2NPYqerUVBWUB94hfbiaS7y9OeaMHY=
+	t=1773145307; cv=none; b=CPa2lBd7gKlePF2PKU8Xy9hgIdMLeTH8PSb/7BLqYc3KeRH3GcWfl3RJ7K1yKRxZ6ZTwnoyOXo8uxnxG1iw6LhMtF0upXiy/UReqTXxa5Egz9PgCQasQc6lZR9Uvqrr1lVtZU8r0wv4QxY5nx2oj19cIArYnBDBUnVqt4Vn5iyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773145292; c=relaxed/simple;
-	bh=fx/lvIvL/S3x19RqD/RjUqJrQys9pu/CXG8mO+EI1JQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRWUB3/YkR2yIQMJmyJdEjXFHwewcY/8zwRHdkUejHQL1tdn727KShEJ/1t+rn+1UM2UhuZnsn+XYkVWr1/ZCdofzOkOWasVuUdZWXgWV1Mthi5vYD50AzkqofqLlTQhQ7LizST99eiEFmYW4tojqqcLBvKHE+5FolBs7xyL5i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=L6tk2LDG; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id BE62220764;
-	Tue, 10 Mar 2026 13:21:27 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7PJfvpR0dvyL; Tue, 10 Mar 2026 13:21:26 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1773145307; c=relaxed/simple;
+	bh=an9adZHQvM7cqpkUyWxiNhIKJh3mohUEa/nINU0P6c4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fB7lb/3TgVrqznGJdKj9zWVEz8W+pHumKGSkNfyiZ0i5fkIbpGW8YlXI9tgxe/XTBYhVYnNFQf1ocwjodrmIAXhPGOVWHIN0Ofw7r0WrpY1t9lvFKUHx1U0P9iusU6TJvmtkrdl+52j7E43TT/u+LHaq8bfck+Gw3UKURRtOmOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oy51/10i; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773145303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JDfq77R22sq1ejgAyTb445PzrQTFDDUJmCUs/6D4c1E=;
+	b=Oy51/10ipXKNmJTBmO6jS9MuLUIgpJ6RUxJ0z/SjSngAtuVHNSNV/oFQWha5kPukRiHyiX
+	8fwtEdYmPghx21nF+wqBm0gd+yy/aOsC3lnSAINlUWigO0HTbSPxdI2c8jP1BetlLmfkmF
+	lc7bjdUz4II7vBB9w5HG5rhDVMlypbc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-508-ebwdEchyMvCNphjQnpk2TQ-1; Tue,
+ 10 Mar 2026 08:21:40 -0400
+X-MC-Unique: ebwdEchyMvCNphjQnpk2TQ-1
+X-Mimecast-MFC-AGG-ID: ebwdEchyMvCNphjQnpk2TQ_1773145297
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id CE041201E5;
-	Tue, 10 Mar 2026 13:21:26 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com CE041201E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773145286;
-	bh=3Y+1Ss4rc0Pofv3vspABGOE8TUz5/q99ZY2ILFsB2oI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=L6tk2LDGTnBllIuFd8Yi6a7g+EvW5/FMpOOgncJrKeHCDI+Ys0/TCnUu6K2dErMp+
-	 UjIn5jHpM6lkF057TTYmWmeRihtZB5i9RfMPO9MjNSIzT1ew/nh5FTTkMdbQsVbO5A
-	 M+copUgl07HlfAtQoXpi7OUkd6B2tYqU9y7xVR3U8iRF/kfc+aNrq5+PkOffj1fIR4
-	 2H5bl9eEgjS+wMWQ8+3J0q4vyxxDdi9mtKqFAosni19+iQdS9Mjb3dnGhDbKRvjwtx
-	 TwdtBN1cyrJdLFc5ELWEbPIwxVYoaYuN5RLX+Lf0CytO6EpCiyPZxfPg2gR/QSXoWg
-	 KgqAVl/CnFcow==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 10 Mar
- 2026 13:21:25 +0100
-Received: (nullmailer pid 152708 invoked by uid 1000);
-	Tue, 10 Mar 2026 12:21:25 -0000
-Date: Tue, 10 Mar 2026 13:21:25 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-CC: <netdev@vger.kernel.org>, <chopps@labn.net>, <horms@kernel.org>,
-	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <herbert@gondor.apana.org.au>, Hao Long
-	<me@imlonghao.com>
-Subject: Re: [PATCH ipsec v2] xfrm: iptfs: fix skb_put() panic on non-linear
- skb during reassembly
-Message-ID: <abAMxZbDHa4TfYbX@secunet.com>
-References: <20260304140935.19783-1-fmancera@suse.de>
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A89218002E3;
+	Tue, 10 Mar 2026 12:21:37 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.133])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 90784180035F;
+	Tue, 10 Mar 2026 12:21:30 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: dipayanroy@linux.microsoft.com
+Cc: ernis@linux.microsoft.com,
+	decui@microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	andrew+netdev@lunn.ch,
+	kys@microsoft.com,
+	kuba@kernel.org,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	edumazet@google.com,
+	wei.liu@kernel.org,
+	horms@kernel.org,
+	davem@davemloft.net,
+	linux-rdma@vger.kernel.org,
+	ssengar@linux.microsoft.com,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	haiyangz@microsoft.com,
+	linux-kernel@vger.kernel.org,
+	dipayanroy@microsoft.com,
+	netdev@vger.kernel.org
+Subject: Re: [net-next,v2] net: mana: Force full-page RX buffers for 4K page size on specific systems.
+Date: Tue, 10 Mar 2026 13:21:27 +0100
+Message-ID: <20260310122127.200675-1-pabeni@redhat.com>
+In-Reply-To: <aarXjJ+n2EoX2JvB@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aarXjJ+n2EoX2JvB@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260304140935.19783-1-fmancera@suse.de>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Rspamd-Queue-Id: 0D052250782
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: 936C724FE6A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	TAGGED_FROM(0.00)[bounces-266123-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:dkim,secunet.com:mid];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266124-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 03:09:35PM +0100, Fernando Fernandez Mancera wrote:
-> In iptfs_reassem_cont(), IP-TFS attempts to append data to the new inner
-> packet 'newskb' that is being reassembled. First a zero-copy approach is
-> tried if it succeeds then newskb becomes non-linear.
-> 
-> When a subsequent fragment in the same datagram does not meet the
-> fast-path conditions, a memory copy is performed. It calls skb_put() to
-> append the data and as newskb is non-linear it triggers
-> SKB_LINEAR_ASSERT check.
-> 
->  Oops: invalid opcode: 0000 [#1] SMP NOPTI
->  [...]
->  RIP: 0010:skb_put+0x3c/0x40
->  [...]
->  Call Trace:
->   <IRQ>
->   iptfs_reassem_cont+0x1ab/0x5e0 [xfrm_iptfs]
->   iptfs_input_ordered+0x2af/0x380 [xfrm_iptfs]
->   iptfs_input+0x122/0x3e0 [xfrm_iptfs]
->   xfrm_input+0x91e/0x1a50
->   xfrm4_esp_rcv+0x3a/0x110
->   ip_protocol_deliver_rcu+0x1d7/0x1f0
->   ip_local_deliver_finish+0xbe/0x1e0
->   __netif_receive_skb_core.constprop.0+0xb56/0x1120
->   __netif_receive_skb_list_core+0x133/0x2b0
->   netif_receive_skb_list_internal+0x1ff/0x3f0
->   napi_complete_done+0x81/0x220
->   virtnet_poll+0x9d6/0x116e [virtio_net]
->   __napi_poll.constprop.0+0x2b/0x270
->   net_rx_action+0x162/0x360
->   handle_softirqs+0xdc/0x510
->   __irq_exit_rcu+0xe7/0x110
->   irq_exit_rcu+0xe/0x20
->   common_interrupt+0x85/0xa0
->   </IRQ>
->   <TASK>
-> 
-> Fix this by checking if the skb is non-linear. If it is, linearize it by
-> calling skb_linearize(). As the initial allocation of newskb originally
-> reserved enough tailroom for the entire reassembled packet we do not
-> need to check if we have enough tailroom or extend it.
-> 
-> Fixes: 5f2b6a909574 ("xfrm: iptfs: add skb-fragment sharing code")
-> Reported-by: Hao Long <me@imlonghao.com>
-> Closes: https://lore.kernel.org/netdev/DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com/
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Applied to the ipsec tree, thanks a lot!
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: mana: Force full-page RX buffers for 4K page size on specific systems.
+
+This commit adds processor-specific optimization for ARM64 systems with
+4K pages where page_pool fragments cause throughput regression. It
+detects affected processors via SMBIOS and forces one RX buffer per page.
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index aef8612b73cb..05fecc00a90c 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+
+[ ... ]
+
+> @@ -1959,6 +1960,128 @@ static bool mana_is_pf(unsigned short dev_id)
+>  	return dev_id == MANA_PF_DEVICE_ID;
+>  }
+>
+> +/*
+> + * Table for Processor Version strings found from SMBIOS Type 4 information,
+> + * for processors that needs to force single RX buffer per page quirk for
+> + * meeting line rate performance with ARM64 + 4K pages.
+> + * Note: These strings are exactly matched with version fetched from SMBIOS.
+> + */
+> +static const char * const mana_single_rxbuf_per_page_quirk_tbl[] = {
+> +	"Cobalt 200",
+> +};
+> +
+> +/* On some systems with 4K PAGE_SIZE, page_pool RX fragments can
+> + * trigger a throughput regression. Hence identify those processors
+> + * from the extracted SMBIOS table and apply the quirk to forces one
+> + * RX buffer per page to avoid the fragment allocation/refcounting
+> + * overhead in the RX refill path for those processors only.
+> + */
+> +static bool mana_needs_single_rxbuf_per_page(struct gdma_context *gc)
+> +{
+> +	int i = 0;
+> +	const char *ver = gc->processor_version;
+> +
+> +	if (!ver)
+> +		return false;
+> +
+> +	if (PAGE_SIZE != SZ_4K)
+> +		return false;
+> +
+> +	while (i < ARRAY_SIZE(mana_single_rxbuf_per_page_quirk_tbl)) {
+> +		if (!strcmp(ver, mana_single_rxbuf_per_page_quirk_tbl[i]))
+> +			return true;
+> +		i++;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void mana_get_proc_ver_strno(const struct dmi_header *hdr, void *data)
+> +{
+> +	struct gdma_context *gc = data;
+> +	const u8 *d = (const u8 *)hdr;
+> +
+> +	/* We are only looking for Type 4: Processor Information */
+> +	if (hdr->type != SMBIOS_TYPE_4_PROCESSOR_INFO)
+> +		return;
+> +
+> +	/* Ensure the record is long enough to contain the Processor Version
+> +	 * field
+> +	 */
+> +	if (hdr->length <= SMBIOS_TYPE4_PROC_VERSION_OFFSET)
+> +		return;
+> +
+> +	/* The 'Processor Version' string is located at index pointed by
+> +	 * SMBIOS_TYPE4_PROC_VERSION_OFFSET.  Make a copy of the index.
+> +	 * There could be multiple Type 4 tables so read and store the
+> +	 * processor version index found the first time.
+> +	 */
+> +	if (gc->proc_ver_strno)
+> +		return;
+> +
+> +	gc->proc_ver_strno = d[SMBIOS_TYPE4_PROC_VERSION_OFFSET];
+> +}
+> +
+> +static const char *mana_dmi_string_nosave(const struct dmi_header *hdr, u8 s)
+> +{
+> +	const char *bp = (const char *)hdr + hdr->length;
+> +
+> +	if (!s)
+> +		return NULL;
+> +
+> +	/* String numbers start at 1 */
+> +	while (--s > 0 && *bp)
+> +		bp += strlen(bp) + 1;
+> +
+> +	if (!*bp)
+> +		return NULL;
+> +
+> +	return bp;
+> +}
+> +
+> +static void mana_fetch_proc_ver_string(const struct dmi_header *hdr,
+> +				       void *data)
+> +{
+> +	struct gdma_context *gc = data;
+> +	const char *ver;
+> +
+> +	/* We are only looking for Type 4: Processor Information */
+> +	if (hdr->type != SMBIOS_TYPE_4_PROCESSOR_INFO)
+> +		return;
+> +
+> +	/* Extract proc version found the first time only */
+> +	if (!gc->proc_ver_strno || gc->processor_version)
+> +		return;
+> +
+> +	ver = mana_dmi_string_nosave(hdr, gc->proc_ver_strno);
+> +	if (ver)
+> +		gc->processor_version = kstrdup(ver, GFP_KERNEL);
+> +}
+> +
+> +/* Check and initialize all processor optimizations/quirks here */
+> +static bool mana_init_processor_optimization(struct gdma_context *gc)
+> +{
+> +	bool opt_initialized = false;
+> +
+> +	gc->proc_ver_strno = 0;
+> +	gc->processor_version = NULL;
+> +
+> +	dmi_walk(mana_get_proc_ver_strno, gc);
+> +	if (!gc->proc_ver_strno)
+> +		return false;
+> +
+> +	dmi_walk(mana_fetch_proc_ver_string, gc);
+> +	if (!gc->processor_version)
+> +		return false;
+> +
+> +	if (mana_needs_single_rxbuf_per_page(gc)) {
+> +		gc->force_full_page_rx_buffer = true;
+> +		opt_initialized = true;
+> +	}
+> +
+> +	return opt_initialized;
+> +}
+> +
+>  static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  {
+>  	struct gdma_context *gc;
+
+[ ... ]
+
+> @@ -2013,6 +2136,11 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
+>  							  mana_debugfs_root);
+>
+> +	if (mana_init_processor_optimization(gc))
+> +		dev_info(&pdev->dev,
+> +			 "Processor specific optimization initialized on: %s\n",
+> +			gc->processor_version);
+> +
+>  	err = mana_gd_setup(pdev);
+>  	if (err)
+>  		goto unmap_bar;
+
+[ ... ]
+
+> @@ -2055,6 +2183,8 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	pci_iounmap(pdev, bar0_va);
+>  free_gc:
+>  	pci_set_drvdata(pdev, NULL);
+> +	kfree(gc->processor_version);
+> +	gc->processor_version = NULL;
+>  	vfree(gc);
+>  release_region:
+>  	pci_release_regions(pdev);
+
+[ ... ]
+
+> @@ -2110,6 +2240,9 @@ static void mana_gd_remove(struct pci_dev *pdev)
+>
+>  	pci_iounmap(pdev, gc->bar0_va);
+>
+> +	kfree(gc->processor_version);
+> +	gc->processor_version = NULL;
+> +
+>  	vfree(gc);
+>
+>  	pci_release_regions(pdev);
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index ea71de39f996..f17cc2cc7dd9 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+
+[ ... ]
+
+> @@ -744,6 +744,26 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
+>  	return va;
+>  }
+>
+> +static bool
+> +mana_use_single_rxbuf_per_page(struct mana_port_context *apc, u32 mtu)
+> +{
+> +	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
+> +
+> +	/* On some systems with 4K PAGE_SIZE, page_pool RX fragments can
+> +	 * trigger a throughput regression. Hence forces one RX buffer per page
+> +	 * to avoid the fragment allocation/refcounting overhead in the RX
+> +	 * refill path for those processors only.
+> +	 */
+> +	if (gc->force_full_page_rx_buffer)
+> +		return true;
+> +
+> +	/* For xdp and jumbo frames make sure only one packet fits per page. */
+> +	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>  /* Get RX buffer's data size, alloc size, XDP headroom based on MTU */
+>  static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
+>  			       int mtu, u32 *datasize, u32 *alloc_size,
+
+[ ... ]
+
+> @@ -754,8 +774,7 @@ static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
+>  	/* Calculate datasize first (consistent across all cases) */
+>  	*datasize = mtu + ETH_HLEN;
+>
+> -	/* For xdp and jumbo frames make sure only one packet fits per page */
+> -	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc)) {
+> +	if (mana_use_single_rxbuf_per_page(apc, mtu)) {
+>  		if (mana_xdp_get(apc)) {
+>  			*headroom = XDP_PACKET_HEADROOM;
+>  			*alloc_size = PAGE_SIZE;
+
+[ ... ]
+
+> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+> index ec17004b10c0..be56b347f3f6 100644
+> --- a/include/net/mana/gdma.h
+> +++ b/include/net/mana/gdma.h
+
+[ ... ]
+
+> @@ -9,6 +9,12 @@
+>
+>  #include "shm_channel.h"
+>
+> +/* SMBIOS Type 4: Processor Information table */
+> +#define SMBIOS_TYPE_4_PROCESSOR_INFO 4
+> +
+> +/* Byte offset containing the Processor Version string number.*/
+> +#define SMBIOS_TYPE4_PROC_VERSION_OFFSET 0x10
+> +
+>  #define GDMA_STATUS_MORE_ENTRIES	0x00000105
+>  #define GDMA_STATUS_CMD_UNSUPPORTED	0xffffffff
+>
+
+[ ... ]
+
+> @@ -444,6 +450,9 @@ struct gdma_context {
+>  	struct workqueue_struct *service_wq;
+>
+>  	unsigned long		flags;
+> +	u8			*processor_version;
+> +	u8			proc_ver_strno;
+> +	bool			force_full_page_rx_buffer;
+>  };
+>
+>  static inline bool mana_gd_is_mana(struct gdma_dev *gd)
+
+Should processor_version be declared as char * instead of u8 *?
+
+The field is used as a string throughout the code: it's assigned from
+kstrdup() in mana_fetch_proc_ver_string(), read as const char *ver
+in mana_needs_single_rxbuf_per_page(), passed to strcmp(), and printed
+with %s format in dev_info().
+
+Using u8 * for string data can trigger compiler warnings with
+-Wpointer-sign, since string functions expect char * types.
+
 
