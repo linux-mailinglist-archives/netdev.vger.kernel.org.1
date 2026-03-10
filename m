@@ -1,196 +1,298 @@
-Return-Path: <netdev+bounces-266305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266306-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBgfEyt0sGnejQIAu9opvQ
-	(envelope-from <netdev+bounces-266305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:42:35 +0100
+	id QDvoHmx0sGnJjQIAu9opvQ
+	(envelope-from <netdev+bounces-266306-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:43:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05296257171
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:42:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D72DD257188
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 20:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6C1F5300D762
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:42:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3E54304A6E0
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AE7351C3D;
-	Tue, 10 Mar 2026 19:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01FD3563FB;
+	Tue, 10 Mar 2026 19:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zmp6i5y1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZsdVi2A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9645A239E63
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 19:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773171751; cv=pass; b=LYm5uwy3Ox7Sp2pZoASCvXf8jhcHeB+GVhUFphRm1WO9MKWmqIekfRVLfVacYEEbFkMkvT5pAIz/K7gHgTfmHoDL0X5jco01uXvPqCkjWblTVLsRG576Gi9b+9ONB7BiW/yBEmZibpc29T8Ykf39AILpnv7/7kKQ2n9WUyQmeAs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773171751; c=relaxed/simple;
-	bh=YOPazVwyCUag60TOJ5EwGjcIbyWsLDxMHcCXTPyHcwc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bKwmFW9Ecpr7y1mAfOTr4AKNXIN8HshFiwStcGX0YsiOs4kSeiT7ip2iIDeTp+4hu4zq99LCqU8JPx1/j3y/OMlvkk8l34XqxJY85Nmvr7ClqcQZF0AMnv8JLDeczYXhK8yRBpwWCKR1r8Nfeoos0mHSsb3PIQgDc8PHc+2Q+vg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zmp6i5y1; arc=pass smtp.client-ip=209.85.161.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5041E351C3D
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 19:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773171779; cv=none; b=EG40Q9do16ingtH74Fr7ll1ua9JbBYuEDzLs7MNcG9MLq8nK93Ww77z7z+7JZGSaNMvR54HG4YdmshIC2pky/y5Bd2MyFzU3/8wDF32mpvm7n81Za3gZlouoAjVszJuwlW+763XYhAyiLhRWjj7XYj5MDGf6n6nRF1itF/CjYX4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773171779; c=relaxed/simple;
+	bh=Xp5cWeF4HbrybahqdWf5fNySKUbdzSzewb3UFHtW5Vg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=uQ04yFqKprxSRyOOuOi7ttL6oXFBtKuHFhRgO31oFzmDnohPUjMOgOmdiaH5xWYoy5KTMbUYFWIEpkU5mXRHhccYXx9BZipLzkfUA/QEaLuuOcBQbyb+Ug6oQGJlLiHyABK+gURFrIN4N51CqD14+fTr6E+XJM4mmr9l2ccA+jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZsdVi2A; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-66b0418ebe7so668385eaf.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 12:42:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773171749; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GUrbMrqxXYwaC4NQE8/CruOnaN7xTJ9CLShnIFjQKziSFeSZufKOEiziXuTQS1xFsm
-         esgU9G0sO4J09KQ4H57CqRGx/ovh4v0m9TgcEilKRwW+/Yq32H47BGVT3dRDS4j3HAZ3
-         NMYpgvUdMzVlxnsftg7xM8npZ2QFB6TeNhhlQ8s029EgoXtWObhHt6IXdCttaKQqG4SH
-         4W6xVpLq+XQQXxfYNCqh8UhHyWwRGG5cve2Q4K4DKAG3K7ZcsV0dUg5Og/efemo+HZjS
-         zg8RWxW5SlELG8kXOHfB5gn1Cdxr8ypdUR9OE7Myk2X6uwXh1dXCrqu1K7epRpaqyDZx
-         8XNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OrSZmBhb+FpmdwQApu/RhAcQKR/9+Z4LOYsPgxaxZqU=;
-        fh=m+MlybpBgAvXRatjRUI4/rwZ0BxaHes2eWqCG1qWzds=;
-        b=dNfYV9/tDEQu4flLAeUtAuIXlBaycC9cD3K0NC5YtsnPeZfzGAqXsRUO1tCli92lU3
-         y3xmihea3yBfNgyxrdTKFAxE2xjZhc3CPJbazUCy1aVroMxqDRqsQTTc5W8Nj3/RImGq
-         0rfXOXFgODFWbnLatUQE29wzRCGJ2hb5310QUtjXKDATSdMkAvkIMmxlOpWYLirPpMW+
-         18W7T3Hh1feohUq8YozNTzvFtgGI+7V6MDJQPg6WMkrEFbnzQQlJvGQZ9COQU7oswidp
-         H2C+CBDd20TJ4KLe8o5/F5l0tEplTZs42cltCnVVraK2refeALOfR4tPAhZGIbl2Hr51
-         4Kgg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7985ce90542so128500887b3.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 12:42:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773171749; x=1773776549; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1773171777; x=1773776577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OrSZmBhb+FpmdwQApu/RhAcQKR/9+Z4LOYsPgxaxZqU=;
-        b=Zmp6i5y19w3FbzaWbVTKQoy0XOnIRwlEz2CAgAnrcbdQq3NtmDSKJdclSop+GjJUa4
-         rHIg4S2n5QMasr/LmxIQpRYOJ2AfIt3mIb0H0lLhm5JK2OckCADQXQQCMUxKwNgG/S1f
-         LHxKCnIBRaq84ZSQ1kcKABpuPr7vpTaDlvtijOsr3EahwO5GWamLO2DFKwsK0snGLD9J
-         7QASBgOSiELj0XM6+XYYn2HEweiV/sMfkJRQaisBXZSQ038It2+9t1YyO2oIe9MDHiYP
-         uZANWKLULj/D3S4JpyD3ByzS5zibF5pWWJoTa+nQeZG8Jlmi1qt/VczHJM32+wXWyJs9
-         iheg==
+        bh=ZazdfSh9sc5uTQUQsfsPdnqHL0tjvmP+aKPck8iX0h0=;
+        b=DZsdVi2A5yxF8CzURNMHL0mXHWUyP8/kYCG78NxLCdL9V0QD+aOCoEHVLnQUz0k/K9
+         po1BzsfXAxei5f9g4eRE3Btdimv/kmFc2Iqlw36dSoRB+ZQCClBKvYufivrGliYeqrfo
+         9JnkjLbJmJ1MnXngD6jLwjn4zrnV2yZ7DudaYNJgh5b7vExf0H2/GxnED8B60qt+TJqc
+         MrjJJ1VsiX7gKt2EREGzBMXig5dGS4c+x9kq+/la2sMMjaWBjnr0DYbmcGc7NWmS973u
+         5opU9RzgCibnKKPjARJs8A7Lzhi6CVxlNv5IZLWSO4idGAVh/cDMPXqgS6M/ppBh4YNX
+         R8hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773171749; x=1773776549;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OrSZmBhb+FpmdwQApu/RhAcQKR/9+Z4LOYsPgxaxZqU=;
-        b=vKDutb7dVfwoF1IQqgy6MKzR/RjLIo4fwygrf/teQFiWeXfp+HPMeYYDnT6N8MGR+q
-         shJJw5eJf82UvC85Pv7yNRUIOiftFRL6+1jCeiiSNLE4cRfHFlYqPxjS7zZnhHF9/CDm
-         XFlfNRncn9KewqNkwp3i7LT8WaMABojSnLHwMQs2kMIxfIJJ8kvLn2MjLEZ0aMdY6+oA
-         0GcxHUT4ezFMxVNmgHyUhnsZfZ80FGGP1Aow+xNaFY/sZeqc22Q+recfP+oRdQpiVkRl
-         /QPCXdywLWZlAFvI9ED0ukBLEItLSY1hhfkxFWAGteLxZE7KJXyQv78u0eqOfLUcYC3t
-         VEMQ==
-X-Gm-Message-State: AOJu0YxsBUL1Ns9fymTdgQjOa46cqGPMhuXHgyXF2lV1kd+qe5fHysj3
-	K6aE8U/YeuVij5PcIbzCEHLJ5+oZ8XhAScpiL+TShv1qeLjT+c7RyizKwdFKZa+1QBiI8pkROT0
-	c643khMcwtdbhuV1BU/4kikft63hLdjE=
-X-Gm-Gg: ATEYQzw7qUnZZta05LbJsNFiii5mm6ecUcRGXJ1t/TZU0IoSEZ6F6M4wUEsVszwp0nq
-	yja4htNeWlfeS3qYSZTKiFgOJosSo+pBiPmxmE5uuTXV6gGZxzOHZ0vmqsWX4fA4Tl075QV0n3m
-	6MVc0xx0vgfyEVXn6BD9ewTZx9C+FR/l8zT2wHBwvi9R6xpVJAsGLEed+KZNOyrj/+4ySES2qHt
-	XdeGKxqBfbtCmJOtArlR5a0wT+vzaf6jChNMWYMWz001ZEorx5zFm6ROusva1uUrpLJbx7b/VDH
-	z+uMHmv5NxNX1D9OSpTv9tQ=
-X-Received: by 2002:a05:6830:2681:b0:7d7:4c91:13ac with SMTP id
- 46e09a7af769-7d76a78717emr59149a34.5.1773171749538; Tue, 10 Mar 2026 12:42:29
- -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773171777; x=1773776577;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZazdfSh9sc5uTQUQsfsPdnqHL0tjvmP+aKPck8iX0h0=;
+        b=K9C7Er7F6rhXJjpLz7x5iOLNV6+Sc5yHMAtTM0u/egno+XB3iX76yQOo5vU2IL3K2d
+         dqE50I2bvKczb31UP0H73v/dHJCFPGE7iktJHAlAkBNrzB1bLwKqMOOXmII59fNic7W7
+         u3DfVAzpqpmNeiUjtS9zBpeBsi2yfPsh5OmuQu2L/SfzmC6Eu6oIZZSnGPCC4lw5UULQ
+         FcHMexAYq4TgGakFIpDj67+EdlcSqzrLaImgxDVHQghDtDsZDQtiTVB/LExUDpp//Wpn
+         aLdLzlHquensxD8+y9NN6IaWRZ3ht9GKtQqz7oEzIQn9SuYfRSiGdX10UoAJgnl/rO5a
+         cOSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpGwuroJwAVwbmeVtw45u5lZ6O4N9HPREepeISMDakrEQZNoXxhusQrqukALOZCb3fryguQSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7VQj48PcFE4VshCrcHZMDZ6yUW6CmtC21f6xfLsxr02O9lF7p
+	S6CAZId3eeq80BmREp0v3jPSy34kMyt3i/y4x28z6Gn6wnVmeWA5poIZ
+X-Gm-Gg: ATEYQzwVRUc4LRfSQm4W93d6rKwjF86C+RFAfAS99Cud1evcms3VAKNnLLt3Snea7q8
+	EhZY/lY8oCHkT8yMMR1PyZ1BFt0jrdUP14g0+goultpSicQCmqaNC9tHZG8/ZzcauJkkzctwJld
+	r7WhXpb/O8fptm/aJiv1KtkYpcVTKnv4OkrCoFyhrYG2YPeS9H2n1vnK62P1yNN2PK749YE7pvr
+	xFVXQydp/Lvi9Rt1D7Hi6rlrK25AvcRDS10reRHiIb0Nj80zs3gIanPPJScPgoXgplbOU5stjjP
+	0KEMFztw5NU6JwBo4SpMqzdnZJqvvAUkRN3QvucmIuUJ5yP63nnPKg4tiOCZ5fOm1muUp/X39+0
+	Y6SrJxrUxPrhNMt3QFzykD7yCpOAGWbgetDFHSnfQl+p05j222838rSwKd/Fjrw98/qCnk97Qxu
+	TeOvkHOkLDn1OlI8aqh2nj9XkudrjzkPUULHntWq1t9CA/NnAlR7voq0u2gbeZ17s0UZEO+hypw
+	aT6Xtavls92WPU=
+X-Received: by 2002:a05:690c:c0b:b0:798:68a4:15c5 with SMTP id 00721157ae682-798dd78020amr158895557b3.38.1773171777277;
+        Tue, 10 Mar 2026 12:42:57 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7990a54d3f5sm21712357b3.22.2026.03.10.12.42.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 12:42:56 -0700 (PDT)
+Date: Tue, 10 Mar 2026 15:42:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Hudson, Nick" <nhudson@akamai.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "Glasgall, Anna" <aglasgal@akamai.com>, 
+ "Tottenham, Max" <mtottenh@akamai.com>, 
+ "Hunt, Joshua" <johunt@akamai.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Paul Chaignon <paul.chaignon@gmail.com>, 
+ Mykyta Yatsenko <yatsenko@meta.com>, 
+ Tao Chen <chen.dylane@linux.dev>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Anton Protopopov <a.s.protopopov@gmail.com>, 
+ Tobias Klauser <tklauser@distanz.ch>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Message-ID: <willemdebruijn.kernel.326800cb16195@gmail.com>
+In-Reply-To: <58BD9063-C619-45C4-AB60-CCA40E391A52@akamai.com>
+References: <20260219104710.1490304-1-nhudson@akamai.com>
+ <20260219104710.1490304-2-nhudson@akamai.com>
+ <willemdebruijn.kernel.5766d0a10c73@gmail.com>
+ <7C8018C7-B0E2-435F-B155-60F29BCF5018@akamai.com>
+ <willemdebruijn.kernel.7c6e5a81afba@gmail.com>
+ <58BD9063-C619-45C4-AB60-CCA40E391A52@akamai.com>
+Subject: Re: [RFC PATCH 1/1] bpf: Add tunnel decapsulation and GSO state
+ updates per new flags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260309183454.2872967-1-weibunny.kernel@gmail.com>
- <20260309183454.2872967-3-weibunny.kernel@gmail.com> <9b7c4207-1bdd-4d56-a3fe-ea3e25e62559@gmail.com>
-In-Reply-To: <9b7c4207-1bdd-4d56-a3fe-ea3e25e62559@gmail.com>
-From: Wei Wang <weibunny.kernel@gmail.com>
-Date: Tue, 10 Mar 2026 12:42:18 -0700
-X-Gm-Features: AaiRm53pc2qKyRqXBOJscIxo6uizkt-y4pK4WTQ22jv5BJG6DzzcAjn-zuXhMRQ
-Message-ID: <CAGqc4nUrYicU82F01vDB0kiFa2b4j0QW57AP2vrPT5fs_G7oFQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 2/5] psp: add new netlink cmd for dev-assoc
- and dev-disassoc
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Wei Wang <weibunny@fb.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 05296257171
+X-Rspamd-Queue-Id: D72DD257188
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266305-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	TAGGED_FROM(0.00)[bounces-266306-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,meta.com,distanz.ch,vger.kernel.org];
+	FREEMAIL_TO(0.00)[akamai.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 8:08=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
->
->
-> On 3/9/26 2:34 PM, Wei Wang wrote:
-> > @@ -131,8 +263,7 @@ void psp_nl_notify_dev(struct psp_dev *psd, u32 cmd=
-)
-> >       struct genl_info info;
-> >       struct sk_buff *ntf;
-> >
-> > -     if (!genl_has_listeners(&psp_nl_family, dev_net(psd->main_netdev)=
-,
-> > -                             PSP_NLGRP_MGMT))
-> > +     if (!psp_nl_has_listeners_any_ns(psd, PSP_NLGRP_MGMT))
-> >               return;
-> >
-> >       ntf =3D genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-> > @@ -140,13 +271,13 @@ void psp_nl_notify_dev(struct psp_dev *psd, u32 c=
-md)
-> >               return;
-> >
-> >       genl_info_init_ntf(&info, &psp_nl_family, cmd);
-> > +     genl_info_net_set(&info, dev_net(psd->main_netdev));
-> >       if (psp_nl_dev_fill(psd, ntf, &info)) {
-> >               nlmsg_free(ntf);
-> >               return;
-> >       }
-> >
-> > -     genlmsg_multicast_netns(&psp_nl_family, dev_net(psd->main_netdev)=
-, ntf,
-> > -                             0, PSP_NLGRP_MGMT, GFP_KERNEL);
-> > +     psp_nl_multicast_all_ns(psd, ntf, PSP_NLGRP_MGMT);
-> >   }
->
-> I don't think this will work correctly when there are listeners outside
-> of dev_net(psd->main_netdev). psp_nl_dev_fill() will prepare a
-> notification containing the unfiltered assoc list, but then that will be
-> broadcast out to all listeners regardless of netns, so those listeners
-> will see peer nsids relative to a different netns.
+Hudson, Nick wrote:
+> =
 
-Yea. That's true. I can't just set genl_info_net to
-dev_net(psd->main_netdev). And I have to compute nsid relative to the
-netns of the listener instead of just using the same passed in netns.
-Let me see how to fix this.
+> =
+
+> > On 25 Feb 2026, at 15:45, Willem de Bruijn <willemdebruijn.kernel@gma=
+il.com> wrote:
+> > =
+
+> > !-------------------------------------------------------------------|=
+
+> >  This Message Is From an External Sender
+> >  This message came from outside your organization.
+> > |-------------------------------------------------------------------!=
+
+> > =
+
+> > Hudson, Nick wrote:
+> >> =
+
+> >> =
+
+> >>> On 20 Feb 2026, at 21:08, Willem de Bruijn <willemdebruijn.kernel@g=
+mail.com> wrote:
+> >>> =
+
+> >>> !------------------------------------------------------------------=
+-|
+> >>> This Message Is From an External Sender
+> >>> This message came from outside your organization.
+> >>> |------------------------------------------------------------------=
+-!
+> >>> =
+
+> >>> Nick Hudson wrote:
+> >>>> Enable BPF programs to properly handle GSO state when decapsulatin=
+g
+> >>>> tunneled packets by adding selective GSO flag clearing and a trust=
+ed
+> >>>> mode for GSO handling.
+> >>>> =
+
+> >>>> New decapsulation flags:
+> >>>> =
+
+> >>>> - BPF_F_ADJ_ROOM_DECAP_L4_UDP: Clear UDP tunnel GSO flags
+> >>>> (SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM)
+> >>>> - BPF_F_ADJ_ROOM_DECAP_L4_GRE: Clear GRE tunnel GSO flags
+> >>>> (SKB_GSO_GRE, SKB_GSO_GRE_CSUM)
+> >>>> - BPF_F_ADJ_ROOM_DECAP_IPXIP4: Clear SKB_GSO_IPXIP4 flag for
+> >>>> IPv4-in-IPv4 (IPIP) and IPv6-in-IPv4 (SIT) tunnels
+> >>>> - BPF_F_ADJ_ROOM_DECAP_IPXIP6: Clear SKB_GSO_IPXIP6 flag for
+> >>>> IPv6-in-IPv6 and IPv4-in-IPv6 tunnels
+> >>>> - BPF_F_ADJ_ROOM_NO_DODGY: Preserve gso_segs and don't set
+> >>>> SKB_GSO_DODGY when the BPF program is trusted and modifications
+> >>>> are known to be valid
+> >>>> =
+
+> >>>> The existing anonymous enum for BPF_FUNC_skb_adjust_room flags is
+> >>>> renamed to enum bpf_adj_room_flags to enable CO-RE (Compile Once -=
+
+> >>>> Run Everywhere) lookups in BPF programs.
+> >>>> =
+
+> >>>> By default, bpf_skb_adjust_room sets SKB_GSO_DODGY and resets
+> >>>> gso_segs to 0, forcing revalidation. The NO_DODGY flag bypasses th=
+is
+> >>>> for trusted programs that guarantee GSO correctness.
+> >>>> =
+
+> >>>> Usage example (decapsulating UDP tunnel with IPv4 inner packet):
+> >>>> bpf_skb_adjust_room(skb, -hdr_len, BPF_ADJ_ROOM_NET,
+> >>>>                     BPF_F_ADJ_ROOM_DECAP_L3_IPV4 |
+> >>>>                     BPF_F_ADJ_ROOM_DECAP_L4_UDP);
+> >>> =
+
+> >>> This patch is doing to much in one patch.
+> >> =
+
+> >> Sure, I=E2=80=99ll split it up.
+> >> =
+
+> >>> =
+
+> >>> Also not convinced of the need for the NO_DODGY flag.
+> >> =
+
+> >> The reason for NO_DODGY is that, without it, the egress interface wi=
+ll see the
+> >> SKB_GSO_DODGY flag. In our use case, we want to avoid marking the eg=
+ress tap as
+> >> NETIF_F_GSO_ROBUST, so the skb will fail skb_gso_ok() with SKB_GSO_D=
+ODGY set.
+> >> When skb_gso_ok() fails, validate_xmit_skb() calls skb_gso_segment()=
+.
+> > =
+
+> > I understand why you might want it. But the dodgy check has long been=
+
+> > there for a reason: becauses these transformations are not blindly
+> > accepted by the kernel. This use case does not change that.
+> =
+
+> The defence I came up with here is...
+> =
+
+>     - setting NETIF_F_GSO_ROBUST for the tun/tap device, as it is a dev=
+ice level property, affects both host to guest and guest to host. the for=
+mer is trusted. the latter is not. therefore this is not an option.
+>     - the host to guest direction is fully trusted
+>         - Physical NIC driver is trusted (kernel driver, hardware-valid=
+ated GSO)
+>         - BPF program is trusted (privileged, CAP_BPF, verified by kern=
+el)
+>         - Decapsulation is trusted operation for BPF code authors
+>         - Bridge + TAP is internal kernel forwarding
+> =
+
+> Would protecting its use with a sysctl make it acceptable? (If it isn=E2=
+=80=99t still)
+
+Is the DODGY path and going through GSO a significant impact to your
+workload?
+
+So far we have always declined to add such custom opt-outs. This is
+not at all the first affected user case.
+
+Either way, let's separate this from the main functional decap patch.
 
