@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-266280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPVqOQ5esGloigIAu9opvQ
-	(envelope-from <netdev+bounces-266280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:14 +0100
+	id cHl8NapesGloigIAu9opvQ
+	(envelope-from <netdev+bounces-266281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:10:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0926925628D
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5124F2562FF
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:10:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E742A3024872
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:07:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 055CE308C0F7
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09213D47AE;
-	Tue, 10 Mar 2026 18:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976413D9DA7;
+	Tue, 10 Mar 2026 18:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PD5ydLzv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jtn+gQ+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397E93D1CAC
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 18:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4698E3D812A
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 18:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773166035; cv=none; b=D9QnHKaMSvhgP2EApcSfgHAZcEI3HtvHx3neX7nO+LBTLNcEzZff9XTt/0dpTS6hSXLun2hKaHKEKedDZo/1tAsgTuKIZ3yLvc8/TPcmCfQDMr9UdvmKGjH6MuBwlz90XgBltLH3CMe49SmvdcPPsaPsudq34aPpqbS/4WISctk=
+	t=1773166037; cv=none; b=mDid8fLujRgXl1UfayOUJcFOmOxvNMTNNxtPRyLG2kjbOh08L16WedGKw5gJHDb5vEVAEIG4Yc6VflY0XdV2F590apEh0r3RmHtm+OmQRjrYi5xdH/Yqk6XhsyTlLIk3O6KEmLChaENMsC1W/OHOcqoVHzb3zPt3IjHkAJCB5x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773166035; c=relaxed/simple;
-	bh=7HGi8o8fZZBzo9JxS54617SCXYMm/i5jFnmAJ/o7FT8=;
+	s=arc-20240116; t=1773166037; c=relaxed/simple;
+	bh=DimZn8kYpq/S50h5bbNfR1Us61RIl6hOivpSGg0IMu0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=adEqoNLWTRlYiDDjME6vslj+L6W5ORyiMbLYZsJZHTLxiRe8ZA1cjyou8ypvyyR7AfKOMxZ50JZUNgWoimhSSEExBkUMwEwHgz4E2fblIMnapPvDfZVuY7Tn+YkCnU3U0CgdBkBxAbJMkAohNmY/nTrt3NxbADTWpSdflF3O1O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PD5ydLzv; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=V8PYZhdBNc8VC/nTht3gbXnJ/p7boiqF7yE2oydJgXoJXuSt87cFLiN+iz64DD0O2VFYtuRcLQL/sOy3ztrkZiS36u2SowJNGbgGBUtpV0u54zXtjXJ8NXVwOnYGGV/05X9tJvg46FZu8VDu1L0pGT7y8TN0JW89c96uxEZFf3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jtn+gQ+G; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773166033;
+	s=mimecast20190719; t=1773166035;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9zxze3lztuGeHLLYgvHOE0JfV/Y+QwJK/ck8K0QJqPQ=;
-	b=PD5ydLzvIMtlt/5bqoFBCQrab3wu+1pnIfFAEKK1WPyQKgsmVtMC8Shuy6vuCXnlh6GKvX
-	pc3SDxfOZLkHHrrhL7bQiI0lWkk6n1gZW0AAixpKVUQ9nOdBhFyfRmPr6PDxeYDuQfqM7Z
-	R18jlB4pJjhLCy9jhmoNSnhnN/PvBUM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=Eq0w5FChHatH/xQe95hLSx/OsUh0GkWPdmlsBA8Yx1E=;
+	b=Jtn+gQ+G3/xOkYAQcMTnvTmLpOvXM7U8K5ZqISuCe9uflB0busR6SzN3WxbOCnB1tuZrts
+	K4UZNXitfS6vS47X6O4kufWaFeogqZKDnCFourixRmyxNtci/8SfesYVJg4rFwQ4sHG8Sh
+	ZmIfi0WeqQL4MJjvzQdDrtuzL0+igp8=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-pTr1G7J2PJSuZp4JNhlYUw-1; Tue,
- 10 Mar 2026 14:07:08 -0400
-X-MC-Unique: pTr1G7J2PJSuZp4JNhlYUw-1
-X-Mimecast-MFC-AGG-ID: pTr1G7J2PJSuZp4JNhlYUw_1773166026
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-131-9XQ4eV49O-Okd2kSksBKJQ-1; Tue,
+ 10 Mar 2026 14:07:12 -0400
+X-MC-Unique: 9XQ4eV49O-Okd2kSksBKJQ-1
+X-Mimecast-MFC-AGG-ID: 9XQ4eV49O-Okd2kSksBKJQ_1773166031
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D9A91956096;
-	Tue, 10 Mar 2026 18:07:06 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2DBF4180034E;
+	Tue, 10 Mar 2026 18:07:11 +0000 (UTC)
 Received: from dcaratti.users.ipa.redhat.com (unknown [10.44.33.226])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 443011956095;
-	Tue, 10 Mar 2026 18:07:02 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0EF261955D71;
+	Tue, 10 Mar 2026 18:07:07 +0000 (UTC)
 From: Davide Caratti <dcaratti@redhat.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -69,9 +69,9 @@ To: Jakub Kicinski <kuba@kernel.org>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Jiri Pirko <jiri@resnulli.us>
 Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next 1/4] netdevsim: move TC offload code to a dedicated file
-Date: Tue, 10 Mar 2026 19:06:28 +0100
-Message-ID: <b9c3cab13359044df5e8fe52f47c09cf37754e92.1773165520.git.dcaratti@redhat.com>
+Subject: [PATCH net-next 2/4] netdevsim: generalize taprio offload
+Date: Tue, 10 Mar 2026 19:06:29 +0100
+Message-ID: <52ae15a7e42d7754487bb744c1a1718246d032ef.1773165520.git.dcaratti@redhat.com>
 In-Reply-To: <cover.1773165520.git.dcaratti@redhat.com>
 References: <cover.1773165520.git.dcaratti@redhat.com>
 Precedence: bulk
@@ -82,7 +82,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: 0926925628D
+X-Rspamd-Queue-Id: 5124F2562FF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -90,18 +90,18 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266280-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266281-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
@@ -111,52 +111,35 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
+
+Currently, netdevsim supports TC offloads only for filter blocks and the
+'taprio' qdisc. This improves coverage for situations where
+
+  .ndo_setup_tc(dev, TC_SETUP_QDISC_TAPRIO, ...)
+
+returns 0, but the code can be generalized for offloading most of the
+Linux qdiscs we have at the moment. Generalize netdevsim qdisc offload,
+by providing:
+ - a function that returns 0 on 'setup'/'destroy'/'get_stats' commands
+   read from qdisc-specific offload parameters, and returns -EOPNOTSUPP
+   otherwise, namely "handle_<qdisc_name>()"
+ - a case label handling TC_SETUP_QDISC_<qdisc_name> in nsim_setup_tc().
 
 This commit has no functional change.
 
 Signed-off-by: Davide Caratti <dcaratti@redhat.com>
 ---
- drivers/net/netdevsim/Makefile    |  2 +-
- drivers/net/netdevsim/netdev.c    | 51 ---------------------------
- drivers/net/netdevsim/netdevsim.h |  3 ++
- drivers/net/netdevsim/tc.c        | 57 +++++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+), 52 deletions(-)
- create mode 100644 drivers/net/netdevsim/tc.c
+ drivers/net/netdevsim/tc.c | 57 ++++++++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/netdevsim/Makefile b/drivers/net/netdevsim/Makefile
-index 14a553e000ec..87718204fb4d 100644
---- a/drivers/net/netdevsim/Makefile
-+++ b/drivers/net/netdevsim/Makefile
-@@ -3,7 +3,7 @@
- obj-$(CONFIG_NETDEVSIM) += netdevsim.o
- 
- netdevsim-objs := \
--	netdev.o dev.o ethtool.o fib.o bus.o health.o hwstats.o udp_tunnels.o
-+	netdev.o dev.o ethtool.o fib.o bus.o health.o hwstats.o udp_tunnels.o tc.o
- 
- ifeq ($(CONFIG_BPF_SYSCALL),y)
- netdevsim-objs += \
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 5ec028a00c62..1dc2f8c0695d 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -199,12 +199,6 @@ static int nsim_change_mtu(struct net_device *dev, int new_mtu)
- 	return 0;
- }
- 
--static int
--nsim_setup_tc_block_cb(enum tc_setup_type type, void *type_data, void *cb_priv)
--{
--	return nsim_bpf_setup_tc_block_cb(type, type_data, cb_priv);
--}
--
- static int nsim_set_vf_mac(struct net_device *dev, int vf, u8 *mac)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
-@@ -335,51 +329,6 @@ static int nsim_set_vf_link_state(struct net_device *dev, int vf, int state)
- 	return 0;
+diff --git a/drivers/net/netdevsim/tc.c b/drivers/net/netdevsim/tc.c
+index 8a1960f5f99e..358fa5bb835f 100644
+--- a/drivers/net/netdevsim/tc.c
++++ b/drivers/net/netdevsim/tc.c
+@@ -11,32 +11,31 @@ nsim_setup_tc_block_cb(enum tc_setup_type type, void *type_data, void *cb_priv)
+ 	return nsim_bpf_setup_tc_block_cb(type, type_data, cb_priv);
  }
  
 -static void nsim_taprio_stats(struct tc_taprio_qopt_stats *stats)
@@ -164,7 +147,8 @@ index 5ec028a00c62..1dc2f8c0695d 100644
 -	stats->window_drops = 0;
 -	stats->tx_overruns = 0;
 -}
--
++static LIST_HEAD(nsim_block_cb_list);
+ 
 -static int nsim_setup_tc_taprio(struct net_device *dev,
 -				struct tc_taprio_qopt_offload *offload)
 -{
@@ -180,107 +164,55 @@ index 5ec028a00c62..1dc2f8c0695d 100644
 -	default:
 -		err = -EOPNOTSUPP;
 -	}
--
++#define QDISC_OFFLOAD_HANDLERS(X)					\
++	X(taprio, tc_taprio_qopt_offload, cmd, TAPRIO_CMD_REPLACE,	\
++	  TAPRIO_CMD_DESTROY, TAPRIO_CMD_STATS, stats)			\
+ 
 -	return err;
--}
--
++#define QH(NAME, OL_TYPE, CMD_FLD, O_REPLACE, O_DESTROY, O_STATS, STATS_FLD) \
++static int handle_##NAME(struct net_device *dev, struct OL_TYPE *offload) \
++{									\
++	switch (offload->CMD_FLD) {					\
++	case O_REPLACE:							\
++	case O_DESTROY:							\
++		/* Do nothing, accept offload */			\
++		return 0;						\
++	case O_STATS:							\
++		/* Zero out the requested stats block */		\
++		memset(&offload->STATS_FLD, 0, sizeof(offload->STATS_FLD)); \
++		return 0;						\
++	default:							\
++		return -EOPNOTSUPP;					\
++	}								\
+ }
+ 
 -static LIST_HEAD(nsim_block_cb_list);
--
--static int
--nsim_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type_data)
--{
--	struct netdevsim *ns = netdev_priv(dev);
--
--	switch (type) {
++QDISC_OFFLOAD_HANDLERS(QH)
++#undef QH
+ 
+ int
+ nsim_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type_data)
+@@ -44,8 +43,18 @@ nsim_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type_data)
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 
+ 	switch (type) {
 -	case TC_SETUP_QDISC_TAPRIO:
 -		return nsim_setup_tc_taprio(dev, type_data);
--	case TC_SETUP_BLOCK:
--		return flow_block_cb_setup_simple(type_data,
--						  &nsim_block_cb_list,
--						  nsim_setup_tc_block_cb,
--						  ns, ns, true);
--	default:
--		return -EOPNOTSUPP;
--	}
--}
--
- static int
- nsim_set_features(struct net_device *dev, netdev_features_t features)
- {
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index f767fc8a7505..fdd35ab29d98 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -470,3 +470,6 @@ struct nsim_bus_dev {
- 
- int nsim_bus_init(void);
- void nsim_bus_exit(void);
++#define TC_QDISC_SETUP_CASES(X)						\
++	X(TC_SETUP_QDISC_TAPRIO, tc_taprio_qopt_offload, taprio)	\
 +
-+int nsim_setup_tc(struct net_device *dev, enum tc_setup_type type,
-+		  void *type_data);
-diff --git a/drivers/net/netdevsim/tc.c b/drivers/net/netdevsim/tc.c
-new file mode 100644
-index 000000000000..8a1960f5f99e
---- /dev/null
-+++ b/drivers/net/netdevsim/tc.c
-@@ -0,0 +1,57 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/netdevice.h>
-+#include <net/pkt_sched.h>
-+
-+#include "netdevsim.h"
-+
-+static int
-+nsim_setup_tc_block_cb(enum tc_setup_type type, void *type_data, void *cb_priv)
-+{
-+	return nsim_bpf_setup_tc_block_cb(type, type_data, cb_priv);
-+}
-+
-+static void nsim_taprio_stats(struct tc_taprio_qopt_stats *stats)
-+{
-+	stats->window_drops = 0;
-+	stats->tx_overruns = 0;
-+}
-+
-+static int nsim_setup_tc_taprio(struct net_device *dev,
-+				struct tc_taprio_qopt_offload *offload)
-+{
-+	int err = 0;
-+
-+	switch (offload->cmd) {
-+	case TAPRIO_CMD_REPLACE:
-+	case TAPRIO_CMD_DESTROY:
-+		break;
-+	case TAPRIO_CMD_STATS:
-+		nsim_taprio_stats(&offload->stats);
-+		break;
-+	default:
-+		err = -EOPNOTSUPP;
++#define SC(SETUP_LABEL, OL_TYPE, NAME)					\
++	case SETUP_LABEL:						\
++	{								\
++		return handle_##NAME(dev, (struct OL_TYPE *)type_data); \
 +	}
 +
-+	return err;
-+}
++	TC_QDISC_SETUP_CASES(SC)
++#undef SC
 +
-+static LIST_HEAD(nsim_block_cb_list);
-+
-+int
-+nsim_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type_data)
-+{
-+	struct netdevsim *ns = netdev_priv(dev);
-+
-+	switch (type) {
-+	case TC_SETUP_QDISC_TAPRIO:
-+		return nsim_setup_tc_taprio(dev, type_data);
-+	case TC_SETUP_BLOCK:
-+		return flow_block_cb_setup_simple(type_data,
-+						  &nsim_block_cb_list,
-+						  nsim_setup_tc_block_cb,
-+						  ns, ns, true);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
+ 	case TC_SETUP_BLOCK:
+ 		return flow_block_cb_setup_simple(type_data,
+ 						  &nsim_block_cb_list,
 -- 
 2.52.0
 
