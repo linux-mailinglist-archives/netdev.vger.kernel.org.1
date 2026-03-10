@@ -1,403 +1,236 @@
-Return-Path: <netdev+bounces-266110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266116-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJ37IQQasGlAfwIAu9opvQ
-	(envelope-from <netdev+bounces-266110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:17:56 +0100
+	id ECkEIsUhsGkkgQIAu9opvQ
+	(envelope-from <netdev+bounces-266116-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:51:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E46824FE37
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:17:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E06250E2F
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 99DC231111EF
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:53:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3362C3065CFD
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3F53A544C;
-	Tue, 10 Mar 2026 12:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0103AF651;
+	Tue, 10 Mar 2026 12:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="esbFHyJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-53.mail.aliyun.com (out28-53.mail.aliyun.com [115.124.28.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941F73A3E8E;
-	Tue, 10 Mar 2026 12:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B583F3AF643;
+	Tue, 10 Mar 2026 12:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773144620; cv=none; b=ZL8uIBE8ZZ7xA84ZCnPr/rVv9ML7fbCQDqjhxDfZFWb0WTYpYP87B1wiOZSC9YL3dhnVNvZsw148momfN5L0sYSoJHhwcMJonBiYK8AzZiL+h848HHJPkVmxw87jp4nNvRtP7h2aytp43QPDtsG4ozCItgwIqBYb6LuXQiwzNaY=
+	t=1773144631; cv=none; b=o71I+eue7zFV4irrfpj3HbCccHT8UVSGjHhL8Y/znCkiUn62h1LcDi1U+TFYZecG+WubyKOp2NZ+9CQr3kCg7UgEktP/2MeUz0KiuMIfBUCNLWyh1d9OUu/9cP7xKmali2wVx0y+Tzk7hDN9ZxRn6FOeoyEisB1YrksqmsL/q8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773144620; c=relaxed/simple;
-	bh=LSImPPtx20s0xp4nr+PMncOThBezmavUWGhMv7IJfkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lzsd/Tf2ABtqQ1Rhrq9AFYNee+TMEXca4Gs28YnptA94BpgHK0yT2GwJ9mIhZmN+GODHoZlzqBnKFD6fi/UKpMosQFB6T5UjXvKcTxznpk72jk+K438HR9Mt+uBnFELuzSvN7iRjiFtPLiVQ/lvWNuYcNHxNsl5hFEDi3q6T+ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.gpIYKiO_1773144613 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 10 Mar 2026 20:10:14 +0800
-From: "illusion.wang" <illusion.wang@nebula-matrix.com>
-To: dimon.zhao@nebula-matrix.com,
-	illusion.wang@nebula-matrix.com,
-	alvin.wang@nebula-matrix.com,
-	sam.chen@nebula-matrix.com,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	corbet@lwn.net,
-	kuba@kernel.org,
-	linux-doc@vger.kernel.org,
-	lorenzo@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vadim.fedorenko@linux.dev,
-	lukas.bulwahn@redhat.com,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v7 net-next 11/11] net/nebula-matrix: add common dev start/stop operation
-Date: Tue, 10 Mar 2026 20:09:55 +0800
-Message-ID: <20260310120959.22015-12-illusion.wang@nebula-matrix.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260310120959.22015-1-illusion.wang@nebula-matrix.com>
-References: <20260310120959.22015-1-illusion.wang@nebula-matrix.com>
+	s=arc-20240116; t=1773144631; c=relaxed/simple;
+	bh=23fDxMo4xHy1EdAru6003n7+54nLBKHhNf3N9eMsvmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S8wr/Bo/0A1w0DDEKZXNOp8iRRl2X87dFQqzApIg/dEubjbqoDOXWdDcR6xW8d/yobTqgu9fSfp6loFBHnQM0g7p0yBFygYe/wclQlNvHqVMVW7PxVQ0dMZaXmiRxj1IYY/tAMtlzYrAYEwoG9i0cmyQbR4iZJ6LTyUBFiCcV7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=esbFHyJU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D072C19423;
+	Tue, 10 Mar 2026 12:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773144631;
+	bh=23fDxMo4xHy1EdAru6003n7+54nLBKHhNf3N9eMsvmE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=esbFHyJUClN9ir49CHpIDKhs+H20RGPu+wVQFm0oPuzWgAt6b45cTzMlVhL76SN//
+	 nIyhRmvxgDLi6HslyCGD+do86TN6mO+nT5bHHCrTT9ia7oBj5zkuEZF/fZ2ziBhxcA
+	 couq0541qNncgf4ysPb3VoGDTAQqspVQwxiliQjIQPKkFhrlz2AqMThjdmTO5DPvsG
+	 ytB04eLHKQrjAMjNiqiG3oIgA9wcww5+LbNTYeWvOHoWMFC5ow6CHeNm9Ed4zGcRtO
+	 pI+NoY30AaLZ+h2BH5904jSaICxZkuIUM5u2MPT8h+dmCWOF/e3J2O2N5yvFqwTucH
+	 APH7Q4CvCGlQg==
+Date: Tue, 10 Mar 2026 12:10:24 +0000
+From: Lee Jones <lee@kernel.org>
+To: Rong Zhang <i@rong.moe>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Cc: Pavel Machek <pavel@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Benson Leung <bleung@chromium.org>,
+	Guenter Roeck <groeck@chromium.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Ike Panhc <ikepanhc@gmail.com>, Vishnu Sankar <vishnuocv@gmail.com>,
+	vsankar@lenovo.com, linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org, chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org
+Subject: Re: [RFC PATCH 0/9] leds: Add support for hw initiated hw control
+ trigger transition
+Message-ID: <20260310121024.GJ183676@google.com>
+References: <20260227190617.271388-1-i@rong.moe>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1E46824FE37
+In-Reply-To: <20260227190617.271388-1-i@rong.moe>
+X-Rspamd-Queue-Id: 88E06250E2F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266110-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266116-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,weissschuh.net,chromium.org,squebb.ca,gmail.com,linux.intel.com,lenovo.com,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[illusion.wang:url,nebula-matrix.com:mid,nebula-matrix.com:email]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-start common dev: config msix map table, alloc and enable msix vectors,
-register mailbox ISR and enable mailbox irq
+I'd like for the netdev folks to take a look at this please.
 
-Signed-off-by: illusion.wang <illusion.wang@nebula-matrix.com>
----
- .../nebula-matrix/nbl/nbl_core/nbl_dev.c      | 217 ++++++++++++++++++
- .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  30 ++-
- 2 files changed, 246 insertions(+), 1 deletion(-)
+> Some laptops can tune their keyboard backlight according to ambient
+> light sensors (auto mode). This capability is essentially a hw control
+> trigger. Meanwhile, such laptops also offer a shrotcut for cycling
+> through brightness levels and auto mode. For example, on ThinkBook,
+> pressing Fn+Space cycles keyboard backlight levels in the following
+> sequence:
+> 
+>   1 => 2 => 0 => auto => 1 ...
+> 
+> Recent ThinkPad models should have similar sequence too.
+> 
+> However, there are some issues preventing us from using hw control
+> trigger:
+> 
+> 1. We want a mechanism to tell userspace which trigger is the hw control
+>    trigger, so that userspace can determine if auto mode is on/off or
+>    turing it on/off programmatically without obtaining the hw control
+>    trigger's name via other channels
+> 2. Turing on/off auto mode via the shortcut cannot activate/deactivate
+>    the hw control trigger, making the software state out-of-sync
+> 3. Even with #1 resolved, deactivating the hw control trigger after
+>    receiving the event indicating "auto => 1" has a side effect of
+>    emitting LED_OFF, breaking the shortcut cycle
+> 
+> This RFC series tries to demonstrate a path on solving these issues:
+> 
+> - Introduce an attribute called trigger_may_offload, so that userspace
+>    can determine:
+>    - if the LED device supports hw control (supported => visible)
+>    - which trigger is the hw control trigger
+>    - if the hw control trigger is selected
+>    - if the hw control trigger is in hw control (i.e., offloaded)
+>      - A callback offloaded() is added so that LED triggers can report
+>        their hw control state
+> - Add led_trigger_notify_hw_control_changed() interface, so that LED
+>   drivers can notify the LED core about hardware initiated hw control
+>   state transitions. The LED core will then determine if the transition
+>   is allowed and turning on/off the hw control trigger accordingly
+> - Tune the logic of trigger deactivation so that it won't emit LED_OFF
+>   when the deactivation is triggered by hardware
+> 
+> The last two patches are included into the RFC series to demonstrate how
+> to utilize these interfaces to add support for auto keyboard backlight
+> to ThinkBook. They will be submitted separately once the dust settles.
+> 
+> Currently no Kconfig entry is provided to disable either interface. If
+> needed, I will add one later.
+> 
+> [ Summary of other approaches ]
+> 
+> < custom attribute >
+> 
+> Pros:
+> - simplicity, KISS
+> - no need to touch the LED core
+> - extensible as long as it has a sensor-neutral name
+>   - a sensor-related name could potentially lead to a mess if a future
+>     device implements auto mode based on multiple different sensors
+> 
+> Cons:
+> - must have zero influence on brightness_set[_blocking] callbacks
+>   in order not to break triggers
+>   - potential interference with triggers and the brightness attribute
+> - weird semantic (an attribute other than "brightness" and "trigger"
+>   changes the brightness)
+> 
+> < hw control trigger (this series) >
+> 
+> Pros:
+> - mutually exclusive with other triggers (hence less chaos)
+> - semantic correctness
+> - acts as an aggregate switch to turn on/off auto mode even a future
+>   device implements auto mode based on multiple different sensors
+>   - extensibility (through trigger attributes)
+> 
+> Cons:
+> - complexity
+> 
+> [ Previous discussion threads ]
+> 
+> https://lore.kernel.org/r/08580ec5-1d7b-4612-8a3f-75bc2f40aad2@app.fastmail.com
+> 
+> https://lore.kernel.org/r/1dbfcf656cdb4af0299f90d7426d2ec7e2b8ac9e.camel@rong.moe
+> 
+> Thanks,
+> Rong
+> 
+> Rong Zhang (9):
+>   leds: Load trigger modules on-demand if used as hw control trigger
+>   leds: Add callback offloaded() to query the state of hw control
+>     trigger
+>   leds: cros_ec: Implement offloaded() callback for trigger
+>   leds: turris-omnia: Implement offloaded() callback for trigger
+>   leds: trigger: netdev: Implement offloaded() callback
+>   leds: Add trigger_may_offload attribute
+>   leds: trigger: Add led_trigger_notify_hw_control_changed() interface
+>   platform/x86: ideapad-laptop: Decouple HW & cdev brightness for kbd
+>     backlight
+>   platform/x86: ideapad-laptop: Fully support auto kbd backlight
+> 
+>  .../obsolete/sysfs-class-led-trigger-netdev   |  15 ++
+>  Documentation/ABI/testing/sysfs-class-led     |  22 ++
+>  .../testing/sysfs-class-led-trigger-netdev    |  13 --
+>  Documentation/leds/leds-class.rst             |  72 ++++++-
+>  drivers/leds/led-class.c                      |  23 +++
+>  drivers/leds/led-triggers.c                   | 176 +++++++++++++++-
+>  drivers/leds/leds-cros_ec.c                   |   6 +
+>  drivers/leds/leds-turris-omnia.c              |   7 +
+>  drivers/leds/leds.h                           |   3 +
+>  drivers/leds/trigger/ledtrig-netdev.c         |  10 +
+>  drivers/platform/x86/lenovo/Kconfig           |   1 +
+>  drivers/platform/x86/lenovo/ideapad-laptop.c  | 194 ++++++++++++++----
+>  include/linux/leds.h                          |   6 +
+>  13 files changed, 492 insertions(+), 56 deletions(-)
+>  create mode 100644 Documentation/ABI/obsolete/sysfs-class-led-trigger-netdev
+> 
+> 
+> base-commit: a75cb869a8ccc88b0bc7a44e1597d9c7995c56e5
+> -- 
+> 2.51.0
+> 
 
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-index 6818ffcbaa40..9f46ed144c9a 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
-@@ -6,6 +6,17 @@
- #include <linux/pci.h>
- #include "nbl_dev.h"
- 
-+static int nbl_dev_clean_mailbox_schedule(struct nbl_dev_mgt *dev_mgt);
-+
-+/* ----------  Interrupt config  ---------- */
-+static irqreturn_t nbl_dev_clean_mailbox(int __always_unused irq, void *data)
-+{
-+	struct nbl_dev_mgt *dev_mgt = (struct nbl_dev_mgt *)data;
-+
-+	nbl_dev_clean_mailbox_schedule(dev_mgt);
-+	return IRQ_HANDLED;
-+}
-+
- static void nbl_dev_init_msix_cnt(struct nbl_dev_mgt *dev_mgt)
- {
- 	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-@@ -14,6 +25,174 @@ static void nbl_dev_init_msix_cnt(struct nbl_dev_mgt *dev_mgt)
- 	msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num = 1;
- }
- 
-+static int nbl_dev_request_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	u16 local_vec_id;
-+	u32 irq_num;
-+	int err;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	irq_num = pci_irq_vector(common->pdev, local_vec_id);
-+
-+	snprintf(dev_common->mailbox_name, sizeof(dev_common->mailbox_name),
-+		 "nbl_mailbox@pci:%s", pci_name(common->pdev));
-+	err = request_irq(irq_num, nbl_dev_clean_mailbox, 0,
-+			  dev_common->mailbox_name, dev_mgt);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static void nbl_dev_free_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	u16 local_vec_id;
-+	u32 irq_num;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	irq_num = pci_irq_vector(common->pdev, local_vec_id);
-+
-+	free_irq(irq_num, dev_mgt);
-+}
-+
-+static int nbl_dev_enable_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_channel_ops *chan_ops = dev_mgt->chan_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	u16 local_vec_id;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	chan_ops->set_queue_state(dev_mgt->chan_ops_tbl->priv,
-+				  NBL_CHAN_INTERRUPT_READY,
-+				  NBL_CHAN_TYPE_MAILBOX, true);
-+
-+	return disp_ops->enable_mailbox_irq(dev_mgt->disp_ops_tbl->priv,
-+					    local_vec_id, true);
-+}
-+
-+static int nbl_dev_disable_mailbox_irq(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_channel_ops *chan_ops = dev_mgt->chan_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	u16 local_vec_id;
-+
-+	if (!msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].num)
-+		return 0;
-+
-+	flush_work(&dev_common->clean_mbx_task);
-+	local_vec_id =
-+		msix_info->serv_info[NBL_MSIX_MAILBOX_TYPE].base_vector_id;
-+	chan_ops->set_queue_state(dev_mgt->chan_ops_tbl->priv,
-+				  NBL_CHAN_INTERRUPT_READY,
-+				  NBL_CHAN_TYPE_MAILBOX, false);
-+
-+	return disp_ops->enable_mailbox_irq(dev_mgt->disp_ops_tbl->priv,
-+					    local_vec_id, false);
-+}
-+
-+static int nbl_dev_configure_msix_map(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	bool mask_en = msix_info->serv_info[NBL_MSIX_NET_TYPE].hw_self_mask_en;
-+	u16 msix_net_num = msix_info->serv_info[NBL_MSIX_NET_TYPE].num;
-+	u16 msix_not_net_num = 0;
-+	int err, i;
-+
-+	for (i = NBL_MSIX_NET_TYPE; i < NBL_MSIX_TYPE_MAX; i++)
-+		msix_info->serv_info[i].base_vector_id =
-+			msix_info->serv_info[i - 1].base_vector_id +
-+			msix_info->serv_info[i - 1].num;
-+
-+	for (i = NBL_MSIX_MAILBOX_TYPE; i < NBL_MSIX_TYPE_MAX; i++) {
-+		if (i == NBL_MSIX_NET_TYPE)
-+			continue;
-+
-+		msix_not_net_num += msix_info->serv_info[i].num;
-+	}
-+
-+	err = disp_ops->configure_msix_map(dev_mgt->disp_ops_tbl->priv,
-+					   msix_net_num, msix_not_net_num,
-+					   mask_en);
-+
-+	return err;
-+}
-+
-+static int nbl_dev_destroy_msix_map(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-+
-+	return disp_ops->destroy_msix_map(dev_mgt->disp_ops_tbl->priv);
-+}
-+
-+static int nbl_dev_alloc_msix_intr(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
-+	struct nbl_msix_info *msix_info = &dev_common->msix_info;
-+	struct nbl_common_info *common = dev_mgt->common;
-+	int needed = 0;
-+	int err;
-+	int i;
-+
-+	for (i = 0; i < NBL_MSIX_TYPE_MAX; i++)
-+		needed += msix_info->serv_info[i].num;
-+
-+	err = pci_alloc_irq_vectors(common->pdev, needed, needed,
-+				    PCI_IRQ_MSIX | PCI_IRQ_AFFINITY);
-+	if (err < 0) {
-+		pr_err("pci_alloc_irq_vectors failed, err = %d.\n", err);
-+		goto enable_msix_failed;
-+	}
-+
-+	return needed;
-+
-+enable_msix_failed:
-+	return err;
-+}
-+
-+static int nbl_dev_init_interrupt_scheme(struct nbl_dev_mgt *dev_mgt)
-+{
-+	int err;
-+
-+	err = nbl_dev_alloc_msix_intr(dev_mgt);
-+	if (err < 0) {
-+		dev_err(dev_mgt->common->dev,
-+			"Failed to enable MSI-X vectors\n");
-+		return err;
-+	}
-+	return 0;
-+}
-+
-+static void nbl_dev_clear_interrupt_scheme(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_common_info *common = dev_mgt->common;
-+
-+	pci_free_irq_vectors(common->pdev);
-+}
-+
- /* ----------  Channel config  ---------- */
- static int nbl_dev_setup_chan_qinfo(struct nbl_dev_mgt *dev_mgt, u8 chan_type)
- {
-@@ -79,6 +258,14 @@ static void nbl_dev_clean_mailbox_task(struct work_struct *work)
- 				      NBL_CHAN_TYPE_MAILBOX);
- }
- 
-+static int nbl_dev_clean_mailbox_schedule(struct nbl_dev_mgt *dev_mgt)
-+{
-+	struct nbl_dev_common *common_dev = dev_mgt->common_dev;
-+
-+	nbl_common_queue_work(&common_dev->clean_mbx_task);
-+	return 0;
-+}
-+
- /* ----------  Dev init process  ---------- */
- static int nbl_dev_setup_common_dev(struct nbl_adapter *adapter,
- 				    struct nbl_init_param *param)
-@@ -219,9 +406,39 @@ void nbl_dev_remove(struct nbl_adapter *adapter)
- /* ----------  Dev start process  ---------- */
- int nbl_dev_start(struct nbl_adapter *adapter, struct nbl_init_param *param)
- {
-+	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-+	int ret;
-+
-+	ret = nbl_dev_configure_msix_map(dev_mgt);
-+	if (ret)
-+		goto config_msix_map_err;
-+
-+	ret = nbl_dev_init_interrupt_scheme(dev_mgt);
-+	if (ret)
-+		goto init_interrupt_scheme_err;
-+	ret = nbl_dev_request_mailbox_irq(dev_mgt);
-+	if (ret)
-+		goto mailbox_request_irq_err;
-+	ret = nbl_dev_enable_mailbox_irq(dev_mgt);
-+	if (ret)
-+		goto enable_mailbox_irq_err;
- 	return 0;
-+enable_mailbox_irq_err:
-+	nbl_dev_free_mailbox_irq(dev_mgt);
-+mailbox_request_irq_err:
-+	nbl_dev_clear_interrupt_scheme(dev_mgt);
-+init_interrupt_scheme_err:
-+	nbl_dev_destroy_msix_map(dev_mgt);
-+config_msix_map_err:
-+	return ret;
- }
- 
- void nbl_dev_stop(struct nbl_adapter *adapter)
- {
-+	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-+
-+	nbl_dev_disable_mailbox_irq(dev_mgt);
-+	nbl_dev_free_mailbox_irq(dev_mgt);
-+	nbl_dev_clear_interrupt_scheme(dev_mgt);
-+	nbl_dev_destroy_msix_map(dev_mgt);
- }
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-index 0b31075c3fd7..9b5bd1da448e 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-@@ -284,7 +284,35 @@ static struct pci_driver nbl_driver = {
- 	.remove = nbl_remove,
- };
- 
--module_pci_driver(nbl_driver);
-+static int __init nbl_module_init(void)
-+{
-+	int status;
-+
-+	status = nbl_common_create_wq();
-+	if (status) {
-+		pr_err("Failed to create wq, err = %d\n", status);
-+		goto wq_create_failed;
-+	}
-+	status = pci_register_driver(&nbl_driver);
-+	if (status) {
-+		pr_err("Failed to register PCI driver, err = %d\n", status);
-+		goto pci_register_driver_failed;
-+	}
-+	return 0;
-+
-+pci_register_driver_failed:
-+	nbl_common_destroy_wq();
-+wq_create_failed:
-+	return status;
-+}
-+
-+static void __exit nbl_module_exit(void)
-+{
-+	pci_unregister_driver(&nbl_driver);
-+	nbl_common_destroy_wq();
-+}
- 
-+module_init(nbl_module_init);
-+module_exit(nbl_module_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Nebula Matrix Network Driver");
 -- 
-2.47.3
-
+Lee Jones [李琼斯]
 
