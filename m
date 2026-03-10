@@ -1,223 +1,187 @@
-Return-Path: <netdev+bounces-266247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WC2vDGlMsGnFhgIAu9opvQ
-	(envelope-from <netdev+bounces-266247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:52:57 +0100
+	id uA7YECZPsGnFhgIAu9opvQ
+	(envelope-from <netdev+bounces-266248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:04:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945DC25518D
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:52:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E76255364
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84AC4300679E
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:52:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3C18317E9ED
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3242F3CFF65;
-	Tue, 10 Mar 2026 16:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="i4oc/69g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9993C9445;
+	Tue, 10 Mar 2026 17:02:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87203CFF74;
-	Tue, 10 Mar 2026 16:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A6A3B6361
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 17:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773161533; cv=none; b=TP5dcL0q3Qw2aJqVTO6Om7SlyswP8ZdPzUUYbEMruVhkDdeNUDrV0MxQO229Gh8WN/ilvTX180yOpchbsgM7nrA6yXdD0mUakGDD8eyBVcMdBU/mP9Epj9oBmYOtKz9AHX/LcW6iIIco6R8oISNMspkReQIOIMrXCAJ66baZ0ZU=
+	t=1773162132; cv=none; b=gizmUuhaW9WbVt7uZjLhRu3WU8fLeqacCQKVrzX3mBJ4Ub1gpmXGPtLp/bzvw8K06Jc/j3lUqK07acE03G+yhQVPC51iI5x4SY8hVwQyxRuFgwVvfYiUkwAZj2mQCaJ3MgDonDvfDKkuzYyQcFB2BlbHvAw6fTsxS/O43xeIJEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773161533; c=relaxed/simple;
-	bh=qCCpDaL9t68wwaimcdy210aFh2IuYNoS23y6q1PkTPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DhMKG+t8o+dr5C/ffQWYV5W9aPMGwYSqc75BL75R25O3LQXDzfmn60DXJQPhDKbdm1zPAyNll4Nfb39mxtubl+0zRRzeBNcNlT0srvnyegkXFSeoFBQ8JUkHg1Ux5HTAuKGw6izwclkXX0bvDI59+awBJQD636iyxrnHXKMhchU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=i4oc/69g; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1773161525; x=1774025526; bh=qCCp
-	DaL9t68wwaimcdy210aFh2IuYNoS23y6q1PkTPU=; b=i4oc/69gTuEDw0tQ6/Ot
-	OZXHfl/aFwyS4drjBE9rjoUzKZmJ434cBW9ndUlww3DCrdJ8jFVvHv11AhsAvJw7
-	0a9F9OH35fnLJtG1wTpdJU/fClwgltJ8+UlkcCJx04XnG2YGOPTaIb8NOtD07SdZ
-	ID+r6B2s/T2CNPSrf7ZKjcyNErBmRxRV1DVKUPDWHIGXhPwl5geTF0mq2bzSjutu
-	3YShtmwUqSX3tS80rzJbklOICPt+gKCGlqtXwsYfrezK3z4Wk2mGddmexZQN2iYz
-	XN1CUc3NWwHnjra9NnC+gnTetHiMSoa8I7cK+85p4K0nbjZR4OqkBN2hoEZPx+E0
-	5A==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Tue, 10 Mar 2026 17:52:03 +0100 (CET)
-Date: Tue, 10 Mar 2026 17:52:01 +0100
-From: Antony Antony <antony@phenome.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antony Antony <antony@phenome.org>, Yan Yan <evitayan@google.com>,
-	Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org, Nathan Harold <nharold@google.com>
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 8/8] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <abBMMZWNp_zN23xL@Antony2201.local>
-References: <cover.1769509130.git.antony.antony@secunet.com>
- <b7b1bee9456ac4ada8941c93c2cc17f07d0b1912.1769509131.git.antony.antony@secunet.com>
- <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
- <aaF_SAQj4WT8jRaO@krikkit>
- <CADHa2dCF=Cq2SMYgjHcs71VedwYaDmUXPWnNbv=46+11Mz0otA@mail.gmail.com>
- <aa2K8pXXipCH8cke@Antony2201.local>
- <aa_750R5Jm5qPbNs@krikkit>
+	s=arc-20240116; t=1773162132; c=relaxed/simple;
+	bh=VmCzHmrG9j2bMu3s45uDq31/hcIEsZkaQY0AfH8hzag=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=GKntGx1L0tF0wyt615vvDPmG+MxTnfzyY93OXI/9D6bZn0UVWVfgCrmP3UzQFBlACE2ycAAkKgBs4wPXVSnMWtbPhGe0I7pd2z+7tOPoNPybQLDCKElTqwUlds0ijN2MLqI+8mIaufAogqF9z2rXkFHXsAy9xQWNLXF9bp4R6YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-67ba64650d9so48240745eaf.3
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:02:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773162130; x=1773766930;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q21Kf+JSTc9Wfjs37P9MOrHmbMi2Fg3vu9CFH4m6XNY=;
+        b=DixvO9J/gR6rN/eADU2Gv0A1ZIt0jfa9UzDyn+gGxDgRsU4ZIvZ1zeLqHSEQXqSD8Q
+         Sz52LlV5Z+A8sG+WSsJrXM/s2lf+kaj2raXJxcowJkHi4T5jt1bvL1tT0v/AdmXDpFDz
+         WGcYmM55KXSbtqb/AuGlZKjEzq2lAkz9rqsiHNLZIpk8bV+kzfJj8jvdPsOFZREsN1CP
+         fEwKbve7JEycdS+zd732D4PdTrBtVk0TG9ciNwUBjJmFKLqkGnzScY6aP5mVbJJ+1K6J
+         +uiBO+idIHAOnka18TpexNKU3jf9rVKIE5qUMnQzWi2qCeWhkRP+g44cx194UasmVRDd
+         8eAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEjt9EeF9wkN51Gth0z+hiKkuu5o6YPoVs2pnmOSCsyaIDA9HXlyTAlgosu3OClxox0MHgj+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0g5LPadCixjYWT2fLcg9wmesA16Z7GWbds0puswO8Ik1jwR3l
+	9MjH+6LlNmMWeTX/GRdFeI7FDhBJEUcuE7gQU408I1XmEDl5TUYZzEApbrj6pIT+ZeLTkHjfK6Q
+	iOJyjcoJGyGZ5oFSnk3JmEMpXQveEVYY/fO69I9HcDACGF7bGJgQtxkAwskM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa_750R5Jm5qPbNs@krikkit>
-X-Rspamd-Queue-Id: 945DC25518D
+X-Received: by 2002:a4a:cf16:0:b0:67b:a5a1:8ee0 with SMTP id
+ 006d021491bc7-67ba5a19256mr5796493eaf.66.1773162129784; Tue, 10 Mar 2026
+ 10:02:09 -0700 (PDT)
+Date: Tue, 10 Mar 2026 10:02:09 -0700
+In-Reply-To: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69b04e91.a70a0220.51e36.0000.GAE@google.com>
+Subject: [syzbot ci] Re: net: move netdev_compute_master_upper_features to ndo_set_features
+From: syzbot ci <syzbot+ci098fa7c1795eceac@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, bridge@lists.linux.dev, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, idosch@nvidia.com, jiri@resnulli.us, 
+	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	liuhangbin@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	razor@blackwall.org, sridhar.samudrala@intel.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: A1E76255364
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266247-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266248-lists,netdev=lfdr.de,ci098fa7c1795eceac];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,lists.linux.dev,davemloft.net,google.com,kernel.org,nvidia.com,resnulli.us,jvosburgh.net,vger.kernel.org,gmail.com,redhat.com,blackwall.org,intel.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[phenome.org,google.com,secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.916];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,googlesource.com:url,googlegroups.com:email]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 12:09:27PM +0100, Sabrina Dubroca wrote:
-> 2026-03-08, 15:42:58 +0100, Antony Antony wrote:
-> > On Fri, Feb 27, 2026 at 03:14:21PM -0800, Yan Yan via Devel wrote:
-> > > > Anything that we leave as implicit copy will have to be "forever"
-> > > > implicitly copied with this new MIGRATE_STATE op -- unless we find a
-> > > > way to pass a new "clear these properties" flag (probably via a list
-> > > > of XFRMA_* attribute names)
-> > 
-> > that is a limitation we should avoid. It would be nice to extend it
-> > over time. We have been there before and it is a pain point. So it is
-> > worth investigating alternatives if there is momentum here, otherwise
-> > I would keep it simple:)
-> 
-> Well, because it's a known pain point, we shouldn't just jump into an
-> implementation.
-> 
-> (FWIW, as a kernel-only developer, ie not involved at all in the *swan
-> code, I don't have much of an opinion on which property should behave
-> which way, just that we know what we're getting into)
+syzbot ci has tested the following series
 
-Understandable. Partly *swan world, Android, IETF RFC guidelines, NIST et 
-al. The *swan world usually wakes late after the time the kernel
-reaches distributions.This is too late to fix kernel without breaking ABI.
-standards world has its own path. Kernel often implements that what
-makes practical sense in the moment and hard depreciate/remove ABI:)
+[v1] net: move netdev_compute_master_upper_features to ndo_set_features
+https://lore.kernel.org/all/20260310-offload_compute-v1-0-3df79c09ea65@gmail.com
+* [PATCH net-next 1/3] net: use ndo_set_features to set offload features for bonding/bridge/team
+* [PATCH net-next 2/3] failover: use ndo_set_features for failover offload compute
+* [PATCH net-next 3/3] net: no need to disable LRO specifically
 
-I feel these days there are more interactions such as this, which is a good 
-sign!
+and found the following issue:
+WARNING in rtmsg_ifinfo_build_skb
 
-> > > That is true. I also have the concern that if all updatable attributes
-> > > follow the "omit-to-clear" pattern, we lose the extensibility. Thus
-> > > ideally we should switch to an "omit-to-inherit" model for some, if
-> > > not all, attributes to ensure that adding new SA properties doesn't
-> > > break backward compatibility.
-> 
-> Implicit copy ("omit-to-inherit") gets us in the situation we have
-> with the old MIGRATE code, we don't have a way to _not inherit_
-> properties. Well, apparently we do, based on what Antony wrote below.
-> 
-> 
-> 
-> > Here is my proposal. I extended the code and am testing it now; I hope
-> > to send out v6 soon.
-> 
-> I think it would have been nice to postpone v6 a little bit so that
-> others had time to answer here (and avoid a respin if there's some
-> disagreement on what the behavior should be).
-> 
-> > How would omit-to-inherit look in practice? Specify almost all XFRMA
-> > attributes supported in XFRM_MSG_NEWSA, minus some immutable ones.
-> > The immutable attributes that come to mind are:
-> > 
-> >     - XFRMA_ALG_*      : crypto must not change during the life of an SA;
-> >                          also *swan userspace does not keep this in memory
-> >                          after the SA is installed, which is correct
-> >                          behaviour.
-> >     - XFRMA_SA_DIR     : direction is fixed at SA creation.
-> >     - XFRMA_SEC_CTX    : security context is immutable.
-> 
-> So we should be rejecting an attempt to pass those attributes in a
-> MIGRATE_STATE request.
+Full report is available here:
+https://ci.syzbot.org/series/d5001c4a-a51e-49c1-9106-624836e43ec2
 
-yes. I added it o v6.It reject all unused attributes.  
-NL_SET_ERR_MSG_ATTR(extack, attrs[i], "Unsupported attribute in 
-XFRM_MSG_MIGRATE_STATE");
+***
 
-> > currently supported attributes, using omit-to-inherit semantics:
-> > 
-> >     sentinel value to clear, omit to inherit:
-> >     - XFRMA_ENCAP              : encap_type=0 to clear
-> 
-> That would be a new special case value for that attribute, ok.
-> 
-> >     - XFRMA_OFFLOAD_DEV        : ifindex=0 to clear
-> 
-> OFFLOAD_DEV with xuo.ifindex=0 is a valid attribute to request offload
-> and let the kernel figure out which device to use. We can't use that
-> to clear/disable offload of an SA.
+WARNING in rtmsg_ifinfo_build_skb
 
-Good catch, thanks.
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      52ede1bce557c66309f41ac29dd190be23ca9129
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/281e7e02-f6af-4b4a-845e-d1d5842a9301/config
 
-Two options to fix this:
-
-Option 1: add XFRM_OFFLOAD_CLEAR to xfrm_user_offload flags in uapi xfrm.h:
-
-#define XFRM_OFFLOAD_CLEAR  (1 << 7)
-When set in XFRMA_OFFLOAD_DEV, it means remove offload rather than configure it.
-
-Option 2: add a __u32 flags field to xfrm_user_migrate_state in uapi xfrm.h.
-There is a __u16 reserved currently used for alignment, but 16 bits feels
-too small if we want to cover clearing other attributes in the future.
-A __u32 at the end of the struct avoids that constraint.
-
-I am leaning toward option 2. Any preference? 
+batman_adv: batadv0: Not using interface batadv_slave_1 (retrying later): interface not active
+hsr_slave_0: entered promiscuous mode
+hsr_slave_1: entered promiscuous mode
+------------[ cut here ]------------
+err == -EMSGSIZE
+WARNING: net/core/rtnetlink.c:4421 at rtmsg_ifinfo_build_skb+0x218/0x260, CPU#0: syz-executor/6496
+Modules linked in:
+CPU: 0 UID: 0 PID: 6496 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:rtmsg_ifinfo_build_skb+0x218/0x260
+Code: f6 ba 01 00 00 00 89 e9 e8 25 15 3a 00 4c 89 f0 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d e9 7f 3a 2e 02 cc e8 49 3b 42 f8 90 <0f> 0b 90 eb 90 89 d9 80 e1 07 fe c1 38 c1 0f 8c 95 fe ff ff 48 89
+RSP: 0018:ffffc9000637e9a0 EFLAGS: 00010293
+RAX: ffffffff89835e27 RBX: 0000000000000000 RCX: ffff8881b80a57c0
+RDX: 0000000000000000 RSI: 00000000ffffffa6 RDI: 00000000ffffffa6
+RBP: 00000000ffffffa6 R08: 0000000000000004 R09: 0000000000000004
+R10: fffff52000c6fcdc R11: 0000000000000000 R12: 1ffff110235ddc21
+R13: 0000000000000000 R14: ffff8881133dc780 R15: ffff88811aeee000
+FS:  0000555557c4a500(0000) GS:ffff88818de65000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055555e1838c8 CR3: 0000000168b80000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ rtnetlink_event+0x1b7/0x270
+ notifier_call_chain+0x1be/0x400
+ netdev_change_features+0x95/0xe0
+ __netdev_upper_dev_link+0xb20/0xc80
+ netdev_upper_dev_link+0xb0/0x100
+ macsec_newlink+0xb11/0x1200
+ rtnl_newlink_create+0x329/0xb70
+ rtnl_newlink+0x1666/0x1be0
+ rtnetlink_rcv_msg+0x7d5/0xbe0
+ netlink_rcv_skb+0x232/0x4b0
+ netlink_unicast+0x80f/0x9b0
+ netlink_sendmsg+0x813/0xb40
+ __sys_sendto+0x672/0x710
+ __x64_sys_sendto+0xde/0x100
+ do_syscall_64+0x14d/0xf80
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ffadf757917
+Code: 48 89 fa 4c 89 df e8 a8 56 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007ffd0eb79f80 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000555557c4a500 RCX: 00007ffadf757917
+RDX: 0000000000000054 RSI: 00007ffae0544670 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 00007ffd0eb79fe4 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
+R13: 0000000000000000 R14: 00007ffae0544670 R15: 0000000000000000
+ </TASK>
 
 
-> For the rest, it seems that passing 0 is equivalent to omitting the
-> attribute in the current code. Except XFRMA_SA_PCPU, where we consider
-> UINT_MAX as "disable" (default value for x->pcpu_num), but we reject
-> userspace passing us that value, and XFRMA_SA_PCPU containing 0 is a
-> valid value.
+***
 
-yes XFRMA_SA_PCPU that would be UINT_MAX.
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
--antony
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
