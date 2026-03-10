@@ -1,176 +1,155 @@
-Return-Path: <netdev+bounces-265868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OK+iOeKFr2lvaAIAu9opvQ
-	(envelope-from <netdev+bounces-265868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:45:54 +0100
+	id WHVhFxWIr2lvaAIAu9opvQ
+	(envelope-from <netdev+bounces-265869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:55:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D9AD244556
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:45:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7622447E5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 03:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66E2730B4FAB
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 02:45:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6A61305E319
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 02:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6486C3ACA46;
-	Tue, 10 Mar 2026 02:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458273B3BFE;
+	Tue, 10 Mar 2026 02:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="deu669Z9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnGUTqsQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411CC3AE715
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 02:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215A93A6411;
+	Tue, 10 Mar 2026 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773110716; cv=none; b=OcwYYOpxgK60k4X10a5LaZ8SPe/U6bMQf6hggZBQj5RvrBIzx67CrAyMJicTv9JYNGPwii6ThwbxXW/ZCc/iFRG7lpnqYHL7Tw2Is9o/GyvudI9F/TyIIJfwfNQo7vmPcKjPunvFXNAw5DvxlpeMpJxNVxs9qx9HJQTWGAwrN1M=
+	t=1773111092; cv=none; b=BCYAzzioW6NxFFh2+9jZxsgO/5Za4QLIWpSQlMvfbjIiBrcOYzU//Lh00epGRxYcnoqF5xUMLMMT6fmXrHbkBLmych4a8dNUoILquBNkFwR/az9jUbs0FrT1027vSb7MA/VizHghe7IX1axtVQ+DfX3iUAQb9U9aSJ679ANKx0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773110716; c=relaxed/simple;
-	bh=AiuSbGc4gyF+r0NsVvYBegnqTPdAIt4V0L/szs51RLs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A1yGtiQVYW2piZ0m4Bfqtv7i+3Sw/pCAuKW+9ec/73CPQ0tHInggCb0fjuGUkhdX2yIAZYdR2NqKc9HvlRvzH84Dl0lAxOQcupCg9PXRj/87N4u6QJEAYl6Z4vsBVpjSdxpfM9m7NiYSVuKxP3RobTu3D4G7NnhfTz/oRP5d6H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=deu669Z9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E9DC4CEF7
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 02:45:16 +0000 (UTC)
+	s=arc-20240116; t=1773111092; c=relaxed/simple;
+	bh=QE8oSiIig2ZBt5EyS5zX1hfXhBg0DDje2u0pf2P1jq4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dyGCwo0M9+1MOEKOQglK6LHyS0HHZuoEiPB7LsdmnAklbYWxpiDbfKjIEzOUTaWIpSJaNQcV6A/5TJYKAhI3BE0QzhmTezXKW3FC7r+gCatCSojS86OyYShM2Mk7QTsNfzhm3Ts7ivQMElO3eDBjDETzn/4JugtGPB70wnXckrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnGUTqsQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A947C4CEF7;
+	Tue, 10 Mar 2026 02:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773110716;
-	bh=AiuSbGc4gyF+r0NsVvYBegnqTPdAIt4V0L/szs51RLs=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=deu669Z9bCAa3MHzmq85IHa4IIybHro01N3INe+ETq7xl2XbjqfVmZtHlbKEs3Rpw
-	 tmDIW2kRFqJXcxnteRZJq11Hw220gZXTp/2BYB4i36vmN3QlYcjnB8SKQqD/eYiveS
-	 kdCfsege3WAIPqGpWp0aJs4k8pxbZ0GvI9LVkl3kqCeagxiCHPMyZQh5WFMwuv29jU
-	 r0SkhBw5sUyj4Wd28Ft87E8doiuqor0WxSYfGuRbKELjs/txoCHc7aYpv4jk4tB8A/
-	 duwiqpP9JaL54dfvTeud0bobzW7DtU/TskHR7IvQ8+D1CzPaM9SU8UO1JxP0q5x6zt
-	 BsA6px45ozMxQ==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-38a01c80c34so136276991fa.0
-        for <netdev@vger.kernel.org>; Mon, 09 Mar 2026 19:45:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXFwDS1BggftEVnyL/GskMX5oyk67VZjgyD/mwz7GGmVRYsEz4GPS/zHxCynHQJr976oTP6xt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBJ379uvuPO3r53vnG1MOmi8c8Y9Yi4/veHgFRXzsPrk4Rp6VY
-	KmN0Z9vVIDT/NxAnpl0qZD0Dkunw53rlASuxXn/mvsdkd/MpDBFJH/jG9rGISMXMyxlmLE1RV3i
-	dHciXbnXUpniGbmMxMm3E1Q7VINa+2Fo=
-X-Received: by 2002:a05:651c:1104:b0:385:c21f:37e1 with SMTP id
- 38308e7fff4ca-38a40b6a2d2mr40186201fa.15.1773110714064; Mon, 09 Mar 2026
- 19:45:14 -0700 (PDT)
+	s=k20201202; t=1773111091;
+	bh=QE8oSiIig2ZBt5EyS5zX1hfXhBg0DDje2u0pf2P1jq4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SnGUTqsQQnSMButRD3adlkw0yCDl+ZoBL3Nj6a10VsC5q9dt1CDmvFjIpNi74bmWu
+	 +YPt8tkBDZqMGIuoM58l58MZLVDLWX8C8MCBhrPZM+iDLXegZiYvZ6AOxV321vDK9R
+	 U4P7w0bDAQ8Y3eadEkG9g1MiGc8BwEvUcFBffc5JhZ/rXrtar1xSJWIdAUmMo3NRnQ
+	 djMxMR7bJm/1kHEgG4VXFcL6UVH8XRAYj+mZlg87THcWrbGh91N/iLFUUMVt1hCNep
+	 2Un2K33S0mW5DC7Kp6wZXPm6zGWANdlCDibRs0timM/kaWtBNKF7BvDRxvSPSfjt8s
+	 PqdqfkxtBPmGw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: rosenp@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	Raju.Rangoju@amd.com,
+	linux-kernel@vger.kernel.org (open list),
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net
+Subject: Re: [PATCHv2,net-next] net: xgbe: use device_get_mac_addr
+Date: Mon,  9 Mar 2026 19:51:27 -0700
+Message-ID: <20260310025127.3751023-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260307032227.640904-1-rosenp@gmail.com>
+References: <20260307032227.640904-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309190842.927634-1-vladimir.oltean@nxp.com> <20260309190842.927634-18-vladimir.oltean@nxp.com>
-In-Reply-To: <20260309190842.927634-18-vladimir.oltean@nxp.com>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Tue, 10 Mar 2026 10:45:01 +0800
-X-Gmail-Original-Message-ID: <CAGb2v65surpnqrmv4tbH4TSrx6SaTpdbsQtCsNqwse5xwdb8fA@mail.gmail.com>
-X-Gm-Features: AaiRm535EaFxYtCAjq5FIkHiBmgOxc7_e434rO98DZfg5NrM7RTttw3IOCzqW1Y
-Message-ID: <CAGb2v65surpnqrmv4tbH4TSrx6SaTpdbsQtCsNqwse5xwdb8fA@mail.gmail.com>
-Subject: Re: [PATCH v3 phy-next 17/24] media: sunxi: a83-mips-csi2: include
- PHY provider header
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, 
-	freedreno@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, spacemit@lists.linux.dev, 
-	UNGLinuxDriver@microchip.com, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 6D9AD244556
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: AE7622447E5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.infradead.org,kernel.org,linaro.org,lists.freedesktop.org,vger.kernel.org,lists.linux.dev,microchip.com,gmail.com,sholland.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-265868-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wens@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-265869-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c0a:e001:db::12fc:5321:from];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[10.30.226.201:received,100.90.174.1:received];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	HAS_REPLYTO(0.00)[wens@kernel.org]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 3:10=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nx=
-p.com> wrote:
->
-> The introduction commit 576d196c522b ("media: sunxi: Add support for the
-> A83T MIPI CSI-2 controller") says:
->
->     This implementation splits the protocol and D-PHY registers and
->     uses the PHY framework internally. The D-PHY is not registered as a
->     standalone PHY driver since it cannot be used with any other
->     controller.
->
-> However, this does not matter, and is not the only instance of tight PHY
-> provider <-> consumer pairing. According to Vinod Koul, having PHY
-> provider drivers outside of drivers/phy/ is discouraged, although it
-> would be difficult for me to address a proper movement here.
->
-> So just include the private provider API header from drivers/phy/ and
-> leave a FIXME in place.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Acked-by: Chen-Yu Tsai <wens@kernel.org>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: xgbe: use device_get_mac_addr
 
-> ---
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Chen-Yu Tsai <wens@kernel.org>
-> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
-> Cc: Samuel Holland <samuel@sholland.org>
+This commit refactors the MAC address retrieval code to use
+device_get_mac_address() instead of device_property_read_u8_array() with
+an explicit is_valid_ether_addr() check. It also removes the
+XGBE_MAC_ADDR_PROPERTY definition since the new function supports multiple
+MAC address properties.
+
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+> index 47d53e59ccf6..f2db920fbaec 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+> @@ -252,11 +252,9 @@ static int xgbe_platform_probe(struct platform_device *pdev)
+>  		dev_dbg(dev, "sir1_regs  = %p\n", pdata->sir1_regs);
 >
-> v1->v3: none
-> ---
->  .../media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t_dphy.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t=
-_dphy.c b/drivers/media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t_dphy=
-.c
-> index 24bbcc85013d..1143feeb4fcb 100644
-> --- a/drivers/media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t_dphy.c
-> +++ b/drivers/media/platform/sunxi/sun8i-a83t-mipi-csi2/sun8i_a83t_dphy.c
-> @@ -4,9 +4,9 @@
->   * Author: Paul Kocialkowski <paul.kocialkowski@bootlin.com>
->   */
->
-> -#include <linux/phy/phy.h>
->  #include <linux/regmap.h>
->
-> +#include "../../../../phy/phy-provider.h" /* FIXME */
->  #include "sun8i_a83t_dphy.h"
->  #include "sun8i_a83t_mipi_csi2.h"
->
-> --
-> 2.43.0
->
+>  	/* Retrieve the MAC address */
+> -	ret = device_property_read_u8_array(dev, XGBE_MAC_ADDR_PROPERTY,
+> -					    pdata->mac_addr,
+> -					    sizeof(pdata->mac_addr));
+> -	if (ret || !is_valid_ether_addr(pdata->mac_addr)) {
+> -		dev_err(dev, "invalid %s property\n", XGBE_MAC_ADDR_PROPERTY);
+> +	ret = device_get_mac_address(dev, pdata->mac_addr);
+> +	if (ret) {
+> +		dev_err(dev, "invalid MAC address property\n");
+>  		if (!ret)
+                     ^^^^^^^^
+
+Is this check reachable? When execution enters the 'if (ret)' block above,
+ret is guaranteed to be non-zero, so the nested 'if (!ret)' condition can
+never be true.
+
+The old code needed 'if (!ret) ret = -EINVAL;' because
+device_property_read_u8_array() could return 0 with an invalid MAC address
+(checked by the !is_valid_ether_addr() part of the condition).
+
+The new device_get_mac_address() already returns an error when the MAC
+address is invalid, so this conversion is no longer needed and the
+condition can never execute.
+
+>  			ret = -EINVAL;
+>  		goto err_io;
+
+[ ... ]
+-- 
+pw-bot: cr
 
