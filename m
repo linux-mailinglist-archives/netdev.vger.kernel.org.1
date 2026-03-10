@@ -1,418 +1,204 @@
-Return-Path: <netdev+bounces-266264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJ++GSNTsGmBiAIAu9opvQ
-	(envelope-from <netdev+bounces-266264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:21:39 +0100
+	id gMkBN5lUsGkJiQIAu9opvQ
+	(envelope-from <netdev+bounces-266265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:27:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD32255748
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:21:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 802E9255916
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:27:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 662AF300DCE5
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:21:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF7713108B5A
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF983D1702;
-	Tue, 10 Mar 2026 17:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A2C3D16F5;
+	Tue, 10 Mar 2026 17:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gD4SY/I+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ld7NVVPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335FC3D16F3;
-	Tue, 10 Mar 2026 17:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773163296; cv=none; b=WhL6Qf0OS3yxb0c7SjV/HkQoyGLBPyNBgECeETzKam/tl6VgIIfIdrLG5E3SkbtgaWmNEyBeJaXI0ff3ee23k+YObnqevQDu+HQcOMXikbSBjBnSnA5+gj/+QQU8tzFA67nm/+4+4O2fnC15fofNYNHMQk3DR0prI/ry4tC4ntE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773163296; c=relaxed/simple;
-	bh=24mHAtJi53l2fD5YRsztQMaW9zAAR5od9y43t2HCgIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kbB+sk8g2wfDbPiHvQsi3r9RUmjvK2D12bTZxsiSrhYfogUzaiLQ9TV5AifLoNDjCgrSettTOeb8LppZLd2velzRJ1uarDov1+BlfdUVY0JQlN9msQeTBKjAG21CNDJlIDcJ1oWy+zaZ9CtTAsl1gymjG1wppd+ximVPoPGB9w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gD4SY/I+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1B3DC19423;
-	Tue, 10 Mar 2026 17:21:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773163295;
-	bh=24mHAtJi53l2fD5YRsztQMaW9zAAR5od9y43t2HCgIs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gD4SY/I+pbjCfmNifCbEFQVebBUEB9JhN+A/EqIiUWojpoiHPko7jdd9adpXsaIfe
-	 QtrO/GZE/++CJL6Od03owxJIjfNDKtUARay86mlDKiAC2pdE/1nAugDVAYUBiRgatr
-	 CLSymGhbz0550t3+vpSICFm+XiH7vrzy2pxvlRuJC7k0NV9NYsC0x0IO50sYSGxZRD
-	 rUEVli+OjlFwinlnJM/lsUh6vGrucr2Y4t5Gd0gglSb5+yZ/n3NVDyzTmxNXG93GCf
-	 fhdsJMHsb3wujnAnk5Mjys44MTc/Bpaqwm89F8CbDAlt36u1gzxPWhMD3lBDW+xVVZ
-	 23jsbJKund8+A==
-From: Simon Horman <horms@kernel.org>
-To: rkannoth@marvell.com
-Cc: Simon Horman <horms@kernel.org>,
-	cjubran@nvidia.com,
-	matttbe@kernel.org,
-	chuck.lever@oracle.com,
-	shshitrit@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sgoutham@marvell.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	saeedm@nvidia.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com
-Subject: Re: [v3,net-next,5/5] octeontx2-af: Add support for loading custom KPU profile from filesystem
-Date: Tue, 10 Mar 2026 17:21:00 +0000
-Message-ID: <20260310172100.890161-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260309024619.898211-6-rkannoth@marvell.com>
-References: <20260309024619.898211-6-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433533BD25C
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 17:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773163467; cv=pass; b=AbYAOUuu0B8l38zXxmWY+WVFIODjX+++kKQmsBThBeshCrzMM0nObBdMOLhTGiU1brkjNO9Rwh8PaYeJsQie2p6fSBL4KJ0K+sNIG/u6Qm2hoFLc5yVOj4xBT63NYMAe+DqSRctWknq+gUjwoWHi6wY0wQQPPLzK+kwMJcImy6I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773163467; c=relaxed/simple;
+	bh=qe6UOPyH09fVG+sn9JIknvgtuqP2tPFx+HmroRjB1BE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e49RWmVeXcoijYC2h1r/XnatAAChn6sPzpR9VG78PYruMuLtgi2Ykvwva4Ef2hWy+WwuOXRF7+ntbboU50Lf++GuUSLh2qANGLajsaz6o9Qdw2CfF44H8rz7zpHY5sYZ1Fl/qNeuLVuv1KzOq8bAFK8In3pk2IQrgkYdxEJFV3E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ld7NVVPT; arc=pass smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-482f454be5bso1546825e9.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:24:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773163463; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PrAscyBQLTAIhCuYFDoaEN/HNAxdrkKs9pFoVhzNV/3C7UeuXqZUesqwLbtOLB1Wax
+         Cnziw1KWEjF5TyWTysBpJsO2BnjR5F/evQ/PhO5e2Vn8dgHk7+37MXMJ7Sf8tGTRw96/
+         ZgkUZL4aeZgjUlV5Wqol1miIg7aEQxthngRoI4307abB4YLKcrDvGLwkFL/gzKuAzVv+
+         7WyiikaQgQHRUe+W8etffa/ib7Kudr4Ds3NMC57HqbTzKmLTJ1qMe34NJcUjXlkAOj20
+         2EeA8QOfDfM0Y1pyw9H9HeCdZq8f6Q5sPku5UvKb1kU8Wv6CIAdT2VKJdax196FyF042
+         uz5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=m34P9qg5/9p0up6Ob522geMpxbEkYzYijmYKyt2ZJUw=;
+        fh=ZkufZdZHwH3k+V8sWuGBU483c0qCHBsSpEyWzfQweJU=;
+        b=BYpmQUUH6ipxtbJm+xDtY07qU9QGjSGAFNxz3xp5EkSar4DkLrZO5seAvT6Feizujr
+         L+n3MAecsMfkU8GsZep5zMsqXHtpBlK37ANeCK/fh6pW+nDwWM5dq6K23HkxxSGW6+qP
+         JbUiiLG4J0SnX5MAoRe64KFwUKJjNyXoAtaIFewiArPUqdYunCm31TTHMSk1mEdG4JFl
+         k9uNC9UwI8WuhyrmlHH6Pm2WfeqJZL3cWXCKkp2nFYzd/PL67WfmLttR0cBg11XDQ/kb
+         zrcMauNsMFV+qEA9LDR8RjXGF7CK05mD1vEM1bXJ9PmpYmgB+YDDce2N0HQxUc8C/d+M
+         9Cyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773163463; x=1773768263; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=m34P9qg5/9p0up6Ob522geMpxbEkYzYijmYKyt2ZJUw=;
+        b=ld7NVVPTHQ3qZjn108yq6rGOKQ8aSqMn0E4BqLLp0jATneuZIHFsKKjd3Hkgy4PJhh
+         p5qxLlQtfImvbXRtM7Z3mwTgwM0vNT6QQ7S5/f7MP/J8rOQBEwtdlZKo29DVJwdhJ1o3
+         kwdyuBQeDLES+itEZawxZB+FG8FXwWLjg8jw+4ldHM2vXohqKUB52OG6X4Jcv3UVrzZO
+         Qjk6Ut/JFpJmFTvPPRrACxL0y7f3m7v7b/9RcruEL7t7st/yQnvSE0bGKPFfX2w7tP6x
+         Zk+8aqtmiPkrRDDUZqt3SJjUrjjOBdWWDJLW8d+2Fq7G22hEaZtm4SWaNgfwYlJbIL5G
+         iu1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773163463; x=1773768263;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m34P9qg5/9p0up6Ob522geMpxbEkYzYijmYKyt2ZJUw=;
+        b=SsAfds4ptX3DEJzN+DTcmci7iXzk63Ym0CMGSYQFn58qlbX8FROGT7U4ngOKD5wKL/
+         n01HzLuvs4k5/eyNqXq1sPLVQrmm1GVwx2NlZEIuIhL+3d/ALTBVDLKxdJBKe+jdwfza
+         xEFFqnJgujFlaiR2cItYL6SjF2SX/WE0vT57n2//E10qHbJCtM2R+4byjTd+3LKsDAur
+         j8KMjqbNBgIcNSF5PhyelP3ABNbloNDsiyefLnwI7NmagO1NlVt0gmn+1r2U2NXHKbwI
+         fq2avUH7+PXET/A01JD+AJxF3XB6lDdORsLp1gvrQtWtD39CbtMILmuDGKQC9LlHRqNS
+         T0iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVl/GHwHY+4hOwsxW61mD4m2Nv6TsD1Msh20qwYgYoHgg2zGws+IPPcy23FL3kbEcFVMH0ZQvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA8HZ/M6ofL79WRalOfJ3ZmuiaoKogJOtkmuTwA9vCQ+VOM5pi
+	w2vSIiP+hOSsvU10S3ZGN9xf0NKlSAEEIlITEMRO/DGZ0JU4519xDUPiBNWtNKZFSXv2UOBJiUC
+	tO3Zjcqqfn0ARmJbskii8pHyliZiwEpE=
+X-Gm-Gg: ATEYQzwLG9LxQnm/plqBsLSH5NqF/FYfHdzWhoTZ9uk1oMDdAXuspVCb0+via3sb5g5
+	muLoX8aHQU3sx5IwH66EBh14xnYOjrGIXeDv9P/BuQv3vz/VNN3k3rA7W+qCI+Ln85sl0LITGGQ
+	kWWcwQaJQNQMycIJdkccHA+Nj98Rc+2mVOhxMI7CQ/cjyweORS7FiWs02tdgDeTFu6t9Yu6oHQc
+	muYeffi8cfOb/QKCHFExGELV5DExXxF2g7/ojosOJ2AR/vxW6UNcS8NzDK6oY2EEydUrX2SYRt4
+	R6p9OqCmtFaxz4aDEkifPqdLjkp+BnwKIfmm2Cbqi2o/rBC6EpDQubagZ7Zw
+X-Received: by 2002:a05:600d:6450:20b0:483:a2b0:d210 with SMTP id
+ 5b1f17b1804b1-485419e0654mr57793155e9.7.1773163462372; Tue, 10 Mar 2026
+ 10:24:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BDD32255748
+References: <20260303150639.85007-4-leon.hwang@linux.dev> <47fbcb9aa941b07054bfef30b802d488688fafdf6df889e78b38313a614b98c1@mail.kernel.org>
+In-Reply-To: <47fbcb9aa941b07054bfef30b802d488688fafdf6df889e78b38313a614b98c1@mail.kernel.org>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Tue, 10 Mar 2026 18:23:45 +0100
+X-Gm-Features: AaiRm513_5D97dMh5zZ6mTaj8z2tHS7OLQWsE8CcolmJzu3CwwWzrNbuIqXtyes
+Message-ID: <CAP01T74sqmUAL7=PuzFPNbghX+6N_OzrsZiOHcMEMtg01CuL4A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 3/6] bpf: Disallow !kprobe_write_ctx progs
+ tail-calling kprobe_write_ctx progs
+To: bot+bpf-ci@kernel.org
+Cc: leon.hwang@linux.dev, bpf@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, yangfeng@kylinos.cn, 
+	menglong8.dong@gmail.com, puranjay@kernel.org, bjorn@kernel.org, 
+	pulehui@huawei.com, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	kernel-patches-bot@fb.com, martin.lau@kernel.org, clm@meta.com, 
+	ihor.solodrai@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 802E9255916
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,oracle.com,vger.kernel.org,marvell.com,resnulli.us,davemloft.net,google.com,redhat.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266265-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-266264-lists,netdev=lfdr.de];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[linux.dev,vger.kernel.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,fb.com,meta.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[memxor@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-octeontx2-af: Add support for loading custom KPU profile from filesystem
-
-This commit adds functionality to load custom KPU (Key Parse Unit)
-profiles from the filesystem at module load time, providing an
-alternative to flashing updated firmware on deployed devices.
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-> index cefc5d70f3e4..5928c4d3cc8b 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-
-[ ... ]
-
-> @@ -290,6 +303,7 @@ struct npc_kpu_profile {
->  	int action_entries;
->  	struct npc_kpu_profile_cam *cam;
->  	struct npc_kpu_profile_action *action;
-> +	struct npc_kpu_profile_cam2 *cam2;
->  };
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> index a466181cf908..1efc53b63b67 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-
-[ ... ]
-
-> @@ -553,8 +553,8 @@ struct npc_kpu_profile_adapter {
->  	const char			*name;
->  	u64				version;
->  	const struct npc_lt_def_cfg	*lt_def;
-> -	const struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
-> -	const struct npc_kpu_profile	*kpu; /* array[kpus] */
-> +	struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
-> +	struct npc_kpu_profile	*kpu; /* array[kpus] */
-
-[ ... ]
-
-> @@ -564,6 +564,7 @@ struct npc_kpu_profile_adapter {
->  	bool				custom;
->  	size_t				pkinds;
->  	size_t				kpus;
-> +	bool				from_fs;
->  };
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> index 352dc5f1d5b9..05aabe26f030 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-
-[ ... ]
-
-> @@ -1610,6 +1622,7 @@ u64 npc_enable_mask(int count)
->  static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
->  				    const struct npc_kpu_profile *profile)
->  {
-> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
->  	int entry, num_entries, max_entries;
->  	u64 entry_mask;
+On Tue, 3 Mar 2026 at 17:04, <bot+bpf-ci@kernel.org> wrote:
 >
-> @@ -1621,10 +1634,15 @@ static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
+> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > --- a/kernel/bpf/core.c
+> > +++ b/kernel/bpf/core.c
 >
->  	max_entries = rvu->hw->npc_kpu_entries;
+> [ ... ]
 >
-> +	WARN(profile->cam_entries > max_entries,
-> +	     "KPU%u: err: hw max entries=%u, input entries=%u\n",
-> +	     kpu,  rvu->hw->npc_kpu_entries, profile->cam_entries);
-> +
->  	/* Program CAM match entries for previous KPU extracted data */
->  	num_entries = min_t(int, profile->cam_entries, max_entries);
->  	for (entry = 0; entry < num_entries; entry++)
->  		npc_config_kpucam(rvu, blkaddr,
-> +				  adapter->from_fs ? (void *)&profile->cam2[entry] :
->  				  &profile->cam[entry], kpu, entry);
+> > +     switch (match) {
+> > +     case BPF_MAP_OWNER_MATCH_FOR_INIT:
+> > +             if (owner->kprobe_write_ctx != aux->kprobe_write_ctx)
+> > +                     return false;
+> > +             break;
+> > +
+> > +     case BPF_MAP_OWNER_MATCH_FOR_UPDATE:
+> > +             if (!owner->kprobe_write_ctx && aux->kprobe_write_ctx)
+> > +                     return false;
+> > +             break;
+> > +     }
+>
+> In the v1 review, Alexei Starovoitov asked for strict conformance
+> both ways rather than one-directional validation:
+>
+>     "Don't be fancy. Require strict conformance both ways
+>     in *all* patches."
+>
+> https://lore.kernel.org/bpf/CAADnVQ+-V0-1i8_+CYpK7G0CnV-2n8e9Szv43yM3Az197eL_0A@mail.gmail.com/
+>
+> The BPF_MAP_OWNER_MATCH_FOR_UPDATE case still uses one-directional
+> matching, rejecting only !owner->kprobe_write_ctx && aux->kprobe_write_ctx
+> but allowing the reverse.  Was this an intentional design choice, and
+> if so, should the changelog note the disagreement?
+>
 
-Can this dereference NULL when from_fs is true for KPUs not covered by
-the filesystem firmware?
+Let's follow the approach Alexei outlined, while the changes look ok
+to me, let's remove the one way check and just do
+owner->kprobe_write_ctx != aux->kprobe_write_ctx, same for the other
+two checks. With this we can also get rid of this INIT vs UPDATE
+distinction.
 
-Looking at the filesystem loading path in npc_apply_custom_kpu:
-
-    for (kpu = 0; kpu < fw->kpus; kpu++) {
-        ...
-        ret = npc_alloc_kpu_cam2_n_action(rvu, kpu, entries);
-        ...
-        for (entry = 0; entry < entries; entry++) {
-            profile->kpu[kpu].cam2[entry] = cam2[entry];
-            ...
-        }
-    }
-
-The code allocates cam2 and populates entries only for the first
-fw->kpus KPUs found in the firmware blob.
-
-However, npc_program_kpu_profile is later called for all KPUs in
-npc_parser_profile_init:
-
-    for (idx = 0; idx < num_kpus; idx++)
-        npc_program_kpu_profile(rvu, blkaddr, idx, &rvu->kpu.kpu[idx]);
-
-Since adapter->from_fs is a global flag (not per-KPU), when idx >=
-fw->kpus, profile->cam2 remains NULL (the default npc_kpu_profiles[]
-static initializer doesn't include cam2), causing &profile->cam2[entry]
-to compute an invalid pointer.
-
-Shouldn't there be a check to verify cam2 is non-NULL before
-dereferencing it, or allocate cam2 for all KPUs when from_fs is true?
+Other than that I think patches are good, please also test both
+directions in the selftest in next respin.
 
 >
->  	/* Program this KPU's actions */
-
-[ ... ]
-
-> @@ -1678,26 +1696,50 @@ static void npc_prepare_default_kpu(struct rvu *rvu,
->  	npc_cn20k_update_action_entries_n_flags(rvu, profile);
->  }
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 >
-> +static int npc_alloc_kpu_cam2_n_action(struct rvu *rvu, int kpu_num,
-> +				       int num_entries)
-> +{
-> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
-> +	struct npc_kpu_profile *kpu;
-> +
-> +	kpu = &adapter->kpu[kpu_num];
-> +
-> +	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
-> +				 sizeof(*kpu->cam2), GFP_KERNEL);
-> +	if (!kpu->cam2)
-> +		return -ENOMEM;
-> +
-> +	kpu->action = devm_kcalloc(rvu->dev, num_entries,
-> +				   sizeof(*kpu->action), GFP_KERNEL);
-> +	if (!kpu->action)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-
-Can this permanently corrupt the default profile when the second
-allocation fails?
-
-The kpu pointer targets the static npc_kpu_profiles[] array (adapter->kpu
-starts as &npc_kpu_profiles[0]). When the first devm_kcalloc succeeds but
-the second fails:
-
-    kpu->cam2 = devm_kcalloc(...)  // succeeds, modifies static array
-    kpu->action = devm_kcalloc(...) // fails
-    return -ENOMEM;                 // kpu->action is now NULL in static array
-
-The caller in npc_apply_custom_kpu returns the error without restoring
-the original action pointer.
-
-Later, npc_parser_profile_init calls npc_program_kpu_profile for all
-KPUs, which calls npc_config_kpuaction with &profile->action[entry]
-where action is NULL, causing a crash when dereferencing the NULL pointer.
-
-Should the function restore the original pointers on allocation failure,
-or use a separate copy of the profile entries for filesystem loading?
-
-> +
->  static int npc_apply_custom_kpu(struct rvu *rvu,
-> -				struct npc_kpu_profile_adapter *profile)
-> +				struct npc_kpu_profile_adapter *profile,
-> +				bool from_fs)
->  {
->  	size_t hdr_sz = sizeof(struct npc_kpu_profile_fwdata), offset = 0;
->  	struct npc_kpu_profile_action *action;
-> +	struct npc_kpu_profile_fwdata *sfw;
->  	struct npc_kpu_profile_fwdata *fw;
-> +	struct npc_kpu_profile_cam2 *cam2;
->  	struct npc_kpu_profile_cam *cam;
->  	struct npc_kpu_fwdata *fw_kpu;
-> -	int entries;
-> +	int entries, ret;
->  	u16 kpu, entry;
-
-[ ... ]
-
-> @@ -1731,31 +1773,80 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
->  		return -EINVAL;
->  	}
->
-> +	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
-> +	if (!sfw)
-> +		return -ENOMEM;
-> +
-> +	memcpy(sfw, fw, sizeof(*sfw));
-> +
->  	profile->custom = 1;
-> -	profile->name = fw->name;
-> +	profile->name = sfw->name;
->  	profile->version = le64_to_cpu(fw->version);
-> -	profile->mcam_kex_prfl.mkex = &fw->mkex;
-> -	profile->lt_def = &fw->lt_def;
-> +	profile->mcam_kex_prfl.mkex = &sfw->mkex;
-> +	profile->lt_def = &sfw->lt_def;
-> +
-> +	/* Binary blob contains ikpu actions entries at start of data[0] */
-> +	if (from_fs) {
-> +		action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> +
-> +		if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
-> +			return -ENOMEM;
-> +
-> +		memcpy((void *)profile->ikpu, action, sizeof(ikpu_action_entries));
-> +		offset += sizeof(ikpu_action_entries);
-> +	}
->
->  	for (kpu = 0; kpu < fw->kpus; kpu++) {
->  		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
-> -		if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> -			dev_warn(rvu->dev,
-> -				 "Too many custom entries on KPU%d: %d > %d\n",
-> -				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> -		entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> -		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> -		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> +		if (!from_fs) {
-> +			if (fw_kpu->entries > KPU_MAX_CST_ENT)
-> +				dev_warn(rvu->dev,
-> +					 "Too many custom entries on KPU%d: %d > %d\n",
-> +					 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-> +			entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-> +			cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-> +			offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-> +			action = (struct npc_kpu_profile_action *)(fw->data + offset);
-> +			offset += fw_kpu->entries * sizeof(*action);
-> +			if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-> +				dev_warn(rvu->dev,
-> +					 "Profile size mismatch on KPU%i parsing.\n",
-> +					 kpu + 1);
-> +				return -EINVAL;
-> +			}
-> +			for (entry = 0; entry < entries; entry++) {
-> +				profile->kpu[kpu].cam[entry] = cam[entry];
-> +				profile->kpu[kpu].action[entry] = action[entry];
-> +			}
-> +			continue;
-> +		}
-> +		entries = fw_kpu->entries;
-> +		dev_info(rvu->dev,
-> +			 "Loading %u entries on KPU%d\n", entries, kpu);
-> +
-> +		cam2 = (struct npc_kpu_profile_cam2 *)fw_kpu->data;
-> +		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam2);
->  		action = (struct npc_kpu_profile_action *)(fw->data + offset);
->  		offset += fw_kpu->entries * sizeof(*action);
->  		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
->  			dev_warn(rvu->dev,
-> -				 "Profile size mismatch on KPU%i parsing.\n",
-> +				 "profile size mismatch on kpu%i parsing.\n",
->  				 kpu + 1);
->  			return -EINVAL;
->  		}
-> +
-> +		profile->kpu[kpu].cam_entries = entries;
-> +		profile->kpu[kpu].action_entries = entries;
-> +		ret = npc_alloc_kpu_cam2_n_action(rvu, kpu, entries);
-> +		if (ret) {
-> +			dev_warn(rvu->dev,
-> +				 "profile entry allocation failed for kpu=%d for %d entries\n",
-> +				 kpu, entries);
-> +			return -EINVAL;
-> +		}
-> +
->  		for (entry = 0; entry < entries; entry++) {
-> -			profile->kpu[kpu].cam[entry] = cam[entry];
-> +			profile->kpu[kpu].cam2[entry] = cam2[entry];
->  			profile->kpu[kpu].action[entry] = action[entry];
->  		}
-
-Could this loop overflow and hang the kernel if firmware specifies more
-than 65535 entries?
-
-The loop variable 'entry' is declared as u16:
-
-    u16 kpu, entry;
-
-while 'entries' is an int:
-
-    entries = fw_kpu->entries;
-
-In the from_fs path, 'entries' is read directly from the firmware blob
-without capping it (unlike the !from_fs path which uses
-min(fw_kpu->entries, KPU_MAX_CST_ENT)).
-
-If a corrupt or malicious firmware file specifies fw_kpu->entries >
-65535, the u16 variable wraps around at 65536:
-
-    for (entry = 0; entry < entries; entry++)
-
-When entry reaches 65535, incrementing it produces 0, which is still
-less than entries, creating an infinite loop that hangs the kernel.
-
-Should the code either cap entries in the from_fs path or use an
-int-sized loop variable?
-
->  	}
-
-[ ... ]
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22630000544
 
