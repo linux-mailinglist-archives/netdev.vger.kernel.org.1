@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-266257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266258-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aApcDuRSsGnYiAIAu9opvQ
-	(envelope-from <netdev+bounces-266257-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:20:36 +0100
+	id AHgmIARTsGnYiAIAu9opvQ
+	(envelope-from <netdev+bounces-266258-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:21:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5E12556FD
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:20:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1144E255722
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC05130B5A12
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:19:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E74B30C1903
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 17:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F00D3D16F1;
-	Tue, 10 Mar 2026 17:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9543D1716;
+	Tue, 10 Mar 2026 17:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCNeWMn1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwf9qDw/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB793D092C;
-	Tue, 10 Mar 2026 17:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4212314D08;
+	Tue, 10 Mar 2026 17:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773163148; cv=none; b=PaL2R4VIla351nW3vcBSyjJta9sMW9LmglWG5LS9q/r1CNAhLfZJE5hQQWTCkwwVFjJq1qrXtcG94k5tod20axlTO40nOKAFBJqnZ9ae4EdsHJKC04VhfKGv3aOudtoxWGLZsNrHsZohx4Or2c23i0k0TWF80xrEQVkZMjVfXp4=
+	t=1773163153; cv=none; b=ourzFSpVk+wez0eaa1GfsILlmc6500x2pLzoYqTV0NLleWR6gagTMNVxWw1jwxiVxcmO1LOsHVi5ICQzLiuRgDSgiArcDnZXtCAZGqP78GHUzL+Xd+k4/0Dw6yQjWl/ftI52J+NF4PRcrMx52fOUKs1nT09IqwU7exOhAnjRNmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773163148; c=relaxed/simple;
-	bh=d+MyLOiuyfRC+NF64EIUpcY9qyHiXTVHxjTblw4Yz08=;
+	s=arc-20240116; t=1773163153; c=relaxed/simple;
+	bh=hLF9AXo3lnRxCyN0gi/H0Xuz7Ot4l/b2adjyOOaaEI4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WGsm7stbUG58gwT0AoeEBeME9OJi/7SmgOsnmLnX3XPwub6qVHsDuSXFspdoBweFWDcDn6hWy/nWTtFIAQXbiys0RtO2Ck/wK3tQy0cJ98YbCqTDNhjtanSBJHpG1fpBFBZl0Nli6ljptxl5a4Uvuifquql6XpNN8s90ih5NemA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCNeWMn1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DF10C19423;
-	Tue, 10 Mar 2026 17:19:02 +0000 (UTC)
+	 MIME-Version; b=Lo4KgMDjbqQo+AIQtDwhVfQ5ZzeQErMwPoBQkQA3bhbAz9gWT4i0tytwOA0G3uXrC1dyDbkbfylkhkADV07YpKdICs/MDOj9egr7//gJkzJp7R9PXFsQKaw425CXkCBUHopxLFI8Rvej1sgvHylFbhI8QhXl74F5zfKEG4JqMCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwf9qDw/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45606C2BCB3;
+	Tue, 10 Mar 2026 17:19:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773163147;
-	bh=d+MyLOiuyfRC+NF64EIUpcY9qyHiXTVHxjTblw4Yz08=;
+	s=k20201202; t=1773163153;
+	bh=hLF9AXo3lnRxCyN0gi/H0Xuz7Ot4l/b2adjyOOaaEI4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SCNeWMn1m35PFvOXY1i1G++rR2Au25weAg7P477mhiUILy/1IvFe4m4e1RIMzCXG3
-	 pQFqWTH3S2EjnABKGPiJwVzMoBlV8y8Keq2IxcmaVVEFszRAPESVc+4CoSkOpaz1V2
-	 GUaUi1xuKbpKRuDmCil2CiNPrEOBiBVjrNPvjztoyMJMd4GvW4W7g6pPWGsw1Q96xl
-	 RaPEiGjpB26qhFq8jPKKnkTDq3iqrmeL074laGAsU6+HHHKp0tTp4Z/Z2wFLwvaPXc
-	 dJRKl/3nwTVBfk728zRIA6MabbxzRsy2DpIiUumX7G6X+K3uhhhCjWsSCl56Wa5QT6
-	 oJgXFfwzEgW5Q==
+	b=bwf9qDw/MyxKklGxC1YMHWeNHNONf3PTOcwDD4Egre0SngpWtcsBvesiwLKTh50Mx
+	 twUPpUQyBtpbZ9HFZd2z1eKEIzF2czgc+UvQqRIuCs53UI7vjAFJhfep22/GZC+c2D
+	 DWhGCXdky/T/eSKNQGz/cuC053Mgz7Uf7b1K3Zh1eyPd4tSXCKVZiR8OaA7aOXRtn9
+	 mc/hhN9BKI/c0ii/rKR6VidQ5QHZu2fpqyvMsM8vbZTGqsbdAuk/1OGcisp4Ua08LS
+	 E53Qb8ui27LsD9n+MWnaC9ihLePi9a54xC2vEMsU+yUxyt21j0vau9OY4HAZWJ5/0j
+	 z7vizcfy6LPlQ==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -75,9 +75,9 @@ Cc: conor@kernel.org,
 	Abin Joseph <abin.joseph@amd.com>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>,
 	Ryan.Wanner@microchip.com
-Subject: [PATCH net-next v3 04/10] net: macb: rework usrio refclk selection code
-Date: Tue, 10 Mar 2026 17:17:11 +0000
-Message-ID: <20260310-flinch-placidly-599515687107@spud>
+Subject: [PATCH net-next v3 05/10] net: macb: np4 doesn't need a usrio pointer
+Date: Tue, 10 Mar 2026 17:17:12 +0000
+Message-ID: <20260310-stubbed-passenger-30e7c6736c8f@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260310-moneyless-dispense-7bce14b16388@spud>
 References: <20260310-moneyless-dispense-7bce14b16388@spud>
@@ -87,10 +87,10 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5400; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=2bAmm8yzB8brPeFan+juq3/KVYptD7voFpcvqp+7QWc=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJkbgnSbY+44O3/5smZRfL3atpMfvko/TdibPM+V//xqP TF+EfctHaUsDGJcDLJiiiyJt/tapNb/cdnh3PMWZg4rE8gQBi5OAZhIYA8jQ+OF3MI/qvseT5p3 9NgtVY/o7AvdW47/CTs43dC1aHJzVTvDX5lMt39Lt3na7GRty2P6WXk3do3C78pQvo+/xRQv/G/ 25AAA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=785; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=F9UBzeUId/kao0gPpAeZyIh8nfmZqgwg0AfcGoyheCk=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJkbgnRnL/waZl51aLHuooOxwpu1ZV4f5ND/qXL4K/s11 ynlgs4HO0pZGMS4GGTFFFkSb/e1SK3/47LDuectzBxWJpAhDFycAjARpVBGhn3be72Xx19sM54R xsaVtjxmCluD96SI/ZkeecynY3bM+sHIcC2hKF/LUIFvZvyiR2pvzXz/i4XrpPvEdjAcqd7g+fE MIwA=
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9F5E12556FD
+X-Rspamd-Queue-Id: 1144E255722
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -98,14 +98,14 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-266257-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266258-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -119,167 +119,32 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,microchip.com:email]
 X-Rspamd-Action: no action
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-The USRIO based refclk selection code abuses a capability flag to set
-the refclk to an external source based on match data/compatible on
-sama7g5-emac and use an internal source for the gmac.
-
-Ryan previously added a property in an attempt to decouple the refclk
-source from the compatible, because this is not fixed by compatible
-and there's variance based on the choices made by board designers.
-
-Originally when Ryan added it, he removed the capability flag entirely
-from match data, but this changed the default for the sama7g5-emac and
-the removal had to be reverted for these devices. Because these devices
-default to an external refclk, and the current property is only capable
-of communicating external refclks, there's no way to make the
-sama7g5-emac use an internal refclk.
-
-Additionally, this property has no limiting based on compatible, and
-if used on a platform with an external refclk that is not controlled
-by USRIO the capability would be erroneously set. Because of the reuse
-of the at91_default_usrio struct by non-at91 devices, this could cause
-the refclk bit to be set in error, on a system where the refclk is
-externally provided without usrio settings being required.
-
-Change the new capability flag so that it actually represents the
-hardware being capable of controlling the refclk source via USRIO,
-and move the selection of default behaviour into the macb_usrio_config
-struct provided as part of match data.
-Modify the devicetree code to support a new property,
-"cdns,refclk-source" which will support devices with either default,
-retaining support for "cdns,refclk-external" for compatibility reasons.
+USRIO is disabled on this platform, having a pointer to a usrio config
+structure doesn't actually do anything other than look weird.
 
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/cadence/macb.h      |  1 +
- drivers/net/ethernet/cadence/macb_main.c | 55 ++++++++++++++++++------
- 2 files changed, 44 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index baf48f02d7e27..9cd565cb87e4c 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -1214,6 +1214,7 @@ struct macb_usrio_config {
- 	u32 refclk;
- 	u32 clken;
- 	u32 hdfctlen;
-+	bool refclk_default_external;
- };
- 
- struct macb_config {
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index d908850c59498..1f9e46cf7e1cb 100644
+index 1f9e46cf7e1cb..414a8fa3f99d9 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4318,12 +4318,8 @@ static const struct net_device_ops macb_netdev_ops = {
- static void macb_configure_caps(struct macb *bp,
- 				const struct macb_config *dt_conf)
- {
--	struct device_node *np = bp->pdev->dev.of_node;
--	bool refclk_ext;
- 	u32 dcfg;
- 
--	refclk_ext = of_property_read_bool(np, "cdns,refclk-ext");
--
- 	if (dt_conf)
- 		bp->caps = dt_conf->caps;
- 
-@@ -4356,9 +4352,6 @@ static void macb_configure_caps(struct macb *bp,
- 		}
- 	}
- 
--	if (refclk_ext)
--		bp->caps |= MACB_CAPS_USRIO_HAS_REFCLK_SOURCE;
--
- 	dev_dbg(&bp->pdev->dev, "Cadence caps 0x%08x\n", bp->caps);
- }
- 
-@@ -4626,8 +4619,36 @@ static int macb_init(struct platform_device *pdev)
- 		if (bp->caps & MACB_CAPS_USRIO_HAS_CLKEN)
- 			val |= bp->usrio->clken;
- 
--		if (bp->caps & MACB_CAPS_USRIO_HAS_REFCLK_SOURCE)
--			val |= bp->usrio->refclk;
-+		if (bp->caps & MACB_CAPS_USRIO_HAS_REFCLK_SOURCE) {
-+			const char *prop;
-+			bool refclk_ext;
-+			int ret;
-+
-+			/* Default to whatever was set in the match data for
-+			 * this device. There's two properties for refclk
-+			 * control, but the boolean one is deprecated so is
-+			 * a lower priority to check, no device should have
-+			 * both.
-+			 */
-+			refclk_ext = bp->usrio->refclk_default_external;
-+
-+			ret = of_property_read_string(pdev->dev.of_node,
-+						      "cdns,refclk-source", &prop);
-+			if (!ret) {
-+				if (!strcmp(prop, "external"))
-+					refclk_ext = true;
-+				else
-+					refclk_ext = false;
-+			} else {
-+				ret = of_property_read_bool(pdev->dev.of_node,
-+							    "cdns,refclk-ext");
-+				if (ret)
-+					refclk_ext = true;
-+			}
-+
-+			if (refclk_ext)
-+				val |= bp->usrio->refclk;
-+		}
- 
- 		macb_or_gem_writel(bp, USRIO, val);
- 	}
-@@ -5223,11 +5244,21 @@ static const struct macb_usrio_config at91_default_usrio = {
- 	.clken = MACB_BIT(CLKEN),
- };
- 
--static const struct macb_usrio_config sama7g5_usrio = {
-+static const struct macb_usrio_config sama7g5_gem_usrio = {
- 	.mii = 0,
- 	.rmii = 1,
- 	.rgmii = 2,
- 	.refclk = BIT(2),
-+	.refclk_default_external = false,
-+	.hdfctlen = BIT(6),
-+};
-+
-+static const struct macb_usrio_config sama7g5_emac_usrio = {
-+	.mii = 0,
-+	.rmii = 1,
-+	.rgmii = 2,
-+	.refclk = BIT(2),
-+	.refclk_default_external = true,
- 	.hdfctlen = BIT(6),
- };
- 
-@@ -5364,7 +5395,7 @@ static const struct macb_config sama7g5_gem_config = {
- 	.dma_burst_length = 16,
+@@ -5349,7 +5349,6 @@ static const struct macb_config np4_config = {
+ 	.caps = MACB_CAPS_USRIO_DISABLED,
  	.clk_init = macb_clk_init,
  	.init = macb_init,
--	.usrio = &sama7g5_usrio,
-+	.usrio = &sama7g5_gem_usrio,
+-	.usrio = &at91_default_usrio,
  };
  
- static const struct macb_config sama7g5_emac_config = {
-@@ -5376,7 +5407,7 @@ static const struct macb_config sama7g5_emac_config = {
- 	.dma_burst_length = 16,
- 	.clk_init = macb_clk_init,
- 	.init = macb_init,
--	.usrio = &sama7g5_usrio,
-+	.usrio = &sama7g5_emac_usrio,
- };
- 
- static const struct macb_config versal_config = {
+ static const struct macb_config zynqmp_config = {
 -- 
 2.51.0
 
