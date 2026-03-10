@@ -1,131 +1,139 @@
-Return-Path: <netdev+bounces-265904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNFOOkbLr2nWcAIAu9opvQ
-	(envelope-from <netdev+bounces-265904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:41:58 +0100
+	id SEkXIODKr2nWcAIAu9opvQ
+	(envelope-from <netdev+bounces-265905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:40:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E4D246845
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:41:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20EDC246808
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 08:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 178CA30330B2
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:39:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 18F19304F5C4
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 07:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF403D7D76;
-	Tue, 10 Mar 2026 07:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16C83E9592;
+	Tue, 10 Mar 2026 07:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ioa+vCv3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OFv0CWa6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85BB359A79;
-	Tue, 10 Mar 2026 07:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8814E347FE1
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 07:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773128338; cv=none; b=ovOe14baLmLFsDhzyOuX6V5KBSC0Xt+lmu1+6IWXAPnIMSMLr27AtGnczz/vGoKfpq7SF5w/I/aTZ76df7Smi9DYQaTXIQp5DGmDDBTgyH2u9k3YJ+7eNFTdMGadgU4olmrA+HjBOx15MhwmuBc3GrHbQbWW7xJk8h4NyvNKNp4=
+	t=1773128339; cv=none; b=tjVBl+DtKi51Zxlq/Qop2pUEKKH0S5eYXNy69nYwG8QOZwmLExZjpkEcbosZLPVP1m5PXNzEAcm/sz3jl0RvjNaDv+P3w//aIJ3ujLpsWZPXvXMeB1ubExnOn9T/qu+vYiIwVkj/zV2PStg4Gv6tWmOoxqJ2M9ALY0Ye3WPLanE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773128338; c=relaxed/simple;
-	bh=eigS/zAmAe39yYs+o8HKoJPAI0Rl29kSXCxO5QeFKrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PdEpQvLYIfMMQo2ui38Vvp1ZYvqxX4T0z8ivhewTeSWbi2S6ma2BCEX3aXUnSptJePq9sEHl2Bs+t+pVgB3n9H1i+Zt4SafVjueaWKhx/nB62JV+h6Z9AVLYpXl0icwTr+ijQ7Hq8jiydrMiN7iiZ5VgoA9dltMC7rEMVHgnnig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ioa+vCv3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDBEBC19423;
-	Tue, 10 Mar 2026 07:38:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773128338;
-	bh=eigS/zAmAe39yYs+o8HKoJPAI0Rl29kSXCxO5QeFKrg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ioa+vCv3zf1suIzQ56s0muplBFPtUWyxbX/mtLahEuzfGKcPw0u1wt4TOY1tn0n/6
-	 ybrFCK6eDjaY/nBNHzjF+G7qwIvc3qPT+vS0qKpjjTfPX+owKYUOjJMh7j+TdA/xxS
-	 xeACZi8K7y8Ss9NOLB+cR2EBxSyO3Qw7WGKubeqGMjYpvAs4dqqlYHhsoFOLQ0sJ7X
-	 2x2vL2Wr9NROMmp4yslHyCXfdZts61+YBbUoC5jPMAHMjfVRjxN/R+R4fRPODd5IVv
-	 YmyC8Ud6PxpaRHZkluLjIbNuATJmHa1CK2/pUr1vVMhQa0rWgXkK7u+yXXR7sG5JoH
-	 EgnTZI9pQDm3g==
-Date: Tue, 10 Mar 2026 08:38:55 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Chen-Yu Tsai <wenst@chromium.org>, 
-	Miles Chen <miles.chen@mediatek.com>, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	Project_Global_Chrome_Upstream_Group@mediatek.com, Qiqi Wang <qiqi.wang@mediatek.com>, sirius.wang@mediatek.com, 
-	vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-Subject: Re: [PATCH v6 01/18] dt-bindings: clock: Add MediaTek MT8189 clock
-Message-ID: <20260310-notorious-manul-of-maturity-facd51@quoll>
-References: <20260309120512.3624804-1-irving-ch.lin@mediatek.com>
- <20260309120512.3624804-2-irving-ch.lin@mediatek.com>
+	s=arc-20240116; t=1773128339; c=relaxed/simple;
+	bh=lbfzRkOE3N7zogoWf5GAlm2KrA97THFl2Mmcyt3ZKg0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kmc4/VoU4buAcwEi3mBuVxlwZecSC3gKGZc2UL7WWxX3xrIdCV3ojiZ4xUkIR8p7rvAwbtd8x9ltSgr4Ah5tc3BSjiJCPE5N5PJwGN5JyF6/fgupNkYD2+Jv6m3+xr1CBfOlFwumBmQKtF8ysQyOnllZQJvNT5n0jPKy26vRVc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OFv0CWa6; arc=none smtp.client-ip=209.85.217.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-5fb6622ca5dso11541940137.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 00:38:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773128337; x=1773733137; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fROB+o9OjU/y4jLUu61fRYQiZzi0FWP19k1YpYoXXGg=;
+        b=OFv0CWa6trrVp/oXwiv3+ionb8snv8xcCGPwg7iRMnOPr8H3mQDHpzJk58yLft6uVZ
+         F3aNOVM6Xje1CEDJ8yoxFJlI4vMa0iACfOkZl0BOebpeHuUUCA+y/eAMrN/sgWHkeWFG
+         MvF0S51in+AYwLblRZ7vfbEIQymCJE3+NJuftJF+qp8P8ZPwwxL1nNLGN0Ixt7cgHzON
+         2ozedI1XiqvNBBgTtClpk7cmqiQQxLl+mV4Gup82EkPjZ/ywInUzZ95mfSkinhBhpCtN
+         mwCDRvDRW5vV/xaBtWEHU+3vccN9/0nlki5LWbdU4a1LrmvjmqlqqRDuNw4ZYA9BFWZR
+         HxOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773128337; x=1773733137;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fROB+o9OjU/y4jLUu61fRYQiZzi0FWP19k1YpYoXXGg=;
+        b=oj88MjuvZ+aI4tVgg7N7mwiKXVzYghwJpt1XyeP1XLZOQi3I8BK5W/3oJX+IdNfMbw
+         fzo3r4RFhp6WclHWAUTbF8nrpXed098jckoeN7Ae7DsBXc5ZKjT7kvdRXoCdJHb3Cy15
+         fWKiw3oWV1jthICPW6w+iD6QLggtsLul3qcISj76UPcjrd7n3fKy1eY0zjmcHm8FXMJU
+         8LB8yyoxC7RFUKUEoHpLSnNZRmtE0wnvtkT3/ipvD5BQJWhpsbvmVnXKiDIfdioNF/1/
+         EkNOrwRquP795riSFNSWty1i03ieP//fdn3ejRxCIlrHVMe4LgPhUqjZZgtXITzjg1yi
+         YODQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKC2UCf/0EqAdno+ALWCa6bDl5UxzYH2Itx9ORYC8mXsMWbJNeuTDqRritVeWJWvSEHpZnP10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXOiM/hgyeN8PSeqC5GJr+Vyf4/o+oBBlhzNGFFUszi8AyDTTh
+	LxyIq6xGyvu9BkBTlAGfgYoM9Gr5S+jUdG3mVexrci/2aan7Si5w6udEfyDr43Ipb2gFVyft0if
+	n/+n14Q89zCQG0w==
+X-Received: from uabcg14.prod.google.com ([2002:a05:6130:c0e:b0:94a:bbb7:a8c5])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:3f08:b0:5ff:a16b:93f0 with SMTP id ada2fe7eead31-5ffe61138a9mr4346993137.22.1773128337261;
+ Tue, 10 Mar 2026 00:38:57 -0700 (PDT)
+Date: Tue, 10 Mar 2026 07:38:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260309120512.3624804-2-irving-ch.lin@mediatek.com>
-X-Rspamd-Queue-Id: 82E4D246845
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260310073855.564927-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: add sysctl_tcp_shrink_window to netns_ipv4_sysctl.rst
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 20EDC246808
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-265904-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,gmail.com,collabora.com,chromium.org,mediatek.com,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-265905-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mediatek.com:email,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 08:04:43PM +0800, irving.ch.lin wrote:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> 
-> Add dt schema and IDs for the clocks of MediaTek MT8189 SoC.
-> The MT8189 clock IP provide clock control for main system
-> (apmixedsys, topcksys and vlpcksys) and
-> subsys (eg. peri, mfg, venc/vdec ...).
-> 
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> ---
->  .../bindings/clock/mediatek,apmixedsys.yaml   |   1 +
->  .../bindings/clock/mediatek,infracfg.yaml     |   1 +
->  .../bindings/clock/mediatek,pericfg.yaml      |   1 +
->  .../bindings/clock/mediatek,syscon.yaml       |  27 +
->  .../bindings/clock/mediatek,topckgen.yaml     |   2 +
->  .../dt-bindings/clock/mediatek,mt8189-clk.h   | 577 ++++++++++++++++++
->  6 files changed, 609 insertions(+)
->  create mode 100644 include/dt-bindings/clock/mediatek,mt8189-clk.h
+Add missing entry for sysctl_tcp_shrink_window.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards,
-Krzysztof
+diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+index beaf1880a19bf4cfa578e162c571e09f7a9dffbe..79b5ee81a07e49a09fce409b7a24e3d7346d06ae 100644
+--- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
++++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+@@ -104,6 +104,7 @@ u8                              sysctl_tcp_nometrics_save
+ u8                              sysctl_tcp_no_ssthresh_metrics_save                                                  TCP_LAST_ACK/tcp_(update/init)_metrics
+ u8                              sysctl_tcp_moderate_rcvbuf                                       read_mostly         tcp_rcvbuf_grow()
+ u32                             sysctl_tcp_rcvbuf_low_rtt                                        read_mostly         tcp_rcvbuf_grow()
++u8                              sysctl_tcp_shrink_window                     read_mostly         read_mostly         __tcp_select_window()
+ u8                              sysctl_tcp_tso_win_divisor                   read_mostly                             tcp_tso_should_defer(tcp_write_xmit)
+ u8                              sysctl_tcp_workaround_signed_windows                                                 tcp_select_window
+ int                             sysctl_tcp_limit_output_bytes                read_mostly                             tcp_small_queue_check(tcp_write_xmit)
+-- 
+2.53.0.473.g4a7958ca14-goog
 
 
