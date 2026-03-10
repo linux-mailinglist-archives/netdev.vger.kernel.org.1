@@ -1,175 +1,197 @@
-Return-Path: <netdev+bounces-266079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHv1JaUZsGlAfwIAu9opvQ
-	(envelope-from <netdev+bounces-266079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:16:21 +0100
+	id ECMWNBgHsGlregIAu9opvQ
+	(envelope-from <netdev+bounces-266035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:57:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A542724FD92
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 14:16:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA0E24BCC0
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:57:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28FED30B6E02
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 12:20:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D78830E0709
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BF23DD530;
-	Tue, 10 Mar 2026 11:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F24B41C2E4;
+	Tue, 10 Mar 2026 11:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="TIbH7crS"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R6x7Cjvu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.avm.de (mail.avm.de [212.42.244.119])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBE1480DF9;
-	Tue, 10 Mar 2026 11:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE0E38A71F;
+	Tue, 10 Mar 2026 11:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773143759; cv=none; b=jfUxk+KYOndhae6qDR0yN4CxJXLBUaegc7iipVmd3QbQP4Nr97QxK7vAz1kgrTN3EHVcUd3Yu/lr9iSVYzr7GI3Hn7JD5rRkqPPJt/frnyV5J+4Plitn0u1qajr4rrCWt0BwKtH5DrouNDQPWF88nDYBxJsuachHYl8EBichzUs=
+	t=1773143698; cv=none; b=b2na+ODqGeJlTnhVwyEEuVTU9LCTRYDE1NX4YNDnVqTO36wafm7rKh8pumRyPzH3rHGczw/hf7U8vgOrCNKjkddMv5rQTRloIoyHjy4tP7PL8VtphtXRAD45Vv2bopOTz9AXstQRkVtyKmLmZmG6l/5gZtyJwyDFECuUKp2O9oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773143759; c=relaxed/simple;
-	bh=BZdZKAXpTi8WGNXN2fiMzetM/noYEEE0kBAl+EzvNzY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UdzcZYnsq11b1ncHEnZPKiqtO4Y/xznWt7ZVIWh6XqAEnoBdbvoGzvbzZCwostyUGGjN7+ERfrCrQUMIVlErNJOTp2wFeuilWhIFC5rqqflakhbmds42zWmkux6VUOOh6MyMQ4Xn49arZNJVkqTXWeKBhnKsz5jFs5ErM6C4U7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=TIbH7crS; arc=none smtp.client-ip=212.42.244.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1773143729; bh=BZdZKAXpTi8WGNXN2fiMzetM/noYEEE0kBAl+EzvNzY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TIbH7crS0SmEGXdWYXiB338cx2RG5o2kmg7yTrotd2tHsLApaCsary2KGcodujAHU
-	 1zev4KPVi0Zbv11oZIIukDmu4zoiaTsO5E1fIsAx2k5eCnOYIW+bfhx20WkjdEzFnJ
-	 0Znlt2X5Bcfw0fHrIvFCMZOxvVHPIhC2D1cR+o/8=
-Received: from [212.42.244.71] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
-	(envelope-from <phahn-oss@avm.de>)
-	id 69b006b1-2367-7f0000032729-7f000001ca5e-1
-	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:29 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Tue, 10 Mar 2026 12:55:29 +0100 (CET)
-From: Philipp Hahn <phahn-oss@avm.de>
-Date: Tue, 10 Mar 2026 12:49:27 +0100
-Subject: [PATCH 61/61] file: Drop unlikely() around IS_ERR_OR_NULL()
+	s=arc-20240116; t=1773143698; c=relaxed/simple;
+	bh=JJ0/wgz5fHNJeUNDzrX/vGzpt/sg5tDTkEJEVh7c6s4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D66iQgMTKpg67B/z2rkEq8TRdYRiFJrq0RyLzGtNS8Ft1didenq9e3pKBmoe+3fJbzCs3JQVyAuA81QE3el48ray4VGxp6vuU91tiAP6MkHcUwfxCsbhzzIurjr0HD0djw9Wkas8D7odd8V2eJvcM+kAnQkJOA2tZhyGENrlFN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=R6x7Cjvu; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=6YUglPdTeT6PnJ2VigHuPaBWpc+wHGHPrtyvjVV6qA0=; b=R6x7CjvuXPCoP6BGCRfRaOSi1f
+	2omxMlzdTHgcbeIAwTLRL7FtITb4pdwvJLsNfX3gOgddtPAp06k6jAZivoy4mIDMcv+wqQ/OGebD5
+	DqG68XVNyc9kV3AYj4WYGAvawUEY+713TRJPU6CeF+TaTH9YupXptRq+w86Ng70i0FAqChDG9ux8s
+	8RK1VBEkDIaSa8gyzmHJu3qG2wlCqSyT3Z1rnEY3XwxKtKFsmQmFXiUTw0gNv9YNh38BltrxbIRUz
+	OlIdHCj+AFEXfS3JtTIZacl3w1RW16QG7RKL/3U7hj5fbKCRhwyK8qcanfzQH85+3/S42ov9HnENN
+	Pgv45iqQ==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vzvfc-00000007lSG-00ba;
+	Tue, 10 Mar 2026 11:54:40 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A1BF030027B; Tue, 10 Mar 2026 12:54:33 +0100 (CET)
+Date: Tue, 10 Mar 2026 12:54:33 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+	rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+	Linux Kernel <linux-kernel@vger.kernel.org>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <MKoutny@suse.com>,
+	Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Message-ID: <20260310115433.GV1282955@noisy.programming.kicks-ass.net>
+References: <87v7f61cnl.ffs@tglx>
+ <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
+ <87pl5ds88r.ffs@tglx>
+ <0ae4d678-5676-4523-bae3-5ad73b526e27@kernel.org>
+ <87eclsrtqg.ffs@tglx>
+ <e846cb5f-65c4-4a9b-9f9b-593e4af526d8@kernel.org>
+ <76e2b909-98db-49de-a8eb-f6f0a192f630@kernel.org>
+ <878qc0rofr.ffs@tglx>
+ <874imorobw.ffs@tglx>
+ <4cad1b9a-e157-427b-9896-cf54cf6fba36@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-b4-is_err_or_null-v1-61-bd63b656022d@avm.de>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
- bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
- dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
- linux-mips@vger.kernel.org, linux-mm@kvack.org, 
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org, 
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
- Philipp Hahn <phahn-oss@avm.de>
-Cc: Christian Brauner <brauner@kernel.org>, 
- Jeff Layton <jlayton@kernel.org>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1020; i=phahn-oss@avm.de;
- h=from:subject:message-id; bh=BZdZKAXpTi8WGNXN2fiMzetM/noYEEE0kBAl+EzvNzY=;
- b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAamjmr2YH1D6NIv4bWMOoOgSjqlNw1AkTnEk
- z4zblGz3BCJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAGpgAKCRA0LQZT0ays
- 24dkB/9I2IH2WVtNuAbc4pN8k/UWfzfn7IBk5SYldKbG4a3vAt2BCQOMLY6KBgHTT+SL+30NFE0
- eqhT72U09tRMvyWUaeodCCSJABvxL6Unq+gQWaX6/P1+X8+kVa/Fa0v8GHtiYqiopntbOsAjZBr
- sS0Bbptn0GuVsdoMNke4vQD0A9rA3xW5nWOgDpK1U8FjC9uaXfz1Bfzn2XQq/Me0fZtcNCJpNlZ
- qjNOLRSw3BZGb7IPqnUrcjHIuuNd6dYbs6wYHOgbyiibTqQrj6tp6SnoDxHnYU93V6GBh2lMfHt
- 9qSEynUbZNIYOnoqI2ah9KWLVKFkMsTrddsdp5JisL6z2WZS
-X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
- fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
-X-purgate-ID: 149429::1773143729-A2CB9E1F-E26B4D9C/0/0
-X-purgate-type: clean
-X-purgate-size: 1022
-X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-Rspamd-Queue-Id: A542724FD92
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4cad1b9a-e157-427b-9896-cf54cf6fba36@kernel.org>
+X-Rspamd-Queue-Id: 4AA0E24BCC0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[avm.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[avm.de:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[avm.de:+];
+	TAGGED_FROM(0.00)[bounces-266035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266079-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phahn-oss@avm.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[56];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[avm.de:dkim,avm.de:email,avm.de:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,noisy.programming.kicks-ass.net:mid]
 X-Rspamd-Action: no action
 
-IS_ERR_OR_NULL() already uses likely(!ptr) internally. checkpatch does
-not like nesting it:
-> WARNING: nested (un)?likely() calls, IS_ERR_OR_NULL already uses
-> unlikely() internally
-Remove the explicit use of unlikely().
+On Tue, Mar 10, 2026 at 12:24:02PM +0100, Matthieu Baerts wrote:
 
-Change generated with coccinelle.
+> Just did. Output is available there:
+> 
+>   https://github.com/user-attachments/files/25867817/issue-617-debug-20260310.txt.gz
+> 
+> Only 7.7k lines this time.
 
-To: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
----
- include/linux/file.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Same damn thing again...
 
-diff --git a/include/linux/file.h b/include/linux/file.h
-index 27484b444d3155685cdbb89f546f26ef66e3e1b4..007b9b9d365a052c1c056e12571eaf4f8ef5a45c 100644
---- a/include/linux/file.h
-+++ b/include/linux/file.h
-@@ -163,7 +163,7 @@ static inline void class_fd_prepare_destructor(const struct fd_prepare *fdf)
- {
- 	if (unlikely(fdf->__fd >= 0))
- 		put_unused_fd(fdf->__fd);
--	if (unlikely(!IS_ERR_OR_NULL(fdf->__file)))
-+	if (!IS_ERR_OR_NULL(fdf->__file))
- 		fput(fdf->__file);
- }
- 
+[    2.533811] virtme-n-1         3d..1. 849756us : mmcid_user_add: pid=1 users=1 mm=000000002b3f8459
+[    4.523998] virtme-n-1         3d..1. 1115085us : mmcid_user_add: pid=71 users=2 mm=000000002b3f8459
+[    4.529065] virtme-n-1         3d..1. 1115937us : mmcid_user_add: pid=72 users=3 mm=000000002b3f8459
 
--- 
-2.43.0
+[    4.529448] virtme-n-71        2d..1. 1115969us : mmcid_user_add: pid=73 users=4 mm=000000002b3f8459         <=== missing!
+[    4.529946] virtme-n-71        2d..1. 1115971us : mmcid_getcid: mm=000000002b3f8459 cid=00000003
+
+71 spawns 73, assigns cid 3
+
+[    4.530573]   <idle>-0         1d..2. 1115991us : sched_switch: prev_comm=swapper/1 prev_pid=0 prev_prio=120 prev_state=R ==> next_comm=virtme-ng-init next_pid=73 next_prio=120
+[    4.530865]   <idle>-0         1d..2. 1115993us : mmcid_cpu_update: cpu=1 cid=00000003 mm=000000002b3f8459
+
+It gets scheduled on CPU-1, sets CID...
+
+[    4.531038] virtme-n-1         3d..1. 1116013us : mmcid_user_add: pid=74 users=5 mm=000000002b3f8459
+
+Then 1 spawns 74 on CPU 3, this is the 5th task, so we initiate a
+task->cpu cid transition:
+
+[    4.531203] virtme-n-1         3d..1. 1116014us : mmcid_task_update: pid=1 cid=20000000 mm=000000002b3f8459
+[    4.531369] virtme-n-1         3d..1. 1116014us : mmcid_cpu_update: cpu=3 cid=20000000 mm=000000002b3f8459
+
+Task 1
+
+[    4.531530] virtme-n-1         3..... 1116014us : mmcid_fixup_task: pid=71 cid=00000001 active=1 users=4 mm=000000002b3f8459
+[    4.531790] virtme-n-1         3d..2. 1116015us : mmcid_task_update: pid=71 cid=80000000 mm=000000002b3f8459
+[    4.532000] virtme-n-1         3d..2. 1116015us : mmcid_putcid: mm=000000002b3f8459 cid=00000001
+
+Task 71
+
+[    4.532169] virtme-n-1         3..... 1116015us : mmcid_fixup_task: pid=72 cid=00000002 active=1 users=3 mm=000000002b3f8459
+[    4.532362] virtme-n-1         3d..2. 1116016us : mmcid_task_update: pid=72 cid=20000002 mm=000000002b3f8459
+[    4.532514] virtme-n-1         3d..2. 1116016us : mmcid_cpu_update: cpu=0 cid=20000002 mm=000000002b3f8459
+
+Task 72
+
+[    4.532649] virtme-n-1         3..... 1116016us : mmcid_fixup_task: pid=74 cid=80000000 active=1 users=2 mm=000000002b3f8459
+
+Task 74, note the glaring lack of 73!!! which all this time is running
+on CPU 1. Per the fact that it got scheduled it must be on tasklist,
+per the fact that 1 spawns 74 after it on CPU3, we must observe any
+prior tasklist changes and per the fact that it got a cid ->active must
+be set. WTF!
+
+That said, we set active after tasklist_lock now, so it might be
+possible we simply miss that store, observe the 'old' 0 and skip over
+it?
+
+Let me stare hard at that...
+
+
+[    4.532912] virtme-n-1         3..... 1116017us : mmcid_fixup_task: pid=71 cid=80000000 active=1 users=1 mm=000000002b3f8459
+[    4.533386] virtme-n-1         3d..2. 1116041us : mmcid_cpu_update: cpu=3 cid=40000000 mm=000000002b3f8459
+
+I *think* this is the for_each_process_thread() hitting 71 again.
+
+[    4.533805]   <idle>-0         2d..2. 1116043us : mmcid_getcid: mm=000000002b3f8459 cid=00000001
+[    4.533980]   <idle>-0         2d..2. 1116044us : mmcid_cpu_update: cpu=2 cid=40000001 mm=000000002b3f8459
+[    4.534156]   <idle>-0         2d..2. 1116044us : mmcid_task_update: pid=74 cid=40000001 mm=000000002b3f8459
+[    4.534579] virtme-n-72        0d..2. 1116046us : mmcid_cpu_update: cpu=0 cid=40000002 mm=000000002b3f8459
+
+[    4.535803] virtme-n-73        1d..2. 1116179us : sched_switch: prev_comm=virtme-ng-init prev_pid=73 prev_prio=120 prev_state=S ==> next_comm=swapper/1 next_pid=0 next_prio=120
+
+And then after all that, 73 blocks.. not having been marked TRANSIT or
+anything and thus holding on to the CID, leading to all this trouble.
+
+
 
 
