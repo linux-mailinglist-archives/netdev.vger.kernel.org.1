@@ -1,147 +1,232 @@
-Return-Path: <netdev+bounces-265984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-265985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOreHA/zr2nkdAIAu9opvQ
-	(envelope-from <netdev+bounces-265984-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:31:43 +0100
+	id iLWhNJjzr2nkdAIAu9opvQ
+	(envelope-from <netdev+bounces-265985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:34:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2091249688
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:31:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EBC32496D7
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 11:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 825B630CAD52
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:31:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45B8F30027D5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 10:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1652370D4F;
-	Tue, 10 Mar 2026 10:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4792346AE5;
+	Tue, 10 Mar 2026 10:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M7BhwY9u"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Qd7WgNiy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F492D24B7
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 10:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25D7271468;
+	Tue, 10 Mar 2026 10:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773138700; cv=none; b=L3pPZxJGUOsAF8fJQHFKF8bq5tR2bGiLGB1jRCjW/MX6izfTSL06Ey4F8Hl3JhjbWVbFvBeuvPDW9kxdkr4FGhkcOWNnxwc7DY8tfcv0xmiNNRWRiUDTC+ug3LmUkEuNZS1E5xT4fkdC8FVVPYykHT5jwqygL7f5EVsQ0eAO1Ys=
+	t=1773138838; cv=none; b=gGb6OTR5g+R5GQR/dcbIO6Ai8Y9LdcZkStgVbmiovfMdEMcf41wK/YsHpRaaG/OWqy6EU1Nc8kr0/wduVa0HDgARboYM5En5vAjRDnu3K2LNxwICPDFnNf80mtcBJoMrrMc+dblozHT7YzLvvxFKKWSJzbkA4W9N9gKfoszC08c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773138700; c=relaxed/simple;
-	bh=XV6Oz7u1T/2j5qrwX1qOo6PhgGykz9lb2mI/7CFF2fU=;
+	s=arc-20240116; t=1773138838; c=relaxed/simple;
+	bh=a55lUpeA26zDb/0g4h/jfJ8mwz9U47tGl4tVQmz+BbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FcYHDeI1MhPbl75jfGpKQnhGQ7hWXvzpwnAg0hiCq9Yy+2DORpFzXKODszLZI5Nik+arQ9Wh9wmuY+bsHgEJyYGofWywbN1nK97OzsU5voRpSG/H/kkPnmKsPriWWdsxruBQhlUlsnt6uD46MEJoL7ttjmTDzR38KVqTcZ/1Tgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M7BhwY9u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CA7EC2BC86;
-	Tue, 10 Mar 2026 10:31:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773138699;
-	bh=XV6Oz7u1T/2j5qrwX1qOo6PhgGykz9lb2mI/7CFF2fU=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hyd1GeFWgMu8+K1ZR2jeGR1WDSiPPt/46/gmQanYIKCQ6TKKz/GJ1YVto9n/lF4PR3e+kvE3YRkJJe44m/hdueFKYyy+DUbdogBzR0ZaZyELrt4cSRUpPZ/MwhvxEDsiYNupW8Xn6vMOqN5vhm3QTk2+FkFIGwV7JQMh/bdduJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Qd7WgNiy; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 8DE3E6055C;
+	Tue, 10 Mar 2026 11:33:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1773138827;
+	bh=tUSmWE2RbjPu+6It5uyYg4McPg3jKQUPLt/9npl99ks=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M7BhwY9uyy91JdjHBR1chYrF3ua9YmjHCcbiDwfjDAy5StcIhp7zQ2Px7ASx2npae
-	 iwD4ScVocQKHlZuv2zimrQELGMBInrabajLwcfmbKx65lHyu7ZPV+Au92uByXrlTA3
-	 fArfVRK3guJG7hoM0VSHBbgIvsARWarUrARri4j7NsPaiWtp8mxiS4a1Ad4TrmQ6Kx
-	 aRHl78ak4rB4J/BRstxo6+46tH3dmikFY7mg7myrWRFxFcz86iDvmVeLO687riaxnA
-	 65Vteysyk+q5F7n8cZNcRIaMfbvLHLC2dTn7/0n/jp2vYGPF5B6j4t6ZSK+b/TcyxZ
-	 I7iEmgIAXfwag==
-Date: Tue, 10 Mar 2026 12:31:35 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH ipsec-next 01/10] xfrm: state: fix sparse warnings on
- xfrm_state_hold_rcu
-Message-ID: <20260310103135.GB12611@unreal>
-References: <cover.1773051558.git.sd@queasysnail.net>
- <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
+	b=Qd7WgNiycBeA7rXcR66BE3SIun2alGmDjd+8hy3/qNkWsdsFvIIWe6w+NWtBHaXJK
+	 /vNrbt/naN5KfqbEGcA4DxOrD8HZ7jK14krHmH0vbafla3dxeLhKrAOiGYTS4D1Fuq
+	 /OFvohcVBUdY8sftOLmbzeeu69bIC8Q5i/dGD9B+pVpIn0t1A58otY8GEHMrtIIOdQ
+	 c75rRS0nQI0xyFI/YvgFBTgyekOenxmekxmYCKgJrd89x+RtTUuA0kAPPxDukxIZnP
+	 PkEKgGAcpNWJg0HJM+076biq/fG/QkDy5lc8ZEvDmk0z0CyFN4vMcQGFzsiUeje8S7
+	 nlU5RQsRFl9/Q==
+Date: Tue, 10 Mar 2026 11:33:44 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce
+ nf_flow_vlan_push()
+Message-ID: <aa_ziMdBBa1kHNhl@chamomile>
+References: <20260227162955.122471-1-ericwouds@gmail.com>
+ <aa86Ai1FRuJzthEF@strlen.de>
+ <5f8c4194-5066-4a55-898f-257bfdce4a6c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="0i2WGxtpAoAh3qoB"
 Content-Disposition: inline
-In-Reply-To: <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
-X-Rspamd-Queue-Id: C2091249688
+In-Reply-To: <5f8c4194-5066-4a55-898f-257bfdce4a6c@gmail.com>
+X-Rspamd-Queue-Id: 4EBC32496D7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-265984-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	TAGGED_FROM(0.00)[bounces-265985-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c04:e001:36c::12fc:5321:from];
+	HAS_ATTACHMENT(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:email]
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,netfilter.org:dkim]
 X-Rspamd-Action: no action
 
-On Mon, Mar 09, 2026 at 11:32:34AM +0100, Sabrina Dubroca wrote:
-> In all callers, x is not an __rcu pointer. We can drop the annotation to
-> avoid sparse warnings:
-> 
-> net/xfrm/xfrm_state.c:58:39: warning: incorrect type in argument 1 (different address spaces)
-> net/xfrm/xfrm_state.c:58:39:    expected struct refcount_struct [usertype] *r
-> net/xfrm/xfrm_state.c:58:39:    got struct refcount_struct [noderef] __rcu *
-> net/xfrm/xfrm_state.c:1166:42: warning: incorrect type in argument 1 (different address spaces)
-> net/xfrm/xfrm_state.c:1166:42:    expected struct xfrm_state [noderef] __rcu *x
-> net/xfrm/xfrm_state.c:1166:42:    got struct xfrm_state *[assigned] x
-> (repeated for each caller)
-> 
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> ---
->  net/xfrm/xfrm_state.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 98b362d51836..7a68c594ce37 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -53,7 +53,7 @@ static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
->  static HLIST_HEAD(xfrm_state_gc_list);
->  static HLIST_HEAD(xfrm_state_dev_gc_list);
->  
-> -static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
-> +static inline bool xfrm_state_hold_rcu(struct xfrm_state *x)
->  {
->  	return refcount_inc_not_zero(&x->refcnt);
->  }
 
-This change makes me wonder why we need both xfrm_state_hold_rcu() and
-xfrm_state_hold().
+--0i2WGxtpAoAh3qoB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-    932 static inline void xfrm_state_hold(struct xfrm_state *x)
-    933 {
-    934         refcount_inc(&x->refcnt);
-    935 }
-
-The function signatures differ, of course, but it still seems worth
-considering whether they could be unified.
-
-Thanks
-
-> -- 
-> 2.51.2
+On Tue, Mar 10, 2026 at 09:25:46AM +0100, Eric Woudstra wrote:
 > 
 > 
+> On 3/9/26 10:22 PM, Florian Westphal wrote:
+> > Eric Woudstra <ericwouds@gmail.com> wrote:
+> > 
+> > Hi Eric
+> > 
+> >> With double vlan tagged packets in the fastpath, getting the error:
+> >>
+> >> skb_vlan_push got skb with skb->data not at mac header (offset 18)
+> >>
+> >> Introduce nf_flow_vlan_push(), that can correctly push the inner vlan
+> >> in the fastpath. It is closedly modelled on existing nf_flow_pppoe_push()
+> >>
+> >> Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
+> >> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> >   
+> >> +static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
+> >> +{
+> >> +	if (skb_vlan_tag_present(skb)) {
+> >> +		struct vlan_hdr *vhdr;
+> >> +
+> >> +		if (skb_cow_head(skb, VLAN_HLEN))
+> >> +			return -1;
+> >> +
+> >> +		__skb_push(skb, VLAN_HLEN);
+> >> +		skb_reset_network_header(skb);
+> >> +
+> >> +		vhdr = (struct vlan_hdr *)(skb->data);
+> >> +		vhdr->h_vlan_TCI = htons(id);
+> >> +		vhdr->h_vlan_encapsulated_proto = skb->protocol;
+> >> +		skb->protocol = proto;
+> >> +	} else {
+> >> +		__vlan_hwaccel_put_tag(skb, proto, id);
+> >> +	}
+> > 
+> > I did not apply this because I'm not sure if this preserves correct tag
+> > order.  Can you clarify?
+> > 
+> > Lets consider vlan-offload-doesn't-exist case.
+> > 
+> > First loop pushes vlan tag 1, we get:
+> > 
+> >   [vlan1][inet]
+> 
+> Always !skb_vlan_tag_present (all vlan tags are pulled before the push
+> in the fastpath), so vlan1 is always stored in skb->vlan_all.
+> 
+> > 
+> > 2nd items pushes vlan tag 2, we get:
+> >   [vlan2][vlan1][inet]
+> > 
+> 
+> The second is pushed directly [vlan2][inet]. At a later moment the
+> contents of skb->vlan_all is pushed by SW. Ending up with
+> [vlan1][vlan2][inet].
+> 
+> > Now lets consider with-offload.  We have one tag only, so we get 1 skb with hwaccel
+> > tag in the sk_buff.  This is fine, HW will insert it for us.
+> > 
+> > But now lets consider two tags:
+> > 
+> > First loop pushes vlan1, we get the vlan1 tag in sk_buff vlan info.
+> > Packet is: [inet].
+> 
+> Correct, so same as SW, vlan1 in skb->vlan_all.
+> 
+> > 
+> > 2nd loop pushes vlan2, we get:
+> > 	[vlan2][inet].
+> > 
+> 
+> Correct, [vlan2][inet].
+> 
+> > Now, when packet is transmitted, where will the HW insert the tag?
+> > 
+> > [vlan1][vlan2][inet]?
+> > Or will this be [vlan2][vlan1][inet]?
+> 
+> The contents of skb->vlan_all is pushed by HW. Ending up with
+> [vlan1][vlan2][inet], same as SW.
+> 
+> Hope this is enough to clarify, but you can double-check it looking at
+> nf_flow_tuple_encap(). With 2 vlan tags, the contents of skb->vlan_all,
+> is always vlan1, the first in the encap array, which is the outer tag.
+
+In your patch, if vlan offload is present, then this outer (second)
+VLAN header is pushed with the outer vlan ID.
+
+This goes against the assumption that the outer VLAN header is always
+offloaded.
+
+Probably it is easier to fix this by resetting the mac header (see
+your patch).
+
+But if you prefer, just fix your patch to be similar to
+skb_vlan_push().
+
+--0i2WGxtpAoAh3qoB
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="fix.patch"
+
+diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+index 3fdb10d9bf7f..ab58ba0c5ff6 100644
+--- a/net/netfilter/nf_flow_table_ip.c
++++ b/net/netfilter/nf_flow_table_ip.c
+@@ -738,6 +738,9 @@ static int nf_flow_encap_push(struct sk_buff *skb,
+ 		switch (tuple->encap[i].proto) {
+ 		case htons(ETH_P_8021Q):
+ 		case htons(ETH_P_8021AD):
++			skb_reset_mac_header(skb);
++			skb_reset_mac_len(skb);
++
+ 			if (skb_vlan_push(skb, tuple->encap[i].proto,
+ 					  tuple->encap[i].id) < 0)
+ 				return -1;
+
+--0i2WGxtpAoAh3qoB--
 
