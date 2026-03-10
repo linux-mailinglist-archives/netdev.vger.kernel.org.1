@@ -1,335 +1,253 @@
-Return-Path: <netdev+bounces-266217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266218-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QDwhEvU2sGkKhQIAu9opvQ
-	(envelope-from <netdev+bounces-266217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:21:25 +0100
+	id aCmgKNw/sGkehgIAu9opvQ
+	(envelope-from <netdev+bounces-266218-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:59:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06525253386
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:21:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0182542B8
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 16:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3DEFF303A3F5
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:19:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45C1B31ED229
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 15:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1E6313277;
-	Tue, 10 Mar 2026 15:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE4331AAB8;
+	Tue, 10 Mar 2026 15:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWh0omad"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AQHs/yr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841FC30FC06
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 15:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773155988; cv=none; b=QHRCf1Bupf5BxQGSL/KZbRaxATtIEcoQnVnKiehbbica+kpGz/dPJFh7aWU8/YlfkKwBdTGJtsbB1O87TTxrCtsS5XXpEX0P3JLxYWd7Vqm6x0pKY+mmg1Vkgo7rLKh3gXPCFPDjm8uaCLQPOjIrwEXRXRJhy8e5HKzYkIxiBAs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773155988; c=relaxed/simple;
-	bh=Yn4rjllrYHk/ctlmLPVwWjts5+Uwqds4FvaaiUMOC/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xpe65p20Jnmkm4jz5de7XmOzAUSVjBwPN0rbfya0SglRUaUPQ70aLA6p7y9aa6yD8zFfdljYKGmKJHHIWkgp4FEP2E4A5JJ2jJj/gnqIAE/wjVFQR3cmq7FtNjxdOn9aawYAWTTzh5Hxk4QcdFpTYBJvFWA0lGtJMxcLWWLxQKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWh0omad; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3598cab697eso6076570a91.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:19:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE0D30AD05
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 15:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773156343; cv=pass; b=FOoHQsfHWsZjg4wqwzIE7G/IDnK9XA/4RoSi3A0gLEUQUVg+8RGA3pOmxZw8R0lacJf4spWbd09ZX+6zClCmMYqgNYZsRBXfHyG8EwVpBPTporNhZv4mRwgjLiETwGGNbMUKBc0ujk8DiYL/YyfLn/QDd0btEJFs3s7HuU7m28g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773156343; c=relaxed/simple;
+	bh=GFx5yp5C5pnYLv7xRJ3Ffwa6mKYbZQnZ2HP/JE3CkCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rvnHALXaDouDqr9W3ToXByAia9Mz2msknNVT9Pg3S2kmIPVK9rTSryhrF6LVexK2D6ff8t/XXteBk2y0E4WImEla1iTINBVXsgCh8QJskYHn80ThAb+mxzFUUhRerXS6mhP4Ofz3Bna0ukEhqSIrGIJaBS2o9wx3rtYPbgwYyjM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AQHs/yr7; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509064418a8so37668521cf.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 08:25:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773156342; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DISJKkuYCxQ1A/h8eFQzQJ5O//M1EFL+pgvrqxFHGJlTQZwWKzifuEhiOSmDfBiaji
+         9QCNPF6UBpTPVpgxAHgHdVHgY2L8W9WYHHC3BVKwwcuhv3DBMgErR4DAPf4BNPbu1PfW
+         5RB01WPmqK0QwhsVxJsDXHBjJ1b62SnBThR0EdbUMDcv67eIjjm56yV6L4zISwPfYxPP
+         t3AJK+751wkBwZh0jKwyT0r5FnT8cIvxjaO6C9zW3ghD1SK4RoW9X9CjwLMQaGZgHT+6
+         1K6oJknu2hHAdNNALWXq42Nbs3bX1Iv1C4+7TfqPCpiftd8HNHhZ78p0M6KQ5HMAUzHK
+         PUKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
+        fh=mK+DTs/Bg0SotNI/0fsRvMkpcQXcDi1pSGR6iiIQVVI=;
+        b=hE1lQi4+vwyG30alcTDLr4PPQRK+Ex8NLtHE5lbCgT7QstcwnSqqCxKin4bngkl1pR
+         E5RQ5RH3VSWAea75U5m4YGK/NvltHVWsjhOxuAVTxLlo9u8HcAADAgUeWkuE5YyM7hEo
+         Fb5CBxizSJm0m7LT1zPEVHQW6xMrfImc/0GamsYr8e/gCQxQmQJa+65CZ4TCGdgE7R+B
+         K9HEpNZmdxtFDWoIYouYmbpt/xoIoxv31iSUwAFS2InePoUcnjxwg+Qgw/gF4BgAwkKF
+         HpX+3EPJP/fOlxfTup2GB36jq/7lJLwkc/G/PRtcMQDAru6vmcMf3FoPl7sZJ18sEP2q
+         lQtw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773155986; x=1773760786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/tbEPBXLOW6W4Gfj+URzMtQVIzs7pEYzk3RvSx2kF+M=;
-        b=MWh0omadQaDkZEzZkUwMCqVo98TdS/1ONqS5uQa0Xo6j2NaD82SiY5MW61vCZJJPXx
-         NikzYetZomo5HetmP5/qiPFKhSzzAku/yCqzLzkQyNKHMbk6l8h53mpkoa5J/OAESrmq
-         oASvKkdf78Xc/7vGTBJrDQissoqtgkddvIbb5tCCh6HbR7v48lkhhIKeu52m+nDQSs5v
-         ZJYM9PjVq4gOShgtJcbGkRNDeg/8pSEI6RNjoq7Cmbve8HzhiiRvg5mbL4vRfNr8M4rl
-         hx3GyNujBrHftHc7muHV0IqY54afmxZ73nEZQO/hdzpRhpQyY6EfPZAXWkU1ksTPwzHB
-         b0vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773155986; x=1773760786;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1773156342; x=1773761142; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/tbEPBXLOW6W4Gfj+URzMtQVIzs7pEYzk3RvSx2kF+M=;
-        b=PYj3/NN0LBfUedYB3/VSf643COoyNthiH0imqh3tSCu8TWA/5NdwmVEh2e8CvsZ4Yz
-         J6h3mSuUIe/5ZMaoJhI5NHrOycdPK9rAdlS3Wbkn8HF6tYWintVbDgW979xJMJ+q1Uxt
-         cRwIjrD/kgprmyTl0efR2gr6SJLtGKnlRd6SqQOppKCzs+KVWCRZl4BYiuFo53iIiKTs
-         2Z2oekjmNzDQxnbvZiBZ5t1abXGDUanXgOZAdQdBTFPupJfUgIqvqjzrhRN+kOX+gpgN
-         rjL12n4NwS5yHBZA05pElvL6t5EYU6FqFfFUOdO379Ha/yeOtRK1MN9MfIOULh4JA3uU
-         dipw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMg+fzuRzmFGgbjSR3XXdMV4AWxo/MmkVL1lPAh7HSsUdCM4OIrv9PL/DUsUWck5gBwQJnAdI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8FQlLnt3Ai+ocO3uiTHqfHdm3wqM6TvK0iomTqUKDwPoPZzCE
-	7jFgHCLirfetpmkRf7FvgwplkCbm5d+wThFMWJf5e3F/MzcoEdQ8F/IY
-X-Gm-Gg: ATEYQzzfEoRWsVHKnUVyl7yvQlWEaB0LzqOTUf7uK9pxOKLzrsKgs6zBWwA+u8jb9zZ
-	EU8XhW+dcS+hEn4QGcI9RXmnhfQsUIaOLjNBMuC/oXofgUB4GCQXiWgvwa6hCYrlyP/O/2pkEfV
-	E5aaNWeuf+iX5uLBMIx8ASWpwDzRu3FZMHt6h+QEa1/IkgOsbbzUC3BGv0m+2PNhyAioHZyOf4f
-	4DxHuVJT7UNYmCvWBLMCl7uMHuKlGAff6FMdZzTg2+Crv33Bb7COuJUnJqxxEv5WaONqntrmzIe
-	o3PYyz5qR+p2aN7szNx3AzBFm3KE9mRJn1MsMAngQ9jZfgV0LMTlpY9TmEc320N8D6FlrNpTc+r
-	Iuvw+XRcYorCRPYTe/69FIL6J3PktkTMZB44UvoycHJCLFm0nk5rCtj8/yw/DAdXNwSFt3e5Q68
-	iQsOudDy4iKUhvvSIZbk5P3j3CXKlaQEKxr+C52xSUVRZxORqX/UDNsZ1mU+FR7qaF8AQh9fnud
-	vEo
-X-Received: by 2002:a17:90b:2c86:b0:359:8ca0:308d with SMTP id 98e67ed59e1d1-359f05cddb0mr3295256a91.14.1773155985702;
-        Tue, 10 Mar 2026 08:19:45 -0700 (PDT)
-Received: from localhost.localdomain ([2001:448a:2003:2adb:898c:8fe1:aebd:4139])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359f080db95sm5051182a91.9.2026.03.10.08.19.42
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 10 Mar 2026 08:19:45 -0700 (PDT)
-From: Muchamad Coirul Anwar <muchamadcoirulanwar@gmail.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	ojeda@kernel.org
-Cc: linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Muchamad Coirul Anwar <muchamadcoirulanwar@gmail.com>
-Subject: [RFC PATCH net-next] net: phy: rust: add experimental Davicom PHY driver
-Date: Tue, 10 Mar 2026 22:19:35 +0700
-Message-ID: <20260310151935.33197-1-muchamadcoirulanwar@gmail.com>
-X-Mailer: git-send-email 2.50.0
+        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
+        b=AQHs/yr7Gvha4WeeSLnWSMlooVzJGo6GAU7UhekNH07V+/520QYqL1byWRSaDp51B/
+         d9hHwCr4bDru0nUCVMsIPmp56fW/n5xj3Y99eHbj2NKzOCdaPCLJ47VfwHGYiLAfNwwa
+         oPuz1da3kALubqjorkJ7JO56SjNRqB0aU+uqOdcQhvgN33lIHQiAQpO4+PPwkz6xanug
+         aIn5YLCE7qlo27kUYVLjV8Sc6FTYhDGS91XswwN5t2U7P4ekvOuXVmLHcqt6LSLI/g9X
+         Iesn/8K6G8pek2dqIO7BLC+r7/1VlYfpgMbhtNJS6lg5aNRUlznPsFDSRpTAiDb9mGfI
+         eFlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773156342; x=1773761142;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qdCpZGVa/V+5p0O179Xw74ZYNlsySsblEen64ng3edI=;
+        b=aD9wbmF68FF/xy3+xBfB/cTP5hkhGKTQGxY42A7OtEFxDuMs5Hn2k4rd/1oOA044cw
+         dgN3aB4AHTHV27zB7LvUUf3pjtlybLmkyvJe+qPVw2OfTEa68o32ypBcM36vKc8p2O3A
+         vrSOOG3CYajahLeyJ3UywyZBmI08KwKgHehyrFOkL9kRM5NNqMEDDBKfguOzhJEDG6R9
+         8Yr6PskZ29eI0FFIeZy5bJRv5PYVv3+hy9hjktdNGI3dQSVyGbL585dT2t3CjgNJSjQ3
+         qdr7FxBPv8Cy08xOthnEx/L1E7pS70CiggMkbZ4LRoipis+NVYLeIU+hSXXIFcXFwxI7
+         S6Xg==
+X-Gm-Message-State: AOJu0YyQ+rMDz9fpiw8ilgogxTHxrEfu85BrRwwMy9EcB5NOExN+UjWv
+	FyhsbCboTLhnk64kZy6A29NgdbxP+/VG9i+fKXwjw0k/bFsHZs17bbTp29KSu0iJvpO3UNyytH3
+	yNtdGPEaB5ES2McyRW1kDZV2Amf/+wAiYrQWGgnla
+X-Gm-Gg: ATEYQzxUDhxH25N7MY6XiTaRIRhvCc02Hh5bA8gtFDKHNY9j7N4sFaL4aiLLlWL3sla
+	Nx9MeoHALM7cTPyimFaHLZykFYAHOezgjUZNWNTpKdsJaP44PF2FcJNRHxJg3DnYlOE06hngMak
+	qieGW51t425kfZDETjIqRodCDpPlkGBLXCYovMyS98e0MMhVv/fzYmj9Hyk+GRESivCXiSS2M16
+	o6LdnDWKCk7mnXtTV48P6wN3pbSplvi8oVKW30KZo/iPFSWXmlxYABgxRFMHr+OqOhxg9Jtf7iI
+	Rr2p0ds=
+X-Received: by 2002:a05:622a:4d2:b0:509:1ffc:c538 with SMTP id
+ d75a77b69052e-5091ffcc7demr69849831cf.19.1773156341020; Tue, 10 Mar 2026
+ 08:25:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 06525253386
+References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-3-edumazet@google.com>
+ <a4686348-ad60-481b-8898-9c68e9c27a50@cybernetics.com> <CANn89iJziPq9Au9A8DK8Um6Nn2F-xTcG3+r5x0tVMf+7TUJEMg@mail.gmail.com>
+ <cb925a24-c4a2-46cd-98e8-2be5e2aa2152@cybernetics.com> <CANn89iKVarorgFqxpCp9C5r1_ntRDcz7Xn-kXxpfwWLQkN++BQ@mail.gmail.com>
+ <146f94cd-e8c1-423c-8ca7-1f849b684785@cybernetics.com> <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
+In-Reply-To: <62aa08ff-16a0-4672-8e70-00b9081369df@cybernetics.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 10 Mar 2026 16:25:29 +0100
+X-Gm-Features: AaiRm50HG9WJWpUEPI5YYSq3IEMZ8J-QW64Yg0VXFJtbTjYG3Ikh2rEvM9WKrVY
+Message-ID: <CANn89iJpgABfLzXOFVzh0rjnZUvHhyqYuNTvP6_EegHgcjuY1w@mail.gmail.com>
+Subject: Re: Long delay in freeing skbs
+To: Tony Battersby <tonyb@cybernetics.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, eric.dumazet@gmail.com, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Jason Xing <kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4A0182542B8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266217-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muchamadcoirulanwar@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com];
+	TAGGED_FROM(0.00)[bounces-266218-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cybernetics.com:email]
 X-Rspamd-Action: no action
 
-This is an experimental Rust port of the legacy Davicom PHY driver
-(davicom.c) to explore the boundaries of the current PHY abstractions.
+On Tue, Mar 10, 2026 at 3:49=E2=80=AFPM Tony Battersby <tonyb@cybernetics.c=
+om> wrote:
+>
+> On 3/9/26 17:47, Tony Battersby wrote:
+> > On 3/9/26 17:24, Eric Dumazet wrote:
+> >> On Mon, Mar 9, 2026 at 10:18=E2=80=AFPM Tony Battersby <tonyb@cybernet=
+ics.com> wrote:
+> >>> On 3/9/26 17:07, Eric Dumazet wrote:
+> >>>> On Mon, Mar 9, 2026 at 10:00=E2=80=AFPM Tony Battersby <tonyb@cybern=
+etics.com> wrote:
+> >>>>> I have some out-of-tree code that was broken by commit e20dfbad8aab
+> >>>>> ("net: fix napi_consume_skb() with alien skbs") in kernel 6.19.  I
+> >>>>> retested with 7.0-rc3 with the same results.  I'm not sure if the c=
+hange
+> >>>>> in behavior that I am seeing is expected or if it is a bug, so I th=
+ought
+> >>>>> I would ask.  Omitting irrelevant details, my kernel code does the
+> >>>>> following:
+> >>>>>
+> >>>>> 1) allocate a buffer
+> >>>>> 2) perform some network I/O using the buffer (cmd over iscsi_tcp)
+> >>>>> 3) wait for the I/O to complete
+> >>>>> 4) wait for the buffer page refcounts to drop back to their values =
+for
+> >>>>> idle I/O
+> >>>>> 5) reuse the buffer for more I/O
+> >>>>>
+> >>>>> Step 4 is necessary in this case due to some of those irrelevant de=
+tails
+> >>>>> that I omitted, and that is where it trips up.  Commit e20dfbad8aab
+> >>>>> seems to keep the page refcounts elevated long after the I/O has
+> >>>>> completed (hours or longer), presumably because the deferred skb fr=
+ee
+> >>>>> isn't happening for a long time.  So:
+> >>>>>
+> >>>>> 1) Is this long delay expected, or is this a bug?
+> >>>>>
+> >>>>> 2) If the delay is expected, is there a way for me to force the net=
+work
+> >>>>> system to process the deferred skb frees on request?  e.g. write to=
+ a
+> >>>>> file in /sys, or call a kernel function to flush the deferred frees=
+?
+> >>>>>
+> >>>>> Worst case is that I can redesign my code to kfree() the buffer if =
+it is
+> >>>>> busy and allocate a new one, and let the old buffer be freed
+> >>>>> asynchronously when the skb is freed at some indeterminate time in =
+the
+> >>>>> future.
+> >>>>>
+> >>>>> Thanks,
+> >>>>> Tony Battersby
+> >>>> If you are using zero copy, please look at:
+> >>>>
+> >>>> Maybe you should make sure your code is compatible with it.
+> >>>>
+> >>>> commit 0943404b1f3b178e1e54386dadcbf4f2729c7762
+> >>>> Author: Eric Dumazet <edumazet@google.com>
+> >>>> Date:   Mon Feb 16 19:36:53 2026 +0000
+> >>>>
+> >>>>     net: do not delay zero-copy skbs in skb_attempt_defer_free()
+> >>>>
+> >>>>     After the blamed commit, TCP tx zero copy notifications could be
+> >>>>     arbitrarily delayed and cause regressions in applications waitin=
+g
+> >>>>     for them.
+> >>>>
+> >>> The I/O is being sent by a userspace program via the SCSI generic dri=
+ver
+> >>> (drivers/scsi/sg.c) over iSCSI (drivers/scsi/iscsi_tcp.c).  I don't s=
+ee
+> >>> any mention of zero copy in iscsi_tcp.c.
+> >> Set /proc/sys/net/core/skb_defer_max to 0 ?
+> > Thanks; I should have grepped the docs harder.
+> >
+> > That seems to work if I do it before sending the I/O but not after the
+> > I/O has completed.  So I presume it would decrease performance?
+> >
+> > Tony
+> >
+> I found a workable solution.  When my code finds an elevated page
+> refcount, it does the following:
+>
+> for_each_online_cpu(cpu) {
+>         kick_defer_list_purge(cpu);
+> }
+>
+> And that seems to take care of it, and it pushes the extra overhead to
+> the slow path.
+>
+> Thanks for your help!
 
-During the porting process, a few limitations in the current
-`net::phy::Driver` trait were observed:
-1. Callbacks for `config_init`, `config_intr`, and `handle_interrupt`
-   are not yet exposed.
-2. `bindings::genphy_config_aneg` is not yet wrapped.
+You probably could send packets over loopback interface, this should trigge=
+r
+net_rx_action() from one cpu only, this might be less disruptive, but maybe
+a bit more complicated to get it right.
 
-In this RFC, the logic for these missing callbacks is implemented
-and marked with `#[allow(dead_code)]` to demonstrate the required
-hardware logic. Additionally, `unsafe` blocks are used as a temporary
-workaround for `genphy_config_aneg` and interface checking.
+Another way is to setup RFS on your NIC.
 
-Note: I don't have access to the physical Davicom hardware.
-This patch is compile-tested and verified via QEMU only. It is
-submitted as an RFC to share findings regarding the missing
-abstractions and gather feedback on the Rust PHY usage.
+Documentation/networking/scaling.rst
 
-Signed-off-by: Muchamad Coirul Anwar  <muchamadcoirulanwar@gmail.com>
----
- drivers/net/phy/davicom_rust.rs | 165 ++++++++++++++++++++++++++++++++
- 1 file changed, 165 insertions(+)
- create mode 100644 drivers/net/phy/davicom_rust.rs
-
-diff --git a/drivers/net/phy/davicom_rust.rs b/drivers/net/phy/davicom_rust.rs
-new file mode 100644
-index 000000000000..173f14ce25cf
---- /dev/null
-+++ b/drivers/net/phy/davicom_rust.rs
-@@ -0,0 +1,165 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+//! Davicom PHY Rust driver.
-+//!
-+//! C version `drivers/net/phy/davicom.c`
-+
-+use kernel::net::phy::{self, reg::C22, DeviceId, Driver};
-+use kernel::prelude::*;
-+
-+/// Register 0x10: Scrambler Control Register (SCR)
-+const SCR: C22 = C22::vendor_specific::<0x10>();
-+const SCR_INIT: u16 = 0x0610;
-+const SCR_RMII: u16 = 0x0100;
-+
-+/* DM9161 Interrupt Register */
-+
-+/// Register 0x15: Interrupt Register
-+const INTR: C22 = C22::vendor_specific::<0x15>();
-+const INTR_PEND: u16 = 0x8000;
-+const INTR_DPLX_MASK: u16 = 0x0800;
-+const INTR_SPD_MASK: u16 = 0x0400;
-+const INTR_LINK_MASK: u16 = 0x0200;
-+const INTR_MASK: u16 = 0x0100;
-+const INTR_DPLX_CHANGE: u16 = 0x0010;
-+const INTR_SPD_CHANGE: u16 = 0x0008;
-+const INTR_LINK_CHANGE: u16 = 0x0004;
-+const INTR_INIT: u16 = 0x0000;
-+const INTR_STOP: u16 = INTR_DPLX_MASK | INTR_SPD_MASK | INTR_LINK_MASK | INTR_MASK;
-+const INTR_CHANGE: u16 = INTR_DPLX_CHANGE | INTR_SPD_CHANGE | INTR_LINK_CHANGE;
-+
-+/// Register 0x12: 10Base-T Configuration/Status Register
-+const BTCSR: C22 = C22::vendor_specific::<0x12>();
-+const BTCSR_INIT: u16 = 0x7800;
-+
-+/// Handles incoming hardware interrupts from the Davicom PHY.
-+///
-+/// This checks if the interrupt was caused by a link, speed, or duplex change.
-+/// If so, it notifies the kernel to update the link state using `genphy_update_link`.
-+///
-+/// TODO: This function is currently unused because the Rust PHY abstraction `net::phy::Driver`
-+/// does not yet expose a `handle_interrupt` callback. It is included here for the RFC.
-+#[allow(dead_code)]
-+fn dm9161_handle_interrupt(dev: &mut phy::Device) -> Result {
-+    let irq_status = dev.read(INTR)?;
-+
-+    if (irq_status & INTR_CHANGE) == 0 {
-+        return Ok(());
-+    }
-+
-+    dev.genphy_update_link()?;
-+
-+    Ok(())
-+}
-+
-+#[allow(dead_code)]
-+fn dm9161_ack_interrupt(dev: &mut phy::Device) -> Result {
-+    let _ = dev.read(INTR)?;
-+    Ok(())
-+}
-+
-+/// Configures whether the hardware alarm (interrupts) should be turned on or off.
-+///
-+/// It reads the current interrupt status requested by the OS by accessing the raw pointer.
-+///
-+/// TODO: This function is currently unused because the Rust PHY abstraction `net::phy::Driver`
-+/// does not yet expose a `config_intr` callback. It is included here for the RFC.
-+#[allow(dead_code)]
-+fn dm9161_config_intr(dev: &mut phy::Device) -> Result {
-+    let mut temp = dev.read(INTR)?;
-+
-+    let intr_enabled = unsafe {
-+        let ptr = (dev as *mut phy::Device).cast::<bindings::phy_device>();
-+        (*ptr).interrupts == bindings::PHY_INTERRUPT_ENABLED as u8
-+    };
-+
-+    if intr_enabled {
-+        dm9161_ack_interrupt(dev)?;
-+        temp &= !INTR_STOP;
-+        dev.write(INTR, temp)?;
-+    } else {
-+        temp |= INTR_STOP;
-+        dev.write(INTR, temp)?;
-+        dm9161_ack_interrupt(dev)?;
-+    }
-+    Ok(())
-+}
-+
-+/// Configures PHY Auto-Negotiation.
-+///
-+/// Isolates the PHY during configuration, then calls the generic `genphy_config_aneg`
-+/// via unsafe C bindings because Rust abstractions don't expose it directly yet.
-+fn dm9161_config_aneg(dev: &mut phy::Device) -> Result {
-+    dev.write(C22::BMCR, bindings::BMCR_ISOLATE as u16)?;
-+
-+    let err = unsafe {
-+        let ptr = (dev as *mut phy::Device).cast::<bindings::phy_device>();
-+        bindings::genphy_config_aneg(ptr)
-+    };
-+    to_result(err)?;
-+
-+    Ok(())
-+}
-+
-+/// Initializes the Davicom PHY hardware upon detection.
-+///
-+/// Depending on the `interface` mode (MII vs RMII), the Scrambler Control Register (SCR)
-+/// is configured. It relies on `C22::vendor_specific` addresses.
-+///
-+/// TODO: This function is currently unused because the Rust PHY abstraction `net::phy::Driver`
-+/// does not yet expose a `config_init` callback. It is included here for the RFC.
-+#[allow(dead_code)]
-+fn dm9161_config_init(dev: &mut phy::Device) -> Result {
-+    dev.write(C22::BMCR, bindings::BMCR_ISOLATE as u16)?;
-+
-+    let interface = unsafe {
-+        let ptr = (dev as *mut phy::Device).cast::<bindings::phy_device>();
-+        (*ptr).interface
-+    };
-+
-+    let temp = match interface as core::ffi::c_uint {
-+        bindings::phy_interface_t_PHY_INTERFACE_MODE_MII => SCR_INIT,
-+        bindings::phy_interface_t_PHY_INTERFACE_MODE_RMII => SCR_INIT | SCR_RMII,
-+        _ => return Err(code::EINVAL),
-+    };
-+
-+    dev.write(SCR, temp)?;
-+
-+    dev.write(BTCSR, BTCSR_INIT)?;
-+
-+    dev.write(C22::BMCR, bindings::BMCR_ANENABLE as u16)?;
-+
-+    Ok(())
-+}
-+
-+/// Representation of the Davicom DM9161E chip.
-+struct DavicomDM9161E;
-+
-+#[vtable]
-+impl Driver for DavicomDM9161E {
-+    const NAME: &'static CStr = c"Davicom DM9161E";
-+    const PHY_DEVICE_ID: phy::DeviceId = DeviceId::new_with_custom_mask(0x0181b880, 0x0ffffff0);
-+    fn config_aneg(dev: &mut phy::Device) -> Result {
-+        dm9161_config_aneg(dev)
-+    }
-+}
-+
-+struct DavicomDM9161A;
-+
-+#[vtable]
-+impl Driver for DavicomDM9161A {
-+    const NAME: &'static CStr = c"Davicom DM9161A";
-+    const PHY_DEVICE_ID: phy::DeviceId = DeviceId::new_with_custom_mask(0x0181b8a0, 0x0ffffff0);
-+    fn config_aneg(dev: &mut phy::Device) -> Result {
-+        dm9161_config_aneg(dev)
-+    }
-+}
-+
-+kernel::module_phy_driver! {
-+    drivers: [DavicomDM9161E, DavicomDM9161A],
-+    device_table: [DeviceId::new_with_driver::<DavicomDM9161E>(), DeviceId::new_with_driver::<DavicomDM9161A>()],
-+    name: "davicom_rust",
-+    authors: ["Andy Fleming"],
-+    description: "Davicom PHY Rust Driver",
-+    license: "GPL"
-+}
--- 
-2.50.0
-
+Thanks.
 
