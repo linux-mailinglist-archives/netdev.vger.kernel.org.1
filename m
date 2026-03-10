@@ -1,171 +1,120 @@
-Return-Path: <netdev+bounces-266283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPXqNghesGloigIAu9opvQ
-	(envelope-from <netdev+bounces-266283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:08 +0100
+	id cLs9FCVesGloigIAu9opvQ
+	(envelope-from <netdev+bounces-266284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C29625627E
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99ECA2562B9
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 19:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 940B130054CB
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:07:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24D26313D5F5
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 18:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F873D1CAC;
-	Tue, 10 Mar 2026 18:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49BF33D0922;
+	Tue, 10 Mar 2026 18:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzTdgDi7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g2vEA06Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2923C9452
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 18:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258893C344C;
+	Tue, 10 Mar 2026 18:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773166051; cv=none; b=ljWh6BeuxcuG76nl3G/2JbXIDAiSZJ/epGe3yAYfMzW61rAtuaCF4R21tKDc7vaQ9QpM5oXXLqv0kIa2eHz2vRHQJkWbRocjaL7TpcQVg7+6Vvac0ModPeTeOEMGC8WCt6VSaa+93PBbiGJV00tJV8FJc/8J86pPHnS2P2ZYsUU=
+	t=1773166100; cv=none; b=CfEMwz82JXOb5N92copDtHwAkVvSfsd1FTkEp3lL0DuJWCGgvZJINUyogyat6mzFiaf0Kiwgv27jrmxMx1wEu3oIOUc4fwpAwAci0LNAYeYCLlENuHK1QSTama9FItP1ZWBjo90YNJ9TrFgKFJPkX/Ffk5ik73UX5fHJhwQSXdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773166051; c=relaxed/simple;
-	bh=TOIxCaaQZCslnPSzRbjtB1BfPHqcCBDUGx5tuEkjj40=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kofztOts5A/1vziw4RIwIZr/RqdEZ5eItwT2/vT1z/jk0NRxIxJdGZlNKE/6MJ/xzF/z4CNXteXs6Z5WMUda5eKJdW8BX2gYIb5bM8gw5uzfA0xb5MjkG8X6xnG1WMEv3YFMiidZFZRphXqTi9/zTPeoHYHuJ9e/BABHqcF/zb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RzTdgDi7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773166049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SYgkPHSTrobEp5EvyP2HzxHmiohKuV8d8R9zRfNhISI=;
-	b=RzTdgDi7an3kxumMGM0dYon1yUSJcPGW+6nHaTvVFPbMr1wkq24R287rWRjIvvF2bIiXUl
-	Bai9lAO5vIbAMPpVfx0ofS4lBB2jRtSZbCGNpv9fWUddYJb00liSViiRYBbf8ACAiiDQuq
-	nZC+iSw+Lr6fbL+KoKgLva3+YYT9feI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-526-nqTzg-LINHOqX0VQ1_h3sQ-1; Tue,
- 10 Mar 2026 14:07:23 -0400
-X-MC-Unique: nqTzg-LINHOqX0VQ1_h3sQ-1
-X-Mimecast-MFC-AGG-ID: nqTzg-LINHOqX0VQ1_h3sQ_1773166040
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 258221956060;
-	Tue, 10 Mar 2026 18:07:20 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.44.33.226])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4AEC41956095;
-	Tue, 10 Mar 2026 18:07:17 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1773166100; c=relaxed/simple;
+	bh=9TEA36UZnGZhsqp6aaqGfEB0TcVYWyEKHcKIM8n7B6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mVCZvxr0fLzLJAmWlZNeHiRBidH4qURFIUq2nH1NJbmsbR3pGXyR3W/VJHoi0BNTyxXbzffaEzlXFe2mTgQ6ygz1QG+LPOdB0kGi+WsvYiuTKhca9cdIb2wYgdvlUzd11FUFa3EjdHtTV+oNf60HVtQ5gGo1w51aL7kGo2Tc9OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g2vEA06Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1AEBC19423;
+	Tue, 10 Mar 2026 18:08:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773166099;
+	bh=9TEA36UZnGZhsqp6aaqGfEB0TcVYWyEKHcKIM8n7B6A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g2vEA06ZGMjQRvmNK2JBW2pmACYF5k3xRMJVuUgTPwedDVc23aWTSmikWBBhsaLex
+	 eh4PnDfX76O4GlohlRPt0XuAxwfz3SN1MkyCYjqeB6L+tSPKWxRTZyyjG2NRWet/9p
+	 GmdG1/UXaKEZMEaC3ITn6WJMoEtAfjpBrAi8LHe8r/4dl30i0JwyysHOZrI5iRwHoQ
+	 IA0MqnpQ1ufPPOjqWO1QjgZTdj5QePA6+Im5aH4hG+NKDtkk2NjJxZNHA8BLm1YLRM
+	 LBC76CvdAbB6XjiuI7TrUQDtSlaP+9C06PQhMVqAKVXqYMPhYai8+8hkqtcSh9JgcW
+	 2gl5hMwN07fbw==
+Date: Tue, 10 Mar 2026 18:08:14 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next 4/4] tc-testing: add a test case for ETS offload
-Date: Tue, 10 Mar 2026 19:06:31 +0100
-Message-ID: <43fde83da7dab5e2ffde37658a753195f145eece.1773165520.git.dcaratti@redhat.com>
-In-Reply-To: <cover.1773165520.git.dcaratti@redhat.com>
-References: <cover.1773165520.git.dcaratti@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	=?utf-8?Q?Miqu=C3=A8l?= Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: Fix error path in PTP IRQ setup
+Message-ID: <20260310180814.GA899930@kernel.org>
+References: <20260309-ksz-ptp-irq-fix-v1-1-757b3b985955@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: 8C29625627E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260309-ksz-ptp-irq-fix-v1-1-757b3b985955@bootlin.com>
+X-Rspamd-Queue-Id: 99ECA2562B9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266283-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,se.com,bootlin.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-266284-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mojatatu.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:email]
 X-Rspamd-Action: no action
 
-While reviewing the fix for unintentional u32 overflows in ets offload
-code, Jamal said:
+On Mon, Mar 09, 2026 at 02:15:43PM +0100, Bastien Curutchet (Schneider Electric) wrote:
+> If request_threaded_irq() fails during the PTP message IRQ setup, the
+> newly created IRQ mapping is never disposed. Indeed, the
+> ksz_ptp_irq_setup()'s error path only frees the mappings that were
+> successfully set up.
+> 
+> Dispose the newly created mapping if the associated
+> request_threaded_irq() fails at setup.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: d0b8fec8ae505 ("net: dsa: microchip: Fix symetry in ksz_ptp_msg_irq_{setup/free}()")
+> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 
- [...]
-
- > otherwise a tdc test should cover it fine (when you get to the
- > netdevsim change perhaps)
-
-Add a test case to reproduce the division by zero fixed in [1].
-
-[1] https://lore.kernel.org/all/CAM0EoMm17wsYZmdFLshH3_-GrZtzd=i0xnoO2yiVB=-N4761mw@mail.gmail.com/
-
-Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- .../tc-testing/tc-tests/qdiscs/ets.json       | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/ets.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/ets.json
-index a5d94cdec605..479b866031bb 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/ets.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/ets.json
-@@ -984,5 +984,28 @@
-         "matchCount": "1",
-         "teardown": [
-         ]
-+    },
-+    {
-+        "id": "41f5",
-+        "name": "ETS offload where the sum of quanta wraps u32",
-+        "category": [
-+            "qdisc",
-+            "ets"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "echo \"1 1 4\" > /sys/bus/netdevsim/new_device",
-+            "ethtool -K $ETH hw-tc-offload on"
-+        ],
-+        "cmdUnderTest": "$TC qdisc add dev $ETH root ets quanta 4294967294 1 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $ETH",
-+        "matchPattern": "qdisc ets .*bands 3 quanta 4294967294 1 1",
-+        "matchCount": "1",
-+        "teardown": [
-+            "echo \"1\" > /sys/bus/netdevsim/del_device"
-+        ]
-     }
- ]
--- 
-2.52.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
