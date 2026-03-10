@@ -1,212 +1,318 @@
-Return-Path: <netdev+bounces-266373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 30vCG6GksGlalgIAu9opvQ
-	(envelope-from <netdev+bounces-266373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:09:21 +0100
+	id LuT/LxKmsGnZlgIAu9opvQ
+	(envelope-from <netdev+bounces-266374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:15:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1342592A2
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:09:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A28259334
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EABB230240AF
-	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:09:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1BF5313D5EC
+	for <lists+netdev@lfdr.de>; Tue, 10 Mar 2026 23:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797137267D;
-	Tue, 10 Mar 2026 23:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PxKoj/ko"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F1D32AABF;
+	Tue, 10 Mar 2026 23:15:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB1371053
-	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 23:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B371C271468
+	for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 23:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773184158; cv=none; b=Ci36IhfAULR7xumGjfESx8aM6P1/nWjAQlO2UbawNrbRp7CPDQbK6uxT9bCt64OO/UaDx9Xnw20n2W5op0Ql+8eVFR00eiMxd5yDGka3rXPmB5MSeJlXiwvQotzj5nnGJ1uadwm4tGaSHZaWrKQ/J9aqhy1lsKb6ZSaowHJfMSs=
+	t=1773184528; cv=none; b=OE9sSeqeuPQf6A3Z9/JUsUsrbvsVnhSzjOUdwIpIBD3VYpl3x4CKmFd3VN8U3aU5ZPZLisTAk2/yj2UWA8aqJpcTHWHmymDl6bat+8kBEaLB4hn3eLNLwFmUxHXH+R8QKADmZMQ7ygveyByd/uHlBHpfExZ5USfTfe2OCKFeC/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773184158; c=relaxed/simple;
-	bh=pZ58cNGp7FiVPONqDxgEYxZYyOKBMFQVjpjV6yX9SsQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=da6xsAbqZCUrMJUp97dkuXWkmKJNBdGg9aIc0n6tDNtpoB+4SpzPwRHzg8dOvyUzPkbjOacWHT1U16jMiGvFp4i3usdANnbrTvglMAdLSyDtayDNa7vuvll+bIdakjaFjBYH0NOisVDle9T/mhmTUKSiOV1o54LIB4yYXA4wwi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PxKoj/ko; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4853c1ca73aso22970855e9.2
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 16:09:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773184156; x=1773788956; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DbJBr0HEiXYCW71Jk8MuoGm/RlPukS0X9H3Qzzqpl0U=;
-        b=PxKoj/koMG1EKEnLP8c4P1pMUdx6ABVSrlNJzSuUyQyTpQBwzVebz1TdWympwqvPCF
-         Zi+tpSjUGkRoaPVyHE+wmrFxwSETTO8tqCdg2jNljYPCxKa8Mm8pnkbupVJLQTtfcfe2
-         UPUZ7lzp7D1Y47TK4tS6gIVChDgrgwjOJb08+b93BQADN5ECHK2FTdu+WrD0LpnRZ9HR
-         JlQliJ7asZ9NzQRh1B9LlwvYOHZU0r/mStlWzu+rpoOx4eLMUybHit5q/u+Ld2VwhTdH
-         eezWmVHjvFiuKQylEQvEVLMFN2qeOfVL8GpNLvTmHt5tjpANQyD/Q6io9EQ+d0Q1R5zP
-         mz/w==
+	s=arc-20240116; t=1773184528; c=relaxed/simple;
+	bh=jDPt2+axzf6QmW4X7Bq1ogLhr/VgUZUOuwu6w/7LA3Y=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=PDOwqngo+mxa5CpwNMhNQdCK0PHpPdnXFI0ZXk4MyikQWxbNCXnxHZk7/5EnZI4dTbzJSjD5YUEkJ5Cpnja0+O+gsiQwexONRNfJGJxBaU5PMN5pPDCDyejiyeZ5pzjcrJ7PloWjte8CrmbvUK08duoUuEGYiQgRu009N4V5Pzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-41701418411so30016008fac.1
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 16:15:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773184156; x=1773788956;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DbJBr0HEiXYCW71Jk8MuoGm/RlPukS0X9H3Qzzqpl0U=;
-        b=FUoFOUYKUTw2g6kb/Sd/36D/E8EC1OtNM0zaia3K1+cD/yqsARSD5M0z6X98FR2kw0
-         s4MekouOGG089uJtnuugeYJId9VykJnumDCg+75fKr+fqSBP15y5yU8ytH/LKcmmnuZY
-         OXlJxG5OpLdg0qOxi1JH6e92gB62Px8VGLvFXb9FNRyx1+vos+v2RrSNAFWMn6mXtOxS
-         6V1nOc1hPHOhmPQl/m9gZ8GfxpliRPNE/tgeqkV3Mngcy2Y/2RH7LLPTZP5q6+aAH68X
-         NEtH020WGHTAdcC/uQKOxwt+jBAI2Qf0GRePJ8blfqF0z1IvOdDFuhRqjD5U0shG9zEO
-         AJQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhKNjvhaLwgkEATL61OnIzJXuyuJHt8ZFn7ZRhBDB82xSJJLJeIaeFOF4OFcz6g9ioHF/leSE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXWNuCCLd9zXwMvALjetaaOzPbIxHrR0YYsRnkSaRCC3X1FlBf
-	nC5Qu2o+UNxllXfCbpndY/X/ULrJ9P95Dim+vYA4ohsV/upuht0YFxiy
-X-Gm-Gg: ATEYQzzmpK1vB2DCQxS1M8OWzPTyZFEL+3AsPSaapm4fbdh60qSreoH62XkoVJ5rAj1
-	LvIxUKjUPL6aYTfaYJcpLfA3L81SsSfLEzBS5wYUEO9jHJUecidS/B9A+dNAD6qEU8WZ1O+zFzd
-	iaLxP2qstJybVokc2/F71V/54wK4Yw9K7MVP5kLw6ogsDSTqJBK+loHg07gOnw9ZM6COug1C5L1
-	1PevDcg3Fjb4AKTzdopwPq0zYGfR0G+YK6rwYiXgFcJG8zqsYNotIQv8vwx1o7bnGfc2e0mxbhf
-	6UEbXwpTHTv0UKbX95c8f9neRPf157HGNOyAKpnQHTkl6IsXOTfNo/iC/6b+FxGOisv8+hTtvGy
-	Z1rC5MY35S9PsV22OrmlpB+JHYJfaFRBpspPWMTd/KBB5gnvIxu2ulwSZCHXvIuzZLSpsy9I5g7
-	AJSN4gNX824qGJbPpxVtDuZvV2KjIlXStAp7e3WcWG3TK3ETuWwc2TbUJ0wJS+Dg==
-X-Received: by 2002:a05:600c:4710:b0:485:3b00:f939 with SMTP id 5b1f17b1804b1-4854b0bafa5mr8549225e9.8.1773184155268;
-        Tue, 10 Mar 2026 16:09:15 -0700 (PDT)
-Received: from gandalf.schnuecks.de (p5b2e2ef5.dip0.t-ipconnect.de. [91.46.46.245])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854a18bcf4sm11438625e9.0.2026.03.10.16.09.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 16:09:14 -0700 (PDT)
-Received: by gandalf.schnuecks.de (Postfix, from userid 500)
-	id 390E7302C898; Wed, 11 Mar 2026 00:09:14 +0100 (CET)
-Date: Wed, 11 Mar 2026 00:09:14 +0100
-From: Simon Baatz <gmbnomis@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	David Ahern <dsahern@kernel.org>, Jon Maloy <jmaloy@redhat.com>,
-	Jason Xing <kerneljasonxing@gmail.com>, mfreemon@cloudflare.com,
-	Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next v3 6/6] selftests/net: packetdrill: add
- tcp_rcv_neg_window.pkt
-Message-ID: <abCkmiCSPkmxzECa@gandalf.schnuecks.de>
-References: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com>
- <20260309-tcp_rfc7323_retract_wnd_rfc-v3-6-4c7f96b1ec69@gmail.com>
- <CANn89i+PypF1cK4mnp8L_eCG_z+3Aj6uxJoohm_=DwGfR1=4FA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1773184525; x=1773789325;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P2m7J15Rmijkxj/rodQsj2WND6I6uBKnU+578P4HG1Q=;
+        b=B71cCyiUN3QtAGjX9gQOdBmoC+5ekmZdEF2iRMmlJ4H2EfyuFnc4xl+PSv+OceS9wf
+         bmTyswnVOFejBC3in/xhfzIzbLPqT8TWwliXlBJd3IkUHIUypCrZX73iznaQoDo5VZMo
+         d0g4WAClaB0U7X+E2q/qhHCcUDTQxm3tfGC4EWVm3X8d9UVR62OQZ8q5fkkPXzuq52oJ
+         cPd+lopFsAi5EnWxrhSxkUypc2kPmeFyFInwa29EjQFiWnyoegnI4d746XWrK/GZGJM/
+         EY6WInMJlrDkjXI0bVkHOfyyczD733zrMnOeV8nHd9CCSCkrBdWxZJN6N61A2k+pDfPx
+         Zb6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVGWIWCVE0+Ud823UlengNO2jXFHDzVdZJHYuc+a82dN13VJlWSXua+QGFazw3jMFTr6CJTqNo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE5hoOK1KaKLg4/V1worDzTPUeLUzvpM5/ie846q0vjpqOjKmz
+	sWrN3aZiYeWsIxAjaRpUC0J/vz40JSz3K9si4aSeaHhfCXbICZlzgVIOPS4sx3DCNqpBiMAfrG/
+	7VvcZu8C0MY9dwCh4O86RRsgsZa0DYUIycryidLjaMcuFQMB5ev1kVKVcmCU=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89i+PypF1cK4mnp8L_eCG_z+3Aj6uxJoohm_=DwGfR1=4FA@mail.gmail.com>
-X-Rspamd-Queue-Id: ED1342592A2
+X-Received: by 2002:a05:6820:460c:b0:67b:b7ff:e3b5 with SMTP id
+ 006d021491bc7-67bc89918f2mr338388eaf.42.1773184525685; Tue, 10 Mar 2026
+ 16:15:25 -0700 (PDT)
+Date: Tue, 10 Mar 2026 16:15:25 -0700
+In-Reply-To: <20260310120053.136594-1-jiayuan.chen@linux.dev>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69b0a60d.a00a0220.3a1cd4.0002.GAE@google.com>
+Subject: [syzbot ci] Re: net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
+From: syzbot ci <syzbot+ci146b0afba6158e88@syzkaller.appspotmail.com>
+To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	jiayuan.chen@linux.dev, jiayuan.chen@shopee.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sidraya@linux.ibm.com, syzbot@syzkaller.appspotmail.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 14A28259334
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,cloudflare.com,vger.kernel.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-266373-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,gandalf.schnuecks.de:mid]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.814];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266374-lists,netdev=lfdr.de,ci146b0afba6158e88];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-Hi Eric,
+syzbot ci has tested the following series
 
-On Tue, Mar 10, 2026 at 09:54:58AM +0100, Eric Dumazet wrote:
-> On Mon, Mar 9, 2026 at 9:03???AM Simon Baatz via B4 Relay
-> <devnull+gmbnomis.gmail.com@kernel.org> wrote:
-> >
-> > From: Simon Baatz <gmbnomis@gmail.com>
-> >
-> > The test ensures we correctly apply the maximum advertised window limit
-> > when rcv_nxt advances past rcv_mwnd_seq, so that the "usable window"
-> > is properly clamped to zero rather than becoming negative.
-> >
-> > Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
-> > ---
-> >  .../net/packetdrill/tcp_rcv_neg_window.pkt         | 26 ++++++++++++++++++++++
-> >  1 file changed, 26 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-> > new file mode 100644
-> > index 0000000000000000000000000000000000000000..15a9b4938f16d175ac54f3fd192ed2b59b0a4399
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_neg_window.pkt
-> > @@ -0,0 +1,26 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +
-> > +--mss=1000
-> > +
-> > +`./defaults.sh`
-> > +
-> > +// Establish a connection.
-> > +   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-> > +   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-> > +   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) = 0
-> > +   +0 bind(3, ..., ...) = 0
-> > +   +0 listen(3, 1) = 0
-> > +
-> > +   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-> > +   +0 > S. 0:0(0) ack 1 win 18980 <mss 1460,nop,wscale 0>
-> > +  +.1 < . 1:1(0) ack 1 win 257
-> > +
-> > +   +0 accept(3, ..., ...) = 4
-> > +
-> > +// A too big packet is accepted if the receive queue is empty
-> > +   +0 < P. 1:20001(20000) ack 1 win 257
-> 
-> We do not see the answer, it seems this test is not complete ?
+[v3] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
+https://lore.kernel.org/all/20260310120053.136594-1-jiayuan.chen@linux.dev
+* [PATCH net v3] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
 
-Actually we do not want to see an answer.  The packet won't trigger
-an immediate ACK (it is larger than the advertised window, but does
-not cause immediate memory pressure).
+and found the following issues:
+* WARNING: suspicious RCU usage in smc_fback_error_report
+* WARNING: suspicious RCU usage in smc_fback_state_change
+* WARNING: suspicious RCU usage in smc_fback_write_space
 
-When we then send a RST before the delayed ACK would be generated:
- 
-> > +// Send a RST immediately so that there is no rcv_wup/rcv_mwnd_seq update yet
-> > +   +0 < R. 20001:20001(0) ack 1 win 257
+Full report is available here:
+https://ci.syzbot.org/series/b6883213-02f6-437e-bb3b-09fc59b0534c
 
-We are in a state where rcv_wup, rcv_wnd, and rcv_mwnd_seq have not
-been updated yet, but we must still accept the RST 
-(rcv_nxt == 20001 > rcv_mwnd_seq, tcp_max_receive_window() == 0)
+***
 
-> > +
-> > +  +.1 %{ assert tcpi_state == TCP_CLOSE, tcpi_state }%
+WARNING: suspicious RCU usage in smc_fback_error_report
 
-And we verify that we accepted the RST here.
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
+C repro:   https://ci.syzbot.org/findings/f8c698ca-41b9-4ced-953c-f6c3ee405ebc/c_repro
+syz repro: https://ci.syzbot.org/findings/f8c698ca-41b9-4ced-953c-f6c3ee405ebc/syz_repro
 
-Given how subtle this sequence is, and considering the limited value
-of this test, I am also fine with dropping it if it is too fragile or
-confusing.
+=============================
+WARNING: suspicious RCU usage
+syzkaller #0 Not tainted
+-----------------------------
+./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+2 locks held by syz.0.17/5970:
+ #0: ffff88811a1d1d60 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
+ #0: ffff88811a1d1d60 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet_stream_connect+0x51/0xa0 net/ipv4/af_inet.c:749
+ #1: ffff88811a1d1f08 (k-clock-AF_INET6){++..}-{3:3}, at: smc_fback_error_report+0x2d/0x140 net/smc/af_smc.c:900
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5970 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
+ __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
+ smc_clcsock_user_data net/smc/smc.h:345 [inline]
+ smc_fback_error_report+0x135/0x140 net/smc/af_smc.c:901
+ sk_error_report+0x48/0x2b0 net/core/sock.c:348
+ tcp_disconnect+0x132c/0x1fa0 net/ipv4/tcp.c:3543
+ __inet_stream_connect+0x32b/0xdd0 net/ipv4/af_inet.c:648
+ inet_stream_connect+0x66/0xa0 net/ipv4/af_inet.c:750
+ __sys_connect_file net/socket.c:2089 [inline]
+ __sys_connect+0x312/0x450 net/socket.c:2108
+ __do_sys_connect net/socket.c:2114 [inline]
+ __se_sys_connect net/socket.c:2111 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2111
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7effcfd9c799
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe9219fa18 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007effd0015fa0 RCX: 00007effcfd9c799
+RDX: 000000000000000c RSI: 00002000000001c0 RDI: 0000000000000003
+RBP: 00007effcfe32bd9 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007effd0015fac R14: 00007effd0015fa0 R15: 00007effd0015fa0
+ </TASK>
+
+
+***
+
+WARNING: suspicious RCU usage in smc_fback_state_change
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
+C repro:   https://ci.syzbot.org/findings/fb044c1b-44f5-483a-bb87-1aad71a75a03/c_repro
+syz repro: https://ci.syzbot.org/findings/fb044c1b-44f5-483a-bb87-1aad71a75a03/syz_repro
+
+=============================
+WARNING: suspicious RCU usage
+syzkaller #0 Not tainted
+-----------------------------
+./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+3 locks held by syz.0.17/5945:
+ #0: ffff8881be8b0ee0 (sk_lock-AF_SMC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
+ #0: ffff8881be8b0ee0 (sk_lock-AF_SMC){+.+.}-{0:0}, at: smc_sendmsg+0x52/0x4d0 net/smc/af_smc.c:2802
+ #1: ffff8881b9f04360 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
+ #1: ffff8881b9f04360 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x21/0x50 net/ipv4/tcp.c:1464
+ #2: ffff8881b9f04508 (k-clock-AF_INET){++..}-{3:3}, at: smc_fback_state_change+0x2d/0x140 net/smc/af_smc.c:864
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 5945 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
+ __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
+ smc_clcsock_user_data net/smc/smc.h:345 [inline]
+ smc_fback_state_change+0x135/0x140 net/smc/af_smc.c:865
+ tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:7000 [inline]
+ tcp_rcv_state_process+0x2b23/0x4810 net/ipv4/tcp_input.c:7215
+ tcp_v4_do_rcv+0x6bb/0x1430 net/ipv4/tcp_ipv4.c:1907
+ sk_backlog_rcv include/net/sock.h:1185 [inline]
+ __release_sock+0x265/0x3a0 net/core/sock.c:3213
+ release_sock+0x5f/0x1f0 net/core/sock.c:3795
+ tcp_sendmsg+0x39/0x50 net/ipv4/tcp.c:1466
+ smc_sendmsg+0x250/0x4d0 net/smc/af_smc.c:2823
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9b66d9c799
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe630639c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f9b67015fa0 RCX: 00007f9b66d9c799
+RDX: 00000000200048cc RSI: 0000200000000240 RDI: 0000000000000003
+RBP: 00007f9b66e32bd9 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f9b67015fac R14: 00007f9b67015fa0 R15: 00007f9b67015fa0
+ </TASK>
+
+
+***
+
+WARNING: suspicious RCU usage in smc_fback_write_space
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/0ecfc74c-85c7-4a7b-8b09-d322ac9ea108/config
+C repro:   https://ci.syzbot.org/findings/a3f8aa1e-ebea-41f3-b6e4-97d45bc19aaf/c_repro
+syz repro: https://ci.syzbot.org/findings/a3f8aa1e-ebea-41f3-b6e4-97d45bc19aaf/syz_repro
+
+=============================
+WARNING: suspicious RCU usage
+syzkaller #0 Not tainted
+-----------------------------
+./include/net/sock.h:682 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+2 locks held by syz.0.17/5953:
+ #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
+ #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: sockopt_lock_sock net/core/sock.c:1152 [inline]
+ #0: ffff8881b9ed1c60 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: sk_setsockopt+0xe62/0x2e80 net/core/sock.c:1310
+ #1: ffff8881b9ed1e08 (k-clock-AF_INET){++..}-{3:3}, at: smc_fback_write_space+0x2d/0x140 net/smc/af_smc.c:888
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 5953 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
+ __rcu_dereference_sk_user_data_with_flags include/net/sock.h:682 [inline]
+ smc_clcsock_user_data net/smc/smc.h:345 [inline]
+ smc_fback_write_space+0x135/0x140 net/smc/af_smc.c:889
+ sk_setsockopt+0x221f/0x2e80 net/core/sock.c:1351
+ do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2318
+ __sys_setsockopt net/socket.c:2347 [inline]
+ __do_sys_setsockopt net/socket.c:2353 [inline]
+ __se_sys_setsockopt net/socket.c:2350 [inline]
+ __x64_sys_setsockopt+0x13d/0x1b0 net/socket.c:2350
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f0c5f39c799
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd35759278 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 00007f0c5f615fa0 RCX: 00007f0c5f39c799
+RDX: 0000000000000020 RSI: 0000000000000001 RDI: 0000000000000003
+RBP: 00007f0c5f432bd9 R08: 0000000000000004 R09: 0000000000000000
+R10: 0000200000000100 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f0c5f615fac R14: 00007f0c5f615fa0 R15: 00007f0c5f615fa0
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
