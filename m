@@ -1,179 +1,165 @@
-Return-Path: <netdev+bounces-266707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266708-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CQ/MpmdsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266707-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:51:37 +0100
+	id iOUoMuKdsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266708-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:52:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DA12678F9
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:51:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FAE267933
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D50F23016296
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:51:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 32F3230269EA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031F53E2765;
-	Wed, 11 Mar 2026 16:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B85F3E1D16;
+	Wed, 11 Mar 2026 16:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPXeee+P";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nwlvj0BV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xBzYY7Vx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5953DDDB5
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603F53DEAEB;
+	Wed, 11 Mar 2026 16:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773247894; cv=none; b=VdJA1W2oluybgxpkvAKmffWRh1FIOMTyXFHRNCI0foOiNUqEWcLW+S2ckABgDK8/FjY/3TpOh87RjQpeFDvWKI4yQaR2YZwFwSYX6AfoIKphauvwvLOG6m0bE1lhJhngexod60SSt2IIJnd05pOns0pUFpoDYqZUQf6IcyKVRos=
+	t=1773247966; cv=none; b=Gbt4MEHPES/0wqibjcJJcpClycpwYC25j6v6YYk49QLZVXxJfPIIXer5v2KUgJFpT5ImsLTvq/K4oCcHqkwnMmtmidbJQZ8tXIlStn+uy78vvk/H90LDZTcHmpx64k85MmNhdNdyWGDcL333ocKSFbS2e4ak76Mxb2geW/j4ybs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773247894; c=relaxed/simple;
-	bh=7ZtgjYvWplDOeClThKKS1LpYWJXuZCe9BIMhGL4CNGs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=D3kc76rvRj87eFmLxU4CispGN+Kri9I/gBW7LtNnswhrpxtBI0qVbPs/ZC8kfek8GXJu1uKre56xXmaRwbhTcoJF86F+St05KWWnmehtiJUcWSQzlzeU3IEISc0snot+9JcaLZJ8fvrZ+wP+c/GtqVwk4m7xu+/e+9QlhjdF1Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CPXeee+P; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nwlvj0BV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773247892;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6d/LkdYVX1QbyofflI+RZNGcLNUAjGX4JUh09PCAgUQ=;
-	b=CPXeee+PLnl6ntsIei+yUY04RewISvQuWoq9tgeh/XzTr01GO7JZ3bQ3tzCqAWZHQqLxpf
-	NA/fGLsyQAqjcD41aKawlCK9Ii/fpdHHTH6u5k9T6RiZOdD3QtYY/kpza7LMmqQLPtHQOu
-	Q/h84ZU2n8+NSXPCZrSe+3DDggO2uJ0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-rGoutYtXOvGG95LiQxDRxQ-1; Wed, 11 Mar 2026 12:51:31 -0400
-X-MC-Unique: rGoutYtXOvGG95LiQxDRxQ-1
-X-Mimecast-MFC-AGG-ID: rGoutYtXOvGG95LiQxDRxQ_1773247890
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-483786a09b1so439245e9.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773247890; x=1773852690; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6d/LkdYVX1QbyofflI+RZNGcLNUAjGX4JUh09PCAgUQ=;
-        b=Nwlvj0BVbN8Utke1RhkltAscrd1d1FqpJ1s0UaEODmtmVYQdaVJUEvJQ7itu4wx+oq
-         9oLKQvvDhEPqC+QcOEejfkmGnlN5+viTT20oLKpDFBoVUv1g0upKO/FNwe1CMb+BooUz
-         wxzZz8oZbmO6QwyG1S9YQTn2mC3myWyawdEFHX1DnwpAvlWrQEP0/a4hjoyIm7maxnZG
-         vitM/lyhKWAfVNaMI2UafV/eEDW+ethPEp12T+BRnNChYzwen+C3R+oywdV5Z7uRsUlo
-         UG95ZXs96l/2y/kcM9W42VKkWIpLrhZxJ8tJ7Ko6fCSU9MsP+DRU0s6P8XO81DuJIaTh
-         ydaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773247890; x=1773852690;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6d/LkdYVX1QbyofflI+RZNGcLNUAjGX4JUh09PCAgUQ=;
-        b=b2aDK1je3RbXEO8mGXhOvxEXTCEu42xjZxlsrMyoGTXxbgcmsHFJlUoxQ+U8JjzzJE
-         r/9My6DcPWRufwcd680w8mu8Ve78q6ZEjjvWyqFaHyB9XwN4iimT38ISjKU22s4yqRTp
-         cqaXX1xrvPmVLj89CAuESifvC37CNq59FguKBq1V8h295ueoZQN1w5STl3k0FoH0zSzH
-         I6T13V1+w+fPXjySLv5tv3BBbXPuvk81cxojWzFhh1X1JHDu8sX51C+X7++4PqnRNJGp
-         oF1/FXRQQJbwElB7buiHmdbidZotA7HnS6VXqK1w7WUQUIWnJpfTTsn/CKJbCNy3tEg7
-         8ZPg==
-X-Gm-Message-State: AOJu0YwOkYhRGhNpZJeqU+PTk7hhLVzHzXouIKj8LNd4av67nqCXAheN
-	llEtD3MtvyzwQecf2JTjD1ejpuwCekP4TD4qu+XPfit3cprfMPr1sXjDlMsVaJ+v0YMLxCSUEbJ
-	Thmr6Tl5HnydGBpVEVuFxMqtKPjHBmP+2TLRTXb+yoaSxhfqaBDCfQHC5UQ==
-X-Gm-Gg: ATEYQzz5q9D6LOeeiJ5ZI0kQeqApb0onM2vGJBcR1yx+EgDVPxcS010rFfQCwIVMgef
-	58ISLA1vXj1aD+x2V08iByF2G4VRK2tk9HvScuTYQPHt/HrxuFMBKjP+RnoDGXANlP6haxdqz6I
-	Cxj29HYRysBdDux5tBFDFKuArQLQfdybdb7Rl2GHiDzwDoYkXm1mk0N4jg5UIWCXwHccOtsxcKu
-	lWi0lqNfYV4sOU7DT2rUIboc5mnxi+gg87IeKYIXsXejz7/vlZtNUifgQ+Td0IAylogy239rv5D
-	1be5KaecbmC6GZ0/n6/EM3JhlACP7d5wAHWvVQjLYHc1JHsHqm5f86Vlyst++8NKNR9JPDmaylH
-	FL/26mWCYvSUNBCmJ1rV9QU95OrxX0IFLSEQUD0wA58vn67v/DotSkEFdG64=
-X-Received: by 2002:a05:600c:a009:b0:485:3b00:f92e with SMTP id 5b1f17b1804b1-4854b0a3c2fmr63080555e9.2.1773247889801;
-        Wed, 11 Mar 2026 09:51:29 -0700 (PDT)
-X-Received: by 2002:a05:600c:a009:b0:485:3b00:f92e with SMTP id 5b1f17b1804b1-4854b0a3c2fmr63080185e9.2.1773247889392;
-        Wed, 11 Mar 2026 09:51:29 -0700 (PDT)
-Received: from localhost (net-93-146-155-42.cust.vodafonedsl.it. [93.146.155.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485419c2930sm275892925e9.0.2026.03.11.09.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 09:51:28 -0700 (PDT)
-From: Paolo Valerio <pvalerio@redhat.com>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Nicolai Buchwitz <nb@tipi-net.de>
-Subject: Re: [PATCH v4 7/8] net: macb: add XDP support for gem
-In-Reply-To: <20260310232119.1254817-1-nb@tipi-net.de>
-References: <20260309144353.1213770-1-pvalerio@redhat.com>
- <20260309144353.1213770-8-pvalerio@redhat.com>
- <20260310232119.1254817-1-nb@tipi-net.de>
-Date: Wed, 11 Mar 2026 17:51:22 +0100
-Message-ID: <87cy1acnsl.fsf@redhat.com>
+	s=arc-20240116; t=1773247966; c=relaxed/simple;
+	bh=bWzneiJ4IHda7JaLKwlE8kyRQwSKFX283+EeLiYFgR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SR7Z2NdoXJUuxfCcfwbJbQPNIDe1YzsbvCP4nyPGf5xSJe1TZQZi8n0+mpiTSJOyQh+Ch6gLMevTcRbKrQCgmGg9AcfWLXeJ1aMJHPnZ9eR8E7cL3ygCkm/NoF1pvgu/Q8DFGPd7svjh3aGGgvId99fxzuW7mdkPbJmEzdqj/Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xBzYY7Vx; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IOU4FYp2Mavg+4y+nURWKTXm/MUcQxgEkuD1zFPesWk=; b=xBzYY7VxoM62hImxr1VBygl6qr
+	oXO4dWHonS5SVoay10fjrp5mvSX+n8VlxChnKaYb1MpmrjozaEEnAQmYpEj6UjSYXQFd425lUm6Tg
+	mTjag/ClBwdKsN0ahAuIyOSvjZAQJwUX4mglydDLFlYpmgPwWQ+nNg47JrqXgsU2qQoBoSE/t3V63
+	9DFW7XUKiY+t7HJyxyqA4fhhcIJOJmj8zernVMGCWe0VXXB09Yg+Sw3zGovcT5qk1hk46N83NinPl
+	ZWoWA24Dhm/H+1CC3cBNGHKSdEkeJ1pC7UMNMkDqmXuP/lX+p2bFy3rz/ybcz0XN93E1bGPuksF0u
+	HhNOiWGA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52112)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w0MnX-000000006g2-00uT;
+	Wed, 11 Mar 2026 16:52:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w0MnS-000000006OJ-43hU;
+	Wed, 11 Mar 2026 16:52:34 +0000
+Date: Wed, 11 Mar 2026 16:52:34 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Naveen Mamindlapalli <naveenm@marvell.com>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next v2 0/6] ethtool: Generic loopback support
+Message-ID: <abGd0kJb0zEn2Yzb@shell.armlinux.org.uk>
+References: <20260308124016.3134012-1-bjorn@kernel.org>
+ <aa7P7UUUG1p5RVwO@naveenm-PowerEdge-T630>
+ <87tsupnjbc.fsf@all.your.base.are.belong.to.us>
+ <aa/Jt36h3EuhpPKf@naveenm-PowerEdge-T630>
+ <de9f5282-6270-4bb5-b9bf-d80cbc977f14@lunn.ch>
+ <abEEuPa3/cThM40a@naveenm-PowerEdge-T630>
+ <0aa736b4-2c1c-4317-bcc1-1d4c9ad49380@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aa736b4-2c1c-4317-bcc1-1d4c9ad49380@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266707-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266708-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,kernel.org,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch,bootlin.com,broadcom.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.964];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 70DA12678F9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 43FAE267933
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 11 Mar 2026 at 12:21:19 AM, Nicolai Buchwitz <nb@tipi-net.de> wrote:
+On Wed, Mar 11, 2026 at 01:32:09PM +0100, Andrew Lunn wrote:
+> > > > With a SERDES component, the mapping becomes cleaner:
+> > > >   component  name         supported
+> > > >   MAC        mac          near-end
+> > > >   SERDES     serdes-ned   near-end
+> > > >   SERDES     serdes-nea   near-end
+> > > >   SERDES     serdes-fed   far-end
+> > > 
+> > > If Linux where to drive the SERDES, what part of Linux would it be?
+> > > Generic PHY? How does your SERDES hardware block fit into 802.3? Which
+> > > clause describes it?
+> > 
+> > Hi Andrew,
+> > 
+> > On OcteonTx2 SoC, the SerDes (GSERM) is a HW block integrated into the
+> > SoC die. It is not on an MDIO bus or any bus that Linux can enumerate.
+> > The block is fully managed by the firmware running on the SoC. The NIC
+> > driver configures it indirectly through firmware mailbox commands.
+> > 
+> > The data path looks like:
+> >   MAC (RPM) --- SerDes (GSERM) --- module/PHY
+> > 
+> > In 802.3 terms, the closest match would be PMA. The GSERM handles
+> > serialization/deserialization and the analog front-end.
+> 
+> A Linux Generic PHY is probably also PMA.
+> 
+> 802.3 says very little about SERDES, it is not a well defined term. So
+> i think we want PCS and PMA, not SERDES as a loopback point.
 
-> Hi Paolo,
->
-> Nice series! One issue I spotted that interacts with the EEE support
-> that's currently in net-next:
->
+That's a good point. I'm wondeirng whether to change "serdes" /
+"SerDes" in my stmmac patches to be "pma".
 
-Hi Nicolai,
-
->> +	spin_lock(&bp->lock);
->> +	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
->> +	spin_unlock(&bp->lock);
->
-> macb_xdp_submit_frame() writes TSTART without first waking the MAC
-> from LPI. The regular TX path in macb_start_xmit() calls
-> macb_tx_lpi_wake(bp) before TSTART for this reason -- the GEM MAC
-> has no auto-wake mechanism, so when TXLPIEN is set in NCR, TX is
-> blocked and frames will sit in the FIFO indefinitely.
->
-> This affects XDP_TX, XDP_REDIRECT and ndo_xdp_xmit. The fix should
-> be straightforward:
->
-> 	spin_lock(&bp->lock);
-> 	macb_tx_lpi_wake(bp);
-> 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
-> 	spin_unlock(&bp->lock);
->
-> macb_tx_lpi_wake() is a no-op when EEE is not active, so there's no
-> overhead in the non-EEE case.
->
-
-good catch! I'll make sure to add it to the next version, thanks.
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
