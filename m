@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-266428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBWPG3LWsGnLngIAu9opvQ
-	(envelope-from <netdev+bounces-266428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:41:54 +0100
+	id KFb/HUHWsGnLngIAu9opvQ
+	(envelope-from <netdev+bounces-266429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:41:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E0B25B0EB
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:41:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D5F25B09F
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:41:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C4429309023D
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:40:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CA6B230330DD
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D085F37188E;
-	Wed, 11 Mar 2026 02:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A85372B21;
+	Wed, 11 Mar 2026 02:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MKgPKkc6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bRho0y2r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBF336EABF
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 02:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F87A36EABF;
+	Wed, 11 Mar 2026 02:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773196830; cv=none; b=pM2XysPQHBWjz9awpTaDwBEbliWvJD475GbwbLWsJdHyHie3edfaEMxNB8w3D6tOIIdjJsR2TB11pd4zCiZVoV5aKhDUtcmmFfoTLV71vfvQz1UNNdccdJOVdYq60Tzx7ZOT5VhvnSu73/QkYC5dwic6/rhTag/H0ixCb/LTr4Q=
+	t=1773196832; cv=none; b=qIeK517CKc+EV3D+ZwUed1htqSHApia/r0MeZxT5jE4UdlQgdHus67OHIt8GOwudEU8aKZ2ri73CVyXOaQW6kV8CkNOr/URelUXTEto59/aGRKy5JgHfdvs+8F2qHR4R8YYSE7rWZ0HLKSbEuFpLYmFB8sh0p4+jN8L31xvLAgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773196830; c=relaxed/simple;
-	bh=x+26bV6NB48NsGQivd9Gz+0slvnxHCiCsxeUf5KMzU4=;
+	s=arc-20240116; t=1773196832; c=relaxed/simple;
+	bh=5eStcQIKsavYd2mr+kLuqtIxtZKjXn9Rnm4KonKjYs0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=M54se8m2pi5Njkx/jCQO705Nu++FnX4CAInSwu65/mQ2ZoCkVq5MvHQ3E0sXweobJHOQo/cWh0zXo+dh6S2KUm3GtGKCL20pkpGtkgnkCqlckCKWCNf5UK5nZCVF5sV8/JNRh4r+md3pQkSX0uGiUfyudHzLyw952lBePcPlemE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKgPKkc6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83331C19423;
-	Wed, 11 Mar 2026 02:40:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=k28qPBdFHxDAwdWh8MZHgyiMWkQv0wTzn1H2EFFpCzd/GyqLwZTjmVunqAfrPAKgPLBu3vjvOgUM4skqQGg8cSwvgrProlBUybViVRnArI+nPa63ltPikItvCtKn1RoNSiQ41OAju2Uq1ilGpbql3mOxsAG3uBB+sTa/xP7Cl+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bRho0y2r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC2BDC19423;
+	Wed, 11 Mar 2026 02:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773196830;
-	bh=x+26bV6NB48NsGQivd9Gz+0slvnxHCiCsxeUf5KMzU4=;
+	s=k20201202; t=1773196831;
+	bh=5eStcQIKsavYd2mr+kLuqtIxtZKjXn9Rnm4KonKjYs0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MKgPKkc6P1P/vK0QllPDRaptwebyfwc7Jx8BhZBDxcOaa6ebgm0zORN7TUZYgA7Bv
-	 GzfuZik9M9UIXwiLeHS2CbQ1pAvBAcw+655jn2Mn4ZwYZ4tkyqmg0R/mHUfLecJVPb
-	 KJmYmZKD9VEt7coNHc/5+Oo0wqqCeKFOYU3fJrYw01cars1p6QLpeAHrH3h+eZZ1rM
-	 5loOzW01nR1zoSRkAeEizwWxP28VoJGVw8gIGC4vcrgEPJZtfbwX/LFFC85qgVjeJz
-	 q/kuBImLUq+RXqNolcmbNxfIbqnKt3hhKPs5LsuDd9OwtlX7jHWp+Xy8e8d7dJ+TuB
-	 pqFbGh7u8Kc+Q==
+	b=bRho0y2r8sd4eU4s+7RzlduNeDCU1RBzH1U0in2lXv4uSPBuySwl5XNEeMJcSG/Fe
+	 BH0vhknG2CORrx30jcLF+2kdIy2aCEpDirvUCcnouaS4T1wHoub1Xjx718YsHSC9/r
+	 vVy/VVPcTq+9hrd6xLqyK9V9sUvkDoFZleeZh12hzx2g7ZdDq1TbBIXyN9P7lQSBlD
+	 kdqdjmJzE8flLJdW4K42RcYePNrayDsp1r+IpGX9st56JPhaxMA4sO90Q3vLQNSPt+
+	 JhBmoPhbZrAjQwXvPwXhNd1w3HyGrKbWYzYopqIVwlpEwXfL2N799hejCsOMUcMA3i
+	 Q6wpdbcs+Ojjw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FDCE3808200;
-	Wed, 11 Mar 2026 02:40:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF033808200;
+	Wed, 11 Mar 2026 02:40:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,47 +55,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ionic: Report additional media types from
- firmware
+Subject: Re: [PATCHv2 net-next] net: mvneta: support EPROBE_DEFER when reading
+ MAC
+ address
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177319682704.3014711.2482785792686293576.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Mar 2026 02:40:27 +0000
-References: <20260306215634.64550-1-eric.joyner@amd.com>
-In-Reply-To: <20260306215634.64550-1-eric.joyner@amd.com>
-To: Eric Joyner <eric.joyner@amd.com>
-Cc: netdev@vger.kernel.org, brett.creeley@amd.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-X-Rspamd-Queue-Id: E4E0B25B0EB
+ <177319682829.3014711.17648033774376846198.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Mar 2026 02:40:28 +0000
+References: <20260307031709.640141-1-rosenp@gmail.com>
+In-Reply-To: <20260307031709.640141-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, marcin.s.wojtas@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: 35D5F25B09F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266428-lists,netdev=lfdr.de,netdevbpf];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266429-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 Hello:
@@ -103,20 +107,19 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 6 Mar 2026 13:56:34 -0800 you wrote:
-> The device firmware supports reporting more media types than what was
-> there in the past, so map these new media types to existing ethtool
-> bits, which appears to be what other drivers do for media types that
-> match speeds but not physical spec.
+On Fri,  6 Mar 2026 19:17:09 -0800 you wrote:
+> If nvmem loads after the ethernet driver, mac address assignments will
+> not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
+> case so we need to handle that to avoid eth_hw_addr_random.
 > 
-> And while here, make a very small cleanup in ionic_get_link_ksettings()
-> to remove some unnecessary code duplication.
+> Add extra goto section to just free stats as they are allocated right
+> above.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] ionic: Report additional media types from firmware
-    https://git.kernel.org/netdev/net-next/c/1f9cab56e79e
+  - [PATCHv2,net-next] net: mvneta: support EPROBE_DEFER when reading MAC address
+    https://git.kernel.org/netdev/net-next/c/73a864352570
 
 You are awesome, thank you!
 -- 
