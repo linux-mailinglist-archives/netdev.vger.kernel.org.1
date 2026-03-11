@@ -1,232 +1,246 @@
-Return-Path: <netdev+bounces-266599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266602-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IC7OJJpGsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:40:26 +0100
+	id 4JrOLk9HsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266602-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:43:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F018262647
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:40:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283DD2626F1
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 287E1302AD10
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:14:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE1BF341F483
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0383AF650;
-	Wed, 11 Mar 2026 10:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968913CA4B4;
+	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="omvXq9dU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="up0mfz66"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6757F35F8A8;
-	Wed, 11 Mar 2026 10:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690973C9ECC;
+	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224096; cv=none; b=jktWi2TcFshHPe/yCkFZpLeCmCn5SiNvT4a2/ZesGk7RAyB4kpHFb77YX+iC6w+BvHl0bK7egpHnUh972JW8AvxWuulFmS+z6BCcNjRAc0UfengBpuXvhjsUwlU5xVVE+G8qFtbGOj8DE47pEG7Me8QUZHfifPjTSYt93I2U9dQ=
+	t=1773224292; cv=none; b=mKhOue6MNjyOHE9zmMd7LaUsOvGJNEoqOK3UTtuFXcVnMmYOPq6eTqhGyMvFtivJvwrgbsJQORIt++AFtIp3hMfp5Js7aJdtmyGtDaQ2s7CCwqs3C8aaImejC4XJoJyavOBWeuAhRpY3jAa+8yczFbm/50XeI9eSO0rOFp/5nLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224096; c=relaxed/simple;
-	bh=8NzBTafHxFIIYzj/NK+6B25hapn0+IoGoAIp8GSAk2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U8q1uHWpAvYSHMlrD3y3ZpIVj/2SrDGrgtYuaIVzyyX3Q4s37WHxI86f5+Vjt+riDapmDGKzDRR7f6Ho2Qc+VUbQajJdJJE01M+q8UvGThph6rdzdA8H/7gbI0QzXimBUv6N1UaSA2AIaT1zTiRH5NVNd7bs2m2uLFGPP8p40Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=omvXq9dU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37EDCC2BC86;
-	Wed, 11 Mar 2026 10:14:53 +0000 (UTC)
+	s=arc-20240116; t=1773224292; c=relaxed/simple;
+	bh=Hicf9XQr1VM3rKrvaseGCP1p6RgZxal1WiVh3tjqMqU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cqPSPV2JOCEB4xYzw7rvZQfzOpQBCh9sOqw5t09bWicEoEfHbiOF2gd1CIJFoy/bilHb+smxMdeMemnqw9kTxUAMk6K6rnjcZpijB4PG13WSu0B2SIhjsJPktHCsaE2oKaIhEqMuKaB6PyYG+crhGkbsHztRfxxGX2cdpUFJv5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=up0mfz66; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ED416C2BC86;
+	Wed, 11 Mar 2026 10:18:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773224096;
-	bh=8NzBTafHxFIIYzj/NK+6B25hapn0+IoGoAIp8GSAk2E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=omvXq9dUVQ+8IEM4NP4nwWQTatXPPeZdmycSZhv/Qow9WNXIG6PXAxerxp3XY2UxY
-	 83entbEZw2AX1bg5/HQXnlgPYg08Q/BBtCeauWK3wfhbUcDe9VcUwO4jYncYAkDEZN
-	 lEjReDZHF65LF34/dZUwINs1eT9qZih1Z7GqhgbNmf3XPBchzgubdhXH6XOz/HCbk7
-	 sj/tmK4gljCTt189DfGMWlOHx3vSyCwQ1ddLG55Ca+PBMlmcXMEBBPFNxRYjxLs0v3
-	 wa7Mm+wSUiZ+Sac0HNu3TU2zBlSQRcOyQEovsSESMFzyCsFLLvl9a1Yj/h23Ib8wCL
-	 SMqtIflOJ1Rlw==
-Date: Wed, 11 Mar 2026 10:14:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: cjubran@nvidia.com, matttbe@kernel.org, chuck.lever@oracle.com,
-	shshitrit@nvidia.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, sgoutham@marvell.com, jiri@resnulli.us,
-	davem@davemloft.net, saeedm@nvidia.com, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com
-Subject: Re: [v3,net-next,5/5] octeontx2-af: Add support for loading custom
- KPU profile from filesystem
-Message-ID: <20260311101450.GR461701@kernel.org>
-References: <20260309024619.898211-6-rkannoth@marvell.com>
- <20260310172100.890161-1-horms@kernel.org>
- <abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090>
+	s=k20201202; t=1773224292;
+	bh=Hicf9XQr1VM3rKrvaseGCP1p6RgZxal1WiVh3tjqMqU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=up0mfz66SzSTWbt72UdQ419+7BArGOpvZnTkJE1Z2munD4z6s+BwQckqMw4oL2jhq
+	 iTaCB+VVvcgeXvJllZpd0kfkCUfDJn16rxLjsxcZfrlSI2wJJRbXk89B9b6hnfBjI3
+	 R5uJ59KqA8n6pSoLwJShE+yevgc5nVYr6HchNhqt7V9AqMlY6zUM2zjPARn8BD5bAO
+	 ao0wEwsawnXnBw9/PLxF7TS2Hv9ia6Jhvrw88hQuVCOYl99TqdJMmhNl3eJ4K7y9Ii
+	 ME9MTQDEEana55hjLcHF3OSrlTTa+2Za9w5ojlbNYlus44PN0F7Lonp7IlzV67Resu
+	 qfdWLFHFVHonA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB74D1049515;
+	Wed, 11 Mar 2026 10:18:11 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH v10 0/5] Support multi-channel IRQs in stmmac platform
+ drivers
+Date: Wed, 11 Mar 2026 11:17:57 +0100
+Message-Id: <20260311-dwmac_multi_irq-v10-0-7ab1669759b5@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090>
-X-Rspamd-Queue-Id: 3F018262647
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFVBsWkC/23SzU7DMAwA4FeZcqZT7Pw04cR7IDQlacwi0Xa0o
+ wxNfXfSAVpRerQlf7ZsX9kYhxRH9ri7siFOaUx9lwPgDzsWjq57jVVqcoIhRwXIbdV8ti4c2o+
+ 3czqk4b2yjSHNpcYQgOWq0xApXW7k80uOj2k898PXrcMES/bXAllYE1S8ElppdJ5HS/VTP4777
+ nLah75lizbhn6B5JkoBF8EbtCh4w2soBbEWRCmILISgBKGPxuoNQa4FUwoyCwbJCUmBkLAU1F3
+ ArRnUIlDQ1jpFLshS0GtBlYLOAkrlCZoagIdSqNeCLoU6C2QoCm+z4zdmMHdBbHzGZBaB5136Y
+ ADcxjXtSoCNa9ofgYtIpuFA/4V5nr8BuZSrXsECAAA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
+ Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
+ NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ imx@lists.linux.dev, devicetree@vger.kernel.org, rmk+kernel@armlinux.org.uk, 
+ vladimir.oltean@nxp.com, boon.khai.ng@altera.com, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773224290; l=4792;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=Hicf9XQr1VM3rKrvaseGCP1p6RgZxal1WiVh3tjqMqU=;
+ b=xlnICUKnVumeJjPG6VajLwl7SIOUWEWDx+liXIWqpzOHTDlUmge9ojm7sM6dRgcWCSEqffruO
+ B1EpOLRO8lgAMSEMgL2tv3BF/OkSA+7b5//qKE2x6zKhCLPpQiIkmTj
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
+X-Rspamd-Queue-Id: 283DD2626F1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266599-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266602-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,oracle.com,vger.kernel.org,marvell.com,resnulli.us,davemloft.net,google.com,redhat.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	HAS_REPLYTO(0.00)[jan.petrous@oss.nxp.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,oss.nxp.com:replyto,oss.nxp.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Mar 11, 2026 at 08:45:40AM +0530, Ratheesh Kannoth wrote:
-> On 2026-03-10 at 22:51:00, Simon Horman (horms@kernel.org) wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> >
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> > ---
-> > octeontx2-af: Add support for loading custom KPU profile from filesystem
-> >
-> > This commit adds functionality to load custom KPU (Key Parse Unit)
-> > profiles from the filesystem at module load time, providing an
-> > alternative to flashing updated firmware on deployed devices.
-> >
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-> > > index cefc5d70f3e4..5928c4d3cc8b 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-> >
-> > [ ... ]
-> >
-> > > @@ -290,6 +303,7 @@ struct npc_kpu_profile {
-> > >  	int action_entries;
-> > >  	struct npc_kpu_profile_cam *cam;
-> > >  	struct npc_kpu_profile_action *action;
-> > > +	struct npc_kpu_profile_cam2 *cam2;
-> > >  };
-> >
-> > [ ... ]
-> >
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> > > index a466181cf908..1efc53b63b67 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> >
-> > [ ... ]
-> >
-> > > @@ -553,8 +553,8 @@ struct npc_kpu_profile_adapter {
-> > >  	const char			*name;
-> > >  	u64				version;
-> > >  	const struct npc_lt_def_cfg	*lt_def;
-> > > -	const struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
-> > > -	const struct npc_kpu_profile	*kpu; /* array[kpus] */
-> > > +	struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
-> > > +	struct npc_kpu_profile	*kpu; /* array[kpus] */
-> >
-> > [ ... ]
-> >
-> > > @@ -564,6 +564,7 @@ struct npc_kpu_profile_adapter {
-> > >  	bool				custom;
-> > >  	size_t				pkinds;
-> > >  	size_t				kpus;
-> > > +	bool				from_fs;
-> > >  };
-> >
-> > [ ... ]
-> >
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > > index 352dc5f1d5b9..05aabe26f030 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> >
-> > [ ... ]
-> >
-> > > @@ -1610,6 +1622,7 @@ u64 npc_enable_mask(int count)
-> > >  static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
-> > >  				    const struct npc_kpu_profile *profile)
-> > >  {
-> > > +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
-> > >  	int entry, num_entries, max_entries;
-> > >  	u64 entry_mask;
-> > >
-> > > @@ -1621,10 +1634,15 @@ static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
-> > >
-> > >  	max_entries = rvu->hw->npc_kpu_entries;
-> > >
-> > > +	WARN(profile->cam_entries > max_entries,
-> > > +	     "KPU%u: err: hw max entries=%u, input entries=%u\n",
-> > > +	     kpu,  rvu->hw->npc_kpu_entries, profile->cam_entries);
-> > > +
-> > >  	/* Program CAM match entries for previous KPU extracted data */
-> > >  	num_entries = min_t(int, profile->cam_entries, max_entries);
-> > >  	for (entry = 0; entry < num_entries; entry++)
-> > >  		npc_config_kpucam(rvu, blkaddr,
-> > > +				  adapter->from_fs ? (void *)&profile->cam2[entry] :
-> > >  				  &profile->cam[entry], kpu, entry);
-> >
-> > Can this dereference NULL when from_fs is true for KPUs not covered by
-> > the filesystem firmware?
-> >
-> > Looking at the filesystem loading path in npc_apply_custom_kpu:
-> >
-> >     for (kpu = 0; kpu < fw->kpus; kpu++) {
-> >         ...
-> >         ret = npc_alloc_kpu_cam2_n_action(rvu, kpu, entries);
-> >         ...
-> >         for (entry = 0; entry < entries; entry++) {
-> >             profile->kpu[kpu].cam2[entry] = cam2[entry];
-> >             ...
-> >         }
-> >     }
-> >
-> > The code allocates cam2 and populates entries only for the first
-> > fw->kpus KPUs found in the firmware blob.
-> >
-> > However, npc_program_kpu_profile is later called for all KPUs in
-> > npc_parser_profile_init:
-> >
-> >     for (idx = 0; idx < num_kpus; idx++)
-> >         npc_program_kpu_profile(rvu, blkaddr, idx, &rvu->kpu.kpu[idx]);
-> >
-> > Since adapter->from_fs is a global flag (not per-KPU), when idx >=
-> > fw->kpus, profile->cam2 remains NULL (the default npc_kpu_profiles[]
-> > static initializer doesn't include cam2), causing &profile->cam2[entry]
-> > to compute an invalid pointer.
-> >
-> > Shouldn't there be a check to verify cam2 is non-NULL before
-> > dereferencing it, or allocate cam2 for all KPUs when from_fs is true?
-> 
-> The filsystem binary contains entries for all KPUs. So we can ignore this
-> case.
+The stmmac core supports two interrupt modes, controlled by the
+flag STMMAC_FLAG_MULTI_MSI_EN:
 
-Maybe it is just me. But I don't think it is entirely satisfactory for
-the kernel to rely on data supplied from the filesystem being well formed.
-E.g. what if it is corrupted?
+- When the flag is set, the driver uses multi-channel IRQ mode (Multi-IRQ).
+- Otherwise, a single IRQ line is requested (aka MAC-IRQ):
 
-I think all the points in the AI generated review hinge on this.
-So let's try and agree on the basic principles and move on from there.
+static int stmmac_request_irq(struct net_device *dev)
+{
+        /* Request the IRQ lines */
+        if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+                ret = stmmac_request_irq_multi_msi(dev);
+        else
+                ret = stmmac_request_irq_single(dev);
+}
 
-...
+At present, only PCI drivers (Intel and Loongson) make use of the Multi-IRQ
+mode. This concept can be extended to DT-based embedded glue drivers
+(dwmac-xxx.c).
+
+This series adds support for reading per-channel IRQs from the DT node and
+reuses the existing STMMAC_FLAG_MULTI_MSI_EN flag to enable multi-IRQ
+operation in platform drivers.
+
+The final decision if Multi-IRQ gets enabled remains on glue driver
+to allow implementing any reguirements/limitions the focused platform
+needs.
+
+NXP S32G2/S32G3/S32R SoCs integrate the DWMAC IP with multi-channel
+interrupt support. The dwmac-s32.c driver change is provided as an example of
+enabling multi-IRQ mode for non-PCI drivers.
+
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+---
+Changes in v10:
+- Fixed yaml issue
+- Link to v9: https://lore.kernel.org/r/20260311-dwmac_multi_irq-v9-0-f0c03ef8d01f@oss.nxp.com
+
+Changes in v9:
+- Changed interrupt minItems from 11 to 1 to support backward compatibility
+  and removed the 'Reviewed-by' accordingly for patch 4
+- Link to v8: https://lore.kernel.org/r/20260309-dwmac_multi_irq-v8-0-f0cc5bc811a7@oss.nxp.com
+
+Changes in v8:
+- Rewritten queue irq getter, based on Russell's (ready-to-use) hint
+- Renamed s32_gmac_validate_multi_irq() to s32_gmac_setup_multi_irq() to
+  better describe the functionality
+- Fixed typo in commit message for patch 5
+- Renamed label in patch 5 to make it more descriptive
+- Link to v7: https://lore.kernel.org/r/20260226-dwmac_multi_irq-v7-0-f8fe3b945bb4@oss.nxp.com
+
+Changes in v7:
+- Optimized 2 similar loops on queue rx/tx irq reading
+- Swap the yaml and dts patches with hope it fix dt_binding_check failing
+- Link to v6: https://lore.kernel.org/r/20260225-dwmac_multi_irq-v6-0-245bf1d7110c@oss.nxp.com
+
+Changes in v6:
+- Added 2 mintainers which were not covered by 'b4 prep --auto-to-cc'
+  but complained on patchwork check
+- Added helper macro for loop over queue-based arrays (inspired by AI
+  review)
+- Added full validation on all channel IRQs
+- Link to v5: https://lore.kernel.org/r/20260223-dwmac_multi_irq-v5-0-8fc699a5fac4@oss.nxp.com
+
+Changes in v5:
+- fixed typo in "symetrical"
+- cleaned negative return value on platform_get_irq_byname_optional()
+  in stmmac_get_platform_resources()
+- rebased on v7.0-rc1
+- Link to v4: https://lore.kernel.org/r/20260128-dwmac_multi_irq-v4-0-82fa34fcf2f2@oss.nxp.com
+
+Changes in v4:
+- Fixed IRQ reading check
+- Made cleaner the IRQ validity (to get AI reviewer happy)
+- Fixed minItems of interrupts property in yaml
+- Link to v3: https://lore.kernel.org/r/20260123-dwmac_multi_irq-v3-0-cc53f2be8961@oss.nxp.com
+
+Changes in v3:
+- removed RFC prefix
+- rebased on v6.19-rc6
+- fixed forgotten extra line setting to Multi-IRQ unconditionally
+- fixed yaml
+- Link to v2: https://lore.kernel.org/r/20260121-dwmac_multi_irq-v2-0-3b829230d071@oss.nxp.com
+
+Changes in v2:
+- Fixed incorrect buffer len for 'rx-queue-%d' property check
+- Added backward compatibility to not break old settings
+- Fixed DT example in yaml
+- Link to v1: https://lore.kernel.org/r/20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com
+
+---
+Jan Petrous (OSS) (5):
+      net: stmmac: Use helper macro for loop over queue-based arrays
+      net: stmmac: platform: read channels irq
+      arm64: dts: s32: set Ethernet channel irqs
+      dt-bindings: net: nxp,s32-dwmac: Declare per-queue interrupts
+      stmmac: s32: enable support for Multi-IRQ mode
+
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 47 ++++++++++++++++--
+ arch/arm64/boot/dts/freescale/s32g2.dtsi           | 26 ++++++++--
+ arch/arm64/boot/dts/freescale/s32g3.dtsi           | 26 ++++++++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    | 36 +++++++++++++-
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       |  3 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 16 +++---
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 57 +++++++++++++++++++++-
+ 8 files changed, 191 insertions(+), 22 deletions(-)
+---
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+change-id: 20251209-dwmac_multi_irq-9d8f60462cc1
+
+Best regards,
+-- 
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
+
 
