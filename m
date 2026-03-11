@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-266421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0EFsHYHTsGmLnQIAu9opvQ
-	(envelope-from <netdev+bounces-266421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:29:21 +0100
+	id kJPHI7fTsGmLnQIAu9opvQ
+	(envelope-from <netdev+bounces-266422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:30:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8CA225AF6E
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:29:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C5425AF8E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFDF43070164
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:28:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7661A3064F3F
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5548E2D97AA;
-	Wed, 11 Mar 2026 02:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F7D3164D6;
+	Wed, 11 Mar 2026 02:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qc9p90vr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9KyyTmQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320DAEEC0;
-	Wed, 11 Mar 2026 02:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84662D73B9;
+	Wed, 11 Mar 2026 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773196124; cv=none; b=Lpk1NznNJJPma7/9fl22/CSLsKf2Jf6gJZtohqXZx6J9HmpnPrTPKmWxSYjRQf+UxTBa/HPj0jw+8QZStkYNrLjUtfK6wP4jp4qnQVQv88IEQVpfIhErrH37KqZ/MCz7tAFaoZzqH2YwR9hw9xu2hQjYCXlj5cTYvy1I1e8eJgQ=
+	t=1773196212; cv=none; b=HK0+F44C6XCQfK31K9Swrh60vkKtJ1107JF846yaFij6I9tAjzKpX/cuBapA/QcH/B6cTBXSAXalTWuGZlz4sfAhwDyp7SFskik3H4+t9TNSP9f6dLDQBa9EGHuOY8q7VCjg7WIBFyAru3pmuZDKtWHyunFgnAYQaOISJ+0vus0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773196124; c=relaxed/simple;
-	bh=kHUhOKfm6EhYoR1ZSmXpxs6iSlwDqVibrXnaqUm+ZyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lsRj9hDXKjEYIoqq7fnxwk10kAWqXeMOalONiZ5Pjf2LkmHLabOqLCx4QlKEUD9wHbhvdYKLIK6WqZDyFRIG7AwAhvK6KPSx5/24q+xhlP7ADzGpotOFZIE7IDHhxdPBPSjXAR8bTwu+R3gG77zR7YihryyO3MEAemkCnkQ6Scs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qc9p90vr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65CE3C2BC87;
-	Wed, 11 Mar 2026 02:28:43 +0000 (UTC)
+	s=arc-20240116; t=1773196212; c=relaxed/simple;
+	bh=/mhdTkWcFYzfhmabe4wdOfcjP4DM+L6htZA3voec/MM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FaVKHvnu4dBPd0ZH0BM9b7Y5eOLJaHoRltI1bGNqbIgMOrsKiXisr8lCzOvFsF9FxI85VQH1AIp9k8pQHoLW3yDZJ9DOjgfGNAoDdX3hQGrFc8RqouE4O0TP2dW7BPHzMqshTG1EcMRfZNISiOypf7ZbGdqXcfVnA8f7zE/SC38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9KyyTmQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C44C19423;
+	Wed, 11 Mar 2026 02:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773196123;
-	bh=kHUhOKfm6EhYoR1ZSmXpxs6iSlwDqVibrXnaqUm+ZyY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qc9p90vrsxl2S2oOvzVknpXAtSV9SDR2xko1hMCnji/mxbS7k5EHWuejElmAT4PFH
-	 2iIR4laFcFzzNGjPqZcNd9G0OEf+eoHbCUpA3Ekh3O26MqJqlEVHEn6p/57oukFLjq
-	 K/fkVt81U84hfgM8qLpf/xb7NTuUEK8I+VTH+DmxEpr2Q0+eoLzefqFK/SNNp9xZ2j
-	 2Yh6WGbyrfnMEb722cNDVmYh8JlUMs4AnR1k7AsfvTv7HUpdusl5Pep35rd5nDWjt2
-	 fAg/t8nisHq08xsBQoJK4/QXE5rGnSMKVDitlIO5k4/vXJYOFwM/KcYPKQdGaKTLKU
-	 8tWix0Wrm75UQ==
-Date: Tue, 10 Mar 2026 19:28:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paul Moses <p@1g4.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, jiri@resnulli.us, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net-shapers: clear hierarchy pointer and defer
- flush frees with RCU
-Message-ID: <20260310192842.3c3b2070@kernel.org>
-In-Reply-To: <20260309173450.538026-1-p@1g4.org>
-References: <20260309173450.538026-1-p@1g4.org>
+	s=k20201202; t=1773196211;
+	bh=/mhdTkWcFYzfhmabe4wdOfcjP4DM+L6htZA3voec/MM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=b9KyyTmQRKi3wypiAFEfMxmT3t//XKlohjJ0qppXibViwBAt5j7RrOjyBEVEHdTEB
+	 EoebxEX1K5DF330tjf6X9owHEYqNuKI6AxvADT559SU4r8a+WubJWKuUPeOLnkJvVQ
+	 M9eq+EtPY5SXk98XQ6X+aZsPq2rW1uLaXN7KRxWWJftUd/+KWcf/q5JvEQ6fzGPXuq
+	 s+WN5BGvhLT1Qdc12R6Y51fNhEa3hGvF/Srwuyry4vcvQxDYssnC0U7bikkwp+FJpL
+	 mZQF+C6KNK66jXcKfO1BmrAMxb0Y8hZ+1gymsYsKbR0IFBWiiymNdGgV0U6gJMmQKQ
+	 xOBWvDll4YZAw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FEDA3808200;
+	Wed, 11 Mar 2026 02:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C8CA225AF6E
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: dsa: mxl862xx: don't set user_mii_bus
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177319620777.3011849.7918373050266861971.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Mar 2026 02:30:07 +0000
+References: 
+ <0f0df310fd8cab57e0e5e3d0831dd057fd05bcd5.1773103271.git.daniel@makrotopia.org>
+In-Reply-To: 
+ <0f0df310fd8cab57e0e5e3d0831dd057fd05bcd5.1773103271.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: E0C5425AF8E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266422-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-266421-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
@@ -94,25 +100,32 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, 09 Mar 2026 17:35:06 +0000 Paul Moses wrote:
-> net_shaper_lookup() and the GET dump path traverse shaper state
-> under rcu_read_lock() without taking the shaper lock. During
-> teardown, net_shaper_flush() freed both the shapers and the
-> hierarchy with kfree(), but netdev->net_shaper_hierarchy still
-> pointed at the freed hierarchy.
-> 
-> This lets GET readers race netdevice teardown and walk freed
-> xarray state or freed shaper objects.
-> 
-> Detach the hierarchy pointer from the netdevice under the
-> shaper lock before teardown and switch the shaper and hierarchy
-> frees in flush to kfree_rcu().
+Hello:
 
-This is not the right fix. The shaper hierarchy as a while is not under
-RCU. The problem is that we take a ref on netdev and then lock it,
-assuming that it's still alive. But it may have gotten unregistered in
-the meantime. The correct fix is to check that the netdev is still
-alive after we lock the binding or take RCU from the Netlink side.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I'll take patch 2 it looks obviously correct.
+On Tue, 10 Mar 2026 00:41:56 +0000 you wrote:
+> The PHY addresses in the MII bus are not equal to the port addresses,
+> so the bus cannot be assigned as user_mii_bus. Falling back on the
+> user_mii_bus in case a PHY isn't declared in device tree will result in
+> using the wrong (in this case: off-by-+1) PHY.
+> Remove the wrong assignment.
+> 
+> Fixes: 23794bec1cb60 ("net: dsa: add basic initial driver for MxL862xx switches")
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: dsa: mxl862xx: don't set user_mii_bus
+    https://git.kernel.org/netdev/net/c/f441b489cc66
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
