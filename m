@@ -1,433 +1,231 @@
-Return-Path: <netdev+bounces-266667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2O0DLCuBsWmjCwAAu9opvQ
-	(envelope-from <netdev+bounces-266667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:50:19 +0100
+	id mEg3LrmDsWmjCwAAu9opvQ
+	(envelope-from <netdev+bounces-266668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:01:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3228D265B92
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:50:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F9D265EB9
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 35E9630A5CD5
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:48:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6469431107A3
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AA83D6462;
-	Wed, 11 Mar 2026 14:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EFB3E3C51;
+	Wed, 11 Mar 2026 14:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RzdMeCjd"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="fuMUlx6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013014.outbound.protection.outlook.com [40.107.159.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3635A3D5236
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 14:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773240468; cv=none; b=pg6YUPHJnRBS0XHQ2I8PB6Xw7bDIa16Y1cz1zBQDf1IcmAbQ8m20zNhUU3pKKHw3vB3sGsY++oqtFI3/T9MGVtHl+MTA9m8aW6ehrarCK3keFz7swBNKGlSM290W9UsF2nF5+2Hu0rNz4CiFVB7ly9VCXTczIvnu7z5cHgsmunY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773240468; c=relaxed/simple;
-	bh=M0M513xG9QJd0xlU03Fihqwn8kUOVJm+JuiFoPZVfPI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VTDGghdsri0EgqOfF9evOgar+/qN631wwZyghvUgjv1YOHubvwzaIS50Iea+7R0pH4VOUOQe1Y1BbqDs1d8cZFWhB6z+oN17xqvj+f6hNiRHZ0fRdaaOrkWwREyrYBuNqwTXnkdDbPOEe0byAfMphgHz17hmBpH/rPFI85rZq/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RzdMeCjd; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-439b6d9c981so1053f8f.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773240463; x=1773845263; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9OcgCVoXpwmk9jK46IQdFKL4LgjvcP8o4RT8R4WmikQ=;
-        b=RzdMeCjdRBSLy/nEidWIdmWX33QoHiOoIBtG5yCc/W+1jKl2zPJPmBaqytW0Ji4ywh
-         MXKN8XSrFkqiGXwnD6QzghV39GTDYMM0svwQmybhpsBAV4GbdBrWYV26fhE0A56bh2AM
-         MZRXlN2aASCvMT1bf20MJtnFrKsYCVVugHngRNg+1Fxz5sDu/c72/bsnEBZACTw4HyTg
-         lmBmzBBwCYy0dw3Rc9wHWPJutVBK/CAl25K4el7kT5x9cbCZefSi2eqjQC4P7igRrLO9
-         Fl4F7vwhWfsCysxv8Yjn+VR5sVDGZr6E0qt97SsGlBwI08UhKScvs2s3xPONZ7WK6ctK
-         4I/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773240463; x=1773845263;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9OcgCVoXpwmk9jK46IQdFKL4LgjvcP8o4RT8R4WmikQ=;
-        b=GlnMIMbRTKyrrUzVoq3LSks4atUBIzt5JZkswYoIIBH7G4lmP2zn4e5rjc+ZBG4x10
-         4NQ79I82nTe/Hwxh0yvrMr7tNvyIgd3SDvC4H6dFBh4xHpGpr4aCbBnSh2bnnnjsjoGQ
-         46vDYAJaDp37XXLQNH0hLW8lKBJ6duC6HpZZuCbtN4jLoK7f4VzS88NSqynYaU4Pn/OW
-         9uHn9YgTMaLI/vT662QGhn703fVPrVd2yo4lmNjMD8kPDLzW7ebbG/+AAK1CVRfWPE4t
-         uI2Oq0vGajpgP92EnFrSbni0hSXm9ujSLpzSZUlfTC+VPHoC+zPKFDDmunKACkBJHSnU
-         Q7lg==
-X-Gm-Message-State: AOJu0Ywg62Z4l+JAvxRKqOTEeo4kRFrJSal74agyulf/iF+sQQWQLbcd
-	+Nx4CgibaJYCGbtbbrkD/2z6Y9g5yEYaoNi83JAZq8zSjJ1pxq/AJFqS
-X-Gm-Gg: ATEYQzw7RgMxR3SNijxbTM90qSEsME7QlL6HmbfDqzXSULMsVerpWmh7VXJsGq2D/WQ
-	Uofw630TWZJYQb/QJdi9OkfqJOJZnu8IhEQdexFGitmhs6sHCqcJe01Y4cqwbC1kWDOSnVI3vN/
-	cap/spBgKlwozEH5uGjHRCpNz9sIY9fSCKllDnuU1nrn9e7cXSRp1p2TrYo0C58K50ytYgWMg04
-	L3r7pjAfclggkkdRlUn1OHcxjXgZCX3UQ0dTMtt+4PLwuDtFUG7+PUjjb+FtzHfrzplXHjrvNew
-	G+abZ4qkJevh2ibj8ryb28HCbhS1p7Fc5I1SmAUhlAQm+5broLIT5G+IqH8lNWx3EqmApt/5KA/
-	lhjbfob1vJKyREDM2dFznpDYr8aKxUclFLtsgSEsqduU/37/59M9WM3zLa0D55t6IceTKu0KZ49
-	WT1XGGgCFdlrS3bHWhaOoEbwfNhW5v2uTl/h4Ciw==
-X-Received: by 2002:a05:6000:2dc1:b0:439:936b:c006 with SMTP id ffacd0b85a97d-439eff5ecebmr13646536f8f.20.1773240463156;
-        Wed, 11 Mar 2026 07:47:43 -0700 (PDT)
-Received: from localhost ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f81a0480sm7127501f8f.12.2026.03.11.07.47.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 07:47:42 -0700 (PDT)
-From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- ameryhung@gmail.com, kernel-team@meta.com
-Subject: Re: [RFC PATCH bpf-next v2 01/11] bpf: Set kfunc dynptr arg type
- flag based on prototype
-In-Reply-To: <20260307064439.3247440-2-ameryhung@gmail.com>
-References: <20260307064439.3247440-1-ameryhung@gmail.com>
- <20260307064439.3247440-2-ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 14:47:42 +0000
-Message-ID: <87o6kutoc1.fsf@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436823009D4;
+	Wed, 11 Mar 2026 14:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773240723; cv=fail; b=R68gcox/rtr6M1reBEvzDLmNUSoeRaziS5qg2s1RZOd7T8tIti/PS3xc+kYSN04+8kqwMxwsntcrtA95Px6Anr+g6irTrwoQy9bbJwfKByTqWUI0Rp+1NFoW8eRzuPA8Hp10nPvhW7iWe4HcgxLVIpZOh+uznoMCUmBlN4+CCdk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773240723; c=relaxed/simple;
+	bh=wthAECyhIVWoFyJZ7fSavqwwgVNREKoT1IIVXhssLkQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HsV4KcfIeJa80kYNEsL4fjLa709/NSdTLODnevWjrO4YEKb2+nYiRVfDbPkP7g0D5OjIX6/Uj+qdoHXa3trWj4REUX3aYrYhWe+y9BFZZhDY6ghETP+Lq/Lo4ckYVcWSx1Zb4y6ZYlG6u0978icG7PhoOqM5pankcvMg+wXdl04=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=fuMUlx6Y; arc=fail smtp.client-ip=40.107.159.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HEMJByiEFKgD3W4OJ5FFmPGLJk4COlk/6MYlBrSD8KKSs2zVeL660jb+sR7Dba+8YQdiiYNJcEaMk2EpRgpNdF6LBqZB+bZVvREybzjb0R0yI9uCJS3kk5/7jRIDY+Zy3fwDqXtaNaVrG5yywuSKDIXeFfK26yhWCSxYAUT/lblds/3Y/8SuIAvHR9fF8VFaT+Me0iXD3Ebv344iirmQR3oqg7fL9lowgHZdwYalt6hQZ1ffp7aQix9u5+7I5+t0cCw7ugtnV+gdK9yYA8R3gj+SlKsTc6jBduuGVH4ZY5Ae16VejT9YftZpkRgfN322lseBkTSFvC7i/kHdYHPiZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HI5pQZw6QKOSqbMo6pPtdDTVXPQGtN+mOtIoN+bG+B0=;
+ b=C70Z9JdCefQ2Jdx3zgVIL1DCYT4LoHM75UAPe1QRjqDNHretVMYLaN+yXa9c2AG/J9lIS7J13vhraJdxcgj0p9baTnwHhYjyUYcv2wQtilDsv6Q62tPulKD0SLC2nmNE02i1Wm4qA+HmM+4Xrte2mIdBemVIMDCHfbpxEo8RPPMRyLwbRkdJwvGwCJvq2AsIR9O7tPtsBvUJ62Vv85SuNTxCmCv3sDHVzmKUHbouwphzv1vy02yh/QiDUuybDJnIgzjIpZKmA6HHwDL4RYWwZDo7HW5pXyfwMm2UTCzO6Ar5/m+P0K6RBqHe8p7FXIeCscJlt4ueg2B8ckCgJQK6zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HI5pQZw6QKOSqbMo6pPtdDTVXPQGtN+mOtIoN+bG+B0=;
+ b=fuMUlx6YU0OAXe5PB+Z0gyt5fOoQzCD6dn1o34ubPPZA+7xMKql404kLkYCpBCFZjMTwSkbS470iTW/Ew5EMFynRo0nIebitKbbrb6OTWceVLRm1R7HKFmyLeJLvg+6X8tEIB+QGy1rrPyHIv2r8hNXsb9inQPXmo6+N7T08WpeRu4+/QViAGR7245CzOWc081cKpddboGpUQEVoRkgbs2wDeGUbhP0VpDJ/24tY4j1vJpJ7/yl5uWVLrJQKrH235xYc11hXfb2f+f5fxmjJ4gx79AiRS5RNIUX3o2eblp7eV2BRr015o2VvVGHF5xPgP4HWyoNWnBD+IGXqsZ9v7A==
+Received: from PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:a2::8)
+ by DB9PR10MB6004.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:39f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Wed, 11 Mar
+ 2026 14:51:57 +0000
+Received: from PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::bcf7:efb8:212:4fdd]) by PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::bcf7:efb8:212:4fdd%3]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
+ 14:51:57 +0000
+From: "Bouska, Zdenek" <zdenek.bouska@siemens.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Richard Cochran
+	<richardcochran@gmail.com>, Song Yoong Siang <yoong.siang.song@intel.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>, Vinicius Costa Gomes
+	<vinicius.gomes@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"Bezdeka, Florian" <florian.bezdeka@siemens.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2] igc: fix page fault in XDP TX
+ timestamps handling
+Thread-Topic: [Intel-wired-lan] [PATCH v2] igc: fix page fault in XDP TX
+ timestamps handling
+Thread-Index: AQHcpj1ShQMklK5X6UG86S4EbCzDnrWTPMOAgAL4PcA=
+Date: Wed, 11 Mar 2026 14:51:57 +0000
+Message-ID:
+ <PR3PR10MB4270AE69139227E56F4D4842EB47A@PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM>
+References:
+ <20260225-igc-fix-xdp-tx-tstamp-pagefault-v2-1-bf797ec20f3b@siemens.com>
+ <5d2c5f84-436f-4681-ad81-9900a8563b61@molgen.mpg.de>
+In-Reply-To: <5d2c5f84-436f-4681-ad81-9900a8563b61@molgen.mpg.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_ActionId=46ba3ac2-d69d-4d84-8b63-839bc8b76bfe;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_ContentBits=0;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Enabled=true;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Method=Standard;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Name=restricted;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_SetDate=2026-02-27T08:11:56Z;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_SiteId=38ae3bcd-9579-4fd4-adda-b42e1495d55a;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PR3PR10MB4270:EE_|DB9PR10MB6004:EE_
+x-ms-office365-filtering-correlation-id: a7c10c5a-51fd-4295-277d-08de7f7dbe6d
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|1800799024|7416014|38070700021|56012099003|18002099003|22082099003|55112099003;
+x-microsoft-antispam-message-info:
+ ybIgap8ocPAHmFsCS+9UuHY/RmZfAlFEpL+wS3/jppFogRWud3RZYEOR3yRbOuZBYV5L0nTb6+P2Dg4Sevc61sbVl0xCuCnYrYviga/FJZnMYpDxxCa1OXtj1OeeWFlNV66ACZ7UlEfKs4gecdSUTRQBlXg2o6Mt6+gze6rL47xjobAq461lxDGKkePBQ4EcTiSHWB0fQabKCtAl36Vq9Uap6h5NJA7hfDG8l0ASZTRON4JIFCHHpoHuvd+L0xgCGZnHBeAM9h9S8dn2OYT33z9pV3J0CQy2dnxSIPXLSqLPR0NAdSisHPvNKCgM5leHZ8jg5xRDOs3ZF/ct4o5z1iGaKoMsz9yYPryoqtivEj2m6yY5TS7cmdTQrD2Gvpq84vbqgvH4HRXOWG1sJz9lYBK1T+vF5OFeGsiez0LEVpWTvd/R5Om4SpP1WzXYFlq39inf5tF9z9UrrNT7XbciMNgANeg9siyQuJlv/QXot7gN5LnrXiWEeK8LZj1r75DZ2KxYDbnJRTNFUp4FpcZXW8AJhtS3LCZpnDjUHw3jkVsk33kmsI6EO3SdyzhzNG1B/gkNmdRNe/Nrfcpu+F6i4VzAxEGrF8RT0hFSONic2/MimJui8SaXKvN0VzajtoinaQ95EgnPs53BPLQoP5tpJNgBIqXmSrt05Ls5Wh49XeTxcoLPfWoktDjcDEQARi2i42/xZnR3eryKuJb8quI4zcVc4kiEa6f7kUs9qZE+XQT2utcwCZmKuQkXhDvHriVBSNYFoNvW7dyVRBd4kblO4LfNip4XgVYfVBoCegZtxXM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(38070700021)(56012099003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-2?Q?P5Y2kS3KGD9rabXia07nGA05P/kGDW7GXCdYrAwVxfgztfV7b5/2hRE+xP?=
+ =?iso-8859-2?Q?fgpTZSC0Q+ey1MaykraYiI8NOP7cf6tOyb8JynYWfWo43+Krl5foU0vj3y?=
+ =?iso-8859-2?Q?Xrjl3ZegnpvCeaIWhrAEUM6HzlCvW8Eh9qLUxVgEg/2ajxLx++UqDTZcst?=
+ =?iso-8859-2?Q?AdZSYGps2wf1eY2qlYcRF6Mde5ZPDZlluzgVYvkJ7HDeaU1lRIqcA+Pwqn?=
+ =?iso-8859-2?Q?xTwlkNamG2fs2kaaoQRMZnfGVAMHjcmbflliGCxtyxQxuhbyOfjOhCaUPS?=
+ =?iso-8859-2?Q?GbbKaqhY39xSCio2a37S6IKI9IyIHuUm5HPMPp++o0g55SEwiKLCWOP4dF?=
+ =?iso-8859-2?Q?IRhUTW8fSNQ4JM/XdGQ3Anjm3t0ILy8S/5/AhjHn70msy6e4l/8LXVlFQZ?=
+ =?iso-8859-2?Q?WnDMquD4UrACwPMT1geb5qXjtJJ4l1WKwJ5woXEwzD5ytLkoUXj308mIt/?=
+ =?iso-8859-2?Q?06y/zdyhYH7rUk6VHRsB5Z+/gavcVMAOn66pEfHvlLkwiqdfvS0fHv+g2W?=
+ =?iso-8859-2?Q?Ge4NDahpA+efHZKj+WuVg4FbAXDr7KM3ceeLASVeVrL/PRVVcbco4drTSA?=
+ =?iso-8859-2?Q?r8yrXlKFwtO6miBqtTUewJrsHt4t9JnKQLJ7NJpuxtn7Zz1x6aEj2d48Kh?=
+ =?iso-8859-2?Q?WtHWiVAsT8KOC/R9iP4nHbAbIGVCL+hPz283o6tnMfV8WkuYXRwumGrxGl?=
+ =?iso-8859-2?Q?35folmxV8a8dshJ14spuPyljmYgEV/4Pwyw60HBUeWynH+/xdlw8Du+rFT?=
+ =?iso-8859-2?Q?Es8NkM/2hMOSAjxaX7r05/KAgBdCVDLxFpc4AN144Fh8naCM2VaF0WvV7q?=
+ =?iso-8859-2?Q?PFx57dys6YPaMth9HWt7wFPLTzrJ9/Phq5dhgTErW1ZAtWvr2+X74O+ScI?=
+ =?iso-8859-2?Q?tcSxq9l9Aa3yOWfmaULxa6Q7DG6Ctdy5ViaCj3tv+XjHpxTg2zWMbVHd9+?=
+ =?iso-8859-2?Q?d0bDZGJg81ZtLZt1uwEDpHsPO8egG13Cub+qOtkWqEGY2Hi4WvEg288wCU?=
+ =?iso-8859-2?Q?Kpfzo+4Mx5MqdkY9z3j2y9wWxbIiO+HSYkTiuyKk1NocTjBZjZFHQMSPIQ?=
+ =?iso-8859-2?Q?U12StqsJgad5EBLlxTT6glKjF1ndp3gqQ1uyXRN4oHvJDCWYobXp/MfUD6?=
+ =?iso-8859-2?Q?wZXwObDaRSyeeWhi2NHloDp5hse5M2DUQjGdpethURht2gsuRVFoEK+RAA?=
+ =?iso-8859-2?Q?GnEXr2BQ/3i2arTstkUaI7QYgrXYNvNwP3ZtOlV7MlKRsYxtj3AAVY0VN0?=
+ =?iso-8859-2?Q?xNryZPmX3gnmAX8BfcsvFo3GwiW+u2GkbDzsAbZmucLw4rAEVqoZbqBUZe?=
+ =?iso-8859-2?Q?f/UxIEdPyPW3TI0Mcbk+3+T1idZp/K9zM89xkCDvUC04t6f6o+Fz0kXbp4?=
+ =?iso-8859-2?Q?tWpYS0A3cFh/1JYs+zC3F7Q1uYfNhTzwMQxNo2U5p/Y23ly6BRSfgn6Ktd?=
+ =?iso-8859-2?Q?qoKZ5tc20VlGj/hp/Ji9SJuMq4LbQBhTfCCh+WLDFaHluHj6pfq7l2NBMq?=
+ =?iso-8859-2?Q?rNFfER8xIaX0McopLFO2QcRcROIfBxOOsqwwSLODn3nlCDD0rxIq+Lsn0Y?=
+ =?iso-8859-2?Q?UH+h8RARNh1W1Y4KmGT0YvNt0MZ+s8DGfeoX2hAWb5prKGvv5Ebul7UkHu?=
+ =?iso-8859-2?Q?nZasKlPFW+y7mobhEKO3RY38UsLB6gM0LVe77yxrnHhyyvevZ9znpnny6e?=
+ =?iso-8859-2?Q?opFOzAfYBYWHqkBvSoMO5oE8tzPpYOXJcw04LIMh8Rpa5vAK0o522vqaHl?=
+ =?iso-8859-2?Q?uyeYTbvuhZqOMej+/cJ5uUo96DfS/ienLzhB98n0rcNcN9/7L6T3+PkM0q?=
+ =?iso-8859-2?Q?o2EZVaoaJQ=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7c10c5a-51fd-4295-277d-08de7f7dbe6d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2026 14:51:57.5599
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 38fyxdos69XVr+3N8jB8TLoMCcPBcc3c0yXf6cKvh+dzbjPFKPK9QHOiKQTYj8J/F9ywROQEqsN6U6/w94MRTEKHmW2rmx8Rs36F9crIcUw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR10MB6004
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[siemens.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-266667-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266668-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,lists.osuosl.org,vger.kernel.org,siemens.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zdenek.bouska@siemens.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[siemens.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3228D265B92
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,siemens.com:dkim,PR3PR10MB4270.EURPRD10.PROD.OUTLOOK.COM:mid]
+X-Rspamd-Queue-Id: 32F9D265EB9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Amery Hung <ameryhung@gmail.com> writes:
+Dear Paul,
 
-> The verifier should decide whether a dynptr argument is read-only
-> based on if the type is "const struct bpf_dynptr *", not the type of
-> the register passed to the kfunc. This currently does not cause issues
-> because existing kfuncs that mutate struct bpf_dynptr are constructors
-> (e.g., bpf_dynptr_from_xxx and bpf_dynptr_clone). These kfuncs have
-> additional check in process_dynptr_func() to make sure the stack slot
-> does not contain initialized dynptr. Nonetheless, this should still be
-> fixed to avoid future issues when there is a non-constructor dynptr
-> kfunc that can mutate dynptr. This is also a small step toward unifying
-> kfunc and helper handling in the verifier, where the first step is to
-> generate kfunc prototype similar to bpf_func_proto before the main
-> verification loop.
->
-> We also need to correctly mark some kfunc arguments as "const struct
-> bpf_dynptr *" to align with other kfuncs that take non-mutable dynptr
-> argument and to not break their usage. Adding const qualifier does
-> not break backward compatibility.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  fs/verity/measure.c                            |  2 +-
->  include/linux/bpf.h                            |  8 ++++----
->  kernel/bpf/helpers.c                           | 10 +++++-----
->  kernel/bpf/verifier.c                          | 18 +++++++++++++++++-
->  kernel/trace/bpf_trace.c                       | 18 +++++++++---------
->  tools/testing/selftests/bpf/bpf_kfuncs.h       |  6 +++---
->  .../selftests/bpf/progs/dynptr_success.c       |  6 +++---
->  .../bpf/progs/test_kfunc_dynptr_param.c        |  7 +------
->  8 files changed, 43 insertions(+), 32 deletions(-)
->
-> diff --git a/fs/verity/measure.c b/fs/verity/measure.c
-> index 6a35623ebdf0..3840436e4510 100644
-> --- a/fs/verity/measure.c
-> +++ b/fs/verity/measure.c
-> @@ -118,7 +118,7 @@ __bpf_kfunc_start_defs();
->   *
->   * Return: 0 on success, a negative value on error.
->   */
-> -__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr *digest_p)
-> +__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, const struct bpf_dynptr *digest_p)
->  {
->  	struct bpf_dynptr_kern *digest_ptr = (struct bpf_dynptr_kern *)digest_p;
->  	const struct inode *inode = file_inode(file);
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index b78b53198a2e..946a37b951f7 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -3621,8 +3621,8 @@ static inline int bpf_fd_reuseport_array_update_elem(struct bpf_map *map,
->  struct bpf_key *bpf_lookup_user_key(s32 serial, u64 flags);
->  struct bpf_key *bpf_lookup_system_key(u64 id);
->  void bpf_key_put(struct bpf_key *bkey);
-> -int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
-> -			       struct bpf_dynptr *sig_p,
-> +int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
-> +			       const struct bpf_dynptr *sig_p,
->  			       struct bpf_key *trusted_keyring);
->  
->  #else
-> @@ -3640,8 +3640,8 @@ static inline void bpf_key_put(struct bpf_key *bkey)
->  {
->  }
->  
-> -static inline int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
-> -					     struct bpf_dynptr *sig_p,
-> +static inline int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
-> +					     const struct bpf_dynptr *sig_p,
->  					     struct bpf_key *trusted_keyring)
->  {
->  	return -EOPNOTSUPP;
-> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> index 6eb6c82ed2ee..3d44896587ac 100644
-> --- a/kernel/bpf/helpers.c
-> +++ b/kernel/bpf/helpers.c
-> @@ -3000,8 +3000,8 @@ __bpf_kfunc int bpf_dynptr_clone(const struct bpf_dynptr *p,
->   * Copies data from source dynptr to destination dynptr.
->   * Returns 0 on success; negative error, otherwise.
->   */
-> -__bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_off,
-> -				struct bpf_dynptr *src_ptr, u64 src_off, u64 size)
-> +__bpf_kfunc int bpf_dynptr_copy(const struct bpf_dynptr *dst_ptr, u64 dst_off,
-> +				const struct bpf_dynptr *src_ptr, u64 src_off, u64 size)
->  {
->  	struct bpf_dynptr_kern *dst = (struct bpf_dynptr_kern *)dst_ptr;
->  	struct bpf_dynptr_kern *src = (struct bpf_dynptr_kern *)src_ptr;
-> @@ -3055,7 +3055,7 @@ __bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_off,
->   * at @offset with the constant byte @val.
->   * Returns 0 on success; negative error, otherwise.
->   */
-> -__bpf_kfunc int bpf_dynptr_memset(struct bpf_dynptr *p, u64 offset, u64 size, u8 val)
-> +__bpf_kfunc int bpf_dynptr_memset(const struct bpf_dynptr *p, u64 offset, u64 size, u8 val)
->  {
->  	struct bpf_dynptr_kern *ptr = (struct bpf_dynptr_kern *)p;
->  	u64 chunk_sz, write_off;
-> @@ -4069,8 +4069,8 @@ __bpf_kfunc void bpf_key_put(struct bpf_key *bkey)
->   *
->   * Return: 0 on success, a negative value on error.
->   */
-> -__bpf_kfunc int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_p,
-> -			       struct bpf_dynptr *sig_p,
-> +__bpf_kfunc int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_p,
-> +			       const struct bpf_dynptr *sig_p,
->  			       struct bpf_key *trusted_keyring)
->  {
->  #ifdef CONFIG_SYSTEM_DATA_VERIFICATION
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 1153a828ce8d..0f77c4c5b510 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -12276,6 +12276,22 @@ static bool is_kfunc_arg_dynptr(const struct btf *btf, const struct btf_param *a
->  	return __is_kfunc_ptr_arg_type(btf, arg, KF_ARG_DYNPTR_ID);
->  }
->  
-> +static bool is_kfunc_arg_const_ptr(const struct btf *btf, const struct btf_param *arg)
-> +{
-> +	const struct btf_type *t, *resolved_t;
-> +
-> +	t = btf_type_skip_modifiers(btf, arg->type, NULL);
-> +	if (!t || !btf_type_is_ptr(t))
-> +		return false;
-> +
-> +	resolved_t = btf_type_skip_modifiers(btf, t->type, NULL);
-nit: t is ptr type, maybe we can do t = btf_type_by_id(btf, t->type)
-before the loop starts, as we know the result of the first iteration.
-> +	for (; t != resolved_t; t = btf_type_by_id(btf, t->type))
-> +		if (BTF_INFO_KIND(t->info) == BTF_KIND_CONST)
-nit: btf_kind() is a bit shorter than BTF_KIND_INFO()
-> +			return true;
-> +
-> +	return false;
-> +}
-The logic in this function looks correct to me. The refactoring makes
-sense as well (although I'm not 100% sure how this is relevant to this
-patch series)
-Acked-by: Mykyta Yatsenko <yatsenko@meta.com>
-> +
->  static bool is_kfunc_arg_list_head(const struct btf *btf, const struct btf_param *arg)
->  {
->  	return __is_kfunc_ptr_arg_type(btf, arg, KF_ARG_LIST_HEAD_ID);
-> @@ -13509,7 +13525,7 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
->  			enum bpf_arg_type dynptr_arg_type = ARG_PTR_TO_DYNPTR;
->  			int clone_ref_obj_id = 0;
->  
-> -			if (reg->type == CONST_PTR_TO_DYNPTR)
-> +			if (is_kfunc_arg_const_ptr(btf, &args[i]))
->  				dynptr_arg_type |= MEM_RDONLY;
->  
->  			if (is_kfunc_arg_uninit(btf, &args[i]))
-> diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-> index 9bc0dfd235af..127c317376be 100644
-> --- a/kernel/trace/bpf_trace.c
-> +++ b/kernel/trace/bpf_trace.c
-> @@ -3391,7 +3391,7 @@ typedef int (*copy_fn_t)(void *dst, const void *src, u32 size, struct task_struc
->   * direct calls into all the specific callback implementations
->   * (copy_user_data_sleepable, copy_user_data_nofault, and so on)
->   */
-> -static __always_inline int __bpf_dynptr_copy_str(struct bpf_dynptr *dptr, u64 doff, u64 size,
-> +static __always_inline int __bpf_dynptr_copy_str(const struct bpf_dynptr *dptr, u64 doff, u64 size,
->  						 const void *unsafe_src,
->  						 copy_fn_t str_copy_fn,
->  						 struct task_struct *tsk)
-> @@ -3533,49 +3533,49 @@ __bpf_kfunc int bpf_send_signal_task(struct task_struct *task, int sig, enum pid
->  	return bpf_send_signal_common(sig, type, task, value);
->  }
->  
-> -__bpf_kfunc int bpf_probe_read_user_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_probe_read_user_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					   u64 size, const void __user *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy(dptr, off, size, (const void __force *)unsafe_ptr__ign,
->  				 copy_user_data_nofault, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_probe_read_kernel_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_probe_read_kernel_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					     u64 size, const void *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy(dptr, off, size, unsafe_ptr__ign,
->  				 copy_kernel_data_nofault, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_probe_read_user_str_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_probe_read_user_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					       u64 size, const void __user *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy_str(dptr, off, size, (const void __force *)unsafe_ptr__ign,
->  				     copy_user_str_nofault, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_probe_read_kernel_str_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_probe_read_kernel_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  						 u64 size, const void *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy_str(dptr, off, size, unsafe_ptr__ign,
->  				     copy_kernel_str_nofault, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_copy_from_user_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_copy_from_user_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					  u64 size, const void __user *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy(dptr, off, size, (const void __force *)unsafe_ptr__ign,
->  				 copy_user_data_sleepable, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_copy_from_user_str_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_copy_from_user_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					      u64 size, const void __user *unsafe_ptr__ign)
->  {
->  	return __bpf_dynptr_copy_str(dptr, off, size, (const void __force *)unsafe_ptr__ign,
->  				     copy_user_str_sleepable, NULL);
->  }
->  
-> -__bpf_kfunc int bpf_copy_from_user_task_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_copy_from_user_task_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  					       u64 size, const void __user *unsafe_ptr__ign,
->  					       struct task_struct *tsk)
->  {
-> @@ -3583,7 +3583,7 @@ __bpf_kfunc int bpf_copy_from_user_task_dynptr(struct bpf_dynptr *dptr, u64 off,
->  				 copy_user_data_sleepable, tsk);
->  }
->  
-> -__bpf_kfunc int bpf_copy_from_user_task_str_dynptr(struct bpf_dynptr *dptr, u64 off,
-> +__bpf_kfunc int bpf_copy_from_user_task_str_dynptr(const struct bpf_dynptr *dptr, u64 off,
->  						   u64 size, const void __user *unsafe_ptr__ign,
->  						   struct task_struct *tsk)
->  {
-> diff --git a/tools/testing/selftests/bpf/bpf_kfuncs.h b/tools/testing/selftests/bpf/bpf_kfuncs.h
-> index 7dad01439391..ffb9bc1cace0 100644
-> --- a/tools/testing/selftests/bpf/bpf_kfuncs.h
-> +++ b/tools/testing/selftests/bpf/bpf_kfuncs.h
-> @@ -70,13 +70,13 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
->  
->  extern int bpf_get_file_xattr(struct file *file, const char *name,
->  			      struct bpf_dynptr *value_ptr) __ksym;
-> -extern int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr *digest_ptr) __ksym;
-> +extern int bpf_get_fsverity_digest(struct file *file, const struct bpf_dynptr *digest_ptr) __ksym;
->  
->  extern struct bpf_key *bpf_lookup_user_key(__s32 serial, __u64 flags) __ksym;
->  extern struct bpf_key *bpf_lookup_system_key(__u64 id) __ksym;
->  extern void bpf_key_put(struct bpf_key *key) __ksym;
-> -extern int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_ptr,
-> -				      struct bpf_dynptr *sig_ptr,
-> +extern int bpf_verify_pkcs7_signature(const struct bpf_dynptr *data_ptr,
-> +				      const struct bpf_dynptr *sig_ptr,
->  				      struct bpf_key *trusted_keyring) __ksym;
->  
->  struct dentry;
-> diff --git a/tools/testing/selftests/bpf/progs/dynptr_success.c b/tools/testing/selftests/bpf/progs/dynptr_success.c
-> index e0d672d93adf..e0745b6e467e 100644
-> --- a/tools/testing/selftests/bpf/progs/dynptr_success.c
-> +++ b/tools/testing/selftests/bpf/progs/dynptr_success.c
-> @@ -914,7 +914,7 @@ void *user_ptr;
->  char expected_str[384];
->  __u32 test_len[7] = {0/* placeholder */, 0, 1, 2, 255, 256, 257};
->  
-> -typedef int (*bpf_read_dynptr_fn_t)(struct bpf_dynptr *dptr, u64 off,
-> +typedef int (*bpf_read_dynptr_fn_t)(const struct bpf_dynptr *dptr, u64 off,
->  				    u64 size, const void *unsafe_ptr);
->  
->  /* Returns the offset just before the end of the maximum sized xdp fragment.
-> @@ -1106,7 +1106,7 @@ int test_copy_from_user_str_dynptr(void *ctx)
->  	return 0;
->  }
->  
-> -static int bpf_copy_data_from_user_task(struct bpf_dynptr *dptr, u64 off,
-> +static int bpf_copy_data_from_user_task(const struct bpf_dynptr *dptr, u64 off,
->  					u64 size, const void *unsafe_ptr)
->  {
->  	struct task_struct *task = bpf_get_current_task_btf();
-> @@ -1114,7 +1114,7 @@ static int bpf_copy_data_from_user_task(struct bpf_dynptr *dptr, u64 off,
->  	return bpf_copy_from_user_task_dynptr(dptr, off, size, unsafe_ptr, task);
->  }
->  
-> -static int bpf_copy_data_from_user_task_str(struct bpf_dynptr *dptr, u64 off,
-> +static int bpf_copy_data_from_user_task_str(const struct bpf_dynptr *dptr, u64 off,
->  					    u64 size, const void *unsafe_ptr)
->  {
->  	struct task_struct *task = bpf_get_current_task_btf();
-> diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> index d249113ed657..c3631fd41977 100644
-> --- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> +++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> @@ -11,12 +11,7 @@
->  #include <bpf/bpf_helpers.h>
->  #include <bpf/bpf_tracing.h>
->  #include "bpf_misc.h"
-> -
-> -extern struct bpf_key *bpf_lookup_system_key(__u64 id) __ksym;
-> -extern void bpf_key_put(struct bpf_key *key) __ksym;
-> -extern int bpf_verify_pkcs7_signature(struct bpf_dynptr *data_ptr,
-> -				      struct bpf_dynptr *sig_ptr,
-> -				      struct bpf_key *trusted_keyring) __ksym;
-> +#include "bpf_kfuncs.h"
->  
->  struct {
->  	__uint(type, BPF_MAP_TYPE_RINGBUF);
-> -- 
-> 2.47.3
+On 25/05/2026 11:51 Paul Menzel wrote:
+> Am 25.02.26 um 10:58 schrieb Zdenek Bouska via Intel-wired-lan:
+> > If an XDP application that requested TX timestamping is shutting down
+> > while the link of the interface in use is still up the following kernel
+> > splat is reported:
+> >
+> > [  883.803618] [   T1554] BUG: unable to handle page fault for address:
+> ffffcfb6200fd008
+> > ...
+> > [  883.803650] [   T1554] Call Trace:
+> > [  883.803652] [   T1554]  <TASK>
+> > [  883.803654] [   T1554]  igc_ptp_tx_tstamp_event+0xdf/0x160 [igc]
+> > [  883.803660] [   T1554]  igc_tsync_interrupt+0x2d5/0x300 [igc]
+> > ...
+> >
+> > During shutdown of the TX ring the xsk_meta pointers are left behind, s=
+o
+> > that the IRQ handler is trying to touch them.
+> >
+> > This issue is now being fixed by cleaning up the stale xsk meta data on
+> > TX shutdown. TX timestamps on other queues remain unaffected.
+>=20
+> If you have the commands to reproduce this, that'd be great to have.
+
+The software which I used is not public yet. I will let you know when that =
+changes.
+
+Thank you for the review!
+
+Best regards,
+Zdenek Bouska
+
+--
+Siemens, s.r.o
+Foundational Technologies
 
