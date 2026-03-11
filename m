@@ -1,297 +1,196 @@
-Return-Path: <netdev+bounces-266497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIE3CyENsWldqAIAu9opvQ
-	(envelope-from <netdev+bounces-266497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:35:13 +0100
+	id sFZfEk0OsWldqAIAu9opvQ
+	(envelope-from <netdev+bounces-266498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:40:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD3C25CE75
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:35:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A4DA25CEFF
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2FD6E3033D44
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:35:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EF502310FE14
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA50238D52;
-	Wed, 11 Mar 2026 06:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526E0317143;
+	Wed, 11 Mar 2026 06:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qPnpTE2Y"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="I3P454cs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69E840DFC7
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 06:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D69372EC6
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 06:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773210908; cv=none; b=JTF1Nf1v39IS2UHXBsBGlRT4J+GT96tV8agcAQjiGjdDsSmli6BueJlCxHDMKpNJY+Dtwgfx07ZrAEPT5Q5TOeQ6919bmygXLCtrTo7AJPSi0TRGF3NKa3mNO6nEuaQIrUFQHBg4p0EKXk7xaSseZXAuFwQbGVkzdNTyrjg5Gds=
+	t=1773211210; cv=none; b=stb7+JcWQvYiTBt8m0huwajg8Ke5+xGvzsucPfiMJJMJ0aS2X0XPVwg5jJvqD5E9aFZalSdqHPA2bzKD64PE1hT1CCi3PAyiicyYY9gaaOF7T/6lT1mqfQnodrYaHcQkfApjGAY/VUH5Z+NF3UoZ70mAaOjY1nTsAjKwbpTT+nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773210908; c=relaxed/simple;
-	bh=1EcLenB/nf7iMC4+h9jMGvIvmmie5QpV4xtjqV2Xo2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pyg5fBpv06SibEs1RCibJ/jmNmUlash99pZaXyJW3xelMpjDKmpamsWiH3LjTLeFE1Ubp1I81zfbliQ9MZmyNKPcG5wZv9N0hf1TQtPLe1q8BoF9F+tBRC1mH83uK7vCCbdJXJujvXGq8i3UtFuFtJJbiplXY+GBzrWktcw0HJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qPnpTE2Y; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 11 Mar 2026 14:34:38 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773210904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tfNns3ZE9bP5e8cQvGX1WWFaXLrY8EikgZKzAR4LmuE=;
-	b=qPnpTE2Ye6P7Qb9hmpI8G9YJ0qXyZjOyXjlSBMkLFg0pAUIY5ph2MLawvbHRsh0y4EYDGV
-	ckR3ki08IuJDFfl/q7T5u7rlYg4tG/GCbKKQgt3WN6mKDHap0ZNStz0Bz8TheIgMqxDeqg
-	zoVJMdReIfHDzR0rzf0XI734LHDKfzM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	Julia.Lawall@inria.fr, linux@treblig.org, nate.karstens@garmin.com, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] strparser: Fix race condition in strp_done()
-Message-ID: <sbbx62xaaudsds6mp4gchkv3f5t5bkybhuwpzecjjdsrd67u6d@m5yekizhbsiz>
-References: <aZgpkyTDU3aXe_V0@v4bel>
- <aZyMejqTbkI7o_VM@krikkit>
- <aaDATohaW62X_pxk@v4bel>
- <aaYY6UiXSppOig9Q@krikkit>
- <aaY-TbPsNxo6toSr@v4bel>
- <aaoTVMhnY5FKMrem@krikkit>
- <aaobmK6d_xd9ZXGj@v4bel>
- <aaqovyrmd5pJtZKq@krikkit>
- <aaq9TgFpsjn9XWAC@v4bel>
+	s=arc-20240116; t=1773211210; c=relaxed/simple;
+	bh=ZsjOez3Qway2mYAXvu5QL0vJ5UlYJAMwXZdy+YBKfwI=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=YYJoTVI6284yUX7UAeglJEMQmx609+4ES6dZr1H1Qaxegtdhdlen7KwkBhk4P6b2CkXzMtn/TBfm1YygkHnHUqMui98BlNFlIxqQaTdBWDssgEgQpo92ExlbYbGvauA9YjMWy1mMIoEdZZch+zq/eKkS2JC1B7fMk7KwuTrsjfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=I3P454cs; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773211200; h=Message-ID:Subject:Date:From:To;
+	bh=uofCL946arayV1G7q+ZDv8qxg7fecoCepNUKFyCvd9k=;
+	b=I3P454csqaxRinlEP1q57TXo8aG73lTu/M9noypgRLs72609PQlh0NZlVEGGJ4XQqDnsryaV4wtMvPNg8D1Pt7N7KTKPll436mgXuogS34ZqNFCzNPDh/SdKxz4RUVffQdViH2KbhYEP612OCdvTse3AInWVDMlO4tffe6zwDC0=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-irTwk_1773211198 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 11 Mar 2026 14:39:59 +0800
+Message-ID: <1773210927.2628298-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v8 2/2] virtio-net: correct hdr_len handling for tunnel gso
+Date: Wed, 11 Mar 2026 14:35:27 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ virtualization@lists.linux.dev,
+ netdev@vger.kernel.org
+References: <20260305031938.24518-1-xuanzhuo@linux.alibaba.com>
+ <20260305031938.24518-3-xuanzhuo@linux.alibaba.com>
+ <cf62a942-e1e8-4b37-837a-b0bd76297656@redhat.com>
+In-Reply-To: <cf62a942-e1e8-4b37-837a-b0bd76297656@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aaq9TgFpsjn9XWAC@v4bel>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 2FD3C25CE75
+X-Rspamd-Queue-Id: 8A4DA25CEFF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-266497-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,resnulli.us,solid-run.com,lists.linux.dev,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266498-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026 at 08:41:02PM +0800, Hyunwoo Kim wrote:
-> On Fri, Mar 06, 2026 at 11:13:19AM +0100, Sabrina Dubroca wrote:
-> > 2026-03-06, 09:11:04 +0900, Hyunwoo Kim wrote:
-> > > On Fri, Mar 06, 2026 at 12:35:48AM +0100, Sabrina Dubroca wrote:
-> > > > Sorry for the delay, I wanted to think about the race condition a bit
-> > > > more.
-> > > > 
-> > > > 2026-03-03, 10:50:05 +0900, Hyunwoo Kim wrote:
-> > > > > On Tue, Mar 03, 2026 at 12:10:33AM +0100, Sabrina Dubroca wrote:
-> > > > > > 2026-02-27, 06:51:10 +0900, Hyunwoo Kim wrote:
-> > > > > > > On Mon, Feb 23, 2026 at 06:20:58PM +0100, Sabrina Dubroca wrote:
-> > > > > > > > 2026-02-20, 18:29:55 +0900, Hyunwoo Kim wrote:
-> > > > > > > > "strp stopped" is not really enough, I think we'd also need to reset
-> > > > > > > > the CBs, and then grab bh_lock_sock to make sure a previously-running
-> > > > > > > > ->sk_data_ready has completed. This is what kcm does, at least.
-> > > > > > > 
-> > > > > > > It seems that this is not something that should be handled inside strp itself, 
-> > > > > > > but rather something that each caller of strp_stop() is expected to take care 
-> > > > > > > of individually. Would that be the right direction?
-> > > > > > 
-> > > > > > Agree.
-> > > > > > 
-> > > > > > > It also appears that ovpn and kcm handle this by implementing their own callback 
-> > > > > > > restoration logic.
-> > > > > > 
-> > > > > > Right. I tried to look at skmsg/psock (the other user of strp), but
-> > > > > > didn't get far enough to verify if it's handling this correctly.
-> > > > > > 
-> > > > > > > > Without that, if strp_recv runs in parallel (not from strp->work) with
-> > > > > > > > strp_done, cleaning up skb_head in strp_done seems problematic.
-> > > > > > > 
-> > > > > > > From the espintcp perspective, how about applying a patch along the following lines?
-> > > > > > 
-> > > > > > This is what I was thinking about, yes.
-> > > > > 
-> > > > > In my opinion, it might be cleaner to split the espintcp callback restoration work into 
-> > > > > a separate patch, rather than merging it into the strparser v3 patch. What do you think?
-> > > > 
-> > > > Sure. But once espintcp is fixed in that way, can the original race
-> > > > condition with strparser still occur? release_sock() will wait for any
-> > > 
-> > > If the espintcp callback restoration patch is applied, the strparser
-> > > race should no longer occur in espintcp.
-> > > 
-> > > > espintcp_data_ready()/strp_data_ready() that's already running, and a
-> > > > sk_data_ready that starts after we've changed the callbacks will not
-> > > > end up in strp_data_ready() at all so it won't restart the works that
-> > > > are being stopped by strp_done()?
-> > > > 
-> > > > It's quite reasonable to use disable*_work_sync in strp_done, but I'm
-> > > > not sure there's a bug other than espintcp not terminating itself
-> > > > correctly on the socket.
-> > > 
-> > > That said, the _cancel APIs in strparser still appear to carry some
-> > > structural risk, so it might still make sense to switch to the _disable
-> > > APIs for the benefit of other strp users or potential future callers.
-> > 
-> > Not really. Every user of strp that is open to the strp_recv vs
-> > cancel_* race is also open to the strp_recv vs free race, so switching
-> > from cancel_* to disable_* is only a partial fix.
-> > 
-> > But if we took and released the socket lock in strp_done, we would
-> > solve the issue for all users even without resetting the callbacks?
-> 
-> Looks good to me. With this change, it seems the issue can be resolved
-> not only for espintcp but for all strp users.
-> 
-> When strp_stop() runs first:
-> ```
->                  cpu0                                cpu1
-> 
-> espintcp_close()
->   strp_stop()
->     strp->stopped = 1;
->                                          espintcp_data_ready()
->                                            strp_data_ready()
->                                              if (unlikely(strp->stopped)) return;
->   strp_done()
->     lock_sock();
->     release_sock();
->     cancel_delayed_work_sync(&strp->msg_timer_work);
->     kfree_skb(strp->skb_head);
-> ```
-> 
-> When strp_data_ready() runs first:
-> ```
->                  cpu0                                cpu1
-> 
->                                          espintcp_data_ready()
->                                            strp_data_ready()
->                                              if (unlikely(strp->stopped)) return;
-> espintcp_close()
->   strp_stop()
->     strp->stopped = 1;
->   strp_done()
->     lock_sock();
->                                              strp_read_sock()
->                                                tcp_read_sock()
->                                                  __tcp_read_sock()
->                                                    strp_recv()
->                                                      __strp_recv()
->                                                        head = strp->skb_head;
->                                                        strp_start_timer()
->                                                          mod_delayed_work(&strp->msg_timer_work);
->                                                        ...
->     release_sock();
->     cancel_delayed_work_sync(&strp->msg_timer_work);
->     kfree_skb(strp->skb_head);
-> ```
-> In both cases, the race does not appear to cause any problem.
-> 
-> > 
-> > @@ -503,6 +503,10 @@ void strp_done(struct strparser *strp)
+On Tue, 10 Mar 2026 11:05:33 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+> On 3/5/26 4:19 AM, Xuan Zhuo wrote:
+> > The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
+> > GSO tunneling.") introduces support for the UDP GSO tunnel feature in
+> > virtio-net.
+> >
+> > The virtio spec says:
+> >
+> >     If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
+> >     VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
+> >     all the headers up to and including the inner transport.
+> >
+> > The commit did not update the hdr_len to include the inner transport.
+> >
+> > I observed that the "hdr_len" is 116 for this packet:
+> >
+> >     17:36:18.241105 52:55:00:d1:27:0a > 2e:2c:df:46:a9:e1, ethertype IPv4 (0x0800), length 2912: (tos 0x0, ttl 64, id 45197, offset 0, flags [none], proto UDP (17), length 2898)
+> >         192.168.122.100.50613 > 192.168.122.1.4789: [bad udp cksum 0x8106 -> 0x26a0!] VXLAN, flags [I] (0x08), vni 1
+> >     fa:c3:ba:82:05:ee > ce:85:0c:31:77:e5, ethertype IPv4 (0x0800), length 2862: (tos 0x0, ttl 64, id 14678, offset 0, flags [DF], proto TCP (6), length 2848)
+> >         192.168.3.1.49880 > 192.168.3.2.9898: Flags [P.], cksum 0x9266 (incorrect -> 0xaa20), seq 515667:518463, ack 1, win 64, options [nop,nop,TS val 2990048824 ecr 2798801412], length 2796
+> >
+> > 116 = 14(mac) + 20(ip) + 8(udp) + 8(vxlan) + 14(inner mac) + 20(inner ip) + 32(innner tcp)
+> >
+> > Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  include/linux/virtio_net.h | 31 ++++++++++++++++++++-----------
+> >  1 file changed, 20 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> > index 23f42bb8ece0..906157779955 100644
+> > --- a/include/linux/virtio_net.h
+> > +++ b/include/linux/virtio_net.h
+> > @@ -209,18 +209,29 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> >
+> >  static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
+> >  					 struct virtio_net_hdr *hdr,
+> > +					 struct skb_shared_info *sinfo,
+> >  					 bool little_endian,
+> >  					 bool feature_hdrlen)
 > >  {
-> >  	WARN_ON(!strp->stopped);
-> >  
-> > +	lock_sock(strp->sk);
-> > +	/* sync with other code */
-> > +	release_sock(strp->sk);
+> >  	u16 hdr_len;
+> >
+> >  	if (feature_hdrlen) {
+> > -		hdr_len = skb_transport_offset(skb);
+> > -
+> > -		if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+> > -			hdr_len += sizeof(struct udphdr);
+> > -		else
+> > -			hdr_len += tcp_hdrlen(skb);
+> > +		if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+> > +				       SKB_GSO_UDP_TUNNEL_CSUM)) {
+> > +			hdr_len = skb_inner_transport_offset(skb);
 > > +
-> >  	cancel_delayed_work_sync(&strp->msg_timer_work);
-> >  	cancel_work_sync(&strp->work);
-> >  
-> > 
-> > 
-> >  - strp->stopped so any new call into strp_data_ready will not do anything
-> > 
-> >  - lock/release need to take bh_lock_sock so any existing call to
-> >    strp_data_ready will have to complete before we move on to cancel*_work
-> > 
-> > 
-> > 
-> > Or maybe the requirement should be that strp_stop has to be called
-> 
-> >From my perspective, adding lock_sock() inside strp_done(), as in the
-> patch above, looks cleaner.
-> 
-> > under lock_sock() (or even just bh_lock_sock), but again I can't
-> > figure out if that's ok for sockmap.
-> 
-> sockmap/psock has a more complex call stack compared to other strp
-> users, so I'm also not entirely certain about that part.
+> > +			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+> > +				hdr_len += sizeof(struct udphdr);
+> > +			else
+> > +				hdr_len += inner_tcp_hdrlen(skb);
+> > +		} else {
+> > +			hdr_len = skb_transport_offset(skb);
+> > +
+> > +			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+> > +				hdr_len += sizeof(struct udphdr);
+> > +			else
+> > +				hdr_len += tcp_hdrlen(skb);
+> > +		}
+>
+> I already mentioned the following a couple of times, with no replies...
+> perhaps the 3rd attempt will be more successful.
+>
+> I think it's a bad adding tunnel specific check here. It sounds like
+> layering violation. Instead you could have tunnel-specific variant, say
+> virtio_net_set_tnl_hdrlen(), and use it in virtio_net_hdr_tnl_from_skb().
+>
+> Or you could try what i suggested in:
+>
+> https://lore.kernel.org/netdev/CAF6piCLkv6kFqoq7OQfJ=Su9AVHSQ9J7DzaumOSf5xuf9w-kyA@mail.gmail.com/#t
 
+I saw your suggestions, though I didn't reply directly. I proceeded to adjust
+the code based on my understanding of your feedback, but it appears my
+understanding was incorrect. After re-reading your suggestions, I think
+virtio_net_hdr_from_skb does not need to be changed. Instead, within
+virtio_net_hdr_tnl_from_skb, we should directly call the device header length
+function based on whether the feature is negotiated.
 
-For sockmap, I think it's not affected by this race.
+Thanks.
 
-The sockmap path has additional synchronization:
-
-1. sk_psock_strp_data_ready() holds read_lock_bh(&sk->sk_callback_lock) when
-calling strp_data_ready(), while sk_psock_drop() holds write_lock_bh(&sk->sk_callback_lock)
-when calling strp_stop(). This rwlock serializes the stopped flag check with the stopped
-flag set.
-
-2. strp_done() is not called directly from sk_psock_drop(), but deferred via
-queue_rcu_work() → sk_psock_destroy() → sk_psock_done_strp().
-The RCU grace period guarantees that all in-flight sk_psock_strp_data_ready()
-calls (which are within rcu_read_lock() sections) have completed before strp_done()
-runs. So cancel_delayed_work_sync() / cancel_work_sync() in
-strp_done() won't be defeated by a subsequent re-schedule.
-
-I think it common practice to use strparser just like the doc says:
-
-	void strp_done(struct strparser *strp);
-
-     strp_done is called to release any resources held by the stream
-     parser instance. This must be called after the stream processor
-     has been stopped.
-
-> 
-> > 
-> > 
-> > > With that in mind, perhaps the direct fix for this race could be handled
-> > > in the espintcp callback restoration patch. For the strparser patch, I
-> > > could instead adjust the commit message to reflect that it removes a
-> > > potential hazard by replacing the _cancel APIs with the _disable
-> > > variants, and resubmit it in that form.
-> > 
-> > I'm not going to nack a patch doing s/cancel_/disable_/ in strp_done,
-> > but it doesn't fully solve the race condition if the caller isn't
-> > doing the right thing, and it doesn't do anything if the strp user is
-> > handling the teardown correctly.
-> 
-> I agree with your point there. Still, after the core patches addressing
-> this race are applied, I plan to resubmit the _disable patch with an
-> updated commit message. I think applying that change is still beneficial.
-> 
-> 
-> Best regards,
-> Hyunwoo Kim
+>
+> Thanks,
+>
+> Paolo
+>
 
