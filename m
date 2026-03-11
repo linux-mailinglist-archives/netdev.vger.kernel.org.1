@@ -1,167 +1,283 @@
-Return-Path: <netdev+bounces-266446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266447-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SGyLJKPhsGkuoAIAu9opvQ
-	(envelope-from <netdev+bounces-266446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:29:39 +0100
+	id aFRECSXisGkuoAIAu9opvQ
+	(envelope-from <netdev+bounces-266447-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:31:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA87425B9B4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:29:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E61E25BA27
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D5C331F1BE5
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:24:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DB6B323413C
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E76A3750BA;
-	Wed, 11 Mar 2026 03:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211DE2F616B;
+	Wed, 11 Mar 2026 03:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRi6CcN7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VEuMfloW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118273750A6
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773199443; cv=none; b=TZghyjBvJfd+8QSmOabPFJYfMVQ/Lm724c0h+HruHZsHx3yGHiB1itA7YlvLlLWpruAJ60VN4oHfaCkuqsomI/dE0g6xRlg1r8yVweJMN4WrEd5LTz0TJvrk4uBajY9EErVLQTY+o3iYFfRYFMtDY0aSUJljq4iAz9EmrneE6k0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773199443; c=relaxed/simple;
-	bh=4CmlSSsCnPynyh+7RZ4n6Spv5D930upDulXja9oszS4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=t00jv3/+CudTFUytMwGkvbgg0qsdn31kiNKug+wUA6Amoj12JUYUpeh6GmqCKPpz32Jics8x3s/sFoH0TeapGe0bMVN5dNlgj7CzTkUMADP26sL0k1PDfe91fKXwMBRNBQF6hll5KQpsrOV+KvSm7uaqx85A83bZ/94faT421+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRi6CcN7; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-829a9c03780so4491031b3a.1
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 20:24:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F232E06E6
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773199564; cv=pass; b=X8pANXRIE0dpXkqYYlP+HPSIiWWcGc0PUB2LaS7D34ejiWk+4MwYLr3nYXApQlQS1z5nu9WwczUAyFvfxU4N2Qlt9FAfZW9e7iljtQctzrTsoxPofusqOMKXgWj/xansXV23MJVQTfMfX2DDMkbDtSVe0S5eMgr+LYYdhQOoOZw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773199564; c=relaxed/simple;
+	bh=mzpAkzG9fjf9UXt86O4rB1ItbHSHGLkmwSbDibbg/nk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F2nwFf5S9nOEtylxLkluLdyXLAYXCwP3O3bd8nDN2X+4yrkGwbrlKzrOgCYnPGCaeU8gX0NyD/7EsBXmbpAGJGiGf5fTa1zv2tfzcd4cBTvLwQBixXP+9p7uu9qSf8H+4wvq3mW8zlJjO5nU0p/VFbV0zFNsde0U21jC9tipk5A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VEuMfloW; arc=pass smtp.client-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-128d2e3074fso4787536c88.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 20:26:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773199562; cv=none;
+        d=google.com; s=arc-20240605;
+        b=icp9IA+FnER4NTjkZyQ8crDBM66nmqkA4JCyqXFHfeUCCDngnbZDNK10LxM/fHEmFG
+         29295z+CCyzqZRpjT5nsnT9cAqIHKucxCDrcMQLZWzLXYm01VJ0+fU5Lgbf3mmcqbTt7
+         lFpo8ut61ZCvQW2I9R7S5OeufmwHuT3xkolAjrSS3kC5ZzWJwIYszZ54gFJ8iQTxle7G
+         R23b48qweCRNu8L0w4n30NjH1yOwDAf85Al0b9It9i2nuncALUwuv4vPxKms/r+6ONYZ
+         okBkmlo1ZmTd4bi5mY+1aGaSGI2r6V/q7GNTNHUephmO6LHR+XIANsyl3AroCpHeUQLb
+         sLng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lXS2GlmYXXSCq6gPG2JwjXS13V2LdQYrOfwZoD/0pWw=;
+        fh=SmvcnGAznyaaAp3Z72I+PenSMMcXMJcNMakXzlTraUU=;
+        b=DzQxCVFRuWCAlDMbWtHITxhUfSHVMjqCCn7nQhemonM4SU4PuSmfR4w7ezH7+WmTKl
+         c3rBOpHeu93r22yZJZLziQBdrLUWuskrrPg31j+/qjBC9TbvhdP9VQQJW8jsmlR+6Uel
+         XCIwIW8lReOpkI5GOt800G3wweRF0D0/RL4x7E2yMq4OyhiAchd3oXTh/PQ6BPs6cfg1
+         UoiNdbCZIuteiNROnHAd4/YZ1+6plZWaq9Fk9yGdqsTl9WYK0BnUrusPMC6O6R1MvVcY
+         UPSS3RORGGVUk7EIKhEChdpcFfFDJlmKVeLerN1Q/kWtEWbNMVjzOjmNz8GJeRdgp2KU
+         jZRA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773199441; x=1773804241; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7iE5HACLz4Z/RwSO9wFPzeTdq72RimNiWiYc2tOiIgM=;
-        b=RRi6CcN7GEfMj4gi937EKxmsYBTK6LGLcTZPo++Z0cRL7XD8qjmrf1hbzn+VmtA3bF
-         ZVmABBQ7DzLmyJ2tCHIFfSBo0mq+3HitqXNQ30230ORawWfS5d9pHvMNsiqgm1K8eDf/
-         nOA15/vSbpMadVeoOxupDYHW3oGiJ1+/geXTUjndazP3yjXe3MYyBwDVSD8pO383MuR9
-         10oTrD+xvHryAFOVG+rfEQbXZBEu4mRAEDCd8taa53HaF502aNr7Bappvw0PKGRmtN53
-         J544bmhK6tk6aJwGu0BUi73vBIZ69hHRWu/XH9X8KY8fd6YSJpos9eYoS1lQ+wjr/TxO
-         e5jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773199441; x=1773804241;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1773199562; x=1773804362; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7iE5HACLz4Z/RwSO9wFPzeTdq72RimNiWiYc2tOiIgM=;
-        b=EeWqqSNE+TI63+135N1mL7wgdljvPxL7D8RbOiSQrdcPx50XUDVljFZHy27jlTsdub
-         RqqzErWUGGNpa/VdCerVjeaiTFo/V+2K46NRF1UdMAbizev31VjjthLQTg+mpXDgxElR
-         iRlUwUb8qF+pwOXXOCatDCrEs/36t9IAP+hHxH7HFhAXjWTKWsv10sygrgXV2nl+Ws79
-         6+m05eDKeY58Uby2jHkYYP5DO+m7EfmFqek3WtowQbKWp/bjV6pDrcDL7rRa2qVk6rMe
-         Ylfg6DDAxiUMAqRu8uShf+VxIgyNZtWXUDQ342E2lOG8xEIRpUWHyP7Wi5GO7zECARRC
-         DquQ==
-X-Gm-Message-State: AOJu0YytTyhVwD9UOmqbHYm/0OJkIUEPXuXJbj7lk1Mawmj9Uhxpjm+w
-	Kj668PjzngbD3IWerLymCrMsehGCUUpfo5YkCCAam6kJMahL8nH3Uq6y
-X-Gm-Gg: ATEYQzyqcxuXYiTmTJ5iRztYi/i9FHjqS7gsokVFo0c1kzUxMqWXG/OLr3l5qiBxwGR
-	V6/rFT5+f9wiD1pnXXOmRz/cQNYgmdvJBY5OmJ+2DEYzR1hHsfAFDaobUvBq2PB3SNOePt7IGbD
-	WiQkB4poSif7rh1fOovnVC9cDhxoCXBD910HX8KvTHMjj4XNYyaGQ+pZ/719ONgX+yA+ODVxIFU
-	ikQZLNXJAGmDqXMgBkFw8UyZD0rsD7j23SKVR8j/5e9ezeMWZV0jpEw5NlShhAT0VboaGs29h48
-	gfTpHkpnskJIlCf/Sa/Idfi2bAsab1QCHo7hZsfaxFsUq5nvxpmX/T3WElcMCeXbaAFGhDJxXam
-	6fT7xoBsOaDc9LDocVaqlVfKXn60nUs4YhEtSRptgvrQnD9gV7PFj7Us7mVpOcz/cO7KQx/q+7v
-	qhydl7ZJq6634GU0gcj77VObFX0ShXRWngz4Yeo3+S33mcKtKOVNo7R08POmlbE4ctRuxfcP5u7
-	HFg0RWY19edNJcDwgkEG4+pElGieDnP6ulQ5+oiVCE=
-X-Received: by 2002:a05:6a00:bb0d:b0:824:9848:b020 with SMTP id d2e1a72fcca58-829f70eb4b0mr999580b3a.52.1773199441399;
-        Tue, 10 Mar 2026 20:24:01 -0700 (PDT)
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829f6eec031sm704043b3a.41.2026.03.10.20.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 20:24:00 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Wed, 11 Mar 2026 11:22:29 +0800
-Subject: [PATCH] ynl: ethtool: remove duplicated unspec entry
+        bh=lXS2GlmYXXSCq6gPG2JwjXS13V2LdQYrOfwZoD/0pWw=;
+        b=VEuMfloWbLzEiHs2wVAQ9/djeyWswG0aofcqI6hKbWCY8gHQC/+C1ZRW8rx6qxR9QA
+         intlb8UubImRZWjxMrWh+9MLgussgS1JEPBQTUyJP5N5T7cNwdUlGa+IMJIO3yICprrY
+         apgrYp5CbD9zx2saN2UOAOhyx9BsS6fVtJfKRI3i9G6RiLVP+JthFmeBQJPnpmnYse2d
+         OmzAF3xozYglAG39oFkNedHNuRbzhgaGeez2IA0uF0ndVaHi3qp9cvHAQhy26fvUovK9
+         xTdBnQoX7Ow0TPAR/cBjwbzcCetQXAzQLPT3sCjbVYxxiDPXaxhnNVNOTyiZIQvm+fKi
+         WAMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773199562; x=1773804362;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lXS2GlmYXXSCq6gPG2JwjXS13V2LdQYrOfwZoD/0pWw=;
+        b=bpJPnEWm/0vucccOSH8BhCRUetNQZ0FaC8uSaRSFALbkT+T2hQVZMyjmyKIpV4cPbc
+         x1X8TAB5H9qCHY0bevRH9sfdqYa/I56cbW/Ub0aD0yTREEincPEWI6Mg36pnt3KSTMFs
+         ORHsozSTgvr4WecsYxl12uvs2fG3S4rnyFkpRiF+9IjzSIUfe9UK5hLl4gLoCvlts0nk
+         5rMtJVTFehmA3IE3GNWVV/kymZK2ytU+5vq8yb/xXZH7P5tCVg5AmStIqZJBNFYqyzgU
+         QtxacjAhD+TpMJxInJjC36RcKcItUtWSBim2ogYCLHdPWgCtS39M87BQtO30p5CKVhCx
+         Rpyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAJ97KI9OiVBtNF2g20qUtdAM5QdQv+oxwVNyYoIKLMYEblNpQq5oAcJWtR1/LQLeZb1LzipA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycVHaBJhdLUWfgjl9JbT9GW+e3wxojrP9tQPXpZE8j4jIpHCKK
+	ioZ+yUCiSCCdi5jbpmNN+mZQ+73dGMbExSSc9kDAQBAnriINz/Yk92ulC6s18BlCDhiw3wVgCPr
+	44OmEtigQbPWozqbBG9cbGV9CRSuJikqn0c6493xR
+X-Gm-Gg: ATEYQzzdmLqItJ8srySalYByS+rsg3N80PcTVAq4zGh2ZE5smX7mJ4VUdGagZtazSRP
+	CnCxsc79SQj3Mf0NI4KcMpqN04j72I3SE3DPbYLOhfRHuitH4tLmXjXk3TaSPqomwkfsP62nTNS
+	lue01nK2T2ixWUkX1Gj0oD+zLJzi5y8Kf3z8VpW5A1lxapMK94lCY0sEXeGhMZ+Mnd3UWx8lrcQ
+	50kHgRqpnGTuApQisJelBhPiTejzXBIxK2OXaIxpDD2gHISsbUrEvsToZ5AtDx5kbR6uzucotaR
+	cP1xDJD8/52dvvxABpgqKnr+cCG0frUMp0V1Ydg+r6bXW2d4Xw+FQyYAfLGyj6rF5udtec0=
+X-Received: by 2002:a05:7022:78e:b0:119:e56c:18b3 with SMTP id
+ a92af1059eb24-128e78494b8mr451366c88.27.1773199560464; Tue, 10 Mar 2026
+ 20:26:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260311-b4-drop_dup_unspec-v1-1-e0dfa47b5981@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqAIBBA0avIrBMarYiuEhHVTDUbFcUIorsnL
- d/i/wcSR+EEg3og8iVJvCvASsF2Lu5gLVQMpjZdbRH12miKPsyUw5xdCrxpQxa7fekNtQglDJF
- 3uf/pOL3vB9y7sf9kAAAA
-X-Change-ID: 20260311-b4-drop_dup_unspec-2d316fa82d51
-To: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Hangbin Liu <liuhangbin@gmail.com>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: EA87425B9B4
+References: <20260309185823.3502204-1-kuniyu@google.com>
+In-Reply-To: <20260309185823.3502204-1-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 10 Mar 2026 20:25:49 -0700
+X-Gm-Features: AaiRm526XuL2ztWrEOg3OaKtcleZy_oiQezgs8fv8vJP419eMQJxprMuKObl7RE
+Message-ID: <CAAVpQUBEyvGA5JQgdmrxc3a-7p0E_gNmb2it17EsRgkwzy+PgA@mail.gmail.com>
+Subject: Re: [PATCH v2 net] af_unix: Give up GC if MSG_PEEK intervened.
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, 
+	Linus Torvalds <torvalds@linuxfoundation.org>, netdev@vger.kernel.org, 
+	Igor Ushakov <sysroot314@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9E61E25BA27
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-266446-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linuxfoundation.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-266447-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,kernel.org,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-There is a duplicated unspec entry. Remove it.
+On Mon, Mar 9, 2026 at 11:58=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> Igor Ushakov reported that GC purged the receive queue of
+> an alive socket due to a race with MSG_PEEK with a nice repro.
+>
+> This is the exact same issue previously fixed by commit
+> cbcf01128d0a ("af_unix: fix garbage collect vs MSG_PEEK").
+>
+> After GC was replaced with the current algorithm, the cited
+> commit removed the locking dance in unix_peek_fds() and
+> reintroduced the same issue.
+>
+> The problem is that MSG_PEEK bumps a file refcount without
+> interacting with GC.
+>
+> Consider an SCC containing sk-A and sk-B, where sk-A is
+> close()d but can be recv()ed via sk-B.
+>
+> The bad thing happens if sk-A is recv()ed with MSG_PEEK from
+> sk-B and sk-B is close()d while GC is checking unix_vertex_dead()
+> for sk-A and sk-B.
+>
+>   GC thread                    User thread
+>   ---------                    -----------
+>   unix_vertex_dead(sk-A)
+>   -> true   <------.
+>                     \
+>                      `------   recv(sk-B, MSG_PEEK)
+>               invalidate !!    -> sk-A's file refcount : 1 -> 2
+>
+>                                close(sk-B)
+>                                -> sk-B's file refcount : 2 -> 1
+>   unix_vertex_dead(sk-B)
+>   -> true
+>
+> Initially, sk-A's file refcount is 1 by the inflight fd in sk-B
+> recvq.  GC thinks sk-A is dead because the file refcount is the
+> same as the number of its inflight fds.
+>
+> However, sk-A's file refcount is bumped silently by MSG_PEEK,
+> which invalidates the previous evaluation.
+>
+> At this moment, sk-B's file refcount is 2; one by the open fd,
+> and one by the inflight fd in sk-A.  The subsequent close()
+> releases one refcount by the former.
+>
+> Finally, GC incorrectly concludes that both sk-A and sk-B are dead.
+>
+> One option is to restore the locking dance in unix_peek_fds(),
+> but we can resolve this more elegantly thanks to the new algorithm.
+>
+> The point is that the issue does not occur without the subsequent
+> close() and we actually do not need to synchronise MSG_PEEK with
+> the dead SCC detection.
+>
+> When the issue occurs, close() and GC touch the same file refcount.
+> If GC sees the refcount being decremented by close(), it can just
+> give up garbage-collecting the SCC.
+>
+> Therefore, we only need to signal the race during MSG_PEEK with
+> a proper memory barrier to make it visible to the GC.
+>
+> Let's use seqcount_t to notify GC when MSG_PEEK occurs and let
+> it defer the SCC to the next run.
+>
+> This way no locking is needed on the MSG_PEEK side, and we can
+> avoid imposing a penalty on every MSG_PEEK unnecessarily.
+>
+> Note that we can retry within unix_scc_dead() if MSG_PEEK is
+> detected, but we do not do so to avoid hung task splat from
+> abusive MSG_PEEK calls.
+>
+> Fixes: 118f457da9ed ("af_unix: Remove lock dance in unix_peek_fds().")
+> Reported-by: Igor Ushakov <sysroot314@gmail.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+> v2: Use seqcount_t for proper memory barrier
+> v1: https://lore.kernel.org/netdev/20260308030406.1825938-1-kuniyu@google=
+.com/
+> ---
+>  net/unix/af_unix.c |  2 ++
+>  net/unix/af_unix.h |  1 +
+>  net/unix/garbage.c | 75 +++++++++++++++++++++++++++++-----------------
+>  3 files changed, 50 insertions(+), 28 deletions(-)
+>
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 7eaa5b187fef..b23c33df8b46 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1958,6 +1958,8 @@ static void unix_detach_fds(struct scm_cookie *scm,=
+ struct sk_buff *skb)
+>  static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
+>  {
+>         scm->fp =3D scm_fp_dup(UNIXCB(skb).fp);
+> +
+> +       unix_peek_fpl(scm->fp);
+>  }
+>
+>  static void unix_destruct_scm(struct sk_buff *skb)
+> diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
+> index c4f1b2da363d..8119dbeef3a3 100644
+> --- a/net/unix/af_unix.h
+> +++ b/net/unix/af_unix.h
+> @@ -29,6 +29,7 @@ void unix_del_edges(struct scm_fp_list *fpl);
+>  void unix_update_edges(struct unix_sock *receiver);
+>  int unix_prepare_fpl(struct scm_fp_list *fpl);
+>  void unix_destroy_fpl(struct scm_fp_list *fpl);
+> +void unix_peek_fpl(struct scm_fp_list *fpl);
+>  void unix_schedule_gc(struct user_struct *user);
+>
+>  /* SOCK_DIAG */
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index 816e8fa2b062..5c9692c98d23 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -318,6 +318,21 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
+>         unix_free_vertices(fpl);
+>  }
+>
+> +static bool gc_in_progress;
+> +static seqcount_t unix_peek_seq =3D SEQCNT_ZERO(unix_peek_seq);
+> +
+> +void unix_peek_fpl(struct scm_fp_list *fpl)
+> +{
+> +       if (!fpl->count_unix)
+> +               return;
+> +
+> +       if (!READ_ONCE(gc_in_progress))
+> +               return;
+> +
+> +       /* Invalidate the final refcnt check in unix_vertex_dead(). */
+> +       raw_write_seqcount_barrier(&unix_peek_seq);
 
-Fixes: 0187e602c03c ("ynl: add missing pieces to ethtool spec to better match uapi header")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- Documentation/netlink/specs/ethtool.yaml | 4 ----
- 1 file changed, 4 deletions(-)
+I'll add NULL check for fpl and spinlock for seqcount update.
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 0a2d2343f79a..f47e9e68889a 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -306,10 +306,6 @@ attribute-sets:
-     name: strings
-     attr-cnt-name: __ethtool-a-strings-cnt
-     attributes:
--      -
--        name: unspec
--        type: unused
--        value: 0
-       -
-         name: unspec
-         type: unused
-
----
-base-commit: 73aefba4e2eb713cf7bc4ad83cfc9b5d4f966f6d
-change-id: 20260311-b4-drop_dup_unspec-2d316fa82d51
-
-Best regards,
--- 
-Hangbin Liu <liuhangbin@gmail.com>
-
+pw-bot: cr
 
