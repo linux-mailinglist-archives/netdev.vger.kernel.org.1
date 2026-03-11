@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-266423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qEwqBBHWsGnLngIAu9opvQ
-	(envelope-from <netdev+bounces-266423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:40:17 +0100
+	id KMfwCy/WsGnLngIAu9opvQ
+	(envelope-from <netdev+bounces-266424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:40:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F3225B05A
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:40:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2BDC25B083
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:40:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B47613023ABE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:40:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A75FE301753D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CF23290CB;
-	Wed, 11 Mar 2026 02:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A833290CB;
+	Wed, 11 Mar 2026 02:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ptmo5TZ7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btk+gJgb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E4424A076;
-	Wed, 11 Mar 2026 02:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEB824A076;
+	Wed, 11 Mar 2026 02:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773196809; cv=none; b=sbmP8p9q8KK2jcEavJJGK+q9mRq4nWhVdrtn6tjWzb80PUkKRx7WC/GLmvy7q5MKtFTCEfmltMsVfsJIdTvsvoP/MlwViFtc61aeQF+btuD7QnVaY5nH//BZTX4y8E6uconfTT/CCOQhJC63yscNv+Ib+LXHdALXQFDyrGfu8Sw=
+	t=1773196825; cv=none; b=Y1+2kG7LveGoKNntIw50t+Qbz5pGur3JFS6LEjOSVCtj5H8F/dfzX+Fz36uXo9l7H0E+G0+uqKUYUKMQt+DO/qEsA5Alz16Yjxx9tDhHMJ3QK2SItMBNdgtnVt7zcY8p5q0o5otefopXdqEgTCYEAbAaZK8cX4NrDJMZnDyyn/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773196809; c=relaxed/simple;
-	bh=Ucx5TIv2w1wnhufdoMWg7B8yvrx7FLI81e377GXvYnI=;
+	s=arc-20240116; t=1773196825; c=relaxed/simple;
+	bh=egK2cl2ZnUqY3I2vs+Er5QqP9FOygAy5JUBJ+9WkLLE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nMkmnuZtt6ei8agXK6aNzPF+2RRMXKmqw/zWpbesWIP9IPt6j9b+YCbaCjrwaF4or2aOcQ0V8RkNX713L0C5ZlN9AwrZCkcPOB3jty0uQ7UKMo9RsQ5AZPYh9ftDoUnhVoENUKKV2VH5fzBqur3TsCRpgvxjjnBu1T5/sNBLdPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ptmo5TZ7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2385CC19423;
-	Wed, 11 Mar 2026 02:40:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Kh8RtKEWjqSSIHgBctiXanoxrBUqOg1+4sn7Xh0O//w16v2huZAzuisJWQyQ0vyeX2MjKTtlyN1XYI12sbZ9PYBzOLCoM4azqoiFoS3IC1s5yYS5G156ctHJ9PhSiEe3Fm7ukj/LxXJkMR4q40rsUu6rRicyx42lud2xxdENQ3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btk+gJgb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13690C19423;
+	Wed, 11 Mar 2026 02:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773196809;
-	bh=Ucx5TIv2w1wnhufdoMWg7B8yvrx7FLI81e377GXvYnI=;
+	s=k20201202; t=1773196825;
+	bh=egK2cl2ZnUqY3I2vs+Er5QqP9FOygAy5JUBJ+9WkLLE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ptmo5TZ78pjESmi8tgLeDaqIHI/RdVGlNsnkJ9D0t6SRYLBoB1OTAmVDyW0VRiu+b
-	 HX4ZxLGRzCacasgybVASodGPbFqZtnwqPcH0bxsVns9y+odX61qS3ffhDDXPsIL6ia
-	 I4TwWiS7dTBNYifyErJ9L3GVm2OY4b03nAbV2ZDDNOvJcsyp5Hk+bxpmwWuQ8CUaDb
-	 ouv5ehIZEESgMesx97/x0pW+hPt7W0CloX96FPoeCNl8ZWnDoRGu39Am9HPdLg5dDs
-	 lx+p0J9udo4YKxcJwQo0Q3O5s6zm+gl8fJwuRxmTkRBjgh/Onmzu8B5J/vBRQNsX4V
-	 KU4lRAZEWoPMA==
+	b=btk+gJgbssjC+uPxVzV65QaP3N5RLaudxWPexVAIVoHYIfgEVsZ3CF2tdgqfLWjfJ
+	 x2Vfxlwu8rMyIl+oQph3Jb2CPG7839uKy2od8bG6TdrTrWtHq3YTAZpu7Cg+xNJcEE
+	 4CXKN2TA8DBXLy3j7mA3sumjj2n5sJ4CXeyKqsh1vpphu+g3o8h/0B/A39SUqVgniS
+	 q15cJOnPqUGdOB75DykpIu5KUwMU7sRBsMdTi0hhE5Rwf09IyJnqOaWrQR624uFgKr
+	 3xT1zc1+kCvK7e5Pfv5FUQVjTmfw6FN0tPNqC9AWvlokMX8ovmW1vyikjF4/+uTUD+
+	 VGraev8NOO94w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F2D3808200;
-	Wed, 11 Mar 2026 02:40:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9ECE3808200;
+	Wed, 11 Mar 2026 02:40:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,72 +55,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] net-shapers: clear hierarchy pointer and defer
- flush
- frees with RCU
+Subject: Re: [PATCH net-next 0/5] tools: ynl: policy query support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177319680555.3014711.8321881589100718655.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Mar 2026 02:40:05 +0000
-References: <20260309173450.538026-1-p@1g4.org>
-In-Reply-To: <20260309173450.538026-1-p@1g4.org>
-To: Paul Moses <p@1g4.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Rspamd-Queue-Id: 01F3225B05A
+ <177319682153.3014711.5472638473199917370.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Mar 2026 02:40:21 +0000
+References: <20260310005337.3594225-1-kuba@kernel.org>
+In-Reply-To: <20260310005337.3594225-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, donald.hunter@gmail.com, netdev@vger.kernel.org,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+ linux-kselftest@vger.kernel.org
+X-Rspamd-Queue-Id: B2BDC25B083
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266423-lists,netdev=lfdr.de,netdevbpf];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-266424-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 09 Mar 2026 17:35:06 +0000 you wrote:
-> net_shaper_lookup() and the GET dump path traverse shaper state
-> under rcu_read_lock() without taking the shaper lock. During
-> teardown, net_shaper_flush() freed both the shapers and the
-> hierarchy with kfree(), but netdev->net_shaper_hierarchy still
-> pointed at the freed hierarchy.
+On Mon,  9 Mar 2026 17:53:32 -0700 you wrote:
+> Improve the Netlink policy support in YNL. This series grew out of
+> improvements to policy checking, when writing selftests I realized
+> that instead of doing all the policy parsing in the test we're
+> better off making it part of YNL itself.
 > 
-> This lets GET readers race netdevice teardown and walk freed
-> xarray state or freed shaper objects.
+> Patch 1 adds pad handling, apparently we never hit pad with commonly
+> used families. nlctrl policy dumps use pad more frequently.
+> Patch 2 is a trivial refactor.
+> Patch 3 pays off some technical debt in terms of documentation.
+> The YnlFamily class is growing in size and it's quite hard to
+> find its members. So document it a little bit.
+> Patch 4 is the main dish, the implementation of get_policy(op)
+> in YnlFamily.
+> Patch 5 plugs the new functionality into the CLI.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] net-shapers: clear hierarchy pointer and defer flush frees with RCU
-    (no matching commit)
-  - [net,2/2] net-shapers: don't free reply skb after genlmsg_reply()
-    https://git.kernel.org/netdev/net/c/57885276cc16
+  - [net-next,1/5] tools: ynl: handle pad type during decode
+    https://git.kernel.org/netdev/net-next/c/7b1309c33927
+  - [net-next,2/5] tools: ynl: move policy decoding out of NlMsg
+    https://git.kernel.org/netdev/net-next/c/c26fda6212b8
+  - [net-next,3/5] tools: ynl: add short doc to class YnlFamily
+    https://git.kernel.org/netdev/net-next/c/8bbcfce5db97
+  - [net-next,4/5] tools: ynl: add Python API for easier access to policies
+    https://git.kernel.org/netdev/net-next/c/77a6401a8722
+  - [net-next,5/5] tools: ynl: cli: add --policy support
+    https://git.kernel.org/netdev/net-next/c/d6df5e9b2a56
 
 You are awesome, thank you!
 -- 
