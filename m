@@ -1,296 +1,172 @@
-Return-Path: <netdev+bounces-266701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266702-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKrzCgybsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:40:44 +0100
+	id 4F4fOMGbsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266702-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:43:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8262E2677A3
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:40:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4696E267813
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FA5C3023DFA
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:38:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8CF83013688
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6147F37106D;
-	Wed, 11 Mar 2026 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF233E1CFD;
+	Wed, 11 Mar 2026 16:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JDA6e0Km"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FftUn82e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CAE3DCD89
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773247113; cv=pass; b=R+mC0lx+iVW2lpruoMl2qksif8yjQcfH+MDZA5z7LEOuJ9Sn0fyBJt6JCTwMJtXgsGR2eOeOoQwzvlxxcPnlcgZRD61vhp6IGL+sW8lARP5TT1B8GH1vHii7lq2PqrSxKxgxpquIjnzHCpneOFR8+N4/ZLZ/pW84ih++M0XeoEk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773247113; c=relaxed/simple;
-	bh=AMMI15d+s7pTmfoE1fiMuQZTwNVK4nGX6l+tsFLNgrg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RcKV1mFZDYSblziIUn6bkZeHMV0wqmulOyjEgOR6NSCafV6oc09Jn6AhnQdPsj+eTnFqRuafcb9iiPJNdRx5scYfKrK51kNY+yU8QtMQ1IFIGpTYcB/Ge90IG/X3mgJZwTWnwK/wpxmRHHPssjFfeeHCvHfLOChcVgNk5bT2Gpc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JDA6e0Km; arc=pass smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-64ad9238d8fso91824d50.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:38:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773247111; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BKVpg26BXAjxCi24ziXqvb/5NxQO4BfFcCLzf502QUUuiXgcwfuVPaGjBZDnGXw8Q1
-         2IVZK3P1kouQvg3p38fBqTyRu+U7jhcDpqFYfnfMj/1JQrZqwHBfFcEL4Tjf38p8M/cR
-         GVoYjc2KyU27TxeUOvJxks8swScKoe08xib8jcRQDIX1yJqMLUqNCx0VciH5nMKLMiWb
-         2gQrIvwfq3Cza638GOWsQ7t7l7jImvrtORBaT5cMtcSjRYy3Kz8WYmzruIw6CFyaZ9HR
-         7lYQ5PMEDMPf6JOaFPm8uPptc0oD3UHbxQUbQZ533bxSV52odVADISMR9T1e/mhWKJXu
-         QNVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6fElsDI5EEh6ALprW2iuuzCdvhv2CT1kMYpnMsm1Ty4=;
-        fh=awogf4R/BygijoSg4MJcJk8j0yY1Pjt8mbkCSNiS64o=;
-        b=bBKj/0yWVzwzrvnf2eXJL3qBgM7lCfxoE4EOrKtNUwnF5GImaHfdbyx4cJqSLRORCi
-         twut4G+Ju+mInzrl8U5uFaXq9Cw+ugJ8rj0dOP1FZJaYLihNO6+IFTD3Hlc59UG0qqm5
-         egLZvv/9yex0/Fx+eNmvhNbET99+/I0p6Er37MNUZsPMaLOwAD2d39BW+x7hMS/wFK77
-         vMfRs71yHt1/VK3tQMgve2JAS9TBvYQIE2qsJSOkt/sDTnCGY7Oos7hg2X9x/me9RFis
-         VwA+WbqKsCxfI4lldQubChG7AHGqOlxZlylPfb1md3c7HGLPWYE5DR1z8+zM5CSruIQZ
-         jWYQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773247111; x=1773851911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6fElsDI5EEh6ALprW2iuuzCdvhv2CT1kMYpnMsm1Ty4=;
-        b=JDA6e0KmSuuoNsJ0kUKVDpQWfcwCtSCHyB2bz9sxFUDvAIgzOlVLFT75sC2k/L9nje
-         IZkQYuVWnVT/5g83VtO/lJWwTuQhDTnQFWDmixPzfeG6TZpWOyvzhKsM/TtarWd9YiZU
-         s6ooRczlO6qLovgbo9JJKADByu4PvbcJYF9rDPjemsfD6BVNqLmk1g2pxs/JTx9RUwEP
-         DZNcvQbY6lgnYkbeLELsG5MDRaDhOaStFK9814uzIRrvxCvKlVKGMtEe544XXCcQvrcW
-         fpoX1cDmLsl7efz833uAI+EWWiIOoj1dSh/WX0J+h9M+Lvm5JCfXMQS6V5LqV9qOKt68
-         Ko2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773247111; x=1773851911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6fElsDI5EEh6ALprW2iuuzCdvhv2CT1kMYpnMsm1Ty4=;
-        b=Gly0YIqPZKkcddgzeTfylbGIv3duO437+8qK6NlixVzdfHIqt729Ce9e5aHTi8204I
-         GFXFN/ga1tLADdPdnmI0cvhEXYtd+eps369TOVk9O61a3o9Q4de3fw8ikaBCCZ/0Ggoi
-         JhkzuH0GwlshKoxqbI8Xl3rVgoCFiozCdL1X6fwzwCHydCn66jn6kfwo414vhJ4CnOWF
-         +izh8Td5mfYXVb1Y5D1HOBmeehCyZvPv4O8yAjkevQjwjzYF6ykegNoqRaSSjiLrCKMQ
-         aRcqjvW7xyBY0H7oRoNoynw/vlm8VH67k/JQ/6opVQVZ8IfpW4ozo37cnpnxnrrUlI9j
-         XHfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVa0sSSefXU9lou7crOg3H5ANtZHpOFzP5aUTQiEhUAGYfL9a4DeBaGHQAuo5N7EJRPPkEsb/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxxcm1kevypKDZhtZ30C7FRypolNajxNoZVicNuZzIBBUyjHP31
-	DkdWMgsGSaARDARlAvhBcjTOzJt1R+k5q4cLnAHvuMGLh7l/pU71PMfMzRjFMXQjpGe+IhTxqcW
-	vUus3f+198H8QbyQOQpO8gjbb/GiffLU=
-X-Gm-Gg: ATEYQzyPXB80/3ubC1fJVMXEEVpDkj0GAIQFM57p0RqVgMGlvy5MzRW/AZGDXwWEpJX
-	P7wtaS0bfnYsgDVsgcWFtD6eLQjBf9bmGXoXDxWVEgL1/YOpdu56sOaNpsD29Lz+qFbMuIOK16K
-	wQeGO/Xg45lhoVp628eD5j1z+kE479/lvI8z58duEMrFyhoHecf3z1q/6pniinoQOM5VuN8ySqM
-	SkRlV6fAII2Q7Kq1Ay238hp64f4s9D8vjXgdhGy0B+qwt/3IpAq9gd06HEFQKXT53ooEgJ93FLT
-	jnhQDZM=
-X-Received: by 2002:a05:690c:6e83:b0:798:2cd4:5567 with SMTP id
- 00721157ae682-79917fce634mr31914247b3.56.1773247110914; Wed, 11 Mar 2026
- 09:38:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087BF3E0C5E
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773247326; cv=none; b=eTeAczs9rLqClKUHNrdev/O6M7sFUw5H/WX/dfOrCE1EoYAX+x7LqLI7HrG1eiGdIE4N52At4WqPV0B0v+PRyNLm23fo+ugUoUdKHrxTywf8EPLouldT7NpDaYHmVT4cwlkBg86amMywbcZ0lQUEqFEizzmDk6MlJ6k4ddIBQ1g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773247326; c=relaxed/simple;
+	bh=Rxwu7P2BsBf7J3IMi0b3ZYktsM6QyOeW9SKkUNzmkwM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=V4PAnt/8oMWPaBOFzGFMx+ZNcIeVVhVhlaO8uuM/RlSjDrsw0FaK1e55ewPseF0seI8Zfy7tm0/sKwqF0ENjwAmlFsVssG2HlRrFcQUrgx4oXMzDbSuOFX+OCjbCa+xiXwVR9WMkLjTZ2oZWQA0u+ghiR96RC6TVw1Qsg2cwgS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FftUn82e; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 92CA9C41588;
+	Wed, 11 Mar 2026 16:42:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3971B60004;
+	Wed, 11 Mar 2026 16:42:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36DAA10369C3E;
+	Wed, 11 Mar 2026 17:41:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773247321; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=JcIMZNMBI1wXpXximaDXv28O7qFSIHi31ekLqyAd7Hc=;
+	b=FftUn82eNPTqQwYk+E19drRGFnglXM5f2DDFCtgUh7JjlbtFMXtSNWzMmSo+0ztL6YEoqL
+	IqmdyfCOoEeRnibpNB7ZN8AOUqm1q0OjGPGDZ9s/5gVPf4F+I8jpDbZjtd2qlsNYFB44fH
+	iX4MRw59LnpFJeljZ+iTkmzrKeJuXG19q//ST2MXjt08jFm4N5rvWZg25XGN/p1jNETBbn
+	NnDREneC2eHLUOZCqHFkPVIPEpcFtfTve/1DTbPJTS31r2B5ry0u+kvJJoHRywzNAbiKsW
+	Y7v/Wakna6Q9xHeI9242304sIljtSkEzsBUUx+ul70do+XavgFSjheIwfGdgTA==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next v2 0/2] net: macb: implement ethtool set channels
+ count operation
+Date: Wed, 11 Mar 2026 17:41:52 +0100
+Message-Id: <20260311-macb-set-channels-v2-0-982693a1f5fc@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-3-ameryhung@gmail.com>
- <87ldfytmja.fsf@gmail.com>
-In-Reply-To: <87ldfytmja.fsf@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 09:38:19 -0700
-X-Gm-Features: AaiRm51dqOIMR6ioMceqANJxWV3HRlorIvLhVhQ8U3y78KKMZL76mjWV4QQeICA
-Message-ID: <CAMB2axNWHa9aTigQ4G1zxuYtzC7QNj1KVQZNoFiY9fNMhUBsCg@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 02/11] selftests/bpf: Test passing
- CONST_PTR_TO_DYNPTR to kfunc that may mutate dynptr
-To: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAFCbsWkC/32NQQ6DIBBFr2Jm3WkQorZd9R6NC8SxTqJggBgbw
+ 91LOUCXP+//908I5JkCPKoTPO0c2Nkc5KUCM2v7JuQxZ5BCtkKJBldtBgwU8YctLQGbYWpJdJO
+ SnYC82zxNfBTnC2xuWjoi9JnMHKLzn3K214X/8e41CpQ3UvreajUa9Ryciwvbq3Er9CmlL6GtE
+ cy+AAAA
+X-Change-ID: 20260305-macb-set-channels-5bf6e07f3270
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Paolo Valerio <pvalerio@redhat.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: b4 0.15-dev
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266701-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266702-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8262E2677A3
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4696E267813
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 8:26=E2=80=AFAM Mykyta Yatsenko
-<mykyta.yatsenko5@gmail.com> wrote:
->
-> Amery Hung <ameryhung@gmail.com> writes:
->
-> > Make sure for kfunc that takes mutable dynptr argument, verifier reject=
-s
-> > passing CONST_PTR_TO_DYNPTR to it.
-> >
-> > Rename struct sample to test_sample to avoid a conflict with the
-> > definition in vmlinux.h
-> >
-> > In test_kfunc_dynptr_param.c, initialize dynptr to 0 to avoid
-> > -Wuninitialized-const-pointer warning.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  .../testing/selftests/bpf/progs/dynptr_fail.c | 37 +++++++++++++++----
-> >  .../bpf/progs/test_kfunc_dynptr_param.c       |  2 +-
-> >  2 files changed, 30 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/te=
-sting/selftests/bpf/progs/dynptr_fail.c
-> > index 8f2ae9640886..5e1b1cf4ea8e 100644
-> > --- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> > +++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> > @@ -1,15 +1,14 @@
-> >  // SPDX-License-Identifier: GPL-2.0
-> >  /* Copyright (c) 2022 Facebook */
-> >
-> > +#include <vmlinux.h>
-> >  #include <errno.h>
-> >  #include <string.h>
-> > -#include <stdbool.h>
-> > -#include <linux/bpf.h>
-> >  #include <bpf/bpf_helpers.h>
-> >  #include <bpf/bpf_tracing.h>
-> > -#include <linux/if_ether.h>
-> >  #include "bpf_misc.h"
-> >  #include "bpf_kfuncs.h"
-> > +#include "../test_kmods/bpf_testmod_kfunc.h"
-> >
-> >  char _license[] SEC("license") =3D "GPL";
-> >
-> > @@ -46,7 +45,7 @@ struct {
-> >       __type(value, __u64);
-> >  } array_map4 SEC(".maps");
-> >
-> > -struct sample {
-> > +struct test_sample {
-> >       int pid;
-> >       long value;
-> >       char comm[16];
-> > @@ -95,7 +94,7 @@ __failure __msg("Unreleased reference id=3D4")
-> >  int ringbuf_missing_release2(void *ctx)
-> >  {
-> >       struct bpf_dynptr ptr1, ptr2;
-> > -     struct sample *sample;
-> > +     struct test_sample *sample;
-> >
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr1);
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
-> > @@ -173,7 +172,7 @@ __failure __msg("type=3Dmem expected=3Dringbuf_mem"=
-)
-> >  int ringbuf_invalid_api(void *ctx)
-> >  {
-> >       struct bpf_dynptr ptr;
-> > -     struct sample *sample;
-> > +     struct test_sample *sample;
-> >
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
-> >       sample =3D bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> > @@ -315,7 +314,7 @@ __failure __msg("invalid mem access 'scalar'")
-> >  int data_slice_use_after_release1(void *ctx)
-> >  {
-> >       struct bpf_dynptr ptr;
-> > -     struct sample *sample;
-> > +     struct test_sample *sample;
-> >
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
-> >       sample =3D bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> > @@ -347,7 +346,7 @@ __failure __msg("invalid mem access 'scalar'")
-> >  int data_slice_use_after_release2(void *ctx)
-> >  {
-> >       struct bpf_dynptr ptr1, ptr2;
-> > -     struct sample *sample;
-> > +     struct test_sample *sample;
-> >
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, 64, 0, &ptr1);
-> >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
-> > @@ -1993,3 +1992,25 @@ int test_dynptr_reg_type(void *ctx)
-> >       global_call_bpf_dynptr((const struct bpf_dynptr *)current);
-> >       return 0;
-> >  }
-> > +
-> > +/* Cannot pass CONST_PTR_TO_DYNPTR to bpf_kfunc_dynptr_test() that may=
- mutate the dynptr */
-> > +__noinline int global_subprog_dynptr_mutable(const struct bpf_dynptr *=
-dynptr)
-> > +{
-> > +     long ret =3D 0;
-> Why do we need this long ret? Do we even need this function at all, why
-> not calling bpf_kfunc_dynptr_test() directly from the
-> kfunc_dynptr_const_to_mutable()?
-> > +
-> > +     /* this should fail */
-> > +     bpf_kfunc_dynptr_test((struct bpf_dynptr *)dynptr, NULL);
-> > +     __sink(ret);
-> > +     return ret;
-> > +}
-> > +
-> > +SEC("tc")
-> nit: it looks like most of the programs in this file are optional:
-> SEC("?tc").
+Add support for changing the active number of queues. Tested on Mobileye
+EyeQ5. The first patch is as expected. However the second one might be
+more surprising:
 
-I will make it SEC("?tc").
+GEM has per-queue Tx SRAM segmentation. If we do not touch SRAM
+distribution then we'll only be able to exploit a portion of it when a
+smaller queue count is configured. It also is beneficial if bootloader
+stages write to the register and we don't reset it but attempt to use
+all queues (the default).
 
-> > +__failure __msg("cannot pass pointer to const bpf_dynptr, the helper m=
-utates it")
-> > +int kfunc_dynptr_const_to_mutable(struct __sk_buff *skb)
-> > +{
-> > +     struct bpf_dynptr data;
-> > +
-> > +     bpf_dynptr_from_skb(skb, 0, &data);
-> > +     global_subprog_dynptr_mutable(&data);
-> > +     return 0;
-> > +}
-> > diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.=
-c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > index c3631fd41977..1c6cfd0888ba 100644
-> > --- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > +++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > @@ -33,7 +33,7 @@ SEC("?lsm.s/bpf")
-> >  __failure __msg("cannot pass in dynptr at an offset=3D-8")
-> >  int BPF_PROG(not_valid_dynptr, int cmd, union bpf_attr *attr, unsigned=
- int size, bool kernel)
-> >  {
-> > -     unsigned long val;
-> > +     unsigned long val =3D 0;
-> >
-> >       return bpf_verify_pkcs7_signature((struct bpf_dynptr *)&val,
-> >                                         (struct bpf_dynptr *)&val, NULL=
-);
-> > --
-> > 2.47.3
+The operation is only hidden behind MACB_CAPS_QUEUE_DISABLE, we do not
+introduce yet another feature flag.
+
+As this series must s/num_queues/max_num_queues/ quite a lot, it
+conflicts with other in-flights series touching MACB in the netdev ML.
+I'll make sure to resend once net-next gets updated.
+
+Have a nice day,
+Thanks,
+Théo
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+Changes in v2:
+- Move gem_sram_distribute_segments() from macb_main.c to macb_utils.c
+  and kunit tests from macb_main.c to macb_kunit.c.
+- macb_set_channels():
+  - Add comment about MACB_CAPS_QUEUE_DISABLE.
+  - Refuse operation if netif_running(), with code comment.
+  - Drop useless sanity checks on ch->{combined,rx,tx}_count.
+- Add help text to CONFIG_MACB_KUNIT_TEST.
+- Fix `checkpatch --max-line-length=80` warnings.
+- Rebase onto latest net-next; nothing to report.
+- Link to v1: https://lore.kernel.org/r/20260305-macb-set-channels-v1-0-28e3a96a3dc3@bootlin.com
+
+---
+Théo Lebrun (2):
+      net: macb: implement ethtool_ops.get|set_channels()
+      net: macb: distribute evenly Tx SRAM segments
+
+ drivers/net/ethernet/cadence/Kconfig      |  13 ++++
+ drivers/net/ethernet/cadence/Makefile     |   5 +-
+ drivers/net/ethernet/cadence/macb.h       |   9 +++
+ drivers/net/ethernet/cadence/macb_kunit.c |  73 ++++++++++++++++++
+ drivers/net/ethernet/cadence/macb_main.c  | 118 ++++++++++++++++++++++++++----
+ drivers/net/ethernet/cadence/macb_utils.c |  56 ++++++++++++++
+ 6 files changed, 257 insertions(+), 17 deletions(-)
+---
+base-commit: df99d268555f52fb2ac3b9fc9a6198ea0579c48a
+change-id: 20260305-macb-set-channels-5bf6e07f3270
+
+Best regards,
+--  
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
