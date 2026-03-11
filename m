@@ -1,190 +1,176 @@
-Return-Path: <netdev+bounces-266739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMqBKqi0sWnbEgAAu9opvQ
-	(envelope-from <netdev+bounces-266739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:30:00 +0100
+	id eBiZCHu2sWl0EwAAu9opvQ
+	(envelope-from <netdev+bounces-266741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:37:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F782689FB
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:30:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7823C268B3F
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:37:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1006306C535
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 18:27:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 330763011842
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 18:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091B93E8C7A;
-	Wed, 11 Mar 2026 18:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBE229405;
+	Wed, 11 Mar 2026 18:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtP4RQTQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fObSmMwU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E1C2E8DEF;
-	Wed, 11 Mar 2026 18:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773253659; cv=none; b=kXggo96UfhuIAlt8xxIs+drvA8W61+QY4RPxxoPsWfeP/nizJorgihN842d0/wWMp/0xis4UHCbTjWonulFIzT1u7mEhV8hL3CBERSgO5xUUb30588MwpXFLtO+jaMeiisHaqdSvYwM/+LERveZCBprvT9+Oi7aGpPvtb4e0G5A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773253659; c=relaxed/simple;
-	bh=psbKm+JUIEOmVDxhlExsmkrYZCYiynHWiEWJ93E/oIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hAqeevxI1FdPfuyeOse365ZqX4NnHQPue4ItrYvE7vBlzrBRLBGT4mG+9zn51N0UgGnyrHYurNPxQD+NJkqdHMK4sK/81JEQKEAuQZgN3PxnzQ2EuSW7JaW63HCwntBgmY01wDYXUUBL5WXx4qvEwTjqd84D2e9MPNQCsqQnMFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtP4RQTQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B17C4CEF7;
-	Wed, 11 Mar 2026 18:27:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773253659;
-	bh=psbKm+JUIEOmVDxhlExsmkrYZCYiynHWiEWJ93E/oIs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dtP4RQTQjVcXurfV+HjrB/RNKkQfN96ZR2NDOGYO/rWtfTDgc72vOznc27235rL3p
-	 Af0Op11P45Yz/5cL7zb05FEaBhxV9zavR8QnZs4JAYo77juxoWuhjlRLxNHDlANyu8
-	 M3Nm65Uyd/xRrfUs+XTOxwD6O8w5TSAiKPeZESb1iyzN/kcaaJX10YdAzppPRZYQkf
-	 pdXoaR4z6MeiiIDkcv5wHa1+VfhxrgMXIPloVu+uneoxAql8gLnBtF3mTP5208WD4M
-	 VEuiFNi0u2Mm39h+aUbKQBp91Nrlutd0dNIxnGoD6uXRAHdBpKUHy4R207/CZBo71+
-	 GngxM7FZnMPZg==
-Date: Wed, 11 Mar 2026 18:27:34 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: cdns,macb: add a
- compatible for Microchip pic64hpsc
-Message-ID: <20260311-quickstep-helmet-ea7f37444cfc@spud>
-References: <20260310212202.3991199-1-charles.perry@microchip.com>
- <20260310212202.3991199-2-charles.perry@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D05B20E023
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 18:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773254090; cv=pass; b=jxlYmTKXeT0Wkz5aR9g2Gfw4UeCYgZ6CMM8H4rnxzjy6eSkF67uyy5GWXLzYjAd/2XoDkEM/RvJuNkdhPP8FzOD43R9C5AvaZmPYgWTy9lDliI5ffSE/qPDI52k6qJuJWGXKXQYBhZA9nihRh5ORV8Yodrzug7ypCwtF97oZzbE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773254090; c=relaxed/simple;
+	bh=he8tUH7QVpVmguEgNqoYDYanfQslOupF4XsWFpqcG5g=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=jPeCqFt8jmI7L1ucHl4tG/6nVkRWTs5CvKSM+RbAoLh6cLeYsyNtfmZ1eKvOtuH7FtUoaM2ts54AcrVgDMsMUIWmLo4iXkFsxieD/9QsCw6bXiFhkhUVxQe29j5zwNbU5hyEG2n8Q5XTYS7c8CHqtYSVKX0SpQ1ZY7Xkf4XQ/SI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fObSmMwU; arc=pass smtp.client-ip=74.125.224.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64ad9fabd08so297250d50.2
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 11:34:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773254088; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZWpDx8Acs9uA9wooBFZES7v5U1ERtjdc4Hc+daD7dc7DaZ62LY8CVBbX8GovRP+k4U
+         wHGXSNCnhkvw4CH71yX4frnW231Z/9lbPK8LJhVrta6KmXyAimiv7Ct3gBylWuGkUc7k
+         CLAuCNgchHkXThJxVTuBrjHIuhse+KqOExohnvfp3bfqqXVsVs3aMpBcxTR6fj9XxrSF
+         bw/urjlina4wAvDY9scXfYlhSAPvW4r8p9uqKxoDZGUMamueO3F0CiF9DE+3p/TQYBaT
+         4cf9nCk+fgKehiCIW8lu5cZrQkmrYz/sQebi0It6j98FAFi+aNxRpyUsk7tDdpokzLJE
+         Rxlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=he8tUH7QVpVmguEgNqoYDYanfQslOupF4XsWFpqcG5g=;
+        fh=PB7M7k9nF88f07lgNGcK8dvi+Ly75QXAFrcuw78bJ7Y=;
+        b=fwf7H1j9WsalCVMRbwdQuu8rWRyuwBP6e+gIs5RS4qy9vLbBq0Z3oVor6QvS5MiX8A
+         ZkvCaLkNJjF+psZyB4xqPD6Y+4NazSko1BYEa8NKVaLiOamcN94zkrfUKZOqD2RV0bIh
+         tKoEC+nVHwwBQw51Mquqb9bmzkL2zvSLSmlnfv21eKKMNDoujvWynyvcz8H4xJICsC/A
+         JT9I60RFHFlQmhOuKCJBvJJ65E3sEY92eySPiyVfyfuO6xB8PRP6nJrQSmOOzzYDcrcy
+         MTen5SSM22ohqU9ifQoMCO6bXJeYbFWR9Z4JjAp5QbN1rjsUg6TPsr8nweVkOo4LPWq0
+         ihag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773254088; x=1773858888; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=he8tUH7QVpVmguEgNqoYDYanfQslOupF4XsWFpqcG5g=;
+        b=fObSmMwUsIjczfdzUuTSYJc84Jlt0dWsKEMhRbPJgy7y1V70t8iHATaIwMdwPuTvYU
+         P7MDl4ArxCtcQTu6wC/hLnFlF7+tPT4pwu+vR5Y2Qi2xTnat06lJFfewP51y44xrT76e
+         fNl4BPxYdwuK+9EuSZs/ql2YwVFfDlLf1DQwn88FDEVFTKnTpBdsDGLI1wST6tOxoZK8
+         blkkUpNE+inJrI6RQMjhKew5VYpIrj5AbFF0J9rWHK/o7/3IxbwGBh/K5ZBzWC90qKe8
+         29W1QSk7wm8U38CPeZboKYFOZzjtDg+19RhJLiczM6os8O3w1dZXqK4zf/UO/H6sAUnt
+         rerw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773254088; x=1773858888;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=he8tUH7QVpVmguEgNqoYDYanfQslOupF4XsWFpqcG5g=;
+        b=ROZgaN7jc7c8b38PIczgBw8UApH2Wy4ew2t56C4u53D1ARAstbmrP0hE/aCMgKAH4E
+         rmJN9ml4CVyD0ae+Z3MyveDbaigLtRDC9glmNu3Pk/XRmzYIvWo1vGbDHfjJMt53k9MU
+         Xmg3HcfO3jYRPI0cvx8CpA+MH69s7peZNsIAlNAiL7Shf/xQO+HhnOvquOS9Cv3Jn01r
+         PrFZmrUBara11iwiFwDea30y3IPib2Nb65PKfZUdETvlZiLvsVFYwWZMx4+UqGLqN46Z
+         v5d87GAdHBSKrPy5O/ROS68Eg2hYRUunIHos9mbfCNFDP37nHGO43G+zCfSNWuybwONv
+         N68Q==
+X-Gm-Message-State: AOJu0YwkLWuGklQWPpJdV21fo3epkGVaq6DHf2Actm+OYx9X+3EPF0m6
+	VzmQH7Q3KvTnthwmBZCgUH4dW4nRoXFXI1s8yObYH0bew3UibxbHCFDTe583gTsVyLpMHcUYuDL
+	TrYQ2xsCaSMO1Jw56FoXIu/Yn+VlrgiE/sEBi
+X-Gm-Gg: ATEYQzxE13qZPAiMWxgvl2oy0wXtbFafpT7v2HoGYgM17bm/pKnYVjC49LpTFINhKZk
+	OPIEzzW9f+onNLH18YOb45mQJeFX8PhIqr/KSsCSdhvOzlroVRvup0JbZ8NNzxLQcFz9HeJSirI
+	VLZhYfgVOyn6G6W09y7X71U/ei9MCI/LtfejWizbmHq97D70LIJuhvcLK0C8HlK5Ynb8KKjDFrC
+	PQp8I4ldGHkMUeuW+b8BjY2xIAKQme/7mVVbw8MAErhsjjep1hASnn49xlUJ2mhdGhgQL2Dd/xM
+	N4P86HSu
+X-Received: by 2002:a53:d68b:0:b0:64c:aab1:89fb with SMTP id
+ 956f58d0204a3-64d656d6017mr2432596d50.32.1773254088248; Wed, 11 Mar 2026
+ 11:34:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LzxDbwZaErEq3HMU"
-Content-Disposition: inline
-In-Reply-To: <20260310212202.3991199-2-charles.perry@microchip.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+From: Tomer Maimon <tmaimon77@gmail.com>
+Date: Wed, 11 Mar 2026 20:34:36 +0200
+X-Gm-Features: AaiRm52f0GclXu_AijBjtzUoQVU2XZw55qpcMdBquY-Fx_MYlXAMTC-RLhAKYtI
+Message-ID: <CAP6Zq1i31Z0kfDST1Xcoftxja-TFaxgSjKH6jX5eY0AGdASpTw@mail.gmail.com>
+Subject: stmmac: TX stalls with head OWN=1; requiring manual DMA kick (6.12.63)
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266739-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-266741-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[tmaimon77@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 58F782689FB
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7823C268B3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Giuseppe,
 
---LzxDbwZaErEq3HMU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On kernel 6.12.63 (GMAC, normal 16=E2=80=91byte TX descriptors), we observe
+brief TX stalls when sending small packets.
 
-On Tue, Mar 10, 2026 at 02:22:00PM -0700, Charles Perry wrote:
-> Add "microchip,pic64hpsc-gem" for "PIC64-HPSC" and
-> "microchip,pic64hx-gem" for "PIC64HX", compatible with the former.
->=20
-> The generic compatible "cdns,gem" works but offers limited features.
-> Keep it as a fallback.
->=20
-> The GEM IPs within pic64hpsc have their MDIO controllers
-> unconnected from any physical pin. Add a check to prevent adding PHYs
-> under the GEM node.
->=20
-> Signed-off-by: Charles Perry <charles.perry@microchip.com>
+During these pauses, when stmmac_tx_clean() runs, the head descriptor
+(dirty_tx) consistently still has OWN=3D1 across multiple NAPI polls.
+Descriptor programming in xmit() looks correct (OWN=3D1, FD/LD=3D1, CIC=3D2=
+,
+length =E2=89=88 60=E2=80=93110 bytes), but reclamation does not proceed un=
+til a later
+event (typically the next TX).
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Reading DMA_STATUS during the stall shows the Transmit Process State
+(TS) remains active (TS =3D 6), so the TX DMA engine appears to be
+running, but it is not fetching the head descriptor, and the OWN bit
+remains set until something nudges the engine.
 
-> ---
->  .../devicetree/bindings/net/cdns,macb.yaml    | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Docum=
-entation/devicetree/bindings/net/cdns,macb.yaml
-> index cb14c35ba996..b934abd98e20 100644
-> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> @@ -70,6 +70,14 @@ properties:
->                - microchip,sama7d65-gem   # Microchip SAMA7D65 gigabit et=
-hernet interface
->            - const: microchip,sama7g5-gem # Microchip SAMA7G5 gigabit eth=
-ernet interface
-> =20
-> +      - items:
-> +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
-> +          - const: cdns,gem
-> +      - items:
-> +          - const: microchip,pic64hx-gem   # Microchip PIC64HX
-> +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
-> +          - const: cdns,gem
-> +
->    reg:
->      minItems: 1
->      items:
-> @@ -196,6 +204,17 @@ allOf:
->        required:
->          - phys
-> =20
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: microchip,p64h-gem
-> +    then:
-> +      patternProperties:
-> +        "^ethernet-phy@[0-9a-f]$": false
-> +      properties:
-> +        mdio: false
-> +
->  unevaluatedProperties: false
-> =20
->  examples:
-> --=20
-> 2.47.3
->=20
+As a work=E2=80=91around, we added the following logic inside stmmac_tx_cle=
+an():
 
---LzxDbwZaErEq3HMU
-Content-Type: application/pgp-signature; name="signature.asc"
+If the head descriptor still has OWN=3D1, issue a Transmit Poll Demand
+via stmmac_enable_dma_transmission().
+This immediately resumes the DMA and clears the stall.
 
------BEGIN PGP SIGNATURE-----
+We would appreciate your feedback on the following questions:
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabG0FgAKCRB4tDGHoIJi
-0vz+AQCTLDRkNbEjSXGxX44BY5pz1csSJ4nSQ+q9irleZdC0PgEApg7yHBTlVlQU
-IdAb5Z+z9AzJHBfwC4qIO8pr2q+/Ewc=
-=opRa
------END PGP SIGNATURE-----
+Are you familiar with this behavior in the stmmac TX path (head OWN=3D1
+in tx_clean despite TS being active)?
+What conditions could cause the TX DMA not to fetch new descriptors
+even when TS=3D6?
+Is this work=E2=80=91around acceptable, or would you recommend a different
+trigger/condition for issuing Transmit Poll Demand?
 
---LzxDbwZaErEq3HMU--
+Thank you,
+
+Tomer
 
