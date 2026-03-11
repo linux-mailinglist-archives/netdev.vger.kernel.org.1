@@ -1,205 +1,229 @@
-Return-Path: <netdev+bounces-266648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266649-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFHcK+JtsWlVvAIAu9opvQ
-	(envelope-from <netdev+bounces-266648-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:28:02 +0100
+	id qBS7Hl5vsWlVvAIAu9opvQ
+	(envelope-from <netdev+bounces-266649-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:34:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3330264834
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:28:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28072649EF
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:34:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F2B183001F87
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:27:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8759430790A7
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1142031AABC;
-	Wed, 11 Mar 2026 13:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C6D3191A5;
+	Wed, 11 Mar 2026 13:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wakICEnW"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="HnEdIysk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Eczk5gPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B166F31AAAF
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773235632; cv=pass; b=Kpr5zM0BYIpIflAGJNduUlKmmjO5UFpKZV5tFcjnkKxiElgp+5WiKqakeQwy+KuwgvBlNV41ulOKFrINcL7Ou+joWR7x7vnEN+wZJN6EoclqSddscW7jv7QwJgUa/Vi1aW85xX/cJBP40bW1BCKZTGPdfnL/DKgj2hVNVS66HlU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773235632; c=relaxed/simple;
-	bh=x1fV68zR50XdjvYdrXqInhAsqBdrON62F0GQ1SojPrU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JzINC2Nn7iCkNOIxmcJrwhrH21yTMt4f+dAUP06ruvTEfBdX4Wh4ZoLc9aZ8UqIK4HAUZel7+2aWnfo7pyx3GH/zkshKtQFDWaLYkHeCn5nf/jzUm9DmFlREQYKdsDp4+cf8+IK2cZl43gq6iYIIa5FEd6yN2+8QR3PkFWM+7Ys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wakICEnW; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-509046c5c7fso49082151cf.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 06:27:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773235629; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Hmr2kO/db5z8vx8TDycVUpSw6515TEEtN65MtWzaqH2Y9jYslAogsU230G46oKNuSG
-         26WBZYBxOCmaJ4zRwwm7PTJ2d0MbpsUxkLTeyvbHLvScnxlKJ1F97NCXG+4L44TvBaJ9
-         YfV0OJLYG+B62jQREeRri9/QqTjnH4zFF5gnB35cCuFsGwekx3I/Z87sG/5xA1ce2MeS
-         6iHcBxCABUgQ66U53vQdhMS9Nvg4o3cDUdPyb42U+QArRiJ7no9D2h1aNgwa3FAj6PYV
-         oRtEXVpdGdloRbSDszaMhComwpf8vdsB8Q77RHf0aINfEVvnbG8kVIIDAhK5RHYycZo7
-         NNsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
-        fh=aew0eDZBRxY+ivziZ1Uwp1GONzZ1iJKFFTqn6zxk85w=;
-        b=jxAGU+5rEQ+skR5Wt/Id7HAand+cWLBDDP24exeloqGDPUuAH7/Fta8n129PLtpDSM
-         MbAYez8fj0sIycIxbtOrhEPUYqlXYpv3+h6cvLHEgKPUbFM5zj8ISAUWQ2aNRnpXgsja
-         dHCWMewsMXRfxuAvkeb2VSht+343eTBOTb/ISHBWxxZNSs4q0fESAIJWfITkDJ4nD20u
-         L8wThxVm+4azBmfCaiXyyA0CT42zlu50RoxLnmRaIQR/2K6pKmMIkt9FL9aCbHOhs0cG
-         77L8JWTOr2vV9wG5/dMdFxqugnvNZ91TmPYtp9QW5XA8PcXbdi+pwTP/AmQQxK2O/KPC
-         CwWw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773235629; x=1773840429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
-        b=wakICEnW50uAllXmTUvp/Uuuuta5FvYGO0AUw1SOBTEkbVVWkOG0G+TlVEX4s5Cb8T
-         lHjLOwQLgfa9XWEJFby6f7WvYM1RvmZ2f2qqAkgeRUA+91hpgbx0lHscRYDl2N48n8Q8
-         fTQBXXm524EjqU8pT9piw3g+I+w2nLhdE20YGWfwEVAYVPl6fGwqCV2Zn3BW5Vdce3Q+
-         KK/SjjzAP34HT2cT4qecd/0m/7LijD8aMpHmh04T9ftbKOjajYFAFwgGwVnvmY4pfjmd
-         sXhVL9pEh95SJRs/wIMXdUvbDIEDdG5mYKSq6YarF7E6Jdr1l7gX5O0WJF6KIIM9LGCE
-         WxVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773235629; x=1773840429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
-        b=rmiDy4rvbdEw2mbalxxxEKEjEyOVM/6tto5TlAlZ2VScw77T+5PeYJp48+YuN0ljfk
-         BV2QyyeW9U4k3MTkyImhjW0pFedByhgFIgAgxdYL0aSJTDXpxrStfx3vmMu+RH+nDmEm
-         RxDdoNzHyIax+1SpaE76DBSR4NW+UlQU+0Uo9ZxVmgcPmj3KydDlVDPlEvHKENDgd1Nj
-         1p1R68norOkyYjK3k5LeSYIbu0qmP6M3MOFssUw3uVTybz8Tl80O6wQkoWF/hYTQveas
-         nJdGa7N9ynaE0X/8Eh/UVoqzPkZo0gztuHeEa0GUAYqmsZVjRg36A6Tn793QCAT/GmwU
-         DgFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1blS8WYstycYKVJ47o+X1HxbesauKElvZFtrZ1N+9oy0Mbv+RmELcDw5fmkLCqBSMiklyU08=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzj7Ht7UqMGyUEEznigrcg/4wZ8hvHYv9aQSYkAU4nmRe3rHSaj
-	LYn5a/DxlAzsPyr2lk5yaYTW3cDGSterFmZRL36XzkVPecBLFWwGpAL0z4fRJ8hgr9wMRBFpfwI
-	cqTApsPiydidtQKKNFW/Fe146GzzlBwAyEcGHoOqz
-X-Gm-Gg: ATEYQzwZBNvcDqNKTBYSL/9S86PcoAM550zDcGP3HHJEOX6QwCMO95Cbvrrb4FbHvv9
-	oLG/h7NU+6F6Xzu5p7Lmq9vQOCHAcRQesSRFPC1ZJmc9Wu9Ow26c1B6v1fidiPuhvholKIEa8s9
-	woZKeX4B2zlFJQbDFZRgqwSuIxRHeAavDjiLSSsVSJFTbzZdIu4BIgRnUMWbcC1lk3JxQ7shfCT
-	sbMDsWfxsb4hAgPUoF7ULKXeh39V53z8vw2x08G4B9oc4AYpKsHXa5JkRgZQFb+/H5Baq/ISDfx
-	wNkNYaZm
-X-Received: by 2002:ac8:5f0e:0:b0:509:1c3e:d765 with SMTP id
- d75a77b69052e-5093a17eb62mr30215071cf.45.1773235628813; Wed, 11 Mar 2026
- 06:27:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAE1250C06
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773235667; cv=none; b=LnEYjcb6UFVbX69Kc0C0XDnf54LZI6vdOKo1VA2iK6z7qjCqX47gcXhd27WqOcWUGV1PSG4/3sq3YFYQ6kw0XIEvWoK/CEaBklmNqESnAK7hnzEMjev5ypBqkFGbj4boQ0lIuJ5dx+g3qXv9lyihHhGGVWAUCtGgtf/nTA7+oYg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773235667; c=relaxed/simple;
+	bh=Qi0FNc6l3xlf4M5GgzFlPm9w48wQ+Cr9ucelOJJzMmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u49v9kMS36d+V9WYzZAWVWQUvpfd46tIzOal5OpzVjq3LF34zrWpoqD/ALz9R1d35XRU5OiFOwjeFkJ6Mv0dPloGX/EO17sEheTrdN7jMV2uTkgMF9Mc4fhHrnXucA+imegVqr8YvAu+v4oqveI8rr16UocOp+zbnynFaF8HQFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=HnEdIysk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Eczk5gPc; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id C37E8EC05AC;
+	Wed, 11 Mar 2026 09:27:42 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Wed, 11 Mar 2026 09:27:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1773235662; x=1773322062; bh=h6y0IFIVXWgpALqIzRmnvFlM8wDy3FmJ
+	Mbqp1sSaMT8=; b=HnEdIyskvmZ5XGNeRiB4EwUnp5P4RX2xpRgnZtPgUd6h93+a
+	HQQkMPVY/4unzt1Xm3lnNqA7Ye+M+yZBsiyPsAXvfBjyQUkeK8i6EqidM6Qi2Ab0
+	7PkYUIMzZ3fP261lYbPBURLtYBQXTwZQZdc56GEJJ2Nl3YLtiGt+2AEuHoVX+OBM
+	DO841qHKQ6P6by4VgWwV4qSoz0lc6ByT4Y1/xLvB5znR6enwMvxB2+oOQuW9TRb8
+	oOobLFh0gQ42ggb+cg6zyUA98mFe/+PuEoZWM5EfYgIfCNMOShhJPAciywHtIbAp
+	sW6eg1WlZmBKSV554BRf68evWAzcLyncGrglJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773235662; x=
+	1773322062; bh=h6y0IFIVXWgpALqIzRmnvFlM8wDy3FmJMbqp1sSaMT8=; b=E
+	czk5gPcBVHuZIWk750TImgYh0BtMlb6a7Iktq/VPsiweQqQXcalHGQJ9ft6Py4g4
+	xauiWPQPyYrZvRZ839XRXUnr6c4334T+kKOZoHmuVLp615nnfo+qsDJYjxPbm1Lk
+	1CP9NFJjUnLFSrRjFtlDr/OkbXtVWMT+fyQ/RX2I6JQ/bGNCKKMjnPTmkf6bGgXw
+	Tkou51dSCpP6EKzQ+USk5h36Rbg35RhD2+pJslotlG6eznRfAk8bg0A4jUAqwEIs
+	+9FKlES62ws6B7Qo6CjKNwRd0SlXFupBDsg/qgJXG5LcIFyH7+yhRKSvgZty2YDR
+	QhNyJdgn1JuNjjlnLxgaA==
+X-ME-Sender: <xms:zW2xaVxRufBks2oKgpiffxIjeMRh73aCmVZX8_qsI6i5XsVtEgx_cQ>
+    <xme:zW2xabTD0p8ptosur6JxW-n0qN1m2IEV3Skim9N_zz7p6jUbn4f6_CZf8xY3qdFqy
+    L-2YVB7dT6JdoiEbCfH5TwMqngDbChdFWPZiJi4bBK-NaegKgKhScY>
+X-ME-Received: <xmr:zW2xaaJ0QX5ALypmAaYbdjIMG-TMwrjMYu5SrOF6DtKuU_ueAzrA76WnZcxv>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeegtddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopegvhigrlhdrsghirhhgvghrsehgmhgrih
+    hlrdgtohhmpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtghomhdprhgtphht
+    thhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtph
+    htthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghp
+    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumh
+    griigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoh
+    ephhhorhhmsheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:zW2xaaVFclTXTxq4PYR7LQ_poXIIl-3O5cHtHYN8h_pcpaeSP0VNYA>
+    <xmx:zW2xaWSn0HLgzHd0zZPrsNAeEnmnSeuSfqY_1_P3bbyLOslxe0B72A>
+    <xmx:zW2xaaCj48Pqjl23Grc3LUEQd3oF41H6haFTGpOO7dMEcxDWSrNNcQ>
+    <xmx:zW2xadKuvHs4xPSJhxvkvC92v6j8Xh4h62mkM8w5fjyifdrWanx63A>
+    <xmx:zm2xaVdSXUdzt7gUa2UyNy2Aj8tljWXLSnDNdUpJ8nS5nBlgiqQq3GoQ>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 11 Mar 2026 09:27:40 -0400 (EDT)
+Date: Wed, 11 Mar 2026 14:27:39 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eyal Birger <eyal.birger@gmail.com>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] xfrm: Fix work re-schedule after cancel in
+ xfrm_nat_keepalive_net_fini()
+Message-ID: <abFty6McRkN8dtEe@krikkit>
+References: <abBf_R81PYmafhWv@v4bel>
+ <abCh2CgVS3Uw7W-_@krikkit>
+ <CAHsH6GtYpoowPJe5VWMcm=CCdUernc1q-Sk6HznXxMy7LDAmrQ@mail.gmail.com>
+ <abE1Q7BMvZ1l14jF@krikkit>
+ <CAHsH6GtCAqJf1PTGjQppScME6h-dXCUFJMeJvmJsrSDkhSJa8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310105331.2371-1-lirongqing@baidu.com> <20260311131935.GA2415888@shredder>
-In-Reply-To: <20260311131935.GA2415888@shredder>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Mar 2026 14:26:57 +0100
-X-Gm-Features: AaiRm53mLKyKMmg7vzNWKYn0nRuHheeVWc6FScH0DgBLyXOdwz5ru76AgH_yiD4
-Message-ID: <CANn89i+PK6N0VJPQ_NtvHFizpnnrWb9AOPz=M0WyzsQGogsUpQ@mail.gmail.com>
-Subject: Re: [PATCH][net-next] net: vrf: switch to synchronize_net() when
- releasing routes
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: lirongqing <lirongqing@baidu.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: C3330264834
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHsH6GtCAqJf1PTGjQppScME6h-dXCUFJMeJvmJsrSDkhSJa8g@mail.gmail.com>
+X-Rspamd-Queue-Id: F28072649EF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266648-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266649-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nvidia.com:email,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:dkim,queasysnail.net:email]
 X-Rspamd-Action: no action
 
-On Wed, Mar 11, 2026 at 2:19=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Tue, Mar 10, 2026 at 06:53:31AM -0400, lirongqing wrote:
-> > From: Li RongQing <lirongqing@baidu.com>
+2026-03-11, 06:00:03 -0700, Eyal Birger wrote:
+> On Wed, Mar 11, 2026 at 2:26 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
 > >
-> > Replace synchronize_rcu() with synchronize_net() in vrf_rtable_release(=
-)
-> > and vrf_rt6_release().
+> > 2026-03-10, 17:14:19 -0700, Eyal Birger wrote:
+> > > Hi,
+> > >
+> > > On Tue, Mar 10, 2026 at 3:57 PM Sabrina Dubroca <sd@queasysnail.net> wrote:
+> > > >
+> > > > Please also CC the author, and maybe additional contributors, of the
+> > > > patch that introduced the problem you're fixing.
+> > > >
+> > > > 2026-03-11, 03:16:29 +0900, Hyunwoo Kim wrote:
+> > > > > After cancel_delayed_work_sync() is called from
+> > > > > xfrm_nat_keepalive_net_fini(), xfrm_state_fini() flushes remaining
+> > > > > states via __xfrm_state_delete(), which calls
+> > > > > xfrm_nat_keepalive_state_updated() to re-schedule nat_keepalive_work.
+> > > >
+> > > > Eyal, I'm wondering why __xfrm_state_delete() calls
+> > > > xfrm_nat_keepalive_state_updated(). At this point the state has been
+> > > > removed from the walk list so nat_keepalive_work() won't do
+> > > > anything. Am I missing something?
+> > >
+> > > I don't remember for sure, but I think the idea was to have the work
+> > > run "now" so that when deleting the last nat-keepalive state it
+> > > won't run in the future, and in general to refresh the interval and
+> > > not wait for the next iteration.
+> > >
+> > > Eyal.
 > >
-> > synchronize_net() is RTNL-aware and can use the more efficient
-> > synchronize_rcu_expedited() when the RTNL lock is held, avoiding
-> > potentially long wait times for a standard RCU grace period.
+> > Ok. I thought about this, but I'm not seeing the benefit of doing
+> > that. Assuming we're deleting just this one state, the next run will
+> > process all the remaining states in the same way, whether it happens
+> > right now or at the previously scheduled time:
 > >
-> > Since these release functions are called during device teardown where
-> > the RTNL lock is typically held, this change reduces the time spent
-> > in RTNL critical sections and speeds up VRF device deletion.
+> >  - if the next run was needed by the peer we're deleting, not much
+> >    changes except that we're recomputing the delay earlier than
+> >    otherwise (right now instead of when deleted_state's interval runs
+> >    out)
 > >
-> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> > ---
-> >  drivers/net/vrf.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >  - if some other state was the first to need a keepalive, we do a run
+> >    for nothing
 > >
-> > diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-> > index 8c009bc..92a0f4b 100644
-> > --- a/drivers/net/vrf.c
-> > +++ b/drivers/net/vrf.c
-> > @@ -755,7 +755,7 @@ static void vrf_rt6_release(struct net_device *dev,=
- struct net_vrf *vrf)
-> >       struct dst_entry *dst;
-> >
-> >       RCU_INIT_POINTER(vrf->rt6, NULL);
-> > -     synchronize_rcu();
-> > +     synchronize_net();
->
-> I might be missing something, but why do we need synchronize_rcu() here?
-> The code below calls dst_release() which will only free the dst entry
-> after an RCU grace period (assuming we dropped the last reference).
+> > So I think we could drop the xfrm_nat_keepalive_state_updated call
+> > from __xfrm_state_delete.
+> 
+> Right. I think at the time I didn't think it was "nice" to have the
+> work running long after all states have been deleted, and also it
+> decoupled the implementation a little - i.e. if instead of a global
+> work we had per-state timers (which one of the original versions had).
 
-Agreed, this could/should have been removed after
+Ok, I see. Thanks.
 
-commit 4f04256c983a4f115417d2009b44dcb7d70a6375
-Author: David Ahern <dsahern@gmail.com>
-Date:   Fri Aug 11 17:11:14 2017 -0700
+> > @Hyunwoo here again I'm not opposed to s/cancel/disable/, it makes
+> > sense to use disable_ in a "destruct" operation where we don't plan to
+> > need the work again. But AFAICT this schedule_delayed_work isn't
+> > really useful.
+> 
+> I'm fine with both approaches.
 
-    net: vrf: Drop local rtable and rt6_info
+Ok, so:
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-    The VRF cached rtable and rt6_info for local traffic are no longer
-    needed and actually prevent local traffic through enslaved devices.
-    Remove them.
+Hyunwoo, if you want to send a v2 that does disable_ + remove the
+xfrm_nat_keepalive_state_updated call, or keep this one as-is (and
+then we can remove the unnecessary xfrm_nat_keepalive_state_updated
+call in -next later), that's ok for me either way. Thanks.
 
 
+BTW, patches for "NETWORKING [IPSEC]" should be tagged as [PATCH ipsec]
+or [PATCH ipsec-next] rather than [PATCH net] or [PATCH net-next].
+They go through Steffen Klassert's ipsec/ipsec-next trees, and get
+pulled into net/net-next a bit later.
 
->
-> Also, I think that instead of using net->loopback_dev the code can be
-> converted to use dst_dev_put() before dst_release().
->
-
-Maybe in a separate patch ;)
+-- 
+Sabrina
 
