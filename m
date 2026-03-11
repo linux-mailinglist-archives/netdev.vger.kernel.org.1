@@ -1,161 +1,117 @@
-Return-Path: <netdev+bounces-266439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266440-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPNPHRbcsGmHnwIAu9opvQ
-	(envelope-from <netdev+bounces-266439-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:05:58 +0100
+	id EDfqHsHdsGkuoAIAu9opvQ
+	(envelope-from <netdev+bounces-266440-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:13:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBEC25B438
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:05:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCCC25B4F9
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 835C0304A579
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:05:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4EE0A30C1F8C
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2811E328B63;
-	Wed, 11 Mar 2026 03:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20DA35CB6B;
+	Wed, 11 Mar 2026 03:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZciOML3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmO0g5WW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00902848AD
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884F935A938;
+	Wed, 11 Mar 2026 03:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773198353; cv=none; b=k3bSLO7OxZior5UrUmhw9FtJiukTrGrHHD2uJ6q7018Fod2SX2IEhdl4p/5SZwxbzDN+OvnIyVcUqhzRgfjVsehqb2U/26DqjKG2hShlNLRW2lL8rQR3rLWDsHQ06yChMw867EcBlAIq1JcNktEPGMEwuXdPtcYYnSG6XM+Cgbs=
+	t=1773198763; cv=none; b=J8f+16G9r6zaHw9SjAADdoiePBhNCqAt85QRvy/Za8G+Ea97fU7VvPzMjZVH/LuYZa2n/nh5PT3tPxPzEV/FMhSGalL6SUPg8atj4qH/8v8wm3MwT6iWpAZDQ/bgYqNHB4XSG/kryCVH1MJSDQgYCJDgWbkK6RYaT7Fme9Rkc5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773198353; c=relaxed/simple;
-	bh=g0jP/cCy0U+7vBEtzVQh9T91m2nfewDiwa5GpQYX8hQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iaZpldtW+2faoiCFjFb4LRo60wM7PSYX2vYZAz42bmQEC/QFS3QlzY96YQ2fJJNqDERSepGZAC0/jNHaoH9+qN3O5w6wSx3BCuKdwV4vR6fdJIiJkbAB7hVuWydrZaZ2V1vo0gjWUlgUh+HydSs7ad2vLs4Mh1EQij5s+i36yzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZciOML3; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-467166cb638so956936b6e.2
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 20:05:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773198351; x=1773803151; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=95ZRrtc4eXz3V4yj62Q+GPsi5hI9uvUkZWMdSqVx+RM=;
-        b=BZciOML3J05tgEuHCeUpKJ979BzwmjZ5M3RcxhcHptbOGQE+cLL/4PD6q0lMuniqEx
-         3pqZ6XQ0nxZ2J6NQsP7b4K96Q8iymyJEBnmp274PdCN/BhqiwMjxX3q0qwEM1cJVQQtJ
-         JNZK1nym6Woy4HgqsWB/P6gXyYLud54h73bg4I1Py3sDp64CcTfvJy7p3ne8Ftl0eQdK
-         ZctrsiYXbI7qFWnxu9FaksD32zHNbVqlMcenfITbmxG3mS3/gjaBwMEq/LaT4e+LNeSy
-         f31x4YjrYxAJwj3GfkCH9q/myztAE2XBxFDrgLiUvrdgGXy9+bgvQMl0yRlPhne9CnAL
-         s14w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773198351; x=1773803151;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=95ZRrtc4eXz3V4yj62Q+GPsi5hI9uvUkZWMdSqVx+RM=;
-        b=TsOR1Eb3ikT/trwkwUEvQPviHMOCmWf2Blws2JOFrCqjAtpeE2CmNFx/kJGJ8Op84U
-         CdnSl7I2f6xmlE2QTsV8Bhfm2IF2zPZ/+7rN6XvHI1XD+TJb2bSt80z/LsTzIX6TNie1
-         kNTkeSL4/1AUCPvNWBqztvBHV9Fl6cmwfflA/bdswU3cdI3OQS6IjttUoHQT+vD2cna2
-         fpfnIw8UrPnK2elQRPTtkHtgwsKI5rBWa6HvsZzGXjP4r9Nnnl9QD2Hi4xnaBiaW4Fui
-         Jdoc/gIfi8tTluffo/Ip8N5T2EzEbMAJxBCxPdz0oi3tqGQ358ZHyCS11s6TYnCRf4pG
-         Yf4A==
-X-Gm-Message-State: AOJu0YzDq1pPCsiLfJg16TJCbkXB53cl5lInwXmAJ5vdXhu0kEuE0y7B
-	42NxVR1+zyqLnhptzPwXpyTIA8Q1XVX9OqYN2WgJe0f9xHUVKUGQ3GZAm8M+cgChf4M=
-X-Gm-Gg: ATEYQzxLXtJRbdgm+nEgcolMpJ7elLYYhlfUBPYRozL4RzxLTuB1RaegIO2lIJ2qDIe
-	HhJMLjNbKTBfqygjXfrg1Iq0+7RY7vB6mfyf07rcnuTkC+7LPcTELyfFpeEcYZBoOGu784VsAMj
-	RxvUmZyTZRvCXjys2NI7vZvdF1OTNYNc+9lrpUbOYkPq8cVkPJj2tq4Ao53EaVR8Ek+X8jiOpwg
-	QHyFt9vxX3X9sJAM7SQCHqwQtwTaseroS37PjGXRs2SxSkZQingmR8MJ7LUZW4tmCP1Jh/D9D5d
-	aWb8GZTW3y9qnrTkmnmb/PhOxThj3SbS7jn2/K4HuLNrAJMfpaFoGeBPLDPCE9yRTD0RGfKXSOq
-	GgdR08u1CROpQnqQ1MzLGfcz8bl5qYr12if7OK8gohtTp6jCLkxPEo43GUyY8Ke4OYcPIFTrLnX
-	Ms4+xAuxLB7GWhSb3ZtLhVcpRWs2/B9gnLMVk8mPRbdE962d8tlBytkbm0w++PP7nfP9qBMgGAs
-	/ySkB5oLdfvftODpVtFmNc=
-X-Received: by 2002:a05:6808:30a5:b0:467:2a6e:adad with SMTP id 5614622812f47-46733425bc7mr575564b6e.11.1773198350583;
-        Tue, 10 Mar 2026 20:05:50 -0700 (PDT)
-Received: from ShravyaPC.. (r74-192-25-180.bcstcmta01.clsttx.tl.dh.suddenlink.net. [74.192.25.180])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-467342ef6fesm468393b6e.14.2026.03.10.20.05.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 20:05:50 -0700 (PDT)
-From: ShravyaPanchagiri <shravy112@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Cc: sgoutham@marvell.com,
-	lcherian@marvell.com,
-	gakula@marvell.com,
-	hkelam@marvell.com,
-	sbhatta@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	ShravyaPanchagiri <shravy112@gmail.com>
-Subject: [PATCH v2] docs: octeontx2: fix typo in documentation
-Date: Tue, 10 Mar 2026 22:04:50 -0500
-Message-ID: <20260311030450.8461-1-shravy112@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773198763; c=relaxed/simple;
+	bh=SDUWr51B+h5ikqvo7TzBEoMCm6C8OxHIRzg3bWcb7GQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p7NpCbTHlxCUc0JeL9743WkacyCRl1l/+KgHbToom3CT6iJhTuD0/wE9wiJ8JbRmxBGzgEELec+Mr0lDcIwS80ObM7uMmnSIlfqHF0xvsl85CHELEKiBspfrmTQ5v6t9XcaqxFDTrUomqQt3p9W5hYURym7R2m+4SWnJJpd/n5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmO0g5WW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 907C7C19423;
+	Wed, 11 Mar 2026 03:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773198763;
+	bh=SDUWr51B+h5ikqvo7TzBEoMCm6C8OxHIRzg3bWcb7GQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QmO0g5WWQTdZhQYSc2d7BIBWhFKMOZjtRH4SeL5O1qETn7L5HsVtD/RlBRGpb+U/C
+	 qNv0ZP2CKT8SEZGGhreTyzvz/iNG/DdIz/hcLD6B3J+3CrjrK85ku4S3Nv5C+Htkbz
+	 /cM1SurMlNPKnL9qTxlxyelI1MdiNO2gJos0Nded+7dGrYq/E/N8c/qTj/FLwy9WJJ
+	 xUcscguVuZdL80S+1N1dlC4sVAY3pegXu3TvkYSnQhscMhpo5HRTNgIQ9x+AT6xUQe
+	 zOpEfKtCA2f9faZ+ZDx1p+INskCdAf5Bdk1jYLZCQHhYk1Kbba4obZpyspx+u2EQCC
+	 +frKdXgxeRXKA==
+Date: Tue, 10 Mar 2026 20:12:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, "Mark Bloch"
+ <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe
+ Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next V2 1/5] net/mlx5e: Report hw_gso_packets and
+ hw_gso_bytes netdev stats
+Message-ID: <20260310201241.2f6e87c3@kernel.org>
+In-Reply-To: <20260309095519.1854805-2-tariqt@nvidia.com>
+References: <20260309095519.1854805-1-tariqt@nvidia.com>
+	<20260309095519.1854805-2-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: ECBEC25B438
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: DDCCC25B4F9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-266439-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266440-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shravy112@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Fix spelling mistake "Crate" to "Create" in the documentation.
+On Mon, 9 Mar 2026 11:55:15 +0200 Tariq Toukan wrote:
+> From: Gal Pressman <gal@nvidia.com>
+> 
+> Report hardware GSO statistics via the netdev queue stats API by mapping
+> the existing TSO counters to hw_gso_packets and hw_gso_bytes fields.
 
-Signed-off-by: ShravyaPanchagiri <shravy112@gmail.com>
----
- .../networking/device_drivers/ethernet/marvell/octeontx2.rst    | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The docs on our stats are based on the virtio spec:
+https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+which is not very detailed, but to me "bytes of TSO packets"
+is a sum of skb->len of those packets. And mlx5 seems to only
+be counting payloads??
 
-diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-index a52850602cd8..c31c6c197cdb 100644
---- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-@@ -323,7 +323,7 @@ Setup HTB offload
- 
-         # ethtool -K <interface> hw-tc-offload on
- 
--2. Crate htb root::
-+2. Create htb root::
- 
-         # tc qdisc add dev <interface> clsact
-         # tc qdisc replace dev <interface> root handle 1: htb offload
--- 
-2.43.0
-
+Maybe given the ambiguity / mismatch report just the packet
+count? IDK how useful the bytes are in real life anyway.
 
