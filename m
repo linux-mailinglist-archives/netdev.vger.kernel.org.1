@@ -1,170 +1,213 @@
-Return-Path: <netdev+bounces-266614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266616-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEzREENKsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:56:03 +0100
+	id KA2RIGJKsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266616-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:56:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F04B262A18
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:56:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB1D262A2E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:56:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D71D330A0DF
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:45:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EFBB3375DA3
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E6B3D170E;
-	Wed, 11 Mar 2026 10:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42E93D3324;
+	Wed, 11 Mar 2026 10:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A3ybSBEq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHzQeQEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D21E1F875A
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 10:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773225935; cv=pass; b=rs3Aiu0TffJuht5/V5JGJBXvPzvy1rLfS6B4txq4ZHPBV64p4uYYJmXqp9DL8DNkyuLVRsohtF8nC07YG8xU9fWrT6OAzva4hktTv80om9MQXALFs26sFErh8xMgRryc8sSCH2uYYmbitXxImXDufAwPkLCa0bny0giHwCQsEc0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773225935; c=relaxed/simple;
-	bh=7vsDk25zVBTfwb1axdr1KCfVVl/kd3eHhZd/r75+KnU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lxYaHPejKFUxdDMmMugcBFfw7Dud3kEzU+lw5czTJ1HF64E6po3qTuFmxfCq+H2eKznJE3qTVDBKsxUQ88Y1OdA5vUbr40DZuAiD/5W2dGz+Gw2Z5lju9Hetq8cYHPIWPewrCb25fCqsdMuOS4ACksnF6jo838wjQaTSzkkKZSk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A3ybSBEq; arc=pass smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8cd73c4a827so477715185a.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:45:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773225933; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JAJ708Y+cro+V4aAsyi4GUgzohLAXugE2KtJluocgaSKOQ125lry8H5qENDilznECx
-         Y6RJxVgLwTO9Gjg4iIgu8SlYzUFiDYCwqYRH1weO9RdL8xIkwEw2KQtlZSUJO+nxnv+P
-         jsYPhBoACyNQYBw18XKts1uqz1nTe7nPxyxeqEmRm8/jm9cLOr/4fgrvgx5U9fiJDBmx
-         TNv5jmFRc+AXj/d415gUwbWdBOxBTcUQNHyNHjntzXr1ijLk7LmeEip0UDT7shRltR1x
-         NYBSfIgXrvK7PVm6AHvmzzEZVQQN/jtitQ4hIPPHtP04DTndIdyd3by77PsCNAbJ3QI+
-         OoYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7vsDk25zVBTfwb1axdr1KCfVVl/kd3eHhZd/r75+KnU=;
-        fh=+HA1RDfu0QVuWA4/EXkKlzUEQV7qliXl/87nNiLsSDg=;
-        b=PdVDRpGIOl8jCO9iXmUsLYFTw++QULhl8DA/9yrG80vyquyn6+Vmb/M8x5CAPYp+jG
-         RqGN0LVp8ncDlSDizzW/z3U/GkzZ0AVDHOZ/+pCashTnXqEjxjN7AGjn2eHE1XkZaqc1
-         5YhstLPypss05OskPD3gD7zjC9MiEplDcsY6oYvsqjJPPvc4iKSSymmFN9m05hMcRzZ5
-         J6OfCMeSHiE3mT72J2QT2jMekdLuQsHiIvnsLp+5u25vLPZ1Us8K+Zphr0Dmm2MQnz9f
-         8AAlYpLbXo/f8KZCY/KSYunZE0Rp+6FFjT1Ze142qzADoaVMgbFdmPcHxCfyNjH0D52e
-         NZdw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773225933; x=1773830733; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7vsDk25zVBTfwb1axdr1KCfVVl/kd3eHhZd/r75+KnU=;
-        b=A3ybSBEqCvOF9TOgD/cukZvxNM34FzsWMu2Zht3rmo5m5z8Cl4O8mt4doNlS4bPQsg
-         OQ9Smoc3eCcZAG/PxyGi7Xt6QEgPT/gKB5EOiRD9aVSoxOG8JyWjdOFA/h2G+dxThLRZ
-         I7yp4VoE9QXVssfdDoz21hQHT8jBEgkVa/8NMCRFokHVn3N0HIGLTLO0WvWXxshGQFpm
-         Lk4pYyeRWoJR8HfrwPjUYFojSfC42mmxg/I5+KqFBhwTK4ybKyd0kZHwpuVmmBZbfkLh
-         LBC+UhLUQQRmkIbWwrnDlBDT+4IbAGh1wo1VBEK/skA+/I/Dxqks1cUbDt3Juam2skXr
-         PukQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773225933; x=1773830733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7vsDk25zVBTfwb1axdr1KCfVVl/kd3eHhZd/r75+KnU=;
-        b=nOaokNovvX42s7XAPJvkrcI3CJAH32pQJFi0u2oXPsrfh5pcIqiSp6QetQSLMlgK6S
-         PdUJrH3q24iQMSbLdwCYRFCt7Y0HozcmAMFxayQgu20SmJ7KXqdD9MP7YtYI7eTui7f6
-         C8UbI6Yfyfdg3SzK/POKnRt1rpMNjBHO+dhEQGJg6dhKaSKjLHg39dSvVxfLjapNqgrI
-         Fnla5XGm1u4DBXvdQHs2COz+LiYAoK2+K7Ro6Yu2QE/1dl6y9CQhrFWMSLGEkvojCFm/
-         mudSjnqdv1s+bwzemfH66KJOHP/2xeMclWtDQrZ4gq2gIR3xHznIg9bYz0RsWB4qB35J
-         C8iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjPVPGrdwneqHpwjxnISBkzVspyO0DF1lTl774a7a7W+hcaNZstZSwEnzOEoSa+vyZ/s5NicQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGfFtFiH805RDs6fEUfUGPFPwzf56IQJNtjwcXeTsrOu1Ubtoo
-	c7+uhi3XzacJriRO1+f3ZgFIyClzm5lsOEG2mh1bBEOeAx/j2KQWV1csZTleQcXk4V4gulXhhgw
-	ol/k9WoV4tG4IQz1c17oUAk2Pc+fvJtkDqStGyVAv
-X-Gm-Gg: ATEYQzy9N7rNSe1VG+tZSlXd0JzLq916e74ZreVCGzAZ1CqMy3P9ettw2aym1Etw5eF
-	4FiNbEkRn/QBx4Si1//GgZf7Dd6+ocUlz9SWl/vKVDqoWImPV6TQ9ScERLmfP2jQB6TSNn1k/J7
-	4e3WBqYDLMuUjvX3uOaquHj6cnqJv/7MwbnRWuf3oCMmoSZR+mSOt2iNgbaBn19Mb8gnw2sElx7
-	8bf8lILAOpHbK706kmPUZf/8OQkvnxuyv08Qjimqb5kUmlrhLyxfv48Ka/ksogv6ljCpDqODt4f
-	1amLk6LW
-X-Received: by 2002:a05:620a:19a3:b0:8cd:8f18:d1d3 with SMTP id
- af79cd13be357-8cda1aa96fcmr238042885a.58.1773225932110; Wed, 11 Mar 2026
- 03:45:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9159E3D1714;
+	Wed, 11 Mar 2026 10:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773225981; cv=none; b=ARuVCW7R24SCcdrmBMh/Nc8HOImfwXWpeL9ZXDBBdLcjm9gCWv0+xlKI3jDv0CTYKrnwW+bk/VRRPB9XApkYbdFveGaPfWKvDhLo0PArHHW1K6upGq07BLSZhJrmxX68Dazbs9KmJVIz3ug7fXeaW+dJmajaKNeMXtb5RVVlc2k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773225981; c=relaxed/simple;
+	bh=CH6f9TMm0d3EtY6ULRD+dt0KRbIlG4y7+cUqEvseSDY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CmqKxNtC+iZ+sh7hUN2oWwrPZ1rvI3y3flNqGYfSpVUf+lfPLa1I4060wxSlQSGRMrRIDdXcKUKOPa4Jlb7yjEZajZXbVUKRNVUlJhMgRTB9WMebyMjlIufOi9cqcldbtpvGwcJs0aaDEiQJhiPf9oa3xk/PvsgNk2TIr1aZMs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHzQeQEZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 38CCEC4CEF7;
+	Wed, 11 Mar 2026 10:46:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773225981;
+	bh=CH6f9TMm0d3EtY6ULRD+dt0KRbIlG4y7+cUqEvseSDY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=EHzQeQEZhtu8p02pk4GViwtCnQNupa5M8HdKwLOMxO7HIrSTqxzp9uc+CH+umzJcX
+	 8aXllxyIbmjZjPeL1KDtTE2SRuF8Z9eB5I486eC/A9CXqocSzeP1aPYCPbwzv6PFuU
+	 WasvVGcAMkoj4lWqSEOCFFAhI2U4JkkRMATFDGPSgd0KRKfT7CAlAcL5pHOt3KOJaY
+	 Vyd+q8qCP61VcuEeGq7VEW7NQqanjHtxcs88hPXrCNKtXjHZcLNQoMGIqfbC+ekYJL
+	 vVeZgX7qBv/3d4FQuwaoi4kgJUmXKUR27sEkbc5e7JcALTmwZ5WNgqVKIv+0LEOQy1
+	 d8D/hhRc4B16w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E574104BEC7;
+	Wed, 11 Mar 2026 10:46:21 +0000 (UTC)
+From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
+Subject: [PATCH net-next v8 0/2] net: dsa: mv88e6xxx: Add partial support
+ for TCAM entries
+Date: Wed, 11 Mar 2026 11:46:17 +0100
+Message-Id: <20260311-net-next-mv88e6xxx-tcam-v8-0-32dd5ba30002@luminex.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202603091409.866c520c-lkp@intel.com> <CANn89iKUdtWw4ptM8ZreRP0a2FuvQOJ5FgE3o4q-zTRTmt1Umg@mail.gmail.com>
- <abFE5PEtrkT5paKB@yuki.lan>
-In-Reply-To: <abFE5PEtrkT5paKB@yuki.lan>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Mar 2026 11:45:21 +0100
-X-Gm-Features: AaiRm53pzyyhStKrLmQaAlgunggh_gChR9xqV-J3aHPcZ3AKfR6HTggnSd94pyY
-Message-ID: <CANn89iL8xwJxLMm+a-QqDUq_NeYSZBAMxvAAJ2_2X0tCd+J7kQ@mail.gmail.com>
-Subject: Re: [LTP] [linux-next:master] [icmp] 64db5933c7: ltp.cve-2020-25705.fail
-To: Cyril Hrubis <chrubis@suse.cz>
-Cc: kernel test robot <oliver.sang@intel.com>, Kuniyuki Iwashima <kuniyu@google.com>, lkp@intel.com, 
-	netdev@vger.kernel.org, oe-lkp@lists.linux.dev, 
-	Jakub Kicinski <kuba@kernel.org>, ltp@lists.linux.it
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 9F04B262A18
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPlHsWkC/4XQzU7DMAwA4FeZciYodvNXTrwH4tAkDotEu6ktV
+ dHUd8dUQhRVHYccLNtfbN/EQH2hQTydbqKnqQzl0nHgH04inpvujWRJHAtUaBVCJTsa+c2jbCf
+ vyc7zLMfYtDJbEwisUj4Hwd3XnnKZV/lF/DSJV86cyzBe+s/1ywnW/L/6BBKkMkDGIGGT4/P7R
+ 1u48jHQik64hdwxhAwlr2PWqFKj7Q6qNhDqY6j6hiJ4711ykHEH6S1kjiHNEIDLfDvSkNwOMr9
+ Qpe7cyEglba4Ba+sduv1qdgvdmcgyVGF0OTSRtbSD3AYCdQw5hlyqU6gVYED/B1qW5QvwT17pf
+ wIAAA==
+X-Change-ID: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Cedric Jehasse <cedric.jehasse@luminex.be>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773225979; l=3809;
+ i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
+ bh=CH6f9TMm0d3EtY6ULRD+dt0KRbIlG4y7+cUqEvseSDY=;
+ b=2SQ3BpVZPy/3YfD2osBUlFa8/M7PAupf/i3aXS/J6mGs+x3t1nBoGiFA1n/IS03hv6SNxPxm2
+ BOzP8aWetNGDR7fhMQ/D+Yzdcz9r9rQKurI/LcET5eOjciuTHjKSWaW
+X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
+ pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
+X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
+ with auth_id=638
+X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
+Reply-To: cedric.jehasse@luminex.be
+X-Rspamd-Queue-Id: DFB1D262A2E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266614-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266616-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,mojatatu.com,resnulli.us];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.cz:email,mail.gmail.com:mid]
+	RCPT_COUNT_TWELVE(0.00)[13];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[luminex.be:replyto,luminex.be:email,luminex.be:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Mar 11, 2026 at 11:33=E2=80=AFAM Cyril Hrubis <chrubis@suse.cz> wro=
-te:
->
-> Hi!
-> > I do not want to know what this test is doing or expecting.
-> >
-> > If it expects sysctls to have a precise value, it should set them ?
->
-> The test is a CVE reproducer that checks if ICMP message ratelimiting is
-> sufficiently randomized so that we do not leak information about the
-> system.
->
-> See the test source code:
->
-> https://github.com/linux-test-project/ltp/blob/master/testcases/cve/icmp_=
-rate_limit01.c
->
+This series adds partial Ternary Content Addressable Memory (TCAM) for
+the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
+switch to match the first 48 or 96 bytes of a frame and take actions on
+matched frames.
 
-This test needs to be tweaked/changed.
+This patch introduces a subset of the available TCAM functionality.
+Matching on ip addresses/protocol and trapping to the cpu.
 
-It has been written with wrong assumption.
+Eg. to trap traffic with destination ip 224.0.1.129 to the cpu:
 
-(icmp_msgs_burst =3D=3D 50)
+tc qdisc add dev p1 clsact
+tc filter add dev p1 ingress protocol ip flower skip_sw \
+    dst_ip 224.0.1.129 action trap
 
-Thanks.
+Review of the mv88e6xxx changes have brought to light something in
+cls_flower:
+When adding a classifier with an ipv4 address both
+FLOW_DISSECTOR_KEY_IPV4_ADDRS and FLOW_DISSECTOR_KEY_IPV6_ADDRS bits are
+set in dissector->used_keys.
+A change was made to address this.
+
+Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
+---
+Changes in v8:
+- add teardown function for tcflower to free entries in the tcam list
+- Link to v7: https://lore.kernel.org/r/20260310-net-next-mv88e6xxx-tcam-v7-0-7d9db9012b28@luminex.be
+
+Changes in v7:
+- clear register field before setting it
+- fix name inconsistency of mv88e6xx_flower_parse_key
+- use defines for spv and spv_mask register fields
+- Link to v6: https://lore.kernel.org/r/20260305-net-next-mv88e6xxx-tcam-v6-0-32c7fbac129d@luminex.be
+
+Changes in v6:
+- add num_tcam_entries in chip info and check this is not exceeded when
+  adding an entry
+- fix use after free in error path of tcam entry deletion
+- fix copy/paste mistake in comment
+- Link to v5: https://lore.kernel.org/r/20260303-net-next-mv88e6xxx-tcam-v5-0-6f9129687276@luminex.be
+
+Changes in v5:
+- changes to cls_flower to only set the correct
+  FLOW_DISSECTOR_KEY_IPV*_ADDRS bits
+- Link to v4: https://lore.kernel.org/r/20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be
+
+Changes in v4:
+- return -ENOMEM on allocation failure
+- fix double mv88e6xxx_reg_unlock
+- return -EOPNOTSUPP for unsupported addr_type
+- improve error handling in mv88e6xxx_tcam_entry_del
+- Link to v3: https://lore.kernel.org/r/20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be
+
+Changes in v3:
+- move locking to top level functions
+- use defines for match field offsets
+- use correct comment style
+- remove warning used for debugging
+- rename rc variables to err
+- limit line length to 80 characters
+- Link to v2: https://lore.kernel.org/r/20260217-net-next-mv88e6xxx-tcam-v2-1-d84cf420da46@luminex.be
+
+Changes in RFC-v2:
+- moved tcam_addr to chip info struct and remove tcam_support field
+- added 6393-specific tcam ops that write the TCAM extension register
+- rename the defines for TCAM registers to be consistent
+- reverse christmas tree variable declarations
+- Link to v1: https://lore.kernel.org/r/20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be
+
+---
+Cedric Jehasse (2):
+      net/sched: cls_flower: remove unions from fl_flow_key
+      net: dsa: mv88e6xxx: Add partial support for TCAM entries
+
+ drivers/net/dsa/mv88e6xxx/Makefile   |   2 +
+ drivers/net/dsa/mv88e6xxx/chip.c     |  35 ++++
+ drivers/net/dsa/mv88e6xxx/chip.h     |  52 ++++++
+ drivers/net/dsa/mv88e6xxx/port.c     |  28 ++-
+ drivers/net/dsa/mv88e6xxx/port.h     |   7 +-
+ drivers/net/dsa/mv88e6xxx/tcam.c     | 338 +++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcam.h     |  41 +++++
+ drivers/net/dsa/mv88e6xxx/tcflower.c | 167 +++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcflower.h |  14 ++
+ net/sched/cls_flower.c               |  12 +-
+ 10 files changed, 686 insertions(+), 10 deletions(-)
+---
+base-commit: cd51b40495c09b92beea6893663b3d0ed7605e81
+change-id: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+
+Best regards,
+-- 
+Cedric Jehasse <cedric.jehasse@luminex.be>
+
+
 
