@@ -1,212 +1,321 @@
-Return-Path: <netdev+bounces-266644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266645-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2IZkN5hpsWnsugIAu9opvQ
-	(envelope-from <netdev+bounces-266644-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:09:44 +0100
+	id yMNbExhrsWnsugIAu9opvQ
+	(envelope-from <netdev+bounces-266645-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:16:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17E52642B8
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:09:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0600264417
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF9193030DA6
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:08:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D2F2318A685
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568102E4257;
-	Wed, 11 Mar 2026 13:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78302D8771;
+	Wed, 11 Mar 2026 13:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="ddBrJh5K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KfdT4ody"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF2528507E;
-	Wed, 11 Mar 2026 13:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773234487; cv=none; b=pirMBszawCXNK3gXZpU7/5Fsbwjhd6ADFJDS1wdk9KWFTCsSVFqgqKfzqwpkIXtxq8aH37AtG43paMRQD6mvpYFVWSWYqbtSwA9ETzuOYVefLNXtyNORRuRmkd1x2d0nIOgGBrRFQxEHWJqaH1bXKh1zZPvLpZAYBBgvYrkMQiI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773234487; c=relaxed/simple;
-	bh=8E+RklUDOEWGr3ASBSUDYmUqwJJzbYjGPEsS2dVw21c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rOH2CapqnthCMvKe2byU5EarQI0cxHwWnu3JX0/VBKp6L84oyAGR/cBYGXz/YaR9Gm6lOfbDW8URtocf3AZCJHDZ/WIZjZukh+7/1F63WQXVH4xSNev83xp9cSRNjZTfkUU3LtcOV3q2M8kK+pXRTJ+wJFHkdt4gAKpNeoUetBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=ddBrJh5K; arc=none smtp.client-ip=148.163.152.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
-Received: from pps.filterd (m0354655.ppops.net [127.0.0.1])
-	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62B9TbZK983285;
-	Wed, 11 Mar 2026 13:07:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	default; bh=SrAeFWtveCtEjyE93SCzkC8c47nJq1JLGeA5lKkS2Y8=; b=ddBr
-	Jh5KHnMGBWqk+k3l/jEWGCFQC2jacrZpcM/i4rdK1IoC9xUVz8RrlbC2azQq4Om7
-	G/kHIsd2LhFgg7dv61Pbfo0LMHJDihuM1l5SmtUxVQMZFHX2szlZWZH6F0PdhPkk
-	vPoRaMl71fxdSvTWoliuIIiDveOwrrUpQZOm5iFisHn9TIMKi0KyTD3iCz7lDa1t
-	fSzdl2zVsrju3kzIOp3zbCy+GTCWU4krZ6+e+ZAyxxgGg42HJ+e2BGEdKmdaxPlX
-	EL681UyCPZkyEyprR4lkAr7YpYrlZtrOuH8Znrzdp7fbjawQ15KLJV+s8vHP+snf
-	X8eC+MRg932SktvdWA==
-Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4cu5tf8nrq-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Mar 2026 13:07:20 +0000 (GMT)
-Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
- 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B102E4257
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773234560; cv=fail; b=FuJ0LhZ0HIHMjJhI2eakaPiFrDrw5l9nEaDcmGa8nAHFHns4kyrAfYs76QUW1oUoNJX1eP+iRne8ssX69kDSAXfzqMGoqRej3Y1CMElz/RvK33hyUuwju3fvs1pVdcTQaEXdByJOWnelHovDSwvHjfoPkMwL4d/H0X+ELZEmtZY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773234560; c=relaxed/simple;
+	bh=V3Z6cXCNhesEtDWPH8zigK37RCtnckhCOpV3TPVUOMk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=B9Wvk7wYHYsYJknRHQZv6PPOJqxcVd9RTm7wDaSNLPJOzfiMcPYlDxIK+vcWFy+VG1eWRaZ1joQcEgxm82x60l2cJ7ys/vQBylrNQgoAxy2WGF+mDrxfkQRKj1vV4MM/NWAIjkEBOT3dbuhgX0W2HCo623671NdtOw/FukpjbI0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KfdT4ody; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773234559; x=1804770559;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=V3Z6cXCNhesEtDWPH8zigK37RCtnckhCOpV3TPVUOMk=;
+  b=KfdT4odygzsl/5h6cm1lONNFkbb/KNVqXVgzVV0sSutTeDScwYNhwh22
+   lYgNCQTiR8J+tB2ca4YaBgsjpb2RQdX8BMOkSKyU9MuLbKOVTYqgjAv/B
+   KNnxY5AVh1CmuYbuiYwU5vqhdL9TlLSSXgsMh5wzuvo95w9SF50bGAwBo
+   jsa7y6HEKkMz0K3wpv2RTq/J9P2+MrvqrcWLUrDq2qAqksy/4edaMmwtk
+   kvzV+OZxujgCPxcv3HF30tApj5fgvGvFp3Mmzz7Wh8vpIGq9aX136taAN
+   ICuD2pCqapxXE0F/nrTGo2EOLUu5NCQ+tpVOvs7yu6v1UHsj+oyNPiaxN
+   w==;
+X-CSE-ConnectionGUID: LCWre7gyTSuxfz+82zR0Lw==
+X-CSE-MsgGUID: x3iN6irZSjShYzj4JV78TA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11726"; a="74490073"
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="74490073"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 06:09:18 -0700
+X-CSE-ConnectionGUID: JK0D0I0/Q4q3ItgOTAoIvA==
+X-CSE-MsgGUID: QnkhImwCTOuj9IPs7fcONQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="219706542"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 06:09:17 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 11 Mar 2026 13:07:14 +0000
-From: Slava Imameev <slava.imameev@crowdstrike.com>
-To: <eddyz87@gmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-        <daniel@iogearbox.net>, <davem@davemloft.net>, <edumazet@google.com>,
-        <haoluo@google.com>, <horms@kernel.org>, <john.fastabend@gmail.com>,
-        <jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-open-source@crowdstrike.com>, <martin.lau@linux.dev>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
-        <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next v4 1/2] bpf: Support new pointer param types via SCALAR_VALUE for trampolines
-Date: Thu, 12 Mar 2026 00:07:11 +1100
-Message-ID: <20260311130711.33966-1-slava.imameev@crowdstrike.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <979c7539ac475b3c428f609066e947844b6dd8b0.camel@gmail.com>
-References: <979c7539ac475b3c428f609066e947844b6dd8b0.camel@gmail.com>
+ 15.2.2562.37; Wed, 11 Mar 2026 06:09:16 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 11 Mar 2026 06:09:16 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.49) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 11 Mar 2026 06:09:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=B7JI4fBjBYufQo+CV2z6Zl51O7z6ptiB7Ren68V7EJVcBtWm0oUmk01VFfrpkV7HkwGVVYy4SYqCfVT6IJn//9rJyPMs5kvG76zyNECU05cCByhqAa0TDFWBZqo/5Ri8mmBt69OE23XrGK1JcQjA8i0SMqVp76ZJbsepDvVxAOeVsczW7En42saLdZtOC18IO+5cWubTdksXhHMnfA03c13L3di0Vg0NP5mhUMnxDAqrAA0Xa7CJrDhyXdr1tS04saa48lOF5wu2KEQ2/6gK42gclPwMQ9lwh3YmDZqwtRxH9pbQARBbkFDUZ3YsIESgyFvZNFkNy6wh25QMsF8Uew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VowCAOGTurT6IIdV7oooybfN94a7VtVYKvDoSP1fYII=;
+ b=UdxLvknexYYEsEKmJzqqF+RGGkN5Dmu5tJSmFEGI03QzeK/sS9sH3NqmLYAl6qdTGQNAHCeKwYsrQxvpJXcFsjZABxwbF6Wg3dxLyoRNAIi10pCIhtUI8tVwlZDrJ51Hy+f6KajYLANz1nBtqK6+soDJrhe60BC76KfJvn4VJKWKYsxBxDRye9F8nTjGi1A+M3x30mDy+SvF5Wl4FBgxDrQ3xPYQ49rpGlN4LjKTa9SiQCLLCuSecYwP6NSJYtE2x6ozR+w3jOnmPF/H1ke8kuVglSeazCChgNlD54YE5RaD19v6HImIX5sdHOBjZDR9HApkttL8ZC0RBrUGkPYZ8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB4904.namprd11.prod.outlook.com (2603:10b6:510:40::10)
+ by DS4PPF2D9C959A2.namprd11.prod.outlook.com (2603:10b6:f:fc02::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.10; Wed, 11 Mar
+ 2026 13:09:09 +0000
+Received: from PH0PR11MB4904.namprd11.prod.outlook.com
+ ([fe80::ff04:50e9:d186:6305]) by PH0PR11MB4904.namprd11.prod.outlook.com
+ ([fe80::ff04:50e9:d186:6305%5]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
+ 13:09:09 +0000
+From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write support
+ for sideband queue operations
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write support
+ for sideband queue operations
+Thread-Index: AQHcsH3aCkZV4GjS0EiRZNcpFpJXibWnngwAgAGxW1A=
+Date: Wed, 11 Mar 2026 13:09:08 +0000
+Message-ID: <PH0PR11MB4904742C406E5B30DA7400C89447A@PH0PR11MB4904.namprd11.prod.outlook.com>
+References: <20260310110700.345904-1-przemyslaw.korba@intel.com>
+ <IA3PR11MB89862BC3078293849BE46C35E546A@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB89862BC3078293849BE46C35E546A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB4904:EE_|DS4PPF2D9C959A2:EE_
+x-ms-office365-filtering-correlation-id: 0f421468-c934-4cc7-d255-08de7f6f61b0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|56012099003|22082099003|18002099003|38070700021|7053199007;
+x-microsoft-antispam-message-info: 2p3JRqHCrd42sfxbxRRbCAAJYxnx/wEj+XP3Q/NhyNecVuefZCmCxcvtcENq+ZktMc2RK+ZaPrV8s+bJKO6nmAchAAWgXvHkbJV5H9/ZillhJF+N5M0ddKmJ2KICShC4M+VZYUy9sCW6wRzm03JQFNtCmxUuOXENv/rWiQuwBVvpN2eVct0Yy5pcbIe6tddWUL4S5GIEKEFDHDSqIn4x+AHmqGuv4Zf/au7+srYmgQ867j7HzNCW46WihmYeDHs2OTBxgbgcryF03iWWGEuY8EtcLWA+jeWW4oBbMPWrqCeWoBTbWkDLgkCEtmFbnnpCG2V6i/ABH1Rllnep0x5OEcPDNDG5rneG74ZcbFPcmDnbsGg0cvwRjYy2gIhHAyZTsG1dZd3Z6K1Uz+nW4nrfy5wIQkDGqSO3oQHpJD5Uklfpm/iq1uO9BGBSeq3AuPzmgbfQwN34a+JaitqLtYeBbcUzv6JvfI+BAUL6XRWOhsA8JXnSGxQcQrLy+u8DO+dABZvZh31thC6YTpFIrcr03fU67Ba8m7IPJWS8RKisJ/Go+Fs4NyxeaE0jXPd7Z8JgM+nUMPXlv6PM/us7w1thiiJ8+Odg/3Bc9heQRgoo1dqBIcYOt2O/JDnzzeA3DGRR/R7h3gpWUHvsUqox97VVNAOTVQ4z7I4wEVY9x3OfWgqxzdgAjxjGo/bbZ72DJyP0m+i9e0xjIxVHN835JnRp6/Kd18guHzuQEyK0cdafxGC/x5Gcbs3h94ldlDfqZCxouFhUel1tUtfsdKhHvykkUPekwzEoeMrhxGIHbtzv10g=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4904.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(56012099003)(22082099003)(18002099003)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?c1nTo0DJU18UooscE0fRN2h9IuL4bm/wHlQ+fYDWTrlr5weZSV0p6bLigBmf?=
+ =?us-ascii?Q?EgnQKeuFGRF1YPBNHbcThpU0J4IqobweSophqWDQ8qVzsq1CTTcZErXJuAGh?=
+ =?us-ascii?Q?zP7cTPNI7OHhzpK96EnK47xbDdKT1y7vGjBxHv3/o5ccKWfCInUVmPJOaRgb?=
+ =?us-ascii?Q?sKpzZQTM3QQZupORnl6j6gEBX59eSucPrEetZf2fv3bMD5azq9YF++W1VjqS?=
+ =?us-ascii?Q?kwx/ms9B8ImS0M48JfCQMFHAd7Cm2SHpVOXMfrMQ2blr0Mo6VZ6rHaILvIRv?=
+ =?us-ascii?Q?3ncgCAYm7yzY7lGviN3oSfmUqfoWPf7GSHm1mvUbPgCYq73D7q4Lsy4SncU6?=
+ =?us-ascii?Q?McgluHgtUxoXD7Bw24FJOWLxGwWnWWM1YJedViTfJ8fdQxqO5AlwRv4dSu+I?=
+ =?us-ascii?Q?lRHKePmc8kaZ0Evm47C5Tc9OUc1dIGmlhWeNQDRwpdRI2B5ht/5hkv4/ncMV?=
+ =?us-ascii?Q?jh8LJGUzRQchFLrvFHyMbUdcRTYvoXQdhpba5ZCWRdrsUc5DwWmyqPwmzjux?=
+ =?us-ascii?Q?gQJwNo+1g9/WyxWuzr5rcrG4R0Bft4kXDNJ7iOf5E+lt/EW+9Pnt/lpgLkkY?=
+ =?us-ascii?Q?+pMuZpkQYCbilVI7dKhidIAOJTka62+Rg5SkituU8taVuYA+30sl0E7y0I3J?=
+ =?us-ascii?Q?O33eZ8yy/DsvaZspiKxGqBS5aDqD0XzUHLjh0cJka5sozH2azkAt2yDPhdI4?=
+ =?us-ascii?Q?4mzjjxmksbYxi0OKVQSi99IICTUbwqt0CV18xA00CLvhr8rgE5HyoVH0hzSw?=
+ =?us-ascii?Q?VJgOI0FnNSVaTulAcrzEZGZ1OIi5lEyDmnPaXPBq4WAYlASZyhed33foZGY3?=
+ =?us-ascii?Q?2zH8lHDo0JFvMFeHICQVQQswrO3x5pXKz/h6L8JaBQ68O+Vs6gYD6BbJTwP6?=
+ =?us-ascii?Q?QSaI9nuAw+Wac5BadGme0Y5NLt727z5nwbLCCWk/jHUC/cQJ0Ltwdz+PpbTq?=
+ =?us-ascii?Q?Ufj6/I+1HAMvKcF9EaA2iWZaEObCeyKIptI00FJoMv4ELGQT79YhEH6AvJIS?=
+ =?us-ascii?Q?FFIVQGpxxhybvsCLzspQEERpgIIiXrxP5H2Mkuf0hYwRrTZqQzUyY++SEOtS?=
+ =?us-ascii?Q?3l/+8IzYD7kJsqB7hl1qLXpQPrpagKhcNiftBWG02waRqS25UqOJxYYyW+Eg?=
+ =?us-ascii?Q?LhoTrpFStjAaKXWKsxBPBiWQhGwtXkLjwy9JGzZEvh8IodP3ctaiMyAAuCxm?=
+ =?us-ascii?Q?OVQ7Uh9akKQuTxajtT+P2zsse5YHezT8DqgBHY2sw7xSuVoRNMcNNIhAwgYc?=
+ =?us-ascii?Q?5WCF5acmNHBztmol/VSR+jXm/5zvVJEMHRrOZsQ9lYbSez1GmMzZHlip5gml?=
+ =?us-ascii?Q?C0+Jobmezs8lpwJQiBAj/cTwEdGh00n5hxarhWcjcRMyiyieyzYOPie4Lj+o?=
+ =?us-ascii?Q?UcIsYK5/BPZvS5ft6UYImnfmmcsYdajt78Zqkev4mvXEjZidoQtMX5AqdmN5?=
+ =?us-ascii?Q?xb8cxc/npToUHMNwe/LIaAp14muGYfIKAFFrViinitNhBPoIyk4UFuZEK8u5?=
+ =?us-ascii?Q?Eq8Orfa7T5fGKAj6nmU5ZnQDz/NP6Eo+S5SVT7N6gNJfGrUrQt5STFEzY+AB?=
+ =?us-ascii?Q?/xkDlJi3aEjsHyOOAH7reW1doA7Jh/IRQ+/41jyk1kjLKSd6wirVKBAtvasa?=
+ =?us-ascii?Q?S/pyakn/rMSZVXZaqvJrGmEW7LO81NzUONm3/GVp8Ty2EIfKK9tIR59UVKd5?=
+ =?us-ascii?Q?0mVVWYJZNWUVzBYKZ4KvXIFDhwHks8uAmrJHh/bUMWe4aVf5mPLKXSsdsVRJ?=
+ =?us-ascii?Q?HqiAeKsklg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: 04WPEXCH013.crowdstrike.sys (10.100.11.83) To
- 04WPEXCH006.crowdstrike.sys (10.100.11.70)
-X-Disclaimer: USA
-X-Proofpoint-ORIG-GUID: CcdMPNc4NXEkZivWkmHMQ8qkEE15fTCU
-X-Authority-Analysis: v=2.4 cv=ANV8z2x0 c=1 sm=1 tr=0 ts=69b16908 cx=c_pps
- a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
- a=EjBHVkixTFsA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=T2KQ53IYiC3MXPrxx8bB:22 a=vDKVRhTs-M86Ea50iKLw:22 a=pvr0aSInfWstAloVo1wA:9
-X-Proofpoint-GUID: CcdMPNc4NXEkZivWkmHMQ8qkEE15fTCU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDExMCBTYWx0ZWRfX/V+SIEDRrIH3
- h0B1M2lbaQBFT+v3Dg0wWy2BTGQXEZTuW7b4NDCsxWl9xb08kla2l2yZc+jVYgqzk9NpbOTtib0
- Z1cjWH3uaYHv6a8rH3HZENZfN6p7zb+gImb3xZTTwNGauYqJXGScdMmvYDY3ooMrVVV+bxpsdkD
- kAkJAtlyAd52JuIVeXHz72Gomb1C/fCy9lPL3I3Apl5clT2gPEdW6B60+oW4Wi/Pi5aR6in/Vaa
- roqtfC4f9FWbPvrGZR1HgdZT3sXt7SMBgERzyZ3cFbyhM4FYne/gL/24Xia+LtXt/qNI5QiYRIV
- nGHi4BAkHj6lP3dHxNxTnaFKYTGYqmsyN2qIxZdRQmuDBNstGVAEvOa2Un5BIXxpL/oNARiX7FI
- etg8So2gFqC4pRFdY0ahNWUS4kXKU4QxzCLmcgh1XGk7VOqPrEvh7ahMfYK1XB2gRH9HuJfYJQD
- oiMog9E2xIj+9qEZHpg==
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11726
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 suspectscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- clxscore=1015 lowpriorityscore=0 bulkscore=0 phishscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603110110
-X-Rspamd-Queue-Id: A17E52642B8
+X-Exchange-RoutingPolicyChecked: KPCqtxOlC6cnoCQxq9QpHiiHzRSux6dGfEgk/odMTTyauHyPJ+qa5UFehGrqjtW3r1zqZylD0CWhfurX/RX6OAhXQRYJ2igu06R06ZdWJ4kzA6Z8+ZoLdQY4SV+RAewZxEV1PsnZKGDq8c7m+8sdyBpyIKdUjO5pEjRnU0Rk9BEvqKQ26QZ+GlBnon1Oa/HYcEnqA8eyZlqRMI1694Vevfkbl4v/Xx7/nC4JVPA8wCmIKhabNi4yIH/DIaKbUXiZDhVrwIghVR2Bw1FV9D3sFlP4ZC9dhLnqxhMupK4tivuCRr1X/Xo4GjYEy/95DR1OHmnPLY9dkepx8NxrGbAijA==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4904.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f421468-c934-4cc7-d255-08de7f6f61b0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2026 13:09:08.9893
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zAmk2CBeAVWRrWrN+cgSkOynRRVKhmt6NAOemuw9GS6xtNiCQmyiw1NrE2Oz9UBQQHgbVMP3KX+HBWmLtXD0/LiKkXo0SbJKOLiWcMdp4MI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF2D9C959A2
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: A0600264417
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,gmail.com,crowdstrike.com,linux.dev,redhat.com,fomichev.me];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-266644-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-266645-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,msg.data:url,intel.com:dkim,intel.com:email,PH0PR11MB4904.namprd11.prod.outlook.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[crowdstrike.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,crowdstrike.com:dkim,crowdstrike.com:mid]
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-Tue, 10 Mar 2026 11:52:10 -0700, Eduard Zingerman wrote:
-> [...]
-> 
-> > I verified whether PTR->FUNC, PTR->DATASEC, PTR->VAR can be passed to
-> > btf_ctx_access() in the current mainline.
-> > 
-> > I added helpers that inject PTR->FUNC, PTR->DATASEC, PTR->VAR as pre or
-> > post calls to btf_check_meta(). In all cases, the BPF program load
-> > failed with errors "arg0 type FUNC / DATASEC / VAR is not a struct",
-> > which indicates that btf_check_meta() can indeed be called with
-> > PTR->FUNC, PTR->DATASEC, PTR->VAR.
-> > 
-> > If the condition for pointer check is changed to
-> > `if (!btf_type_is_struct_ptr(btf, t))`, these BPF programs will load
-> > successfully with arguments set to scalar().
-> > 
-> > Do we accept this change in behavior?
-> 
-> Kernel validates BTF before loading, see kernel/bpf/btf.c:btf_resolve().
-> Validation is applied to kernel, module and program-level BTF.
-> Does BTF containing PTR->DATASEC and PTR->VAR pass validation?
-> If it does, validation should be updated to reject such cases.
-> For PTR->FUNC, which one is legit PTR->FUNC or PTR->FUNC_PROTO?
-> The legit one should be allowed and invalid should be rejected
-> at validation phase.
-> 
-> You can craft invalid BTF as in the following selftest:
-> tools/testing/selftests/bpf/prog_tests/btf.c.
-> 
-> [...]
+> -----Original Message-----
+> From: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> Sent: Tuesday, March 10, 2026 12:18 PM
+> To: Korba, Przemyslaw <przemyslaw.korba@intel.com>; intel-wired-lan@lists=
+.osuosl.org
+> Cc: netdev@vger.kernel.org; Nguyen, Anthony L <anthony.l.nguyen@intel.com=
+>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Korba,
+> Przemyslaw <przemyslaw.korba@intel.com>
+> Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write supp=
+ort for sideband queue operations
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Przemyslaw Korba
+> > Sent: Tuesday, March 10, 2026 12:07 PM
+> > To: intel-wired-lan@lists.osuosl.org
+> > Cc: netdev@vger.kernel.org; Nguyen, Anthony L
+> > <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; Korba, Przemyslaw
+> > <przemyslaw.korba@intel.com>
+> > Subject: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write
+> > support for sideband queue operations
+> >
+> > On E830, PTP time adjustment commands sent via SBQ don't generate
+> > completion responses, causing the driver to timeout waiting and return
+> > -EIO, when trying:
+> >
+> > phc_ctl eth8 get adj 2 get
+> > dmesg: ice 0000:1a:00.0: PTP failed to adjust time, err -5
+> >
+> > Add support for posted mode not to wait for completion response.
+> >
+> > Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
+> > Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> > ---
+> >  drivers/net/ethernet/intel/ice/ice_common.c   | 7 ++++++-
+> >  drivers/net/ethernet/intel/ice/ice_controlq.c | 4 ++++
+> > drivers/net/ethernet/intel/ice/ice_controlq.h | 1 +
+> >  3 files changed, 11 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
+> > b/drivers/net/ethernet/intel/ice/ice_common.c
+> > index 8866902efb91..df9e5422b981 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> > @@ -1765,6 +1765,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct
+> > ice_sbq_msg_input *in, u16 flags)  {
+> >  	struct ice_sbq_cmd_desc desc =3D {0};
+> >  	struct ice_sbq_msg_req msg =3D {0};
+> > +	struct ice_sq_cd cd =3D {0};
+> >  	u16 msg_len;
+> >  	int status;
+> >
+> > @@ -1785,10 +1786,14 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct
+> > ice_sbq_msg_input *in, u16 flags)
+> >  		 */
+> >  		msg_len -=3D sizeof(msg.data);
+> >
+> > +	if (in->opcode =3D=3D ice_sbq_msg_wr)
+> > +		cd.postpone =3D 1;
+> > +
+> >  	desc.flags =3D cpu_to_le16(flags);
+> >  	desc.opcode =3D cpu_to_le16(ice_sbq_opc_neigh_dev_req);
+> >  	desc.param0.cmd_len =3D cpu_to_le16(msg_len);
+> > -	status =3D ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
+> > +	status =3D ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
+> > +
+> >  	if (!status && !in->opcode)
+> >  		in->data =3D le32_to_cpu
+> >  			(((struct ice_sbq_msg_cmpl *)&msg)->data); diff -
+> > -git a/drivers/net/ethernet/intel/ice/ice_controlq.c
+> > b/drivers/net/ethernet/intel/ice/ice_controlq.c
+> > index dcb837cadd18..5fb3a8441beb 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_controlq.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
+> > @@ -1086,6 +1086,10 @@ ice_sq_send_cmd(struct ice_hw *hw, struct
+> > ice_ctl_q_info *cq,
+> >  	wr32(hw, cq->sq.tail, cq->sq.next_to_use);
+> >  	ice_flush(hw);
+> >
+> > +	/* If the message is posted, don't wait for completion. */
+> > +	if (cd && cd->postpone)
+> > +		goto sq_send_command_error;
+> > +
+> >  	/* Wait for the command to complete. If it finishes within the
+> >  	 * timeout, copy the descriptor back to temp.
+> >  	 */
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h
+> > b/drivers/net/ethernet/intel/ice/ice_controlq.h
+> > index 788040dd662e..7c98d3a0314e 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_controlq.h
+> > +++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
+> > @@ -77,6 +77,7 @@ struct ice_ctl_q_ring {
+> >  /* sq transaction details */
+> >  struct ice_sq_cd {
+> >  	struct libie_aq_desc *wb_desc;
+> > +	u8 postpone : 1;
+> I'd recommend to rename postpone -> posted to match terminology /* posted=
+ write */.
+>=20
 
-Invalid BTF pointer types PTR->DATASEC, PTR->FUNC, PTR->VAR are
-rejected by btf_ptr_resolve(), which is called through the sequence
-btf_check_all_types()->btf_resolve()->btf_ptr_resolve().
+Thanks for review! I would keep this naming to be consistent with OOT
 
-PTR->FUNC_PROTO is a valid type.
-
-vmlinux BTF is processed by btf_parse_vmlinux, which calls
-btf_parse_base. Since btf_parse_base doesn't call btf_check_all_types,
-it becomes possible to invoke btf_ctx_access with PTR->DATASEC,
-PTR->FUNC, PTR->VAR in case of vmlinux BTF.
-
-Modules and programs BTF are processed by btf_parse, which calls
-btf_check_all_types and detects invalid pointer types, so
-btf_ctx_access cannot see PTR->DATASEC, PTR->FUNC, PTR->VAR in
-these cases.
-
-If btf_check_all_types is added to btf_parse_base, invalid pointer
-types get detected inside btf_parse_vmlinux, resulting in failure
-to process vmlinux BTF and effectively disabling BPF. libbpf
-returns this error:
-libbpf: Error in bpf_object__probe_loading(): -EINVAL. Couldn't load
-trivial BPF program. Make sure your kernel supports BPF
-(CONFIG_BPF_SYSCALL=y) and/or that RLIMIT_MEMLOCK is set to big
-enough value.
-
-If vmlinux BTF is trusted not to contain invalid types like
-PTR->DATASEC, PTR->FUNC, PTR->VAR, which seems reasonable, we can
-conclude that btf_ctx_access will never observe these types.
-
-Adopting the view that vmlinux BTF is consistent, we can replace
-btf_ctx_access's condition for inferring scalar() for pointers
-from "if (is_void_or_int_ptr(btf, t))" to
-"if (!btf_type_is_struct_ptr(btf, t))".
-
-Otherwise, we need to either check types for vmlinux BTF,
-incurring additional cost, or use explicit checks for pointer types
-that can be inferred as scalar by btf_ctx_access to exclude invalid
-types. This would let invalid pointer types be rejected with an
-error like "func 'bpf_fentry_test_invalid_ptr_func' arg0 type FUNC
-is not a struct".
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>=20
+> >  };
+> >
+> >  /* rq event information */
+> >
+> > base-commit: acd2abc52dea91c3bc3d1b6dd8a92b9631d48bbf
+> > --
+> > 2.43.0
 
 
