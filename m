@@ -1,127 +1,207 @@
-Return-Path: <netdev+bounces-266754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAFJAjC9sWmxEwAAu9opvQ
-	(envelope-from <netdev+bounces-266754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:06:24 +0100
+	id kFVbFNW/sWkwFAAAu9opvQ
+	(envelope-from <netdev+bounces-266755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:17:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 064A0269071
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:06:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C422692D2
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 572E83013CB3
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:06:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6F723126721
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7882FFDE1;
-	Wed, 11 Mar 2026 19:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDFAA372B27;
+	Wed, 11 Mar 2026 19:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S7ZDfcEr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1ZY68XfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1C63009CB;
-	Wed, 11 Mar 2026 19:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CF91E8320
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773255960; cv=none; b=IgVWjTIuUjr8AmeVGKFtSDAGZVxC4ynWJ2062zUH81Dw1BunfISs57ADQVfiAqUK6YNlwK1me5siWBSmRLRJmKP0LHU972zI1Aev6tzLI2HVUNRyxG+xVRIoydJTkCMArmWGTY+sQab5FevjQX9w/hHP2NAc8vEdKnU0p7jIpDE=
+	t=1773256425; cv=none; b=QQiLHm/y4L1qnH+1/SN0anZyf1K9NxivjkcHKrLcqD/s5Wa7xMA/8Rh8lBwPBAPpvBa7RZRnMSVCux6NlFiaoigO/57Bf+dFKXxLf4ukJKdiNkZv280I8m2DROYWN2FHFipdzq4MM5TzxgPgSkbKltAT3VBTPffjqD3545D1QWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773255960; c=relaxed/simple;
-	bh=vp9EBnA90pAuNfzdkQ/1NTTq+tBucUNTIT8s+GHJpO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XJUllWjBo/lC98o4ljRTLAUwLQWwB7EICd0FROOIzbPwGKD8fgU8wnZXhTLLVCBjQaoh1Ek13UyaLeHYwx/KOQ0OlpmAQlECfMdclBU62HD9ZIXwk+Vvp+ZhFaCDZoOUaWenZ9Sc8Outg849QRfryJCigcGfoR0CNgD5Pqvknto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=S7ZDfcEr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5gRxnZD8U/5ckRzWr71ozFSAJCluHjpENwN4p7JUM2o=; b=S7ZDfcErva4VvLRf6BJtS+bE71
-	V+CUHd/1dULG8mhX3qBVhVH9/n2BIn9oqGtazTrBGbOdDrjowC3KwjL1gm/WyIOjGdzkKL8sNomh6
-	ouYz7m3ufNA6xwPa+cS/bdLmsUIXWML/zxqj15KxOWtZqFgYHXb21tYCUVKkayZ9A8Gw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w0OsF-00BDzA-CF; Wed, 11 Mar 2026 20:05:39 +0100
-Date: Wed, 11 Mar 2026 20:05:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chen-Yu Tsai <wens@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: Handle PHY reset during initial PHY
- ID read
-Message-ID: <5f8e32e1-c73c-4a3f-a1ff-21b78f764bfd@lunn.ch>
-References: <20260302144458.3180702-1-wens@kernel.org>
+	s=arc-20240116; t=1773256425; c=relaxed/simple;
+	bh=S8QKUqpGzGzisTLh8aaFTAVkSUuuWisu142oQfvPALQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sQsl4hxROHM0ztPlN1FPKfYgGXj5vZBdAb+uf2h+LiuAGEds6Ay5KJcrlAKSX7qUA6GHnwo4x5LdXfBjySGQjHXpP+i7YF/+rEbIG86HRJG34gm8jBkYDHFc+s4DLuT0Rh9TTFrC6a7cgH7YY5VZeI+941LxClvv0XtkfFCWNys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1ZY68XfW; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cd7f6ac239so104123285a.2
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773256423; x=1773861223; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zslP9GG38UrSlaERzGOdn87DTk40RRX2h4DYJhBDKnU=;
+        b=1ZY68XfWM4RzL2aFJYVDXkckIfJOl1Hc7T3ppMROcczEDDgGaqGilHz8XlimJZawFN
+         1l+6dAzoj5RcwQW09wmOyuIIZ3RUnQwLe0tZqHa2+6noQ2jAOfLz/92M+idfvWX+Wo86
+         ROFvr5nWqqszyvtDFDVPiUU1SdX1A7uKEyiLuKhSoQ6ZcpTa/fjSxyYiC4vLaYTak2bR
+         jQFyKAsXcCuKgt8RYX7Wu8PAzhkuzzcwQOpGfpJs4smehLMdXpz6AzR0wsjNO8yJ0Vyv
+         2LWjaxwC7q/1z5Pkpn3YkgT2b7LduqZNOQLt+jHnhng+XClg1AsGmuzKNLzvybOry8Wh
+         Z1Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773256423; x=1773861223;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zslP9GG38UrSlaERzGOdn87DTk40RRX2h4DYJhBDKnU=;
+        b=jqNvTcp58z1W3916u281ZdSv1Jc8I+RIm7xPlV1teSy7zjy+Ab0i2GBTekUjf3caTp
+         5L6m6Q8r6xwBEpLoT+7lLpVCpdnLPG7HGNodY+YZOX3x2i4vfThL52Z/excb5X03RveU
+         9H7T53UH4k2lawbq46bg/s7CWSbhEnZnD5QSsVYcA0pfRXTGNm5bk+E2GV8nPlRSpkjp
+         0xkjGSufQqAmgROytSs+t904udDZ24hffqEMFmRnTzWJ3nZcmd8t4VS9SvqQmV2Rnc+C
+         f5/lvyPo1k2kThJsjdcdeTc4X+jiX422lYzmZz8OaTWToqf9O/m1nh+rXdujY8AbubT8
+         2CPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzTUF7Ij7hh85MUq4aNcJEHEDYvhlXfWjH8Bhtbzyp0A4T81v975+fxnZCbU9+yecuLJg3oK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAZ0K4ec7zDLm3vAeizNG7Or+bBZaR0BQv6DZI77m46gKsJ5eY
+	dqmn3R5H5LU9STiypyOODV0eHhVNWNsaPJvxqgRBvsxNAyIB68SIS24XFR606FHRzYd5eNak3+l
+	81xqKqNR023hapQ==
+X-Received: from qknwm10.prod.google.com ([2002:a05:620a:580a:b0:8cd:8ab2:545])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:7006:b0:8cd:580d:6e82 with SMTP id af79cd13be357-8cda1a1962emr460425785a.46.1773256422626;
+ Wed, 11 Mar 2026 12:13:42 -0700 (PDT)
+Date: Wed, 11 Mar 2026 19:13:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260302144458.3180702-1-wens@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260311191340.1996888-1-edumazet@google.com>
+Subject: [PATCH net-next] net: add skb_defer_disable_key static key
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-266754-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266755-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 064A0269071
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D5C422692D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> This work was the result of Russell mentioning [1] that placing the
-> reset GPIO under the PHY node in the device tree might result in it
-> not working.
-> 
-> I also talked about this at Plumbers in Tokyo last year during the
-> Device Tree MC. There a few people mentioned that MDIO reset handling
-> has been a pain point.
+Add a static key to bypass skb_attempt_defer_free() steps
+if net.core.skb_defer_max is set to zero.
 
-It is definitely a pain point. I wish we never added support for
-resets, just left it to the bootloader to get the hardware into a
-usable state before starting linux.
+Main benefit is the atomic_long_inc_return() avoidance.
 
-Anyway, i don't really see this being a MDIO/PHY problem. It is a
-generic device driver model problem. We need the core to have generic
-code used for any enumerable bus, PCIe, USB, SDIO, MDIO etc to ensure
-the clocks, resets, regulators, etc are in the correct state that the
-probe can work.
-
-Once the core has this facility, we can modify MDIO to make use of it,
-if needed.
-
-    Andrew
-
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-pw-bot: cr
+ net/core/net-sysfs.h       |  1 +
+ net/core/skbuff.c          |  5 +++++
+ net/core/sysctl_net_core.c | 25 ++++++++++++++++++++++++-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/net-sysfs.h b/net/core/net-sysfs.h
+index e938f25e8e86f9dfd8f710a08922c4cabf662c2e..38e2e3ffd0bdc4ccea2f6c7636c1bbc7d0f46af5 100644
+--- a/net/core/net-sysfs.h
++++ b/net/core/net-sysfs.h
+@@ -13,4 +13,5 @@ int netdev_change_owner(struct net_device *, const struct net *net_old,
+ 
+ extern struct mutex rps_default_mask_mutex;
+ 
++DECLARE_STATIC_KEY_FALSE(skb_defer_disable_key);
+ #endif
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 513cbfed19bc34bbb6767cdd7a50dad68be430fb..3d6978dd0aa83f63984b994359d0c914c6427a00 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -7256,6 +7256,8 @@ static void kfree_skb_napi_cache(struct sk_buff *skb)
+ 	local_bh_enable();
+ }
+ 
++DEFINE_STATIC_KEY_FALSE(skb_defer_disable_key);
++
+ /**
+  * skb_attempt_defer_free - queue skb for remote freeing
+  * @skb: buffer
+@@ -7272,6 +7274,9 @@ void skb_attempt_defer_free(struct sk_buff *skb)
+ 	bool kick;
+ 	int cpu;
+ 
++	if (static_branch_unlikely(&skb_defer_disable_key))
++		goto nodefer;
++
+ 	/* zero copy notifications should not be delayed. */
+ 	if (skb_zcopy(skb))
+ 		goto nodefer;
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index 502705e0464981ecfc32233d22c747e14b3febf7..b508618bfc12393ba926ebf5a2dd4ea73ef03ee8 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -349,6 +349,29 @@ static int proc_do_rss_key(const struct ctl_table *table, int write,
+ 	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
+ }
+ 
++static int proc_do_skb_defer_max(const struct ctl_table *table, int write,
++		 void *buffer, size_t *lenp, loff_t *ppos)
++{
++	static DEFINE_MUTEX(skb_defer_max_mutex);
++	int ret, oval, nval;
++
++	mutex_lock(&skb_defer_max_mutex);
++
++	oval = !net_hotdata.sysctl_skb_defer_max;
++	ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
++	nval = !net_hotdata.sysctl_skb_defer_max;
++
++	if (nval != oval) {
++		if (nval)
++			static_branch_enable(&skb_defer_disable_key);
++		else
++			static_branch_disable(&skb_defer_disable_key);
++	}
++
++	mutex_unlock(&skb_defer_max_mutex);
++	return ret;
++}
++
+ #ifdef CONFIG_BPF_JIT
+ static int proc_dointvec_minmax_bpf_enable(const struct ctl_table *table, int write,
+ 					   void *buffer, size_t *lenp,
+@@ -650,7 +673,7 @@ static struct ctl_table net_core_table[] = {
+ 		.data		= &net_hotdata.sysctl_skb_defer_max,
+ 		.maxlen		= sizeof(unsigned int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec_minmax,
++		.proc_handler	= proc_do_skb_defer_max,
+ 		.extra1		= SYSCTL_ZERO,
+ 	},
+ };
+-- 
+2.53.0.473.g4a7958ca14-goog
+
 
