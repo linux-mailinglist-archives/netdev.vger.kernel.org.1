@@ -1,107 +1,157 @@
-Return-Path: <netdev+bounces-266744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266745-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNkzCfW4sWmxEwAAu9opvQ
-	(envelope-from <netdev+bounces-266744-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:48:21 +0100
+	id KCJzGi+6sWmxEwAAu9opvQ
+	(envelope-from <netdev+bounces-266745-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:53:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F07A268DA9
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:48:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C083D268E95
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:53:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 292C53021C14
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 18:47:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B6223064EA2
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 18:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811113EBF01;
-	Wed, 11 Mar 2026 18:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEFB034753A;
+	Wed, 11 Mar 2026 18:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="vbnC+Vk3"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="JX/uUg2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-07.mail-europe.com (mail-0701.mail-europe.com [51.83.17.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5E23EB812
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 18:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.17.38
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA2429405;
+	Wed, 11 Mar 2026 18:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773254846; cv=none; b=UTq/m8lomgkt8YLHKpL2cuZNSDPVMr1ZxLmuDnFRvVK8jMepOMgI30skByl8c4FrUE7y20cR3jlwJVk0P1Vnqq9oM1bdUKNZmK7Rquk9XI3pYpwVPYbGOinlWg/GunqS+zidcvr8N/9SKV4bS/Ya1dlCfqq++GyVcT7Cg8KHCls=
+	t=1773255144; cv=none; b=ophJk+jIYeuRqLham2WZrzr0XIddr0ixBccu+KNqZueaWVKVGrregLUyKAXT4z5OOl2JqUgu3uaY1QhFHV/aZ9sxYBO6R0AN6WlmF4sEz5Ng77BQLPJkARD71SUPoigbDPLE/yKi3xBsEcP8E8RPOFbezvowfEG2oNlxxRj0WGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773254846; c=relaxed/simple;
-	bh=Jl7leThxnp/lGPAmTErmrNimY7QkLMfU1aZqqvKoU40=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KtozXVGW9WG66HglPHKZH6tQ6QVaTeFmI5q5P4jPTcExbhouZHKwrs6s5iZ3frpcjGnSI8NmKt3NGuimfAkMb2Mb6zrLJsdcHXLRJHVxwG97Pr0kXbN9NDAIQv1UAeGgWs4Ezcs4uiIVMe5fAojFzEm/dCObRJ224/XZpVef5a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=fail smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=vbnC+Vk3; arc=none smtp.client-ip=51.83.17.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1773254829; x=1773514029;
-	bh=Jl7leThxnp/lGPAmTErmrNimY7QkLMfU1aZqqvKoU40=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=vbnC+Vk3tCDm99skCrj6obm6wxp1HQZt8aS+bc1z+/aa69PTErRtp37kWoM/dpVVB
-	 7DTxpUUJUyhq9vyAbZlPRzCS3vI0y2P/MV9zlLr8w46e9aRzNmnXMFwy9GCZOvjopd
-	 G9k/kfyfCnpZfRwP7ppQRnZrQfqI1aAgG/2xw41rJF7kdoLJzMJEaI5x9Uvm/nQpnW
-	 E8ovvpErJJTYcUvpj4kJ7UkO78UYQwYZv9B9LsZugaII7tKsN5CDN6fVBOFHwra/7K
-	 3PQxI1OrJYbkTox3ccDj0Ix8wwKLpfh2y/oy+YcldZ9erwpd8v8vhUeoSrPYNXexNU
-	 dq2Sq47WAsbnQ==
-Date: Wed, 11 Mar 2026 18:47:05 +0000
-To: Simon Horman <horms@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: edumazet@google.com, stable@vger.kernel.org, herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, steffen.klassert@secunet.com, chopps@labn.net, netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [net] xfrm: iptfs: only publish mode_data after clone setup
-Message-ID: <gMKu-eP2Z17VRGWDt3UsswTDUTaUJjm9BDstYEsXaGoK7ZFwEFDiflQT85gbZ1IiVx2mjZ09xI6Mn72M23V-3oYTNL8nMgb112XEGMoXcJY=@1g4.org>
-In-Reply-To: <20260311171134.1134085-1-horms@kernel.org>
-References: <20260309173033.537743-1-p@1g4.org> <20260311171134.1134085-1-horms@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: ffd8969943b7fec8d286fa5d2d15212eda546b76
+	s=arc-20240116; t=1773255144; c=relaxed/simple;
+	bh=ULIUto0qRjCbTIuOnsOoG21FLhirAyCxdGtxAeqVlYU=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SELQn4SoZgwtO5TU0tTGFj8QtCR/In7CwM+Diys87nAG0wpz9T4gDymKfD3ODpvOLu5llLeNH2lolMezUWeGvCeU15l0IrkGOyE+DrJybCJixS3uiFMogQK8SJQBWdgQw2if1NbU5ksE0Djc35TVI71WHTMOWKFy2w6t+hJMj5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=JX/uUg2H; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 7136C20B710C; Wed, 11 Mar 2026 11:52:23 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7136C20B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1773255143;
+	bh=D8p+7eCyWUtiW18+m8UO3XA9k0HZTG3gUHVfVFyNdY8=;
+	h=Date:From:To:Subject:References:In-Reply-To:From;
+	b=JX/uUg2HzIF+FIhywqxsEgm8lL354Du+9hPI5bJGo1K4nd66BS05TzL0AC2/R7OTx
+	 ppO88IwatIE9/ElDlJeQNkgH+ptkiBsFct6KMeOIfK3XaGiLKcyEQBHzwnb6+94PhT
+	 B8YiYk/nVBkFrJnF/gMQdCUVX9dlQaxCdQ27AmoY=
+Date: Wed, 11 Mar 2026 11:52:23 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	horms@kernel.org, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Fix use-after-free in
+ mana_hwc_destroy_channel() by re-ordering teardown
+Message-ID: <abG555Qgh/1zX+Kk@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aa8PshvNRfuRYO/p@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa8PshvNRfuRYO/p@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266744-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266745-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[1g4.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1F07A268DA9
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C083D268E95
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->=20
-> > Fixes: 4b3faf610cc63 ("xfrm: iptfs: add new iptfs xfrm mode impl")
->=20
-> Should this Fixes tag point to 6be02e3e4f37 instead?
->=20
+On Mon, Mar 09, 2026 at 11:21:38AM -0700, Dipayaan Roy wrote:
+> A potential race condition exists in mana_hwc_destroy_channel() where
+> hwc->caller_ctx is freed before the HWC's Completion Queue (CQ) and
+> Event Queue (EQ) are destroyed. This allows an in-flight CQ interrupt
+> handler to dereference freed memory, leading to a use-after-free or
+> NULL pointer dereference in mana_hwc_handle_resp().
+> 
+> mana_smc_teardown_hwc() signals the hardware to stop but does not
+> synchronize against IRQ handlers already executing on other CPUs. The
+> IRQ synchronization only happens in mana_hwc_destroy_cq() via
+> mana_gd_destroy_eq() -> mana_gd_deregister_irq(). Since this runs
+> after kfree(hwc->caller_ctx), a concurrent mana_hwc_rx_event_handler()
+> can dereference freed caller_ctx (and rxq->msg_buf) in
+> mana_hwc_handle_resp().
+> 
+> Fix this by reordering teardown to reverse-of-creation order: destroy
+> the TX/RX work queues and CQ/EQ before freeing hwc->caller_ctx. This
+> ensures all in-flight interrupt handlers complete before the memory they
+> access is freed.
+> 
+> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/hw_channel.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> index 91975bdb5686..dbbde0fa57e7 100644
+> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> @@ -814,9 +814,6 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
+>  		gc->max_num_cqs = 0;
+>  	}
+>  
+> -	kfree(hwc->caller_ctx);
+> -	hwc->caller_ctx = NULL;
+> -
+>  	if (hwc->txq)
+>  		mana_hwc_destroy_wq(hwc, hwc->txq);
+>  
+> @@ -826,6 +823,9 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
+>  	if (hwc->cq)
+>  		mana_hwc_destroy_cq(hwc->gdma_dev->gdma_context, hwc->cq);
+>  
+> +	kfree(hwc->caller_ctx);
+> +	hwc->caller_ctx = NULL;
+> +
+>  	mana_gd_free_res_map(&hwc->inflight_msg_res);
+>  
+>  	hwc->num_inflight_msg = 0;
+> -- 
+> 2.43.0
+>
+Hi,
+I am sending a v2 as I missed adding Stephen.
 
-Yes
-
-Thanks,
-Paul
+Thank you.  
 
