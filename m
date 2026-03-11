@@ -1,310 +1,184 @@
-Return-Path: <netdev+bounces-266709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266710-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHnMKPKesWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266709-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:57:22 +0100
+	id GAAWGEWfsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266710-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:58:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18FE2679C2
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:57:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086C02679FE
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EC14930086A6
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:57:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0D71F3012E6E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0933E1236;
-	Wed, 11 Mar 2026 16:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754713E1236;
+	Wed, 11 Mar 2026 16:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzROdWa8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mJc1Ccki"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096DB27F19F
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773248233; cv=pass; b=gAP9nSvl8Ke5DhWKqTTk7SRYW+BxNrRfHly2gpDbh1CNuXcW6vE/H+VeNZh5Ta1DlMy+1cNGnxo/Qeha/JGPrxRwxVXOZI/MnKQCfG9yccco+bG+kPrZ3BpcgWpC8P31tR8+3DAJuDxeYy95uxCewEGruL42pBCLBhnmDr3NpMI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773248233; c=relaxed/simple;
-	bh=BRB3wDLz/jn2nOvVLIccx2wENPSwD58xFUwhfC4aI9M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gbeugWkZaKAWFyha/ub90NUW/9Ch5LhYTfUm61ITTAdfEU6RXEBcbWI+eWJLTT+7Bcn9n4wpwjLbS6IQOhPDIG8CIud98kjof0IhRPwILyQPa7CRvQIg9thjkUIdepadwf2p44tm0EHIF6B/m2lHRnMRRj4e6/Bt3kVb0GDO334=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzROdWa8; arc=pass smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-797ab169454so380687b3.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:57:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773248231; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Di8TjllNymHx+hcRY3IQTEkzCTKbu/1h+F2mBRMmbycqQtq68mUOXA060GPLUBMN0c
-         qVhoe/QO2Gt2keaevsLx0zc+oTZzl7J7dFcN9Er/wmY1T+5G1aE+3xR3Os6RWfOBdjzg
-         Eoc4EYuQxz24CBv2zw0ZVZgNv3ySASB0BKLTZr0knrXgr0/lsDF+ROtt/CF+CQyD/ywq
-         jHFFOKLzgaDiQW2mp/pmzUBT2ynC248UEKEqMEwkORUbZ+AQaLa+Xr2rStb8BhtfTyPp
-         Ao0O86xBJyGMMmm04uR4m2LtbzLKWJu5z4l3ulvUvHHk61YrNpSyhTgw1iE068uySp3+
-         432Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MRLF7utSMB+F1MK0j+aEXx5BvijhWq8cP3RtjVJVGqE=;
-        fh=Tj6K8gTuPhTbuYPJJ40QstBlVOn++gRk+ZSAz9M/72E=;
-        b=IxhXGpz6jUHHKAZS3wlqf9t43b+Gz9IbVa/S38V8dKcjihm9yJqQaJTcpDWNGtagBi
-         l4EJTNtfxhP2+CX8lIRzWrf4V9QuBRHewmJSYUvYCUzZ/dUwX0/iYpF+XxSAw3fh6yRV
-         I5G9gLDgVU9Iu/N6MVVHNUxbXKgGVShfQkFpOvpD1lZn0XcrtxIs1GCoJHnfwJ/QHWk/
-         LmTeLTaISiygDBJ2AvpGPICRRrJZlDhU7+4nikLI4SH2MVvmHgfkbjtm65xqY1R+XzlE
-         3iYuWJ/v2Xc+Jifnq/EkkpvB7w93dErR1jw5NSzP9fO69ybw7aVICpddhy+dO7VJBTfG
-         24Jg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773248231; x=1773853031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MRLF7utSMB+F1MK0j+aEXx5BvijhWq8cP3RtjVJVGqE=;
-        b=jzROdWa8+OThkXfxjY7iBbfEA5r41YOAumqUS/+CP/6mBPFm9n4LBgyhhhRAXqh75V
-         emGEP9n7Pc9eDeiN84N2QXVq2taAsPQS2Nr+BwruIDoeZKn9yPRygRdB5xV3fVcAault
-         7zlqWIfgpKi3Ef2wIrQ6lHBmPg/YlA5wGfmovEB8VibbIYoHXbtZXHUWOfmlu2YLf4H9
-         oERNu0urlrBrCL6wM3V8eqFVopzIMmbS0PaI7e6glbFS5HJOHJ8SfadimyhuZBcBHsMB
-         SZ6604rHu8kSWlrNm2fVxAbTu+pjM0emU0aoRMfX8ZqscV7RsT58SQG+tFEjrNMwP739
-         4m3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773248231; x=1773853031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MRLF7utSMB+F1MK0j+aEXx5BvijhWq8cP3RtjVJVGqE=;
-        b=drVihpjquGnVBjIzoh4UPFX6rwmu2LG4qqaQwJ1j0OQbvWdHeJpEx5dBidkxEf1LdV
-         SCdPdaBG2aFzUbH0bLkhiCtB/ztb/Np0Ym6ZAGR5aGLxMtBzA7z4edNtDAt1JYWaqwop
-         qn1OAo9zoV9BLUGQU1Acj8gSBZWXoRX/B6ZMI/otzSqFgSmYj12IeENxeN2cqMti5kEi
-         bVivA6OfhWVnudVFnF7fi+7Tu10ng5r1zbavnjIlv90+SR9Ud1+RPOJk02LDVZCq1kIC
-         BraC1TLz22RxVfpXAXchRcddG/OiB04eAODTPMmrSyJYhuagySV+j83Y6I93Ae8Cv0jD
-         OlMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfLJxrHgtn/dToKdlgoc3JIM7EZC7QtgO5HVtZhyHDQdgThmNr6iclwl1OneZ1gK8ZOhZkFT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh2XY7oEIWGLPP42CVbo2QiuZ6cu8iAJJT4aemRiGCFi0Kzsgd
-	ay42CQoGWm1+fNiU7nv0kvpDZ4N9sEPpnGX6K47GGNzXcuJM9fa2miblT5ZpUDlsx57NsjQpF5r
-	VsKcsqSzxgPPr1NzVrS+Uz+IYj38lk0Q=
-X-Gm-Gg: ATEYQzyCG/UWql1So2+dBN+RaZUQHLC7ttCTf0OmxZ1Nlb6mmKY6yqN1kpEgFfeH29X
-	7Y5c1uly07gSYXRP0d6YBW2INqY/Su62acRsEAWjKIH3uulKc9+uzRM30vMOgkIBtrPrkUf/SVZ
-	GzIAa3Aqr6jON7huzg/Rtjnp6Dk47zDCsCBgBDhIaiainaH+GMG1WWugHPfMKuqF7XI8yuNnv93
-	6/EPZpDvWfHhN6WzouKwcMIYdsRmcOa+x3jD/w9hcIj2l0h4apX+pjo0Xdi3TjqdcWSFKnUvgEA
-	OoS4scc=
-X-Received: by 2002:a05:690c:22c6:b0:798:36:e110 with SMTP id
- 00721157ae682-7991801ac2cmr30369447b3.62.1773248230893; Wed, 11 Mar 2026
- 09:57:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C9233E34B
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773248321; cv=none; b=afyPWqTI8zXylNstglBY6XC67xIPm29DkrPap9lvtleOeN2739D9v2wsIPmEen8dBKOz/0FhBGzRfXtAnMKMVCzVJflGWJpjwOqIIySvvGUXGnCS6MxD7PGI4JYtHqf3Mlv0yOFNzWFCTzg+5Eb7SjMA36dRAbjnCZBMM4D9Q1Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773248321; c=relaxed/simple;
+	bh=ljHegwytkaV/FBDgBuS8TCRPpTwkqz4fZOs9t3/8E3c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DHITR740rTDHvHGTJY+7Fe350vUHRdogqN4+vSfrPSC3UVujogMFZleea47D+FaYHRl7/Q+UM8eOGyI5JG8QYPUB6HeITQkQsGhBOxjZDxvmwp7cg6o0qKMAaP00IFtronjXLWVOXuf4wfWxFEFpcnc9Rz4wwujjyUGKznsUUpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mJc1Ccki; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 3D4E7C41588;
+	Wed, 11 Mar 2026 16:58:59 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CFAAE60004;
+	Wed, 11 Mar 2026 16:58:37 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9FC5A10369C69;
+	Wed, 11 Mar 2026 17:58:33 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773248317; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=G0bVwI05x8FHTW4L9qcttDJh3j7jp3YQEaUFXuqkqSg=;
+	b=mJc1CckiNFvfwpkGKRG06Lmv2PeH+QOqXYJ5m73SxPwcLWAn3GzrRAmj2xjBxpXwTc+kHc
+	aQhMOjV1FXYV5Q4MQxEenikuiuUzXz7IUWxsSd7GwbJEXLddWE1v3bW/P0Pzy1hl4Ur1YA
+	uDISEfPhL1WNczfWaNVzlR/OpxRFmdkk40voGnmkZBgomJW/IOjjc/vv/7syV+G9+Vw+kX
+	1kxPBk+1ZhKSXNOu5ZM9uuIP0vuZeNleV8wffPylMKG5eLYsUykR3IqrKxeL30Bi+Gs/EE
+	7TK2RACBy2USLYWZZx5fpWo6r6++xwWAFGt7bKoQyJ49XXufVjsfsCItec/EgQ==
+Message-ID: <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
+Date: Wed, 11 Mar 2026 17:58:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-3-ameryhung@gmail.com>
- <87ldfytmja.fsf@gmail.com> <CAMB2axNWHa9aTigQ4G1zxuYtzC7QNj1KVQZNoFiY9fNMhUBsCg@mail.gmail.com>
-In-Reply-To: <CAMB2axNWHa9aTigQ4G1zxuYtzC7QNj1KVQZNoFiY9fNMhUBsCg@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 09:56:59 -0700
-X-Gm-Features: AaiRm51CQMvijRuppXo8FNftbSnpPNiYu2yHtuE3TPP_jR4RQ3GRPGA6-QxhbCA
-Message-ID: <CAMB2axM2y2zZxCf5e4rmgK5yB4t14Oqn2-3_+xVHbVmWmOXycw@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 02/11] selftests/bpf: Test passing
- CONST_PTR_TO_DYNPTR to kfunc that may mutate dynptr
-To: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
+ KSZ8463 global irq
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
+ pascal.eberhard@se.com, miquel.raynal@bootlin.com,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
+ Tristram.Ha@microchip.com
+References: <20260305095656.vlyaztv6nbdqrmil@skbuf>
+ <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
+ <20260305125149.ejju5ptrkviqi3sm@skbuf>
+ <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
+ <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
+ <20260309205401.bk5fpw6kqnmlktbu@skbuf>
+ <dde60639-af13-4653-9a34-38c4bd98b149@bootlin.com>
+ <20260311115356.windefb3j4kkuslg@skbuf>
+ <c3812b1f-50b7-4663-92f5-14c5c6b483a2@bootlin.com>
+ <20260311135610.oox5ahxcyvxkuegw@skbuf>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260311135610.oox5ahxcyvxkuegw@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266709-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266710-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A18FE2679C2
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 086C02679FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 9:38=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> On Wed, Mar 11, 2026 at 8:26=E2=80=AFAM Mykyta Yatsenko
-> <mykyta.yatsenko5@gmail.com> wrote:
-> >
-> > Amery Hung <ameryhung@gmail.com> writes:
-> >
-> > > Make sure for kfunc that takes mutable dynptr argument, verifier reje=
-cts
-> > > passing CONST_PTR_TO_DYNPTR to it.
-> > >
-> > > Rename struct sample to test_sample to avoid a conflict with the
-> > > definition in vmlinux.h
-> > >
-> > > In test_kfunc_dynptr_param.c, initialize dynptr to 0 to avoid
-> > > -Wuninitialized-const-pointer warning.
-> > >
-> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > > ---
-> > >  .../testing/selftests/bpf/progs/dynptr_fail.c | 37 +++++++++++++++--=
---
-> > >  .../bpf/progs/test_kfunc_dynptr_param.c       |  2 +-
-> > >  2 files changed, 30 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/=
-testing/selftests/bpf/progs/dynptr_fail.c
-> > > index 8f2ae9640886..5e1b1cf4ea8e 100644
-> > > --- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> > > +++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> > > @@ -1,15 +1,14 @@
-> > >  // SPDX-License-Identifier: GPL-2.0
-> > >  /* Copyright (c) 2022 Facebook */
-> > >
-> > > +#include <vmlinux.h>
-> > >  #include <errno.h>
-> > >  #include <string.h>
-> > > -#include <stdbool.h>
-> > > -#include <linux/bpf.h>
-> > >  #include <bpf/bpf_helpers.h>
-> > >  #include <bpf/bpf_tracing.h>
-> > > -#include <linux/if_ether.h>
-> > >  #include "bpf_misc.h"
-> > >  #include "bpf_kfuncs.h"
-> > > +#include "../test_kmods/bpf_testmod_kfunc.h"
-> > >
-> > >  char _license[] SEC("license") =3D "GPL";
-> > >
-> > > @@ -46,7 +45,7 @@ struct {
-> > >       __type(value, __u64);
-> > >  } array_map4 SEC(".maps");
-> > >
-> > > -struct sample {
-> > > +struct test_sample {
-> > >       int pid;
-> > >       long value;
-> > >       char comm[16];
-> > > @@ -95,7 +94,7 @@ __failure __msg("Unreleased reference id=3D4")
-> > >  int ringbuf_missing_release2(void *ctx)
-> > >  {
-> > >       struct bpf_dynptr ptr1, ptr2;
-> > > -     struct sample *sample;
-> > > +     struct test_sample *sample;
-> > >
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr1)=
-;
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2)=
-;
-> > > @@ -173,7 +172,7 @@ __failure __msg("type=3Dmem expected=3Dringbuf_me=
-m")
-> > >  int ringbuf_invalid_api(void *ctx)
-> > >  {
-> > >       struct bpf_dynptr ptr;
-> > > -     struct sample *sample;
-> > > +     struct test_sample *sample;
-> > >
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
-> > >       sample =3D bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> > > @@ -315,7 +314,7 @@ __failure __msg("invalid mem access 'scalar'")
-> > >  int data_slice_use_after_release1(void *ctx)
-> > >  {
-> > >       struct bpf_dynptr ptr;
-> > > -     struct sample *sample;
-> > > +     struct test_sample *sample;
-> > >
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
-> > >       sample =3D bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> > > @@ -347,7 +346,7 @@ __failure __msg("invalid mem access 'scalar'")
-> > >  int data_slice_use_after_release2(void *ctx)
-> > >  {
-> > >       struct bpf_dynptr ptr1, ptr2;
-> > > -     struct sample *sample;
-> > > +     struct test_sample *sample;
-> > >
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, 64, 0, &ptr1);
-> > >       bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2)=
-;
-> > > @@ -1993,3 +1992,25 @@ int test_dynptr_reg_type(void *ctx)
-> > >       global_call_bpf_dynptr((const struct bpf_dynptr *)current);
-> > >       return 0;
-> > >  }
-> > > +
-> > > +/* Cannot pass CONST_PTR_TO_DYNPTR to bpf_kfunc_dynptr_test() that m=
-ay mutate the dynptr */
-> > > +__noinline int global_subprog_dynptr_mutable(const struct bpf_dynptr=
- *dynptr)
-> > > +{
-> > > +     long ret =3D 0;
-> > Why do we need this long ret? Do we even need this function at all, why
-> > not calling bpf_kfunc_dynptr_test() directly from the
-> > kfunc_dynptr_const_to_mutable()?
+On 3/11/26 2:56 PM, Vladimir Oltean wrote:
+> On Wed, Mar 11, 2026 at 01:53:38PM +0100, Bastien Curutchet wrote:
+>> On 3/11/26 12:53 PM, Vladimir Oltean wrote:
+>>> On Wed, Mar 11, 2026 at 11:02:35AM +0100, Bastien Curutchet wrote:
+>>>> I, more or less, managed to fit this PTP support in the current framework,
+>>>> but the next series I prepared to add periodic output support is full of
+>>>> is_ksz8463() branches. So I think that I'll go with what you suggested and
+>>>> try to move the KSZ8463 support in the ksz8995.c driver. It will probably be
+>>>> cleaner this way.
+>>>>
+>>>> TBH I'm a bit lost with all these KSZ variants but IIUC KSZ8463 and KSZ8995
+>>>> both belong to the 'old generation' of the hardware. Maybe a good split
+>>>> would be to have these old switches in the ksz8995.c driver and keep the
+>>>> rest under ksz_common infra.
+>>>
+>>> Wait, to make sure I understand, you said you're going to rebase this
+>>> series onto the ksz8995 driver?
+>>
+>> Well I'll first add basic support for the KSZ8463 in the ksz8995 driver and
+>> then add interrupt and PTP support on top of it yes. Did I misunderstand
+>> you're suggestion ?
+> 
+> If we're splitting drivers, I would like to see them grouped by actual similarity,
+> so as to not repeat the same mistakes.
+> 
+> I took a random feature, user port separation, and I'm comparing how Linus
+> implemented it in ksz8995:
+> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-5-a7fc63fe1916@kernel.org/
+> vs the register map from KSZ8463:
+> https://www.microchip.com/en-us/product/ksz8463#Documentation
+> 
 
-oops. Will remove ret.
+I took a look at the register maps from both datasheets. Registers 
+aren't always at the same address and some bits differ here and there 
+but following areas look very similar:
+- global control
+- port control
+- TOS priority
+- MAC address config
+- Indirect access
+- Data rate limit
 
-IIUC, this global subprog is needed so that the arg will be
-CONST_PTR_TO_DYNPTR. Verifier will see PTR_TO_STACK if passing &data
-directly to bpf_kfunc_dynptr_test().
+> Apart from some funky naming differences (KS8995_REG_PC1 corresponds to
+> "PORT 1 CONTROL REGISTER 2"), it should be pretty similar, right? Do you
+> see some differences requiring major surgery in ks8995?
+> 
 
-> > > +
-> > > +     /* this should fail */
-> > > +     bpf_kfunc_dynptr_test((struct bpf_dynptr *)dynptr, NULL);
-> > > +     __sink(ret);
-> > > +     return ret;
-> > > +}
-> > > +
-> > > +SEC("tc")
-> > nit: it looks like most of the programs in this file are optional:
-> > SEC("?tc").
->
-> I will make it SEC("?tc").
->
-> > > +__failure __msg("cannot pass pointer to const bpf_dynptr, the helper=
- mutates it")
-> > > +int kfunc_dynptr_const_to_mutable(struct __sk_buff *skb)
-> > > +{
-> > > +     struct bpf_dynptr data;
-> > > +
-> > > +     bpf_dynptr_from_skb(skb, 0, &data);
-> > > +     global_subprog_dynptr_mutable(&data);
-> > > +     return 0;
-> > > +}
-> > > diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_para=
-m.c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > > index c3631fd41977..1c6cfd0888ba 100644
-> > > --- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > > +++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> > > @@ -33,7 +33,7 @@ SEC("?lsm.s/bpf")
-> > >  __failure __msg("cannot pass in dynptr at an offset=3D-8")
-> > >  int BPF_PROG(not_valid_dynptr, int cmd, union bpf_attr *attr, unsign=
-ed int size, bool kernel)
-> > >  {
-> > > -     unsigned long val;
-> > > +     unsigned long val =3D 0;
-> > >
-> > >       return bpf_verify_pkcs7_signature((struct bpf_dynptr *)&val,
-> > >                                         (struct bpf_dynptr *)&val, NU=
-LL);
-> > > --
-> > > 2.47.3
+The biggest difference I see is the way KSZ8463 accesses the registers 
+through SPI. It uses byte enable bits in the command word that don't 
+exist on the other switches.
+
+> Apart from the obvious incompleteness, of course. That driver currently
+> reports DSA_TAG_PROTO_NONE. It will have to return DSA_TAG_PROTO_KS8995
+> for ks8995:
+> https://lore.kernel.org/netdev/20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org/
+> and DSA_TAG_PROTO_KSZ9893 for your KSZ8463. Right?
+
+Yes.
+
+In the end, it feels OK to me to migrate KSZ8463 into ksz8863.c but it's 
+hard to know for sure before actually doing it.
 
