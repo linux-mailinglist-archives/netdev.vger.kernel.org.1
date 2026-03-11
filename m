@@ -1,158 +1,175 @@
-Return-Path: <netdev+bounces-266609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOyMLNxDsWm4tAIAu9opvQ
-	(envelope-from <netdev+bounces-266609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:28:44 +0100
+	id qDLNL6lEsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:32:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40CFF2622AF
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:28:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E4B42623D1
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A2286303CB34
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:26:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B30730214F8
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E8B3CBE8D;
-	Wed, 11 Mar 2026 10:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4793B2FEA;
+	Wed, 11 Mar 2026 09:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xk1/SHJZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G/NhPocL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7972D3739
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 10:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224812; cv=pass; b=Bpiul2VZrWLylhhU2Pv5z8XFiUaC+NwIKCKWP83t+t09Pd/3n1gpk4qclKNdOPi6stvqJ9MQ3b84dAMhLy4MaGCcP0oLbuUGumBQTmpUbZcbuNe8VAXc9yC8A0WN9ninRvyeOrIQSDWrmW+u937045YEQymDY2aRgm9Bw4k2a1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224812; c=relaxed/simple;
-	bh=eKf0LarMl2Wj8kangLrl8qGd7vnQ56basY47H72P2gk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f1XAPobJChsjACEhoBpqzGR6/cCd6Z3UKxl6JFKqfNEEamXXRWMpACxTRq/yMJhQAu40Dt/Zz4GUwGvqnkmnCnONlOWsks/CKUWNaRMYc3QPIbiHyzwfq1sP+LAZ36rrOPXS5iLYeD1lmKkB+vfrMk9daI5hLiTWgPPXCL/NAMY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xk1/SHJZ; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5090c48de85so37483021cf.0
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:26:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773224810; cv=none;
-        d=google.com; s=arc-20240605;
-        b=i2mTMlysOmmTd8JoJj32KK1nA9R+L4G7iEhz16lvQwZWO5pdsmyhg8ILOvgWLBJTK0
-         9oOeBQ5+FwBXAamID3/rdfU60RF3PMue3ZX6gqkHVvaAwGGrp8VmxDAROJGxEGIfajql
-         0nh3gdM4USYnMvs3ob4lOr1efEDCfSNNPKLR4juvBx8yRtSURdnGV1pLorZQXyJD7rpe
-         AfsmXM2Wu0UQh1h4Tzjljw7mKLRTjxkb3uPrWv47YUi05a/ptrpgHZNgYCWiyOB0rl5X
-         jssI3F5iycUcxGUErGpoXQwiURdUBzWeQRzr8IXlBk8hmIeDWlQkptHzt7KHjSRCavLx
-         YRyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eKf0LarMl2Wj8kangLrl8qGd7vnQ56basY47H72P2gk=;
-        fh=BPyBPwxh6PHBPfDgfRydhKKE88Ej1tUcft2vn0UgVPA=;
-        b=KdSIpO5AupXQw+ka0NrTeNsfvKKeJtNqsIavbg7KpYPNanNW42YkuhT9Iadf4DSTZr
-         DADvB4EZFXp9R1vvN5MYCwldwWsAwUIaHpctsLX5yMn+Xv3Yxlvs0OAI2Ih+otYmgApo
-         tyYJjlCpZGoCnp8PS7u+ESbQvpfPqnAYumhJdQjuRY/3E8vukxY2nL4PAeaVF6dQgYXF
-         qgtLhkmPhpmqQpnoupC9Q55bSDn+hIyIUqfbABu1VQzbC4BHuBEbWQcSslDhvWWA85VO
-         cLN8fy4HKUH9S4k2LwRwoaY6E1XNe1ku6qjFbh1KbmkTwKk9TW8p1AkYNSWGTpH4C7yt
-         /I8g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773224810; x=1773829610; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eKf0LarMl2Wj8kangLrl8qGd7vnQ56basY47H72P2gk=;
-        b=Xk1/SHJZ4lS07Ose926XBvRWQvwZEQoEGaKGfcKC7r8crwaxPf9jhXjYBwcUx8tQxh
-         ykuZeH0BcMdKMihlMoGpK57Wei+izZLT5VhbGT/ECv2KjQHaY5vsMoJZf/BPlIz3ManH
-         wvflFcn5SwUAlChMhYYBuasDZnh4PF6I6JNXwGPy8xUPGrXWzcDWIgAoUf9ohmYs3a4r
-         miujbZKg25tb9vla7bfrwQAffAG/uiQyQXqpc1ldsQzQp+NL5iTQxzGX6EAvnnsryZ+F
-         0dMbHQwvFEATqVZcGYoLNt3oh9VduC9arV+l0En2a8a/PZgpe8bom80faT7OcQbiz6FU
-         oaOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773224810; x=1773829610;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eKf0LarMl2Wj8kangLrl8qGd7vnQ56basY47H72P2gk=;
-        b=u/bBFDDDVLKslxot73blwl9uWUNxGkcBxh2jGx6U10VpjIQEiwlRCgy46/SKBvd4ob
-         gDDiI8F3QlIj7JJ0jLTIex6L5abtzYkLkkZLebX82lYmupqmtXPtvbFMjNcC1wwKdaWF
-         kE5x9rKsRf7ofRORy8h5Ovkgeij9Y5wpiOtensO11bULxV0ZCUFDJyDKh/eqBlAUU4lM
-         OzL2ne6qNe5fvRpIPzNvMT6FTqUDAwWAb0tN4YU1/H9D+zITs+w2lPtS3rtb6kCCGYkj
-         FMLHT8CW1cbfo0X0HVkmX1o7O2fgutteIBBxehFiu/RkEs5VZWfbQr3auakXSo+TY4eM
-         X+Og==
-X-Forwarded-Encrypted: i=1; AJvYcCVgOBOBKnj5u5m/NH94iDFAtI5FbHOhrkPnSgtl5adR0zxVrsKjMCSMdEUMhsvyvtHyAPQMGo8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4C5vFq8wrprMqYzMssPeqOF9Sbi9/ja1e63PpWs1F27hIUJcX
-	rAINQj27LaxtaSUCjdgcnBdR1I5F8cSDnMtBobsiPPFmFYinucLfLKSaABVJcmCjvVShZ3MwyuN
-	jsaLfy0cX2xNUcOYdcbcXRDbHn8+l1jNsb7a4foio
-X-Gm-Gg: ATEYQzyFHco05eZf5gLf9TiUOHL5bKeUc8XvKvhM1IX5xqgRjN2ZnFjWV2UWdXKvW18
-	6xN6Scq37hCb1/XkAl/W7S77PyUHncSy6U4qdpUgT4IP3svaaMmmHPubsgLEj1RR7doj/VWpSzQ
-	Uo3EmzYOQGEzxC2Qcc54xC9LDR48xPeNZyQoJOC/i1E6ZwENK+gO+lLuwC/ZuyhE/z7n+OHYdiV
-	+kL3SMAfFG62taxFE8LwLk+zvb5mKoazJcD7OeLJKE5HvBsc0+CO4p0vP09i92Fifm6x7abvgcF
-	HE8jA82l
-X-Received: by 2002:a05:622a:178b:b0:509:2d50:9788 with SMTP id
- d75a77b69052e-5093a0e7234mr24295631cf.32.1773224809745; Wed, 11 Mar 2026
- 03:26:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3832D3B775B
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773223060; cv=none; b=oiDQHzAbbe3vP2FcXtqJcvxPRdwC1uhg4cxX1sW0d4cdKW2QHKEb0DCGGHZ+nkNJXSkRJYpZC9xzfVLGAl2t7lJbRVH/XoDmiMi9IAEr0PQP9zaLFx0VWgXhRuSBd6uQq+IJxnNkR516CZAZJmD75NsDyDAcT/3E5m5hYQMWtyM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773223060; c=relaxed/simple;
+	bh=4bI/btbONON9G3trYcFCis9chSVGO43gW9VYlSHW2nU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oGfCW5bh/MEfUPwpUI2iOZ9sGrHzP0M2NFQt44sVR+H/+Z+xAHJBUkZAHVAC7TQ0cKU9d/7gmZcm6Qm+Zaj+Z39r9Dii0J7n89JijeBqwl+Mf9gIWtkub153m5jLAjMmyVt72WNgDbvL2URQmEbVXkkQ35bKkq7kmis7r+ZdjKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G/NhPocL; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773223058; x=1804759058;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4bI/btbONON9G3trYcFCis9chSVGO43gW9VYlSHW2nU=;
+  b=G/NhPocLaFGepQ9OmLuxyj+9CvjAEU/L+WTX15SeSJApsRFwCcTB5bsv
+   KnU2Gh561C8HUBEUW/CrT/yAZdURiexAHYeiAd6zJsM2sFy2hh+OK1m2h
+   853kF2l33L8HROHAhQNVU5AskZW5znQR3kz6p7m1F/2SmKhxqUph41C+J
+   azz+qAwUUOBFQc5OXAKbSZErU27Vk4Ca1k8gnjZP73+wtNNQkNkbHcSmo
+   xxQF7I1423JUsn6PcsjJO/z9sbsuEsQGgY0jCRW3wqli1EvEjNQn+TwUH
+   VIQT2yTgQFMyyOuHC9ool9Pk11LuzFTHCswZzY4xlkmriN9gYoNJqVJEb
+   Q==;
+X-CSE-ConnectionGUID: joNQ7bdJQR+8qpnTAEkPhA==
+X-CSE-MsgGUID: WlFdASk3THWAbamiCqlXBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11725"; a="74325902"
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="74325902"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 02:57:38 -0700
+X-CSE-ConnectionGUID: P1Np9L/jRPKDRQekogkxWg==
+X-CSE-MsgGUID: o8q8qZd/TSavEXFw45L3UA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="217095711"
+Received: from rtauro-desk.iind.intel.com ([10.190.238.50])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 02:57:33 -0700
+From: Riana Tauro <riana.tauro@intel.com>
+To: intel-xe@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org
+Cc: aravind.iddamsetty@linux.intel.com,
+	anshuman.gupta@intel.com,
+	rodrigo.vivi@intel.com,
+	joonas.lahtinen@linux.intel.com,
+	simona.vetter@ffwll.ch,
+	airlied@gmail.com,
+	pratik.bari@intel.com,
+	joshua.santosh.ranjan@intel.com,
+	ashwin.kumar.kulkarni@intel.com,
+	shubham.kumar@intel.com,
+	ravi.kishore.koppuravuri@intel.com,
+	raag.jadav@intel.com,
+	anvesh.bakwad@intel.com,
+	maarten.lankhorst@linux.intel.com,
+	Riana Tauro <riana.tauro@intel.com>
+Subject: [PATCH 0/4] Add support for clear counter and error event in DRM RAS
+Date: Wed, 11 Mar 2026 15:59:14 +0530
+Message-ID: <20260311102913.3387468-6-riana.tauro@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <36d7f2e7f504d620c1b88526b25ebc89e3cb61d9.1773142315.git.chleroy@kernel.org>
-In-Reply-To: <36d7f2e7f504d620c1b88526b25ebc89e3cb61d9.1773142315.git.chleroy@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Mar 2026 11:26:38 +0100
-X-Gm-Features: AaiRm53B50GTY8UnzKaLcgodqwhUvO9jIfRzrYAFDN15-xaW5BZME-8koYe_8EA
-Message-ID: <CANn89iJWkZTpM-5ymgDBztx-Be_maV_Ugv2xHdSHZVybfcHueQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Convert move_addr_to_user() to scoped user access
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 40CFF2622AF
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9E4B42623D1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266609-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,ffwll.ch,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266589-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 12:33=E2=80=AFPM Christophe Leroy (CS GROUP)
-<chleroy@kernel.org> wrote:
->
-> move_addr_to_user() is a critical functions that was converted to
-> masked user access by commit 1fb0e471611d ("net: remove one stac/clac
-> pair from move_addr_to_user()")
->
-> Convert it to scoped user access to simplify the code.
->
-> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
+Clear Error Counter : Add clear-error-counter command to DRM RAS to clear
+a specific error counter of a node. Implement the callback in XE driver
+to demonstrate usage.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Usage with both get-error-counter and clear-error-counter:
+
+$ sudo ynl --family drm_ras  --dump get-error-counter --json '{"node-id":1}'
+[{'error-id': 1, 'error-name': 'core-compute', 'error-value': 0},
+ {'error-id': 2, 'error-name': 'soc-internal', 'error-value': 3}]
+
+$ sudo ynl --family drm_ras  --do clear-error-counter --json \
+'{"node-id":1, "error-id":2}'
+None
+
+$ sudo ynl --family drm_ras  --dump get-error-counter --json '{"node-id":1}'
+[{'error-id': 1, 'error-name': 'core-compute', 'error-value': 0},
+ {'error-id': 2, 'error-name': 'soc-internal', 'error-value': 0}]
+
+Error Event Support:  Introduce `error-event` support in DRM RAS to notify
+userspace whenever an error occurs.
+
+Each notification includes the node-id and error-id to identify
+the source and type of the error. To receive notifications,
+userspace must subscribe to the 'error-notify' multicast group.
+
+Userspace can receive the event by subscribing to multicast group.
+
+$ sudo ynl --family drm_ras --subscribe error-notify
+{'msg': {'error-id': 2, 'node-id': 1}, 'name': 'error-event'}
+
+Riana Tauro (4):
+  drm/drm_ras: Add clear-error-counter netlink command to drm_ras
+  drm/xe/xe_drm_ras: Add support for clear-error-counter in XE DRM RAS
+  drm/drm_ras: Add DRM RAS netlink error event notification
+  drm/xe/xe_drm_ras: Add error-event support in XE DRM RAS
+
+ Documentation/gpu/drm-ras.rst            | 17 +++++
+ Documentation/netlink/specs/drm_ras.yaml | 27 ++++++-
+ drivers/gpu/drm/drm_ras.c                | 91 +++++++++++++++++++++++-
+ drivers/gpu/drm/drm_ras_nl.c             | 19 +++++
+ drivers/gpu/drm/drm_ras_nl.h             |  6 ++
+ drivers/gpu/drm/xe/xe_drm_ras.c          | 52 +++++++++++++-
+ drivers/gpu/drm/xe/xe_drm_ras.h          |  7 ++
+ drivers/gpu/drm/xe/xe_hw_error.c         |  5 ++
+ include/drm/drm_ras.h                    | 13 ++++
+ include/uapi/drm/drm_ras.h               |  4 ++
+ 10 files changed, 237 insertions(+), 4 deletions(-)
+
+-- 
+2.47.1
+
 
