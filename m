@@ -1,111 +1,161 @@
-Return-Path: <netdev+bounces-266394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LLSA8W1sGlvmQIAu9opvQ
-	(envelope-from <netdev+bounces-266394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:29 +0100
+	id yMA6I0a5sGn0mQIAu9opvQ
+	(envelope-from <netdev+bounces-266395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:37:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E43259B61
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76870259D7D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EBC3E3185863
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:21:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7A07B302BBCA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F400632AADA;
-	Wed, 11 Mar 2026 00:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F9636605D;
+	Wed, 11 Mar 2026 00:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VyKWni0x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jz1k53Z0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F113325491;
-	Wed, 11 Mar 2026 00:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773188510; cv=none; b=t92KexQ0lEEx+FuOXO9wg2yS2v7G86P8LvbSEHCqLdQ1oYEGzPmmtI2fdH0lE2N6Sbc/3CojAV2bE8KvpLAp9RCEBOfit+hArOtkTkVzC1GyD6/5+80V5ix/Lx+liSQs+g8WbB2GWRYtzWySvgTdklLrlBTFkJlu2A51hXM4h3s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773188510; c=relaxed/simple;
-	bh=JZ1MupmgP5MlyQ17bumvQ8kuB33cvaR/2S7m0iYGFq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F6OR2h84Adh1SUuwTOtRqVnIWNAJJyMmAyCUSljTwXISABIpCqVu0Yw/98UKzY8O1wRvr5juM9A23NGbvZ006iv/NmU9wpdndIk3UiHZooOjX9ELSEkvdOgYzVeDeqsROEOyTH7zBg4FMxNs+pzKNs/aanmGv3HPQV+uDhE7mFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VyKWni0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E35C2BC87;
-	Wed, 11 Mar 2026 00:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773188509;
-	bh=JZ1MupmgP5MlyQ17bumvQ8kuB33cvaR/2S7m0iYGFq0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VyKWni0xwhMlKVxWt6yF+H/Efit0Qo3drviI3YYg41MMGKNBmpnhGSIMF8vjPWMro
-	 zw7mTvDI92vtI5N2PEIbK171+yhO/rS6qHun4F24huF5/M0LK2xIzI2fh1u40j+Au3
-	 arhtMHW4n7BW2CopvdR8a6hXtrxxJsgMPtnzLOj2OjFtHLICFgWSHJCa4kDyO4l5VO
-	 4fE0xkcVJbpdtwg2g9BwVCSK6NcaLX6cuPB89jg06HVKaQjMwf+70WoMqVOIrYTsLz
-	 97A2BqSI2MY1ckn19zmflrz7Xip//GSL6KcBABp4Y2Nqag9E8fg2qDQOuAADoKCHdi
-	 xsk2wKwEDqlVA==
-Date: Tue, 10 Mar 2026 17:21:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
- <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v3 0/3] ethtool: Dynamic RSS context
- indirection table resizing
-Message-ID: <20260310172148.2e22e3d7@kernel.org>
-In-Reply-To: <20260308131218.3172332-1-bjorn@kernel.org>
-References: <20260308131218.3172332-1-bjorn@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B113644C1
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 00:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773189440; cv=pass; b=R36PeWOsX3B5WNiGSzZDU4k2lSA0/EVTMtKA6/quwfjL2Bgj//fTLZXYWgWHgcDdQuP1o6mBZoMbJas7ZjoINMUxRVce2J6nrF4nGpvffiasavgFq8qOvcmzGiQ8FZ6eyoFWFPSDPLhwcu2B82+NEUFeqJ8889yR/miTT+U0wjk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773189440; c=relaxed/simple;
+	bh=qB2Y9UmS3AGYwZt5ou15zHmd+DF8TtbO3BwMKq5EH/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=imh1EQdGXzUBwJSekmAxrhaNSSCMhBoewIkf92dQ1j3aoM91D6QEJaYHNbljJdZBsy/X/uOSFKUWrd1EyOomDatshR11bDckE2RfzOG7yUgoIYKsPIY2A59SV2/aCzc8k0sQB5TubyK2U9r1WkliXiubQ8agvVUJlHaAVdlw82E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jz1k53Z0; arc=pass smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5a126c8aab9so8149702e87.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 17:37:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773189436; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QOKvBDwTUvtr4se5Hhq33f2oB0l72dEbYjaUwcUlQ5fassBcK9/ha2qIM27xzsJ2ot
+         wHnIEalNpYNsB4BofSki+j5Dou0oP88K1i7RYzix7yJt35TSHqdhC44qSZr2g9r4OhMd
+         ExGtqtGJDlWYUW/qJhF5zBDbkqeEkDo4P09GCDbbFNOYaqJieg52RHYdXTvXffP20HCV
+         L+dEtBB+q5AJ8kh66rbxsj75OoyvSxAYqoNhWYlGpsEauyAkYrsjIexYRCrCv0EHRIKE
+         dqyxR20ORQ7Qx92TwbMxaizyt/bWG1oMgkauw1EkX+yE0r2kackKcQ8lKb8ySgiev55S
+         N8Yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=qB2Y9UmS3AGYwZt5ou15zHmd+DF8TtbO3BwMKq5EH/s=;
+        fh=o7U8UBNx2O/SNASv+IGw9Ra1fhO3i7vf01pihjE8er4=;
+        b=josHsEEWA1oz2RKPkvmKWdARMJm06HuwwB8gece6rUPwb7exL2lPjeLAKB2ntgFji+
+         LoZU3r8korkJSZSb1dk8vNKoaR2NFqlHtTIGTiVlV7zZFVIDFI8iOWPvQtWrbq9zhnHr
+         x73YqrRyRrAxGoH0YHTIyzX5BmKbWdfjIcxLPrdN2P9VuTAFFk2Jq0TMRBK/sa29+ULb
+         0cixfl5hHuzDf4ZsgHCqkpvF9++60GttsW3S0JmHEi377OVJFeAPTQJvF0XjmK1SrrkY
+         NE1ApFUARt82zZdmgcB9wuaL4AQOp3qZXmKybD7F1Y7+uCqmMR2atslJjMBZeVhLG/Tm
+         cuOQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773189436; x=1773794236; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qB2Y9UmS3AGYwZt5ou15zHmd+DF8TtbO3BwMKq5EH/s=;
+        b=Jz1k53Z0FHFzA49AV7XnVztSZl2QXneLkgTzK/MyPWhwiOIyr5ez/yLelhxBPE88vq
+         c48T4eExpH7cZL0OEOW6Mno7DwSzWEJrEllkGGIGIF/DuCaMyd+Z5otFrMuFo8OZJR0Z
+         nFIGi3RcFjEDDT0Rl4mGzZCPsVoIGGCi7639oTdt11RmHSocCnnUO8nBYXHN15fU2VN1
+         2jIRYxzojHQl3pHhLoAkApl4YmqkyFFt1/yRxoHBE6+PxtXhwYO3fKBzWwzpMkPznlc/
+         1O1zyJoD7AN2JhWmHiiYrD4jVon3gOckWF6P4iBEDav+mHioddVwbnLCxbfhLzt1VNqk
+         ksBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773189436; x=1773794236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qB2Y9UmS3AGYwZt5ou15zHmd+DF8TtbO3BwMKq5EH/s=;
+        b=BTHm+qNudVkOwiyfHXVkk3v4+gJAvULJubOoO3J6U9nzBeMaf95dRp8t3FUNp5AFtO
+         lfAKemefvQkwzvHbSngO9zgH0BP+Kzx2wvXyy6H094pTASuvnCr1NjvrFsxwAlKT8YdV
+         h4L1BuzTsh2sx1S6HjozGyQ61nrZCuAevrnPZwpN8QLtlOz0MpYff1mG6tT9CTfahTlU
+         tN8AQTPv68Y368SHSYjVTf04GxR0sd103K7DLO16cNwZwutkoii/RG0vzrSoY2LcHhud
+         0XCT0726Xvy2QvTMYf3ZytWmzMrZ6hRZ7zC5lUrDcefz9IF+JYYqBzq8619dh/WbjJeo
+         uVNQ==
+X-Gm-Message-State: AOJu0Yyl/8v04DPDDMCfjKE1YiKth8XlsXmCUsuBqxN7MeK3gRG73bhZ
+	xUEJr6CuCEOh2uWtSZPLqM38CQCOK1nxJgDXAx5Un856uBF5JsPQ3x/+ep8q9vLJM65NsyuLJep
+	FuuQKfkyGXyNrfm81jwYJC0Z5BEPVHb0=
+X-Gm-Gg: ATEYQzwSTTPa6q6SMhPMHOgPoC2076puvB4FOCkz1vfw+WjPXWDAVIUfAC7Lnrk4PSq
+	C9NsZNsWzDHOLtmHj9sjaLY87CHvDIyEE2bXZHVPsZXBPLcElcz+keLYyycfqvSgI6KmUrEkKUf
+	M2KgUSce2IdcKyUk+ujJjTAC4kDEbONaCFDVd0O7wn6LKPdSrRVuG/ZelIyQKY+nByUlhogfWZT
+	Q8mOkFUWILceNxGbAnQyPRoWKl0vvwMbKKZLLmAkhcoeO+90CXGHX3rYl89bqtQKlitIQbYebeS
+	EkkMeWQ0O0+Lrry9dQ==
+X-Received: by 2002:ac2:5b52:0:b0:5a1:3f63:c7e2 with SMTP id
+ 2adb3069b0e04-5a156cd0940mr124426e87.26.1773189436194; Tue, 10 Mar 2026
+ 17:37:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20260310133024.422464-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20260310133024.422464-1-maciej.fijalkowski@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 11 Mar 2026 08:36:38 +0800
+X-Gm-Features: AaiRm51sHV0zYJIAPWsSjsEAUdn-xyam-DpjW4gRVLnnnDHvbN21UgXe1QQXnuM
+Message-ID: <CAL+tcoBmggp7USbD_n4oq3C1rLduejPyn+OgSbV_H-7vhyndmw@mail.gmail.com>
+Subject: Re: [PATCH net-next] xsk: use __xsk_rcv_zc_safe for ZC multi-buffer
+ Rx processing
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com, 
+	stfomichev@gmail.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: A4E43259B61
+X-Rspamd-Queue-Id: 76870259D7D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-266395-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266394-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid,intel.com:email]
 X-Rspamd-Action: no action
 
-On Sun,  8 Mar 2026 14:12:14 +0100 Bj=C3=B6rn T=C3=B6pel wrote:
-> Some NICs (e.g. bnxt) change their RSS indirection table size based on
-> the queue count, because the hardware table is a shared resource. The
-> ethtool core locks ctx->indir_size at context creation, so drivers
-> have to reject channel changes when RSS contexts exist.
+On Tue, Mar 10, 2026 at 11:04=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Commit f620af11c27b ("xsk: avoid double checking against rx queue being
+> full") addressed a case in copy mode, when working with multi-buffer
+> xdp_buff, where we were peeking onto XSK Rx queue twice, to find out if
+> there is a space to produce descriptors.
+>
+> Adjust ZC path to follow the same principle.
+>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-This will conflict with Michael's fix so please rebase & repost
-as soon as we merge net into net-next on Thrusday.
---=20
-pw-bot: cr
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+Thanks!
 
