@@ -1,444 +1,238 @@
-Return-Path: <netdev+bounces-266693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIhaDU+TsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:07:43 +0100
+	id eGueMgSVsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:15:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEAB7266FC9
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:07:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5078A26726E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 376A23034660
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:03:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E13F43235672
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C63373BE2;
-	Wed, 11 Mar 2026 16:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577B631E85D;
+	Wed, 11 Mar 2026 16:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPKD8jkU"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="e6c+ElXV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12FF372B35
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245030; cv=none; b=VuJ/hQ6laswwT0GY8d9up1vpZV284c2g8RjEqivxbkbFlDXopdGSbmspnBNLqFQHgjg7wj/h8tIPr7Arjn9CSRKoaDFkxgEestqBLwcnq8l7NhlhxbQyk2DO7HMAiQyZodRdb4U/hqgpjAOuUkYgXHe1hITOjNc9f3DEjZjhta0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773245030; c=relaxed/simple;
-	bh=nfdCb+ZX2vm8iVqO0V2fUhvxyc8e4s6DcEvQGAVwJzo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OPHVxNUE7G40DbeBFsopEi92Gv69CCdrrC4TmrDx3mpfvqMZnCq8cKCHiUgYtB/i6yIDFL7ZFI4TTqnqhIjS43x6wKnZUez8hNqFAHloIcSjpnK5Pf6ql7tkJmfApwjS9MRiDuSkScye1COLYyFeNC5JVBIVYVSlVgZNP+9Mx4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KPKD8jkU; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4852e09e23dso187405e9.0
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:03:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4003B47E5
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773245339; cv=pass; b=NFB9r0YRP9MsUpybIAo9GkpnfgAjF4YL3xs7dqTVOGK28GSEdJKNp+WVuxgJO0ybbfPUXG847e5HC2FJrQSQDs+eT005lZrdw2OCMF3w9Z5tShs0DtT37Ca7nm1FXLXjY6aWuntpwrL9F1KiJk7wf1kRbobPWRyFdw0OD1Isy8A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773245339; c=relaxed/simple;
+	bh=owVe3Qfob2UO8yuqdH2PqAC+rPmSIbbd71zfyNJWtfE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f5mqwrkCTqhQKgCsOcEDVIcnBjpEpSSBLnoNOyl6sDHwb2ao+7R8xk1Ol4++tkpjEI5YGd6Y8G/PLNe4UoNFk8eZxlafO9znUtdQ9R0tpn6ixtO/XbD4qNBeb9x8ZX+C0E5BVZvsXDg24bcJBAWbae/+cM6uDR0szmSJs9ugwrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=e6c+ElXV; arc=pass smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-359ff894f0dso507151a91.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:08:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773245337; cv=none;
+        d=google.com; s=arc-20240605;
+        b=I8PJzy8kV1NlCv5OejS90Jhg7iiUaBq3DiSiKNfF4q02fM4SKwrckKBL74vCmLklBA
+         Eog+8PnJ4UaC+T+hkrHi7EGgik4FBu2gg84ivsibzYeMtSc1xHNVeggG+zZ12ppXDtAJ
+         5nj9mDXxcEyLog4UzPQPZDMkcaRI0cCf8XYqAAl7G8m/rZExgbeQ5+ZFR2GjtQc8bbL6
+         kOqdFIy05FLZkbpvHnTMuNbfqvIjdHtju3Ur8lNWbjn/PJl1D2YGSDE3v0P6oMvebid2
+         meSVMiaa5itPMga7tLIzzUOjkujU2hjBID7IlNILp9HvMFneAqnxqIrVhr/PlDIsD1x8
+         rltA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
+        fh=4AxJWIgipTw7LuZGFEvcVW2jhf3Ab/8G87BztoUcL9A=;
+        b=Mculw4yjPb/n9p9VVJ5eyxHcnMJ7mKqxJA/MzwMzxG1wM4p7ViOKE0PdJlfTzJNsWX
+         WU2sjCcKt4FfxpkyGU9jRJ17jatTPjCGhlvbeDSgDuxrc9EsxbBGdJuBVXCmidqVrb8+
+         IwiReox06uHllKIdG603v7mYLBbYTGqf99AnJdGYLntmPLyzTSa/ld0H/pMCbFJJsR2w
+         Nbt1amRzNirpsjpmpUjEoXyPSY2ctGBUUE7dRCXM3sv6nWxgoMRZ9kQ8weA9aR5QxD2M
+         Jd+SPPjYGC56VDANc3NXmZTkBCQlqu9aNsuo8eeHw8lgiZATpJDoKxCcjW7EE51DncwT
+         REqA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773245027; x=1773849827; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TaSlV2hEW5hcNc0uAEcapl0te5oFyDK8uE1cGHT+3MU=;
-        b=KPKD8jkUxFyJgcw82ry/iyv2XwtUiD9b+KNWlXbIO78igvucHWOypnPqVcAF7LNyZ7
-         8h4gpM/lJ3sJTvglIPsq2tPdVG5HRLvZXK03WB36JfR1ydeCvigLZTyS9xeCaUPyIK5E
-         58LxI+DgzL5bUwHkT+oKlUNUDavcLVTASMxlfpw8tHAHNM3Ha4ilzorik83TSWoa7Jrx
-         aii/hFrWvdW7yuNUkImjEmdXNL1D6pmBVTk0uyjYm4dbhXia9i28cYR5y2tSM6pjdJnp
-         iO7a37doele7ZPVNr+HudlELb2JH33jxNRez2BJTAJ6jgkCKAFCbm+0UwAdW8DXbiFAh
-         BZ1A==
+        d=paul-moore.com; s=google; t=1773245337; x=1773850137; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
+        b=e6c+ElXV9/S8dBAt4s3Y0Qdq9+tZ8d5cWILHAnHHImVT5PIIkJUyCZiacq7jRwg0wO
+         3Cebb97OPazwIb6fjRP+vY3CtMSNoYR2RIKBrDAwtxeicH+/z2rbTPh7Os6MuY5k4bsk
+         ma028J0ookNSr0KijANIvgZg9rIgryyaHdtXthB65JBFV5watPKOGnOo8nJM04Fvkhcu
+         1sUQwoIi9bTkdmnd5BJfx1eZGuBrZjPCVZAWLHDskfYdbIiO+mBd3Ciep3WaOeYu4bZ3
+         AOcYAN3ypG4b0iCneKQdTkcp00UtTnkzuS2zWuf4D3tjbFYHt0mKsjvS4pJXtGlYQIpi
+         h/Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773245027; x=1773849827;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TaSlV2hEW5hcNc0uAEcapl0te5oFyDK8uE1cGHT+3MU=;
-        b=sZgh/yixHo+DpHPLJknKT6Cpj2128BTSv/RxYQvsJzQK3H8ti6DcGFbjQB/3eyKiZp
-         HjJz1JmKy+ojCWPw7L3e4VELcZgp3yTLAXaB9LXSmWts/buWHZKoGlDlZ752Ke0NQMh5
-         8CmodHxTRTdN4jvaDxQhcC/qKS7FFwbi6wsuf4I7k5SwMxplgg4Leotl6vL96nYQLaaq
-         mvVa/OQBz4kDFX2zKhw9SrPsAVBoejYAQHCGJILLnvSfws7053yiurNLvP4bGIRP+iGO
-         M/SSx9aS1v6zx/hAaG0G+S6XfBnd6NLjsbkh64FPEsPICbsJBoDOf1DfdBPbtLCO9QvV
-         eHtQ==
-X-Gm-Message-State: AOJu0Yy3nz1TPPjoiVfHFvqKs13eaNkL1Z7fNVSsau0dGP/7N8l+g3Ti
-	0kfA1OTLmrrVlTRpefraPvhLKwqGgAYpTN6f83l1zd32pXaG0QHrBRTL
-X-Gm-Gg: ATEYQzx0+kv1AIhGWuoro6/1X+UGqJ8YQ/xjv69+Z1sBLQjVKobuiqG/9T1G/U8EE8e
-	Us42ZZLC0ylFAnKqfCHq+disk79I0HtmznwtvchPmEseL09jpvo21Dqp66YIfvy+qWmdlC6ekG/
-	idb9aqTdTIX7SwawrLJqQ+5iN2aMFxPrsvwSKoeyW3GeTzYPH7vqTmjVFCyVdA9Jafza40DN+jk
-	yZNA2hED0ZMfqbNd0alJiHIacEsijFuAqCC2A+ZH35UMjQ53BBiNw7Rarh3eSUFleIAMx64UxR2
-	t7tDjFi3VWOh+qPbPqeIJJ/nk5alk7IejawD3Yt1SRCezWc/kUjAytBd9uFFHfiYBGx/WraOeiz
-	DqModpkeakZ8XstDWOSXDr6cGLZOgupBRbE1gnTzFuNMY/iU2yWrJrw2Gq4n+ZrEw5PhU3rBIXC
-	HoOz46/yaqMYFeLyYLquKkZSVloXsts6or3qgzHg==
-X-Received: by 2002:a05:600c:444e:b0:485:2fc5:39e with SMTP id 5b1f17b1804b1-4854b117cdbmr52453635e9.27.1773245026857;
-        Wed, 11 Mar 2026 09:03:46 -0700 (PDT)
-Received: from localhost ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541b7f255sm165940575e9.12.2026.03.11.09.03.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 09:03:46 -0700 (PDT)
-From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- ameryhung@gmail.com, kernel-team@meta.com
-Subject: Re: [RFC PATCH bpf-next v2 03/11] bpf: Unify dynptr handling in the
- verifier
-In-Reply-To: <20260307064439.3247440-4-ameryhung@gmail.com>
-References: <20260307064439.3247440-1-ameryhung@gmail.com>
- <20260307064439.3247440-4-ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 16:03:45 +0000
-Message-ID: <87ikb2tkta.fsf@gmail.com>
+        d=1e100.net; s=20230601; t=1773245337; x=1773850137;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
+        b=qGrHVygxYaeN5qVSHXf9nzEhJKLHFkMbwazz2KX7X8jP1L3LACG/yvc9Ij8Y0ekYei
+         XoVYHX4ewn5e6Yx8kN6fCjeWCUjcispBuSWOl4Q5z+gaQfZVEZPpMrir0vB7Jkw8WR28
+         fw4odk2JfVhNn79jtdqPB89iWEp/I/zVZ0U0HGaqy9Qr59I/M0B4wsn7/t7TrimIw025
+         FoJqjlvdYHXjtMbjuh5GAnU5RrcqMDWihuemkYh2mdmP1T6oB5swg+BuiYqYP+0bUUiK
+         9tKmE0bmC2LyNWP9dyJHyX3Ydvxai3+2tI+0EPSPimsP2id0ZjC4TiKBjj+1kdVOHaM4
+         WK/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUwu+rYUdz/fOrZ4T2qyX1xzvvCD2ZGrXRugCg4RVPeky50PwA5labYfdiPm2CHFonyXTQCDmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJN6/w4whP6Z16VIrzynoVDL6C4YFjDsFuWW+DthE31F+5A5fT
+	yujmdkTJuhX9SdTm5SitrRc14iemd1j474MZYR7wdDUxS84lNX0Qz0PFJb8KCQmxcIr+++tHGnD
+	YWML9AxYn0wUQUDhwlIr4zauatxP7QaW9GhnFNAlT
+X-Gm-Gg: ATEYQzz64Y2mr6iNcP5dEsxLCLFN34ogJf/ow/B3t//2CfA/ngZIeHiS0giUUvmCUSX
+	/Ta9FiT5Zr6/Gqks4E4Vl0/29Gzw6Iyr8PQMR5cOHScBNHx649+UXKGitD6v0YE9NaJQJCOeO1g
+	TuyVvE5ECrJd5wbPq/liZduF4zcZs2hFRmigYnn0OuB9fyE934BareFujeBh3Jp5f0BWLOMYMAs
+	ivv4Z9YSDTNQQ2ofrcuncm3ZylaxC1jcUCv+uCHm2D/UWcph/Z8wUVUfoHiuoKRGxowr/gjfg2X
+	isor/wo=
+X-Received: by 2002:a17:903:3d05:b0:2ae:3d7d:d905 with SMTP id
+ d9443c01a7336-2aeae81490amr32213615ad.23.1773245337226; Wed, 11 Mar 2026
+ 09:08:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+References: <aZcPd3OKqxwCZV-5@suesslenovo> <20260219200459.1474232-1-utilityemal77@gmail.com>
+ <20260219.de5dc35ec231@gnoack.org> <CAHC9VhSu=YtE0dMiEtUQgz0pFy5K8cuHh_EWprNtFTDAxhss_w@mail.gmail.com>
+ <abFhawSTjNoa-KaH@suesslenovo>
+In-Reply-To: <abFhawSTjNoa-KaH@suesslenovo>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 11 Mar 2026 12:08:43 -0400
+X-Gm-Features: AaiRm51y1oanFGZp0hATWZweBML1M22bqKd3H2ES5tayYiLT9l2hp1VRACvAC4Q
+Message-ID: <CAHC9VhSA=jaKTXg-Tmzzpaj9STGMXH3ZMgQm_XvicimRqdW0+w@mail.gmail.com>
+Subject: Re: [PATCH v6] lsm: Add LSM hook security_unix_find
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, brauner@kernel.org, 
+	demiobenour@gmail.com, fahimitahera@gmail.com, hi@alyssa.is, horms@kernel.org, 
+	ivanov.mikhail1@huawei-partners.com, jannh@google.com, jmorris@namei.org, 
+	john.johansen@canonical.com, konstantin.meskhidze@huawei.com, 
+	linux-security-module@vger.kernel.org, m@maowtm.org, matthieu@buffet.re, 
+	mic@digikod.net, netdev@vger.kernel.org, samasth.norway.ananda@oracle.com, 
+	serge@hallyn.com, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-266693-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266694-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,alyssa.is,huawei-partners.com,google.com,namei.org,canonical.com,huawei.com,vger.kernel.org,maowtm.org,buffet.re,digikod.net,oracle.com,hallyn.com,zeniv.linux.org.uk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AEAB7266FC9
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[maowtm.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,paul-moore.com:dkim,paul-moore.com:url,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 5078A26726E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Amery Hung <ameryhung@gmail.com> writes:
+On Wed, Mar 11, 2026 at 8:34=E2=80=AFAM Justin Suess <utilityemal77@gmail.c=
+om> wrote:
+>
+> On Tue, Mar 10, 2026 at 06:39:12PM -0400, Paul Moore wrote:
+> > On Thu, Feb 19, 2026 at 3:26=E2=80=AFPM G=C3=BCnther Noack <gnoack3000@=
+gmail.com> wrote:
+> > > On Thu, Feb 19, 2026 at 03:04:59PM -0500, Justin Suess wrote:
+> > > > Add a LSM hook security_unix_find.
+> > > >
+> > > > This hook is called to check the path of a named unix socket before=
+ a
+> > > > connection is initiated. The peer socket may be inspected as well.
+> > > >
+> > > > Why existing hooks are unsuitable:
+> > > >
+> > > > Existing socket hooks, security_unix_stream_connect(),
+> > > > security_unix_may_send(), and security_socket_connect() don't provi=
+de
+> > > > TOCTOU-free / namespace independent access to the paths of sockets.
+> > > >
+> > > > (1) We cannot resolve the path from the struct sockaddr in existing=
+ hooks.
+> > > > This requires another path lookup. A change in the path between the
+> > > > two lookups will cause a TOCTOU bug.
+> > > >
+> > > > (2) We cannot use the struct path from the listening socket, becaus=
+e it
+> > > > may be bound to a path in a different namespace than the caller,
+> > > > resulting in a path that cannot be referenced at policy creation ti=
+me.
+> > > >
+> > > > Cc: G=C3=BCnther Noack <gnoack3000@gmail.com>
+> > > > Cc: Tingmao Wang <m@maowtm.org>
+> > > > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> > > > ---
+> > > >  include/linux/lsm_hook_defs.h |  5 +++++
+> > > >  include/linux/security.h      | 11 +++++++++++
+> > > >  net/unix/af_unix.c            | 13 ++++++++++---
+> > > >  security/security.c           | 20 ++++++++++++++++++++
+> > > >  4 files changed, 46 insertions(+), 3 deletions(-)
+> >
+> > ...
+> >
+> > > Reviewed-by: G=C3=BCnther Noack <gnoack3000@gmail.com>
+> > >
+> > > Thank you, this looks good. I'll include it in the next version of th=
+e
+> > > Unix connect patch set again.
+> >
+> > I'm looking for this patchset to review/ACK the new hook in context,
+> > but I'm not seeing it in my inbox or lore.  Did I simply miss the
+> > patchset or is it still a work in progress?  No worries if it hasn't
+> > been posted yet, I just wanted to make sure I wasn't holding this up
+> > any more than I already may have :)
+>
+> Good Morning Paul,
+>
+> Can't speak to the rest of the patch, but I sent this LSM hook for
+> review purposes before inclusion with the rest of the V6 of this patch.
+>
+> G=C3=BCnther added his review tag, but I was asked to make some minor com=
+ment / commit
+> message updates. I sent the same patch, with updated comments/commit to h=
+im
+> in a follow up, off-list email to avoid spamming the list. No code change=
+s were
+> made, just comments.
+>
+> I don't think this particular patch will change substantially, unless we =
+find
+> something unexpected. But the way we use the hook may change (esp wrt to
+> locking and the SOCK_DEAD state), which is important for your review.
+>
+> So you may want to hold off your review until the full V6 series gets sen=
+t so
+> you can review the hook in context. There were some questions about
+> locking that needed proper digging into. [1]
 
-> Simplify dynptr checking for helper and kfunc by unifying it. Remember
-> initialized dynptr in process_dynptr_func() so that we can easily
-> retrieve the information for verification later.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  kernel/bpf/verifier.c | 179 +++++++++---------------------------------
->  1 file changed, 36 insertions(+), 143 deletions(-)
->
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 0f77c4c5b510..d52780962adb 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -277,8 +277,15 @@ struct bpf_map_desc {
->  	int uid;
->  };
->  
-> +struct bpf_dynptr_desc {
-> +	enum bpf_dynptr_type type;
-> +	u32 id;
-> +	u32 ref_obj_id;
-nit: let's add a comment here explaining what this field is for.
-> +};
-> +
->  struct bpf_call_arg_meta {
->  	struct bpf_map_desc map;
-> +	struct bpf_dynptr_desc initialized_dynptr;
->  	bool raw_mode;
->  	bool pkt_access;
->  	u8 release_regno;
-> @@ -287,7 +294,6 @@ struct bpf_call_arg_meta {
->  	int mem_size;
->  	u64 msize_max_value;
->  	int ref_obj_id;
-> -	int dynptr_id;
->  	int func_id;
->  	struct btf *btf;
->  	u32 btf_id;
-> @@ -346,16 +352,12 @@ struct bpf_kfunc_call_arg_meta {
->  	struct {
->  		struct btf_field *field;
->  	} arg_rbtree_root;
-> -	struct {
-> -		enum bpf_dynptr_type type;
-> -		u32 id;
-> -		u32 ref_obj_id;
-> -	} initialized_dynptr;
->  	struct {
->  		u8 spi;
->  		u8 frameno;
->  	} iter;
->  	struct bpf_map_desc map;
-> +	struct bpf_dynptr_desc initialized_dynptr;
->  	u64 mem_size;
->  };
->  
-> @@ -511,11 +513,6 @@ static bool is_ptr_cast_function(enum bpf_func_id func_id)
->  		func_id == BPF_FUNC_skc_to_tcp_request_sock;
->  }
->  
-> -static bool is_dynptr_ref_function(enum bpf_func_id func_id)
-> -{
-> -	return func_id == BPF_FUNC_dynptr_data;
-> -}
-> -
->  static bool is_sync_callback_calling_kfunc(u32 btf_id);
->  static bool is_async_callback_calling_kfunc(u32 btf_id);
->  static bool is_callback_calling_kfunc(u32 btf_id);
-> @@ -597,8 +594,6 @@ static bool helper_multiple_ref_obj_use(enum bpf_func_id func_id,
->  		ref_obj_uses++;
->  	if (is_acquire_function(func_id, map))
->  		ref_obj_uses++;
-> -	if (is_dynptr_ref_function(func_id))
-> -		ref_obj_uses++;
->  
->  	return ref_obj_uses > 1;
->  }
-> @@ -8750,7 +8745,8 @@ static int process_kptr_func(struct bpf_verifier_env *env, int regno,
->   * type, and declare it as 'const struct bpf_dynptr *' in their prototype.
->   */
->  static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn_idx,
-> -			       enum bpf_arg_type arg_type, int clone_ref_obj_id)
-> +			       enum bpf_arg_type arg_type, int clone_ref_obj_id,
-> +			       struct bpf_dynptr_desc *initialized_dynptr)
->  {
->  	struct bpf_reg_state *reg = reg_state(env, regno);
->  	int err;
-> @@ -8825,6 +8821,20 @@ static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn
->  		}
->  
->  		err = mark_dynptr_read(env, reg);
-> +
-> +		if (initialized_dynptr) {
-> +			struct bpf_func_state *state = func(env, reg);
-state is only used if reg->type != CONST_PTR_TO_DYNPTR, does it make
-sense to move state = func(env, reg); to the corresponding if block?
-> +			int spi;
-> +
-> +			if (reg->type != CONST_PTR_TO_DYNPTR) {
-> +				spi = dynptr_get_spi(env, reg);
-looking at the deleted dynptr_id() and dynptr_ref_obj_id() spi can be
-negative, what changed here that we no longer need this check?
-> +				reg = &state->stack[spi].spilled_ptr;
-> +			}
-> +
-> +			initialized_dynptr->id = reg->id;
-> +			initialized_dynptr->type = reg->dynptr.type;
-> +			initialized_dynptr->ref_obj_id = reg->ref_obj_id;
-> +		}
->  	}
->  	return err;
->  }
-> @@ -9587,72 +9597,6 @@ static int check_func_arg_reg_off(struct bpf_verifier_env *env,
->  	}
->  }
->  
-> -static struct bpf_reg_state *get_dynptr_arg_reg(struct bpf_verifier_env *env,
-> -						const struct bpf_func_proto *fn,
-> -						struct bpf_reg_state *regs)
-> -{
-> -	struct bpf_reg_state *state = NULL;
-> -	int i;
-> -
-> -	for (i = 0; i < MAX_BPF_FUNC_REG_ARGS; i++)
-> -		if (arg_type_is_dynptr(fn->arg_type[i])) {
-> -			if (state) {
-> -				verbose(env, "verifier internal error: multiple dynptr args\n");
-> -				return NULL;
-> -			}
-> -			state = &regs[BPF_REG_1 + i];
-> -		}
-> -
-> -	if (!state)
-> -		verbose(env, "verifier internal error: no dynptr arg found\n");
-> -
-> -	return state;
-> -}
-> -
-> -static int dynptr_id(struct bpf_verifier_env *env, struct bpf_reg_state *reg)
-> -{
-> -	struct bpf_func_state *state = func(env, reg);
-> -	int spi;
-> -
-> -	if (reg->type == CONST_PTR_TO_DYNPTR)
-> -		return reg->id;
-> -	spi = dynptr_get_spi(env, reg);
-> -	if (spi < 0)
-> -		return spi;
-> -	return state->stack[spi].spilled_ptr.id;
-> -}
-> -
-> -static int dynptr_ref_obj_id(struct bpf_verifier_env *env, struct bpf_reg_state *reg)
-> -{
-> -	struct bpf_func_state *state = func(env, reg);
-> -	int spi;
-> -
-> -	if (reg->type == CONST_PTR_TO_DYNPTR)
-> -		return reg->ref_obj_id;
-> -	spi = dynptr_get_spi(env, reg);
-> -	if (spi < 0)
-> -		return spi;
-> -	return state->stack[spi].spilled_ptr.ref_obj_id;
-> -}
-> -
-> -static enum bpf_dynptr_type dynptr_get_type(struct bpf_verifier_env *env,
-> -					    struct bpf_reg_state *reg)
-> -{
-> -	struct bpf_func_state *state = func(env, reg);
-> -	int spi;
-> -
-> -	if (reg->type == CONST_PTR_TO_DYNPTR)
-> -		return reg->dynptr.type;
-> -
-> -	spi = __get_spi(reg->var_off.value);
-> -	if (spi < 0) {
-> -		verbose(env, "verifier internal error: invalid spi when querying dynptr type\n");
-> -		return BPF_DYNPTR_TYPE_INVALID;
-> -	}
-> -
-> -	return state->stack[spi].spilled_ptr.dynptr.type;
-> -}
-> -
->  static int check_reg_const_str(struct bpf_verifier_env *env,
->  			       struct bpf_reg_state *reg, u32 regno)
->  {
-> @@ -10007,7 +9951,8 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
->  					 true, meta);
->  		break;
->  	case ARG_PTR_TO_DYNPTR:
-> -		err = process_dynptr_func(env, regno, insn_idx, arg_type, 0);
-> +		err = process_dynptr_func(env, regno, insn_idx, arg_type, 0,
-> +					  &meta->initialized_dynptr);
->  		if (err)
->  			return err;
->  		break;
-> @@ -10666,7 +10611,7 @@ static int btf_check_func_arg_match(struct bpf_verifier_env *env, int subprog,
->  			if (ret)
->  				return ret;
->  
-> -			ret = process_dynptr_func(env, regno, -1, arg->arg_type, 0);
-> +			ret = process_dynptr_func(env, regno, -1, arg->arg_type, 0, NULL);
->  			if (ret)
->  				return ret;
->  		} else if (base_type(arg->arg_type) == ARG_PTR_TO_BTF_ID) {
-> @@ -11771,52 +11716,10 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
->  			}
->  		}
->  		break;
-> -	case BPF_FUNC_dynptr_data:
-> -	{
-> -		struct bpf_reg_state *reg;
-> -		int id, ref_obj_id;
-> -
-> -		reg = get_dynptr_arg_reg(env, fn, regs);
-> -		if (!reg)
-> -			return -EFAULT;
-> -
-> -
-> -		if (meta.dynptr_id) {
-> -			verifier_bug(env, "meta.dynptr_id already set");
-> -			return -EFAULT;
-> -		}
-> -		if (meta.ref_obj_id) {
-> -			verifier_bug(env, "meta.ref_obj_id already set");
-> -			return -EFAULT;
-> -		}
-> -
-> -		id = dynptr_id(env, reg);
-> -		if (id < 0) {
-> -			verifier_bug(env, "failed to obtain dynptr id");
-> -			return id;
-> -		}
-> -
-> -		ref_obj_id = dynptr_ref_obj_id(env, reg);
-> -		if (ref_obj_id < 0) {
-> -			verifier_bug(env, "failed to obtain dynptr ref_obj_id");
-> -			return ref_obj_id;
-> -		}
-> -
-> -		meta.dynptr_id = id;
-> -		meta.ref_obj_id = ref_obj_id;
-> -
-> -		break;
-> -	}
->  	case BPF_FUNC_dynptr_write:
->  	{
-> -		enum bpf_dynptr_type dynptr_type;
-> -		struct bpf_reg_state *reg;
-> -
-> -		reg = get_dynptr_arg_reg(env, fn, regs);
-> -		if (!reg)
-> -			return -EFAULT;
-> +		enum bpf_dynptr_type dynptr_type = meta.initialized_dynptr.type;
->  
-> -		dynptr_type = dynptr_get_type(env, reg);
->  		if (dynptr_type == BPF_DYNPTR_TYPE_INVALID)
->  			return -EFAULT;
->  
-> @@ -12007,10 +11910,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
->  		return -EFAULT;
->  	}
->  
-> -	if (is_dynptr_ref_function(func_id))
-> -		regs[BPF_REG_0].dynptr_id = meta.dynptr_id;
-> -
-> -	if (is_ptr_cast_function(func_id) || is_dynptr_ref_function(func_id)) {
-> +	if (is_ptr_cast_function(func_id)) {
->  		/* For release_reference() */
->  		regs[BPF_REG_0].ref_obj_id = meta.ref_obj_id;
->  	} else if (is_acquire_function(func_id, meta.map.ptr)) {
-> @@ -12024,6 +11924,11 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
->  		regs[BPF_REG_0].ref_obj_id = id;
->  	}
->  
-> +	if (func_id == BPF_FUNC_dynptr_data) {
-> +		regs[BPF_REG_0].dynptr_id = meta.initialized_dynptr.id;
-> +		regs[BPF_REG_0].ref_obj_id = meta.initialized_dynptr.ref_obj_id;
-> +	}
-> +
->  	err = do_refine_retval_range(env, regs, fn->ret_type, func_id, &meta);
->  	if (err)
->  		return err;
-> @@ -13559,22 +13464,10 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
->  				}
->  			}
->  
-> -			ret = process_dynptr_func(env, regno, insn_idx, dynptr_arg_type, clone_ref_obj_id);
-> +			ret = process_dynptr_func(env, regno, insn_idx, dynptr_arg_type, clone_ref_obj_id,
-> +						  &meta->initialized_dynptr);
->  			if (ret < 0)
->  				return ret;
-> -
-> -			if (!(dynptr_arg_type & MEM_UNINIT)) {
-> -				int id = dynptr_id(env, reg);
-> -
-> -				if (id < 0) {
-> -					verifier_bug(env, "failed to obtain dynptr id");
-> -					return id;
-> -				}
-> -				meta->initialized_dynptr.id = id;
-> -				meta->initialized_dynptr.type = dynptr_get_type(env, reg);
-> -				meta->initialized_dynptr.ref_obj_id = dynptr_ref_obj_id(env, reg);
-> -			}
-> -
->  			break;
->  		}
->  		case KF_ARG_PTR_TO_ITER:
-> -- 
-> 2.47.3
+Great, thanks for the update, that was helpful.  As you recommend,
+I'll hold off on reviewing this further until we have the full context
+of the other patchset; we've already talked about this hook addition a
+few times anyway, and based on a quick look yesterday, nothing
+particularly evil jumped out at me.
+
+--=20
+paul-moore.com
 
