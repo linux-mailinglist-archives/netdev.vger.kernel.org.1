@@ -1,244 +1,143 @@
-Return-Path: <netdev+bounces-266638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PfjBJ5ksWkZuwIAu9opvQ
-	(envelope-from <netdev+bounces-266638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:48:30 +0100
+	id 0DtaNcBksWnsugIAu9opvQ
+	(envelope-from <netdev+bounces-266639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:49:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3E82263D62
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:48:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07C2263D90
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E475302C365
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 12:48:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 20BE13006D44
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 12:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB7E239E88;
-	Wed, 11 Mar 2026 12:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2F7282F21;
+	Wed, 11 Mar 2026 12:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M0TxS6wu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/iAbvT8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4161DE2D3
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773233306; cv=fail; b=SycOX4u2ATc8LkFupdmId2XFVevX42mujHdqSSZcnvFGGdu/bIPVernfccT1vpoOqg+iY7BQ2X3vPB12wp7m86zNO8eenLE4hSyujGDP86N1poCZT8nmjdlRzDe/PCgvc8eWYeXgAsjZ25qL4m6v8ui5zbG7aBO90pX7Xk/FesI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773233306; c=relaxed/simple;
-	bh=xE9Qi+AcyZp3fZMitxtcPTZr6QIxbkUpfSX2v3V1OG0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=donuzR4I+wKNi3Sp7u4pKuXpYTdQc1kiVe/HncMKgN/gb2+nDMYxfb1zfNK6nhgnCoX4kqkBht8+Kicv1si8O4t854vCQYTqaabPkrV9JA77DW8tqLTox567vAqxdSEAloxzmOzs2q2uPnXq8aDX6AzBfwp8+tlNavfZ8mb5/8o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M0TxS6wu; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773233304; x=1804769304;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xE9Qi+AcyZp3fZMitxtcPTZr6QIxbkUpfSX2v3V1OG0=;
-  b=M0TxS6wuWTka0u8Ooed9Q/VwWI/hsICpPTBebKmR/BlU0PjBOd8jsorr
-   D6NHo1wTMDtX/p2q8F91KiQcUP9QkQXkhthuRbHRSVDPWtXmUx33wQP6+
-   HMembe4+5LiSIFxv8dOAzQS/25YLhMXK8ak3eaPpPRnz50zA1uGCyxw4j
-   iVVxdFV4Eh0ThE9NstLWF+RfX2lV8zsbLhyJJFbe/4xSS5q3GwPnvGONK
-   P1qI4wZzSEP9ODME/L3JbsDjZhBZykTpX3jXzzxHKzIWMYo1waPedazmp
-   nY6fX2pyv7TrxM3b7joOQqT17+UjAhGBzzX2l62w3CokZujM8dHWKG08c
-   A==;
-X-CSE-ConnectionGUID: IWh4oSxJSjGfi5bp92miUA==
-X-CSE-MsgGUID: ymxVrzwmRvSiToRlzZxavQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11726"; a="91679200"
-X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
-   d="scan'208";a="91679200"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 05:48:24 -0700
-X-CSE-ConnectionGUID: hHTKxtXoT8KZHBTkH9raDA==
-X-CSE-MsgGUID: 2Dqw/4bMRSqx1RsLXW7Bag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
-   d="scan'208";a="246032955"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 05:48:23 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 11 Mar 2026 05:48:23 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 11 Mar 2026 05:48:22 -0700
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.29) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 11 Mar 2026 05:48:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EiImhIK8U5Lx8Jda+hJTFKsZ77uOiXxjpSp+bOYtYWoacJ+oEP5qa5ct/1nLX11cAvJSS1St1ro3pqxjCBQZCyoF4lYi6zW2etFq+Z6JChmxRd75y234PjEU1Hla8TVXvgwEX08sMVc7vCqaVQdneWM2zsMzXnfuzIGa5nHmN1tn+71BY1CrXCWUO9JpBN70xscH0WH0hWyu0Fogtb5amFggAgYruIRMZCnbdpdbf5qfty0q8bntR3Tsw+/isljV1c0IH8IzYC5WOIXigrIVi+eiE5UoFHIUajoOesk4/Z2XGghyJDZvcrBPH8Xrz9IkeaUqXgLZnIPStF3HAtTUTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xE9Qi+AcyZp3fZMitxtcPTZr6QIxbkUpfSX2v3V1OG0=;
- b=fGVTgl4RMlTIx/NMQSCxyud+HCdqQgI+y+hMGdcFX0zGB0hrAxr/sbSoJaEihtEgv+hOykoixjILM0ynebkgdqkkK47ctZ3LAUFf3kte2SeUMCDoHyMsB+Ld9VQfX13mYHqnjBq8HqujWpdASUZUsrJD+Te/am03KywCuectRgg7Do5afooPQGG1IJUaNMZKCCLuKiUpmtRbaTlLanw6UY2IZIhTCWzySyJDRgGNGCWDccFEW2SkRwYiOasMXA4emkA4u7ESa6Thxw5lEE9YwjNaeUwE83bmNJW3CP8nA7I3w+shfCq/nUNGGcgRxC4OvBkEWaEOTNGff09E5IMcIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB4904.namprd11.prod.outlook.com (2603:10b6:510:40::10)
- by CO1PR11MB4801.namprd11.prod.outlook.com (2603:10b6:303:9c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Wed, 11 Mar
- 2026 12:48:20 +0000
-Received: from PH0PR11MB4904.namprd11.prod.outlook.com
- ([fe80::ff04:50e9:d186:6305]) by PH0PR11MB4904.namprd11.prod.outlook.com
- ([fe80::ff04:50e9:d186:6305%5]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
- 12:48:20 +0000
-From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write support
- for sideband queue operations
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write support
- for sideband queue operations
-Thread-Index: AQHcsH3aCkZV4GjS0EiRZNcpFpJXibWo+xaAgABOdkA=
-Date: Wed, 11 Mar 2026 12:48:20 +0000
-Message-ID: <PH0PR11MB49041E1A867A41D186EFD4C29447A@PH0PR11MB4904.namprd11.prod.outlook.com>
-References: <20260310110700.345904-1-przemyslaw.korba@intel.com>
- <d8a70780-3490-473d-9641-fc015c7993cf@linux.intel.com>
-In-Reply-To: <d8a70780-3490-473d-9641-fc015c7993cf@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB4904:EE_|CO1PR11MB4801:EE_
-x-ms-office365-filtering-correlation-id: 3b27c0f6-a563-4cf9-1c94-08de7f6c799c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|18002099003|56012099003|22082099003;
-x-microsoft-antispam-message-info: uM5N/Q9TEQsM8buL9lbR357wayTR3x1qRjfof0NTJ/Vm4kTbGdSjsGAKOvsBiUHKMRVYlRpA2Tp5S6RONHFkr6dxiDctbPFTZXJK7Wuj0ucAuMfGNqUG2cyjL9gQNCs/HOMV5Yqxpdlrauu6jOkcCXsJt/fYfsP/UEmzLADxP5HCBpV3fQOclVdQTQDHRI+01XCVQ8umLXy+IEf5UKfJKq//gUpDb2GFGiVnFfJHQYYx/8xUMxqjUwvC7D7Zq52FpT7SWxipcVB7rOMVA3u2KZdToHD8YV41yNap45jUfudqxX5gWr0iXEHxhxqUyMeD0M6aYmezWdz2sbokDfr0iRt1Hw7sD1PEyQtd60cUjbDQ5DtZWibHxT6qFMGAjlQr8my95+eQcuuZtMoCAZRcnHgonYI/1hNRPKjV7TXPFOPwvOWHUhwKaT/r+lCsBBI6GFhSWN0/e2/uyT2yeg/OhnFIu80cCFMgbJiDe2t3TCtAHJFmn96svuUenV3/zXXdA8M0s44mG82IXSViQ7X3bXhkQ1BTAczUd9CXO32YIGU7BE1YGdHIVD8w21M56N/P4R1yBFctWhHo8LerAecai7lR2/W3oAUoSxfubQjAFRbA0yzaCaA3OWbjBcH2y2KGvYId+WxLvt7dBxApd3U3BtH+YzyymtUkHPfn4O3Fkbm1KGvbwiduMcSsgIXVzbB0zg2Be1PiUL2wj8+ci7ZukT4u1HeNwAOQhUxDEXK+eCLMganwUw1z/b7DsZ3YevXVIAdYKwU1iHhTBCRIc0D5rNRzzMfNUv39iAAOcOGuM7Y=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4904.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Sm53MkxaK0VtZEpMeWxPNVFXZDFMRWN1N29tUE1mdUtyWVhrN09DSXVPQ01w?=
- =?utf-8?B?NEN3cHRiRlhQSHVPelVSdEFoWTZvU3ZhS0NrRFJDd2pKZUpEN1I3TWdoVEhl?=
- =?utf-8?B?TVBqbWpYMGdiQkxnY2k4K3BHYjNWUU5ES0JRQ3kveTlHM3pOMUwzbzFRWmg0?=
- =?utf-8?B?S3ZHWlcrTXd0akJwbmRJeHYwNERjMUQvb3RORHFHdjRjd0JZZWhSNndYR2hC?=
- =?utf-8?B?bzVTMmcvdmlWMTZrUWxETzJCK1FsNmhIaXVEOC81TnJjdzZQcFBzejFrY1k1?=
- =?utf-8?B?NTZ0MEI1S0Z4SmVKeERDVVR6MWZhbUtOOUh1SmxVQ2gwZTNrUXQyZFMyRWZm?=
- =?utf-8?B?d1oxc3pDVm9zTWpZeDFZcklKblpCL2MzNzVzSjMxR0trdUlWeXU0YnJ6VHRp?=
- =?utf-8?B?eExPTFEwTHFnSDdwcWlyc0NxdXZ3NnFLZ1hOY3FwMG9LZkc0UmFkcHVlZE1O?=
- =?utf-8?B?VGxYTzF0Qm42ZTdNaitndXBXNFpnMGhGSGtMVUdtOFFUTHJPRkxXYUdtQ0hh?=
- =?utf-8?B?VVNiTUZhVmszVnNyUmpsYnNXOFdGcUF0Tm9jQ0VlTys5eWdraEo0OENDNnNS?=
- =?utf-8?B?K2U5WlNWZ1dxY3ZsYXRmVzZVUStPUzloWlYzMkU4bmZNTzJsNkdlUHROcHds?=
- =?utf-8?B?NEF0OWpkZHp2NjVkZUdabVp1Vy9jZUlJbTN6SENLM29hZmU2TDNHUVd6QllR?=
- =?utf-8?B?eXZIZkVibGgxWE1iVlJwUGttTlprVU1JOGg3R2UvZTRLcnBaUmVkcVA1UldB?=
- =?utf-8?B?em5FNkwwZVBINnk5bkd4SWZOUnhhb2pMZGNHSjFvOFpUampjVWprL1lwL2J0?=
- =?utf-8?B?cGc4dDhVQ244VW1qZVUvZ2thbkM4Yk1WZHFTVnBVa0dOTzFWZ2lST1VIbnpr?=
- =?utf-8?B?bXpwTlgyZkIreERVOTZPNUN2RVNsTmFxVzNzcUo0L0tHNVRmeFBwaWcwU3VK?=
- =?utf-8?B?MktSbWl4RlFObUJqNE0zOUtaQ0lXNDlDY0xpZURSME16ZHloOGJYQTNyeCtU?=
- =?utf-8?B?aGNCR3Uwck1tUWwyeE93WDV3Vm1QTkJHelBBZ0N1cVlCMW9iNTUyL0pZMm9P?=
- =?utf-8?B?ZVJUcmd3anJBVjdpQjRDVHVQMHB6VWFueG4xOTJabWRTU1hOK09aQmpLZ3cw?=
- =?utf-8?B?eENTbVBzNW9WVEhlazVibDduRzVZUzRQcTUwMXhLMTVIN05aTzdLWFcxbloz?=
- =?utf-8?B?SDdoYWpLdTgzL2pTY0RoNjZXZDBXSStzelpRRWx1RVNkZ1F0UFdwZ0FJYTZR?=
- =?utf-8?B?NXFHZDFGWkh6cXkxVGFKdTMyZHNOa1Bma3FEZjdwcHcvdm94VXJzYnBPV3NX?=
- =?utf-8?B?OG1hU2t6aVR4QXM0WUxRYUNleXpVTTVYNWxrcmE5UDdoa3NtaUZ2dTVTVU8w?=
- =?utf-8?B?MjM5WWNmbllBdjQ1cVl3QlIrUlZTUzg5aEdSSitZMGtUcEp6a0JlbXlEbHdT?=
- =?utf-8?B?VTlTUFRSaCszQ3dwY29nQ2MvTEt4TGdhTVNVK1ZCcDJtSkJHM0JFeHJVajFS?=
- =?utf-8?B?THN3d1p0RjMwaXpJOE5PNW4yTTlPVkZLY0xxWUkrM2o5cVhOY1YyZW5xRVZj?=
- =?utf-8?B?MzBmTHlmU0RjcDlsNnBPazVWZy9mb2VNdjd5eHkzYVZhODJ2S1FGeXFXaEtv?=
- =?utf-8?B?eHNoeWVrNDFKRDMrTlFCOU8wT2piVldLc2QwQXZSSFNCSEtEZzFvSWJtazZt?=
- =?utf-8?B?U2x3a2pob0ZHSVlxR2g4WXFiQUdPRHJCYzhEYlRNMG01VGs4aTRQbEU1Tk00?=
- =?utf-8?B?bUdXd2tManpBNGQxU0NVYm5OSy9VaHpnZDVvZWo2WkRoVFBqUnlwQlJOY0pV?=
- =?utf-8?B?OWwwMHpnYjV3a29YdENhaEhENm5HU1BjU1BCQ09XUnp3a0ZkVGFQU3J2VHFw?=
- =?utf-8?B?NlVDNDhJMWZyQVEwQmFMVy9TVXNvM2k0YkwwSXhKNEN4ZDRsZ0tVcktpbjQ4?=
- =?utf-8?B?Z01mUHMzQTBwYnpUVmphWlpYdU9mclU3RDJjbVY5SXBlT1hQSjlkYnpsM1Q4?=
- =?utf-8?B?WkZ3Q0pyeFk0T2pIek44WkFaUXp2bW0zNWVrdjkvSlNGRWdzV3IzQVI3ZUIz?=
- =?utf-8?B?Vml6MjFrY2p1YWUzaUh3dFhQT2s1UDVGR1dqV0xIaXo0N2h5NkkvTzd0MDFm?=
- =?utf-8?B?VFIvT2N1ekxkcm1HNEZPYlB5SkU0ekdRL3U4d2VSd081NDVXYUV3akJjeHl5?=
- =?utf-8?B?U1AvUWNydUxjeDZjZ2prYk5WeXhMd0pURXNhYllwbTYyKytOU2dlbTNsRjMw?=
- =?utf-8?B?d2Nxd3RRMEY1dTNiamhPUU4rRVViYkJsZFQvVWtLNlN6U2pYK252RU96ZkZI?=
- =?utf-8?B?MzJNK0lEcCtma2tIVHArQWIyUklCV1VzMWk1OE1rc2lOa0dnYnh1dz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF34A253F05
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773233340; cv=none; b=nxM+nh530MiEI1Lna7ve/YrLziHQPzQZbr48a2dNdwlmDVysHpMiywH7kFfhC4QvNaeQuU5zukSrO5WagpCymuTi2Iai1cSWISt2TJugFs1D5BRrl2cmxob/zr8Z+PV+h7cYKg6WOuJ3PLki3sUZ7EBqIGtojD7TaJ93RMEymV0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773233340; c=relaxed/simple;
+	bh=xcZpsPLRj4+t91HOPhvrSX6TCcutsqBZTrGwFvx+E0Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Zukm9rBZhBRHkghLbrWMDlJ8MeouTWvFCix3RR0zZUhF5QVsf1FNsa32eso54df7LRBWf1nrVRrhvINIueCC61Wn/xHi9mOfbqHrSCPyuQhY/2fTpAQjD7cACsRglaBOBt/mHAlk1eyUJrMwsQripFfUQmaI+z4Nhm3GJRd0V+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B/iAbvT8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773233337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J8EogtX9KqkwlCTtPWzX2zysM9V7W8qju+U/TiK9m24=;
+	b=B/iAbvT8l1afwDj+npGTrnV1OQLynDSKdDnV4zz564lmjtVrl6mPEk6bPyfwxGRrG/cdXg
+	nKIsf2tg5nDguVtUM2FNoSHQE7w4RGapaSpYRIEN0rV87v3VE/8g8Aeutr2HmJ4oGHcdl7
+	JK3r/UNYwCcyGeIwk4gZgq6V3iTFolc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-108-eeoS19fpM2eiU-KewMbZQw-1; Wed,
+ 11 Mar 2026 08:48:53 -0400
+X-MC-Unique: eeoS19fpM2eiU-KewMbZQw-1
+X-Mimecast-MFC-AGG-ID: eeoS19fpM2eiU-KewMbZQw_1773233331
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A86119560A3;
+	Wed, 11 Mar 2026 12:48:51 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.88.168])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBCD13000223;
+	Wed, 11 Mar 2026 12:48:48 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  Ilya Maximets <imaximet@redhat.com>,  Eelco Chaudron
+ <echaudro@redhat.com>,  Stefano Brivio <sbrivio@redhat.com>,
+  netdev@vger.kernel.org,  linux-kselftest@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  dev@openvswitch.org
+Subject: Re: [PATCH net v4 1/5] selftests: net: make ovs-dpctl.py fail when
+ pyroute2 is unsupported
+In-Reply-To: <20260309152013.565216-2-aleksey.oladko@virtuozzo.com> (Aleksei
+	Oladko's message of "Mon, 9 Mar 2026 15:20:09 +0000")
+References: <20260309152013.565216-1-aleksey.oladko@virtuozzo.com>
+	<20260309152013.565216-2-aleksey.oladko@virtuozzo.com>
+Date: Wed, 11 Mar 2026 08:48:47 -0400
+Message-ID: <f7t7brir0pc.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: XjkUo2BU6Ke5Hr3qQPIlKRUPpuQiGwugIgzLwvhZPDYXJDeHMHZSDLh5f77n4xc9vjhcvHOEZur65cs+43ZW8FRCQ1KJIBdsFXKHNkwfbmGd1/vVF6vyRzkDd+QTswqnw8Q7DZMcRbkPNYElgsoQzkgCVwQIBhhj5rq3+Id/TkETZT7Wx+Zovc2NrxyHkKfeU96kjAh0KqWxOziMnJqoSO1V3solpMILj7vSqAUsecUjGARLMiCfzaiEXqMjRpNAoUpXu0XfwZ5GFOgypRUXWYh12MZv0EJE8y8OyQqmTXxSYQ/p312r4Hh6HKJ+X6C73WxtgNQLmCGS2N8IEk7MNA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4904.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b27c0f6-a563-4cf9-1c94-08de7f6c799c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2026 12:48:20.6630
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cTPB+C1c6T9BJ02uCgXDcBdxHR/6CDNw0khw5l/hgFQrKTRsvYCbtCb6qPlwsLnhsTtRbHzN8V2TksmgQQlpbCq7Vy+PaaxSOaDNORIWooo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4801
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: A3E82263D62
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: E07C2263D90
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.94 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266638-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266639-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,PH0PR11MB4904.namprd11.prod.outlook.com:mid,intel.com:dkim,intel.com:email,osuosl.org:email];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,pmtu.sh:url,ovs-dpctl.py:url]
 X-Rspamd-Action: no action
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXdpZCBPc3VjaG93c2tpIDxk
-YXdpZC5vc3VjaG93c2tpQGxpbnV4LmludGVsLmNvbT4NCj4gU2VudDogV2VkbmVzZGF5LCBNYXJj
-aCAxMSwgMjAyNiA5OjA3IEFNDQo+IFRvOiBLb3JiYSwgUHJ6ZW15c2xhdyA8cHJ6ZW15c2xhdy5r
-b3JiYUBpbnRlbC5jb20+OyBpbnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZw0KPiBDYzog
-bmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgTmd1eWVuLCBBbnRob255IEwgPGFudGhvbnkubC5uZ3V5
-ZW5AaW50ZWwuY29tPjsgS2l0c3plbCwgUHJ6ZW15c2xhdyA8cHJ6ZW15c2xhdy5raXRzemVsQGlu
-dGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtJbnRlbC13aXJlZC1sYW5dIFtQQVRDSCBpd2wtbmV0
-XSBpY2U6IGZpeCBwb3N0ZWQgd3JpdGUgc3VwcG9ydCBmb3Igc2lkZWJhbmQgcXVldWUgb3BlcmF0
-aW9ucw0KPiANCj4gT24gMjAyNi0wMy0xMCAxMjowNiBQTSwgUHJ6ZW15c2xhdyBLb3JiYSB3cm90
-ZToNCj4gPiBPbiBFODMwLCBQVFAgdGltZSBhZGp1c3RtZW50IGNvbW1hbmRzIHNlbnQgdmlhDQo+
-ID4gU0JRIGRvbid0IGdlbmVyYXRlIGNvbXBsZXRpb24gcmVzcG9uc2VzLCBjYXVzaW5nIHRoZSBk
-cml2ZXIgdG8NCj4gPiB0aW1lb3V0IHdhaXRpbmcgYW5kIHJldHVybiAtRUlPLCB3aGVuIHRyeWlu
-ZzoNCj4gPg0KPiA+IHBoY19jdGwgZXRoOCBnZXQgYWRqIDIgZ2V0DQo+ID4gZG1lc2c6IGljZSAw
-MDAwOjFhOjAwLjA6IFBUUCBmYWlsZWQgdG8gYWRqdXN0IHRpbWUsIGVyciAtNQ0KPiA+DQo+ID4g
-QWRkIHN1cHBvcnQgZm9yIHBvc3RlZCBtb2RlIG5vdCB0byB3YWl0IGZvciBjb21wbGV0aW9uIHJl
-c3BvbnNlLg0KPiA+DQo+ID4gRml4ZXM6IDhmNWVlM2M0NzdhOCAoImljZTogYWRkIHN1cHBvcnQg
-Zm9yIHNpZGViYW5kIG1lc3NhZ2VzIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBQcnplbXlzbGF3IEtv
-cmJhIDxwcnplbXlzbGF3LmtvcmJhQGludGVsLmNvbT4NCj4gDQo+IEhleSBQcnplbWVrLA0KPiAN
-Cj4gU2ltaWxhcmx5IHRvIHdoYXQgSSBwb3N0ZWQgaW4gcmVzcG9uc2UgdG8geW91ciBwYXRjaCAi
-W1BBVENIIGl3bC1uZXh0XQ0KPiBpNDBlOiBQVFA6IHNldCBzdXBwb3J0ZWQgZmxhZ3MgaW4gcHRw
-X2Nsb2NrX2luZm8iLCB5b3UgYXJlIG1pc3NpbmcNCj4gUmV2aWV3ZWQtYnkgdGFncyBmcm9tIGlu
-dGVybmFsIHJldmlldy4gSSBzZWUgeW91IGRpZCBzZW5kIGZvciBpbnRlcm5hbA0KPiByZXZpZXcg
-YnV0IG5vYm9keSBhY3R1YWxseSBwcm92aWRlZCBhbiBSQiB0YWcgKGF0IGxlYXN0IG5vdCBkaXJl
-Y3RseSBvbg0KPiB0aGUgaW50ZXJuYWwgbGlzdCkuDQo+IA0KPiAtRGF3aWQNCg0KSGksIHRoYW5r
-IHlvdSBmb3IgdGhlIHJldmlldyEgWWVzLCBJJ3ZlIGJlZW4gYSBiaXQgdG9vIHF1aWNrIC0gZ290
-IGludGVybmFsIHJldmlldywgYnV0IGRpZCBub3QgcmVjZWl2ZSByZXZpZXdlZC1ieSB0YWcuIFdp
-bGwga2VlcCB0aGF0IGluIG1pbmQgbmV4dCB0aW1lLg0K
+Aleksei Oladko <aleksey.oladko@virtuozzo.com> writes:
+
+> The pmtu.sh kselftest configures OVS using ovs-dpctl.py and falls back
+> to ovs-vsctl only when ovs-dpctl.py fails. However, ovs-dpctl.py exits
+> with a success status when the installed pyroute2 package version is
+> lower than 0.6, even though the OVS datapath is not configured.
+>
+> As a result, pmtu.sh assumes that the setup was successful and
+> continues running the test, which later fails due to the missing
+> OVS configuration.
+>
+> Fix the exit code handling in ovs-dpctl.py so that pmtu.sh can detect
+> that the setup did not complete successfully and fall back to
+> ovs-vsctl.
+>
+> Fixes: 962e8a01eab9 ("selftests: openvswitch: Add version check for pyroute2")
+> Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+> ---
+
+Still LGTM (but this is already in net-next as 0bcac7b11262 so does it
+need to be included still?  Actually I think it should be in 'net')
+
+(including tag just in case)
+Reviewed-by: Aaron Conole <aconole@redhat.com>
+
 
