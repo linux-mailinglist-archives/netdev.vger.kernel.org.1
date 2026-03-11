@@ -1,168 +1,137 @@
-Return-Path: <netdev+bounces-266416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ePYnAJvQsGmLnQIAu9opvQ
-	(envelope-from <netdev+bounces-266416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:16:59 +0100
+	id cCzhDtbQsGmLnQIAu9opvQ
+	(envelope-from <netdev+bounces-266417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:17:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CF8125AD6D
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:16:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B265D25AD94
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:17:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60B8C321624F
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:14:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ACEAD300EC90
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC8D34D390;
-	Wed, 11 Mar 2026 02:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C09C26F289;
+	Wed, 11 Mar 2026 02:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WW3IgNdu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmuO4hWA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62C43563FA;
-	Wed, 11 Mar 2026 02:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225A52517AF
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 02:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773195282; cv=none; b=H97QoA6gHMVSX/3j7wI+wF3IVUhExZdnlmESC4zEVeVsNsJGlM18f51JrW4t39uVDN4sHg3isogkHWsrvZiu+7+bGj6aOoaFafpHEZoPAjyAAio6Q2lEMRR8fFg89kioQJySIRpXSWdYwKfaCSjKaLZgPOWxrEP2HI/qH6XoRZs=
+	t=1773195474; cv=none; b=aaptcfjEwf5c5Wfr/lewKKtZlaFLkAelwy6GUsG2IBUa1Ef8gjDkUXYt9LDB/4BBov6qPegL36OvXaWNh7xsGdZZOz3B5+HkycGPj7uc0ujiZq/jD/Vqs0ZMpEHodV0+UvrcReChrceNjf1YSHTyUWG4PcPKT8TdoB8OAsKux4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773195282; c=relaxed/simple;
-	bh=g9KzHJnx61EhnIzoqsS+c9rf3WD+Idn9HQQ7iGVKYJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J2/P93SobZc/eboWCtO9+3phbAlXyL4rYQspOFfjn+T9qm1fJHokQ+f5rBtrEwUo5KhscLEwYOg3y9Hj9zN/snaVSkNKjgFriAVtkZ02y81rsf9gxQwmvr1DKx5MIb5X+QCaZVzevQfayBX3XBiT60Phxj56fnPuFXHncnClmPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WW3IgNdu; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62AJkWSZ1524531;
-	Wed, 11 Mar 2026 02:14:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2ZceOk
-	42rdEXugzjAGSRfQyEii6gNZwu/bJn2eegNWQ=; b=WW3IgNdutfTc9AYvNYBMDm
-	HvoooDuQJBZ40CXMkmv0B8HdG/bdsOfAeKi2uMAcEvnPzZ0ZPGkLA9fKN3vJkeic
-	NHX4uAVtqn5b8Z7JHeap+pwVEt2es3//N+AKVVr3Y36VKb+sJMwPhW/SflfiGprF
-	C8aB5xJTLIn6k8xHP6SyO6L/EgW1DhAWxE8aH7E1+xAam8WGzh0CFVsvcdMsPJf4
-	1ywXE7FZsk1W7euMOWNL0uH85/IMNQZkxJwKkASOMQAKOwv+W/bHaf6EB0K0b90A
-	N8gh4VEu8Z48mBuhIPfQG/0wpWMqqsSvljZgbkxDw/8gVNDxAa0/n8Qydm72KiVA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcvmdufc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Mar 2026 02:14:31 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62ALKPFK025052;
-	Wed, 11 Mar 2026 02:14:30 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cs0jk3fs8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Mar 2026 02:14:30 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62B2ESWH23724328
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Mar 2026 02:14:28 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 810072006C;
-	Wed, 11 Mar 2026 02:14:28 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 587042006A;
-	Wed, 11 Mar 2026 02:14:25 +0000 (GMT)
-Received: from Linuxdev (unknown [9.43.124.195])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 11 Mar 2026 02:14:25 +0000 (GMT)
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-To: Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Rob Herring (Arm)" <robh@kernel.org>
-Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] powerpc: dts: fsl: Drop unused .dtsi files
-Date: Wed, 11 Mar 2026 07:44:24 +0530
-Message-ID: <177319508337.269267.16812187725403935492.b4-ty@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260128140222.1627203-1-robh@kernel.org>
-References: <20260128140222.1627203-1-robh@kernel.org>
+	s=arc-20240116; t=1773195474; c=relaxed/simple;
+	bh=CZeHveheAeadX0UEZpxNLvWqoeKOmWKP6TM+p1mI3Cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YosOrIUdysWIf5VeGedMcq1TrpvmMjzNanj86yekOtBcbP7onbE25JuKi17rFp8UwLODz84+VqML6AeIy7wjEXZHjM/nglZ/ig1zy4lQvJFyxc+0LmFmP1x9lhK4w3YhH1hlKr7sSE0tzfSPvhytoZ/62wQ67SNBLAQWHeL6xYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LmuO4hWA; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2aaed195901so62335955ad.0
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 19:17:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773195472; x=1773800272; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lNIznmqrMaqnx+se5M0cKItTRTQ1UgUfNOmgMa/FK0s=;
+        b=LmuO4hWAcwfWz8/Ktov1da9O3Ya+6U9EQUsMYjaLZbcftzmZ0C2yeACA3SNKAYHgto
+         /m/TmJ05ibgidsAVEEPJuVsofhSGwCTgCX362SBMYD+0U6CbpFpN5I21G44HVFW0O+cy
+         jQe1fD5ezd260luhEy3qi3KqfaWgCvBZCCWUhKtfi7+mSPgVweU23x7i+Uok64aIn8WQ
+         G0aHN1gKcJkd919eN7w+zcdSu28Ur4RW7jnVBBBw5DWludwDvtsqkAzCOhiJZvOwF2tH
+         wDEydBoq5ezMt8lSaMInz+E1OZjaTjvWdiswznoyxOATGDxEMUhF9H9YPqIA4aYQeKOQ
+         Qw/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773195472; x=1773800272;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lNIznmqrMaqnx+se5M0cKItTRTQ1UgUfNOmgMa/FK0s=;
+        b=r56p8e6spKzmRFsBeR9yund3jcNkDjckrIanNu3/Py+wthq35NtUtseYcXMXrP1HzD
+         rHWckvqoBX9rgo0ASGhBA4RXHJuebdbw+CtBreHLlWuOxwTWnSj4vCKHNcPyalKu9C/R
+         Rcz+dseUXuFaJqqUlmsVQ+NboBOVqLlE0Py1YxgojOiINqhMDH7LLxb90fkTujR/McgQ
+         xMkNPxcQjC/2b+EursyGlGxAuqM8N8bVhDpp5lhopeBiSw/01kBX8o9tQpHwHHzo0A//
+         9t3eWJlRQ2MAJOzY0fhMwrok6JxaQGWF/NoZx4LYtxY+mpkDem4CAkb6O/lmtMbWedbw
+         qnhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXr/xq5QQdjBR4f8VXhHP8hbmxmNSMVOKSMv9GdwvWiqzJwLo4RGjgIt7UAjtoDEZHSt/+XJG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVmStKhiSiOhmSCtGpsQKyBm9WdnllFMzfHEOR2f5yy83gKCbC
+	SpeLslIsTJjw+trSBciSnbMxWmAoLXwxdI3GviKDcVvMjODKTGd1YIhc
+X-Gm-Gg: ATEYQzwRLlMVcan/vxHKFqmYaxAsoCsq4ZabTQVjpW9Kf/x/U7+0zBh2ed4xydgvqvd
+	OuEbkNmnaqT98v2V+iKLGG//YZUdA8cGVT/1pP1uYzfl0b3l276FI5Z5RHBMNixoLA424uu6354
+	NsupGLE7Nnp4Ix3VSIsl6lIqWelZETLS0UMeaISE2oHaSaQraZJW6HLOwjsynZQskgwP+RQhjtO
+	PgtMag3siG2GVs+u1X/FXRBW4SBY82XcObLEVv42HOz4IomeOEWefjW1h31jyIuniO7zyyEV7ha
+	etEFk6ziq1gHMI0goByfwRsOGAdRFWQUMb24IpL7TQrhW4zJ/AsX5d43n8BAYOV7AK4UD9HS8aR
+	19E4RM9h9m4/EpcLkWsJ3Z1LuAr8BPzqyvPP/trPa9CIWc4FohxtKayzCGFbKh0HZXg7hxwH4Z8
+	LRsokFW3LyQOAndQXFJP5CFe5G8L8=
+X-Received: by 2002:a17:903:3887:b0:2ae:69d3:5b9f with SMTP id d9443c01a7336-2aeae928e9dmr10936355ad.52.1773195472364;
+        Tue, 10 Mar 2026 19:17:52 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aeae34dff2sm5892155ad.57.2026.03.10.19.17.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 19:17:51 -0700 (PDT)
+Date: Wed, 11 Mar 2026 02:17:46 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, Brendan Jackman <jackmanb@google.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCHv3] selftests: Use ktap helpers for runner.sh
+Message-ID: <abDQyvRGhRIsRGaU@fedora>
+References: <20260225010833.11301-1-liuhangbin@gmail.com>
+ <DGO2DAIFY07Y.367VMZA7XGT4U@google.com>
+ <aajisr9n2pInS7jm@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: hCYDyKHWNdjAoXl8sTBYY5Yk76KZBsq0
-X-Proofpoint-ORIG-GUID: ekoJEsiTHtdoQQ4LVuqf-mnYOUpkl9We
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDAxNiBTYWx0ZWRfX1Z53069OfAF8
- l9k32Xe/ddRW1NELIzPRxp7EJa62BzLSPQPunOPDJT6UwP63z7XaEwXOGxSolD8FQCmXhsMl3GQ
- w+RCGjClj6hOd21VMljOegCkTlPBMmCyi+5KWyC39Ttm93XAdERlTw3rO+Y2pqWkjA2hFFFLE1M
- fPSMz8+dLsch+CZePHyy9ZWAQ0AGhoc1G1INE1fClpIJDdD2hNBfZwENdiWl1xt9ql1MkPkKnVs
- cgAu715zF8Lh/HYBbD5QsGpelOTKlJ1TGukv0sJ3ADnDhVdVRxZbcfibB40TUfTbEMPZsobcPMY
- Sz+AmEqMXsqkOyowobXc3DmdDosQzvHatiQ2atYDtyvQ3R/NNONwvNdF1eit8dmHBAWY5B9lcP0
- 1wtlC5Wlq4uhO8ZfD4hJOIp7neBMPV5qDkbJ1TN68hvZEzBxSKyXVwibT+KPf2jHaZMbvALgaVH
- 3p8sfObWh2BcsxFwZvg==
-X-Authority-Analysis: v=2.4 cv=B5q0EetM c=1 sm=1 tr=0 ts=69b0d007 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
- a=ojrkqjeVVkUaGn_0cJcA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-10_05,2026-03-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 spamscore=0 clxscore=1011 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603110016
-X-Rspamd-Queue-Id: 9CF8125AD6D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aajisr9n2pInS7jm@fedora>
+X-Rspamd-Queue-Id: B265D25AD94
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,ellerman.id.au,gmail.com];
-	TAGGED_FROM(0.00)[bounces-266416-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266417-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.ibm.com:mid];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maddy@linux.ibm.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 08:02:20 -0600, Rob Herring (Arm) wrote:
-> These files are not included by anything and therefore don't get built or
-> tested.
+On Thu, Mar 05, 2026 at 01:56:09AM +0000, Hangbin Liu wrote:
+> Hi Shuah,
 > 
-> There's also no upstream driver for the interlaken-lac stuff.
-> 
-> 
+> Is there anything else I need to do to move this patch forward?
 
-Applied to powerpc/fixes.
+ping
 
-[1/1] powerpc: dts: fsl: Drop unused .dtsi files
-      https://git.kernel.org/powerpc/c/0706178339974d4332a782ba851cb6694bd210fe
-
-cheers
+Hangbin
 
