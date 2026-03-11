@@ -1,253 +1,159 @@
-Return-Path: <netdev+bounces-266696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGP0EeOWsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:22:59 +0100
+	id 8OwFNgeZsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:32:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3AD26741A
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:22:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37AA726765D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:32:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 859423001BD4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:22:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 888FE30E4309
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5685D238159;
-	Wed, 11 Mar 2026 16:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE7237189B;
+	Wed, 11 Mar 2026 16:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="yFgxRSI/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AiCrci2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB96E31E82D
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773246176; cv=pass; b=EH/0ZYqtpsGvM3P+wKM3g7uuIjdIesBFsBhVGBnFsiNmjKSf5x1S5i32EKDA5q1DSz24ADipVDsg4j6JfSPOeq3ZOhjG3oF+n5U40LQ9dMcYZOmuwCFudROh6gMpFnzrBBXGc7Uuxr04KOW1tYd9Nar9Ru+xdU7uK3B5JkcEQEk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773246176; c=relaxed/simple;
-	bh=/8jX/0nXFpkyhyrW+LSOBtcRnALE1ajFmbVXm3b0yVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WLavDB25eKpXNRf77JxC7T9Qo78hxglfz51R9HjlAypPKIoVBl30MGYN2+FCFDgbUqQgT1AGvzpM1NXDt8HWS+96g/j7voo3ddboH+mfijPsdOC+UrYuxyyox5juFRw4er3GrLl6DnsR2UVQ4fYtYWE/qFNr+o89OlMvEhj2+wM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=yFgxRSI/; arc=pass smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-829ac4670c4so76041b3a.0
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:22:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773246173; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CSJbE18t3ydZNCPyxiaeXjpydi/vtQR0Yr3ZPrRXtvmu3S+jba+6wCrdVxYrX8A7FS
-         Xp9QJB/e/7sXOsH/7S6q0sWyvzjnqm45DAKiINFjVQdwGUfXAFCh+DUPy83gY8w7y+Ey
-         5iCBjCE3bA+eDhY+yMl5CGn9BFimedqoFMic7ZtSUhr4QKOHNgZvD/sa9wYCr/dOocwD
-         LUSc+8SZqol61WF+bGst+tgv5h93N1StAkppdZnn7wXUTuNtLdvqDsTAImug0PYUACw3
-         Dlu9XDQybPgSyFnkCAqhM9lrpECZSUh1oUsdCNslWKhrqmQsJNwYzpYP9lSVT1mPVgpB
-         Nh8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vfY7z/mH1QCzKBvw7XY9whOUf9+5X6AiAqhhH3gD6M4=;
-        fh=Mp2hs9P3BP/QKqpP8CsYi+NLBnHRzFu06/7QBJ/Qy/k=;
-        b=SusuDhns7gVUTDKfCaNxyNYyg5Pivd7OUoN7RweWJE1jNIOCK4oMJBz98AEn5Xido/
-         NVdrEV8ecK6UJF4UjeA9aDyPhGlQ7XlYC8XhJ2yMOxYEGfvfvXQA/jcGh8IA56Q7y2j/
-         oxiTH3LUPbvUtzyJ5Ba9MXtj9TSFPGYmFqCJ4L2AKN4617FViZRCsjxKVvVw3jUVOlTb
-         7KDN6r5NnAwQu1osppiPh6niBnFsLZ3QdZhmy8wXPumJalNJmbGSda/lLvCdJ6IC7OtX
-         0XCtRKthfK2xUj5klfwJ7/bUKwWdv+Miq/SsjLEjKY8ZI6Hj/6h20MiqxovyyigNXQyV
-         c4cg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773246173; x=1773850973; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vfY7z/mH1QCzKBvw7XY9whOUf9+5X6AiAqhhH3gD6M4=;
-        b=yFgxRSI/Zh6RIo4oRK2m59I1tVQFN3wpCh7/78HRUTkRQcFJHz1Krl52pltuaAfoJm
-         zHBspXvHVt9uOVXy5AvbLLFy2tMgPOmlnDjCKawLT4D5b52rq2dvy/djjKszB7VTWF4o
-         4jJWNMatb7YoUGHnwbdlFBz2Ff5HxySx639j57WalC7zam31UkDnLt9NtZ+HCU4TwC4q
-         IJSYFhKgtzZ1Q3Sqxx8tnCuRaXuQqA5IjhBWicIja4E0WfV+8ujLjudWTylkbEJRI7Qi
-         TYHUdRkuxgvGT3mft8Yc2qb3f6BP1xHB/VV/q6Kg+3oCXsOj7PhuuNRV6LjTQcdlLcDP
-         0Agw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773246173; x=1773850973;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vfY7z/mH1QCzKBvw7XY9whOUf9+5X6AiAqhhH3gD6M4=;
-        b=GYfY5D2OJvqQqzZ02RXMK7C0ai/KP+pyxuOLzC63EarFXk4c4P6rM3FfC+iFdWd34h
-         StozyL+62lTB9AyILa4ZdyV8Ecne/E2+QWAoAzM4vX7H17UThACAJzwzdZOgBR9xqIz0
-         I0NcdtCfFILzKostHXAMpG8Eyo08TvvWInjI3YG8z2imLB4i5VOYfZ00XXAuTx1ecH9L
-         oYoOEKEaWzMVqGQnQFykwi2GfRCv5FsMWgjkm+UZ+kMGljsh4S4JZPRuE+EkWuwGaGPV
-         CC1g7vwwnCQwSLfSjrXy6GRwPCUXqw6IIwZO/P9Yw1HT1zPGbZC23hI9sARNTzJa8nN2
-         nN0Q==
-X-Gm-Message-State: AOJu0YyBqcYuJNi4x1Dbu20pN5H/39NZzeePHHiiUJJhYJpb0pFEbS72
-	mn7aBXi5/W++0tDCSFH4kW0oIf9thcW8In56YqsAtaGm8aVQku5fKDcXscoxR/CwbgwGuS8ys70
-	2tBPdzUUHo0G+MSS4jNXgc2GnQyClPXSWZ5msVcY4b5lYUww7ImA=
-X-Gm-Gg: ATEYQzx+MasnsEhHrVwjEm6ihUZlhpAhCX+eRj40mh+ajOVM1TPegQRecSt9xgXTKk/
-	823Imub2fHKruF252ER+t0+Z83lLYRO4NpJi5yBgrLMMGeG6hwLspnLa5tn4y8Keo6//p2X0XQF
-	hVmrd9EtcVZGm7NLPy7UdU4qILmczKSmsPUoFiGtZ0IUvb4yUPxgm2pxPgb6KU0vPRuNB2vBCqJ
-	YHb0D0w7ptO6GH/3dT8COWBlVi2Eg1oBFbpkhROPQNM4SkTbzA2YxnKJzChy9f7GExyGv9HvUO9
-	9NOPTOl8NDq9QVphOfNmdYZhuw==
-X-Received: by 2002:a05:6a00:7603:b0:829:9a7b:db84 with SMTP id
- d2e1a72fcca58-829f715d0c1mr2313680b3a.49.1773246172868; Wed, 11 Mar 2026
- 09:22:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985E41FA272;
+	Wed, 11 Mar 2026 16:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773246464; cv=none; b=Aj+y2c3RZU7MR97XtbJuvsRSQK0bB9hKdbkt3kfSvLX3PajlKKGAAFUQpdfeS9V9u/ABpTM/mZN+APQ8N0FAM//IaXQ9+IX4TFf5BtmA/6ELJ9iQK35NcpczKm9x/m1B/o089kvmAAVHdFMH2OTwQsP/EURcV9o+ZRZRYgDeO0Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773246464; c=relaxed/simple;
+	bh=VX/ucxoN0bDeGzxlfUXT8/1rB8ANGubW5vwh2e7Yon0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RFC4rhsA2oTE32uzvdiQXM++4MH1LP/sMtP0N5oHMFNrXWPjERizG61+hvJLgwgA35Uq4sJ5ZVVBGWlPFFc74Rk85jjrqb9MvVDsfEHRZW+SVco0gBv8wHtW5SRAfw/J8k6t3NOdeelldMcoLfJs+YhVhRD50DVXeJ7nhzmwCcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AiCrci2j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD587C4AF0B;
+	Wed, 11 Mar 2026 16:27:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773246464;
+	bh=VX/ucxoN0bDeGzxlfUXT8/1rB8ANGubW5vwh2e7Yon0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AiCrci2jaX26iY5Ad0sSalr/RHMxMJXDp7eDz8pUD1P/gArXJGN/6epfhwKZyIeci
+	 8V5IZHRQqfTIRicBN5Za56zJpK8yt/smSW2FA6WJt63Jm+yZBn2sUKOGzPeDJu8luQ
+	 87RRBMvwvoFmTpItoy3X6+V9rwYm2gf1rGhj3URzYuVwGFqpYJRc5xGS/CS5pmZYF1
+	 T3sMkV09vpty2W5B95a8TJIchRYh/nr6dhBvQ6ENoFvh1oq/xmpyoNkZFjfAtCqUtp
+	 MmZJHRDJ6aS+cLBXdh+YhhoyW0uzkIBBUCzhegS3eCpAcTgdCZzQLeMW08csE/n+Cy
+	 nWEOqUOUXluXg==
+Message-ID: <a0e8c1a2-619a-40d1-bbf6-0a8c5c5b2fca@kernel.org>
+Date: Wed, 11 Mar 2026 17:27:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307212058.169511-1-jhs@mojatatu.com> <20260310184713.7e810431@kernel.org>
-In-Reply-To: <20260310184713.7e810431@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 11 Mar 2026 12:22:41 -0400
-X-Gm-Features: AaiRm52amjkmnAH6dCMjUuecqHixg9RGz4S-GvYmjS08m4Y_7VN4P7VgDYfbo_8
-Message-ID: <CAM0EoM=TAAfwZc3q1=RKWPrS778R_B8uM18ev_jYYz8oj4YiBA@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: Mark qdisc for deletion if graft cannot delete
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [net-next,1/2] mptcp: better mptcp-level RTT estimator
+Content-Language: fr
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, toke@toke.dk, 
-	vinicius.gomes@intel.com, stephen@networkplumber.org, vladbu@nvidia.com, 
-	cake@lists.bufferbloat.net, bpf@vger.kernel.org, ghandatmanas@gmail.com, 
-	km.kim1503@gmail.com, security@kernel.org, 
-	Victor Nogueira <victor@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+Cc: martineau@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ pabeni@redhat.com, fw@strlen.de, horms@kernel.org, edumazet@google.com,
+ linux-kernel@vger.kernel.org, mptcp@lists.linux.dev, geliang@kernel.org,
+ mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org,
+ rostedt@goodmis.org, mathieu.desnoyers@efficios.com
+References: <20260309-net-next-mptcp-reduce-rbuf-v1-1-8f471206f9c5@kernel.org>
+ <20260311024547.361027-1-kuba@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260311024547.361027-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266697-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266696-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,toke.dk,intel.com,networkplumber.org,nvidia.com,lists.bufferbloat.net,gmail.com,mojatatu.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 8F3AD26741A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 37AA726765D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 10, 2026 at 9:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat,  7 Mar 2026 16:20:58 -0500 Jamal Hadi Salim wrote:
-> > Note: We tried a couple of different approaches that had smaller code
-> > footprint but were a bit fugly. The first approach was to use recursion
-> > on the qdisc hash table to iterate the descendants of the qdisc; howeve=
-r,
-> > the challenge here is if the graph depth is "high" - we may overflow th=
-e
-> > stack. The second approach was to use a breadth first search to achieve
-> > the same goal; the challenge here was it was a quadratic algorithm.
->
-> Lots of complexity when realistically only ingress/clsact support
-> the unlocked operations. Can we not just take rtnl before the
-> references and not bother all the real qdiscs with this @#%$ ?
-> (diff just to illustrate the point not even compiled)
->
+Hi Jakub, Claude,
 
-Two of the several (I think 4!) patches we had took a similar path. I
-am trying to remember at least one variant was bad for performance and
-the other was unstable. Let's see if we can revive it and take a
-closer look. BTW - none were pretty, it was maybe half the lines of
-code but touched many things.
+On 11/03/2026 03:45, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 
-cheers,
-jamal
+Thank you for having forwarded this. The review is indeed valid, a v2 is
+required.
 
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 4829c27446e3..21b461f3323d 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -2255,6 +2255,7 @@ static int tc_new_tfilter(struct sk_buff *skb, stru=
-ct nlmsghdr *n,
->         int err;
->         int tp_created;
->         bool rtnl_held =3D false;
-> +       bool rtnl_take =3D false
->         u32 flags;
->
->  replay:
-> @@ -2290,11 +2291,17 @@ static int tc_new_tfilter(struct sk_buff *skb, st=
-ruct nlmsghdr *n,
->                 }
->         }
->
-> +       /* Realistically only INGRESS supports unlocked ops */
-> +       if (parent !=3D TC_H_INGRESS) {
-> +               rtnl_held =3D true;
-> +               rtnl_lock();
-> +       }
-> +
->         /* Find head of filter chain. */
->
->         err =3D __tcf_qdisc_find(net, &q, &parent, t->tcm_ifindex, false,=
- extack);
->         if (err)
-> -               return err;
-> +               goto errout;
->
->         if (tcf_proto_check_kind(tca[TCA_KIND], name)) {
->                 NL_SET_ERR_MSG(extack, "Specified TC filter name too long=
-");
-> @@ -2306,11 +2313,12 @@ static int tc_new_tfilter(struct sk_buff *skb, st=
-ruct nlmsghdr *n,
->          * block is shared (no qdisc found), qdisc is not unlocked, class=
-ifier
->          * type is not specified, classifier is not unlocked.
->          */
-> -       if (rtnl_held ||
-> +       if (rtnl_take ||
->             (q && !(q->ops->cl_ops->flags & QDISC_CLASS_OPS_DOIT_UNLOCKED=
-)) ||
->             !tcf_proto_is_unlocked(name)) {
-> +               if (!rtnl_held)
-> +                       rtnl_lock();
->                 rtnl_held =3D true;
-> -               rtnl_lock();
->         }
->
->         err =3D __tcf_qdisc_cl_find(q, parent, &cl, t->tcm_ifindex, extac=
-k);
-> @@ -2451,17 +2459,16 @@ static int tc_new_tfilter(struct sk_buff *skb, st=
-ruct nlmsghdr *n,
->         }
->         tcf_block_release(q, block, rtnl_held);
->
-> -       if (rtnl_held)
-> -               rtnl_unlock();
-> -
->         if (err =3D=3D -EAGAIN) {
->                 /* Take rtnl lock in case EAGAIN is caused by concurrent =
-flush
->                  * of target chain.
->                  */
-> -               rtnl_held =3D true;
-> +               rtnl_take =3D true;
->                 /* Replay the request. */
->                 goto replay;
->         }
-> +       if (rtnl_held)
-> +               rtnl_unlock();
->         return err;
->
->  errout_locked:
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
