@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-266584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFrOJ75DsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:28:14 +0100
+	id +Ac4CUY+sWmtswIAu9opvQ
+	(envelope-from <netdev+bounces-266585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:04:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5C3262271
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:28:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A36D261B50
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1524533696A8
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:53:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8E93A3149697
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0702B3B637D;
-	Wed, 11 Mar 2026 09:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86243603DA;
+	Wed, 11 Mar 2026 09:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lwhPCo9G"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UisvdeZ3"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8743A6B61;
-	Wed, 11 Mar 2026 09:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DB73B38A1;
+	Wed, 11 Mar 2026 09:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773222801; cv=none; b=VcNECKMbFD6VDCv7DhFP22jmEfnmiE1jRow3aBNSjZcw8fbBe3b7UjM66oddlbgb7O6frOtekFO27eo6CXO1W1DaWNCQCgUJCLpUus6qYxkB52MnhtHEb6flmyua6UTBrp/zFMZ62/J73p48So2t2JJoFt1hA52MY2iNVGrNsck=
+	t=1773222805; cv=none; b=QjF7OMxZghMtNsRPR8ioY74fUK73pyP9yue/WhSBkUHY2A2ZuU/1CKYOZLKZ6HDWPfqaIN2B5WBIIVJMeEHq2zMdZptX1OYozgX2DApXSvHoawd2B9ffn+dKC3C12wTI68Vn0/0z+O9mohCgXfpWLlWGGhgRfFifCP0/wAxWogo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773222801; c=relaxed/simple;
-	bh=ZvJ2Gz0QjLwmMMuvqsd6TZZpOao32nY99IbDVrnCHMA=;
+	s=arc-20240116; t=1773222805; c=relaxed/simple;
+	bh=qqUc6IGecAKIHqxhBHUK67Qb9DpkM7wobrznfxJh7Lk=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=johWZwKMMnmIbscs+OJ2/1ebBgaClh7IKjQYEuQ9wF6RqYHZ6oF7VYVGqQX6Xp+IwZQN1GANnxuDECyQ54vUaTgGub5WG6YlY4gNzBF74eSDw65k9gLWIBYVgxwgbxCX/bOeubGSxKP22VkuBTbAsmw6tFvIrpIQpa7gDBZ0zEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lwhPCo9G; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=Nfa296QiphlEaW8+21HLy8DZpTb4AEu2wjjSjNd27fZOFAeYdSisSIRqbYDh1lUhcdfTRKOTgoEsJiPIzCNlgWuzEkfVcX2tTFZGmN8SJloWi/IvHH/bsQFMjP/MVtDT30oAhuBUVZSZTpCifVeKRjoNkFcOnX7kCQkJY8M4Nc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UisvdeZ3; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QSDqBN/DmAWeozPDEC8b1qloPDPE+0ZqAmxNNyAd8yY=; b=lwhPCo9GozFtFqGQ95cJPBrJZx
-	jEw644y5sUyNsK+DHanWL8g6Zu5c2e0ZEcno0DSxNsSJMW6L62i8PsWp0OX5lJbLvBKqOcfjeXHNy
-	8Bl2iYagPupfIoa0Ldy9WsFFqZnutrD1w5xmHVpy8Enh1E4edxn8b/GB/6v0O8PH1C8N6zDkuu2IF
-	HxZK7b8gaR06L1L+feUL6mMgAb8luD2NvXz3J/YB+xqaYtKnp9b7Kn3P9pMGuYFGdrkuhbwCCf593
-	XKJOlPtXqFySbpOVEJgUvFoET2omYjrc40/37R9C8FAhuIAHti5dBT5PfM96j/C0XZUL87EDE+wTy
-	oOY1hJXg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37106 helo=rmk-PC.armlinux.org.uk)
+	bh=Vwljc2bReMp+ReRMVI0DIpKEZxv2RLRL09hipjwo8dA=; b=UisvdeZ3sIRa/cQr4FIvJ6x+fe
+	Vkc33eMxBmw2nIHMH3s6ZoKZ4hkdUlNxGCYE6rXaXCZ6rYvywXxF9VO2eWsITNSd5JQkUd4Eo4/mP
+	CMetRg0OX+J7/e269TzibJu7CTC84pcdR+z9XaA1GvKkTS/WAgcEEJ8gj4mJze+Qdgc6gFmhKFyCn
+	gY+6ieOdbxD6VSk4lGi+JriIojryii3pBLLtAFzpqPMXJwy9/x/WMigvsoemTWWGpMUOsJ3+GY7l1
+	9FYLD28zNrG4rkMCPpogtyM+q+HT30UJuDlmIlmegTvcEn/fW66IjQ9cdi4lE7u6/QgdTme+ZGVwv
+	lCppcNPA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37986 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w0GFZ-000000006A6-2CSn;
-	Wed, 11 Mar 2026 09:53:10 +0000
+	id 1w0GFf-000000006AR-0IVd;
+	Wed, 11 Mar 2026 09:53:15 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w0GFV-0000000CiTi-2gYu;
-	Wed, 11 Mar 2026 09:53:05 +0000
+	id 1w0GFa-0000000CiTn-3BDH;
+	Wed, 11 Mar 2026 09:53:10 +0000
 In-Reply-To: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
 References: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -74,8 +74,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next 12/15] net: stmmac: add helper to get size of a
- transmit descriptor
+Subject: [PATCH net-next 13/15] net: stmmac: add helper to set transmit tail
+ pointer
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,21 +85,21 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w0GFV-0000000CiTi-2gYu@rmk-PC.armlinux.org.uk>
+Message-Id: <E1w0GFa-0000000CiTn-3BDH@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 11 Mar 2026 09:53:05 +0000
-X-Rspamd-Queue-Id: 0C5C3262271
+Date: Wed, 11 Mar 2026 09:53:10 +0000
+X-Rspamd-Queue-Id: 1A36D261B50
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266584-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-266585-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[15];
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
@@ -117,104 +117,96 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rmk-PC.armlinux.org.uk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email]
 X-Rspamd-Action: no action
 
-Add and use a helper to get the size of the hardware transmit
-descriptor.
+Setting the queue transmit tail pointer follows a common pattern:
+calculate the DMA address, and then call stmmac_set_tx_tail_ptr().
+The only difference between all the call sites is the index used.
+
+Factor this out into a static function.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 40 +++++++------------
- 1 file changed, 15 insertions(+), 25 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 ++++++++++---------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 76e4dcf8f697..da1726b887f3 100644
+index da1726b887f3..4521469c5e1d 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -362,6 +362,17 @@ static inline u32 stmmac_tx_avail(struct stmmac_priv *priv, u32 queue)
- 			  priv->dma_conf.dma_tx_size);
+@@ -385,6 +385,18 @@ static struct dma_desc *stmmac_get_tx_desc(struct stmmac_priv *priv,
+ 		return &tx_q->dma_tx[index];
  }
  
-+static size_t stmmac_get_tx_desc_size(struct stmmac_priv *priv,
-+				      struct stmmac_tx_queue *tx_q)
++static void stmmac_set_queue_tx_tail_ptr(struct stmmac_priv *priv,
++					 struct stmmac_tx_queue *tx_q,
++					 unsigned int chan, unsigned int index)
 +{
-+	if (priv->extend_desc)
-+		return sizeof(struct dma_extended_desc);
-+	else if (tx_q->tbs & STMMAC_TBS_AVAIL)
-+		return sizeof(struct dma_edesc);
-+	else
-+		return sizeof(struct dma_desc);
++	int desc_size;
++
++	desc_size = stmmac_get_tx_desc_size(priv, tx_q);
++
++	tx_q->tx_tail_addr = tx_q->dma_tx_phy + index * desc_size;
++	stmmac_set_tx_tail_ptr(priv, priv->ioaddr, tx_q->tx_tail_addr, chan);
 +}
 +
- static struct dma_desc *stmmac_get_tx_desc(struct stmmac_priv *priv,
- 					   struct stmmac_tx_queue *tx_q,
- 					   unsigned int index)
-@@ -1501,14 +1512,8 @@ static void stmmac_display_tx_rings(struct stmmac_priv *priv,
+ static size_t stmmac_get_rx_desc_size(struct stmmac_priv *priv)
+ {
+ 	if (priv->extend_desc)
+@@ -3311,9 +3323,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ 		stmmac_init_tx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
+ 				    tx_q->dma_tx_phy, chan);
  
- 		pr_info("\tTX Queue %d rings\n", queue);
- 
--		if (priv->extend_desc)
--			desc_size = sizeof(struct dma_extended_desc);
--		else if (tx_q->tbs & STMMAC_TBS_AVAIL)
--			desc_size = sizeof(struct dma_edesc);
--		else
--			desc_size = sizeof(struct dma_desc);
--
- 		head_tx = stmmac_get_tx_desc(priv, tx_q, 0);
-+		desc_size = stmmac_get_tx_desc_size(priv, tx_q);
- 
- 		stmmac_display_ring(priv, head_tx, dma_conf->dma_tx_size, false,
- 				    tx_q->dma_tx_phy, desc_size);
-@@ -2186,17 +2191,14 @@ static void __free_dma_tx_desc_resources(struct stmmac_priv *priv,
- 	dma_free_tx_skbufs(priv, dma_conf, queue);
- 
- 	if (priv->extend_desc) {
--		size = sizeof(struct dma_extended_desc);
- 		addr = tx_q->dma_etx;
- 	} else if (tx_q->tbs & STMMAC_TBS_AVAIL) {
--		size = sizeof(struct dma_edesc);
- 		addr = tx_q->dma_entx;
- 	} else {
--		size = sizeof(struct dma_desc);
- 		addr = tx_q->dma_tx;
+-		tx_q->tx_tail_addr = tx_q->dma_tx_phy;
+-		stmmac_set_tx_tail_ptr(priv, priv->ioaddr,
+-				       tx_q->tx_tail_addr, chan);
++		stmmac_set_queue_tx_tail_ptr(priv, tx_q, chan, 0);
  	}
  
--	size *= dma_conf->dma_tx_size;
-+	size = stmmac_get_tx_desc_size(priv, tx_q) * dma_conf->dma_tx_size;
- 
- 	dma_free_coherent(priv->device, size, addr, tx_q->dma_tx_phy);
- 
-@@ -2358,14 +2360,7 @@ static int __alloc_dma_tx_desc_resources(struct stmmac_priv *priv,
- 	if (!tx_q->tx_skbuff)
- 		return -ENOMEM;
- 
--	if (priv->extend_desc)
--		size = sizeof(struct dma_extended_desc);
--	else if (tx_q->tbs & STMMAC_TBS_AVAIL)
--		size = sizeof(struct dma_edesc);
--	else
--		size = sizeof(struct dma_desc);
--
--	size *= dma_conf->dma_tx_size;
-+	size = stmmac_get_tx_desc_size(priv, tx_q) * dma_conf->dma_tx_size;
- 
- 	addr = dma_alloc_coherent(priv->device, size,
- 				  &tx_q->dma_tx_phy, GFP_KERNEL);
-@@ -4333,12 +4328,7 @@ static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue)
+ 	return ret;
+@@ -4326,9 +4336,6 @@ static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
+ static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue)
+ {
  	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
- 	int desc_size;
- 
--	if (likely(priv->extend_desc))
--		desc_size = sizeof(struct dma_extended_desc);
--	else if (tx_q->tbs & STMMAC_TBS_AVAIL)
--		desc_size = sizeof(struct dma_edesc);
--	else
--		desc_size = sizeof(struct dma_desc);
-+	desc_size = stmmac_get_tx_desc_size(priv, tx_q);
+-	int desc_size;
+-
+-	desc_size = stmmac_get_tx_desc_size(priv, tx_q);
  
  	/* The own bit must be the latest setting done when prepare the
  	 * descriptor and then barrier is needed to make sure that
+@@ -4336,8 +4343,7 @@ static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue)
+ 	 */
+ 	wmb();
+ 
+-	tx_q->tx_tail_addr = tx_q->dma_tx_phy + (tx_q->cur_tx * desc_size);
+-	stmmac_set_tx_tail_ptr(priv, priv->ioaddr, tx_q->tx_tail_addr, queue);
++	stmmac_set_queue_tx_tail_ptr(priv, tx_q, queue, tx_q->cur_tx);
+ }
+ 
+ /**
+@@ -6967,9 +6973,7 @@ void stmmac_enable_tx_queue(struct stmmac_priv *priv, u32 queue)
+ 	if (tx_q->tbs & STMMAC_TBS_AVAIL)
+ 		stmmac_enable_tbs(priv, priv->ioaddr, 1, tx_q->queue_index);
+ 
+-	tx_q->tx_tail_addr = tx_q->dma_tx_phy;
+-	stmmac_set_tx_tail_ptr(priv, priv->ioaddr,
+-			       tx_q->tx_tail_addr, tx_q->queue_index);
++	stmmac_set_queue_tx_tail_ptr(priv, tx_q, tx_q->queue_index, 0);
+ 
+ 	stmmac_start_tx_dma(priv, queue);
+ 
+@@ -7070,9 +7074,7 @@ int stmmac_xdp_open(struct net_device *dev)
+ 		stmmac_init_tx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
+ 				    tx_q->dma_tx_phy, chan);
+ 
+-		tx_q->tx_tail_addr = tx_q->dma_tx_phy;
+-		stmmac_set_tx_tail_ptr(priv, priv->ioaddr,
+-				       tx_q->tx_tail_addr, chan);
++		stmmac_set_queue_tx_tail_ptr(priv, tx_q, chan, 0);
+ 
+ 		hrtimer_setup(&tx_q->txtimer, stmmac_tx_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+ 	}
 -- 
 2.47.3
 
