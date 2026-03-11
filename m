@@ -1,259 +1,263 @@
-Return-Path: <netdev+bounces-266677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EICTJwCKsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:28:00 +0100
+	id mE8cGieLsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:32:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E0D266812
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:28:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02D6726696F
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:32:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 69E1C303D133
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:26:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A2FBD309B533
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514B23CCFB2;
-	Wed, 11 Mar 2026 15:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3F533F58F;
+	Wed, 11 Mar 2026 15:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gmByQsAg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdHdiuLe"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011067.outbound.protection.outlook.com [52.101.52.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E7730E837
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 15:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773242790; cv=fail; b=b+HfF2+DnNxqMXekAmh5Pl1gdeKglHh0fh864Ez2p3hhYlipXVUHoFqFypIi9klJZMGPuqUjC/hKYzPz7ihMg9f0qwdieL1YHeFeT9+vfVSZ3F7c9qEGjJ7XX7siO472yCx2Rm6JmVlC2Z4hR20NClfkjzBthUldNIpGcShSKuI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773242790; c=relaxed/simple;
-	bh=H8JBVHNUX6SvEZCvLAUlsOagEoTy0cC+7pICYG0bptg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=lRbQjyY+KhxCvLQ7vM/6M0N8fM1ir0ty2FQw20Zx2zXToUsLwckLLLiupvvZGucBn323J0+c8dUaLvNuGX83ulV/ksHBv9cjrtdtPrgUMJs47dDY8wIszxFSvGJx/pz1abKIoccPvvIFYwP/wjeYeHcM4vGrG+Za4EXT6CY67eU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gmByQsAg; arc=fail smtp.client-ip=52.101.52.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mhUkn5Pd0WXCK1vnPH02BE8kGqPdLlZwzYnODO7yrRCmI38g+XXf4HOjAJDgm3paUkfZFpf2Brpf8zecXchz5qpoX2/FEIrE3tUdr938KFGZ9mOixI9HUWGPZlQ91O3tMIpgurgJ3+RihQJ/x894+9c3vDpOL2q83Vzh8CAxHfO+ARVURsEgFYcwXNBFnS5AFxuxRAzL8xhodVTwLiK7lW+ums+9U2M3mAgo/WP0y+cXuxPSqjI/TtXFlwp+WmJ7a/pPiyzkV43EOB5WEaUkAx6YUjmljdKGip6e+yZZ4QAFpvtVqeNreRJfcvfPjvES9qpRkgfMoQ7aY7VKppV5yA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jxaSnL37mMnAVlglf9Og5ae0GZBMbZ36OWG6AE6/caI=;
- b=QgwlSSayvNgzDJ3Goz1S71//JHIIdYzlU+Qy77eElgiYoQxkUEdS1cUUJKss/Mv4uCQr5wNK9A8Rcl5E0IL1d4iyEwAvUxlddBnEY/7+qMaDgzMbLSLVbzrsD40tWC+nCyRB3hIe+79Ufgu2ChSYNvCny00IBqPaZqIo9M323KoqkFh3cgxCWbjIbTow6Z5DccdRcAwuLNU4cAOCB9qflN3vHXCreWIM6kMDR2rpgm3IWfewuVl5rCA2LQQAEegLcWl86Y65EDc7DbGdHWPD2c5OSTQPwMdWoaiYuoCVtyiBJU2PCvhehMH3fWwdLuz7kzGfp746xpCO9/EbOsJO0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jxaSnL37mMnAVlglf9Og5ae0GZBMbZ36OWG6AE6/caI=;
- b=gmByQsAgo4yG1zYuOqFUauC5FiRypyZYv+7gXIxUlcW1xDGBA9IpObTs/7h3bsFyqWYW9++4xKGVjge3wIIQAVpgyJ/nkg+I8KtH1E2qfsrwGL1WPkqfugdBdH1KPzhcMjjPJl6AebQiCLWspskMIyuMuB22iPGmGQvzwv+YsDFqH+fzRXkwxEgUPqH4yF/8LK7ag9A3RIUMt6Mw4wTAfMYouVIU38MjbuTql2whgr15LQi0297/AfEOYjDlwY4jRiELJoPDTB5/OPh5NMbAbJE82y0fmgwb6H8UaIY9+tt7QS6ebksDJcHnspXoHde8nLMbLglWoMQUf4g3Sj2Pzg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
- by BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.12; Wed, 11 Mar
- 2026 15:26:25 +0000
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9700.003; Wed, 11 Mar 2026
- 15:26:25 +0000
-Date: Wed, 11 Mar 2026 17:26:13 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, lirongqing@baidu.com
-Cc: David Ahern <dsahern@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH][net-next] net: vrf: switch to synchronize_net() when
- releasing routes
-Message-ID: <20260311152613.GA2441293@shredder>
-References: <20260310105331.2371-1-lirongqing@baidu.com>
- <20260311131935.GA2415888@shredder>
- <CANn89i+PK6N0VJPQ_NtvHFizpnnrWb9AOPz=M0WyzsQGogsUpQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+PK6N0VJPQ_NtvHFizpnnrWb9AOPz=M0WyzsQGogsUpQ@mail.gmail.com>
-X-ClientProxiedBy: TL2P290CA0002.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::12) To DS0PR12MB7900.namprd12.prod.outlook.com
- (2603:10b6:8:14e::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC3B3DEACD
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 15:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773242798; cv=none; b=JplbvtaGggJ/VatNUVYe67sgRNH6q+N4FtLasQOgZG6k5FQkgDXpDHUBwRns6TTLhV98tQaDEBBdRa2/z2Osi9fzdWApmdNs8eNTLd3gwrbvr/leXn+7ksHmXBeBq42C3UtX5WuNfjHZCGNdGQLy0NqFN3dbYy0ftKUZzDAy8+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773242798; c=relaxed/simple;
+	bh=Ogmo8lAWGR7xwaijtfYuplaPa093NRJ7ZgbTzbnG5J0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iipKAQ6X2wohVzzaT5W3/PJJoeJSYeZuyxvBSzcrivriIClu7cw6iGdfmjNhiPDpMpjP0GbRanNxF3zW+Q5VP3lMONzqGDD4j/WBF+tEYNNM89Ei7oBairkOV9IhLbX5u/N4WTcS9nh2JdWg8dASxuJchqGzPNEVV5VVzJN8Pls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EdHdiuLe; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439b8a3f2bcso8162862f8f.3
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773242795; x=1773847595; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eS744gcGkNHKNUI99cJyO4KVI3lVp7bb2Qfj3UT6608=;
+        b=EdHdiuLeLkie5oeqkJoXjTpgQTFjSQHcPKpzMArNYjh2HXxa3Ln+x+SDJnnvutOMsH
+         f6j//+TDySlKwJ60J+K9SMOquU2zdGZOoWiT14beiUM8v5hvaMCZr78/a0/+BMtCvzaF
+         7rYQD+enEmOsTVYEQ1RKtdVvUh5lJ5gfGZdhqTFU/+AeVrR4bO6/c3uu8KvBZZRmn8GD
+         AVHjFab7vHe52t/z96eeLevlpvvBZG6KKG1aWPR9alRtrrU+5llFD4BYz7eRx3IsZ7Ph
+         ml3ix0/PkczXN9cI7WOl7H1M7LwPqUjTcIEdg8GvciJ/NIYzDRRUU0vKgjlqbR6XnXEs
+         s2cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773242795; x=1773847595;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eS744gcGkNHKNUI99cJyO4KVI3lVp7bb2Qfj3UT6608=;
+        b=L4m6YNX4vTQtdG0kRgIGA5CQWe8Oa/yrZMlBu9taa7rL6+ck2a8xtUxyv7+woyyCFY
+         s/3RKiFH1TtBXSduJdZnPjRecGf8Ra3txzJ33wvkLzKk/275AJHTu1s+G4a5aZkha1Ty
+         hCOMJB86bqFjcFCuSWPwYT6LZVppipbGB3R5EL+0FlOufV4OYp63E/TEyX+cTzHB1WoM
+         tve2s/XmDvDJe4Q8QhWeynaCCZzcFlN8gTL59nEvYE3/ZdhENRDwZnvOj4/M78UeWaoX
+         DrLbWCtcFmIi3Mf5jYEflbd6vsDaO/cZoFmVQuyaJQIVLoHygvqXsWHKw9+Dq0IMfJmP
+         WE4g==
+X-Gm-Message-State: AOJu0YzoPFJ/Xoh/5PSXImSNw0inBRbuV6+JwCkMIWuM/8ZinVyYe66P
+	AjRGGyyITl9xujF/ITPfQsnusbriS4wON89wDe1iCtmUtZVtSBivbtqh
+X-Gm-Gg: ATEYQzyo3/6U91ah1D/SA6cu85h1MQz8e4Judqnyl2+Q0j6haKhxjPDzn1Jz/hFC4W1
+	T3Gkhz5pVGhBtOMj5y0ZcqHXKTrSGa9kFck6g+nzGDld2AhE0ahn42ssYZpII4GU8pUyRblRUFS
+	/z8TCBgOoWhFd8C4NvUtzMu/F9LLIaBrK2HoANpFH4MgvWcMFWqzZ1f8glqjUJZssOh0It1noiH
+	QBxL7HncaN2V1hcwXC81jS6+TI1ymO+EqE/I7E4VcSQl1WszqDDKX6UN9CjuDCq+rVtnAomVNmn
+	pb6F9Lbhua1R5SRf8KafIZr/QJvd6thajLVDyeRj+1wDJc5SzJrk1sIc9xjUz1kuHBnyIOSnwje
+	+TAU1+u0J2ziK/aFBqCP1kp9dn0GZY4GdnX+FTQAHWNOqD/23wlapMS5mCW/fZq0a5RsRli7nK+
+	fk32D9f0YAqlvFNwqQkuZPzGw9VGptzk73OTHr+g==
+X-Received: by 2002:a05:6000:184d:b0:439:ad2d:99f8 with SMTP id ffacd0b85a97d-439f821b6b3mr5685512f8f.30.1773242794679;
+        Wed, 11 Mar 2026 08:26:34 -0700 (PDT)
+Received: from localhost ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f818d5eesm8699344f8f.1.2026.03.11.08.26.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 08:26:34 -0700 (PDT)
+From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
+ ameryhung@gmail.com, kernel-team@meta.com
+Subject: Re: [RFC PATCH bpf-next v2 02/11] selftests/bpf: Test passing
+ CONST_PTR_TO_DYNPTR to kfunc that may mutate dynptr
+In-Reply-To: <20260307064439.3247440-3-ameryhung@gmail.com>
+References: <20260307064439.3247440-1-ameryhung@gmail.com>
+ <20260307064439.3247440-3-ameryhung@gmail.com>
+Date: Wed, 11 Mar 2026 15:26:33 +0000
+Message-ID: <87ldfytmja.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|BL1PR12MB5732:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52e0b812-65b7-431b-0675-08de7f828ec1
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	ne5PL3gUraYSlbkyWw9zQypn/p7CR075hru8m3ybZRrQkGTaQJkbQJ+/pMdY1R87UC8Uy6k1bl6mSBvzLxfw88wRrObDj9OGgkVod6fQw1AMk+XLbdOUR1TuYaYbGfonk1aH3+kxo+PYUz8zf2almGWPu20hLGp2LtwCbCqNehmwZv9qaF00jAx5qa+7XsqS2UXvkxe6CQTSOBFUyMZXSKC2W6CC2+rX+cl6U5Sn2iUlOMgZdmlYxexrCP9U2txNAHTUrENL+pVcGvdNbEF6UqA/0g1logcVX0b1VuP+FqR1GyJgk8xYchEV+1GTR6kjvXDQ49ySBQLWSvQLuTUrY6sIyqPqTxTRhYx20iP4krdhVBkLwt7kSWzrZMTj88A56ajrbydActNXeBvRhWlfPfcKowXmgR7MlTjczxIpIGDtyhIrZHig+zal/UyQ/3QeHKmy+Ckel/f+znx44LbjKIgVbnpfAkA3nHKrFxmm5H5jxVAFhwzGX48HeWEzJAdXLcTf1LLk7+z7LLdVRuphpnBj5au2KOTxJho9jQpVdHfAcoaDUd8EjuYJP57jwL8avCR/KY6I1p64S1dEebZjlANK7+h1MyRiqru99jYbCaNReuY2pq9UARpYyz9urpYeesrbbSpGCG7o8NxkNOx7ZGqEHWubCUz7DdyjPeXImTocqs95JGO1UBt77elY3dIAsPoXYHP2aTGY0Tujf06efUQlTqq893/eq6nujGx9bBY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WFRlc0IzWlNTOVNidDkzdFNIOVZVUmJCSjY4M0c1SitNaGlIb3hWcFJIUE0w?=
- =?utf-8?B?UUJ1TEQzMVRFbm96OVNLOHRoWm5yWUxzWXRHUE5WR2JmSnJaeW0vM1IxSjk0?=
- =?utf-8?B?TFhsMHQ1eENTSDVYT3ZHdEJGOVVzd3dPcG4xV0R5Q1ZWSFVvY3JHeFBFOTlI?=
- =?utf-8?B?TWhnREpNWGlLR1k0NWhZYnd1TFFxQjhzSjRYYUZoa29Oc2owZzhCd0xjejZK?=
- =?utf-8?B?MjcvK0tpdDVzWUNsbTM0cUhGaVhOS1h1aDIrTkF6d2ZHWkdDNTNiekRoMUlp?=
- =?utf-8?B?eU9JTDVRTW5VVm9lYTJWV0w0OW9ubDhlUHRhUUtjUUhxR2c3VStNem4vVTl5?=
- =?utf-8?B?Zi9mWnNnNnVSOHIyNjVGaVZwUDBJQWFlRlZGQ043ZjAvUG8vaWpIWGVSMmVE?=
- =?utf-8?B?eXI5Uno3Q2l1VFRrd1RvUzJhOFp0UzZNdW1NemxNZ1JZcEdFTExyZGFWMkph?=
- =?utf-8?B?cDA0Y1F5NzJoam4wNlhVN0VzZlA5OG5hSDFmNUtFQ1pwaTc2R25GcnJZK1RU?=
- =?utf-8?B?dEhpcitWZThvWDNpbEpkKytEQzM3ay9PL0U1anJwRUwxTmFXQXgwQ0ttby9L?=
- =?utf-8?B?clVzaDQyS0loU0ZnNE9lQ1JKOU9CSzd2eHJ0WVRYTzdHVnBaNUVWcDhubzF4?=
- =?utf-8?B?VXhQR1FLditORXJ6cU5GZmF2OExxV1NVQ2RxVDhoUHpiQlR2Ukp6eDlLZExr?=
- =?utf-8?B?ZmhQZ251bjllRk4zakcxcjNyYWs0TVQ5bDlYN3dNNGYwWUg2NHpydlVKTDEx?=
- =?utf-8?B?cVFkbHVqeUZUdjNKeit5djhzWWdSTS9LSitvZFFNaG9Ga25yUSs1QzBYWWlV?=
- =?utf-8?B?d1h1aXlXc3E0QzF4SlZKYUp6cTNyNDM2ZlhMZWZJUjJVTFZJdmlmYmVDWENC?=
- =?utf-8?B?VTRvMHRwdGNVM0pGMkRReld5dnZKMVRxM0x6emFieTNtMldURlhyYWNWRHhW?=
- =?utf-8?B?ZndPR2hWbWtPektNWituM0hBbHVaek9OUGdiUWdCL3VnSTNNQXZ3MjBRUnp1?=
- =?utf-8?B?ckU2ZmR4SXBhR3J5aGtBdUtIRml0WW5GeGZDRVNoSXhmNHpqU0dkZVlyVGFC?=
- =?utf-8?B?VTk3T1IxUzdsSlM5a1k5M3RNTGNuVzlGMGhBN3JXdmNvQVZzZktiTEVIVnc4?=
- =?utf-8?B?RUtGMW1BQStXWG9yRFp0WWtpalhObVA3a1FqRnFaZzJSWHlNdC9IcFlRWUEy?=
- =?utf-8?B?RGF2bDBGbHh3QjR3RXVLU3BQMmN1Y1pUNS9ZVm9xS1Q0VlUrd0R2cW9vaUlV?=
- =?utf-8?B?YThPRGp2K0ZNTmpSNUYyWWxYdDV5T0swd1JhTVJFOWNXcWxBOFIxTCtTVnNZ?=
- =?utf-8?B?cERlUDREbmx0a1JpUHJRKzN3U0tFYXhEaEVBcmdsYWJvOXpHRTEyVE0zSXNk?=
- =?utf-8?B?bFNyeXRrMXBsNHkwZWgzV1Fna2pOdUNXTnUrUHFQeVF3amtWZWlXYitxYVdn?=
- =?utf-8?B?dERYSHBrTGRQWWk2VWR2VlVJVzloU3dGbThaaXJ3VjgwbURFK3pVd3RtcDJu?=
- =?utf-8?B?V3hBU0FPbFpFcHdvZXU3dU55RlIyOGt6YUVDREpTckIzV0N1alp6dXU0WHZH?=
- =?utf-8?B?R0FTRXpUNGE0dE80b2VFMm14YUtuUW01UzRjN2FCUzh1QXZGQ080MDVKc2dv?=
- =?utf-8?B?RkN1TGJ1RVl1SGhDdnJKQURjVFp4QUJEczY4cVRQc2dac0RJcDlwSGdWTDNF?=
- =?utf-8?B?RzRkaExHVm5vajdhSnlJcEhUOHRuUitFYUp3cDl6UmJITXRhV0Z3WUxGbUFU?=
- =?utf-8?B?TnRHSW1pcXhFVS93RnI5QlpCMlV4NzRoVkxQeUc3b2hXbitINE9OUU5NYnVm?=
- =?utf-8?B?ODlzT3h6OTU4VlNqQWhTenp5cjgreXNqSG4yNE1QNHNDZjhPaEdvdDZxUnV5?=
- =?utf-8?B?aVhGY0FiUFBUeVZVUWFRS2svRFh6eTVUNEVON3NHeTEzeDR4dU5NVm1LWnBi?=
- =?utf-8?B?VllqeTVxVHJUU0tPSWlBYld1TGxyMjBrUWdqdFRkNWwxYlc0NkhOQ0RUa2xh?=
- =?utf-8?B?L1ZyYWtnVFovRUhUZ0ZIT1FSOHdzWE5qYjlsR1pMSHgwMkhsT1FUNWh6V3pU?=
- =?utf-8?B?ejlDZGlkQzR6TE1UUkRKZnc5c01iVkU4V1BUUmNtcGFBZjZObitxK3JhajBI?=
- =?utf-8?B?RVlNOFVvYXJvbzYvY0xoZ2hEdktLUjdjbmxQSzZRK3AwRzZFa25ON29hbDJC?=
- =?utf-8?B?K2F1R1RwZ3FEeWVYVVdSTC9Gdll1aGU1bHVMK1p5LzUzT3Y0TWdaSHFINERS?=
- =?utf-8?B?OGNvZmpGTy9FUVZTVkU1L0FVRldsYTdTUFZnUlM3cDcyU0NhQi9EN3owaXFK?=
- =?utf-8?B?aDhHdy81N3FTVWdhQzlvNzltN3FwNEszSzJDUi9wb3hlR0U1YXJ3Zz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52e0b812-65b7-431b-0675-08de7f828ec1
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 15:26:25.2791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RpIzMLzmOJ6NVm7tnfEA1BqrjMLX4xELqBN3mXAaoLjGQi3ysN8nYX4YtBoDSMKsx6UgZ6CvR8rQ0nyAitxskg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5732
-X-Spamd-Result: default: False [1.84 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266677-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-266678-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email]
-X-Rspamd-Queue-Id: 56E0D266812
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 02D6726696F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 02:26:57PM +0100, Eric Dumazet wrote:
-> On Wed, Mar 11, 2026 at 2:19 PM Ido Schimmel <idosch@nvidia.com> wrote:
-> >
-> > On Tue, Mar 10, 2026 at 06:53:31AM -0400, lirongqing wrote:
-> > > From: Li RongQing <lirongqing@baidu.com>
-> > >
-> > > Replace synchronize_rcu() with synchronize_net() in vrf_rtable_release()
-> > > and vrf_rt6_release().
-> > >
-> > > synchronize_net() is RTNL-aware and can use the more efficient
-> > > synchronize_rcu_expedited() when the RTNL lock is held, avoiding
-> > > potentially long wait times for a standard RCU grace period.
-> > >
-> > > Since these release functions are called during device teardown where
-> > > the RTNL lock is typically held, this change reduces the time spent
-> > > in RTNL critical sections and speeds up VRF device deletion.
-> > >
-> > > Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> > > ---
-> > >  drivers/net/vrf.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-> > > index 8c009bc..92a0f4b 100644
-> > > --- a/drivers/net/vrf.c
-> > > +++ b/drivers/net/vrf.c
-> > > @@ -755,7 +755,7 @@ static void vrf_rt6_release(struct net_device *dev, struct net_vrf *vrf)
-> > >       struct dst_entry *dst;
-> > >
-> > >       RCU_INIT_POINTER(vrf->rt6, NULL);
-> > > -     synchronize_rcu();
-> > > +     synchronize_net();
-> >
-> > I might be missing something, but why do we need synchronize_rcu() here?
-> > The code below calls dst_release() which will only free the dst entry
-> > after an RCU grace period (assuming we dropped the last reference).
-> 
-> Agreed, this could/should have been removed after
-> 
-> commit 4f04256c983a4f115417d2009b44dcb7d70a6375
-> Author: David Ahern <dsahern@gmail.com>
-> Date:   Fri Aug 11 17:11:14 2017 -0700
-> 
->     net: vrf: Drop local rtable and rt6_info
-> 
->     The VRF cached rtable and rt6_info for local traffic are no longer
->     needed and actually prevent local traffic through enslaved devices.
->     Remove them.
-> 
-> 
-> 
-> >
-> > Also, I think that instead of using net->loopback_dev the code can be
-> > converted to use dst_dev_put() before dst_release().
-> >
-> 
-> Maybe in a separate patch ;)
+Amery Hung <ameryhung@gmail.com> writes:
 
-Yes, separate patch. Another thing that can be simplified in this area
-is the NULL check in vrf_rtable_release(). I don't see how that can
-happen. It is necessary in the case of vrf_rt6_release() due to
-'ipv6.disable=1'.
-
-Li RongQing, can you take care of these changes?
-
-1. Remove NULL check in vrf_rtable_release().
-
-2. Convert vrf_rtable_release() and vrf_rt6_release() to use
-dst_dev_put() before dst_release(), instead of using
-'net->loopback_dev'.
-
-3. Remove synchronize_rcu() from both vrf_rtable_release() and
-vrf_rt6_release().
-
-Thanks
+> Make sure for kfunc that takes mutable dynptr argument, verifier rejects
+> passing CONST_PTR_TO_DYNPTR to it.
+>
+> Rename struct sample to test_sample to avoid a conflict with the
+> definition in vmlinux.h
+>
+> In test_kfunc_dynptr_param.c, initialize dynptr to 0 to avoid
+> -Wuninitialized-const-pointer warning.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  .../testing/selftests/bpf/progs/dynptr_fail.c | 37 +++++++++++++++----
+>  .../bpf/progs/test_kfunc_dynptr_param.c       |  2 +-
+>  2 files changed, 30 insertions(+), 9 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/testing/selftests/bpf/progs/dynptr_fail.c
+> index 8f2ae9640886..5e1b1cf4ea8e 100644
+> --- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
+> +++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
+> @@ -1,15 +1,14 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (c) 2022 Facebook */
+>  
+> +#include <vmlinux.h>
+>  #include <errno.h>
+>  #include <string.h>
+> -#include <stdbool.h>
+> -#include <linux/bpf.h>
+>  #include <bpf/bpf_helpers.h>
+>  #include <bpf/bpf_tracing.h>
+> -#include <linux/if_ether.h>
+>  #include "bpf_misc.h"
+>  #include "bpf_kfuncs.h"
+> +#include "../test_kmods/bpf_testmod_kfunc.h"
+>  
+>  char _license[] SEC("license") = "GPL";
+>  
+> @@ -46,7 +45,7 @@ struct {
+>  	__type(value, __u64);
+>  } array_map4 SEC(".maps");
+>  
+> -struct sample {
+> +struct test_sample {
+>  	int pid;
+>  	long value;
+>  	char comm[16];
+> @@ -95,7 +94,7 @@ __failure __msg("Unreleased reference id=4")
+>  int ringbuf_missing_release2(void *ctx)
+>  {
+>  	struct bpf_dynptr ptr1, ptr2;
+> -	struct sample *sample;
+> +	struct test_sample *sample;
+>  
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr1);
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
+> @@ -173,7 +172,7 @@ __failure __msg("type=mem expected=ringbuf_mem")
+>  int ringbuf_invalid_api(void *ctx)
+>  {
+>  	struct bpf_dynptr ptr;
+> -	struct sample *sample;
+> +	struct test_sample *sample;
+>  
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
+>  	sample = bpf_dynptr_data(&ptr, 0, sizeof(*sample));
+> @@ -315,7 +314,7 @@ __failure __msg("invalid mem access 'scalar'")
+>  int data_slice_use_after_release1(void *ctx)
+>  {
+>  	struct bpf_dynptr ptr;
+> -	struct sample *sample;
+> +	struct test_sample *sample;
+>  
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
+>  	sample = bpf_dynptr_data(&ptr, 0, sizeof(*sample));
+> @@ -347,7 +346,7 @@ __failure __msg("invalid mem access 'scalar'")
+>  int data_slice_use_after_release2(void *ctx)
+>  {
+>  	struct bpf_dynptr ptr1, ptr2;
+> -	struct sample *sample;
+> +	struct test_sample *sample;
+>  
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, 64, 0, &ptr1);
+>  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
+> @@ -1993,3 +1992,25 @@ int test_dynptr_reg_type(void *ctx)
+>  	global_call_bpf_dynptr((const struct bpf_dynptr *)current);
+>  	return 0;
+>  }
+> +
+> +/* Cannot pass CONST_PTR_TO_DYNPTR to bpf_kfunc_dynptr_test() that may mutate the dynptr */
+> +__noinline int global_subprog_dynptr_mutable(const struct bpf_dynptr *dynptr)
+> +{
+> +	long ret = 0;
+Why do we need this long ret? Do we even need this function at all, why
+not calling bpf_kfunc_dynptr_test() directly from the
+kfunc_dynptr_const_to_mutable()?
+> +
+> +	/* this should fail */
+> +	bpf_kfunc_dynptr_test((struct bpf_dynptr *)dynptr, NULL);
+> +	__sink(ret);
+> +	return ret;
+> +}
+> +
+> +SEC("tc")
+nit: it looks like most of the programs in this file are optional:
+SEC("?tc").
+> +__failure __msg("cannot pass pointer to const bpf_dynptr, the helper mutates it")
+> +int kfunc_dynptr_const_to_mutable(struct __sk_buff *skb)
+> +{
+> +	struct bpf_dynptr data;
+> +
+> +	bpf_dynptr_from_skb(skb, 0, &data);
+> +	global_subprog_dynptr_mutable(&data);
+> +	return 0;
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
+> index c3631fd41977..1c6cfd0888ba 100644
+> --- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
+> +++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
+> @@ -33,7 +33,7 @@ SEC("?lsm.s/bpf")
+>  __failure __msg("cannot pass in dynptr at an offset=-8")
+>  int BPF_PROG(not_valid_dynptr, int cmd, union bpf_attr *attr, unsigned int size, bool kernel)
+>  {
+> -	unsigned long val;
+> +	unsigned long val = 0;
+>  
+>  	return bpf_verify_pkcs7_signature((struct bpf_dynptr *)&val,
+>  					  (struct bpf_dynptr *)&val, NULL);
+> -- 
+> 2.47.3
 
