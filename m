@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-266434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNDqAdHasGmsnwIAu9opvQ
-	(envelope-from <netdev+bounces-266434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:00:33 +0100
+	id 8OQaEN/asGmHnwIAu9opvQ
+	(envelope-from <netdev+bounces-266435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:00:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2DA125B38D
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:00:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A10E925B3A6
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 04:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9F3BF301752E
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:00:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB364303433E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C4C26C3BD;
-	Wed, 11 Mar 2026 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069C8346777;
+	Wed, 11 Mar 2026 03:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBo62BpP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5pSz2cI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A111D5174;
-	Wed, 11 Mar 2026 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D843633F5B3;
+	Wed, 11 Mar 2026 03:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773198028; cv=none; b=dPttDge1ItUFjok+Mk+XPQZPP05kFj2/nhUcazI4jU9W/GxuE2uEXtL5FFXTkArNtB/MnGs9brDqADUDOsW3+MDDfbw3+hyjOLZsZloa4uHO7ilVs2Tk/58bSo2ZUuawdVkz39rVr9ea8niJ9Z8xEqJD9gOurAdYHrgiI/OXPtA=
+	t=1773198029; cv=none; b=fPQKpY4aM13KtUs2MOjVdGTUHWPd/h1rZr3d9sJPKbMjqELsIABT3kIBXIM7VnLVEy6F/QcooaBTcmorneLOH9nQJlvm+912/jKXNq7ljC/jkwqI2mSxcedlfzb1Ks7NJ4zKNZFo02LQa4sEbjO4QcjVc2pYKjRRp2aMv9zEZPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773198028; c=relaxed/simple;
-	bh=bOXGmh6jsTxCsgYCU4QHEri4xQgWhuXk6jt33pBkt/M=;
+	s=arc-20240116; t=1773198029; c=relaxed/simple;
+	bh=YjBu3ccKblFlbxjxX63EOOWdru0qv/4ykvXO+fdeiLc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CoLk8Oc9tIi9AmoaYL3yjNX57GCiQf9h3Mrz/RB0UlY/GQaa5D7Mf3qPaTUMgXPM4/hT4cKx8FSSrhRuhORcDGGr6w6WADU7dqtmCU236fLjWBE7vXVchgeRp5yTMUXo1ddbm10U2a3VbguKTKj9kro3wrY3tBc2UbgkT+3QnBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBo62BpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1298CC19423;
-	Wed, 11 Mar 2026 03:00:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IazX2CikorO8HHLk8yP7OxpN6ZKWvTSc/TgSX1L0RucRFdRwf8WvMKlSmiRnvC5rvxuELcZypjzBJbyhUA4Qo/TzGuTmy/wnwD1djc+blM+Av2af/1F44cv3FmL9tgB7tUHg1uvPAZZ99XagyKGcmoF76ld4NWQJ0fLJzh6Ba2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5pSz2cI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB9BC19423;
+	Wed, 11 Mar 2026 03:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773198028;
-	bh=bOXGmh6jsTxCsgYCU4QHEri4xQgWhuXk6jt33pBkt/M=;
+	s=k20201202; t=1773198029;
+	bh=YjBu3ccKblFlbxjxX63EOOWdru0qv/4ykvXO+fdeiLc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MBo62BpPJVP29oqsWlvaUEmQVEicBzq1LzxONNHQoQJeAlOHFN27fwIYhsEkwpaUf
-	 543muqKkM5o5/dNrAJRZigmxY2M5WVe/1QCjnsHxq0Mcj6jR+1xkc+2RCaU2IwQxrD
-	 8OgHEkmTQoJAw3xcls+LC8RLLSGdUfS9cRTaEyfHqnau6evdCT0yl2CbgAW3GNHzQo
-	 uXZZ3ur23R3qcmztDAFeJ4hQoEMzpQjWuBdaFQCFYCdoE8yAwMNPNbWjq/Hguns5vE
-	 1tAT4z+YuaROAdOa0CEyQs/19Dtnb7TN9at5Tao5oFzqNZZe0R2S/6Pnx5s7vWg4fI
-	 Ck8Kh3oKcVFEA==
+	b=F5pSz2cIAGLhcvRiab04DTuWMm/yF0utfmGHRBwtj7fA3THI0b8xg1qq34s5xt0Uy
+	 FYwR+y6O2Yo4DF4kHBmDjQeslmfV4Z1qqdQQEYxjLX724ZyV5CWgRK1JA9B8eQPJ/u
+	 bvouA3ptxGYr0KnOw0lf+A8Q/MOEQDca9NLnIyNi/oJGb2lUnGu2KazpScjJ690E0C
+	 2VlFaq1Cv8S1PXjMEWnaPn4BSQ9dbRY0T8YCKCymlVxUgjXbuBUjm9ZEK+LkLQV4rt
+	 wD8fgTcKTlmWFBOe0cS7fvrChwLjhIiXgzzSCmKGjR3d3vZZlO854/O5SGK7waaeVA
+	 vSorgYVLIE+Bw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F783808200;
-	Wed, 11 Mar 2026 03:00:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE8A3808200;
+	Wed, 11 Mar 2026 03:00:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,54 +55,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/7] net: stmmac: start to shrink memory usage
+Subject: Re: [PATCH net-next v2 0/2] amd-xgbe: Improve power management for
+ S0i3
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177319802455.3019253.1878262013471339195.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Mar 2026 03:00:24 +0000
-References: <aa6VEsmBK-S9eNYU@shell.armlinux.org.uk>
-In-Reply-To: <aa6VEsmBK-S9eNYU@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
- angelogioacchino.delregno@collabora.com, wens@kernel.org,
- davem@davemloft.net, edumazet@google.com, Frank.Li@nxp.com,
- imx@lists.linux.dev, kuba@kernel.org, jan.petrous@oss.nxp.com,
- jonathanh@nvidia.com, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
- linux-tegra@vger.kernel.org, maxime.chevallier@bootlin.com,
- mohd.anwar@oss.qualcomm.com, netdev@vger.kernel.org, pabeni@redhat.com,
- kernel@pengutronix.de, s32@nxp.com, samuel@sholland.org,
- s.hauer@pengutronix.de, me@ziyao.cc
-X-Rspamd-Queue-Id: A2DA125B38D
+ <177319802579.3019253.7007480805177156476.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Mar 2026 03:00:25 +0000
+References: <20260308092851.1510214-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20260308092851.1510214-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
+X-Rspamd-Queue-Id: A10E925B3A6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266434-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266435-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
@@ -111,36 +104,21 @@ Hello:
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 9 Mar 2026 09:38:26 +0000 you wrote:
-> Hi,
+On Sun, 8 Mar 2026 14:58:49 +0530 you wrote:
+> Improve the amd-xgbe power management handling to allow AMD platforms to
+> reach the deepest suspend state (S0i3) when modern standby is used.
 > 
-> Start shrinking stmmac's memory usage by avoiding using "int" for
-> members that are only used for 0/1 (boolean) values, or values that
-> can't be larger than 255.
-> 
-> In addition, as struct stmmac_dma_cfg is approximately a cache line,
-> shrinks below a cache line as a result of this patch set, and is
-> required, there is no point separately allocating this from
-> struct plat_stmmacenet_data. Embed it into the end of this struct
-> and set the existing pointer to avoid large wide-spread changes.
+> The first patch cleans up the xgbe_powerdown() and xgbe_powerup()
+> helpers by removing an unused caller distinction and aligning the
+> ordering of operations with xgbe_stop().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/7] net: stmmac: provide plat_dat->dma_cfg in stmmac_plat_dat_alloc()
-    https://git.kernel.org/netdev/net-next/c/7a6387dec8ce
-  - [net-next,v2,2/7] net: stmmac: convert plat_stmmacenet_data booleans to type bool
-    https://git.kernel.org/netdev/net-next/c/c3d08424e025
-  - [net-next,v2,3/7] net: stmmac: reorder structs to reduce memory consumption
-    https://git.kernel.org/netdev/net-next/c/3357642e65e9
-  - [net-next,v2,4/7] net: stmmac: use u8 for ?x_queues_to_use and number_?x_queues
-    https://git.kernel.org/netdev/net-next/c/94808793fed7
-  - [net-next,v2,5/7] net: stmmac: use u8 for host_dma_width and similar struct members
-    https://git.kernel.org/netdev/net-next/c/758ed85aadd0
-  - [net-next,v2,6/7] net: stmmac: add documentation for stmmac_dma_cfg members
-    https://git.kernel.org/netdev/net-next/c/9fe167ab790b
-  - [net-next,v2,7/7] net: stmmac: add documentation for clocks
-    https://git.kernel.org/netdev/net-next/c/315bab9411f3
+  - [net-next,v2,1/2] amd-xgbe: Simplify powerdown/powerup paths
+    https://git.kernel.org/netdev/net-next/c/fe81629217e0
+  - [net-next,v2,2/2] amd-xgbe: add PCI power management for S0i3 support
+    https://git.kernel.org/netdev/net-next/c/7644e76956ba
 
 You are awesome, thank you!
 -- 
