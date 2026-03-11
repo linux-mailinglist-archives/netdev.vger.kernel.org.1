@@ -1,227 +1,186 @@
-Return-Path: <netdev+bounces-266535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aH0yOEkosWkBrgIAu9opvQ
-	(envelope-from <netdev+bounces-266535-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:31:05 +0100
+	id eG5nB/gosWkBrgIAu9opvQ
+	(envelope-from <netdev+bounces-266534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:34:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B49825F5A4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:31:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8343B25F66C
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:33:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B362E3057E8F
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:28:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6D11E30A3549
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465BD3A3E7A;
-	Wed, 11 Mar 2026 08:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A037C2010EE;
+	Wed, 11 Mar 2026 08:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pexCnYug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF4B3A168A
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773217701; cv=none; b=myiOGiufMcBQDZSCGHbbJVCuT5SQfRNUYY53AMM+h2BDLAITp7qW/F3ULmiKz/XUjeQmCbyaFOI4WkMpZ8LAeHQWBy11aqQgZDyR3WdUgFT0+8vrEuZQ29f47U14HRUFNKoMGmEnlBSOQVXRo3Ms13MZX6GOjEsNmQdYAMYqAk0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773217701; c=relaxed/simple;
-	bh=62QCpDXQ19DuCkEVmsTIfiPIA4bbzZLKZDd0zU0n8k8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA4222126C
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773217502; cv=pass; b=bmMkxb47ZYYCk/FZczSNx/tUgqRQfEMgjv2UTHqXc4v41vZwId2co+GII+CUajpYNOiLNwBxzyWjF5nzVLwfk0p85XhqaNRuqp+U+6jNqQ+BXThFF/D/GwqtOZelLUsc9cVeN8Uu2GRuPk78TE4JQCtPFwG/JtTwUWhgL9/M+NY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773217502; c=relaxed/simple;
+	bh=bh6U49eCiCBbIvwEknUz7QsV9A4ESrZsJ/9XWVh19mc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M7pGh4DgL4vKh2oV2X+hFefknzSDgs/o4Lq6+HYgZfHt9mpTcf3QN4MZPF8ieXZraVoiVWhp86rC+Ce+tH8Rf00PegCMh0fF4U1FnteWcDAr0ywHnLm0UWKMx4aLEQzZADyH+v5Otk4889U//Cz7VX3B1X0V8O6hFJa1Ohj4LVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8cd78a4ce8dso529148485a.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:28:18 -0700 (PDT)
+	 To:Cc:Content-Type; b=jNEumYcwlzL4VPBuQROmkPRQWY1dg9QrSdW5S+gyL4nb/TGeHFHAxoTsWz3gw5zsZbVL27K0ADUTVn/9JQJdDyxFP3GUSNHCAP1AZ6cz+wVUYaSZV5tt9SI1j16+n+J1m+jm2LOgJHZlVTiHp8oZ8rEOKG7XJRZJNb3u+G/9U2U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pexCnYug; arc=pass smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5091d71aa11so8559621cf.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:24:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773217499; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k1GutKHqCpUvVKcPdnl0z2MQmjtPp085WIydD7bI9bBS7VKKQ/yUgSHHBcIUhzT6Nb
+         eYhGt8xwRWeJxptSu0+AfyJTndNsAyq6v9SguJlkk1lYH5U6QwTR9IzebwCuYr1SxI31
+         xkUOhG0XYrX9gJYUgZaGc22x6OPg7u2mXewVyq+1BWHdBBCSkkObYpr2KbD4TIie93pJ
+         3LjKBWvKBdUVll+ihBDKAVQbDMqW8OyjLpQKNGgqX5Rlx+vx3KjIrDLkLT5ErnrlF0aX
+         mk7biGFUemScyaMmqYk2FhxFPv095++tSGJ2fDqu+WU7CSNsnCuu5snt7q7gFGvxDTOP
+         ngoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bh6U49eCiCBbIvwEknUz7QsV9A4ESrZsJ/9XWVh19mc=;
+        fh=RyFZCfKDFsLtmoI4wM6B7Purrtu3SlrqUF+t1/8sJ7c=;
+        b=GhtC77K90omSRh94H223ZMRtxRTueExUqVDJrSHf/4lHgrWzNkTHcNjdddaKekaZ1K
+         5PT5go8B27tfrxDSGDbRj1vzSt90bBfX2ePoH4XgvkaeRqQIJmfsOQG/20d7vqJQQSvP
+         dAdKT7gh08FHeRHTqqSFQJKEYYNb+5xDUgNDno+3ha+qfPuYwQdiRM7Hzpmygx7Wso/E
+         36FpCemvCUAzXStVkSj1BblTBeAnjpJKDwTUi6LA7eYbNYyyzFcoxzIeftnjTbSSUDvI
+         a6hnM3jjClxj4cn5EPw2+F7qLxzeYZ9owKp5G37HIBAxzcLVkihnrpD+AVVmMHB/Ru7o
+         HQFQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773217499; x=1773822299; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bh6U49eCiCBbIvwEknUz7QsV9A4ESrZsJ/9XWVh19mc=;
+        b=pexCnYugPMRnQt3MsAuJ5g+koHlN/GxcIaJ4EZs20CzSu2b5bAoN8F8/Rfd6Pd7YYc
+         7NSkaaVRkIX/qvWhHQm60t7YTedMIhyeJtuUVJDiDb1MWcVLs0Gx8Z37u0gyAjloGs3j
+         iAxrG7dSdWu+S1sHEu0k277zq9zDOTqD0FFMc2dipY4lGDUqV/zi2qO2h5uTVI2V1wRX
+         Os0uSb+gKk2ATyWEiIYiVpoIe4luZ0qFgm/lewfgWG1MFrM6XGwwYegNEybZa0zaGNpP
+         bkf3hjoxD956x6GMKks3P53X0cmSkwmivsjLJ4bxbqNcCHqE67KT9An0YHNH4Ajx70c5
+         0SdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773217698; x=1773822498;
+        d=1e100.net; s=20230601; t=1773217499; x=1773822299;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OPUxC4UVYYzFR5WbkDP1rfKgT9C5RxhWe2cP85gtoTg=;
-        b=oz7Mh8rzTkrOHSctpIZ0VARQAD6YD3QTdryV7yMlRfOhFUN72lTuej0569n8bkTFR9
-         Y2mrRNcXJLvbXqUpXNwKaGSHKoFBkLml8HlaZJ0kNxh4khaorKVztDkPqfVtfJtZ+VWO
-         XQGcKP+CFrJImhiuJnem9VffXMnRY51ys9KJWdXYtEk362is1fMNWsKl8NBUcSaDvoaT
-         JLgBv/0HuYGyLdiZFbudztYnlj09yY1xtusKMhV3LeYUwbskOXYdIAMnLzIGBLPsu5al
-         +1Oj/6I33v5p2OKTkBtKpgiZdyc/VLzTqRYaNCKLq2lXGUMN5DEWbROOrGcRMzOVw6J+
-         fcZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWov6RGQz3FPkz4zentctsQ1LAy5WUPQPF/oT5U0aDGI7HPNkC2K7vH8c9c7qG0LV7DbnpA7xA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb3oLC4JGVXtTLhwjvrrU5z7xWg0ueN43zdcB6jewdMafGPfS9
-	4g/v2PZoSN+z9/iL9tYQK0nn/vLYrxqN87s7YsKYuuF+KT7r1BDWXQy1U/G/08pa
-X-Gm-Gg: ATEYQzyxUpM4B3GRWcL3LGAq1DY8kQoSVwJ5HhTd56Hmew6lxfW5PXSC4aEpYBXa9sf
-	qbW9PFaoGYja/Phag86uofYXtJLKuZVYHYxWnad2GaDr4vYbcsnIiRNI1swof2zvyyvTWGvn93A
-	1pPUhoNqbrowJvmqYv5aXXYOlaIkARy2rkYY88DiFY0D1+081Ofy6eDl1YDseOwvSR9VEF/JhXj
-	iBMwVWFv7jtyoyU7jY3F9WtpTpV2IFMxQ5fWkLwg2Sioxff+S7zhErDiOPcLsUfjoXeLzIwdk9+
-	+n4XSTUnnWlyKzulC7zD/xoY/GyclYVsVkxfE3n++WRav0se3RFIbxDpJE+XcvaVRgg+F6Zmpbr
-	VoaOTxoMcqapVrcaqJSxsqNxOf7LLtuWSSLmoMZIO6VckMTBINRmgxDZT6JhKEBLQN35i1dCeP8
-	+VYhfesT4kqv1cr07s4Vu5zpQGpPALi5foe4+wkdWGYLfqMHP3PqgZ5r8b3mNrSghO
-X-Received: by 2002:a05:620a:1990:b0:8cd:911e:2c3a with SMTP id af79cd13be357-8cda19362bemr205026285a.10.1773217697964;
-        Wed, 11 Mar 2026 01:28:17 -0700 (PDT)
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com. [209.85.222.177])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cda21346a0sm90206585a.34.2026.03.11.01.28.17
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Mar 2026 01:28:17 -0700 (PDT)
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cd8347d9fdso432572785a.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:28:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXCT3KTVr1crLjUARMcgsCiY7ezmFMKSNNVIO1ngIpUXB61PhX0ODVCUGtvoW0Qk6RFrhD6YVM=@vger.kernel.org
-X-Received: by 2002:a05:6102:290c:b0:5ff:d192:ff22 with SMTP id
- ada2fe7eead31-601deec1db1mr739173137.19.1773217280031; Wed, 11 Mar 2026
- 01:21:20 -0700 (PDT)
+        bh=bh6U49eCiCBbIvwEknUz7QsV9A4ESrZsJ/9XWVh19mc=;
+        b=t+3LI2vpL98CDUA73PPgfnKnHMMI8iVpLkph0j4mlFM38bd9noSHIiZ88Lf57RaOAs
+         uqAr9P/xKa2YNtHD2ckwtGs6N0dk+1PAhJRu7P48sh5R7SDq+NQfAFcaZjtii0XZZNfh
+         Q9FYNE+ekA0PgngxohtrbhhPjSt/T/KUHMjCZaWs/8lAKymSBUBQaovmHZTzisTe+hcn
+         KrLtsmqxr1RQghYBVdStrS8gpKDiStMQXLoIdy46fMMbKf8Dy00MuWd5KCabYho7T9VG
+         YTigoTgqY2blOuNSOQ+lE2XOzgxDwy/8/FrmV+Ryfl+0r5ygPHcW7uP5mJvvwEU1X9oP
+         GqVA==
+X-Gm-Message-State: AOJu0YzSwS0pb9JZpb5Xe0vR9i5lSo39bxL7ZpV5DW7OgXSV7UY2q6cj
+	+eoPcS/BX3QsNHy6u1xvCafh8HelwcR358T6UkN5Wx3eKZJ5zLkzMYtLDFDtU5Fofm72UgFwTc+
+	UX8m1gxMZH/YlSwx4iqCujNkRXX2KuZW3k2uql6B7
+X-Gm-Gg: ATEYQzyKvPjsnOr1u4SDiMAmkcILK5OSDx0yFi6ZGvaFjGV6FmMJ9n0KxY8cfsigSCD
+	jB4Z7FilEQXFA/A012V8VxadYfwyy1roLM8oih7nk6s4NPTqrXIjzqiiuIgxnC5CRfCT60n0jrb
+	mn+tRvqXf7+MDHweQph/0XMZXn1KyfoTRzu3I3dF9WEvb8Y7Z2zl8bdjbTt+CrBPY75fPdjlrou
+	uV83garC+HJsObPdYXzDpnbIIjmT8CORkevrfrGBZ2LaFe7Wlp3AVxoT97XYEvoVq+AnVBlnLvA
+	SgKvtwsx
+X-Received: by 2002:a05:622a:54:b0:509:f1e:41fb with SMTP id
+ d75a77b69052e-50925fcd943mr73573621cf.6.1773217498516; Wed, 11 Mar 2026
+ 01:24:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309022013.5199-1-fmancera@suse.de> <20260309022013.5199-2-fmancera@suse.de>
- <01a4936f-77cd-4c60-a1be-cabec872a2bb@kernel.org> <e54d887c-5a70-b8c9-aeef-433c5134dd14@kolla.no>
- <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
-In-Reply-To: <5c4b6043-a484-479d-83bc-a86ecdb8f810@app.fastmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 11 Mar 2026 09:21:08 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWec3Xwi1ma22D_eqs3OqRJXEt4=YmWvO2MgtBdSpNuqg@mail.gmail.com>
-X-Gm-Features: AaiRm52Q0QeELW2kE8F3ZB9XQa9qhSRDKWOoNuroUdAnxhN87qOfxCDKsawyRAY
-Message-ID: <CAMuHMdWec3Xwi1ma22D_eqs3OqRJXEt4=YmWvO2MgtBdSpNuqg@mail.gmail.com>
-Subject: Re: [PATCH 01/10 net-next] ipv6: convert CONFIG_IPV6 to built-in only
- and clean up Kconfigs
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: =?UTF-8?Q?Kolbj=C3=B8rn_Barmen?= <linux-m68k@kolla.no>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Fernando Fernandez Mancera <fmancera@suse.de>, Netdev <netdev@vger.kernel.org>, 
-	linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Selvin Xavier <selvin.xavier@broadcom.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Saurav Kashyap <skashyap@marvell.com>, Javed Hasan <jhasan@marvell.com>, 
-	"maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <GR-QLogic-Storage-Upstream@marvell.com>, 
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali <njavali@marvell.com>, 
-	Manish Rangankar <mrangankar@marvell.com>, Varun Prakash <varun@chelsio.com>, 
-	Alexander Aring <aahringo@redhat.com>, David Teigland <teigland@redhat.com>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	David Ahern <dsahern@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, David Howells <dhowells@redhat.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Jon Maloy <jmaloy@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
-	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>, 
-	Michal Simek <michal.simek@amd.com>, Luca Weiss <luca.weiss@fairphone.com>, 
-	Sven Peter <sven@kernel.org>, 
-	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Gow <david@davidgow.net>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ryota Sakamoto <sakamo.ryota@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kir Chou <note351@hotmail.com>, 
-	Kuan-Wei Chiu <visitorckw@gmail.com>, Vikas Gupta <vikas.gupta@broadcom.com>, 
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>, 
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>, 
-	"open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>, 
-	"open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>, 
-	"open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>, 
-	"open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <linux-scsi@vger.kernel.org>, 
-	"open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>, "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>, 
-	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>, 
-	"open list:NETFILTER" <coreteam@netfilter.org>, 
-	"open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>, 
-	"open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>, 
-	"open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
+References: <20260311070611.76913-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260311070611.76913-1-jiayuan.chen@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 11 Mar 2026 09:24:47 +0100
+X-Gm-Features: AaiRm52SdgCeU51Y-1e-Sk6l4P3zSL-DgLPLdP1cnJA8BQG1vPHxIiVp-Wp5uO4
+Message-ID: <CANn89i+MTAhm+T3dR9T45wOBU3xjiyKfsKXHen3bBLu2T8JD9Q@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/rose: fix NULL pointer dereference in
+ rose_transmit_link on reconnect
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>, 
+	syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Takamitsu Iwai <takamitz@amazon.co.jp>, Thomas Gleixner <tglx@kernel.org>, Pwnverse <stanksal@purdue.edu>, 
+	Ingo Molnar <mingo@kernel.org>, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4B49825F5A4
+X-Rspamd-Queue-Id: 8343B25F66C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kolla.no,kernel.org,suse.de,vger.kernel.org,ziepe.ca,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,gondor.apana.org.au,hotmail.com,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
-	TAGGED_FROM(0.00)[bounces-266535-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266534-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[69];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.811];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux-m68k.org:email]
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d00f90e0af54102fb271];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,syzkaller.appspot.com:url,mail.gmail.com:mid,appspotmail.com:email,shopee.com:email]
 X-Rspamd-Action: no action
 
-On Tue, 10 Mar 2026 at 20:58, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Tue, Mar 10, 2026, at 20:40, Kolbj=C3=B8rn Barmen wrote:
-> > On Mon, 9 Mar 2026, Krzysztof Kozlowski wrote:
-> >> On 09/03/2026 03:19, Fernando Fernandez Mancera wrote:
-> >>
-> >> It must stay module for me. Alternatively, drop it, but then some user=
-s
-> >> will be really affected.
-> >
-> > I agree. If anything I would prefer to see IPv4 be made optional (and
-> > modular) as well, and not as something IPv6 depends on, it's (AFAIK)
-> > impossible today to build an IPv6-only Linux kernel.
+On Wed, Mar 11, 2026 at 8:06=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
 >
-> My first feeling was that this is a bad idea as well. On the other hand
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>
+> syzkaller reported a bug [1], and the reproducer is available at [2].
+>
+> ROSE sockets use four sk->sk_state values: TCP_CLOSE, TCP_LISTEN,
+> TCP_SYN_SENT, and TCP_ESTABLISHED. rose_connect() already rejects
+> calls for TCP_ESTABLISHED (-EISCONN) and TCP_CLOSE with SS_CONNECTING
+> (-ECONNREFUSED), but lacks a check for TCP_SYN_SENT.
+>
+> When rose_connect() is called a second time while the first connection
+> attempt is still in progress (TCP_SYN_SENT), it overwrites
+> rose->neighbour via rose_get_neigh(). If that returns NULL, the socket
+> is left with rose->state =3D=3D ROSE_STATE_1 but rose->neighbour =3D=3D N=
+ULL.
+> When the socket is subsequently closed, rose_release() sees
+> ROSE_STATE_1 and calls rose_write_internal() ->
+> rose_transmit_link(skb, NULL), causing a NULL pointer dereference.
+>
+> Per connect(2), a second connect() while a connection is already in
+> progress should return -EALREADY. Add this missing check for
+> TCP_SYN_SENT to complete the state validation in rose_connect().
+>
+> [1] https://syzkaller.appspot.com/bug?extid=3Dd00f90e0af54102fb271
+> [2] https://gist.github.com/mrpre/9e6779e0d13e2c66779b1653fef80516
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/69694d6f.050a0220.58bed.0027.GAE@goog=
+le.com/T/
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> ---
 
-Exactly my feeling. That's why I stayed quiet for a while, and gave
-it some thought...
-
-> I found that the default changed from =3Dm to -y over 10 years ago, all
-> recent distros listed in https://github.com/nyrahul/linux-kernel-configs
-> use that default (the only two exceptions are board specific builds
-> of Debian and Ubuntu for linux-5.x).
-
-Thanks, that is something I was wondering too.
-
-Obviously the world is moving the IPv6 (but having IPv6=3Dm doesn't
-preclude that!).  From the other side, there is a trend to have as much
-as possible in modules instead of built-in.  A larger base kernel not
-only has impact on memory usage (and loading modules has, too), but
-also on e.g. boot partitions.  Various platform-specific limitations
-may be at play (boot loader size limits, boot partition size limits,
-base kernel must fit in the first memory block on systems with many
-small discontiguous memory blocks, ...).
-
-But apparently even the Android gki_defconfig (which is not on the
-page mentioned above?) has IPv6 built-in.
-
-Back to the numbers:
-  - base kernel: atari_defconfig (CONFIG_IPv6=3Dm)
-  - with this series, CONFIG_IPv6=3Dn: -22 KiB
-  - with this series, CONFIG_IPv6=3Dy: +246 KiB
-Note that I ignored any defconfig changes in these series.
-The size impact is almost the same for v1 and v2, but only v2 boots.
-
-Each new kernel release increases kernel size by ca. 30-40 KiB on
-average.  So a one-time increase of 246 KiB is not unsurmountable,
-and slightly less than the increase between v6.14 and v6.19...
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
