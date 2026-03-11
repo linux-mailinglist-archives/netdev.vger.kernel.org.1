@@ -1,138 +1,159 @@
-Return-Path: <netdev+bounces-266500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOIHBocTsWkZqgIAu9opvQ
-	(envelope-from <netdev+bounces-266500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:02:31 +0100
+	id YIdUFI8VsWkZqgIAu9opvQ
+	(envelope-from <netdev+bounces-266501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:11:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B0C25D24D
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:02:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2D425D62E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:11:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 193CB3026419
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:02:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6F60325BFCC
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F40371899;
-	Wed, 11 Mar 2026 07:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA38378D80;
+	Wed, 11 Mar 2026 07:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="icwXk+JQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eYDsJlyA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F54301701;
-	Wed, 11 Mar 2026 07:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4AA3783A7
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773212543; cv=none; b=bmrchYf2K0nTlnY5suQ67okNuIVDf+cGneeS6ujHemjTX2TllXJT/XcejnY9bA3UxDtPc5nrPlk1vccsbQZQi4+JCb1iuQFHgABujllkWF9fPHN64kyyTlTzHEaypShpj3mkg2lcjbX3D7WNxQAoCm27RIBChdUsAUSUXOpaFWY=
+	t=1773212796; cv=none; b=Vjxy/0h3zALIP3ki2R6guwPP9NxfZaiiF0hONiX2VmPKhz9uBG9Yq6JWmhJDtUtZ3PAgO8IlxP8uKdAMZwC4efe+gHexsAme8+xLRU9DWnXJ9iEgnxbxkokNXwgcvml5MHPz6MpIK3IWIsGwekujLZ1Dfr6GEW/WMpYiAD5CPRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773212543; c=relaxed/simple;
-	bh=oEp0zagVz/EKP3oxg1isMpE3fIGisB1T3dXsWTVrdpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pq8suxz2FULl4tHXwTdRvRb5ZoilemO3v27H+V0GoCjNwFyHR7czNXDP0stUHKnRtISEErX3ZQjtflxNbkYn457b8xJyJSlmg2O+ePJazr2idUsTdOsHKb5VxJ+lm34puxKfEyGh2giyyDl4M9G/etPHXBu38cx3xEmEwvEHiTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=icwXk+JQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B533EC4CEF7;
-	Wed, 11 Mar 2026 07:02:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773212543;
-	bh=oEp0zagVz/EKP3oxg1isMpE3fIGisB1T3dXsWTVrdpo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=icwXk+JQMwQUrKJOn6jtJCSJkbG/Y3cGfZTlZJh6uzdoYw+WWSE6ZeMJd3UamP8uc
-	 JK4WOJw+3i4pNSkCcTB6L1EujwAhmvMQQC58vuR9aCiDvdbCB5buitTXA90WICPnQw
-	 WaA0O5VLCtPRTWDPgfIbzzXXNWLl73U7KMeBfrPnr8QbYhSaMCwpcSkKsj427MkKGb
-	 TUDvITYa28rpmTrWEvAS8dCT2P73+87rEPHBhr3xhgymWDSn3azdTsJWR4gd/HVCwD
-	 g3Qm78MEyXKPvUA/QLL1T1ojsKTzydSe8rILiD4zGRUolu819EmLdeAGMJFa1EIBjG
-	 PqURs1aPe9B4A==
-Date: Wed, 11 Mar 2026 08:02:20 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>, 
-	Valentina.FernandezAlanis@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Daire McNamara <daire.mcnamara@microchip.com>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Richard Cochran <richardcochran@gmail.com>, 
-	Samuel Holland <samuel.holland@sifive.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Dave Stevenson <dave.stevenson@raspberrypi.com>, 
-	Sean Anderson <sean.anderson@linux.dev>, Vineeth Karumanchi <vineeth.karumanchi@amd.com>, 
-	Abin Joseph <abin.joseph@amd.com>, =?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>, 
-	Ryan.Wanner@microchip.com
-Subject: Re: [PATCH net-next v3 09/10] dt-bindings: net: macb: add property
- indicating timer adjust mode
-Message-ID: <20260311-uncovered-paper-hog-e32fcb@quoll>
-References: <20260310-moneyless-dispense-7bce14b16388@spud>
- <20260310-aviator-upswing-80e8543a2300@spud>
+	s=arc-20240116; t=1773212796; c=relaxed/simple;
+	bh=fDoXbQjgWEGw9tvqtPVdOHqQWf6S2QPStECJ9pYJGnM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qHZNkrDaxLdOov8wpmkadZcb+HzbNVNK1nFAIV2D6KpZzzk+FQ8KNMp4QkJn2DzB1mTFpDa/+YyDenT+zHfQoranYxBELDTWrtNpA1KfSd5x9uBRMd7GGIyURoMDicttpGgVGNQjsS3JjKRG34qabQWqNgA0pJQEmYrqLwB9Nyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eYDsJlyA; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773212783;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0CXo0x7BiCEEpnzU+2Ow+NXjhaBWC/PdinzAYFVwnT4=;
+	b=eYDsJlyAQL5W9YiEJCWmAM0miLOaFxYlN6EA8vgkobqFWoM5Hf6U7hq/EPjdZBaO/oxRWv
+	tuTLvtBNIszAb22CuEUHpUJ680fdStt3f8/3/2MnOXaDqTK3cEoY6Jy3RzqUupUlOkJ0V+
+	XWrd1wgl15XdhwgnIrdmOws3hrfxc70=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com,
+	Eric Dumazet <edumazet@google.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Takamitsu Iwai <takamitz@amazon.co.jp>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Pwnverse <stanksal@purdue.edu>,
+	Ingo Molnar <mingo@kernel.org>,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net/rose: fix NULL pointer dereference in rose_transmit_link on reconnect
+Date: Wed, 11 Mar 2026 15:06:02 +0800
+Message-ID: <20260311070611.76913-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260310-aviator-upswing-80e8543a2300@spud>
-X-Rspamd-Queue-Id: 11B0C25D24D
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 9D2D425D62E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266500-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-266501-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d00f90e0af54102fb271];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,microchip.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,shopee.com:email,syzkaller.appspot.com:url,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 05:17:16PM +0000, Conor Dooley wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
-> 
-> The GEM IP has two methods for modifying the ptp timer. The first of
-> these, named "increment mode", relies on software controlling the timer
-> by setting tsu_timer_incr and tsu_timer_incr_sub_nsec and performing
-> once-off adjustments via the tsu_timer_adjust register. This is what the
-> macb driver uses. The second mechanism, "timer adjust mode" uses the
-> gem_tsu_inc_ctrl and gem_tsu_ms signals to control the timer. These
-> modes are not intended to be used in parallel, but both can be possible
-> on the same device and which mode is used cannot be determined from the
-> compatible on all devices, because some users of the GEM IP are SoC
-> FPGAs that permit configuring how the IP is wired up.
-> 
-> Add a property to indicate that gem_tsu_inc_ctrl and gem_tsu_ms are wired
-> up for timer adjust mode.
-> 
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  .../devicetree/bindings/net/cdns,macb.yaml        | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+syzkaller reported a bug [1], and the reproducer is available at [2].
 
-Best regards,
-Krzysztof
+ROSE sockets use four sk->sk_state values: TCP_CLOSE, TCP_LISTEN,
+TCP_SYN_SENT, and TCP_ESTABLISHED. rose_connect() already rejects
+calls for TCP_ESTABLISHED (-EISCONN) and TCP_CLOSE with SS_CONNECTING
+(-ECONNREFUSED), but lacks a check for TCP_SYN_SENT.
+
+When rose_connect() is called a second time while the first connection
+attempt is still in progress (TCP_SYN_SENT), it overwrites
+rose->neighbour via rose_get_neigh(). If that returns NULL, the socket
+is left with rose->state == ROSE_STATE_1 but rose->neighbour == NULL.
+When the socket is subsequently closed, rose_release() sees
+ROSE_STATE_1 and calls rose_write_internal() ->
+rose_transmit_link(skb, NULL), causing a NULL pointer dereference.
+
+Per connect(2), a second connect() while a connection is already in
+progress should return -EALREADY. Add this missing check for
+TCP_SYN_SENT to complete the state validation in rose_connect().
+
+[1] https://syzkaller.appspot.com/bug?extid=d00f90e0af54102fb271
+[2] https://gist.github.com/mrpre/9e6779e0d13e2c66779b1653fef80516
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/69694d6f.050a0220.58bed.0027.GAE@google.com/T/
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+---
+ net/rose/af_rose.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+index 841d62481048..ba56213e0a2a 100644
+--- a/net/rose/af_rose.c
++++ b/net/rose/af_rose.c
+@@ -811,6 +811,11 @@ static int rose_connect(struct socket *sock, struct sockaddr_unsized *uaddr, int
+ 		goto out_release;
+ 	}
+ 
++	if (sk->sk_state == TCP_SYN_SENT) {
++		err = -EALREADY;
++		goto out_release;
++	}
++
+ 	sk->sk_state   = TCP_CLOSE;
+ 	sock->state = SS_UNCONNECTED;
+ 
+-- 
+2.43.0
 
 
