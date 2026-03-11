@@ -1,193 +1,182 @@
-Return-Path: <netdev+bounces-266409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266410-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHS0NmnAsGn9mgIAu9opvQ
-	(envelope-from <netdev+bounces-266409-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:07:53 +0100
+	id EE+qKKbJsGk8nAIAu9opvQ
+	(envelope-from <netdev+bounces-266410-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:47:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4317925A3F4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:07:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2019725A7D3
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22C9C3018769
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:07:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19CF83056663
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6F91A6817;
-	Wed, 11 Mar 2026 01:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DE31A3164;
+	Wed, 11 Mar 2026 01:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UUZ7Fj6t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hC9iKbFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4113FEE
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D071413DDA4;
+	Wed, 11 Mar 2026 01:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773191227; cv=none; b=ES2Jcoz5dBnTr+dyRz0o56ILB9v7MeMe0d5xPsKxgzD53IR/nDpLVKVtDMRpIaVBrYeFu2/4+D+JXPbur2S6B6wNFTjYSZ3xuH9elRVqzP7cTO5dPOMRe733CUQyKsescVrYRq6EDv2cx0LqVMpOUZpGhBDO+iyNMd1btK/etiE=
+	t=1773193635; cv=none; b=LSAaDF8qfXQN7GFsdnYIlJ3KGu8eXUKupwAPdabHlBZES5CFwPi/WKk8xD7a8mSnsGahSir7KRShPWtGl7q5xAAysSg1z4xqpO5or3olwJqHr3OYhtppl4rGAcBKfV+mIDdE6D3P1D2s14i/qpOi75rmPw90rrYH8tEYNU/w894=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773191227; c=relaxed/simple;
-	bh=FvcoCUzBxdGf5SAtHPwW0zfePJ4ZjIi3iSEEUEY68RY=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=tgqbufKpN37X/VU4U4ot4cFHJ721QXYS0ccGv1IVsVNzroCMupmT+nN0FT45adtY5fD08yTp7Rnad1NW0wmMicAV5bBcUAu71XAr9jVCabQUbdtgOr8emzq576/erH2tkFtynmut46Zt8mORuQrAqt1guomqEh3qcuhMAOgTSoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UUZ7Fj6t; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gx41xOBjt0DixVI2WdPI+lK6vX/WGjfhPcx8g6Ep4k0=; b=UUZ7Fj6tiRQ+Ij0WjL9AOlE9h/
-	05VKv10oBDRPck2CbNw5vYDuqdRpmuxKFanRKcx0+PzjALsNwC/wx647nsZX+H0cpU1Me089Pmtql
-	4pG2tKYoxSdZRigHRgFfjvthwJeDZkRDGx9TeaJVAgr3W+61Ufrn8ssxLS6Njteg+53dorx4mGtfx
-	2Vf1sRmX8ZvfvZUFmVYz+oPa0PEVavRpunPNEz5Az0e5egdtB6JZzRg1u4XsEMIhayUVST2JZp6uX
-	gqJmwKCJJ4zRafW/+igMxS4SjJaPGhX7K6eNKzgC3rmEMji749zbcO7mJfD6lPy3a3vjToPkLMJm2
-	LL90e5hg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38794 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w082P-000000005hS-0jwg;
-	Wed, 11 Mar 2026 01:07:01 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w082O-0000000ChNc-1wDz;
-	Wed, 11 Mar 2026 01:07:00 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: phy: vitesse: add inband caps and configuration
+	s=arc-20240116; t=1773193635; c=relaxed/simple;
+	bh=og1LLtXorZrs+Q+bQZo49nlyuGcPsXUkWjbetN4e8Y4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YSqQxdr3rSM1iM162qJew2qYegoxeHOliZOzrCDzOrPlJEAtk/N4gzsk7h7LEHj8YChHNQTHYYUQv5B1i8jUqwesf14J8tksTDysyA4QtpteAJzk+22v70c6N+RgFB/nI6G/jft8+bTgE6lq06dCWfDFo4E///DiBZ0mp3ui2mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hC9iKbFL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C723CC19423;
+	Wed, 11 Mar 2026 01:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773193635;
+	bh=og1LLtXorZrs+Q+bQZo49nlyuGcPsXUkWjbetN4e8Y4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hC9iKbFLOvNhBKvS7YoJYNwqhg68O/CbQNlPatn8SqrBKkGxVp5RcQvmw2PPwh/vR
+	 mfPDuDbYTKiHxeVdoCym+69abXYTPJLNWRUn9hNrg43aij5TJrdIVtAgLFieEX/8h0
+	 0dMgjklpi1+S4pqYoxk3WpsVTiZY0Dvzg/LFVAX3/8QBtxKDgGCfwhZ2B644nSVURf
+	 mvKRcJimn4BFyZjJ/nePbYCfywjRdNUHhrveQGNt+/t6CbJMVdlQvGT7kyWCtsDMnA
+	 RjjdQ3wRvSq0N3bZ2uwo5FOfUU1Ze7VWHgOtmgtiHN2SKMR+nzC6S7oUDHhfDaPNMc
+	 NxYTehWIgxo3g==
+Date: Tue, 10 Mar 2026 18:47:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, toke@toke.dk,
+ vinicius.gomes@intel.com, stephen@networkplumber.org, vladbu@nvidia.com,
+ cake@lists.bufferbloat.net, bpf@vger.kernel.org, ghandatmanas@gmail.com,
+ km.kim1503@gmail.com, security@kernel.org, Victor Nogueira
+ <victor@mojatatu.com>
+Subject: Re: [PATCH net] net/sched: Mark qdisc for deletion if graft cannot
+ delete
+Message-ID: <20260310184713.7e810431@kernel.org>
+In-Reply-To: <20260307212058.169511-1-jhs@mojatatu.com>
+References: <20260307212058.169511-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w082O-0000000ChNc-1wDz@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 11 Mar 2026 01:07:00 +0000
-X-Rspamd-Queue-Id: 4317925A3F4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 2019725A7D3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266410-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266409-lists,netdev=lfdr.de,kernel];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,toke.dk,intel.com,networkplumber.org,nvidia.com,lists.bufferbloat.net,gmail.com,mojatatu.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.981];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Add support for VSC8662 reporting its inband capabilities, and also
-hook to configure the PHY's inband mode.
+On Sat,  7 Mar 2026 16:20:58 -0500 Jamal Hadi Salim wrote:
+> Note: We tried a couple of different approaches that had smaller code
+> footprint but were a bit fugly. The first approach was to use recursion
+> on the qdisc hash table to iterate the descendants of the qdisc; however,
+> the challenge here is if the graph depth is "high" - we may overflow the
+> stack. The second approach was to use a breadth first search to achieve
+> the same goal; the challenge here was it was a quadratic algorithm.
 
-This fixes a regression in the macb driver caused by commit
-1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
+Lots of complexity when realistically only ingress/clsact support 
+the unlocked operations. Can we not just take rtnl before the
+references and not bother all the real qdiscs with this @#%$ ?
+(diff just to illustrate the point not even compiled)
 
-Reported-by: Conor Dooley <conor@kernel.org>
-Link: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/vitesse.c | 41 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index b1b7bbba284e..1a430e832f66 100644
---- a/drivers/net/phy/vitesse.c
-+++ b/drivers/net/phy/vitesse.c
-@@ -62,6 +62,13 @@
- /* Vitesse Extended Page Access Register */
- #define MII_VSC82X4_EXT_PAGE_ACCESS	0x1f
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 4829c27446e3..21b461f3323d 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -2255,6 +2255,7 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 	int err;
+ 	int tp_created;
+ 	bool rtnl_held = false;
++	bool rtnl_take = false
+ 	u32 flags;
  
-+/* Vitesse VSC8662 extended control register */
-+#define VSC8662_EXT_CON1		0x17
-+#define VSC8662_EXT_CON_MAC_AN		BIT(13)
-+
-+#define VSC8662_MAC_AN			0x1b
-+#define VSC8662_MAC_AN_BYPASS		BIT(13)
-+
- /* Vitesse VSC73XX Extended Control Register */
- #define MII_VSC73XX_PHY_CTRL_EXT3		0x14
+ replay:
+@@ -2290,11 +2291,17 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 		}
+ 	}
  
-@@ -140,6 +147,38 @@ static int vsc824x_config_init(struct phy_device *phydev)
++	/* Realistically only INGRESS supports unlocked ops */
++	if (parent != TC_H_INGRESS) {
++		rtnl_held = true;
++		rtnl_lock();
++	}
++
+ 	/* Find head of filter chain. */
+ 
+ 	err = __tcf_qdisc_find(net, &q, &parent, t->tcm_ifindex, false, extack);
+ 	if (err)
+-		return err;
++		goto errout;
+ 
+ 	if (tcf_proto_check_kind(tca[TCA_KIND], name)) {
+ 		NL_SET_ERR_MSG(extack, "Specified TC filter name too long");
+@@ -2306,11 +2313,12 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 	 * block is shared (no qdisc found), qdisc is not unlocked, classifier
+ 	 * type is not specified, classifier is not unlocked.
+ 	 */
+-	if (rtnl_held ||
++	if (rtnl_take ||
+ 	    (q && !(q->ops->cl_ops->flags & QDISC_CLASS_OPS_DOIT_UNLOCKED)) ||
+ 	    !tcf_proto_is_unlocked(name)) {
++		if (!rtnl_held)
++			rtnl_lock();
+ 		rtnl_held = true;
+-		rtnl_lock();
+ 	}
+ 
+ 	err = __tcf_qdisc_cl_find(q, parent, &cl, t->tcm_ifindex, extack);
+@@ -2451,17 +2459,16 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 	}
+ 	tcf_block_release(q, block, rtnl_held);
+ 
+-	if (rtnl_held)
+-		rtnl_unlock();
+-
+ 	if (err == -EAGAIN) {
+ 		/* Take rtnl lock in case EAGAIN is caused by concurrent flush
+ 		 * of target chain.
+ 		 */
+-		rtnl_held = true;
++		rtnl_take = true;
+ 		/* Replay the request. */
+ 		goto replay;
+ 	}
++	if (rtnl_held)
++		rtnl_unlock();
  	return err;
- }
  
-+static unsigned int vsc8662_inband_caps(struct phy_device *phydev,
-+					phy_interface_t interface)
-+{
-+	if (interface == PHY_INTERFACE_MODE_SGMII)
-+		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE |
-+		       LINK_INBAND_BYPASS;
-+
-+	return 0;
-+}
-+
-+static int vsc8662_config_inband(struct phy_device *phydev, unsigned int modes)
-+{
-+	u16 mask, set;
-+	int ret;
-+
-+	mask = VSC8662_MAC_AN_BYPASS;
-+	set = modes & LINK_INBAND_BYPASS ? mask : 0;
-+	ret = phy_modify(phydev, VSC8662_MAC_AN, mask, set);
-+	if (ret < 0)
-+		return ret;
-+
-+	mask = VSC8662_EXT_CON_MAC_AN;
-+	set = modes & (LINK_INBAND_ENABLE | LINK_INBAND_BYPASS) ? mask : 0;
-+
-+	ret = phy_modify_changed(phydev, VSC8662_EXT_CON1, mask, set);
-+	if (ret <= 0)
-+		return ret;
-+
-+	/* We need to soft-reset the PHY when changing VSC8662_EXT_CON_MAC_AN */
-+	return genphy_soft_reset(phydev);
-+}
-+
- #define VSC73XX_EXT_PAGE_ACCESS 0x1f
- 
- static int vsc73xx_read_page(struct phy_device *phydev)
-@@ -649,6 +688,8 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = &vsc824x_config_init,
-+	.inband_caps	= vsc8662_inband_caps,
-+	.config_inband	= vsc8662_config_inband,
- 	.config_aneg    = &vsc82x4_config_aneg,
- 	.config_intr    = &vsc82xx_config_intr,
- 	.handle_interrupt = &vsc82xx_handle_interrupt,
--- 
-2.47.3
-
+ errout_locked:
 
