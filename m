@@ -1,187 +1,148 @@
-Return-Path: <netdev+bounces-266779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHvoCmncsWlPFwAAu9opvQ
-	(envelope-from <netdev+bounces-266779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 22:19:37 +0100
+	id IHpLFX7dsWmaGgAAu9opvQ
+	(envelope-from <netdev+bounces-266780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 22:24:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8500A26A5D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 22:19:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B35EB26A608
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 22:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1EEC3069D4A
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:19:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 328D0306B087
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B65344DAA;
-	Wed, 11 Mar 2026 21:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E58D34B1AD;
+	Wed, 11 Mar 2026 21:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="mYchXt9A";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Xx5RTjzq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fp3Ultb3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D2B2EBB8A;
-	Wed, 11 Mar 2026 21:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF912DF3F2
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 21:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773263942; cv=none; b=NbGBargny4Ive6ljvsJ1eLHRdGpRNZdca3/DLYzX6aE7MVrpgnM89784Uz7aD5JJ0U/iTrjhL8qeT4faDJojtneoHidUtr7MNVuI0MLZ6FKnn9k6sf19+S/fudc+d+PUyXF2FBBWtFQ/1lYgmLh0vZj22wNIfBKwDh6QmVMYcoM=
+	t=1773264251; cv=none; b=DKbl7ExtNIsqyMzYTBIQlUPXoXq4i53X5A7m1+2JUAiurIoTIQ8jfK+CVSdoN5bZw/FPNEw7AN2I8xA9eBZ1wpWWCVJCdN+Q8sk1mC2wE41kdJ2JtwTnZxGISsNOCwhLPZrSJXSCbe3enyhi4x7gwNQxVqR5aLByl43jzd+3+vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773263942; c=relaxed/simple;
-	bh=Ck1WGm3JB9WgBILFV8PcGp4nnOpEb0OCQOjIOYjUnPQ=;
+	s=arc-20240116; t=1773264251; c=relaxed/simple;
+	bh=XfWqvbsVc9ds4VVMoGSCLr8lNokOczr/75K3US0vH7E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qa+dTtYOo6t7yO9ZE8xIk9/On8u7C2lkMDRSFKL2PNoYzbAzb4XG/+/X10G/UxIG/hyiBIyqo2GcQ794EBhbJC6JR38Ia4/DJBFvRQ8azl72Rh2dSVfsXrPjaWksh1HxZRoS/BrKBJIYF4c+CSfWrNNV2oz6fzgg6GjqJa36+pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=mYchXt9A; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Xx5RTjzq; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5D38A140018D;
-	Wed, 11 Mar 2026 17:18:59 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 11 Mar 2026 17:18:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1773263939; x=
-	1773350339; bh=4dvTDrogvp784xveY6cb9wwHV9l3oDZGkVzPFiKZYpk=; b=m
-	YchXt9A/l86ncX1/IknWrOIt/wZuEki/bJzlL5XwQ9P0+ZtQ8M6GMlIisDRz7W1v
-	zwHpN8gIHRz0BeQrYDH6EdZQeYHFiczD1BhVtaE6+mD0NWgV9lutL1SqUq6O2TmA
-	Nf4lSip8faMdT4DCsUQrdJEQibFo38gwHSiGZMnGZ/hEvsVUUjlDLJN2UxIOaUe/
-	6GXOdaoETxoAH1VSP0lGQUNMDaFc2LCy4qUO2OzALnu8auJU8MVhR/0Qn5fPUfQ/
-	e0+EtwUtgl75H8ZwGULePv4+84qKmR4TXAin5d0X90JytT2iwCjPyACfhLvWueoH
-	N4UT2bvbgpYQaGJ4J5icg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1773263939; x=1773350339; bh=4dvTDrogvp784xveY6cb9wwHV9l3oDZGkVz
-	PFiKZYpk=; b=Xx5RTjzqij2Al9h5rOMNmWveGexEjHbbDReT2P+CYReXF4lEk2o
-	LKYHxXBCVZC2/Ne/3DunBup3qmn7cKsVB8zgQZx2ea+sgoa29a+A3AgLFa4b+IfB
-	0Kmt9909Z69oY4UZ2QaC2ZZ8gZQI+Wddw6AihZbNlMhCcf3AOVrvMN3dg+4vNu6n
-	zbGJRaKDMUnNgoNRMpCZxAAPG4i79QhtNq6yvn2qcPGtwLJd0w5SiR3mfKqdKPCv
-	s1WjXstBkjhDvZoKcsWC2X5gpXIJlg7Tqv+Xlaz5N5rFRoKkpPDbgyGOs/oE1fmr
-	IP44qW1hXWqhlCLRPs0MoeNL2FsYQpD7rEA==
-X-ME-Sender: <xms:QdyxabnwV8fj_MHWDigFM9VYJ9ARw_dZmfdMEErrDvJvfnUppN1PoQ>
-    <xme:QdyxaQNMXp1u7mGfbrAuNEtG-xIBPhFK0UsLz4zV0sJukMR26Znr2eVRiQi4gmtS0
-    49b-yQVtNw1Mm2Rsa1mESafvmIbK9gXurRSmLz98RijHZ0qdmSP17yA>
-X-ME-Received: <xmr:Qdyxaa7O6wEtqvfxgn4svL9DLaKmSMK-cOi8kKXt0xPrX1g0XkSB7PkoXdc7>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeegleeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedukedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrd
-    gtohhmpdhrtghpthhtohepshihiigsohhtodgtihdtleekfhgrjegtudejleehvggtvggr
-    tgesshihiihkrghllhgvrhdrrghpphhsphhothhmrghilhdrtghomhdprhgtphhtthhope
-    grnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegsrhhiughgvgeslhhishhtshdr
-    lhhinhhugidruggvvhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvg
-    htpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehiughoshgthhesnhhvih
-    guihgrrdgtohhmpdhrtghpthhtohepjhhirhhisehrvghsnhhulhhlihdruhhs
-X-ME-Proxy: <xmx:Qtyxab0Kdh1k_JNzulDgnlL0w6Zsx1Q63aBASeOlXk47VxnidaU7Gw>
-    <xmx:QtyxaQpqynodIxueD5DNU-Cx0OTcPNnvKl1Q1UvMKNurxqKHWXs_xA>
-    <xmx:Qtyxadl_j6VgoDMxQmpvFrrQ7W1SucPjmJ2Td67dDqHBtf4gfQdK4A>
-    <xmx:QtyxaaS38SbptzcuPgJCvjCyvQGdkVjL7aEPU6Phhiq_bddmho4hcA>
-    <xmx:Q9yxabX-8p5DvKatHiRpc1zttMUuerQe5aoJiLAKFWBdNJJsQQ4FfKiI>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 11 Mar 2026 17:18:57 -0400 (EDT)
-Date: Wed, 11 Mar 2026 22:18:55 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: syzbot ci <syzbot+ci098fa7c1795eceac@syzkaller.appspotmail.com>,
-	andrew@lunn.ch, bridge@lists.linux.dev, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, idosch@nvidia.com,
-	jiri@resnulli.us, jv@jvosburgh.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, razor@blackwall.org, sridhar.samudrala@intel.com,
-	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot ci] Re: net: move netdev_compute_master_upper_features
- to ndo_set_features
-Message-ID: <abHcP3GTO29rfKML@krikkit>
-References: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
- <69b04e91.a70a0220.51e36.0000.GAE@google.com>
- <abBuLV3P6aTzUg3W@krikkit>
- <abC7rdjxv9ENw-tA@fedora>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JV9k2CNfojQjjLqznWqmb6LgGYt1nICbni1u13DudihlJ+Lv2s1PGZdZ+mmcUCQMClnlyGpWAW0VpHVvZCubc23UE9NYdSWWyIiosMe0ci9wXWZe1wNE81EkX52Tajuz4Ltnj85cBQE0aTIVtmzCGFVbdMexzat4zeXNgswzOHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fp3Ultb3; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439fbfb12d0so46322f8f.3
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 14:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773264248; x=1773869048; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XfWqvbsVc9ds4VVMoGSCLr8lNokOczr/75K3US0vH7E=;
+        b=Fp3Ultb3XaOiT32t6j67WhylIq6lmQPUsj34b8Vjv6i4EqSJSg9LvIPD+5LsY/DKe1
+         l0DOyU//8hGw3rRgBw9CVGyfCFkJHtGsiDAnAyQjmvkNL/1sNOdk3zyaVbUOpXIfgyXF
+         Q4gIkLMj4+jraYjo6Og4XKXFjncrIGBajokBoeGcnrkytoBJV1krvPEWwrcrtVc1buC+
+         hnxmhno9TmJM79vprctGRSMmE1i3VuYDa9tN0mw4J7O1QJJYM6bR/PlLfjx6Y7o0dqvG
+         BS6gdXyrNcmbmCWVEfSfhF7udn9NRyPkKqBwgyv7K3nVttVZVPgqH1zU49SoB8hG5d0P
+         l7ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773264248; x=1773869048;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XfWqvbsVc9ds4VVMoGSCLr8lNokOczr/75K3US0vH7E=;
+        b=XiiyyryJPk5zcMnbw1TkczZgodu+AgBnG1vbqCOrm8cCgqts5cuORg4PqjSlRIauHZ
+         o3AvZA4lG55bbq1wQU5Qi5XiuOyVvJp/M8urOfSL50G39ma1wg5+JhmCXfgM5hXf/XVq
+         XP67RmG93AzFDusPC9ET1m4WTLfcUmYtOAZW6R/IBalHAG88RFUxvBywd1GdsWZlIS0A
+         nhytBzRZiKhIcQ8xsGfbw0T+UPQb+AqbLTkewxmEfTV0mux4/BFVl14OtmTZcXZRKsS2
+         B3iRJB9nSwziDrCs/jNWLXPSAuLPWUl2KQQWhB3LXjHSOiJaACiliYz3wuU82rPQKBrP
+         S+zw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWUVFcUGTAobmjbLGBceow8VbMErcMM6G2uurvT/SN1pApDRedhrMI1HZt766tDAx/6xXOsnY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqB3PIxNK4RIa0shG4Bp8Dmzwld6PGDCI/LO4LMoTzTHEvsuBB
+	qIykN6QrrDZd2nC+n8aiXjG7jc77up7qpgdPmAx0dvFGDI4yYXvQVd6U
+X-Gm-Gg: ATEYQzwKDAMXEmp5QrKRYNtInDuQEqrPSIoj//B4SlUic0/gaFYOfMdTQdwKDq5tZv8
+	JLoMajddBI9obZGo9UM13G6IPN+yyHgqRl+8ipSgwYFpWQWmwCigf9eDVel3kI0DCzYahDUsG+j
+	dsFNXqY3vtZvOEpd9EFIeTwZN2r8kS/JYJjoKclgd09FZntCkEkIPEe1sqqo0KLk/zlypqJ0iYR
+	de/U96bDaWV+WSPQ4BTC9cno86hCrySlQeNSt2aCP3iB9Wo4oXO4TEI4hSRRRmr4Ie4AgNpK0B/
+	YhmjjDfTTPYp2xsOQqnHYvfegIzkgYkx9whaZLIWu/RHME3o2CqqegCieSADAqvPkdcAHDqFuv3
+	ytzDID2wcULLY0OaeEYpDrjkwySQxV37fEOPzcNJuZG4/6Lm5EJMX3mz65IWxIYdezFuBGh9Ijh
+	O+TAEl08GsUSr9Gg==
+X-Received: by 2002:a05:600c:5491:b0:483:7d93:9f8a with SMTP id 5b1f17b1804b1-4854b0abbddmr41110555e9.1.1773264248026;
+        Wed, 11 Mar 2026 14:24:08 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d00a:e00:e489:77c9:805a:398d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541acea11sm208565585e9.7.2026.03.11.14.24.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 14:24:07 -0700 (PDT)
+Date: Wed, 11 Mar 2026 23:24:04 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
+	pascal.eberhard@se.com, miquel.raynal@bootlin.com,
+	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
+	Tristram.Ha@microchip.com
+Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
+ KSZ8463 global irq
+Message-ID: <20260311212404.xsx55lh3gnuze253@skbuf>
+References: <20260305125149.ejju5ptrkviqi3sm@skbuf>
+ <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
+ <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
+ <20260309205401.bk5fpw6kqnmlktbu@skbuf>
+ <dde60639-af13-4653-9a34-38c4bd98b149@bootlin.com>
+ <20260311115356.windefb3j4kkuslg@skbuf>
+ <c3812b1f-50b7-4663-92f5-14c5c6b483a2@bootlin.com>
+ <20260311135610.oox5ahxcyvxkuegw@skbuf>
+ <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <abC7rdjxv9ENw-tA@fedora>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-266779-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266780-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,ci098fa7c1795eceac];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 8500A26A5D0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B35EB26A608
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-11, 00:47:41 +0000, Hangbin Liu wrote:
-> On Tue, Mar 10, 2026 at 08:17:01PM +0100, Sabrina Dubroca wrote:
-> > 2026-03-10, 10:02:09 -0700, syzbot ci wrote:
-> > > batman_adv: batadv0: Not using interface batadv_slave_1 (retrying later): interface not active
-> > > hsr_slave_0: entered promiscuous mode
-> > > hsr_slave_1: entered promiscuous mode
-> > > ------------[ cut here ]------------
-> > > err == -EMSGSIZE
-> > > WARNING: net/core/rtnetlink.c:4421 at rtmsg_ifinfo_build_skb+0x218/0x260, CPU#0: syz-executor/6496
-> > 
-> > I'm not sure this one is caused by this series, but either way,
-> 
-> 
->  rtnetlink_event+0x1b7/0x270
->  notifier_call_chain+0x1be/0x400
->  netdev_change_features+0x95/0xe0
->  __netdev_upper_dev_link+0xb20/0xc80
->  netdev_upper_dev_link+0xb0/0x100
-> 
-> 
-> This patch calls netdev_change_features() after __netdev_upper_dev_link(),
-> Which trigger a NETDEV_FEAT_CHANGE notify and calls rtmsg_ifinfo_event()
-> to fill the new link info. Maybe the event is a bit early and macsec has
-> data not ready?
+On Wed, Mar 11, 2026 at 05:58:32PM +0100, Bastien Curutchet wrote:
+> In the end, it feels OK to me to migrate KSZ8463 into ksz8863.c but it's
+> hard to know for sure before actually doing it.
 
-But this would still mean that there's a mismatch between
-if_nlmsg_size() and rtnl_fill_ifinfo(), and your patch is only
-revealing it.
-
-I'll send fixes for the stuff I mentioned, no idea if that's what
-syzbot saw since we don't have a repro.
-
--- 
-Sabrina
+Sorry, what ksz8863.c? I may be misunderstanding something.
 
