@@ -1,283 +1,176 @@
-Return-Path: <netdev+bounces-266660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266661-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIlRHgJ3sWk2vgIAu9opvQ
-	(envelope-from <netdev+bounces-266660-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:06:58 +0100
+	id KC/gBGR4sWk2vgIAu9opvQ
+	(envelope-from <netdev+bounces-266661-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:12:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF19F26513A
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:06:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 942DB26528D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:12:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CCC13019BA9
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:05:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59F56301C3F2
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D5E3612F4;
-	Wed, 11 Mar 2026 14:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="L20ILv19"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4E931ED7C;
+	Wed, 11 Mar 2026 14:12:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24420.protonmail.ch (mail-24420.protonmail.ch [109.224.244.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE3731E836
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 14:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D1C30E835
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 14:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773237908; cv=none; b=kvtAO7u11o1SrcEJh/EP6jI+Ujlc2R2FtfIhMDZEJL9v3+xIg1SFpZwOV7chvNj1qeQNYm2uLHbLHzHMSbDhiSs+nvIobDHDFIGFqFapJfv3xnnPAsUstIAx3Bad8nxlkMu7A8ssRoKhHNy4okClfM8OkeVM22924/ymxG1KjLw=
+	t=1773238370; cv=none; b=LHkutBPjnu1qUWgbz8AmccS9nlFighw+8UWiJ54m6jhuJxkmKfrm1RN9/jOczU6r7vfXpZAQHFU4LD33kJ2MPMYsQsKSnRZ7MKGQjGzZ1v59AIKWYd1Jlnlf4SENFLDkSgU3c4JLgFv4s+MimysO+ZzdTHtRHHzyG3McAR9Igbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773237908; c=relaxed/simple;
-	bh=METKl9O+g2rYCR6yXomMBW77UPt4p8e3I7+mrNJYisQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DB/8ljMfl+wa/W1SegL3tpdBtsR+zxne8VT89q7mdZtaXYcnxuf+SECMFxvVa3YzUzbTMT5OpBWaARM3TqcgYFgkgYFnhY2nan9wpF4rfm6jJ4K5Aq1bFs6WbzL+RVovlZE7nyr3UDa+qidsa0+FjDI7RsXpNymWLBJ9OfmLhsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=L20ILv19; arc=none smtp.client-ip=109.224.244.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1773237897; x=1773497097;
-	bh=U/Kv4Sn6NWBO9Vy9sZJUOVhYH69CPNBNs8qjyrr5T+k=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=L20ILv19MHiJNVc2WgqJXJ/tPfy73yovZVsmvU+biP+jcIdJH4u1EmnoMTB+++Obb
-	 56fSxcQ0621/rmdk/2uuxqLWWMgRA9z9fr/OQ4dL8lQ4znJuvViZoquS/28oDpmtek
-	 M3y8BY1DpMc8RNaVVmTEOpNEuyp6sOJE2KzmBiAoiZs6SeQ0tAKUhlmFni1K3o+9h/
-	 rQ4CqFrugLYGwJJLG4xMNWcDTHaRsySxUEtko+U/IulDaYaeyZlFcAGhiHo9SvhfNs
-	 slO2Uk1xCqpDNWegV8RhkxD3KjsxL+u2z1JA1OEyrjh3M5Nz+1yNbFVBUg7Y9hbB4l
-	 peFiSXRXALLTA==
-Date: Wed, 11 Mar 2026 14:04:54 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net-shapers: clear hierarchy pointer and defer flush frees with RCU
-Message-ID: <cjiUUrQ73CJYWcTmlHQVSJPUJlxVg4kSZAnqkHKnU1SKeWoyy4F2qtIw7wuFRP9qz6Ra9ax0v2EQKsgdiRRUQnnuMweGbv-n08lgvXSTTG4=@1g4.org>
-In-Reply-To: <20260310192842.3c3b2070@kernel.org>
-References: <20260309173450.538026-1-p@1g4.org> <20260310192842.3c3b2070@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 8144b063a6dca35d23f648dac5130d5e87bce951
+	s=arc-20240116; t=1773238370; c=relaxed/simple;
+	bh=POUJjzeRhBIXfPGojdZfC417KH92loTKx1KmDpRcfoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IrKaV5k8lGwwgfKuQM3CgUgesebVv2Dg0twGFg3RlLoK88UCDiCHL9put9vmlMf47lhwccBCFwRVVZO/mM9m+JmEbySs4W+Ps2SF1tC8eHSoZ8t8xqrkpfis7VTHPT1L9X9N7nqWHhEpJ5Db1deYAEK4R89udE+sKbY9Lu9wYdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-660ea6ceb5aso1640452a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:12:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773238367; x=1773843167;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wIz9Fr5w5J45ZN4rxwvT/0kjXMGfLP1VpB2aKPOax7k=;
+        b=kBJKpsQIH5VTackSFpMLMZkYTsjrdVcamWqGIs73+8erC+wIqdx5z2YGv9lTOyyKLI
+         q515rWCtrDGDicu8uYQTP2HqGrbibSakoW59BwnEIjTP/W37gBdoJj082htZFVyF33FK
+         qf0KEZ8cxEs6PssIQnMf8ZwlaWlvOUl9q4juMOlojbH+YYhFdL4xaL4h2NnjSZCYP0kQ
+         GHNdRBnF4UfmseTckVptyyFBUA6Z5kcirJ5vTLnEO4jVdOHAydWCx9NivQHG5fQsLdf9
+         zvOHS882BTzZY3gmKCIhMXPxddP0y8uBTm6vAZmUfXK2TideSPYu6VnQc5qF4zzsdwwd
+         IV/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVnQVVzKvKsYg8in9DJIGZ/j9gqGljE7OubDwdBGZsy1LXvjnx0vHnjVZSM1W8YhN30XidBf7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq6OzZtjnFXcydj++DLF8M4XVUVkv4BdjGCfo3/bCSKtCAOdmg
+	ThsevCLs5muX2y3xbqui+KdzrCa4ykJd87sIFX4QwWO1I+RQEXQZzOZVFawCuZDgNpANuA==
+X-Gm-Gg: ATEYQzzVwHmLcCbubbYwOGCoRXR5dnkeZsXM5r+L7+zikkdNLaS9OSs4pAmwUKEMInK
+	4to2Ocb/6LF+xRc5RjA3lS8fJL1joE+zo3mvuwEx4aI7z04hKh4/9WNw4yfwda+v8SYpoGGaPzY
+	YHHmlGI5NxyAn9vzWjKMMP5sfbYww5JcF9tR88NY7OhaRtUXXaVJgtiPKgZXUYM7NkGYmhKlKmp
+	mbcwAOFBL5c745Wb84w2cMNXbUqB0md+GIqdqC+h0UuC6nVJCsDVTbCNu/Ua322Y2o084krEkJh
+	7om+KVLd6botnj08rA9dWEy5JSKJo6boP30VXj/GyfPNGpAlL0+sHvGi43mQcqgede6mClYNDMt
+	iNVNtxGhcRkf+G05Ifv3wACL1oeG9aeRjOROUB6YFak1cK9FQOvpBJcgV2c0Q5E8FP9+JRWHjU2
+	i+6bIDhEPT/BvyRHCufgqCFgaWNOW5etpA9i96DeksQSQe6MDneL4CIQBEbtwn
+X-Received: by 2002:a17:906:f596:b0:b96:f4f6:2a02 with SMTP id a640c23a62f3a-b9711a76a7emr477532966b.25.1773238366724;
+        Wed, 11 Mar 2026 07:12:46 -0700 (PDT)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6631532de07sm522384a12.33.2026.03.11.07.12.46
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 07:12:46 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-660ea6ceb5aso1640391a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:12:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUYLZxdxwWc0TGGV5yEuY36POMUcKz5l5fNziWqobE+S4pZ2gkHC5V0+9z4yk5OGps4+/B0zfI=@vger.kernel.org
+X-Received: by 2002:a17:907:6d16:b0:b88:4f25:81da with SMTP id
+ a640c23a62f3a-b97113ff0b9mr462021166b.0.1773237981235; Wed, 11 Mar 2026
+ 07:06:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: DF19F26513A
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de> <20260310100750.303af303@gandalf.local.home>
+ <20260311141332.b611237d36b61b2409e66cb3@kernel.org> <20260311100332.6a2ce4b1@gandalf.local.home>
+In-Reply-To: <20260311100332.6a2ce4b1@gandalf.local.home>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 11 Mar 2026 15:06:07 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
+X-Gm-Features: AaiRm53WEGMMLW4z34e7P-lM1qFvsCJGZ_o4JNL5NPWbhJPKmcqz6k9bJcyL--8
+Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
+Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, 
+	apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
+	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	v9fs@lists.linux.dev, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 942DB26528D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266660-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266661-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[1g4.org:+];
+	DMARC_NA(0.00)[linux-m68k.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_GT_50(0.00)[57];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goodmis.org:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux-m68k.org:email]
 X-Rspamd-Action: no action
 
-The reported UAF was in the GET doit reader path.
+Hi Steven,
 
-GET doit enters rcu_read_lock(), then net_shaper_lookup() performs
-READ_ONCE(netdev->net_shaper_hierarchy) and walks the xarray locklessly.
+On Wed, 11 Mar 2026 at 15:03, Steven Rostedt <rostedt@goodmis.org> wrote:
+> On Wed, 11 Mar 2026 14:13:32 +0900
+> Masami Hiramatsu (Google) <mhiramat@kernel.org> wrote:
+>
+> > Hmm, now IS_ERR_OR_NULL() is an inline function, so it is safe.
+> > But if you want to use IS_ERR_OR_NULL() here, it will be better something like
+> >
+> > node = rhashtable_walk_next(&iter);
+> > while (!IS_ERR_OR_NULL(node)) {
+> >       fprobe_remove_node_in_module(mod, node, &alist);
+> >       node = rhashtable_walk_next(&iter);
+> > }
+>
+> But now you need to have a duplicate code in order to acquire "node"
+>
+> I think the patch just makes the code worse.
 
-GET dump reads the hierarchy pointer first, then enters rcu_read_lock()
-and uses xa_find() to walk the xarray.
+Obviously we need a new for_each_*() helper hiding all the gory internals?
 
-Both paths rely on RCU to keep the hierarchy and its shapers valid during
-the lockless walk.
+Gr{oetje,eeting}s,
 
-So that might be another issue, but that's not what I reproduced.
+                        Geert
 
-Thanks,
-Paul
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-[    9.142939] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[    9.143220] BUG: KASAN: slab-use-after-free in xas_start+0x513/0x610
-[    9.143441] Read of size 8 at addr ffff88810612a748 by task poc4/156
-[    9.143693]
-[    9.143755] CPU: 5 UID: 0 PID: 156 Comm: poc4 Not tainted 6.18.13 #4 PRE=
-EMPT(voluntary)
-[    9.143760] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-[    9.143763] Call Trace:
-[    9.143765]  <TASK>
-[    9.143768]  dump_stack_lvl+0x84/0xd0
-[    9.143775]  print_report+0x171/0x4dc
-[    9.143781]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143785]  ? __virt_addr_valid+0x26b/0x510
-[    9.143791]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143794]  ? kasan_complete_mode_report_info+0x80/0x220
-[    9.143800]  ? xas_start+0x513/0x610
-[    9.143803]  kasan_report+0xd4/0x1a0
-[    9.143809]  ? xas_start+0x513/0x610
-[    9.143817]  __asan_report_load8_noabort+0x14/0x30
-[    9.143820]  xas_start+0x513/0x610
-[    9.143825]  xa_get_mark+0xd9/0x500
-[    9.143829]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143834]  ? __pfx_xa_get_mark+0x10/0x10
-[    9.143844]  net_shaper_lookup+0x107/0x1b0
-[    9.143849]  net_shaper_nl_get_doit+0x14c/0x560
-[    9.143854]  ? __pfx_net_shaper_nl_get_doit+0x10/0x10
-[    9.143857]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143863]  genl_family_rcv_msg_doit+0x1db/0x2e0
-[    9.143870]  ? __pfx_genl_family_rcv_msg_doit+0x10/0x10
-[    9.143873]  ? netlink_sendmsg+0x56c/0xc80
-[    9.143876]  ? __sys_sendto+0x427/0x520
-[    9.143879]  ? __x64_sys_sendto+0xe4/0x1f0
-[    9.143891]  genl_rcv_msg+0x3ec/0x660
-[    9.143897]  ? __pfx_genl_rcv_msg+0x10/0x10
-[    9.143901]  ? __pfx_net_shaper_nl_pre_doit+0x10/0x10
-[    9.143904]  ? __pfx_net_shaper_nl_get_doit+0x10/0x10
-[    9.143907]  ? __pfx_net_shaper_nl_post_doit+0x10/0x10
-[    9.143911]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143918]  netlink_rcv_skb+0x127/0x3b0
-[    9.143922]  ? __pfx_genl_rcv_msg+0x10/0x10
-[    9.143926]  ? __pfx_netlink_rcv_skb+0x10/0x10
-[    9.143939]  genl_rcv+0x28/0x50
-[    9.143943]  netlink_unicast+0x60f/0xa50
-[    9.143949]  ? __pfx_netlink_unicast+0x10/0x10
-[    9.143957]  netlink_sendmsg+0x751/0xc80
-[    9.143964]  ? __pfx_netlink_sendmsg+0x10/0x10
-[    9.143969]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143972]  ? apparmor_socket_sendmsg+0x6a/0xa0
-[    9.143979]  __sys_sendto+0x427/0x520
-[    9.143984]  ? __pfx___sys_sendto+0x10/0x10
-[    9.143992]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143995]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.143999]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144002]  ? __kasan_check_read+0x11/0x20
-[    9.144007]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144010]  ? trace_hardirqs_on_prepare+0x2b/0x50
-[    9.144015]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144018]  ? do_syscall_64+0x1b5/0x1210
-[    9.144023]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144026]  ? __kasan_check_read+0x11/0x20
-[    9.144029]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144032]  ? trace_irq_enable+0xd5/0x120
-[    9.144038]  __x64_sys_sendto+0xe4/0x1f0
-[    9.144041]  ? __kasan_check_read+0x11/0x20
-[    9.144044]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144047]  ? trace_irq_enable+0xd5/0x120
-[    9.144049]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144054]  x64_sys_call+0x1d15/0x2350
-[    9.144058]  do_syscall_64+0x90/0x1210
-[    9.144063]  ? trace_hardirqs_on_prepare+0x2b/0x50
-[    9.144066]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144069]  ? do_syscall_64+0x1b5/0x1210
-[    9.144072]  ? trace_hardirqs_on_prepare+0x2b/0x50
-[    9.144076]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144079]  ? __kasan_check_read+0x11/0x20
-[    9.144082]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144085]  ? trace_irq_enable+0xd5/0x120
-[    9.144089]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144092]  ? trace_hardirqs_on_prepare+0x2b/0x50
-[    9.144095]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144098]  ? do_syscall_64+0x1b5/0x1210
-[    9.144101]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    9.144106]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[    9.144109] RIP: 0033:0x42fc6c
-[    9.144113] Code: 5a 3a 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c3 44 8b =
-54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48=
-> 3d 00 f0 ff ff 77 34 89 df 48 89 44 24 08 e8 a0 3a 02 00 48 8b
-[    9.144115] RSP: 002b:000074a97f7fd1c0 EFLAGS: 00000293 ORIG_RAX: 000000=
-000000002c
-[    9.144120] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00000000004=
-2fc6c
-[    9.144122] RDX: 0000000000000030 RSI: 000074a97f7fd200 RDI: 00000000000=
-00009
-[    9.144124] RBP: 000074a97f7fe230 R08: 00000000004a36b8 R09: 00000000000=
-0000c
-[    9.144127] R10: 0000000000000000 R11: 0000000000000293 R12: 000074a96c0=
-00b70
-[    9.144129] R13: 0000000000001000 R14: 000074a97f7fe200 R15: 000074a97f7=
-fd21c
-[    9.144139]  </TASK>
-[    9.144141]
-[    9.156968] Freed by task 160:
-[    9.157068]  kasan_save_stack+0x26/0x60
-[    9.157190]  kasan_save_track+0x14/0x40
-[    9.157311]  __kasan_save_free_info+0x3b/0x60
-[    9.157447]  __kasan_slab_free+0x7a/0xb0
-[    9.157573]  kfree+0x133/0x5c0
-[    9.157675]  net_shaper_flush_netdev+0x10c/0x150
-[    9.157822]  unregister_netdevice_many_notify+0x15b2/0x25e0
-[    9.157994]  unregister_netdevice_queue+0x28d/0x380
-[    9.158145]  nsim_destroy+0x170/0x6e0
-[    9.158263]  __nsim_dev_port_del+0x160/0x280
-[    9.158397]  nsim_dev_reload_destroy+0x145/0x500
-[    9.158544]  nsim_drv_remove+0x4e/0x1e0
-[    9.158666]  nsim_bus_remove+0xe/0x20
-[    9.158783]  device_remove+0xc5/0x190
-[    9.158901]  device_release_driver_internal+0x3db/0x590
-[    9.159062]  device_release_driver+0x12/0x20
-[    9.159197]  bus_remove_device+0x1f5/0x3f0
-[    9.159325]  device_del+0x3b0/0x980
-[    9.159438]  device_unregister+0x17/0xb0
-[    9.159567]  del_device_store+0x2bd/0x470
-[    9.159694]  bus_attr_store+0x67/0xf0
-[    9.159812]  sysfs_kf_write+0xe5/0x150
-[    9.159932]  kernfs_fop_write_iter+0x3d9/0x5e0
-[    9.160072]  vfs_write+0x4e5/0x10e0
-[    9.160185]  ksys_write+0xdf/0x1d0
-[    9.160294]  __x64_sys_write+0x72/0xd0
-[    9.160413]  x64_sys_call+0x79/0x2350
-[    9.160536]  do_syscall_64+0x90/0x1210
-[    9.160655]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[    9.160810]
-[    9.160865] The buggy address belongs to the object at ffff88810612a700
-[    9.160865]  which belongs to the cache kmalloc-rnd-03-96 of size 96
-[    9.161246] The buggy address is located 72 bytes inside of
-[    9.161246]  freed 96-byte region [ffff88810612a700, ffff88810612a760)
-[    9.161606]
-[    9.161661] The buggy address belongs to the physical page:
-[    9.161831] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0=
-x0 pfn:0x10612a
-[    9.162070] ksm flags: 0x17ffffc0000000(node=3D0|zone=3D2|lastcpupid=3D0=
-x1fffff)
-[    9.162278] page_type: f5(slab)
-[    9.162382] raw: 0017ffffc0000000 ffff888100049400 ffffea00041ca640 dead=
-000000000007
-[    9.162616] raw: 0000000000000000 0000000000200020 00000000f5000000 0000=
-000000000000
-[    9.162846] page dumped because: kasan: bad access detected
-[    9.163015]
-[    9.163070] Memory state around the buggy address:
-[    9.163218]  ffff88810612a600: fa fb fb fb fb fb fb fb fb fb fb fb fc fc=
- fc fc
-[    9.163434]  ffff88810612a680: fa fb fb fb fb fb fb fb fb fb fb fb fc fc=
- fc fc
-[    9.163656] >ffff88810612a700: fa fb fb fb fb fb fb fb fb fb fb fb fc fc=
- fc fc
-[    9.163870]                                               ^
-[    9.164039]  ffff88810612a780: fa fb fb fb fb fb fb fb fb fb fb fb fc fc=
- fc fc
-[    9.164254]  ffff88810612a800: fa fb fb fb fb fb fb fb fb fb fb fb fc fc=
- fc fc
-[    9.164474] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[    9.164716] Disabling lock debugging due to kernel taint
-
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
