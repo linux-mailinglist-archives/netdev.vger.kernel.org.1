@@ -1,68 +1,71 @@
-Return-Path: <netdev+bounces-266501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIdUFI8VsWkZqgIAu9opvQ
-	(envelope-from <netdev+bounces-266501-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:11:11 +0100
+	id iOQDEtIdsWmOqwIAu9opvQ
+	(envelope-from <netdev+bounces-266502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:46:26 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2D425D62E
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:11:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 974BD25E263
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6F60325BFCC
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:06:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4BC2033DDDDA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA38378D80;
-	Wed, 11 Mar 2026 07:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eYDsJlyA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BA93A6F1E;
+	Wed, 11 Mar 2026 07:24:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4AA3783A7
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6833AB279;
+	Wed, 11 Mar 2026 07:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773212796; cv=none; b=Vjxy/0h3zALIP3ki2R6guwPP9NxfZaiiF0hONiX2VmPKhz9uBG9Yq6JWmhJDtUtZ3PAgO8IlxP8uKdAMZwC4efe+gHexsAme8+xLRU9DWnXJ9iEgnxbxkokNXwgcvml5MHPz6MpIK3IWIsGwekujLZ1Dfr6GEW/WMpYiAD5CPRo=
+	t=1773213839; cv=none; b=RAx3tEWzoMLxcjB8BE7dKMFhebIxZu3X+Qs5Tq8NJoC/NVE/GrPaU8zZbP6BDTb/eF3efFErcUDDardEw3XsZeXaD75H6fFmRmO3VnwKwkr6wPsicc7BN+n7ZgxJCl6c8w07hXyAC4rQhdhFJG7OFukinSA/BN+/Fd6wGTKWppM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773212796; c=relaxed/simple;
-	bh=fDoXbQjgWEGw9tvqtPVdOHqQWf6S2QPStECJ9pYJGnM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qHZNkrDaxLdOov8wpmkadZcb+HzbNVNK1nFAIV2D6KpZzzk+FQ8KNMp4QkJn2DzB1mTFpDa/+YyDenT+zHfQoranYxBELDTWrtNpA1KfSd5x9uBRMd7GGIyURoMDicttpGgVGNQjsS3JjKRG34qabQWqNgA0pJQEmYrqLwB9Nyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eYDsJlyA; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773212783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0CXo0x7BiCEEpnzU+2Ow+NXjhaBWC/PdinzAYFVwnT4=;
-	b=eYDsJlyAQL5W9YiEJCWmAM0miLOaFxYlN6EA8vgkobqFWoM5Hf6U7hq/EPjdZBaO/oxRWv
-	tuTLvtBNIszAb22CuEUHpUJ680fdStt3f8/3/2MnOXaDqTK3cEoY6Jy3RzqUupUlOkJ0V+
-	XWrd1wgl15XdhwgnIrdmOws3hrfxc70=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com,
-	Eric Dumazet <edumazet@google.com>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Takamitsu Iwai <takamitz@amazon.co.jp>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Pwnverse <stanksal@purdue.edu>,
-	Ingo Molnar <mingo@kernel.org>,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net/rose: fix NULL pointer dereference in rose_transmit_link on reconnect
-Date: Wed, 11 Mar 2026 15:06:02 +0800
-Message-ID: <20260311070611.76913-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773213839; c=relaxed/simple;
+	bh=Le4ziTymiOzp62xJ0hVlRSDbd5mAajWhUu65VgUkFLE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YzNZIpDy0lTNtwSCPackKSn1zArqZs8fKxN+7MmVI7lxKea1sgoIUbTJCz+cEpZ9w5nTEHYTp2JZ2ZY8yqe/nnGAf7cRfvTWMzHivnS34/qmRuY1Wj+/XubRZiHsjd/sY96pw4zavpi0VWgWb5YnGGvLXU1qM6bQd6t1+nkp8CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 3b0ce3d61d1b11f1a21c59e7364eecb8-20260311
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.11,REQID:a251f3ab-8b1c-4a43-b8e7-a8c71cbc9894,IP:0,U
+	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:89c9d04,CLOUDID:c196242fa8e833772f764fd8a49e5b49,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|898,TC:nil,Content:0|15|50,EDM:5
+	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 3b0ce3d61d1b11f1a21c59e7364eecb8-20260311
+X-User: heminhong@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 314001501; Wed, 11 Mar 2026 15:23:41 +0800
+From: Minhong He <heminhong@kylinos.cn>
+To: andrea.mayer@uniroma2.it,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	david.lebrun@uclouvain.be,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Minhong He <heminhong@kylinos.cn>
+Subject: [PATCH net] ipv6: sr: Add unlikely hint to idev NULL check in seg6_hmac_validate_skb
+Date: Wed, 11 Mar 2026 15:23:30 +0800
+Message-Id: <20260311072330.96491-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,90 +73,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 9D2D425D62E
+X-Rspamd-Queue-Id: 974BD25E263
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-266501-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266502-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d00f90e0af54102fb271];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,shopee.com:email,syzkaller.appspot.com:url,appspotmail.com:email]
+	FROM_NEQ_ENVFROM(0.00)[heminhong@kylinos.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.979];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email]
 X-Rspamd-Action: no action
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
+can theoretically be NULL if the network device lacks proper IPv6
+initialization or is being torn down. However, this is an exceptional
+error path; in normal operation, the device will always have a valid
+inet6_dev structure.
 
-syzkaller reported a bug [1], and the reproducer is available at [2].
+Marking this NULL check with unlikely() helps the compiler optimize
+branch prediction and code layout. It ensures that the common case
+(valid idev) remains in the hot path, while the error handling code
+is placed out of line, improving CPU pipeline efficiency for high-speed
+SRv6 packet processing.
 
-ROSE sockets use four sk->sk_state values: TCP_CLOSE, TCP_LISTEN,
-TCP_SYN_SENT, and TCP_ESTABLISHED. rose_connect() already rejects
-calls for TCP_ESTABLISHED (-EISCONN) and TCP_CLOSE with SS_CONNECTING
-(-ECONNREFUSED), but lacks a check for TCP_SYN_SENT.
-
-When rose_connect() is called a second time while the first connection
-attempt is still in progress (TCP_SYN_SENT), it overwrites
-rose->neighbour via rose_get_neigh(). If that returns NULL, the socket
-is left with rose->state == ROSE_STATE_1 but rose->neighbour == NULL.
-When the socket is subsequently closed, rose_release() sees
-ROSE_STATE_1 and calls rose_write_internal() ->
-rose_transmit_link(skb, NULL), causing a NULL pointer dereference.
-
-Per connect(2), a second connect() while a connection is already in
-progress should return -EALREADY. Add this missing check for
-TCP_SYN_SENT to complete the state validation in rose_connect().
-
-[1] https://syzkaller.appspot.com/bug?extid=d00f90e0af54102fb271
-[2] https://gist.github.com/mrpre/9e6779e0d13e2c66779b1653fef80516
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+d00f90e0af54102fb271@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/69694d6f.050a0220.58bed.0027.GAE@google.com/T/
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Signed-off-by: Minhong He <heminhong@kylinos.cn>
 ---
- net/rose/af_rose.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/ipv6/seg6_hmac.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index 841d62481048..ba56213e0a2a 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -811,6 +811,11 @@ static int rose_connect(struct socket *sock, struct sockaddr_unsized *uaddr, int
- 		goto out_release;
- 	}
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index ee6bac0160ac..a8f279ffb678 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+ 	int require_hmac;
  
-+	if (sk->sk_state == TCP_SYN_SENT) {
-+		err = -EALREADY;
-+		goto out_release;
-+	}
-+
- 	sk->sk_state   = TCP_CLOSE;
- 	sock->state = SS_UNCONNECTED;
+ 	idev = __in6_dev_get(skb->dev);
++	if (unlikely(!idev))
++		return false;
+ 
+ 	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
  
 -- 
-2.43.0
+2.25.1
 
 
