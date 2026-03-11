@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-266391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EiUDsW1sGlvmQIAu9opvQ
-	(envelope-from <netdev+bounces-266391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:29 +0100
+	id WLB4FdG1sGlvmQIAu9opvQ
+	(envelope-from <netdev+bounces-266392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6499259B68
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDBEC259B7E
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E93D730AF3B0
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:20:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CDF8D30B46B6
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E27732AACB;
-	Wed, 11 Mar 2026 00:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDDD32D0D4;
+	Wed, 11 Mar 2026 00:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DbPcEOrt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kETbLBSY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B6732A3FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C7231E83A;
 	Wed, 11 Mar 2026 00:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773188406; cv=none; b=Wvhtk+mbeCSMgzlNugXRWtOlF0yAsJ2A0gOeHS5NkTYsWZzAKcnsljX77ER4fIBAqLtz7lbC46GmFfLXXbCkMHcito7WsREG9X5HA3S5zJPo4txlY5TCeffXKLGlojiRS/C6c5czGOU8srbXBy419iCfdkaqD/WrxwO5BFB3z54=
+	t=1773188407; cv=none; b=jLeLO2GHTM3vz0Ncvcr/VqQvckgl0jXsXvPt4LPxKOFS9T7l/N/yi1SzRzYPlxZUXnEMKpsI9fPrQD9wGT2Cmbe3eXP3GfdluPy5TaRspB/PE8ygOp3s9Uj4+6Zyl533v94yhRHYO0jD0xTtGPk8otXXMxN2iXobnQpHjRJJq4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773188406; c=relaxed/simple;
-	bh=iuaHISxE/W8i0nLEelp452PXlP9gOcNSEJkS4GyM74E=;
+	s=arc-20240116; t=1773188407; c=relaxed/simple;
+	bh=1LZZbq0+cSxFvf8KzrdAgm9SfNlqLHeKWtCA6Qu4oys=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TqRGifsP/gq2qP3SEpH5niWQ+tPa8mjIGoN5qbcgyF7t8gqBCxF0KiWNGWxjjHHL3Lel1tCPUC7rKggWUuY7yy4NyXCNMCmIUYeOx0oRWTqeNr4eGPj5W59YAHaRQLSldf+Qvq7/lZls7I7eQoFJyU4VW3Nt+MaGvDDHB0n8heg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DbPcEOrt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64837C2BC9E;
-	Wed, 11 Mar 2026 00:20:05 +0000 (UTC)
+	 MIME-Version; b=h0uaZPTPEf/cCE7XFZXwkQpSx0k0UvE/+hpSlkY1E/t5hxpOpWvUXl7nL3PwL6WfbrXVIctPuE/Zk622iaUTJ4frMcdvfqvQtrwSb19f595DrcWwwF0NkdXxwcYOzOn9fdnKmTQifAe/iPxytocKf5FP0z+lnT+/aFTf1eJFFjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kETbLBSY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425B8C19423;
+	Wed, 11 Mar 2026 00:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1773188406;
-	bh=iuaHISxE/W8i0nLEelp452PXlP9gOcNSEJkS4GyM74E=;
+	bh=1LZZbq0+cSxFvf8KzrdAgm9SfNlqLHeKWtCA6Qu4oys=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DbPcEOrtSFGtaqWYo5dgptEsCuNq43fw0gbFlSgmeW4TSEh/dylHicA8Ui94BaruA
-	 arO55B8VWaYTwQlnl7f6uUjuM01MqIr6lHF0scQ4r1IQVedfUDr9tDsqMQ+dJAZJB1
-	 vdQq38hAcz0Bp9r70qhit+1QEdHyao5C7mUJO9elH7VdcW4aOWWDZLSzA9ryYl8law
-	 z6yAdnhcuqjYxrPK49Ro9q6tdwCZR0+a0SPZ0wX+UoWja1GAFR8K3fdn50YOP7D3LG
-	 e58WSLFHpL4glObrxhpVuZED9ZGxgK/4PVqpCQ9iQN63ChQ87R6cGaKlEFQEtdNqFy
-	 lH9O/0hRtrJIQ==
+	b=kETbLBSY15xk9MliFfg/U1SodNwgBFXjiuyHuDHRxex0ueX4tDnM2GaUs3/snQwoN
+	 /DGrE0190KjEyF0NO1oY2VE4zvkgg1ZLGpQkTCv9PLkqVTyO84YNRuWiMU+lA8m1OB
+	 J5HfMkb7yvCU/Htaa5F/HD2pw9SHGcPDSNhgT5HR1SVGHFizOcrTQeSEGk3WSMyoy+
+	 1trye1wM4CR6nXBt5NyYUySNtRv3m0578s+XWelQzwrGluzGNc8dVyuyxC4G8hiNoG
+	 FmbwIKK+1KQZKKZOXdi3djI+QNSSMHYKmmcjSckjMFzbH5brCkF9rwvl0D6tWpxdHK
+	 YaXnaORk5++Sw==
 From: Chuck Lever <cel@kernel.org>
 To: john.fastabend@gmail.com,
 	kuba@kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	kernel-tls-handshake@lists.linux.dev,
 	Chuck Lever <chuck.lever@oracle.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 7/8] tls: Restructure tls_sw_read_sock() into submit/deliver phases
-Date: Tue, 10 Mar 2026 20:19:51 -0400
-Message-ID: <20260311001952.57059-8-cel@kernel.org>
+Subject: [PATCH v2 8/8] tls: Enable batch async decryption in read_sock
+Date: Tue, 10 Mar 2026 20:19:52 -0400
+Message-ID: <20260311001952.57059-9-cel@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260311001952.57059-1-cel@kernel.org>
 References: <20260311001952.57059-1-cel@kernel.org>
@@ -65,7 +65,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E6499259B68
+X-Rspamd-Queue-Id: CDBEC259B7E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266391-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266392-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -100,135 +100,175 @@ X-Rspamd-Action: no action
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-Pipelining multiple AEAD operations requires separating decryption
-from delivery so that several records can be submitted before any
-are passed to the read_actor callback. The main loop in
-tls_sw_read_sock() is split into two explicit phases: a submit
-phase that decrypts one record onto ctx->rx_list, and a deliver
-phase that drains rx_list and passes each cleartext skb to the
-read_actor callback.
+tls_sw_read_sock() decrypts one TLS record at a time, blocking until
+each AEAD operation completes before proceeding. Hardware async
+crypto engines depend on pipelining multiple operations to achieve
+full throughput, and the one-at-a-time model prevents that. Kernel
+consumers such as NVMe-TCP and NFSD (when using TLS) are therefore
+unable to benefit from hardware offload.
 
-With a single record per submit phase, behavior is identical to the
-previous code. A subsequent patch will extend the submit phase to
-pipeline multiple AEAD operations.
+When ctx->async_capable is true, the submit phase now loops up to
+TLS_READ_SOCK_BATCH (16) records. The first record waits via
+tls_rx_rec_wait(); subsequent iterations use tls_strp_msg_ready()
+and tls_strp_check_rcv() to collect records already queued on the
+socket without blocking. Each record is submitted with darg.async
+set, and all resulting skbs are appended to rx_list.
+
+After the submit loop, a single tls_decrypt_async_drain() collects
+all pending AEAD completions before the deliver phase passes
+cleartext records to the consumer. The batch bound of 16 limits
+concurrent memory consumption to 16 cleartext skbs plus their AEAD
+contexts. If async_capable is false, the loop exits after one
+record and the async wait is skipped, preserving prior behavior.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/tls/tls_sw.c | 79 +++++++++++++++++++++++++-----------------------
- 1 file changed, 41 insertions(+), 38 deletions(-)
+ net/tls/tls_sw.c | 95 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 78 insertions(+), 17 deletions(-)
 
 diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 644a65ff9964..535c856d64e0 100644
+index 535c856d64e0..0e2b7d285d06 100644
 --- a/net/tls/tls_sw.c
 +++ b/net/tls/tls_sw.c
-@@ -2353,8 +2353,8 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
- 	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
- 	struct tls_prot_info *prot = &tls_ctx->prot_info;
--	struct strp_msg *rxm = NULL;
- 	struct sk_buff *skb = NULL;
-+	struct strp_msg *rxm;
+@@ -261,6 +261,12 @@ static int tls_decrypt_async_drain(struct tls_sw_context_rx *ctx)
+ 	return ret;
+ }
+ 
++/* Submit an AEAD decrypt request.  On success with darg->async set,
++ * the caller must not touch aead_req; the completion handler frees
++ * it.  Every error return clears darg->async and guarantees no
++ * in-flight AEAD operation remains -- callers rely on this to
++ * safely free aead_req and to skip async drain on error paths.
++ */
+ static int tls_do_decryption(struct sock *sk,
+ 			     struct scatterlist *sgin,
+ 			     struct scatterlist *sgout,
+@@ -2347,6 +2353,13 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
+ 	goto splice_read_end;
+ }
+ 
++/* Bound on concurrent async AEAD submissions per read_sock
++ * call.  Chosen to fill typical hardware crypto pipelines
++ * without excessive memory consumption (each in-flight record
++ * holds one cleartext skb plus its AEAD request context).
++ */
++#define TLS_READ_SOCK_BATCH	16
++
+ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+ 		     sk_read_actor_t read_actor)
+ {
+@@ -2358,6 +2371,7 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
  	struct sk_psock *psock;
  	size_t flushed_at = 0;
  	bool released = true;
-@@ -2379,17 +2379,15 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 
++	bool async = false;
+ 	struct tls_msg *tlm;
+ 	ssize_t copied = 0;
+ 	ssize_t decrypted;
+@@ -2380,31 +2394,68 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
  	decrypted = 0;
  	for (;;) {
--		if (!skb_queue_empty(&ctx->rx_list)) {
--			skb = __skb_dequeue(&ctx->rx_list);
--			rxm = strp_msg(skb);
--			tlm = tls_msg(skb);
--		} else {
--			struct tls_decrypt_arg darg;
-+		struct tls_decrypt_arg darg;
+ 		struct tls_decrypt_arg darg;
++		int nr_async = 0;
  
--			/* Drain backlog so segments that arrived while the
--			 * lock was held appear on sk_receive_queue before
--			 * tls_rx_rec_wait waits for a new record.
--			 */
-+		/* Phase 1: Submit -- decrypt one record onto rx_list.
-+		 * Flush the backlog first so that segments that
-+		 * arrived while the lock was held appear on
-+		 * sk_receive_queue before tls_rx_rec_wait waits
-+		 * for a new record.
-+		 */
-+		if (skb_queue_empty(&ctx->rx_list)) {
- 			sk_flush_backlog(sk);
- 			err = tls_rx_rec_wait(sk, NULL, true, released);
- 			if (err <= 0)
-@@ -2404,38 +2402,43 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 			released = tls_read_flush_backlog(sk, prot, INT_MAX,
- 							  0, decrypted,
- 							  &flushed_at);
--			skb = darg.skb;
-+			decrypted += strp_msg(darg.skb)->full_len;
-+			tls_rx_rec_release(ctx);
-+			__skb_queue_tail(&ctx->rx_list, darg.skb);
+-		/* Phase 1: Submit -- decrypt one record onto rx_list.
++		/* Phase 1: Submit -- decrypt records onto rx_list.
+ 		 * Flush the backlog first so that segments that
+ 		 * arrived while the lock was held appear on
+ 		 * sk_receive_queue before tls_rx_rec_wait waits
+ 		 * for a new record.
+ 		 */
+ 		if (skb_queue_empty(&ctx->rx_list)) {
+-			sk_flush_backlog(sk);
+-			err = tls_rx_rec_wait(sk, NULL, true, released);
+-			if (err <= 0)
++			while (nr_async < TLS_READ_SOCK_BATCH) {
++				if (nr_async == 0) {
++					sk_flush_backlog(sk);
++					err = tls_rx_rec_wait(sk, NULL,
++							      true,
++							      released);
++					if (err <= 0)
++						goto read_sock_end;
++				} else {
++					if (!tls_strp_msg_ready(ctx)) {
++						tls_strp_check_rcv_quiet(&ctx->strp);
++						if (!tls_strp_msg_ready(ctx))
++							break;
++					}
++					if (!tls_strp_msg_load(&ctx->strp,
++							       released))
++						break;
++				}
++
++				memset(&darg.inargs, 0, sizeof(darg.inargs));
++				darg.async = ctx->async_capable;
++
++				err = tls_rx_decrypt_record(sk, NULL,
++							    &darg);
++				if (err < 0)
++					goto read_sock_end;
++
++				async |= darg.async;
++				released = tls_read_flush_backlog(sk, prot,
++								  INT_MAX,
++								  0,
++								  decrypted,
++								  &flushed_at);
++				decrypted += strp_msg(darg.skb)->full_len;
++				tls_rx_rec_release(ctx);
++				__skb_queue_tail(&ctx->rx_list, darg.skb);
++				nr_async++;
++
++				if (!ctx->async_capable)
++					break;
++			}
 +		}
 +
-+		/* Phase 2: Deliver -- drain rx_list to read_actor */
-+		while ((skb = __skb_dequeue(&ctx->rx_list)) != NULL) {
- 			rxm = strp_msg(skb);
- 			tlm = tls_msg(skb);
--			decrypted += rxm->full_len;
- 
--			tls_rx_rec_release(ctx);
--		}
--
--		/* read_sock does not support reading control messages */
--		if (tlm->control != TLS_RECORD_TYPE_DATA) {
--			err = -EINVAL;
--			goto read_sock_requeue;
--		}
--
--		used = read_actor(desc, skb, rxm->offset, rxm->full_len);
--		if (used <= 0) {
--			if (!copied)
--				err = used;
--			goto read_sock_requeue;
--		}
--		copied += used;
--		if (used < rxm->full_len) {
--			rxm->offset += used;
--			rxm->full_len -= used;
--			if (!desc->count)
-+			/* read_sock does not support reading control messages */
-+			if (tlm->control != TLS_RECORD_TYPE_DATA) {
-+				err = -EINVAL;
- 				goto read_sock_requeue;
--		} else {
--			consume_skb(skb);
--			skb = NULL;
--			if (!desc->count)
--				break;
-+			}
++		/* Async wait -- collect pending AEAD completions */
++		if (async) {
++			int ret = tls_decrypt_async_drain(ctx);
 +
-+			used = read_actor(desc, skb, rxm->offset,
-+					  rxm->full_len);
-+			if (used <= 0) {
-+				if (!copied)
-+					err = used;
-+				goto read_sock_requeue;
-+			}
-+			copied += used;
-+			if (used < rxm->full_len) {
-+				rxm->offset += used;
-+				rxm->full_len -= used;
-+				if (!desc->count)
-+					goto read_sock_requeue;
-+			} else {
-+				consume_skb(skb);
-+				skb = NULL;
++			async = false;
++			if (ret) {
++				__skb_queue_purge(&ctx->rx_list);
++				err = ret;
+ 				goto read_sock_end;
+-
+-			memset(&darg.inargs, 0, sizeof(darg.inargs));
+-
+-			err = tls_rx_decrypt_record(sk, NULL, &darg);
+-			if (err < 0)
+-				goto read_sock_end;
+-
+-			released = tls_read_flush_backlog(sk, prot, INT_MAX,
+-							  0, decrypted,
+-							  &flushed_at);
+-			decrypted += strp_msg(darg.skb)->full_len;
+-			tls_rx_rec_release(ctx);
+-			__skb_queue_tail(&ctx->rx_list, darg.skb);
 +			}
  		}
-+		/* Drain all of rx_list before honoring !desc->count */
-+		if (!desc->count)
-+			break;
+ 
+ 		/* Phase 2: Deliver -- drain rx_list to read_actor */
+@@ -2442,6 +2493,16 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
  	}
  
  read_sock_end:
++	if (async) {
++		int ret = tls_decrypt_async_drain(ctx);
++
++		__skb_queue_purge(&ctx->rx_list);
++		/* Preserve the error that triggered early exit;
++		 * a crypto drain error is secondary.
++		 */
++		if (ret && !err)
++			err = ret;
++	}
+ 	tls_strp_check_rcv(&ctx->strp);
+ 	tls_rx_reader_release(sk, ctx);
+ 	return copied ? : err;
 -- 
 2.53.0
 
