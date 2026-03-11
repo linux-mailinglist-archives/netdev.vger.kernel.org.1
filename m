@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-266600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266601-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDfwJhRCsWk3tAIAu9opvQ
-	(envelope-from <netdev+bounces-266600-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:21:08 +0100
+	id AP7VDTREsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266601-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:30:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 844DF262015
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:21:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B9726231D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:30:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D2CF3070B11
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:18:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5476130B606D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD013C945B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F4F3CA4A2;
 	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UINxgHhj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTEosz+p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AD73C8703;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690023C945D;
 	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224292; cv=none; b=Kjjli8lhLqgkEs7hoKZpnqIOV9ikwOZQ0hlIA0476t6L51CVthLnD6IzaOFN3nAhg0QhK8E9tJ9/N/kaSDhOFaOuMBC+O/Op9Yc03uGLftPbWNji8vKxwnc9aEo6eKBrxylm/dKgcn0TMZoBPoxF2hRjOaqx9cKouettkIPJwHs=
+	t=1773224292; cv=none; b=oLNxq8gk46bFTIFKQ4aCt6qWyxG2A42qagS94cCmgCm8iB8ffG/PvzvkgQNSak92Ga3W3/CiebByyV5DY3nRFOMHLwGWXYp+XdLUxyJydyZpvs5isbrTHUBeusyfSgJTJdmfNON6ZT08XbrCesvlloCf/CepVywQLm+8Fpl3UNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773224292; c=relaxed/simple;
-	bh=Q9V6sTMaJ2pd7d5NGrdgzvEcNvyFxJE7OuvaMwzwrfQ=;
+	bh=KLueA/c6Dz81/C8ynUU6RVHQqxMTLTUtghgfet0J2Ow=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WF3/RpK5zl3Cl6deRxNNIDk80okyggP52UrsVjbxP2kKC90q5Yz0ANheND4PhlJg6H6US2m1hxQq3C+d5in/Q/WjOazRpjJ4xKwau9BjRY8651AZJxbLIB7ywKpYWPe/e8aSZ0jmlZe6l4xfS/uSg6QaFP+muA0G+UQvP3hFCZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UINxgHhj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0CDA8C4CEF7;
+	 In-Reply-To:To:Cc; b=jGNhWESRnfZK7Ytu9tmLYf1CI4QYDOOCg1RVOfkArOFIDOfS21SxAU6jodUHaz/BEhe/X0DrfiE2rCumtnJEcNxn44XfgE9iAi9My7bLYRiJcHBcfmX/QTIsHlKjts1W60iFaiCMxz9IoWQWeiOhCsxpB3MxpIGw3Hvl8san1yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTEosz+p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 36134C2BCB0;
 	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1773224292;
-	bh=Q9V6sTMaJ2pd7d5NGrdgzvEcNvyFxJE7OuvaMwzwrfQ=;
+	bh=KLueA/c6Dz81/C8ynUU6RVHQqxMTLTUtghgfet0J2Ow=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=UINxgHhj5nFHJdbk8R8jKEjQwnRTiyXul20oua9CGsmATA6RcX3jyt96stH4mODiT
-	 riK9uywOPih13MokiXk2zgklZnA7kYsahet7LRLfnKvVCek03PVR4m0s9C4QhHt5sV
-	 gNM7bPt6+dbE11FvJTu+5EMkJ+jv3cxt2P+01a59kdphbzs7dNWVFUk2ZWVlAz/mmT
-	 P4c4A6yG6kJ6Fh3EtpLThNNabr+JNTaQ0m9gchaRexMf6IYzXx1JPkUq7T4Q0sys+T
-	 UO9wFZ1W1w46/sT0slkujIP36qQ/FZAOS9lmJdYLaAnFaR8UIRqGgGaKRvtAwSjI3T
-	 ZDqtPBI9J3hpg==
+	b=mTEosz+porOROi16F15hqrBFVAoMVHypgQ2OATZOFvrYnrW1r8vvqO/jqyt3kjRgn
+	 AIq+KhWUTCwu1jw6S1/z+QqLz0pA38LPPAmjAKHbfd2Xww1NH5XA38rHFcRg6TnKkJ
+	 u0D7bO+uOvSTXcUzWJ0dIef+FQLCPm8w7EEz25tKRujR+RluMab4IV7t+liEqa60j8
+	 5950+NvpVaGxzTVejsH8oAXZ9yhJ202L/Cmx9IU+z4w2e4SQrAnzOu5P29kTsE5w9I
+	 NSxQSMmH/FUDs5Hc5raKm6zMHspBPO0UMy022Ai74hvNkm7kSe5/QnvLiibvj0NQA6
+	 08Ch1D352MrYw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC37E104BEC5;
-	Wed, 11 Mar 2026 10:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281271049527;
+	Wed, 11 Mar 2026 10:18:12 +0000 (UTC)
 From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Date: Wed, 11 Mar 2026 11:17:58 +0100
-Subject: [PATCH v10 1/5] net: stmmac: Use helper macro for loop over
- queue-based arrays
+Date: Wed, 11 Mar 2026 11:17:59 +0100
+Subject: [PATCH v10 2/5] net: stmmac: platform: read channels irq
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260311-dwmac_multi_irq-v10-1-7ab1669759b5@oss.nxp.com>
+Message-Id: <20260311-dwmac_multi_irq-v10-2-7ab1669759b5@oss.nxp.com>
 References: <20260311-dwmac_multi_irq-v10-0-7ab1669759b5@oss.nxp.com>
 In-Reply-To: <20260311-dwmac_multi_irq-v10-0-7ab1669759b5@oss.nxp.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -81,30 +80,30 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  vladimir.oltean@nxp.com, boon.khai.ng@altera.com, 
  "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773224290; l=4143;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773224290; l=2726;
  i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
- bh=AN9BxArjvT+LtwWtaoyDzsO4XeDTxufZg6uDwPtH3+8=;
- b=5GmT30ZsmnI//0cQZqIyqmK7gRXf93+3mWuwKF2QsS+zP9qDLp9dVlKTTFuR52dc4rr5IUTEi
- tqlCVS1a1XyDDJB1U7gBvoP4QYZRbSHa1Rav6mqSTjzMn2I9T7rcWXJ
+ bh=/ncF81mYqriMzIkXDHCjmpdMkczIZjJbkswTEDIvT3Y=;
+ b=bm5gtvhweXyuMN7zIx3xAqcxJZj6Ixg3v6ty41EZIAlSzdOUny2h+SMlwnULvokzSuV17til/
+ CFDKd5xFoz1D2CGNgGGAuQ+LwKs62AnUhVTnLZI2FF4M/OYyg8quuEb
 X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
  pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
 X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
  auth_id=217
 X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 Reply-To: jan.petrous@oss.nxp.com
-X-Rspamd-Queue-Id: 844DF262015
+X-Rspamd-Queue-Id: 33B9726231D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266600-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
+	TAGGED_FROM(0.00)[bounces-266601-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de];
@@ -118,112 +117,102 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	HAS_REPLYTO(0.00)[jan.petrous@oss.nxp.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.nxp.com:replyto,oss.nxp.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nxp.com:email,suse.com:email]
 X-Rspamd-Action: no action
 
 From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 
-The stmmac driver contains similar pattern for processing queue-based
-arrays, ie. interrupt lines, etc. Factor out the for loop and provide
-a macro STMMAC_FOREACH_MTL_QUEUE(var, limit).
+Read IRQ resources for all rx/tx channels, to allow Multi-IRQ mode
+for platform glue drivers.
 
+Reviewed-by: Matthias Brugger <mbrugger@suse.com>
 Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c |  2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h        |  3 +++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 16 ++++++++--------
- 3 files changed, 12 insertions(+), 9 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 57 +++++++++++++++++++++-
+ 1 file changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index 49893b9fb88c..3890e82c69f6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -233,7 +233,7 @@ static void dwxgmac2_prog_mtl_tx_algorithms(struct mac_device_info *hw,
- 	writel(value, ioaddr + XGMAC_MTL_OPMODE);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 5c9fd91a1db9..7c299e47ff14 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -697,9 +697,47 @@ struct clk *stmmac_pltfr_find_clk(struct plat_stmmacenet_data *plat_dat,
+ }
+ EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
  
- 	/* Set ETS if desired */
--	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_TX_QUEUES) {
- 		value = readl(ioaddr + XGMAC_MTL_TCx_ETS_CONTROL(i));
- 		value &= ~XGMAC_TSA;
- 		if (ets)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 51c96a738151..c972ad8e79f8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -382,6 +382,9 @@ enum stmmac_state {
- 
- extern const struct dev_pm_ops stmmac_simple_pm_ops;
- 
-+#define STMMAC_FOREACH_MTL_QUEUE(var, limit) \
-+	for (var = 0; var < (limit); var++)
++/**
++ * stmmac_pltfr_get_irq_array - Read per-channel IRQs from platform device
++ * @pdev: platform device
++ * @fmt: IRQ name format string (e.g., "tx-queue-%d")
++ * @irqs: array to store IRQ numbers
++ * @num: maximum number of IRQs to read
++ *
++ * Return: 0 on success, -EPROBE_DEFER if IRQ is deferred, -EINVAL on error.
++ * Missing IRQs are set to 0 and iteration stops at first missing IRQ.
++ */
++static int stmmac_pltfr_get_irq_array(struct platform_device *pdev,
++				      const char *fmt, int *irqs, size_t num)
++{
++	char name[16];
++	int i;
 +
- int stmmac_mdio_unregister(struct net_device *ndev);
- int stmmac_mdio_register(struct net_device *ndev);
- int stmmac_mdio_reset(struct mii_bus *mii);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index edf0799b7236..b920ca17b2be 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3875,7 +3875,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 	}
- 
- 	/* Request Rx MSI irq */
--	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
-+	STMMAC_FOREACH_MTL_QUEUE(i, priv->plat->rx_queues_to_use) {
- 		if (i >= MTL_MAX_RX_QUEUES)
- 			break;
- 		if (priv->rx_irq[i] == 0)
-@@ -3899,7 +3899,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 	}
- 
- 	/* Request Tx MSI irq */
--	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
-+	STMMAC_FOREACH_MTL_QUEUE(i, priv->plat->tx_queues_to_use) {
- 		if (i >= MTL_MAX_TX_QUEUES)
- 			break;
- 		if (priv->tx_irq[i] == 0)
-@@ -4084,10 +4084,10 @@ static int __stmmac_open(struct net_device *dev,
- 			 struct stmmac_dma_conf *dma_conf)
++	STMMAC_FOREACH_MTL_QUEUE(i, num) {
++		if (snprintf(name, sizeof(name), fmt, i) >= sizeof(name))
++			return -EINVAL;
++
++		irqs[i] = platform_get_irq_byname_optional(pdev, name);
++		if (irqs[i] == -EPROBE_DEFER)
++			return -EPROBE_DEFER;
++
++		if (irqs[i] <= 0) {
++			dev_dbg(&pdev->dev, "IRQ %s not found\n", name);
++
++			/* Stop on first unset irq */
++			irqs[i] = 0;
++			break;
++		}
++	}
++
++	return 0;
++}
++
+ int stmmac_get_platform_resources(struct platform_device *pdev,
+ 				  struct stmmac_resources *stmmac_res)
  {
- 	struct stmmac_priv *priv = netdev_priv(dev);
-+	int ret, i;
- 	u32 chan;
--	int ret;
++	int ret;
++
+ 	memset(stmmac_res, 0, sizeof(*stmmac_res));
  
--	for (int i = 0; i < MTL_MAX_TX_QUEUES; i++)
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_TX_QUEUES)
- 		if (priv->dma_conf.tx_queue[i].tbs & STMMAC_TBS_EN)
- 			dma_conf->tx_queue[i].tbs = priv->dma_conf.tx_queue[i].tbs;
- 	memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));
-@@ -7734,9 +7734,9 @@ static int __stmmac_dvr_probe(struct device *device,
- 	priv->device = device;
- 	priv->dev = ndev;
+ 	/* Get IRQ information early to have an ability to ask for deferred
+@@ -735,7 +773,24 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
  
--	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_RX_QUEUES)
- 		u64_stats_init(&priv->xstats.rxq_stats[i].napi_syncp);
--	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_TX_QUEUES) {
- 		u64_stats_init(&priv->xstats.txq_stats[i].q_syncp);
- 		u64_stats_init(&priv->xstats.txq_stats[i].napi_syncp);
- 	}
-@@ -7759,9 +7759,9 @@ static int __stmmac_dvr_probe(struct device *device,
- 	priv->sfty_irq = res->sfty_irq;
- 	priv->sfty_ce_irq = res->sfty_ce_irq;
- 	priv->sfty_ue_irq = res->sfty_ue_irq;
--	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_RX_QUEUES)
- 		priv->rx_irq[i] = res->rx_irq[i];
--	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
-+	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_TX_QUEUES)
- 		priv->tx_irq[i] = res->tx_irq[i];
+ 	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
  
- 	if (!is_zero_ether_addr(res->mac))
+-	return PTR_ERR_OR_ZERO(stmmac_res->addr);
++	if (IS_ERR(stmmac_res->addr))
++		return PTR_ERR(stmmac_res->addr);
++
++	/* TX channels irq */
++	ret = stmmac_pltfr_get_irq_array(pdev, "tx-queue-%d",
++					 stmmac_res->tx_irq,
++					 MTL_MAX_TX_QUEUES);
++	if (ret)
++		return ret;
++
++	/* RX channels irq */
++	ret = stmmac_pltfr_get_irq_array(pdev, "rx-queue-%d",
++					 stmmac_res->rx_irq,
++					 MTL_MAX_RX_QUEUES);
++	if (ret)
++		return ret;
++
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(stmmac_get_platform_resources);
+ 
 
 -- 
 2.47.0
