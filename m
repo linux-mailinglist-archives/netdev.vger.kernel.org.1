@@ -1,365 +1,210 @@
-Return-Path: <netdev+bounces-266488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGiRGmwAsWn1pgIAu9opvQ
-	(envelope-from <netdev+bounces-266488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:41:00 +0100
+	id yBIcGPoBsWkzpwIAu9opvQ
+	(envelope-from <netdev+bounces-266489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:47:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8AB925C7FE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:40:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633C225C8B1
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:47:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16AE53062482
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 05:40:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 49FE4302DE56
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 05:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1A832AAAB;
-	Wed, 11 Mar 2026 05:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBD5313298;
+	Wed, 11 Mar 2026 05:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uftw3W5F"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JEFzcPwp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8E11A6812
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 05:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041992D0607;
+	Wed, 11 Mar 2026 05:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773207648; cv=none; b=ZuX0qdvcbNCfkWdMVcJKYSDqIp2pnm1B2dOEhRBZvKukfilx0viVdNgOMNSn0HmusqcZtsmw4omC2+fu3y2ko1TnmeJJhdRJ+o/my+TzTa2hbaQtPM0nYrzxwkXzygI8gSy5MOQvz65fqYijcrAQVfs+fyXAxIqEhwCaVpjbQks=
+	t=1773208048; cv=none; b=KoW+zOwAOJg9ief/FoQjIYMpTMq/00x0W40vKxytZRhpvndGDIBYqXfWSHX0EoHuOG2KynhzIaPbKHEBHYy4OwZUSP2aquoG06X413wUlgXezfVaJJGshrEPEQxpZQ0hEeFGuS86S0b9Fk7Qs/oCRj5ReAlqHJeVRsSueb4CIXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773207648; c=relaxed/simple;
-	bh=JSHWAVNvVBXSB9ThXFaPOcmNZbT1t2WDsQSAwsQ2+uc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=D08Blln2P4JFDqIZopwGKfUBt6jkwMFRPpNTgbt7O4NDXannv3jLWZFsqXthf6Y0sv3ko/tI8XgmYStR92u9Zsd6geiNUyR0+vhWooECHQs+6pLU9jOjAqxliKxAyp6+LzAMfB7BdMM8nh8IDv9zghpSsBRNQL1cl8k1Kv8R4bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uftw3W5F; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35842aa350fso65593368a91.0
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 22:40:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773207646; x=1773812446; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2iYEkGtIkHmh44Up4SKoGdEtE6K71EUjC2yOR5QWR94=;
-        b=uftw3W5Fa0UorbnRKyeW2g8BZ2ID1Ix+VB1Hy3B+rOjy4gEykD5Ls+eGVIycCaT9M7
-         M09FU7xsLsg7PGvY+3rtxryff+CYLW5AMA0uVXlCfuVLKyqvYQBhyLH83GxYy65ZLMDd
-         nJqtqlJKE/uvk1hw6yEQl3p7VLsWEQLBQVeDqWAoOmiartJGAfNwVbmNIicsYqzepPee
-         S83+eUcyS+TvmJXI59lWkMzzGCa1rCArt4cLR+Hrxgra0aeDjY3xVOE3TrBrYvxOivMD
-         afpiZ4b924C5V+kmCMK45Q/7whH3LBrf0hjvKgEHSxU5lhwVzWRnGp1Uh2cmvj0XzZVu
-         Mbsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773207646; x=1773812446;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2iYEkGtIkHmh44Up4SKoGdEtE6K71EUjC2yOR5QWR94=;
-        b=s+yy4T/D57NrhN0hBD2cSp8vDZqZCaFwtFXA3Peu45Xz/Z/9ZS2y06gmiB1iKkHhID
-         yndjKdEP0f9gElEymosF1cJjn9yY2nsQDapH6bXN4zOfYgteFjwjMSijcV8KFH4RthWd
-         0TldBRVGGcLql/KvU++y8aXdN8CGn6EvFOduDem2q0L3sld6IejGRSJTlEaIKVVQAbTC
-         x+OvUqIuqTJj9ejCf4FsUUzXZhd++OYbQIUPahvk10BgCqnbgI3rQfWvW6O9d8yAjYdl
-         RCiVnuOpbzED78MEpiT7Q4hsinZXEnIgCPBSzDD3SssRaYY9MPNE5ZJDtkkeG3+0LWz9
-         Ge6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVM1zFkKEGjWmQ7EhFPKeBTOqcM0mpClEtasW2khjpTUGsF0YDttBCRY2rCIBAzNwLrTMGJnPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg1NbU2sWbV6iBERbMQHGgDI4p6/ofrhRBbbzRarrbLR6023Fr
-	mnwqKie1FUJlAkZql+wODxi9CHxKNjcA29JsE2hZBaNfq8XgGrjgF8kZV1zNcbETA2iquHZPLAS
-	8RoEJLg==
-X-Received: from pjbbt19.prod.google.com ([2002:a17:90a:f013:b0:354:a750:45dc])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3fc4:b0:359:806c:7a94
- with SMTP id 98e67ed59e1d1-35a011cbed6mr1308934a91.7.1773207646333; Tue, 10
- Mar 2026 22:40:46 -0700 (PDT)
-Date: Wed, 11 Mar 2026 05:40:40 +0000
+	s=arc-20240116; t=1773208048; c=relaxed/simple;
+	bh=6e9nm3L3Ml4roIesxDngfDxHgzLdoKE/dPXzpdnu5E4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JthOvV8qA6B48OIx73Y8gr4kSuWeIG4Tog68uokVGnUBcCXRHNnX7YtZ/SVtv7Vn+/IfT0dpEEz4UGCWNvgz1D2B5r654vno2iq/Vm5WXeKhEuwYg9bKMgbjjrhsqzlCztj+Gw/EL5F8fKiL7q5SrvG1KsSKSoGG38RB5YlE+28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JEFzcPwp; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=7Yr8EZclJahCKTtZ/Xw6DqH7nt1Ujj1rZPquim7QHJ4=; b=JEFzcPwpzBaxCtB2FLUkSi1ZsU
+	JUXBztiKdPj9Gg5DHz4kbDZuqo/wpNmv+G1DK5UGy4VoHKvI92kQJNsmwwbBXfvN7H0CHvES4OiwV
+	f6cPQEdnEFCcaSc+1FZrL29kk3UQ/ZZPDM19yEPA8vcCq9E/iG8QSLYFLHKgmBx5jhucodN8+eXQk
+	RwU8A4R7qdf7+2kULSsVyq7aQSE6kwCsk14tV2JqqMBlFG2YeSdqirORjU0qFpdsRTJswcGSLlcSX
+	8CFP+BWd6bKOpqYwBAcVSjy+36HqQlOpnkbnT+/bbh0RptrET3elK/SMrq5yG2xNbwH82KT54Y3TQ
+	4KqNRKZQ==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1w0CPX-000EA3-39;
+	Wed, 11 Mar 2026 06:47:12 +0100
+Received: from localhost ([127.0.0.1])
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1w0CPW-0002vk-1V;
+	Wed, 11 Mar 2026 06:47:10 +0100
+Message-ID: <6da18a29-f545-4151-a7d4-58bcaf04b967@iogearbox.net>
+Date: Wed, 11 Mar 2026 06:47:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260311054043.1231316-1-kuniyu@google.com>
-Subject: [PATCH v3 net] af_unix: Give up GC if MSG_PEEK intervened.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, Linus Torvalds <torvalds@linuxfoundation.org>, 
-	netdev@vger.kernel.org, Igor Ushakov <sysroot314@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: D8AB925C7FE
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 3/4] bpf: bpf_out_neigh_v4: Fix nd_tbl NULL
+ dereference when IPv6 is disabled
+To: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260307-net-nd_tbl_fixes-v4-0-e2677e85628c@suse.com>
+ <20260307-net-nd_tbl_fixes-v4-3-e2677e85628c@suse.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260307-net-nd_tbl_fixes-v4-3-e2677e85628c@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27936/Tue Mar 10 07:24:39 2026)
+X-Rspamd-Queue-Id: 633C225C8B1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266488-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,linuxfoundation.org,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266489-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[suse.com,linux.dev,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,suse.com:email]
 X-Rspamd-Action: no action
 
-Igor Ushakov reported that GC purged the receive queue of
-an alive socket due to a race with MSG_PEEK with a nice repro.
-
-This is the exact same issue previously fixed by commit
-cbcf01128d0a ("af_unix: fix garbage collect vs MSG_PEEK").
-
-After GC was replaced with the current algorithm, the cited
-commit removed the locking dance in unix_peek_fds() and
-reintroduced the same issue.
-
-The problem is that MSG_PEEK bumps a file refcount without
-interacting with GC.
-
-Consider an SCC containing sk-A and sk-B, where sk-A is
-close()d but can be recv()ed via sk-B.
-
-The bad thing happens if sk-A is recv()ed with MSG_PEEK from
-sk-B and sk-B is close()d while GC is checking unix_vertex_dead()
-for sk-A and sk-B.
-
-  GC thread                    User thread
-  ---------                    -----------
-  unix_vertex_dead(sk-A)
-  -> true   <------.
-                    \
-                     `------   recv(sk-B, MSG_PEEK)
-              invalidate !!    -> sk-A's file refcount : 1 -> 2
-
-                               close(sk-B)
-                               -> sk-B's file refcount : 2 -> 1
-  unix_vertex_dead(sk-B)
-  -> true
-
-Initially, sk-A's file refcount is 1 by the inflight fd in sk-B
-recvq.  GC thinks sk-A is dead because the file refcount is the
-same as the number of its inflight fds.
-
-However, sk-A's file refcount is bumped silently by MSG_PEEK,
-which invalidates the previous evaluation.
-
-At this moment, sk-B's file refcount is 2; one by the open fd,
-and one by the inflight fd in sk-A.  The subsequent close()
-releases one refcount by the former.
-
-Finally, GC incorrectly concludes that both sk-A and sk-B are dead.
-
-One option is to restore the locking dance in unix_peek_fds(),
-but we can resolve this more elegantly thanks to the new algorithm.
-
-The point is that the issue does not occur without the subsequent
-close() and we actually do not need to synchronise MSG_PEEK with
-the dead SCC detection.
-
-When the issue occurs, close() and GC touch the same file refcount.
-If GC sees the refcount being decremented by close(), it can just
-give up garbage-collecting the SCC.
-
-Therefore, we only need to signal the race during MSG_PEEK with
-a proper memory barrier to make it visible to the GC.
-
-Let's use seqcount_t to notify GC when MSG_PEEK occurs and let
-it defer the SCC to the next run.
-
-This way no locking is needed on the MSG_PEEK side, and we can
-avoid imposing a penalty on every MSG_PEEK unnecessarily.
-
-Note that we can retry within unix_scc_dead() if MSG_PEEK is
-detected, but we do not do so to avoid hung task splat from
-abusive MSG_PEEK calls.
-
-Fixes: 118f457da9ed ("af_unix: Remove lock dance in unix_peek_fds().")
-Reported-by: Igor Ushakov <sysroot314@gmail.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v3: Check !fpl and add spinlock in unix_peek_fpl()
-v2: https://lore.kernel.org/all/20260309185823.3502204-1-kuniyu@google.com/
-  * Use seqcount_t for proper memory barrier
-v1: https://lore.kernel.org/netdev/20260308030406.1825938-1-kuniyu@google.com/
----
- net/unix/af_unix.c |  2 ++
- net/unix/af_unix.h |  1 +
- net/unix/garbage.c | 79 ++++++++++++++++++++++++++++++----------------
- 3 files changed, 54 insertions(+), 28 deletions(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 7eaa5b187fef..b23c33df8b46 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1958,6 +1958,8 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
- {
- 	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
-+
-+	unix_peek_fpl(scm->fp);
- }
- 
- static void unix_destruct_scm(struct sk_buff *skb)
-diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
-index c4f1b2da363d..8119dbeef3a3 100644
---- a/net/unix/af_unix.h
-+++ b/net/unix/af_unix.h
-@@ -29,6 +29,7 @@ void unix_del_edges(struct scm_fp_list *fpl);
- void unix_update_edges(struct unix_sock *receiver);
- int unix_prepare_fpl(struct scm_fp_list *fpl);
- void unix_destroy_fpl(struct scm_fp_list *fpl);
-+void unix_peek_fpl(struct scm_fp_list *fpl);
- void unix_schedule_gc(struct user_struct *user);
- 
- /* SOCK_DIAG */
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 816e8fa2b062..a7967a345827 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -318,6 +318,25 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
- 	unix_free_vertices(fpl);
- }
- 
-+static bool gc_in_progress;
-+static seqcount_t unix_peek_seq = SEQCNT_ZERO(unix_peek_seq);
-+
-+void unix_peek_fpl(struct scm_fp_list *fpl)
-+{
-+	static DEFINE_SPINLOCK(unix_peek_lock);
-+
-+	if (!fpl || !fpl->count_unix)
-+		return;
-+
-+	if (!READ_ONCE(gc_in_progress))
-+		return;
-+
-+	/* Invalidate the final refcnt check in unix_vertex_dead(). */
-+	spin_lock(&unix_peek_lock);
-+	raw_write_seqcount_barrier(&unix_peek_seq);
-+	spin_unlock(&unix_peek_lock);
-+}
-+
- static bool unix_vertex_dead(struct unix_vertex *vertex)
- {
- 	struct unix_edge *edge;
-@@ -351,6 +370,36 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
- 	return true;
- }
- 
-+static LIST_HEAD(unix_visited_vertices);
-+static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-+
-+static bool unix_scc_dead(struct list_head *scc, bool fast)
-+{
-+	struct unix_vertex *vertex;
-+	bool scc_dead = true;
-+	unsigned int seq;
-+
-+	seq = read_seqcount_begin(&unix_peek_seq);
-+
-+	list_for_each_entry_reverse(vertex, scc, scc_entry) {
-+		/* Don't restart DFS from this vertex. */
-+		list_move_tail(&vertex->entry, &unix_visited_vertices);
-+
-+		/* Mark vertex as off-stack for __unix_walk_scc(). */
-+		if (!fast)
-+			vertex->index = unix_vertex_grouped_index;
-+
-+		if (scc_dead)
-+			scc_dead = unix_vertex_dead(vertex);
-+	}
-+
-+	/* If MSG_PEEK intervened, defer this SCC to the next round. */
-+	if (read_seqcount_retry(&unix_peek_seq, seq))
-+		return false;
-+
-+	return scc_dead;
-+}
-+
- static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
- {
- 	struct unix_vertex *vertex;
-@@ -404,9 +453,6 @@ static bool unix_scc_cyclic(struct list_head *scc)
- 	return false;
- }
- 
--static LIST_HEAD(unix_visited_vertices);
--static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
--
- static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 				     unsigned long *last_index,
- 				     struct sk_buff_head *hitlist)
-@@ -474,9 +520,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 	}
- 
- 	if (vertex->index == vertex->scc_index) {
--		struct unix_vertex *v;
- 		struct list_head scc;
--		bool scc_dead = true;
- 
- 		/* SCC finalised.
- 		 *
-@@ -485,18 +529,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
- 		 */
- 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
- 
--		list_for_each_entry_reverse(v, &scc, scc_entry) {
--			/* Don't restart DFS from this vertex in unix_walk_scc(). */
--			list_move_tail(&v->entry, &unix_visited_vertices);
--
--			/* Mark vertex as off-stack. */
--			v->index = unix_vertex_grouped_index;
--
--			if (scc_dead)
--				scc_dead = unix_vertex_dead(v);
--		}
--
--		if (scc_dead) {
-+		if (unix_scc_dead(&scc, false)) {
- 			unix_collect_skb(&scc, hitlist);
- 		} else {
- 			if (unix_vertex_max_scc_index < vertex->scc_index)
-@@ -550,19 +583,11 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 	while (!list_empty(&unix_unvisited_vertices)) {
- 		struct unix_vertex *vertex;
- 		struct list_head scc;
--		bool scc_dead = true;
- 
- 		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
- 		list_add(&scc, &vertex->scc_entry);
- 
--		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
--			list_move_tail(&vertex->entry, &unix_visited_vertices);
--
--			if (scc_dead)
--				scc_dead = unix_vertex_dead(vertex);
--		}
--
--		if (scc_dead) {
-+		if (unix_scc_dead(&scc, true)) {
- 			cyclic_sccs--;
- 			unix_collect_skb(&scc, hitlist);
- 		}
-@@ -577,8 +602,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 		   cyclic_sccs ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC);
- }
- 
--static bool gc_in_progress;
--
- static void unix_gc(struct work_struct *work)
- {
- 	struct sk_buff_head hitlist;
--- 
-2.53.0.473.g4a7958ca14-goog
-
+On 3/7/26 9:50 PM, Ricardo B. Marlière wrote:
+> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
+> initialized because inet6_init() exits before ndisc_init() is called which
+> initializes it. If bpf_redirect_neigh() is called from tc with an explicit
+> nexthop of nh_family == AF_INET6, bpf_out_neigh_v4() takes the AF_INET6
+> branch and calls ip_neigh_gw6(), which relies on ipv6_stub->nd_tbl.
+> 
+>   BUG: kernel NULL pointer dereference, address: 0000000000000248
+>   Oops: Oops: 0000 [#1] SMP NOPTI
+>   RIP: 0010:skb_do_redirect+0xb93/0xf00
+>   Call Trace:
+>    <TASK>
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    ? __tcf_classify.constprop.0+0x83/0x160
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    ? tcf_classify+0x2b/0x50
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    ? tc_run+0xb8/0x120
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    __dev_queue_xmit+0x6fa/0x1000
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    ? alloc_skb_with_frags+0x58/0x200
+>    packet_sendmsg+0x10da/0x1700
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    __sys_sendto+0x1f3/0x220
+>    __x64_sys_sendto+0x24/0x30
+>    do_syscall_64+0x101/0xf80
+>    ? exc_page_fault+0x6e/0x170
+>    ? srso_alias_return_thunk+0x5/0xfbef5
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>    </TASK>
+> 
+> Fix this by adding an early check in the AF_INET6 branch of
+> bpf_out_neigh_v4(). If IPv6 is disabled, unlock RCU and drop the packet.
+> 
+> Suggested-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> Fixes: ba452c9e996d ("bpf: Fix bpf_redirect_neigh helper api to support supplying nexthop")
+> Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
