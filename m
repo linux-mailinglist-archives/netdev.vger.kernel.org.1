@@ -1,149 +1,161 @@
-Return-Path: <netdev+bounces-266663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266664-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJWKMkR6sWk2vgIAu9opvQ
-	(envelope-from <netdev+bounces-266663-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:20:52 +0100
+	id KLSPNBx+sWmjCwAAu9opvQ
+	(envelope-from <netdev+bounces-266664-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:37:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23714265537
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:20:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8183265851
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA15D3036D55
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:20:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9950C300516C
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C038436DA0F;
-	Wed, 11 Mar 2026 14:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16A13BADBD;
+	Wed, 11 Mar 2026 14:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/b/iXz9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="If8uo/u9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D53D36CDE2;
-	Wed, 11 Mar 2026 14:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4283A392C27
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 14:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773238848; cv=none; b=Rr/IdnQUe8IfQVgb5EJ8GqJ8Qx09hb6JyDpBm0LzCHWlrBny3fYZcPO1SiTiJRNPMwJBzj/tfTZ1lWCWKaDaMHWbIeW+d7cGGF2wIaVexHc8ssOift3bQK5a2/ZSIOl70/Ezb7m3A4/22BVxEC3wUty+AG9IUrD+E85ND5rVcnI=
+	t=1773239180; cv=none; b=YOE7DgatI9Z2tybrLqO8PbHP3bUyRnACqmYaA2PMN04GCh0oQ3SSDW1pwN3yWYZwaCjbnFFTKwap1h3xM1A6L1JhHTwfARy5IXFO30CbfgWJlpP72JXlHpN7d99sZHnDlTHpyK/7k7NqSuksMb9GC5ny4iwBa0S1GYbgQyMeX8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773238848; c=relaxed/simple;
-	bh=t0zMQLLWn8qY/GiuewiNpQmrxDLN7vxpCqE3pvHmEno=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eZvil2iDk8E/YclYaheApEt5op8Y1UBPDxWezwJCDg4RKxQKSghGZYa53IXNZ7RtIOApfOjR3V3Vt124QUnBKLfQwGwg6NpnIZg7imC6xsuYp4xEo0lPyooHCUiiIEP/V5xePBCT8LsletcC1zhEppRNXw3SSsJS+0VE09fbN5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/b/iXz9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91E8C4CEF7;
-	Wed, 11 Mar 2026 14:20:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773238848;
-	bh=t0zMQLLWn8qY/GiuewiNpQmrxDLN7vxpCqE3pvHmEno=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a/b/iXz9A6iIP7OxXL55jzJEX/XBP2eLKwDl5Av2xcMxujxM2G4pC+fclYaOXwO1d
-	 50dmJZEIQvuF2WO5xqxkpBSZ8AXUlRmXp0ronwhkr4ZFy72vtIV5S56RAqYqu//OVO
-	 /uKBnerjhCsXxDAL/Z0wGYCR4T9X2W+8AM7rnUeWCyLnFtrD2BHnF/4EUlJwppArhM
-	 m6pQMLfPqSNSRluRf0+uCeIoIPP1EoThJB+lO0kqoQxSlcOMbKc4hIL7lRjRmYFlq6
-	 CzK+AtUBnkX5kUqO4ctX/g+IdQQuMPjXQUZ4fBAwC2QaO6VKKk86ah98+tIBLJ1NUU
-	 1cpB7npjjwiWQ==
-Message-ID: <19d1571d-0415-42ff-b9b4-8c866f566958@kernel.org>
-Date: Wed, 11 Mar 2026 10:20:45 -0400
+	s=arc-20240116; t=1773239180; c=relaxed/simple;
+	bh=4ceUNuXX6pWUvU8VvO1XDBzl8/ZMKu+p+vbNJlMs9wY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9ceReDOkl9582jutfOC8+H0Ok0t6JVji08tMwIIdHYjV/fpG4iscqO7hAhq+CrBmbNCZnZ/sOYxo72QgIZQyDHlW6dONDsBA7Wru6tn6iQSsU6Pyimc416nwzXaijs+7Qc4fGAc/fvtNCtuE8EVCVWr7OZT1FYMfZsa1qkdLmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=If8uo/u9; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=11YlZnsUQzWnNst822K7eoXd8kxt6rzmcbVMr2uy4Lc=; b=If8uo/u9Auvd7+rrMk9k7Qek3q
+	9ptxQOfM2dhiWqWfXsvF2GLny+7Mk7grOH4y9ADF5f5FwbPfXKkGgDowPgIa+YrfIx4paWTrrl4aI
+	SZfUKZyrgXsNTeXFOK/cNEgyQ3f6PPIpdbs7CtieOOP/pahOrhhhe0yH4SCnqUJIn2YlsJCN9BOve
+	r8E8ORDNAP5nAL03BRQcoluFBZNb9+xDeCl5OfYx8DZfGRzeaz0dNSd6gcsaDQ1//HvoJfnQ4iend
+	o4ZyPsgVU2kTROZJi/h0QsjoKI2XwcvUlHj920lvnhuMafoEKCz6iIscxM4nEf64+nvKA1E8O/0ik
+	wg9rGovA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44788)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w0KVp-000000006Tx-2h7t;
+	Wed, 11 Mar 2026 14:26:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w0KVn-000000006Iv-3UY6;
+	Wed, 11 Mar 2026 14:26:11 +0000
+Date: Wed, 11 Mar 2026 14:26:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: andrew@lunn.ch, conor@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: phy: vitesse: add inband caps and
+ configuration
+Message-ID: <abF7g9kZk5-9YN5_@shell.armlinux.org.uk>
+References: <E1w082O-0000000ChNc-1wDz@rmk-PC.armlinux.org.uk>
+ <20260311140135.937544-1-geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] sunrpc: fix TLS connect_worker rpc_clnt lifetime UAF
-To: Benjamin Coddington <bcodding@hammerspace.com>, bsdhenrymartin@gmail.com,
- Trond Myklebust <trondmy@kernel.org>
-Cc: linux-nfs@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, Anna Schumaker <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260309112041.1336519-1-bsdhenrymartin@gmail.com>
- <FEF1FBB7-B82A-4A71-8F25-689EB5CD8F41@hammerspace.com>
-From: Chuck Lever <cel@kernel.org>
-Content-Language: en-US
-Organization: kernel.org
-In-Reply-To: <FEF1FBB7-B82A-4A71-8F25-689EB5CD8F41@hammerspace.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 23714265537
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260311140135.937544-1-geert+renesas@glider.be>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266663-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[hammerspace.com,gmail.com,kernel.org];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266664-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.958];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: D8183265851
 X-Rspamd-Action: no action
+X-Rspamd-Server: lfdr
 
-On 3/11/26 10:18 AM, Benjamin Coddington wrote:
-> On 9 Mar 2026, at 7:19, bsdhenrymartin@gmail.com wrote:
-
->> @@ -2805,7 +2811,11 @@ static void xs_connect(struct rpc_xprt *xprt, struct rpc_task *task)
->>         } else
->>                 dprintk("RPC:       xs_connect scheduled xprt %p\n", xprt);
->>
->> -       transport->clnt = task->tk_client;
->> +       if (transport->connect_worker.work.func == xs_tcp_tls_setup_socket) {
+On Wed, Mar 11, 2026 at 03:01:35PM +0100, Geert Uytterhoeven wrote:
+> 	Hi Russell,
 > 
-> ^^ .. this seems a bit brittle..
-
-This caught my eye as well.
-
-
+> On Wed, 11 Mar 2026 at 01:07, Russell King <rmk@armlinux.org.uk> wrote:
+> > Add support for VSC8662 reporting its inband capabilities, and also
+> > hook to configure the PHY's inband mode.
+> >
+> > This fixes a regression in the macb driver caused by commit
+> > 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
 > 
->> +               WARN_ON_ONCE(transport->clnt != NULL);
->> +               refcount_inc(&task->tk_client->cl_count);
->> +               transport->clnt = task->tk_client;
->> +       }
->>         queue_delayed_work(xprtiod_workqueue,
->>                         &transport->connect_worker,
->>                         delay);
+> Fixes: 1338cfef1ff1b958 ("net: macb: fix SGMII with inband aneg disabled")
 > 
-> This fix works and I think its great for stable:
+> > Reported-by: Conor Dooley <conor@kernel.org>
+> > Link: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
 > 
-> Reviewed-by: Benjamin Coddington <bcodding@hammerspace.com>
-> 
-> But I think we ended up with this problem because we're re-using the
-> rpc_clnt in order to set up the lower_transport, and maybe we don't have to
-> actually mix those layers.
-> 
-> Chuck, Trond - can we use a "dummy" rpc_program to create the lower rpc_clnt,
-> and keep the lifetime of the original rpc_clnt disconnected from the
-> sock_xprt?  I can send a patch..
+> s/Link/Closes/
 
-The upper/lower architecture was Trond's suggestion. I just implemented
-it (poorly). Let's see whatcha got!
+I avoided it because any other PHY used with macb that is also connected
+via SGMII will run into this same issue. It just happens that adding
+this support fixes the above commit.
 
+Conversely, we have stmmac, which unconditionally enables SGMII inband
+at the MAC end no matter what phylink says to do, and should this
+PHY be used with this patch in a stmmac system, it will cause that to
+break, because we end up with either end misconfigured.
+
+Also, if this commit is applied without the macb change, you'll
+probably also find that macb breaks (please test that.) 
+
+So, while this is a solution and a step forward, I'd rather not suggest
+that it is an official fix to the macb issue - it's merely filling in
+a missing piece of the jigsaw.
+
+Sadly, this is a fundamental issue with SGMII implementations today:
+whether SGMII inband is used/required is completely random both at the
+MAC/PCS end but also at the PHY end. If one ends up with a mismatch,
+then things stop working.
+
+As I say, the problem with fixing the PHY end of the link is that
+it could cause a different network driver to regress.
+
+So yes, this is a solution to the macb problem, but I regard it as
+high risk.
+
+That said, given the SGMII mess, there is no easy way forward.
 
 -- 
-Chuck Lever
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
