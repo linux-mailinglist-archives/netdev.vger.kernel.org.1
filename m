@@ -1,275 +1,259 @@
-Return-Path: <netdev+bounces-266771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCi/Oc/NsWmQFQAAu9opvQ
-	(envelope-from <netdev+bounces-266771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:17:19 +0100
+	id cMdBE83RsWnQFQAAu9opvQ
+	(envelope-from <netdev+bounces-266772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:34:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F177269D54
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:17:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9919269FC5
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7627330234E0
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:17:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 659BF30420B6
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA0038D008;
-	Wed, 11 Mar 2026 20:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A5324716;
+	Wed, 11 Mar 2026 20:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3pTjzrQ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="desBFOHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013014.outbound.protection.outlook.com [52.101.72.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1397238D002
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B4C347FD3
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773260233; cv=pass; b=mT5F5yLPS7ZVzXP/ao23Ad2Pf8bptmoVcEvL8OZQB5zFUKlXYVC5RpX/8fMad2vxw9Lh80yy4R+FImq44gONBP/jow0/ld68Y2bTcQk9Sn6FemYnwbLH5n3jhySXbhPbAgtQKTG/fAmXT4ajc0+4xNYmRqN409nXGcJcICqL/z4=
+	t=1773261258; cv=fail; b=hFqOFh4T6wBpCSMa5t1NS2THYwdpDgOncOI314TI180Lgju//GximZ9EKxhj/MD80fGo2++VbOSRarYxcXrEQcs73cmc6dXBlpC6sQ+oiiN85k9kUghzvAo2u14piRUm0JyTzXPqT9L9SkvR++tTxgx/G7ll4jnyriKtdMieTNE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773260233; c=relaxed/simple;
-	bh=d1eyVS+Zp9IXBT7u0kM5sa61xIBMpLOIIWtclrSsC5A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J7CHS3FnekR+Pevsg2COjjBXKdIOTjfuhcYevnTVTtbg8ZMRKUIMJUl+CpH+54mwPzXT1JPYeqpB6crwHhU8PYQNmCK00Cdw9297tYG0myS3JxbFpD36grZuS0FyJHl5SBskjOTecsrsun3E0r544A5QiqjRZWJIw7MT24BJsDY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3pTjzrQ; arc=pass smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-79860421382so1908647b3.0
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:17:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773260230; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MP/sbx6wmLOpwjTyqNTDXgYfTytdvfHCzJllOV50D0xcH0a5RPzW6zUcziP16WMcDh
-         RybuoCTWBjdt4IDHLF4GdKXJn6OV6JZXfhSG4b6TnhBahFMaJVwwwg7mBS29kej8Cke5
-         EeRQ68XDfVhGJ41ZLDtpY3IPgnH2H84p4RZ3yVwzbjME9HV/jbROs9Z7oyZPu5+WV8k0
-         IVNas4f0Kbca3wB/oAqUbEIuN3FYZ0TFju4gBtiUG5FelMlJyIKOvODq99wwJzx073Az
-         cSJ8pifs9eTkvc6fYrxVme//ypZ18c0pTHvOiXWyX7J7ojucq3PRjoThpKGmeG2uD+Iu
-         NIPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
-        fh=yGfRJNs7iphAM53QRjSmlbVcpwueRa4VqedSvVkXqg4=;
-        b=cIHApeMPerhw6qJgGimDFyzvRPvYd6uqmBZeLfD8D+QTEX+a+s9gnXZIrkHw9edPQZ
-         at5KaQ5o3i61sleI5DejHJznuJsDxx8vjhZLtan5IBPPY9wWkpe3781/2l2B7pwr6NU8
-         dkSlsE/FXEiFHs7J94BUypnfbSUfeiJK5U0D6pKHtoGD5mQQJ9bzaSqHOkJI/q9MKo7/
-         zq48Y8+S0nBlhWINSZ/Kpk3tJu2+aduRIgsnKBxs4cjG/vr2d9E4Awiy1dDpmvV8OUQ/
-         hI1IY4wGSdaCrST484bf8UHpJqjHKsJf3z6hdq13tZEjaBZxeFlya25436pdwtSEZ2Su
-         TAUw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773260230; x=1773865030; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
-        b=M3pTjzrQlGKHQZ8aKgd+y+GOH37WmJgdPU+ML9s1KfZTXbvF2JLblL3bclDT01AONh
-         pWDIqLxKY+LiMcxOI77DTck8XXKd/AumLItpVYTiPBWB3A6EfGguYfC0jAxvLeOQrF1z
-         UsEuQjq7qocT11f5EnhJbJr3iGU/T9rjK9Ul3SgRgddndXWhHFBNOyrjMLoGPhu2PON2
-         KZPn767KINYMLmz3dmtVllXfF5yp9M5myTzRW8UyrwNLDLmS8Hv4xRNdxoICtIM8Cguq
-         Da7+KQ6CA32B2I7tIVjhCGSd4xFU2pSyjIHGSPF3kZKVwxdas3WTm68a2JqUW43fLdTC
-         2kvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773260230; x=1773865030;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
-        b=aHKB9lnUV+idqQpOjsaJaAiepB4aPd+BYo7WUzPYtVfNR+QDxusTwyoijmxupvVaa8
-         pLw3MRXr6mtluMkPnGvZMOZuojya1Pq4FA/EbXcTEd89sconB0lbMBjHKsM5GTGjXVYY
-         9jFZ1mcN6inl3M/wCONC9ODSuOmDCSIpyy4nUCTTMdr+08xYvoGuixGZ0t7z2N6SwxiC
-         izGrc7cXy5QLH7YNzkkkZx2A5hYiH288mPeMu4jhjOxdJ6uw0S8ZcQrMR0H9AxkieRlj
-         RluOHAQQioVY9n7HJR444wioKwL1fD9vWcxwoHYR2zgU/HTjrorW16Vdq65hZJiU3JPw
-         /e4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBE0LtXgVm+oCRfUkSkb7pxCADshkXXz+4rYqYPEZvNdj5U6X5hTkbqOLL0AF5wOms0ZMS0hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoTbNwA1qts7X8T/j94Xk7GraHNMXFpqHAVBH/zGF4RkEwvLVt
-	Y/cO6Bsmo0nXjS61ME3TNUFWDqXT6QActzzpXn6gC6QYgFPMIp9XHlr5eP/CndpPTmH6IEL5Fnm
-	oWaC1s4V7YaxmCBRHQ+mcWzDmZY9C/yQpav/k6p8=
-X-Gm-Gg: ATEYQzzxKw3H35/gzQZmUqDy0tBvzQvvOKGcr/RFgPusWImPlpFCA/WMnE63Ma+MkeI
-	DK07z0gslgaR4dOKVuE3k7UVu4d6cJafaTF42SgY0aqhqU7d6gLYdxwAwLHG7KUcFCdYm6M8/IJ
-	uJiexRB6iOJPIyMgv1iFDLpel9OuPkYulzgYIK7k2Uz4wD8II+kqnlrz7nIdA6RTOG8fin9hEZM
-	xZZhKFXNIZFwPgj4DuWrHuTF1w5WCYVVlm1xgISPDlBZd7UzrKNm834e5tL3KZgJvL9Oz6rAFtv
-	kS+wRx8=
-X-Received: by 2002:a05:690c:e3c6:b0:798:78ea:f0c5 with SMTP id
- 00721157ae682-79917e97d83mr38847737b3.13.1773260230066; Wed, 11 Mar 2026
- 13:17:10 -0700 (PDT)
+	s=arc-20240116; t=1773261258; c=relaxed/simple;
+	bh=9YfmH9VPNjzlQOrQShUhCitNONAUD2UfBwR/IR53xB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SUksRw5xobbVmJbBrKKd+/M0dnu77IXIUE3d54TtS949qCghYfwEApptEf48NzxZmedRLpmXmE5ZJ7r+I/C6OYhUQGaBdpMEs7zXaZ3SmETUvwqQHkfGC/FgFrTjLFhkjNRhT3H42Skj9twWzsKhr5EL16hpS4TCozbZGSK3Rng=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=desBFOHH; arc=fail smtp.client-ip=52.101.72.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lF3qEuFsX36DtzuUZNhHIvxPKe8roFoIYGZVlknO8o1yUgRTZ/fRPXN0opeSEpQv+5mRsxLVRJRaLEJiTCg0TdBnHnEatcBIhs+2B9ewy6MKSdGNt+LltTXs65aKCsftMpdhWaAyYEV4+vSfddoohhT9tRaexOTdF6T1pSofspuP1UI8V7rb1Pf4nixX1Hl/xs1MSkOjM/9c4EeZX5kMElHP8O7eGkISWEX6w8qfrhcGrktZFLFXHqVvbdcq7WXSMM8ZBxIhyP92RiH8rINie76X+5Cm7U5i74H1vFpDfBUJjwf0ULZRliVdG7R35iy50PQ9zTFa0XhM0etCqEU6zg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nwqpmSMGh9l+PfzIvYwQYyBpCivENE17EiTSj+kPtSo=;
+ b=pcKdAVWM8rxzKKYieI2SbtfPNdeVB5Lk49sYeA80lz/vqlyYxL9qGHC1VIU8XuZDJ/0kMkV+ft6EU+NpuJPVqS2pd8HseE+gznx9y6ZFujx81p3vTzUWEI0N8nRdykoAuUyLS/7mAtAKsvJ3kD8x1sr+78nTwHZZAu+2IXHb5FGldQj/xdgF/ALOC4EC2+VmWFCtPAIH+xVS/dgVjO1+FZ5pao2oIl7FEvgzjqcr1VCp0qcWVOcB63PmZXWuJD7VdlJtReLBmjiPgmfNtimlep8hYDkCqpqhP/RKV27Y3MJgiKYPg4pyH9EiLnDhMtiiOYgcLl2go1MKULZ93dWGIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nwqpmSMGh9l+PfzIvYwQYyBpCivENE17EiTSj+kPtSo=;
+ b=desBFOHHki/RQug+iMU708WCnTgGpldt/HUwmyzr7oiQb2Jf29hFu+/hr6HUK4xkCq0uXI+eg5jrSHdWxkx9pNT3a5QdWUHVM9Ussmku5ukFFoEuTkiNN3sHxP4vATfHkKr6MZChxnN4AlFjx+y4mgqeMt1/5kb86pDbusTdg6jDsmhfpu8xFbF6T1Ewn4N7O7KB6MW3dccojCfEzqVuITvErCc9tBLBTRmd5fG4W7B1jxD6ZcEkinIcQYE+ktHWSGUnwT12pkTl+rbZMchC6sMRKCl0H/EayyjFS9+wcf+NQJMnrJz7B0o7crMDBWl14EZc+eL7VXRztmQP4zqGiw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by PAWPR04MB9861.eurprd04.prod.outlook.com (2603:10a6:102:381::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Wed, 11 Mar
+ 2026 20:34:12 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
+ 20:34:09 +0000
+Date: Wed, 11 Mar 2026 22:34:10 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Wei Fang <wei.fang@nxp.com>,
+	netdev@vger.kernel.org
+Subject: Re: Disappearance of network PHYs
+Message-ID: <20260311203410.rio7m6nuf72hs5p6@skbuf>
+References: <20260311153421.u454m3e4blkstymt@skbuf>
+ <eb6edd0d-36b6-416a-bf74-676421f12f2d@bootlin.com>
+ <243d5ec4-785e-459e-9129-d1e862d36716@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <243d5ec4-785e-459e-9129-d1e862d36716@lunn.ch>
+X-ClientProxiedBy: VE1PR03CA0013.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::25) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-4-ameryhung@gmail.com>
- <CAEf4BzaRJ4hgMZY04=B0nnAE=MjyD4FN2L867vGCbornshOXDw@mail.gmail.com>
-In-Reply-To: <CAEf4BzaRJ4hgMZY04=B0nnAE=MjyD4FN2L867vGCbornshOXDw@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 13:16:58 -0700
-X-Gm-Features: AaiRm50_1E906IE_5n6OlSDFA1nUlOC73HbmufmmtzwTEwEgDBcaxSIlMklfoMo
-Message-ID: <CAMB2axPL07LZXAjy=FMBh2GeRkF0KQ81ixNFmX_+ZxZWm7nvSQ@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 03/11] bpf: Unify dynptr handling in the verifier
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PAWPR04MB9861:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba25793e-3bcb-40d2-eca3-08de7fad8c51
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|10070799003|19092799006|376014|1800799024|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	ywjfsb73YUvDKvJjHxlYSlwcxfIGK7iJouu6mxF1vP/tDorAdVoPElZPzsOP1PeiBfqWtV7dwz786iKHs6CR6ZHTTQUMQzEwh++RJimE4IexyuJfq63Abn3++f1MVWek7/bOepunKdLsLsssOYIMcrf5OMrsyWbDs53JrfBFDywr9H3MjFYn/x352ypY2Rk1NguRx1uR5bj7mGwb6kUVGAw4HJVjoDIn1gqMF5OEoFIFkr6I2p6L8wfqtOCmYrld4S7bVGS+8Qckt1Em/OmT3eaFzWvcf5TSpyDP8Iya3OmWO/u77orYaN4JIxfvMlHZ/7a5FpjcC6jHyyenQbQlmh1fwwbzhoPLtA6pK4YRO/SxoLAJbOfXAsoNRuq6gxZLYx8+tew6EL/QUHvOHjAL5g7L70//Wh2aq5tcb/4hVlSFGm6n2P2xsiZLLJv00UzLP8bDZ1BnmwGqcQia2c4tGuvLLet6SvpQvOJ/lfFRcAfhZxw59E6N43E2s3zEnEzeFtLugR1ntT1m2u+/pKrYOesQ9E2BpvbFWX3zG6rcwfC8PDFYO5sJaGCtHOAAdLtt3+70d67+4QVuXWz4Am054rLF+kpJZ0bxEk+yMcGl/hbeP8/oUAjOnQT/9FWkewOLvjoOXxlipiURCR/2uYSv7yf1qrX3TWCCzwHttqpTwxQ3xjAuKPf2zyezw+V7sAdgdPNOKnH84iNbtiID8BGDGMiG2unGVyPhCrny//6ouls=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(19092799006)(376014)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?oVV3TxInA4SeXKPrzQUsvT3RYIOwOgq7w4BLh5PkUT/PJrN7Q902REWlqBCv?=
+ =?us-ascii?Q?PJfnLC6BfysssXQCi4oGzhRDNv2zkCy4E/qAaXn+8xI990eyYfvvcQnXVlHz?=
+ =?us-ascii?Q?kwyOX9qldPDA+ft7yIo2bBnpFE3ZXQO1fnioB9QFp6feimA+IQOIoNId4QL8?=
+ =?us-ascii?Q?Fdkyc/KdI7jT4C08ZxPvFGTAnXbxdtyX8gfQPOJ4oH5c5NQv/6TiQO3OZImE?=
+ =?us-ascii?Q?JvRpUcOs/lHBI7rK8T6GugzPiWgld6SLXp3yJW2T861l9Iw+siVSjiNsSKmZ?=
+ =?us-ascii?Q?5p+vF4OTUDTqaBTdlrdw1fsfiwUqoIO/Ng2IlqSFHn/5sthl768qHwe6Yfcc?=
+ =?us-ascii?Q?NClDGlg39GYOUXVoNpMtezPU75uC9o2qBKLl+0QD95z6E9L4AKKd90ox0pjJ?=
+ =?us-ascii?Q?kK27OW9oDG4jGSwJ9/PB7njb/NWJ/EW23Xatbj/QrGiprkuSb1+l4K6+pY6X?=
+ =?us-ascii?Q?seNri7QUENrI7GXmGCaqcoNsFsmP0wQaMMwKq2l6VHe+hwP7jnWy05su4En8?=
+ =?us-ascii?Q?69CVq28eQzMqrq2OWrOrFprOi7oJQ7Ic7UC8HKxRlzMvO+DhmMny0GrwDlo5?=
+ =?us-ascii?Q?ZlC5L1KbSVXtBxxQYNxOc9yi80l0RwvCPNNajYONsbQqAcJnOqONxuZcuC2h?=
+ =?us-ascii?Q?k4uBAV+lwfcR2Nzzz73dDEpvZn0G1eItjIl+wORfdFUDspVf1oHW8JfyFJ8m?=
+ =?us-ascii?Q?YdCpn3ShLeNkXi9qpTzKTFHYMbSHatt36RQVT9pywXIHVnhsjbNMNNlOnxbE?=
+ =?us-ascii?Q?K9ZG7yt/a38OKCZ7EFx0g2uWj/nOSd+j7fc5NDwOKdgs0bMNNC1+NtjfzmEF?=
+ =?us-ascii?Q?Umm7iMDWsn6/ty4HdzmqwwzCrBo5f6j6NMacn9NLmYHDdo6fSrJFRvU/aFtK?=
+ =?us-ascii?Q?d5fwlf4Qpo+irr0qdlwsu1OUW70Xosik+NjIxG1f1KDxyg6wbSbm7PeYIBdS?=
+ =?us-ascii?Q?KZxuUZh/qCGcFEHSdWjf345TW5O7B3r6QRq4pB8ttJGLRg4G2Fv1Q8b/Rp+C?=
+ =?us-ascii?Q?Ji8rUvJNbhgJynKrPrHv4SNOCdmSU3H4860mJggXs2PKN2JePUPjp+2/wk0M?=
+ =?us-ascii?Q?y/SP8RXTBcENmukkSxU7rUcb+9ylCU5YANnZuYKE+oErXP5/8suK/uEqIaDT?=
+ =?us-ascii?Q?HfAqqtHFH/Dw2gU3o1FPaer0mcIQ1g/UQ4Jzq3Ydx7jO2UW+8Z1swV68lxaH?=
+ =?us-ascii?Q?G3QCswNDGnOXeZmvoMl0siqV0oop5Fnxa4M5kub2kzpaCkGrQ4P0o7nSkSsl?=
+ =?us-ascii?Q?O0tWPG2usAUw/kiF4E7n5bR70XJcI8M/6Jv1pphRiUXIQ5LO7My2JQza0C9t?=
+ =?us-ascii?Q?zWLeCIGK7YODK2TM4zoz3dn599SdAh+shxoP67HD+zFlTk1ZO6f3pu9a8tWA?=
+ =?us-ascii?Q?AIPuYQHfe4VGPoPiOehuuh8Q0ZjzZMKU++lFaEAeD2kM8fxd7mmWnNqCoz/n?=
+ =?us-ascii?Q?LLBttHCTkBCuSWL3O6Ey98ScQygZMTI0i7MIkg5H+BA3nEvMC4uGv55XmZx3?=
+ =?us-ascii?Q?asiUoHXAA7msS/YorM9qy0sBMLu272oBFu3DvnRMFd19CbfCS6PnllOrImRw?=
+ =?us-ascii?Q?uz72YWrTZmwqH6vatdL1FZsd9aPNPg+pG9kh+9TTQ/0Lmp8d6/5v6p4YiWsx?=
+ =?us-ascii?Q?Xerh9gCexfBzO+4e1ie74G8GyHK8ZeClvQP6DkeOpQqyRkA385Q5I9DDPm/O?=
+ =?us-ascii?Q?MXyeg2wVfPNnyymUyR9LqLsmUDkJ7SLDwMVRNwmaROXCU5NzjpmpXyvwjjj/?=
+ =?us-ascii?Q?d8ophRfaIzGbaZjDdOH5y7Un8jHxMK8bVNM6ORx7weulxoJJz3HKkTWHvY2F?=
+X-MS-Exchange-AntiSpam-MessageData-1: pg+8xwoSl4fLNw==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba25793e-3bcb-40d2-eca3-08de7fad8c51
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 20:34:09.7163
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: myIGrdKSUEKo3h/fhe1Iuyi4CG3VhMu2M4m6WX3ycyWQUBkEOoY8NNtT4N4jVk+cD6xW73loN9wmvNPUHFLYjg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB9861
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266771-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-266772-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[bootlin.com,gmail.com,armlinux.org.uk,nxp.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 5F177269D54
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A9919269FC5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 12:57=E2=80=AFPM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Fri, Mar 6, 2026 at 10:44=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
-wrote:
-> >
-> > Simplify dynptr checking for helper and kfunc by unifying it. Remember
-> > initialized dynptr in process_dynptr_func() so that we can easily
-> > retrieve the information for verification later.
->
-> it would help to call out why all those checks you are removing are
-> not needed anymore
+On Wed, Mar 11, 2026 at 07:17:18PM +0100, Andrew Lunn wrote:
+> > One other thing could be to rely on phylink to handle that ? It's the
+> > one part of the net stack that already handles PHY devices suddenly
+> > disappearing, with the SFP case. It has all the logic in place to
+> > maintain the netdev's phydev pointer without the MAC driver having to
+> > deal with that.
+> 
+> We might want to consider the different use cases.
+> 
+> 1) Hot pluggable hardware, and it disappears. As you say, phylink can
+> handle this.
+> 
+> 2) Root unbinds the device, while it is in use, for hardware which is
+> only cold pluggable? Cannot we just consider this a foot gun?
+> Exploding is O.K?
+> 
+> Is there a good use case for root unbinding the PHY driver? We should
+> only add complexity if there is a good use case.
+> 
+>    Andrew
 
-Mykyta also raised a similar question in another place. I will explain
-in the commit msg if there are checks dropped in the next iteration.
+I do have a customer specifically targetting equipment for explosive
+zones (EX-A, EX-P), which has components powered from independent power
+domains that can be administratively powered down and taken out for
+servicing, and then plugged in.
 
->
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  kernel/bpf/verifier.c | 179 +++++++++---------------------------------
-> >  1 file changed, 36 insertions(+), 143 deletions(-)
-> >
-> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > index 0f77c4c5b510..d52780962adb 100644
-> > --- a/kernel/bpf/verifier.c
-> > +++ b/kernel/bpf/verifier.c
-> > @@ -277,8 +277,15 @@ struct bpf_map_desc {
-> >         int uid;
-> >  };
-> >
-> > +struct bpf_dynptr_desc {
-> > +       enum bpf_dynptr_type type;
-> > +       u32 id;
-> > +       u32 ref_obj_id;
-> > +};
-> > +
-> >  struct bpf_call_arg_meta {
-> >         struct bpf_map_desc map;
-> > +       struct bpf_dynptr_desc initialized_dynptr;
->
-> nit: let's drop "initialized_" prefix? so verbose
+The requirements that were formulated to me are:
+- it is known ahead of time, typically by a few seconds in advance, that
+  a power domain will be turned off.
+- the rest of the system must continue to run with no interruption
+- the system must pick up the components after being powered back up
 
-Ack.
+Their system is a ZynqMP with 3 SJA1105 switches forming a single DSA
+tree.
+i.  2 of the 3 switches are in EX areas, and the main switch (in the main
+    power domain) must continue to run when the EX area is powered down
+ii. one on-board PHY of the main switch, with an M12 connector, is also
+    part of an EX area and can be powered down independently
 
->
-> [...]
->
-> > @@ -511,11 +513,6 @@ static bool is_ptr_cast_function(enum bpf_func_id =
-func_id)
-> >                 func_id =3D=3D BPF_FUNC_skc_to_tcp_request_sock;
-> >  }
-> >
-> > -static bool is_dynptr_ref_function(enum bpf_func_id func_id)
-> > -{
-> > -       return func_id =3D=3D BPF_FUNC_dynptr_data;
-> > -}
-> > -
-> >  static bool is_sync_callback_calling_kfunc(u32 btf_id);
-> >  static bool is_async_callback_calling_kfunc(u32 btf_id);
-> >  static bool is_callback_calling_kfunc(u32 btf_id);
-> > @@ -597,8 +594,6 @@ static bool helper_multiple_ref_obj_use(enum bpf_fu=
-nc_id func_id,
-> >                 ref_obj_uses++;
-> >         if (is_acquire_function(func_id, map))
-> >                 ref_obj_uses++;
-> > -       if (is_dynptr_ref_function(func_id))
-> > -               ref_obj_uses++;
->
-> e.g., why this is fine? (because we don't use ref_obj_id for tracking
-> dynptrs anymore, right? would be good to call this out in the commit
-> message)
+There are isolators on the *GMII and SPI lines, pull ups for MDIO, so
+electrically the boards can handle the missing components, but software
+is a bit limited, and I had to figure out what is missing.
 
-Thanks for the example.
+First off, the customer is OK with unbinding the driver from a device
+when the power is about to go down. Linux mostly* makes no access to the
+registers of unbound devices, so you can do anything to them in that state.
+It also cleanly fails to probe if you try that and there's no power
+applied (because probing typically accesses registers, which would fail),
+operation which you can retry later with well defined semantics.
+So, binding/unbinding was chosen as the simplest tool that gets the job
+done.
 
->
-> >
-> >         return ref_obj_uses > 1;
-> >  }
->
-> [...]
->
-> > @@ -13559,22 +13464,10 @@ static int check_kfunc_args(struct bpf_verifi=
-er_env *env, struct bpf_kfunc_call_
-> >                                 }
-> >                         }
-> >
-> > -                       ret =3D process_dynptr_func(env, regno, insn_id=
-x, dynptr_arg_type, clone_ref_obj_id);
-> > +                       ret =3D process_dynptr_func(env, regno, insn_id=
-x, dynptr_arg_type, clone_ref_obj_id,
-> > +                                                 &meta->initialized_dy=
-nptr);
-> >                         if (ret < 0)
-> >                                 return ret;
-> > -
-> > -                       if (!(dynptr_arg_type & MEM_UNINIT)) {
->
-> I can't fully connect MEM_UNINIT and CONST_PTR_TO_DYNPTR, this is
-> something that should be called out in commit message, IMO
+The DSA assumptions preventing use case i. from working are that a tree
+is only set up when complete (all switches present) and torn down when the
+first switch goes missing. There is no "degraded" state - I had to add it,
+and rewrite DSA tree probing such that each switch contributes independently
+with just its bits, rather than the tree doing it all centrally.
 
-Will explain in the commit message that !(dynptr_arg_type &
-MEM_UNINIT) means the argument expects an initialized dynptr.
+For use case ii, the phylib code is actually mostly fine already. You
+can unbind a PHY driver as long as the MAC hasn't connected to it, and
+nothing bad will happen, the PHY state machine doesn't run, ethtool
+operations don't pass through to the PHY, etc. The problem is again in
+DSA, which connects to the PHY at probe time and disconnects at remove.
+I've moved these operations to ndo_open() and ndo_stop(), and as long as
+I run "ip link set swp0 down" prior to unbinding the PHY driver, things
+are again fine.
 
->
-> > -                               int id =3D dynptr_id(env, reg);
-> > -
-> > -                               if (id < 0) {
-> > -                                       verifier_bug(env, "failed to ob=
-tain dynptr id");
-> > -                                       return id;
-> > -                               }
-> > -                               meta->initialized_dynptr.id =3D id;
-> > -                               meta->initialized_dynptr.type =3D dynpt=
-r_get_type(env, reg);
-> > -                               meta->initialized_dynptr.ref_obj_id =3D=
- dynptr_ref_obj_id(env, reg);
-> > -                       }
-> > -
-> >                         break;
-> >                 }
-> >                 case KF_ARG_PTR_TO_ITER:
-> > --
-> > 2.47.3
-> >
+*actually the EX area may be unpowered even at boot time, and in that
+case, being that MDIO is an enumerated bus, the kernel will fail to
+create a device for the PHY in the EX area. That is completely distinct
+from having a device with no driver.
+
+We solved this by disabling PHY enumeration by using an
+"ethernet-phy-idAAAA.BBBB" style compatible string.  This tells the
+kernel the PHY is always present, so it will create a device for it
+without trying to access any PHY ID register. When we apply power and
+then run phy_connect(), it works.
+
+My involvement with Wei's device link patch is actually just that I want
+to proactively protect this use case from breaking (and to upstream it).
+Of course a device link between the PHY in the EX area and the main
+switch would throw a wrench in the whole use case ii. This makes it a
+bit fragile, given the fact that, as explained, device links seem pretty
+common sense for single-port NICs. So it is in my best interest that we
+have a clear model where unbinding the driver from a PHY doesn't "explode"
+(no reference to EX areas intended), even in uncontrolled situations
+where the netdev isn't carefully disconnected from the PHY first.
 
