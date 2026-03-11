@@ -1,243 +1,245 @@
-Return-Path: <netdev+bounces-266414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Pq0OWbNsGkKnQIAu9opvQ
-	(envelope-from <netdev+bounces-266414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:03:18 +0100
+	id gJl0OizPsGmKnQIAu9opvQ
+	(envelope-from <netdev+bounces-266415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:10:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F1D25A955
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:03:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9216325AB66
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 03:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D74B23057C54
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:03:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DAF4322F786
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362C8283FC5;
-	Wed, 11 Mar 2026 02:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423A51A6806;
+	Wed, 11 Mar 2026 02:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="bBGLQIsh"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SqpOgAb4"
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013027.outbound.protection.outlook.com [52.101.83.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A7FEEBB;
-	Wed, 11 Mar 2026 02:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290921A6807
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 02:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773194595; cv=fail; b=BltteZwY4vIOscmxRTLb6fpSEseU8mRD+SMrYo+q24HTmKUznVzf8hfHDlltRXSpKU1NzDr6fLmshVyzd8RcURqTW7s3dKs2jjy6hMNJL1LMf1XEEIdgDVyPRmmNX/2/LT2dt5eoH5QtapIzin8ou7B6dnrzeW01+Q52/taBMNE=
+	t=1773194857; cv=pass; b=nQqmPLYziX5kcqXFS9uFqEJEJjR1RL0eENiNRoVrUwyHTNsjKG9lPhOzYIIRSqKGW1JSEL1JjGmg7IZZ7k5BXrmjQNkn3HyN8RKkj5qzabrrWCaPTFLpjrPoRCZd/lna7OZu+3D48wxEC99rYYtiPk2kV9oY0EJD60mwa9wYtPY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773194595; c=relaxed/simple;
-	bh=zCkQnqjEdTnThZp5iUm352CnfMSkFN7zqIDao+55ico=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=I7ng5VSKVWLMTUwvjP//PLJ7xW6dcUVjRh3PKFoZj6E/OPcX4v1s+BpJsIFChq1Ez7T4F6KZfarNDXloUzTqJuTbu1AD5tFoM/tkM2rWLSNyo5q61nyYFPHxhJ5MmnwB2YdIWISHrL641ZkQePE975PXxVo/ASJiGSlC95njhFU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=bBGLQIsh; arc=fail smtp.client-ip=52.101.83.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mNtQNHagdu2e6t5hphfZzBXKlxP32oi0Mt1M69JILzkw6xZc3yJ/CQIT47Q8vJOPvvIKs/cggAsNkFKS93hBBsZzMR8b4ras+yrXkVHZYuftbYst8JHs5TKaqi4Mbx9/jO8TFf+YFzveCEZ3C7RhC2NwW9WBb9+n0dDkF8aD5vxwOQ3TzpxycQ4s6MEaxbmujkPNTRSYtyreHl0LgTyuRjUiDQukCq6FzwM8jwsP8jmy850wZbv6EAbIEw7uyxMvme+Orvf8m8Z/PTiCYxROYd2SW8XlI/qUNBni8YLKh76IykQ6fFGqKsUmeaAbtorPcZFnBamtdH8lBz8NUEaWow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gE33YEvs628SX2fmLFN0onA0UK5FzzsTfp8GzGCVh2g=;
- b=rqf42WLV86mDc1HK6zVMs9nFPgJ8/we1PhAlgOCCjnsTojbtCo7wuyowkYYL1I5JC+D8Z+TU0W7nvNxFP8qXu0oc5UVT3NllGextIgl44AaEms6H8EUOzB982dy1GulPeJCCWjXv20AFJrL8wGJq/czHv6/LOhn4bW2bU7T+TY6dnDrlxOTNThW3voinNDYuXMcnZAsXZHcYc7WjShx/frjQagnWsY6F5noFowyUNjHALuR6xaz3qc0YjwKpFrGoYSJf/IkCrV70OU0frJxYamn3SH4t1O6rcvvausdkA6wHgPfCZBGV5mVLLHpXZJOO2MY5thwvQvYuFatd4ipGXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gE33YEvs628SX2fmLFN0onA0UK5FzzsTfp8GzGCVh2g=;
- b=bBGLQIshCvhTHIZxntH8KgYevIgmypb5VNSCjlx8WfyFoSU5B4rX+DXjgRYcBqvUc/mobBHx/d+6uTSS+i/mTW6tTURLF42T4sZCwKFsqmQELlBYpYqmzSx5zOfd8msJz0oO1uPavPCdxn5cQ0lOMjXTyoZJUIZyt5ESn4sQZc2YWShNP1e8RKTEJdGMfx2oslhtIJ2+OJ4q1bnxvQMchAtqFXmnyCAc8HTlMZpp63a3ypWFX0d4UZHnMlt4Hvvfgfd7VgoaJh8vPT3f34iohRz/1Vqk6zWzMo8NeZu/svBg/LYj6fPlNxJApMlkAWV2Hlt68aEX9qiPIN3pf5bgQQ==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- GV4P189MB3630.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:2b8::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.11; Wed, 11 Mar 2026 02:03:08 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9678.020; Wed, 11 Mar 2026
- 02:03:08 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Mehul Rao <mehulrao@gmail.com>
-CC: "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "jmaloy@redhat.com" <jmaloy@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH net v3] tipc: fix divide-by-zero in
- tipc_sk_filter_connect()
-Thread-Topic: [PATCH net v3] tipc: fix divide-by-zero in
- tipc_sk_filter_connect()
-Thread-Index: AQHcsLCodQ3q/iHTiEWzp6xsU7/WIrWolHEw
-Date: Wed, 11 Mar 2026 02:03:08 +0000
-Message-ID:
- <GV1P189MB198885BF0A6FB7973CED2D86C647A@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260310170730.28841-1-mehulrao@gmail.com>
-In-Reply-To: <20260310170730.28841-1-mehulrao@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|GV4P189MB3630:EE_
-x-ms-office365-filtering-correlation-id: 9a4cf091-c4f5-4181-750d-08de7f125747
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700021|7053199007|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info:
- EjARUujN4d5XyadzGvqF4slSD25RWZoiTN3tfQX4MjaXGhmm2B9s7bjt1h+HB4LUNUOs7tHqvtmTzj15nqDm7I6Qk/Bx4Wp2JtJDescvzYNJnTpavJrwISMsv3ijcwBVgoDyZT2KZHGVOzrw+LI2URHtxTvJty0fg9i7M3pwVvyAU3Z7j0cr/rNlY7mPHtFO+VNoOzBRSHlECJfU/rzRgD0TIgDXIGOT1ifJUHMca555aYGj1BWgzzLRNcAydcw1d7lTyv/txIDblY+4HZ7tmF1UcxslGTFnBNRMKFV7Dwcfkj0/LqSyI+SZeyoEF4fIRVVbgVaSfPZTha/GWyHpub52+ifX0msgAJTeShbCHuHyBL6PJoHU/9g7Loh4vF/uDo8+BoHrB4atIor94Si58vkj8WIUrYUOBcM1I69fFwxKHgPNUKOogHahGUeYuB5Y7HhLgRSG1ZiXPl7W5JU7eYK9O3QpwyMSBbaR/A8ke7WZc1RBbF3LRhVtlreH0fTLtMk2KttOCcpYuEQOyFP6sTxUOF5l7fXEy5AFwbOlICGghCpkF2EE0tayDm2IdJsM0L/foAr1Qd+1FHIIRs6J7R7g8aVyjTYqK6tUYmgdSXhL3sGMiW2zNDgbAPcqwUNfSejVDe7OTwX4lHvfqA7wWKSPkTL/YdHggzE3K5k94XJw2wHHj7yALXXUPh4xpcJoj8NdBtI3Q4euk+w4zv43vQV/HlM0/xOCKDcckbyh9kaK9NMnWBplbwPitBnN9rUSN+hKv9KAZyidJuZCNR97sv72V4URkUvEER4fUHHHuFM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700021)(7053199007)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BZR99O8oeOyviXzKNNjJYWU2g4xhy0nEQha42tzNncnrpQ3DOFc6bKVnv8Uk?=
- =?us-ascii?Q?3Tr9wR0bx6Z/gHaWnz6Lina+nYq8xzIbYl2niD6ptMXDL6sx+RCGRWrhqUs5?=
- =?us-ascii?Q?nSDgJvE9lByQrd+hYvj5W4wRsMGMQaeZvGF2LGz51qcJ+wgS9/3dl1gk8L5W?=
- =?us-ascii?Q?b2mENXXgaIv3jn9oCCo/L4KbkoAiiYsE51X+sO9kitHjGnSYM1gsJWMmry5T?=
- =?us-ascii?Q?3Tn7urlnzgsmhfgri5txXAeFgdChc1Sd2/p/XauwpXUF9VF/k8D/usxB8uoa?=
- =?us-ascii?Q?Dy6Ismx9PKbPxclolnqabGdpkxt7S6FeJp1JufkKypzTz2GQz0WL1e2lzjZ8?=
- =?us-ascii?Q?FxMhvdUI5zyrXuCUu7UZx2Y9dGg72Rxp6jrokuHuktuAPcTUDK2YTuEnA/sP?=
- =?us-ascii?Q?Lg2r7FmjjYHH1utnYt+r90ePuJREzJY1z7LepuR7Jig7kgkYzec8/S2OetXn?=
- =?us-ascii?Q?9w+gk1lSpeRNhTuoYJqvNInlHnDjr3feLk3HHFd3ntrpV4ci014QKXQ7hM9Z?=
- =?us-ascii?Q?BC5vUAb2h2FkwQuEn8cusvdBpzMBlqpkmueDY3HdV3aGPdG+OS2FeaIQk3XR?=
- =?us-ascii?Q?rDE29Bt3GSv1bK+ruIYfVV6LMlCGAr1j52eN5VBXDBRxOA6iAAcDvHfhdTZO?=
- =?us-ascii?Q?lyZ7eStUNnzmJKRxAqY1D/7nFR8ZEP1FugeRmQTVn1MbcRvOTNWx1be7Syy6?=
- =?us-ascii?Q?d0coPuyj2pkp6LMCZyP8lQLHiZOT8JQuGumXYBN4C0RgqTwv2/K3LqW9oNT8?=
- =?us-ascii?Q?pi0UsBjrFkTOKIEwzuMKlWhNcypagQIT1A/6Se8yQRUMY0sE2IJGAZzKEfFZ?=
- =?us-ascii?Q?/jh4SoqNtkrtCa8TvjGrUiyaxbQTB5/SUAiG3xurqv3UUMbA1AR/gphvmnFk?=
- =?us-ascii?Q?Z9GNszMuqhMjIMluW9ixo541TdrQPKYykGll11auxc1ga/nFNTmzfXwBMmIF?=
- =?us-ascii?Q?mq6IKRugltkcuci7pjwCGFqRB5evKXWy0u9w39o/ylME/DIE52qgLncd3UXI?=
- =?us-ascii?Q?PZKhbrr4Nf7PhiIXDiMGbG/NqF8KoXvZHnjoXU3x+CdDgCkjnHh200kUpxgQ?=
- =?us-ascii?Q?9VsDTZZWyKYFwAO6JDoEkSeQSTdLfQ9gX329SmU6GTEK6Zz04m+bkJj44jun?=
- =?us-ascii?Q?nI9LeGX6Ovxg8JprDe6tZOj8cIa7/yB8Kdp2AcloI1ZgjJMLWh+vQyUF7mO0?=
- =?us-ascii?Q?2q8i4GRrraKN+w2ly0H0ieOZuUf9bAb09VWY26Z8v06vQWnpin2eUfkFM1kA?=
- =?us-ascii?Q?c+b6QJMk2pXO7+CrmzjbrUAh4k1JBxHBSIpyU4A6qJMHq0jdDt1D4+90QIiT?=
- =?us-ascii?Q?VSJjWv79yANQSgQBFAKEMLm8KFrLABlPGijBAs95g+mdNJXo5+S2Yo5OSCO1?=
- =?us-ascii?Q?fcqaDws0PMs2nxLiDHdHU0ZwHLvn7AIjZaPn92gi5V2jkPN91+f8Pafn0x3I?=
- =?us-ascii?Q?aMMy8AP1i1v8MnvQT6Zinsf6xQxzkptU+HMmMxevoLbQrs5oE0fhB7lgtLlk?=
- =?us-ascii?Q?w6TOfhQqBkcKnbMiBkbfaB92uKQD9xtApGLnOY6ETvQ5NOIufQWswQNg5uiP?=
- =?us-ascii?Q?RGbO5aP93h92wVl/TuepYZesxKt6q6R0+oYfT/vkge1mdmzl1jpuKLhg3ubq?=
- =?us-ascii?Q?1+Tn3stmi4Ascf3DNBeoWjzGcCHaglfXt6rqVQ97q752LxXyzneFuPjAuHD5?=
- =?us-ascii?Q?tl/6OIhsYjJJWTUZvBS4DJFvEb64R5PKt8XRnlE50uJ9nxqfH9c8M8XhI0Ht?=
- =?us-ascii?Q?DSelelsOJw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1773194857; c=relaxed/simple;
+	bh=8UJnLa/DDQ+b65RDSHa97nR/Rm6zetnRjswOkVb13wc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ujY48pyoYbcjWehK57wwmd/7DaptpUIUvKvGmm8frAVN6kh/ucMwUweoSvKxUZ5QxWjjKNDkVMcOUSnav5TVvHI8yq9JAGzSy1/psiq0UoWQ8tlzNGJcUBYthKw7MZllvS/Vt5uBOAy9s/xIxl5Rsvh2JSuaEacKdFfG5IYq9Jg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=SqpOgAb4; arc=pass smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5a1362c9a3cso5630114e87.2
+        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 19:07:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773194852; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Rg+20wrW1pCadDg8gBi0k1QMi2I7aSf1c1SkSEKtVRnyk36pdZqZmLyH9lAsLuc1nt
+         Zst6R8EO51trY0rCRlRBqcsUY2MwEMXh0p+UzXOR2u7DR+dvrxsnUB/4MPz1F3B6cktM
+         joxDfgeDGM1N7DOjgqlnGHJeTctLNbgFI1GM/FsMqJ3Wk2A+2Gb2BBFoiLmqqUiptwWB
+         m0ujRysOBsZVsjieoJF5KAntvVsViN+M0NaFFiVHD7x2+j/kSsKtH7uBuBz8PyLkzQ3g
+         l7/Vw4UkblmFPNiEBSkg0e/WJTJWDawgLqEwntWtezQrvqC+WCnHBXbNsttnCaN6LUof
+         zrJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        fh=6JM3RfwSs5+s4nN2CS7sdg/bKnL1RA53YXpHBBvnGJQ=;
+        b=ZEcdn/DdCceXLt1kE58GneSPpL4jaYWiXMh2PQh4UJB/xtctl4B2scChtG9D5FvqgZ
+         uHrvBDtkqfuFXbANbHh7cOuzIsk22VhIRWbkZ9Yi737oBUi49PziM2kFBQ5ORi5j61yO
+         24rvnX5Bbuz0cgIkVDHxkzDNg1dfTXaV/FSj7k6m3CE62Z963f8OGMkTNqUxrzhdfrKm
+         B0HbEkxQ6+cYEOG0J8Uv6FJ2dpx6/5vnou/TlDlmo1fBhsrf1s7Aetiyv/0+cVb3O2Cy
+         vy05t4ZYZcwddsigZ7us9X8/bw8GnI1U5Mx9CjU9XyjSRJ0xPslx6Uk17TUMj794Ik6e
+         N24Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1773194852; x=1773799652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        b=SqpOgAb4CQOCp6QT1IhDiJXNOENCCAthmmQiQ2Xm1LqdH6AuNnr9pWEOxoaM6J2EHp
+         TaZvrNsWvEAAdeAh3rGZCGLrxzU767HUy57VJt43+079ae3+2kuAr2+JBVbU8T9+l/BT
+         vjjO+GANIyds0bGFgUhdgNG0FnF3NJi/nWQH4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773194852; x=1773799652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+zLBLQzKjcztDlxJqoLP6w+B6xnZmfHibV4jlBQCebA=;
+        b=j0DPgz++uqVPq2EblFsrmLNN0/1jdws/I34crOFCzHPtYSIdmlB81T/4zNVH2+NpAA
+         hekB+8alX5ewUYr1HpFlltMtKXfsK3MdJ0/N0hxBgSfy5Orf5eucYPKIzGvW0576/8fc
+         XoSnJd3d4La73P3XTkQANlKXn+AjxVo4/KC+cFfg8AM5zux9lWPVXgdbjESjfmgGctSt
+         hVGa5N3x69OChUVmFaTaRVw8bbu9O7Jfq/y6y9qUfV9JE5X6+37a13T/z+kVrvA5brtu
+         mHVLq5WFq0fjMuW/+i9S41C78A/DmvPTfzeDFUwqu0VQHsi4mCU1AzoA0dmuC9XugGTH
+         JvJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGhIotQrxQwxp0ZYF8IpRXPKIZuzMgXPzudlTttDvdv6TizB550KxD4xzKGyQzBQeJj86tj3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4m4nuGvRnLOTLDUgXiGhLmUauj0tlOhl3CT+fW0Y/tMu61oh/
+	tT2TadUa78o+fM23gq393LTibvt57iCmAwcrhyqpovlnfUWBjp9k7oqYaIEMHOmnYcWkpDOxBmV
+	jUSfssWIGmJESpLDVUhIQWuotj8FOFH5Y74Rk2Kgs
+X-Gm-Gg: ATEYQzwMKD8cam2lwj2Pc0rNzTyHoVHg5YNgx6vFCJGLsNfIggtpU7myTRVDULrGIOy
+	+Zx/jWvn/a9hGP66mv3FIHOosY5waf8IUlwW1wsI59juGRiU3BhCNFxUIWofzHB7GK8EqzEDivR
+	nDsfOty6Uj53J5w8ZKLyz6ZoOOFjqbsyARba4skyWN69du9AohUQw+puN3UC13rG2i7OSmrXj/H
+	aKPYownWRiuALGnAGBql5vNzHMI/aHB83UunsqTZZcyDjZVVv6Qt4RVt4FsmHV4gyLghsi1tNAC
+	3i74IzCP0Q==
+X-Received: by 2002:ac2:4427:0:b0:5a1:3134:9bac with SMTP id
+ 2adb3069b0e04-5a156cbd1bbmr169453e87.28.1773194852284; Tue, 10 Mar 2026
+ 19:07:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a4cf091-c4f5-4181-750d-08de7f125747
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2026 02:03:08.3000
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MQ3N49gd/Ibowil3tZ7wDKmx3mAChOICgM+EfTH2cKlk82+G+jR2xQt4xrNBfPxrXYtcsk4B//jpsXcI1POPz3w7tlAKm7K8fpYET+P/x5I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4P189MB3630
-X-Rspamd-Queue-Id: 61F1D25A955
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-56-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-56-bd63b656022d@avm.de>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Wed, 11 Mar 2026 11:07:21 +0900
+X-Gm-Features: AaiRm5028PWt8n-JnveiRgn8oYMksdR_-_nk4JOkvxMfplWs-GDr7RRk-OxICyw
+Message-ID: <CAGXv+5FQAVaJjqhv+Xq-ysOc4SHQn2mCNTgCAp8XocmWBWGGoA@mail.gmail.com>
+Subject: Re: [PATCH 56/61] clk: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
+	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	v9fs@lists.linux.dev, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9216325AB66
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[chromium.org,none];
+	R_DKIM_ALLOW(-0.20)[chromium.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266414-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266415-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_NA(0.00)[est.tech];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[est.tech:+];
-	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[chromium.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wenst@chromium.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_GT_50(0.00)[58];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[avm.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,baylibre.com:email,mail.gmail.com:mid,chromium.org:dkim]
 X-Rspamd-Action: no action
 
->Subject: [PATCH net v3] tipc: fix divide-by-zero in tipc_sk_filter_connect=
-()
+On Tue, Mar 10, 2026 at 9:57=E2=80=AFPM Philipp Hahn <phahn-oss@avm.de> wro=
+te:
 >
->A user can set conn_timeout to any value via
->setsockopt(TIPC_CONN_TIMEOUT), including values less than 4.  When a SYN
->is rejected with TIPC_ERR_OVERLOAD and the retry path in
->tipc_sk_filter_connect() executes:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
 >
->    delay %=3D (tsk->conn_timeout / 4);
+> Semantich change: Previously the code only printed the warning on error,
+> but not when the pointer was NULL. Now the warning is printed in both
+> cases!
 >
->If conn_timeout is in the range [0, 3], the integer division yields 0, and=
- the
->modulo operation triggers a divide-by-zero exception, causing a kernel
->oops/panic.
+> Change found with coccinelle.
 >
->Fix this by clamping conn_timeout to a minimum of 4 at the point of use in
->tipc_sk_filter_connect().
+> To: Michael Turquette <mturquette@baylibre.com>
+> To: Stephen Boyd <sboyd@kernel.org>
+> To: Daniel Lezcano <daniel.lezcano@kernel.org>
+> To: Thomas Gleixner <tglx@kernel.org>
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/clk/clk.c               | 4 ++--
+>  drivers/clocksource/timer-pxa.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 >
->Oops: divide error: 0000 [#1] SMP KASAN NOPTI
->CPU: 0 UID: 0 PID: 119 Comm: poc-F144 Not tainted 7.0.0-rc2+
->RIP: 0010:tipc_sk_filter_rcv (net/tipc/socket.c:2236 net/tipc/socket.c:236=
-2) Call
->Trace:
-> tipc_sk_backlog_rcv (include/linux/instrumented.h:82
->include/linux/atomic/atomic-instrumented.h:32 include/net/sock.h:2357
->net/tipc/socket.c:2406)  __release_sock (include/net/sock.h:1185
->net/core/sock.c:3213)  release_sock (net/core/sock.c:3797)  tipc_connect
->(net/tipc/socket.c:2570)  __sys_connect (include/linux/file.h:62
->include/linux/file.h:83 net/socket.c:2098)
+> diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
+> index 47093cda9df32223c1120c3710261296027c4cd3..35146e3869a7dd93741d10b72=
+23d4488a9216ed1 100644
+> --- a/drivers/clk/clk.c
+> +++ b/drivers/clk/clk.c
+> @@ -4558,7 +4558,7 @@ void clk_unregister(struct clk *clk)
+>         unsigned long flags;
+>         const struct clk_ops *ops;
 >
->Fixes: 6787927475e5 ("tipc: buffer overflow handling in listener socket")
->Cc: stable@vger.kernel.org
->Signed-off-by: Mehul Rao <mehulrao@gmail.com>
->---
->Changes in v3:
->- Decode stack trace symbols (Eric Dumazet)
->- Link to v2: https://lore.kernel.org/netdev/20260306185005.22120-1-
->mehulrao@gmail.com/
+> -       if (!clk || WARN_ON_ONCE(IS_ERR(clk)))
+> +       if (WARN_ON_ONCE(IS_ERR_OR_NULL(clk)))
+>                 return;
 >
->Changes in v2:
->- Clamp conn_timeout at the point of use in tipc_sk_filter_connect()
->  instead of rejecting small values in tipc_setsockopt()
->- Link to v1: https://lore.kernel.org/netdev/20260305215336.645186-1-
->mehulrao@gmail.com/
->---
-> net/tipc/socket.c | 2 ++
-> 1 file changed, 2 insertions(+)
+>         clk_debug_unregister(clk->core);
+> @@ -4744,7 +4744,7 @@ void __clk_put(struct clk *clk)
+>  {
+>         struct module *owner;
 >
->diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
->4c618c2b871d..9329919fb07f 100644
->--- a/net/tipc/socket.c
->+++ b/net/tipc/socket.c
->@@ -2233,6 +2233,8 @@ static bool tipc_sk_filter_connect(struct tipc_sock
->*tsk, struct sk_buff *skb,
-> 		if (skb_queue_empty(&sk->sk_write_queue))
-> 			break;
-> 		get_random_bytes(&delay, 2);
->+		if (tsk->conn_timeout < 4)
->+			tsk->conn_timeout =3D 4;
-> 		delay %=3D (tsk->conn_timeout / 4);
-> 		delay =3D msecs_to_jiffies(delay + 100);
-> 		sk_reset_timer(sk, &sk->sk_timer, jiffies + delay);
->--
->2.53.0
+> -       if (!clk || WARN_ON_ONCE(IS_ERR(clk)))
+> +       if (WARN_ON_ONCE(IS_ERR_OR_NULL(clk)))
+
+clk_get_optional() returns NULL if the clk isn't present.
+
+Drivers would just pass this to clk_put(). Your change here would cause
+this pattern to emit a very big warning.
+
+I don't think this change should be landed.
+
+
+ChenYu
+
+>                 return;
 >
-Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+>         clk_prepare_lock();
+> diff --git a/drivers/clocksource/timer-pxa.c b/drivers/clocksource/timer-=
+pxa.c
+> index 7ad0e5adb2ffac4125c34710fc67f4b45f30331d..f65fb0b7fc318b766227e5e7a=
+4c0fb08ba11c8f9 100644
+> --- a/drivers/clocksource/timer-pxa.c
+> +++ b/drivers/clocksource/timer-pxa.c
+> @@ -218,7 +218,7 @@ void __init pxa_timer_nodt_init(int irq, void __iomem=
+ *base)
+>
+>         timer_base =3D base;
+>         clk =3D clk_get(NULL, "OSTIMER0");
+> -       if (clk && !IS_ERR(clk)) {
+> +       if (!IS_ERR_OR_NULL(clk)) {
+>                 clk_prepare_enable(clk);
+>                 pxa_timer_common_init(irq, clk_get_rate(clk));
+>         } else {
+>
+> --
+> 2.43.0
+>
+>
 
