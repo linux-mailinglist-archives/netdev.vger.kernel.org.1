@@ -1,234 +1,233 @@
-Return-Path: <netdev+bounces-266545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266546-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGwcHVsysWm0rwIAu9opvQ
-	(envelope-from <netdev+bounces-266545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:14:03 +0100
+	id 2KL2ELszsWm0rwIAu9opvQ
+	(envelope-from <netdev+bounces-266546-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:19:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57A0260199
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:14:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9D7260311
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:19:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA05C301BA71
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:13:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7882430F7F98
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B9E3C7DEA;
-	Wed, 11 Mar 2026 09:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61F33B6BE3;
+	Wed, 11 Mar 2026 09:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a4qDJ89u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgDro3Eo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940CE3BD231
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2873AA4E6;
+	Wed, 11 Mar 2026 09:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773220423; cv=none; b=CiylvtwmtfLOslTVSiyQuMu8CjR9TMU5/vvI04Nbw3WnJy6hQ1xW/i6tL0sQRK0pArVlcIt7HEwHgvn53frgbTuMEju1v3lPjm6d2hlg9LElEcYo94zosvU676r3R6CJQryCmbE4xt2Infpx9lbYm/rKHeHAlSQFa70bROB5ay0=
+	t=1773220528; cv=none; b=VPg9pPOphHQ0t9iGyPbBTVh5Td5awR8elD/ubbd8i3WKC9H/oJm3YqiyGghkFzzt/uaphcx6JNUGGQtCZQrlYUD/0UUJ4TelX6jvAHVdlzz7quIq5joF2vIQYdIgfKKC1/hj4rY8wIkMh3S9jDYfVF+3MdCnIUFogtbdqsGbEkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773220423; c=relaxed/simple;
-	bh=LtEuNdw1/8UfnUOvcSxR9RmkxQ2lvnxXCbaWYrgsrp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=U4SD+6wqgjMuYPJR98mklj5nQFPIuy7tpP0y7t/fT+w9Q7Ejj2+RSBkr/Ae1zXaJNgMzeGRAzLz9oVigYKBdC9ZSopJCp4zLLgNeYU0J9WY3umBAKq/pm8DB0zy6Uf03UlwvZTHdk350b5vbYUc1fvU0N/8SwEH9G2Tr8wRU5IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a4qDJ89u; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <94089b74-def5-4dd0-9143-1cfbc722fe73@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773220402;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qPwtlh8YIGGNtoSsoazXJ8QY55uOAfW2FM+h3RicQNM=;
-	b=a4qDJ89uGfHvMYiTQS2jL5B6Wv1nQCYGBVvJ/wEDEjC1T2qgvkA55eAvm2mFjRCIG5RmO/
-	XOKCH/3tAjo+VTm/VD65mxcFn8h44U+7xZhb74YywDqLIsIQoc9t43XLapUsrhZK9ARAA9
-	RfjPluE1HEGGwoY28ZAkInVi7mg+FWk=
-Date: Wed, 11 Mar 2026 17:13:12 +0800
+	s=arc-20240116; t=1773220528; c=relaxed/simple;
+	bh=/qi/E3sx1wLUyctUK7y+OHXYZPNKh6z9xCAoPwaS9tY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KJv//iT/jC3cibLGHfw3QWkJKpjB1XLJ/+ZW5MmVP/6gL67dWYy8KerPS4FUhHz38iZou3U55ygs3jcLOdZ/cAFliZIk+qP8F0RR/GxJtQLqV7ROZ6tpHYPXwMsizw16DilhHJF/7jduJqjBSRLGrTy7bQ1EuQm8zaVRA/BTT5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgDro3Eo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FCD9C4CEF7;
+	Wed, 11 Mar 2026 09:15:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773220527;
+	bh=/qi/E3sx1wLUyctUK7y+OHXYZPNKh6z9xCAoPwaS9tY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LgDro3Eo6GuEp/c7KpExTwow2lUTl/Pn1bh3kCtPgx5EZkzvkzK56JY3zwHnUDcCc
+	 2as2PvShmmr1XG14DpK2Vlg+JLgJPDOEbIdyLQiZA99gO2VhR6aNobJIyS0CqNvQtn
+	 yBA+KuKdx+4dfgWg9peWZmhGw4/QosQ2PPXaLIeUrGAHySdhxN3QZSvEY8TJQRF4w5
+	 5y2vcF8WS6Vs3oTWyB2qlm1mbS5CYuB5pIK+WazvnWck2cAfQHHfFT1RCTg/MOj6af
+	 KpqT4L8GJkV64xMCr6wNACXlhye3na8PI6Nzf9xRvk9/jbbFZy4EGpTLuB6A51j2SG
+	 LfTqtyCu5LFfA==
+Message-ID: <61df6369-333c-430a-bd18-c5b1acae68ea@kernel.org>
+Date: Wed, 11 Mar 2026 10:15:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
- __ethtool_get_link_ksettings
-To: Jianzhou Zhao <luckd0g@163.com>, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, kuba@kernel.org,
- pabeni@redhat.com, sdf@fomichev.me, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <a3fb1f.6f59.19cdbf3d67d.Coremail.luckd0g@163.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <a3fb1f.6f59.19cdbf3d67d.Coremail.luckd0g@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: B57A0260199
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 16/16] mm/memory: support VM_MIXEDMAP in
+ zap_special_vma_range()
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ David Rientjes <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>,
+ H Hartley Sweeten <hsweeten@visionengravers.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Leon Romanovsky <leon@kernel.org>,
+ Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-17-david@kernel.org>
+ <20260309142954.GM1687929@ziepe.ca>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20260309142954.GM1687929@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CF9D7260311
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266545-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[163.com,google.com,davemloft.net,lunn.ch,kernel.org,redhat.com,fomichev.me,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-266546-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+On 3/9/26 15:29, Jason Gunthorpe wrote:
+> On Fri, Feb 27, 2026 at 09:08:47PM +0100, David Hildenbrand (Arm) wrote:
+>> There is demand for also zapping page table entries by drivers in
+>> VM_MIXEDMAP VMAs[1].
+>>
+>> Nothing really speaks against supporting VM_MIXEDMAP for driver use. We
+>> just don't want arbitrary drivers to zap in ordinary (non-special) VMAs.
+>>
+>> [1] https://lore.kernel.org/r/aYSKyr7StGpGKNqW@google.com
+> 
+> Are we sure about this?
 
-On 3/11/26 4:11 PM, Jianzhou Zhao wrote:
->
-> Subject: [BUG] net: kernel NULL pointer dereference in __ethtool_get_link_ksettings
->
-> Dear Maintainers,
->
-> We are writing to report a NULL pointer dereference vulnerability within the `__ethtool_get_link_ksettings()` function. This bug was found by our custom fuzzing tool, RacePilot. The bug occurs when an internal subsystem (e.g., `smc` routing or `infiniband` querying a hardware port) attempts to retrieve the link speed of an `ipvlan` interface that is layered on top of a virtual or device hierarchy lacking `ethtool_ops`. We observed this bug on the Linux kernel version 6.18.0-08691-g2061f18ad76e-dirty.
->
-> Call Trace & Context
-> ==================================================================
-> BUG: kernel NULL pointer dereference, address: 00000000000001f8
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 0 P4D 0
-> Oops: Oops: 0000 [#1] SMP NOPTI
-> CPU: 0 UID: 0 PID: 8322 Comm: kworker/0:9 Not tainted 6.18.0-08691-g2061f18ad76e-dirty #50 PREEMPT(voluntary)
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> Workqueue: events smc_ib_port_event_work
-> RIP: 0010:__ethtool_get_link_ksettings+0x5c/0x140 net/ethtool/ioctl.c:443
-> ...
-> Call Trace:
->   <TASK>
->   ipvlan_ethtool_get_link_ksettings+0x2c/0x40 drivers/net/ipvlan/ipvlan_main.c:411
->   __ethtool_get_link_ksettings+0x107/0x140 net/ethtool/ioctl.c:450
->   ib_get_eth_speed+0xd2/0x6d0 drivers/infiniband/core/verbs.c:1999
->   rxe_query_port+0x14a/0x270 drivers/infiniband/sw/rxe/rxe_verbs.c:62
->   __ib_query_port drivers/infiniband/core/device.c:2148 [inline]
->   ib_query_port drivers/infiniband/core/device.c:2180 [inline]
->   ib_query_port+0x310/0x440 drivers/infiniband/core/device.c:2170
->   smc_ib_remember_port_attr net/smc/smc_ib.c:364 [inline]
->   smc_ib_port_event_work+0xfa/0x690 net/smc/smc_ib.c:388
-> ...
-> ==================================================================
->
-> Execution Flow & Code Context
-> When backend kernel systems like infiniband (`ib_get_eth_speed`) call `__ethtool_get_link_ksettings()` on a top-level `ipvlan` device to evaluate underlying ethernet capabilities, the execution delegates successfully through the device's mapped proxy routine. However, `ipvlan` triggers a nested fallback lookup to the physical baseline carrier without validating whether the carrier inherently supports ethtool operations:
-> ```c
-> // drivers/net/ipvlan/ipvlan_main.c
-> static int ipvlan_ethtool_get_link_ksettings(struct net_device *dev,
-> 					     struct ethtool_link_ksettings *cmd)
-> {
-> 	const struct ipvl_dev *ipvlan = netdev_priv(dev);
->
-> 	return __ethtool_get_link_ksettings(ipvlan->phy_dev, cmd); // <-- Nested fallback call onto phy_dev
-> }
-> ```
->
-> Unfortunately, the exported helper routine `__ethtool_get_link_ksettings()` relies strictly on `dev->ethtool_ops` being a valid populated pointer and makes no assertions defensively prior to calling the callback layout:
-> ```c
-> // net/ethtool/ioctl.c
-> int __ethtool_get_link_ksettings(struct net_device *dev,
-> 				 struct ethtool_link_ksettings *link_ksettings)
-> {
-> 	ASSERT_RTNL();
->
-> 	if (!dev->ethtool_ops->get_link_ksettings) // <-- NULL pointer dereference (fault at +0x1f8)
-> 		return -EOPNOTSUPP;
-> 	...
-> }
-> ```
->
-> Root Cause Analysis
-> The bug constitutes a NULL pointer dereference explicitly triggered within `__ethtool_get_link_ksettings()`. Because the API is exported for transparent kernel-centric consumption (e.g. by `ib_get_eth_speed`), it bypasses the robust validation standard userspace calls experience via the `ethtool_ioctl` ioctl wrapper, completely overlooking empty/NULL `dev->ethtool_ops` arrays.
->
-> When `ipvlan` bridges the request down to an unyielding backend host (`ipvlan->phy_dev`), and the host operates as a virtual loop or dummy lacking any registered `ethtool_ops`, the fetch targets `dev->ethtool_ops->get_link_ksettings`. Based on the API's pointer offset in `include/linux/ethtool.h`, this lands precisely at structural index `0x1F8`, culminating in a fatal supervisor read fault.
-> Unfortunately, we were unable to generate a reproducer for this bug.
->
-> Potential Impact
-> This memory management gap presents a local kernel panic/Denial of Service (DoS). It manifests silently anytime nested virtual abstractions process asynchronous traffic events requiring network speed capabilities over missing handler arrays, particularly through automated RDMA/IB device initializations.
->
-> Proposed Fix
-> To universally intercept the validation lapse inside the exported generic handler, we suggest introducing a preliminary null-check protecting the interface invocations:
->
-> ```diff
-> --- a/net/ethtool/ioctl.c
-> +++ b/net/ethtool/ioctl.c
-> @@ -440,7 +440,7 @@ int __ethtool_get_link_ksettings(struct net_device *dev,
->   {
->   	ASSERT_RTNL();
->   
-> -	if (!dev->ethtool_ops->get_link_ksettings)
-> +	if (!dev->ethtool_ops || !dev->ethtool_ops->get_link_ksettings)
->   		return -EOPNOTSUPP;
->   
->   	if (!netif_device_present(dev))
-> ```
->
-> We would be highly honored if this could be of any help.
->
-> Best regards,
-> RacePilot Team
+Yes, I don't think relaxing this for drivers to use it on VM_MIXEDMAP is
+a problem.
 
+> 
+> This whole function seems like a hack to support drivers that are not
+> using an address_space.
 
-Thanks for the report.
+I assume, then using
+unmap_mapping_folio()/unmap_mapping_pages()/unmap_mapping_range() instead.
 
-The root cause is a use-after-free of ipvlan->phy_dev, not a simple missing
-NULL check on ethtool_ops.
+> 
+> I say that as one of the five driver authors who have made this
+> mistake.
+> 
+> The locking to safely use this function is really hard to do properly,
+> IDK if binder can shift to use address_space ??
+I cannot really tell.
 
-In ib_get_eth_speed(), ib_device_get_netdev() obtains a reference to the
-ipvlan device *outside* of rtnl_lock(). This creates a race window where
-the underlying phy_dev can be unregistered and freed before rtnl_lock() 
-is acquired.
+Skimming over the code, it looks like it really always handles "single
+VMA" stuff ("Since a binder_alloc can only be mapped once, we ensure the
+vma corresponds to this mapping by checking whether the binder_alloc is
+still mapped"), which makes the locking rather trivial.
 
-Then recurses through ipvlan_ethtool_get_link_ksettings()
-into phy_dev, it dereferences freed memory — which happens to read as 
-NULL for
-ethtool_ops, causing the crash at offset 0x1f8.
+It does seem to mostly allocate/free pages in a single VMA, where I
+think the existing usage of zap_vma_range() makes sense.
 
-Diff below:
+So I'm not sure if using address_space would really be an improvement there.
 
-diff --git a/drivers/infiniband/core/verbs.c 
-b/drivers/infiniband/core/verbs.c
-index 575b4a4b200b..f16d11e7c2e3 100644
---- a/drivers/infiniband/core/verbs.c
-+++ b/drivers/infiniband/core/verbs.c
-@@ -2046,11 +2046,13 @@ int ib_get_eth_speed(struct ib_device *dev, u32 
-port_num, u16 *speed, u8 *width)
-         if (rdma_port_get_link_layer(dev, port_num) != 
-IB_LINK_LAYER_ETHERNET)
-                 return -EINVAL;
+Having that said, maybe binder folks can be motivated to look into that.
+But I would consider that future work.
 
-+       rtnl_lock();
-         netdev = ib_device_get_netdev(dev, port_num);
--       if (!netdev)
-+       if (!netdev) {
-+               rtnl_unlock();
-                 return -ENODEV;
-+       }
+-- 
+Cheers,
 
--       rtnl_lock();
-         rc = __ethtool_get_link_ksettings(netdev, &lksettings);
-         rtnl_unlock();
-
+David
 
