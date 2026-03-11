@@ -1,190 +1,309 @@
-Return-Path: <netdev+bounces-266524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGYpGw0nsWkBrgIAu9opvQ
-	(envelope-from <netdev+bounces-266524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:25:49 +0100
+	id UIUgLaEksWkOrQIAu9opvQ
+	(envelope-from <netdev+bounces-266525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:15:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E91925F2B9
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:25:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B55325EC6D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:15:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56CF5338ABA0
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:13:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 93C0D300646B
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A523B6349;
-	Wed, 11 Mar 2026 08:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0D02673AA;
+	Wed, 11 Mar 2026 08:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ncH7FfqZ"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aDt0qd9W"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2E73B2FE3;
-	Wed, 11 Mar 2026 08:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96045128395
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773216778; cv=none; b=HNZ/hRhoTlfgjTA6poomeTOfTDlF7hvQd0QT1SDuy20u3EtM6ftZ9swI5lKtc1JFlid39CS88FZa4qo99tULcOq2FFHyFj93L5SW8uYkHWGjCWFSvJ3h09CjCyOG+u8xxqk3k/tsHnjzlbEmZDkhvzImBPqFVqSnREQnxZ3LoOs=
+	t=1773216923; cv=none; b=VExYQGnGs+41looRWsTabVgI6ZMczP5wPMkHIWan+oEuElMM/QjbotNFWuxocAJipjS8ExXqLpeXb9m0aEnOOF59JaMEwwGGohHYdYA1ugDAmFnmkTxBeki7DGCKJyBPjJ9mgU94jWsqNTWIb6f9ZbiOIOhluutpOqERXt/UBH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773216778; c=relaxed/simple;
-	bh=+28AbaM0l2llSpXWK3HnSybGAcgjB1fHNFeeA5L0FRY=;
-	h=Date:From:To:Subject:Content-Type:MIME-Version:Message-ID; b=P8a3UwoYYU433RPU49jl3El640XM4mb6RLSArXhveiN98TtoTGfP+I3NLEYUl4pHAySIuWk8DC0Q0vuqJZ0obc5Zv/s45Alw6QPXFvRT5KUf47L4RDVSIvFJCjGlhwqgexjnUPsqek6DIReywj7rAPN7TubY7+LZ2MsrA+wwFXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ncH7FfqZ; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=+28AbaM0l2llSpXWK3HnSybGAcgjB1fHNFeeA5L0FRY=; b=n
-	cH7FfqZE2Cxhx1Myi1PO8ZPQLi3DSfumgw6OByZlp6QdItra040iEb2ng1rcRmUz
-	Chf5CYOrnuWK7BkzjHiXo7gRIDQJVzxadyKJR2j3AF74rMWzdkpFXlgU9MX2hRu+
-	pyhAVdb1E69BxFFRsI1T1Qw92/OdzLO6R5wwGGgewY=
-Received: from luckd0g$163.com ( [183.205.138.18] ) by
- ajax-webmail-wmsvr-40-127 (Coremail) ; Wed, 11 Mar 2026 16:11:56 +0800
- (CST)
-Date: Wed, 11 Mar 2026 16:11:56 +0800 (CST)
-From: "Jianzhou Zhao" <luckd0g@163.com>
-To: edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, sdf@fomichev.me,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: BUG: unable to handle kernel NULL pointer dereference in
- __ethtool_get_link_ksettings
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 163com
-X-NTES-SC: AL_Qu2cAf6auU8q4CSYYOkfmU4Rhug7UMO3uf8n24JfPJ9wjA/p2yseUUF9NmPf88CwFTuXvxiGfTNO1/ZAU5BifrwxKbrooSbP2rWJsszDrrclvA==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1773216923; c=relaxed/simple;
+	bh=Ibv6mxb85Vjx6GR5bQ/iXScyrnppslxrk2BO6HTNO9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=FkBGc5pulugopaj99KTko8W1RHJ1tFVYqoPW5NgaNkd7v2yJ560XzHh767phvN+UswTu8+Y+DP0BS5pjsa80ONb/EjhHDxt3fOYe+T+QyotGCBBJIlsqfBkvFpIbFgZRryeFevmEESuhZuqYaX5eytptNYx/Pn7oR+Fh7PfglWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=aDt0qd9W; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260311081516epoutp025e9721e68355dab62d6573c3dbacc704~bu2QACPoW1703617036epoutp02P
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260311081516epoutp025e9721e68355dab62d6573c3dbacc704~bu2QACPoW1703617036epoutp02P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1773216916;
+	bh=h9QCX6BKlj6YsGEm1cfpdulcqfYz926u/2gberIih6I=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=aDt0qd9WcLNkF5kPaX0dJhZt9jVb010HlptXuMT71Zyfwwnreu3JnXn0lle7mOTuv
+	 81iCdQxI/oQJw8SfWwvR50GBfeJN0Vd77OuWWIcE45oLhMR1RM68u8/FxHTZj1UxaS
+	 A2bt8hQ+Zl6Mq4VufwS/0ecN9j4M4Qnl6cb1kCIA=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260311081516epcas5p4a92c7912401b6fc8d7b9b7e362c12bb9~bu2PlYVg92240022400epcas5p4L;
+	Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4fW3TH740Cz6B9m9; Wed, 11 Mar
+	2026 08:15:15 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326~bu2PKsr952652726527epcas5p4f;
+	Wed, 11 Mar 2026 08:15:15 +0000 (GMT)
+Received: from localhost.localdomain (unknown [109.144.5.214]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260311081514epsmtip1152ce47e14e910fee9d10d443392fbbc~bu2OTGv5w2716427164epsmtip1K;
+	Wed, 11 Mar 2026 08:15:14 +0000 (GMT)
+From: "tailu.shi" <tailu.shi@samsung.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "tailu.shi" <tailu.shi@samsung.com>
+Subject: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO packet
+Date: Wed, 11 Mar 2026 16:14:01 +0800
+Message-Id: <20260311081401.3832000-1-tailu.shi@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <a3fb1f.6f59.19cdbf3d67d.Coremail.luckd0g@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:fygvCgCXFbnMI7FpAcd2AA--.39000W
-X-CM-SenderInfo: poxfyvkqj6il2tof0z/xtbC9gzCTWmxI8wh8wAA3Q
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
-X-Rspamd-Queue-Id: 5E91925F2B9
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
+References: <CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
+X-Rspamd-Queue-Id: 5B55325EC6D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.44 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266524-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,samsung.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-266525-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_PRIO_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,iki.fi];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bluetooth.com:url,samsung.com:dkim,samsung.com:email,samsung.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luckd0g@163.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[163.com];
+	FROM_NEQ_ENVFROM(0.00)[tailu.shi@samsung.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-CgpTdWJqZWN0OiBbQlVHXSBuZXQ6IGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UgaW4g
-X19ldGh0b29sX2dldF9saW5rX2tzZXR0aW5ncwoKRGVhciBNYWludGFpbmVycywKCldlIGFyZSB3
-cml0aW5nIHRvIHJlcG9ydCBhIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSB2dWxuZXJhYmlsaXR5
-IHdpdGhpbiB0aGUgYF9fZXRodG9vbF9nZXRfbGlua19rc2V0dGluZ3MoKWAgZnVuY3Rpb24uIFRo
-aXMgYnVnIHdhcyBmb3VuZCBieSBvdXIgY3VzdG9tIGZ1enppbmcgdG9vbCwgUmFjZVBpbG90LiBU
-aGUgYnVnIG9jY3VycyB3aGVuIGFuIGludGVybmFsIHN1YnN5c3RlbSAoZS5nLiwgYHNtY2Agcm91
-dGluZyBvciBgaW5maW5pYmFuZGAgcXVlcnlpbmcgYSBoYXJkd2FyZSBwb3J0KSBhdHRlbXB0cyB0
-byByZXRyaWV2ZSB0aGUgbGluayBzcGVlZCBvZiBhbiBgaXB2bGFuYCBpbnRlcmZhY2UgdGhhdCBp
-cyBsYXllcmVkIG9uIHRvcCBvZiBhIHZpcnR1YWwgb3IgZGV2aWNlIGhpZXJhcmNoeSBsYWNraW5n
-IGBldGh0b29sX29wc2AuIFdlIG9ic2VydmVkIHRoaXMgYnVnIG9uIHRoZSBMaW51eCBrZXJuZWwg
-dmVyc2lvbiA2LjE4LjAtMDg2OTEtZzIwNjFmMThhZDc2ZS1kaXJ0eS4KCkNhbGwgVHJhY2UgJiBD
-b250ZXh0Cj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PQpCVUc6IGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UsIGFk
-ZHJlc3M6IDAwMDAwMDAwMDAwMDAxZjgKI1BGOiBzdXBlcnZpc29yIHJlYWQgYWNjZXNzIGluIGtl
-cm5lbCBtb2RlCiNQRjogZXJyb3JfY29kZSgweDAwMDApIC0gbm90LXByZXNlbnQgcGFnZQpQR0Qg
-MCBQNEQgMCAKT29wczogT29wczogMDAwMCBbIzFdIFNNUCBOT1BUSQpDUFU6IDAgVUlEOiAwIFBJ
-RDogODMyMiBDb21tOiBrd29ya2VyLzA6OSBOb3QgdGFpbnRlZCA2LjE4LjAtMDg2OTEtZzIwNjFm
-MThhZDc2ZS1kaXJ0eSAjNTAgUFJFRU1QVCh2b2x1bnRhcnkpIApIYXJkd2FyZSBuYW1lOiBRRU1V
-IFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyAxLjE1LjAtMSAwNC8wMS8y
-MDE0CldvcmtxdWV1ZTogZXZlbnRzIHNtY19pYl9wb3J0X2V2ZW50X3dvcmsKUklQOiAwMDEwOl9f
-ZXRodG9vbF9nZXRfbGlua19rc2V0dGluZ3MrMHg1Yy8weDE0MCBuZXQvZXRodG9vbC9pb2N0bC5j
-OjQ0MwouLi4KQ2FsbCBUcmFjZToKIDxUQVNLPgogaXB2bGFuX2V0aHRvb2xfZ2V0X2xpbmtfa3Nl
-dHRpbmdzKzB4MmMvMHg0MCBkcml2ZXJzL25ldC9pcHZsYW4vaXB2bGFuX21haW4uYzo0MTEKIF9f
-ZXRodG9vbF9nZXRfbGlua19rc2V0dGluZ3MrMHgxMDcvMHgxNDAgbmV0L2V0aHRvb2wvaW9jdGwu
-Yzo0NTAKIGliX2dldF9ldGhfc3BlZWQrMHhkMi8weDZkMCBkcml2ZXJzL2luZmluaWJhbmQvY29y
-ZS92ZXJicy5jOjE5OTkKIHJ4ZV9xdWVyeV9wb3J0KzB4MTRhLzB4MjcwIGRyaXZlcnMvaW5maW5p
-YmFuZC9zdy9yeGUvcnhlX3ZlcmJzLmM6NjIKIF9faWJfcXVlcnlfcG9ydCBkcml2ZXJzL2luZmlu
-aWJhbmQvY29yZS9kZXZpY2UuYzoyMTQ4IFtpbmxpbmVdCiBpYl9xdWVyeV9wb3J0IGRyaXZlcnMv
-aW5maW5pYmFuZC9jb3JlL2RldmljZS5jOjIxODAgW2lubGluZV0KIGliX3F1ZXJ5X3BvcnQrMHgz
-MTAvMHg0NDAgZHJpdmVycy9pbmZpbmliYW5kL2NvcmUvZGV2aWNlLmM6MjE3MAogc21jX2liX3Jl
-bWVtYmVyX3BvcnRfYXR0ciBuZXQvc21jL3NtY19pYi5jOjM2NCBbaW5saW5lXQogc21jX2liX3Bv
-cnRfZXZlbnRfd29yaysweGZhLzB4NjkwIG5ldC9zbWMvc21jX2liLmM6Mzg4Ci4uLgo9PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT0KCkV4ZWN1dGlvbiBGbG93ICYgQ29kZSBDb250ZXh0CldoZW4gYmFja2VuZCBrZXJuZWwgc3lz
-dGVtcyBsaWtlIGluZmluaWJhbmQgKGBpYl9nZXRfZXRoX3NwZWVkYCkgY2FsbCBgX19ldGh0b29s
-X2dldF9saW5rX2tzZXR0aW5ncygpYCBvbiBhIHRvcC1sZXZlbCBgaXB2bGFuYCBkZXZpY2UgdG8g
-ZXZhbHVhdGUgdW5kZXJseWluZyBldGhlcm5ldCBjYXBhYmlsaXRpZXMsIHRoZSBleGVjdXRpb24g
-ZGVsZWdhdGVzIHN1Y2Nlc3NmdWxseSB0aHJvdWdoIHRoZSBkZXZpY2UncyBtYXBwZWQgcHJveHkg
-cm91dGluZS4gSG93ZXZlciwgYGlwdmxhbmAgdHJpZ2dlcnMgYSBuZXN0ZWQgZmFsbGJhY2sgbG9v
-a3VwIHRvIHRoZSBwaHlzaWNhbCBiYXNlbGluZSBjYXJyaWVyIHdpdGhvdXQgdmFsaWRhdGluZyB3
-aGV0aGVyIHRoZSBjYXJyaWVyIGluaGVyZW50bHkgc3VwcG9ydHMgZXRodG9vbCBvcGVyYXRpb25z
-OgpgYGBjCi8vIGRyaXZlcnMvbmV0L2lwdmxhbi9pcHZsYW5fbWFpbi5jCnN0YXRpYyBpbnQgaXB2
-bGFuX2V0aHRvb2xfZ2V0X2xpbmtfa3NldHRpbmdzKHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsCgkJ
-CQkJICAgICBzdHJ1Y3QgZXRodG9vbF9saW5rX2tzZXR0aW5ncyAqY21kKQp7Cgljb25zdCBzdHJ1
-Y3QgaXB2bF9kZXYgKmlwdmxhbiA9IG5ldGRldl9wcml2KGRldik7CgoJcmV0dXJuIF9fZXRodG9v
-bF9nZXRfbGlua19rc2V0dGluZ3MoaXB2bGFuLT5waHlfZGV2LCBjbWQpOyAvLyA8LS0gTmVzdGVk
-IGZhbGxiYWNrIGNhbGwgb250byBwaHlfZGV2Cn0KYGBgCgpVbmZvcnR1bmF0ZWx5LCB0aGUgZXhw
-b3J0ZWQgaGVscGVyIHJvdXRpbmUgYF9fZXRodG9vbF9nZXRfbGlua19rc2V0dGluZ3MoKWAgcmVs
-aWVzIHN0cmljdGx5IG9uIGBkZXYtPmV0aHRvb2xfb3BzYCBiZWluZyBhIHZhbGlkIHBvcHVsYXRl
-ZCBwb2ludGVyIGFuZCBtYWtlcyBubyBhc3NlcnRpb25zIGRlZmVuc2l2ZWx5IHByaW9yIHRvIGNh
-bGxpbmcgdGhlIGNhbGxiYWNrIGxheW91dDoKYGBgYwovLyBuZXQvZXRodG9vbC9pb2N0bC5jCmlu
-dCBfX2V0aHRvb2xfZ2V0X2xpbmtfa3NldHRpbmdzKHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsCgkJ
-CQkgc3RydWN0IGV0aHRvb2xfbGlua19rc2V0dGluZ3MgKmxpbmtfa3NldHRpbmdzKQp7CglBU1NF
-UlRfUlROTCgpOwoKCWlmICghZGV2LT5ldGh0b29sX29wcy0+Z2V0X2xpbmtfa3NldHRpbmdzKSAv
-LyA8LS0gTlVMTCBwb2ludGVyIGRlcmVmZXJlbmNlIChmYXVsdCBhdCArMHgxZjgpCgkJcmV0dXJu
-IC1FT1BOT1RTVVBQOwoJLi4uCn0KYGBgCgpSb290IENhdXNlIEFuYWx5c2lzClRoZSBidWcgY29u
-c3RpdHV0ZXMgYSBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UgZXhwbGljaXRseSB0cmlnZ2VyZWQg
-d2l0aGluIGBfX2V0aHRvb2xfZ2V0X2xpbmtfa3NldHRpbmdzKClgLiBCZWNhdXNlIHRoZSBBUEkg
-aXMgZXhwb3J0ZWQgZm9yIHRyYW5zcGFyZW50IGtlcm5lbC1jZW50cmljIGNvbnN1bXB0aW9uIChl
-LmcuIGJ5IGBpYl9nZXRfZXRoX3NwZWVkYCksIGl0IGJ5cGFzc2VzIHRoZSByb2J1c3QgdmFsaWRh
-dGlvbiBzdGFuZGFyZCB1c2Vyc3BhY2UgY2FsbHMgZXhwZXJpZW5jZSB2aWEgdGhlIGBldGh0b29s
-X2lvY3RsYCBpb2N0bCB3cmFwcGVyLCBjb21wbGV0ZWx5IG92ZXJsb29raW5nIGVtcHR5L05VTEwg
-YGRldi0+ZXRodG9vbF9vcHNgIGFycmF5cy4gCgpXaGVuIGBpcHZsYW5gIGJyaWRnZXMgdGhlIHJl
-cXVlc3QgZG93biB0byBhbiB1bnlpZWxkaW5nIGJhY2tlbmQgaG9zdCAoYGlwdmxhbi0+cGh5X2Rl
-dmApLCBhbmQgdGhlIGhvc3Qgb3BlcmF0ZXMgYXMgYSB2aXJ0dWFsIGxvb3Agb3IgZHVtbXkgbGFj
-a2luZyBhbnkgcmVnaXN0ZXJlZCBgZXRodG9vbF9vcHNgLCB0aGUgZmV0Y2ggdGFyZ2V0cyBgZGV2
-LT5ldGh0b29sX29wcy0+Z2V0X2xpbmtfa3NldHRpbmdzYC4gQmFzZWQgb24gdGhlIEFQSSdzIHBv
-aW50ZXIgb2Zmc2V0IGluIGBpbmNsdWRlL2xpbnV4L2V0aHRvb2wuaGAsIHRoaXMgbGFuZHMgcHJl
-Y2lzZWx5IGF0IHN0cnVjdHVyYWwgaW5kZXggYDB4MUY4YCwgY3VsbWluYXRpbmcgaW4gYSBmYXRh
-bCBzdXBlcnZpc29yIHJlYWQgZmF1bHQuClVuZm9ydHVuYXRlbHksIHdlIHdlcmUgdW5hYmxlIHRv
-IGdlbmVyYXRlIGEgcmVwcm9kdWNlciBmb3IgdGhpcyBidWcuCgpQb3RlbnRpYWwgSW1wYWN0ClRo
-aXMgbWVtb3J5IG1hbmFnZW1lbnQgZ2FwIHByZXNlbnRzIGEgbG9jYWwga2VybmVsIHBhbmljL0Rl
-bmlhbCBvZiBTZXJ2aWNlIChEb1MpLiBJdCBtYW5pZmVzdHMgc2lsZW50bHkgYW55dGltZSBuZXN0
-ZWQgdmlydHVhbCBhYnN0cmFjdGlvbnMgcHJvY2VzcyBhc3luY2hyb25vdXMgdHJhZmZpYyBldmVu
-dHMgcmVxdWlyaW5nIG5ldHdvcmsgc3BlZWQgY2FwYWJpbGl0aWVzIG92ZXIgbWlzc2luZyBoYW5k
-bGVyIGFycmF5cywgcGFydGljdWxhcmx5IHRocm91Z2ggYXV0b21hdGVkIFJETUEvSUIgZGV2aWNl
-IGluaXRpYWxpemF0aW9ucy4KClByb3Bvc2VkIEZpeApUbyB1bml2ZXJzYWxseSBpbnRlcmNlcHQg
-dGhlIHZhbGlkYXRpb24gbGFwc2UgaW5zaWRlIHRoZSBleHBvcnRlZCBnZW5lcmljIGhhbmRsZXIs
-IHdlIHN1Z2dlc3QgaW50cm9kdWNpbmcgYSBwcmVsaW1pbmFyeSBudWxsLWNoZWNrIHByb3RlY3Rp
-bmcgdGhlIGludGVyZmFjZSBpbnZvY2F0aW9uczoKCmBgYGRpZmYKLS0tIGEvbmV0L2V0aHRvb2wv
-aW9jdGwuYworKysgYi9uZXQvZXRodG9vbC9pb2N0bC5jCkBAIC00NDAsNyArNDQwLDcgQEAgaW50
-IF9fZXRodG9vbF9nZXRfbGlua19rc2V0dGluZ3Moc3RydWN0IG5ldF9kZXZpY2UgKmRldiwKIHsK
-IAlBU1NFUlRfUlROTCgpOwogCi0JaWYgKCFkZXYtPmV0aHRvb2xfb3BzLT5nZXRfbGlua19rc2V0
-dGluZ3MpCisJaWYgKCFkZXYtPmV0aHRvb2xfb3BzIHx8ICFkZXYtPmV0aHRvb2xfb3BzLT5nZXRf
-bGlua19rc2V0dGluZ3MpCiAJCXJldHVybiAtRU9QTk9UU1VQUDsKIAogCWlmICghbmV0aWZfZGV2
-aWNlX3ByZXNlbnQoZGV2KSkKYGBgCgpXZSB3b3VsZCBiZSBoaWdobHkgaG9ub3JlZCBpZiB0aGlz
-IGNvdWxkIGJlIG9mIGFueSBoZWxwLgoKQmVzdCByZWdhcmRzLApSYWNlUGlsb3QgVGVhbQo=
+The Bluetooth Core Specification defines the 'Time_Stamp' field of
+an HCI ISO packet as optional. However, it's mandatory to include
+the 'Time_Stamp' field when using HCI ISO packets per section 3.3
+'HCI Feature Support Requirement' of TMAP specification.
+https://www.bluetooth.com/specifications/specs/html/?src=TMAP_v1.0.1/out/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
+
+To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
+that allows user application (e.g. PipeWire) to attach timestamp to the
+data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
+
+When the option is enabled, the kernel extracts the timestamp and copies
+it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
+
+This also gives the controller the reference timing information
+required for ISO stream synchronization.
+
+A corresponding userspace change is required for full functionality.
+A reference implementation is available in PipeWire:
+https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
+
+Signed-off-by: tailu.shi <tailu.shi@samsung.com>
+---
+ include/net/bluetooth/bluetooth.h |  5 ++++
+ include/net/bluetooth/hci_core.h  |  1 +
+ net/bluetooth/hci_core.c          |  2 +-
+ net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
+ 4 files changed, 50 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 69eed69f7f26..f88c83d21c5e 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -259,6 +259,10 @@ struct bt_codecs {
+ 
+ #define BT_SCM_PKT_SEQNUM	0x05
+ 
++#define BT_PKT_ISO_TIMESTAMP     23
++
++#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+@@ -409,6 +413,7 @@ enum {
+ 	BT_SK_SUSPEND,
+ 	BT_SK_PKT_STATUS,
+ 	BT_SK_PKT_SEQNUM,
++	BT_SK_PKT_ISO_TIMESTAMP,
+ };
+ 
+ struct bt_sock_list {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1e..e39d192f8ef6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -740,6 +740,7 @@ struct hci_conn {
+ 	struct bt_iso_qos iso_qos;
+ 	__u8		num_bis;
+ 	__u8		bis[HCI_MAX_ISO_BIS];
++	bool		iso_pkt_ts;
+ 
+ 	unsigned long	flags;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 31308c1de4ec..4264c0229dfb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
+ 
+ 	list = skb_shinfo(skb)->frag_list;
+ 
+-	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
++	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_pkt_ts ? 0x01 : 0x00);
+ 	hci_add_iso_hdr(skb, conn->handle, flags);
+ 
+ 	if (!list) {
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index be145e2736b7..dd4d198bab4c 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -73,6 +73,9 @@ struct iso_pinfo {
+ 	__u8			base_len;
+ 	__u8			base[BASE_MAX_LENGTH];
+ 	struct iso_conn		*conn;
++	bool			ts_flag;
++	__u32			ts;
++
+ };
+ 
+ static struct bt_iso_qos default_qos;
+@@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
+ 	struct iso_conn *conn = iso_pi(sk)->conn;
+ 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
+ 	struct hci_iso_data_hdr *hdr;
++	struct hci_iso_ts_data_hdr *hdr_ts;
+ 	int len = 0;
+ 
+ 	BT_DBG("sk %p len %d", sk, skb->len);
+@@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
+ 	len = skb->len;
+ 
+ 	/* Push ISO data header */
+-	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
+-	hdr->sn = cpu_to_le16(conn->tx_sn++);
+-	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
+-						      HCI_ISO_STATUS_VALID));
++	if (iso_pi(sk)->ts_flag) {
++		hdr_ts = skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
++		hdr_ts->ts = cpu_to_le32(iso_pi(sk)->ts);
++		hdr_ts->sn = cpu_to_le16(conn->tx_sn++);
++		hdr_ts->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
++	} else {
++		hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
++		hdr->sn = cpu_to_le16(conn->tx_sn++);
++		hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
++	}
+ 
+ 	if (sk->sk_state == BT_CONNECTED) {
+ 		hci_setup_tx_timestamp(skb, 1, sockc);
++		conn->hcon->iso_pkt_ts = iso_pi(sk)->ts_flag;
+ 		hci_send_iso(conn->hcon, skb);
+ 	} else {
+ 		len = -ENOTCONN;
+@@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb, **frag;
+ 	struct sockcm_cookie sockc;
+-	size_t mtu;
++	struct cmsghdr *cm;
++	size_t mtu, hlen;
+ 	int err;
+ 
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+@@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	hci_sockcm_init(&sockc, sk);
+ 
++	iso_pi(sk)->ts_flag = false;
+ 	if (msg->msg_controllen) {
+ 		err = sock_cmsg_send(sk, msg, &sockc);
+ 		if (err)
+ 			return err;
++
++		for (cm = CMSG_FIRSTHDR(msg); cm; cm = CMSG_NXTHDR(msg, cm)) {
++			if (cm->cmsg_level != SOL_BLUETOOTH)
++				continue;
++			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
++			    cm->cmsg_type == BT_SCM_PKT_ISO_TIMESTAMP &&
++			    cm->cmsg_len == CMSG_LEN(sizeof(u32))) {
++				iso_pi(sk)->ts_flag = true;
++				iso_pi(sk)->ts = *(u32 *)CMSG_DATA(cm);
++				break;
++			}
++		}
+ 	}
+ 
+ 	lock_sock(sk);
+@@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	release_sock(sk);
+ 
+-	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
++	hlen = iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_HDR_SIZE;
++	skb = bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+@@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_PKT_ISO_TIMESTAMP:
++		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
++		if (err)
++			break;
++
++		if (opt)
++			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
++		else
++			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.25.1
+
 
