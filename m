@@ -1,168 +1,359 @@
-Return-Path: <netdev+bounces-266618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLV/MV9IsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:47:59 +0100
+	id SDZUBfhKsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:59:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA3C262834
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:47:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B269F262AAA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BC633301A9DD
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:47:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E81413009F99
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D8B37A49F;
-	Wed, 11 Mar 2026 10:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+NfnaGG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1323D2FE0;
+	Wed, 11 Mar 2026 10:51:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE7A3D3CF2
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 10:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E64A3D1CA4
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 10:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773226062; cv=none; b=O6dc86nk/+l5JeI7DAfLxXlKvQIgYJY8WbzeXN6Y7uukFNKP7SP39XIyVYpK8HQUolCFqUgdqrdACjhG4lgSAMsOgxpaaUB/nfr7St0ZINqdMhbxnS1fFGJtoEM+znmhirA0XGk1o0S0rY0KUdqt9X0pGuJZivciK996puXK/VQ=
+	t=1773226302; cv=none; b=MGlso7RfnJKqPfVuMNJqR/27dxo7zALweJAxV+IMYcJAciEvQ/JdslZFwRm+DBR6rNuM2lww3zuHEajbOq0QscWHRd14LyIoxTOMGZQzeYb3RMslSvpiApyeTfZObYf/arsnIjJbNljdQK0RwP6KyV7EKDNfEQMGL+vqpwEVSsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773226062; c=relaxed/simple;
-	bh=zRCIOZXGAulewyBbqGE0TlQlTPqeFeIDTbPGyy24MV0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M/Kvey38hxllltljXfUMcc0Q0tWF+/5PyKrN9phktKQxGWnHkG3ATtbdm6KS0CpsAme7GrSDTLiT9fBCVdIL57ALELxUEsO1pj0IgxmWrCUGRlRMNdO7Et2C3DSFDYEl0Y2ARDIs2wdfyOtsmkSOaIdm1vxK5oWecDvWPZ648R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l+NfnaGG; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48538c5956bso8763865e9.0
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 03:47:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773226059; x=1773830859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=us9WYwCiTBLLsk5cVeG22xmuXfkRkjPu0Kbcd1njBZs=;
-        b=l+NfnaGGhGE/Qag8NAZKtowOcVY2wLQCbEgf8MnpvieTQKfxTgLXG7gVpu41GQE3Cp
-         lhcuSJ3ojhuoA+XvMW4ZK8DqWwguSBIQJdzHM+m0gGn1i58Im+PG8aw4GSSmMwNkHayu
-         W9J2Et5BO3MOuAYEpSQbP4o8f9J9gsDj/OANzpqDRda1qkC6GXeo6tLR1/FbLVhhy7Cf
-         MUxhHc5jx0lvSaHnxQ6WahuluHX1XzGqARVN8PyVe1PrQbU+agAKtUfEmOiyxhtTA+gY
-         BR6kn5ugraDiB91Rov4L/mant481Z758KVbs1s66hkgz+KSI4U1uv3Da1yI4gGWMgZ4d
-         Uvjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773226059; x=1773830859;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=us9WYwCiTBLLsk5cVeG22xmuXfkRkjPu0Kbcd1njBZs=;
-        b=RxRxVqwPgcyqfZ2gyuqC2e5dkP/OUYoHA4NX+B7WqyHwLqVIWur84jlIfKrmYgyY+m
-         fBAV1dDB3fSwDz6ymOhHJVPGV6Z/2PSmlbh5nlettYRCNuaXUJuFXP2TPBTctyCDJQh9
-         7hNkHaCpZiB/pGJXKvHUjWTo0+P/IvRtMpCHUeKLWRT/NYlCbjko/x8ZCZz805jlZKcd
-         JoAzxidnG5oGlyCJJcefVFYFtYWWymIfeTDYzUJ4u6VQAM2ywFhK3OBcU+sMAb8+gzkg
-         RdZcj+WJFxvX7r4hdCgif6GvRgnA/xQvSpzreiR8+X3+xyP6AzatSZzyEDoGmCr7kLzb
-         /Ghw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvjE+Rz+l2j3+aZIpmJQLmE0lO0BQuj88xPfVRnQeWqy2ZsOvUFfd7Ro6vWPFnR+ebclX/1/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE7bQmIHHY+9azkJ/KiMIorPQJbWVVv7Ttk4j1tgcVmGcGLuYp
-	Bx/Wq9Ofw0WhulTosZamK+0d8m94omcFiPsJxvgzkXvAPg6s1DKF+gF1
-X-Gm-Gg: ATEYQzzvtmOv+B9RIsMDoVVSRFxFuAs6NXu6qfMsorxd4Ftyy0TWDBEZvNnw7yfOK8Z
-	WPoc/fgE4gTDWAxLp2Wali0TO2qB5WWvgcUc1kFDalFR0+uqojDU1cBo3ENaMHu2WGPeBakcWBX
-	Eg3eDwwICadDylaqvACq2ci5rwNSx4j+wNI3c5ILECBvLcbHcg4rlI91aVb9CsplniqBKUqozof
-	SHzSAnLVcW984y2ZxukyB9NtkJgdgWgMH1zNxcgXaFqlTagOFEquWEyoGpKlM/fM6LuXvvI2bw7
-	ZqSX8FpHmDO9YtDa3Imtk/cJVmgNVEslv2wDy/Op7SFoCK6cCaSY2WnMHJclz0wG7VCGdr9cFVc
-	ER4HCLJFScOknVkWyn3zjAgjRYw5trWdhhuLJLFrZ/SubNpXrYuQ59zpNeYR2QCIaMRUOhQZnpp
-	YliW5mgN/lO9HXv9dUXt3ZHvlbD9YqwHmrpSYp4Tb2VhlPi4jwWAnTVl4KJo+SMXJduRod40tAu
-	NY=
-X-Received: by 2002:a05:600c:5298:b0:479:13e9:3d64 with SMTP id 5b1f17b1804b1-4854b291dc2mr30148705e9.15.1773226058755;
-        Wed, 11 Mar 2026 03:47:38 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f820a2f1sm5725154f8f.30.2026.03.11.03.47.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 03:47:38 -0700 (PDT)
-Date: Wed, 11 Mar 2026 10:47:36 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-nfs@vger.kernel.org, bpf@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-doc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netfs@lists.linux.dev, io-uring@vger.kernel.org, audit@vger.kernel.org,
- rcu@vger.kernel.org, kvm@vger.kernel.org, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-mm@kvack.org,
- linux-security-module@vger.kernel.org, Christian Loehle
- <christian.loehle@arm.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] kthread: remove kthread_exit()
-Message-ID: <20260311104736.51b53405@pumpkin>
-In-Reply-To: <20260310-work-kernel-exit-v2-1-30711759d87b@kernel.org>
-References: <20260310-work-kernel-exit-v2-0-30711759d87b@kernel.org>
-	<20260310-work-kernel-exit-v2-1-30711759d87b@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1773226302; c=relaxed/simple;
+	bh=aIPDFmWpiu2n2j6R0cgXmVexdXwuiIG9at9lCRrofUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MwYRs2NNOsTBbU70Pe0e4yXi+tO9Og6AvsIla+2FShnXdodNrCgEL55C4l/AHlin9LIKU3QV47ZWsVqcx4LzyZ4otWaiBGb3aNMHdYLX5HQFZFGJyN20dDs6fYohO2AEb2Wa6eZ6Bauj3S7v9uBKISSZLjOJEn6JYXlYrI87vjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0H9O-0004vc-L2; Wed, 11 Mar 2026 11:50:50 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0H9K-004qSb-2P;
+	Wed, 11 Mar 2026 11:50:48 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0H9L-0000000DLHf-44Eu;
+	Wed, 11 Mar 2026 11:50:47 +0100
+Date: Wed, 11 Mar 2026 11:50:47 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+Message-ID: <abFJB6mZc-0qNbrd@pengutronix.de>
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-3-bjorn@kernel.org>
+ <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8EA3C262834
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Rspamd-Queue-Id: B269F262AAA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-266619-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266618-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.769];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pengutronix.de:url,pengutronix.de:mid]
 X-Rspamd-Action: no action
 
-On Tue, 10 Mar 2026 15:56:09 +0100
-Christian Brauner <brauner@kernel.org> wrote:
+Hi all,
 
-> In 28aaa9c39945 ("kthread: consolidate kthread exit paths to prevent use-after-free")
-> we folded kthread_exit() into do_exit() when we fixed a nasty UAF bug.
-> We left kthread_exit() around as an alias to do_exit(). Remove it
-> completely.
-...
-> -#define module_put_and_kthread_exit(code) kthread_exit(code)
-> +#define module_put_and_kthread_exit(code) do_exit(code)
+On Wed, Mar 11, 2026 at 08:33:26AM +0100, Maxime Chevallier wrote:
+> Hi again Björn,
+> 
+> First, thanks for iterating so quick !
+> 
+> On 10/03/2026 11:47, Björn Töpel wrote:
+> > Add the netlink YAML spec and auto-generated UAPI header for a unified
+> > loopback interface covering MAC, PCS, PHY, and pluggable module
+> > components.
+> > 
+> > Each loopback point is described by a nested entry attribute
+> > containing:
+> > 
+> >  - component  where in the path (MAC, PCS, PHY, MODULE)
+> >  - name       subsystem label, e.g. "cmis-host" or "cmis-media"
+> >  - id         optional instance selector (e.g. PHY id, port id)
+> >  - supported  bitmask of supported directions
+> >  - direction  NEAR_END, FAR_END, or 0 (disabled)
+> > 
+> > Signed-off-by: Björn Töpel <bjorn@kernel.org>
+> > ---
+> >  Documentation/netlink/specs/ethtool.yaml      | 123 ++++++++++++++++++
+> >  .../uapi/linux/ethtool_netlink_generated.h    |  59 +++++++++
+> >  2 files changed, 182 insertions(+)
+> > 
+> > diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> > index 4707063af3b4..8bd14a3c946a 100644
+> > --- a/Documentation/netlink/specs/ethtool.yaml
+> > +++ b/Documentation/netlink/specs/ethtool.yaml
+> > @@ -211,6 +211,49 @@ definitions:
+> >          name: discard
+> >          value: 31
+> >  
+> > +  -
+> > +    name: loopback-component
+> > +    type: enum
+> > +    doc: |
+> > +      Loopback component. Identifies where in the network path the
+> > +      loopback is applied.
+> > +    entries:
+> > +      -
+> > +        name: mac
+> > +        doc: MAC loopback. Loops traffic at the MAC block.
+> > +      -
+> > +        name: pcs
+> > +        doc: |
+> > +          PCS loopback. Loops traffic at the PCS sublayer between the
+> > +          MAC and the PHY.
+> > +      -
+> > +        name: phy
+> > +        doc: |
+> > +          Ethernet PHY loopback. This refers to the Ethernet PHY managed
+> > +          by phylib, not generic PHY drivers. A Base-T SFP module
+> > +          containing an Ethernet PHY driven by Linux should report
+> > +          loopback under this component, not module.
+> > +      -
+> > +        name: module
+> > +        doc: |
+> > +          Pluggable module (e.g. CMIS (Q)SFP) loopback. Covers loopback
+> > +          modes controlled via module firmware or EEPROM registers. When
+> > +          Linux drives an Ethernet PHY inside the module via phylib, use
+> > +          the phy component instead.
+> 
+> So to get back on Andrew's remarks, let's see if we can get something
+> closer to 802.3.
+> 
+> Here, we have loopback at various locations, which all depends on the
+> Ethernet standard you use.
+> 
+> It's usually in the PCS, PMA or PMD components. Thing is, we may have
+> these in multiple places in our link.
+> 
+> If we take an example with a 10G PHY, we may have :
+> 
+> +----SoC-----+
+> |            |
+> |  MAC       |- drivers/net/ethernet
+> |   |        |
+> | Base-R PCS |- could be in drivers/net/pcs, or directly
+> |   |        | in the MAC driver
+> |   |        |
+> |  SerDes    |- May be in drivers/phy, maybe handled by firmware,
+> |   |        |  maybe by the MAC driver, maybe by the PCS driver ?
+> +---|--------+
+>     |
+>     | 10GBase-R
+>     |
+> +---|-PHY+
+> |   |    |
+> | SerDes | \
+> |   |    | |
+> |  PCS   | |
+> |   |    |  > All of that handled by the drivers/net/phy PHY driver
+> |  PMA   | |
+> |   |    | |
+> |  PMD   | /
+> +---|----+
+>     |
+>     v 10GBaseT
+> 
+> So even the "PCS" loopback component is a bit ambiguous, are we talking
+> about the PHY PCS or the MAC PCS ?
+> 
+> Another thing to consider is that there may be multiple PCSs in the SoC
+> (e.g. a BaseX and a BaseR PCS like we have in mvpp2), the one in use
+> depends on the current interface between the MAC and the PHY.
+> 
+> Another open question is, do we deal with loopbacks that may affect
+> multi-netdev links ? Like the multi-lane modes we discussed with fbnic,
+> or even for embedded, interfaces such as QSGMII ?
+> 
+> As for the SerDes on the MAC side (say, the comphy on Marvell devices),
+> can we say it's a PMA for 10GBase-KR ? Or is it something that's simply
+> out of spec ?
+> 
+> So I'd say, maybe we should not have a PCS loopback component at all,
+> but instead loopback at the well-defined components on our link, that is:
+> 
+>  - MAC => MAC loopack, PCS on the MAC side, SerDes on the SoC, etc.
+>  - PHY => Loopbacks on the PCS/PHY/PMA withing the PHY device
+>  - Module => For non-PHY (Q)SFPs
+> 
+> The important part would therefore to get the "name" part right, making
+> sure we don't fall into driver specific names.
+> 
+> We can name that 'pcs', 'pma', 'pmd', or maybe even 'mii' ? Let's see :
+> 
+> +----SoC-----+
+> |            |
+> |  MAC       |- component = MAC, name = 'mac'
+> |   |        |
+> | Base-R PCS |- component = MAC, name = 'pcs'
+> |   |        |
+> |   |        |
+> |  SerDes    |- component = MAC, name = 'mii' ?
+> |   |        |
+> +---|--------+
+>     |
+>     | 10GBase-R
+>     |
+> +---|-PHY+
+> |   |    |
+> | SerDes | - component = PHY, name = 'mii' ?
+> |   |    |
+> |  PCS   | - component = PHY, name = 'pcs'
+> |   |    |
+> |  PMA   | - component = PHY, name = 'pma'
+> |   |    |
+> |  PMD   |- component = PHY, name = 'pmd' or 'mdi' ?
+> +---|----+
+>     |
+>     v 10GBaseT
+> 
+> Sorry that's a lot of questions and I don't expect you to have the
+> answer, but as what you've come-up with is taking a good shape, it's
+> important to decide on the overall design and draw some lines about
+> what do we support, and how :(
+> 
+> > +  -
+> > +    name: loopback-direction
+> > +    type: flags
+> > +    doc: |
+> > +      Loopback direction flags. Used as a bitmask in supported, and as
+> > +      a single value in direction.
+> > +    entries:
+> > +      -
+> > +        name: near-end
+> > +        doc: Near-end loopback; host-loop-host
+> > +      -
+> > +        name: far-end
+> > +        doc: Far-end loopback; line-loop-line
+> 
+> I was browsing 802.3, it uses the terminlogy of "local loopback" vs
+> "remote loopback", I suggest we use those.
 
-I'm intrigued...
-How does that actually know to do the module_put()?
-(I know it does one - otherwise my driver wouldn't unload.)
+I do not want to overload this initial series with complex topology problems,
+but we must ensure the proposed UAPI does not block future extensions. I am
+currently investigating automated datapath diagnostic, and a flat component +
+name model will eventually fail us.
 
-The corresponding try_module_get(THIS_MODULE) is done before the
-kthread_run() (and has to be 'put' if that fails).
-So there is an explicit 'get' but an implicit 'put'.
+Looking at the current patch:
+- component (MAC, PCS, PHY, MODULE)
+- name (subsystem label)
+- id (local instance selector)
+- direction (near-end / far-end): These terms become highly ambiguous in
+  branching topologies (like CPU port on DSA switches).
 
-While a loadable module that creates a kthread usually needs to give
-the kthread a reference to its module and then have that reference
-released as the kthread exits, I can imagine cases where that isn't true.
-(Or broken code that just hopes the module won't be unloaded just
-as the kthread exits.)
+mixed loopbacks across complex interconnects, userspace will eventually need a
+Directed Acyclic Graph (DAG) model.
 
-It actually makes me think that module_put_and_exit() ought to have
-a 'module' parameter.
-Or, perhaps, kthread_create() should have the module parameter and
-hold a reference to that module until it exits.
+By adopting a DAG topology now, we can reduce the load on the initial
+implementation and bypass much of the ongoing naming discussions, as components
+are identified by their topological relations rather than arbitrary string
+labels.
 
-	David
+Can we design the netlink attributes now to ensure we are not blocked from
+adding the following fields later:
+
+- node_id: Global system ID. This also allows us to attach more diagnostic
+  points (e.g., hardware counters) to exact subcomponents.
+
+- parent_node_id: Upstream pointer for tree reconstruction.
+
+- action: Bitmask of hardware modes (e.g., LOOPBACK, GENERATE) to allow
+  simultaneous operations on a single node. See 6.3.1.3.1 Loopback Modes in:
+  https://www.ti.com/lit/ds/symlink/dp83tg720s-q1.pdf?ts=1773225830126
+
+- supported_actions: Bitmask of capabilities (e.g., can this node do LOOPBACK
+  and GENERATE simultaneously?).
+
+- direction: Towards parent / from parent.
+
+- operational_constraints: MTU limits (e.g., FEC corrupts loopbacks >1522
+  bytes), clock injection requirements (e.g., stmmac requires external Rx
+  clocks), and required interface modes (e.g. loopback on FEC works only in
+  MII mode)
+
+If we hardcode a flat list assumption into the framework now, it will break
+when we try to automate tests across datapath forks (e.g., SoC -> DSA Switch ->
+PHYs) or handle complex industrial PHYs... :)
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
