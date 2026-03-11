@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-266579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266580-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFizApc8sWmAswIAu9opvQ
-	(envelope-from <netdev+bounces-266579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:57:43 +0100
+	id 0EADMqhDsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266580-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:27:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB06261799
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:57:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4E9262246
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D3C083103707
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:53:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61A4C3363C5D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C5D3603DA;
-	Wed, 11 Mar 2026 09:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B1E2EB5AF;
+	Wed, 11 Mar 2026 09:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LUsOYvdf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CkOvZyjs"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816DD21FF2E;
-	Wed, 11 Mar 2026 09:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAE832AAB2;
+	Wed, 11 Mar 2026 09:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773222770; cv=none; b=WOJZfV3wiNubZrtBvuCXlq4Mz23Vh8Yzg+8HJarUl40G0SN6Bj6PlrV10mo65XOoZoCDA6cUzyY9TPKmqgJsNKb2iKxGLni94458wa09qZHGHa59P1fWwZ91r1CfjjE9rHyGCzPuVVSdnVJn6UkFtvE8r3kqE3m6UJ1kiMmX8oc=
+	t=1773222780; cv=none; b=EP/wbO/Vo9zQyTJUC9+nalvrjrHultbgZCK8q6sg4HeZjob78zD8LPM9QVZlHk6hLhO677TM0cM3L1ljnitIjhkBwl2hdQ2Qt0o7sCgZyaUFRJG/2Bozte1TDlmNGZrV0/LvdfdS91OvPEC2EZH1DgGoRlnaSGCiCyZS9sG4iRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773222770; c=relaxed/simple;
-	bh=pUe2/MltkAZUYdC6cY/tnaDoNeHAzCaV3lKkkqwnisU=;
+	s=arc-20240116; t=1773222780; c=relaxed/simple;
+	bh=ZWq64joZ2HzysBWsR0irO48NxLG3PCjk88eimnNVwaI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=gEnrbIlnLj8M5Zl5WMS1gguZKR/aOEeLOMGuFx8bqnppgNpIxipkrrYSy04nvu0hzhrMxQ1RRnE6ddwr/d0chReaaGe21tEPSACycCHnEiHmdpbEmsXcaf4TqjISsL64xvB72oQQOUopSUdHPiTdA690SWfuX0Avag+Zq5BaNxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LUsOYvdf; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=Rk7GVjIi0mdcups/CEFzodrSivcO7mBSFDzKKZxDRzVW1n8zCOR6Y7qvwP4C7SBKQiywJbex39bzE7msb+WmyS0fQBRO7y8OEyWIfluxBOXQKJ/Kik0u1hVIhCsAN2+liX7TuO7KeTSkgRjF3vP2MxKII0Gx1eHEyt552JrN/Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CkOvZyjs; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WWguanKzx4dLZRgBponms/+CBeTYJZLbKyDkuByIfqc=; b=LUsOYvdfsZNxH/+4Oh7hdJM6JI
-	9GdHPNozCncllaJEnkGqHWAeOZ/9LDfUziwHJrf1IimhbXH3KDb2ydiicUSzloLEVfeO0UmIQSVVx
-	YelzhnbDyqS3TgHh11aWX9GPiEv8BPIfLGyQvHuXfJBOmkOwHEBmaA6CDsV9yrvj+RRMtz411O1qW
-	kfxFmqEzd/NsejtbsKqJW7u4qZ4wQq8bdgKkOCtMQb7RqMXW6DSgmtXax9wtns0u95lQlAofLdmG1
-	d3xiKTrV3Mzvx7TRG5qsSq59KMPDY8SPrJHPYzRAsAzIO3gkPv5L1eNwdyeW/MocVy9+G7DRBQZ2O
-	Psv5iP8w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59096 helo=rmk-PC.armlinux.org.uk)
+	bh=5rpidXVVDoCtCkRYl0DmYJZsfgbhv+B1m4hTkd40PP4=; b=CkOvZyjsaGMu3pFYdhbmUEfiki
+	efI96mwiwTd03kmdG7WB037nujZp6KXMUOfVJXT25KRS+d+ihRG0zd9EyI+8xrI5CbjQBR505+aSx
+	S/JZGu+8DyzqIZKYlYaP9q7eketVQDLnxlepX59q5BSJTJr/UAMlmTkdeML+yoOtZpGtiaUEho5Ch
+	bYeTS8qcpyqQ4Y6aHnSthc6SrzwffzgdZy9jrojhw2G/rxoLRvy+vuq3Q1q2Ym6JqwcuYN/MiaknE
+	rjx4cDLGFXInDyWa8X0qlNteRW3/D5CPrs1dzgm9rt56uyPugjlHBbrP6b9hFW1vvn79T4IN89o3h
+	qWgz3M/A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59108 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w0GF8-0000000068L-19bq;
-	Wed, 11 Mar 2026 09:52:42 +0000
+	id 1w0GFE-0000000068f-2Qet;
+	Wed, 11 Mar 2026 09:52:49 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w0GF6-0000000CiTD-0KgM;
-	Wed, 11 Mar 2026 09:52:40 +0000
+	id 1w0GFB-0000000CiTJ-0lYt;
+	Wed, 11 Mar 2026 09:52:45 +0000
 In-Reply-To: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
 References: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -74,7 +74,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next 07/15] net: stmmac: remove rx_tail_addr
+Subject: [PATCH net-next 08/15] net: stmmac: use consistent tests for receive
+ buffer size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,21 +85,21 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w0GF6-0000000CiTD-0KgM@rmk-PC.armlinux.org.uk>
+Message-Id: <E1w0GFB-0000000CiTJ-0lYt@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 11 Mar 2026 09:52:40 +0000
-X-Rspamd-Queue-Id: 7FB06261799
+Date: Wed, 11 Mar 2026 09:52:45 +0000
+X-Rspamd-Queue-Id: 2D4E9262246
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266579-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-266580-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[15];
@@ -106,7 +107,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
@@ -116,54 +117,35 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,rmk-PC.armlinux.org.uk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-There is only one place where rx_q->rx_tail_addr is used - the new
-stmmac_set_queue_rx_tail_ptr(). Make this a local variable and remove
-it from struct stmmac_rx_queue.
+Two out of the three sites that set the receive buffer size (via
+stmmac_set_dma_bfsize()) check for rx_q->xsk_pool &&
+rx_q->buf_alloc_num. One uses just rx_q->xsk_pool.
 
-This commit does not change the semantics - the hardware relies upon
-the descriptor ring not crossing a 4GiB boundary as the high address
-bits are programmed into a separate register via stmmac_init_rx_chan().
-Hence, truncating the DMA address to 32-bit is fine as the register it
-will be programmed into is 32-bit, and the high bits are handled
-elsewhere.
+Discussing with Yoong Siang Song, the conclusion is that
+stmmac_dma_operation_mode() is missing the rx_q->buf_alloc_num
+check. Add this check.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h      | 1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index b096a9e090e3..d1f8383d1c04 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -131,7 +131,6 @@ struct stmmac_rx_queue {
- 	unsigned int buf_alloc_num;
- 	unsigned int napi_skb_frag_size;
- 	dma_addr_t dma_rx_phy;
--	u32 rx_tail_addr;
- 	unsigned int state_saved;
- 	struct {
- 		struct sk_buff *skb;
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 8823f8f5b053..1d40168ec68d 100644
+index 1d40168ec68d..787b02c2607a 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -388,8 +388,9 @@ static void stmmac_set_queue_rx_tail_ptr(struct stmmac_priv *priv,
- 	 * descriptiors are only supported with dwmac1000 (<v4.0) which
- 	 * does not implement .set_rx_tail_ptr
- 	 */
--	rx_q->rx_tail_addr = rx_q->dma_rx_phy + index * sizeof(struct dma_desc);
--	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, chan);
-+	u32 rx_tail_addr = rx_q->dma_rx_phy + index * sizeof(struct dma_desc);
-+
-+	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_tail_addr, chan);
- }
+@@ -2612,7 +2612,7 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
+ 		stmmac_dma_rx_mode(priv, priv->ioaddr, rxmode, chan,
+ 				rxfifosz, qmode);
  
- /**
+-		if (rx_q->xsk_pool) {
++		if (rx_q->xsk_pool && rx_q->buf_alloc_num) {
+ 			buf_size = xsk_pool_get_rx_frame_size(rx_q->xsk_pool);
+ 			stmmac_set_dma_bfsize(priv, priv->ioaddr,
+ 					      buf_size,
 -- 
 2.47.3
 
