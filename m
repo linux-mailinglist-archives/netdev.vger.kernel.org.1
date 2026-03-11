@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-266379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iH3oBxCxsGnGmAIAu9opvQ
-	(envelope-from <netdev+bounces-266379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:02:24 +0100
+	id qF/KD8SysGkHmQIAu9opvQ
+	(envelope-from <netdev+bounces-266380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:09:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D70259759
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:02:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FA4259816
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 19214302BBCA
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:02:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 42C7A30066A3
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 00:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E25013777E;
-	Wed, 11 Mar 2026 00:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6201CF8B;
+	Wed, 11 Mar 2026 00:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BxUBogDE"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0010.hostedemail.com [216.40.44.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0E628F5;
-	Wed, 11 Mar 2026 00:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAA9A95E
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 00:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773187341; cv=none; b=VMb0drDCQYkjprcAwMqr63QT9mgJ5cRWE+QZEIXn8JpSfDvax7sNctFDjuKiIA70EUn1na7b10jFb2niXieMoQy1n24IBcP/1dZtIPxV1+58d1brDu0MSlLlgZCGDMGJj1yWGK3GHEnFZWGPBvgDV6OsZ1bHFkBWq1044gihUXs=
+	t=1773187778; cv=none; b=h5Q6XalxjKDT5Aqkzj8irWJaO0Rpi/WTt9eWRO3/z5K754AiH6eKkPt2Fjez9mhBnBpDDDB4kqq7vicg5jmokprbmhWQMGxowQSbeYWKMjO60FiAz/mSD7qcHf8ol3ePRqwAGhPrwoj5Vs5+N4aOgh4j1dMsrfJl1vedj/dRTP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773187341; c=relaxed/simple;
-	bh=smzvbB4nmsoWyjvlw6IqwQZpGTU4rmIBF86uCfM5iSI=;
+	s=arc-20240116; t=1773187778; c=relaxed/simple;
+	bh=G+EASqo5sUpecmd/NHO5XZFZ8PZbl576yUz1wTKeVIk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mZ7SZw8AML/61LYZF+cYH3QVClpOnHegGEKkHaYUPO71sjzYDiM5Q+n4lFaME/6BEsW2e1BZyMolXCAJSu5lYFDt+iIzDok/b+Wt2L0EsMSmi2OBcG9piL8W4T14/fiz+ZcJEAo8snm/H1rLrULkiXmcSICjsos5XMZOMusthos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay02.hostedemail.com (Postfix) with ESMTP id 7BCB113A961;
-	Wed, 11 Mar 2026 00:02:10 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf20.hostedemail.com (Postfix) with ESMTPA id 85BFC20027;
-	Wed, 11 Mar 2026 00:02:06 +0000 (UTC)
-Date: Tue, 10 Mar 2026 20:02:17 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-nfs@vger.kernel.org, bpf@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-doc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netfs@lists.linux.dev, io-uring@vger.kernel.org, audit@vger.kernel.org,
- rcu@vger.kernel.org, kvm@vger.kernel.org, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-mm@kvack.org,
- linux-security-module@vger.kernel.org, Christian Loehle
- <christian.loehle@arm.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] tree-wide: rename do_exit() to task_exit()
-Message-ID: <20260310200217.451cf37e@gandalf.local.home>
-In-Reply-To: <20260310-work-kernel-exit-v2-2-30711759d87b@kernel.org>
-References: <20260310-work-kernel-exit-v2-0-30711759d87b@kernel.org>
-	<20260310-work-kernel-exit-v2-2-30711759d87b@kernel.org>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=jtyrN6DrBTRPgUagDC4zBHDpfGdkQvretvYoN+JEhWKtkvCNei2JQysaDM/JLFP63FtZIwbO6Iu3FjKFwt1jp4n59cPSZaXV45273GSZT9mCuPpK6yKGZ3rE7qNma8g02xmUwhO5p6A/1bsutgwdYcrtsSrQopXb6cTr812KaHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BxUBogDE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29183C19423;
+	Wed, 11 Mar 2026 00:09:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773187777;
+	bh=G+EASqo5sUpecmd/NHO5XZFZ8PZbl576yUz1wTKeVIk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BxUBogDEud91vrfh78nE6b4Psf0sX8c+IxSKV5cvZjPiQq+lV7C8uTr3X4/SPlL/r
+	 AstzdooFZue0vECnrRMKFBC+owKjeOlmDTGjZYeBz33tkCK4RF6okZlwT727EN2nKe
+	 PKqDT7Kq5K9MZE159ubgG4Vl0jYdSZhk7TbNb9xw+QV/iHOkJV3/pVGSgOeh8lQo/i
+	 B6OI2e6azFmokt22bveYZbK3BtOZM58l4PHgI2uyFaOZkW7nd7lvOoaSwy/ogUdpbE
+	 Lt27el5LLlGc3PHmsdal92LE0/tcdoPL7Z5wGE5OrQ5/7u6diSOs49Mq47xFCMDLhv
+	 6qLwGYh/+Dqhg==
+Date: Tue, 10 Mar 2026 17:09:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jakub Ramaseuski <jramaseu@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ przemyslaw.korba@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: enable NETIF_F_HW_CSUM
+ for GSO packets
+Message-ID: <20260310170936.07d429b1@kernel.org>
+In-Reply-To: <20260310115556.1004263-1-jramaseu@redhat.com>
+References: <20260310115556.1004263-1-jramaseu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,102 +63,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Stat-Signature: 5bg3rrg18jbru7uwkfxn1hbh397psca6
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18LHCHZ+vV3JFPf+Z89JvS/nvAKMsv+FAI=
-X-HE-Tag: 1773187326-98008
-X-HE-Meta: U2FsdGVkX1/3tMWPLwyG4JCc4wkqvh9SiSPSlhJp6Tv4W/fwSwUFhWXG3UBrBxSzLq3p72eu37Xu4WWh77aTVVkk97xFw9hCg2Tn+gfwvdW114asIqtfy8xHhNrVuERS2G/65ce3/BsvZjC5d8Vnvs35vga+tnTJklfjQ+UttgL5bwbjp5oOgQNdAzx3oibQ4Mzt0N8V0YHeM+nhQRgwSGhlB1291Y2eHefZmXFBYTpQLIIP1XDBd9pac8iHtBZirKQZfE9I0NK+xzIHdGI0aui4vMm56FkppnHJDf/mUfgi8cC8UEAJB61JKAsSDfwj7R599Re8N4CNbTJgYcDwKo1gfVDZt4y9
-X-Rspamd-Queue-Id: B4D70259759
+X-Rspamd-Queue-Id: D0FA4259816
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[goodmis.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.651];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rostedt@goodmis.org,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266379-lists,netdev=lfdr.de];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,gandalf.local.home:mid]
+	TAGGED_FROM(0.00)[bounces-266380-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, 10 Mar 2026 15:56:10 +0100
-Christian Brauner <brauner@kernel.org> wrote:
+On Tue, 10 Mar 2026 12:55:56 +0100 Jakub Ramaseuski wrote:
+> IPv4 over IPv6 GRE currently fails on E810 with skb_warn_bad_offload,
+> while IPv6 over IPv6 GRE falls back to software segmentation.
+> This happens because the kernel's GSO engine requires the generic HW_CSUM
+> flag to trust the hardware with complex encapsulation offloads.
+> 
+> Add NETIF_F_HW_CSUM to the device's csumo_features to satisfy the network
+> stack and unlock full hardware segmentation for GRE tunnels.
+> To prevent checksum corruption on standard traffic, evaluate the packet
+> in ice_features_check() and dynamically clear the NETIF_F_HW_CSUM bit
+> if it is not a GSO frame. This forces the driver to fall back to safe,
+> protocol-specific checksum features for non-GSO packets
+> while preserving the generic offload for tunnels.
 
-> diff --git a/tools/testing/selftests/bpf/progs/tracing_failure.c b/tools/testing/selftests/bpf/progs/tracing_failure.c
-> index 65e485c4468c..5144f4cc5787 100644
-> --- a/tools/testing/selftests/bpf/progs/tracing_failure.c
-> +++ b/tools/testing/selftests/bpf/progs/tracing_failure.c
-> @@ -25,7 +25,7 @@ int BPF_PROG(tracing_deny)
->  	return 0;
->  }
->  
-> -SEC("?fexit/do_exit")
-> +SEC("?fexit/task_exit")
->  int BPF_PROG(fexit_noreturns)
->  {
->  	return 0;
-> diff --git a/tools/testing/selftests/ftrace/test.d/dynevent/fprobe_syntax_errors.tc b/tools/testing/selftests/ftrace/test.d/dynevent/fprobe_syntax_errors.tc
-> index fee479295e2f..7e00d8ecd110 100644
-> --- a/tools/testing/selftests/ftrace/test.d/dynevent/fprobe_syntax_errors.tc
-> +++ b/tools/testing/selftests/ftrace/test.d/dynevent/fprobe_syntax_errors.tc
-> @@ -82,7 +82,7 @@ check_error 'f vfs_read arg1=^'			# NO_ARG_BODY
->  # multiprobe errors
->  if grep -q "Create/append/" README && grep -q "imm-value" README; then
->  echo "f:fprobes/testevent $FUNCTION_FORK" > dynamic_events
-> -check_error '^f:fprobes/testevent do_exit%return'	# DIFF_PROBE_TYPE
-> +check_error '^f:fprobes/testevent task_exit%return'	# DIFF_PROBE_TYPE
->  
->  # Explicitly use printf "%s" to not interpret \1
->  printf "%s" "f:fprobes/testevent $FUNCTION_FORK abcd=\\1" > dynamic_events
-> diff --git a/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_multiprobe.tc b/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_multiprobe.tc
-> index f0d5b7777ed7..a95e3824690a 100644
-> --- a/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_multiprobe.tc
-> +++ b/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_multiprobe.tc
-> @@ -5,7 +5,7 @@
->  
->  # Choose 2 symbols for target
->  SYM1=$FUNCTION_FORK
-> -SYM2=do_exit
-> +SYM2=task_exit
->  EVENT_NAME=kprobes/testevent
->  
->  DEF1="p:$EVENT_NAME $SYM1"
-> diff --git a/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_syntax_errors.tc b/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_syntax_errors.tc
-> index 8f1c58f0c239..b55ea3c05cfa 100644
-> --- a/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_syntax_errors.tc
-> +++ b/tools/testing/selftests/ftrace/test.d/kprobe/kprobe_syntax_errors.tc
-> @@ -87,7 +87,7 @@ esac
->  # multiprobe errors
->  if grep -q "Create/append/" README && grep -q "imm-value" README; then
->  echo "p:kprobes/testevent $FUNCTION_FORK" > kprobe_events
-> -check_error '^r:kprobes/testevent do_exit'	# DIFF_PROBE_TYPE
-> +check_error '^r:kprobes/testevent task_exit'	# DIFF_PROBE_TYPE
->  
->  # Explicitly use printf "%s" to not interpret \1
->  printf "%s" "p:kprobes/testevent $FUNCTION_FORK abcd=\\1" > kprobe_events
-
-These tests need to pass on old kernels too. So we can't just do a
-"s/do_exit/task_exit/" conversion. It needs to test for task_exit first,
-and if not found, fallback to do_exit.
-
-See how we handled the _do_fork() > kernel_clone() rename:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/ftrace/test.d/functions#n182
-
--- Steve
+If you're CCing netdev on iwl submissions you have to follow the 24h
+min reposting period.
+-- 
+pv-bot: 24h
 
