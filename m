@@ -1,139 +1,300 @@
-Return-Path: <netdev+bounces-266502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOQDEtIdsWmOqwIAu9opvQ
-	(envelope-from <netdev+bounces-266502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:46:26 +0100
+	id aKIXOOgasWmOqwIAu9opvQ
+	(envelope-from <netdev+bounces-266503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:34:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 974BD25E263
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:46:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570F625E055
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BC2033DDDDA
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:27:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C391030BF431
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 07:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BA93A6F1E;
-	Wed, 11 Mar 2026 07:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8043B27F3;
+	Wed, 11 Mar 2026 07:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EWvhKPJ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6833AB279;
-	Wed, 11 Mar 2026 07:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756643B27C0
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 07:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773213839; cv=none; b=RAx3tEWzoMLxcjB8BE7dKMFhebIxZu3X+Qs5Tq8NJoC/NVE/GrPaU8zZbP6BDTb/eF3efFErcUDDardEw3XsZeXaD75H6fFmRmO3VnwKwkr6wPsicc7BN+n7ZgxJCl6c8w07hXyAC4rQhdhFJG7OFukinSA/BN+/Fd6wGTKWppM=
+	t=1773214426; cv=none; b=ZrmtAvzPR7WdZz3XProJkKSehS3wYRuCstrsdOufAskQzWOnyHRZjd2eaeZ6l00GPNteYv87Kgb3Z8s2JfUEp52tyAqEIfVbZK3L6r+f/Q+NqTmfUYjVHMeZj1I/1tucS5iv6WhY89OorbTIdsJgKWDHeMxO0WozJGRAzEd8tho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773213839; c=relaxed/simple;
-	bh=Le4ziTymiOzp62xJ0hVlRSDbd5mAajWhUu65VgUkFLE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YzNZIpDy0lTNtwSCPackKSn1zArqZs8fKxN+7MmVI7lxKea1sgoIUbTJCz+cEpZ9w5nTEHYTp2JZ2ZY8yqe/nnGAf7cRfvTWMzHivnS34/qmRuY1Wj+/XubRZiHsjd/sY96pw4zavpi0VWgWb5YnGGvLXU1qM6bQd6t1+nkp8CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 3b0ce3d61d1b11f1a21c59e7364eecb8-20260311
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.11,REQID:a251f3ab-8b1c-4a43-b8e7-a8c71cbc9894,IP:0,U
-	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:25
-X-CID-META: VersionHash:89c9d04,CLOUDID:c196242fa8e833772f764fd8a49e5b49,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|898,TC:nil,Content:0|15|50,EDM:5
-	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
-	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 3b0ce3d61d1b11f1a21c59e7364eecb8-20260311
-X-User: heminhong@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <heminhong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 314001501; Wed, 11 Mar 2026 15:23:41 +0800
-From: Minhong He <heminhong@kylinos.cn>
-To: andrea.mayer@uniroma2.it,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	david.lebrun@uclouvain.be,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Minhong He <heminhong@kylinos.cn>
-Subject: [PATCH net] ipv6: sr: Add unlikely hint to idev NULL check in seg6_hmac_validate_skb
-Date: Wed, 11 Mar 2026 15:23:30 +0800
-Message-Id: <20260311072330.96491-1-heminhong@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1773214426; c=relaxed/simple;
+	bh=TnUwwV/B77eColgu+FTC3LP0ebszg38zOzmJYiOft34=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lYyXALLqlOrR3SmO85uBHQQozdgvwg4UHmBjsPcVJV5+U49dEQvQiZluBUCtZmLtLHQCjE/Hz8JB5Iz+YsnRhQbFsKxjFzN/qcn7PCnx36zMLl0y4rXYlyYYNhC+tphudcARjiHLlkREdSOfuiHOLzWnbKYfy18MziMfUDxYq8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EWvhKPJ1; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id A15881A235E;
+	Wed, 11 Mar 2026 07:33:36 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 710D560004;
+	Wed, 11 Mar 2026 07:33:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D351D10369B30;
+	Wed, 11 Mar 2026 08:33:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773214415; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=n3wH772870P9IpL8j8omLHGVOBI6gpvI4kazRBxkKQU=;
+	b=EWvhKPJ1D02MgJTIdcjo6/tweA8f7JrxrAEY+uuuroqhEwOwZydPWLbS0Y4laB6GseyYgO
+	UdFSQrUUuAqN2ezIfgS7Z15b5D1fbQHlSzAlHIJGg9Ws4t7hG7iNxc+eyWjxO25e9p1YCX
+	JOUUpjSr3avSsNbQUtvMNrIBrZU1RihcEQEj4hjZEUVmB9gijeuoW1DDqORtn7y4fUYEYt
+	S2Te6EQEonBfw5A2O4iAuDSHrFrbXyB61DBLRL6YCj8KlSJWxpf+0lGPsJTdN1RdM2Etdb
+	LxotNJPIK+3HMww6dmYslKQAnR/S7r21luxnLVLWxksi4glXhvQD6WXz0ihxJQ==
+Message-ID: <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+Date: Wed, 11 Mar 2026 08:33:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Donald Hunter
+ <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Naveen Mamindlapalli
+ <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Danielle Ratson <danieller@nvidia.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Leon Romanovsky
+ <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saeed Mahameed <saeedm@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-3-bjorn@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260310104743.907818-3-bjorn@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 974BD25E263
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 570F625E055
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266502-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266503-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[nvidia.com,marvell.com,bootlin.com,kernel.org,broadcom.com,pengutronix.de,gmail.com,armlinux.org.uk,google.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[heminhong@kylinos.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.979];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:mid,kylinos.cn:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
-can theoretically be NULL if the network device lacks proper IPv6
-initialization or is being torn down. However, this is an exceptional
-error path; in normal operation, the device will always have a valid
-inet6_dev structure.
+Hi again Björn,
 
-Marking this NULL check with unlikely() helps the compiler optimize
-branch prediction and code layout. It ensures that the common case
-(valid idev) remains in the hot path, while the error handling code
-is placed out of line, improving CPU pipeline efficiency for high-speed
-SRv6 packet processing.
+First, thanks for iterating so quick !
 
-Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-Signed-off-by: Minhong He <heminhong@kylinos.cn>
----
- net/ipv6/seg6_hmac.c | 2 ++
- 1 file changed, 2 insertions(+)
+On 10/03/2026 11:47, Björn Töpel wrote:
+> Add the netlink YAML spec and auto-generated UAPI header for a unified
+> loopback interface covering MAC, PCS, PHY, and pluggable module
+> components.
+> 
+> Each loopback point is described by a nested entry attribute
+> containing:
+> 
+>  - component  where in the path (MAC, PCS, PHY, MODULE)
+>  - name       subsystem label, e.g. "cmis-host" or "cmis-media"
+>  - id         optional instance selector (e.g. PHY id, port id)
+>  - supported  bitmask of supported directions
+>  - direction  NEAR_END, FAR_END, or 0 (disabled)
+> 
+> Signed-off-by: Björn Töpel <bjorn@kernel.org>
+> ---
+>  Documentation/netlink/specs/ethtool.yaml      | 123 ++++++++++++++++++
+>  .../uapi/linux/ethtool_netlink_generated.h    |  59 +++++++++
+>  2 files changed, 182 insertions(+)
+> 
+> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> index 4707063af3b4..8bd14a3c946a 100644
+> --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -211,6 +211,49 @@ definitions:
+>          name: discard
+>          value: 31
+>  
+> +  -
+> +    name: loopback-component
+> +    type: enum
+> +    doc: |
+> +      Loopback component. Identifies where in the network path the
+> +      loopback is applied.
+> +    entries:
+> +      -
+> +        name: mac
+> +        doc: MAC loopback. Loops traffic at the MAC block.
+> +      -
+> +        name: pcs
+> +        doc: |
+> +          PCS loopback. Loops traffic at the PCS sublayer between the
+> +          MAC and the PHY.
+> +      -
+> +        name: phy
+> +        doc: |
+> +          Ethernet PHY loopback. This refers to the Ethernet PHY managed
+> +          by phylib, not generic PHY drivers. A Base-T SFP module
+> +          containing an Ethernet PHY driven by Linux should report
+> +          loopback under this component, not module.
+> +      -
+> +        name: module
+> +        doc: |
+> +          Pluggable module (e.g. CMIS (Q)SFP) loopback. Covers loopback
+> +          modes controlled via module firmware or EEPROM registers. When
+> +          Linux drives an Ethernet PHY inside the module via phylib, use
+> +          the phy component instead.
 
-diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-index ee6bac0160ac..a8f279ffb678 100644
---- a/net/ipv6/seg6_hmac.c
-+++ b/net/ipv6/seg6_hmac.c
-@@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
- 	int require_hmac;
- 
- 	idev = __in6_dev_get(skb->dev);
-+	if (unlikely(!idev))
-+		return false;
- 
- 	srh = (struct ipv6_sr_hdr *)skb_transport_header(skb);
- 
--- 
-2.25.1
+So to get back on Andrew's remarks, let's see if we can get something
+closer to 802.3.
 
+Here, we have loopback at various locations, which all depends on the
+Ethernet standard you use.
+
+It's usually in the PCS, PMA or PMD components. Thing is, we may have
+these in multiple places in our link.
+
+If we take an example with a 10G PHY, we may have :
+
++----SoC-----+
+|            |
+|  MAC       |- drivers/net/ethernet
+|   |        |
+| Base-R PCS |- could be in drivers/net/pcs, or directly
+|   |        | in the MAC driver
+|   |        |
+|  SerDes    |- May be in drivers/phy, maybe handled by firmware,
+|   |        |  maybe by the MAC driver, maybe by the PCS driver ?
++---|--------+
+    |
+    | 10GBase-R
+    |
++---|-PHY+
+|   |    |
+| SerDes | \
+|   |    | |
+|  PCS   | |
+|   |    |  > All of that handled by the drivers/net/phy PHY driver
+|  PMA   | |
+|   |    | |
+|  PMD   | /
++---|----+
+    |
+    v 10GBaseT
+
+So even the "PCS" loopback component is a bit ambiguous, are we talking
+about the PHY PCS or the MAC PCS ?
+
+Another thing to consider is that there may be multiple PCSs in the SoC
+(e.g. a BaseX and a BaseR PCS like we have in mvpp2), the one in use
+depends on the current interface between the MAC and the PHY.
+
+Another open question is, do we deal with loopbacks that may affect
+multi-netdev links ? Like the multi-lane modes we discussed with fbnic,
+or even for embedded, interfaces such as QSGMII ?
+
+As for the SerDes on the MAC side (say, the comphy on Marvell devices),
+can we say it's a PMA for 10GBase-KR ? Or is it something that's simply
+out of spec ?
+
+So I'd say, maybe we should not have a PCS loopback component at all,
+but instead loopback at the well-defined components on our link, that is:
+
+ - MAC => MAC loopack, PCS on the MAC side, SerDes on the SoC, etc.
+ - PHY => Loopbacks on the PCS/PHY/PMA withing the PHY device
+ - Module => For non-PHY (Q)SFPs
+
+The important part would therefore to get the "name" part right, making
+sure we don't fall into driver specific names.
+
+We can name that 'pcs', 'pma', 'pmd', or maybe even 'mii' ? Let's see :
+
++----SoC-----+
+|            |
+|  MAC       |- component = MAC, name = 'mac'
+|   |        |
+| Base-R PCS |- component = MAC, name = 'pcs'
+|   |        |
+|   |        |
+|  SerDes    |- component = MAC, name = 'mii' ?
+|   |        |
++---|--------+
+    |
+    | 10GBase-R
+    |
++---|-PHY+
+|   |    |
+| SerDes | - component = PHY, name = 'mii' ?
+|   |    |
+|  PCS   | - component = PHY, name = 'pcs'
+|   |    |
+|  PMA   | - component = PHY, name = 'pma'
+|   |    |
+|  PMD   |- component = PHY, name = 'pmd' or 'mdi' ?
++---|----+
+    |
+    v 10GBaseT
+
+Sorry that's a lot of questions and I don't expect you to have the
+answer, but as what you've come-up with is taking a good shape, it's
+important to decide on the overall design and draw some lines about
+what do we support, and how :(
+
+> +  -
+> +    name: loopback-direction
+> +    type: flags
+> +    doc: |
+> +      Loopback direction flags. Used as a bitmask in supported, and as
+> +      a single value in direction.
+> +    entries:
+> +      -
+> +        name: near-end
+> +        doc: Near-end loopback; host-loop-host
+> +      -
+> +        name: far-end
+> +        doc: Far-end loopback; line-loop-line
+
+I was browsing 802.3, it uses the terminlogy of "local loopback" vs
+"remote loopback", I suggest we use those.
+
+Maxime
 
