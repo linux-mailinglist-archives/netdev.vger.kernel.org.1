@@ -1,114 +1,124 @@
-Return-Path: <netdev+bounces-266766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHs+NPXGsWnvFAAAu9opvQ
-	(envelope-from <netdev+bounces-266766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:48:05 +0100
+	id YPCpN93GsWnvFAAAu9opvQ
+	(envelope-from <netdev+bounces-266767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:47:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C7A2699D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:48:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999F22699B1
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:47:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B2B630630B2
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:46:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 934F9301DC15
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E232D239B;
-	Wed, 11 Mar 2026 19:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58E530B508;
+	Wed, 11 Mar 2026 19:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P9TytM+b"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="q+e9l8gM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D4C295DAC
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9484E20C029;
+	Wed, 11 Mar 2026 19:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773258368; cv=none; b=srMvtkTbWZBqz+aZ/twu4JIrTkmw5COji8d4gb0OorZWBQfG8YswzfarnMEZrEK4KwDJQFuvjRtUe8JneEkDvfPeQ0hH9MMhH0hn3aHJi0/gDMHfBn1ulqepYhRj68WgYP4pBUHy06Gi/FSEMYDoexTAfPjCr1yt00IytqIdGE8=
+	t=1773258457; cv=none; b=q4LQ8DJAPcyug6O1dc9QLnZFLFx5a0QzwoSluf5P+z0mZpvoGaUt8g5LTIsp/kT8aDGbT4rkRaDeRdFvIbqdoeeHG7ieuCSOD6cc2tDRijLOzp6akMmPv3WesZoDsDROQYx6fIZLnZnYxHaR9THshLxLfhzDrlXn+KFyGnFSal4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773258368; c=relaxed/simple;
-	bh=FFvAjx9zCnHSgMM/+8MPstyURpNgnN7LrwEdyxYRiCg=;
+	s=arc-20240116; t=1773258457; c=relaxed/simple;
+	bh=d0orctoNdQlyUbTNAhdFmQruWQlMOYeaidWzfI2MSt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4j0N4ZHKpEiBEZHwtLpZq+Kh1SYII4OfMnYe4Q2NkeK7kef6EgmBu93+iZTHn6Xo+Gvo0kOJivixDWjFxFbthyX0noLjH6aNvG8wbVw5GbVt+b9ufgr5QH3Cv+bjhBo5be1BuTsRM5sPswDIOqfdyiU5EJW5/CrHTDHK4aMy2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P9TytM+b; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=K3XkQEq73jWsAKMEWUB76dwZ/8sAlrAAfvgWR7FJ4Kw=; b=P9
-	TytM+bHeOnkJKMR+kF8qB+bfGb9d1gIKSkDNEZ+TgFo2sEJh8Gw4gh/3iHFCt0WdUFF9xmjk83mQX
-	IfX/TXIXpMk0j/uS97tfBJh8cGVoIloew71NyKJUFnleWUKbdwsRY+ihMgyahSvc0jeBTilGPiOK5
-	XvVLn+0lj5gNtGo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w0PVM-00BEJC-Rb; Wed, 11 Mar 2026 20:46:04 +0100
-Date: Wed, 11 Mar 2026 20:46:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tomer Maimon <tmaimon77@gmail.com>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	Russell King <rmk+kernel@armlinux.org.uk>
-Subject: Re: stmmac: TX stalls with head OWN=1; requiring manual DMA kick
- (6.12.63)
-Message-ID: <b2868f3d-ef84-4ec0-ac37-e41029a1d385@lunn.ch>
-References: <CAP6Zq1i31Z0kfDST1Xcoftxja-TFaxgSjKH6jX5eY0AGdASpTw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uc+3El8XQMIlV5EXqvGv4xh3TNivtmByZFPsbzZG7B5vKGKZMtI1TkaedfGrWlpJuF5URqeRSJeSw5glniNw1J3C805y/VCmu0/rApTcJmKlyJNs/WvK9V1h5k17NRWTwjaBsBiu19NSDQb9hsG7/HMBE4TqIx5RH3/9Jz59JqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=q+e9l8gM; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 7A12A20B710C; Wed, 11 Mar 2026 12:47:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7A12A20B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1773258456;
+	bh=mEJGxu7RvDWY3J5WSSTMNmpjoOu+wgT9zajIpsYmza0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q+e9l8gMuh8mdjN6pDirPG/CcUHNkY7HAzwR62DHewMlm6faNDYIuZDYXA95xja6i
+	 RewoBbEB9SftKU+TrEv6nEay1ykQhNMIOrD2Nb9JGDt7IQ+ZJoCGmAsuIAWh1WMltx
+	 bOq4Gm7VS+/+yPbAAHyVVRSCF9/9tUUfnk/9PvGk=
+Date: Wed, 11 Mar 2026 12:47:36 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next] net: mana: Expose page_pool stats via ethtool
+Message-ID: <abHG2NdwVvTntLeJ@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aaFmRqjjOuPIEo5x@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260227092722.50a7e45f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAP6Zq1i31Z0kfDST1Xcoftxja-TFaxgSjKH6jX5eY0AGdASpTw@mail.gmail.com>
+In-Reply-To: <20260227092722.50a7e45f@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266766-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266767-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 30C7A2699D0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,linux.microsoft.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 999F22699B1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 08:34:36PM +0200, Tomer Maimon wrote:
-> Hi Giuseppe,
+On Fri, Feb 27, 2026 at 09:27:22AM -0800, Jakub Kicinski wrote:
+> On Fri, 27 Feb 2026 01:39:18 -0800 Dipayaan Roy wrote:
+> > MANA relies on page_pool for RX buffers, and the buffer refill paths
+> > can behave quite differently across architectures and configurations (e.g.
+> > base page size, fragment vs full-page usage). This makes it harder to
+> > understand and compare RX buffer behavior when investigating performance
+> > and memory differences across platforms.
 > 
-> On kernel 6.12.63 (GMAC, normal 16‑byte TX descriptors), we observe
-> brief TX stalls when sending small packets.
+> Standard stats must not be duplicated in ethtool -S.
+> ynl and ynltool provide easy access to these stats
+> 
+> # ynltool page-pool stats 
+>     eth0[2]	page pools: 44 (zombies: 0)
+> 		refs: 495680 bytes: 2030305280 (refs: 0 bytes: 0)
+> 		recycling: 100.0% (alloc: 7745:2097593009 recycle: 379301630:1717888312)
 
-You might want to look at Russell Kings patches from this week to
-rework the descriptor handling.
+Thanks Jakub for the feedback, and understood the generic page pool
+stats should be combined with ethtool -S. I will drop this patch
+and use ynltool page-pool stats.
 
-Also, please don't report problems on dead kernels. 6.12.76 is the
-current version for the 6.12 LTS. There is a small chance your problem
-has already been fixed, and you are wasting everybody's time.
 
-       Andrew
+Regards
+
+
 
