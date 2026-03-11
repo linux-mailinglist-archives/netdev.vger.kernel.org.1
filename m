@@ -1,359 +1,259 @@
-Return-Path: <netdev+bounces-266619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266620-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDZUBfhKsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:59:04 +0100
+	id 2GFSAAFOsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266620-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 12:12:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B269F262AAA
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:59:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47CB8262C96
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 12:12:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E81413009F99
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:51:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73BF330BC130
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1323D2FE0;
-	Wed, 11 Mar 2026 10:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B223C0607;
+	Wed, 11 Mar 2026 11:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsB6mvni"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E64A3D1CA4
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 10:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEC13CEB91
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 11:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773226302; cv=none; b=MGlso7RfnJKqPfVuMNJqR/27dxo7zALweJAxV+IMYcJAciEvQ/JdslZFwRm+DBR6rNuM2lww3zuHEajbOq0QscWHRd14LyIoxTOMGZQzeYb3RMslSvpiApyeTfZObYf/arsnIjJbNljdQK0RwP6KyV7EKDNfEQMGL+vqpwEVSsQ=
+	t=1773227336; cv=none; b=ktvIC+OGNwq0gPAOYWf0xZs+bIoumk0pZLY19G1Q6NroV83a7tUsg6jap0Bw02Sshfmq4PNzeBjvikTJ1xRY+OyM4CASOrtjq56DacpEnB31XJqqYz71UW1U1f5CUGY6mhWFaHL0fdAu7zqmW3rZokPcCbdpWNM1s5Cal0wwVjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773226302; c=relaxed/simple;
-	bh=aIPDFmWpiu2n2j6R0cgXmVexdXwuiIG9at9lCRrofUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MwYRs2NNOsTBbU70Pe0e4yXi+tO9Og6AvsIla+2FShnXdodNrCgEL55C4l/AHlin9LIKU3QV47ZWsVqcx4LzyZ4otWaiBGb3aNMHdYLX5HQFZFGJyN20dDs6fYohO2AEb2Wa6eZ6Bauj3S7v9uBKISSZLjOJEn6JYXlYrI87vjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0H9O-0004vc-L2; Wed, 11 Mar 2026 11:50:50 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0H9K-004qSb-2P;
-	Wed, 11 Mar 2026 11:50:48 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0H9L-0000000DLHf-44Eu;
-	Wed, 11 Mar 2026 11:50:47 +0100
-Date: Wed, 11 Mar 2026 11:50:47 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Naveen Mamindlapalli <naveenm@marvell.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-Message-ID: <abFJB6mZc-0qNbrd@pengutronix.de>
-References: <20260310104743.907818-1-bjorn@kernel.org>
- <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+	s=arc-20240116; t=1773227336; c=relaxed/simple;
+	bh=RhlzZEons67Y+S/3t6ZwDTE7rTzHjm4wxfVeUe7uRvo=;
+	h=Content-Type:Message-ID:Date:MIME-Version:From:Subject:To:
+	 References:In-Reply-To; b=nrW0cQf+o310en/Cbna5aPmJxfuoR4abVgwQVg581s7ooj1yUGh70kdrvYL9HB/zf9IWWVW6t6NrVMwv/tsOPiuHPMtEd6X9L9iEm6izMidZJ7ifiWCg4Im2pylowg6OXtU+mSHID2fdrOA0jwyC6c8NUsF6wozuilIY8t9dNAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsB6mvni; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6631e0edde8so829692a12.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 04:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773227331; x=1773832131; darn=vger.kernel.org;
+        h=in-reply-to:content-language:references:to:subject:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fcE2XkuvP0oPClcqbDxDBv2ScKwl7ow5f4zUZ2Q8nNg=;
+        b=OsB6mvniyavbO6e7EZbysAaX8PiASZLOpbNOhTItyuxAuReBlSp7qOdIyD2gkc9DJl
+         sW3YoEqfcjf0OhsBvBajaGcwV4nhHkTIWT+3Az2H9dk2EH2iFQ/qhHGTWLUxC5OS2fRA
+         o/yEFavlUEjPzhN97UwPorUHRUcn2QivVNbQoCCaS7zdD9kG4RMf8dPfNYAzbwV7/kpd
+         3wUTH2g0+lCaMMqVJJ+x+0IYQZD+705XHIWQb2GAanbqCY9YdZXFS1ddowAa9Pj7sgTG
+         /fyoSTVQJ1IEqW849bo4Ni3dMlG06X/5mm3/tetBH7enbDh2mOPx+jLDVTWgAQug7vga
+         mCow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773227331; x=1773832131;
+        h=in-reply-to:content-language:references:to:subject:from:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fcE2XkuvP0oPClcqbDxDBv2ScKwl7ow5f4zUZ2Q8nNg=;
+        b=uBnnEsDO/TKGah7x7LYzUNLWzKhc9jlzaQdLEed3AqChRApCTyC1PmFSD0VEWjy3wt
+         eBzMMU8Z6Ol20H6rcPv6lLbL7e6BV6ln2f1q2K6pbt94Ep1WZ+Mw0ToVKYkvD2U6n+xQ
+         z2t3vxC1DKPbQqF7bcH0x6XgIUKJ76kAbQPNShPs1rP+fFzYjUrM+Y+2LQe94bZK3eaC
+         GUl1qYDsdomT24XuFdF9zNnhpcidiZovpmudBRCiRQm3PLzaiv9lI0Kpo3KUzB3Bu9Ca
+         IRxNbZ72+q16tXuXwVAswT8gp/UbidlTME9ZFVlu7XV7Bz48rl/5jyNjgMF7ml8xP+am
+         BLog==
+X-Forwarded-Encrypted: i=1; AJvYcCW6xSsYXtX19U4jPa5k44/YhPcvem/+6I3KDJP6Ak8RrZPYilia1iTYN/v5UEPqOmQXkF6jtlw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT5g56WPiXiXZvE1RtOGFpDSQRX6oaD2vDoHDMtROBEsiWs4X9
+	LMwt4qJNAInI/loAPeew+vyZ5K364JCPUh/ZMIxAsnzRL1+WffJNP+Ex
+X-Gm-Gg: ATEYQzxhKbBYxCt8DH3rOmrvWGIDWJh5ZP3kfMZ2CmBJKVpIJhUia2BL4s0hhzYRIug
+	hUGO+wjl8r847Qj/Rrt5tYfjEq9OLiQyfsUYPiSCwr5GT+y4BXGaWcmEErw8EBSyoONIYRMYsRl
+	Egihi864e4L97fohwmC+Vb0rakGabUFrDQx8ZphFi9MPKFVvJVEASoPreaPl+GHT4YJpYy7/QNZ
+	QSCB6vAuzVtuMHzTESgIHzGRV2Lv5n5GPE1/EIHycrScAayR6IiwRo4yYpub/SvplEAsCRdqy4O
+	phYDuAYYwG2yTmQjtrm7LVe7XCEaYqQi2dpi6QHOsSJtM5fHk/9UNJfoDGMtZhvW8m/G8eP5d2k
+	g0p3jSNWCcuyke+7X1bBoU/Rv/kk/dwx4LW18BuouDjzF1LB7hg5Y0SczPlLIjnmw5k/WO6XeTm
+	ibzEAiyhxlieXnFuMQNIDYtLmt7GGF6My42Jf/+Ts=
+X-Received: by 2002:a17:907:9452:b0:b94:1d92:7eb with SMTP id a640c23a62f3a-b972e1b12ecmr124646266b.18.1773227331120;
+        Wed, 11 Mar 2026 04:08:51 -0700 (PDT)
+Received: from [130.251.244.21] ([130.251.244.21])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6631419b0efsm480850a12.1.2026.03.11.04.08.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 04:08:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------U0oltHvhNjgthrULRjO8iFJm"
+Message-ID: <824cb117-1676-4a82-b77c-8908efdffa0e@gmail.com>
+Date: Wed, 11 Mar 2026 12:08:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: B269F262AAA
+User-Agent: Mozilla Thunderbird
+From: Luca Stefani <luca.stefani.ge1@gmail.com>
+Subject: Re: [PATCH] nfc: nxp-nci: i2c: restore IRQ trigger fallback
+To: Carl Lee <carl.lee@amd.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, krzk@kernel.org, peter.shen@amd.com,
+ colin.huang2@amd.com
+References: <20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com>
+Content-Language: en-US
+In-Reply-To: <20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com>
+X-Rspamd-Queue-Id: 47CB8262C96
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.06 / 15.00];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-266619-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266620-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.769];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucastefanige1@gmail.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pengutronix.de:url,pengutronix.de:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:email]
 X-Rspamd-Action: no action
 
-Hi all,
+This is a multi-part message in MIME format.
+--------------U0oltHvhNjgthrULRjO8iFJm
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 11, 2026 at 08:33:26AM +0100, Maxime Chevallier wrote:
-> Hi again Björn,
-> 
-> First, thanks for iterating so quick !
-> 
-> On 10/03/2026 11:47, Björn Töpel wrote:
-> > Add the netlink YAML spec and auto-generated UAPI header for a unified
-> > loopback interface covering MAC, PCS, PHY, and pluggable module
-> > components.
-> > 
-> > Each loopback point is described by a nested entry attribute
-> > containing:
-> > 
-> >  - component  where in the path (MAC, PCS, PHY, MODULE)
-> >  - name       subsystem label, e.g. "cmis-host" or "cmis-media"
-> >  - id         optional instance selector (e.g. PHY id, port id)
-> >  - supported  bitmask of supported directions
-> >  - direction  NEAR_END, FAR_END, or 0 (disabled)
-> > 
-> > Signed-off-by: Björn Töpel <bjorn@kernel.org>
-> > ---
-> >  Documentation/netlink/specs/ethtool.yaml      | 123 ++++++++++++++++++
-> >  .../uapi/linux/ethtool_netlink_generated.h    |  59 +++++++++
-> >  2 files changed, 182 insertions(+)
-> > 
-> > diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> > index 4707063af3b4..8bd14a3c946a 100644
-> > --- a/Documentation/netlink/specs/ethtool.yaml
-> > +++ b/Documentation/netlink/specs/ethtool.yaml
-> > @@ -211,6 +211,49 @@ definitions:
-> >          name: discard
-> >          value: 31
-> >  
-> > +  -
-> > +    name: loopback-component
-> > +    type: enum
-> > +    doc: |
-> > +      Loopback component. Identifies where in the network path the
-> > +      loopback is applied.
-> > +    entries:
-> > +      -
-> > +        name: mac
-> > +        doc: MAC loopback. Loops traffic at the MAC block.
-> > +      -
-> > +        name: pcs
-> > +        doc: |
-> > +          PCS loopback. Loops traffic at the PCS sublayer between the
-> > +          MAC and the PHY.
-> > +      -
-> > +        name: phy
-> > +        doc: |
-> > +          Ethernet PHY loopback. This refers to the Ethernet PHY managed
-> > +          by phylib, not generic PHY drivers. A Base-T SFP module
-> > +          containing an Ethernet PHY driven by Linux should report
-> > +          loopback under this component, not module.
-> > +      -
-> > +        name: module
-> > +        doc: |
-> > +          Pluggable module (e.g. CMIS (Q)SFP) loopback. Covers loopback
-> > +          modes controlled via module firmware or EEPROM registers. When
-> > +          Linux drives an Ethernet PHY inside the module via phylib, use
-> > +          the phy component instead.
-> 
-> So to get back on Andrew's remarks, let's see if we can get something
-> closer to 802.3.
-> 
-> Here, we have loopback at various locations, which all depends on the
-> Ethernet standard you use.
-> 
-> It's usually in the PCS, PMA or PMD components. Thing is, we may have
-> these in multiple places in our link.
-> 
-> If we take an example with a 10G PHY, we may have :
-> 
-> +----SoC-----+
-> |            |
-> |  MAC       |- drivers/net/ethernet
-> |   |        |
-> | Base-R PCS |- could be in drivers/net/pcs, or directly
-> |   |        | in the MAC driver
-> |   |        |
-> |  SerDes    |- May be in drivers/phy, maybe handled by firmware,
-> |   |        |  maybe by the MAC driver, maybe by the PCS driver ?
-> +---|--------+
->     |
->     | 10GBase-R
->     |
-> +---|-PHY+
-> |   |    |
-> | SerDes | \
-> |   |    | |
-> |  PCS   | |
-> |   |    |  > All of that handled by the drivers/net/phy PHY driver
-> |  PMA   | |
-> |   |    | |
-> |  PMD   | /
-> +---|----+
->     |
->     v 10GBaseT
-> 
-> So even the "PCS" loopback component is a bit ambiguous, are we talking
-> about the PHY PCS or the MAC PCS ?
-> 
-> Another thing to consider is that there may be multiple PCSs in the SoC
-> (e.g. a BaseX and a BaseR PCS like we have in mvpp2), the one in use
-> depends on the current interface between the MAC and the PHY.
-> 
-> Another open question is, do we deal with loopbacks that may affect
-> multi-netdev links ? Like the multi-lane modes we discussed with fbnic,
-> or even for embedded, interfaces such as QSGMII ?
-> 
-> As for the SerDes on the MAC side (say, the comphy on Marvell devices),
-> can we say it's a PMA for 10GBase-KR ? Or is it something that's simply
-> out of spec ?
-> 
-> So I'd say, maybe we should not have a PCS loopback component at all,
-> but instead loopback at the well-defined components on our link, that is:
-> 
->  - MAC => MAC loopack, PCS on the MAC side, SerDes on the SoC, etc.
->  - PHY => Loopbacks on the PCS/PHY/PMA withing the PHY device
->  - Module => For non-PHY (Q)SFPs
-> 
-> The important part would therefore to get the "name" part right, making
-> sure we don't fall into driver specific names.
-> 
-> We can name that 'pcs', 'pma', 'pmd', or maybe even 'mii' ? Let's see :
-> 
-> +----SoC-----+
-> |            |
-> |  MAC       |- component = MAC, name = 'mac'
-> |   |        |
-> | Base-R PCS |- component = MAC, name = 'pcs'
-> |   |        |
-> |   |        |
-> |  SerDes    |- component = MAC, name = 'mii' ?
-> |   |        |
-> +---|--------+
->     |
->     | 10GBase-R
->     |
-> +---|-PHY+
-> |   |    |
-> | SerDes | - component = PHY, name = 'mii' ?
-> |   |    |
-> |  PCS   | - component = PHY, name = 'pcs'
-> |   |    |
-> |  PMA   | - component = PHY, name = 'pma'
-> |   |    |
-> |  PMD   |- component = PHY, name = 'pmd' or 'mdi' ?
-> +---|----+
->     |
->     v 10GBaseT
-> 
-> Sorry that's a lot of questions and I don't expect you to have the
-> answer, but as what you've come-up with is taking a good shape, it's
-> important to decide on the overall design and draw some lines about
-> what do we support, and how :(
-> 
-> > +  -
-> > +    name: loopback-direction
-> > +    type: flags
-> > +    doc: |
-> > +      Loopback direction flags. Used as a bitmask in supported, and as
-> > +      a single value in direction.
-> > +    entries:
-> > +      -
-> > +        name: near-end
-> > +        doc: Near-end loopback; host-loop-host
-> > +      -
-> > +        name: far-end
-> > +        doc: Far-end loopback; line-loop-line
-> 
-> I was browsing 802.3, it uses the terminlogy of "local loopback" vs
-> "remote loopback", I suggest we use those.
 
-I do not want to overload this initial series with complex topology problems,
-but we must ensure the proposed UAPI does not block future extensions. I am
-currently investigating automated datapath diagnostic, and a flat component +
-name model will eventually fail us.
+On 11/03/2026 10:26, Carl Lee wrote:
+> The driver previously relied on IRQF_TRIGGER_RISING when requesting
+> the interrupt. This was removed to rely on the trigger type provided
+> by firmware.
+>
+> However, some platforms do not propagate the interrupt trigger type
+> to the IRQ descriptor, resulting in interrupts not being triggered.
+>
+> Use the trigger type provided by firmware when available and fall
+> back to the historically used rising-edge trigger otherwise.
+>
+> Signed-off-by: Carl Lee<carl.lee@amd.com>
+> ---
+>   drivers/nfc/nxp-nci/i2c.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
+> index 6a5ce8ff91f0..6339586a6a1b 100644
+> --- a/drivers/nfc/nxp-nci/i2c.c
+> +++ b/drivers/nfc/nxp-nci/i2c.c
+> @@ -268,6 +268,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+>   	struct device *dev = &client->dev;
+>   	struct nxp_nci_i2c_phy *phy;
+>   	int r;
+> +	unsigned long irqflags;
+>   
+>   	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+>   		nfc_err(&client->dev, "Need I2C_FUNC_I2C\n");
+> @@ -303,9 +304,17 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
+>   	if (r < 0)
+>   		return r;
+>   
+> +	/* Prefer the trigger type configured by firmware.
+> +	 * Some platforms do not provide it, so fall back to the
+> +	 * historically used rising-edge trigger.
+> +	 */
+> +	irqflags = irq_get_trigger_type(client->irq);
+Doesn't build, needs #include <linux/irq.h>
+> +	if (!irqflags)
+> +		irqflags = IRQF_TRIGGER_RISING;
+> +
+>   	r = request_threaded_irq(client->irq, NULL,
+>   				 nxp_nci_i2c_irq_thread_fn,
+> -				 IRQF_ONESHOT,
+> +				 irqflags | IRQF_ONESHOT,
+>   				 NXP_NCI_I2C_DRIVER_NAME, phy);
+>   	if (r < 0)
+>   		nfc_err(&client->dev, "Unable to register IRQ handler\n");
+>
+> ---
+> base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
+> change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
+>
+> Best regards,
 
-Looking at the current patch:
-- component (MAC, PCS, PHY, MODULE)
-- name (subsystem label)
-- id (local instance selector)
-- direction (near-end / far-end): These terms become highly ambiguous in
-  branching topologies (like CPU port on DSA switches).
+My ACPI NXP1001 table specifies ActiveHigh that properly gets translated 
+into IRQF_TRIGGER_HIGH.
 
-mixed loopbacks across complex interconnects, userspace will eventually need a
-Directed Acyclic Graph (DAG) model.
+Sadly this seems to just show the same storm as before, I played a bit 
+with the driver and noticed that it is simply broken on my device, all I 
+get are timeouts if I read the NCI device.
 
-By adopting a DAG topology now, we can reduce the load on the initial
-implementation and bypass much of the ongoing naming discussions, as components
-are identified by their topological relations rather than arbitrary string
-labels.
+I could get it working (reading tags) by hacking the driver a bit, first 
+of all I disable the irq as soon as I get it, otherwise I keep getting 
+interrupts when the device is in MODE_COLD that would end up setting 
+hard_fault to EREMOTEIO. With that in place I re-implemented the 
+enable/disable routine in nxp_nci_i2c_set_mode, and that seems to be 
+enough to make it working.
 
-Can we design the netlink attributes now to ensure we are not blocked from
-adding the following fields later:
+--------------U0oltHvhNjgthrULRjO8iFJm
+Content-Type: text/x-patch; charset=UTF-8; name="nxp.diff"
+Content-Disposition: attachment; filename="nxp.diff"
+Content-Transfer-Encoding: base64
 
-- node_id: Global system ID. This also allows us to attach more diagnostic
-  points (e.g., hardware counters) to exact subcomponents.
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmZjL254cC1uY2kvY29yZS5jIGIvZHJpdmVycy9uZmMv
+bnhwLW5jaS9jb3JlLmMKaW5kZXggNjZiMTk4NjYzMzg3Li4xYmI1OTk1ZmNkYjQgMTAwNjQ0
+Ci0tLSBhL2RyaXZlcnMvbmZjL254cC1uY2kvY29yZS5jCisrKyBiL2RyaXZlcnMvbmZjL254
+cC1uY2kvY29yZS5jCkBAIC0xOTAsMTAgKzE5MCwxMCBAQCB2b2lkIG54cF9uY2lfcmVtb3Zl
+KHN0cnVjdCBuY2lfZGV2ICpuZGV2KQogCWlmIChpbmZvLT5waHlfb3BzLT5zZXRfbW9kZSkK
+IAkJaW5mby0+cGh5X29wcy0+c2V0X21vZGUoaW5mby0+cGh5X2lkLCBOWFBfTkNJX01PREVf
+Q09MRCk7CiAKKwltdXRleF91bmxvY2soJmluZm8tPmluZm9fbG9jayk7CisKIAluY2lfdW5y
+ZWdpc3Rlcl9kZXZpY2UobmRldik7CiAJbmNpX2ZyZWVfZGV2aWNlKG5kZXYpOwotCi0JbXV0
+ZXhfdW5sb2NrKCZpbmZvLT5pbmZvX2xvY2spOwogfQogRVhQT1JUX1NZTUJPTChueHBfbmNp
+X3JlbW92ZSk7CiAKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmZjL254cC1uY2kvaTJjLmMgYi9k
+cml2ZXJzL25mYy9ueHAtbmNpL2kyYy5jCmluZGV4IDdhYWFiOTJjNjE2Yy4uMWUzNDRlN2Fm
+ZWFiIDEwMDY0NAotLS0gYS9kcml2ZXJzL25mYy9ueHAtbmNpL2kyYy5jCisrKyBiL2RyaXZl
+cnMvbmZjL254cC1uY2kvaTJjLmMKQEAgLTQzLDE5ICs0MywyNCBAQCBzdHJ1Y3QgbnhwX25j
+aV9pMmNfcGh5IHsKIAkJCSAqLwogfTsKIAotc3RhdGljIGludCBueHBfbmNpX2kyY19zZXRf
+bW9kZSh2b2lkICpwaHlfaWQsCi0JCQkJICAgIGVudW0gbnhwX25jaV9tb2RlIG1vZGUpCitz
+dGF0aWMgaW50IG54cF9uY2lfaTJjX3NldF9tb2RlKHZvaWQgKnBoeV9pZCwgZW51bSBueHBf
+bmNpX21vZGUgbW9kZSkKIHsKLQlzdHJ1Y3QgbnhwX25jaV9pMmNfcGh5ICpwaHkgPSAoc3Ry
+dWN0IG54cF9uY2lfaTJjX3BoeSAqKSBwaHlfaWQ7Ci0KLQlncGlvZF9zZXRfdmFsdWUocGh5
+LT5ncGlvZF9mdywgKG1vZGUgPT0gTlhQX05DSV9NT0RFX0ZXKSA/IDEgOiAwKTsKLQlncGlv
+ZF9zZXRfdmFsdWUocGh5LT5ncGlvZF9lbiwgKG1vZGUgIT0gTlhQX05DSV9NT0RFX0NPTEQp
+ID8gMSA6IDApOwotCXVzbGVlcF9yYW5nZSgxMDAwMCwgMTUwMDApOwotCi0JaWYgKG1vZGUg
+PT0gTlhQX05DSV9NT0RFX0NPTEQpCi0JCXBoeS0+aGFyZF9mYXVsdCA9IDA7Ci0KLQlyZXR1
+cm4gMDsKKyAgICBzdHJ1Y3QgbnhwX25jaV9pMmNfcGh5ICpwaHkgPSAoc3RydWN0IG54cF9u
+Y2lfaTJjX3BoeSAqKSBwaHlfaWQ7CisKKyAgICBpZiAobW9kZSA9PSBOWFBfTkNJX01PREVf
+Q09MRCkgeworICAgICAgICBkaXNhYmxlX2lycShwaHktPmkyY19kZXYtPmlycSk7CisgICAg
+ICAgIGdwaW9kX3NldF92YWx1ZShwaHktPmdwaW9kX2Z3LCAwKTsKKyAgICAgICAgZ3Bpb2Rf
+c2V0X3ZhbHVlKHBoeS0+Z3Bpb2RfZW4sIDApOworICAgICAgICBwaHktPmhhcmRfZmF1bHQg
+PSAwOworICAgICAgICB1c2xlZXBfcmFuZ2UoMTAwMDAsIDE1MDAwKTsKKyAgICB9IGVsc2Ug
+eworICAgICAgICBncGlvZF9zZXRfdmFsdWUocGh5LT5ncGlvZF9mdywgKG1vZGUgPT0gTlhQ
+X05DSV9NT0RFX0ZXKSA/IDEgOiAwKTsKKyAgICAgICAgZ3Bpb2Rfc2V0X3ZhbHVlKHBoeS0+
+Z3Bpb2RfZW4sIDEpOworICAgICAgICBtc2xlZXAoMTUwKTsKKyAgICAgICAgcGh5LT5oYXJk
+X2ZhdWx0ID0gMDsKKyAgICAgICAgZW5hYmxlX2lycShwaHktPmkyY19kZXYtPmlycSk7Cisg
+ICAgfQorICAgIHJldHVybiAwOwogfQogCiBzdGF0aWMgaW50IG54cF9uY2lfaTJjX3dyaXRl
+KHZvaWQgKnBoeV9pZCwgc3RydWN0IHNrX2J1ZmYgKnNrYikKQEAgLTMxNyw4ICszMjIsMTIg
+QEAgc3RhdGljIGludCBueHBfbmNpX2kyY19wcm9iZShzdHJ1Y3QgaTJjX2NsaWVudCAqY2xp
+ZW50KQogCQkJCSBueHBfbmNpX2kyY19pcnFfdGhyZWFkX2ZuLAogCQkJCSBpcnFmbGFncyB8
+IElSUUZfT05FU0hPVCwKIAkJCQkgTlhQX05DSV9JMkNfRFJJVkVSX05BTUUsIHBoeSk7Ci0J
+aWYgKHIgPCAwKQorCWlmIChyIDwgMCkgewogCQluZmNfZXJyKCZjbGllbnQtPmRldiwgIlVu
+YWJsZSB0byByZWdpc3RlciBJUlEgaGFuZGxlclxuIik7CisJCXJldHVybiByOworCX0KKwor
+CWRpc2FibGVfaXJxKGNsaWVudC0+aXJxKTsKIAogCXJldHVybiByOwogfQpAQCAtMzI3LDgg
+KzMzNiw4IEBAIHN0YXRpYyB2b2lkIG54cF9uY2lfaTJjX3JlbW92ZShzdHJ1Y3QgaTJjX2Ns
+aWVudCAqY2xpZW50KQogewogCXN0cnVjdCBueHBfbmNpX2kyY19waHkgKnBoeSA9IGkyY19n
+ZXRfY2xpZW50ZGF0YShjbGllbnQpOwogCi0JbnhwX25jaV9yZW1vdmUocGh5LT5uZGV2KTsK
+IAlmcmVlX2lycShjbGllbnQtPmlycSwgcGh5KTsKKwlueHBfbmNpX3JlbW92ZShwaHktPm5k
+ZXYpOwogfQogCiBzdGF0aWMgY29uc3Qgc3RydWN0IGkyY19kZXZpY2VfaWQgbnhwX25jaV9p
+MmNfaWRfdGFibGVbXSA9IHsK
 
-- parent_node_id: Upstream pointer for tree reconstruction.
-
-- action: Bitmask of hardware modes (e.g., LOOPBACK, GENERATE) to allow
-  simultaneous operations on a single node. See 6.3.1.3.1 Loopback Modes in:
-  https://www.ti.com/lit/ds/symlink/dp83tg720s-q1.pdf?ts=1773225830126
-
-- supported_actions: Bitmask of capabilities (e.g., can this node do LOOPBACK
-  and GENERATE simultaneously?).
-
-- direction: Towards parent / from parent.
-
-- operational_constraints: MTU limits (e.g., FEC corrupts loopbacks >1522
-  bytes), clock injection requirements (e.g., stmmac requires external Rx
-  clocks), and required interface modes (e.g. loopback on FEC works only in
-  MII mode)
-
-If we hardcode a flat list assumption into the framework now, it will break
-when we try to automate tests across datapath forks (e.g., SoC -> DSA Switch ->
-PHYs) or handle complex industrial PHYs... :)
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+--------------U0oltHvhNjgthrULRjO8iFJm--
 
