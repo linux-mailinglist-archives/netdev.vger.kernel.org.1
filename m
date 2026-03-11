@@ -1,184 +1,155 @@
-Return-Path: <netdev+bounces-266710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAAWGEWfsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:58:45 +0100
+	id kJa4G2ifsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:59:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086C02679FE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:58:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12AB5267A15
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0D71F3012E6E
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:58:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 40C743013452
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754713E1236;
-	Wed, 11 Mar 2026 16:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024CF3E1236;
+	Wed, 11 Mar 2026 16:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mJc1Ccki"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JzmL4OYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C9233E34B
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88643E277F;
+	Wed, 11 Mar 2026 16:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773248321; cv=none; b=afyPWqTI8zXylNstglBY6XC67xIPm29DkrPap9lvtleOeN2739D9v2wsIPmEen8dBKOz/0FhBGzRfXtAnMKMVCzVJflGWJpjwOqIIySvvGUXGnCS6MxD7PGI4JYtHqf3Mlv0yOFNzWFCTzg+5Eb7SjMA36dRAbjnCZBMM4D9Q1Y=
+	t=1773248357; cv=none; b=iA2bbUNg7mSPNcMGZ61N2/aCDkAm8G2rnvgtPm9Zo8DSE5VvYXIxa1ERgkmm/DC6G4+BXwfoH+Kdz2YLp2uaIcq68eOdnybeJ/njqzJep4K+RHHQmHD2Pluzpn1Mx6T7WHPb8RyaTJmD/qKtyQj2vAvFxCJ+hsyF8Tvs4kPlUPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773248321; c=relaxed/simple;
-	bh=ljHegwytkaV/FBDgBuS8TCRPpTwkqz4fZOs9t3/8E3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DHITR740rTDHvHGTJY+7Fe350vUHRdogqN4+vSfrPSC3UVujogMFZleea47D+FaYHRl7/Q+UM8eOGyI5JG8QYPUB6HeITQkQsGhBOxjZDxvmwp7cg6o0qKMAaP00IFtronjXLWVOXuf4wfWxFEFpcnc9Rz4wwujjyUGKznsUUpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mJc1Ccki; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 3D4E7C41588;
-	Wed, 11 Mar 2026 16:58:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CFAAE60004;
-	Wed, 11 Mar 2026 16:58:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9FC5A10369C69;
-	Wed, 11 Mar 2026 17:58:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773248317; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=G0bVwI05x8FHTW4L9qcttDJh3j7jp3YQEaUFXuqkqSg=;
-	b=mJc1CckiNFvfwpkGKRG06Lmv2PeH+QOqXYJ5m73SxPwcLWAn3GzrRAmj2xjBxpXwTc+kHc
-	aQhMOjV1FXYV5Q4MQxEenikuiuUzXz7IUWxsSd7GwbJEXLddWE1v3bW/P0Pzy1hl4Ur1YA
-	uDISEfPhL1WNczfWaNVzlR/OpxRFmdkk40voGnmkZBgomJW/IOjjc/vv/7syV+G9+Vw+kX
-	1kxPBk+1ZhKSXNOu5ZM9uuIP0vuZeNleV8wffPylMKG5eLYsUykR3IqrKxeL30Bi+Gs/EE
-	7TK2RACBy2USLYWZZx5fpWo6r6++xwWAFGt7bKoQyJ49XXufVjsfsCItec/EgQ==
-Message-ID: <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
-Date: Wed, 11 Mar 2026 17:58:32 +0100
+	s=arc-20240116; t=1773248357; c=relaxed/simple;
+	bh=aPP5+Lpn9w2FqURG6pLJniGUGaWCGJr41lxWMQTcgcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZHDSBTcP/ItZ+nM+OgbrbGeLhnNzESZyqIcRCdAuIZ0kIpAGa3iDAXFohdimjOsiKmkRUGsyD1dU3UeHrC3+h+Cm2GAMT2b3b6ynwiUrq/wjsn/BfSWvNZ5Fi9tEUfAkXe5/EjFvhOmdqoRGdn8OsXMHhxsnkE/223I/HH5xaqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JzmL4OYI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Az3cnZFilMdn5q62UDAm8yUyIxH4WAfr8yQyMccGVpc=; b=JzmL4OYIxXQcOCQEUgsWHhDbB7
+	tLN3/IBdsnxWRaJwucok4mTBzDeEipsG8p7PGzNoAD61cJpsH9iUDQIQxnmWpVA5s14oNLxrfPEkZ
+	TnwZBQ4G/QyrUe5/4nBb5Jta408COnu4YXG4IuRh2tIT0sCYrIPhD1qy8MILb2KaE3jWnljwKKJCc
+	o5BRBlXPeVVbd7uUHnP16imZkoYz/2p/Ou7VZdfyFN1Ckh0cX9s3mrfmee1luZXiyhuDt00sU4Lmx
+	OoGTHo98rvX5gvtrhL60JshJA1EpP/SYI9ciU/Z3aOEodF7ptW1u7QSmbwJvFtKhTLzMbaGxb7q7G
+	Gj/I1xRw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47316)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w0MtY-000000006gk-24vO;
+	Wed, 11 Mar 2026 16:58:52 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w0MtU-000000006OX-40aR;
+	Wed, 11 Mar 2026 16:58:48 +0000
+Date: Wed, 11 Mar 2026 16:58:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Divya.Koppera@microchip.com, Sabrina Dubroca <sd@queasysnail.net>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v12 1/1] Documentation: net: add flow control
+ guide and document ethtool API
+Message-ID: <abGfSJ7nvkmbcdz8@shell.armlinux.org.uk>
+References: <20260304094811.2779953-1-o.rempel@pengutronix.de>
+ <20260309190953.7c0831b7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
- KSZ8463 global irq
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
- pascal.eberhard@se.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
- Tristram.Ha@microchip.com
-References: <20260305095656.vlyaztv6nbdqrmil@skbuf>
- <98944cef-0877-4fb9-83a0-92bbd3852f66@bootlin.com>
- <20260305125149.ejju5ptrkviqi3sm@skbuf>
- <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
- <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
- <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
- <20260309205401.bk5fpw6kqnmlktbu@skbuf>
- <dde60639-af13-4653-9a34-38c4bd98b149@bootlin.com>
- <20260311115356.windefb3j4kkuslg@skbuf>
- <c3812b1f-50b7-4663-92f5-14c5c6b483a2@bootlin.com>
- <20260311135610.oox5ahxcyvxkuegw@skbuf>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260311135610.oox5ahxcyvxkuegw@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260309190953.7c0831b7@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-266711-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,pengutronix.de,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,bootlin.com,denx.de,lwn.net,linux.dev,resnulli.us,nxp.com,iogearbox.net,vger.kernel.org,microchip.com,queasysnail.net,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266710-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.963];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 086C02679FE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 12AB5267A15
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/11/26 2:56 PM, Vladimir Oltean wrote:
-> On Wed, Mar 11, 2026 at 01:53:38PM +0100, Bastien Curutchet wrote:
->> On 3/11/26 12:53 PM, Vladimir Oltean wrote:
->>> On Wed, Mar 11, 2026 at 11:02:35AM +0100, Bastien Curutchet wrote:
->>>> I, more or less, managed to fit this PTP support in the current framework,
->>>> but the next series I prepared to add periodic output support is full of
->>>> is_ksz8463() branches. So I think that I'll go with what you suggested and
->>>> try to move the KSZ8463 support in the ksz8995.c driver. It will probably be
->>>> cleaner this way.
->>>>
->>>> TBH I'm a bit lost with all these KSZ variants but IIUC KSZ8463 and KSZ8995
->>>> both belong to the 'old generation' of the hardware. Maybe a good split
->>>> would be to have these old switches in the ksz8995.c driver and keep the
->>>> rest under ksz_common infra.
->>>
->>> Wait, to make sure I understand, you said you're going to rebase this
->>> series onto the ksz8995 driver?
->>
->> Well I'll first add basic support for the KSZ8463 in the ksz8995 driver and
->> then add interrupt and PTP support on top of it yes. Did I misunderstand
->> you're suggestion ?
+On Mon, Mar 09, 2026 at 07:09:52PM -0700, Jakub Kicinski wrote:
+> On Wed,  4 Mar 2026 10:48:11 +0100 Oleksij Rempel wrote:
+> > Introduce a new document, flow_control.rst, to provide a comprehensive
+> > guide on Ethernet Flow Control in Linux. The guide explains how flow
+> > control works, how autonegotiation resolves pause capabilities, and how
+> > to configure it using ethtool and Netlink.
+> > 
+> > In parallel, document the pause and pause-stat attributes in the
+> > ethtool.yaml netlink spec. This enables the ynl tool to generate
+> > kernel-doc comments for the corresponding enums in the UAPI header,
+> > making the C interface self-documenting.
+> > 
+> > Finally, replace the legacy flow control section in phy.rst with a
+> > reference to the new document and add pointers in the relevant C source
+> > files.
 > 
-> If we're splitting drivers, I would like to see them grouped by actual similarity,
-> so as to not repeat the same mistakes.
-> 
-> I took a random feature, user port separation, and I'm comparing how Linus
-> implemented it in ksz8995:
-> https://lore.kernel.org/netdev/20260219-ks8995-fixups-v3-5-a7fc63fe1916@kernel.org/
-> vs the register map from KSZ8463:
-> https://www.microchip.com/en-us/product/ksz8463#Documentation
-> 
+> Russell, Andrew, does this doc look good to you?
 
-I took a look at the register maps from both datasheets. Registers 
-aren't always at the same address and some bits differ here and there 
-but following areas look very similar:
-- global control
-- port control
-- TOS priority
-- MAC address config
-- Indirect access
-- Data rate limit
+Only just stumbled across your email - I haven't had a chance to look at
+it yet, so can't comment.
 
-> Apart from some funky naming differences (KS8995_REG_PC1 corresponds to
-> "PORT 1 CONTROL REGISTER 2"), it should be pretty similar, right? Do you
-> see some differences requiring major surgery in ks8995?
-> 
-
-The biggest difference I see is the way KSZ8463 accesses the registers 
-through SPI. It uses byte enable bits in the command word that don't 
-exist on the other switches.
-
-> Apart from the obvious incompleteness, of course. That driver currently
-> reports DSA_TAG_PROTO_NONE. It will have to return DSA_TAG_PROTO_KS8995
-> for ks8995:
-> https://lore.kernel.org/netdev/20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org/
-> and DSA_TAG_PROTO_KSZ9893 for your KSZ8463. Right?
-
-Yes.
-
-In the end, it feels OK to me to migrate KSZ8463 into ksz8863.c but it's 
-hard to know for sure before actually doing it.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
