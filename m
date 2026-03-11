@@ -1,208 +1,193 @@
-Return-Path: <netdev+bounces-266408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266409-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPpXGA+/sGm4mgIAu9opvQ
-	(envelope-from <netdev+bounces-266408-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:02:07 +0100
+	id oHS0NmnAsGn9mgIAu9opvQ
+	(envelope-from <netdev+bounces-266409-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:07:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68B625A3AE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:02:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4317925A3F4
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 02:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 689173035154
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:01:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22C9C3018769
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 01:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EDD36F427;
-	Wed, 11 Mar 2026 01:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6F91A6817;
+	Wed, 11 Mar 2026 01:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TAdFKhz4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UUZ7Fj6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEBE36F40C
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4113FEE
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773190881; cv=none; b=euhSQqfae4cGKMs0QAf87GxAC3uwhtDFQIWHaNTrfgqzEKld/hcLU1W+AtsN4THouchi/P/WsGP7uyS5dCkr4mVfPK0XqcT+xLDcL69cEwPv+UNLY0T8clFX93aNIrj4J3SGAxnixznFjp+f+xPMu5BaAeYW7qVeDc2IVhUXHPM=
+	t=1773191227; cv=none; b=ES2Jcoz5dBnTr+dyRz0o56ILB9v7MeMe0d5xPsKxgzD53IR/nDpLVKVtDMRpIaVBrYeFu2/4+D+JXPbur2S6B6wNFTjYSZ3xuH9elRVqzP7cTO5dPOMRe733CUQyKsescVrYRq6EDv2cx0LqVMpOUZpGhBDO+iyNMd1btK/etiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773190881; c=relaxed/simple;
-	bh=6uaML4bIG5BQHwy/29qZ13YY5ETzZT2ziuriWoIfeTY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G+n07SyYYaYZOIy5MO6zoT71elvSGNeIIFTXbdb7Ca2nzJLuOGziZz4GI5vcYe4BkiKmIlLaHD1QHNArMAVQCQ4pS4c5TxZLFT1uVsBB3sDUV0k1TuqP/eiRhgAa8bs6ks+Jwh4BwyrnnTUA0L7w/4mtQDS/xU/UdOvHTIthObk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TAdFKhz4; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773190878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K9HsfOrfS+eqleG7h8cZbUZvSAAorR+E1jNWHkvLrQs=;
-	b=TAdFKhz4AGLvyBz1IQjH0d3LhD1RTXPiZ2TQ7EZzlcgkFQvEF434gIsHRJvYntgR8tsGMw
-	/waxpyhhsTwNuPUNoJhbqy1ptgdIJ350DJKpO8K6NcG2plAibuoiWLvOwomc2307tPzKWU
-	F6v7NInwpaK1M5+TnPFoRUzVIuHdlwo=
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Tejun Heo <tj@kernel.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
+	s=arc-20240116; t=1773191227; c=relaxed/simple;
+	bh=FvcoCUzBxdGf5SAtHPwW0zfePJ4ZjIi3iSEEUEY68RY=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=tgqbufKpN37X/VU4U4ot4cFHJ721QXYS0ccGv1IVsVNzroCMupmT+nN0FT45adtY5fD08yTp7Rnad1NW0wmMicAV5bBcUAu71XAr9jVCabQUbdtgOr8emzq576/erH2tkFtynmut46Zt8mORuQrAqt1guomqEh3qcuhMAOgTSoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UUZ7Fj6t; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gx41xOBjt0DixVI2WdPI+lK6vX/WGjfhPcx8g6Ep4k0=; b=UUZ7Fj6tiRQ+Ij0WjL9AOlE9h/
+	05VKv10oBDRPck2CbNw5vYDuqdRpmuxKFanRKcx0+PzjALsNwC/wx647nsZX+H0cpU1Me089Pmtql
+	4pG2tKYoxSdZRigHRgFfjvthwJeDZkRDGx9TeaJVAgr3W+61Ufrn8ssxLS6Njteg+53dorx4mGtfx
+	2Vf1sRmX8ZvfvZUFmVYz+oPa0PEVavRpunPNEz5Az0e5egdtB6JZzRg1u4XsEMIhayUVST2JZp6uX
+	gqJmwKCJJ4zRafW/+igMxS4SjJaPGhX7K6eNKzgC3rmEMji749zbcO7mJfD6lPy3a3vjToPkLMJm2
+	LL90e5hg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38794 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1w082P-000000005hS-0jwg;
+	Wed, 11 Mar 2026 01:07:01 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1w082O-0000000ChNc-1wDz;
+	Wed, 11 Mar 2026 01:07:00 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Meta kernel team <kernel-team@meta.com>,
-	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] cgroup: replace global cgroup_file_kn_lock with per-cgroup_file lock
-Date: Tue, 10 Mar 2026 18:01:01 -0700
-Message-ID: <20260311010101.3306366-4-shakeel.butt@linux.dev>
-In-Reply-To: <20260311010101.3306366-1-shakeel.butt@linux.dev>
-References: <20260311010101.3306366-1-shakeel.butt@linux.dev>
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: phy: vitesse: add inband caps and configuration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C68B625A3AE
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1w082O-0000000ChNc-1wDz@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 11 Mar 2026 01:07:00 +0000
+X-Rspamd-Queue-Id: 4317925A3F4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266408-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shakeel.butt@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266409-lists,netdev=lfdr.de,kernel];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.981];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid]
 X-Rspamd-Action: no action
 
-Replace the global cgroup_file_kn_lock with a per-cgroup_file spinlock
-to eliminate cross-cgroup contention as it is not really protecting
-data shared between different cgroups.
+Add support for VSC8662 reporting its inband capabilities, and also
+hook to configure the PHY's inband mode.
 
-The lock is initialized in cgroup_add_file() alongside timer_setup().
-No lock acquisition is needed during initialization since the cgroup
-directory is being populated under cgroup_mutex and no concurrent
-accessors exist at that point.
+This fixes a regression in the macb driver caused by commit
+1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
 
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+Reported-by: Conor Dooley <conor@kernel.org>
+Link: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-Changes since v1:
-- N/A
+ drivers/net/phy/vitesse.c | 41 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
- include/linux/cgroup-defs.h |  1 +
- kernel/cgroup/cgroup.c      | 24 ++++++++----------------
- 2 files changed, 9 insertions(+), 16 deletions(-)
-
-diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
-index bb92f5c169ca..ba26b5d05ce3 100644
---- a/include/linux/cgroup-defs.h
-+++ b/include/linux/cgroup-defs.h
-@@ -167,6 +167,7 @@ struct cgroup_file {
- 	struct kernfs_node *kn;
- 	unsigned long notified_at;
- 	struct timer_list notify_timer;
-+	spinlock_t lock;
- };
+diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
+index b1b7bbba284e..1a430e832f66 100644
+--- a/drivers/net/phy/vitesse.c
++++ b/drivers/net/phy/vitesse.c
+@@ -62,6 +62,13 @@
+ /* Vitesse Extended Page Access Register */
+ #define MII_VSC82X4_EXT_PAGE_ACCESS	0x1f
  
- /*
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index b00f4c3242e0..d899bb2aef2f 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -107,12 +107,6 @@ static bool cgroup_debug __read_mostly;
-  */
- static DEFINE_SPINLOCK(cgroup_idr_lock);
++/* Vitesse VSC8662 extended control register */
++#define VSC8662_EXT_CON1		0x17
++#define VSC8662_EXT_CON_MAC_AN		BIT(13)
++
++#define VSC8662_MAC_AN			0x1b
++#define VSC8662_MAC_AN_BYPASS		BIT(13)
++
+ /* Vitesse VSC73XX Extended Control Register */
+ #define MII_VSC73XX_PHY_CTRL_EXT3		0x14
  
--/*
-- * Protects cgroup_file->kn for !self csses.  It synchronizes notifications
-- * against file removal/re-creation across css hiding.
-- */
--static DEFINE_SPINLOCK(cgroup_file_kn_lock);
--
- DEFINE_PERCPU_RWSEM(cgroup_threadgroup_rwsem);
+@@ -140,6 +147,38 @@ static int vsc824x_config_init(struct phy_device *phydev)
+ 	return err;
+ }
  
- #define cgroup_assert_mutex_or_rcu_locked()				\
-@@ -1748,9 +1742,9 @@ static void cgroup_rm_file(struct cgroup *cgrp, const struct cftype *cft)
- 		struct cgroup_subsys_state *css = cgroup_css(cgrp, cft->ss);
- 		struct cgroup_file *cfile = (void *)css + cft->file_offset;
++static unsigned int vsc8662_inband_caps(struct phy_device *phydev,
++					phy_interface_t interface)
++{
++	if (interface == PHY_INTERFACE_MODE_SGMII)
++		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE |
++		       LINK_INBAND_BYPASS;
++
++	return 0;
++}
++
++static int vsc8662_config_inband(struct phy_device *phydev, unsigned int modes)
++{
++	u16 mask, set;
++	int ret;
++
++	mask = VSC8662_MAC_AN_BYPASS;
++	set = modes & LINK_INBAND_BYPASS ? mask : 0;
++	ret = phy_modify(phydev, VSC8662_MAC_AN, mask, set);
++	if (ret < 0)
++		return ret;
++
++	mask = VSC8662_EXT_CON_MAC_AN;
++	set = modes & (LINK_INBAND_ENABLE | LINK_INBAND_BYPASS) ? mask : 0;
++
++	ret = phy_modify_changed(phydev, VSC8662_EXT_CON1, mask, set);
++	if (ret <= 0)
++		return ret;
++
++	/* We need to soft-reset the PHY when changing VSC8662_EXT_CON_MAC_AN */
++	return genphy_soft_reset(phydev);
++}
++
+ #define VSC73XX_EXT_PAGE_ACCESS 0x1f
  
--		spin_lock_irq(&cgroup_file_kn_lock);
-+		spin_lock_irq(&cfile->lock);
- 		WRITE_ONCE(cfile->kn, NULL);
--		spin_unlock_irq(&cgroup_file_kn_lock);
-+		spin_unlock_irq(&cfile->lock);
- 
- 		timer_delete_sync(&cfile->notify_timer);
- 	}
-@@ -4427,10 +4421,8 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
- 		struct cgroup_file *cfile = (void *)css + cft->file_offset;
- 
- 		timer_setup(&cfile->notify_timer, cgroup_file_notify_timer, 0);
--
--		spin_lock_irq(&cgroup_file_kn_lock);
--		WRITE_ONCE(cfile->kn, kn);
--		spin_unlock_irq(&cgroup_file_kn_lock);
-+		spin_lock_init(&cfile->lock);
-+		cfile->kn = kn;
- 	}
- 
- 	return 0;
-@@ -4699,13 +4691,13 @@ void cgroup_file_notify(struct cgroup_file *cfile)
- 			return;
- 	}
- 
--	spin_lock_irqsave(&cgroup_file_kn_lock, flags);
-+	spin_lock_irqsave(&cfile->lock, flags);
- 	if (cfile->kn) {
- 		kn = cfile->kn;
- 		kernfs_get(kn);
- 		WRITE_ONCE(cfile->notified_at, jiffies);
- 	}
--	spin_unlock_irqrestore(&cgroup_file_kn_lock, flags);
-+	spin_unlock_irqrestore(&cfile->lock, flags);
- 
- 	if (kn) {
- 		kernfs_notify(kn);
-@@ -4723,10 +4715,10 @@ void cgroup_file_show(struct cgroup_file *cfile, bool show)
- {
- 	struct kernfs_node *kn;
- 
--	spin_lock_irq(&cgroup_file_kn_lock);
-+	spin_lock_irq(&cfile->lock);
- 	kn = cfile->kn;
- 	kernfs_get(kn);
--	spin_unlock_irq(&cgroup_file_kn_lock);
-+	spin_unlock_irq(&cfile->lock);
- 
- 	if (kn)
- 		kernfs_show(kn, show);
+ static int vsc73xx_read_page(struct phy_device *phydev)
+@@ -649,6 +688,8 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = &vsc824x_config_init,
++	.inband_caps	= vsc8662_inband_caps,
++	.config_inband	= vsc8662_config_inband,
+ 	.config_aneg    = &vsc82x4_config_aneg,
+ 	.config_intr    = &vsc82xx_config_intr,
+ 	.handle_interrupt = &vsc82xx_handle_interrupt,
 -- 
-2.52.0
+2.47.3
 
 
