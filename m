@@ -1,263 +1,189 @@
-Return-Path: <netdev+bounces-266678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mE8cGieLsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:32:55 +0100
+	id WHW0HmKLsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:33:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D6726696F
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E66342669C4
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A2FBD309B533
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:26:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60DFD30B9911
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 15:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3F533F58F;
-	Wed, 11 Mar 2026 15:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDE23DEFF2;
+	Wed, 11 Mar 2026 15:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdHdiuLe"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="r3nbTnfv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC3B3DEACD
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 15:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793893DF006
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 15:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773242798; cv=none; b=JplbvtaGggJ/VatNUVYe67sgRNH6q+N4FtLasQOgZG6k5FQkgDXpDHUBwRns6TTLhV98tQaDEBBdRa2/z2Osi9fzdWApmdNs8eNTLd3gwrbvr/leXn+7ksHmXBeBq42C3UtX5WuNfjHZCGNdGQLy0NqFN3dbYy0ftKUZzDAy8+s=
+	t=1773242930; cv=none; b=qnFmKLyXfhalRxGJcG5+9Di9xh4/OImX7vUh0ALs3zY8bjX+xzXwMaiYxl5zkkQr6CEqTaUCKavli57EP7hb2DWLbCkZHHw17q1znM1Pv+ptQtYslsmQRiCtQRPGavlVoNROEkmuO6+dq/7tnhKfuN9tstLbUI4bm79MxOm/mbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773242798; c=relaxed/simple;
-	bh=Ogmo8lAWGR7xwaijtfYuplaPa093NRJ7ZgbTzbnG5J0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iipKAQ6X2wohVzzaT5W3/PJJoeJSYeZuyxvBSzcrivriIClu7cw6iGdfmjNhiPDpMpjP0GbRanNxF3zW+Q5VP3lMONzqGDD4j/WBF+tEYNNM89Ei7oBairkOV9IhLbX5u/N4WTcS9nh2JdWg8dASxuJchqGzPNEVV5VVzJN8Pls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EdHdiuLe; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439b8a3f2bcso8162862f8f.3
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773242795; x=1773847595; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eS744gcGkNHKNUI99cJyO4KVI3lVp7bb2Qfj3UT6608=;
-        b=EdHdiuLeLkie5oeqkJoXjTpgQTFjSQHcPKpzMArNYjh2HXxa3Ln+x+SDJnnvutOMsH
-         f6j//+TDySlKwJ60J+K9SMOquU2zdGZOoWiT14beiUM8v5hvaMCZr78/a0/+BMtCvzaF
-         7rYQD+enEmOsTVYEQ1RKtdVvUh5lJ5gfGZdhqTFU/+AeVrR4bO6/c3uu8KvBZZRmn8GD
-         AVHjFab7vHe52t/z96eeLevlpvvBZG6KKG1aWPR9alRtrrU+5llFD4BYz7eRx3IsZ7Ph
-         ml3ix0/PkczXN9cI7WOl7H1M7LwPqUjTcIEdg8GvciJ/NIYzDRRUU0vKgjlqbR6XnXEs
-         s2cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773242795; x=1773847595;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eS744gcGkNHKNUI99cJyO4KVI3lVp7bb2Qfj3UT6608=;
-        b=L4m6YNX4vTQtdG0kRgIGA5CQWe8Oa/yrZMlBu9taa7rL6+ck2a8xtUxyv7+woyyCFY
-         s/3RKiFH1TtBXSduJdZnPjRecGf8Ra3txzJ33wvkLzKk/275AJHTu1s+G4a5aZkha1Ty
-         hCOMJB86bqFjcFCuSWPwYT6LZVppipbGB3R5EL+0FlOufV4OYp63E/TEyX+cTzHB1WoM
-         tve2s/XmDvDJe4Q8QhWeynaCCZzcFlN8gTL59nEvYE3/ZdhENRDwZnvOj4/M78UeWaoX
-         DrLbWCtcFmIi3Mf5jYEflbd6vsDaO/cZoFmVQuyaJQIVLoHygvqXsWHKw9+Dq0IMfJmP
-         WE4g==
-X-Gm-Message-State: AOJu0YzoPFJ/Xoh/5PSXImSNw0inBRbuV6+JwCkMIWuM/8ZinVyYe66P
-	AjRGGyyITl9xujF/ITPfQsnusbriS4wON89wDe1iCtmUtZVtSBivbtqh
-X-Gm-Gg: ATEYQzyo3/6U91ah1D/SA6cu85h1MQz8e4Judqnyl2+Q0j6haKhxjPDzn1Jz/hFC4W1
-	T3Gkhz5pVGhBtOMj5y0ZcqHXKTrSGa9kFck6g+nzGDld2AhE0ahn42ssYZpII4GU8pUyRblRUFS
-	/z8TCBgOoWhFd8C4NvUtzMu/F9LLIaBrK2HoANpFH4MgvWcMFWqzZ1f8glqjUJZssOh0It1noiH
-	QBxL7HncaN2V1hcwXC81jS6+TI1ymO+EqE/I7E4VcSQl1WszqDDKX6UN9CjuDCq+rVtnAomVNmn
-	pb6F9Lbhua1R5SRf8KafIZr/QJvd6thajLVDyeRj+1wDJc5SzJrk1sIc9xjUz1kuHBnyIOSnwje
-	+TAU1+u0J2ziK/aFBqCP1kp9dn0GZY4GdnX+FTQAHWNOqD/23wlapMS5mCW/fZq0a5RsRli7nK+
-	fk32D9f0YAqlvFNwqQkuZPzGw9VGptzk73OTHr+g==
-X-Received: by 2002:a05:6000:184d:b0:439:ad2d:99f8 with SMTP id ffacd0b85a97d-439f821b6b3mr5685512f8f.30.1773242794679;
-        Wed, 11 Mar 2026 08:26:34 -0700 (PDT)
-Received: from localhost ([2a01:4b00:bd1f:f500:f867:fc8a:5174:5755])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439f818d5eesm8699344f8f.1.2026.03.11.08.26.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 08:26:34 -0700 (PDT)
-From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- ameryhung@gmail.com, kernel-team@meta.com
-Subject: Re: [RFC PATCH bpf-next v2 02/11] selftests/bpf: Test passing
- CONST_PTR_TO_DYNPTR to kfunc that may mutate dynptr
-In-Reply-To: <20260307064439.3247440-3-ameryhung@gmail.com>
-References: <20260307064439.3247440-1-ameryhung@gmail.com>
- <20260307064439.3247440-3-ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 15:26:33 +0000
-Message-ID: <87ldfytmja.fsf@gmail.com>
+	s=arc-20240116; t=1773242930; c=relaxed/simple;
+	bh=+5hrHOV/ERFdnBxOF7WQZdPn3U6g+cadS9EuqCb2VLs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aWDvBEayKEjj12+/bQ2dQ/qlXBZzy7ZuTpZdLP8+aVWiaJq8jFj7IIPYLek84kb6gwsrw1sMU84fOXtoJ5WqaGqQ6doq2zbalYQvi8stch5GEflFFWvzXWa1+1LqE4+0OxB5hOwC0hfjKeT3UjWM6eMuh18L/1uHD97u/5lZCyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=r3nbTnfv; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1773242929; x=1804778929;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+5hrHOV/ERFdnBxOF7WQZdPn3U6g+cadS9EuqCb2VLs=;
+  b=r3nbTnfvuuSZ7omZJEhnFMbuXpK8O49DSvPE95qBP/Ta6nWw5zgHY7wO
+   uxht3f21iVzM2zRE2HF+XTB0kLjYDqavCWV922jS2QsWv4hVOFaxHuI9x
+   zrnm+Zor/mb823ThWFZ2DQC3qywiezsevJ7kC7EgQUNq2VAmY68R+j7ep
+   jgl9wpUzNp9NTzLnZjCPBXM8dJfMpirxRb87eWHfFOJ4/bOzPd3aDPj6i
+   bqn2CZ+hzqlni7TNCjD52haHS8d952ZXJafmyoC3Do2M45O1Y1hWIdSIM
+   NeDBEApDVjuzfEemeiySMoydY+pV3qsQLBJHc3xBOznqRMu6Opg2bveqz
+   A==;
+X-CSE-ConnectionGUID: fS9bibfyS/+0az2oXJhB4A==
+X-CSE-MsgGUID: 3JG50Uk6T9C5pTdHlaKeTw==
+X-IronPort-AV: E=Sophos;i="6.23,113,1770620400"; 
+   d="scan'208";a="221791544"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 08:28:43 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Wed, 11 Mar 2026 08:28:19 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Wed, 11 Mar 2026 08:28:18 -0700
+Date: Wed, 11 Mar 2026 08:28:17 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Geert Uytterhoeven <geert+renesas@glider.be>, <andrew@lunn.ch>,
+	<conor@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<charles.perry@microchip.com>
+Subject: Re: [PATCH net-next] net: phy: vitesse: add inband caps and
+ configuration
+Message-ID: <abGKEfPmxjyiNWer@bby-cbu-swbuild03.eng.microchip.com>
+References: <E1w082O-0000000ChNc-1wDz@rmk-PC.armlinux.org.uk>
+ <20260311140135.937544-1-geert+renesas@glider.be>
+ <abF7g9kZk5-9YN5_@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <abF7g9kZk5-9YN5_@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-266678-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266679-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 02D6726696F
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:dkim,bby-cbu-swbuild03.eng.microchip.com:mid]
+X-Rspamd-Queue-Id: E66342669C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Amery Hung <ameryhung@gmail.com> writes:
+On Wed, Mar 11, 2026 at 02:26:11PM +0000, Russell King (Oracle) wrote:
+> On Wed, Mar 11, 2026 at 03:01:35PM +0100, Geert Uytterhoeven wrote:
+> > 	Hi Russell,
+> > 
+> > On Wed, 11 Mar 2026 at 01:07, Russell King <rmk@armlinux.org.uk> wrote:
+> > > Add support for VSC8662 reporting its inband capabilities, and also
+> > > hook to configure the PHY's inband mode.
+> > >
+> > > This fixes a regression in the macb driver caused by commit
+> > > 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
+> > 
+> > Fixes: 1338cfef1ff1b958 ("net: macb: fix SGMII with inband aneg disabled")
+> > 
+> > > Reported-by: Conor Dooley <conor@kernel.org>
+> > > Link: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
+> > 
+> > s/Link/Closes/
+> 
+> I avoided it because any other PHY used with macb that is also connected
+> via SGMII will run into this same issue. It just happens that adding
+> this support fixes the above commit.
+> 
+> Conversely, we have stmmac, which unconditionally enables SGMII inband
+> at the MAC end no matter what phylink says to do, and should this
+> PHY be used with this patch in a stmmac system, it will cause that to
+> break, because we end up with either end misconfigured.
+> 
 
-> Make sure for kfunc that takes mutable dynptr argument, verifier rejects
-> passing CONST_PTR_TO_DYNPTR to it.
->
-> Rename struct sample to test_sample to avoid a conflict with the
-> definition in vmlinux.h
->
-> In test_kfunc_dynptr_param.c, initialize dynptr to 0 to avoid
-> -Wuninitialized-const-pointer warning.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  .../testing/selftests/bpf/progs/dynptr_fail.c | 37 +++++++++++++++----
->  .../bpf/progs/test_kfunc_dynptr_param.c       |  2 +-
->  2 files changed, 30 insertions(+), 9 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> index 8f2ae9640886..5e1b1cf4ea8e 100644
-> --- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> +++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-> @@ -1,15 +1,14 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright (c) 2022 Facebook */
->  
-> +#include <vmlinux.h>
->  #include <errno.h>
->  #include <string.h>
-> -#include <stdbool.h>
-> -#include <linux/bpf.h>
->  #include <bpf/bpf_helpers.h>
->  #include <bpf/bpf_tracing.h>
-> -#include <linux/if_ether.h>
->  #include "bpf_misc.h"
->  #include "bpf_kfuncs.h"
-> +#include "../test_kmods/bpf_testmod_kfunc.h"
->  
->  char _license[] SEC("license") = "GPL";
->  
-> @@ -46,7 +45,7 @@ struct {
->  	__type(value, __u64);
->  } array_map4 SEC(".maps");
->  
-> -struct sample {
-> +struct test_sample {
->  	int pid;
->  	long value;
->  	char comm[16];
-> @@ -95,7 +94,7 @@ __failure __msg("Unreleased reference id=4")
->  int ringbuf_missing_release2(void *ctx)
->  {
->  	struct bpf_dynptr ptr1, ptr2;
-> -	struct sample *sample;
-> +	struct test_sample *sample;
->  
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr1);
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
-> @@ -173,7 +172,7 @@ __failure __msg("type=mem expected=ringbuf_mem")
->  int ringbuf_invalid_api(void *ctx)
->  {
->  	struct bpf_dynptr ptr;
-> -	struct sample *sample;
-> +	struct test_sample *sample;
->  
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
->  	sample = bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> @@ -315,7 +314,7 @@ __failure __msg("invalid mem access 'scalar'")
->  int data_slice_use_after_release1(void *ctx)
->  {
->  	struct bpf_dynptr ptr;
-> -	struct sample *sample;
-> +	struct test_sample *sample;
->  
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr);
->  	sample = bpf_dynptr_data(&ptr, 0, sizeof(*sample));
-> @@ -347,7 +346,7 @@ __failure __msg("invalid mem access 'scalar'")
->  int data_slice_use_after_release2(void *ctx)
->  {
->  	struct bpf_dynptr ptr1, ptr2;
-> -	struct sample *sample;
-> +	struct test_sample *sample;
->  
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, 64, 0, &ptr1);
->  	bpf_ringbuf_reserve_dynptr(&ringbuf, sizeof(*sample), 0, &ptr2);
-> @@ -1993,3 +1992,25 @@ int test_dynptr_reg_type(void *ctx)
->  	global_call_bpf_dynptr((const struct bpf_dynptr *)current);
->  	return 0;
->  }
-> +
-> +/* Cannot pass CONST_PTR_TO_DYNPTR to bpf_kfunc_dynptr_test() that may mutate the dynptr */
-> +__noinline int global_subprog_dynptr_mutable(const struct bpf_dynptr *dynptr)
-> +{
-> +	long ret = 0;
-Why do we need this long ret? Do we even need this function at all, why
-not calling bpf_kfunc_dynptr_test() directly from the
-kfunc_dynptr_const_to_mutable()?
-> +
-> +	/* this should fail */
-> +	bpf_kfunc_dynptr_test((struct bpf_dynptr *)dynptr, NULL);
-> +	__sink(ret);
-> +	return ret;
-> +}
-> +
-> +SEC("tc")
-nit: it looks like most of the programs in this file are optional:
-SEC("?tc").
-> +__failure __msg("cannot pass pointer to const bpf_dynptr, the helper mutates it")
-> +int kfunc_dynptr_const_to_mutable(struct __sk_buff *skb)
-> +{
-> +	struct bpf_dynptr data;
-> +
-> +	bpf_dynptr_from_skb(skb, 0, &data);
-> +	global_subprog_dynptr_mutable(&data);
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> index c3631fd41977..1c6cfd0888ba 100644
-> --- a/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> +++ b/tools/testing/selftests/bpf/progs/test_kfunc_dynptr_param.c
-> @@ -33,7 +33,7 @@ SEC("?lsm.s/bpf")
->  __failure __msg("cannot pass in dynptr at an offset=-8")
->  int BPF_PROG(not_valid_dynptr, int cmd, union bpf_attr *attr, unsigned int size, bool kernel)
->  {
-> -	unsigned long val;
-> +	unsigned long val = 0;
->  
->  	return bpf_verify_pkcs7_signature((struct bpf_dynptr *)&val,
->  					  (struct bpf_dynptr *)&val, NULL);
+macb also unconditionally activated inband aneg before I added the
+->pcs_config() callback.
+
+One of the way I think we could fix macb is by adding:
+
+        if (bp->phy_interface == PHY_INTERFACE_MODE_SGMII) {
+                bp->phylink_config.poll_fixed_state = true;
+                bp->phylink_config.get_fixed_state = macb_get_pcs_fixed_state;
++               bp->phylink_config.default_an_inband = true;
+        }
+
+in macb_mii_probe(). This would force phylink into using inband aneg
+every time, unless there's a fixed link or the PHY explicitly doesn't
+support in-band. This would make it compatible with legacy system that were
+setup with in-band aneg activated. It would fix MPFS without the need for
+this patch or device-tree modifications ('managed = "in-band-status"').
+
+Thanks,
+Charles
+
+> Also, if this commit is applied without the macb change, you'll
+> probably also find that macb breaks (please test that.) 
+> 
+> So, while this is a solution and a step forward, I'd rather not suggest
+> that it is an official fix to the macb issue - it's merely filling in
+> a missing piece of the jigsaw.
+> 
+> Sadly, this is a fundamental issue with SGMII implementations today:
+> whether SGMII inband is used/required is completely random both at the
+> MAC/PCS end but also at the PHY end. If one ends up with a mismatch,
+> then things stop working.
+> 
+> As I say, the problem with fixing the PHY end of the link is that
+> it could cause a different network driver to regress.
+> 
+> So yes, this is a solution to the macb problem, but I regard it as
+> high risk.
+> 
+> That said, given the SGMII mess, there is no easy way forward.
+> 
 > -- 
-> 2.47.3
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
