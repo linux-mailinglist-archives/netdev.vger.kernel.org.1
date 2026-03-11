@@ -1,246 +1,291 @@
-Return-Path: <netdev+bounces-266763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266764-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEdAFCLFsWnvFAAAu9opvQ
-	(envelope-from <netdev+bounces-266763-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:40:18 +0100
+	id aPoFAZ3FsWniFAAAu9opvQ
+	(envelope-from <netdev+bounces-266764-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:42:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F653269799
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:40:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F31A269865
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:42:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AB0E3104CAE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:39:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70C4D30791C4
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9E1344DAA;
-	Wed, 11 Mar 2026 19:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BF532B981;
+	Wed, 11 Mar 2026 19:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brcFPstz"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="AJ6x8yC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A7233D6D5
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773257948; cv=pass; b=XhjJQ9eEwjlIDPZgxsJqOSwPzxd/0dQAGPE8FwwhMPXfWlH5BFlDcYniG/nDFRP3AbN7fG1fRCsw6xcLsxHZ6a77mguTzi+aPR56K+lvU5Rwebg9qIS4c9O1yQh7/L0WLxAAZ580sDgQvlIitiuALZVGGRaNYZs005RMkSR1QG8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773257948; c=relaxed/simple;
-	bh=mLyJKX0z0UnD26/fVrqGAyrbVvIvKVQWy3TTCO3UDic=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JkGWnQ9x8euoFoNTi9renk0R7jGQYc5pqK0t9K6eEBD7fYLDf7C8p9+d83cJ/vyjozd9CycxzwtFcjRG2ih+MEdwGj8BkFm/maQRAuLKf+B5FdE5qEwm0JqcYhsRC3zG5EIRYPmxP7mp80tCq3RzTXrvchHht7JIaBVD/GzzwV4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brcFPstz; arc=pass smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8299f1ca894so148330b3a.2
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:39:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773257944; cv=none;
-        d=google.com; s=arc-20240605;
-        b=C+/xbg2Kxby0CnqwO+LgPbzJVJk/TKXGF5aZC7fQS4NrTewOQ21ibdQ58Ln5yvSrKW
-         /f1M1lJiaJW1GUqyEYmQXfNBM2+5jMp1RuBWuN5Xv4cG/wuIUiA9zlV7zf2A3ESlZnx5
-         WU2rW7VrIi+HV5Lg6EOJ7MjebHhRmV4qKeEx/8GNNPp+nKpH2QvWioU6WHsYSmLm5Ryn
-         LzoesWNgIqbQC9hIqeA2Ur4DZKvUdZOy6i1dFCL221ZCI3qf81cAm4l6Y5esIykEP+Fd
-         4x1T4XcfUqWxS1bgeKW1vSB4l3daV9r47cNTGbC0VIaxM5sFEOFJHhN7yzPnPWtDNyAN
-         L/Iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oGo8IaRI6nSCWA6TsgbfmpupCTd4jSfs0Q7c1ociq6k=;
-        fh=DXUFXJEW0WVSry5PtLxv7Ofg6GhDWpThuuv5DvT7R/0=;
-        b=frFqUhLgEBWOuEqCBKKI/xZAegRC3wSyz9Z7WWGBgz09N3zPqlxnEyijNZcS18Ayc/
-         yYyKxCGOhC/iTdx3dADnjUhRoyV2F2lnfHgC6IwbfdjVCh9vTlty9JqTWjoupNfSn/OR
-         EMJoQELb+EquZuEM5D+wQmOoukHHCwBPh3B72fPG3svFU/6onVI0SMHgvshE56jdGK60
-         C6fVlsKUxyYl4/P/jNrXWRi79xWWcJILSCh2JcMDWTzN9hycifP4C9ef1oK5AB9D3Ius
-         VXIWkWKDIMpsHvNMm72SlTcwwn8DtLN03yz9KgQbeaiQ63DEV3+Ralm89Y0Ec2GcL0cO
-         yv1g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D030530B508
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773258080; cv=none; b=uRZfrCQmmdkJmFf0in5yXodjq21iEsIeELWL+jfxSaZGjxeiCaDKDty/cpE9YKDyEjeBP5A6AgSJd4GE98+Npu0iO1YS9jUL+Zh5i6E/BaPJ6AOEPTjzeasH2Pw+28+qNj/RNMhbpKli7swPQZ8+PfXfF7ltjZI0xabe5B5ikYo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773258080; c=relaxed/simple;
+	bh=JmzZ5cArUGLdVYVbW1glxu2tEsH90YQOrUa0/YOI0Es=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g/hTaThVtIhThxNqQY+Cd2NL5xvWtoDqIQDnwHxtzdW7POldBHQiQ4Jate90ufRuX5lZSAkCjlRgSX0GPM7qPk8gw4h2XwekUx0hwuz1nL6qA2aRTYD49w2kw/EKbDixBIenPCIkliqAiGsgWcZrWybAFVP0GlV7ybL/jRlzUUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=AJ6x8yC+; arc=none smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12776bebe9fso449632c88.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773257944; x=1773862744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oGo8IaRI6nSCWA6TsgbfmpupCTd4jSfs0Q7c1ociq6k=;
-        b=brcFPstzzD55BjbN/zufg2Xia8eWLJxvmbbkjJZMp8Kwux7f/bDarKRoS0frYjLA4G
-         lsiPHCRQujuJwzni34hPQuIQmf2BXgzsBf2fRtH51/VXguUvf2Fp5h9bXEs00jqo3Bl9
-         XhQyF3OusaCAJ54uEvVF9qOMvxWnZOskoJv3n2OXieQKE6OnGCay2B5t6R/IQMY7hyUe
-         vmBIi1YAfeomK/x1idBZP57K+xfLZM1d0yFJeBWJHQtB/z+1rx05VOcSNtfhT6OUUaHo
-         XIYEwdI+mmgrstptSDKDmVgloS8fICobrJo7L9H2XaonfrJeVmxyB9NEMQ/tK2Gj2eQQ
-         Fw7Q==
+        d=arista.com; s=google; t=1773258078; x=1773862878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0wyN7pn3XZY19VGN08Uvl0u7SIQ9oF05liu+AZCu18U=;
+        b=AJ6x8yC+7o/lAmibpOtT7MjE6Pa4z2SZF1agRnMzOY5dakiPhQcsbgS31TR4Z6NzA2
+         d2XmC3itSbq3PvcwYeuly8IsZievObej3lShM4yPAWZBPMAcIaqWjYTfEjwGiffGTD/i
+         uv/1qtGRYvJ8vAYAU8e7AHd6bJfdNpzZDpw9456FFMWu1tBT4P57h2m8A/RYPPYeeUdb
+         70vvMnLZdXdGI7rWL4TUN7LVgri/mLDvB1X1nkiZ+UbUhaEn10aqQprjWJZGfKlQ2yWa
+         nooWQA7RF0cbCmdpbqGlHDMn2rNbSddxPqrfEo1QqKDY56wOEIfOxnWX4rzIZXvnxEY2
+         SBkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773257944; x=1773862744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oGo8IaRI6nSCWA6TsgbfmpupCTd4jSfs0Q7c1ociq6k=;
-        b=efA/aJmOWFC4D5wF8VqzRjiDLVzmvoTCYnJpA1Qm8YPV00SFdpvbO7Tl4xxWdD1/Nl
-         OtaAP/MYqwaY5K1XRMoBHnxsEYFDoixXhUonrcbYvRVjJkMy65f/TEad1gEFUomD1VmQ
-         wP4Mwvd0QgiHScfD1shgvc4N2B37bdzrgymSIKokSL5H3T2tEZAUKmkoHwdAvO/D/5El
-         fMiT8rScYCazHmA3ORboma3xx8w/WaB6/ypOZ1slsbWb5Qn9MDMpFCSy4HdTQs+o1AiA
-         CDMzbrneX9uiRrMM352REDyrkmDr942vtqyqVqk5+r+OM8KDDVfV1A8HOVdJ1NARY0EV
-         UHCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGam0Pi2++VbC/konARYr/BREnMuyYINWd8acPfYMGmGDSQ7Ekfs0O5FeStbr7y4qOCgJFYek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwYbVugnc/FkgO3+QGhuYfaU68a+Ziy5nbvzUJFYDIjT8nUeQy
-	OlRm9LonJxiacj9enztIFqAIxV+NedSzwJin2HVOt5nor4Esi1sVi6BOnhduhwooAjQ0B7bKbLY
-	cDYbfgg3hxxI6tu7hHoRP3EMvCFw1n88zyg==
-X-Gm-Gg: ATEYQzzuEd6ygWWQQ7xK8kr6CpDNJ1UoSkRC9W/tNfSrG1hFuC5I3rkpxF2dLlk0XE2
-	pMdhsQY4su0ity8NkmhK4w8yd9oTfIm+ROfoIOlY04N0ufG/gqY6liZX0YoMI/kBHo7+nchiy7i
-	i//sleuMwtQPKd3vBfZRuNpGz/iY4Ytd8PIpBos5onojoAtAoA0FoR2UyLX6QBlOnzN2EXxCrdT
-	oQAiqJh3WSyXFhIQuc0JcYcL6juY0QBL30YSEnuatGc8Aw6ac5rPwv7/1Z0TycQQJ7mdbU/38ev
-	t3L7Quo=
-X-Received: by 2002:a05:6a00:3ccf:b0:829:8b1f:a3e1 with SMTP id
- d2e1a72fcca58-829f711ff45mr3517560b3a.63.1773257944550; Wed, 11 Mar 2026
- 12:39:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773258078; x=1773862878;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0wyN7pn3XZY19VGN08Uvl0u7SIQ9oF05liu+AZCu18U=;
+        b=vCI1eWOOL2vvdxW+DZLyg1UVaNZqGjLUQ212lGod7nuwn9zNkJ9w3F1yTrhv0szncY
+         Bbcl3y9dth7uV2Ro/r7rrgGbxx7EHvh6RR/rdzCw3tFrvVmnb9EzN8lRHzSCW2khpAc8
+         SuDIifiDrpclmJQ4ry00ydB40L/4yWr8aCzcbhRbjNTR53IBTstn4FAOoVCImQbGpcaj
+         hSy0F90NlFIu7/w1QgD2AHq4c9dtDKu6zEBENZqVjdY7tWlpq/22xmADRfH9v5qEwB2e
+         nQVuWolSH9M1er/4MkTNACGmwTC7LR0QTmJccxMkKLD1UKEBrpxcUfhkBtlaWQz8hAxn
+         K3zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrXlP5q0JgXaruy4NbLHJMxQTiqRhEUDg0Z83UbFixe/Re5U4dB/RUpsOb+IjR3ofnMNqUNg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEtHUWG1yufFZ1GRSUFGOYEx6KFVfmW8SBfCXez9Qo+8tV3W6m
+	tDvOtVUskU3DSE34C8LJpQxQZPiSZobguA0OT8Hgrcuf/G8cLtBZjLLnVQ/foL1RQ+kl5zJemZ3
+	HbphVFQ==
+X-Gm-Gg: ATEYQzzMHB0NxbZxp8T54/3SMvdp+ADF5ELTxmHkkT8F+U/ekYGCY/HTPL+EfYHjxwh
+	c2g7H7bEFF+mtb6JdttZEWcxG4PEhskZ3fy7k3CqqKxraPoGqk3B3QfXmE8cR3PT3yQ4MPUot1o
+	5K0aci5qZ8KT3vVkwUjgmBaI3prJJpACW//rG4ULYSV/ASSA1kh31QNK6w+Hmbl+vOwRNoRw0Vs
+	n6O7H2uDp3IxS27elTwTYMs+e7UdrR1KbpCLdC7sF8LyVLr2mqc9BEVcYbdV0bk1WY2YtoYgYkx
+	FFxvOxzLAcmtu1ghMbt+NYqR/G0ZKtqT28N+53qYPZTXHcNiiPaZxZxHfQf7bzjIPsTBfub0SzN
+	LkOLmGFeB3nSr8U7jMzedlQdM/DlwBqwJiJzy7e8tbhgUG+d8tZNjCcMUSUD2U98KJ6cd5Ki18n
+	8HHS284aAugHFfHR3Wywu5LAR7EMGWl5k1LFQ78h9a7BE2JgBPmZUnUFIeuOWoIE0Q
+X-Received: by 2002:a05:7022:6987:b0:127:3816:50c6 with SMTP id a92af1059eb24-128e77882d3mr1910091c88.8.1773258077754;
+        Wed, 11 Mar 2026 12:41:17 -0700 (PDT)
+Received: from localhost.localdomain ([2600:1700:4a3d:5010:7185:74c9:dc1e:956])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128e7bf1e1asm4074436c88.3.2026.03.11.12.41.15
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 11 Mar 2026 12:41:17 -0700 (PDT)
+From: Prasanna S Panchamukhi <panchamukhi@arista.com>
+To: netfilter-devel@vger.kernel.org
+Cc: panchamukhi@arista.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH net-next] netfilter: conntrack: expose gc_scan_interval_max via sysctl
+Date: Wed, 11 Mar 2026 12:40:58 -0700
+Message-ID: <20260311194058.13860-1-panchamukhi@arista.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307064439.3247440-1-ameryhung@gmail.com>
-In-Reply-To: <20260307064439.3247440-1-ameryhung@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 11 Mar 2026 12:38:51 -0700
-X-Gm-Features: AaiRm51lohapAmPtjK0MnVRFvwqN3yzgXqYTsFTHxMmpnr58SiY3v0-8oHya_NA
-Message-ID: <CAEf4BzZab92hO9ERcfkkg2OHab9F4M9fmwc8yudDu7kjp_qu+A@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 00/11] Dynptr cleanup and bugfixes
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266763-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266764-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_NEQ_ENVFROM(0.00)[panchamukhi@arista.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[arista.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9F653269799
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1F31A269865
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 6, 2026 at 10:44=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> This patchset (1) cleans up dynptr handling (2) refactors object parent-
-> child relationship tracking to make it more precise and (3) fixes dynptr
-> UAF bug due to a missing link between dynptr and the parent referenced
-> object in the verifier.
->
-> This patchset will make dynptr tracks its parent object. In bpf qdisc
-> programs, an skb may be freed through kfuncs. However, since dynptr
-> currently does not track the parent referenced object (e.g., skb), the
-> verifier will not invalidate the dynptr after the skb is freed,
-> resulting in use-after-free. The similar issue also affects file dynptr.
-> To solve the issue, we need to track the parent skb in the derived
-> dynptr and slices.
->
-> However, we need to refactor the verifier's object tracking mechanism
-> first because id and ref_obj_id cannot easily express more than simple
-> object relationship. To illustrate this, we use an example as shown in
-> the figure below.
->
-> Before: object (id,ref_obj_id,dynptr_id)
->   id         =3D id of the object (used for nullness tracking)
->   ref_obj_id =3D id of the underlying referenced object (used for lifetim=
-e
->                tracking)
->   dynptr_id  =3D id of the parent dynptr of the slice (used for tracking
->                parent dynptr, only for PTR_TO_MEM)
->
->                       skb (0,1,0)
->                              ^ (try to link dynptr to parent ref_obj_id)
->                              +-------------------------------+
->                              |           bpf_dynptr_clone    |
->                  dynptr A (2,1,0)                dynptr C (4,1,0)
->                            ^                               ^
->         bpf_dynptr_slice   |                               |
->                            |                               |
->               slice B (3,1,2)                 slice D (5,1,4)
->                          ^
->     bpf_dynptr_from_mem  |
->     (NOT allowed yet)    |
->              dynptr E (6,1,0)
+The conntrack garbage collection worker uses an adaptive algorithm that
+adjusts the scan interval based on the average timeout of tracked
+entries.  The upper bound of this interval is hardcoded as
+GC_SCAN_INTERVAL_MAX (60 seconds).
 
-Ugh... This cover letter is... intimidating. It's good to have all
-this information, but for someone who didn't whiteboard this with you,
-I think it's a bit too hard and overwhelming to comprehend. You are
-also intermingling both problem statements and possible/actual
-solution (and problems with earlier possible solutions) all in the
-same go.
+Expose the upper bound as a new sysctl,
+net.netfilter.nf_conntrack_gc_scan_interval_max, so it can be tuned at
+runtime without rebuilding the kernel.  The default remains 60 seconds
+to preserve existing behavior.  The sysctl is global and read-only in
+non-init network namespaces, consistent with nf_conntrack_max and
+nf_conntrack_buckets.
 
-May I suggest a bit of restructuring? This diagram you have here is a
-great start. I'd use it to "set the scene" and explain an example we
-are going to look at first. (Keep all the IDs, but mention that they
-will be more relevant a bit later and reader shouldn't concentrate on
-them just yet), and just explain that in BPF we have this potential
-hierarchy of interdependent things that have related lifetimes. When
-skb is released, all dynptrs and slices derived from those should be
-released. But also mention that it can't be all-or-nothing, in the
-sense that if dynptr A is "released", skb and dynptr C should still be
-valid.
+In environments where long-lived offloaded flows dominate the table,
+the adaptive average drifts toward the maximum, delaying cleanup
+of short-lived expired entries such as those in TCP CLOSE state
+(10s timeout). Adding sysctl to set the maximum GC scan helps to
+tune according to the evironment.
 
-And it's currently not the case. That's the problem we are trying to
-solve. At this point you might use those IDs to explain why we can't
-solve the release problems with the way we use id and ref_obj_id.
+Signed-off-by: Prasanna S Panchamukhi <panchamukhi@arista.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: Jonathan Corbet <corbet@lwn.net>
+cc: Shuah Khan <skhan@linuxfoundation.org>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>
+cc: Florian Westphal <fw@strlen.de>
+cc: Phil Sutter <phil@nwl.cc>
+cc: netdev@vger.kernel.org
+cc: linux-doc@vger.kernel.org
+cc: linux-kernel@vger.kernel.org
+to: netfilter-devel@vger.kernel.org
+cc: coreteam@netfilter.org
+---
+ Documentation/networking/nf_conntrack-sysctl.rst | 11 +++++++++++
+ include/net/netfilter/nf_conntrack.h             |  1 +
+ net/netfilter/nf_conntrack_core.c                |  9 ++++++---
+ net/netfilter/nf_conntrack_standalone.c          | 10 ++++++++++
+ 4 files changed, 28 insertions(+), 3 deletions(-)
 
-Then explain the idea of parent_id and how it fixes this hierarchy
-reconstruction problem.
+diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
+index 35f889259fcd..c848eef9bc4f 100644
+--- a/Documentation/networking/nf_conntrack-sysctl.rst
++++ b/Documentation/networking/nf_conntrack-sysctl.rst
+@@ -64,6 +64,17 @@ nf_conntrack_frag6_timeout - INTEGER (seconds)
+ 
+ 	Time to keep an IPv6 fragment in memory.
+ 
++nf_conntrack_gc_scan_interval_max - INTEGER (seconds)
++	default 60
++
++	Maximum interval between garbage collection scans of the connection
++	tracking table. The GC worker uses an adaptive algorithm that adjusts
++	the scan interval based on average entry timeouts; this parameter caps
++	the upper bound. Lower values cause expired entries (e.g. connections
++	in CLOSE state) to be cleaned up faster, at the cost of slightly more
++	CPU usage. Minimum value is 1.
++	This sysctl is only writeable in the initial net namespace.
++
+ nf_conntrack_generic_timeout - INTEGER (seconds)
+ 	default 600
+ 
+diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+index bc42dd0e10e6..0449577f322e 100644
+--- a/include/net/netfilter/nf_conntrack.h
++++ b/include/net/netfilter/nf_conntrack.h
+@@ -331,6 +331,7 @@ extern struct hlist_nulls_head *nf_conntrack_hash;
+ extern unsigned int nf_conntrack_htable_size;
+ extern seqcount_spinlock_t nf_conntrack_generation;
+ extern unsigned int nf_conntrack_max;
++extern unsigned int nf_conntrack_gc_scan_interval_max;
+ 
+ /* must be called with rcu read lock held */
+ static inline void
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 27ce5fda8993..54949246f329 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -91,7 +91,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
+  * allowing non-idle machines to wakeup more often when needed.
+  */
+ #define GC_SCAN_INITIAL_COUNT	100
+-#define GC_SCAN_INTERVAL_INIT	GC_SCAN_INTERVAL_MAX
++#define GC_SCAN_INTERVAL_INIT	nf_conntrack_gc_scan_interval_max
+ 
+ #define GC_SCAN_MAX_DURATION	msecs_to_jiffies(10)
+ #define GC_SCAN_EXPIRED_MAX	(64000u / HZ)
+@@ -204,6 +204,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+ 
+ unsigned int nf_conntrack_max __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_conntrack_max);
++
++unsigned int nf_conntrack_gc_scan_interval_max __read_mostly = GC_SCAN_INTERVAL_MAX;
++
+ seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+ static siphash_aligned_key_t nf_conntrack_hash_rnd;
+ 
+@@ -1568,7 +1571,7 @@ static void gc_worker(struct work_struct *work)
+ 				delta_time = nfct_time_stamp - gc_work->start_time;
+ 
+ 				/* re-sched immediately if total cycle time is exceeded */
+-				next_run = delta_time < (s32)GC_SCAN_INTERVAL_MAX;
++				next_run = delta_time < (s32)nf_conntrack_gc_scan_interval_max;
+ 				goto early_exit;
+ 			}
+ 
+@@ -1630,7 +1633,7 @@ static void gc_worker(struct work_struct *work)
+ 
+ 	gc_work->next_bucket = 0;
+ 
+-	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_MAX);
++	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, nf_conntrack_gc_scan_interval_max);
+ 
+ 	delta_time = max_t(s32, nfct_time_stamp - gc_work->start_time, 1);
+ 	if (next_run > (unsigned long)delta_time)
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 207b240b14e5..f8cab779763f 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -637,6 +637,7 @@ enum nf_ct_sysctl_index {
+ 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE,
+ 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE_STREAM,
+ #endif
++	NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX,
+ 
+ 	NF_SYSCTL_CT_LAST_SYSCTL,
+ };
+@@ -920,6 +921,14 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.proc_handler   = proc_dointvec_jiffies,
+ 	},
+ #endif
++	[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX] = {
++		.procname	= "nf_conntrack_gc_scan_interval_max",
++		.data		= &nf_conntrack_gc_scan_interval_max,
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_jiffies,
++		.extra1		= SYSCTL_ONE,
++	},
+ };
+ 
+ static struct ctl_table nf_ct_netfilter_table[] = {
+@@ -1043,6 +1052,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 		table[NF_SYSCTL_CT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
++		table[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX].mode = 0444;
+ 	}
+ 
+ 	cnet->sysctl_header = register_net_sysctl_sz(net, "net/netfilter",
+-- 
+2.50.1 (Apple Git-155)
 
-But then, mention that socket casting problem which introduces shared
-lifetime while objects are actually semi-independent (from verifier
-POV) due to independent NULL-ness. Which makes parent_id not enough
-and we still need ref_obj_id (maybe we should rename it to
-lifetime_id, don't know).
-
-In short, I think there is a clear logical story here, but your cover
-letter hides it a bit behind the wall of dense text, which is hard to
-get through initially.
-
->
-> Lets first try to fix the bug by letting dynptr track the parent skb
-> using ref_obj_id and propagating the ref_obj_id to slices so that when
-> the skb goes away the derived dynptrs and slices will also be
-> invalidated. However, if dynptr A is destroyed by overwriting the stack
-> slot, release_reference(ref_obj_id=3D1) would be called and all nodes wil=
-l
-> be invaldiated. The correct handling should leave skb, dynptr C, and
-> slice D intact since non-referenced dynptr clone's lifetime does not
-> need to tie to the original dynptr. This is not a problem before since
-> dynptr created from skb has ref_obj_id =3D 0. In the future if we start
-> allowing creating dynptr from slice, the current design also cannot
-> correctly handle the removal of dynptr E. All objects will be
-> incorrectly invalidated instead of only invalidating childrens of
-> dynptr E. While it is possible to solve the issue by adding more
-> specialized handling in the dynptr paths [0], it creates more complexity.
->
-
-[...]
 
