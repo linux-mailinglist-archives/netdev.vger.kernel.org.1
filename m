@@ -1,144 +1,153 @@
-Return-Path: <netdev+bounces-266776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GoKBhrWsWk2FgAAu9opvQ
-	(envelope-from <netdev+bounces-266776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:52:42 +0100
+	id YLELH53WsWnVFgAAu9opvQ
+	(envelope-from <netdev+bounces-266777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:54:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CDFA26A2BC
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:52:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F01E226A2DD
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 541F3300FC6A
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:52:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A8A03028369
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220923148D3;
-	Wed, 11 Mar 2026 20:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3403358B6;
+	Wed, 11 Mar 2026 20:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FpHJK5D7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlUHX9+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDD8301465
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982B513D539
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773262325; cv=none; b=QY0REsWKAFZ65Z8SVUV+2ZC73urH6tWV6cNLOfh7fMc4DSKGIbQtT/wFO5a8Yi3+peJEydnOnvQbqP8XWvHBt41umdXb2spu52Q2VIBbozEcjMJCXAG00Vhrep3N9JBotfvcDLM2GCrz03xVV5l+i9QpJu9SPk90g4YzTtfrF/U=
+	t=1773262490; cv=none; b=abKGSWTJ6D6SE0oDkDTa8WwYJECrgKKkFwd88LRS7XDSwgPe5mro8rrPb5fIdqQ8n7I3n4gQGWfA2GVzcW0ED8tI+4Yf2o5grx88gYQlkMjIy5wcTuFmFEHhGF/kiDJ3CVssENhzSlNS1hP7WIdl+etODB3Ph7sxLushuE83cFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773262325; c=relaxed/simple;
-	bh=ScFO38GIlbs0Cjax1hMaBrK/ROUrNfJZ83yhGXwC35I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNiVp4yBr3Cwc+3bsGgbY9hJ1uFIhLBx5eWxqwnQfR2L7wU1lZ8zm2eYRCf7LkaCq/TNbyNyL8pSe0KghSuytKDBCjsX+Nsgi7/lQwdl4SO0kPK5CUhhuJn1WXh19vlr0jal2izlBWxbdkoapouVy+vL5ythQ4tGo/fuXy2B3MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FpHJK5D7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nC3EEV59VHc90/tf0FPOwaIrKtADzP+3bZxUQIxMwmQ=; b=FpHJK5D7KhLe7VbliorxzB6eA6
-	F0wvRAp7Mmz0A7oS3ZH5L084748GjUxsl0DqIk6174vwtpLCQygjrGm0GyYmHuDrASDjYM84b00o9
-	eZJ4YY6dgk2U/xq4fA7FGQf12DF//A1/8QPyFq+xdNxxMgivfWXav5m5FVGcoEckxLqvPs4isA+ul
-	TIeoowBgvNl6xMMn/3FoG35GveFuY/6PJ3bNNZukGZM5bUkxHnRI4IE5Bhp06tV0kakYJtAF2u8sU
-	QjSkE4z5+J0X/t+3XXUthnS7SBv1FZUQ3pQ73fhK2ZVbpobeylL1ws/SBYE0ridhTIRb5KRwsABBv
-	xzulroCg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44872)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w0QXA-000000006us-0L8I;
-	Wed, 11 Mar 2026 20:52:00 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w0QX8-000000006ak-2Jhy;
-	Wed, 11 Mar 2026 20:51:58 +0000
-Date: Wed, 11 Mar 2026 20:51:58 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Tomer Maimon <tmaimon77@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org
-Subject: Re: stmmac: TX stalls with head OWN=1; requiring manual DMA kick
- (6.12.63)
-Message-ID: <abHV7rDryld4A-S_@shell.armlinux.org.uk>
-References: <CAP6Zq1i31Z0kfDST1Xcoftxja-TFaxgSjKH6jX5eY0AGdASpTw@mail.gmail.com>
- <b2868f3d-ef84-4ec0-ac37-e41029a1d385@lunn.ch>
+	s=arc-20240116; t=1773262490; c=relaxed/simple;
+	bh=Owg7Pcsxs/6IIL25irM2uvL22l2LuCBtZQ1UH1mUUgg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=QUHucdOF6Cf7eCIbFRRJUbRN23NKiWJnS/900HR9muUbuFUPD4w0c9E+pP/3sAj0HCKTI22AD0kDucn8Nn+aFIanG/3mSjSusCSG/tfcCORFDDLmsXQ0m8UjsVS840suHavRP9FKgelldcTZY8w5BavUnDcw1PrYuVCNybzLllc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlUHX9+k; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4853510b4f3so3522245e9.0
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773262488; x=1773867288; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N8UZEaziRoHLGkhpk3JfJq82ogKkuVgGchfAl3/e6EQ=;
+        b=DlUHX9+kfiSU7+awk4znLypW4CDK9mUii54f3Vt7Thnd1+RhQa8HGBHiq4FvRbL0Qr
+         1JY5Wi0BFZh30uTJmPtVr2DM8sO84xnXWxlcOERBgRRv2OxaRHzpo9Camh9sNhw6OvRp
+         pdR+b2SloTqrEqArVRMvqwlK3nnztxsAuZTt1Au0lUKUjI2BhZj27SxjEYth+NHVcc2s
+         0ePLOgmcM/vz0i8MDOADwl8tdqMh2QJgUnAARGQYkRyl1h/bQ+7r3m0GBhCnG/wCurUv
+         /QhFmGZgJil4fwhep3/udiyu02PsWq55nr9EDANBNLEuwnSlI5asIiIJmC00VY+1Aete
+         ubkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773262488; x=1773867288;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N8UZEaziRoHLGkhpk3JfJq82ogKkuVgGchfAl3/e6EQ=;
+        b=sP2TYCzy2H+e93EwIfr+3RSlDvrd4Tsg9YBa2VjlNB44ku3+5T+ydugp5tlmQg32Mt
+         /UK2VCsczGoGEznLVRpN9zA83zaqeXfLtMHqlNE7oVUBL8MDsYCTbWkOvBOS0MMDnxq5
+         lH5e4ezgOkLhQfIgmiUVvsdoyT/J9PR8xbm8DuegFbffthB9mn3vwUw7rVEP0+nL51Fo
+         0dr4xPkvorKTjm684ybH3S7k4Alc+CFXlTzFnCkUz5y2AMhO7kKGsyjyNw7zPdkN2IB2
+         x953/zrMwZtPlL8HJad2dZL9+xn3ApFDvQjHSWN/EVAp0swZRoc9sCeiE8AblLbPYAXb
+         XvLA==
+X-Gm-Message-State: AOJu0YxoKKBqQvQ6azoB6DgTDyrrr/VDKgWuO5UHOZ4Wquq7dmt3wwSp
+	4w7xrjDvNTlK7nIUmwP/AttusGgHOc+Srrw8WSJq4L8L7gaxfvPECD8p
+X-Gm-Gg: ATEYQzyNJiEgOTq34DUB7aFOZyefYBM34C5wUT8jWxb4NV/QLk8KMjPyC8eppaGs92H
+	WGKY4VuW7mbfBSS38wd4BKqmciCabp/o5qcN03De7EJyEm+hmxELMgxwPPlXI1od/sPxM6OhvA0
+	FLwPPHjDZ+PwM7qOrS6v1TMyhfzEAiYBmc1ULohIFgflF+3nFemlS2QY1HQbicXBJmQHuLHAfy6
+	RHZTpysxhIojpCbNWOOnHOKiG2s+3n8fC0dNkwyrQ+n0/xEza3MZW6jwqj8RNTFEXsRDXWwQ7RM
+	FA8FBbyJRhlml0Xwy67aLB32tXjm0C3GUESPZNXfrfr5UqlC8V0Q79SGVvuU9GUgbFxxKCrp+pp
+	8raC/ZomNzT8U3atzZpHJ4G4xRAIrLkrtVaF6Gs6ojIYW3LyYKbxK/5YZIPOp7WjEKbdFi1rlrV
+	nosqGJ4bLhUxipQ4Wjp8WBfSvlzHHjbcFg5dauBA1AI6p1GD6j68jeDIPTL7rSM2BvGNt4Hhxas
+	UpdqVpmvZ/fOiO4rkf9RE6hddhRZJ1KPE/RqU72tkMvAwwQhW3zztDLk+go4D2SJw==
+X-Received: by 2002:a05:600c:1d0e:b0:485:3f1c:d887 with SMTP id 5b1f17b1804b1-4854b10d0d6mr71335815e9.26.1773262487542;
+        Wed, 11 Mar 2026 13:54:47 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f15:ce00:4cb2:38f4:6cca:d180? (p200300ea8f15ce004cb238f46ccad180.dip0.t-ipconnect.de. [2003:ea:8f15:ce00:4cb2:38f4:6cca:d180])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b0c3d66sm23847185e9.17.2026.03.11.13.54.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 13:54:47 -0700 (PDT)
+Message-ID: <880ca62b-a5d3-4865-bbce-2d2210928239@gmail.com>
+Date: Wed, 11 Mar 2026 21:54:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b2868f3d-ef84-4ec0-ac37-e41029a1d385@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: mdio: remove selecting FIXED_PHY for
+ FWNODE_MDIO
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,st.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266777-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	TAGGED_FROM(0.00)[bounces-266776-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.970];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 6CDFA26A2BC
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F01E226A2DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 08:46:04PM +0100, Andrew Lunn wrote:
-> On Wed, Mar 11, 2026 at 08:34:36PM +0200, Tomer Maimon wrote:
-> > Hi Giuseppe,
-> > 
-> > On kernel 6.12.63 (GMAC, normal 16‑byte TX descriptors), we observe
-> > brief TX stalls when sending small packets.
-> 
-> You might want to look at Russell Kings patches from this week to
-> rework the descriptor handling.
-> 
-> Also, please don't report problems on dead kernels. 6.12.76 is the
-> current version for the 6.12 LTS. There is a small chance your problem
-> has already been fixed, and you are wasting everybody's time.
+Fwnode MDIO has never used the fixed PHY code, therefore don't select
+symbol FIXED_PHY.
 
-Yep.
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/mdio/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-Not sure they'll materially affect any problem, because I try to avoid
-functional changes in stuff like those.
-
-What's missing from the original report is a description of the
-hardware. stmmac drives multiple different versions of the Synopsys
-IP which have significant changes between them. Which platform glue
-is being used, which core driver is being used (dwmac1000? dwmac4?
-etc.)
-
-Also what isn't mentioned is whether this is a regression, or whether
-it's something that has never worked. If it's a regression, which
-kernel version previously worked?
-
+diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+index 44380378911..53e2c047d80 100644
+--- a/drivers/net/mdio/Kconfig
++++ b/drivers/net/mdio/Kconfig
+@@ -7,7 +7,6 @@ if PHYLIB
+ 
+ config FWNODE_MDIO
+ 	def_tristate (ACPI || OF) || COMPILE_TEST
+-	select FIXED_PHY
+ 	help
+ 	  FWNODE MDIO bus (Ethernet PHY) accessors
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0
+
 
