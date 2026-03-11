@@ -1,224 +1,205 @@
-Return-Path: <netdev+bounces-266646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFgZDt9ssWlVvAIAu9opvQ
-	(envelope-from <netdev+bounces-266646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:23:43 +0100
+	id OFHcK+JtsWlVvAIAu9opvQ
+	(envelope-from <netdev+bounces-266648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:28:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19C52646C4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:23:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3330264834
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 14:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3E3031979FD
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:19:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F2B183001F87
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 13:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C916230F95A;
-	Wed, 11 Mar 2026 13:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1142031AABC;
+	Wed, 11 Mar 2026 13:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RiJTyx2w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wakICEnW"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010057.outbound.protection.outlook.com [52.101.61.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAA430F52A
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B166F31AAAF
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773235193; cv=fail; b=SsbRIA5U8HBkz1Ny7d4yFhzrF3GQ/0tUv0CGCLfU4ki2JkcfJyKAwLd2Emp5UWZg3Rq7GhYDrl6YpEY31oZYXaTfMV1Rc1xK9VfVtq/XvLE7KiLdB77FqiN4itPYgV+Y0JN/vJJLLY1IYD4/PRKnqr+3Arl1b8+d+2xzTYYNPJs=
+	t=1773235632; cv=pass; b=Kpr5zM0BYIpIflAGJNduUlKmmjO5UFpKZV5tFcjnkKxiElgp+5WiKqakeQwy+KuwgvBlNV41ulOKFrINcL7Ou+joWR7x7vnEN+wZJN6EoclqSddscW7jv7QwJgUa/Vi1aW85xX/cJBP40bW1BCKZTGPdfnL/DKgj2hVNVS66HlU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773235193; c=relaxed/simple;
-	bh=mPjb8pXiYrv4EPc1oOVuwO/fUaGC5qLkkz8xE5Lp/l0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=oKs0594C3HkOVeV8LDYwIwpSfzBgKrANaxZbzwBpPo7jIbZu+yUQWkGumucPY+h2cLibJ+1yZbLRSJ8AUUDKajfCCf/VDZxt5GDUvWkeTELL9jTzxg2lxjwWVc6fLpe5p5wfz7hgWsKdtzyRSGeTtZLKItwVM6Io9Vd4q39VSbQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RiJTyx2w; arc=fail smtp.client-ip=52.101.61.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lCdpkCc6DVHW09MYMnPQUjjaFGP4ZUrxBfvfDS4ieVy2DO/7Uu7N81vmq+6+P+2ouKClWYHFU0e1qtYEoPWhO2DSy4Q5Q7PWrNxZ5sgMoyzIKp1a+N629Puz581b+2oTYg/bcoa6WuKlo25cxoHP5my+XpmvtulEb6yKOdQacXesVhUzWCUUQvtrLrk5fmywhRNUo1TvlslxUGfoBsN909MuW95aSkFCiqOs2Blc647k5QD3HS5PNU4bONO+CzFmXVN0wx9AicH5ySt1aZ/JaxDYtAqf1b+RIwQGDZDrYw9dlF6iegrWeKPw/lVCu/s2J8Is6xJEKXUBvAOe321H3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9rDr1Btx5464YoY0LbLGjY++N9JKfcxue7tkbhJ50vY=;
- b=PPG5vpL2Xhgl4HD5ziYkCzT62exZZyNCTI5EEIKnXk+fITWN8BxEe6IWO4MeILMCU8O4F93hshVdlqzsJVUceQ2+AEX52ozke3AstdPmIe0tgMjjk9ZTKx5emtK5BNiWTeuTnTI6ptbthTSLDmqBmZRtoFQI1L5haBBOvyImuXW0uEK33MUA774d7BVKNBoEMmHB7qFbBjaTlHSE2qb4nocWedGj8guk2TC93Xfmxhkw+VG6yOIYCT2KL2G613RQovhV73pOMWfETXGGLQ7w6ZohrWoKv4k0EWLwxfy3PVnWQQBdrmG5Pbnc5vkxC/oy40kUgwzy6BmiZIAJnBwWGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9rDr1Btx5464YoY0LbLGjY++N9JKfcxue7tkbhJ50vY=;
- b=RiJTyx2wlqcqkN9E6CXr+FSK/zyoOA+2blumqa8fklawj26/VOfcKkViZ71YPvEvBEk4FnP/ww7RAwfp8sD5MEHRGOLPXu/Ar6ov8tMOz1jAYX15a1+9e9AuLbRAWJoAcLteCWkfCYa4r2VZS0gmDW0mRzzBx69wMOn2jI1aoXEuJ6B+d+tm9I3/PbRerex/rW2az+bEbu2shM3yfiabGut72fkK+DVAqTi6x1viaSKkjTyNqIT1TIEH+MZlj5SeKLH8oHvDw5WxVLJwzyzTgGnk+fvRA6goGPZfsKb6d/YI/IHLfEvVKTpFnYvFUcxaLYCQx9jSHTxg3Z4LbEHczQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
- by SJ2PR12MB7990.namprd12.prod.outlook.com (2603:10b6:a03:4c3::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.3; Wed, 11 Mar
- 2026 13:19:48 +0000
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9700.003; Wed, 11 Mar 2026
- 13:19:48 +0000
-Date: Wed, 11 Mar 2026 15:19:35 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: lirongqing <lirongqing@baidu.com>
-Cc: David Ahern <dsahern@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH][net-next] net: vrf: switch to synchronize_net() when
- releasing routes
-Message-ID: <20260311131935.GA2415888@shredder>
-References: <20260310105331.2371-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260310105331.2371-1-lirongqing@baidu.com>
-X-ClientProxiedBy: TL0P290CA0009.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::6)
- To DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+	s=arc-20240116; t=1773235632; c=relaxed/simple;
+	bh=x1fV68zR50XdjvYdrXqInhAsqBdrON62F0GQ1SojPrU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JzINC2Nn7iCkNOIxmcJrwhrH21yTMt4f+dAUP06ruvTEfBdX4Wh4ZoLc9aZ8UqIK4HAUZel7+2aWnfo7pyx3GH/zkshKtQFDWaLYkHeCn5nf/jzUm9DmFlREQYKdsDp4+cf8+IK2cZl43gq6iYIIa5FEd6yN2+8QR3PkFWM+7Ys=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wakICEnW; arc=pass smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-509046c5c7fso49082151cf.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 06:27:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773235629; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Hmr2kO/db5z8vx8TDycVUpSw6515TEEtN65MtWzaqH2Y9jYslAogsU230G46oKNuSG
+         26WBZYBxOCmaJ4zRwwm7PTJ2d0MbpsUxkLTeyvbHLvScnxlKJ1F97NCXG+4L44TvBaJ9
+         YfV0OJLYG+B62jQREeRri9/QqTjnH4zFF5gnB35cCuFsGwekx3I/Z87sG/5xA1ce2MeS
+         6iHcBxCABUgQ66U53vQdhMS9Nvg4o3cDUdPyb42U+QArRiJ7no9D2h1aNgwa3FAj6PYV
+         oRtEXVpdGdloRbSDszaMhComwpf8vdsB8Q77RHf0aINfEVvnbG8kVIIDAhK5RHYycZo7
+         NNsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
+        fh=aew0eDZBRxY+ivziZ1Uwp1GONzZ1iJKFFTqn6zxk85w=;
+        b=jxAGU+5rEQ+skR5Wt/Id7HAand+cWLBDDP24exeloqGDPUuAH7/Fta8n129PLtpDSM
+         MbAYez8fj0sIycIxbtOrhEPUYqlXYpv3+h6cvLHEgKPUbFM5zj8ISAUWQ2aNRnpXgsja
+         dHCWMewsMXRfxuAvkeb2VSht+343eTBOTb/ISHBWxxZNSs4q0fESAIJWfITkDJ4nD20u
+         L8wThxVm+4azBmfCaiXyyA0CT42zlu50RoxLnmRaIQR/2K6pKmMIkt9FL9aCbHOhs0cG
+         77L8JWTOr2vV9wG5/dMdFxqugnvNZ91TmPYtp9QW5XA8PcXbdi+pwTP/AmQQxK2O/KPC
+         CwWw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773235629; x=1773840429; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
+        b=wakICEnW50uAllXmTUvp/Uuuuta5FvYGO0AUw1SOBTEkbVVWkOG0G+TlVEX4s5Cb8T
+         lHjLOwQLgfa9XWEJFby6f7WvYM1RvmZ2f2qqAkgeRUA+91hpgbx0lHscRYDl2N48n8Q8
+         fTQBXXm524EjqU8pT9piw3g+I+w2nLhdE20YGWfwEVAYVPl6fGwqCV2Zn3BW5Vdce3Q+
+         KK/SjjzAP34HT2cT4qecd/0m/7LijD8aMpHmh04T9ftbKOjajYFAFwgGwVnvmY4pfjmd
+         sXhVL9pEh95SJRs/wIMXdUvbDIEDdG5mYKSq6YarF7E6Jdr1l7gX5O0WJF6KIIM9LGCE
+         WxVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773235629; x=1773840429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Hww+gEbPOCsxMsGM/aS3dqcEiGvArOWp4G11eFA+gsg=;
+        b=rmiDy4rvbdEw2mbalxxxEKEjEyOVM/6tto5TlAlZ2VScw77T+5PeYJp48+YuN0ljfk
+         BV2QyyeW9U4k3MTkyImhjW0pFedByhgFIgAgxdYL0aSJTDXpxrStfx3vmMu+RH+nDmEm
+         RxDdoNzHyIax+1SpaE76DBSR4NW+UlQU+0Uo9ZxVmgcPmj3KydDlVDPlEvHKENDgd1Nj
+         1p1R68norOkyYjK3k5LeSYIbu0qmP6M3MOFssUw3uVTybz8Tl80O6wQkoWF/hYTQveas
+         nJdGa7N9ynaE0X/8Eh/UVoqzPkZo0gztuHeEa0GUAYqmsZVjRg36A6Tn793QCAT/GmwU
+         DgFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1blS8WYstycYKVJ47o+X1HxbesauKElvZFtrZ1N+9oy0Mbv+RmELcDw5fmkLCqBSMiklyU08=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj7Ht7UqMGyUEEznigrcg/4wZ8hvHYv9aQSYkAU4nmRe3rHSaj
+	LYn5a/DxlAzsPyr2lk5yaYTW3cDGSterFmZRL36XzkVPecBLFWwGpAL0z4fRJ8hgr9wMRBFpfwI
+	cqTApsPiydidtQKKNFW/Fe146GzzlBwAyEcGHoOqz
+X-Gm-Gg: ATEYQzwZBNvcDqNKTBYSL/9S86PcoAM550zDcGP3HHJEOX6QwCMO95Cbvrrb4FbHvv9
+	oLG/h7NU+6F6Xzu5p7Lmq9vQOCHAcRQesSRFPC1ZJmc9Wu9Ow26c1B6v1fidiPuhvholKIEa8s9
+	woZKeX4B2zlFJQbDFZRgqwSuIxRHeAavDjiLSSsVSJFTbzZdIu4BIgRnUMWbcC1lk3JxQ7shfCT
+	sbMDsWfxsb4hAgPUoF7ULKXeh39V53z8vw2x08G4B9oc4AYpKsHXa5JkRgZQFb+/H5Baq/ISDfx
+	wNkNYaZm
+X-Received: by 2002:ac8:5f0e:0:b0:509:1c3e:d765 with SMTP id
+ d75a77b69052e-5093a17eb62mr30215071cf.45.1773235628813; Wed, 11 Mar 2026
+ 06:27:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|SJ2PR12MB7990:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a7cc1a6-011d-4ed1-f15c-08de7f70de4a
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|56012099003|22082099003|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	v9hDA1SVAm5LSWF88ozJIT9+vhe9j9x1NMpKfeTEsTUye02VqSaM+aKK1zr+HL56r5AVyvFyFkm82LnVZiI5lptthcdkdQtMS2t+4DiEc778Q+iWiDTOTHqHRp1BAyuTahluLkWZGGKVxUckdzDshBRVRdVlCniIIclpaWF33rKVOl4PjgObEzpDuvPQp4ZYxEMwa0QofZMs9YlxFCmVCwYdh1qsCIDEv9EomMINExwdeSsG3TN/VpbcKnXbc8ZRLGmrGxODfPuPU8DAHAaX3C1OCeAd4JJSscMOQ5WjcZosoHsD70d7n744QLCtfySo5FqkzBpDwB7bR5bEnvC4+7DQprCk8UlpcbkHwBy6a4L0RcbAp9rvGZAaNP0XLMkC9Ffw2qDIF9zWYu+C3LqtaKapUg47O8LY95QNUF2IANmbwGzf1WsF2JHqCU9PGTUQIZshwJmh8T0sU+HsysrszFjQVTveC1dVrWRPCjHsDZSkW8f+deOSLf2LkAWjZu6+O3PZLxYyxl87rGsfwk6pmuDCC05GQkXZi2gthB3bTOK7emmX7hLmD2+LvhGgsS0ETPEWFy9gCD14uJUsmhugO3Y5GqJzYiV3SlNTKh5BsSEjsWGJXuE6y9cmd8z5gY1f4kVFWQY6/TytghvyTQjHP0Mn6/RLMe8Pg+zmU7LQFhc0S2ZCssRIe/us761BNgoNqkvK9ibbFcjnx0bm/wO5zVEyXccNZgC5cO6L8P2KRDY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(56012099003)(22082099003)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EaZ6cuNGXLt6WD4zMVRMjJ7mmitWti+6D+dADJwJ9H/joQ3tADZskVUk1bus?=
- =?us-ascii?Q?jywsgaqPFiZgj7PiNS1nI2bAoumOoFRxHz9/ovd43j2vKpDsQ51EuaeVcdcj?=
- =?us-ascii?Q?rOqDdvC4/wnisD091Jd8Ln5vsYulaY9mDZwFAvkB2TVwInMCzDm04KK6v8DM?=
- =?us-ascii?Q?fMDqyzSDbYROYflq2Hz1i5B0/5X9YdPiU8Q0eI/9NZDo2e15mWhkq3nTQ9XC?=
- =?us-ascii?Q?Kn0irf07GOXZzRV+Wo8LhM7g2NpS58t7fAdKpMniWOc3cEC5ClfOfcCUaqsV?=
- =?us-ascii?Q?Rv8f+39mpBV3zEWD2TSKNHMiQfBxJJfThROkGNMe3Km9Y9NRew9Cv9VZLFIM?=
- =?us-ascii?Q?6/gRFohzt2o2KYFGhw6bkBqepM+Af+ZZrYVWFVVUiVO57uWdAKY7/9rjsuYK?=
- =?us-ascii?Q?8TdaYYvnxTFCd4csN2ZQXgtWTIKu3SFgeVoFFoH5izcq1NLirTWmmXZUGdMu?=
- =?us-ascii?Q?saUWQJIq51MPBpYbGW9QjdZ/JIKxZuKK4XGKMr4wDs35oojYZXdC4te4xb/W?=
- =?us-ascii?Q?02PNZ7QVn/LfqlE18FMT8P3qbS7rvOL0uLwThe/fvdQK7tgLfMRz1BoIxIoC?=
- =?us-ascii?Q?WAQFXZCCqaPrgN4obqFsDeYZIlbchaKOETL71hOSkcyI7HK+Y5i1zSmGkWjS?=
- =?us-ascii?Q?592UnvA7toUJMbxBryrnoDfcXx4iv6WLjVZnOE6AOKxCmVSnhf1WHZp77pn7?=
- =?us-ascii?Q?QTPmiwyeFBoceWzusKNQGfYM+BzHplk2rHmjf2wQ9O+0J11p2TfwIlnnIi3T?=
- =?us-ascii?Q?0O7cuX5cnuLVWVEJEMP3NBgnmOg/+3VynrbplYFdWkd5qe9bcsZ6V5lgs27+?=
- =?us-ascii?Q?JFIRCbxC1JDQbPuO7crzqk1fnGnsT7/AmYPm3yIZKsDSBckb1fFD5cy29FIX?=
- =?us-ascii?Q?MipCkLqZCxrPbheNc+fZlRcev02nu1fPAKzfudbfpOpqg1KlQeTIwn/Hl9A3?=
- =?us-ascii?Q?i3SltgLPELIgBBbvht8RBCe60Xc1lzx3u0A/gBA4PPoguneYv9JfO/GCWk/l?=
- =?us-ascii?Q?hDzVHYg/PEtgM3n9z0tJrSNaXCPPsuXNcNZsqyQw7oZ3oOpg1q3nFAaSOpn8?=
- =?us-ascii?Q?2ZQovcIJ7AmaV7gM9fN2gHHfTs66vmrv62oO+UQkQKf66g1FboOe1M/afSbw?=
- =?us-ascii?Q?gSkkRQw7NklXfp1byfuhhCqD7Rmmeg+xEnG7Zru+cdlhLltTn+FdGlL9rMJw?=
- =?us-ascii?Q?/KUAEpuJrADFdVrtx/+zHtBQ4Ep9xRFfH7ocHfcebbB/aOlICYldXZApNKyP?=
- =?us-ascii?Q?oRqg2A3RFLMTDBqNBJvgr6buek3nxTyYykklTCYkX4e675kOhTRN5V1b6rDt?=
- =?us-ascii?Q?XVpst21I0nBr4yib6za3KGX4ItmUEh4YR+y7Vrg/KlQLZl0HZha+T9KPRRbz?=
- =?us-ascii?Q?yMhgDgInp+USVId3YCPOJWGOc+lX+8tw6oXe5BlYAZx/xlb0m9fC5TAz3NNQ?=
- =?us-ascii?Q?CrjM+FiMIrveytCwT3Qd3qYaux/8GYT2V1nqT45c/80b1kRGDvS70jd/Ymr7?=
- =?us-ascii?Q?lXl1anKUAYqVP8AVDcNSdZsqLLSWgf+H4yAY/zKzFKjVNlKfe+7GJ5O1KwiL?=
- =?us-ascii?Q?lNuCsPSMG4mJ1qzkwbi39QvNpFTCGHdDD92jP1EZdNof9DOI+KYAhBUtKvcn?=
- =?us-ascii?Q?deGWgW425200PFzMc8ud/5Akxe8V5H2c3o7b+KtDY0qldM0UROQVZdwTk4x9?=
- =?us-ascii?Q?jhL3TrWuMZ3tZweiqTVYiVZPIvUcA2zXWkbEnWRrNo4N7qTHrZgOlf8dXUwp?=
- =?us-ascii?Q?0678QiHZYg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a7cc1a6-011d-4ed1-f15c-08de7f70de4a
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 13:19:48.2033
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kWazsIlz0ScwlgRwSmlJwI6bXCbcKu0d+SUGqw289tW4EhHNvljxkMCn6eNCpVcHSLKodmsuppS5ziM45fJUTg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7990
-X-Rspamd-Queue-Id: A19C52646C4
+References: <20260310105331.2371-1-lirongqing@baidu.com> <20260311131935.GA2415888@shredder>
+In-Reply-To: <20260311131935.GA2415888@shredder>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 11 Mar 2026 14:26:57 +0100
+X-Gm-Features: AaiRm53mLKyKMmg7vzNWKYn0nRuHheeVWc6FScH0DgBLyXOdwz5ru76AgH_yiD4
+Message-ID: <CANn89i+PK6N0VJPQ_NtvHFizpnnrWb9AOPz=M0WyzsQGogsUpQ@mail.gmail.com>
+Subject: Re: [PATCH][net-next] net: vrf: switch to synchronize_net() when
+ releasing routes
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: lirongqing <lirongqing@baidu.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C3330264834
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266646-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266648-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nvidia.com:email,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 10, 2026 at 06:53:31AM -0400, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> Replace synchronize_rcu() with synchronize_net() in vrf_rtable_release()
-> and vrf_rt6_release().
-> 
-> synchronize_net() is RTNL-aware and can use the more efficient
-> synchronize_rcu_expedited() when the RTNL lock is held, avoiding
-> potentially long wait times for a standard RCU grace period.
-> 
-> Since these release functions are called during device teardown where
-> the RTNL lock is typically held, this change reduces the time spent
-> in RTNL critical sections and speeds up VRF device deletion.
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  drivers/net/vrf.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-> index 8c009bc..92a0f4b 100644
-> --- a/drivers/net/vrf.c
-> +++ b/drivers/net/vrf.c
-> @@ -755,7 +755,7 @@ static void vrf_rt6_release(struct net_device *dev, struct net_vrf *vrf)
->  	struct dst_entry *dst;
->  
->  	RCU_INIT_POINTER(vrf->rt6, NULL);
-> -	synchronize_rcu();
-> +	synchronize_net();
+On Wed, Mar 11, 2026 at 2:19=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> On Tue, Mar 10, 2026 at 06:53:31AM -0400, lirongqing wrote:
+> > From: Li RongQing <lirongqing@baidu.com>
+> >
+> > Replace synchronize_rcu() with synchronize_net() in vrf_rtable_release(=
+)
+> > and vrf_rt6_release().
+> >
+> > synchronize_net() is RTNL-aware and can use the more efficient
+> > synchronize_rcu_expedited() when the RTNL lock is held, avoiding
+> > potentially long wait times for a standard RCU grace period.
+> >
+> > Since these release functions are called during device teardown where
+> > the RTNL lock is typically held, this change reduces the time spent
+> > in RTNL critical sections and speeds up VRF device deletion.
+> >
+> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> > ---
+> >  drivers/net/vrf.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> > index 8c009bc..92a0f4b 100644
+> > --- a/drivers/net/vrf.c
+> > +++ b/drivers/net/vrf.c
+> > @@ -755,7 +755,7 @@ static void vrf_rt6_release(struct net_device *dev,=
+ struct net_vrf *vrf)
+> >       struct dst_entry *dst;
+> >
+> >       RCU_INIT_POINTER(vrf->rt6, NULL);
+> > -     synchronize_rcu();
+> > +     synchronize_net();
+>
+> I might be missing something, but why do we need synchronize_rcu() here?
+> The code below calls dst_release() which will only free the dst entry
+> after an RCU grace period (assuming we dropped the last reference).
 
-I might be missing something, but why do we need synchronize_rcu() here?
-The code below calls dst_release() which will only free the dst entry
-after an RCU grace period (assuming we dropped the last reference).
+Agreed, this could/should have been removed after
 
-Also, I think that instead of using net->loopback_dev the code can be
-converted to use dst_dev_put() before dst_release().
+commit 4f04256c983a4f115417d2009b44dcb7d70a6375
+Author: David Ahern <dsahern@gmail.com>
+Date:   Fri Aug 11 17:11:14 2017 -0700
 
->  
->  	/* move dev in dst's to loopback so this VRF device can be deleted
->  	 * - based on dst_ifdown
-> @@ -1002,7 +1002,7 @@ static void vrf_rtable_release(struct net_device *dev, struct net_vrf *vrf)
->  	struct dst_entry *dst;
->  
->  	RCU_INIT_POINTER(vrf->rth, NULL);
-> -	synchronize_rcu();
-> +	synchronize_net();
->  
->  	/* move dev in dst's to loopback so this VRF device can be deleted
->  	 * - based on dst_ifdown
-> -- 
-> 2.9.4
-> 
+    net: vrf: Drop local rtable and rt6_info
+
+    The VRF cached rtable and rt6_info for local traffic are no longer
+    needed and actually prevent local traffic through enslaved devices.
+    Remove them.
+
+
+
+>
+> Also, I think that instead of using net->loopback_dev the code can be
+> converted to use dst_dev_put() before dst_release().
+>
+
+Maybe in a separate patch ;)
 
