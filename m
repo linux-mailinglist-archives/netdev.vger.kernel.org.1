@@ -1,222 +1,212 @@
-Return-Path: <netdev+bounces-266606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPCDHTBHsWlCtAIAu9opvQ
-	(envelope-from <netdev+bounces-266606-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:42:56 +0100
+	id kL6OEw5EsWlCtAIAu9opvQ
+	(envelope-from <netdev+bounces-266587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:29:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5952626D5
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:42:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFDF22622EA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 39FD034632AE
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 10:20:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6718313199A
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1CA3CCFC6;
-	Wed, 11 Mar 2026 10:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED94F32BF41;
+	Wed, 11 Mar 2026 09:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wMo/5xuC"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eeHWkhLZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012000.outbound.protection.outlook.com [52.101.43.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24473C8703;
-	Wed, 11 Mar 2026 10:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224399; cv=none; b=KCVg/LEK/Jowjj5hytH5icaCk/m1tGTsIK8XsX3M4jF/8r2dPtzyWC0mRLodn7w8LJmXZX9yajrM2IDh4HbnrH8KbW35HdMGiuvIZ9WrR/o5IIeSubzyIJMHcokMYSfhrO2bVtvBUlJFw+jjHWkiQPZCRaJQLImldshKRQ45+Z4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224399; c=relaxed/simple;
-	bh=wlHzuUH0gUssp1UjidQbhAVH/CdfFqbsFbfXxNH8yRQ=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Uf5MppnCYSGHoVeIFQ3dy/L4NyPbOeSjpE9muRac9t3Ol3pDckCSrW/qODAyRMAaqmn69eXO3d23LUK/eG6kswcMELzNuyjqIDI7MxXvJHkrJdsQKeizvT7vtAy9eB643l8UL/NEmQyGfjfPp2A1K2hC6FXjzdNTVdwsbHg5HdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wMo/5xuC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jy7ZZYhO/l6AOCV4Dt/j5MRaTr5NmlKcOirpso5gcsI=; b=wMo/5xuCM6GHbf1VABNSVs8FvT
-	J73OKmQkiNMTevw2lC5BF7diZINev13LOSSGOH7DX9JAgM52l7SAtQt88Kc898211sHTdwQiDo5Ls
-	V7u+IrRHQIbwyUzgzkMNvYhk0qiJ2OzvKRBeSRHKMHTM4FGyo9VGo/T7tbS/POr6Z4gJ+Go51Qvlg
-	9VXIG7PS/NxWbJ+7X55bQcbLxgSdsDAyELN5uq54LGPz0IOHh8OozOdyb6u/w2d6HmeyXtl+ww/nl
-	d5n8RycOmq/0HD5UtTr1yLdqbjGFl9JYQe6DdyAMWiWzuRCGipWHVMZkyTPmp9PO1tlgvLPwH/XVu
-	ELJITC+g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:48598 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w0GFp-000000006BF-0GVv;
-	Wed, 11 Mar 2026 09:53:25 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w0GFl-0000000CiU0-03iN;
-	Wed, 11 Mar 2026 09:53:21 +0000
-In-Reply-To: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
-References: <abE7LWj04-JNxgS2@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next 15/15] net: stmmac: use queue rather than
- ->queue_index
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413BF363C64;
+	Wed, 11 Mar 2026 09:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.0
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773222893; cv=fail; b=QDS9A8m2wx7e/b+wzbm1PHx3crzHh0YbDFaB3kDk3rtEr6qgiWfDYyni8c75nSSF83HQBmUAPm71ZQAkgYO1yAs7c1qecKrCm4HKMrp8uQBBJiVn6bFLye2EkoMDdnDSwQ18l/sMYw4qqANXcqjXVezH0p8eVgYkA7AFyfV/fDQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773222893; c=relaxed/simple;
+	bh=78Ywnl+mEoFOA5eFrE1RDeCMDIhrV+r9hCItTcOmQ5I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mQmB2OMzvXSLcB4LnBiwpYX6bJajJ6ap6eeAxHfzvW3IgNjJ3k+rI/oAJVmd5G4OqbospBzzah6jeorrAlwZB2CeMwtkoLdMDE5Q67C0qCfOo7B6wk62GsP7ftqGs3SU94mW2EA7MQAPDoDFO54S0CjQKW2li3q1U9w6ro8y5Os=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eeHWkhLZ; arc=fail smtp.client-ip=52.101.43.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NaOcl4YdLAXsfm6W5i8bZXor30F9M7Fi4EO4X3aNXD7XlU4Nh+R9Jt2Zcqv2HMrzRaOaDhOOvSZwz5XXBeLQF/c9kOwiqh3NFAEFlYOIh1/vl4x3XWH0H5mFHDvTdi4LuxC2pPfyLNarfm6A9cZi9J1GkhT+UQTrm94HkC9C+1RjGmNMaHeOMRpofSx+xVxK+3chKn7TAzgzYh/kSiCg8LGB5ut45ghEbrk/HYLWBx5uKJs6p1T1D4MW5DMAJ0IGmeVbzgwiBa8IVW8ECDy5Tq9CPUiVYO6uRDiEJKT7BtQ29lIRcHyXJTy6+9lQ/FfpFHH5U1jmDYfBDfZsDN12sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p+L2EtX2EkdEP5PMBHKpy4L8IX2sSQ3Pyxu4KTM2VmA=;
+ b=R9a+xrGCJOCZXgCJjABYTFfuhEqkwa1omlx+x5nFatU5zg3ddmcMIgX+SminfDLzzMOf70lWBQRkAO94hG6Bn3Iffr3sgc/mWOb2QHQPYD60Demdj6EH07Gj92KLwwFUxazXkIY3teeROLDeAtCJIv+mVFWV2wANrFKx3ADrgd8BEfYVf8QqD2L+cZFBpd1uDwxMDQjJ+oSQeLMFMW5ZZqxIW7uA+NTfSuNhabqP7Y3XWi6Fx9Sor5vjYXXC8MhqaOZ4Dfat3CX5nf86W0ADc7wFCjinCgCrvjmdPTQvQUjmki/KBXC0pOGyBpgSpvbnar+OTSlSVlP3C3DSKUIyYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p+L2EtX2EkdEP5PMBHKpy4L8IX2sSQ3Pyxu4KTM2VmA=;
+ b=eeHWkhLZPTm+H8iHzIzBC2KlCrvIXUefP2IY5BsZ3X2KQRiaQQkQrSOpSSYcLvmcpCWIYgF70qB93pnSOYR2PM9Zhnjt8PlUsNotKv1INDjCsxUB/gmaL/IA+xKcPVphpx9xcy3eRjAzcUHZ2F3Ggywo2vhT8LPoAS1Bhsaj2ek=
+Received: from BN9PR03CA0139.namprd03.prod.outlook.com (2603:10b6:408:fe::24)
+ by MW4PR10MB6677.namprd10.prod.outlook.com (2603:10b6:303:22f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.12; Wed, 11 Mar
+ 2026 09:54:50 +0000
+Received: from BN2PEPF00004FBB.namprd04.prod.outlook.com
+ (2603:10b6:408:fe:cafe::8) by BN9PR03CA0139.outlook.office365.com
+ (2603:10b6:408:fe::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.26 via Frontend Transport; Wed,
+ 11 Mar 2026 09:54:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ BN2PEPF00004FBB.mail.protection.outlook.com (10.167.243.181) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Wed, 11 Mar 2026 09:54:49 +0000
+Received: from DLEE211.ent.ti.com (157.170.170.113) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
+ 2026 04:54:47 -0500
+Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
+ 2026 04:54:47 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE208.ent.ti.com
+ (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 11 Mar 2026 04:54:47 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62B9slMw116637;
+	Wed, 11 Mar 2026 04:54:47 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 62B9sjp5019904;
+	Wed, 11 Mar 2026 04:54:46 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: <vadim.fedorenko@linux.dev>, <haokexin@gmail.com>,
+	<jacob.e.keller@intel.com>, <m-malladi@ti.com>, <sdf@fomichev.me>,
+	<john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+	<ast@kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net] net: ti: icssg-prueth: Fix memory leak in XDP_DROP for non-zero-copy mode
+Date: Wed, 11 Mar 2026 15:24:41 +0530
+Message-ID: <20260311095441.1691636-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w0GFl-0000000CiU0-03iN@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 11 Mar 2026 09:53:21 +0000
-X-Rspamd-Queue-Id: CB5952626D5
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBB:EE_|MW4PR10MB6677:EE_
+X-MS-Office365-Filtering-Correlation-Id: a69546e4-97a9-43d0-8bb3-08de7f543c35
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|7416014|921020|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	C+9Vak+fFnFyuZoVao6QKptpLkXXva0s6i0SEVE+eXvVUViYhupBEwaM35qQuHx03BHvRPLZQ606cTPwj3Y+ordnH8OF7d96HlNbssaUKyLKNSinTQPmtx/OTwGVKJgjfFHseSW32G+XeClVanQQoC5lfDbkksJPGdOcXQnr1eS4j+g/GeXm1P4YT/EbivumomzByKIqPGztc9mm3zZqtdoN1YHXMVPLnq/7AKdazCc4n1a2s8mjvktJ2WjSVvyUu6LeHC+JjjdqSZdTbftdaFN4XS01lgik1Qs6LHRnEwasgoVMjUZXm67kykR/C1zk5OTQsN/ldW864ZgNkUC+Nkos7h8+nCtleLRHgYV0j5np2cmIggVNnobOVC/mzmTnZxDhsPRIhHdR6mH8ns3AkjlVULVy3ql1EEvse+uMhhHpDZn00Z7OnYV0weN90eDYHmKGbsbTliCiOILSkqWv9hYTVrL+AREgm4k4fCwWEldwIvuwQiMRBxAojl+G7n5whltqh8eBFSD8CHIfOPrlcHJsxldj5oTWdMMIKjwzFD/JpSGTW+RtkOAfyWTDw3oCKmxT4hNPCzciTrRu7JypY8NIGKH0mqPuN6DFe/qQLmejYWKEvJomZ47k7AumERJfsaxZTzVMA2iYSJBqI6MZIvkkl8RX0Yg00okfyc6VpzZsJwYUQZ5HVBuFiBJvuKzZeIDpyhhAkxDLQkEUSEdwiGqasPBKITpktbs4qzSF7q6GE+EEnkrzhc4KSj2AIZd0KINUrObfgoaUTSSSrW+1CzcUHvFqz8ZSCnfURG8//oMyZWGXlgSIaDbwdP5JhAmR
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(7416014)(921020)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	hY4BO04SbH6dNGo8Cpd3SMg8ywoWNEGkA3sgA0YG4v+7o+eZVZOEcXM/72zelCR8r4yhtqdlk84Oqwo05r1YhLzpb2eM3lqrx8XX6T0KSeNwsUukJC1zOLag/QZn/6wN7766FqBks9xHqRHkoGr8wGTScUft5d+8Ffz3kAfT2Z4lI96bWAB8AlbU3HQKRNGdyBee4E4QOzLWjD/cZFmLzNLSUto7pMsJz0MPGa4bjNbz+2yDsxX09OtwseURWLoASA1sj5olJapsaFDMK2Ar78x234AKhfwRTLqPtjWJzd+RfDgs6nSmN3yqZHU0RCJrKw/Q2El79VOhKvoYDHmSkWWug1GR6JRPL/S21bcOsvcQ2t1VOzhD/oa4yPo3PgnztOoBh3fr61ZuSP/BLwpg3lemUhwQqH5pGudjUewtFzc+VIam0ITt8XrzdW5jLiFp
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 09:54:49.6208
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a69546e4-97a9-43d0-8bb3-08de7f543c35
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF00004FBB.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB6677
+X-Rspamd-Queue-Id: DFDF22622EA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266606-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[linux.dev,gmail.com,intel.com,ti.com,fomichev.me,kernel.org,iogearbox.net,redhat.com,google.com,davemloft.net,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266587-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ti.com:dkim,ti.com:email,ti.com:mid,xdp.data:url];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,armlinux.org.uk:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-We use a lot of ->queue_index where we already have the queue / channel
-index (which are actually the same index), which has been used to get
-the queue struct. Since queue and queue_index are identical in
-priv->(tx|rx)_queue[queue]->queue_index there is no point using the
-queue_index where we already have queue.
+Page recycling was removed from the XDP_DROP path in emac_run_xdp() to
+avoid conflicts with AF_XDP zero-copy mode, which uses xsk_buff_free()
+instead.
 
-Use queue rather than queue_index.
+However, this causes a memory leak when running XDP programs that drop
+packets in non-zero-copy mode (standard page pool mode). The pages are
+never returned to the page pool, leading to OOM conditions.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Fix this by handling cleanup in the caller, emac_rx_packet().
+When emac_run_xdp() returns ICSSG_XDP_CONSUMED for XDP_DROP, the
+caller now recycles the page back to the page pool. The zero-copy
+path, emac_rx_packet_zc() already handles cleanup correctly with
+xsk_buff_free().
+
+Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
+Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++++-----------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 55b79e9e637f..8393cbd0875e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -440,7 +440,7 @@ static void stmmac_set_queue_rx_buf_size(struct stmmac_priv *priv,
- 	else
- 		buf_size = priv->dma_conf.dma_buf_sz;
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 0cf9dfe0fa36..0a3cf2f848a5 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -1075,6 +1075,11 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
+ 		xdp_prepare_buff(&xdp, pa, PRUETH_HEADROOM, pkt_len, false);
  
--	stmmac_set_dma_bfsize(priv, priv->ioaddr, buf_size, rx_q->queue_index);
-+	stmmac_set_dma_bfsize(priv, priv->ioaddr, buf_size, chan);
- }
- 
- /**
-@@ -1902,7 +1902,7 @@ static int __init_dma_rx_desc_rings(struct stmmac_priv *priv,
- 						   NULL));
- 		netdev_info(priv->dev,
- 			    "Register MEM_TYPE_XSK_BUFF_POOL RxQ-%d\n",
--			    rx_q->queue_index);
-+			    queue);
- 		xsk_pool_set_rxq_info(rx_q->xsk_pool, &rx_q->xdp_rxq);
- 	} else {
- 		WARN_ON(xdp_rxq_info_reg_mem_model(&rx_q->xdp_rxq,
-@@ -1910,7 +1910,7 @@ static int __init_dma_rx_desc_rings(struct stmmac_priv *priv,
- 						   rx_q->page_pool));
- 		netdev_info(priv->dev,
- 			    "Register MEM_TYPE_PAGE_POOL RxQ-%d\n",
--			    rx_q->queue_index);
-+			    queue);
- 	}
- 
- 	if (rx_q->xsk_pool) {
-@@ -2310,9 +2310,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
- 	else
- 		napi_id = ch->rx_napi.napi_id;
- 
--	ret = xdp_rxq_info_reg(&rx_q->xdp_rxq, priv->dev,
--			       rx_q->queue_index,
--			       napi_id);
-+	ret = xdp_rxq_info_reg(&rx_q->xdp_rxq, priv->dev, queue, napi_id);
- 	if (ret) {
- 		netdev_err(priv->dev, "Failed to register xdp rxq info\n");
- 		return -EINVAL;
-@@ -3340,7 +3338,7 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue)
- 	if (!tx_coal_timer)
- 		return;
- 
--	ch = &priv->channel[tx_q->queue_index];
-+	ch = &priv->channel[queue];
- 	napi = tx_q->xsk_pool ? &ch->rxtx_napi : &ch->tx_napi;
- 
- 	/* Arm timer only if napi is not already scheduled.
-@@ -6918,12 +6916,11 @@ void stmmac_enable_rx_queue(struct stmmac_priv *priv, u32 queue)
- 	stmmac_clear_rx_descriptors(priv, &priv->dma_conf, queue);
- 
- 	stmmac_init_rx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
--			    rx_q->dma_rx_phy, rx_q->queue_index);
-+			    rx_q->dma_rx_phy, queue);
- 
--	stmmac_set_queue_rx_tail_ptr(priv, rx_q, rx_q->queue_index,
--				     rx_q->buf_alloc_num);
-+	stmmac_set_queue_rx_tail_ptr(priv, rx_q, queue, rx_q->buf_alloc_num);
- 
--	stmmac_set_queue_rx_buf_size(priv, rx_q, rx_q->queue_index);
-+	stmmac_set_queue_rx_buf_size(priv, rx_q, queue);
- 
- 	stmmac_start_rx_dma(priv, queue);
- 
-@@ -6969,12 +6966,12 @@ void stmmac_enable_tx_queue(struct stmmac_priv *priv, u32 queue)
- 	stmmac_clear_tx_descriptors(priv, &priv->dma_conf, queue);
- 
- 	stmmac_init_tx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
--			    tx_q->dma_tx_phy, tx_q->queue_index);
-+			    tx_q->dma_tx_phy, queue);
- 
- 	if (tx_q->tbs & STMMAC_TBS_AVAIL)
--		stmmac_enable_tbs(priv, priv->ioaddr, 1, tx_q->queue_index);
-+		stmmac_enable_tbs(priv, priv->ioaddr, 1, queue);
- 
--	stmmac_set_queue_tx_tail_ptr(priv, tx_q, tx_q->queue_index, 0);
-+	stmmac_set_queue_tx_tail_ptr(priv, tx_q, queue, 0);
- 
- 	stmmac_start_tx_dma(priv, queue);
- 
+ 		*xdp_state = emac_run_xdp(emac, &xdp, &pkt_len);
++		if (*xdp_state == ICSSG_XDP_CONSUMED) {
++			page_pool_recycle_direct(pool, page);
++			goto requeue;
++		}
++
+ 		if (*xdp_state != ICSSG_XDP_PASS)
+ 			goto requeue;
+ 		headroom = xdp.data - xdp.data_hard_start;
+
+base-commit: 908c344d5cfac4160f49715da9efacdf5b6a28bd
 -- 
-2.47.3
+2.43.0
 
 
