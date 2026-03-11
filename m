@@ -1,305 +1,191 @@
-Return-Path: <netdev+bounces-266543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Ni4GxYusWkVrwIAu9opvQ
-	(envelope-from <netdev+bounces-266543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:55:50 +0100
+	id ACnWMpsusWkVrwIAu9opvQ
+	(envelope-from <netdev+bounces-266544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:58:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5AA625FD19
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:55:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C912025FD72
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:58:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D0D87300A4D2
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:55:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AB6630095ED
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 08:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B67E28507B;
-	Wed, 11 Mar 2026 08:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D912E92B3;
+	Wed, 11 Mar 2026 08:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jmZOrcsh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666D13C0630;
-	Wed, 11 Mar 2026 08:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773219345; cv=none; b=l4swx8Tr3IzyBB0V+3w8Kc2Fi3OTgyTlB5VYm54X9xJuRtnKU+G58VI7Da+6N7Kg/ellqx1kX22cN1Tf/C/65MGnjfDU/Itw2MuIraUZQHuhRQ/cMzbBhAjcLvkG3QQ3GaD9if7rGSrnUYSbg7h5jO4CTfrnyOv21Q0IGueif5w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773219345; c=relaxed/simple;
-	bh=9uyyFVC+dEr2i7ZqlE+cIRl9d4bFHWF9vTTuUqpF34A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bwps5svajYrnon5uZ5LwuAJcu329ACUIEVrfOJSzRwCPF/ftZ8ky7fTzJeKEabBIwtIgzsf4/u81JVbRM5qLTa9vVANr1KgyQbSjRboTGUxk0agLUJBUutog4+DPyhULIRqNLa2wi2NkB3+f2f+C8EuKX6vvkhdiq//GEnBJzbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.228] (p57bd9914.dip0.t-ipconnect.de [87.189.153.20])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2088E4C2C37D70;
-	Wed, 11 Mar 2026 09:54:40 +0100 (CET)
-Message-ID: <9199a462-09be-402a-a47a-447e51a2f5a4@molgen.mpg.de>
-Date: Wed, 11 Mar 2026 09:54:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADB53B8949
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 08:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773219476; cv=pass; b=U06Hf5sIiasdgm/x6vJWmbYgx4/5jEjvmXK1evVxAVcixWso5VyN1BXRXBpZ58kdcKI0InYjqS6/exBP/5Crp/IJES50Wecv5j+j/1JpdsAu38R/57wA8LopoHQdPpGecoQXRHYzNacgccb52Xd740P7nSp2hB9cxLjRh43Buhc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773219476; c=relaxed/simple;
+	bh=SzB/aA/TD/So63XD7gTkEVh7jqesG3jqxlGG0jXes+E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JpMzfRl0W4UoE6r4CS3wKbwq5oRDxfaU+V/VWjI2aAHTJBdIu1nN6fpqX/aJx6zE3ChU8/WuNtiCQR0YIWG9uLIZW4VtKgF/KLT0zG1CQuuIDhPUn5iCgDcikpZ0+0CD8orAZktIaJuU1GmSZ4ceLcklEOBkzV7nBQBkf87EMiM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jmZOrcsh; arc=pass smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8cd7ecedf2cso346203485a.3
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 01:57:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773219472; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cYRz3hI8VxYfPYccpDfrHIG/xpC/yPq7OlzAUKZjolRTcZmxzfHaeZqHdBVPG79FXb
+         iD3+r0BUNttpKbp8gJ2nqX3F5gI06YysprktDhH8PuSKQNQENpReJ+W0YU7qSSbOeleL
+         qAYVG8zq0iK/2JUM/hs+sRWnklCLekrfH5gAfWTutyFQptDAcGb7s8KCUP5/xqABBor9
+         nZtj7qje/zL0l7N7KlymbqegC4ypDViwbsSWUKL27keyP5TpAFxZ2yYWd321o0lIuUXx
+         1hLWlDiDBjyR7ktpkcxa2fiTdNShhMeRgbALfb1vKtGtjHl7CRNnvnv3JeL+0080g/0H
+         UAaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8JHjqm5FfWew/5hPCXxrRtDXNu5TVPSGZVgHwRYGjd4=;
+        fh=dSvFYbRMWSnQPC/51Ntp3jlkFeHZyl93PPtn+4T/S10=;
+        b=csvmilEaixj073IsdRRI0CX0eYculPyz51XkPGQNg70lbZ5EGsThLgw22EOLq4OB4Q
+         thSDBB3YQQieZtMrLtCR4MDWPW97lyOU+i5pgdHSVDi+LB9c7WSAD/uNwczcvnTYFdwe
+         jIDh5WotW96eXHTd8qtcsYrTWq31k1Co77a0L0TkduYdwA7gw9o4dLs65xKZP0ilzVVn
+         3BCFFrlAKcNH51hEwzIvxqtQ6fUAwJYoR0CsD7Uzrf2xT7m2k4jxSRJGgG/3eJ3Zr0tq
+         8RFfnMtjtQx627sRPzOeAZtg8WTy3WbZN4jl2JeJiFg+zee5bMHOo1Gd+IGu+8bne/T+
+         /S1A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773219472; x=1773824272; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8JHjqm5FfWew/5hPCXxrRtDXNu5TVPSGZVgHwRYGjd4=;
+        b=jmZOrcsh+aCQCfjKb4uOlsfDi3eu+8zY7EWxfuZhV4hvDF+IQKPkrn7HWMjIZ1jb8e
+         wpo5tFCiSsdzfEU54tSFDu16SB+woJpyiCv3Nh+6zcyfuT5Y16EwN1SlL/5VZOBOGDD8
+         htZbih3VAIaNjLBgvtQBZrMtCQo3F0omVTlkvdG0TNjlXCRrsaN+kMM47BGY85xRzYp6
+         z3/6FkeyECu0eQo8yqG/6B/1z8NrLmizZBu0QVb3qAQaWci0Rk5m/8HWh6DUobnrD+Tt
+         CL0lQPV5S62+VpUf4hyW4dN8ts135jJb03P6mpROvKm68qJJhWBn0xZXZXsAwKp2xhS5
+         cj3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773219472; x=1773824272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8JHjqm5FfWew/5hPCXxrRtDXNu5TVPSGZVgHwRYGjd4=;
+        b=m8simATu8lhixDv+LsRi/hkmMFW24hem4a1/L6Mx2z8dJXfHqMdO3WiKCwWhgoFS3B
+         49AThmpHSnoo3+COgto9HYGfT5AcXOjORyUjECf2hbPeYL29fNQmGiCInyMLWoPffnjI
+         geYS/bVgBvsTmQPFSbJqNK/5FdJp7c5JgVyIo2gWHXKt5Ii4WVmtFECCR2ihhgctZNoi
+         jd2N2zHkQMgVVzXVAgNk+byUim/F1qjQh1dD3iLv2XIU59pEyAy7A8SN+QOXwIH3EIq0
+         cOtv3ECJv/I8YgTQzx+Nu2xXDS5bHSTKoQRGYCEqak3rX4oAlLBiXfaPWNi39FL6hvGS
+         A9Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCUegle5b3+Tip/+fq0fcgsoYxLmYKQVN2VnhbdekEQjdc0qAz57gnIwwoT9Mbjc7lA0Fg2Fkf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzg1fRYwMbt0ZQw8zKg1vKWKcOBJaBDGiPFs11erK7e7D2JYNd7
+	NY9371zjDF1d02jiJIhITQTthKAx8WbqKqqyus0F9c/yhy/sOLXa7jGuWDcw4HkAqvhYkRRrmC9
+	vx5lVhIKJAqflMk/BcQdSyAeVVrrjw0jRb7AAl35e
+X-Gm-Gg: ATEYQzwmNGodklGK5gWszpMWNncvQ3kHGkFlDNY/ahngP2hbgmC4yKWdc0UmVoEyaxU
+	5YpLx6hyHn1+Z8OK34PqH7DVTD6jd7uFTWqMFQz1TUvLQEJ/xkYmxPm81sNiO/zNsQSvmJU0FSA
+	eLrcxvJ588axa7PeXmrZ+6D5hBX7MA7Vmt14JYzoWirr0eKYli+sq/TDZIv6eqZW0Pj/QPANBPA
+	33gy+GfQUqLkAN2wWq0vldelkqJRuwjU4765hhDqvEaFES8uuOa0ArkYRrbpxZ9bQX62XoTRfq+
+	zQSaOTEf
+X-Received: by 2002:a05:620a:198a:b0:883:c768:200a with SMTP id
+ af79cd13be357-8cda1974334mr204022785a.32.1773219472102; Wed, 11 Mar 2026
+ 01:57:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO packet
-To: Tailu Shi <tailu.shi@samsung.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
- <20260311081401.3832000-1-tailu.shi@samsung.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260311081401.3832000-1-tailu.shi@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D5AA625FD19
+References: <20260311072330.96491-1-heminhong@kylinos.cn>
+In-Reply-To: <20260311072330.96491-1-heminhong@kylinos.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 11 Mar 2026 09:57:41 +0100
+X-Gm-Features: AaiRm51xEv_4lBrbcchqqSZFTplmhH41N5NFvFrDLscbC9QlkWptXQab3miNahI
+Message-ID: <CANn89iLBN-fxUQ11Txtn73XQ6M9mrpaWEfjK=EfMU8UO1yOdBw@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: sr: Add unlikely hint to idev NULL check in seg6_hmac_validate_skb
+To: Minhong He <heminhong@kylinos.cn>
+Cc: andrea.mayer@uniroma2.it, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	david.lebrun@uclouvain.be, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C912025FD72
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266543-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[mpg.de];
+	TAGGED_FROM(0.00)[bounces-266544-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[holtmann.org,gmail.com,iki.fi,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.378];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,samsung.com:email,gitlab.freedesktop.org:url,user.name:url,mpg.de:email]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,kylinos.cn:email]
 X-Rspamd-Action: no action
 
-Dear Tailu,
+On Wed, Mar 11, 2026 at 8:23=E2=80=AFAM Minhong He <heminhong@kylinos.cn> w=
+rote:
+>
+> In seg6_hmac_validate_skb(), the pointer returned by __in6_dev_get()
+> can theoretically be NULL if the network device lacks proper IPv6
+> initialization or is being torn down. However, this is an exceptional
+> error path; in normal operation, the device will always have a valid
+> inet6_dev structure.
+>
+> Marking this NULL check with unlikely() helps the compiler optimize
+> branch prediction and code layout. It ensures that the common case
+> (valid idev) remains in the hot path, while the error handling code
+> is placed out of line, improving CPU pipeline efficiency for high-speed
+> SRv6 packet processing.
 
+This section is unnecessary and dubious ?
+Note that both clang and gcc already generate the correct code without
+the unlikely()
+So your claim about "CPU pipeline efficiency" is quite strange to me.
 
-Thank you for your patch. A formal request at the beginning to please 
-spell your name without the dot/period – maybe: Tailu Shi.
+Let's keep the changelogs concise and focused on the real issue at hand.
 
-     git config --global user.name "Tailu Shi"
-     git commit --amend -s --author="Tailu Shi <tailu.shi@samsung.com>"
+Thanks.
 
-Am 11.03.26 um 09:14 schrieb tailu.shi:
-> The Bluetooth Core Specification defines the 'Time_Stamp' field of
-> an HCI ISO packet as optional. However, it's mandatory to include
-> the 'Time_Stamp' field when using HCI ISO packets per section 3.3
-> 'HCI Feature Support Requirement' of TMAP specification.
-> https://www.bluetooth.com/specifications/specs/html/?src=TMAP_v1.0.1/out/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
-> 
-> To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
-> that allows user application (e.g. PipeWire) to attach timestamp to the
-> data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
-> 
-> When the option is enabled, the kernel extracts the timestamp and copies
-> it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
-> 
-> This also gives the controller the reference timing information
-> required for ISO stream synchronization.
-> 
-> A corresponding userspace change is required for full functionality.
-> A reference implementation is available in PipeWire:
-> https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
-
-Is the timestamp correctly visible in the btmon trace?
-
-> Signed-off-by: tailu.shi <tailu.shi@samsung.com>
+> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+> Signed-off-by: Minhong He <heminhong@kylinos.cn>
 > ---
->   include/net/bluetooth/bluetooth.h |  5 ++++
->   include/net/bluetooth/hci_core.h  |  1 +
->   net/bluetooth/hci_core.c          |  2 +-
->   net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
->   4 files changed, 50 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 69eed69f7f26..f88c83d21c5e 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -259,6 +259,10 @@ struct bt_codecs {
->   
->   #define BT_SCM_PKT_SEQNUM	0x05
->   
-> +#define BT_PKT_ISO_TIMESTAMP     23
-> +
-> +#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
-> +
->   __printf(1, 2)
->   void bt_info(const char *fmt, ...);
->   __printf(1, 2)
-> @@ -409,6 +413,7 @@ enum {
->   	BT_SK_SUSPEND,
->   	BT_SK_PKT_STATUS,
->   	BT_SK_PKT_SEQNUM,
-> +	BT_SK_PKT_ISO_TIMESTAMP,
->   };
->   
->   struct bt_sock_list {
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a7bffb908c1e..e39d192f8ef6 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -740,6 +740,7 @@ struct hci_conn {
->   	struct bt_iso_qos iso_qos;
->   	__u8		num_bis;
->   	__u8		bis[HCI_MAX_ISO_BIS];
-> +	bool		iso_pkt_ts;
->   
->   	unsigned long	flags;
->   
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 31308c1de4ec..4264c0229dfb 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
->   
->   	list = skb_shinfo(skb)->frag_list;
->   
-> -	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
-> +	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_pkt_ts ? 0x01 : 0x00);
->   	hci_add_iso_hdr(skb, conn->handle, flags);
->   
->   	if (!list) {
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index be145e2736b7..dd4d198bab4c 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -73,6 +73,9 @@ struct iso_pinfo {
->   	__u8			base_len;
->   	__u8			base[BASE_MAX_LENGTH];
->   	struct iso_conn		*conn;
-> +	bool			ts_flag;
-> +	__u32			ts;
-> +
->   };
->   
->   static struct bt_iso_qos default_qos;
-> @@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
->   	struct iso_conn *conn = iso_pi(sk)->conn;
->   	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
->   	struct hci_iso_data_hdr *hdr;
-> +	struct hci_iso_ts_data_hdr *hdr_ts;
->   	int len = 0;
->   
->   	BT_DBG("sk %p len %d", sk, skb->len);
-> @@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
->   	len = skb->len;
->   
->   	/* Push ISO data header */
-> -	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-> -	hdr->sn = cpu_to_le16(conn->tx_sn++);
-> -	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
-> -						      HCI_ISO_STATUS_VALID));
-> +	if (iso_pi(sk)->ts_flag) {
-> +		hdr_ts = skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
-> +		hdr_ts->ts = cpu_to_le32(iso_pi(sk)->ts);
-> +		hdr_ts->sn = cpu_to_le16(conn->tx_sn++);
-> +		hdr_ts->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-> +	} else {
-> +		hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-> +		hdr->sn = cpu_to_le16(conn->tx_sn++);
-> +		hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-> +	}
->   
->   	if (sk->sk_state == BT_CONNECTED) {
->   		hci_setup_tx_timestamp(skb, 1, sockc);
-> +		conn->hcon->iso_pkt_ts = iso_pi(sk)->ts_flag;
->   		hci_send_iso(conn->hcon, skb);
->   	} else {
->   		len = -ENOTCONN;
-> @@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   	struct sock *sk = sock->sk;
->   	struct sk_buff *skb, **frag;
->   	struct sockcm_cookie sockc;
-> -	size_t mtu;
-> +	struct cmsghdr *cm;
-> +	size_t mtu, hlen;
->   	int err;
->   
->   	BT_DBG("sock %p, sk %p", sock, sk);
-> @@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   
->   	hci_sockcm_init(&sockc, sk);
->   
-> +	iso_pi(sk)->ts_flag = false;
->   	if (msg->msg_controllen) {
->   		err = sock_cmsg_send(sk, msg, &sockc);
->   		if (err)
->   			return err;
-> +
-> +		for (cm = CMSG_FIRSTHDR(msg); cm; cm = CMSG_NXTHDR(msg, cm)) {
-> +			if (cm->cmsg_level != SOL_BLUETOOTH)
-> +				continue;
-> +			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
-> +			    cm->cmsg_type == BT_SCM_PKT_ISO_TIMESTAMP &&
-> +			    cm->cmsg_len == CMSG_LEN(sizeof(u32))) {
-> +				iso_pi(sk)->ts_flag = true;
-> +				iso_pi(sk)->ts = *(u32 *)CMSG_DATA(cm);
-> +				break;
-> +			}
-> +		}
->   	}
->   
->   	lock_sock(sk);
-> @@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   
->   	release_sock(sk);
->   
-> -	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
-> +	hlen = iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_HDR_SIZE;
-> +	skb = bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
->   	if (IS_ERR(skb))
->   		return PTR_ERR(skb);
->   
-> @@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
->   
->   		break;
->   
-> +	case BT_PKT_ISO_TIMESTAMP:
-> +		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-> +		if (err)
-> +			break;
-> +
-> +		if (opt)
-> +			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-> +		else
-> +			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-> +		break;
-> +
->   	default:
->   		err = -ENOPROTOOPT;
->   		break;
-
-The diff looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+>  net/ipv6/seg6_hmac.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+> index ee6bac0160ac..a8f279ffb678 100644
+> --- a/net/ipv6/seg6_hmac.c
+> +++ b/net/ipv6/seg6_hmac.c
+> @@ -184,6 +184,8 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+>         int require_hmac;
+>
+>         idev =3D __in6_dev_get(skb->dev);
+> +       if (unlikely(!idev))
+> +               return false;
+>
+>         srh =3D (struct ipv6_sr_hdr *)skb_transport_header(skb);
+>
+> --
+> 2.25.1
+>
 
