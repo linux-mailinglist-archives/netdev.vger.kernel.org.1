@@ -1,168 +1,146 @@
-Return-Path: <netdev+bounces-266565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wO/9Myw/sWmtswIAu9opvQ
-	(envelope-from <netdev+bounces-266565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:08:44 +0100
+	id 2Cb/ODw/sWnrswIAu9opvQ
+	(envelope-from <netdev+bounces-266567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:09:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B832261CA6
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:08:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BED1261CD7
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 11:09:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E4113441EE4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:37:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E594B3077C4A
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 09:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE90F3E3141;
-	Wed, 11 Mar 2026 09:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1DE3F54C1;
+	Wed, 11 Mar 2026 09:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lo1m1vQx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JfVWEI4z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F733E3D8D;
-	Wed, 11 Mar 2026 09:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C5D3D9DB6
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773221203; cv=none; b=VAXvRaXn9DH3GzlK7+rLQ8LRYFPVrFVq8/YgT0Nl+mE4mjY4jto0NX1mMSeeKriagYD3xo/fa5lyYWJHNX9nlIRsLzrnDq78UmpGH9lPcnAWttM8q7we4+KU0WVe/I5r6S4MEwS4PvlcEEEgSRuboj7MhWZbEjY8GKMEQwT+7Vs=
+	t=1773221546; cv=none; b=kefWfG04ZEWLrFt355ty9msnULu6pVq0OFSgTQg/x4g/XgyHrldo/FLOHub6mEjHtSxSHKMUeCfIsZBq7iUiwfNbFTIei0JpPse34r8eYtsrSKZvhKjQIS6uDjGtKQM3Ib3xfKv8fXkFbvCO8raiEpUCW1hNJS4LzY1w/w/Ft/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773221203; c=relaxed/simple;
-	bh=2YgEmPb/8Z5ies75f85PikO3mop/46dFbxulERPGDEo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To; b=RjMjfh4rG1/WiZ8Hxt9DvjB3TurYlaMqUAE1HqQUYYvVZzEFQhrhnVVM3jYvbVbLwiKHafu64/9zUsKXXoBOWs42xrb5qeQL00w+sNtVshrf3Mn+fDroUkSf+w8JlUJYbM2tv4/Dw8jNWlbOPOkwntpfeORHPBIrNz9meZouaoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lo1m1vQx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A16C7C2BC86;
-	Wed, 11 Mar 2026 09:26:42 +0000 (UTC)
+	s=arc-20240116; t=1773221546; c=relaxed/simple;
+	bh=JGYhPK256pxU9EiY8jbQSSjgozqR8V5kd9EUseD+GRo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lDPbIJX30/OfdLsE2BHzTX7jbYMiPXOpA5j6nZZN0URtgNrQnRggRxPparRQodJln6PKo0iETdOrUjfDMLAU6+mt52wlIj51GDRWbeyEWHKG6nftPOXTd1tMgwd1Ubeyd3mhnJ+hfZD/E/jaONTblzUxAJdIQu923r0pSmwOvoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JfVWEI4z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA197C2BCC7
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:32:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773221202;
-	bh=2YgEmPb/8Z5ies75f85PikO3mop/46dFbxulERPGDEo=;
-	h=From:Date:Subject:To:Reply-To:From;
-	b=lo1m1vQxMJPYPxVRLEfwSsXUa6HyH2HnFjpGRvXHm7w6feEnERo2JNaJ1O+N09oqF
-	 rrU6AfWVqs27omlQgl2K5vDOendlFXjqV/kDZw5Oi+L/zQab440vQFNX8QOXXLFlqB
-	 KRr+atf8zQn/lQZGMrtdUXaz7w5xiTOKLMRKuRzXhcv9c0glKfVgliwCBwcqTwLB/m
-	 ZegedTK+f6OJPzppOP/ra5zRPqFP2oRZ33CUgsJ2Ih06CLCBHudPr7UDKSdib1js4Z
-	 p0SqUlZmnSoHUtixcDbvalQGvejpVX77aa2R0T7DzsKp/0H6I2Uh6b+X9FM7eJ4MQ1
-	 fRsoBxrVcVwuQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB7F104950E;
-	Wed, 11 Mar 2026 09:26:42 +0000 (UTC)
-From: Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
-Date: Wed, 11 Mar 2026 17:26:39 +0800
-Subject: [PATCH] nfc: nxp-nci: i2c: restore IRQ trigger fallback
+	s=k20201202; t=1773221545;
+	bh=JGYhPK256pxU9EiY8jbQSSjgozqR8V5kd9EUseD+GRo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=JfVWEI4zDrh3iHX+1r4cle8Phcf0RBN0zERjJ8PQNA3EYWSATJ9h5lha/xBvVFGnI
+	 lElqdFOyu5rUcg336ldY8JBHZo/CNZ6A5HFkXurPLCqwCA7763w9Gzh1MrCiovz1O6
+	 4/dhditNlUPPz/o6nb1awN/pC+8W+SveVLbbW1M3XSJ0LknHbar0z1P9mnX5NF58yX
+	 1Uj5dsDyxTrkO1DJZv/qpV8j6iPNzVVJVRqNM1MXMlgjgqpNnn65QlcqD5KydSFEzI
+	 yLns3+tdmVfBsvgohk6ekX61JLdkJkatIbZorvb97Pbamw8/hcF79oQl43JkoSoDtA
+	 x5H4ornHcPhQg==
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64ae2ce2fe1so13016798d50.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 02:32:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVQqS5hcV18GJgo5tv4qwi57TpG+pjTqSFLv+5aYEGiPAP3o0B74edkQn3r8bwfazLP/T/vUp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxowlhmgAWJ2PxVqMQYPDRkV5zNSw5ftqHAby+NxABCfjo7u38Q
+	XJw7Bn5K0UoxbX1BeU1t1SO1oy+b4PXGVTOl6A9oURiYOTtMbG0vJWZ23PRMkCcVnzcF4UbkVIk
+	bC19Ffj5ohzrSoDwh/no8EhbXV0cOjBo=
+X-Received: by 2002:a05:690e:144d:b0:64c:e890:fbb9 with SMTP id
+ 956f58d0204a3-64d656f696dmr1649157d50.20.1773221544775; Wed, 11 Mar 2026
+ 02:32:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com>
-X-B4-Tracking: v=1; b=H4sIAE81sWkC/x2N0QqDMAwAf0XyvEBbp7D9iuyhi2kXJlFTGYL47
- ys+Hhx3BxQ24QLP5gDjnxSZtYK/NUCfqJlRxsoQXOhd6z1qItR9QSVBCYTGZZutarbiZpIzG6Y
- 4Te9IX6QxPu6hax31DmpyMU6yX7vhdZ5/0iMdoX4AAAA=
-X-Change-ID: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, krzk@kernel.org, 
- carl.lee@amd.com, peter.shen@amd.com, colin.huang2@amd.com
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773221201; l=1872;
- i=carl.lee@amd.com; s=20260203; h=from:subject:message-id;
- bh=d9zEHKYZOWYj9HwgrSBRqAmlYHUoxnu970Vb9ocM+pQ=;
- b=PnTogQDYUwT2GIVK/ooEsD/zYmZXSC3pbnlbEbs1ziFsBf74kT27qLCG4pIgr8wN+zjSny8JF
- VwK4kMt5viMD7VLb1IGsh0A4SNk2pe7yvn1DGgAV4KToY8R3Xo4lLGs
-X-Developer-Key: i=carl.lee@amd.com; a=ed25519;
- pk=pyq7QaQvoxMg806KVkRwpCbiah+7ncWr4MBpK1AEyjA=
-X-Endpoint-Received: by B4 Relay for carl.lee@amd.com/20260203 with
- auth_id=623
-X-Original-From: Carl Lee <carl.lee@amd.com>
-Reply-To: carl.lee@amd.com
-X-Rspamd-Queue-Id: 2B832261CA6
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-41-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-41-bd63b656022d@avm.de>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 11 Mar 2026 10:32:12 +0100
+X-Gmail-Original-Message-ID: <CAD++jLnDv00ErgVdQ4EBpKH9KMWrPD8ODrQ6m846zyQ=wNzCzQ@mail.gmail.com>
+X-Gm-Features: AaiRm52aI8z_G2E4qYaKWPEA43RhLektjwMDQXSLwHd-Xy_BYcin-6heFFY4jM4
+Message-ID: <CAD++jLnDv00ErgVdQ4EBpKH9KMWrPD8ODrQ6m846zyQ=wNzCzQ@mail.gmail.com>
+Subject: Re: [PATCH 41/61] pinctrl: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
+	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	v9fs@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2BED1261CD7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-266565-lists,netdev=lfdr.de,carl.lee.amd.com];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266567-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	HAS_REPLYTO(0.00)[carl.lee@amd.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[54];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:replyto,amd.com:email,amd.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,avm.de:email]
 X-Rspamd-Action: no action
 
-From: Carl Lee <carl.lee@amd.com>
+On Tue, Mar 10, 2026 at 12:55=E2=80=AFPM Philipp Hahn <phahn-oss@avm.de> wr=
+ote:
 
-The driver previously relied on IRQF_TRIGGER_RISING when requesting
-the interrupt. This was removed to rely on the trigger type provided
-by firmware.
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+>
+> Change generated with coccinelle.
+>
+> To: Linus Walleij <linusw@kernel.org>
+> Cc: linux-gpio@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 
-However, some platforms do not propagate the interrupt trigger type
-to the IRQ descriptor, resulting in interrupts not being triggered.
+Patch applied to the pinctrl tree as obviously correct.
 
-Use the trigger type provided by firmware when available and fall
-back to the historically used rising-edge trigger otherwise.
-
-Signed-off-by: Carl Lee <carl.lee@amd.com>
----
- drivers/nfc/nxp-nci/i2c.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-index 6a5ce8ff91f0..6339586a6a1b 100644
---- a/drivers/nfc/nxp-nci/i2c.c
-+++ b/drivers/nfc/nxp-nci/i2c.c
-@@ -268,6 +268,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- 	struct device *dev = &client->dev;
- 	struct nxp_nci_i2c_phy *phy;
- 	int r;
-+	unsigned long irqflags;
- 
- 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
- 		nfc_err(&client->dev, "Need I2C_FUNC_I2C\n");
-@@ -303,9 +304,17 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- 	if (r < 0)
- 		return r;
- 
-+	/* Prefer the trigger type configured by firmware.
-+	 * Some platforms do not provide it, so fall back to the
-+	 * historically used rising-edge trigger.
-+	 */
-+	irqflags = irq_get_trigger_type(client->irq);
-+	if (!irqflags)
-+		irqflags = IRQF_TRIGGER_RISING;
-+
- 	r = request_threaded_irq(client->irq, NULL,
- 				 nxp_nci_i2c_irq_thread_fn,
--				 IRQF_ONESHOT,
-+				 irqflags | IRQF_ONESHOT,
- 				 NXP_NCI_I2C_DRIVER_NAME, phy);
- 	if (r < 0)
- 		nfc_err(&client->dev, "Unable to register IRQ handler\n");
-
----
-base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
-change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
-
-Best regards,
--- 
-Carl Lee <carl.lee@amd.com>
-
-
+Yours,
+Linus Walleij
 
