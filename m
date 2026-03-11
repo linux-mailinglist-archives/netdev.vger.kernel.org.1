@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-266770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDRVMzzKsWnvFAAAu9opvQ
-	(envelope-from <netdev+bounces-266770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:02:04 +0100
+	id SCi/Oc/NsWmQFQAAu9opvQ
+	(envelope-from <netdev+bounces-266771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:17:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355D7269BFF
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:02:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F177269D54
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 21:17:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADD4830B14FC
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:01:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7627330234E0
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42375382380;
-	Wed, 11 Mar 2026 20:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA0038D008;
+	Wed, 11 Mar 2026 20:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6OJbPgq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3pTjzrQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36072DE6E3
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1397238D002
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 20:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773259302; cv=pass; b=LKPKbUCayuMP5x3WxGrb+9JdYBVp3s1kqPAQo0xR4feOMOp2B2UNZgojmPdV2/u3tDYv6d8RCMFW2o7AD8+HivXWvd1wqJ/8Hzqibmb+lplF93pWM5rqdn8x3G9Gd24aUD+cc5dVLcElPIvnHFhuOpBoxAlwsWDB4QfeMtk1wDU=
+	t=1773260233; cv=pass; b=mT5F5yLPS7ZVzXP/ao23Ad2Pf8bptmoVcEvL8OZQB5zFUKlXYVC5RpX/8fMad2vxw9Lh80yy4R+FImq44gONBP/jow0/ld68Y2bTcQk9Sn6FemYnwbLH5n3jhySXbhPbAgtQKTG/fAmXT4ajc0+4xNYmRqN409nXGcJcICqL/z4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773259302; c=relaxed/simple;
-	bh=R+ZXp3/tqW/i0wREeECzf9YJ666Gdsm9vw9LNfjCxKA=;
+	s=arc-20240116; t=1773260233; c=relaxed/simple;
+	bh=d1eyVS+Zp9IXBT7u0kM5sa61xIBMpLOIIWtclrSsC5A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=quRq+/ygxHqgFxItZs8ZMQ7AdLfpM7I801k3MEBIavIPqwt7h+BBsjM/TslMjvR9mIJe9xS2S20MILSA6lA0Sa/bUQET9QlRBl1Ey6P8TEuZOxsv7axr6onb0awZMNeWhEdnaRvp+9a2SCyUHWTuHoomaIXCmUpNlNEvfJFVIdQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l6OJbPgq; arc=pass smtp.client-ip=209.85.160.54
+	 To:Cc:Content-Type; b=J7CHS3FnekR+Pevsg2COjjBXKdIOTjfuhcYevnTVTtbg8ZMRKUIMJUl+CpH+54mwPzXT1JPYeqpB6crwHhU8PYQNmCK00Cdw9297tYG0myS3JxbFpD36grZuS0FyJHl5SBskjOTecsrsun3E0r544A5QiqjRZWJIw7MT24BJsDY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3pTjzrQ; arc=pass smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-4170e916d77so108567fac.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:01:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773259300; cv=none;
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-79860421382so1908647b3.0
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 13:17:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773260230; cv=none;
         d=google.com; s=arc-20240605;
-        b=UUb4CWSCH0R7bdDJgLpWgKtUeoAa+U08bSI/nv2bMZcOyYN50EEv2WgGq5jRy0OZZE
-         MHJ5EMgiu9AKy4HhScKzw/Ouw1X9ag7WGM5JPpK9iYojQBA5DRkeft22LZ6W9EQNvwPI
-         dTLD4G0BFTX+zbqOeZFG66T7GdTIrifnCTZLXT39R6K867wzdb4Pzhz4NOq90M5HIiHH
-         mf/dS6b5PLoxwYdJhPToUInqCq5h58eMQQPVsvwaHelX4AvIUYWOIqnlcwdmZbyZo71S
-         apck9qkJErSyQ32XYzIqH5Pe8jQuRn4iwLbloRSlFCHnDnQp8F6LoErFoDXrvcx1w2by
-         ky2A==
+        b=MP/sbx6wmLOpwjTyqNTDXgYfTytdvfHCzJllOV50D0xcH0a5RPzW6zUcziP16WMcDh
+         RybuoCTWBjdt4IDHLF4GdKXJn6OV6JZXfhSG4b6TnhBahFMaJVwwwg7mBS29kej8Cke5
+         EeRQ68XDfVhGJ41ZLDtpY3IPgnH2H84p4RZ3yVwzbjME9HV/jbROs9Z7oyZPu5+WV8k0
+         IVNas4f0Kbca3wB/oAqUbEIuN3FYZ0TFju4gBtiUG5FelMlJyIKOvODq99wwJzx073Az
+         cSJ8pifs9eTkvc6fYrxVme//ypZ18c0pTHvOiXWyX7J7ojucq3PRjoThpKGmeG2uD+Iu
+         NIPQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=fHPnCWsaqfvTp1UbNlu89sJKMGTnnSPPMuKtOaYd/aQ=;
-        fh=n5nkV6D6KQ7ZScz5ZIOy9wqTdyZ5VIlFPtf3YflB7bk=;
-        b=O1QAi8XuJ9ZVoueeouFy/D9Fu83Z45y0GlWNSV4f6I9BFDGUIq+ds5bie7cuzZ0oWl
-         yz2ZVhqqYMfCiopxllsind6xQaCVwAygYtWDSaxOCaebvsifHXyrclne50/IHiJ8hioK
-         ImXXnP/EdN4mZac+2k0IXh6mlsM80AMqzZjaW3e9l8BFaepkae6XlRoEihzEXXqLQNFK
-         /WZR8eN6MPKacnTqTxulRCLCTYKAj1b8mlPZrtnSIBQWoIvGf98Lcqmd4+FMD9zgXkAj
-         e3zpT57pUVWAakirAIqKNtKm/fCOn0b8RIJKiCRCuwrCh1LiHVdtK95CuUFutXVrMM5I
-         TW9w==;
+        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
+        fh=yGfRJNs7iphAM53QRjSmlbVcpwueRa4VqedSvVkXqg4=;
+        b=cIHApeMPerhw6qJgGimDFyzvRPvYd6uqmBZeLfD8D+QTEX+a+s9gnXZIrkHw9edPQZ
+         at5KaQ5o3i61sleI5DejHJznuJsDxx8vjhZLtan5IBPPY9wWkpe3781/2l2B7pwr6NU8
+         dkSlsE/FXEiFHs7J94BUypnfbSUfeiJK5U0D6pKHtoGD5mQQJ9bzaSqHOkJI/q9MKo7/
+         zq48Y8+S0nBlhWINSZ/Kpk3tJu2+aduRIgsnKBxs4cjG/vr2d9E4Awiy1dDpmvV8OUQ/
+         hI1IY4wGSdaCrST484bf8UHpJqjHKsJf3z6hdq13tZEjaBZxeFlya25436pdwtSEZ2Su
+         TAUw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773259300; x=1773864100; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773260230; x=1773865030; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fHPnCWsaqfvTp1UbNlu89sJKMGTnnSPPMuKtOaYd/aQ=;
-        b=l6OJbPgqDAN9JeVNzGdYlfVpubpFb2mKo6QQ2ilV3jdxm74uUryoSFL/D1Td7SHx6d
-         +5TkW5fR3lcZtcVBQCTA8yCZYJeT+oWx98xGA8vgT4TUWHqWh15p8oG5mHfFj8oeHVWs
-         R5dP2u2by/8f7ri9kE7U/Zgvu6DUm1fmG52UadYfvkcnpcPKeFNT9rWCOou1LCqyKSvK
-         SRIbzTekTGOscb7oARz5xq08v7s3fkZBOZPX95VVCIdisbcE6pQ6j795dCD1x4TP5N+B
-         zxeo42V1uhxaEOdiJWbht7MiT5qVItCuNx5JRx17o/RSWCkT4gIZbg5EratW8u5yBiHX
-         gnFQ==
+        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
+        b=M3pTjzrQlGKHQZ8aKgd+y+GOH37WmJgdPU+ML9s1KfZTXbvF2JLblL3bclDT01AONh
+         pWDIqLxKY+LiMcxOI77DTck8XXKd/AumLItpVYTiPBWB3A6EfGguYfC0jAxvLeOQrF1z
+         UsEuQjq7qocT11f5EnhJbJr3iGU/T9rjK9Ul3SgRgddndXWhHFBNOyrjMLoGPhu2PON2
+         KZPn767KINYMLmz3dmtVllXfF5yp9M5myTzRW8UyrwNLDLmS8Hv4xRNdxoICtIM8Cguq
+         Da7+KQ6CA32B2I7tIVjhCGSd4xFU2pSyjIHGSPF3kZKVwxdas3WTm68a2JqUW43fLdTC
+         2kvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773259300; x=1773864100;
+        d=1e100.net; s=20230601; t=1773260230; x=1773865030;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fHPnCWsaqfvTp1UbNlu89sJKMGTnnSPPMuKtOaYd/aQ=;
-        b=TH+N/9No6dhX9dTMZOvDxDYPe6Kc+OZEZl8VdxKYZ3iabVLhYWbIZndDuOAkeQeWps
-         ZL9NX9ul0Ugt6UoUb9JfdWvKpSB3xQygzr2nzyUwRM9DeAKbfwCgM28yngLlILwbdCpx
-         2XQNbvh0Dz6jmkmTUgue3VAyhy+lIp7YtcGmRLBSV6NRgpWGIsosgZtw++XmnRxNonbK
-         Cy0zrcYr9ZdAFJlNDz3gmKYG/pRE0h6F6QGk7BFw34/7E0RZtMEFRZjk6j3Y2rwmTCXE
-         CjLkg02KrLQ4GffocRx0gS8YXvdIbYuY5Mrq3pcV1zqbF8LCx4WkxUEnl3YoFl4pVnvB
-         c35Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUiD/TF2NVwz1sjYzW5hB9TovLggy9Ln7tvhLsWBH4byPDQ3ld+GWPQyHZzQAFXLqC9EKD609A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMLDQZkh7gUDBL4pjfMknjk+Opue8ksjQ6cGGg2LjlUOA29bSa
-	/PqMKTQnvcRRGHa1SOVHqeF1ZOAQH/wFYFHKPYC77pJxOA2Lypj58v4BtcTvrJV8NV6GPtX+l7S
-	h+1krPMbaMFWFlEQz8giZvFBxwfmem4k=
-X-Gm-Gg: ATEYQzzuVVFkbSf1xl//1TJs3g8TM/uuzPGtydm5EUf8Hf0fpoZTfHtoua52G667Fhy
-	MNzo3nUdqNJJyldd7RmZO/SUxQNDrepT/mNN6CjeHYgOqel0nSwociL141eR6lkxURhrQP0ZIQY
-	n9rseqVNHol4MSChFWFKCoswJiHFUBx8gT5JKofU9h9KqscG3GRSYFlA4WlgNGXzgJwaTN7J6g1
-	du3U9nBVrlBZ4Q4p3jsJjqAC5hxDoiFu6KmjBgB83tsfzsTTgOJD7TX/Whdn9MZcW+lGYLuniNG
-	LvcUnI0=
-X-Received: by 2002:a05:6871:c303:b0:417:382f:c242 with SMTP id
- 586e51a60fabf-4177c8b2f10mr2070301fac.18.1773259296417; Wed, 11 Mar 2026
- 13:01:36 -0700 (PDT)
+        bh=KzF+cwM8huPAZ1UgnF/5+z+9CVUtm6duOXzfOITv/a0=;
+        b=aHKB9lnUV+idqQpOjsaJaAiepB4aPd+BYo7WUzPYtVfNR+QDxusTwyoijmxupvVaa8
+         pLw3MRXr6mtluMkPnGvZMOZuojya1Pq4FA/EbXcTEd89sconB0lbMBjHKsM5GTGjXVYY
+         9jFZ1mcN6inl3M/wCONC9ODSuOmDCSIpyy4nUCTTMdr+08xYvoGuixGZ0t7z2N6SwxiC
+         izGrc7cXy5QLH7YNzkkkZx2A5hYiH288mPeMu4jhjOxdJ6uw0S8ZcQrMR0H9AxkieRlj
+         RluOHAQQioVY9n7HJR444wioKwL1fD9vWcxwoHYR2zgU/HTjrorW16Vdq65hZJiU3JPw
+         /e4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWBE0LtXgVm+oCRfUkSkb7pxCADshkXXz+4rYqYPEZvNdj5U6X5hTkbqOLL0AF5wOms0ZMS0hs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoTbNwA1qts7X8T/j94Xk7GraHNMXFpqHAVBH/zGF4RkEwvLVt
+	Y/cO6Bsmo0nXjS61ME3TNUFWDqXT6QActzzpXn6gC6QYgFPMIp9XHlr5eP/CndpPTmH6IEL5Fnm
+	oWaC1s4V7YaxmCBRHQ+mcWzDmZY9C/yQpav/k6p8=
+X-Gm-Gg: ATEYQzzxKw3H35/gzQZmUqDy0tBvzQvvOKGcr/RFgPusWImPlpFCA/WMnE63Ma+MkeI
+	DK07z0gslgaR4dOKVuE3k7UVu4d6cJafaTF42SgY0aqhqU7d6gLYdxwAwLHG7KUcFCdYm6M8/IJ
+	uJiexRB6iOJPIyMgv1iFDLpel9OuPkYulzgYIK7k2Uz4wD8II+kqnlrz7nIdA6RTOG8fin9hEZM
+	xZZhKFXNIZFwPgj4DuWrHuTF1w5WCYVVlm1xgISPDlBZd7UzrKNm834e5tL3KZgJvL9Oz6rAFtv
+	kS+wRx8=
+X-Received: by 2002:a05:690c:e3c6:b0:798:78ea:f0c5 with SMTP id
+ 00721157ae682-79917e97d83mr38847737b3.13.1773260230066; Wed, 11 Mar 2026
+ 13:17:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-2-ameryhung@gmail.com>
- <CAEf4BzZubPSaS8SQSEQJvTphwgbaBfdC0CYEhsfQN8CJ7HS3pw@mail.gmail.com>
-In-Reply-To: <CAEf4BzZubPSaS8SQSEQJvTphwgbaBfdC0CYEhsfQN8CJ7HS3pw@mail.gmail.com>
+References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-4-ameryhung@gmail.com>
+ <CAEf4BzaRJ4hgMZY04=B0nnAE=MjyD4FN2L867vGCbornshOXDw@mail.gmail.com>
+In-Reply-To: <CAEf4BzaRJ4hgMZY04=B0nnAE=MjyD4FN2L867vGCbornshOXDw@mail.gmail.com>
 From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 11 Mar 2026 13:01:24 -0700
-X-Gm-Features: AaiRm52HnBR9tlmL7QySEZ_Sk1jcSBT-CpyZhFn0m48zVnwHKYssAOY6H82_17Q
-Message-ID: <CAMB2axNR6qPRVy5YCiMygVseS+k9JxY9DFONNHD5Lt8=wD9MGQ@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 01/11] bpf: Set kfunc dynptr arg type flag
- based on prototype
+Date: Wed, 11 Mar 2026 13:16:58 -0700
+X-Gm-Features: AaiRm50_1E906IE_5n6OlSDFA1nUlOC73HbmufmmtzwTEwEgDBcaxSIlMklfoMo
+Message-ID: <CAMB2axPL07LZXAjy=FMBh2GeRkF0KQ81ixNFmX_+ZxZWm7nvSQ@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next v2 03/11] bpf: Unify dynptr handling in the verifier
 To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
 Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
 	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
@@ -118,13 +117,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266770-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266771-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
@@ -142,110 +141,135 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 355D7269BFF
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 5F177269D54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 12:44=E2=80=AFPM Andrii Nakryiko
+On Wed, Mar 11, 2026 at 12:57=E2=80=AFPM Andrii Nakryiko
 <andrii.nakryiko@gmail.com> wrote:
 >
 > On Fri, Mar 6, 2026 at 10:44=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
 wrote:
 > >
-> > The verifier should decide whether a dynptr argument is read-only
-> > based on if the type is "const struct bpf_dynptr *", not the type of
-> > the register passed to the kfunc. This currently does not cause issues
-> > because existing kfuncs that mutate struct bpf_dynptr are constructors
-> > (e.g., bpf_dynptr_from_xxx and bpf_dynptr_clone). These kfuncs have
-> > additional check in process_dynptr_func() to make sure the stack slot
-> > does not contain initialized dynptr. Nonetheless, this should still be
-> > fixed to avoid future issues when there is a non-constructor dynptr
-> > kfunc that can mutate dynptr. This is also a small step toward unifying
-> > kfunc and helper handling in the verifier, where the first step is to
-> > generate kfunc prototype similar to bpf_func_proto before the main
-> > verification loop.
-> >
-> > We also need to correctly mark some kfunc arguments as "const struct
-> > bpf_dynptr *" to align with other kfuncs that take non-mutable dynptr
-> > argument and to not break their usage. Adding const qualifier does
-> > not break backward compatibility.
+> > Simplify dynptr checking for helper and kfunc by unifying it. Remember
+> > initialized dynptr in process_dynptr_func() so that we can easily
+> > retrieve the information for verification later.
+>
+> it would help to call out why all those checks you are removing are
+> not needed anymore
+
+Mykyta also raised a similar question in another place. I will explain
+in the commit msg if there are checks dropped in the next iteration.
+
+>
 > >
 > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
 > > ---
-> >  fs/verity/measure.c                            |  2 +-
-> >  include/linux/bpf.h                            |  8 ++++----
-> >  kernel/bpf/helpers.c                           | 10 +++++-----
-> >  kernel/bpf/verifier.c                          | 18 +++++++++++++++++-
-> >  kernel/trace/bpf_trace.c                       | 18 +++++++++---------
-> >  tools/testing/selftests/bpf/bpf_kfuncs.h       |  6 +++---
-> >  .../selftests/bpf/progs/dynptr_success.c       |  6 +++---
-> >  .../bpf/progs/test_kfunc_dynptr_param.c        |  7 +------
-> >  8 files changed, 43 insertions(+), 32 deletions(-)
+> >  kernel/bpf/verifier.c | 179 +++++++++---------------------------------
+> >  1 file changed, 36 insertions(+), 143 deletions(-)
 > >
-> > diff --git a/fs/verity/measure.c b/fs/verity/measure.c
-> > index 6a35623ebdf0..3840436e4510 100644
-> > --- a/fs/verity/measure.c
-> > +++ b/fs/verity/measure.c
-> > @@ -118,7 +118,7 @@ __bpf_kfunc_start_defs();
-> >   *
-> >   * Return: 0 on success, a negative value on error.
-> >   */
-> > -__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_=
-dynptr *digest_p)
-> > +__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, const struc=
-t bpf_dynptr *digest_p)
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 0f77c4c5b510..d52780962adb 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -277,8 +277,15 @@ struct bpf_map_desc {
+> >         int uid;
+> >  };
+> >
+> > +struct bpf_dynptr_desc {
+> > +       enum bpf_dynptr_type type;
+> > +       u32 id;
+> > +       u32 ref_obj_id;
+> > +};
+> > +
+> >  struct bpf_call_arg_meta {
+> >         struct bpf_map_desc map;
+> > +       struct bpf_dynptr_desc initialized_dynptr;
 >
-> but kfunc is writing into digest_p, so that const is wrong?...
->
-> >  {
-> >         struct bpf_dynptr_kern *digest_ptr =3D (struct bpf_dynptr_kern =
-*)digest_p;
-> >         const struct inode *inode =3D file_inode(file);
+> nit: let's drop "initialized_" prefix? so verbose
+
+Ack.
+
 >
 > [...]
 >
-> > index 6eb6c82ed2ee..3d44896587ac 100644
-> > --- a/kernel/bpf/helpers.c
-> > +++ b/kernel/bpf/helpers.c
-> > @@ -3000,8 +3000,8 @@ __bpf_kfunc int bpf_dynptr_clone(const struct bpf=
-_dynptr *p,
-> >   * Copies data from source dynptr to destination dynptr.
-> >   * Returns 0 on success; negative error, otherwise.
-> >   */
-> > -__bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_of=
-f,
-> > -                               struct bpf_dynptr *src_ptr, u64 src_off=
-, u64 size)
-> > +__bpf_kfunc int bpf_dynptr_copy(const struct bpf_dynptr *dst_ptr, u64 =
-dst_off,
+> > @@ -511,11 +513,6 @@ static bool is_ptr_cast_function(enum bpf_func_id =
+func_id)
+> >                 func_id =3D=3D BPF_FUNC_skc_to_tcp_request_sock;
+> >  }
+> >
+> > -static bool is_dynptr_ref_function(enum bpf_func_id func_id)
+> > -{
+> > -       return func_id =3D=3D BPF_FUNC_dynptr_data;
+> > -}
+> > -
+> >  static bool is_sync_callback_calling_kfunc(u32 btf_id);
+> >  static bool is_async_callback_calling_kfunc(u32 btf_id);
+> >  static bool is_callback_calling_kfunc(u32 btf_id);
+> > @@ -597,8 +594,6 @@ static bool helper_multiple_ref_obj_use(enum bpf_fu=
+nc_id func_id,
+> >                 ref_obj_uses++;
+> >         if (is_acquire_function(func_id, map))
+> >                 ref_obj_uses++;
+> > -       if (is_dynptr_ref_function(func_id))
+> > -               ref_obj_uses++;
 >
-> again, dst_ptr clearly is modifiable because we are copying data into it.
->
-> What am I missing, why is this logically correct?
->
-> (I understand that from purely C type system POV this is fine, because
-> we don't modify bpf_dynptr struct itself on the stack, but bpf_dynptr
-> is a representation of some memory, and if we are modifying this
-> memory, then I think it should be not marked as const)
+> e.g., why this is fine? (because we don't use ref_obj_id for tracking
+> dynptrs anymore, right? would be good to call this out in the commit
+> message)
 
-The patch is just to first make the arg type determination independent
-from bpf_reg_state and make kfunc signature consistent based on what
-commit 52f37c4e0f11 (bpf: Rework process_dynptr_func) has laid out.
-
-Perhaps MEM_RDONLY is a bit misleading. In process_dynptr_func(), the
-flag means the dynptr struct on the stack is immutable. Currently,
-there is no way (and maybe no need?) to specify read-only dynptr.
+Thanks for the example.
 
 >
-> > +                               const struct bpf_dynptr *src_ptr, u64 s=
-rc_off, u64 size)
-> >  {
-> >         struct bpf_dynptr_kern *dst =3D (struct bpf_dynptr_kern *)dst_p=
-tr;
-> >         struct bpf_dynptr_kern *src =3D (struct bpf_dynptr_kern *)src_p=
-tr;
+> >
+> >         return ref_obj_uses > 1;
+> >  }
 >
 > [...]
+>
+> > @@ -13559,22 +13464,10 @@ static int check_kfunc_args(struct bpf_verifi=
+er_env *env, struct bpf_kfunc_call_
+> >                                 }
+> >                         }
+> >
+> > -                       ret =3D process_dynptr_func(env, regno, insn_id=
+x, dynptr_arg_type, clone_ref_obj_id);
+> > +                       ret =3D process_dynptr_func(env, regno, insn_id=
+x, dynptr_arg_type, clone_ref_obj_id,
+> > +                                                 &meta->initialized_dy=
+nptr);
+> >                         if (ret < 0)
+> >                                 return ret;
+> > -
+> > -                       if (!(dynptr_arg_type & MEM_UNINIT)) {
+>
+> I can't fully connect MEM_UNINIT and CONST_PTR_TO_DYNPTR, this is
+> something that should be called out in commit message, IMO
+
+Will explain in the commit message that !(dynptr_arg_type &
+MEM_UNINIT) means the argument expects an initialized dynptr.
+
+>
+> > -                               int id =3D dynptr_id(env, reg);
+> > -
+> > -                               if (id < 0) {
+> > -                                       verifier_bug(env, "failed to ob=
+tain dynptr id");
+> > -                                       return id;
+> > -                               }
+> > -                               meta->initialized_dynptr.id =3D id;
+> > -                               meta->initialized_dynptr.type =3D dynpt=
+r_get_type(env, reg);
+> > -                               meta->initialized_dynptr.ref_obj_id =3D=
+ dynptr_ref_obj_id(env, reg);
+> > -                       }
+> > -
+> >                         break;
+> >                 }
+> >                 case KF_ARG_PTR_TO_ITER:
+> > --
+> > 2.47.3
+> >
 
