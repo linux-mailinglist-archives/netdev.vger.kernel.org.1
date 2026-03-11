@@ -1,253 +1,194 @@
-Return-Path: <netdev+bounces-266484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOS6IIb+sGljpgIAu9opvQ
-	(envelope-from <netdev+bounces-266484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:32:54 +0100
+	id qMf5J///sGn1pgIAu9opvQ
+	(envelope-from <netdev+bounces-266485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:39:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9E7725C736
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:32:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B125C7BA
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 06:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29B9B3235373
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 05:30:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E1476304B383
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 05:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0366032FA2C;
-	Wed, 11 Mar 2026 05:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA49D32572F;
+	Wed, 11 Mar 2026 05:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCkn0rWj"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="wiymi2mj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010044.outbound.protection.outlook.com [52.101.85.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE782332EAE
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 05:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773207001; cv=none; b=adevnXuWBbJls1125PhYz6G3hK2XFslCnaINLrVm2rU2VaEhTq4T3hTKqs4eHAsqNbPwqegIGDyRG5pM/mZRsN5m41ju+OPFL76st8+81h+QFBJ/JurFaVYCdtfoZF6+kSsDQtIGTYIigzorzo2n226ZIqk7h6vPCYU/O3f8on4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773207001; c=relaxed/simple;
-	bh=C1bIPZwqowhLOIwqy1Bkc5bVsCAAe619Do6EqAEVaag=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lH1pnfSQbXTWrireKdznqngKflctqJTWQLWks3rS5ii9/iHc/qQlaAhxryvkaJZuO463RlmybK1xUvM4Snpezubm2i8zw/HoMqqV720+hZpCqVBbh+PsmR7FjaXzRzc7+ZhCN9qoYGF9NkHEHE4vCO3/K+BTVhoxX3CIb7ikmoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCkn0rWj; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-8298150caddso4959953b3a.3
-        for <netdev@vger.kernel.org>; Tue, 10 Mar 2026 22:30:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773207000; x=1773811800; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XglsB4NZxlYwqffuRsPGtYnVD8KhA2LGJTl+Hyimao=;
-        b=jCkn0rWj0MSvRJWaLPLIHd99gBKnMaopNnxNyhieNrI+94uW1CXPE0PIsT9l9z5Nr8
-         cCD094RCiLLsyRGtqG9kvuzhKJK0EMHwFsGXHqXCWXnpWIHzzNKT2VYB5V3ZYcWjg/Hf
-         M0dys+JSi6VOBVX1JAW7/R5cxpbsdQM1avXv8qQkCDgVQZcEY3h+0Sql7x1lLaxxYKW3
-         0bkycDiQBNaV4z3WbWDZ42+DTFtOxsPG5ikVTW8jpQ6ePrryXDXHXxYT79FWCevYuLVg
-         RhqTg6ZMda9EcquMzy130XVrSct5q/d4Zw/ae/2JhNC/3lXZE/HjTY1q1kZPcO/jkLcM
-         +izw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773207000; x=1773811800;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XglsB4NZxlYwqffuRsPGtYnVD8KhA2LGJTl+Hyimao=;
-        b=xBXJ1wmk1QQXTZSSlVmXXwXN05D8FdR2Qdkh/sZHFngVr07FtCdi1EUNkQmDJXU/06
-         uPDqTBhJ+pYczkp6kX3izh5Et+HQiv6Yicnt5xcm9dbTmYcnwGvP2ZZFvYk43aKCQMyU
-         LNoDO1JeVantclUBbpPGXJc6SKU7k3CCtBWPxJjXcJ5DYJEUCY5GxNZYfxH22qrMrsXR
-         QJ+Q0WkOr46+DHosiV0BGEDkbXKO2aL9i/ZPvFzV3iZpKyB5ocKyB1CsFHq7WqTO7hpo
-         qkUWckdJ+GXtHxH1YQtQjNxebsVPdTYGMNPy70ILuajfp8RvZMsDYHVxfxcLXxKq++8g
-         uy8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWU5OfziQ3y2YBQN9swWJvFARwzm+X2bvgcgQzuZt/m+fRy4XIooQyGdQIw3Bgst0w6uj13f/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ71ySg048nYVpKOPHcelxu/tjIjCiqrIijLApyfixSWvbOHSR
-	pgqyEadImvNaroaSfLfRjYmqNtXqzSh/G3qfIq4JTVYCr43B7nbEfw0Kp6hq7qLyyZoZ9Jhzvrv
-	yfW8ulA==
-X-Received: from pfbhm14.prod.google.com ([2002:a05:6a00:670e:b0:829:8287:d81d])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:ab83:b0:81c:92ec:ccf3
- with SMTP id d2e1a72fcca58-829f6f2122emr1369358b3a.19.1773206999824; Tue, 10
- Mar 2026 22:29:59 -0700 (PDT)
-Date: Wed, 11 Mar 2026 05:29:43 +0000
-In-Reply-To: <20260311052954.1224278-1-kuniyu@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD7228CF4A;
+	Wed, 11 Mar 2026 05:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773207548; cv=fail; b=sOD01L7JsKDZTtg5at7zHXnKYBTSXtRXey+I7FT97XJMD6K2ORNkK6ZiFPMQ3VT7AS/lKMKp0ifS4Rcn/sWKaKQXOfuGvCZtIsP+Yt0CEY9x7jQQU7AqBEUoa4OUNHeLVgNm/2tWDLNoabTts4DTPGHbGUfX6WAKLeGMLy62A3I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773207548; c=relaxed/simple;
+	bh=yZWfc4d0Pfi10DW+k6GeFjL7GH47qMb7rk6we9j0R3E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uA0AdDAuMyY7N/yR96XKzEDeP7nhS2KUFujeBHEmb/O46rVnbsSMlQSI5JFXCAqmlAFKDWWkXaW/327dBt1xe+bdsbsVx0cWpGQ4kfSmN3TDAZzVN4e8XRzN7lSlEsJU5dlZzBFUQKYt3TP/NSMAzSIZEMyF4rQM4zUUBjPrYFg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=wiymi2mj; arc=fail smtp.client-ip=52.101.85.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JQirerLAx96nCfwFqHcG2kBD5TjXlZMv/vIpOY/8FB4iF2bg/5VEzG61CHvJtBY33lyiSgwJhOqcXdH/HOfJnjwwJFv6QYGD3ctFm8j8BFwpfd7nskWR+btxIGHBjhSac3foqJPyRiVK6/5AFV+XSDpWPK44V4oeUapyXkH9FsXoVoU3eNXPajKnpSBf1Hd3YzaPuuNnsI7OG3ysf01s0mFigi4Ik4lMSYuMRUw7VMKnTE6AC9Rq1GQ0W4Ixut9fkaNk+VbngsoV36DO3DrOtfaM5+sY+regOHeSwp5o+WL7/9aEQPqZgrwzNVh3N5WNJDIYO++QVVulSG7zVZjLoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RamBF01yXqMY5BetOf1iIqqKwFOFswVOHDrfq4/JpuE=;
+ b=EK92ZhrZaloYF0K1t+19RbzB895ilecLX5dIPAaihVJI1ixQbXguWmorn6XdP58xnSY3OacJiSTGI81v/rKiZb5TyU8FGfrFfDnbsYnP9Pjb5XTzweDkS8ka03qZ/TIXS56M4cYHEM3oaq4r/Qw4zxEjZS3nmWsMjwJMIWQ/ajDlgEWP3PXoEW3vU7JJkRyXZy+myVFEIjG2cEQLnLZUYCc+0kU61QJqwEH1P7/K6fnGwV+fNBPNNcLAK0agtWA+hlkbKTG6jjy+Ij7eDbcxeUMqN8S0/AF9L2+r9RSG57RUzWtIFUxeXhsvY3yz+zEI76xZSb9EJN8thETX+MIFKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RamBF01yXqMY5BetOf1iIqqKwFOFswVOHDrfq4/JpuE=;
+ b=wiymi2mjnLmO1s9VG091Dk0Mv0VQExfkn3SqKX+rdXSSyYEtOFpVqNLoOJOSJDqPaNPRatIt1Y0afIC1DxRAi4WL6tUu2gxRBFxRlGQ35MVsoqAW3t7Ya1O6nrzgkUlmaJM0tnt2QRy9pPyKD9nA666c9VN5MkWbvpf/8RVir1k=
+Received: from SJ0PR03CA0088.namprd03.prod.outlook.com (2603:10b6:a03:331::33)
+ by MN2PR10MB4366.namprd10.prod.outlook.com (2603:10b6:208:1dd::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.24; Wed, 11 Mar
+ 2026 05:39:04 +0000
+Received: from SJ5PEPF000001D4.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::57) by SJ0PR03CA0088.outlook.office365.com
+ (2603:10b6:a03:331::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.25 via Frontend Transport; Wed,
+ 11 Mar 2026 05:38:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SJ5PEPF000001D4.mail.protection.outlook.com (10.167.242.56) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Wed, 11 Mar 2026 05:39:03 +0000
+Received: from DLEE211.ent.ti.com (157.170.170.113) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
+ 2026 00:39:03 -0500
+Received: from DLEE213.ent.ti.com (157.170.170.116) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Mar
+ 2026 00:39:02 -0500
+Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 11 Mar 2026 00:39:02 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62B5d2mj4179354;
+	Wed, 11 Mar 2026 00:39:02 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 62B5d1Yd028451;
+	Wed, 11 Mar 2026 00:39:02 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+CC: Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+	<danishanwar@ti.com>, <m-malladi@ti.com>
+Subject: [PATCH v3 0/2] Add ICSSG0 dual EMAC support for AM642 EVM
+Date: Wed, 11 Mar 2026 11:08:50 +0530
+Message-ID: <20260311053852.1034244-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260311052954.1224278-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260311052954.1224278-3-kuniyu@google.com>
-Subject: [PATCH v4 net 2/2] ipv6: Don't remove permanent routes with
- exceptions from tb6_gc_hlist.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kui-Feng Lee <thinker.li@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: D9E7725C736
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D4:EE_|MN2PR10MB4366:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2684f002-ff60-4306-d63c-08de7f308155
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|376014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	Ev1A1L7J3tTPhIpwNklmzur0wyns+OBz3/Flz8Xv1a1JkvcBs97IjDelQlu7U+lbQHHhwFJtICy/ao1QKlXphr+x8WZxD/LDJLtkTo/+Atxp6y9/5EmUwt1PM0cp3AmJ7e+90lnM+kvFrNZdumjp3ob6ggwnD3HtmQxT5GKFXevKsnSuvmDkK2UpnLxByv3ktWRx6QBKoikD+t1R2JmcGd+ftc5aS1QIfUzjA49ALFiCkMhS3rvAWzuBCbst7Wac/LziLOhTm873lvit/TF+5AvLpEFUmLaS5vxgvFSoaO29fGeR22pkLLaiRiCfQKJyWsXZOVkmU4h2ZiumLxSlluF0KUPoEyO/51D8xEFt4p12EJ+IHhD3nQck0nUuQa375dRCdElr4lvZFw6KcmiUQAxXUaSatgYWk4/fchbA0X26WnKnP+fQNjlfc+58eFUY7PM+6guR+368B1VFmlmoe0Bd6TRo2jH2KlCU0zVieVpYfXXQ76Wm3cYooh8gMVd3Zl/N9tqtBnmyQnlf3YHYIjB7r9qqVMH1LEb+vgwJhzba5ICrsYteq7zK+Zf8IHfSs91QMYDvvZ7FQzztAML4B5ZLugPW9vwiMx/UQiE2KHVxdM7DA7sf+DhMqov1ZvqdSWiJVeg3MShPFv4y0qghMjB2Shz8hQ2tc0hvGzaS1J86+HnbpR4nk4rlNXgUbpV2r/lC7QMgklpGwLZS+bTx2rrcWEmJ4ky8/zXHmsYO0uI=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	OrNvzw9H5s6+aT1kTPrCPJyCJiy/6hRq6+Mq2QvrJhwR3khXPxy9qQqsL2qxDuLVG1Tdqf9fl5OYUdWvlj2hTi7Rj5DjJam7Y5NWITmoGE9AgpNsoJYpm92ayUk4Kv45dD6e7tryiOfBdV40mZrN1Tf3/Zb2h0bc4DRFDmDpW1EgD3TQRFUfZOZam38xIELcjviOiKFW9nEO5HTXIeVVWxAlAgaSeI02a4BPH2eDsPXWg7qki854vIfOCBRZAc4CGUqBqOnUTNLP8hbsZACMGSPqbu/UGJXa/TAFmodGQ+1WooLePwQimXNLVNGEoseMwvX1eYKs9Cs7+7c8MakB0W0JP/XAsVT/UYRoXT1wv86cLnkGjS8oWIRK2jrsJ5nSoihXuVbOSfU0lZ/sVdEeQg3IG9pmGWNwi8p+0fZ+PKEdfrcm1NVVo+wB28NBX88h
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2026 05:39:03.7012
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2684f002-ff60-4306-d63c-08de7f308155
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4366
+X-Rspamd-Queue-Id: 1E3B125C7BA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266485-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266484-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,ti.com:dkim,ti.com:mid];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-The cited commit mechanically put fib6_remove_gc_list()
-just after every fib6_clean_expires() call.
+This series adds device tree overlay support for enabling ICSSG0 dual EMAC
+on the AM642 EVM, along with the necessary PHY driver configuration.
 
-When a temporary route is promoted to a permanent route,
-there may already be exception routes tied to it.
+The overlay enables both ICSSG0 Ethernet interfaces (port0 and port1) in
+dual EMAC mode and can be combined with the existing ICSSG1 overlay to
+enable all four ICSSG interfaces if needed.
 
-If fib6_remove_gc_list() removes the route from tb6_gc_hlist,
-such exception routes will no longer be aged.
+The series also enables the DP83TG720 PHY driver required for the
+DP83TG720-IND-SPE-EVM daughter card used with the ICSSG0 interface.
 
-Let's replace fib6_remove_gc_list() with a new helper
-fib6_may_remove_gc_list() and use fib6_age_exceptions() there.
+v2: https://lore.kernel.org/all/20260228113203.498839-1-m-malladi@ti.com/
+logs: https://gist.github.com/MeghanaMalladiTI/20e9e661c3e1075694097bc02f5a3916
 
-Note that net->ipv6 is only compiled when CONFIG_IPV6 is
-enabled, so fib6_{add,remove,may_remove}_gc_list() are guarded.
+Meghana Malladi (2):
+  arm64: dts: ti: k3-am642-evm: Add ICSSG0 overlay for dual EMAC support
+  arm64: defconfig: Enable DP83TG720 PHY driver
 
-Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v4: s/,/;/ for fib6_gc_args initialisation
-v3: Use IS_ENABLED()
-v2: Fix build failure when CONFIG_IPV6=n (no net->ipv6 definition)
----
- include/net/ip6_fib.h | 19 ++++++++++++++++++-
- net/ipv6/addrconf.c   |  4 ++--
- net/ipv6/ip6_fib.c    |  6 +++---
- net/ipv6/route.c      |  2 +-
- 4 files changed, 24 insertions(+), 7 deletions(-)
+ arch/arm64/boot/dts/ti/Makefile               |   4 +
+ .../boot/dts/ti/k3-am642-evm-icssg0.dtso      | 168 ++++++++++++++++++
+ arch/arm64/configs/defconfig                  |   1 +
+ 3 files changed, 173 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 88b0dd4d8e09..438bcbc54a35 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -507,12 +507,14 @@ void fib6_rt_update(struct net *net, struct fib6_info *rt,
- void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
- 		     unsigned int flags);
- 
-+void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
-+			 unsigned long now);
- void fib6_run_gc(unsigned long expires, struct net *net, bool force);
--
- void fib6_gc_cleanup(void);
- 
- int fib6_init(void);
- 
-+#if IS_ENABLED(CONFIG_IPV6)
- /* Add the route to the gc list if it is not already there
-  *
-  * The callers should hold f6i->fib6_table->tb6_lock.
-@@ -545,6 +547,21 @@ static inline void fib6_remove_gc_list(struct fib6_info *f6i)
- 		hlist_del_init(&f6i->gc_link);
- }
- 
-+static inline void fib6_may_remove_gc_list(struct net *net,
-+					   struct fib6_info *f6i)
-+{
-+	struct fib6_gc_args gc_args;
-+
-+	if (hlist_unhashed(&f6i->gc_link))
-+		return;
-+
-+	gc_args.timeout = READ_ONCE(net->ipv6.sysctl.ip6_rt_gc_interval);
-+	gc_args.more = 0;
-+
-+	fib6_age_exceptions(f6i, &gc_args, jiffies);
-+}
-+#endif
-+
- struct ipv6_route_iter {
- 	struct seq_net_private p;
- 	struct fib6_walker w;
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 0e55f139e05d..f4e23b543585 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2862,7 +2862,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
- 					fib6_add_gc_list(rt);
- 				} else {
- 					fib6_clean_expires(rt);
--					fib6_remove_gc_list(rt);
-+					fib6_may_remove_gc_list(net, rt);
- 				}
- 
- 				spin_unlock_bh(&table->tb6_lock);
-@@ -4840,7 +4840,7 @@ static int modify_prefix_route(struct net *net, struct inet6_ifaddr *ifp,
- 
- 		if (!(flags & RTF_EXPIRES)) {
- 			fib6_clean_expires(f6i);
--			fib6_remove_gc_list(f6i);
-+			fib6_may_remove_gc_list(net, f6i);
- 		} else {
- 			fib6_set_expires(f6i, expires);
- 			fib6_add_gc_list(f6i);
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fadfca49d6b1..dd26657b6a4a 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1133,7 +1133,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 					return -EEXIST;
- 				if (!(rt->fib6_flags & RTF_EXPIRES)) {
- 					fib6_clean_expires(iter);
--					fib6_remove_gc_list(iter);
-+					fib6_may_remove_gc_list(info->nl_net, iter);
- 				} else {
- 					fib6_set_expires(iter, rt->expires);
- 					fib6_add_gc_list(iter);
-@@ -2348,8 +2348,8 @@ static void fib6_flush_trees(struct net *net)
- /*
-  *	Garbage collection
-  */
--static void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
--				unsigned long now)
-+void fib6_age_exceptions(struct fib6_info *rt, struct fib6_gc_args *gc_args,
-+			 unsigned long now)
- {
- 	bool may_expire = rt->fib6_flags & RTF_EXPIRES && rt->expires;
- 	int old_more = gc_args->more;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 08cd86f49bf9..cb521700cee7 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -1033,7 +1033,7 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, int len,
- 
- 		if (!addrconf_finite_timeout(lifetime)) {
- 			fib6_clean_expires(rt);
--			fib6_remove_gc_list(rt);
-+			fib6_may_remove_gc_list(net, rt);
- 		} else {
- 			fib6_set_expires(rt, jiffies + HZ * lifetime);
- 			fib6_add_gc_list(rt);
+
+base-commit: 0bcac7b11262557c990da1ac564d45777eb6b005
 -- 
-2.53.0.473.g4a7958ca14-goog
+2.43.0
 
 
