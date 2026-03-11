@@ -1,238 +1,140 @@
-Return-Path: <netdev+bounces-266694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGueMgSVsWnkDAAAu9opvQ
-	(envelope-from <netdev+bounces-266694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:15:00 +0100
+	id uHBhL++UsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:14:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5078A26726E
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:15:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04ED26720D
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E13F43235672
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:09:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9C2C0300E193
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577B631E85D;
-	Wed, 11 Mar 2026 16:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5F3379ED6;
+	Wed, 11 Mar 2026 16:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="e6c+ElXV"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="BNqDAJlY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4003B47E5
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245339; cv=pass; b=NFB9r0YRP9MsUpybIAo9GkpnfgAjF4YL3xs7dqTVOGK28GSEdJKNp+WVuxgJO0ybbfPUXG847e5HC2FJrQSQDs+eT005lZrdw2OCMF3w9Z5tShs0DtT37Ca7nm1FXLXjY6aWuntpwrL9F1KiJk7wf1kRbobPWRyFdw0OD1Isy8A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773245339; c=relaxed/simple;
-	bh=owVe3Qfob2UO8yuqdH2PqAC+rPmSIbbd71zfyNJWtfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f5mqwrkCTqhQKgCsOcEDVIcnBjpEpSSBLnoNOyl6sDHwb2ao+7R8xk1Ol4++tkpjEI5YGd6Y8G/PLNe4UoNFk8eZxlafO9znUtdQ9R0tpn6ixtO/XbD4qNBeb9x8ZX+C0E5BVZvsXDg24bcJBAWbae/+cM6uDR0szmSJs9ugwrg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=e6c+ElXV; arc=pass smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-359ff894f0dso507151a91.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:08:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773245337; cv=none;
-        d=google.com; s=arc-20240605;
-        b=I8PJzy8kV1NlCv5OejS90Jhg7iiUaBq3DiSiKNfF4q02fM4SKwrckKBL74vCmLklBA
-         Eog+8PnJ4UaC+T+hkrHi7EGgik4FBu2gg84ivsibzYeMtSc1xHNVeggG+zZ12ppXDtAJ
-         5nj9mDXxcEyLog4UzPQPZDMkcaRI0cCf8XYqAAl7G8m/rZExgbeQ5+ZFR2GjtQc8bbL6
-         kOqdFIy05FLZkbpvHnTMuNbfqvIjdHtju3Ur8lNWbjn/PJl1D2YGSDE3v0P6oMvebid2
-         meSVMiaa5itPMga7tLIzzUOjkujU2hjBID7IlNILp9HvMFneAqnxqIrVhr/PlDIsD1x8
-         rltA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
-        fh=4AxJWIgipTw7LuZGFEvcVW2jhf3Ab/8G87BztoUcL9A=;
-        b=Mculw4yjPb/n9p9VVJ5eyxHcnMJ7mKqxJA/MzwMzxG1wM4p7ViOKE0PdJlfTzJNsWX
-         WU2sjCcKt4FfxpkyGU9jRJ17jatTPjCGhlvbeDSgDuxrc9EsxbBGdJuBVXCmidqVrb8+
-         IwiReox06uHllKIdG603v7mYLBbYTGqf99AnJdGYLntmPLyzTSa/ld0H/pMCbFJJsR2w
-         Nbt1amRzNirpsjpmpUjEoXyPSY2ctGBUUE7dRCXM3sv6nWxgoMRZ9kQ8weA9aR5QxD2M
-         Jd+SPPjYGC56VDANc3NXmZTkBCQlqu9aNsuo8eeHw8lgiZATpJDoKxCcjW7EE51DncwT
-         REqA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1773245337; x=1773850137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
-        b=e6c+ElXV9/S8dBAt4s3Y0Qdq9+tZ8d5cWILHAnHHImVT5PIIkJUyCZiacq7jRwg0wO
-         3Cebb97OPazwIb6fjRP+vY3CtMSNoYR2RIKBrDAwtxeicH+/z2rbTPh7Os6MuY5k4bsk
-         ma028J0ookNSr0KijANIvgZg9rIgryyaHdtXthB65JBFV5watPKOGnOo8nJM04Fvkhcu
-         1sUQwoIi9bTkdmnd5BJfx1eZGuBrZjPCVZAWLHDskfYdbIiO+mBd3Ciep3WaOeYu4bZ3
-         AOcYAN3ypG4b0iCneKQdTkcp00UtTnkzuS2zWuf4D3tjbFYHt0mKsjvS4pJXtGlYQIpi
-         h/Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773245337; x=1773850137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JZDNJFGDP5amVq7p/dFv6sOGOZTvq599aR4YcZO7qtw=;
-        b=qGrHVygxYaeN5qVSHXf9nzEhJKLHFkMbwazz2KX7X8jP1L3LACG/yvc9Ij8Y0ekYei
-         XoVYHX4ewn5e6Yx8kN6fCjeWCUjcispBuSWOl4Q5z+gaQfZVEZPpMrir0vB7Jkw8WR28
-         fw4odk2JfVhNn79jtdqPB89iWEp/I/zVZ0U0HGaqy9Qr59I/M0B4wsn7/t7TrimIw025
-         FoJqjlvdYHXjtMbjuh5GAnU5RrcqMDWihuemkYh2mdmP1T6oB5swg+BuiYqYP+0bUUiK
-         9tKmE0bmC2LyNWP9dyJHyX3Ydvxai3+2tI+0EPSPimsP2id0ZjC4TiKBjj+1kdVOHaM4
-         WK/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUwu+rYUdz/fOrZ4T2qyX1xzvvCD2ZGrXRugCg4RVPeky50PwA5labYfdiPm2CHFonyXTQCDmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJN6/w4whP6Z16VIrzynoVDL6C4YFjDsFuWW+DthE31F+5A5fT
-	yujmdkTJuhX9SdTm5SitrRc14iemd1j474MZYR7wdDUxS84lNX0Qz0PFJb8KCQmxcIr+++tHGnD
-	YWML9AxYn0wUQUDhwlIr4zauatxP7QaW9GhnFNAlT
-X-Gm-Gg: ATEYQzz64Y2mr6iNcP5dEsxLCLFN34ogJf/ow/B3t//2CfA/ngZIeHiS0giUUvmCUSX
-	/Ta9FiT5Zr6/Gqks4E4Vl0/29Gzw6Iyr8PQMR5cOHScBNHx649+UXKGitD6v0YE9NaJQJCOeO1g
-	TuyVvE5ECrJd5wbPq/liZduF4zcZs2hFRmigYnn0OuB9fyE934BareFujeBh3Jp5f0BWLOMYMAs
-	ivv4Z9YSDTNQQ2ofrcuncm3ZylaxC1jcUCv+uCHm2D/UWcph/Z8wUVUfoHiuoKRGxowr/gjfg2X
-	isor/wo=
-X-Received: by 2002:a17:903:3d05:b0:2ae:3d7d:d905 with SMTP id
- d9443c01a7336-2aeae81490amr32213615ad.23.1773245337226; Wed, 11 Mar 2026
- 09:08:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CB53B3899;
+	Wed, 11 Mar 2026 16:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773245659; cv=none; b=c3A0PFNxg9dyNgKdh0oVpBLi1ObB6I4sDyUy00Mi+e5ynpZKX/BLahbveYwhT50CT18gZjchMZcUDUNK5FtE7anIZbNgFJnK7du7w3cHmkNEPWh/CfUknHVYXutaXKoPOHwdGmDJeAX84LVY4in1xt2E/kRFEv2VGH5W5WjYqKs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773245659; c=relaxed/simple;
+	bh=c7bYE+nsB8kK50pfsuWbSTwKuW3mYLg8nIK36+IfBxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NpLhRuis6o1wt1lKMeQuABeZPUU/QZ+lfmes813zC87wxUrB0VYfoVQs0yu9WNIHFmg6Aae65PcxHfcKcfnDViKuJmXutKZ1dPBioGgESpmifb5NnplwDK+6tBX7YYU+bNrkEjb1/EfQjn108PNShaWNyKFK2fQA5rfq34iDMz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=BNqDAJlY; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 35DFD60269;
+	Wed, 11 Mar 2026 17:14:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1773245654;
+	bh=83pLPwEbopjSQv9qsfkD5DuxYCyEX12drI0Wxk/9Zt8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BNqDAJlYMPK8KdINpz1XeYElfGw1i2sS3cowaQmcndO+sDg43tJO7vgGzDtdY22gi
+	 oQAtADvtME9fxvQNBFT2jaF+JEMvOYdtV/BU3Cdk5gUwnmpJyyKOUwD6A52X2p/hle
+	 LLm+dqms2Rj7gFcDUtwHIvkAOHYP3euVThTwCPptBiGbNEj6bTedVBqBRBcf2bo1mQ
+	 XdlquenKQ3djkCY+aBGqNRqNt+iHnKiFe1WJKmgakpiHSWJvtW6vlo00hFIQ4SQRey
+	 j01+J68IBgWpsLhgAruHgVCQ7HzDVNYP8zbgMZeThUtfJF104geQ7PabeD5KZeTubj
+	 Z6y/1e7he7uHw==
+Date: Wed, 11 Mar 2026 17:14:11 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: nf_flow_table_ip: reset mac header before
+ vlan push
+Message-ID: <abGU022ZrScARsiO@chamomile>
+References: <20260310143933.354257-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aZcPd3OKqxwCZV-5@suesslenovo> <20260219200459.1474232-1-utilityemal77@gmail.com>
- <20260219.de5dc35ec231@gnoack.org> <CAHC9VhSu=YtE0dMiEtUQgz0pFy5K8cuHh_EWprNtFTDAxhss_w@mail.gmail.com>
- <abFhawSTjNoa-KaH@suesslenovo>
-In-Reply-To: <abFhawSTjNoa-KaH@suesslenovo>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 11 Mar 2026 12:08:43 -0400
-X-Gm-Features: AaiRm51y1oanFGZp0hATWZweBML1M22bqKd3H2ES5tayYiLT9l2hp1VRACvAC4Q
-Message-ID: <CAHC9VhSA=jaKTXg-Tmzzpaj9STGMXH3ZMgQm_XvicimRqdW0+w@mail.gmail.com>
-Subject: Re: [PATCH v6] lsm: Add LSM hook security_unix_find
-To: Justin Suess <utilityemal77@gmail.com>
-Cc: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, brauner@kernel.org, 
-	demiobenour@gmail.com, fahimitahera@gmail.com, hi@alyssa.is, horms@kernel.org, 
-	ivanov.mikhail1@huawei-partners.com, jannh@google.com, jmorris@namei.org, 
-	john.johansen@canonical.com, konstantin.meskhidze@huawei.com, 
-	linux-security-module@vger.kernel.org, m@maowtm.org, matthieu@buffet.re, 
-	mic@digikod.net, netdev@vger.kernel.org, samasth.norway.ananda@oracle.com, 
-	serge@hallyn.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260310143933.354257-1-ericwouds@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266694-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
 	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,alyssa.is,huawei-partners.com,google.com,namei.org,canonical.com,huawei.com,vger.kernel.org,maowtm.org,buffet.re,digikod.net,oracle.com,hallyn.com,zeniv.linux.org.uk];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[paul-moore.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-266695-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[maowtm.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,paul-moore.com:dkim,paul-moore.com:url,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 5078A26726E
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,netfilter.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C04ED26720D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 8:34=E2=80=AFAM Justin Suess <utilityemal77@gmail.c=
-om> wrote:
->
-> On Tue, Mar 10, 2026 at 06:39:12PM -0400, Paul Moore wrote:
-> > On Thu, Feb 19, 2026 at 3:26=E2=80=AFPM G=C3=BCnther Noack <gnoack3000@=
-gmail.com> wrote:
-> > > On Thu, Feb 19, 2026 at 03:04:59PM -0500, Justin Suess wrote:
-> > > > Add a LSM hook security_unix_find.
-> > > >
-> > > > This hook is called to check the path of a named unix socket before=
- a
-> > > > connection is initiated. The peer socket may be inspected as well.
-> > > >
-> > > > Why existing hooks are unsuitable:
-> > > >
-> > > > Existing socket hooks, security_unix_stream_connect(),
-> > > > security_unix_may_send(), and security_socket_connect() don't provi=
-de
-> > > > TOCTOU-free / namespace independent access to the paths of sockets.
-> > > >
-> > > > (1) We cannot resolve the path from the struct sockaddr in existing=
- hooks.
-> > > > This requires another path lookup. A change in the path between the
-> > > > two lookups will cause a TOCTOU bug.
-> > > >
-> > > > (2) We cannot use the struct path from the listening socket, becaus=
-e it
-> > > > may be bound to a path in a different namespace than the caller,
-> > > > resulting in a path that cannot be referenced at policy creation ti=
-me.
-> > > >
-> > > > Cc: G=C3=BCnther Noack <gnoack3000@gmail.com>
-> > > > Cc: Tingmao Wang <m@maowtm.org>
-> > > > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
-> > > > ---
-> > > >  include/linux/lsm_hook_defs.h |  5 +++++
-> > > >  include/linux/security.h      | 11 +++++++++++
-> > > >  net/unix/af_unix.c            | 13 ++++++++++---
-> > > >  security/security.c           | 20 ++++++++++++++++++++
-> > > >  4 files changed, 46 insertions(+), 3 deletions(-)
-> >
-> > ...
-> >
-> > > Reviewed-by: G=C3=BCnther Noack <gnoack3000@gmail.com>
-> > >
-> > > Thank you, this looks good. I'll include it in the next version of th=
-e
-> > > Unix connect patch set again.
-> >
-> > I'm looking for this patchset to review/ACK the new hook in context,
-> > but I'm not seeing it in my inbox or lore.  Did I simply miss the
-> > patchset or is it still a work in progress?  No worries if it hasn't
-> > been posted yet, I just wanted to make sure I wasn't holding this up
-> > any more than I already may have :)
->
-> Good Morning Paul,
->
-> Can't speak to the rest of the patch, but I sent this LSM hook for
-> review purposes before inclusion with the rest of the V6 of this patch.
->
-> G=C3=BCnther added his review tag, but I was asked to make some minor com=
-ment / commit
-> message updates. I sent the same patch, with updated comments/commit to h=
-im
-> in a follow up, off-list email to avoid spamming the list. No code change=
-s were
-> made, just comments.
->
-> I don't think this particular patch will change substantially, unless we =
-find
-> something unexpected. But the way we use the hook may change (esp wrt to
-> locking and the SOCK_DEAD state), which is important for your review.
->
-> So you may want to hold off your review until the full V6 series gets sen=
-t so
-> you can review the hook in context. There were some questions about
-> locking that needed proper digging into. [1]
+On Tue, Mar 10, 2026 at 03:39:33PM +0100, Eric Woudstra wrote:
+> With double vlan tagged packets in the fastpath, getting the error:
+> 
+> skb_vlan_push got skb with skb->data not at mac header (offset 18)
+> 
+> Call skb_reset_mac_header() before calling skb_vlan_push().
 
-Great, thanks for the update, that was helpful.  As you recommend,
-I'll hold off on reviewing this further until we have the full context
-of the other patchset; we've already talked about this hook addition a
-few times anyway, and based on a quick look yesterday, nothing
-particularly evil jumped out at me.
+Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
 
---=20
-paul-moore.com
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+
+Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
+
+> ---
+> 
+> This patch replaces:
+> 
+> "netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()"
+> 
+>  net/netfilter/nf_flow_table_ip.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> index 3fdb10d9bf7f..fd56d663cb5b 100644
+> --- a/net/netfilter/nf_flow_table_ip.c
+> +++ b/net/netfilter/nf_flow_table_ip.c
+> @@ -738,6 +738,7 @@ static int nf_flow_encap_push(struct sk_buff *skb,
+>  		switch (tuple->encap[i].proto) {
+>  		case htons(ETH_P_8021Q):
+>  		case htons(ETH_P_8021AD):
+> +			skb_reset_mac_header(skb);
+>  			if (skb_vlan_push(skb, tuple->encap[i].proto,
+>  					  tuple->encap[i].id) < 0)
+>  				return -1;
+> -- 
+> 2.53.0
+> 
 
