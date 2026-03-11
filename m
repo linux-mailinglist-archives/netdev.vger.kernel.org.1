@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-266759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266760-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEvWM2+/sWkwFAAAu9opvQ
-	(envelope-from <netdev+bounces-266759-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:15:59 +0100
+	id eEMXGerAsWkwFAAAu9opvQ
+	(envelope-from <netdev+bounces-266760-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:22:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F468269282
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:15:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054DE2693C2
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37DB8300AC1F
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:15:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E3FA3024B25
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020E12F3C19;
-	Wed, 11 Mar 2026 19:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266EC32D0DC;
+	Wed, 11 Mar 2026 19:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AC3Rxeav"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Mi0zexhH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF842D47E6;
-	Wed, 11 Mar 2026 19:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76393254A0;
+	Wed, 11 Mar 2026 19:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773256556; cv=none; b=ZKDnIw5xHWx0TeQA6kjYx2Us3DDSUYqKEAl4PZRcWs84HA6tjEMSiCDzW5mOVJsrb1bnNnOnBgFTkr0q/Q6xSZ2G8P7Zq4DgYDz+GCanvs5e3LmMwMWTgSH8qsHH4LFNNXclSR5ExpnKiS87Pc+pD8nis02QKHLt/1lyhAsKNDk=
+	t=1773256933; cv=none; b=k/RlzKntsHzd56F0tXth0NdH9/7fK91Fs3ZTVVReq7dPP/Il5Z1AruSidTENS9/hXlZFfeXP2tjyzBvXfHdM6vnsswPwXtVjxR6n2utBTRvZb3IsJ/yKQoXqeVQV/tf0nDZ7WmF4fqvokIRqCbwj89vsHnmcV+72hzFEV5HPSx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773256556; c=relaxed/simple;
-	bh=gwh9ZtQJ8T4eqca8LnY4EHjsnKJyybWcR2U7kLlgdAA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgpiON26fX4vqLmYcSkTZpnl0Ut5JGOG1r9lT6nHT14J+UOiFKnU2y1uhGkag+oUy1aIBhDISLYffbkR4oqjsYHLS1s+W7gY/gOdxlqUMM9vM+62Ek8/HRcuJXO/MharJC/asDm3CoFeLASl2CO2v9GDpRDEs8o41icDP/Fjegg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AC3Rxeav; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tmKJz4PTXeSP3DIMaLWnUAhuXvl8uJw/wenH2e9XHUg=; b=AC3RxeaviT2nq9ifbCFtg7D8ye
-	nyNyvB4SOixmyd7Jnw374vliShdGmRuMl3EH8V1+USm+BUia6DHGQYFuvR1xF5Z6+xBJ2dn3ZMjT4
-	wVJKP3D+4darksEJftGdlRfNL+O1PEYluNPY2Y7O0wM31lLU2HLZ5OBNJCiG+HjDPnj4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w0P24-00BE63-D4; Wed, 11 Mar 2026 20:15:48 +0100
-Date: Wed, 11 Mar 2026 20:15:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1 net-next] net: usb: cdc-ether: unify error handling
- in probe
-Message-ID: <5db41b5a-c53f-4441-bf4e-a12add3e33b4@lunn.ch>
-References: <20260311112919.678686-1-oneukum@suse.com>
+	s=arc-20240116; t=1773256933; c=relaxed/simple;
+	bh=3a1y95VnLiNRF22yB9xTwkHPK83osW3Y6kfjW4B/qzg=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=XL/utCEjBewzDGHk+0QVSITfnwiVVH98pS0xUvpakWOoQOH488FJafIZOAVSnjuoyz5Bl56Zh9hsGWqpLrp5vtaUpFZppNxtU1pyKmteTg3cTWMMAtPd6KPa1zvxHNoytIRzue6O+/7HPaGxx/QPNNkmw0DvSupkUq9ITWWlMJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Mi0zexhH; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 91EC620B710C; Wed, 11 Mar 2026 12:22:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 91EC620B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1773256924;
+	bh=T3bcUeSPf/iaPcHw/5z6J3eIMmoMmEOuBFZt6y0QIgE=;
+	h=Date:From:To:Subject:From;
+	b=Mi0zexhHPHFpNU+afLZjHBPFBGk7CsOXV1IUzevRs/QG69M0Y2/iJlpjQ0Hj33PoZ
+	 RndwISQ12B+rV8NDbKu0v8gomxytw/32KuKc4Jc+lKYe1cCjGxcYYGLrKKxADq7jxu
+	 13TRd6UelrFN6EyCYv+VTLXBFsDC+VujZxgNFPqc=
+Date: Wed, 11 Mar 2026 12:22:04 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	horms@kernel.org, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net,v2] net: mana: fix use-after-free in
+ mana_hwc_destroy_channel() by reordering teardown
+Message-ID: <abHA3AjNtqa1nx9k@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,60 +65,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260311112919.678686-1-oneukum@suse.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266759-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266760-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 3F468269282
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: 054DE2693C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> @@ -288,16 +288,11 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
->  	if (info->data != info->control) {
->  		status = usb_driver_claim_interface(driver, info->data, dev);
->  		if (status < 0)
-> -			return status;
-> +			goto bad_desc;
+A potential race condition exists in mana_hwc_destroy_channel() where
+hwc->caller_ctx is freed before the HWC's Completion Queue (CQ) and
+Event Queue (EQ) are destroyed. This allows an in-flight CQ interrupt
+handler to dereference freed memory, leading to a use-after-free or
+NULL pointer dereference in mana_hwc_handle_resp().
 
->  bad_desc:
->  	dev_info(&dev->udev->dev, "bad CDC descriptors\n");
-> -	return -ENODEV;
-> +	return status;
+mana_smc_teardown_hwc() signals the hardware to stop but does not
+synchronize against IRQ handlers already executing on other CPUs. The
+IRQ synchronization only happens in mana_hwc_destroy_cq() via
+mana_gd_destroy_eq() -> mana_gd_deregister_irq(). Since this runs
+after kfree(hwc->caller_ctx), a concurrent mana_hwc_rx_event_handler()
+can dereference freed caller_ctx (and rxq->msg_buf) in
+mana_hwc_handle_resp().
 
-Always reporting "bad CDC descriptors" does not seem correct. Not
-being able to claim the interface is probably some other sort of
-problem.
+Fix this by reordering teardown to reverse-of-creation order: destroy
+the TX/RX work queues and CQ/EQ before freeing hwc->caller_ctx. This
+ensures all in-flight interrupt handlers complete before the memory they
+access is freed.
 
-It might be better to change the dev_dbg()s to dev_err()s, and drop
-the dev_info() here. You can then add additional dev_err() before the
-goto's you are adding.
-
-    Andrew
-
+Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 ---
-pw-bot: cr
+Changes in v2:
+  - Added maintainers missed in v1.
+---
+---
+ drivers/net/ethernet/microsoft/mana/hw_channel.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index 91975bdb5686..dbbde0fa57e7 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -814,9 +814,6 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
+ 		gc->max_num_cqs = 0;
+ 	}
+ 
+-	kfree(hwc->caller_ctx);
+-	hwc->caller_ctx = NULL;
+-
+ 	if (hwc->txq)
+ 		mana_hwc_destroy_wq(hwc, hwc->txq);
+ 
+@@ -826,6 +823,9 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
+ 	if (hwc->cq)
+ 		mana_hwc_destroy_cq(hwc->gdma_dev->gdma_context, hwc->cq);
+ 
++	kfree(hwc->caller_ctx);
++	hwc->caller_ctx = NULL;
++
+ 	mana_gd_free_res_map(&hwc->inflight_msg_res);
+ 
+ 	hwc->num_inflight_msg = 0;
+-- 
+2.43.0
+
 
