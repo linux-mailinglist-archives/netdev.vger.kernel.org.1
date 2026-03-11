@@ -1,291 +1,237 @@
-Return-Path: <netdev+bounces-266764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266765-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPoFAZ3FsWniFAAAu9opvQ
-	(envelope-from <netdev+bounces-266764-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:42:21 +0100
+	id kAR4B1TGsWkFFQAAu9opvQ
+	(envelope-from <netdev+bounces-266765-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:45:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F31A269865
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:42:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC33269948
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 20:45:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70C4D30791C4
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:41:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5EA73087D09
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 19:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BF532B981;
-	Wed, 11 Mar 2026 19:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981F8377024;
+	Wed, 11 Mar 2026 19:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="AJ6x8yC+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KniUiV6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D030530B508
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773258080; cv=none; b=uRZfrCQmmdkJmFf0in5yXodjq21iEsIeELWL+jfxSaZGjxeiCaDKDty/cpE9YKDyEjeBP5A6AgSJd4GE98+Npu0iO1YS9jUL+Zh5i6E/BaPJ6AOEPTjzeasH2Pw+28+qNj/RNMhbpKli7swPQZ8+PfXfF7ltjZI0xabe5B5ikYo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773258080; c=relaxed/simple;
-	bh=JmzZ5cArUGLdVYVbW1glxu2tEsH90YQOrUa0/YOI0Es=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g/hTaThVtIhThxNqQY+Cd2NL5xvWtoDqIQDnwHxtzdW7POldBHQiQ4Jate90ufRuX5lZSAkCjlRgSX0GPM7qPk8gw4h2XwekUx0hwuz1nL6qA2aRTYD49w2kw/EKbDixBIenPCIkliqAiGsgWcZrWybAFVP0GlV7ybL/jRlzUUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=AJ6x8yC+; arc=none smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12776bebe9fso449632c88.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:41:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405DF3750BA
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 19:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773258248; cv=pass; b=hixq0d8fjKKQNHexacCcne3UmdTYhWWP1hkMAe63N89iahHXpmnWqvaHDKA2gxpkS8jvYxX8XAHnzPNW8qiYZK4RTldngb929C/W60Knr1FG5oyZA4NlLxzhudkUeYMgDXfUM1HVYVTWgbMfwDX8M+YHyuoO4zEOdmpvUw/1iaI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773258248; c=relaxed/simple;
+	bh=1nbmNN2+uWLC1om5FX22Xmv7l/AAsmEpegK3jh8gm9M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eFV7uqxXH44fWrS0uedNdHF/orhUymBkvu0rLMUWn2bk+wE3PtxG9lBtILOpwB25iM/4IEXJox1+ULIcKqX4coayMtnm3ASRn0b+x8S5jkjHgBeOGKH1EUtUQbK2g3Wtv0qMHWkqI/mtR+8yYw4O5pqImnc4MM3egEN2+VUg7u0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KniUiV6/; arc=pass smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c73a5473bbdso68604a12.2
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 12:44:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773258244; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KxchSkB0sJc//ii4VTtxJd7B43grHHlck3WwwQ/9HqeQNK60gdSMYVu1KIllRBAtRw
+         NK7U52PV6KM/eB/7mU9vigetvK++MIjRHJHP6IC6/H95yApNphojSrzbEe3mhzT5pTwb
+         cdFoEdnFL1/rqHt3aKisazvfeYm9/n01udplKM1/mcPrhGlxJ+hj976IpRS2tlnq5SBB
+         CXGqU+0mumSqd23QP8UBiQBVr4spuh1qkENbFM8I703sPjOJ7DMnzcxn8Uq1DQbwUDPV
+         ca/eNnXaDfRTjLHe+MnXTCTYRuWfPxAB5/ivVysiCLMBHD3cvMOfRZC+W5KhIu0QOp/N
+         hQjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iEAE1DR3z4IwpbaUy8A7+sGJEjgivXuZJQBR6NB9aws=;
+        fh=YiEndGiWKlHlxhfItC+Nhx2SvEuVujf9EWJDDbr0uvg=;
+        b=i3iWAM/1xKWwAM1xqsIsetDoBAn0nn9A4rSWiu08jZJFRuLEHCQnr++NVxStyriEEq
+         7iFPKrdchP5xJ5lHlCHLUtFf9Mix8NJxfWeCfiCmGUw9DJ8rHTI4DxCpghmAShSR6xI7
+         KvSeaYrofnP9RpUUUTVbgC9XqEuNW1Hq9s46I3XtGC5fnV8hP+pz8aPpsIvSG8FFl+Tg
+         5cMpjVuEot9c5DqjyomZPz9DZmsS0ZU3imMCy3J4VDk+rvzWzbllTfnqzRP48dcF3kQ1
+         BdbPDLZKv/+NjKSy1x/Oy1sadwyoh8Erk+DH9thxyCTs3FiSeQy/7pS7Oo1cX0p3a0cj
+         7Oug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1773258078; x=1773862878; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0wyN7pn3XZY19VGN08Uvl0u7SIQ9oF05liu+AZCu18U=;
-        b=AJ6x8yC+7o/lAmibpOtT7MjE6Pa4z2SZF1agRnMzOY5dakiPhQcsbgS31TR4Z6NzA2
-         d2XmC3itSbq3PvcwYeuly8IsZievObej3lShM4yPAWZBPMAcIaqWjYTfEjwGiffGTD/i
-         uv/1qtGRYvJ8vAYAU8e7AHd6bJfdNpzZDpw9456FFMWu1tBT4P57h2m8A/RYPPYeeUdb
-         70vvMnLZdXdGI7rWL4TUN7LVgri/mLDvB1X1nkiZ+UbUhaEn10aqQprjWJZGfKlQ2yWa
-         nooWQA7RF0cbCmdpbqGlHDMn2rNbSddxPqrfEo1QqKDY56wOEIfOxnWX4rzIZXvnxEY2
-         SBkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773258078; x=1773862878;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1773258244; x=1773863044; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0wyN7pn3XZY19VGN08Uvl0u7SIQ9oF05liu+AZCu18U=;
-        b=vCI1eWOOL2vvdxW+DZLyg1UVaNZqGjLUQ212lGod7nuwn9zNkJ9w3F1yTrhv0szncY
-         Bbcl3y9dth7uV2Ro/r7rrgGbxx7EHvh6RR/rdzCw3tFrvVmnb9EzN8lRHzSCW2khpAc8
-         SuDIifiDrpclmJQ4ry00ydB40L/4yWr8aCzcbhRbjNTR53IBTstn4FAOoVCImQbGpcaj
-         hSy0F90NlFIu7/w1QgD2AHq4c9dtDKu6zEBENZqVjdY7tWlpq/22xmADRfH9v5qEwB2e
-         nQVuWolSH9M1er/4MkTNACGmwTC7LR0QTmJccxMkKLD1UKEBrpxcUfhkBtlaWQz8hAxn
-         K3zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrXlP5q0JgXaruy4NbLHJMxQTiqRhEUDg0Z83UbFixe/Re5U4dB/RUpsOb+IjR3ofnMNqUNg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEtHUWG1yufFZ1GRSUFGOYEx6KFVfmW8SBfCXez9Qo+8tV3W6m
-	tDvOtVUskU3DSE34C8LJpQxQZPiSZobguA0OT8Hgrcuf/G8cLtBZjLLnVQ/foL1RQ+kl5zJemZ3
-	HbphVFQ==
-X-Gm-Gg: ATEYQzzMHB0NxbZxp8T54/3SMvdp+ADF5ELTxmHkkT8F+U/ekYGCY/HTPL+EfYHjxwh
-	c2g7H7bEFF+mtb6JdttZEWcxG4PEhskZ3fy7k3CqqKxraPoGqk3B3QfXmE8cR3PT3yQ4MPUot1o
-	5K0aci5qZ8KT3vVkwUjgmBaI3prJJpACW//rG4ULYSV/ASSA1kh31QNK6w+Hmbl+vOwRNoRw0Vs
-	n6O7H2uDp3IxS27elTwTYMs+e7UdrR1KbpCLdC7sF8LyVLr2mqc9BEVcYbdV0bk1WY2YtoYgYkx
-	FFxvOxzLAcmtu1ghMbt+NYqR/G0ZKtqT28N+53qYPZTXHcNiiPaZxZxHfQf7bzjIPsTBfub0SzN
-	LkOLmGFeB3nSr8U7jMzedlQdM/DlwBqwJiJzy7e8tbhgUG+d8tZNjCcMUSUD2U98KJ6cd5Ki18n
-	8HHS284aAugHFfHR3Wywu5LAR7EMGWl5k1LFQ78h9a7BE2JgBPmZUnUFIeuOWoIE0Q
-X-Received: by 2002:a05:7022:6987:b0:127:3816:50c6 with SMTP id a92af1059eb24-128e77882d3mr1910091c88.8.1773258077754;
-        Wed, 11 Mar 2026 12:41:17 -0700 (PDT)
-Received: from localhost.localdomain ([2600:1700:4a3d:5010:7185:74c9:dc1e:956])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128e7bf1e1asm4074436c88.3.2026.03.11.12.41.15
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 11 Mar 2026 12:41:17 -0700 (PDT)
-From: Prasanna S Panchamukhi <panchamukhi@arista.com>
-To: netfilter-devel@vger.kernel.org
-Cc: panchamukhi@arista.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH net-next] netfilter: conntrack: expose gc_scan_interval_max via sysctl
-Date: Wed, 11 Mar 2026 12:40:58 -0700
-Message-ID: <20260311194058.13860-1-panchamukhi@arista.com>
-X-Mailer: git-send-email 2.50.1
+        bh=iEAE1DR3z4IwpbaUy8A7+sGJEjgivXuZJQBR6NB9aws=;
+        b=KniUiV6/XFNmf0hJB5ioZzAUVseKPmiaEBfcQIpIoa6KxbcAoInWV2Nt+xQ/+F1YbJ
+         /nFfbK0UG875+X5tUOOfrBL2RafG+lUxulKb17BCWrUFPmizYQULXD8W2m1BJ1ZQXiXY
+         Uff4OMkgXQhfIkRHFESovBiMCswuVWtWYrD0fweteTh1Viw1zq6wB52Klv/6qabtHGSo
+         7fMMSZXGuZmwefEj77bRuNVL99M8rScV01zksjIiOHqpV9FLArH4fmr0tgP7Ovp9aq0F
+         7h4X55fvqNnSux+B2ZKHE7q8bovEJ670hfV2/WRDtLq/65qCRjXd4ngqxhlkTcN4RG8n
+         0Srw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773258244; x=1773863044;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iEAE1DR3z4IwpbaUy8A7+sGJEjgivXuZJQBR6NB9aws=;
+        b=Pp4oKze/XUILv7FaSG1iz+dVAH0gNjUFHXsuMfiZETyJeRFWnt/MPZ9PClxoSXOfDR
+         remExGMfY7ppmaLusJ89SwjjytTncLUSNfTM+rwEwUk7c9XgeSeWCKwQKRslgBI9GNyr
+         n2KCzcUNGIvBO9kwQThhf/XQXwcJacKcw/D+n/bJsd5OCNduVS2/ocJb44x2kjjQ/qJK
+         nIAn/Pdw+DOAhgCCR6v/5dRfXjjzhr8M+8cGUaGStrJKLBHjYL3zf+ESFvdpMm8fqyuI
+         Cy1DB6tkYU+BxUCz9PavqZoXQSBfnzSOSxDHZoOLZVgh4raDWYFWDllRHma+8ZtzrYON
+         5ZfA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3qbykFCQu574O0tggE3CBHQg69ccPG81aFIzopeHQhwI84e3aQ5KeuW3FC2stfaG8DPoeeF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf/u3qPt/lCdRvkAxy/AR2+ei4E3BzRceRsdNQqD6V9dOyEI8d
+	03mhpoKiZUcH6U3sITuF5eBFV3zoGluVC8IzwWeK8SwBDOi5H3bWCXPsQT6aZsScKy/iVpl7BXA
+	WcFqIFZEIF972uBJBu5O7A8VOv9PCPYw=
+X-Gm-Gg: ATEYQzyPEHX++SlSGcSR/fiCKMw4akQgVzhiH+OS7fu15MipADvzsFBQ4KTvck/LRm4
+	ETWVdxgItnvY0PcjOMtpadfX0TX0DQn22t5nSMHFv6hYZ9NvEx8uQLJdBCmSJPdyS8npP5COSXT
+	CedwjMgSPvLeTXf+0dCzz9Hn0Zktwm2rNvzua/q1lmvqvOMMBrFkrEp4lYUTSl/kZSsg47k0u5/
+	m9TXVsh5obTmV5zQ5UfhTPPuwd3IKbquJMDJSQrNq7wtHO7fAaWUsjOpx3fNYllBZdVR4RB9Y5W
+	4ISNw9nIPxDglw4UhQ==
+X-Received: by 2002:a17:903:3846:b0:2ae:47c9:68aa with SMTP id
+ d9443c01a7336-2aeae92a03dmr40203415ad.52.1773258244461; Wed, 11 Mar 2026
+ 12:44:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-2-ameryhung@gmail.com>
+In-Reply-To: <20260307064439.3247440-2-ameryhung@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 11 Mar 2026 12:43:52 -0700
+X-Gm-Features: AaiRm52PenRsEpFvNhvd5ipgeHWlrodqDFVXteRMZhoEVrKoEHLpFtXoYjZLlqQ
+Message-ID: <CAEf4BzZubPSaS8SQSEQJvTphwgbaBfdC0CYEhsfQN8CJ7HS3pw@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next v2 01/11] bpf: Set kfunc dynptr arg type flag
+ based on prototype
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
+	martin.lau@kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266764-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_NEQ_ENVFROM(0.00)[panchamukhi@arista.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[arista.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-266765-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1F31A269865
+X-Rspamd-Queue-Id: 7DC33269948
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The conntrack garbage collection worker uses an adaptive algorithm that
-adjusts the scan interval based on the average timeout of tracked
-entries.  The upper bound of this interval is hardcoded as
-GC_SCAN_INTERVAL_MAX (60 seconds).
+On Fri, Mar 6, 2026 at 10:44=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> The verifier should decide whether a dynptr argument is read-only
+> based on if the type is "const struct bpf_dynptr *", not the type of
+> the register passed to the kfunc. This currently does not cause issues
+> because existing kfuncs that mutate struct bpf_dynptr are constructors
+> (e.g., bpf_dynptr_from_xxx and bpf_dynptr_clone). These kfuncs have
+> additional check in process_dynptr_func() to make sure the stack slot
+> does not contain initialized dynptr. Nonetheless, this should still be
+> fixed to avoid future issues when there is a non-constructor dynptr
+> kfunc that can mutate dynptr. This is also a small step toward unifying
+> kfunc and helper handling in the verifier, where the first step is to
+> generate kfunc prototype similar to bpf_func_proto before the main
+> verification loop.
+>
+> We also need to correctly mark some kfunc arguments as "const struct
+> bpf_dynptr *" to align with other kfuncs that take non-mutable dynptr
+> argument and to not break their usage. Adding const qualifier does
+> not break backward compatibility.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  fs/verity/measure.c                            |  2 +-
+>  include/linux/bpf.h                            |  8 ++++----
+>  kernel/bpf/helpers.c                           | 10 +++++-----
+>  kernel/bpf/verifier.c                          | 18 +++++++++++++++++-
+>  kernel/trace/bpf_trace.c                       | 18 +++++++++---------
+>  tools/testing/selftests/bpf/bpf_kfuncs.h       |  6 +++---
+>  .../selftests/bpf/progs/dynptr_success.c       |  6 +++---
+>  .../bpf/progs/test_kfunc_dynptr_param.c        |  7 +------
+>  8 files changed, 43 insertions(+), 32 deletions(-)
+>
+> diff --git a/fs/verity/measure.c b/fs/verity/measure.c
+> index 6a35623ebdf0..3840436e4510 100644
+> --- a/fs/verity/measure.c
+> +++ b/fs/verity/measure.c
+> @@ -118,7 +118,7 @@ __bpf_kfunc_start_defs();
+>   *
+>   * Return: 0 on success, a negative value on error.
+>   */
+> -__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_dy=
+nptr *digest_p)
+> +__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, const struct =
+bpf_dynptr *digest_p)
 
-Expose the upper bound as a new sysctl,
-net.netfilter.nf_conntrack_gc_scan_interval_max, so it can be tuned at
-runtime without rebuilding the kernel.  The default remains 60 seconds
-to preserve existing behavior.  The sysctl is global and read-only in
-non-init network namespaces, consistent with nf_conntrack_max and
-nf_conntrack_buckets.
+but kfunc is writing into digest_p, so that const is wrong?...
 
-In environments where long-lived offloaded flows dominate the table,
-the adaptive average drifts toward the maximum, delaying cleanup
-of short-lived expired entries such as those in TCP CLOSE state
-(10s timeout). Adding sysctl to set the maximum GC scan helps to
-tune according to the evironment.
+>  {
+>         struct bpf_dynptr_kern *digest_ptr =3D (struct bpf_dynptr_kern *)=
+digest_p;
+>         const struct inode *inode =3D file_inode(file);
 
-Signed-off-by: Prasanna S Panchamukhi <panchamukhi@arista.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: Jonathan Corbet <corbet@lwn.net>
-cc: Shuah Khan <skhan@linuxfoundation.org>
-cc: Pablo Neira Ayuso <pablo@netfilter.org>
-cc: Florian Westphal <fw@strlen.de>
-cc: Phil Sutter <phil@nwl.cc>
-cc: netdev@vger.kernel.org
-cc: linux-doc@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-to: netfilter-devel@vger.kernel.org
-cc: coreteam@netfilter.org
----
- Documentation/networking/nf_conntrack-sysctl.rst | 11 +++++++++++
- include/net/netfilter/nf_conntrack.h             |  1 +
- net/netfilter/nf_conntrack_core.c                |  9 ++++++---
- net/netfilter/nf_conntrack_standalone.c          | 10 ++++++++++
- 4 files changed, 28 insertions(+), 3 deletions(-)
+[...]
 
-diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
-index 35f889259fcd..c848eef9bc4f 100644
---- a/Documentation/networking/nf_conntrack-sysctl.rst
-+++ b/Documentation/networking/nf_conntrack-sysctl.rst
-@@ -64,6 +64,17 @@ nf_conntrack_frag6_timeout - INTEGER (seconds)
- 
- 	Time to keep an IPv6 fragment in memory.
- 
-+nf_conntrack_gc_scan_interval_max - INTEGER (seconds)
-+	default 60
-+
-+	Maximum interval between garbage collection scans of the connection
-+	tracking table. The GC worker uses an adaptive algorithm that adjusts
-+	the scan interval based on average entry timeouts; this parameter caps
-+	the upper bound. Lower values cause expired entries (e.g. connections
-+	in CLOSE state) to be cleaned up faster, at the cost of slightly more
-+	CPU usage. Minimum value is 1.
-+	This sysctl is only writeable in the initial net namespace.
-+
- nf_conntrack_generic_timeout - INTEGER (seconds)
- 	default 600
- 
-diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
-index bc42dd0e10e6..0449577f322e 100644
---- a/include/net/netfilter/nf_conntrack.h
-+++ b/include/net/netfilter/nf_conntrack.h
-@@ -331,6 +331,7 @@ extern struct hlist_nulls_head *nf_conntrack_hash;
- extern unsigned int nf_conntrack_htable_size;
- extern seqcount_spinlock_t nf_conntrack_generation;
- extern unsigned int nf_conntrack_max;
-+extern unsigned int nf_conntrack_gc_scan_interval_max;
- 
- /* must be called with rcu read lock held */
- static inline void
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index 27ce5fda8993..54949246f329 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -91,7 +91,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
-  * allowing non-idle machines to wakeup more often when needed.
-  */
- #define GC_SCAN_INITIAL_COUNT	100
--#define GC_SCAN_INTERVAL_INIT	GC_SCAN_INTERVAL_MAX
-+#define GC_SCAN_INTERVAL_INIT	nf_conntrack_gc_scan_interval_max
- 
- #define GC_SCAN_MAX_DURATION	msecs_to_jiffies(10)
- #define GC_SCAN_EXPIRED_MAX	(64000u / HZ)
-@@ -204,6 +204,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
- 
- unsigned int nf_conntrack_max __read_mostly;
- EXPORT_SYMBOL_GPL(nf_conntrack_max);
-+
-+unsigned int nf_conntrack_gc_scan_interval_max __read_mostly = GC_SCAN_INTERVAL_MAX;
-+
- seqcount_spinlock_t nf_conntrack_generation __read_mostly;
- static siphash_aligned_key_t nf_conntrack_hash_rnd;
- 
-@@ -1568,7 +1571,7 @@ static void gc_worker(struct work_struct *work)
- 				delta_time = nfct_time_stamp - gc_work->start_time;
- 
- 				/* re-sched immediately if total cycle time is exceeded */
--				next_run = delta_time < (s32)GC_SCAN_INTERVAL_MAX;
-+				next_run = delta_time < (s32)nf_conntrack_gc_scan_interval_max;
- 				goto early_exit;
- 			}
- 
-@@ -1630,7 +1633,7 @@ static void gc_worker(struct work_struct *work)
- 
- 	gc_work->next_bucket = 0;
- 
--	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_MAX);
-+	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, nf_conntrack_gc_scan_interval_max);
- 
- 	delta_time = max_t(s32, nfct_time_stamp - gc_work->start_time, 1);
- 	if (next_run > (unsigned long)delta_time)
-diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-index 207b240b14e5..f8cab779763f 100644
---- a/net/netfilter/nf_conntrack_standalone.c
-+++ b/net/netfilter/nf_conntrack_standalone.c
-@@ -637,6 +637,7 @@ enum nf_ct_sysctl_index {
- 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE,
- 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE_STREAM,
- #endif
-+	NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX,
- 
- 	NF_SYSCTL_CT_LAST_SYSCTL,
- };
-@@ -920,6 +921,14 @@ static struct ctl_table nf_ct_sysctl_table[] = {
- 		.proc_handler   = proc_dointvec_jiffies,
- 	},
- #endif
-+	[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX] = {
-+		.procname	= "nf_conntrack_gc_scan_interval_max",
-+		.data		= &nf_conntrack_gc_scan_interval_max,
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_jiffies,
-+		.extra1		= SYSCTL_ONE,
-+	},
- };
- 
- static struct ctl_table nf_ct_netfilter_table[] = {
-@@ -1043,6 +1052,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
- 		table[NF_SYSCTL_CT_MAX].mode = 0444;
- 		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
- 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
-+		table[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX].mode = 0444;
- 	}
- 
- 	cnet->sysctl_header = register_net_sysctl_sz(net, "net/netfilter",
--- 
-2.50.1 (Apple Git-155)
+> index 6eb6c82ed2ee..3d44896587ac 100644
+> --- a/kernel/bpf/helpers.c
+> +++ b/kernel/bpf/helpers.c
+> @@ -3000,8 +3000,8 @@ __bpf_kfunc int bpf_dynptr_clone(const struct bpf_d=
+ynptr *p,
+>   * Copies data from source dynptr to destination dynptr.
+>   * Returns 0 on success; negative error, otherwise.
+>   */
+> -__bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u64 dst_off,
+> -                               struct bpf_dynptr *src_ptr, u64 src_off, =
+u64 size)
+> +__bpf_kfunc int bpf_dynptr_copy(const struct bpf_dynptr *dst_ptr, u64 ds=
+t_off,
 
+again, dst_ptr clearly is modifiable because we are copying data into it.
+
+What am I missing, why is this logically correct?
+
+(I understand that from purely C type system POV this is fine, because
+we don't modify bpf_dynptr struct itself on the stack, but bpf_dynptr
+is a representation of some memory, and if we are modifying this
+memory, then I think it should be not marked as const)
+
+> +                               const struct bpf_dynptr *src_ptr, u64 src=
+_off, u64 size)
+>  {
+>         struct bpf_dynptr_kern *dst =3D (struct bpf_dynptr_kern *)dst_ptr=
+;
+>         struct bpf_dynptr_kern *src =3D (struct bpf_dynptr_kern *)src_ptr=
+;
+
+[...]
 
