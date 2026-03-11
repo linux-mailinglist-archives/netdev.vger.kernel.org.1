@@ -1,175 +1,162 @@
-Return-Path: <netdev+bounces-266691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UI16As2SsWmRDgAAu9opvQ
-	(envelope-from <netdev+bounces-266691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:05:33 +0100
+	id KPSjIS+SsWnkDAAAu9opvQ
+	(envelope-from <netdev+bounces-266692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:02:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D8CA266F44
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:05:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2AE2266EA4
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 17:02:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1DE093170650
-	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:01:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03685302E7C3
+	for <lists+netdev@lfdr.de>; Wed, 11 Mar 2026 16:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25693A383F;
-	Wed, 11 Mar 2026 16:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFEE3E0C5D;
+	Wed, 11 Mar 2026 16:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rgP3KJaq"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="b6LNihfH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFB93CEB98
-	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68403B6355
+	for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 16:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773244901; cv=none; b=TiKZIrAieCSSRJjhMW1bAHJXB3/zBjhNQ2MyzZhmApHG44tG3lwZpV4D77AyUyCTaIBEKC7yoCiaMXnueubkGmNGEnw+VCt5iG8B5+F8xrvMNFkz65XAc6FuR0G2hrbWUF0F4teBmC5Smv5GN6C5YeHcfEDIwUU7JPi1O++fGOE=
+	t=1773244903; cv=none; b=kUh5SqbVr8HDc7Wjzl0p45gPCEuCvyATBtzo2dKMg/ATuEYgWVAaQ1fhaCU1eNzXel699KjNObIoXo4MPLZ7s0L/jfK3gcTEiGG4WFc7AWWlG+v6h0L2b+5PgT1K++FyllcrZHjgYBI0NcnEbsNRlbAfVX22/tXY2NsP/9Gz5+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773244901; c=relaxed/simple;
-	bh=alZSKgg1lU1wQh0A0HBF21ufoC8erK4cgoNEO+IVhhg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Cerz5r7SaaPSsudYg+mQl5ltVhjraWL2EqGOpqxe+MlV3Cu/3PbYxOI4LwdA9epVWfbIdHGXcyo8dcFkjq4/eOGqWsRg79KddicgPja6XokhbpKcWkNvHD5djoc2kbboE8gx9ZfSPGsno0A8xSFVbbfClXmRH9IFF2/ohkT+mBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rgP3KJaq; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b844098869cso1293344166b.2
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:01:40 -0700 (PDT)
+	s=arc-20240116; t=1773244903; c=relaxed/simple;
+	bh=OSYChhkgL9QLYey1/J92a/3Xa/25vRaPcOHe0XnyVg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ORXbPX0YZqBJt+rotnJEqptgj7z6DXm9iBov9xEQhjj772Tj1iaRXE5m11ZFE2g+VYvnBYcyAw28+IF1R1vH8K/LBy7OxqzeGIksanpsTk6fqtTG5uPll3SE3aeB77ozcld7spyardqF6HS64m1Xih1/x0kRUV6S8AStLYd20vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=b6LNihfH; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7d73dd9cb9bso59710a34.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 09:01:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773244899; x=1773849699; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZ9wJHN98p2eqW+aluFwwdS4VIjV0bOaQ4w+79zBhNs=;
-        b=rgP3KJaqF2BlecOpPvT5kKAcfsza44TQB2S2rx00vuamlvPC3PCFQtN7iBBVErQ0kT
-         4WdJtxceJIxgfEoqrKiMSBM220p/tm52QxQ+p/Vm9qhMEQGFaHmneuWDzyXc37rR6IvX
-         j5BlJPNzE5lVxK7VrA572ygi0hpBk5fcEnP2yH7V3Q+z+BLO1dy4fVpi0jRKEMeOTip2
-         HIDkQduGaTUGLYmL2Eky5xA41gFzkVV4qEEUwksw40H4w8eZCk0GeALUIDP+Gr7DNvF1
-         2+wUJnKujEB5WM6EYBJBnq343bDJzOoB3ZqK8V5pehsfNWev2da3jY31l4UTLmX5NLQo
-         YIPg==
+        d=linuxfoundation.org; s=google; t=1773244901; x=1773849701; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+XHylZPD43sAa0o/s0snunFXKESFhlWC7FjRf+5pW6g=;
+        b=b6LNihfHj4zmwmUhHoJMDn9lu6Z6P+/WprEkwJxmXOnMTT/tN9Y72nWw1vF1mWPUsw
+         KlGIA2cLtKkv0ZdMT0t+QiI7HUM0wQkdgBC1HtJpZY03cnU+yxO1Gp9o0U5hHSBHxOYR
+         3kNN1ZGUQScQXymv9GNQZ56ke4tM9YicKoGRw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773244899; x=1773849699;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZ9wJHN98p2eqW+aluFwwdS4VIjV0bOaQ4w+79zBhNs=;
-        b=KUSyOqj2SHTOkY3WEIQna4ohUuIdLGom6JnWIobPh6/E284HJxuaZ7DnJif8gPkd/l
-         YHxNO5hUy6Ei/esRTOw9XNNRJadsjxUCmiyGATzW3NubLQzWrmeAvp0hjYZ42GRviFGB
-         jJ4UAJVrJTNETokKx+iUUCpJY1ockIGLTguTeyPOB+PUx3J1OW2xYpWZ5Albac8LvpKk
-         qWTkDHimPnDAcMiZN7RA/BM6w/k+XAcoHpO6CeXQ9hyCJm7y5hTSqZ4LyrnbqpamoIL2
-         o876cqekdADpUeTDG9/KbSl1aRYv9FHQoGeuSr7Ezduk6fK+mNVqNV6QV64joArZSmIP
-         CBqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXH7JouuyQxkBKc8meRZ3DgYHjnQ6kviizfXKB16BlbJpZwihPN56MxUstyigdkjDA8q6yGMWU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuU1suQQ7hUuO3IaMMlB77i6AqYCVGOVY7RkdBavkUYY8cHkp0
-	6vD1OzerrEbQir4JIy/dhemaPqxgW+aMPYW9u/JZ34S7yhzag1w8+GU1EPsjxgdI2eH4IUhC9LM
-	2GM+Pnsa7OIZb2pj1bQ==
-X-Received: from wrbgw30.prod.google.com ([2002:a05:6000:40de:b0:439:ac29:98cb])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:6d22:b0:b93:3792:4b03 with SMTP id a640c23a62f3a-b972e4f775amr187595066b.32.1773244898034;
- Wed, 11 Mar 2026 09:01:38 -0700 (PDT)
-Date: Wed, 11 Mar 2026 16:01:36 +0000
-In-Reply-To: <20260311120418.GU1687929@ziepe.ca>
+        d=1e100.net; s=20230601; t=1773244901; x=1773849701;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+XHylZPD43sAa0o/s0snunFXKESFhlWC7FjRf+5pW6g=;
+        b=sT1sCsTYdzmXP3FHFBtbhrvGXDio7bQSKz+A4NQ5Yy/B8aTxfpK/GmrcN7tTcCqxNg
+         3CgTkitOdMfqgLgeyh+fMA2cMVBaPnajM2MgpvdpuN1kn9VZtFUy/THzPI9C79BnnYlt
+         o1dQkvNo+TURnbFIVwEoGgd0LSIwmAzg0ST4B1zuKWazM2q8vq96n+AsU8f1gKmscWsk
+         Zkdm7VTexUwHZDrYUtJITezi/9QIfB2kwgKv6iANtLn25G+1yBndT9B5gVt+SPbKiaS0
+         lYmhmUpI677IQVN/rQyiq0I5qlrKuBDPUDLfGuERl09fnAIlVSNYC4jQInld2ogAgBMF
+         u0kA==
+X-Forwarded-Encrypted: i=1; AJvYcCVBGV/8/iINwhH17G4fCDBlVEicCPVHl75bSOz/GAwKhwH54tfQyo2lTNqqnarvjlDXfOp8ssc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzRpseN6Aa47GuMO18VjCxxAFvv50N0j1L7miSarqwYjN5L+PW
+	b8U2z761hRpnTAG9+wVOT0wMWa9+Jb5SwzwzxazSazrRBHEWyLrvXXbJsFLkAkMRhJ0=
+X-Gm-Gg: ATEYQzwCE7EHqBzL6q065CRC++eyfSE7u5V38V1UamZyQMINaFFTqJn9fkviGX8IJEW
+	X99Rf5iTGAZQJtU1S4ed28mu0VD2EXBteROFfGln76PG/G/YAXgFhXoCJVgE92rAHRE3DzntdCE
+	cI30pNR1pVJ33iYUTHuyi60wos8ElqKJ77IxW5jK7ueUDasdBjrbpRykk6ZrWkFIs4jNxsnDm20
+	ORWe3hu+f1Jrr4Vi/TERo7UC80PU/or9fvdim5bqkJwBq7M+tle0JYrIfN1IbqwcrdI3JTIb8jW
+	xrOUfd9Q8dbRBAxzJU6FG68HHZGSm7XCWLUdzAQW55iIYlgXNaY3/CHiSituj0QeVzTPXITr9DP
+	eKmICZW0345LyT/1m4YkHESTXqQ0jq+g4ais6qTbM3dkBdU7MQvsMCNKMewX/pZBFhi1+L7pZSI
+	rAZbYCgo6bKpfFdL+na4IyF7FNuHn+AglpkGc=
+X-Received: by 2002:a05:6808:17a7:b0:467:268d:31cc with SMTP id 5614622812f47-4673349dd90mr1688611b6e.26.1773244900597;
+        Wed, 11 Mar 2026 09:01:40 -0700 (PDT)
+Received: from [192.168.1.14] ([38.175.187.108])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-467342ef6fesm1473123b6e.14.2026.03.11.09.01.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 09:01:39 -0700 (PDT)
+Message-ID: <426c282e-862f-400d-9989-f3a572125dd3@linuxfoundation.org>
+Date: Wed, 11 Mar 2026 10:01:37 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-17-david@kernel.org>
- <20260309142954.GM1687929@ziepe.ca> <61df6369-333c-430a-bd18-c5b1acae68ea@kernel.org>
- <abE4JYo223OxWCBQ@google.com> <20260311120418.GU1687929@ziepe.ca>
-Message-ID: <abGR4GWMXC2tJyr8@google.com>
-Subject: Re: [PATCH v1 16/16] mm/memory: support VM_MIXEDMAP in zap_special_vma_range()
-From: Alice Ryhl <aliceryhl@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>, linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Leon Romanovsky <leon@kernel.org>, 
-	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] docs: octeontx2: fix typo in documentation Fix spelling
+ mistake "Crate" to "Create" in the documentation.
+To: ShravyaPanchagiri <shravy112@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ hkelam@marvell.com, sbhatta@marvell.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ corbet@lwn.net, Shuah Khan <skhan@linuxfoundation.org>
+References: <20260311024312.6760-1-shravy112@gmail.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20260311024312.6760-1-shravy112@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-266691-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266692-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[73];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5D8CA266F44
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[skhan@linuxfoundation.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,linuxfoundation.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F2AE2266EA4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 09:04:18AM -0300, Jason Gunthorpe wrote:
-> On Wed, Mar 11, 2026 at 09:38:45AM +0000, Alice Ryhl wrote:
-> > It doesn't really make sense to have multiple binder VMAs. What happens
-> > with Rust Binder is that process A is receiving transactions and has the
-> > VMA mapped once.
+On 3/10/26 20:43, ShravyaPanchagiri wrote:
+
+Missing change log. Instead of writing a very long short log,
+you could break it up to add the sentence below to change log.
+
+  Fix spelling mistake "Crate" to "Create" to "Create"
+
+Also there is no need to say which word is misspelled - we
+can see that in the patch.
+
+> Signed-off-by: ShravyaPanchagiri <shravy112@gmail.com>
+> ---
+>   .../networking/device_drivers/ethernet/marvell/octeontx2.rst    | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> IIRC the problem is the kernel doesn't guarentee singleton VMAs,
-> userspace can always clone them with fork or something. Did binder
-> solve this somehow?
+> diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
+> index a52850602cd8..c31c6c197cdb 100644
+> --- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
+> +++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
+> @@ -323,7 +323,7 @@ Setup HTB offload
+>   
+>           # ethtool -K <interface> hw-tc-offload on
+>   
+> -2. Crate htb root::
+> +2. Create htb root::
+>   
+>           # tc qdisc add dev <interface> clsact
+>           # tc qdisc replace dev <interface> root handle 1: htb offload
 
-The Binder VMA is DONTCOPY, so it will not be present after fork.
-
-> Since you can't assume there is only one VMA the locking becomes a
-> mess to cover all the cases where userspace can trigger a VMA clone.
-> 
-> address space deals with this internally.
-> 
-> Thus, zap_special_vma_range() is extremely hard to use.
-
-I mean, the hard part about the locking is keeping them in sync. Binder
-just doesn't do that. Only the original VMA gets pages inserted or
-zapped. If you create a second VMA, you just get a useless read-only VMA
-that you can't do anything with.
-
-Alice
+thanks,
+-- Shuah
 
