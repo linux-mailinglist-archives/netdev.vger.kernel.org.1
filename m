@@ -1,194 +1,268 @@
-Return-Path: <netdev+bounces-267134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJZEJcjfsmkfQgAAu9opvQ
-	(envelope-from <netdev+bounces-267134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:46:16 +0100
+	id mOxSHrDgsmncQQAAu9opvQ
+	(envelope-from <netdev+bounces-267135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:50:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA76274D0E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:46:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0BE274DD7
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:50:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E032030A755E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:42:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8819F303AF1D
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCD83A3E9E;
-	Thu, 12 Mar 2026 15:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFE43CAE92;
+	Thu, 12 Mar 2026 15:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gsVSGWYu";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vhAz6PDE"
+	dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b="QOwG2WEt"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from YT5PR01CU002.outbound.protection.outlook.com (mail-canadacentralazon11021102.outbound.protection.outlook.com [40.107.192.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83E8359A95
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773330179; cv=none; b=qyTH13gNjLG/buIo+6IkfBoHEmstxyCNwQebEQd+2m/LRALZY7ME6hwfy7RmelIFYn8EsE1Zfd+xekco7E2iHsd8xeAH9wXDzBAYRVXvq+DxrzTIhayt4nJerfzG5o3gOdS+osNY2kCXtVikcXoYbgRtMHGwUDZUxM5NuiBRFQE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773330179; c=relaxed/simple;
-	bh=Nz4L1eR+L1qlzE9WAkM18DQuDhU8EP+abBLbKqfGVoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M5FG7YgcPzoT3elaa8fSHi6Q6FPOLekClrk1fc57oOm6DmjRVlUQWR1Y/FKYH2QB1KvDNI9JN96c978a+b0BQTVs31HTzDXeDL51hxixgeW+6TFK3+0YQ41RdneAMQWQLNeOq2taNGeDxjmEemSA4L1CJG5shFKHLqbwNjcQLtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gsVSGWYu; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vhAz6PDE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 12 Mar 2026 16:42:53 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1773330175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nz4L1eR+L1qlzE9WAkM18DQuDhU8EP+abBLbKqfGVoQ=;
-	b=gsVSGWYuc/EKHWX6NW773c3LjLTKHSsF2Jtk6jVnkwQQAn6ON13Ftnn/ez9HfYC8W/s5qK
-	wvemWr4C3Qv98WhNn5qZk2tZJLeoFGF1LJiyhNVCkfBJZSyYwZwIscNkZpjfDOLvTqryyB
-	3u2yQBldlkZrMtAVzSS8tFFN2zCb6lHJvhEdeoGVIoeaLKFR8hzA8Q3LUpdyt9NUCFVF5C
-	MIXyGrlb5NnmIEGtXDoc+CO7hmzMx/EnWppMna6WJkjBAATHhfjOFAnfbhtRjc1P8N4RTQ
-	9pCJUpjkenA4IPyhq8daw1dNobj+RYDvzkS+7ZOrG6SO/vtZADaYBmaTB7FEtA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1773330175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nz4L1eR+L1qlzE9WAkM18DQuDhU8EP+abBLbKqfGVoQ=;
-	b=vhAz6PDEGpz5pAFJqRmIfSsrB5PULGyPyAeVrt2ufD6sU23MVI7SbPiV6ukkb15wGXTfWy
-	B4nwNu54DZYURSCA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, "(JC), Jayachandran" <j-rameshbabu@ti.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
-	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
-	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific
- handling for HSR
-Message-ID: <20260312154253.UC-QUPvD@linutronix.de>
-References: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
- <20260309-hsr_ptp-v2-2-798262aad3a4@linutronix.de>
- <willemdebruijn.kernel.3b7b5294c6434@gmail.com>
- <20260310105544.EVXIekwG@linutronix.de>
- <willemdebruijn.kernel.3693c9aa8271@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1203EF654;
+	Thu, 12 Mar 2026 15:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.192.102
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773330575; cv=fail; b=YBcQ81pCo1LFF9K1cODOVJrg/WfcEUXq4zKXlHnxuw2SAHTfPtBAEZSyR0gQ9GcJiUNEwKaLcOEmkGMxF0Wq5MKxFsl1IC7+VUmVBJhmBSXOakmZ5ms7BdJmisKt/nBQnshGZY9mWVvloBQs0Nnzzx3HUmA8doutIHu5wagLaCg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773330575; c=relaxed/simple;
+	bh=MdVz00LzKdY5lJhCS3MOxCmsjyk8ag4jF6jSMm0JyGU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uToKstk8QxJbkfKUsJsO6gPvFaQxM5mIHCk8czYqyJjOlBAoN9UxNTJs2tOlgI718V/rQs0Wrpf3xcnKrtrMYGKxgeOmEvzgCcKWM9vnkK2hx3ewd6jR0ryWDVgYd1BTzTZGElmNAhgQuD96eSaxgxF7xEdmU+1k4h78E9xO1n8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com; spf=pass smtp.mailfrom=efficios.com; dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b=QOwG2WEt; arc=fail smtp.client-ip=40.107.192.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=efficios.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bhi48NCjGTLHjCSLcJjjhyVCIlwH2yhBLY++GM7K4Gt+nM0TCziV5JCP0MZlgJrcCgpufDVTnbpgy4nmZUmNPnRAwQZRYXWW/8lTkzcWHv9GlnCkd633ti++3MU2THvGVBBmCOvMktO1o8MpoWRT/IK4JqvI7oIa00q13sVWpXZ0WoUZlk1kRj+BnCtr+of1ZJ2UV/2LnardH2ULsGQtlOgPmjO6a2Xs9OjrckXcMXFLi7MJr14CjJxr0S9voVM3/Y29hDHMBaVY0TTl5s3si+V1YM3BvZ2KSiP7dJq2IqIEDf7U9i/AViMq7jOjUSEycBgtghM4TTU6UKCFGWTO+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r+f1OS1gXJn7QXukqE5ZKY8YOg8IHXLISgDrGg7moAU=;
+ b=yKq0x4NdnjLpubIFr1q7w4HSz8QFflJEdPWJaijELdoaTylt6ou4+Wtcr5bRdpEQ2Yn797YxE0ox0Uwr1zlLY0zhM/3VHuYJtr422ux9eRdwGFE2u9PJi4IauTOrGkvu9OwRCdqLOhMjF+9b5dasI1r8h2n6VaBFbCSO0+EiJ3M+ce+/pQHdeF6SWiWCum7O/iT/LLLliGnwKtL+fr2wFHVT53kmfmNNfBgV6XKBt3KItTbe7ERYXv2j6hp7xgtHuXFYcxBF/TB7dHd7kUe6WKusxiRCKpYAtyoe2ujjgILQaFdNpot1F0IhXZko9xkKy8/9k8Xu6PMT8a+lDMh3Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=efficios.com; dmarc=pass action=none header.from=efficios.com;
+ dkim=pass header.d=efficios.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r+f1OS1gXJn7QXukqE5ZKY8YOg8IHXLISgDrGg7moAU=;
+ b=QOwG2WEtH2lDIceIgFCkJgqLqfqdRUE1HV4yNavueIqrG3i4mQR8US7PtMHNHa1DyijRze1BRay9V3zKoqSXyOQkGiAHUMFf3bbt2KKb3szm7YrPETalck/Pk5tfaRsmS7vgAZcM9la34fUXVjwsTZF3k83MQ9ewI49vaubVcxsUOecwRKhHKfmrB8WO8hk+vJ6Exh5FXGGWdDwetpupTxmHp+lYqzcnF4sGYcZTYvwZQ7oKduPvYIpBXmljvu+8+xpB/Wg4BxmLX04vNE/RShTAzCC/QLeabhcWZEW69+pza5NKJIW5YdqSNYzVhoUxPJCUa3lFRE79DMiovqePew==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=efficios.com;
+Received: from YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:be::5)
+ by YT1PPF9FBEE6684.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b08::56e) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Thu, 12 Mar
+ 2026 15:49:27 +0000
+Received: from YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::6004:a862:d45d:90c1]) by YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::6004:a862:d45d:90c1%3]) with mapi id 15.20.9700.015; Thu, 12 Mar 2026
+ 15:49:24 +0000
+Message-ID: <1becdbce-2c01-468a-bbab-42b5dea9fdf8@efficios.com>
+Date: Thu, 12 Mar 2026 11:49:23 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/15] tracepoint: Avoid double static_branch evaluation
+ at guarded call sites
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
+ Peter Zijlstra <peterz@infradead.org>, Dmitry Ilvokhin <d@ilvokhin.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+ Aaron Conole <aconole@redhat.com>, Eelco Chaudron <echaudro@redhat.com>,
+ Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, dev@openvswitch.org,
+ Oded Gabbay <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>,
+ dri-devel@lists.freedesktop.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ "Gautham R. Shenoy" <gautham.shenoy@amd.com>, Huang Rui <ray.huang@amd.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Len Brown <lenb@kernel.org>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ linux-pm@vger.kernel.org, MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, linaro-mm-sig@lists.linaro.org,
+ Eddie James <eajames@linux.ibm.com>,
+ Andrew Jeffery <andrew@codeconstruct.com.au>, Joel Stanley <joel@jms.id.au>,
+ linux-fsi@lists.ozlabs.org, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Alex Deucher <alexander.deucher@amd.com>,
+ Danilo Krummrich <dakr@kernel.org>, Matthew Brost <matthew.brost@intel.com>,
+ Philipp Stanner <phasta@kernel.org>, Harry Wentland
+ <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, linux-input@vger.kernel.org,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-i2c@vger.kernel.org,
+ Mark Brown <broonie@kernel.org>,
+ Michael Hennerich <michael.hennerich@analog.com>,
+ =?UTF-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, linux-spi@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
+ <1e3c2830-765e-4271-89f7-0b6784b37597@efficios.com>
+ <20260312112354.3dd99e36@gandalf.local.home>
+ <219d015d-076b-4c80-8f63-88569115fdad@efficios.com>
+ <20260312114041.5193c729@gandalf.local.home>
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Content-Language: en-US
+In-Reply-To: <20260312114041.5193c729@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: YT3PR01CA0018.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:86::22) To YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:be::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <willemdebruijn.kernel.3693c9aa8271@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: YT2PR01MB9175:EE_|YT1PPF9FBEE6684:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b2414cd-f9a0-4f3b-2712-08de804eef5d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	CCU/Y6dWVcv//xk15ypG7eITc5aQM5bWdOX1u0Bg7LwgrkyHe1wzrwTN5wXXfc5xJCRIakvlCYqdfwdCceaIQFvddxgxCzlQs/IBorNWI0UEoO+mq924zyCtOX4JBRa9rN9zpPbp0JJNTHvaa0PV9WUYu6shnbacYkirruurEEK5KveBdc8qAokvYzgv9O0kPSU4X7J8jC2TYPGjzHTVggJjJtd95SQPMUpF/8bKPRuJXBsks3p7pm8rNuLzkRmYYe7TFfQgh9bFzduN8qrPz6le68qUPo14DQU0vcQnMs7+4yOl0RApfwCBfOJuWhj+bHD+VWbOz83lUg/el537KTfDaV75oL7RowCGOziZZUdlPQ0xJ3hDGclxiISSslmDImqoqyLCKnWtOPnGSZZ0l0MiAZztX8uVJlx5pHuKEjWD38UG7InzMrY68f0dFRTCnw2RzIAPDNtYwiZKROkRI0Hxp6WJR8TlRKr++J3/9hzixnMjukIKvL8Zbktg0i8t4OmfhXCadZTLkQJ/GMS7S13YFu5nFRltQ+CjQzTXIQGu+TVLFMzAL/4WObVG8i/knmreglFb335L29gNuWMmaDQpb7vdXnytVPYuURluTd0taHORk0p76aBppL8BFumWY8JawPXZm//vYPDc14V5XI00ex6bVQMllVX8jN/WF142cQg6/4zy/SZPWX6OTLLE
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UlVoOVVSRkVTdmhnT29ncDBnZDZ1a0REMDBxWUx2cXk5NlpLeVpyWWhxWWYv?=
+ =?utf-8?B?UWZScCtxTVU0aU01dENzakdVMGNEaDNDaGRDcTFrc1dLeFI5WlB1RmZmeWFY?=
+ =?utf-8?B?d25rYTRjajB5Qm1CblJEbkc3WjZlU0Y5bkRuUG1VUG1OTk12UVlmUmJ4YUxa?=
+ =?utf-8?B?UGJUc0pxdVVteEdHbXlDT1ZJS1JJM1lyRE16NFdpRTMxejJvemhscXpDdDBw?=
+ =?utf-8?B?cGxsOFhqVWJ2SFpYanBibHQ5cG9hNDZPZGdHc2VYTXVFUGdoZ3BibW5aSG92?=
+ =?utf-8?B?Z1pXbHdJNklnd0JQU3hiYzcxT0JEWkk3NG0rdmQvclVmNndwVWErOU9ldmJ5?=
+ =?utf-8?B?LzRYS2dsMk5jR3NoQi9aRnJzWGh0UUJqZC84UXk1L09JWng3bmIxZ0EvWU5L?=
+ =?utf-8?B?b0laaENpWkxrbkhnazZMN1F1WXI1Q0FVdy9IeFI0ZXU5aG1wNUxLNnRyVVRU?=
+ =?utf-8?B?R0Ura05JVkxwR1JnOFBHWUZBWTdLZjhlU1V6U3pubHFCc1gySE5ZK2wydkhR?=
+ =?utf-8?B?NHhHSjhkVkJoZXc5N0l6WFh2WWtqcC80Q1IvVVF5OTFlQy81U1NSNzlWSWpk?=
+ =?utf-8?B?dnNPb01QcmNjWHRYdTYyMXlpcFhhaHFUUHBQdkRpMVBSaGRGRnREUHZiclhP?=
+ =?utf-8?B?Q2RNS293SVdEWmZDdkV1Qi8yQ2V2b3hleHRib1VOQ0xQcWNPTnNkWlVkZHVV?=
+ =?utf-8?B?Y2plczlBZ2k5Uzl1Sm1wdnFzMzZ1RHI3a3NoaWdOMC9KMlYzeFhxcUExbzBa?=
+ =?utf-8?B?WHdvZzRtMVo2RjBQMFB5UkFqTktVZERsQVlZWktEVFo2bmtkUk9zbGwxcm5P?=
+ =?utf-8?B?R2JEZTNqRjV2VHpqT01EWFdzVE1weU9KR0JGLzl6N2pxa1I2WFdzR1NDMDVw?=
+ =?utf-8?B?d3BMaEVxcyszREx4U0dyRHNWVlRTNUQ4VUZYVU16NWZ6WnVSMk5rS2NaMllP?=
+ =?utf-8?B?K1owbWpid0RsZlVEZG4ybkZpbittdTVnOFhLMXpUei9iWnZNWm5PeWY3WXhn?=
+ =?utf-8?B?TGwya21OYlNMWlpISDdiOXhWb2tHM1AxTmZQblYrdXJobmF0akZhaThtdXVr?=
+ =?utf-8?B?R2dHVGowb0tybkdVeis1SW14bEp3c2h6Z0o4Y0dBcnpuV3cvK1gwY2pmTVBq?=
+ =?utf-8?B?Zld6UHZGQStORyt1VHEzRDFURDJ0UnNneHhzelJreURtVWIvSXhsRWVhQkJr?=
+ =?utf-8?B?MU9KL1RoWVpFS2VSSUxmZFFlaGF1SDh5Z1NBQ3lUQUd4aXRqWTgwd25ET1F4?=
+ =?utf-8?B?eDI0b0h2bnpWMUJQUDI2ZEpvMDF2TWJVTStQNFcwQ2g0M3R3QTJ0WVJRTGx6?=
+ =?utf-8?B?Q3JOZ0RrSnJZUjBGY1dpSG96VloyR21zczM2YklzYm9PN211dFVnNUx2YlNa?=
+ =?utf-8?B?MmZiMXYyb1E5T3RrdmxEVGJHaThqZU5pY0JzQXRWZEZUM0JhR0N3aXBIK0VO?=
+ =?utf-8?B?elhUb0JoQTVTRldxN3VXYndZazdJMGFHRFZuN0NjTDgxaGZBNDA3c3JOaGlD?=
+ =?utf-8?B?Tk45NExwZk9rM2FtMXRsY09yZUtLcFNRQU5pN0lBMUpLNDJKNXRLMlE3RWIx?=
+ =?utf-8?B?Q250QW5CQ2F4cE4vcHZCVXE1aUZFaUZlZll1OXVsZHF3NEp2Z1BMN2dRRGdM?=
+ =?utf-8?B?L3lQemhHMVN3QkZaNHRaekNpaml6YVIvTjlTbXFvWGNKc3MvUTBuQTV3Ymp1?=
+ =?utf-8?B?NlB2c3JEQmZNWGE0aDA2UXdXWU1JZFJwUlQvYkUvSVlQb1Y5anE5ZjNzR3Rj?=
+ =?utf-8?B?Y0RJOUtJeWpiUTB4N2xUR3JYRE9ZVWRvbndGWmFhcEJpTGtZTEhQNVZmVWJH?=
+ =?utf-8?B?NHhUcEtyTkhHNnBzWU9aVEpoYlkwSi85UnlnVitobk5EcFVtajBZNG9hRCtp?=
+ =?utf-8?B?cnRxbzhxNGVvRmhpSTBaSjQ2bXI4RFJlcG13UU5aenpvYi9IMDRLSkpwejdB?=
+ =?utf-8?B?SVN3alZkWmJyUFpjWDdnMis1N05rNGRuaWhGNkUxQmxTcXdrYjZJZTRnWXI2?=
+ =?utf-8?B?UGVqUmkydUxRbG9UL296T2ZmNnFldXQ4aXZRMDluNEYxenFyL3JKNlhjZFB6?=
+ =?utf-8?B?OUlMYUpGcHl4dnZFTVR1S25RSUExV0R4cWtsZEwvZ043KzZYRkJhWUs4RDVu?=
+ =?utf-8?B?dlpmdU84bXRHSjdKNi9TT0Z6Zm5xdTlLb1ptdzE1Y1lYNkhiem9Celo0UDhR?=
+ =?utf-8?B?ZXBqNDUxZ0pDVDBReTB4bWkrVnkrczJZNVMxRnhRaWpMR3BvazdPNG9BbzlT?=
+ =?utf-8?B?SlZWcTBlY3h6THVCRnR0QmN5YzZGREtOLzFycURlMlNBQ2sydzgyV2lXbS8x?=
+ =?utf-8?B?RmRLVWtQbjVDRHI5QlY5VCtpaUxvMG9NYmY4aWhMdjRTRmMvRE9PZTQ2TGpG?=
+ =?utf-8?Q?uF1Lyn94eYFiXfV0=3D?=
+X-OriginatorOrg: efficios.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b2414cd-f9a0-4f3b-2712-08de804eef5d
+X-MS-Exchange-CrossTenant-AuthSource: YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2026 15:49:24.6247
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4f278736-4ab6-415c-957e-1f55336bd31e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +5uLUtuitkHCTOMsAWxUvvwujOax/8mw+bzWboKw/HDzJRI5hQJwSWEeZOaUhAFcH+15CaSGPnUpnk/IrPZfDmb5LWggTp1PlNuqINXqnKM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: YT1PPF9FBEE6684
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[efficios.com,none];
+	R_DKIM_ALLOW(-0.20)[efficios.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267134-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[bitbyteword.org,infradead.org,ilvokhin.com,kernel.org,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,gmail.com,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,HansenPartnership.com,oracle.com,fb.com,suse.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267135-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[efficios.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FROM_NEQ_ENVFROM(0.00)[mathieu.desnoyers@efficios.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[72];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:mid]
-X-Rspamd-Queue-Id: 0EA76274D0E
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2F0BE274DD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-10 17:35:33 [-0400], Willem de Bruijn wrote:
-> > but the problem was sending with system's HSR header.
-> >
-> > > For the first case, could skb->mark be used as port selector when
-> > > writing from a packet socket to the master device? That already works
-> > > with sock_cmsg_send.
-> >=20
-> > We would have to specify that SO_MARK 1 and 2 denotes the port on which
-> > a packet is sent. This kind of burns the usage for everything else on
-> > HSR so it feels misused.
->=20
-> It is more or less what mark is for. An alternative similar field
-> supported by sock_cmsg_send is skb->priority.
+On 2026-03-12 11:40, Steven Rostedt wrote:
+> On Thu, 12 Mar 2026 11:28:07 -0400
+> Mathieu Desnoyers <mathieu.desnoyers@efficios.com> wrote:
+> 
+>>> Note, Vineeth came up with the naming. I would have done "do" but when I
+>>> saw "invoke" I thought it sounded better.
+>>
+>> It works as long as you don't have a tracing subsystem called
+>> "invoke", then you get into identifier clash territory.
+> 
+> True. Perhaps we should do the double underscore trick.
+> 
+> Instead of:  trace_invoke_foo()
+> 
+> use:  trace_invoke__foo()
+> 
+> 
+> Which will make it more visible to what the trace event is.
+> 
+> Hmm, we probably should have used: trace__foo() for all tracepoints, as
+> there's still functions that are called trace_foo() that are not
+> tracepoints :-p
 
-The ->priority thing looks wrong. It is used by ssh and other
-application so they would suddenly behave differently.
-But okay lets take SO_MARK. Might be smallest abuse here.
-And we would have to hardcode the values in respect to HSR and I have no
-idea where to document this.
-The difference with SO_MARK in general (at least my understanding) is
-that you can choose the values based on your setup. Here we would say
-7-0 are already reserved.
+One certain way to eliminate identifier clash would be to go for a
+prefix to "trace_", e.g.
 
-> An alternative may be to share the information in-band. Already
-> insert the HSR header also wen writing to the master device. If the
-> master device can detect this packet-with-pre-existing header.
+do_trace_foo()
+call_trace_foo()
+emit_trace_foo()
+__trace_foo()
+invoke_trace_foo()
+dispatch_trace_foo()
 
-Given all this, I guess it is easier to stick to SO_MARK as the header
-might collide with other data.
+Thanks,
 
-> This is not the first case where ndo_start_xmit may already expect a
-> header prefixed that it normally inserts. I forgot the exact case (can
-> look it up), maybe a weird edge case in GRE?
->=20
-> It does not even have to be a valid HSR header: just an agreement
-> between the process writing the raw packet and hsr_dev_xmit.
->=20
-> There probably are still more ways we can approach this challenge.
-> But these are three that do not require kernel changes outside the
-> HSR protocol code.
+Mathieu
 
-Okay.
 
-> > And then we would need an additional bit to
-> > specify whether the HSR header is there or not. Unless I open additional
-> > socket on the ethernet device just for sending and dropping everything
-> > incoming.
->=20
-> Right, packets that already have a header prefixed are written
-> directly to the intended slave.
->=20
-> > And we would have to filter/ distinguish the RX port based on it.
-> > Userland has a cBPF filter to filter everything out and receive only PTP
-> > frames. If the PTP packet is forwarded to both sockets (A and B) then
-> > userland would have to throw one copy away and go to sleep again. This
-> > sort of breaks currently linuxptp logic. It would probably require
-> > either eBPF to filter also so_mark or deal with "no packet despite the
-> > wakeup" but so far I tried minimal impact on both sides (kernel and
-> > user).
->=20
-> I don't fully follow this part. It discusses Rx again?
 
-Yes, this is RX. If I open packet socket, bind to hsr0, how do I filter
-for packets from one of the slaves?
-
-After some thinking and browsing through the packet code:
-The hsr stack creates hsrX. If it would create additionally hsrX_A and
-hsrX_B in order to be able to send and receive only on the relevant
-slave device then I wouldn't need the filters in packet code. That could
-work=E2=80=A6
-
-Sebastian
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+https://www.efficios.com
 
