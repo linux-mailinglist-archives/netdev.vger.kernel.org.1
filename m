@@ -1,179 +1,203 @@
-Return-Path: <netdev+bounces-267076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGgjNf7EsmmvPAAAu9opvQ
-	(envelope-from <netdev+bounces-267076-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:51:58 +0100
+	id sO2bKqDGsmmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:58:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F6B272EF0
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:51:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287B127300B
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:58:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DB2ED300C0C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:51:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 14B913038D1C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0A534C981;
-	Thu, 12 Mar 2026 13:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E6431E844;
+	Thu, 12 Mar 2026 13:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYDlmXdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F10634AB03
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0572351C03
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773323505; cv=none; b=H7oe5LUpegZJq8OOe5727ZSxTw/3GV+OyjL53kJYJZWShLvLYkLfsQ5SVbX8YEPfWHOFR5GGchGZXLEF0tGNypVJzz4wunK62chUIeT2nta2Td60qYHfRrfaC46GUaMOflTsz321XVj3WUClULlYIimf3uCkIs+e8mUoXM90+Yo=
+	t=1773323584; cv=none; b=GmdbyksZLbz7lT73eBn/uyR3Rxs07T+kuJVv4ei9Q2zN0pgaHheiiz8mx5KA2wGbC1L5UFzUtcnbAwTn5OHt8AiLPYtkzGkcge3PffyUF1xUmaqDtTU35u9U20kwx2PnF/VSRrJg7axm0+nISqXgHtVkOZMRSbn/oGivud2Up40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773323505; c=relaxed/simple;
-	bh=9ACImsV3PaE3MjN2Tt3sT85C9g5/Cskv8/oIpybHlhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ailSTsZZPnkw3ZbWq710gCUnhjyq95suxuTE3Gi5Wc9o/BYGUebmL70hRr4G8CNha0laPLFgTo1YdpC4B67HFl38ct3HH2em/wa7PHLt99mV8M4eNeeEJUioVx5YDZgk1w5zjn6ei1DS3ryqzHf04JMlKOZ46qhcL7qbk/9A7+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0gRP-0003i6-Hh; Thu, 12 Mar 2026 14:51:07 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0gRL-0051yO-35;
-	Thu, 12 Mar 2026 14:51:05 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0gRN-0000000FJkc-0htF;
-	Thu, 12 Mar 2026 14:51:05 +0100
-Date: Thu, 12 Mar 2026 14:51:05 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-Message-ID: <abLEyaV-ux5XkAz1@pengutronix.de>
-References: <20260310104743.907818-1-bjorn@kernel.org>
- <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
- <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
- <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
- <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
- <20260311195052.1202174f@kernel.org>
- <abJJY8whzSOB8O-X@pengutronix.de>
- <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
+	s=arc-20240116; t=1773323584; c=relaxed/simple;
+	bh=faGQyXQIEexLrthjMYjIHjLk24UDy8P/kcRREOrNBbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JcJCZoGzQdi4WMLy2+f41EXDm/k1bBmI32jYCKvB+7ZFQis75t5ynIbT6SxWyMw0SEJH+vso8+iC8DlCxeouPackkvIThpxq816iMC4c+5Jwix2wF6KuvxdBq+WBTOrJulxB3AA+FifnpJx5WTPG7pYCTpVFf/0h2REeZjsLi+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYDlmXdg; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-59e4989dacdso1242942e87.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773323579; x=1773928379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cLa3hjm81+l0iihx+Vd/908jpbxZZUZC18PWTXWrhu0=;
+        b=iYDlmXdgN8G30SXRuDdtsayoPCU7SCx+mU24f62X+yRkoa8/QlGzs7do3OTHwjuG+7
+         Qad7t6Z+vJwH+bOW8E5bnbdGa91HgaRxF3ZFnHuv5/DPug/DX9kf+AG5rAxqcsOC1YNP
+         W0Uy0JKVpneoUrf9HDuk21CT487bt1DrrGHRJXwtRalNv4V5fOhm6XOTkiilAx2VF5+b
+         2Nur+58cX2giHwK7LqqJBrzCS+DbhN+ws1HoQU3ujG1SFy0m5dM55Lxc7QT+uec16Arr
+         qBx8bMabGMbZXlOxqAuCxj7Pnwqkk+QIY9uKahzymSqqxf5xs0qGeG2VwBF4XHksINpw
+         IC9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773323579; x=1773928379;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cLa3hjm81+l0iihx+Vd/908jpbxZZUZC18PWTXWrhu0=;
+        b=nPid5gKyJ5wtsOfONsXxDI08OkPRvvIqbwQ/qbW43pu0RR4TKRLKxo9BFUfCQbRez+
+         sFPIqOuc96VCs4o1QPmRPOR/CTtBkUJAzn+SrMe9Kux2mGxhlmVH1rmntzWrxCQFMyj3
+         Fm/P0eNQsXOT5ineW14L0NiuOWfHL5NpfCvhAHo8ii1RdSvLG/UEYk1PF3iQophfuwlF
+         fqu/9FNxYEbym8z2tZvEaXcs+TUrIcP4vvsWK7uUeDdWk/GaASDnkvfeYjwn4U+YiXGk
+         78FbHR544hh5d2odfHP5Ads7Oq3SARDPCSeYO4jsQ0AQVtxDkosT+zG4cnoWRdWw3QSy
+         u0bg==
+X-Gm-Message-State: AOJu0YyNvtub0EP8zdKgJcsFIc/y54OsHqz2izrmWPN9D/+qMuJMmVHT
+	EOAIYRfUkSGVK7Ov6Q8XabIas0lPi1slfVAf3cp/XgL9bxnn23GLsaYy
+X-Gm-Gg: ATEYQzxHuairf5pAEIv64VU+dJLJvEVkJB3CA6m8uRsAe6UlDoMtFqVLTOtrwrymstG
+	nOFVtDbmKIExMw0As58ask9uYcTh54S74XkyXSzFXJf252GZOkZRDSWqbOycTxTvwwl17SxZAYb
+	/90vpPWnMNNohP9B6RfflF9OUyJtXXKuk+Q+1zSRzNyOnSyMYX2Up0dDwIohJjBqDoeX/YgnONb
+	wS8JH/5NUAUGX/MMsOZhoNzNshKsP3RiG694NYWl+6VOVSN+2BNBxEkQnVg5yUcOilgEvAFkEw+
+	noKq3zrXri5FO0SG94m4Blc4x3Txz4lyVpat52Z2kIoVnzmZG8ZnbU+MvXaWclZVkH25pHl6jbH
+	Gf2kaSmQjMHMwK9yAKF7ybGk1BbOANRDp9hJ5VWRrtd4FzTdZ2D65Ca0zUUUHv1XUIR+eKic8EG
+	cnZLSK
+X-Received: by 2002:a05:6512:1441:10b0:5a1:34d2:b6db with SMTP id 2adb3069b0e04-5a156bb980dmr1557195e87.1.1773323579188;
+        Thu, 12 Mar 2026 06:52:59 -0700 (PDT)
+Received: from router-0001 ([2a01:4f9:3080:2e0f::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a156033a29sm954117e87.37.2026.03.12.06.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 06:52:58 -0700 (PDT)
+From: Alex Dvoretsky <advoretsky@gmail.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	aleksandr.loktionov@intel.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	kurt@linutronix.de,
+	stable@vger.kernel.org,
+	Alex Dvoretsky <advoretsky@gmail.com>
+Subject: [PATCH net v3] igb: remove napi_synchronize() in igb_down()
+Date: Thu, 12 Mar 2026 14:52:55 +0100
+Message-ID: <20260312135257.71610-1-advoretsky@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <DS4PPF7551E65520F55DBD20987BCAE3C6FE544A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+References: <DS4PPF7551E65520F55DBD20987BCAE3C6FE544A@DS4PPF7551E6552.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,bootlin.com,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-267076-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,linutronix.de,gmail.com];
+	TAGGED_FROM(0.00)[bounces-267077-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[advoretsky@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A5F6B272EF0
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 287B127300B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 02:34:40PM +0100, Andrew Lunn wrote:
-> > As for me, it is problematic to help the user to understand the datapath
-> > depth on a switch. For example:
-> 
-> Do you mean Ethernet switch? Or MII switch.
-> 
-> > 
-> > CPU -- xMII --- MAC1 [loop] --- fabric --- MAC2 [loop] --- xMII -- PHY
-> >                                     \----- MACx [loop] ---
-> 
-> In DSA, MAC1 is the CPU port of the switch. It is not represented by a
-> netif. Since there is no netif, you cannot use ethtool on it. So it is
-> impossible to apply loopback here.
-> 
-> This is one of the oddities of DSA. The CPU port and the conduit
-> interface on the host are just plumbing to make the setup work. In
-> terms of networking, they are not important. But sometimes you need to
-> get into the plumbing to find out why it is blocked up, statistics are
-> useful, and maybe loopback as well. We have discussed it a few times
-> that MAC1 should have a netif, but the conclusion is that developers
-> have a hard enough time with the conduit interface, adding yet another
-> oddball interface with no real purpose other than diagnostics is gone
-> to make the confusion even worse.
-> 
-> So i don't think depth is relevant here.
+When an AF_XDP zero-copy application terminates abruptly (e.g., kill -9),
+the XSK buffer pool is destroyed but NAPI polling continues.
+igb_clean_rx_irq_zc() repeatedly returns the full budget, preventing
+napi_complete_done() from clearing NAPI_STATE_SCHED.
+
+igb_down() calls napi_synchronize() before napi_disable() for each queue
+vector. napi_synchronize() spins waiting for NAPI_STATE_SCHED to clear,
+which never happens. igb_down() blocks indefinitely, the TX watchdog
+fires, and the TX queue remains permanently stalled.
+
+napi_disable() already handles this correctly: it sets NAPI_STATE_DISABLE.
+After a full-budget poll, __napi_poll() checks napi_disable_pending(). If
+set, it forces completion and clears NAPI_STATE_SCHED, breaking the loop
+that napi_synchronize() cannot.
+
+napi_synchronize() was added in commit 41f149a285da ("igb: Fix possible
+panic caused by Rx traffic arrival while interface is down").
+napi_disable() provides stronger guarantees: it prevents further
+scheduling and waits for any active poll to exit.
+Other Intel drivers (ixgbe, ice, i40e) use napi_disable() without a
+preceding napi_synchronize() in their down paths.
+
+Remove redundant napi_synchronize() call and reorder napi_disable()
+before igb_set_queue_napi() so the queue-to-NAPI mapping is only
+cleared after polling has fully stopped.
+
+Fixes: 2c6196013f84 ("igb: Add AF_XDP zero-copy Rx support")
+Cc: stable@vger.kernel.org
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Alex Dvoretsky <advoretsky@gmail.com>
+---
+Agreed, that looks cleaner — no reason to touch the NAPI plumbing while
+the poll could still be running.
+
+v3:
+  - Reorder napi_disable() before igb_set_queue_napi() per Aleksandr
+    Loktionov's suggestion.
+
+v2:
+  - Replaced 3-patch series with single napi_synchronize() removal,
+    per Maciej Fijalkowski's suggestion. napi_disable() handles the
+    stuck NAPI poll via NAPI_STATE_DISABLE, making the __IGB_DOWN
+    checks in igb_clean_rx_irq_zc() and igb_tx_timeout(), and the
+    transition guards in igb_xdp_setup(), all unnecessary.
+  - Tested on Intel I210 (igb) with AF_XDP zero-copy: full E2E
+    traffic suite, graceful shutdown, and 5x kill-9 stress cycles.
+    Zero tx_timeout events.
+
+ drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 7c41e32256fa..0793842cb937 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -2203,9 +2203,8 @@ void igb_down(struct igb_adapter *adapter)
  
-I have some projects where we need to configure the egress queue from
-the switch to the CPU MAC. Currently my idea is to represent them as
-optional HW offloading helpers for the host MAC. For example, this
-pipe is already represented on the linux side as one interface:
-eth0 - [ SoC MAC0 --- xMII --- Switch MAC1 ]
-
-MAC0 and MAC1 counters are merged to one output.
-
-So, the egress queue configuration of the Switch MAC1 would be an
-ingress queue configuration of the MAC0 interface.
-The same about remote loopback on MAC1, are additional local loopbacks
-of MAC0. If we do it with counters, why not with everything else? 
-
+ 	for (i = 0; i < adapter->num_q_vectors; i++) {
+ 		if (adapter->q_vector[i]) {
+-			napi_synchronize(&adapter->q_vector[i]->napi);
+-			igb_set_queue_napi(adapter, i, NULL);
+ 			napi_disable(&adapter->q_vector[i]->napi);
++			igb_set_queue_napi(adapter, i, NULL);
+ 		}
+ 	}
+ 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.51.0
+
 
