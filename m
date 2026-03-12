@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-266939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QA7tFAZ2sml/MwAAu9opvQ
-	(envelope-from <netdev+bounces-266939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:15:02 +0100
+	id mJ5aChh2sml/MwAAu9opvQ
+	(envelope-from <netdev+bounces-266940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:15:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C3A26EBAC
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:15:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA1426EBB4
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:15:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F6A43029E51
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:14:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7AC6D3033884
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F0829C325;
-	Thu, 12 Mar 2026 08:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85CD32D0CC;
+	Thu, 12 Mar 2026 08:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FALcmNNt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gjkQV5t7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765F3382F1
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F26529C325
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773303284; cv=none; b=omPnhRLl3NTkxPj8XH6UFFh/YmBh3yUaLD+DWEcJRWSUjTMSERyXXK/2AiHfaG+plwje5wAmZLJqeHyXW9Fuz6A4MjdWszEafWHNyteBblBcRR+TMZedyQzR+My3kt2DRe3Nf+jT6Y0DQC0dPpKkETg2L0EafdzptCMZeG9z4fQ=
+	t=1773303288; cv=none; b=WvgpNZwVUwQtHUUiI6K8dZrztRXQBjun5iC6W2DxcvSLDlkEO3b7aFE2xQFRI4QZw/vKjCnGwrgA2UU/SHv0ujFXX8QOMRO17Sh10XwZ/mqtbgdOn4I//O/nR97ARinn7AF385mg6iE5JrLSsNyPA0aqI8AonH8DCOFMcNAys5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773303284; c=relaxed/simple;
-	bh=pqOwoURsmmdI1+K6rDnIiO1SBz5bs1V861H94NmP5V8=;
+	s=arc-20240116; t=1773303288; c=relaxed/simple;
+	bh=cs1KGwAKEFW/FOK5rw+QRVROLa56giVXoJA5JjRTJIc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kJh7hiczC/GGnqVDFWMcgieMpTmZcJe6Z3RODczq6mKf77WaUrMrCGmY7J4ADRnyrm58HHjlz4AODEqqpDqkXJInYBVKTTxlm7nOvlldhAe4EM4J4ZDS+WfOmKUwCFABG/d8r2+FojfsZbNZmA3eM9ihkrWkHhY43yFMkF4Jt2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FALcmNNt; arc=none smtp.client-ip=209.85.160.175
+	 In-Reply-To:To:Cc; b=k6D6pI93mkZWgqaQZMfdwlRz7AEU6kvhpp7gAJg36uU230SIcSdcWc+U5Bt0+FEHf+nIJdOBtNi9129Qvalf9o+mASyPCcw/b37W5dSKuv5iVsxSkgnUvt4RXankGKjSxpcqKXuYzJj5uunUVWk9Vx7ooTRdzJ66039E+Xcr+5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gjkQV5t7; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50917417efbso7211871cf.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 01:14:43 -0700 (PDT)
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-89a07f66f4eso9161916d6.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 01:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773303282; x=1773908082; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773303286; x=1773908086; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FTars8MG2idRuOB2npLXPI43TOBe8XlC605+CICslTg=;
-        b=FALcmNNtG91l9d7Cz57oKgRezGlvOZfrUGmSG1e7z1ZJ7i8iXhb1C0yEpaV3GVQ60H
-         0sfYzXv837PMDWGuiwkPZHIzz+Y9O7nln1khnJmhEvihH0ucaeZq+2ilaU1pgEHxKtmB
-         ymxcESGVnPihVtBr9abmaSNfbXgFb39rH0e+nSHydB4Zw4D1IWvb9g8oWi1JYOO/e02t
-         /uWRSXiSPJM7irDafMa29FYNNd6okdOACjEL6I9V0OOsQ5CeKUgFlGd69b/2H/GTmfxl
-         agsx9BpRgWZPlgTrCffcijlUjPrMiToKe/k3Hm2SGWKI1gm1ne0XrGXPj9sqzBQPOPAH
-         g68g==
+        bh=Xmh4GWcYYRX4fgVVj4IGuhR0cpdqOiqNjv69jLST2ew=;
+        b=gjkQV5t7H6BCNE7u85MDM20X8F3PK2AavH9evzrqjW3LtPs4cXbVV1ypP8IUdVtRZD
+         HNFXQoKAh24rX/TtOhn473gwDcW8B8L3jjmdUfQV10jKtW3fhvIfoEofJIb45wVNcUL1
+         BONwymdLh/qtJ4lE6U1VBFJvPhsdeFxd17vq8DVok1/oHj5hosXQVjixxBxZxU/HGiqU
+         ATQmV1CrHRZW6lv01UOaw2W9+XuJLrpAO0TL6QN9wCPisqRvI14Cf15OgvzQSeuwggEN
+         +ljcDHuzCCSoag3GFUuZB1OT68bm6/613fetS9aJoxTuMBHkgQSsPKmAiR8u5WidYAH8
+         8ZQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773303282; x=1773908082;
+        d=1e100.net; s=20230601; t=1773303286; x=1773908086;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=FTars8MG2idRuOB2npLXPI43TOBe8XlC605+CICslTg=;
-        b=gKh99wHEpGPjEeH4UtyxqN/LMi8cfVN5FaNlgmvES5l+lJVw0bBCCYEx7Pm/sgQwLM
-         PGuJErVeSevuZ+7YgrC0inNP/iMQFhSR1m6nJSjZynvTwCh7OucjYetpelPE7C4yV0zG
-         wKvAXaXehW2JYCCVqJPu8Xr1OGWWVnpaVKtGQqe/STiXO/N2ActDr+/XcLQR7WvlbvwA
-         D9FyrvKtNG97OULqxtU0l0HjxmlVTcPcNhdO4ryVmWvPWEPSlgjVXYB/Nls4GPnzlb8R
-         Ab38Yppwmyk2nQJSqFB6BxpqzC70J4ucoTTVzqe6jpL80P87IQj5YhR8/RVSyWWbEnrk
-         92Lw==
-X-Gm-Message-State: AOJu0YxS21fqgrOH1kZYUUCBOflYN/mrCnPE0Zw6Lm7EK/IumBhMRjav
-	TdVnQBB7MyeQe4Z1c4Y1azuPNmjUhis/Wj85+lD1rp87OexODDBUyaNv
-X-Gm-Gg: ATEYQzyOwuUAjvE79C7NmqGpbDfD6bsB2LGyUjUfzQZ9foalePCc0svPMyVpTHFEwOi
-	4tcU6RPcR3MQUAydGqGavijSar3DZKESpPsSfBwwTBE8ZA7RP5VbzAx0QxOHzeo8ZiaVe0AcjeX
-	A5zBtorfpAiMicfudF6dzF4YnX3PO3Vtw7i0ETcA4WOWtsmdvYMOjV9vYnVdF9IMKgZebf87d90
-	eyXBwYsy1JTPLN6BpwTV/byTb19GjF1kI1IopUCd+m06ryFxSxwNUpKqRAQXS3xLXs0sQTJx9yY
-	NWezqnYA0SfcOoF9v/hpe0Mpgnz7qGyyveZJCiCuIr3myzYnU9osWLc+d4EVC2sdfo32FVoQOJR
-	vLYDDfBAt1SjEo4z8WVQL5ImcnYmSJ3kbCFEW/sLhGVujx0mizeTgTNGW8w3OEN8PKYM0nEUqkE
-	2DvkElPA4+TDQ4YEvosDC+u9lWAVToCuJV
-X-Received: by 2002:ac8:7f8b:0:b0:509:2231:977a with SMTP id d75a77b69052e-509472a98d8mr32623281cf.30.1773303282406;
-        Thu, 12 Mar 2026 01:14:42 -0700 (PDT)
+        bh=Xmh4GWcYYRX4fgVVj4IGuhR0cpdqOiqNjv69jLST2ew=;
+        b=g8bcaOw1DIwbiHawzWrNLrCJbUl0XqC7pxosZOfBqBIwDRfqhrskVhx1B27iPWpunX
+         22B1pzBJxlKNWo0Ty+Z5+3omxmjfwTwnnrUjWG7yHhwTLp6JDMhH/e8d8Dq3pAgtzS1V
+         S9Y/rQ1iHEeSO5UqKCU1/2W7LrMqczRV5LCcZESGbUhJ2z46efR/ScNXvqlqjHNOiNoV
+         iFNQDqYbZuz/f2yrlZSggKzqlL254ibarX0AxVCiPDJohYO4bsa2kEuGVkaSad/I0q+t
+         vN4XeilfirPbhdsUiwLE3oN/ZOcXfkUBkqVCMSBEAbsXpBTP8lrdtnF8z6eNhUkn7m5C
+         Rksg==
+X-Gm-Message-State: AOJu0Yyb/ijm03uRCf+7il7nfn9s/oe9MhUXlfmoptaeJ2nzrT4MWRUb
+	txPytYeh4vovyMPv9ysxs8Byoae7uoCkU5kbCwDPBHyPjXIuAo0FO7gZ
+X-Gm-Gg: ATEYQzwXnOmu1/Ns6qAkaqZ41RseACyiiIY8kViD+fetWpJp4mD2M0CwyckN2YZEDGc
+	oIFAndJqeSAdo786PABwi3PqnTssoG3epWuTZE1qygMtQ1D0HLmes9fYkhtOiHSfYZRmGBCM2y6
+	07C4aiU9cH1ROysrxS6JzB0EfQ7VUHBicJcSM/NpH1aOmil1mb/zuXbTu3wx69ZAvdPnJxkmb20
+	sPK9lS+zxsPKI/HS0OjaYyxee53Hv8Eqh9zmM9Zwv9g0PKWztQogK2cpIs0LsMkUn/1g4hKzBBA
+	VKiLBHCMrxqrfdG8PRcE5ZsygZCqxX0GHlE5VPwkUVNiza+mOVDKXuOjZ/VeOtk4xEQlsyr86tD
+	TLg/6xbi2sIOb/zq36+z9eBQ8Lk27+YAwtKUGyJwxrH1Yrt2dptvc7wDWHzkAbecGLlHtvBcUkn
+	Aa2ryG7bs5c2huk7p/rmyWGAw1L+pQI53Bkb0W/U13PHk=
+X-Received: by 2002:a05:6214:622:b0:89a:1c81:65c1 with SMTP id 6a1803df08f44-89a669dd63dmr75619006d6.16.1773303286507;
+        Thu, 12 Mar 2026 01:14:46 -0700 (PDT)
 Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65c122c0sm30423076d6.23.2026.03.12.01.14.39
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65c122c0sm30423076d6.23.2026.03.12.01.14.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 01:14:42 -0700 (PDT)
+        Thu, 12 Mar 2026 01:14:46 -0700 (PDT)
 From: Kevin Hao <haokexin@gmail.com>
-Date: Thu, 12 Mar 2026 16:13:58 +0800
-Subject: [PATCH net 1/2] net: macb: Introduce gem_init_rx_ring()
+Date: Thu, 12 Mar 2026 16:13:59 +0800
+Subject: [PATCH net 2/2] net: macb: Reinitialize tx/rx queue pointer
+ registers and rx ring during resume
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260312-macb-versal-v1-1-467647173fa4@gmail.com>
+Message-Id: <20260312-macb-versal-v1-2-467647173fa4@gmail.com>
 References: <20260312-macb-versal-v1-0-467647173fa4@gmail.com>
 In-Reply-To: <20260312-macb-versal-v1-0-467647173fa4@gmail.com>
 To: netdev@vger.kernel.org
@@ -95,23 +96,24 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Kevin Hao <haokexin@gmail.com>
+ Kevin Hao <haokexin@gmail.com>, Quanyang Wang <quanyang.wang@windriver.com>, 
+ stable@vger.kernel.org
 X-Mailer: b4 0.14.2
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,windriver.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266939-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266940-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -119,57 +121,63 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B2C3A26EBAC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,windriver.com:email]
+X-Rspamd-Queue-Id: 7BA1426EBB4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extract the initialization code for the GEM RX ring into a new function.
-This change will be utilized in a subsequent patch. No functional changes
-are introduced.
+On certain platforms, such as AMD Versal boards, the tx/rx queue pointer
+registers are cleared after suspend, and the rx queue pointer register
+is also disabled during suspend if WOL is enabled. Previously, we assumed
+that these registers would be restored by macb_mac_link_up(). However,
+in commit bf9cf80cab81, macb_init_buffers() was moved from
+macb_mac_link_up() to macb_open(). Therefore, we should call
+macb_init_buffers() to reinitialize the tx/rx queue pointer registers
+during resume.
 
+Due to the reset of these two registers, we also need to adjust the
+tx/rx rings accordingly. The tx ring will be handled by
+gem_shuffle_tx_rings() in macb_mac_link_up(), so we only need to
+initialize the rx ring here.
+
+Fixes: bf9cf80cab81 ("net: macb: Fix tx/rx malfunction after phy link down and up")
+Reported-by: Quanyang Wang <quanyang.wang@windriver.com>
 Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Tested-by: Quanyang Wang <quanyang.wang@windriver.com>
+Cc: stable@vger.kernel.org
 ---
- drivers/net/ethernet/cadence/macb_main.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 952aaf84757c20e94f3bbc98162a18330aa4cf73..67f7ecb05a7d6b8a5f49da588faafe1aa70d0d2b 100644
+index 67f7ecb05a7d6b8a5f49da588faafe1aa70d0d2b..100f478c0d30e4a91021a7da83f8f08606eca66e 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2805,6 +2805,14 @@ static void macb_init_tieoff(struct macb *bp)
- 	desc->ctrl = 0;
- }
- 
-+static void gem_init_rx_ring(struct macb_queue *queue)
-+{
-+	queue->rx_tail = 0;
-+	queue->rx_prepared_head = 0;
-+
-+	gem_rx_refill(queue);
-+}
-+
- static void gem_init_rings(struct macb *bp)
- {
- 	struct macb_queue *queue;
-@@ -2822,10 +2830,7 @@ static void gem_init_rings(struct macb *bp)
- 		queue->tx_head = 0;
- 		queue->tx_tail = 0;
- 
--		queue->rx_tail = 0;
--		queue->rx_prepared_head = 0;
--
--		gem_rx_refill(queue);
-+		gem_init_rx_ring(queue);
+@@ -6106,8 +6106,18 @@ static int __maybe_unused macb_resume(struct device *dev)
+ 		rtnl_unlock();
  	}
  
- 	macb_init_tieoff(bp);
++	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC))
++		macb_init_buffers(bp);
++
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues;
+ 	     ++q, ++queue) {
++		if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
++			if (macb_is_gem(bp))
++				gem_init_rx_ring(queue);
++			else
++				macb_init_rx_ring(queue);
++		}
++
+ 		napi_enable(&queue->napi_rx);
+ 		napi_enable(&queue->napi_tx);
+ 	}
 
 -- 
 2.53.0
