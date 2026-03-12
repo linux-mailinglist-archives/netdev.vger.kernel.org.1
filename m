@@ -1,177 +1,160 @@
-Return-Path: <netdev+bounces-266902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNidAlY9smnzKAAAu9opvQ
-	(envelope-from <netdev+bounces-266902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:13:10 +0100
+	id sKNVFVY/smk6KQAAu9opvQ
+	(envelope-from <netdev+bounces-266903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:21:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A48E26CFAD
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:13:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F92726D0C1
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:21:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5E39330157E6
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:13:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7C57304CCC8
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D543876C3;
-	Thu, 12 Mar 2026 04:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DBE3932F9;
+	Thu, 12 Mar 2026 04:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I1wBRX5L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qta72D+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F85390220
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 04:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773288787; cv=pass; b=Zj2AQNte09L4GWiE42lrLb8NHx4dyz+1NR/Rdl3f14e/vdVkiO/S/c587YhlFueFjhCvCHsr6KvVthNsO21Nti0DJR0SRrsnWEUDjVkRRzakAIuRz+3kMZN+o7d0o9pUXEtW6yx4Zjaf0Os1kTaQK/2HIdwjyD3f+RjAShdamYo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773288787; c=relaxed/simple;
-	bh=cH7qNk4D7abhYV01Aa6ZmoiIJllWqwgK8v2iVDRM2bs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rscIEkQNGwVvSacF6LD+fSqnmKkzCMiw3VuxETle4JuCI1Jg3vQD/v9Wot3hksp77JWerNisyZnARaLVpIxz3Ef0unLWE5FXqZOT4K/iMeg5M+tOykd/K4YVW+WTa/PNmARl9lnshMRbnnHSNt/KbgzdjKo//JlUK1FBkudk6a8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I1wBRX5L; arc=pass smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-509101189f4so5175861cf.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 21:13:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773288785; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bql6PE9+ccJxfRcd6fos/+bNcbNYOiCpBcjCYPfeMLrFpCeN9QoCKRpWg97/gcwFdT
-         GCkVbndvmQZZlAlGrpRaOi19bhHYEj0KTTQ3R2/FpgNvwAnoDybPul6NUFKPj5AP6CbZ
-         wb0/TX35TB4CzXu+fbwD/yUheHLO4URXLpCODYRbCS0yfQdVpKzonkyA3ZKN6yab4go7
-         KTQXvAkknzV6ATbE4NAWyGLMw7o4Iduf1cUXe4Gwl2ts2mGBQGRgth3dcXtd72qqW2nS
-         /+LvIUm9sA9KRmTBD1/AH+bah0lGZtPyMdSDkZCH3Cm7DGSbboMBSlY1JACeYC4qYzUw
-         6NaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZwowkJ+ef4NLgXuLaG/pevMJISu8sLllw2BooraGq+U=;
-        fh=8cGWUrZHUqwBWLOLuOZGnC6kIR6aF2GDYGwIWLi2vq0=;
-        b=GyTC0FdaqPRXShH5TQkHjr2NaO5AxeCjB5L8IBdqLMC6L7TmVaVsHrxUQrcTK+syX4
-         ZCPXWzGK52Pk8XFBBous/6pqLq38uv9+zwdlVdJNSmoXMY/3g3SU3R9GStLKwFYaaMFf
-         QYWbSK7FabT2MGZjav8oBt6taOICxFb4RkBXRvSbhZwJG4FDxsYXMdcva2ueUylxGsg4
-         5LIqbCPg4jgQEaStdefL41cnZsM9OfEK/Q21r2UCdP2nmWHXINkPfQT60rZ8IvwwzXVc
-         i8ERp5nLZjOpnGckcAaxk4IhCIWpFLYqlPWHYX+jDvJB5iqJFE8easuGZvqgQ3WCkTaP
-         q+Vg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773288785; x=1773893585; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZwowkJ+ef4NLgXuLaG/pevMJISu8sLllw2BooraGq+U=;
-        b=I1wBRX5LFDTQhFy9fXtMTPxrmzaU6Sy2wj71a1LHFGHHTLwgRMzycORCPymu1H+ENH
-         j7B6z73RV5tYa1HyDdiXUcKKno2KmNwz8m5spiku1ZjO9Koh/Fq9VUzfCzyMdx9t4OyW
-         SU5oA2lKjudw61xniJjS74VMxiGiVFwRXnLiaTqSdnGtIy2wec8gAC0opj/H/NL+E7ra
-         sw9CIiWfeDa8DO4SDjlRPMJWHzjU+MdthJ95h+9+pICV04sG+Fqa4BdSlJ4zDF/kSLA1
-         IjL6/1PDvAK6EiVvehPKcP9lAUCK5l8GQV/mumO2oQWeOrxkcYcJGf2Fe2EFRTBLM4Yh
-         0f5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773288785; x=1773893585;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZwowkJ+ef4NLgXuLaG/pevMJISu8sLllw2BooraGq+U=;
-        b=QolxYSmnLB+wBJtPFsNcJimUTfeQNyTuUjTg0keNfyZ2MEKABR2WKi7uYtAzm9t2zt
-         QIjUw2Scba1mWaNSgRGpZ1UNyUiYHdGnC42w83bfnHRdSRHCmWQ4k8/DDN7xahIrWClS
-         JO1EIbHLfylHshjAbKi8+34o+6M55OCzVdo/rG5nYTwOl8GAnMKvoiadERKRRdQVDEpU
-         LFDklP+BV5NeWgN1NUKtSgipwpbKbD/JgLwCl/KRG+LJYfTDRNentDj9SZ+G1hU6fWZw
-         q9eogVtd0lnOyjbBwlH5DnO+UtSToGY5xBzhDz5NACiwczX5ePVkxZGnS1oLP+mTh24w
-         awRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVM68FTlLMzaNOMk73/a1PGbCu0Y5bVIlcgO6JXuJH9cBkegjuu+oFFRy2JFDr3roY0XQagCdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEoAQCcwusI5HqfOMpteq2dbItiQnkf2xfIytgoz2KjgjZ88u9
-	0mkTeuRC8QMWhkvpZHkEXXa14FF30cMZbpBnk8RtLIeuxUyMbspr4iKW2RTtDfaQuDnjcfUnGi/
-	i93KM8gZEiNONFp64nwgxJ/aHEzKRNHgsjgVdm7ZS
-X-Gm-Gg: ATEYQzwWIuDS89xigYqgUR3GpvslKHHDjEztOUQyocveCel8v4oPpu/W+BhEa8r2BSa
-	eU/BQfSdL3LwxuQwpdO4nvuZVnys4/3QeFxQ1qMB86IjO9kpqdYR/F0rIFKx4CQP8d46a6bRLF7
-	RjuVV0skwT/r1/O/MLQbgQBbOKOfxPbbjNV12Tf8hI4PVJdLO3uHp3rzG53+ScUu6VW3/F9Lr07
-	fDpF3QC+nraqQ1vAxR8Xd2pTpSbxwSIwTJatsiCwz0xFV1C801vEBlafSntp+V6VOrWnfIZy2VF
-	4PUDyhw=
-X-Received: by 2002:a05:622a:28a:b0:506:9944:8cfe with SMTP id
- d75a77b69052e-50939f6e9dbmr62326321cf.15.1773288784655; Wed, 11 Mar 2026
- 21:13:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76EC38C404;
+	Thu, 12 Mar 2026 04:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773289298; cv=none; b=mTLW2iB1RRQdI0pp4nlN6tATLuw+SB3/+gpprpgcetGpou8eWXXpdVY6FpqwQ5p9xsvKvzuACdEd88U6L62WX3+kOE4Qk1ZCN7HMT9UG0RCa/w7Z5pvE70kvuZdL3UM7qWZ5pKQe2js3L/Ylucqev3KOBZhNMsyh0Igzmx3YhHc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773289298; c=relaxed/simple;
+	bh=7bD8IEomgLkpBjekMzW1r7IdMHdkv+QsIfsDdwgT6Mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rK8mcv63jXOdLlOjzgHMFTD0EUktGp1YpM/nhuYz+XxmKwrB3TP2WLmg2LzxceS4ymVGHCqyGMG9rdIoKopV2jex591GO8+gytpu7u+dSaeEXkmP4H3u5fwnSqMaNQJwz6uCiR/8LZ46dmRb8T4hq9WekrAZPNiziueGqtgQ83o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qta72D+A; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773289298; x=1804825298;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7bD8IEomgLkpBjekMzW1r7IdMHdkv+QsIfsDdwgT6Mo=;
+  b=Qta72D+A/6iSnBFVJWMsz9Rpz0R0MhNxaE6K+jY8foFa57dEJjnfubol
+   Xwz5/xlAmry79Pyvgn+DvUNSo6Vk9HiLOV4RkCWPF4eG1m/pLrFzUJTBS
+   ANRDfSMgsopCYIki7DK2a14VbaeDS8YCrq2AIhvR7m1DojPLYGQaEX7YB
+   kT6V4JVlZXAaJr814d+eXdkZDGrAFQLYjc2+2C8frFWyfKkpjKm9eskoR
+   icmID/SUbo7Cqhq7OKNndYSMPbyzfwS0bzUK1O8++yIuSNt/WiB7M3Iqb
+   Eml9aZzljUCklPt364A9VL6BIDCQKjnUTUMqJy41DKdDW9i5zGfdnVMxn
+   Q==;
+X-CSE-ConnectionGUID: 3pg3ExfyS6mdOfTIHC4E9Q==
+X-CSE-MsgGUID: 8kQ15/5YROyzRSXB41IaSw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11726"; a="74562535"
+X-IronPort-AV: E=Sophos;i="6.23,115,1770624000"; 
+   d="scan'208";a="74562535"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 21:21:38 -0700
+X-CSE-ConnectionGUID: W0MSw16FRyC1s0N38dWxbg==
+X-CSE-MsgGUID: q4mLhQcPRhWf4DVFpQI/eQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,115,1770624000"; 
+   d="scan'208";a="218131647"
+Received: from lkp-server01.sh.intel.com (HELO 418530b1a366) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 11 Mar 2026 21:21:33 -0700
+Received: from kbuild by 418530b1a366 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w0XYA-0000000024N-2uQ2;
+	Thu, 12 Mar 2026 04:21:30 +0000
+Date: Thu, 12 Mar 2026 12:21:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Matteo Croce <technoboy85@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] e1000e: add basic XDP support
+Message-ID: <202603121251.DVGQwVSr-lkp@intel.com>
+References: <20260311191437.3581-2-teknoraver@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260312041123.2756608-1-edumazet@google.com>
-In-Reply-To: <20260312041123.2756608-1-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 12 Mar 2026 05:12:53 +0100
-X-Gm-Features: AaiRm51qig0Gj_8yYie1cl_qKAn7XEQstmYVBVoKqsTCNKe3psgusNnrXIScFog
-Message-ID: <CANn89i+fFZ1JS_ii9QEXsKdPq5nRAh8b1wqP8s3_FT3TdwqTZA@mail.gmail.com>
-Subject: Re: [PATCH net] net: prevent NULL deref in ip[6]tunnel_xmit()
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Weiming Shi <bestswngs@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260311191437.3581-2-teknoraver@meta.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266903-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-266902-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6A48E26CFAD
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 1F92726D0C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 5:11=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Blamed commit missed that both functions can be called with dev =3D=3D NU=
-LL.
->
-> Fixes: 6f1a9140ecda ("net: add xmit recursion limit to tunnel xmit functi=
-ons")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> CC: Weiming Shi <bestswngs@gmail.com>
-> ---
->  include/net/ip6_tunnel.h  | 2 +-
->  net/ipv4/ip_tunnel_core.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/ip6_tunnel.h b/include/net/ip6_tunnel.h
-> index 1253cbb4b0a45f1c62999be21931ca31b596697f..b964b31e8757858ffafe47d00=
-3028d9a2640751c 100644
-> --- a/include/net/ip6_tunnel.h
-> +++ b/include/net/ip6_tunnel.h
-> @@ -158,7 +158,7 @@ static inline void ip6tunnel_xmit(struct sock *sk, st=
-ruct sk_buff *skb,
->
->         if (dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT) {
->                 net_crit_ratelimited("Dead loop on virtual device %s, fix=
- it urgently!\n",
-> -                                    dev->name);
-> +                                    dev ? dev->name : "null");
->                 DEV_STATS_INC(dev, tx_errors);
+Hi Matteo,
 
-I will send a V2, DEV_STATS_INC() would also crash.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Matteo-Croce/e1000e-add-basic-XDP-support/20260312-032318
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260311191437.3581-2-teknoraver%40meta.com
+patch subject: [PATCH net-next 1/2] e1000e: add basic XDP support
+config: i386-defconfig (https://download.01.org/0day-ci/archive/20260312/202603121251.DVGQwVSr-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260312/202603121251.DVGQwVSr-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603121251.DVGQwVSr-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: page_pool_create
+   >>> referenced by netdev.c
+   >>>               drivers/net/ethernet/intel/e1000e/netdev.o:(e1000e_setup_rx_resources) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: page_pool_alloc_pages
+   >>> referenced by netdev.c
+   >>>               drivers/net/ethernet/intel/e1000e/netdev.o:(e1000_alloc_rx_buffers_xdp) in archive vmlinux.a
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
