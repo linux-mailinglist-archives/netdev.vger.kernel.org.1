@@ -1,255 +1,329 @@
-Return-Path: <netdev+bounces-267168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YN5NMuTzsmmLRAAAu9opvQ
-	(envelope-from <netdev+bounces-267168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:12:04 +0100
+	id ID70ORfxsmloRAAAu9opvQ
+	(envelope-from <netdev+bounces-267169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:00:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C436276698
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:12:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05D702763C4
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:00:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 34222302FB00
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:58:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C31823001FB5
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A693C8725;
-	Thu, 12 Mar 2026 16:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4361F3F65F4;
+	Thu, 12 Mar 2026 16:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGGjbm4l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWCSX92D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6203603D2
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 16:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773334686; cv=none; b=BbMXW4y5mUyCZg1Ves0wRLA9/wlyT9zodXJD53A3vG9W5bH4UcdrkK7Xj0GRZGo4RH+IsXzJwLDslaSpiK10RcQ9DOboSJ6zwK6y3UCeDlWImdGjx7IPZ8DtmyGzM9SwSIxU9l9PDg4fCzP5pLHVwdEUjvtWeXpY4GIBVoRYsGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773334686; c=relaxed/simple;
-	bh=qtmraUB3Qs2ZOVkzEocVBMzelwIe4yAF7D+5xl3WjtA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zi3k9Ulfmhtpdk1oyZMfv4KJCrCBFV26w7uGYL6wicYK9lsF59ZVI+YTMZX8Ztx/2YEJ+llMTNeMeKBf0ykKUcd9eyXDW/Wb0qxXJ4De5+frD87fdfKTYq27XDdQH5rp1SHyqf1h59DRspOXrr4G5KRTXq04pHs32V2I+sucRUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGGjbm4l; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A0337DE99
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 16:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773334764; cv=pass; b=UG+STUeUetRIEqYIl/PgHkF/RNr6nFwhMZ93LV3LaRZlCsx01xzr+MtVEpIBpUBRtwEZaTzYUmt+eAQtcN7sQxOTk7NuZh0JTiLXORCXvDSbj9hUlkOiWMdXxMcx1hB7WC/kiDcBjPhFC1RQyY3/Wlce3kgZuW5Z283AWy0mQlo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773334764; c=relaxed/simple;
+	bh=M2iymQZKX+8vHWjM+sGVXO0KItugHB5MFB2eFn6DzUo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pak1By+LOCSk5spSXcnn4GRbg9AJd5q8OOrMF6eVdyGV7fOpoTy5YWDnrlDMr7aMRvDPL5ZPaAudkLUosNKNybX/KHJNN4EcVsNi8t0e5s9zlQAsbtXQVhHDok/P/QFj4chUtBbs4z4iFD5XPx3xqKH163Jgzu4dfvK2nZT1Agg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gWCSX92D; arc=pass smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82a15b44c3cso164606b3a.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:58:05 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-79863ab8478so13054157b3.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:59:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773334762; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Kv7NqB/dV3No343VZilESolF8CmcSNQult1DXiX/7yoksT2JM4N3QMgG6VxeNjLZkV
+         YXAEGphmsoJ4BlwYgMoJeK9HcKw5xG7dDGIQ1gLMooYG4ieXOzRkTm2qjpV6yFrm7roO
+         L3KFQNcY2FEocHYMmTDNSOcwwWyWk5zcIXwCEfz7n9QsycagFJcPnmgOji8UzHOJPIPT
+         bUQXpPP66Csj0rIiBjDbCWpsBbb13TlEKxyNBsNtAELCtc2IaDOOMnFkRclF4jev1fs1
+         qJeaemzhi07IRlRP1BMDrrM+VxTtEMrp0GYLLDWPRGTMLiyXP/kIqZVFqH13xFFOfvR2
+         5FEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RmhvuLaKjTTuQXwRd83noFpknqFUxs50sL6rs4k8AXI=;
+        fh=RDN2ABwCs0SnPiYjARsd0nRqD08v2ablqub58+h9JgM=;
+        b=JkOadXJnDI/4R4wg1HbYpEj1aAEvJfGjd+yk8KYyTryHL21IaXfCDZl8ukB98QPcCH
+         2jfVKBggiCpdLgV4DIhHOak989g/tR0edrHrrxE36efBuPgo5mPw9KyExxwUqKAmM1v3
+         2n3BDrMvZcW8t9DkcZQrdHd18ppf8dOaNLshox3sjJ8ZMJ1BKHkKNSEGYoOJ4lmb39Uc
+         e5Kfv1kSuE4b2jtq+IkdYsD48xJ4iWGJAR6/7SbFURl42RO9e/JCCLeAghyCM/UKEFcl
+         FFn0C+IB42Dow9F+GkCPIy7AjBWEDzHXfuEuai8v1TVA3caS4iUPeUeOROHiHUnvpVK7
+         dUsw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773334685; x=1773939485; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIIGLD+BLldHOqSwok3QT/zDjtx5ptoLmduV+QqJNpg=;
-        b=WGGjbm4lNX1ZPGcBGb/uHC9QN68VfOMcROG3b7UAVDyYii4qEByXc8Lij4U/Ggb9qX
-         ocWlp+Q7XUKvohOGqr4gmWh5u36VkvRvewBlGv1jT+wpdclsuTowAZJ+E6zo1TaO/AC5
-         Z+u3ESRexIjNot5Ko9+J4DYbgr5LpCEgXdTGWONhreU9Irp69kRvgAPOoQX9hziH+Bad
-         ARqp7aocOfyyl6Z4g2Q+6/lp4Dt9JwXuZ2JjAwIR2dm4hiDcB1ZBYbKFI/IJLxGC1Kjs
-         LV906u7hvtYFOlc5eM+D2Uw+TkRGb2tDOtCr1s7WslkwGIW5Inp4C52HLeU+WLnZKE34
-         z4sA==
+        d=gmail.com; s=20230601; t=1773334762; x=1773939562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RmhvuLaKjTTuQXwRd83noFpknqFUxs50sL6rs4k8AXI=;
+        b=gWCSX92DxRzsHIArEfcyFHW1BcfGsf4MTfVadaYPiInZHJSy//LNws/N47+3iZbVeZ
+         If6eZzxrP9PAluwd8KIFKsQ9hE7+y0gWOS3lWjw/8oifly41rVrtf88/4lUB86Rhydxy
+         mf26a8CC+UGfgpvZhpkmSYywbkwlVebSHt81+sH2Ug0063exXBXzgiwib05Lljd6h58O
+         AHyYoByEy5y7OM4lbUyaBE5Lxfn78MjW1CcQIF7biPdrUee+eLeYufz7luROimahmkK7
+         45GNU7LRWrJ49jbze4q07mcas4aOkRNm212rvvGxd5ngT+PNbKs9nO7OzCbkVxWq+1ZR
+         90pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773334685; x=1773939485;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VIIGLD+BLldHOqSwok3QT/zDjtx5ptoLmduV+QqJNpg=;
-        b=VanprLkPzm4p91wr+S563Jkca6D6cF41OoycP1r8kqzuBqDYtuuD8m1crISkpXcwc+
-         vmGef9Kr1iPxNOrRgM0p+1/WT6PdXjJZBf/pcEcZ9mg+V2woumOR8UCcE9fYA/9S8x5Y
-         emjVQ/NrC0zcMuLTyQLcuimbh9fgaTkL6GOjIMFb+34bajC3XgjPexleW7o59O3QArNe
-         grVrrvrBjeDKOH34t+12hzhtnBiPiDFPnfO8QymxHf8wKVgQIJAlflXX10VXdpqkfxPP
-         ssczTQRDrBUTeikzxwTUi4dS1G8cw5FKmEpUNT6A+e/sTcSvi6pQgG9aIJuLCA8B7d70
-         H8Ew==
-X-Gm-Message-State: AOJu0Yw40VQ9eSV9KBzL4flpsS5wMCfTOeRdqCbMP+yqfC6REq/zQagr
-	gXXjbQ0+vZ1aQ2+M9P3HjXqqHqT/EBKNomIYsRpWTkffB6//OXO9+2Rn
-X-Gm-Gg: ATEYQzxBHjQMcq80j5Q3mMVV9Fp5BJiByiNp6DfuS+ZcJXqMDwHCMkdkd72T56E9zJt
-	zAsmchznEQAP7U6IWrKZQCax18hNurAF6ghasVoZq+bOUFrLW57YEjjNE6p1LG8Omz1vV6+HJEZ
-	dml/SPL8GxP53IcKiGIps9y8X12spSN4ebk/37mR5AQX2qtHwbwQ6WMszYiVuwdFrpiIkX6rPeP
-	N/qQMDrMdczJPiZH898s044Qktbkas3IKT1TJZLoSbAMHffn/gDh6/saNRIHtdkZn1IzUGk9Kbx
-	l1nVWBvL6oKsjo7/Op22OhCQUBz4TtOOKnGOjaz6jFr6EdutCvzvgMqnS+2nQVLKLUKbrTUgvwJ
-	0yltkJIqDneMiN/66n6kJyBk2FW32nSPFyB/3SI+vZEpJt6CmxewFZ0oH2VJ6+HBjXQ9p9izW4x
-	PwT3Q8cGGijBpnVCA0
-X-Received: by 2002:a05:6a00:3c8a:b0:829:822e:cdce with SMTP id d2e1a72fcca58-82a197041damr213872b3a.6.1773334684743;
-        Thu, 12 Mar 2026 09:58:04 -0700 (PDT)
-Received: from mingi ([175.125.103.48])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a072414f8sm3625969b3a.4.2026.03.12.09.58.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 09:58:04 -0700 (PDT)
-Date: Thu, 12 Mar 2026 09:57:57 -0700
-From: Mingi Cho <mgcho.minic@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
-	mincho@theori.io, victor@mojatatu.com
-Subject: Re: [RFC Patch net-next 0/2] net_sched: Move GSO segmentation to
- root qdisc
-Message-ID: <20260312165757.GA3411905@mingi>
-References: <20250701232915.377351-1-xiyou.wangcong@gmail.com>
+        d=1e100.net; s=20230601; t=1773334762; x=1773939562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RmhvuLaKjTTuQXwRd83noFpknqFUxs50sL6rs4k8AXI=;
+        b=IaYcpBUrHBrA/PQsLxWFqZIBytjPlwVXwPraaF3vw26D2u7PgXMFFHqck6LuifoNCF
+         iPenfYL0fjuVnM9hGgZ9meD9bIuzwtZovfljfGnL+YnXcUQop8viS616I3fYvVTfnABV
+         gkcVyVXiR8a41fvsr3ZIVGqpqnbUj1dzH/g4VVKioFK6qSmt9uy2eA2V++SQy0+hdaH8
+         +lf8s7VkjobsFmJzItm9SPaEWCtS4k4SVylXcLgtrsgjqnDy6aK3wzcRubmCTjPw7PBQ
+         9m+T6XJY4cvR8UuiZ4lfby6NV3F5Xk/uFZuIMgojHY0ytinYE/EREUEEGv3zG7jNONiN
+         ddWg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2KIHHnXdsW4MDFV4OANjIoZfIXWVCvYSkoV4FFCuVEgtaDZI61tnfQMmzAolkUpBbNuZ/FhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp2iTo8FQT9orPXIaHsqUmKFcEHx42cAqiZ9JNftdL615nJEuw
+	fk9/Yrzu51etSxiXyCF0yRuQu7AhBkIH/J8ggf4h4KC1EF7w955qSQM1+AWowhLV3aNOMqd7Pox
+	4cjHnypwCDVPb2kqvUND5SzSzBjFZglQ=
+X-Gm-Gg: ATEYQzxU6keQ8CHCzb7wahDPA41U+atKbemrkfV1TS76DSS7dadt5F3XgssLU5e4+pa
+	lNE5gngfh3YRGVQlENZkxhMoE8G4d7PxC1cXC/wiJZfNPMjcajdQCOP5tjisddD3X9ikL71Z5Pi
+	mKipVqb91Y8DlF3anFaKHadtnY7U65s99fDCFVB+UC3UlNdk06byu8zNQ03an/4vBqZuR83VgyC
+	VgniKpLy/XjUnl227+mQWVFgunbxqK2bJCL4Te2xetLUaUVLcPYeiRwUSWfscgY70VafD+HhX80
+	YXFZs4qyptT5on/E1C/w0X0=
+X-Received: by 2002:a05:690c:f06:b0:796:4235:ea1c with SMTP id
+ 00721157ae682-79a1c1881a6mr2948747b3.40.1773334761723; Thu, 12 Mar 2026
+ 09:59:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701232915.377351-1-xiyou.wangcong@gmail.com>
-X-Spamd-Result: default: False [14.34 / 15.00];
-	MW_SURBL_MULTI(7.50)[test:email];
-	ABUSE_SURBL(5.00)[test:email];
+References: <20260307064439.3247440-1-ameryhung@gmail.com> <20260307064439.3247440-2-ameryhung@gmail.com>
+ <CAEf4BzZubPSaS8SQSEQJvTphwgbaBfdC0CYEhsfQN8CJ7HS3pw@mail.gmail.com>
+ <CAMB2axNR6qPRVy5YCiMygVseS+k9JxY9DFONNHD5Lt8=wD9MGQ@mail.gmail.com>
+ <CAEf4BzYTO9e-UAEd+W+ftqQZLUZCWHWXAYVnVjHeNtsZL1=Pdw@mail.gmail.com>
+ <CAMB2axN+8+V+29r9tuoVF57ObpvkUE5d5_8jtd5iRPYq4_gLGg@mail.gmail.com> <CAEf4BzY1O1Ne9Rf+O2terCT8f9e6pNFr3N4hOv98N84ZoehCaw@mail.gmail.com>
+In-Reply-To: <CAEf4BzY1O1Ne9Rf+O2terCT8f9e6pNFr3N4hOv98N84ZoehCaw@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 12 Mar 2026 09:59:10 -0700
+X-Gm-Features: AaiRm53ZaiCWGNz9hMLXMLHUgWZMOtoU8omxpXk2jjffjeh5iM3eI87em5sVbOU
+Message-ID: <CAMB2axN8Qe6r_siq5_6od7D_kDZPcYw_Z6KVOFtXNJVKzajqzw@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next v2 01/11] bpf: Set kfunc dynptr arg type flag
+ based on prototype
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
+	martin.lau@kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20230601];
-	TAGGED_FROM(0.00)[bounces-267168-lists,netdev=lfdr.de];
-	CT_SURBL(0.00)[test:email];
-	GREYLIST(0.00)[pass,body];
-	CRACKED_SURBL(0.00)[test:email];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-267169-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DM_SURBL(0.00)[test:email];
-	TAGGED_RCPT(0.00)[netdev];
-	PH_SURBL_MULTI(0.00)[test:email];
-	FROM_NEQ_ENVFROM(0.00)[mgchominic@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c09:e001:a7::/64:c];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_SPAM(0.00)[0.190];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,test:email]
-X-Rspamd-Queue-Id: 6C436276698
-X-Rspamd-Action: add header
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 05D702763C4
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spam: Yes
 
-On Tue, Jul 01, 2025 at 04:29:13PM -0700, Cong Wang wrote:
-> This patchset attempts to move the GSO segmentation in Qdisc layer from
-> child qdisc up to root qdisc. It fixes the complex handling of GSO
-> segmentation logic and unifies the code in a generic way. The end result
-> is cleaner (see the patch stat) and hopefully keeps the original logic
-> of handling GSO.
-> 
-> This is an architectural change, hence I am sending it as an RFC. Please
-> check each patch description for more details. Also note that although
-> this patchset alone could fix the UAF reported by Mingi, the original
-> UAF can also be fixed by Lion's patch [1], so this patchset is just an
-> improvement for handling GSO segmentation.
-> 
-> TODO: Add some selftests.
-> 
-> 1. https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com/
-> 
-> ---
-> Cong Wang (2):
->   net_sched: Move GSO segmentation to root qdisc
->   net_sched: Propagate per-qdisc max_segment_size for GSO segmentation
-> 
->  include/net/sch_generic.h |  4 +-
->  net/core/dev.c            | 52 +++++++++++++++++++---
->  net/sched/sch_api.c       | 14 ++++++
->  net/sched/sch_cake.c      | 93 +++++++++++++--------------------------
->  net/sched/sch_netem.c     | 32 +-------------
->  net/sched/sch_taprio.c    | 76 +++++++-------------------------
->  net/sched/sch_tbf.c       | 59 +++++--------------------
->  7 files changed, 123 insertions(+), 207 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
+On Wed, Mar 11, 2026 at 4:15=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Wed, Mar 11, 2026 at 4:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
+wrote:
+> >
+> > On Wed, Mar 11, 2026 at 3:37=E2=80=AFPM Andrii Nakryiko
+> > <andrii.nakryiko@gmail.com> wrote:
+> > >
+> > > On Wed, Mar 11, 2026 at 1:01=E2=80=AFPM Amery Hung <ameryhung@gmail.c=
+om> wrote:
+> > > >
+> > > > On Wed, Mar 11, 2026 at 12:44=E2=80=AFPM Andrii Nakryiko
+> > > > <andrii.nakryiko@gmail.com> wrote:
+> > > > >
+> > > > > On Fri, Mar 6, 2026 at 10:44=E2=80=AFPM Amery Hung <ameryhung@gma=
+il.com> wrote:
+> > > > > >
+> > > > > > The verifier should decide whether a dynptr argument is read-on=
+ly
+> > > > > > based on if the type is "const struct bpf_dynptr *", not the ty=
+pe of
+> > > > > > the register passed to the kfunc. This currently does not cause=
+ issues
+> > > > > > because existing kfuncs that mutate struct bpf_dynptr are const=
+ructors
+> > > > > > (e.g., bpf_dynptr_from_xxx and bpf_dynptr_clone). These kfuncs =
+have
+> > > > > > additional check in process_dynptr_func() to make sure the stac=
+k slot
+> > > > > > does not contain initialized dynptr. Nonetheless, this should s=
+till be
+> > > > > > fixed to avoid future issues when there is a non-constructor dy=
+nptr
+> > > > > > kfunc that can mutate dynptr. This is also a small step toward =
+unifying
+> > > > > > kfunc and helper handling in the verifier, where the first step=
+ is to
+> > > > > > generate kfunc prototype similar to bpf_func_proto before the m=
+ain
+> > > > > > verification loop.
+> > > > > >
+> > > > > > We also need to correctly mark some kfunc arguments as "const s=
+truct
+> > > > > > bpf_dynptr *" to align with other kfuncs that take non-mutable =
+dynptr
+> > > > > > argument and to not break their usage. Adding const qualifier d=
+oes
+> > > > > > not break backward compatibility.
+> > > > > >
+> > > > > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > > > > > ---
+> > > > > >  fs/verity/measure.c                            |  2 +-
+> > > > > >  include/linux/bpf.h                            |  8 ++++----
+> > > > > >  kernel/bpf/helpers.c                           | 10 +++++-----
+> > > > > >  kernel/bpf/verifier.c                          | 18 ++++++++++=
++++++++-
+> > > > > >  kernel/trace/bpf_trace.c                       | 18 +++++++++-=
+--------
+> > > > > >  tools/testing/selftests/bpf/bpf_kfuncs.h       |  6 +++---
+> > > > > >  .../selftests/bpf/progs/dynptr_success.c       |  6 +++---
+> > > > > >  .../bpf/progs/test_kfunc_dynptr_param.c        |  7 +------
+> > > > > >  8 files changed, 43 insertions(+), 32 deletions(-)
+> > > > > >
+> > > > > > diff --git a/fs/verity/measure.c b/fs/verity/measure.c
+> > > > > > index 6a35623ebdf0..3840436e4510 100644
+> > > > > > --- a/fs/verity/measure.c
+> > > > > > +++ b/fs/verity/measure.c
+> > > > > > @@ -118,7 +118,7 @@ __bpf_kfunc_start_defs();
+> > > > > >   *
+> > > > > >   * Return: 0 on success, a negative value on error.
+> > > > > >   */
+> > > > > > -__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, str=
+uct bpf_dynptr *digest_p)
+> > > > > > +__bpf_kfunc int bpf_get_fsverity_digest(struct file *file, con=
+st struct bpf_dynptr *digest_p)
+> > > > >
+> > > > > but kfunc is writing into digest_p, so that const is wrong?...
+> > > > >
+> > > > > >  {
+> > > > > >         struct bpf_dynptr_kern *digest_ptr =3D (struct bpf_dynp=
+tr_kern *)digest_p;
+> > > > > >         const struct inode *inode =3D file_inode(file);
+> > > > >
+> > > > > [...]
+> > > > >
+> > > > > > index 6eb6c82ed2ee..3d44896587ac 100644
+> > > > > > --- a/kernel/bpf/helpers.c
+> > > > > > +++ b/kernel/bpf/helpers.c
+> > > > > > @@ -3000,8 +3000,8 @@ __bpf_kfunc int bpf_dynptr_clone(const st=
+ruct bpf_dynptr *p,
+> > > > > >   * Copies data from source dynptr to destination dynptr.
+> > > > > >   * Returns 0 on success; negative error, otherwise.
+> > > > > >   */
+> > > > > > -__bpf_kfunc int bpf_dynptr_copy(struct bpf_dynptr *dst_ptr, u6=
+4 dst_off,
+> > > > > > -                               struct bpf_dynptr *src_ptr, u64=
+ src_off, u64 size)
+> > > > > > +__bpf_kfunc int bpf_dynptr_copy(const struct bpf_dynptr *dst_p=
+tr, u64 dst_off,
+> > > > >
+> > > > > again, dst_ptr clearly is modifiable because we are copying data =
+into it.
+> > > > >
+> > > > > What am I missing, why is this logically correct?
+> > > > >
+> > > > > (I understand that from purely C type system POV this is fine, be=
+cause
+> > > > > we don't modify bpf_dynptr struct itself on the stack, but bpf_dy=
+nptr
+> > > > > is a representation of some memory, and if we are modifying this
+> > > > > memory, then I think it should be not marked as const)
+> > > >
+> > > > The patch is just to first make the arg type determination independ=
+ent
+> > > > from bpf_reg_state and make kfunc signature consistent based on wha=
+t
+> > > > commit 52f37c4e0f11 (bpf: Rework process_dynptr_func) has laid out.
+> > > >
+> > > > Perhaps MEM_RDONLY is a bit misleading. In process_dynptr_func(), t=
+he
+> > > > flag means the dynptr struct on the stack is immutable. Currently,
+> > > > there is no way (and maybe no need?) to specify read-only dynptr.
+> > > >
+> > >
+> > > are you basically trying to determine if CONST_DYNPTR_PTR is allowed =
+or not?
+> >
+> > Yes.
+> >
+> > >
+> > > > > > The verifier should decide whether a dynptr argument is read-on=
+ly
+> > >
+> > > can you please remind us what "read-only dynptr argument" means for v=
+erifier?
+> >
+> > Oh well... my apologies for the inconsistency in commit message and
+> > comments. It should be "immutable" instead of "read-only" here.
+>
+> I guess I'd suggest
+>
+> struct bpf_dyntpr *const dptr
+>
+> to mark this through type system? that is, *constant pointer* to
+> dynptr, not a pointer to *constant dynptr*
+>
+> WDYT?
 
-Hi Cong,
+I think they both make sense from different angles, but I am not sure
+which one is better.
 
-I tested the proposed patch and found that the reported bug was fixed. A qlen mismatch between Qdiscs can potentially cause UAF, so I believe this patch needs to be applied.
+From purely C's point of view. the pointer points to a struct dynptr
+that should not be mutated so "const struct dynptr *p" is correct.
 
-When executing the PoC on the latest kernel without the patch applied, a warning message occurs in drr_dequeue() as shown below.
+From the BPF dynptr abstraction's point of view, the pointer points to
+the underlying memory (e.gg., skb, file, ringbuf, etc.), so "struct
+dynptr * const p".
 
-Before applying the patch:
+Any way we choose, I'd suggest that to be a separate patch. This patch
+at least makes things consistent and fixes a logical bug.
 
-root@test:~# ./poc
-qdisc drr 1: dev lo root refcnt 2
-qdisc tbf 2: dev lo parent 1:1 rate 1Mbit burst 1514b lat 50.0ms
-qdisc choke 3: dev lo parent 2:1 limit 2p min 1p max 2p
-[    7.588847] drr_dequeue: tbf qdisc 2: is non-work-conserving?
-
-Testing after applying the patch to the v6.17 kernel shows that the warning message has disappeared.
-
-After applying the patch:
-
-root@test:~# ./poc
-qdisc drr 1: dev lo root refcnt 2
-qdisc tbf 2: dev lo parent 1:1 rate 1Mbit burst 1514b lat 50.0ms
-qdisc choke 3: dev lo parent 2:1 limit 2p min 1p max 2p
-
-I tested the patch and found that the bug was resolved, but I'm not sure if any other side effects occur.
-
-The PoC used for testing is as follows.
-
-#define _GNU_SOURCE
-
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/udp.h>
-
-#ifndef SOL_UDP
-#define SOL_UDP 17 // UDP protocol value for setsockopt
-#endif
-
-void loopback_send (uint64_t size) {
-    struct sockaddr iaddr = { AF_INET };
-    char data[0x1000] = {0,};
-
-    int inet_sock_fd = socket(PF_INET, SOCK_DGRAM, 0);
-
-    int gso_size = 1300;
-
-    setsockopt(inet_sock_fd, SOL_UDP, UDP_SEGMENT, &gso_size, sizeof(gso_size));
-
-    connect(inet_sock_fd, &iaddr, sizeof(iaddr));
-
-    write(inet_sock_fd, data, size);
-
-    close(inet_sock_fd);
-}
-
-int main(int argc, char **argv) {
-    system("ip link set dev lo up");
-    system("ip link set dev lo mtu 1500");
-
-    system("tc qdisc add dev lo root handle 1: drr");
-    system("tc filter add dev lo parent 1: basic classid 1:1");
-    system("tc class add dev lo parent 1: classid 1:1 drr");
-    system("tc class add dev lo parent 1: classid 1:2 drr");
-
-    system("tc qdisc add dev lo parent 1:1 handle 2: tbf rate 1Mbit
-burst 1514 latency 50ms");
-
-    system("tc qdisc add dev lo parent 2:1 handle 3: choke limit 2
-bandwidth 1kbit min 1 max 2 burst 1");
-
-    system("tc qdisc show");
-
-    loopback_send(4000);
-
-    system("tc class del dev lo classid 1:1");
-
-    system("timeout 0.1 ping -c 1 -W0.01 localhost > /dev/null");
-}
-
-Thanks,
-Mingi
+>
+> >
+> > >
+> > > > >
+> > > > > > +                               const struct bpf_dynptr *src_pt=
+r, u64 src_off, u64 size)
+> > > > > >  {
+> > > > > >         struct bpf_dynptr_kern *dst =3D (struct bpf_dynptr_kern=
+ *)dst_ptr;
+> > > > > >         struct bpf_dynptr_kern *src =3D (struct bpf_dynptr_kern=
+ *)src_ptr;
+> > > > >
+> > > > > [...]
 
