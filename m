@@ -1,763 +1,675 @@
-Return-Path: <netdev+bounces-266866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BrpAQclsmnlIwAAu9opvQ
-	(envelope-from <netdev+bounces-266866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:29:27 +0100
+	id QELGIA4lsmnlIwAAu9opvQ
+	(envelope-from <netdev+bounces-266859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:29:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B8A426C381
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:29:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A9F26C388
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 697353026073
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:28:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C21C31135A5
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC503750DD;
-	Thu, 12 Mar 2026 02:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FEC376BE1;
+	Thu, 12 Mar 2026 02:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JVopWV8u"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UibcH4Rz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67EF375F85;
-	Thu, 12 Mar 2026 02:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1674F3750DD
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 02:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773282519; cv=none; b=tkCh6lIkagxVeKpeGsozw4/XwVmV1TzMvF5Whqp+dcoiWwPYDuR+iNPQsFQ2yzdQrwxYJ5z6WWzZZ5BS9UjsggBm2y6L241aCzBXZw/UrwuDBQSN7ssc0vVqmpaWJ3aP2EU3pi7XwGoiONTHPy59q1KBfocbB+zKhMiBtDWoG1o=
+	t=1773282493; cv=none; b=pdqN4xrHbFg56a5FFGZxjBPxlv+2t9/VZrgNjc4MOlizQPGOhhh1ZiuCJEd2hmt1M8KI2ZlqaA/L8su5BxovGbp0Gt0wwR9JAPNbgDUsdqVvxwcnz7nkdGXAvIhpldxNnlYBo9tjjR7is8cDib0mKvZwjH6qm7ZyEwvQlReHjPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773282519; c=relaxed/simple;
-	bh=Wo6H6oBb195n17cYoqzF2DfVf6lMUJFEbMJZUc0uq5A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H93xOygN97aKGav2y8sqlZAac9qTGFk17RIKnAOrmRMlMGIrsm37C3CgXkL+Lm4++17mnAbZCBZgmKWEt+jzV8UQwUPE30Z8x+3k1qYDVakz98dxtWseKtcg+phAMjv45xe5jQVQDwsMsz1kvvDDEQc88Orh/Kg2gawyxxIU7nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JVopWV8u; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62BMQiGu2347386;
-	Wed, 11 Mar 2026 19:28:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=f
-	F6qPbj0Ssp7huoiNgwVmrs1hcR7r6uAvCgbUTaH5wY=; b=JVopWV8unENVSksvc
-	pwFuZHQBy7jpHTJj3A6fZ9g94yr7Rx7hwm8mp6kuOHov/D9P8Fu+v4nO69o82tPx
-	irvNPPXNVkWIbhpQgUkmfa/QzI9TJFv8klaiEWpc3LBvV6rxJFjERIJkL9fRAYBC
-	MwRTb4eXGqP2gnmQdsUWaw673gz+Oh79Zya/Im13WnwITzArlBZCRpCgHnd/wn1U
-	82SKDi//ae2PwQGFi+tZ0R+BbijSkea76dLX0fvdT8oAhMBN74XZ8a+CzCQ5dPDX
-	NkOpUwbjEoiPSYuR+xudeb/Wr/n0cVyqEI+ZGVY50u60Js5IyL1e6Dw1ApEXUGB4
-	esz2Q==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cuh6kgfpt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Mar 2026 19:28:28 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Mar 2026 19:28:27 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 11 Mar 2026 19:28:26 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 1B98A3F705A;
-	Wed, 11 Mar 2026 19:28:21 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
-        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
-        <shshitrit@nvidia.com>, "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH v4 net-next 4/5] octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM entries
-Date: Thu, 12 Mar 2026 07:57:53 +0530
-Message-ID: <20260312022754.2029595-5-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260312022754.2029595-1-rkannoth@marvell.com>
-References: <20260312022754.2029595-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1773282493; c=relaxed/simple;
+	bh=eSoEEobBzVPvh2IJYadFnW8UamkbyMutevYMvUlzPA4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DxxqFHk/yr8PcOee3ohhq3OXNWxiSRVXbUras2gpN3MAQGI7+0dA/qNlXdUCttPfQRYeR4CHmgNKqP5bi5TmXL+cn9ZRTbOq3Zb4DGxOa5AmrhMSb8OuQU9ed1euaVbwpzLyBpK3IKLe/L5IlCTDLD3ex3P1yC9IYo9yAPQqDAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UibcH4Rz; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773282483; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=1z+O7pJRi8eRLRbs9HABQxJffZN8CYfIu0Pm8AguVcw=;
+	b=UibcH4RzTabbAg+s5SPy7o4HS1Sr4gYm4AuWBdY8yHnSGqgp5bJL+PwbfWIhhLnNrqC68ftAVnrE6+EyR65DR9OZSNWCKpTLNOYZHVEPiNBtJlJvfpReI3nEDhqiQX7+VVH6CmfAn0IXvgSspmAc8ON/oXCtD9gJrHhbZmBEcss=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-mnpci_1773282482 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Mar 2026 10:28:02 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v29 1/8] eea: introduce PCI framework
+Date: Thu, 12 Mar 2026 10:27:54 +0800
+Message-Id: <20260312022801.90699-2-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+In-Reply-To: <20260312022801.90699-1-xuanzhuo@linux.alibaba.com>
+References: <20260312022801.90699-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 2825a2ca1173
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=aLz9aL9m c=1 sm=1 tr=0 ts=69b224cc cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=WDb9-8Tz2aN2ynPxKakA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: Lcd7Y6_zNTRO1IL6VSePJw6RXn6u7XbT
-X-Proofpoint-GUID: Lcd7Y6_zNTRO1IL6VSePJw6RXn6u7XbT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEyMDAxNyBTYWx0ZWRfXygmzv2wELstg
- 8sy8Sgp9SMbaVXrxjjMzuqruKLQAw1n3nkmLLi1yQ00tBA8ho6uXcVJN+sC2pdHoKHb+xoVjuRy
- 48AUNh8WwLlyXBxqsTS+6FXV/Cm+IZo0rnr+DqBnhPaOz4/j+S3xU9toXOeJPUBkilG0ZW6pejy
- KfTrqOij/VO8TQi1a4jrSS3a80oi/jPYDJ1z/oza9kbGdfczstsqhBcchbQHgHRBv9T6UPPO+mK
- Enl9m0t1e7p/Z6tm90nQC5zEow1xENHhQ7DQChXsxumLT+SOU8Xm/Dz8bhLIHTqzkz2atj/jZd5
- IhC0Jitqk2mfMiAu7GoqxxcfA6t/7KEzZrqFjjxJl7E1ZSB1O7Hia3+/O7aP5Xm9nyaGClqO/HY
- v3uHRqfkAJX7dgS0ZkJ++zUhcoFL6TzcxyHq+5kn+enLuXIwH9V/3D0Dq2ZG6Ns6F1G1nomrTHW
- 8A8CcPQIuv1OjmFo+jA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-11_02,2026-03-09_02,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266866-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266859-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 0B8A426C381
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 01A9F26C388
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Improve MCAM utilization by tying default (broadcast, multicast,
-promisc, ucast) entry lifetime to NIX LF usage.
+Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
 
-- On NIX LF alloc (e.g. kernel or DPDK), allocate default MCAM entries
-  if missing; on NIX LF free, release them so they return to the pool.
-- Add NIX_LF_DONT_FREE_DFT_IDXS so the kernel PF driver can free the
-  NIX LF without releasing default entries (e.g. across suspend/resume).
-- When NIX LF is used by DPDK, default entries are allocated on first
-  use and freed when the LF is released if NIX_LF_DONT_FREE_DFT_IDXS is
-  not set
+This commit implements the EEA PCI probe functionality.
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 108 +++++++++++----
- .../ethernet/marvell/octeontx2/af/cn20k/npc.h |   1 +
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  16 ++-
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 128 +++++++++++++-----
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
- 6 files changed, 191 insertions(+), 69 deletions(-)
+ MAINTAINERS                                |   8 +
+ drivers/net/ethernet/Kconfig               |   1 +
+ drivers/net/ethernet/Makefile              |   1 +
+ drivers/net/ethernet/alibaba/Kconfig       |  28 ++
+ drivers/net/ethernet/alibaba/Makefile      |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile  |   3 +
+ drivers/net/ethernet/alibaba/eea/eea_pci.c | 383 +++++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h |  50 +++
+ 8 files changed, 479 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 348a72c4ee43..8dad272fd069 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -808,6 +808,11 @@ npc_cn20k_enable_mcam_entry(struct rvu *rvu, int blkaddr,
- 	u64 cfg, hw_prio;
- 	u8 kw_type;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a38fe0ed7144..dd612297b25b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -810,6 +810,14 @@ S:	Maintained
+ F:	Documentation/i2c/busses/i2c-ali1563.rst
+ F:	drivers/i2c/busses/i2c-ali1563.c
  
-+	if (index < 0 || index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %d\n", index);
-+		return;
++ALIBABA ELASTIC ETHERNET ADAPTER DRIVER
++M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
++M:	Wen Gu <guwen@linux.alibaba.com>
++R:	Philo Lu <lulie@linux.alibaba.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/alibaba/eea
++
+ ALIBABA ELASTIC RDMA DRIVER
+ M:	Cheng Xu <chengyou@linux.alibaba.com>
+ M:	Kai Shen <kaishen@linux.alibaba.com>
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index aa7103e7f47f..9ead9c49e6c6 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -22,6 +22,7 @@ source "drivers/net/ethernet/aeroflex/Kconfig"
+ source "drivers/net/ethernet/agere/Kconfig"
+ source "drivers/net/ethernet/airoha/Kconfig"
+ source "drivers/net/ethernet/alacritech/Kconfig"
++source "drivers/net/ethernet/alibaba/Kconfig"
+ source "drivers/net/ethernet/allwinner/Kconfig"
+ source "drivers/net/ethernet/alteon/Kconfig"
+ source "drivers/net/ethernet/altera/Kconfig"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 6615a67a63d5..9e6d740f4cf7 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -12,6 +12,7 @@ obj-$(CONFIG_NET_VENDOR_ADI) += adi/
+ obj-$(CONFIG_NET_VENDOR_AGERE) += agere/
+ obj-$(CONFIG_NET_VENDOR_AIROHA) += airoha/
+ obj-$(CONFIG_NET_VENDOR_ALACRITECH) += alacritech/
++obj-$(CONFIG_NET_VENDOR_ALIBABA) += alibaba/
+ obj-$(CONFIG_NET_VENDOR_ALLWINNER) += allwinner/
+ obj-$(CONFIG_NET_VENDOR_ALTEON) += alteon/
+ obj-$(CONFIG_ALTERA_TSE) += altera/
+diff --git a/drivers/net/ethernet/alibaba/Kconfig b/drivers/net/ethernet/alibaba/Kconfig
+new file mode 100644
+index 000000000000..9bd8cc9fd203
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/Kconfig
+@@ -0,0 +1,28 @@
++#
++# Alibaba network device configuration
++#
++
++config NET_VENDOR_ALIBABA
++	bool "Alibaba Devices"
++	default y
++	help
++	  If you have a network (Ethernet) device belonging to this class, say Y.
++
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Alibaba devices. If you say Y, you will be asked
++	  for your specific device in the following questions.
++
++if NET_VENDOR_ALIBABA
++
++config EEA
++	tristate "Alibaba Elastic Ethernet Adapter support"
++	depends on PCI_MSI
++	depends on 64BIT
++	select PAGE_POOL
++	help
++	  This driver supports Alibaba Elastic Ethernet Adapter.
++
++	  To compile this driver as a module, choose M here.
++
++endif #NET_VENDOR_ALIBABA
+diff --git a/drivers/net/ethernet/alibaba/Makefile b/drivers/net/ethernet/alibaba/Makefile
+new file mode 100644
+index 000000000000..7980525cb086
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/Makefile
+@@ -0,0 +1,5 @@
++#
++# Makefile for the Alibaba network device drivers.
++#
++
++obj-$(CONFIG_EEA) += eea/
+diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
+new file mode 100644
+index 000000000000..cf2acf1733fd
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/Makefile
+@@ -0,0 +1,3 @@
++
++obj-$(CONFIG_EEA) += eea.o
++eea-y := eea_pci.o
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+new file mode 100644
+index 000000000000..ea89cf1ca131
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+@@ -0,0 +1,383 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#include <linux/io-64-nonatomic-lo-hi.h>
++#include <linux/iopoll.h>
++
++#include "eea_pci.h"
++
++#define EEA_PCI_DB_OFFSET 4096
++
++struct eea_pci_cfg {
++	__le32 reserve0;
++	__le32 reserve1;
++	__le32 drv_f_idx;
++	__le32 drv_f;
++
++#define EEA_S_OK           BIT(2)
++#define EEA_S_FEATURE_DONE BIT(3)
++#define EEA_S_FAILED       BIT(7)
++	u8   device_status;
++	u8   reserved[7];
++
++	__le32 rx_num_max;
++	__le32 tx_num_max;
++	__le32 db_blk_size;
++
++	/* admin queue cfg */
++	__le16 aq_size;
++	__le16 aq_msix_vector;
++	__le32 aq_db_off;
++
++	__le32 aq_sq_addr;
++	__le32 aq_sq_addr_hi;
++	__le32 aq_cq_addr;
++	__le32 aq_cq_addr_hi;
++
++	__le64 hw_ts;
++};
++
++struct eea_pci_device {
++	struct eea_device edev;
++	struct pci_dev *pci_dev;
++
++	u32 msix_vec_n;
++
++	void __iomem *reg;
++	void __iomem *db_base;
++
++	char ha_irq_name[32];
++	u8 reset_pos;
++};
++
++#define cfg_pointer(reg, item) \
++	((void __iomem *)((reg) + offsetof(struct eea_pci_cfg, item)))
++
++#define cfg_write8(reg, item, val) iowrite8(val, cfg_pointer(reg, item))
++#define cfg_write32(reg, item, val) iowrite32(val, cfg_pointer(reg, item))
++
++#define cfg_read8(reg, item) ioread8(cfg_pointer(reg, item))
++#define cfg_read32(reg, item) ioread32(cfg_pointer(reg, item))
++#define cfg_readq(reg, item) readq(cfg_pointer(reg, item))
++
++const char *eea_pci_name(struct eea_device *edev)
++{
++	return pci_name(edev->ep_dev->pci_dev);
++}
++
++int eea_pci_domain_nr(struct eea_device *edev)
++{
++	return pci_domain_nr(edev->ep_dev->pci_dev->bus);
++}
++
++u16 eea_pci_dev_id(struct eea_device *edev)
++{
++	return pci_dev_id(edev->ep_dev->pci_dev);
++}
++
++static void eea_pci_io_set_status(struct eea_device *edev, u8 status)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	cfg_write8(ep_dev->reg, device_status, status);
++}
++
++static u8 eea_pci_io_get_status(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	return cfg_read8(ep_dev->reg, device_status);
++}
++
++static void eea_add_status(struct eea_device *dev, u32 status)
++{
++	eea_pci_io_set_status(dev, eea_pci_io_get_status(dev) | status);
++}
++
++#define EEA_RESET_TIMEOUT_US (1000 * 1000 * 1000)
++
++int eea_device_reset(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++	u8 val;
++
++	eea_pci_io_set_status(edev, 0);
++
++	return read_poll_timeout(cfg_read8, val, !val, 20, EEA_RESET_TIMEOUT_US,
++				false, ep_dev->reg, device_status);
++}
++
++int eea_pci_set_aq_up(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++	u8 status = eea_pci_io_get_status(edev);
++	u8 val;
++
++	WARN_ON(status & EEA_S_OK);
++
++	eea_pci_io_set_status(edev, status | EEA_S_OK);
++
++	return read_poll_timeout(cfg_read8, val, val & EEA_S_OK, 20,
++				 EEA_RESET_TIMEOUT_US,
++				 false, ep_dev->reg, device_status);
++}
++
++static int eea_negotiate(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev;
++	u32 status;
++
++	ep_dev = edev->ep_dev;
++
++	edev->features = 0;
++
++	cfg_write32(ep_dev->reg, drv_f_idx, 0);
++	cfg_write32(ep_dev->reg, drv_f, (u32)edev->features);
++	cfg_write32(ep_dev->reg, drv_f_idx, 1);
++	cfg_write32(ep_dev->reg, drv_f, edev->features >> 32);
++
++	eea_add_status(edev, EEA_S_FEATURE_DONE);
++	status = eea_pci_io_get_status(edev);
++	if (!(status & EEA_S_FEATURE_DONE))
++		return -ENODEV;
++
++	return 0;
++}
++
++static void eea_pci_release_resource(struct eea_pci_device *ep_dev)
++{
++	struct pci_dev *pci_dev = ep_dev->pci_dev;
++
++	if (ep_dev->reg) {
++		pci_iounmap(pci_dev, ep_dev->reg);
++		ep_dev->reg = NULL;
 +	}
 +
- 	enable ? set_bit(index, npc_priv.en_map) :
- 		clear_bit(index, npc_priv.en_map);
- 
-@@ -1053,6 +1058,11 @@ void npc_cn20k_config_mcam_entry(struct rvu *rvu, int blkaddr, int index,
- 	int kw = 0;
- 	u8 kw_type;
- 
-+	if (index < 0 || index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %d\n", index);
-+		return;
++	if (ep_dev->msix_vec_n) {
++		ep_dev->msix_vec_n = 0;
++		pci_free_irq_vectors(ep_dev->pci_dev);
 +	}
 +
- 	/* Disable before mcam entry update */
- 	npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, false);
- 
-@@ -1132,6 +1142,11 @@ void npc_cn20k_copy_mcam_entry(struct rvu *rvu, int blkaddr, u16 src, u16 dest)
- 	int bank, i, sb, db;
- 	int dbank, sbank;
- 
-+	if (src >= mcam->total_entries || dest >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index src=%u dest=%u\n", src, dest);
-+		return;
++	pci_release_regions(pci_dev);
++	pci_disable_device(pci_dev);
++}
++
++static int eea_pci_setup(struct pci_dev *pci_dev, struct eea_pci_device *ep_dev)
++{
++	int err, n, ret;
++
++	ep_dev->pci_dev = pci_dev;
++
++	err = pci_enable_device(pci_dev);
++	if (err)
++		return err;
++
++	err = pci_request_regions(pci_dev, "EEA");
++	if (err)
++		goto err_disable_dev;
++
++	pci_set_master(pci_dev);
++
++	err = dma_set_mask_and_coherent(&pci_dev->dev, DMA_BIT_MASK(64));
++	if (err) {
++		dev_warn(&pci_dev->dev, "Failed to enable 64-bit DMA.\n");
++		goto err_release_regions;
 +	}
 +
- 	dbank = npc_get_bank(mcam, dest);
- 	sbank = npc_get_bank(mcam, src);
- 	npc_mcam_idx_2_key_type(rvu, src, &src_kwtype);
-@@ -1190,11 +1205,24 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 	int kw = 0, bank;
- 	u8 kw_type;
- 
-+	if (index >= mcam->total_entries) {
-+		WARN(1, "Wrong mcam index %u\n", index);
-+		return;
++	ep_dev->reg = pci_iomap(pci_dev, 0, 0);
++	if (!ep_dev->reg) {
++		dev_err(&pci_dev->dev, "Failed to map pci bar!\n");
++		err = -ENOMEM;
++		goto err_release_regions;
 +	}
 +
- 	npc_mcam_idx_2_key_type(rvu, index, &kw_type);
- 
- 	bank = npc_get_bank(mcam, index);
- 	index &= (mcam->banksize - 1);
- 
-+	cfg = rvu_read64(rvu, blkaddr,
-+			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0));
-+	entry->action = cfg;
++	ep_dev->edev.rx_num = cfg_read32(ep_dev->reg, rx_num_max);
++	ep_dev->edev.tx_num = cfg_read32(ep_dev->reg, tx_num_max);
 +
-+	cfg = rvu_read64(rvu, blkaddr,
-+			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 1));
-+	entry->vtag_action = cfg;
-+
- 	cfg = rvu_read64(rvu, blkaddr,
- 			 NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index,
- 								 bank, 1)) & 3;
-@@ -1244,7 +1272,7 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 									bank,
- 									0));
- 		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
--		goto read_action;
-+		return;
- 	}
- 
- 	for (bank = 0; bank < mcam->banks_per_entry; bank++, kw = kw + 4) {
-@@ -1289,17 +1317,6 @@ void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
- 	}
- 
--read_action:
--	/* 'action' is set to same value for both bank '0' and '1'.
--	 * Hence, reading bank '0' should be enough.
--	 */
--	cfg = rvu_read64(rvu, blkaddr,
--			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 0));
--	entry->action = cfg;
--
--	cfg = rvu_read64(rvu, blkaddr,
--			 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 1));
--	entry->vtag_action = cfg;
- }
- 
- int rvu_mbox_handler_npc_cn20k_mcam_write_entry(struct rvu *rvu,
-@@ -1671,8 +1688,8 @@ int npc_mcam_idx_2_key_type(struct rvu *rvu, u16 mcam_idx, u8 *key_type)
- 
- 	/* mcam_idx should be less than (2 * bank depth) */
- 	if (mcam_idx >= npc_priv.bank_depth * 2) {
--		dev_err(rvu->dev, "%s: bad params\n",
--			__func__);
-+		dev_err(rvu->dev, "%s: bad params mcam_idx=%u\n",
-+			__func__, mcam_idx);
- 		return -EINVAL;
- 	}
- 
-@@ -4024,6 +4041,13 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 	void *val;
- 	int i, j;
- 
-+	for (int i = 0; i < ARRAY_SIZE(ptr); i++) {
-+		if (!ptr[i])
-+			continue;
-+
-+		*ptr[i] = USHRT_MAX;
++	/* 2: adminq, error handle*/
++	n = ep_dev->edev.rx_num + ep_dev->edev.tx_num + 2;
++	ret = pci_alloc_irq_vectors(ep_dev->pci_dev, n, n, PCI_IRQ_MSIX);
++	if (ret != n) {
++		err = ret;
++		goto err_unmap_reg;
 +	}
 +
- 	if (!npc_priv.init_done)
- 		return 0;
- 
-@@ -4039,7 +4063,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
- 				 pcifunc);
- 
--			*ptr[0] = USHRT_MAX;
- 			return -ESRCH;
- 		}
- 
-@@ -4059,7 +4082,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
- 				 pcifunc);
- 
--			*ptr[3] = USHRT_MAX;
- 			return -ESRCH;
- 		}
- 
-@@ -4079,7 +4101,6 @@ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
- 				 __func__,
- 				 npc_dft_rule_name[i], pcifunc);
- 
--			*ptr[j] = USHRT_MAX;
- 			continue;
- 		}
- 
-@@ -4174,7 +4195,7 @@ int rvu_mbox_handler_npc_get_dft_rl_idxs(struct rvu *rvu, struct msg_req *req,
- 	return 0;
- }
- 
--static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
- {
- 	return is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)) ||
- 		is_lbk_vf(rvu, pcifunc);
-@@ -4182,9 +4203,10 @@ static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
- 
- void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- {
--	struct npc_mcam_free_entry_req free_req = { 0 };
-+	struct npc_mcam *mcam = &rvu->hw->mcam;
-+	struct rvu_npc_mcam_rule *rule, *tmp;
- 	unsigned long index;
--	struct msg_rsp rsp;
-+	int blkaddr;
- 	u16 ptr[4];
- 	int rc, i;
- 	void *map;
-@@ -4209,7 +4231,7 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__,
- 				npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
-@@ -4223,7 +4245,7 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__,
- 				npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
-@@ -4237,21 +4259,47 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
- 		index = NPC_DFT_RULE_ID_MK(pcifunc, i);
- 		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
- 		if (!map)
--			dev_dbg(rvu->dev,
-+			dev_err(rvu->dev,
- 				"%s: Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
- 				__func__, npc_dft_rule_name[i],
- 				pcifunc);
- 	}
- 
- free_rules:
-+	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
-+	if (blkaddr < 0)
-+		return;
- 
--	free_req.hdr.pcifunc = pcifunc;
--	free_req.all = 1;
--	rc = rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
--	if (rc)
--		dev_err(rvu->dev,
--			"%s: Error deleting default entries (pcifunc=%#x\n",
--			__func__, pcifunc);
-+	for (int i = 0; i < 4; i++) {
-+		if (ptr[i] == USHRT_MAX)
-+			continue;
++	ep_dev->msix_vec_n = ret;
 +
-+		mutex_lock(&mcam->lock);
-+		npc_mcam_clear_bit(mcam, ptr[i]);
-+		mcam->entry2pfvf_map[ptr[i]] = NPC_MCAM_INVALID_MAP;
-+		npc_cn20k_enable_mcam_entry(rvu, blkaddr, ptr[i], false);
-+		mcam->entry2target_pffunc[ptr[i]] = 0x0;
-+		mutex_unlock(&mcam->lock);
++	ep_dev->db_base = ep_dev->reg + EEA_PCI_DB_OFFSET;
++	ep_dev->edev.db_blk_size = cfg_read32(ep_dev->reg, db_blk_size);
 +
-+		rc = npc_cn20k_idx_free(rvu, &ptr[i], 1);
-+		if (rc)
-+			dev_err(rvu->dev,
-+				"%s:%d Error deleting default entries (pcifunc=%#x) mcam_idx=%u\n",
-+				__func__, __LINE__, pcifunc, ptr[i]);
++	return 0;
++
++err_unmap_reg:
++	pci_iounmap(pci_dev, ep_dev->reg);
++	ep_dev->reg = NULL;
++
++err_release_regions:
++	pci_release_regions(pci_dev);
++
++err_disable_dev:
++	pci_disable_device(pci_dev);
++
++	return err;
++}
++
++void __iomem *eea_pci_db_addr(struct eea_device *edev, u32 off)
++{
++	return edev->ep_dev->db_base + off;
++}
++
++u64 eea_pci_device_ts(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	return cfg_readq(ep_dev->reg, hw_ts);
++}
++
++static int eea_init_device(struct eea_device *edev)
++{
++	int err;
++
++	err = eea_device_reset(edev);
++	if (err)
++		return err;
++
++	eea_pci_io_set_status(edev, BIT(0) | BIT(1));
++
++	err = eea_negotiate(edev);
++	if (err)
++		goto err;
++
++	/* do net device probe ... */
++
++	return 0;
++err:
++	eea_add_status(edev, EEA_S_FAILED);
++	return err;
++}
++
++static int __eea_pci_probe(struct pci_dev *pci_dev,
++			   struct eea_pci_device *ep_dev)
++{
++	int err;
++
++	pci_set_drvdata(pci_dev, ep_dev);
++
++	err = eea_pci_setup(pci_dev, ep_dev);
++	if (err)
++		return err;
++
++	err = eea_init_device(&ep_dev->edev);
++	if (err)
++		goto err_pci_rel;
++
++	return 0;
++
++err_pci_rel:
++	eea_pci_release_resource(ep_dev);
++	return err;
++}
++
++static void __eea_pci_remove(struct pci_dev *pci_dev)
++{
++	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
++	struct device *dev = get_device(&ep_dev->pci_dev->dev);
++
++	pci_disable_sriov(pci_dev);
++
++	eea_pci_release_resource(ep_dev);
++
++	put_device(dev);
++}
++
++static int eea_pci_probe(struct pci_dev *pci_dev,
++			 const struct pci_device_id *id)
++{
++	struct eea_pci_device *ep_dev;
++	struct eea_device *edev;
++	int err;
++
++	ep_dev = kzalloc(sizeof(*ep_dev), GFP_KERNEL);
++	if (!ep_dev)
++		return -ENOMEM;
++
++	edev = &ep_dev->edev;
++
++	edev->ep_dev = ep_dev;
++	edev->dma_dev = &pci_dev->dev;
++
++	ep_dev->pci_dev = pci_dev;
++
++	err = __eea_pci_probe(pci_dev, ep_dev);
++	if (err) {
++		pci_set_drvdata(pci_dev, NULL);
++		kfree(ep_dev);
 +	}
 +
-+	mutex_lock(&mcam->lock);
-+	list_for_each_entry_safe(rule, tmp, &mcam->mcam_rules, list) {
-+		for (int i = 0; i < 4; i++) {
-+			if (ptr[i] != rule->entry)
-+				continue;
++	return err;
++}
 +
-+			list_del(&rule->list);
-+			kfree(rule);
-+			break;
-+		}
-+	}
-+	mutex_unlock(&mcam->lock);
- }
- 
- int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-index b168ecfbc5c8..0fa56f5382b4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-@@ -345,5 +345,6 @@ int npc_mcam_idx_2_subbank_idx(struct rvu *rvu, u16 mcam_idx,
- 			       int *sb_off);
- const u32 *npc_cn20k_search_order_get(bool *restricted_order, u32 *sz);
- int npc_cn20k_search_order_set(struct rvu *rvu, u32 arr[32], int cnt);
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc);
- 
- #endif /* NPC_CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index dc42c81c0942..e07fbf842b94 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1009,6 +1009,7 @@ struct nix_lf_free_req {
- 	struct mbox_msghdr hdr;
- #define NIX_LF_DISABLE_FLOWS		BIT_ULL(0)
- #define NIX_LF_DONT_FREE_TX_VTAG	BIT_ULL(1)
-+#define NIX_LF_DONT_FREE_DFT_IDXS	BIT_ULL(2)
- 	u64 flags;
- };
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index ef5b081162eb..bd671b553df5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -16,6 +16,7 @@
- #include "cgx.h"
- #include "lmac_common.h"
- #include "rvu_npc_hash.h"
-+#include "cn20k/npc.h"
- 
- static void nix_free_tx_vtag_entries(struct rvu *rvu, u16 pcifunc);
- static int rvu_nix_get_bpid(struct rvu *rvu, struct nix_bp_cfg_req *req,
-@@ -1684,10 +1685,16 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 	if (is_sdp_pfvf(rvu, pcifunc))
- 		intf = NIX_INTF_TYPE_SDP;
- 
-+	if (is_cn20k(rvu->pdev)) {
-+		rc = npc_cn20k_dft_rules_alloc(rvu, pcifunc);
-+		if (rc)
-+			goto free_mem;
++static void eea_pci_remove(struct pci_dev *pci_dev)
++{
++	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
++
++	__eea_pci_remove(pci_dev);
++
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(ep_dev);
++}
++
++static int eea_pci_sriov_configure(struct pci_dev *pci_dev, int num_vfs)
++{
++	int ret;
++
++	if (pci_vfs_assigned(pci_dev))
++		return -EPERM;
++
++	if (num_vfs == 0) {
++		pci_disable_sriov(pci_dev);
++		return 0;
 +	}
 +
- 	err = nix_interface_init(rvu, pcifunc, intf, nixlf, rsp,
- 				 !!(req->flags & NIX_LF_LBK_BLK_SEL));
- 	if (err)
--		goto free_mem;
-+		goto free_dft;
- 
- 	/* Disable NPC entries as NIXLF's contexts are not initialized yet */
- 	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
-@@ -1699,6 +1706,10 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 
- 	goto exit;
- 
-+free_dft:
-+	if (is_cn20k(rvu->pdev))
-+		npc_cn20k_dft_rules_free(rvu, pcifunc);
++	ret = pci_enable_sriov(pci_dev, num_vfs);
++	if (ret < 0)
++		return ret;
 +
- free_mem:
- 	nix_ctx_free(rvu, pfvf);
- 	rc = -ENOMEM;
-@@ -1775,6 +1786,9 @@ int rvu_mbox_handler_nix_lf_free(struct rvu *rvu, struct nix_lf_free_req *req,
- 
- 	nix_ctx_free(rvu, pfvf);
- 
-+	if (is_cn20k(rvu->pdev) && !(req->flags & NIX_LF_DONT_FREE_DFT_IDXS))
-+		npc_cn20k_dft_rules_free(rvu, pcifunc);
++	return num_vfs;
++}
 +
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index c2ca5ed1d028..352dc5f1d5b9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -165,12 +165,20 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
- 
- 		switch (type) {
- 		case NIXLF_BCAST_ENTRY:
-+			if (bcast == USHRT_MAX)
-+				return -EINVAL;
- 			return bcast;
- 		case NIXLF_ALLMULTI_ENTRY:
-+			if (mcast == USHRT_MAX)
-+				return -EINVAL;
- 			return mcast;
- 		case NIXLF_PROMISC_ENTRY:
-+			if (promisc == USHRT_MAX)
-+				return -EINVAL;
- 			return promisc;
- 		case NIXLF_UCAST_ENTRY:
-+			if (ucast == USHRT_MAX)
-+				return -EINVAL;
- 			return ucast;
- 		default:
- 			return -EINVAL;
-@@ -237,12 +245,8 @@ void npc_enable_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
- 	int bank = npc_get_bank(mcam, index);
- 	int actbank = bank;
- 
--	if (is_cn20k(rvu->pdev)) {
--		if (index < 0 || index >= mcam->banksize * mcam->banks)
--			return;
--
-+	if (is_cn20k(rvu->pdev))
- 		return npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, enable);
--	}
- 
- 	index &= (mcam->banksize - 1);
- 	for (; bank < (actbank + mcam->banks_per_entry); bank++) {
-@@ -1113,7 +1117,7 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		index = mcam_index;
- 	}
- 
--	if (index >= mcam->total_entries)
-+	if (index < 0 || index >= mcam->total_entries)
- 		return;
- 
- 	bank = npc_get_bank(mcam, index);
-@@ -1158,16 +1162,18 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		/* If PF's promiscuous  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf,
-+							  index, blkaddr, alg_idx);
- 
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 						 nixlf, NIXLF_ALLMULTI_ENTRY);
- 		/* If PF's allmulti  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf,
-+							  index, blkaddr, alg_idx);
- 	}
- }
- 
-@@ -1212,8 +1218,13 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- {
- 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
-+	int type = NIXLF_UCAST_ENTRY;
- 	int index, blkaddr;
- 
-+	/* only CGX or LBK interfaces have default entries */
-+	if (is_cn20k(rvu->pdev) && !npc_is_cgx_or_lbk(rvu, pcifunc))
-+		return;
++static const struct pci_device_id eea_pci_id_table[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_ALIBABA, 0x500B) },
++	{ 0 }
++};
 +
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
-@@ -1221,8 +1232,11 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 	/* Ucast MCAM match entry of this PF/VF */
- 	if (npc_is_feature_supported(rvu, BIT_ULL(NPC_DMAC),
- 				     pfvf->nix_rx_intf)) {
-+		if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+			type = NIXLF_PROMISC_ENTRY;
++MODULE_DEVICE_TABLE(pci, eea_pci_id_table);
 +
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
--						 nixlf, NIXLF_UCAST_ENTRY);
-+						 nixlf, type);
- 		npc_enable_mcam_entry(rvu, mcam, blkaddr, index, enable);
- 	}
- 
-@@ -1232,9 +1246,13 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 	if ((pcifunc & RVU_PFVF_FUNC_MASK) && !rvu->hw->cap.nix_rx_multicast)
- 		return;
- 
-+	type = NIXLF_BCAST_ENTRY;
-+	if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+		type = NIXLF_PROMISC_ENTRY;
++static struct pci_driver eea_pci_driver = {
++	.name            = "eea",
++	.id_table        = eea_pci_id_table,
++	.probe           = eea_pci_probe,
++	.remove          = eea_pci_remove,
++	.sriov_configure = eea_pci_sriov_configure,
++};
 +
- 	/* add/delete pf_func to broadcast MCE list */
- 	npc_enadis_default_mce_entry(rvu, pcifunc, nixlf,
--				     NIXLF_BCAST_ENTRY, enable);
-+				     type, enable);
- }
- 
- void rvu_npc_disable_default_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
-@@ -1244,6 +1262,9 @@ void rvu_npc_disable_default_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 
- 	npc_enadis_default_entries(rvu, pcifunc, nixlf, false);
- 
-+	if (is_cn20k(rvu->pdev) && is_vf(pcifunc))
-+		return;
++static __init int eea_pci_init(void)
++{
++	return pci_register_driver(&eea_pci_driver);
++}
 +
- 	/* Delete multicast and promisc MCAM entries */
- 	npc_enadis_default_mce_entry(rvu, pcifunc, nixlf,
- 				     NIXLF_ALLMULTI_ENTRY, false);
-@@ -1301,6 +1322,10 @@ void rvu_npc_disable_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 	if (blkaddr < 0)
- 		return;
- 
-+	/* only CGX or LBK interfaces have default entries */
-+	if (is_cn20k(rvu->pdev) && !npc_is_cgx_or_lbk(rvu, pcifunc))
-+		return;
++static __exit void eea_pci_exit(void)
++{
++	pci_unregister_driver(&eea_pci_driver);
++}
 +
- 	mutex_lock(&mcam->lock);
- 
- 	/* Disable MCAM entries directing traffic to this 'pcifunc' */
-@@ -1345,6 +1370,8 @@ void rvu_npc_free_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 	/* Free all MCAM counters owned by this 'pcifunc' */
- 	npc_mcam_free_all_counters(rvu, mcam, pcifunc);
- 
-+	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
++module_init(eea_pci_init);
++module_exit(eea_pci_exit);
 +
- 	/* Delete MCAM entries owned by this 'pcifunc' */
- 	list_for_each_entry_safe(rule, tmp, &mcam->mcam_rules, list) {
- 		if (rule->owner == pcifunc && !rule->default_rule) {
-@@ -1355,7 +1382,6 @@ void rvu_npc_free_mcam_entries(struct rvu *rvu, u16 pcifunc, int nixlf)
- 
- 	mutex_unlock(&mcam->lock);
- 
--	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
- }
- 
- static void npc_program_mkex_rx(struct rvu *rvu, int blkaddr,
-@@ -2504,33 +2530,58 @@ void npc_mcam_clear_bit(struct npc_mcam *mcam, u16 index)
- static void npc_mcam_free_all_entries(struct rvu *rvu, struct npc_mcam *mcam,
- 				      int blkaddr, u16 pcifunc)
- {
-+	u16 dft_idxs[NPC_DFT_RULE_MAX_ID] = {[0 ... NPC_DFT_RULE_MAX_ID - 1] = USHRT_MAX};
- 	u16 index, cntr;
-+	bool dft_rl;
- 	int rc;
- 
-+	npc_cn20k_dft_rules_idx_get(rvu, pcifunc,
-+				    &dft_idxs[NPC_DFT_RULE_BCAST_ID],
-+				    &dft_idxs[NPC_DFT_RULE_MCAST_ID],
-+				    &dft_idxs[NPC_DFT_RULE_PROMISC_ID],
-+				    &dft_idxs[NPC_DFT_RULE_UCAST_ID]);
++MODULE_DESCRIPTION("Driver for Alibaba Elastic Ethernet Adapter");
++MODULE_AUTHOR("Xuan Zhuo <xuanzhuo@linux.alibaba.com>");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.h b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+new file mode 100644
+index 000000000000..be4e75b4ed2f
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
 +
- 	/* Scan all MCAM entries and free the ones mapped to 'pcifunc' */
- 	for (index = 0; index < mcam->bmap_entries; index++) {
--		if (mcam->entry2pfvf_map[index] == pcifunc) {
--			mcam->entry2pfvf_map[index] = NPC_MCAM_INVALID_MAP;
--			/* Free the entry in bitmap */
--			npc_mcam_clear_bit(mcam, index);
--			/* Disable the entry */
--			npc_enable_mcam_entry(rvu, mcam, blkaddr, index, false);
--
--			/* Update entry2counter mapping */
--			cntr = mcam->entry2cntr_map[index];
--			if (cntr != NPC_MCAM_INVALID_MAP)
--				npc_unmap_mcam_entry_and_cntr(rvu, mcam,
--							      blkaddr, index,
--							      cntr);
--			mcam->entry2target_pffunc[index] = 0x0;
--			if (is_cn20k(rvu->pdev)) {
--				rc = npc_cn20k_idx_free(rvu, &index, 1);
--				if (rc)
--					dev_err(rvu->dev,
--						"Failed to free mcam idx=%u pcifunc=%#x\n",
--						index, pcifunc);
-+		if (mcam->entry2pfvf_map[index] != pcifunc)
-+			continue;
++#ifndef __EEA_PCI_H__
++#define __EEA_PCI_H__
 +
-+		mcam->entry2pfvf_map[index] = NPC_MCAM_INVALID_MAP;
++#include <linux/pci.h>
 +
-+		dft_rl = false;
-+		if (is_cn20k(rvu->pdev)) {
-+			if (dft_idxs[NPC_DFT_RULE_BCAST_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_MCAST_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_PROMISC_ID] == index ||
-+			    dft_idxs[NPC_DFT_RULE_UCAST_ID] == index) {
-+				dft_rl = true;
- 			}
- 		}
++struct eea_pci_cap {
++	__u8 cap_vndr;
++	__u8 cap_next;
++	__u8 cap_len;
++	__u8 cfg_type;
++};
 +
-+		/* Free the entry in bitmap.*/
-+		if (!dft_rl)
-+			npc_mcam_clear_bit(mcam, index);
++struct eea_pci_reset_reg {
++	struct eea_pci_cap cap;
++	__le16 driver;
++	__le16 device;
++};
 +
-+		/* Disable the entry */
-+		npc_enable_mcam_entry(rvu, mcam, blkaddr, index, false);
++struct eea_pci_device;
 +
-+		/* Update entry2counter mapping */
-+		cntr = mcam->entry2cntr_map[index];
-+		if (cntr != NPC_MCAM_INVALID_MAP)
-+			npc_unmap_mcam_entry_and_cntr(rvu, mcam,
-+						      blkaddr, index,
-+						      cntr);
-+		mcam->entry2target_pffunc[index] = 0x0;
-+		if (is_cn20k(rvu->pdev)) {
-+			if (dft_rl)
-+				continue;
++struct eea_device {
++	struct eea_pci_device *ep_dev;
++	struct device         *dma_dev;
++	struct eea_net        *enet;
 +
-+			rc = npc_cn20k_idx_free(rvu, &index, 1);
-+			if (rc)
-+				dev_err(rvu->dev,
-+					"Failed to free mcam idx=%u pcifunc=%#x\n",
-+					index, pcifunc);
-+		}
- 	}
- }
- 
-@@ -3917,13 +3968,22 @@ void rvu_npc_clear_ucast_entry(struct rvu *rvu, int pcifunc, int nixlf)
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	struct rvu_npc_mcam_rule *rule;
- 	int ucast_idx, blkaddr;
-+	u8 type;
- 
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
- 
-+	type = NIXLF_UCAST_ENTRY;
-+	if (is_cn20k(rvu->pdev) && is_lbk_vf(rvu, pcifunc))
-+		type = NIXLF_PROMISC_ENTRY;
++	u64 features;
 +
- 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
--					     nixlf, NIXLF_UCAST_ENTRY);
-+					     nixlf, type);
++	u32 rx_num;
++	u32 tx_num;
++	u32 db_blk_size;
++};
 +
-+	/* In cn20k, default rules are freed before detach rsrc */
-+	if (ucast_idx < 0)
-+		return;
- 
- 	npc_enable_mcam_entry(rvu, mcam, blkaddr, ucast_idx, false);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..81b088f5a016 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1053,7 +1053,6 @@ irqreturn_t otx2_pfaf_mbox_intr_handler(int irq, void *pf_irq)
- 	/* Clear the IRQ */
- 	otx2_write64(pf, RVU_PF_INT, BIT_ULL(0));
- 
--
- 	mbox_data = otx2_read64(pf, RVU_PF_PFAF_MBOX0);
- 
- 	if (mbox_data & MBOX_UP_MSG) {
-@@ -1729,7 +1728,7 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	mutex_lock(&mbox->lock);
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
--		free_req->flags = NIX_LF_DISABLE_FLOWS;
-+		free_req->flags = NIX_LF_DISABLE_FLOWS | NIX_LF_DONT_FREE_DFT_IDXS;
- 		if (otx2_sync_mbox_msg(mbox))
- 			dev_err(pf->dev, "%s failed to free nixlf\n", __func__);
- 	}
-@@ -1803,7 +1802,7 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
- 	/* Reset NIX LF */
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
--		free_req->flags = NIX_LF_DISABLE_FLOWS;
-+		free_req->flags = NIX_LF_DISABLE_FLOWS | NIX_LF_DONT_FREE_DFT_IDXS;
- 		if (!(pf->flags & OTX2_FLAG_PF_SHUTDOWN))
- 			free_req->flags |= NIX_LF_DONT_FREE_TX_VTAG;
- 		if (otx2_sync_mbox_msg(mbox))
-@@ -1926,7 +1925,6 @@ int otx2_alloc_queue_mem(struct otx2_nic *pf)
- 	struct otx2_qset *qset = &pf->qset;
- 	struct otx2_cq_poll *cq_poll;
- 
--
- 	/* RQ and SQs are mapped to different CQs,
- 	 * so find out max CQ IRQs (i.e CINTs) needed.
- 	 */
++const char *eea_pci_name(struct eea_device *edev);
++int eea_pci_domain_nr(struct eea_device *edev);
++u16 eea_pci_dev_id(struct eea_device *edev);
++
++int eea_device_reset(struct eea_device *dev);
++int eea_pci_set_aq_up(struct eea_device *dev);
++
++u64 eea_pci_device_ts(struct eea_device *edev);
++
++void __iomem *eea_pci_db_addr(struct eea_device *edev, u32 off);
++#endif
 -- 
-2.43.0
+2.32.0.3.g01195cf9f
 
 
