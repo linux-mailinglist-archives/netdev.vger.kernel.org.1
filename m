@@ -1,166 +1,343 @@
-Return-Path: <netdev+bounces-266954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGwmDYWFsml4NQAAu9opvQ
-	(envelope-from <netdev+bounces-266954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:21:09 +0100
+	id sE2CAuWHsml4NQAAu9opvQ
+	(envelope-from <netdev+bounces-266955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:31:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8829826F792
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:21:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9458726F987
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4F353022F81
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:21:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 302053042025
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A434282F1C;
-	Thu, 12 Mar 2026 09:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8A43B775C;
+	Thu, 12 Mar 2026 09:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d//vKsPQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E59FA3GS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6987223BD05
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EA43B7766
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773307266; cv=none; b=Gk+Y7AoiUmPqZVyzh2VkZiBH2DILPi6v3OoGqrOZbjwb93II8F8NNgT8PlCZJySKBeukQ5tPBL2+X/k+TJfkAaY1VGgQHTAKF6/BtRJjjnHM9aHA1plgcPMmWa1qTj8eHerW/yiLAQeQoHGedJGjBWa25apcnp23TnE5VbTal+U=
+	t=1773307792; cv=none; b=SSnc2WjiNOU2/4iPusJw9D2NldZKaZsH9G1ZjRfhDjY52V0NDsJ5fIr6kd4jdESCsNXv4dVjt3jEexrtDBzV2svJRLaBt87KOZ2s6Xw7IAEcZQD2lqAdPqNCTgcLTqw5KZe4TSAqha4HpgZYJHCZW24CTOdfnyoU2/4Oa1LjgNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773307266; c=relaxed/simple;
-	bh=PSfQXHav3C0tSuD/OTS61QwfCk1GGT0dCfZRYWKuC3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GNv9gt0478mROm0nUlfe6k15/PIaLl7nTvp9KvvIptDK7hGYYTK8ULvghOHYrQj+otfJ8o6ALQ4ySX7lKIwpsYmezKJO8/8bGc7WMSvQe9jXN/i4othCHpJ0kwi1fWoJkerNMOoC5I7eQE5g02VFBQk9ND1gE0yINfZ8aRe9TfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d//vKsPQ; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773307263; x=1804843263;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PSfQXHav3C0tSuD/OTS61QwfCk1GGT0dCfZRYWKuC3s=;
-  b=d//vKsPQsrPhKudfnr0ADdl3ZBVSB292TRnMBqtTlj8mtcuYbV55LnSs
-   p3H3k/aQW+hk2kIZRIwmwahTgFbjvqBXbutXMGlR1Wd8+EdyvyQ0W6144
-   p+/47WzW4yobxbj7m1ldgjnvE84kuhW7jwgt+0gTRgIGp0oyHY5vUZBBX
-   /2/VcvmVygT5at6W5TJ//acvnqsS3AOhPTro3ehC+VvKZFwD3flUXBAYk
-   R15CWJSOYZfUSNmg9hxVd/UEgK/u40oZY0NplimmJaQ56U4aX+hpCFUO5
-   di2nmzQNVyvLn1ewgBC3NJ9ISZ5UIGwi9iTH6imBCxnTjqDerosB5dM0S
-   w==;
-X-CSE-ConnectionGUID: TJ0dYkTaSyK2WHsZBp8c5A==
-X-CSE-MsgGUID: mMcIT9z/TVuqyrn4eeTQYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11726"; a="85478516"
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="85478516"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2026 02:21:03 -0700
-X-CSE-ConnectionGUID: KlaPLjGcSM6py3Ba7wFbdw==
-X-CSE-MsgGUID: YJ3xSlcyQd6LMZoc7uWdEQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="251253771"
-Received: from lkp-server01.sh.intel.com (HELO 418530b1a366) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 12 Mar 2026 02:21:00 -0700
-Received: from kbuild by 418530b1a366 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w0cDw-000000002Ih-3QFC;
-	Thu, 12 Mar 2026 09:20:56 +0000
-Date: Thu, 12 Mar 2026 17:20:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Wang <weibunny.kernel@gmail.com>, netdev@vger.kernel.org,
+	s=arc-20240116; t=1773307792; c=relaxed/simple;
+	bh=Rj/4sFG1pif+Eq/S+Jj3++hKlOosTFCHyZI86FVlPic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=or89UR+K8UHlUGf11ylm89BHVuZOrP8snL+fxl9AULbtmwiJzUwy1qONcZZeTsh3gOTEp3+Z7CF/MsEzKXrN2aTHwOGeLVNH8Y2UKP7TKxRc+jtEO6nAJnXoLagB2qGwmCIyExOgj46ArN/7MX14y3FyMjJ4+Cf+EPF1+jV/4g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E59FA3GS; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773307778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uBRqbG57c0gxktkhNnrZHJgUKtWTivbvPUXrbPI8WKk=;
+	b=E59FA3GSVEPk2DHWwPxq7xyFM4b53nHHJtRynpKdgV0m9PdiijivEg1kjCIYF4HiqmNtBz
+	nYf4SV5YfryRZiGB3pqE2WUigjq2gev5jJ+TRgeQkQA3e0RkRSziCnA8Ek/ehKPHXAv+nc
+	znEe7Kx9Gr7Rl2y9bC7qFgndnDle8NQ=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com,
+	Eric Dumazet <edumazet@google.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Daniel Zahka <daniel.zahka@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, Wei Wang <weibunny@fb.com>
-Subject: Re: [PATCH v4 net-next 3/5] psp: add a new netdev event for dev
- unregister
-Message-ID: <202603121737.vPEHjYAG-lkp@intel.com>
-References: <20260311235904.2392010-4-weibunny.kernel@gmail.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v5] net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
+Date: Thu, 12 Mar 2026 17:29:07 +0800
+Message-ID: <20260312092909.48325-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260311235904.2392010-4-weibunny.kernel@gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266954-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-266955-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: 8829826F792
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,827ae2bfb3a3529333e9];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shopee.com:email,appspotmail.com:email]
+X-Rspamd-Queue-Id: 9458726F987
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Wei,
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-kernel test robot noticed the following build warnings:
+Syzkaller reported a panic in smc_tcp_syn_recv_sock() [1].
 
-[auto build test WARNING on net-next/main]
+smc_tcp_syn_recv_sock() is called in the TCP receive path
+(softirq) via icsk_af_ops->syn_recv_sock on the clcsock (TCP
+listening socket). It reads sk_user_data to get the smc_sock
+pointer. However, when the SMC listen socket is being closed
+concurrently, smc_close_active() sets clcsock->sk_user_data
+to NULL under sk_callback_lock, and then the smc_sock itself
+can be freed via sock_put() in smc_release().
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Wang/psp-add-admin-non-admin-version-of-psp_device_get_locked/20260312-080310
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260311235904.2392010-4-weibunny.kernel%40gmail.com
-patch subject: [PATCH v4 net-next 3/5] psp: add a new netdev event for dev unregister
-config: x86_64-randconfig-014-20260312 (https://download.01.org/0day-ci/archive/20260312/202603121737.vPEHjYAG-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260312/202603121737.vPEHjYAG-lkp@intel.com/reproduce)
+This leads to two issues:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603121737.vPEHjYAG-lkp@intel.com/
+1) NULL pointer dereference: sk_user_data is NULL when
+   accessed.
+2) Use-after-free: sk_user_data is read as non-NULL, but the
+   smc_sock is freed before its fields (e.g., queued_smc_hs,
+   ori_af_ops) are accessed.
 
-All warnings (new ones prefixed by >>):
+The race window looks like this (the syzkaller crash [1]
+triggers via the SYN cookie path: tcp_get_cookie_sock() ->
+smc_tcp_syn_recv_sock(), but the normal tcp_check_req() path
+has the same race):
 
-   net/psp/psp_main.c: In function 'psp_init':
->> net/psp/psp_main.c:449:13: warning: unused variable 'err' [-Wunused-variable]
-     449 |         int err;
-         |             ^~~
+  CPU A (softirq)              CPU B (process ctx)
 
+  tcp_v4_rcv()
+    TCP_NEW_SYN_RECV:
+    sk = req->rsk_listener
+    sock_hold(sk)
+    /* No lock on listener */
+                               smc_close_active():
+                                 write_lock_bh(cb_lock)
+                                 sk_user_data = NULL
+                                 write_unlock_bh(cb_lock)
+                                 ...
+                                 smc_clcsock_release()
+                                 sock_put(smc->sk) x2
+                                   -> smc_sock freed!
+    tcp_check_req()
+      smc_tcp_syn_recv_sock():
+        smc = user_data(sk)
+          -> NULL or dangling
+        smc->queued_smc_hs
+          -> crash!
 
-vim +/err +449 net/psp/psp_main.c
+Note that the clcsock and smc_sock are two independent objects
+with separate refcounts. TCP stack holds a reference on the
+clcsock, which keeps it alive, but this does NOT prevent the
+smc_sock from being freed.
 
-   446	
-   447	static int __init psp_init(void)
-   448	{
- > 449		int err;
-   450	
-   451		mutex_init(&psp_devs_lock);
-   452	
-   453		return genl_register_family(&psp_nl_family);
-   454	}
-   455	
+Fix this by using RCU and refcount_inc_not_zero() to safely
+access smc_sock. Since smc_tcp_syn_recv_sock() is called in
+the TCP three-way handshake path, taking read_lock_bh on
+sk_callback_lock is too heavy and would not survive a SYN
+flood attack. Using rcu_read_lock() is much more lightweight.
 
+- Set SOCK_RCU_FREE on the SMC listen socket so that
+  smc_sock freeing is deferred until after the RCU grace
+  period. This guarantees the memory is still valid when
+  accessed inside rcu_read_lock().
+- Use rcu_read_lock() to protect reading sk_user_data.
+- Use refcount_inc_not_zero(&smc->sk.sk_refcnt) to pin the
+  smc_sock. If the refcount has already reached zero (close
+  path completed), it returns false and we bail out safely.
+
+Note: smc_hs_congested() has a similar lockless read of
+sk_user_data without rcu_read_lock(), but it only checks for
+NULL and accesses the global smc_hs_wq, never dereferencing
+any smc_sock field, so it is not affected.
+
+Reproducer was verified with mdelay injection and smc_run,
+the issue no longer occurs with this patch applied.
+
+[1] https://syzkaller.appspot.com/bug?extid=827ae2bfb3a3529333e9
+
+Fixes: 8270d9c21041 ("net/smc: Limit backlog connections")
+Reported-by: syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/67eaf9b8.050a0220.3c3d88.004a.GAE@google.com/T/
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+---
+v5:
+- Fix dst_entry leak and missing tcp_listendrop() on
+  early return when smc is NULL or refcount has reached
+  zero. This affects the SYN cookie path where dst is
+  non-NULL.
+
+v4: https://lore.kernel.org/netdev/20260311022451.395802-1-jiayuan.chen@linux.dev/T/#t
+
+v4:
+- Add a new smc_clcsock_user_data_rcu() helper instead of
+  modifying the existing smc_clcsock_user_data(), to allow
+  gradual conversion of callers. Only smc_tcp_syn_recv_sock()
+  uses the RCU variant; other callers under sk_callback_lock
+  remain unchanged, avoiding lockdep warnings.
+- Use rcu_dereference_sk_user_data() for reading and
+  rcu_assign_sk_user_data() for writing sk_user_data to
+  prevent load/store tearing.
+
+v3: https://lore.kernel.org/netdev/20260310120053.136594-1-jiayuan.chen@linux.dev/
+
+v3:
+- Write sk_user_data with RCU to prevent store tearing.
+
+v2: https://lore.kernel.org/netdev/20260309023846.18516-1-jiayuan.chen@linux.dev/
+
+v2:
+- Use rcu_read_lock() + refcount_inc_not_zero() instead of
+  read_lock_bh(sk_callback_lock) + sock_hold(), since this
+  is the TCP handshake hot path and read_lock_bh is too
+  expensive under SYN flood.
+- Set SOCK_RCU_FREE on SMC listen socket to ensure
+  RCU-deferred freeing.
+
+v1: https://lore.kernel.org/netdev/20260307032158.372165-1-jiayuan.chen@linux.dev/
+---
+ net/smc/af_smc.c    | 23 +++++++++++++++++------
+ net/smc/smc.h       |  5 +++++
+ net/smc/smc_close.c |  2 +-
+ 3 files changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index d0119afcc6a1..1a565095376a 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -131,7 +131,14 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 	struct smc_sock *smc;
+ 	struct sock *child;
+ 
+-	smc = smc_clcsock_user_data(sk);
++	rcu_read_lock();
++	smc = smc_clcsock_user_data_rcu(sk);
++	if (!smc || !refcount_inc_not_zero(&smc->sk.sk_refcnt)) {
++		rcu_read_unlock();
++		smc = NULL;
++		goto drop;
++	}
++	rcu_read_unlock();
+ 
+ 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
+ 				sk->sk_max_ack_backlog)
+@@ -153,11 +160,14 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
+ 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
+ 	}
++	sock_put(&smc->sk);
+ 	return child;
+ 
+ drop:
+ 	dst_release(dst);
+ 	tcp_listendrop(sk);
++	if (smc)
++		sock_put(&smc->sk);
+ 	return NULL;
+ }
+ 
+@@ -254,7 +264,7 @@ static void smc_fback_restore_callbacks(struct smc_sock *smc)
+ 	struct sock *clcsk = smc->clcsock->sk;
+ 
+ 	write_lock_bh(&clcsk->sk_callback_lock);
+-	clcsk->sk_user_data = NULL;
++	rcu_assign_sk_user_data(clcsk, NULL);
+ 
+ 	smc_clcsock_restore_cb(&clcsk->sk_state_change, &smc->clcsk_state_change);
+ 	smc_clcsock_restore_cb(&clcsk->sk_data_ready, &smc->clcsk_data_ready);
+@@ -902,7 +912,7 @@ static void smc_fback_replace_callbacks(struct smc_sock *smc)
+ 	struct sock *clcsk = smc->clcsock->sk;
+ 
+ 	write_lock_bh(&clcsk->sk_callback_lock);
+-	clcsk->sk_user_data = (void *)((uintptr_t)smc | SK_USER_DATA_NOCOPY);
++	__rcu_assign_sk_user_data_with_flags(clcsk, smc, SK_USER_DATA_NOCOPY);
+ 
+ 	smc_clcsock_replace_cb(&clcsk->sk_state_change, smc_fback_state_change,
+ 			       &smc->clcsk_state_change);
+@@ -2665,8 +2675,8 @@ int smc_listen(struct socket *sock, int backlog)
+ 	 * smc-specific sk_data_ready function
+ 	 */
+ 	write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
+-	smc->clcsock->sk->sk_user_data =
+-		(void *)((uintptr_t)smc | SK_USER_DATA_NOCOPY);
++	__rcu_assign_sk_user_data_with_flags(smc->clcsock->sk, smc,
++					     SK_USER_DATA_NOCOPY);
+ 	smc_clcsock_replace_cb(&smc->clcsock->sk->sk_data_ready,
+ 			       smc_clcsock_data_ready, &smc->clcsk_data_ready);
+ 	write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
+@@ -2687,10 +2697,11 @@ int smc_listen(struct socket *sock, int backlog)
+ 		write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
+ 		smc_clcsock_restore_cb(&smc->clcsock->sk->sk_data_ready,
+ 				       &smc->clcsk_data_ready);
+-		smc->clcsock->sk->sk_user_data = NULL;
++		rcu_assign_sk_user_data(smc->clcsock->sk, NULL);
+ 		write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
+ 		goto out;
+ 	}
++	sock_set_flag(sk, SOCK_RCU_FREE);
+ 	sk->sk_max_ack_backlog = backlog;
+ 	sk->sk_ack_backlog = 0;
+ 	sk->sk_state = SMC_LISTEN;
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 9e6af72784ba..52145df83f6e 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -346,6 +346,11 @@ static inline struct smc_sock *smc_clcsock_user_data(const struct sock *clcsk)
+ 	       ((uintptr_t)clcsk->sk_user_data & ~SK_USER_DATA_NOCOPY);
+ }
+ 
++static inline struct smc_sock *smc_clcsock_user_data_rcu(const struct sock *clcsk)
++{
++	return (struct smc_sock *)rcu_dereference_sk_user_data(clcsk);
++}
++
+ /* save target_cb in saved_cb, and replace target_cb with new_cb */
+ static inline void smc_clcsock_replace_cb(void (**target_cb)(struct sock *),
+ 					  void (*new_cb)(struct sock *),
+diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+index 10219f55aad1..bb0313ef5f7c 100644
+--- a/net/smc/smc_close.c
++++ b/net/smc/smc_close.c
+@@ -218,7 +218,7 @@ int smc_close_active(struct smc_sock *smc)
+ 			write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
+ 			smc_clcsock_restore_cb(&smc->clcsock->sk->sk_data_ready,
+ 					       &smc->clcsk_data_ready);
+-			smc->clcsock->sk->sk_user_data = NULL;
++			rcu_assign_sk_user_data(smc->clcsock->sk, NULL);
+ 			write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
+ 			rc = kernel_sock_shutdown(smc->clcsock, SHUT_RDWR);
+ 		}
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
