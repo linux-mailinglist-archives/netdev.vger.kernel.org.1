@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-267005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sO+cDkGSsml5NgAAu9opvQ
-	(envelope-from <netdev+bounces-267005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:15:29 +0100
+	id lnIlOGOSsmnONgAAu9opvQ
+	(envelope-from <netdev+bounces-267006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:16:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5922270391
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:15:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A80B2703C7
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:16:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 88311305C6E4
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:12:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29D543145A3D
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D682A3BE63A;
-	Thu, 12 Mar 2026 10:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1083E3C141A;
+	Thu, 12 Mar 2026 10:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hp+t8ykU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uTy1jOSg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C88A3B47D4
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1683C0628;
+	Thu, 12 Mar 2026 10:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773310324; cv=none; b=WJQabimVogFkNjKfurEugTkHT2Ok8xx3P+xqWX4XuNG6QfURm9TCGswVflXtN9Ky9lCBU1Cv0lJP7J5vCCCgwSyYAALZZP9CDyaoF0Xk4aHB2BGktkgJ4mfaT43OlEnRgXOgZDxhJ78KUUvnQ1hJ/AEy/Z7FDnuFzgFbgchlzHg=
+	t=1773310333; cv=none; b=UIJWjn0wNs7i7xPzyxZtGk81NwDpr+DcMNliwkhnjrhShxiR+zTuA5QBEfFSOdI6mKWzWQ5+FVkDLp6yydrah48WdU4ciT8/r5gDdiFuEg0qkaHPG/NSpJIu7QG2o1pQh2p4xtf3M3pN/wb4oTr0EzNWZRyRMKxGcrDOKL3DgYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773310324; c=relaxed/simple;
-	bh=6xUWKdeUm13YMjnYSU6F2gpNMpsC2neElMV4EzL5Njs=;
+	s=arc-20240116; t=1773310333; c=relaxed/simple;
+	bh=0JNH+vV9m6Q+pG8VsJX1wdlMdhhBGkOHek4F0EB6bdU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VhHS+Ogcdbh1BlwEsDD5wMJlzcr76K5X4g/C1VTEqamx6O8LH49rPwxRrn7nPiCEKv37LcRDMdO/0XtBD6s/Pc1Qt7IuEB/13rgM95VSlqBffjgUfCXMxgB68XQzm+X1BBbAldZ0SvZmrC7xWJCpF1cmi1bYn9LK9uPSRKMlMr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hp+t8ykU; arc=none smtp.client-ip=185.246.85.4
+	 MIME-Version:Content-Type; b=jjAqqgUmT7cTAsYSMeDqpRVmj/1KMHzMZk/yorJaOWRVPIulJ2WJvfBGv6LohsLFB91puLyptm9D6JxrbhOwXziav9ZQRjw4Vwx6QUNi1YFyX9itWqey5xNGTggKLB5Xx4NKRmErt4dyIN/ebk7qOnCcBFsJB7BwMoRRDFliG3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uTy1jOSg; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id E1C974E42650;
-	Thu, 12 Mar 2026 10:12:01 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 19E0C1A2DEB;
+	Thu, 12 Mar 2026 10:12:10 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B21AB5FDEB;
-	Thu, 12 Mar 2026 10:12:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6DFE610368916;
-	Thu, 12 Mar 2026 11:11:55 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id DF6365FDEB;
+	Thu, 12 Mar 2026 10:12:09 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3782310369C61;
+	Thu, 12 Mar 2026 11:12:04 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773310320; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1773310327; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=Lj7v8KqAHFpPD+bbuLSZdQfcrsKxuMLWjY2vWELEISw=;
-	b=hp+t8ykUahsGtr0cK+M2lXNRD8ODQBIMFRzp3qoMPndxGauz3WJl2gZGyJzv9rhO2BzEfB
-	1mm3ifxAGhW7gOtndV6Gl3tkVBlR3+3FdlMpPy0imKO3GHrhGDWHURUtDsVGhnhSkWbVJ2
-	vlZZOSiXo3OYnXKM2LtpoPcNH3F/FRg1j5daWQizrIAZNlRhcv3UAMgbjrRtuM3AZV/AOz
-	Rse89qlv1VJlId9mybaJP8pnudgIBP8Vq0Xio+EdwngnUruw89lPzhcq1QXF9HEdxOEi+L
-	D3g4uqfDV052jeAwt7ganfNXgo5JZ0TFE37HrOwHwaoi4ngOxPISMyqI6Z6X5w==
+	bh=ZScxyatlTWwp4VNBkqTha4B6duYhO6GHXUx9ibpGkcE=;
+	b=uTy1jOSgn+W8bTv2Bu4HIkJ8axtG/wxKhMn+PbT6zK+r5oqzCkIgeV0QZcW/LQGyWkDjIC
+	21cUmsPqAuliL36gz5dC82ca7VnYBtrVVlmCYMFT9c+OGPOzrVTACPxsT/Jsp79ELcW9ZL
+	yDHOVpcBarPpgEcakALDfZgunbdvLRP/lvbcGrwswLN2uzGPCP0LewYtKmyi3mzm6oqtYa
+	uQ+JpyQUuK7PfkpMx+RFci2j2NzaSgbgR0ci0gGlLRxhydcEChudsq5l6rvSM2BHdZhO6x
+	BF/fUQAiyBZ0xoCx4Z+5LKINSwkONA2qgogKbav9QeWb1pIqGRpxAWSKWSdxFw==
 From: =?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
 To: theo.lebrun@bootlin.com
 Cc: Ryan.Wanner@microchip.com,
@@ -84,12 +84,13 @@ Cc: Ryan.Wanner@microchip.com,
 	sean.anderson@linux.dev,
 	thomas.petazzoni@bootlin.com,
 	vineeth.karumanchi@amd.com
-Subject: [PATCH 1/3] net: macb: runtime detect MACB_CAPS_USRIO_DISABLED
-Date: Thu, 12 Mar 2026 11:11:36 +0100
-Message-ID: <20260312101138.465482-1-theo.lebrun@bootlin.com>
+Subject: [PATCH 2/3] net: macb: set MACB_CAPS_USRIO_DISABLED if no usrio config is provided
+Date: Thu, 12 Mar 2026 11:11:37 +0100
+Message-ID: <20260312101138.465482-2-theo.lebrun@bootlin.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <DH0PZN0WJZC5.26KLH464PMMTP@bootlin.com>
+In-Reply-To: <20260312101138.465482-1-theo.lebrun@bootlin.com>
 References: <DH0PZN0WJZC5.26KLH464PMMTP@bootlin.com>
+ <20260312101138.465482-1-theo.lebrun@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,7 +113,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[microchip.com,amd.com,ghiti.fr,lunn.ch,eecs.berkeley.edu,tuxon.dev,kernel.org,raspberrypi.com,davemloft.net,vger.kernel.org,google.com,bootlin.com,lists.infradead.org,redhat.com,dabbelt.com,gmail.com,sifive.com,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267005-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267006-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -127,57 +128,44 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_TWELVE(0.00)[32];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
-X-Rspamd-Queue-Id: C5922270391
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1A80B2703C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-DCFG1 (design config 1 register) carries a bit indicating whether User
-I/O feature has been enabled or not. The MACB/GEM driver has a cap flag
-indicating that HW has the feature disabled (default is enabled). Add
-the missing connection between DCFG1 bit and MACB_CAPS_USRIO_DISABLED.
+bp->usrio is copied directly from dt_conf->usrio in macb_probe().
 
-Indirect impact: avoid useless writel() on USERIO register; this is not
-an important fix because USERIO is anyway read-only when feature is
-disabled.
+If dt_conf->usrio is NULL, we do not want to land in USRIO write
+codepaths which dereference bp->usrio. Inherit automatically
+MACB_CAPS_USRIO_DISABLED to avoid those.
 
-If for some reason a compatible sets USRIO_DISABLED but DCFG1 indicates
-it is enabled, we still keep the disabled capability flag. This ensures
-we don't break "cdns,np4-macb" that sets the flag from compatible match
-data.
+This means a macb_config that wants to disable usrio can simply drop
+its .usrio field, rather than add the disabled capability explicitly.
+
+Nit: drop the dt_conf NULL check because the pointer is always valid.
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb.h      | 2 ++
- drivers/net/ethernet/cadence/macb_main.c | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 8e5305f9a754..16527dbab875 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -524,6 +524,8 @@
- #define GEM_IRQCOR_SIZE				1
- #define GEM_DBWDEF_OFFSET			25
- #define GEM_DBWDEF_SIZE				3
-+#define GEM_USERIO_OFFSET			9
-+#define GEM_USERIO_SIZE				1
- #define GEM_NO_PCS_OFFSET			0
- #define GEM_NO_PCS_SIZE				1
- 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 6ac68731784f..ecab7fdc962d 100644
+index ecab7fdc962d..972499aa4191 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4481,6 +4481,8 @@ static void macb_configure_caps(struct macb *bp,
- 			bp->caps |= MACB_CAPS_ISR_CLEAR_ON_WRITE;
- 		if (GEM_BFEXT(NO_PCS, dcfg) == 0)
- 			bp->caps |= MACB_CAPS_PCS;
-+		if (!(dcfg & GEM_BIT(USERIO)))
-+			bp->caps |= MACB_CAPS_USRIO_DISABLED;
- 		dcfg = gem_readl(bp, DCFG12);
- 		if (GEM_BFEXT(HIGH_SPEED, dcfg) == 1)
- 			bp->caps |= MACB_CAPS_HIGH_SPEED;
+@@ -4470,8 +4470,10 @@ static void macb_configure_caps(struct macb *bp,
+ {
+ 	u32 dcfg;
+ 
+-	if (dt_conf)
+-		bp->caps = dt_conf->caps;
++	bp->caps = dt_conf->caps;
++
++	if (!dt_conf->usrio)
++		bp->caps |= MACB_CAPS_USRIO_DISABLED;
+ 
+ 	if (hw_is_gem(bp->regs, bp->native_io)) {
+ 		bp->caps |= MACB_CAPS_MACB_IS_GEM;
 -- 
 2.53.0
 
