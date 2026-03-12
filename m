@@ -1,213 +1,280 @@
-Return-Path: <netdev+bounces-267113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cH68BMHXsmlDQAAAu9opvQ
-	(envelope-from <netdev+bounces-267113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:12:01 +0100
+	id WAjbHtrXsmlDQAAAu9opvQ
+	(envelope-from <netdev+bounces-267117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:12:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA6D273FE7
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:12:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C767273FFD
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:12:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 521E530BFD5B
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:05:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 479203011CBE
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13D23B4EBF;
-	Thu, 12 Mar 2026 15:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0176337EFF7;
+	Thu, 12 Mar 2026 15:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="zkgHMU1s"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xRu6vREz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RojeaC+1";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xRu6vREz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RojeaC+1"
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013046.outbound.protection.outlook.com [52.101.83.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFC01400C
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773327930; cv=fail; b=U0Hfa5AADY9GiJX/7yVxPFqc8s0UbLyC6QATs6ABqd1ZXSvgWsQrO4FhjbaH2eYQVxwk7De8P/Wg+4SfrAn8qGgKzXAWItZrO3F5jo+JTM88ZkHabcw6GYn5qnyWzg8tSAwsF3IZsyLy+/6iOGrDWNUiDl/ZHlb6pGPLQspwMHc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773327930; c=relaxed/simple;
-	bh=SA5/PiMKBDcO/l7Mf9tDqed39oZ0Dcqnnz1MYk6or9E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RpRlilK0x9QOa842nebTxRUgmI8ONfx1+UokCAMJdU3njrqczx0Fzg2CUbyOwsxcsGngeeh62ld41vMLFP2iJ4Zws6Qy5PeIRuAerC94lMzpTcRu3tWcAS8YrUBuARDe1fZoofrDYf03C7o4/TKb4VPWNoNvP3MXwyBWXD9qQoI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=zkgHMU1s; arc=fail smtp.client-ip=52.101.83.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GLufE3bqR9C66eRK2sDdjOnGGgL2bbeB7lcH6WcJnZa/d02ftPZ/3gsJnqgio6Btdw4+Wt10U6HEp3xYhAwscAeA5GMCPCPwn40eZ6P6zUrTxje1UxWCKfe/3JrIXzY/Yb7Y66nfQGrUcsG7F+18pud5rBi9uVuPG7TC3zm0tYA45yh6NxJEib0mwcWxrFZi68micUAeyABlXgokLAHb+hMOr8eHgd+f4J7/+K1x95EAvOzksOxIaIGojcplJD1XprLhK8Jv8Uvz8pPJrcjthy/mankgD8lV2U/95vcvvnTsylryHRCIvw3Pj1lWY136tElJmKv5VgcDY6VSMbXjRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SA5/PiMKBDcO/l7Mf9tDqed39oZ0Dcqnnz1MYk6or9E=;
- b=N4w+dwrq+WO9BQQF7vfXxgCfYc/gl0tJC8mgkHug6/XuaoCIKztyd+jsaLGUdorv5RJJIQ23RF3RNyeT7BgoVVsjT4a43b5ZGKr6Cff7T9Ve0SCKIIz0EtbLkckuUfmz6iJnO2oVJmDnQq3ujUoJhiHFr9tiHqH0fwJMrK2n4PCpqeTvhlVqbNQ4vjoDbq/nrAKu0Sn2iDi52urcOGzscdn4tt9L2GArcXhd1TX/DTAlSPESwyHQ+KIjtDKsTpmtVFA5pgYziFZOUEGRFBzmSzrVxTDgSsyFlmgqSQel5kcepU2hwIg2mRpxf4abaUTx+wMSWTOZBMUaS04gLr4OOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
- dkim=pass header.d=siemens.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SA5/PiMKBDcO/l7Mf9tDqed39oZ0Dcqnnz1MYk6or9E=;
- b=zkgHMU1svR/8tRxcaXpRJ61m6excYTccivqynG4D2yrAEBDSVMw9Lh/8Fz7wyVUlcJU4LHSfBvwz0sJjJuNk8xV2N5OUnFPFnBopSdx1WztiU+/2iSNPs8Dq00uyzJlVr34hqZU3ziKT9mu6ePmc4PrUnseOGN8nA2kNgiAVYbHGOU6muDGCzsEZllvMR8jTcYOBmUMiTCnTPD8FGSGDLKss/DWZsKyLsZViT5ZPt/sc0vnpniumwn35YAxQ1qJPp9I3PpFCne9dbxpqk6wKK8LZUKgMhSmRmbWIc6+5/G+z+b7YP7ULEjPJcYFFbVq56dvdQk3yDfmxntpBRz4jvA==
-Received: from DB9PR10MB5689.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:30d::14)
- by AS8PR10MB6722.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:564::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.15; Thu, 12 Mar
- 2026 15:05:23 +0000
-Received: from DB9PR10MB5689.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::ea30:bdcf:399e:679]) by DB9PR10MB5689.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::ea30:bdcf:399e:679%5]) with mapi id 15.20.9700.013; Thu, 12 Mar 2026
- 15:05:23 +0000
-From: "Bezdeka, Florian" <florian.bezdeka@siemens.com>
-To: "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
-	"andrew@lunn.ch" <andrew@lunn.ch>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kuba@kernel.org" <kuba@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: move MSI data out of struct
- stmmac_priv
-Thread-Topic: [PATCH net-next] net: stmmac: move MSI data out of struct
- stmmac_priv
-Thread-Index: AQHcshnFshdFNRptYUCfq4Ta73h+wbWq/xaA
-Date: Thu, 12 Mar 2026 15:05:22 +0000
-Message-ID: <b5b47ed3a98720b82f82217f6d7c3955559e121d.camel@siemens.com>
-References: <E1w0evD-0000000CzY1-19rN@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1w0evD-0000000CzY1-19rN@rmk-PC.armlinux.org.uk>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.58.3 (3.58.3-1.fc43) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=siemens.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR10MB5689:EE_|AS8PR10MB6722:EE_
-x-ms-office365-filtering-correlation-id: 034ecdca-7bf7-47b0-a8ae-08de8048c8ed
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|10070799003|366016|1800799024|38070700021|56012099003|18002099003|22082099003|55112099003;
-x-microsoft-antispam-message-info:
- ecWDxenjGvjtvcrzu6wevubAXqPj5nBohKUnJgW1r53KbBJJc2rmW0qy1rpnWJAraReDB3B8tWtqWc7TS1fpmhUhQOpy/GfHKMnpL3Y8WvZ9CxWDDP6kMMdpkn/K7H6Wc1t+1rULOzFMlH95gCZGxqnffyLIFvVWsryIkgzaeBB1FHUuPk9bXLvXsA5K1uSbqsUjjvWtm9ThUCNDtoB8w7C5e90zueBeaMMclvVhNarvRf7jWF7q3Tv0iY729NE3wZAqux23ADHEXbAkdgHc195a0H3RLa17UVQjUZK/nf1f4EPyHo9vB3Fn4qh9agbGUfN3bACMZu1N7aMole+sbvcqCAB9al6fD7pDEPsOK50P6LDk3b46GpAILbn+A1za0c8Syt9Kfi/y4xSmtKw7G1W4lvmgjRRGDNYeLxptLcFGxZ/M4pPJNxqvSYjRDAhqTtYwbHcNZx8vosXghxkH6QoAuluFFWQA76hCQr0pNOLToHdLYyNnBw54LJZ4j1cE2S27cEGb+YXIwLCkEClHBfdJhGts3TysPP/duOWLgZApREhhoWOBRSA9VZU+2zQcn+Nn7TAFbn1gklXvM3GTiXyPupd4BWVuMnLz0tqRXecqw5IIxQGzTN57cnNv5YQ7DTLtUpyXIaCdtHkuQrh6WjqtKNvtk6k612NHQlIrrPS+IJ580sEnA0f38/MRUYatYQgZVzsfdcE7uAylzVqyvMjAsSi1J6c79K4cVkPwxnQ4yqHloo80PB+hviuHB3PDXLg5W9XQ8nQpnhpvUEEGAVKlo0io7HeJ4DcBa0pWDhM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR10MB5689.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(366016)(1800799024)(38070700021)(56012099003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dUROa2taNEh1TWNPQmNDWUNVbmhVUDIxTnc1d2xUZGhlcm80dDlEUjhUTVAz?=
- =?utf-8?B?d1NIYnI5eUthNUdXeFFLSnYrMEUxdkZtend4Wk9GcitKcGVvUTdld2VBZnpF?=
- =?utf-8?B?M25hNnUybWFtWmNZQUtldGhxbkVrWXIvZ1Vxd0U2Zm0yV0lPRHVjK3BrZzBW?=
- =?utf-8?B?V2UzVEw2VC8vRy8zbWszUTlrL3A1UVJSTTVqdXUxeXk0REdmZnBKalZBMGky?=
- =?utf-8?B?WXFzY05pY011SFBnNlhGSFRnUE1WZWtkdHVCYkdxUUNtZm9OWWpnVEdQb0I2?=
- =?utf-8?B?cEZheFM5TzhjR2M5U2ZrVGZLVmRwcVhyYmQvVmltbWVzVTRIUGthMWdYMVpl?=
- =?utf-8?B?WW9TTittSG9ZSnhHaFZkRXkzcldVZzkzZ1dmeXc4Mzl1ZFdOUDNoTjB5dTcz?=
- =?utf-8?B?TWUwNXpmUFNTUm9jRHdoaEgyZTl5L2d3TmtUWGRNTzNzY2x1L1Z3YVhFenh6?=
- =?utf-8?B?WFlHek8vQTRhTXBRdWJDbXkwOWtYNlYrUEV1UDF1cWdxU0xDSUZpQy9VTFRN?=
- =?utf-8?B?S0V0eGViMXk1MG5ySCtBZEtRYUFUS2NxYUl5Uzh4dm91Y0RYMHVBUGxHOCtu?=
- =?utf-8?B?Z1VwczZjK1VGVGU4YUdDbEE5VXpTMy9pb0V0VmpzbWZreUxtS2xETUh2aDlR?=
- =?utf-8?B?ODQ4TWZnN2ViN1NLR3VkdldBdE1qbHJHU1AwNzgxV2pxWmFVTW0ydkJkaGYr?=
- =?utf-8?B?R3NSQ0M4cGQ3ODJaY3lzZmx1YUdEb0J0RGVGVFZ0MXVQd3VGL0pMckdOZkxN?=
- =?utf-8?B?SWxCbE41VHNISEp1RFhjWTM0ZlBaWUZINVF5eVNxT1ZoREpNbFBpRkhXVjZK?=
- =?utf-8?B?NkZ6R0xxcERYUnNNUUwxQVZESXZRSm5KWkdiczdoWU1HdEwwQTk0azQ0eC9o?=
- =?utf-8?B?UUdWa3BzbGhocWFaMVNwWlRHK25oOGQxM0QrZUZqQmlhbFAwNmxUYUNmM3lI?=
- =?utf-8?B?TFZGZEdwakxvZElGOFlWOHZJR2M1RksvaVJWWHdkQ1hKQk5uM2JIMnN2V1E5?=
- =?utf-8?B?NWM1aXB5ZVJQL1Z5SXEvQkxtd1ZOZHBPN3Q1cGJ1ekx3U1JXeUlpVFd0VVM2?=
- =?utf-8?B?UWE4aUE4VEFjU2hvQW94RFpXaTFzcmlLWjZzS1R3UU02YUw0NXc4c3V0TGxK?=
- =?utf-8?B?QjlRcld2TlZmVGdCVHZNdUhQK0trTExXQWhWYkwyYTJnMkdTSTlTMmh4MzRW?=
- =?utf-8?B?bHRyL1pUQ0l3SHBYeU44VTlGTkxJMGpFNUZIS2FlTElGNmUvbkU5OXE3QXdL?=
- =?utf-8?B?dEhPQnN6NzFKWE5YaG9VSU81RWgxTjl5Q2M1ZlRnUHpybzhOS2RRMmhWa2hB?=
- =?utf-8?B?S2dyMDJmcUlUaWNKazRtbDJqYW5aU1U0TUNvb3YxUVVPTFl6TUM3SzN3aHZN?=
- =?utf-8?B?UCtDWG45bWVYaUcvWFhFWFhleXoySmpCcEJZcFV5dWlpcVVja2NkSDhHbXVX?=
- =?utf-8?B?UHZoWEFNVWhnWmtTVUNJcG5FaldLMWNLM05VMlRFRyt2N3krQlN3cTFoMkM1?=
- =?utf-8?B?Nm04bmMrZkhwTkhyZ20wWmh4RnAwSWNqRWh0SUxJUHJzUkMxZnVZMk50eHdH?=
- =?utf-8?B?aHhJWktxd0E3RlBRR1hsaGtBRmgvT3pIblBFM1I3TjFYV3Zadk85dDhoMXBl?=
- =?utf-8?B?TSsxVUZrTzBlU1FCZ2pyb1JVcXllKytaQ2lWd0w3V0NnQlBUSWJYRFBDNVVW?=
- =?utf-8?B?NG1mQ0c5RTc1dXBLRlFKalI2a2pKdy9rT2s0aUxESUdwSUpDYXg3dVFWT3R5?=
- =?utf-8?B?TnJpeGxjSjlLelJJdWRCSEhKK0YwdzdCRTRzMm5iS3VLY0RsN0MySUp5ZE56?=
- =?utf-8?B?WXlOTWVZSTdzcEtPeE00dXloTE80aGNOZm5waU1VaTUrUnlQcGFpbEJQTDhx?=
- =?utf-8?B?UHhBOGVkNTRwdUQzWVFiT005UTdFVTZibXJuU3Nib2xpZ2FvNWxxQVhDQlB2?=
- =?utf-8?B?bEFYZzBhYWlSZUc2Z05qS1BRT1BreDJUV3d6Tjc5cjZBeTJQSFV6YjVseXZE?=
- =?utf-8?B?OFJDV2szRWFiL2xOM0t6NmZXWXUyOGpDTEFkQ05QNGNLbVhLQ2hvSEtXV2dG?=
- =?utf-8?B?VklzVWUzMkRKbHdQT0kxckc2UW1SeTRnYzBhSXhBSFZySmg1djNEdUh3a0Mv?=
- =?utf-8?B?dUNscVRsS3dKU3BmQWtVVjZTTHNETEpPeG10N3hHYUE0QUt3b1JEUHB6aElh?=
- =?utf-8?B?UkExNEFMYjJGTSs0VlVqMTJ5SUk4clkzWjJyUkU1Q2tPWDczbTBXaXpNLzY2?=
- =?utf-8?B?L2RsM1hzYWY4UmNQQlUxbEhRT0pKaHJsQVJRYkpHWTI4NnRDMjRpVXBaQ2JM?=
- =?utf-8?B?RTNDR3orSzhTVUhHUHhVNmVmZ1h5WDBxM3FEVTduQjdkMGVjYU1YTzVicDho?=
- =?utf-8?Q?astWTdgE53Q7Vtml90rqd/NXHNkMwrIVZjChcJ5mD8OTg?=
-x-ms-exchange-antispam-messagedata-1: SXxiKrbUcljfRSIiE+4OgKIFTYl55b3vzTQ=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EBA0B5F73F9EC24BBB774B5CF6922507@EURPRD10.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CDB3B95EB
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773328341; cv=none; b=EiaEZwrrNocJsBdKPnJUYV1/vzGJwgCBHLwkTP0p7Q3PtWvmIZya+elMcskhT1koVdb7C66jQ9hIYp/8EjkYiUpL18wKc9ZSaDrKgB6Ssgxs4djXMjGgE0w4l6cgznijycUtprGpn8/LYSiiBCjLNt7AYf+Utv1NR3EwMzzt5Q8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773328341; c=relaxed/simple;
+	bh=/OlB2wYXzxx2lhu8Gs9ALiFJ9KIIcAJs+OvO6vGrCEY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y+1ok76nE0tclkcy+VRIc7hEuGR2S8wx7ov3bxgSqHfX9sLn2zq5qvTYMNZ8qXMn56ZNmaEIfoJbhtk5SV8wBNhX7GGnp+omUmw5cX+3UaHETxXKgkp/2hyL61pVgdaZrK6+Ud0JHSyT2jprg+4U6La+TpqV4n9btPlG3EJ5Z/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xRu6vREz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RojeaC+1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xRu6vREz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RojeaC+1; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 56B334D291;
+	Thu, 12 Mar 2026 15:12:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773328337; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YMN3lOpSDeHzFKXg/7He8rMHmT0WmpOMpEjVHXqTdfM=;
+	b=xRu6vREzGoHgGA2fUdRtHBjA2bI6+qRvJ+qzs72hVNkf5rofPyioB74jN3qYC0SeFB1juk
+	+uMPAE6Ps4ODzS5/FRsPQ609BczthN1Q2WOoDjd3ZX+buc/kjfgEVhdsZXmDnOKnR96QbK
+	21KoogoFiYYWcg5v4GiQO/x3chITNFk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773328337;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YMN3lOpSDeHzFKXg/7He8rMHmT0WmpOMpEjVHXqTdfM=;
+	b=RojeaC+1VkbWVze91xYdCKbNG6aIJzoN8TYBSjL2bj11VaV2q1HRH+YFNqtt2k6oiP5Uqo
+	I+qIkjWcskTktIBg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=xRu6vREz;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=RojeaC+1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773328337; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YMN3lOpSDeHzFKXg/7He8rMHmT0WmpOMpEjVHXqTdfM=;
+	b=xRu6vREzGoHgGA2fUdRtHBjA2bI6+qRvJ+qzs72hVNkf5rofPyioB74jN3qYC0SeFB1juk
+	+uMPAE6Ps4ODzS5/FRsPQ609BczthN1Q2WOoDjd3ZX+buc/kjfgEVhdsZXmDnOKnR96QbK
+	21KoogoFiYYWcg5v4GiQO/x3chITNFk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773328337;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YMN3lOpSDeHzFKXg/7He8rMHmT0WmpOMpEjVHXqTdfM=;
+	b=RojeaC+1VkbWVze91xYdCKbNG6aIJzoN8TYBSjL2bj11VaV2q1HRH+YFNqtt2k6oiP5Uqo
+	I+qIkjWcskTktIBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CDA7B40022;
+	Thu, 12 Mar 2026 15:12:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id VQkzL83XsmnAJAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 12 Mar 2026 15:12:13 +0000
+Message-ID: <aebac89f-f3b9-4983-8139-353a3ff19c98@suse.de>
+Date: Thu, 12 Mar 2026 16:12:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: siemens.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR10MB5689.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 034ecdca-7bf7-47b0-a8ae-08de8048c8ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Mar 2026 15:05:22.9488
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FNN2JHWxNRTz5BrggnIB7WpVpf9yzOwF7//gZNrngsxxl3lU1JxbDkI8jyKcnXQCjgSzLuQscUFSFIz6OcuOmWo1fiRrLYtZEHYDB1cKHao=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR10MB6722
-X-Spamd-Result: default: False [2.44 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/10 net-next v2] ipv6: convert CONFIG_IPV6 to built-in
+ only and clean up Kconfigs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, rbm@suse.com,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>, Selvin Xavier
+ <selvin.xavier@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+ Petr Machata <petrm@nvidia.com>, Simon Horman <horms@kernel.org>,
+ Saurav Kashyap <skashyap@marvell.com>, Javed Hasan <jhasan@marvell.com>,
+ "maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <GR-QLogic-Storage-Upstream@marvell.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>, Varun Prakash
+ <varun@chelsio.com>, Alexander Aring <aahringo@redhat.com>,
+ David Teigland <teigland@redhat.com>,
+ Andreas Gruenbacher <agruenba@redhat.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, David Ahern <dsahern@kernel.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, David Howells <dhowells@redhat.com>,
+ Marc Dionne <marc.dionne@auristor.com>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+ Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+ Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>,
+ Michal Simek <michal.simek@amd.com>, Luca Weiss <luca.weiss@fairphone.com>,
+ Sven Peter <sven@kernel.org>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+ Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+ Andrew Morton <akpm@linux-foundation.org>, David Gow <david@davidgow.net>,
+ Kuan-Wei Chiu <visitorckw@gmail.com>, Ryota Sakamoto
+ <sakamo.ryota@gmail.com>, Kir Chou <note351@hotmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Vikas Gupta <vikas.gupta@broadcom.com>,
+ Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+ Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+ =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>,
+ "open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>,
+ "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
+ "open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER"
+ <linux-scsi@vger.kernel.org>,
+ "open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>,
+ "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
+ "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
+ "open list:NETFILTER" <coreteam@netfilter.org>,
+ "open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>,
+ "open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>,
+ "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
+References: <20260310153506.5181-1-fmancera@suse.de>
+ <20260310153506.5181-2-fmancera@suse.de> <20260311200219.45796ec4@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260311200219.45796ec4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
-	R_DKIM_ALLOW(-0.20)[siemens.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267113-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-m68k.org,ziepe.ca,kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,HansenPartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,hotmail.com,gondor.apana.org.au,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-267117-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.bezdeka@siemens.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[siemens.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[68];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3DA6D273FE7
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux-m68k.org:url,suse.de:dkim,suse.de:mid]
+X-Rspamd-Queue-Id: 1C767273FFD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-T24gVGh1LCAyMDI2LTAzLTEyIGF0IDEyOjEzICswMDAwLCBSdXNzZWxsIEtpbmcgKE9yYWNsZSkg
-d3JvdGU6DQo+IE9ubHkgdGhyZWUgcGxhdGZvcm1zIHN1cHBydCBNU0lzLCB3aGljaCBtZWFucyBo
-YXZpbmcgYWxsIHRoZSBzdHJpbmdzDQo+IGFuZCBpbnRlcnJ1cHQgYXJyYXlzIGFsd2F5cyBhbGxv
-Y2F0ZWQgd2FzdGVzIHNwYWNlLiBOb25lIG9mIHRoaXMgZGF0YQ0KPiBpcyBwZXJmb3JtYW5jZSBj
-cml0aWNhbCAtIHRoaXMgZGF0YSBpcyBvbmx5IHVzZWQgd2hlbiByZXF1ZXN0aW5nIGFuZA0KPiBy
-ZWxlYXNpbmcgdGhlIE1TSSBpbnRlcnJ1cHRzLg0KPiANCj4gTW92ZSB0aGUgTVNJIGRhdGEgb3V0
-IG9mIHN0cnVjdCBzdG1tYWNfcHJpdiBpbnRvIGl0cyBvd24gc2VwYXJhdGVseQ0KPiBhbGxvY2F0
-ZWQgc3RydWN0dXJlLCBhbmQgbW92ZSBpdHMgaW5pdGlhbGlzYXRpb24gdG8gYSBzZXBhcmF0ZQ0K
-PiBmdW5jdGlvbi4NCj4gDQo+IFRoaXMgcmVtb3ZlcyA3NjggYnl0ZXMgZnJvbSBzdHJ1Y3Qgc3Rt
-bWFjX3ByaXYuDQo+IA0KPiBMaW5rOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yL2FZdHE0eXB4
-WFR2bl9JczZAc2hlbGwuYXJtbGludXgub3JnLnVrDQo+IFNpZ25lZC1vZmYtYnk6IFJ1c3NlbGwg
-S2luZyAoT3JhY2xlKSA8cm1rK2tlcm5lbEBhcm1saW51eC5vcmcudWs+DQo+IC0tLQ0KPiANCg0K
-VGhhbmtzIGEgbG90IFJ1c3NlbGwsIEkgZGlkbid0IG1hbmFnZSB0byBjb21lIGJhY2sgdG8gdGhp
-cyBjbGVhbnVwDQp0b3BpYy4gSGlnaGx5IGFwcHJlY2lhdGVkIQ0KDQpSZXZpZXdlZC1ieTogRmxv
-cmlhbiBCZXpkZWthIDxmbG9yaWFuLmJlemRla2FAc2llbWVucy5jb20+DQoNCkJlc3QgcmVnYXJk
-cywNCkZsb3JpYW4NCg==
+On 3/12/26 4:02 AM, Jakub Kicinski wrote:
+> On Tue, 10 Mar 2026 16:34:24 +0100 Fernando Fernandez Mancera wrote:
+>> Maintaining a modular IPv6 stack offers image size and memory savings
+>> for specific setups, this benefit is outweighed by the architectural
+>> burden it imposes on the subsystems on implementation and maintenance.
+>> Therefore, drop it.
+>>
+>> Change CONFIG_IPV6 from tristate to bool. Remove all Kconfig
+>> dependencies across the tree that explicitly checked for IPV6=m. In
+>> addition, remove MODULE_DESCRIPTION(), MODULE_ALIAS(), MODULE_AUTHOR()
+>> and MODULE_LICENSE().
+>>
+>> This is also replacing module_init() by device_initcall(). It is not
+>> possible to use fs_initcall() as IPv4 does because that creates a race
+>> condition on IPv6 addrconf.
+>>
+>> Finally, modify the default configs from CONFIG_IPV6=m to CONFIG_IPV6=y
+>> except for m68k as according to the bloat-o-meter the image is
+>> increasing by 330KB~ and that isn't acceptable. Instead, disable IPv6 on
+>> this architecture by default. This is aligned with m68k RAM requirements
+>> and recommendations [1].
+> 
+> AI has spotted:
+> 
+>> diff --git a/arch/m68k/configs/amiga_defconfig b/arch/m68k/configs/amiga_defconfig
+>> index 31d16cba9879..de088071dde4 100644
+>> --- a/arch/m68k/configs/amiga_defconfig
+>> +++ b/arch/m68k/configs/amiga_defconfig
+>> @@ -64,7 +64,6 @@ CONFIG_NET_IPIP=m
+>>   CONFIG_NET_IPGRE_DEMUX=m
+>>   CONFIG_NET_IPGRE=m
+>>   CONFIG_NET_IPVTI=m
+>> -CONFIG_NET_FOU_IP_TUNNELS=y
+>>   CONFIG_INET_AH=m
+> 
+> Is CONFIG_NET_FOU_IP_TUNNELS=y removed intentionally? This option
+> provides FOU/GUE encapsulation for IP tunnels and has 'depends on
+> NET_IPIP || NET_IPGRE || IPV6_SIT' as its Kconfig dependency. With IPv6
+> disabled, IPV6_SIT becomes unavailable, but CONFIG_NET_IPIP=m and
+> CONFIG_NET_IPGRE=m are both still present in the defconfig, so the
+> dependency remains satisfiable.
+> 
+> Since CONFIG_NET_FOU_IP_TUNNELS has no 'default y', removing it from the
+> defconfig means FOU/GUE encapsulation for IP tunnels will be silently
+> disabled by default on m68k. The commit message describes only disabling
+> IPv6 on m68k, not removing IPv4 FOU tunnel support.
+> 
+
+I noticed that when running
+
+./scripts/config --disable CONFIG_IPV6
+
+for the m68k, the script was adding CONFIG_LWTUNNEL=y and CONFIG_NET_FOU=y.
+
+CONFIG_LWTUNNEL was selected by multiple IPV6 features. I do not think 
+it makes sense to keep it for m68k given the information there is on 
+http://www.linux-m68k.org/faq/platinfo.html.
+
+CONFIG_NET_FOU was something IPV6_FOU required, probably it should be 
+just dropped from the config instead of explicitly turn it off as it 
+turns off FOU_IP_TUNNELS too. It will be selected by FOU_IP_TUNNELS too 
+anyway.
+
+I will update the config and also the commit message about CONFIG_LWTUNNEL.
+
+FTR; I doubt anyone is running Foo over UDP in m68k but let's avoid 
+doing extra undocumented changes.
+
+Thanks,
+Fernando.
+
+> This affects four m68k defconfigs:
+> - amiga_defconfig
+> - apollo_defconfig
+> - atari_defconfig
+> - bvme6000_defconfig
+> 
+
 
