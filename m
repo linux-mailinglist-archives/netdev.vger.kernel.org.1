@@ -1,170 +1,194 @@
-Return-Path: <netdev+bounces-267186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2H87A3wUs2mDSAAAu9opvQ
-	(envelope-from <netdev+bounces-267186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:31:08 +0100
+	id QLIlFdsUs2mDSAAAu9opvQ
+	(envelope-from <netdev+bounces-267187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:32:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C7F277FBB
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:31:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53282278099
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83C8632B727C
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:21:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 04CBE303C124
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DA537C933;
-	Thu, 12 Mar 2026 19:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AADD3AA4F2;
+	Thu, 12 Mar 2026 19:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eSaHjqQ9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CV6gWzZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013010.outbound.protection.outlook.com [52.101.72.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D423A32D441
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 19:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773343155; cv=none; b=I8Q7cMe6Glrvxto3e2Jy2TRIJlE8CaAKIq4ZrUOLk3vnzHlu98T0fBak2oybcnoGRztUhoW8PoPPRG3MLgN8XXaAAzSnLw+sLZ+CF6t3Vk6uvhD5q2DvcqsXyEVtW638sForlYMV1PJXZN6Ees/yteQjuxxzl9J8EsDB0g6p0ek=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773343155; c=relaxed/simple;
-	bh=2xfM7jnhDY9KAwp/GaPrzlkh8TdqszEvTWgmspjt1h4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fhjddMMnjE7Y/k3pKIZBAlonTHFvcLHduBAhYY2XKPJI2tguik4IuworOh7slGm98KMRZ1rPms+22AliybKkcnLJN8yQWqT+e3aDpX58aSCiYSsuv+sqx7cuM7FsnHb79G/dk2BT3/cqKLjHQlf8vj61LOUT9tAjo17NDDhz5SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eSaHjqQ9; arc=none smtp.client-ip=209.85.214.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2ae4d919f9bso9489825ad.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:19:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773343153; x=1773947953;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0uNxdikJ8tWonFr0cU2+MqW311h46aK8dNu84Z/yYXo=;
-        b=aQv7E73rKQjOSKfNe2czReeEZVm++7iW73P4xwn8l+OLnAm54zUIt6EgcYjFx+s3In
-         tHUU/PLLQtowDEUsIZmOt+nR+0hMVQdtobaBhz+iXypkG+8VrXWMZN6z38g8DIxVwH2h
-         TkAx2MHeNJCgTBS2GnmkcmgcM8ruY1t7YiPTnlHb8wiQJBvP86Rj1r9n6QPdMOoJJm8m
-         tnhmh5yLYP7yacsz5TbdFYI7z5EhkVu24y48eM644/6izNDn+uc0rQFqiSc3esZ7fCQc
-         PpRu9oBLlhXjmqSeW1cs57FtZWz39hC0CFgME/wPewOpsaKt1Si+Eaa4HCm0ltsmXmio
-         Y/fw==
-X-Gm-Message-State: AOJu0YyV5QO11zdfMkkz2FlWkzWYUQmZubeaNvZ9zzF0XkTgVbMhffk4
-	KHy24povNrQlOX3RvDPPMeona6ILf/zbI+l55YdJT8Yr+S/jiiygPzDufjFduoQFH8neDaSfjH6
-	2jE3V9Qlt3BJYsriIjEi4cXCo4LYtpFfWvDh9utr3+8F8enebHfLMQfyYsHdXiAyF0yGX3AunIf
-	0cl9/obJXU2RMLsOFYpya2lNHI9vrR8eudzQJdKg+7FETlCsJgtgDYkisPorWSTMI4o5M7aMefg
-	KTwsJFWEA==
-X-Gm-Gg: ATEYQzy62QjrBwqmv3ZIreGue5E17fSX7ctfma2PqXEQZRvSM8aTZs+5CjUc+eqofPG
-	wfZIM7RxgT8342jVaNU2NaY/aBbaFGrH0NbvAbIOmmLYAdHaz6rcwcVTTyyltInh7Pw0fF7ypGB
-	YBol3d1YRYIo9zc8idVfB4BUwhup+333gE2Ud69+a1Ens0aSOfLYxjKTBTJ1gFVMpsZ5peS+7bG
-	nV4kyeMZMEn01TK446TNqoAFupsUzATRYkUTt6+VkvgoTGumjCCYGuY0umDtFokZ7QaydutPjxf
-	IJK9u5RgOlhVOtOGj5eokj1MrEaeg9t4tc8mdCunwy/murTiYzOxYwn+EVWxlNcHwHbe2guWIn8
-	e6XRaCOgwG93pswkcT3O/bktgAqlAQtBFjbg9pnjjBdjsVPvdzFwplmOl61qWQaGLTzVpCl2OcK
-	sRZCX04YKy87c8kAfKk3fTQyrLb3DAmfGtiSTMOxssiTjGcCcjwDmtEj06yw==
-X-Received: by 2002:a17:902:dac8:b0:2ae:4dce:7e99 with SMTP id d9443c01a7336-2aeca9a41bdmr5105975ad.20.1773343153139;
-        Thu, 12 Mar 2026 12:19:13 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2aeae312823sm7933835ad.33.2026.03.12.12.19.12
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 12 Mar 2026 12:19:13 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-128d0b690feso21975459c88.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:19:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1773343151; x=1773947951; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0uNxdikJ8tWonFr0cU2+MqW311h46aK8dNu84Z/yYXo=;
-        b=eSaHjqQ9nVZoxUu7HR6YCTxf2Qu1msLCVCXLt53cTTbP7diY5VfK5YuG36lFbAx/WS
-         tW6xyTaS5//JKoZmkBR3N5MuNgjhKAobeuS2YyN4+n7LNm1PCT58xr4/FPuuXO5zCFcT
-         qJ7rIpJq1jmzbTxg/55yJPDqJCjhMWmWhjjdo=
-X-Received: by 2002:a05:7022:6b8b:b0:128:d51a:5143 with SMTP id a92af1059eb24-128f3e125e9mr342863c88.31.1773343151128;
-        Thu, 12 Mar 2026 12:19:11 -0700 (PDT)
-X-Received: by 2002:a05:7022:6b8b:b0:128:d51a:5143 with SMTP id a92af1059eb24-128f3e125e9mr342843c88.31.1773343150503;
-        Thu, 12 Mar 2026 12:19:10 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128e7cb558fsm9962551c88.10.2026.03.12.12.19.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 12:19:09 -0700 (PDT)
-From: justin.chen@broadcom.com
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F128E39B96A;
+	Thu, 12 Mar 2026 19:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773343275; cv=fail; b=TBqPDBracnJ9pGJ8FoYJA7IjAS78iu3CIlRqbHYRsBn53YwgdJ58lY55lvaHAP05AkWGIFBJL9rCnPDmoc4HMAJ5xc0g3DbdVlsstd8QRYmjW0AWRO6MVn6WnlXIOXvbfMNylibaR8GS9i+wpDsECPvQuHZHrtDuMTx76SEl9Yg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773343275; c=relaxed/simple;
+	bh=L5IXsgQsGSECg+llGsq8RlDo7ScELx2oWPa6DVLmR7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EJSJkuYMSs5wtANVbGQQrqgwDu7VmVmB3u/XK7OypW9LBBekxwqgvBr024zujzY3o22C3qeO5w3k/TwPvaN6X806Z8KDrR4kXgqC2pju16m61TAF306hMQXNEpLQzZgaRoJaizReOH3Co3Cy9S0dbmuDsFTngG4ttTRR9t7gFXQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CV6gWzZS; arc=fail smtp.client-ip=52.101.72.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X5t2E3g6Zln2oarhiyLq/pfZIk/9ilAk1dFxerDqBKmS2afsaqMH9lWXPx8J/cxZx0cydwWKPtUxtVbhh/tsnp6nYxV+av3P8LiZc+gqohmtnfZ81vKw8V8uIyAapp7RNnqpxUIEIDq7HypxqL43wG5/kBL/kJLZ+te8pJ4s5UlA9ESGuk87AbH8K0QPGyEj6yoGAS+EkEkY3n+xbVrnsxX/Wcz+CtmWqrjggQoG7PlXTWI1G89PGei/apOo1v8XJjNqMBm7DUr6aBDrQv23u56q5lMFRF8oFxdxiP50nfMTzcCIxXw6CZaJLEz8UhZiNkYkk5/G20nkXM1dbwUyig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L5IXsgQsGSECg+llGsq8RlDo7ScELx2oWPa6DVLmR7g=;
+ b=bLuk1MoHAC30XmFp3+ZJsZeQA/KJNRGvKrNLdoOsF2Z3ZgYPxZV604iicFQK+kQbrLVyDwESVd9cs9p9f2du+b+kNWCL7jgwXvdAkhMDCoWjlIRobNNIb1UUzEyDe8HgW7J1GEoLOr2hwwg/PyaZ6LPaNlHhk3Iyf9yZ8G89lgnPVLGNIvcK4sycjiJNNQoGe23+vYccH46rGq+tAUqn1lTWOYQis61rIFCle12/RDHH1D4lwNFH4RQ4tCQJPJfHN0yvk4pjMIQ8VzmliHXzxAXrf0KEvwhGE8uspIXTbexB0BibqoR4pZFMyJq4Xqq8YvcsystfKNs10qiFszZoig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L5IXsgQsGSECg+llGsq8RlDo7ScELx2oWPa6DVLmR7g=;
+ b=CV6gWzZSvn7ScWm/eIPmGW1F/JuqRMYPsLt4tcuTtUpe64OaYHZjoSl3RunKJFQhITY4+eHD4y/EDMznKQHeei+XhXOkeXZyqubFaBqn9aCqQZ98sE8O47BExy89CPFmi/4QkMrsnaJlKwH7SM6mnJRN9xzfgwWFsIsSLLMA/uo900nRe3jPjHvbfJjK/cLVCg7x4YTxRymaActuIShdJz5JXU2VSvbT9VQTryq/zSfZ8jhMsgCbWMAjrxCBcbHZ0xdBm9G8VGqEGRzC4R1TThGzVkCqCFGj9UfaY7HNwNm+SzfcQOLc56pzWAEnf59/3VAOdOC897H24Y6grgg4Gw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB9366.eurprd04.prod.outlook.com (2603:10a6:102:2a9::8)
+ by PAXPR04MB9124.eurprd04.prod.outlook.com (2603:10a6:102:22f::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.15; Thu, 12 Mar
+ 2026 19:21:04 +0000
+Received: from PA4PR04MB9366.eurprd04.prod.outlook.com
+ ([fe80::75e4:8143:ddbc:6588]) by PA4PR04MB9366.eurprd04.prod.outlook.com
+ ([fe80::75e4:8143:ddbc:6588%6]) with mapi id 15.20.9700.010; Thu, 12 Mar 2026
+ 19:21:04 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
 	andrew+netdev@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	florian.fainelli@broadcom.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net] net: bcmgenet: increase WoL poll timeout
-Date: Thu, 12 Mar 2026 12:18:52 -0700
-Message-Id: <20260312191852.3904571-1-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	Frank.Li@nxp.com,
+	horms@kernel.org,
+	saikrishnag@marvell.com
+Cc: Frank Li <frank.li@nxp.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH v4 net 1/2] net: enetc: reset PIR and CIR if they are not equal when initializing TX ring
+Date: Thu, 12 Mar 2026 15:20:49 -0400
+Message-ID: <20260312192051.3484705-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260312095415.669128-2-wei.fang@nxp.com>
+References: <20260312095415.669128-2-wei.fang@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0234.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c1::29) To PA4PR04MB9366.eurprd04.prod.outlook.com
+ (2603:10a6:102:2a9::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB9366:EE_|PAXPR04MB9124:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0c7989c-e090-462d-3c07-08de806c8109
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|1800799024|366016|7416014|376014|52116014|38350700014|921020|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	8nMBdLA/2tViHSvdNTXuzjU59rNKJHmqUYuQLBR9pn6YshOB1OqxA5XrzVAusSSpsiWfc0aRCGYYt1Gm2wmNZaLB2mBc7GREdjcpLLkbxcdKrHRzT1CiNbJWyOQKbCiLcQo4ESPNTZL0qMz58/cXBGcaa9TEW0kx3QaPIIx54Ot6ETxHnWxBXKV713MOMGURK+Jk7EHblS0DlSoMuFn6KlOCaRoquAXE4D4+4dEhiUFfBKXnaIvzXKv3aTlGA5IdtrY4y1ZshpGPVLsq+z03aV54z4W2c6SYVeN111PX8SUeZBgznbiFz4z3Ku4k7FCYO4j66tc47XypDx4daHMCqnmk04/QqQkFEtit/9jfCB2me4o7MVbx+ZJ0KZ/YnRaI/pZwvc0nQbjg2italthSiVpMPDSgkNvzlXP4mazF+5v9+GCVftDs3mvX4Q79lC4fdt7wqClY+XJc96f04JY7s1nYckQsOtqkdP7SieFsy28Y1y+ZdgUouKg9wCt4ChDYfTfHfvMT0YhMp+afChJ2vexHU7lm8DpLp95jsLxEKivD8tJFEvapfLQccUJryGTwKSCrDcBchI8kPbSPAa+HuoF5owCTjVD2UuUNIYhDH9aCtUJBuHnJS8rI+aJ2PW7RI/53UyRiw8CVKepp6XjJhiRbuLc14oZexFEprGZfEsoY6C+aPA3w1UNyIogpAFNpzJfzJ5LojiOUVk8in7volXE20Q+21UNOF9s5L/ONz4cPukPy/EGXHh5vrAGeO96QVkT3c20YnepOJiqRL7yqwVuNtIUe0I7xxkoLtBo5GPslMydOhTYFCchfsmPME7n/
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9366.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(366016)(7416014)(376014)(52116014)(38350700014)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?zsB8+N4t/oUn9LiADrsNtSeIgwlPuuQWzMhZrCsJDEYYTac9J8qFDkBl4MHl?=
+ =?us-ascii?Q?GLfaRdi/0v5knI6GzUvSeImnzftG4JcDJaXZK0EU8JRVyBKg3IW35cqz/XcH?=
+ =?us-ascii?Q?GDRsp827ureAm3jY14U6U/8S0ESQxZvq0NF5hI8dJM/aPotv+9zNWzGzzKLY?=
+ =?us-ascii?Q?3XDGFGV14daXq3/1v2oLg7LDkRvyhyA+hzVeK6RAHeb+ZgYqqlZbdMj82lfN?=
+ =?us-ascii?Q?eruzKKPw8JLu9CYF1ccxtRbiTH+xNI+0C8QuSbU1LEZFZJ/FEuBtQPk2brgc?=
+ =?us-ascii?Q?ckvGiPM0t38pH1svV1z/EoMDEfN3Fy15F215x6UeEjl1Yq8Cud9Gw8h2nDvH?=
+ =?us-ascii?Q?2+jBrLFsb19M68ym4AX9quNsmNKU23xMgCTAQ+uLam8Jy3wFXrdUOV3gbzr/?=
+ =?us-ascii?Q?U9/CUpehM/8q14hbHeH9Xzkyk0t8m1UAHvgPHoTpfcV1rMFDb+zHxYf77Qmu?=
+ =?us-ascii?Q?jzxo9CCzrQXeXbXhWu/dDIGz2Q6q4cYo9dWuGU614G0rZ8ymql19TDVxUg9S?=
+ =?us-ascii?Q?5fhDb7D3NEXqs8S3mJtdt5dR2WHguHoXJgzxX8/Qd3IsHsIxrka+MeQqQJfA?=
+ =?us-ascii?Q?DCBC717qKEthzIW2qkJPZwUOFCw3JrUbRrEobmOxHrq3ZWJxq5B3YFkfmKRE?=
+ =?us-ascii?Q?IIyyA0JQxpbMvYbxNjNeSySOPec8B60kuOMon3Y/t+Tni4fqu7txJhEbkMFX?=
+ =?us-ascii?Q?onhCLHOvbKHWNBGK8jJseo4hGD7AxHH4Tn85bGqnXKGHKh92HxjCiDvK2x6y?=
+ =?us-ascii?Q?VWAh12P0Edk6MDK6uNbLSJ9u4n/O1IW5WQncf2ceOHXMjOV8CZ2FeFWBdQ6C?=
+ =?us-ascii?Q?Flf2Vqhn8yDQCBYiti9PbnFE+WAjtKo3navqKoI9CGu3VjV+IWWNTMF2P2O5?=
+ =?us-ascii?Q?G2ZPqr6wGwPkzUAYVMcftk7xGyCVKPSNknQ1Lh3OWR/iXIhBOq2QkDYVVjVZ?=
+ =?us-ascii?Q?SjWvsppA2rYhMiXMGmmlzBPTpD+vjusZCjUStvXxXUOlNCMxf99r8ErQLc2i?=
+ =?us-ascii?Q?3XyK0KvCdvfFveJlA1jBkdm/YAQbN8K0Gv4EHBUVo/mC/dhSE2JvRut4/pFI?=
+ =?us-ascii?Q?tCT5t0SOB3bIf/MMTfW+i4iZiJHemQ8oWjyGxZVvOmPhRe9aljDoLVtW1RLz?=
+ =?us-ascii?Q?oRxoPl6+MxeXnqSXwXHNxgnwDkr8tTbbDQC8gjh0gQxjQXaHfH36sAdbDSXs?=
+ =?us-ascii?Q?Yf59VcJqTPBBZb60qFHeMAOrjaUo9ryXbXRalnwEjo+nW2E26DtuZUdw1vTi?=
+ =?us-ascii?Q?7SOVwLrKZzYy4QYDb3H1sRQ4fvYV+ueIu0xEPjkh9GWTglzLHddz6s1r+bDD?=
+ =?us-ascii?Q?MnjJf5dmoeYeNx7Nr5W0X65YzUGM99pf4tCiCj5tgw47+Qe/iZBMQjBmdkfQ?=
+ =?us-ascii?Q?qC5m/IJonPXR+huurBdr3IJPxJLYYM5VOaVVv/cLDAs9xvzkHzfen4YH/41f?=
+ =?us-ascii?Q?2OCM3Yj7v98XtIwMtBTi5rckS0JVGY2pL+vM3aYc3wXVO4Y7WCjH9RehJ/tx?=
+ =?us-ascii?Q?dXv5CIs1F4z5mwKVlDQEq2somVPx2rLvOfCngDcZliYx72XmhIGpUyy3tFma?=
+ =?us-ascii?Q?PMiBEQXPfwsuzoZcqFQrutxwLqQCg6kY53Z/dTkT6hUKzfkKVyfngri7Makv?=
+ =?us-ascii?Q?1iKCHW2U2llv+b1wlH9UgTxo2grM7p7EXegF5MjIghWvNCZs0ew+td+QXND9?=
+ =?us-ascii?Q?9cv/PFPnFMMM662ehgk0NxHkNa1UecJauMWrws32fzHRfZ8c?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0c7989c-e090-462d-3c07-08de806c8109
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB9366.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2026 19:21:04.6353
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wQkBIQIIh1dnmeTf/DArJQeCTO4/FoVpiUeKrwCCaDFWWPICnfvxyMjFbjlDAT9I3V1G+NQJGVQckUMwWvHeiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9124
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-267186-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267187-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	URIBL_MULTI_FAIL(0.00)[sin.lore.kernel.org:server fail,nxp.com:server fail];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[Frank.Li@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 83C7F277FBB
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 53282278099
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Justin Chen <justin.chen@broadcom.com>
+From: Frank Li (AI-BOT) <frank.li@nxp.com>
 
-Some systems require more than 5ms to get into WoL mode. Increase the
-timeout value to 50ms.
+> Currently the driver does not reset the producer index register (PIR) and
+> consumer index register (CIR) when initializing a TX BD ring. The driver
+> only reads the PIR and CIR and initializes the software indexes. If the
+> TX BD ring is reinitialized when it still contains unsent frames, its PIR
+> and CIR will not be equal after the reinitialization. However, the BDs
+> between CIR and PIR have been freed and become invalid and this can lead
+> to a hardware malfunction, causing the TX BD ring will not work perperly.
 
-Fixes: c51de7f3976b ("net: bcmgenet: add Wake-on-LAN support code")
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+AI: Typo: "perperly" should be "properly"
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-index 8fb551288298..96d5d4f7f51f 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-@@ -123,7 +123,7 @@ static int bcmgenet_poll_wol_status(struct bcmgenet_priv *priv)
- 	while (!(bcmgenet_rbuf_readl(priv, RBUF_STATUS)
- 		& RBUF_STATUS_WOL)) {
- 		retries++;
--		if (retries > 5) {
-+		if (retries > 50) {
- 			netdev_crit(dev, "polling wol mode timeout\n");
- 			return -ETIMEDOUT;
- 		}
--- 
-2.34.1
-
+Frank
 
