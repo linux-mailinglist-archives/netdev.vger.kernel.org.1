@@ -1,262 +1,309 @@
-Return-Path: <netdev+bounces-267213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267214-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6AXgJ48zs2ntSwAAu9opvQ
-	(envelope-from <netdev+bounces-267213-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:43:43 +0100
+	id SHayOaM0s2ntSwAAu9opvQ
+	(envelope-from <netdev+bounces-267214-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:48:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5467427A20B
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:43:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EA827A448
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45B83303A3DC
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:43:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17D5132118E3
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A8F33F5AC;
-	Thu, 12 Mar 2026 21:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B073F8DE9;
+	Thu, 12 Mar 2026 21:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D01+0/da"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="P1U8+WnR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C258F37DEAE
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 21:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773351820; cv=none; b=mkvd5R+3/dqlb26EI9odof/Oms5rp8ZGQ7++oPOD6yAMUTtD0EpeD/xd8r7CL0luw2LI6MehvgnuL+2zRSmJopGQvWeDh2ZUeT8im2nKg6Ue+t18zWMs7Vvcizk2fo6G2FKA+PV23jpwgo/aUZ6zzhx53fdjJ7LhyWW3hIcGAFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773351820; c=relaxed/simple;
-	bh=mz3u90N8hf+wV4srd4oW/1I4nV5mOY6t0gEFQ6zAyBk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=bzBBl4FTZk3i/nCCub8zwDqekCSBoN2TH+q8wmZEUAmE4OPwbYjOY+iqeT07DcRty392ZWUi/2Ai/gKgjL+nFPm8L7Dp0KVmh30S6Mdn5tTxvLrKO/b3w5MaYO64sxDn26ba5FLu6wnA98jh/VQqmpKAtugVBrb87lgu3aWYv3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D01+0/da; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-899ed41208fso9633386d6.1
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 14:43:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B34C3F0A9D
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 21:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773351902; cv=pass; b=J8fQzQJrP9tb4Qar3gaQP21arrpUb+wcOhu5324KzUHo9TNIzfe6tTAf1qWxhL9PfsYDK1otilDZDQcooXOWcdIbFn11a2vk6f7Yk68qDtkcasPpJeLJDJZZRtqBGqsZMYDzl2WcFcDjMPJQDzMHwrllVn7/K4rxOcdyag7ZdTg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773351902; c=relaxed/simple;
+	bh=VudM6nzCZVkA9277WVscwWUtl1xQAIgu3m2h8apEcxk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ozp37fAfT02JaGkSg/ebF4g3Wo/vjEyyWEsJHqnXe3gljnPS+oZ9+My+0ogSp+XvFLBHELUYkt0ieD2CCg2vGvJHmY2rDMkwLv/gY8HU//w0GGwrnHFpfHr4cP4SjzRMLvxoHYYf+J4JdEGXG0wAWcqFSBB/KoyvDuB2or8unqc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=P1U8+WnR; arc=pass smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a0faa0d15cso1564986e87.0
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 14:45:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773351898; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Xw86DxdEjwDvNFJfsOzd4mh2LB8j5+fRQC6S6Zo7Y+WMIJUIU+WXyvtdIWxodBHLo8
+         6RwvWo7bIgMxOTnAPD+iDqCJGx4bYD45aQRGO00YKEPa23DFYaDd/4pwixsOgJJExbx+
+         DlSAh3haW5uB8s2RWM66g2PirDQjymj90aCIuLJFUA73ko2HX6vrw/cOpvrNCEMK1cV2
+         HACaS2w34zL3VT7zn6Enop1+KW6d5LjKhm3bLEr5+273U8DcEE92TuxQ+KvbrxIZMfcK
+         A1wkyvCGLzAOhQoQXIf7Wrv2swrvh8ptsvruWOzVKIDLn0GLhtCeRyBa0LiLbLsXUxKA
+         7tWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
+        fh=78xIFwhwKjq+LFwbtnzKiur98HclKzI03ef+1sbu1HI=;
+        b=eilyih2c8mwt1e1fyM5bs358nuX7rdptqzaKmaztDMSXsRmna4pIMhIKC8v+SqSSH9
+         b1Gy5+BJTqmEGuEmRXNLE5TABoiuAGnmYV08aahPy5NE7kye3FFabos+WGxJS6iplgoh
+         nskks8jYM8m0vsx4j8DNUrVQ/fm+i0Ywpfuqz+XufsB9G6HrICAD7UEL2ISgm0OGVsZ+
+         zdcxepyfrA/ePKt4UtiFQaA8GUAXBjvTCtUpcAI7kORRIVTuIyPKdlj/gptWOgdwpooz
+         ItqngzeJA0taakEGWLUJ1eAOoL+RBRy9FVRgaIpPLKzlEcWuev2j6WS2qxWl4A/37AQq
+         g8UQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773351818; x=1773956618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=arista.com; s=google; t=1773351898; x=1773956698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mz3u90N8hf+wV4srd4oW/1I4nV5mOY6t0gEFQ6zAyBk=;
-        b=D01+0/daObqwfEKER3rNEOmmlVaZPdqhymbF/qPr77AkoLvhuQkvmpnWKnkcJHxvnt
-         NZSq6DQ5tSNSqe0NGSaYI5DhRalHq+sTgbIDODGAK22mkxNP19xeCbqhHcO3pGVzdjEy
-         bYR9JmfBDgsd5LSzG5NeZzo/tcC7esM+fzIyeMOr1ZeQVnQdzyY7IEVQhQpRHi9g6aBd
-         Hlbjn5OqHIZegLrDuh50pqak4aopaeOUFYX42iaSjCRTVKmY5tVR8f+gCo1SBFG+GV88
-         ACcp3ai4WGFZIG/5LUQ4mq3jm3GEKAWdEM0x7cjJSVAFTMezceqLS1c4xDNDhbhr4VSM
-         Q2Sw==
+        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
+        b=P1U8+WnR1Lxln/UwJwc8ebgTjoABiPgnTSelTRWOxp1XWROJwkYsd/Rt1spe3UkyvU
+         aXXwCzrLM8uNc3VNLHKn8RC0MhQBW8+9aQnQplWSsYG9S5cs4H+6pmoYj0FFB2zlkm82
+         I6klhGgtdfGe+BD1ssrolYw0vvNsJVF183w+mExZ+N6oJ9WYbpvpkAkj8QgoaYTdke7W
+         VnVPd++/gk5rhpvgHTjo3oFsozsN2SjQ9kGTSJSYk+hERnR3hdGMXDVyOBq8DjFeew81
+         56Qfhf4fW2bz7KKGB1i/OUKLxpcczJRq1bNYM3AONlHtQvtSnTCVjj6LnKyexXbkfmpC
+         JvVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773351818; x=1773956618;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mz3u90N8hf+wV4srd4oW/1I4nV5mOY6t0gEFQ6zAyBk=;
-        b=kFt8KMd+nIjSuiUfQu5SFp7azpgZa1AEzIm9gL1TuxZUuNVl1lgudUFlw2PYEE5v3U
-         ly0fukCKnnjmH2zI76jhd32IRuCReaIhUbid7hTj6fQtBrD72IE7BqEwvQFDAafcL+uf
-         htPId9gaNjoItOe7nIaHgOX9l7ycQUaStJ30OVmHkiucms8NVY9obyQkvmmM1WweiM2p
-         ZK48/KVc3B3MKhQ5Ip025a+wywYEA5cwhLVmSKtEhbSeB7nY3QPZJ3hwol66ypsEv8aI
-         l/KKcxdyYijmpvprA+5tvrpsndBaPEFLByf3OiAcid22qUmy/f3B5gwggETT2hSz4B1K
-         /exQ==
-X-Gm-Message-State: AOJu0Yw7EgzHWGKkSmRZymyBUdn96FyJJ+1nc39a3uVRAQDAUvsHnrjB
-	1Qsp9RqtAtOoteFt3gdcxm8Rg3kUw62BnAMT7n2+aVB4/AYCtB3BcV2lus7U0Q==
-X-Gm-Gg: ATEYQzw0/oX8SdDomSRsfFEFaK28ZnHglh3WqGwg/ap3pwSTuJTWYtfWnWfcQ1MPfSu
-	CXhxQAtNlQB28eEWQcigY59NnKIt44HjeLB4nvLsu3CH/Y2SWV8epH2g64HGnC0C5qG1usbHSOv
-	l6Eya8j6V4bHYhDxLPPc3fytTB7kD1UbQe0mmw2D7cKAuZqSOrZ3xtwCCjAl1buDj0xl/ozRYjT
-	e1Pnc5glQYS/HHcMti0bR11uXMKc0B0Y9Zh7ELP9NZN/GxeluA5fNDS5VoVd80hq45yBxt4z51Z
-	PMRoIc5soh0HnLZ8iKQlybbX1i6mgnCxt/PSCxgLMZNrFCEfVYHKy/gaf3Co1FFdFu6k70eKf0i
-	XEB11oi8XH9yNndyhVBjHXwX7YVHRGMZRg2WI6dEy1+nW36yLB9Uj7mbsLnedASbl3R0yANTD6F
-	oedN9k6bDjenU9jXJri30SkJYubsLFeFDzWzCryrjynebukQGkeVUBaaJWMg21HxGGUiQyHt62B
-	vE5DkuHGn2crVs=
-X-Received: by 2002:ad4:5ba7:0:b0:89a:14be:4593 with SMTP id 6a1803df08f44-89a81f8c1b4mr21550836d6.35.1773351817777;
-        Thu, 12 Mar 2026 14:43:37 -0700 (PDT)
-Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-89a65a96b33sm43307346d6.0.2026.03.12.14.43.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 14:43:36 -0700 (PDT)
-Date: Thu, 12 Mar 2026 17:43:36 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- "(JC), Jayachandran" <j-rameshbabu@ti.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Chintan Vankar <c-vankar@ti.com>, 
- Danish Anwar <danishanwar@ti.com>, 
- Daolin Qiu <d-qiu@ti.com>, 
- Eric Dumazet <edumazet@google.com>, 
- Felix Maurer <fmaurer@redhat.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Simon Horman <horms@kernel.org>
-Message-ID: <willemdebruijn.kernel.be379ee17449@gmail.com>
-In-Reply-To: <20260312154253.UC-QUPvD@linutronix.de>
-References: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
- <20260309-hsr_ptp-v2-2-798262aad3a4@linutronix.de>
- <willemdebruijn.kernel.3b7b5294c6434@gmail.com>
- <20260310105544.EVXIekwG@linutronix.de>
- <willemdebruijn.kernel.3693c9aa8271@gmail.com>
- <20260312154253.UC-QUPvD@linutronix.de>
-Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific handling
- for HSR
+        d=1e100.net; s=20230601; t=1773351898; x=1773956698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
+        b=WsZJbrINzUQPBlQ54Oa7PaBeSdc3aXIaqkwDtgAphw0OpV1gynmflFRVJOIxR2X5Sg
+         3GEspT+RmmfKFuqvMf0J23HGfbAEmOfXGePQBxEf0wS+yquJtfQUS8vQIwmSXaNYQJMF
+         L0NOvxpgAnwdttIlahpfkr5qv6C0tXxMnzb5oY8hzMgO5ZOgDDI4A1MdypOYb5LfkzFx
+         k3GTauEtcup554mTVAGxwQkjXlurABDjdAuJSFYH+8CUKlp2u/hjKE1ObPFwqnjZEMez
+         eTkTKTQQuQ8B+zdWTWjH8yByu6YPbhbmr6oVkqPjjyV4QCsIv56hvHQd2vBygf8cLVno
+         A+nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3y9hN40KFFXjl7sZw1kongj0muxgVI3z4R/8Fe8M0X7LHPqJLenQJENZcA7jeWHLhLlcd1Kw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGb72dSrH1aktgD/PO9uW0VDfsjHCpHVyDxDy8CtUzagqYkT/o
+	aAoBiYUOY80+GUP8pFCavRw86egB1bz5m7TGlgpgySCYoBM/CpyR01mcSVfGU3cBXs+JyXQQ49Y
+	YZ6ou3AVX4sPGZdkjQud4I5bVOgHY1+nTMqHKQofh
+X-Gm-Gg: ATEYQzwwcANW6YtGBXbJfEIDam8xtXFyBFqS5iQLhK0+oil+hLBFQPG416m0etdjvGa
+	5zAZ1rjKVxq46LGSmtDnyQPUa+0WjnVveWbh5teiBJfTYTG1x1ebKx+D6OK0BIyDMdTzSmaXl/i
+	pzinMATYWNmS0DSd6csY8Qm3w5wW48SZ1qc2iSPxbWJIJVziCKy74EQ5fb7TvdtA2UHck6PzntX
+	HKj4RT3E5cz0WvmRqRtWtXpIZNIHRFwrKfk/i6LMh0QFkqW80AVHlYJcPKHmwUEC92vusmKqvN9
+	GCvpxg==
+X-Received: by 2002:a05:6512:254d:b0:5a1:45a2:2177 with SMTP id
+ 2adb3069b0e04-5a162b2af9emr230055e87.44.1773351898274; Thu, 12 Mar 2026
+ 14:44:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <20260311194058.13860-1-panchamukhi@arista.com> <09e1535f-59fe-41eb-91ed-2aeb97957bfc@suse.de>
+In-Reply-To: <09e1535f-59fe-41eb-91ed-2aeb97957bfc@suse.de>
+From: Prasanna Panchamukhi <panchamukhi@arista.com>
+Date: Thu, 12 Mar 2026 14:44:46 -0700
+X-Gm-Features: AaiRm51hQ3Exo0jf6qTinlBXpNuOgadUGx__Nada8LeERG7UHXRQpfwz9Fpg_no
+Message-ID: <CACqWiXCufBst=oga885BjD2Dr3FSaEK-WcJCSC8kjL48BBABvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: expose gc_scan_interval_max
+ via sysctl
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netfilter-devel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	coreteam@netfilter.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
+	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267213-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linutronix.de,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5467427A20B
+	RCVD_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[panchamukhi@arista.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267214-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[arista.com:+]
+X-Rspamd-Queue-Id: 69EA827A448
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Sebastian Andrzej Siewior wrote:
-> On 2026-03-10 17:35:33 [-0400], Willem de Bruijn wrote:
-> > > but the problem was sending with system's HSR header.
-> > >
-> > > > For the first case, could skb->mark be used as port selector when=
+Hi Fernando,
 
-> > > > writing from a packet socket to the master device? That already w=
-orks
-> > > > with sock_cmsg_send.
-> > > =
+Thank you for the quick review.
 
-> > > We would have to specify that SO_MARK 1 and 2 denotes the port on w=
-hich
-> > > a packet is sent. This kind of burns the usage for everything else =
+On Thu, Mar 12, 2026 at 5:15=E2=80=AFAM Fernando Fernandez Mancera
+<fmancera@suse.de> wrote:
+>
+> On 3/11/26 8:40 PM, Prasanna S Panchamukhi wrote:
+> > The conntrack garbage collection worker uses an adaptive algorithm that
+> > adjusts the scan interval based on the average timeout of tracked
+> > entries.  The upper bound of this interval is hardcoded as
+> > GC_SCAN_INTERVAL_MAX (60 seconds).
+> >
+> > Expose the upper bound as a new sysctl,
+> > net.netfilter.nf_conntrack_gc_scan_interval_max, so it can be tuned at
+> > runtime without rebuilding the kernel.  The default remains 60 seconds
+> > to preserve existing behavior.  The sysctl is global and read-only in
+> > non-init network namespaces, consistent with nf_conntrack_max and
+> > nf_conntrack_buckets.
+> >
+> > In environments where long-lived offloaded flows dominate the table,
+> > the adaptive average drifts toward the maximum, delaying cleanup
+> > of short-lived expired entries such as those in TCP CLOSE state
+> > (10s timeout). Adding sysctl to set the maximum GC scan helps to
+> > tune according to the evironment.
+> >
+> > Signed-off-by: Prasanna S Panchamukhi <panchamukhi@arista.com>
+> [...]
+> > ---
+> >   Documentation/networking/nf_conntrack-sysctl.rst | 11 +++++++++++
+> >   include/net/netfilter/nf_conntrack.h             |  1 +
+> >   net/netfilter/nf_conntrack_core.c                |  9 ++++++---
+> >   net/netfilter/nf_conntrack_standalone.c          | 10 ++++++++++
+> >   4 files changed, 28 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documen=
+tation/networking/nf_conntrack-sysctl.rst
+> > index 35f889259fcd..c848eef9bc4f 100644
+> > --- a/Documentation/networking/nf_conntrack-sysctl.rst
+> > +++ b/Documentation/networking/nf_conntrack-sysctl.rst
+> > @@ -64,6 +64,17 @@ nf_conntrack_frag6_timeout - INTEGER (seconds)
+> >
+> >       Time to keep an IPv6 fragment in memory.
+> >
+> > +nf_conntrack_gc_scan_interval_max - INTEGER (seconds)
+> > +     default 60
+> > +
+> > +     Maximum interval between garbage collection scans of the connecti=
 on
-> > > HSR so it feels misused.
-> > =
-
-> > It is more or less what mark is for. An alternative similar field
-> > supported by sock_cmsg_send is skb->priority.
-> =
-
-> The ->priority thing looks wrong. It is used by ssh and other
-> application so they would suddenly behave differently.
-> But okay lets take SO_MARK. Might be smallest abuse here.
-> And we would have to hardcode the values in respect to HSR and I have n=
-o
-> idea where to document this.
-> The difference with SO_MARK in general (at least my understanding) is
-> that you can choose the values based on your setup. Here we would say
-> 7-0 are already reserved.
-> =
-
-> > An alternative may be to share the information in-band. Already
-> > insert the HSR header also wen writing to the master device. If the
-> > master device can detect this packet-with-pre-existing header.
-> =
-
-> Given all this, I guess it is easier to stick to SO_MARK as the header
-> might collide with other data.
-
-Inserting a header by the packet socket sender and popping it in
-hsr_dev_xmit is a bit like virtio_net. It is a private channel.
-
-The tricky part is how hsr_dev_xmit can differentiate such packets
-inserted by a packet socket, from regular packets arriving on the
-device.
-
-Anyway, admittedly it is a bit of a hack too.
+> > +     tracking table. The GC worker uses an adaptive algorithm that adj=
+usts
+> > +     the scan interval based on average entry timeouts; this parameter=
+ caps
+> > +     the upper bound. Lower values cause expired entries (e.g. connect=
+ions
+> > +     in CLOSE state) to be cleaned up faster, at the cost of slightly =
+more
+> > +     CPU usage. Minimum value is 1.
+> > +     This sysctl is only writeable in the initial net namespace.
+> > +
+>
+> I think it would be a good idea to add under which situations it is good
+> to tweak this setting.
 
 
-> > This is not the first case where ndo_start_xmit may already expect a
-> > header prefixed that it normally inserts. I forgot the exact case (ca=
-n
-> > look it up), maybe a weird edge case in GRE?
-> > =
+Done.
 
-> > It does not even have to be a valid HSR header: just an agreement
-> > between the process writing the raw packet and hsr_dev_xmit.
-> > =
+>
+>
+> >   nf_conntrack_generic_timeout - INTEGER (seconds)
+> >       default 600
+> >
+> > diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilt=
+er/nf_conntrack.h
+> > index bc42dd0e10e6..0449577f322e 100644
+> > --- a/include/net/netfilter/nf_conntrack.h
+> > +++ b/include/net/netfilter/nf_conntrack.h
+> > @@ -331,6 +331,7 @@ extern struct hlist_nulls_head *nf_conntrack_hash;
+> >   extern unsigned int nf_conntrack_htable_size;
+> >   extern seqcount_spinlock_t nf_conntrack_generation;
+> >   extern unsigned int nf_conntrack_max;
+> > +extern unsigned int nf_conntrack_gc_scan_interval_max;
+> >
+>
+> Could it be just int? so there is no need to cast it to s32 later?
 
-> > There probably are still more ways we can approach this challenge.
-> > But these are three that do not require kernel changes outside the
-> > HSR protocol code.
-> =
 
-> Okay.
-> =
 
-> > > And then we would need an additional bit to
-> > > specify whether the HSR header is there or not. Unless I open addit=
-ional
-> > > socket on the ethernet device just for sending and dropping everyth=
-ing
-> > > incoming.
-> > =
+Regarding the data type, I encountered the following compilation error
+when trying to address the signedness:
 
-> > Right, packets that already have a header prefixed are written
-> > directly to the intended slave.
-> > =
+"../../net/netfilter/nf_conntrack_core.c: In function 'gc_worker':
+../../include/linux/compiler_types.h:548:45: error: call to
+'__compiletime_assert_1027' declared with attribute error:
+clamp(next_run, (1ul * 250), gc_scan_max) signedness error"
 
-> > > And we would have to filter/ distinguish the RX port based on it.
-> > > Userland has a cBPF filter to filter everything out and receive onl=
-y PTP
-> > > frames. If the PTP packet is forwarded to both sockets (A and B) th=
-en
-> > > userland would have to throw one copy away and go to sleep again. T=
-his
-> > > sort of breaks currently linuxptp logic. It would probably require
-> > > either eBPF to filter also so_mark or deal with "no packet despite =
-the
-> > > wakeup" but so far I tried minimal impact on both sides (kernel and=
 
-> > > user).
-> > =
+>
+> >   /* must be called with rcu read lock held */
+> >   static inline void
+> > diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_connt=
+rack_core.c
+> > index 27ce5fda8993..54949246f329 100644
+> > --- a/net/netfilter/nf_conntrack_core.c
+> > +++ b/net/netfilter/nf_conntrack_core.c
+> > @@ -91,7 +91,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
+> >    * allowing non-idle machines to wakeup more often when needed.
+> >    */
+> >   #define GC_SCAN_INITIAL_COUNT       100
+> > -#define GC_SCAN_INTERVAL_INIT        GC_SCAN_INTERVAL_MAX
+> > +#define GC_SCAN_INTERVAL_INIT        nf_conntrack_gc_scan_interval_max
+> >
+> >   #define GC_SCAN_MAX_DURATION        msecs_to_jiffies(10)
+> >   #define GC_SCAN_EXPIRED_MAX (64000u / HZ)
+> > @@ -204,6 +204,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+> >
+> >   unsigned int nf_conntrack_max __read_mostly;
+> >   EXPORT_SYMBOL_GPL(nf_conntrack_max);
+> > +
+> > +unsigned int nf_conntrack_gc_scan_interval_max __read_mostly =3D GC_SC=
+AN_INTERVAL_MAX;
+> > +
+> >   seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+> >   static siphash_aligned_key_t nf_conntrack_hash_rnd;
+> >
+> > @@ -1568,7 +1571,7 @@ static void gc_worker(struct work_struct *work)
+> >                               delta_time =3D nfct_time_stamp - gc_work-=
+>start_time;
+> >
+> >                               /* re-sched immediately if total cycle ti=
+me is exceeded */
+> > -                             next_run =3D delta_time < (s32)GC_SCAN_IN=
+TERVAL_MAX;
+> > +                             next_run =3D delta_time < (s32)nf_conntra=
+ck_gc_scan_interval_max;
+> >                               goto early_exit;
+> >                       }
+> >
+>
+> READ_ONCE() is required IMHO as it can be modified from sysctl concurrent=
+ly.
+Done.
+>
+> > @@ -1630,7 +1633,7 @@ static void gc_worker(struct work_struct *work)
+> >
+> >       gc_work->next_bucket =3D 0;
+> >
+> > -     next_run =3D clamp(next_run, GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERV=
+AL_MAX);
+> > +     next_run =3D clamp(next_run, GC_SCAN_INTERVAL_MIN, nf_conntrack_g=
+c_scan_interval_max);
+> >
+>
+> Likewise here, READ_ONCE() recommended..
 
-> > I don't fully follow this part. It discusses Rx again?
-> =
+Done. I have also added a local variable gc_scan_max to avoid multiple
+load instructions since it is referenced twice in the code.
 
-> Yes, this is RX. If I open packet socket, bind to hsr0, how do I filter=
-
-> for packets from one of the slaves?
-
-I was thinking of attaching directly to the slave devices.
-
-> After some thinking and browsing through the packet code:
-> The hsr stack creates hsrX. If it would create additionally hsrX_A and
-> hsrX_B in order to be able to send and receive only on the relevant
-> slave device then I wouldn't need the filters in packet code. That coul=
-d
-> work=E2=80=A6
-
-That's another option.
+>
+> Thanks,
+> Fernando.
 
