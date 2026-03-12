@@ -1,89 +1,98 @@
-Return-Path: <netdev+bounces-267217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267218-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qH7THqA/s2l6TgAAu9opvQ
-	(envelope-from <netdev+bounces-267217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:35:12 +0100
+	id qND7HMU/s2l6TgAAu9opvQ
+	(envelope-from <netdev+bounces-267218-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:35:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E7527AF08
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:35:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED8527AF2D
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:35:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 864C73146618
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:35:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C219F31784FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9943AB27D;
-	Thu, 12 Mar 2026 22:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE343BADAA;
+	Thu, 12 Mar 2026 22:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="OYg1Y+cK"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="ALM2w1B6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A63438D687
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 22:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4103A3B38AB
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 22:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773354908; cv=none; b=MBXT45PsHxEiYSTck6kBcX4C38jFpN3hstgiGpiN09u58R/b6xjP0wqpGX0ryjye9YNfhemG4mDCe26lAsYDrdjSqo4NE4/z/4nWQGGO93Yg2GivLQrTTGo822GZST8rTcUOEvEsu0p+giGJ/1z6+G2Z7Vph2rpqyzln5mWldjU=
+	t=1773354910; cv=none; b=DL4Zw4qykwRv3RDCCMwh+b7UWfApfcb/zBF7PiWQiME9PLi+aiWZymIbx9CgN6JtcWGv2lQ722yc09bMcJDlEsH2zXWKkNUqHF5fjm+jR46qP197DlKJZP2XTItlS/TnPSKm8sm6qnkjqCPG67kAvQHbkb61dbn5clTePqQsu+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773354908; c=relaxed/simple;
-	bh=JdxBtLe1skEr+lkBm4BLYYO+cnif1zFCiJ304cr7LCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+6bfaMmEtEd5Mjngs7j3IIdSa5CtDZ/EtHfHG9ESylQ9dPgJICXBfNP37kKMquFejpC7miuxerj/vAb9H7YZGg/3Qiqpgyuw3s6wsXOWd9wSvhUH77B12s5QutEsHOD04fPtNP9c5cM79IbBAAP/CES6ju/COBw2MOQcQXm5F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=OYg1Y+cK; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1773354910; c=relaxed/simple;
+	bh=Z/ESX+LLNY5t82nBsQH8Qqv4GqQzNnZ9UJQed+Rqsn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hOYdBE+eVvNG9daeOAyqDYuJMwDY96OmJC3OmquBDQT5n9nnTHTdRZ/x7ZYtDa3SAd28Z0LwRLOXg6B+bfWeXeRv8pJhDOCYENLkHzqbw7OYQichguFhfuHGIqvG5EmTw34aRcw5v4UFzgPjc+erL6WZEPMGX25toE/fgC5CgAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=ALM2w1B6; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-829759ca646so943538b3a.2
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:35:07 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-35a1c6081a5so370071a91.0
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:35:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773354907; x=1773959707; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D74ccSKcWRfdVq6Tl/hNyC4BUkGRUL5LAr4+bhXTzSg=;
-        b=OYg1Y+cKgo5fmRlP2IzzlG4T+wz3XD6S9RzTzadY0YiwBJzQb4YEw7Bl5+VE0izkdi
-         1EzENETwSmaQQb7OLJQ2ut75Pcq69HTmcx+jC/UDmSHO7lTAHIMNQFx+hygpT0PvcYAp
-         47wR5fufGPtPtSF5Pu5JsAuO5rG/PuDoktVvelylVOZ8IdFe34Wsq0Nspsdv4VIRkoom
-         YR+7l0Su6Kzj0TE3VhoQ80ZqE5P5sjJwxjJ/6lGRYAX3c0eu4T3Nk/itluoMhtqUcjE9
-         tB6EziRA5IOmYq4MBT38QTNBK36t/YgK04+fGvjECHx80Bu8nbscULg0ckC91pglDsdX
-         rE1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773354907; x=1773959707;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773354908; x=1773959708; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D74ccSKcWRfdVq6Tl/hNyC4BUkGRUL5LAr4+bhXTzSg=;
-        b=rBGNNxmEXRC84fR56QnDn7DlHxupQewGv6yhK9E/n7dN4d8hoNYhahGGFi4WZP8G6G
-         +lnoC48BRU0+jhYBRpU0maiGCTe++E4aURyzEq4EaQwwdWKU0Nd4oPOgT/0tGQwjP4cy
-         +guMnKAcAbbKWuAj1ek4HXhYZqb7TINEWv4VvzRwhdCvknIaRMZ0UNZ6axwbGCCkKdUT
-         HhP+rtzZ4yIr3fVjaz6zruZzBiMKqo2sSei1zTYF0IVkqVVPqERnseEK9I8+NyG4UzW9
-         wlB21ZzPynAIsr2lN0Bs6cjf1uZmLjVBpIYLDfHbCZy6y4AU31LicB0vbL9qJN0uZ8YU
-         7rqg==
-X-Gm-Message-State: AOJu0Yw5k+RgAVPMOUgj4Kl8qlVATpw+eg9lemohCpUyhNtaXq/FvfWm
-	2M76yrwof9VjCoDL/uGCzQVH/83gO8l/2C7l69Ou2nBRXrKZkm9ThR9SAEdRxMvymwHnk5IdkOu
-	FRhIX
-X-Gm-Gg: ATEYQzzNac224jm4nSdaswX0kqPKgCgvMBznV7R1nbSEAG+3uuy4a9vmTKnDkxBAk69
-	1tcOU3pgBFuKM6KN/CsJakYOOWFgWhbQqmP/3i1w8F7tD5ZwlKh/UmOcGBP47LrNZhlQvyT+yH3
-	GoQzXH2sqZ4l0CR0UrqqPC5B7JyDHgmVYSeEX/JkbHhDOjC812EZyPl5MO52WK+Qk1Ezn+jlCBS
-	4M0c4pUH1e6fSnESZwCGAk2eMW13bOFwVqMaQEW7LTIitrscinOEsBtDh/ISGBdOOL4sGtvfuAN
-	pK92r8BOO85cDp7UEKiRCvyzjNq4H7zl5O865ikIyvqRp1vQL/auM9R045uxEl06Tzv8ItzFBgJ
-	gUOpIVbjTx/ZacQTO9rGToOPF4VzityynbxrhK9zAVjQeMlMyufLCIEfBBF2Xd2OLc8z1gs76f/
-	0p40I=
-X-Received: by 2002:a05:6a00:f92:b0:829:8015:1637 with SMTP id d2e1a72fcca58-82a196d2ee6mr753591b3a.12.1773354906561;
-        Thu, 12 Mar 2026 15:35:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a072419efsm4219975b3a.11.2026.03.12.15.35.05
+        bh=fhbXK6hap671NF5qoYb68AsIxNo8RyyFm3WoVwNRKKg=;
+        b=ALM2w1B6qU98oRWzwOpue/SZqP+/jeMEJwh3g7KH5J6svrCZ4OPmDGVZN4sa1XTmBA
+         M2d4NjqB2WKZOtgIjf402UWRGL3f1NK22atGEQrYRcjjx3EUmZ3piMYAF/HV0nh3Z8xy
+         c1i6XQ9nlUPHnMWdzNg9kTVV8G5phty6xm1eLiyUq/NKX0UDmQSx7YCX8zk7G11OpCly
+         Nmm4ejQlz8N18fCjxl+6p8TUb/0OjLslvlKoMww6k68B1EGOQ430zuZDTXwzP/58wf/B
+         ES3MF71eb03gRA0QgKIUNwjCahbS6AEkJlsF0BFzczuUi2dBrK2J/IzeaERnjTJlz6NA
+         pg+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773354908; x=1773959708;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fhbXK6hap671NF5qoYb68AsIxNo8RyyFm3WoVwNRKKg=;
+        b=GWoMDvfTP+Wv25vRAQ4K72+MrS+LpwO7zc8fO0HHdmTumCHyewhJiWS3BeCKmgUksO
+         H2JIWJZyyjIMxnJf1PVS/LTajJeN0XspSNoaOLtDCEL3O7xO0Fi9I5dYAJsKgJrjoIRU
+         ZNf86/kbGq7F/YsM1G1oGd/Yg+Ckks3r7vTw//hXg+RUNSNYMaF0F2LBB14sEEFDUm37
+         QCcAwMvrU8UQzMlZBzRuoe3X4k4utTb/8hBDbq1/eHnRqUqZuPM68cQecRic5t/HgQVZ
+         bm4a2sYcFUG2xhk8V7h1lpZvkOorlkaJFaGrj5pD+nCFVTrqIWgp9IO8za45dHJ4Jfr1
+         wx/g==
+X-Gm-Message-State: AOJu0YyUlpO8chpUF7ekWXbpZAyDQd4wntWGsxXvzyBBog41sFx4YPM6
+	XeXw0y4zIC836JtlCo2DQ7XhyFhXvE5IdB1w/3ayfxlfrlPvvMTUJ2D7GDlO01DmOIX7wYKKVSi
+	oNVTJg48=
+X-Gm-Gg: ATEYQzze5oJc3pb+4hkaer45dGkzKyZN2+RislYNkGuAGiJNlpT6y2MUAAP7fBRpDG6
+	LvMHr58sPAVxZVzgFOocQjkkSXsjbFFaX8KWkkJiQl1esFazM5q5JuvmqxoCOucO2db6rAvX7YS
+	qCAFZawUgn7dsZnOb+TKqli8ZPIwwlw43+Rzm8S2mCjZx4zODquUujH4MR+yU7uxlg8KZ05BQvC
+	4Z1afa3p/DMkqLcajkMXbgVHvYHoUNboD1gZLOirY1X9pC/Nr4I0DzWXdAFSLcqC4rgO+XAtzZq
+	UUIAhwyxV7iHV1h7RggAFErgSeHTgtSGMdz9DdesL/0+TrpPKmg5vkC/AxRo2bp9gsCrz/nDMxT
+	zy/O176quWfXSwT0ARJLnstpasnYLFeFKFo8MrClIImJlOQjv0pVveomfl41jPKXp+DILvOQAHG
+	PgPQEu
+X-Received: by 2002:a17:90b:2b4d:b0:359:f5f4:7740 with SMTP id 98e67ed59e1d1-35a2208696fmr831058a91.17.1773354908222;
+        Thu, 12 Mar 2026 15:35:08 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:73::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35a1ac3baf8sm2718951a91.12.2026.03.12.15.35.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 15:35:06 -0700 (PDT)
+        Thu, 12 Mar 2026 15:35:07 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
-To: netdev@vger.kernel.org
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
 Cc: michael.chan@broadcom.com,
 	pavan.chebbi@broadcom.com,
 	linux-kernel@vger.kernel.org,
 	Joe Damato <joe@dama.to>
-Subject: [RFC net-next v2 00/12] Add TSO map-once DMA helpers and bnxt SW USO support
-Date: Thu, 12 Mar 2026 15:34:37 -0700
-Message-ID: <20260312223457.1999489-1-joe@dama.to>
+Subject: [RFC net-next v2 01/12] net: tso: Introduce tso_dma_map
+Date: Thu, 12 Mar 2026 15:34:38 -0700
+Message-ID: <20260312223457.1999489-2-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260312223457.1999489-1-joe@dama.to>
+References: <20260312223457.1999489-1-joe@dama.to>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,110 +101,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-267218-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267217-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
 	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: D2E7527AF08
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama.to:email,dama.to:mid]
+X-Rspamd-Queue-Id: BED8527AF2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Greetings:
+Add struct tso_dma_map to tso.h for tracking DMA addresses of mapped
+GSO payload data.
 
-This series extends net/tso to add a data structure and some helpers allowing
-drivers to DMA map headers and packet payloads a single time. The helpers can
-then be used to reference slices of shared mapping for each segment. This
-helps to avoid the cost of repeated DMA mappings, especially on systems which
-use an IOMMU. N per-packet DMA maps are replaced with a single map for the
-entire GSO skb.
+The struct combines DMA mapping storage (linear_dma, frags[]) with
+iterator state (frag_idx, offset), allowing drivers to walk pre-mapped
+DMA regions linearly. Helpers to initialize and operate on this struct
+will be added in the next commit.
 
-The added helpers are then used in bnxt to add support for software UDP
-Segmentation Offloading (SW USO) for older bnxt devices which do not have
-support for USO in hardware. Since the helpers are generic, other drivers
-can be extended similarly.
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Joe Damato <joe@dama.to>
+---
+ include/net/tso.h | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-Testing on a production UDP workload shows a ~4x reduction in DMA mapping
-calls at the same wire packet rate.
-
-Special care is taken to make bnxt ethtool operations work correctly: the ring
-size cannot be reduced below a minimum threshold while USO is enabled and
-growing the ring automatically re-enables USO if it was previously blocked.
-
-I've extended netdevsim to have support for SW USO, but I used
-tso_build_hdr/tso_build_data in netdevsim because I couldn't figure out if
-there was a way to test the DMA helpers added by this series. If anyone has
-suggestions, let me know. I think to test the DMA helpers you probably need
-to use real hardware.
-
-I ran the added uso.py test on both netdevsim and a real bnxt and the test
-passed. I've also let this run in a production environment for ~24 hours.
-
-Thanks,
-Joe
-
-RFCv2:
-  - Some bugs were discovered shortly after sending: incorrect handling of the
-    shared header space and a bug in the unmap path in the TX completion.
-    Sorry about that; I was more careful this time.
-  - On that note: this rfc includes a test.
-
-RFCv1: https://lore.kernel.org/netdev/20260310212209.2263939-1-joe@dama.to/
-
-Joe Damato (12):
-  net: tso: Introduce tso_dma_map
-  net: tso: Add tso_dma_map helpers
-  net: bnxt: Export bnxt_xmit_get_cfa_action
-  net: bnxt: Add a helper for tx_bd_ext
-  net: bnxt: Use dma_unmap_len for TX completion unmapping
-  net: bnxt: Add TX inline buffer infrastructure
-  net: bnxt: Add boilerplate GSO code
-  net: bnxt: Implement software USO
-  net: bnxt: Add SW GSO completion and teardown support
-  net: bnxt: Dispatch to SW USO
-  net: netdevsim: Add support for SW USO
-  selftests: drv-net: Add USO test
-
- drivers/net/ethernet/broadcom/bnxt/Makefile   |   2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 177 +++++++++++---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  29 +++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  19 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c | 230 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |  31 +++
- drivers/net/netdevsim/netdev.c                | 100 +++++++-
- include/net/tso.h                             |  42 ++++
- net/core/tso.c                                | 165 +++++++++++++
- tools/testing/selftests/drivers/net/Makefile  |   1 +
- tools/testing/selftests/drivers/net/uso.py    |  87 +++++++
- 11 files changed, 843 insertions(+), 40 deletions(-)
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
- create mode 100755 tools/testing/selftests/drivers/net/uso.py
-
-
-base-commit: 8e7adcf81564a3fe886a6270eea7558f063e5538
+diff --git a/include/net/tso.h b/include/net/tso.h
+index e7e157ae0526..cd4b98dbea71 100644
+--- a/include/net/tso.h
++++ b/include/net/tso.h
+@@ -3,6 +3,7 @@
+ #define _TSO_H
+ 
+ #include <linux/skbuff.h>
++#include <linux/dma-mapping.h>
+ #include <net/ip.h>
+ 
+ #define TSO_HEADER_SIZE		256
+@@ -28,4 +29,37 @@ void tso_build_hdr(const struct sk_buff *skb, char *hdr, struct tso_t *tso,
+ void tso_build_data(const struct sk_buff *skb, struct tso_t *tso, int size);
+ int tso_start(struct sk_buff *skb, struct tso_t *tso);
+ 
++/**
++ * struct tso_dma_map - DMA mapping state for GSO payload
++ * @dev: device used for DMA mapping
++ * @skb: the GSO skb being mapped
++ * @hdr_len: per-segment header length
++ * @frag_idx: current region (-1 = linear, 0..nr_frags-1 = frag)
++ * @offset: byte offset within current region
++ * @linear_dma: DMA address of the linear payload (after headers)
++ * @linear_len: length of the linear payload
++ * @nr_frags: number of frags successfully DMA-mapped
++ * @frags: per-frag DMA address and length
++ *
++ * Struct that DMA-maps the payload regions of a GSO skb
++ * (linear data + frags) upfront, then provides iteration to yield
++ * (dma_addr, chunk_len) pairs bounded by region boundaries.
++ */
++struct tso_dma_map {
++	struct device		*dev;
++	const struct sk_buff	*skb;
++	unsigned int		hdr_len;
++	/* Iterator state */
++	int			frag_idx;
++	unsigned int		offset;
++	/* Pre-mapped regions */
++	dma_addr_t		linear_dma;
++	unsigned int		linear_len;
++	unsigned int		nr_frags;
++	struct {
++		dma_addr_t	dma;
++		unsigned int	len;
++	} frags[MAX_SKB_FRAGS];
++};
++
+ #endif	/* _TSO_H */
 -- 
 2.52.0
 
