@@ -1,179 +1,202 @@
-Return-Path: <netdev+bounces-266908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAo9DIpJsmn8LAAAu9opvQ
-	(envelope-from <netdev+bounces-266908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:05:14 +0100
+	id 4JxeEMxNsmlRLgAAu9opvQ
+	(envelope-from <netdev+bounces-266909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:23:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA4C526D461
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:05:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD9026D5DB
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:23:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AFC70300BC5E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:05:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4BC4E301DDBE
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 05:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5A339448E;
-	Thu, 12 Mar 2026 05:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49411358389;
+	Thu, 12 Mar 2026 05:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Er1UP/a/"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8EA35DA49
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2E42D8DC2
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773291908; cv=none; b=d67yUsHYc9y8yku4MFMIPxzUtRayaOUrMfMY7l8cHzSDkgcWbMxgE4prmjTmkMRILrtwv188EXWoplZneVdjZht8m6nESqPTbyQKKp+yTP6Q2RWQz2ywyyykZYu7SBau8r+/UKX5Tm0i2utL1dThJRRO4E6oFlr0O9IcdzwmZmQ=
+	t=1773292999; cv=none; b=CldxnrTpfz0Iql52NUeA0wM2rSiXCSWYsxG5oVJYxRaE7jDB82OvJvpKYIR6DNce7pq0uncCUNCA+1i69OjJPb4hzClUHoxe4oSdOS85wmel3NqyYxILFTmhSRXigokIViAvEDHPqzB6IDrYySo2nGFz1LDh0cVRzvLnmQrggKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773291908; c=relaxed/simple;
-	bh=8zELuTv51U8Qj+1Jp80UH9hJK1v4K07BgFQeM2+oZJk=;
+	s=arc-20240116; t=1773292999; c=relaxed/simple;
+	bh=5CMMjtxgQtXyKnrP/IHYxuAvxK1t7FxJ2XoytVnj0RM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JgpyV4Vpj16jKYJeKCx3iF2zhtwsS+oEKNoc654MRG+RKNuyDkaluinqGsMIkx+pkmXfB2PFpWLxJHZvvq4zcbM6t+TD5ngKqr39/Bz6WjCDE1iLL97ONga8CFvAYlsf44HUDNA0chJjgvw2RsLNpKVcgQfTe99mLMqXB6QzV+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0YDu-0004bZ-Ez; Thu, 12 Mar 2026 06:04:38 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0YDq-004yCS-1n;
-	Thu, 12 Mar 2026 06:04:35 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w0YDr-0000000FDEl-3BLw;
-	Thu, 12 Mar 2026 06:04:35 +0100
-Date: Thu, 12 Mar 2026 06:04:35 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-Message-ID: <abJJY8whzSOB8O-X@pengutronix.de>
-References: <20260310104743.907818-1-bjorn@kernel.org>
- <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
- <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
- <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
- <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
- <20260311195052.1202174f@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gaw7QFx2GNvCMGxGMpt5dlGUNiVX0HUUpZ9IasgjFtcDQtvxLj4fZSWwfQ7Hf/IdSsIK2x3P2w9Km5k6RyWSW/jENNdWZbggfhux1vp+vD9Ma9wOKT7VJvEJZyjd3oV/xoJuF9eiFbIEAe7xotSG0GEb84t4xbeCyrS4tpA+VG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Er1UP/a/; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c73bc3dd25fso227613a12.1
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 22:23:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773292997; x=1773897797; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6vlO7FYWL3aJ8KsO9iAiZaaumwdfYJ9v4wBE7Btvdw=;
+        b=Er1UP/a/KuLCavNZE/Ru5bPh34hB6MS/e2poZqKj+2MBQlJV5sV8Dt1VqTLW2H79lM
+         OMghTsLz53mBtd9+p0KVci/F6pBvyTXOzpNXa+I9GZ1VogIT051PXRaZoOL07OjlzJDy
+         UU2ehR/IbDm0TJvPB6AvRhlry0WNJPkvC8bl3G9BCYv3MJVS4hzYGZSEaQIkVKYUW7LQ
+         3lAWbxrL2iEWMPIzeAaOh06oEwWQDKUk3OJpn44Juy9AAjvbMsi1yltPbL9JGBmdoOjz
+         iQ3m9uwL16hMfGUo6vaUMKR0tnEIWzPPpsDh3bK0h8CDkpdcRfMxl+IsnHvFGu6GnTPz
+         OlnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773292997; x=1773897797;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q6vlO7FYWL3aJ8KsO9iAiZaaumwdfYJ9v4wBE7Btvdw=;
+        b=xAiM/OyIZmgQasjHWIH8JgcUTY5JIvmn7N09eKotq1+b706iZBjJOyPlFPrbzNh8If
+         Gtg6Hn/fdyOS74sdPvc7Eb7FdIy8TcqhuS4h3QheU08lrozURrElt2RidYpSlSUU8J1d
+         UgvhpPaOA9DYXrFM2xPCSVY30nbYhD/KKKhVYgP7qHzvlbeAVLI9gUCArtOaXP6ytO2J
+         1yHl9FjpMcCtLXMP2/AQFjOnsJ4H0Ou3MtBaSvs26CpBW6ORwHdTEpLKXBPsds21RSq2
+         8zmVu9sRtAj+VNgpaDZ7H+hMsY4Nl1f09FINtEUFUQgMrFqMktg/LknwmG/xfoop6iFZ
+         zKHw==
+X-Forwarded-Encrypted: i=1; AJvYcCV6a/XDk95ZJ/CA2JaHzzaIlNitteugARVLjzqik3/l5RdW2bHpgzhwVP7/gCCz1Zb9ZtxjWAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyibgBin5uwQTJ+Vh//WpqcEfGXa3c1VgXtwTTmsRN6XcwQvWX5
+	3WaPeiFga+1JjHq1N8Suq7HLQ75RL8mPtimpe9l9L2uArQtRbS/oKofo
+X-Gm-Gg: ATEYQzzDupFaLIKcFpsWMhVlTEd+a9aQYaxmhwEp+bt7TaphTCJohmVN3AYBg+GZ9Md
+	qNHbd1hNaeBnjB5StOJ7KSlkkiTcQWG8PaB5agDzudSK2+XOCohSRFQEuWiBmy+/WjtIXQLg2xi
+	ZEXYJaCn0xcbHzHWFqdAaY3s61RC96XwuQYrCoMiDyGbOXAjU0I5AGBTC43kts9YwnDlYpVJRMJ
+	6s1ev8JRx89ALSWFocNVQ+LxowbEL/LnZlzV/R9aYpMe6/14q2nluOjsn6rqG+zDERdl/AlIOkn
+	boGupT+YxFcjvKzqZ2KWzxVu7QCLq7BN63YKTHAr1/6KTot/j/aIeQy93DgBd1vaM4wi/vK06TN
+	rdhcuTgiRlhAfIW1z4hnkMP7PqOcQy94a11yzVIILZ4V0928zyT3q4FAJPZZ5lWpaVZ+zu3hkRu
+	Y6M2POpnvDnv/nSmoYeyVY0yC6iO9LCDF5qKfKbdxoe7BudyiqdXm9myg5Z+o=
+X-Received: by 2002:a05:6a21:693:b0:398:9d5f:e09c with SMTP id adf61e73a8af0-398c5f9dee4mr4749644637.24.1773292997327;
+        Wed, 11 Mar 2026 22:23:17 -0700 (PDT)
+Received: from SLSGDTSWING002 ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c73cdf92fd9sm3724460a12.19.2026.03.11.22.23.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 22:23:16 -0700 (PDT)
+Date: Thu, 12 Mar 2026 13:23:13 +0800
+From: Weiming Shi <bestswngs@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net] net: prevent NULL deref in ip[6]tunnel_xmit()
+Message-ID: <abJNwYsvfTj0jzMr@SLSGDTSWING002>
+References: <20260312043908.2790803-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260311195052.1202174f@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [0.04 / 15.00];
+In-Reply-To: <20260312043908.2790803-1-edumazet@google.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,bootlin.com,kernel.org,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-266908-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266909-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA4C526D461
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9FD9026D5DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 07:50:52PM -0700, Jakub Kicinski wrote:
-> On Wed, 11 Mar 2026 20:26:39 +0100 Andrew Lunn wrote:
-> > > For that we have what we need with phy_link_topology, as each PHY has
-> > > its index, we should be good to go in that regard hopefully :)  
-> > 
-> > So depth would be local to a component? We could have two PHY
-> > components, each with a different index, and depth = 0?
-> > 
-> > I _think_ Jakub's depth was more at a global level? But then it would
-> > need to be passed down as we do the enumeration.
+On 26-03-12 04:39, Eric Dumazet wrote:
+> Blamed commit missed that both functions can be called with dev == NULL.
 > 
-> Oh, sorry, I responded without reading the whole discussion :)
-> No, I imagined the depth would be within a single component, 
-> so under control of a single driver (instance). The ordering
-> between components should be defined by PHY topology etc so
-> it's outside of the loopback config.
+> Also add unlikely() hints for these conditions that only fuzzers can hit.
 
-As for me, it is problematic to help the user to understand the datapath
-depth on a switch. For example:
+Hi Eric,
+Thank you for the quick fix. I missed the NULL dev case despite the
+existing `if (dev)` guard in iptunnel_xmit().
 
-CPU -- xMII --- MAC1 [loop] --- fabric --- MAC2 [loop] --- xMII -- PHY
-                                    \----- MACx [loop] ---
+Thanks,
+Weiming Shi
 
-... each port has two xMII loop configurations: towards the xMII or towards
-the fabric. From a driver perspective, a loop towards the xMII is
-"remote." However, from a system perspective, a "remote" loop on MAC1 is
-a local loop at depth=0, whereas a "local" loop on MAC2 is a local loop
-at depth=1.
-
-Other example would be where we have a chain of components which are
-attached on the system in a unexpected direction, where the MDI
-interface is pointing towards the main CPU, so the remote loopbacks
-became to local loop.
-
-One more issue is the test data generator location. The data generator
-is not always the CPU. We have HW generators located in components like
-PHYs or we may use external source (remote loopback).
-
-This is why i would prefer to have description of topology by not
-hard coding the perspective of view.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> Fixes: 6f1a9140ecda ("net: add xmit recursion limit to tunnel xmit functions")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> CC: Weiming Shi <bestswngs@gmail.com>
+> ---
+> 
+> I am sending v2 without the usual ~24 hours delay, hoping to catch our PR today.
+> 
+> v2: avoid DEV_STATS_INC(NULL, tx_errors) as well.
+>     add unlikely() hints.
+> 
+>  include/net/ip6_tunnel.h  | 10 ++++++----
+>  net/ipv4/ip_tunnel_core.c | 10 ++++++----
+>  2 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/net/ip6_tunnel.h b/include/net/ip6_tunnel.h
+> index 1253cbb4b0a45f1c62999be21931ca31b596697f..359b595f1df93663b3e32c006d936427e8c8b20c 100644
+> --- a/include/net/ip6_tunnel.h
+> +++ b/include/net/ip6_tunnel.h
+> @@ -156,10 +156,12 @@ static inline void ip6tunnel_xmit(struct sock *sk, struct sk_buff *skb,
+>  {
+>  	int pkt_len, err;
+>  
+> -	if (dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT) {
+> -		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+> -				     dev->name);
+> -		DEV_STATS_INC(dev, tx_errors);
+> +	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
+> +		if (dev) {
+> +			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+> +					     dev->name);
+> +			DEV_STATS_INC(dev, tx_errors);
+> +		}
+>  		kfree_skb(skb);
+>  		return;
+>  	}
+> diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+> index b1b6bf949f65ab7a09ba201d48aa204d913f146d..5683c328990f49df2954af9d890b5f24150caeb2 100644
+> --- a/net/ipv4/ip_tunnel_core.c
+> +++ b/net/ipv4/ip_tunnel_core.c
+> @@ -58,10 +58,12 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+>  	struct iphdr *iph;
+>  	int err;
+>  
+> -	if (dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT) {
+> -		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+> -				     dev->name);
+> -		DEV_STATS_INC(dev, tx_errors);
+> +	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
+> +		if (dev) {
+> +			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+> +					     dev->name);
+> +			DEV_STATS_INC(dev, tx_errors);
+> +		}
+>  		ip_rt_put(rt);
+>  		kfree_skb(skb);
+>  		return;
+> -- 
+> 2.53.0.473.g4a7958ca14-goog
+> 
 
