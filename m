@@ -1,231 +1,127 @@
-Return-Path: <netdev+bounces-267073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2JvDMS3FsmmvPAAAu9opvQ
-	(envelope-from <netdev+bounces-267073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:52:45 +0100
+	id GFoeKUjEsmmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:48:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC82272F2E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:52:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326B4272E0E
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 97350301F7B8
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:48:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D267D3029252
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A522D9ECA;
-	Thu, 12 Mar 2026 13:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E82C351C37;
+	Thu, 12 Mar 2026 13:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BE31/LmX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cknpOdOm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AN6+VsgP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F9B40DFD5
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6522D97B7;
+	Thu, 12 Mar 2026 13:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773323306; cv=none; b=Fz+4EcdptWwug34s/wHzXUaAbLqTdWQq0dIk/VV08bvkq1TRWJ3ba5GMhGmj6bNw6JQvAmQxK02pfZNKjYKkeznRxXMf3Ve97ImiJ7BKm+PQ+LTY462PB2LaDD7380Bqx52YMeO9QFvLvobCzvPZ8926N5cPXbrdp/10gE+unaM=
+	t=1773323311; cv=none; b=i02quiATI7ws0PrGTlDJOAeIV7kspxt0DB6pO4ORcWibJR+uJ812v+gQ2o4O6mIhH80ysYJbceOQUT9VVeswHR28o2NVXt+6KxlZlhWIRCwH0iT7dMO/r93q8ql7GPS4JsPqCzHUGcOqx0BWnHU611CLhaIJY1G8G4OLTSy7+f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773323306; c=relaxed/simple;
-	bh=hGyOVcucJQ+6emh9f4kMcpR+qKcT8eW/N7Sl3bHKnnY=;
+	s=arc-20240116; t=1773323311; c=relaxed/simple;
+	bh=hcAPt99+1FVBi2us+P3Rabs49pP9IyapSrVjbDkk1dk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HAUPz+RjQCCAPbCZr246VgZI38KNHu3KManE9LyPt/J6INKK+bgr7gwxkQt8ufy+xqjueBJaoGlPIJm47Mh+nIA5znQeVHP74ks0HsS+Um2zZ0AEImZLeGMB9WxOeAXAyqvPI3nsIMGlWqWiUIkDVn1vSUfXG4TM5eadWq9mvWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BE31/LmX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cknpOdOm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773323304;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aAjqsvp3FTb2qvy1Zip4J9H1NlgvRXsWkj7RxsCfbGM=;
-	b=BE31/LmX4+Yo1OhDde1LaybhlagXx55kRe4GAZCmm/GCBJVj4LLdTZlrtTRtYI6lH3x097
-	EvkqyM/aRhwFIN4sR3XGfeE46DM58B3+0vk+Wsh8nu1mvPaH+W623ONQgrdEOHTYxH8h0e
-	wQ8ihe1kNzICevcv5fZwKFZdpawVNPM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-hSKSeE9WO7Wheo9wN1TSEA-1; Thu, 12 Mar 2026 09:48:23 -0400
-X-MC-Unique: hSKSeE9WO7Wheo9wN1TSEA-1
-X-Mimecast-MFC-AGG-ID: hSKSeE9WO7Wheo9wN1TSEA_1773323302
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4853b0af42aso13427655e9.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:48:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773323302; x=1773928102; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aAjqsvp3FTb2qvy1Zip4J9H1NlgvRXsWkj7RxsCfbGM=;
-        b=cknpOdOmGACPqzKKOMDkm4tpBV3BHg54+sAklMOSmpgft++0PGmrIMexb4XJxrw3Uk
-         /2lun8kGXIADk/Nd2gGTAcEceH7p/rCMI8LpKGITYZiluU6cGInqJCY9IxhKBPw5rqTr
-         uaYqPjICYesOB4fHSluxfjKwi7M9RgL4EtU9w1mCSqIbbvg1gAzxY3i+H5xFAqEuIjS5
-         wnm8lv34fh8CFjn0d6TTUvvNIZpN1/aDc4bWg9+lR8+O7y6P96eQzGIowbzX+n++k02j
-         kb+SrufpS09iAmiJ6Vo70Mme1YZoYFtvmqw4Yg8zUFv0Ydffvg6ptFsd5jhWsrxYVIWT
-         najA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773323302; x=1773928102;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aAjqsvp3FTb2qvy1Zip4J9H1NlgvRXsWkj7RxsCfbGM=;
-        b=MMjme8zT5p61CUzzcy9O4CmYiNQtwABhsaZwN2vt+fCpPFRWKAc3faQEPelz9nxLQs
-         4ApTMDL0b8w+RIdsX6WMIveUP6Qv6uuTPOtksbrcPdnJU6NW56SmsDtYW/n1DHkxAB/U
-         NobaGWzwhOQGT4ll5he3webplYMLKadEeqz2Eya0FTBeQKxSq0FgiWg+l52uOw0Ahl96
-         e7B4fIkeJVo3zvvhL1J+D8ZM6o75gd/qN68uBafAcxeqjtL11YTs8W0ePOg0X2vP0zC8
-         xrDqou2iPHaCJxZ2nL57oUmZLWIIDzXimqRjj/KpnU7bKACcUCfWPvQ/yg64V5wDCxLB
-         /KgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHQkHbTBeJvg5w2sOwwfP2iyGKeMhCj62C8TBQ+2Nl3ZPo4F2QQJ2Grjl/OPKuWtef4qz8xJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXtX21wEmWBDClIOy9adluwBRRqJzrMOeMOwoXIybNuaNCK/b2
-	ADrqwF2ks/1oBuaq8u1zy8cSS+xhW02c9urRC5s9vMnC9rJEzbW60SMcghv/Kb535iLVXfhj0nb
-	Z3QAvoGLp5EdJcWCoevhQJgakpSUmOxs5dHu3ADgp5PLpAudPCR6pxnF4zQ==
-X-Gm-Gg: ATEYQzx9sOfb2t2dCcsyWmUIhqfFzR8vW8qzOwrb7E5HEd2N7RoMeaeHxLHrm6H/+49
-	eHwImBWWsIV8hdq7G8XIh6yLxH4pIE6OFGGx+sScDetzUdadlq3a6DdmjW3a8wbWt95xM66OQmx
-	w3ynh5AZw0D3yWWmQKTRQtJQ01FXwcDVperxSost4VnF0rcw/h73QN2wHpUMnwQ9Xy90yL5kvXw
-	qA4z8Ohb++lg6Me3xT3DlcfNK3FKdez+wFMJRCBxBP5Z0ZQmb/ptvixOLDQ5eJXRt6OwMgYZcxg
-	udsMV6MCDkVADZOehLE6kbBdrOX8IEyFqhSWbSYh/qmVpyDSMgJd4UEBj0/R87/LAdVVNC8Zu4r
-	B2lecVrzjHAC6uqm/a8KPFMVjQR3AVAXcVMvpsLeVVTa0dA==
-X-Received: by 2002:a05:600c:46d3:b0:485:35ba:1d8a with SMTP id 5b1f17b1804b1-4854b111768mr107604755e9.27.1773323301762;
-        Thu, 12 Mar 2026 06:48:21 -0700 (PDT)
-X-Received: by 2002:a05:600c:46d3:b0:485:35ba:1d8a with SMTP id 5b1f17b1804b1-4854b111768mr107604245e9.27.1773323301167;
-        Thu, 12 Mar 2026 06:48:21 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541b6f708sm326209285e9.11.2026.03.12.06.48.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 06:48:20 -0700 (PDT)
-Date: Thu, 12 Mar 2026 09:48:16 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, eperezma@redhat.com, leiyang@redhat.com,
-	stephen@networkplumber.org, jon@nutanix.com,
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v8 3/4] ptr_ring: move free-space check into
- separate helper
-Message-ID: <20260312094447-mutt-send-email-mst@kernel.org>
-References: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
- <20260312130639.138988-4-simon.schippers@tu-dortmund.de>
- <CANn89i+tWCtSAAH5i=FDDqRe0jm3XZS-_Ce3kHvZQpkedRqoFQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tpbMw0i8p4yDteJggipfXInFcBXxBQQcheN1afKb0RFo+yju1NVv9k5jqKztIhy3jLzMvawuZ5PlARtDr9kSMOs8IHHejKTESNI0XuOAG7cMf8Oaw0VpkcwBZziSSrMpKesNxMEj/+8aUc+epV7RSb+x2ZcWmxPERgepXO5/sh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AN6+VsgP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD00DC4CEF7;
+	Thu, 12 Mar 2026 13:48:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773323311;
+	bh=hcAPt99+1FVBi2us+P3Rabs49pP9IyapSrVjbDkk1dk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AN6+VsgPxg7z6yjxM0AzUPLK0tr3TY1t+CVdtXMKx9gCqygejoDStChHpikQhSPvu
+	 1kuuPyE8kCoIEVpeI7KkPIIQ3/7AMG1HCc9obe+YLaLzmsyYYa/l5bKlzNHY3sp4Ts
+	 Ob+TvU3svpa8BO1XfpPB2p49uRSJ1XwYCzFYU1xE3WfDWTPHCkpu2XhvdV8rBOTt6z
+	 VAz9ffpUb2BNCz3n6QdlxTs+Xtr89ork8F0nDcU5OFXOTPkU6yn6tZHR2nWsqGfUAk
+	 N/yJR5mJjHQdhTBerG47JPk0ySEzhSvZzhLMgiRjv9zaNxh3ksYdI9Bhka29EwfX3O
+	 zXw/8BUSvMr9Q==
+Date: Thu, 12 Mar 2026 08:48:30 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: linux-kernel@vger.kernel.org,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>, kevin-kw.huang@airoha.com,
+	matthias.bgg@gmail.com, Heiner Kallweit <hkallweit1@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	macpaul.lin@mediatek.com, devicetree@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, kernel@collabora.com,
+	linux-arm-kernel@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn <andrew@lunn.ch>,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: Add support for Airoha
+ AN8801/R GbE PHY
+Message-ID: <177332330960.2900818.4098843765589208189.robh@kernel.org>
+References: <20260304-add-airoha-an8801-support-v1-0-0ae4ee5a2f9d@collabora.com>
+ <20260304-add-airoha-an8801-support-v1-1-0ae4ee5a2f9d@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+tWCtSAAH5i=FDDqRe0jm3XZS-_Ce3kHvZQpkedRqoFQ@mail.gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260304-add-airoha-an8801-support-v1-1-0ae4ee5a2f9d@collabora.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267073-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[tu-dortmund.de,gmail.com,redhat.com,lunn.ch,davemloft.net,kernel.org,networkplumber.org,nutanix.com,vger.kernel.org,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,collabora.com,davemloft.net,airoha.com,gmail.com,redhat.com,mediatek.com,kernel.org,lists.infradead.org,google.com,armlinux.org.uk,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-267074-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FC82272F2E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[collabora.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 326B4272E0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 02:17:16PM +0100, Eric Dumazet wrote:
-> On Thu, Mar 12, 2026 at 2:06 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
-> >
-> > This patch moves the check for available free space for a new entry into
-> > a separate function. As a result, __ptr_ring_produce() remains logically
-> > unchanged, while the new helper allows callers to determine in advance
-> > whether subsequent __ptr_ring_produce() calls will succeed. This
-> > information can, for example, be used to temporarily stop producing until
-> > __ptr_ring_peek() indicates that space is available again.
-> >
-> > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> > ---
-> >  include/linux/ptr_ring.h | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-> > index 534531807d95..a5a3fa4916d3 100644
-> > --- a/include/linux/ptr_ring.h
-> > +++ b/include/linux/ptr_ring.h
-> > @@ -96,6 +96,14 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
-> >         return ret;
-> >  }
-> >
-> > +static inline int __ptr_ring_produce_peek(struct ptr_ring *r)
-> > +{
-> > +       if (unlikely(!r->size) || r->queue[r->producer])
+
+On Wed, 04 Mar 2026 10:35:28 +0100, Louis-Alexis Eyraud wrote:
+> From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 > 
-> I think this should be
+> Add a new binding to support the Airoha AN8801R Series Gigabit
+> Ethernet PHY.
 > 
->        if (unlikely(!r->size) || READ_ONCE(r->queue[r->producer]))
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+> ---
+>  .../devicetree/bindings/net/airoha,an8801.yaml     | 81 ++++++++++++++++++++++
+>  1 file changed, 81 insertions(+)
 > 
-> And of course:
-> 
-> @@ -194,7 +194,7 @@ static inline void *__ptr_ring_peek(struct ptr_ring *r)
->  static inline bool __ptr_ring_empty(struct ptr_ring *r)
->  {
->         if (likely(r->size))
-> -               return !r->queue[READ_ONCE(r->consumer_head)];
-> +               return !READ_ONCE(r->queue[READ_ONCE(r->consumer_head)]);
->         return true;
->  }
 
-
-I don't understand why it's necessary. consumer_head etc are
-all lock protected.
-
-queue itself is not but we are only checking it for NULL -
-it is fine if compiler reads it in many chunks and not all
-at once.
-
-> @@ -256,7 +256,7 @@ static inline void __ptr_ring_zero_tail(struct
-> ptr_ring *r, int consumer_head)
->          * besides the first one until we write out all entries.
->          */
->         while (likely(head > r->consumer_tail))
-> -               r->queue[--head] = NULL;
-> +               WRITE_ONCE(r->queue[--head], NULL);
-> 
->         r->consumer_tail = consumer_head;
->  }
-> 
-> 
-> Presumably we should fix this in net tree first.
-
-
-Maybe this one yes but I am not sure at all - KCSAN is happy.
-
-
--- 
-MST
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
