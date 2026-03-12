@@ -1,138 +1,173 @@
-Return-Path: <netdev+bounces-266910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHpZF8xXsmmVLwAAu9opvQ
-	(envelope-from <netdev+bounces-266910-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:06:04 +0100
+	id aP5nNudfsmlmMAAAu9opvQ
+	(envelope-from <netdev+bounces-266928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:40:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B533A26D7B2
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:06:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E0DB26DFE9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66C86304DEA5
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:06:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 831903093244
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915483624BB;
-	Thu, 12 Mar 2026 06:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4638A39EF02;
+	Thu, 12 Mar 2026 06:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="Yzoj+YGA"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="YpeqQxRZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938B4324B16;
-	Thu, 12 Mar 2026 06:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654F538C40D
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773295561; cv=none; b=fMHsbT0ygfy8B0vkkPLtdcM2xmV1nu8MuUSFwh7QJXgxCtg+ONWYS0lGl3Yxs8ENiVn1OYG0L792t/hhrePE5cEuee/BkPVNNCU5Ok40lAVP/YjVULoG5jMEfaM44Ng3BTksr2u+B3iVYAUq4tHHuK/zv9RStWOiqGu0kEhutVI=
+	t=1773297417; cv=none; b=ljkaFc6nwT+tNktVmsfBzNxMa9/YBdtEvGIsOmwyq+5h7/dhuDBvF1q39xKSGN3qp7wQaN/W+Zr0ejlaoEsNWNQ4DmlulfBwEzaMPqcDxBmXbvMrWUDiLxRxMaG1h7hnNceW0Qk5Kb5/0saQdo2v49irL5G8zYybZ7SNro9cn2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773295561; c=relaxed/simple;
-	bh=/P7ZeZyhk1pp5G1acgHcRKYh4lgx8MJ2CCC/QPg9l+Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EmlNTxQbAXeqRhoSDjLnbxRVa7c+DvhRFuJva70OYBmt3savZBW/n4S2SwVTBhQaf/rGgtQlZt/r6MFdNtv8TQd6whdd8Hb8VYbmq+FeRVI7nrU5PzWJWt8HIMqRwk5X47+AliEKpDbWpFiveQQKxmKTG6BpPacJOtlLxFle4A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=Yzoj+YGA; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1773295550; x=1773554750;
-	bh=/P7ZeZyhk1pp5G1acgHcRKYh4lgx8MJ2CCC/QPg9l+Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Yzoj+YGAjldpjhYAPWn8uPt3v5HuMBLmMfNHMlYY0eY0+YLAgZ1ZcSnFzMNQONJ4U
-	 3Bd1kwrgp8aJ8tTWILqglsaI2zYriERjUWDitqy+114ERXOfSjsXDkoXZ6HdxIU+YU
-	 SMim8/HLH/bVGnlyXUAD6QHuMfcfR+hZ3c/n5kD7SBCpE6rOt+G8EGWHLfbutOhUkb
-	 aRcqp5zRpHUTzdZyxCEZMH5tY/oXSF/ShCPZBtiMI04gthV8gsfs6BHSPKiCAyfdoY
-	 P78lIHbZFCOzFw+pMluxhTkxOEKedqO/WJLGNKWnWtXr9BoSQYP3xTlVGZjKep50YC
-	 +TiJkDlC5RFnw==
-Date: Thu, 12 Mar 2026 06:05:45 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net-shapers: clear hierarchy pointer and defer flush frees with RCU
-Message-ID: <HsPWaZkAZhVlbA7H6W6OtjDWVtryYVaPhSvE1jztmcWN02uRKeG3Gnvh5x0WjwdmDvowQge_ZUmD8Dmm3g5tGVyT5PjgmFcgGIRy2_B4bwQ=@1g4.org>
-In-Reply-To: <20260311171802.2d8a4d45@kernel.org>
-References: <20260309173450.538026-1-p@1g4.org> <20260310192842.3c3b2070@kernel.org> <cjiUUrQ73CJYWcTmlHQVSJPUJlxVg4kSZAnqkHKnU1SKeWoyy4F2qtIw7wuFRP9qz6Ra9ax0v2EQKsgdiRRUQnnuMweGbv-n08lgvXSTTG4=@1g4.org> <20260311171802.2d8a4d45@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 9486c23f579547f2779b1dbb6d3a8fe4c92ec401
+	s=arc-20240116; t=1773297417; c=relaxed/simple;
+	bh=OeXeDMD6HirRqZTISbCpNb0ZIAgYnt7jVAhUMhiP3yo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eC306flxwihSvLXWXGKfU63aS8pLIzN5+rgWhGGDS5BoVqfGBPZfmauTEqLBKuPjr9J/2wl0qzRRVWj5/6mpnfHythhWbLLxG5+uRU0U9QpmZZCWBLZZ0C5rR4Xp+TH/iQGsMImrFXtcughIyde+T19AHkFWx3gHfk2AZ+M5BDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=YpeqQxRZ; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 7B11D20799;
+	Thu, 12 Mar 2026 07:27:10 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KyymKwPJ0iCP; Thu, 12 Mar 2026 07:27:10 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id E26402064C;
+	Thu, 12 Mar 2026 07:27:09 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E26402064C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1773296829;
+	bh=qCMrG6R9wEgYocFLXELTgCv1qgm6eoLjiHswNf5w1Wo=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=YpeqQxRZionh1zy32zOhz1ZvCAuO9b423vS6nACI6CJ/4qlz2NWFACZKt3MlqOMEY
+	 8LdOuJ9P3q6G0E6aC6mWIX6J9gHOZgZZV0QRRI7lc8kvDaRkd1QBgykINqaKaprbT1
+	 ZC/d/dRxe2Fy4zphJYIp6Br3axHoG3Ifs6WmuBFz3j78C89zRHzTHWh05JU/sWapXt
+	 24oBbNqKUIISNLVc2BlUwrtGuxnguRJw21TYjqbFNZwdvcHNtTTEABd6jG7M5c/Pr4
+	 WPMxQgg2YY6cNg3Ph2OzoMAJd/xgBAUw8B3H1txQ/7y4ayOr24FCPvs0rmQ9H06rPT
+	 0QuhPskMgcZig==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 12 Mar
+ 2026 07:27:09 +0100
+Received: (nullmailer pid 2329501 invoked by uid 1000);
+	Thu, 12 Mar 2026 06:27:08 -0000
+Date: Thu, 12 Mar 2026 07:27:08 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: Leon Romanovsky <leon@kernel.org>, Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>, <netdev@vger.kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+Subject: Re: [PATCH ipsec-next 01/10] xfrm: state: fix sparse warnings on
+ xfrm_state_hold_rcu
+Message-ID: <abJcvFX-pbZ4WZry@secunet.com>
+References: <cover.1773051558.git.sd@queasysnail.net>
+ <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
+ <20260310103135.GB12611@unreal>
+ <abABg6aO9twGIk7F@krikkit>
+ <20260310182012.GF12611@unreal>
+ <abBv6zR4Qq_lrzuC@strlen.de>
+ <20260310194500.GO12611@unreal>
+ <abB12Ae769OivuYB@strlen.de>
+ <20260310201021.GP12611@unreal>
+ <abCQGh5Ce9uDbOo9@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <abCQGh5Ce9uDbOo9@krikkit>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266910-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266928-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:mid];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,1g4.org:dkim,1g4.org:mid]
-X-Rspamd-Queue-Id: B533A26D7B2
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 4E0DB26DFE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> On Wed, 11 Mar 2026 14:04:54 +0000 Paul Moses wrote:
-> > The reported UAF was in the GET doit reader path.
-> >
-> > GET doit enters rcu_read_lock(), then net_shaper_lookup() performs
-> > READ_ONCE(netdev->net_shaper_hierarchy) and walks the xarray locklessly=
-.
-> >
-> > GET dump reads the hierarchy pointer first, then enters rcu_read_lock()
-> > and uses xa_find() to walk the xarray.
-> >
-> > Both paths rely on RCU to keep the hierarchy and its shapers valid duri=
-ng
-> > the lockless walk.
->=20
-> RCU was never intended to protect the whole hierarchy in shapers.
-> Only individual shapers inside the xarray.
-> The struct net_shaper_hierarchy is allocated lazily but it is never
-> freed during lifetime of the device, only once the device is dead.
->=20
-> The bug is that we are accessing a dead device.
->=20
-> (reminder: please quote what you're replying to correctly during ML
-> discussions)
->=20
+On Tue, Mar 10, 2026 at 10:41:46PM +0100, Sabrina Dubroca wrote:
+> 
+> > Yes, this is possible scenario and this is what is worth to document.
+> 
+> 
+> We could add something like:
+> 
+> /* Take a reference to @x, when we know the state has a refcount >= 1.
+>  * In this case, we can avoid refcount_inc_not_zero and the error
+>  * handling it requires.
+>  * In contexts where concurrent state deletion is possible and we
+>  * don't already hold a reference to that state, xfrm_state_hold_rcu
+>  * must be used.
+>  */
+> 
+> Though it may not make much sense to refer to xfrm_state_hold_rcu
+> (implemented in net/xfrm/xfrm_state.c) from include/net/xfrm.h.
+> 
+> And if we consider the hashtables to be private to
+> net/xfrm/xfrm_state.c, nothing outside of it should ever see a state
+> with refcount=0, since they will only ever see states that already
+> have one reference held by whatever gave them the pointer.
+> 
+> So maybe it's more xfrm_state_hold_rcu that needs a mention of
+> "concurrent state deletion could bring the refcount to 0 while we're
+> doing the lookup"? I don't know, for me it's pretty obvious with the
+> _rcu suffix that RCU -> unlocked -> could be deleted in parallel.
+> 
+> 
+> We also have __xfrm_state_put, the commit message that introduced it
+> states:
+> 
+>     We often just do an atomic_dec(&x->refcnt) on an xfrm_state object
+>     because we know there is more than 1 reference remaining and thus
+>     we can elide the heavier xfrm_state_put() call.
+> 
+> so we could add:
+> 
+> /* Drop a reference to @x, when we know there is more than 1 reference remaining.
+>  * In this case, we can avoid refcount_dec_and_test and just decrement refcnt.
+>  */
+> 
+> but maybe someone has a better suggestion.
 
-I'm sorry, I'm not seeing it that way. We are racing teardown, that's true,=
-=20
-but there is no reliance on the device being gone to hit this bug. It can=
-=20
-happen before or after, makes no difference.
-
-SET/GROUP/DELETE paths might all be susceptible to your bug but GET is not,
-it never follows the =E2=80=9Cref then lock=E2=80=9D pattern.
-
-So the choices I'm left with are fundamentally changing in the GET paths lo=
-cking=20
-contract or papering over the locking issue to where it's no longer reachab=
-le.
-
-Thanks,
-Paul
+I plan to take this series as is. If you feel we need a comment,
+just add it with a followup patch.
 
