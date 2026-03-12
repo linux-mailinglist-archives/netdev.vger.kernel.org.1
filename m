@@ -1,180 +1,233 @@
-Return-Path: <netdev+bounces-267053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267056-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBjvLYK4smmYOwAAu9opvQ
-	(envelope-from <netdev+bounces-267053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:58:42 +0100
+	id cDivFqq6smmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267056-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:07:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5E92721D9
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:58:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B3927248A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C152E3129BD9
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:57:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E98D300C33C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5603C5DA5;
-	Thu, 12 Mar 2026 12:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5F93C5DC5;
+	Thu, 12 Mar 2026 13:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="EcU4BDZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77503C342E
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E47B3C455D;
+	Thu, 12 Mar 2026 13:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773320257; cv=none; b=ErZlv6CQiswLpT/U3DB5IjdBwrSBBM3aE8SSTt7xppAIXyLn772NsdiS/2Z2nIGkrUEY5BI+J3EUN4cj9hLWcnmxIVWA6/98Lq5CNgUI0/gXjIjypUQG+783ab3I8eXHNp9SzgjR3emi3XLPpsgv+kjLlbhJLH8z/Y15rql8mOs=
+	t=1773320825; cv=none; b=GUId/6XHREWP2fU00rdaqNFIYW7egztCgb+mKmIxVMZszR9vPga1z8rgXqRFMsd/uh+XDEgK3mVMpM0SJeOTPq2FisCSVWBtB9hLP5oxWuDUHUVXMOI14ZieTNNrwelvPihOsXuKYzuqMK9CTbNkGANlxPGTtMltGDkE/vVPQUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773320257; c=relaxed/simple;
-	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50915e14cf6so7425501cf.3
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
-         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
-         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
-         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
-         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
-         JV6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=HjZR4rKXwRYMmZVMagxxuOLy2X3Wa7FAANS8XtMMqvUaeCJE8yR6RvcS7pc9BCCl8w
-         FCRcuFEwn8GE2flo1JZvya2uuxVyXdrsrIXOJQ6mCaPQ/0oVS7f8hhDgyQje0XdPe0ak
-         iLILvzMeSWmlQdt/ezwJKowEOfDLFx/Vw0qGdqfNO7nXoMTgI4Tj/arbpaPmP9jtPz9Y
-         9sh1WQ11KHfBFdRphgQHhfAhoL7tIh1s5w4YoiZliW6RLeX5cN9/M6UTFomvboNkQXi7
-         dCv7FIj8UzFzP2evkb/NOH15UKaZoulBT8w+kgRNegVh/fNslQ+3hIaAvLa4B/+mWwop
-         oSgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUs5RU1qIkHRAqJNvMP+jyIydlvjgpqoWdJtRFiD2PeR53FmC3te7q0NSD8P9VmXe7HowitG/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf5KvK9o5ro/gMBjV4VM/sqEKUFbdQrcNE8gvAs5FyazAGmvvR
-	kzmTg1VHs5Mnv7Qbmrz6Fzv0dDi//FURRoFs6/vLhKARoM8YSyQS/88Etp/5ycGPRfI=
-X-Gm-Gg: ATEYQzxL+48YhL/z2jkljuEd9lA0X/6iShZqoCqSq803NYZtAwmgaxTDkxhF4ku3Out
-	IMswhdMy4YKMi8LIegwxbzbYly103k1BsnPkouZpyYeBJdu5t5XAwJkSSqi6CFCUTABydg2iZPc
-	yGOhli1KcJU3zorHsWL0/TuH9MD1QBeqbP5QPvmWYYHMOttAcWzscH2O9O+ce12km6dVz3iSgmL
-	JWoKvFsSjGAd7wuAn4xUFE2kquT4ckJLeTpYAVAbFoFdlWcW79siYe3fwZMVvMIfUBZUaKNrQf8
-	oCnBqDfv/KfgK7o0Fvszq31NoAGK3nVdys/bM1H1aIekUcnLsm1Zsz1/JolbFc1dMisEl3P+8/v
-	u/w5gzjvLJyWcAVQmGFgh1oq2lkKFe9ofs75sO94tv3E5kkwz02OPoYQdpwMS2gDT8F2t+7c81D
-	5LxV9DdFo7yQkbhyCHAU16IIqTWHABXp1dYLmU95l6pz2qk39e+hOXZSTTo9IxBSgAmIfGxsvvU
-	80kPdz8
-X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1w0fbW-00000006fKD-1POa;
-	Thu, 12 Mar 2026 09:57:30 -0300
-Date: Thu, 12 Mar 2026 09:57:30 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
-	ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-Message-ID: <20260312125730.GI1469476@ziepe.ca>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <abBlpGKO842B3yl9@google.com>
+	s=arc-20240116; t=1773320825; c=relaxed/simple;
+	bh=uO7mUI3S7FozVecYjXmr+LnyTxVSbRSpJoQgkGbAwuc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HG8CPUPktSyjwq/AHdVLL5CJ9W2HSAaO+Mbk2ax5OERvmGEZ9Yhm4HHKrW1EMnuz/0m90CqekBiTzXxCP9MnyYjm5Hos3MTl/x4IZXD5gaKlzq/MMPrujnEP80hrDbOkKr611EPbSZ1FXPihJRTXYDqeZrinqSSjoOeb5L34U9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=EcU4BDZL; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1773320810;
+	bh=uO7mUI3S7FozVecYjXmr+LnyTxVSbRSpJoQgkGbAwuc=;
+	h=From:To:Subject:Date;
+	b=EcU4BDZLq1TnMiKCMDcFd8nsDo1CkOjF7HzgSld3B3ppipdD1aSsRmt/LF6XGSAOV
+	 Mxly3RCPw06BAQuOskuSVb7Pp+LNvAuN3jS33b8XPSCFr9N67uYCU68F9t1Kno/wUD
+	 7K8tADq8t8aOTy8FzX2yBpZXh28CtSZxz5qG5XRU=
+Received: from simon-Latitude-5450.fritz.box ([129.217.186.105])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 62CD6mqf014094
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 12 Mar 2026 14:06:49 +0100 (CET)
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+        eperezma@redhat.com, leiyang@redhat.com, stephen@networkplumber.org,
+        jon@nutanix.com, tim.gebauer@tu-dortmund.de,
+        simon.schippers@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+Subject: [PATCH net-next v8 0/4] tun/tap & vhost-net: apply qdisc backpressure on full ptr_ring to reduce TX drops
+Date: Thu, 12 Mar 2026 14:06:35 +0100
+Message-ID: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abBlpGKO842B3yl9@google.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	TAGGED_FROM(0.00)[bounces-267053-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-267056-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[55];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:dkim,ziepe.ca:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5D5E92721D9
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tu-dortmund.de:dkim,tu-dortmund.de:mid,tu-dortmund.de:url,stackexchange.com:url]
+X-Rspamd-Queue-Id: F3B3927248A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
+This patch series deals with tun/tap & vhost-net which drop incoming
+SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
+patch series, the associated netdev queue is stopped - but only when a
+qdisc is attached. If no qdisc is present the existing behavior is
+preserved. This patch series touches tun/tap and vhost-net, as they
+share common logic and must be updated together. Modifying only one of
+them would break the other.
 
-> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
-> flawed API design. It usually implies that the caller is unsure whether
-> a failure results in an error pointer or a NULL pointer. 
+By applying proper backpressure, this change allows the connected qdisc to 
+operate correctly, as reported in [1], and significantly improves
+performance in real-world scenarios, as demonstrated in our paper [2]. For 
+example, we observed a 36% TCP throughput improvement for an OpenVPN 
+connection between Germany and the USA.
 
-+1
+Synthetic pktgen benchmarks indicate a slight regression.
+Pktgen benchmarks are provided per commit, with the final commit showing
+the overall performance.
 
-IS_ERR_OR_NULL() should always be looked on with suspicion. Very
-little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
-pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
-implies ERR and NULL are semanticly the same, so fix the things to
-always use ERR.
+Thanks!
 
-If you want to improve things work to get rid of the NULL checks this
-script identifies. Remove ERR or NULL because only one can ever
-happen, or fix the source to consistently return ERR.
+[1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+[2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+[3] Link: https://lore.kernel.org/r/174549940981.608169.4363875844729313831.stgit@firesoul
+[4] Link: https://lore.kernel.org/r/176295323282.307447.14790015927673763094.stgit@firesoul
 
-Jason
+---
+Changelog:
+V8:
+- Drop code changes in drivers/net/tap.c; The code there deals with
+  ipvtap/macvtap which are unrelated to the goal of this patch series
+  and I did not realize that before
+-> Greatly simplified logic, 4 instead of 9 commits
+-> No more duplicated logics and distinction in vhost required
+- Only wake after the queue stopped and half of the ring was consumed
+  as suggested by MST
+-> Performance improvements for TAP, but still slightly slower
+- Better benchmarking with pinned threads, XDP drop program for
+  tap+vhost-net and disabling CPU mitigations (and newer Ryzen 5 5600X
+  processor) as suggested by Jason Wang
+
+V7: https://lore.kernel.org/netdev/20260107210448.37851-1-simon.schippers@tu-dortmund.de/
+- Switch to an approach similar to veth [3] (excluding the recently fixed 
+variant [4]), as suggested by MST, with minor adjustments discussed in V6
+- Rename the cover-letter title
+- Add multithreaded pktgen and iperf3 benchmarks, as suggested by Jason 
+Wang
+- Rework __ptr_ring_consume_created_space() so it can also be used after 
+batched consume
+
+V6: https://lore.kernel.org/netdev/20251120152914.1127975-1-simon.schippers@tu-dortmund.de/
+General:
+- Major adjustments to the descriptions. Special thanks to Jon Kohler!
+- Fix git bisect by moving most logic into dedicated functions and only 
+start using them in patch 7.
+- Moved the main logic of the coupled producer and consumer into a single 
+patch to avoid a chicken-and-egg dependency between commits :-)
+- Rebased to 6.18-rc5 and ran benchmarks again that now also include lost 
+packets (previously I missed a 0, so all benchmark results were higher by 
+factor 10...).
+- Also include the benchmark in patch 7.
+
+Producer:
+- Move logic into the new helper tun_ring_produce()
+- Added a smp_rmb() paired with the consumer, ensuring freed space of the 
+consumer is visible
+- Assume that ptr_ring is not full when __ptr_ring_full_next() is called
+
+Consumer:
+- Use an unpaired smp_rmb() instead of barrier() to ensure that the 
+netdev_tx_queue_stopped() call completes before discarding
+- Also wake the netdev queue if it was stopped before discarding and then 
+becomes empty
+-> Fixes race with producer as identified by MST in V5
+-> Waking the netdev queues upon resize is not required anymore
+- Use __ptr_ring_consume_created_space() instead of messing with ptr_ring 
+internals
+-> Batched consume now just calls 
+__tun_ring_consume()/__tap_ring_consume() in a loop
+- Added an smp_wmb() before waking the netdev queue which is paired with 
+the smp_rmb() discussed above
+
+V5: https://lore.kernel.org/netdev/20250922221553.47802-1-simon.schippers@tu-dortmund.de/T/#u
+- Stop the netdev queue prior to producing the final fitting ptr_ring entry
+-> Ensures the consumer has the latest netdev queue state, making it safe 
+to wake the queue
+-> Resolves an issue in vhost-net where the netdev queue could remain 
+stopped despite being empty
+-> For TUN/TAP, the netdev queue no longer needs to be woken in the 
+blocking loop
+-> Introduces new helpers __ptr_ring_full_next and 
+__ptr_ring_will_invalidate for this purpose
+- vhost-net now uses wrappers of TUN/TAP for ptr_ring consumption rather 
+than maintaining its own rx_ring pointer
+
+V4: https://lore.kernel.org/netdev/20250902080957.47265-1-simon.schippers@tu-dortmund.de/T/#u
+- Target net-next instead of net
+- Changed to patch series instead of single patch
+- Changed to new title from old title
+"TUN/TAP: Improving throughput and latency by avoiding SKB drops"
+- Wake netdev queue with new helpers wake_netdev_queue when there is any 
+spare capacity in the ptr_ring instead of waiting for it to be empty
+- Use tun_file instead of tun_struct in tun_ring_recv as a more consistent 
+logic
+- Use smp_wmb() and smp_rmb() barrier pair, which avoids any packet drops 
+that happened rarely before
+- Use safer logic for vhost-net using RCU read locks to access TUN/TAP data
+
+V3: https://lore.kernel.org/netdev/20250825211832.84901-1-simon.schippers@tu-dortmund.de/T/#u
+- Added support for TAP and TAP+vhost-net.
+
+V2: https://lore.kernel.org/netdev/20250811220430.14063-1-simon.schippers@tu-dortmund.de/T/#u
+- Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
+unnecessary netif_tx_wake_queue in tun_ring_recv.
+
+V1: https://lore.kernel.org/netdev/20250808153721.261334-1-simon.schippers@tu-dortmund.de/T/#u
+---
+
+Simon Schippers (4):
+  tun/tap: add ptr_ring consume helper with netdev queue wakeup
+  vhost-net: wake queue of tun/tap after ptr_ring consume
+  ptr_ring: move free-space check into separate helper
+  tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
+
+ drivers/net/tun.c        | 91 +++++++++++++++++++++++++++++++++++++---
+ drivers/vhost/net.c      | 15 +++++--
+ include/linux/if_tun.h   |  3 ++
+ include/linux/ptr_ring.h | 14 ++++++-
+ 4 files changed, 111 insertions(+), 12 deletions(-)
+
+-- 
+2.43.0
+
 
