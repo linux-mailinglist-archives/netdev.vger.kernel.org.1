@@ -1,295 +1,219 @@
-Return-Path: <netdev+bounces-266945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EE53NGF9smkcNAAAu9opvQ
-	(envelope-from <netdev+bounces-266945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:46:25 +0100
+	id 6PE3DHt9smkcNAAAu9opvQ
+	(envelope-from <netdev+bounces-266946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:46:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB626F1DF
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:46:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6FE26F1F5
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4F793027B78
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:46:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D3748300B8C9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35223750B3;
-	Thu, 12 Mar 2026 08:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="mfpsD2Yw";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="mfpsD2Yw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E2F386429;
+	Thu, 12 Mar 2026 08:46:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CDC1C3F0C
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C633806C2
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773305182; cv=none; b=sdSumHiPDq9xw/LkzV3IJlcLIibE55PA5jkLYaJSMp1+cgr+EwZbc5gGJiTuDKEhC3jiozP3cLc9n7E1jFRFGiDxPgGyfnI2uYDbGBXHLTosrv7KFXyLV4/Uh2nMRpunfpr2Zyv1uLxZW7etKnG9CtOsjzK6L6xgA2RvB3Knb/Q=
+	t=1773305205; cv=none; b=SLyoS6cT65LqD2VEAQdAnafdEgFm3lip2w3/ET+k4UfWEmwhExWmiwpbhpBnTxcCdjzMxiSCMAdJ2fby9+sQ/4aCUzsPXoXj/DlDO8z+Q1lmfNr/sRp8v+tRdtNEAAFlSiFszXZm08EujrCCTkS9I9YyH6hdqEqr+XG/1fLzJT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773305182; c=relaxed/simple;
-	bh=lRneqrBse5iE4f5KN0Vi0p7riTduE91DU2hkP3wHz4k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYiyCvMExIB5m5EZunF4YLuVgfws4HYReVrLG2BWt5KRb2ofD+bChh7l0Zah4c035fRD3xN/JqFUQ1pSmas+4GE2tGgzYo9D6Qq+mg8vvhkpDYGJPdqrvCYfOmoaKrJzLhvgkuTSSQv/bWMBPwf1G+L3WkFt+QSg7ZEbI82w4Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=mfpsD2Yw; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=mfpsD2Yw; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id CF8C05C0A9;
-	Thu, 12 Mar 2026 08:46:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1773305179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=pEJJ+p96t4oQiCAzM1jGrjr4e8RntKOJTw3Pgh8Z8xs=;
-	b=mfpsD2YwjiZ6hjT31ix3XF5moLOhAK5FkCdMpa7uwB3toauLiI1aI2DvixNkL55ntnjEMC
-	+OpGQQWRMYIlnvGIsj2mOP9/SFMqyfHwDKJXCuovlIFrR5VjTxAjgvk4ql/29x/buP8Jpx
-	U8YGL3rx8+dKksUwQ6yW9PVCv4ycM0I=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1773305179; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=pEJJ+p96t4oQiCAzM1jGrjr4e8RntKOJTw3Pgh8Z8xs=;
-	b=mfpsD2YwjiZ6hjT31ix3XF5moLOhAK5FkCdMpa7uwB3toauLiI1aI2DvixNkL55ntnjEMC
-	+OpGQQWRMYIlnvGIsj2mOP9/SFMqyfHwDKJXCuovlIFrR5VjTxAjgvk4ql/29x/buP8Jpx
-	U8YGL3rx8+dKksUwQ6yW9PVCv4ycM0I=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 950EC3FEA0;
-	Thu, 12 Mar 2026 08:46:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id adFFI1t9smkTewAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Thu, 12 Mar 2026 08:46:19 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [PATCHv2 1/1 net-next] net: usb: cdc-ether: unify error handling in probe
-Date: Thu, 12 Mar 2026 09:45:32 +0100
-Message-ID: <20260312084612.1469853-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1773305205; c=relaxed/simple;
+	bh=/mZilDisdviIicDgh987PANEInYCM0ltIoHh+VCYsYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GiG1mS0ZT4k+eQmnJ2kQRFQWeHeuyjjIOFlyxp2ay6KuSEyox6FYz9pnmo54jPCLFFQfg6FxMlt02kElRNIWa58bObAsb5gynNdkPNi+UHH+AfkECgAhchQXS54UB1SDffBR0gUr/Bp1KYil+U0jd4/OIO1x5jqcryXavkkk/50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0bgR-0000cN-2D; Thu, 12 Mar 2026 09:46:19 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0bgN-004zeL-0D;
+	Thu, 12 Mar 2026 09:46:16 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w0bgO-0000000FFGc-19Ts;
+	Thu, 12 Mar 2026 09:46:16 +0100
+Date: Thu, 12 Mar 2026 09:46:16 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+Message-ID: <abJ9WAOrOn5qFmwp@pengutronix.de>
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-3-bjorn@kernel.org>
+ <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+ <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
+ <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
+ <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
+ <20260311195052.1202174f@kernel.org>
+ <abJJY8whzSOB8O-X@pengutronix.de>
+ <ebab1d3e-8967-444b-be54-437e4dfe3c7e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ebab1d3e-8967-444b-be54-437e4dfe3c7e@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266945-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-266946-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[suse.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email,suse.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0FEB626F1DF
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:url]
+X-Rspamd-Queue-Id: 2A6FE26F1F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-usbnet_generic_cdc_bind() is duplicating the error handling
-multiple times. That is bad. Unify it with jumps.
+On Thu, Mar 12, 2026 at 08:49:39AM +0100, Maxime Chevallier wrote:
+> 
+> 
+> On 12/03/2026 06:04, Oleksij Rempel wrote:
+> > On Wed, Mar 11, 2026 at 07:50:52PM -0700, Jakub Kicinski wrote:
+> >> On Wed, 11 Mar 2026 20:26:39 +0100 Andrew Lunn wrote:
+> >>>> For that we have what we need with phy_link_topology, as each PHY has
+> >>>> its index, we should be good to go in that regard hopefully :)  
+> >>>
+> >>> So depth would be local to a component? We could have two PHY
+> >>> components, each with a different index, and depth = 0?
+> >>>
+> >>> I _think_ Jakub's depth was more at a global level? But then it would
+> >>> need to be passed down as we do the enumeration.
+> >>
+> >> Oh, sorry, I responded without reading the whole discussion :)
+> >> No, I imagined the depth would be within a single component, 
+> >> so under control of a single driver (instance). The ordering
+> >> between components should be defined by PHY topology etc so
+> >> it's outside of the loopback config.
+> > 
+> > As for me, it is problematic to help the user to understand the datapath
+> > depth on a switch. For example:
+> > 
+> > CPU -- xMII --- MAC1 [loop] --- fabric --- MAC2 [loop] --- xMII -- PHY
+> >                                     \----- MACx [loop] ---
+> > 
+> > ... each port has two xMII loop configurations: towards the xMII or towards
+> > the fabric. From a driver perspective, a loop towards the xMII is
+> > "remote." However, from a system perspective, a "remote" loop on MAC1 is
+> > a local loop at depth=0, whereas a "local" loop on MAC2 is a local loop
+> > at depth=1.
+> 
+> What's important is to specify clearly in the documentation from which
+> end do we start, where representing the topology. From your scenario
+> here, each block is already well represented and exposed, and if we use
+> local depth definitions we should be fine ?
 
-V2: Update error logging with every cause a unique message
+I guess my main problem is to imagine depth representation in two
+separate directions for the user. So, the kernel documentation should
+describe what is the starting point of view depending on the device
+type. For example:
+- PHY has typically xMII and MDI end points, so the loop towards the xMII
+  is the local loop and towards the MDI is the remote loop.
+- a switch/bridge has mutiple, application specific end points. So, we
+  have a starting point of view from the fabric. Every loop pointing from
+  the fabric towards the outside world of the switch is the remote loop,
+  independent on connection type (xMII or MDI).
 
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
----
- drivers/net/usb/cdc_ether.c | 54 ++++++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 24 deletions(-)
+Correct?
 
-diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-index a032c1ded406..a0a5740590b9 100644
---- a/drivers/net/usb/cdc_ether.c
-+++ b/drivers/net/usb/cdc_ether.c
-@@ -115,7 +115,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int				len = intf->cur_altsetting->extralen;
- 	struct usb_interface_descriptor	*d;
- 	struct cdc_state		*info = (void *) &dev->data;
--	int				status;
-+	int				status = -ENODEV;
- 	int				rndis;
- 	bool				android_rndis_quirk = false;
- 	struct usb_driver		*driver = driver_of(intf);
-@@ -169,10 +169,13 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 	info->header = header.usb_cdc_header_desc;
- 	info->ether = header.usb_cdc_ether_desc;
- 	if (!info->u) {
--		if (rndis)
-+		if (rndis) {
- 			goto skip;
--		else /* in that case a quirk is mandatory */
-+		} else {
-+			/* in that case a quirk is mandatory */
-+			dev_err(&dev->udev->dev, "No union descriptors\n");
- 			goto bad_desc;
-+		}
- 	}
- 	/* we need a master/control interface (what we're
- 	 * probed with) and a slave/data interface; union
-@@ -192,18 +195,20 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 			android_rndis_quirk = true;
- 			goto skip;
- 		}
-+		dev_err(&intf->dev, "bad CDC descriptors\n");
- 		goto bad_desc;
- 	}
- 	if (info->control != intf) {
--		dev_dbg(&intf->dev, "bogus CDC Union\n");
- 		/* Ambit USB Cable Modem (and maybe others)
- 		 * interchanges master and slave interface.
- 		 */
- 		if (info->data == intf) {
- 			info->data = info->control;
- 			info->control = intf;
--		} else
-+		} else {
-+			dev_err(&intf->dev, "bogus CDC Union\n");
- 			goto bad_desc;
-+		}
- 	}
- 
- 	/* some devices merge these - skip class check */
-@@ -213,7 +218,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 	/* a data interface altsetting does the real i/o */
- 	d = &info->data->cur_altsetting->desc;
- 	if (d->bInterfaceClass != USB_CLASS_CDC_DATA) {
--		dev_dbg(&intf->dev, "slave class %u\n", d->bInterfaceClass);
-+		dev_err(&intf->dev, "slave class %u\n", d->bInterfaceClass);
- 		goto bad_desc;
- 	}
- skip:
-@@ -227,7 +232,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 	if (rndis && is_rndis(&intf->cur_altsetting->desc) &&
- 	    header.usb_cdc_acm_descriptor &&
- 	    header.usb_cdc_acm_descriptor->bmCapabilities) {
--		dev_dbg(&intf->dev,
-+		dev_err(&intf->dev,
- 			"ACM capabilities %02x, not really RNDIS?\n",
- 			header.usb_cdc_acm_descriptor->bmCapabilities);
- 		goto bad_desc;
-@@ -242,14 +247,14 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	if (header.usb_cdc_mdlm_desc &&
- 	    memcmp(header.usb_cdc_mdlm_desc->bGUID, mbm_guid, 16)) {
--		dev_dbg(&intf->dev, "GUID doesn't match\n");
-+		dev_err(&intf->dev, "GUID doesn't match\n");
- 		goto bad_desc;
- 	}
- 
- 	if (header.usb_cdc_mdlm_detail_desc &&
- 		header.usb_cdc_mdlm_detail_desc->bLength <
- 			(sizeof(struct usb_cdc_mdlm_detail_desc) + 1)) {
--		dev_dbg(&intf->dev, "Descriptor too short\n");
-+		dev_err(&intf->dev, "Descriptor too short\n");
- 		goto bad_desc;
- 	}
- 
-@@ -267,7 +272,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 		info->control = usb_ifnum_to_if(dev->udev, 0);
- 		info->data = usb_ifnum_to_if(dev->udev, 1);
- 		if (!info->control || !info->data || info->control != intf) {
--			dev_dbg(&intf->dev,
-+			dev_err(&intf->dev,
- 				"rndis: master #0/%p slave #1/%p\n",
- 				info->control,
- 				info->data);
-@@ -275,7 +280,7 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 		}
- 
- 	} else if (!info->header || (!rndis && !info->ether)) {
--		dev_dbg(&intf->dev, "missing cdc %s%s%sdescriptor\n",
-+		dev_err(&intf->dev, "missing cdc %s%s%sdescriptor\n",
- 			info->header ? "" : "header ",
- 			info->u ? "" : "union ",
- 			info->ether ? "" : "ether ");
-@@ -287,16 +292,15 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 	 */
- 	if (info->data != info->control) {
- 		status = usb_driver_claim_interface(driver, info->data, dev);
--		if (status < 0)
--			return status;
-+		if (status < 0) {
-+			dev_err(&intf->dev, "Second interface unclaimable\n");
-+			goto bad_desc;
-+		}
- 	}
- 	status = usbnet_get_endpoints(dev, info->data);
- 	if (status < 0) {
--		/* ensure immediate exit from usbnet_disconnect */
--		usb_set_intfdata(info->data, NULL);
--		if (info->data != info->control)
--			usb_driver_release_interface(driver, info->data);
--		return status;
-+		dev_dbg(&intf->dev, "Mandatory endpoints missing\n");
-+		goto bail_out_and_release;
- 	}
- 
- 	/* status endpoint: optional for CDC Ethernet, not RNDIS (or ACM) */
-@@ -316,10 +320,9 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 		}
- 	}
- 	if (rndis && !dev->status) {
--		dev_dbg(&intf->dev, "missing RNDIS status endpoint\n");
--		usb_set_intfdata(info->data, NULL);
--		usb_driver_release_interface(driver, info->data);
--		return -ENODEV;
-+		dev_err(&intf->dev, "missing RNDIS status endpoint\n");
-+		status = -ENODEV;
-+		goto bail_out_and_release;
- 	}
- 
- 	/* override ethtool_ops */
-@@ -327,9 +330,12 @@ int usbnet_generic_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	return 0;
- 
-+bail_out_and_release:
-+	usb_set_intfdata(info->data, NULL);
-+	if (info->data != info->control)
-+		usb_driver_release_interface(driver, info->data);
- bad_desc:
--	dev_info(&dev->udev->dev, "bad CDC descriptors\n");
--	return -ENODEV;
-+	return status;
- }
- EXPORT_SYMBOL_GPL(usbnet_generic_cdc_bind);
- 
+> > Other example would be where we have a chain of components which are
+> > attached on the system in a unexpected direction, where the MDI
+> > interface is pointing towards the main CPU, so the remote loopbacks
+> > became to local loop.
+> 
+> I have a few of these types of setup on my desk, where 3 PHY devices are
+> daisy-chained, we don't support that for now. If we one day add support
+> for standalone PHYs acting as media converters, I expect we'll be able
+> to tell which end is pointing where, and let it up to the user to figure
+> out what "remote" and "local" means in that case.
+> 
+> > 
+> > One more issue is the test data generator location. The data generator
+> > is not always the CPU. We have HW generators located in components like
+> > PHYs or we may use external source (remote loopback).
+> 
+> There were discussions about PRBS, I think the same idea of "pinpointing
+> which block we want to use" can be applied for both loopback and
+> generation ?
+
+Yes, the same apply for the counters. If we represent the data path as
+pipe with different components like loopbacks, PRBS, etc on different
+stages of the pipe, the same we have with counters. For example
+industrial or automotive PHYs have separate counters for xMII and MDI.
+A low depth loopback would not triggers some of counters.
+
+Since I do not wont push all of this right now, i suggest to use more
+abstract topology representation to make it easily extendable. 
+
 -- 
-2.53.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
