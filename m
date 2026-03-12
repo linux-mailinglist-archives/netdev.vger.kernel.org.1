@@ -1,650 +1,185 @@
-Return-Path: <netdev+bounces-266941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266942-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cK97Clx3sml/MwAAu9opvQ
-	(envelope-from <netdev+bounces-266941-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:20:44 +0100
+	id YIqFKyt4sml/MwAAu9opvQ
+	(envelope-from <netdev+bounces-266942-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:24:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C39726ED02
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:20:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F67326EDDB
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:24:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA97E302C6CA
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:20:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89C08301CFC5
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5A531E85D;
-	Thu, 12 Mar 2026 08:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4C6332EC8;
+	Thu, 12 Mar 2026 08:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKSTaRm0"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Zvan+lBK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D1C28D8DA
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1E340DFDC;
+	Thu, 12 Mar 2026 08:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773303617; cv=none; b=T0eObvl8EWHvT7iTg2quv09C6Hnvh15TghgnPDiJB7g2ooiaVNhA5YG3NZZMk+cuOir2wLI9H9VvcfmQLLmGiGQcn/1e+FBJ49RO4/bje21LImS+c+AaoJ8IINMrL45VMAvCK45a+08LuoE360ktaJlp47dtHryCmY8WbFPczD8=
+	t=1773303724; cv=none; b=tV58ehJ+a006+PyB9E3LKNF48j79zaT7AC9notV5PBnd6O9WragEQg7BVBSgzFDQiqjp3xI34113C6QAp9a8bUHScgAyZJkdrrS0HdFn6xkbs5kaV4Xf2nSITCzz4TwYDqBLr5pP3RDL1vdnq+nDZ/+zhDRhjB5FV5y1syGlzMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773303617; c=relaxed/simple;
-	bh=IbMZ3ACsTq/gNu0IUvNy/WwZYBAXsKW1iDqTJA5omgo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KOOgGaaypLZnroq5GXi0kOED0vXHws5z0y1Cj4957PPzfC2Jmjt8j3quzcREMFjaXpBgf2ktrROKHejQIrPWyMT1QYmarHsojK0YIxsheItR2sieLNIEgEMDjDYv1aW/EzqdVGwiyHliXozsKq3ijWB1pabmA7CQYzO6hlLofUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aKSTaRm0; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439aa2f8ebaso432896f8f.2
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 01:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773303614; x=1773908414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X8v1F5qUYC+Io6VdftfbVI50RZHjmvkkdUIIvq8X39k=;
-        b=aKSTaRm00K67Bpp1nAfmkCa9eZQhR23eIjsNgDeR9AGJCHwxglCfpnYqkkB7WYh5VA
-         AA4fK2PiQ6mHSgF5sOCCr/wwCM9p3pvf9LDtCInymar1sDq5eHm6xXJlHjver0i3bMEp
-         jqM3cSL6D+vm1eYmjhve9tX/A2e1fMr8fuFMMxkf+nKlH8X9h/QAwpZ5U6SwPRfFWnv7
-         Ib7NaaWZJhRPClnOXBj7fOVLcqTJTD12YVd2WYl5F9EoTwsKEqMrBvNgsLy5p5b653Km
-         glbeTVi7MTu8XIWcl26KSevXA5vR6ClypaZEr7cAJwojIZXvRit9qPY0qlDNHlkQjaFF
-         psSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773303614; x=1773908414;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X8v1F5qUYC+Io6VdftfbVI50RZHjmvkkdUIIvq8X39k=;
-        b=puppaDaougrtujQGjkyZ06RlOhWJCWDXUAiYR2v55Fb5i+j4A0Fn6TT/uUuBYnYykl
-         CkV1Gdr2j9DLbmgiIcREBHhQRCnVjAJzBPK4rTyEAmjVJfUmkGuebqH568drwgT+opPD
-         1eZ+LNqH/NHc4TCbIZQiAh7I2Czk/8pItwKHY80kV5a0XJVJaE87hwHuB0pVYEP/Jy9O
-         DoI6pTUgIaGHqxwIQASb49o/sJvufyTRQPK6f8/L8oIhRQkhdRzOzPaJiXtkk/q+wwK0
-         oQVl8dnn0D84IFE4IIlZ/3Ffa81o+/+6osLZgnDN3n9/7MN4xDsDqnqDgrkiF9R//UlA
-         qpCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWaFF+X95hNJ/cg7cZVIfBd2yEsW5Yn7JUV0BfsHnw+QFeTNhOExVUNKeg3ZYmu6IQwB9iYOjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBOE7j5U9cywCBE53YGygURvgZi12OwzzB7rzmpdvQZoigPbo0
-	sezEcdoGfFeovpM71uI9meCJybL72LnbuBb27VHwGvniwRwCDQxd3FF0
-X-Gm-Gg: ATEYQzxbePaJxL474Pjxvn5MKAQwk3vFdPgq/plJ77B3f+qw/VjyYOEDUPkoN5aI9No
-	NHbaRyXmAZ2juKQxqWqFtRuYm0Uy6OY1rN4f/8C++TRJUBdOmdFr8eCR/aL0ykibIHiorCsdx7p
-	V4Q8uwGsyZnOuuK9e5Tgt/jHT6vO+GeJhz7npJfWeNyoANrz9cMsu1IxGLmn0PNEIC5iWVziEwm
-	aozYO9g97slL3up8yMktHVM7MIX3xbCODveOvNkgJQB9OuFFI2w0mHw2IdZwa9YTk+CbHMOSg5V
-	zoTm4d6uuzv45pSLrFQegnA/HKh9aJN4Yw+j/YDZWEdBANGlmOw6T78aFKYM6nETWtku0Ub2o5I
-	P2GCIqyX3HWviIKK7cFZYEX9UktKaLrIMhcuG6l0HNj0Kc+rZeZ3rpi18xzYIiS61da4QP6lRsc
-	4W5Zez1oC0K1E6+2XIEe5Cc1FvnVMYT39TWYkyhnPRcpwFdZ0lOLQaF4gxZGbm
-X-Received: by 2002:a05:6000:381:b0:439:b541:a088 with SMTP id ffacd0b85a97d-439f8415214mr10632271f8f.54.1773303613438;
-        Thu, 12 Mar 2026 01:20:13 -0700 (PDT)
-Received: from fedora.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe20c0b4sm6929969f8f.25.2026.03.12.01.20.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 01:20:12 -0700 (PDT)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1773303724; c=relaxed/simple;
+	bh=q/azlWKjAp4we7q6Qx+4F63Asl3fpuCKmfeBqyy8J90=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gjo4QJMjaz/ORG4YzJwmdQesZs9PUi98Fap1l9tVMeY8n0oND1zDmo0dvSANmrbi0+JBvuabs++UMZQj/6JHUJi7rmSj1L6KEEXebYPmnz7+BGW10fI3aO1YSzZ21RCjw286L3xgYRPBB0ABVuoOvtA9+nxMr2owi8cua9IzqCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Zvan+lBK; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773303720; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=QRs3heLeiIPoQjVY6D6mQ+vxJzYydmVXlCV3tRwqkKs=;
+	b=Zvan+lBKqzsNTJCdRNpZK/4cSD7ToQgTi43Tq4xlOb7UmDJWBAHt7CmWpphhnkhQVCACoZrf9sbg26KrQuXzeHNSu1JZVlCioNr6Fv8rjbcv/qFoPvDpARBZrIvaLFrexUXmSQO2TPuAZbVQSOXWFgGpxqZBbeqcDDQE7PFAFbk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0X-nrvgb_1773303715;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X-nrvgb_1773303715 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Mar 2026 16:21:59 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Sagi Maimon <maimon.sagi@gmail.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v5] ptp: ocp: Add support for Xilinx-based Adva TimeCard variant
-Date: Thu, 12 Mar 2026 10:20:03 +0200
-Message-ID: <20260312082009.249622-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: [PATCH net-next] net/smc: cap allocation order for SMC-R physically contiguous buffers
+Date: Thu, 12 Mar 2026 16:21:54 +0800
+Message-ID: <20260312082154.36971-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266941-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-266942-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maimonsagi@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7C39726ED02
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 1F67326EDDB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the Adva TimeCard model built on a Xilinx-based design.
-This patch enables detection and integration of the new hardware within
-the existing OCP timecard framework.
-The Xilinx variant relies on the shared driver infrastructure, requiring
-only small, targeted additions to accommodate its specific
-characteristics.
+The alloc_page() cannot satisfy requests exceeding MAX_PAGE_ORDER,
+and attempting such allocations will lead to guaranteed failures
+and potential kernel warnings.
 
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER.
+This ensures the attempts to allocate the largest possible physically
+contiguous chunk succeed, instead of failing with an invalid order.
+This also avoids redundant "try-fail-degrade" cycles in
+__smc_buf_create().
+
+For SMCR_MIXED_BUFS, if its order exceeds MAX_PAGE_ORDER, skip the
+doomed physical allocation attempt and fallback to virtual memory
+immediately.
+
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
 ---
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202603100054.UoKwTVMf-lkp@intel.com/
----
-Addressed comments from Simon Horman and Vadim Fedorenko:
- - https://www.spinics.net/lists/netdev/msg1160388.html
- - https://www.spinics.net/lists/netdev/msg1160386.html
- - https://www.spinics.net/lists/netdev/msg1165262.html
+ net/smc/smc_core.c | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
 
-Changes since v4:
- - Fix commit message formatting: added the missing blank line between subject and body. 
-
-Changes since v3:
- - Corrected the Signed-off-by email address (previous version used the wrong one)
-
-Changes since v2:
- - Fix W=1 build warnings reported by kernel test robot
- - Define SMA op structures only after full type is visible
-
-Changes since v1:
- - Removed duplicated Adva init functions
- - Unified logic with variant‑specific data
----
- drivers/ptp/ptp_ocp.c | 365 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 337 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index d88ab2f86b1b..1689ecb592f4 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -35,6 +35,7 @@
- 
- #define PCI_VENDOR_ID_ADVA			0xad5a
- #define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
-+#define PCI_DEVICE_ID_ADVA_TIMECARD_X1	0x0410
- 
- static struct class timecard_class = {
- 	.name		= "timecard",
-@@ -72,6 +73,20 @@ struct ptp_ocp_servo_conf {
- 	u32	servo_drift_i;
- };
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index e2d083daeb7e..a18730edb7e0 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -2314,6 +2314,10 @@ int smcr_buf_reg_lgr(struct smc_link *lnk)
+ 	return rc;
+ }
  
 +/*
-+ * Combined servo + board-variant parameters for ADVA boards.
-+ * Embedded in the resource table .extra so a single ptp_ocp_adva_board_init()
-+ * can handle both ADVA and ADVA-X1 without per-variant init functions.
++ * smcr_new_buf_create may allocate a buffer smaller than the requested
++ * bufsize. Use buf_desc->len to determine the actual allocated size.
 + */
-+struct ptp_ocp_adva_info {
-+	struct ptp_ocp_servo_conf	servo;
-+	u32				flash_start;
-+	const struct ocp_sma_op		*sma_op;
-+	u8				signals_nr;
-+	u8				freq_in_nr;
-+	const struct ocp_attr_group	*attr_groups;
-+};
-+
- #define OCP_CTRL_ENABLE		BIT(0)
- #define OCP_CTRL_ADJUST_TIME	BIT(1)
- #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
-@@ -293,6 +308,20 @@ struct ocp_attr_group {
- 	const struct attribute_group *group;
- };
- 
-+struct ocp_selector {
-+	const char *name;
-+	int value;
-+	u64 frequency;
-+};
-+
-+struct ocp_sma_op {
-+	const struct ocp_selector *tbl[2];
-+	void (*init)(struct ptp_ocp *bp);
-+	u32 (*get)(struct ptp_ocp *bp, int sma_nr);
-+	int (*set_inputs)(struct ptp_ocp *bp, int sma_nr, u32 val);
-+	int (*set_output)(struct ptp_ocp *bp, int sma_nr, u32 val);
-+};
-+
- #define OCP_CAP_BASIC	BIT(0)
- #define OCP_CAP_SIGNAL	BIT(1)
- #define OCP_CAP_FREQ	BIT(2)
-@@ -420,12 +449,17 @@ static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
- 
- static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
- 
-+static const struct ocp_sma_op ocp_adva_sma_op;
-+static const struct ocp_sma_op ocp_adva_x1_sma_op;
-+
- static const struct ocp_attr_group fb_timecard_groups[];
- 
- static const struct ocp_attr_group art_timecard_groups[];
- 
- static const struct ocp_attr_group adva_timecard_groups[];
- 
-+static const struct ocp_attr_group adva_timecard_x1_groups[];
-+
- struct ptp_ocp_eeprom_map {
- 	u16	off;
- 	u16	len;
-@@ -1020,11 +1054,225 @@ static struct ocp_resource ocp_adva_resource[] = {
- 	},
- 	{
- 		.setup = ptp_ocp_adva_board_init,
--		.extra = &(struct ptp_ocp_servo_conf) {
--			.servo_offset_p = 0xc000,
--			.servo_offset_i = 0x1000,
--			.servo_drift_p = 0,
--			.servo_drift_i = 0,
-+		.extra = &(struct ptp_ocp_adva_info) {
-+			.servo = {
-+				.servo_offset_p = 0xc000,
-+				.servo_offset_i = 0x1000,
-+				.servo_drift_p = 0,
-+				.servo_drift_i = 0,
-+			},
-+			.flash_start  = 0xA00000,
-+			.sma_op       = &ocp_adva_sma_op,
-+			.signals_nr   = 2,
-+			.freq_in_nr   = 2,
-+			.attr_groups  = adva_timecard_groups,
-+		},
-+	},
-+	{ }
-+};
-+
-+static struct ocp_resource ocp_adva_x1_resource[] = {
-+	{
-+		OCP_MEM_RESOURCE(reg),
-+		.offset = 0x01000000, .size = 0x10000,
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts0),
-+		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 0,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts1),
-+		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts2),
-+		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 2,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts3),
-+		.offset = 0x01110000, .size = 0x10000, .irq_vec = 15,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 3,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts4),
-+		.offset = 0x01120000, .size = 0x10000, .irq_vec = 16,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 4,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	/* Timestamp for PHC and/or PPS generator */
-+	{
-+		OCP_EXT_RESOURCE(pps),
-+		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 5,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[0]),
-+		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[1]),
-+		.offset = 0x010E0000, .size = 0x10000, .irq_vec = 12,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 2,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[2]),
-+		.offset = 0x010F0000, .size = 0x10000, .irq_vec = 13,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 3,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[3]),
-+		.offset = 0x01100000, .size = 0x10000, .irq_vec = 14,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 4,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_ext),
-+		.offset = 0x01030000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_clk),
-+		.offset = 0x01040000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(tod),
-+		.offset = 0x01050000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(image),
-+		.offset = 0x00020000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_select),
-+		.offset = 0x00130000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map1),
-+		.offset = 0x00140000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map2),
-+		.offset = 0x00220000, .size = 0x1000,
-+	},
-+	{
-+		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
-+		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
-+		.extra = &(struct ptp_ocp_serial_port) {
-+			.baud = 9600,
-+		},
-+	},
-+	{
-+		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
-+		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
-+		.extra = &(struct ptp_ocp_serial_port) {
-+			.baud = 115200,
-+		},
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[0]),
-+		.offset = 0x01200000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[1]),
-+		.offset = 0x01210000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[2]),
-+		.offset = 0x01220000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(freq_in[3]),
-+		.offset = 0x01230000, .size = 0x10000,
-+	},
-+	{
-+		OCP_SPI_RESOURCE(spi_flash),
-+		.offset = 0x00310000, .size = 0x10000, .irq_vec = 9,
-+		.extra = &(struct ptp_ocp_flash_info) {
-+			.name = "xilinx_spi", .pci_offset = 0,
-+			.data_size = sizeof(struct xspi_platform_data),
-+			.data = &(struct xspi_platform_data) {
-+				.num_chipselect = 1,
-+				.bits_per_word = 8,
-+				.num_devices = 1,
-+				.force_irq = true,
-+				.devices = &(struct spi_board_info) {
-+					.modalias = "spi-nor",
-+				},
-+			},
-+		},
-+	},
-+	{
-+		OCP_I2C_RESOURCE(i2c_ctrl),
-+		.offset = 0x00150000, .size = 0x10000, .irq_vec = 7,
-+		.extra = &(struct ptp_ocp_i2c_info) {
-+			.name = "xiic-i2c",
-+			.fixed_rate = 50000000,
-+			.data_size = sizeof(struct xiic_i2c_platform_data),
-+			.data = &(struct xiic_i2c_platform_data) {
-+				.num_devices = 2,
-+				.devices = (struct i2c_board_info[]) {
-+					{ I2C_BOARD_INFO("24c02", 0x50) },
-+					{ I2C_BOARD_INFO("24mac402", 0x58),
-+					  .platform_data = "mac" },
-+				},
-+			},
-+		},
-+	},
-+	{
-+		.setup = ptp_ocp_adva_board_init,
-+		.extra = &(struct ptp_ocp_adva_info) {
-+			.servo = {
-+				.servo_offset_p = 0xc000,
-+				.servo_offset_i = 0x1000,
-+				.servo_drift_p = 0,
-+				.servo_drift_i = 0,
-+			},
-+			.flash_start  = 0x1000000,
-+			.sma_op       = &ocp_adva_x1_sma_op,
-+			.signals_nr   = 4,
-+			.freq_in_nr   = 4,
-+			.attr_groups  = adva_timecard_x1_groups,
- 		},
- 	},
- 	{ }
-@@ -1035,6 +1283,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
- 	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
- 	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
- 	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
-+	{ PCI_DEVICE_DATA(ADVA, TIMECARD_X1, &ocp_adva_x1_resource) },
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
-@@ -1042,12 +1291,6 @@ MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
- static DEFINE_MUTEX(ptp_ocp_lock);
- static DEFINE_IDR(ptp_ocp_idr);
- 
--struct ocp_selector {
--	const char *name;
--	int value;
--	u64 frequency;
--};
--
- static const struct ocp_selector ptp_ocp_clock[] = {
- 	{ .name = "NONE",	.value = 0 },
- 	{ .name = "TOD",	.value = 1 },
-@@ -1137,12 +1380,32 @@ static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
- 	{ }
- };
- 
--struct ocp_sma_op {
--	const struct ocp_selector *tbl[2];
--	void (*init)(struct ptp_ocp *bp);
--	u32 (*get)(struct ptp_ocp *bp, int sma_nr);
--	int (*set_inputs)(struct ptp_ocp *bp, int sma_nr, u32 val);
--	int (*set_output)(struct ptp_ocp *bp, int sma_nr, u32 val);
-+static const struct ocp_selector ptp_ocp_adva_x1_sma_in[] = {
-+	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
-+	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
-+	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
-+	{ .name = "TS3",    .value = 0x0040,      .frequency = 0 },
-+	{ .name = "TS4",    .value = 0x0080,      .frequency = 0 },
-+	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
-+	{ .name = "FREQ2",	.value = 0x0200,      .frequency = 0 },
-+	{ .name = "FREQ3",  .value = 0x0400,      .frequency = 0 },
-+	{ .name = "FREQ4",  .value = 0x0800,      .frequency = 0 },
-+	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
-+	{ }
-+};
-+
-+static const struct ocp_selector ptp_ocp_adva_x1_sma_out[] = {
-+	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
-+	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
-+	{ .name = "MAC",	.value = 0x0002,  .frequency = 1 },
-+	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
-+	{ .name = "GEN1",	.value = 0x0040 },
-+	{ .name = "GEN2",	.value = 0x0080 },
-+	{ .name = "GEN3",	.value = 0x0100 },
-+	{ .name = "GEN4",	.value = 0x0200 },
-+	{ .name = "GND",	.value = 0x2000 },
-+	{ .name = "VCC",	.value = 0x4000 },
-+	{ }
- };
- 
- static void
-@@ -2639,6 +2902,14 @@ static const struct ocp_sma_op ocp_adva_sma_op = {
- 	.set_output	= ptp_ocp_sma_adva_set_output,
- };
- 
-+static const struct ocp_sma_op ocp_adva_x1_sma_op = {
-+	.tbl		= { ptp_ocp_adva_x1_sma_in, ptp_ocp_adva_x1_sma_out },
-+	.init		= ptp_ocp_sma_fb_init,
-+	.get		= ptp_ocp_sma_fb_get,
-+	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
-+	.set_output	= ptp_ocp_sma_adva_set_output,
-+};
-+
- static int
- ptp_ocp_set_pins(struct ptp_ocp *bp)
+ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
+ 						int bufsize)
  {
-@@ -2887,18 +3158,19 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 	return ptp_ocp_init_clock(bp, r->extra);
- }
+@@ -2326,18 +2330,22 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
  
--/* ADVA specific board initializers; last "resource" registered. */
-+/* ADVA board initializer; variant differences come from r->extra. */
- static int
- ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- {
--	int err;
-+	struct ptp_ocp_adva_info *info = r->extra;
- 	u32 version;
-+	int err;
+ 	switch (lgr->buf_type) {
+ 	case SMCR_PHYS_CONT_BUFS:
++		bufsize = min(bufsize, (int)PAGE_SIZE << MAX_PAGE_ORDER);
++		fallthrough;
+ 	case SMCR_MIXED_BUFS:
+ 		buf_desc->order = get_order(bufsize);
+-		buf_desc->pages = alloc_pages(GFP_KERNEL | __GFP_NOWARN |
+-					      __GFP_NOMEMALLOC | __GFP_COMP |
+-					      __GFP_NORETRY | __GFP_ZERO,
+-					      buf_desc->order);
+-		if (buf_desc->pages) {
+-			buf_desc->cpu_addr =
+-				(void *)page_address(buf_desc->pages);
+-			buf_desc->len = bufsize;
+-			buf_desc->is_vm = false;
+-			break;
++		if (buf_desc->order <= MAX_PAGE_ORDER) {
++			buf_desc->pages = alloc_pages(GFP_KERNEL | __GFP_NOWARN |
++						      __GFP_NOMEMALLOC | __GFP_COMP |
++						      __GFP_NORETRY | __GFP_ZERO,
++						      buf_desc->order);
++			if (buf_desc->pages) {
++				buf_desc->cpu_addr =
++					(void *)page_address(buf_desc->pages);
++				buf_desc->len = bufsize;
++				buf_desc->is_vm = false;
++				break;
++			}
+ 		}
+ 		if (lgr->buf_type == SMCR_PHYS_CONT_BUFS)
+ 			goto out;
+@@ -2476,7 +2484,7 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
+ 		}
  
--	bp->flash_start = 0xA00000;
--	bp->eeprom_map = fb_eeprom_map;
--	bp->sma_op = &ocp_adva_sma_op;
--	bp->signals_nr = 2;
--	bp->freq_in_nr = 2;
-+	bp->flash_start = info->flash_start;
-+	bp->eeprom_map  = fb_eeprom_map;
-+	bp->sma_op      = info->sma_op;
-+	bp->signals_nr  = info->signals_nr;
-+	bp->freq_in_nr  = info->freq_in_nr;
- 
- 	version = ioread32(&bp->image->version);
- 	/* if lower 16 bits are empty, this is the fw loader. */
-@@ -2906,15 +3178,15 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 		version = version >> 16;
- 		bp->fw_loader = true;
- 	}
--	bp->fw_tag = 3;
-+	bp->fw_tag     = 3;
- 	bp->fw_version = version & 0xffff;
--	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-+	bp->fw_cap     = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
- 
- 	ptp_ocp_tod_init(bp);
- 	ptp_ocp_nmea_out_init(bp);
- 	ptp_ocp_signal_init(bp);
- 
--	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
-+	err = ptp_ocp_attr_group_add(bp, info->attr_groups);
- 	if (err)
- 		return err;
- 
-@@ -2923,7 +3195,7 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 		return err;
- 	ptp_ocp_sma_init(bp);
- 
--	return ptp_ocp_init_clock(bp, r->extra);
-+	return ptp_ocp_init_clock(bp, &info->servo);
- }
- 
- static ssize_t
-@@ -3982,6 +4254,43 @@ static const struct ocp_attr_group adva_timecard_groups[] = {
- 	{ },
- };
- 
-+static struct attribute *adva_timecard_x1_attrs[] = {
-+	&dev_attr_serialnum.attr,
-+	&dev_attr_gnss_sync.attr,
-+	&dev_attr_clock_source.attr,
-+	&dev_attr_available_clock_sources.attr,
-+	&dev_attr_sma1.attr,
-+	&dev_attr_sma2.attr,
-+	&dev_attr_sma3.attr,
-+	&dev_attr_sma4.attr,
-+	&dev_attr_available_sma_inputs.attr,
-+	&dev_attr_available_sma_outputs.attr,
-+	&dev_attr_clock_status_drift.attr,
-+	&dev_attr_clock_status_offset.attr,
-+	&dev_attr_ts_window_adjust.attr,
-+	&dev_attr_utc_tai_offset.attr,
-+	&dev_attr_tod_correction.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group adva_timecard_x1_group = {
-+	.attrs = adva_timecard_x1_attrs,
-+};
-+
-+static const struct ocp_attr_group adva_timecard_x1_groups[] = {
-+	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_x1_group },
-+	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal2_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal3_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq1_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq2_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq3_group },
-+	{ },
-+};
-+
- static void
- gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
- 	       const char *def)
+ 		SMC_STAT_RMB_ALLOC(smc, is_smcd, is_rmb);
+-		SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, bufsize);
++		SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, buf_desc->len);
+ 		buf_desc->used = 1;
+ 		down_write(lock);
+ 		smc_lgr_buf_list_add(lgr, is_rmb, buf_list, buf_desc);
 -- 
-2.47.0
+2.45.0
 
 
