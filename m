@@ -1,130 +1,142 @@
-Return-Path: <netdev+bounces-267071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267072-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iP0ODM/DsmmvPAAAu9opvQ
-	(envelope-from <netdev+bounces-267071-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:46:55 +0100
+	id OC/WJgDEsmmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267072-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:47:44 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD193272DB6
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:46:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD73272DDA
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 313A23006B73
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:46:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B25823035480
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5681E307AE3;
-	Thu, 12 Mar 2026 13:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43280345752;
+	Thu, 12 Mar 2026 13:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TN6CDgQL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eQ3z5RCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E261400C;
-	Thu, 12 Mar 2026 13:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E0F35836C;
+	Thu, 12 Mar 2026 13:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773323211; cv=none; b=K9RoLmfgY74ACONBFn39QZWrn/iMkc4z6k97phIj/iJ+NgnkWOx8xFelB5yZDJOPobD+evWRW0f9BicyzeZHE+tgA5PbvstS9+x3eqXy8h1I5mffHSbk3MrJdLPNxQsiACUlSz+jSi61vpwJBXVpxp06HXeaGTOLoLSC5mBNGJk=
+	t=1773323216; cv=none; b=K8wRyT5ei1PLGYCZBwTvdKZHCTjHhri4f7b99h2ZVq86htNhvZ94EoC9I2928iNc7ntFYb3LjYzYGmDS2WXPhna4ZrARdGkvQUOyVcHCD8ZdWvsJ6MQnzcsA55ji6DoosxaUx20o+G5Q9z59lygK2b7BO38E0U9vVjcF3lDr3qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773323211; c=relaxed/simple;
-	bh=VK+7gafAHvTyxfKIFSUbNi+SG4lYk3wkyix1ctNBytM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TbWQCnK89h0jE0jieC+sehA4MqCmE3ebKYs0UfFbXSNLJlvjbrg5cjgHsxk2GE+zc+OlOQ5KY55GCJDQg3e3nq7yMXNlWPdGhq5j4LQjjZH/NZs6jp9/bMiYy+q0lvoolN6Co6N6iEQfoShhuhkhROn8GNkeeKzzSjt/6tka5m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TN6CDgQL; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=xHSnv9tLXFW6xHAI8kdqvBwlRENeG50Atlr+18B0An0=;
-	b=TN6CDgQLnHeBopCB2VSgbxrGIx+MSBtDkP2/zVa/qQsdnu63uKxkjdT/WqD4EZ
-	2UZ1YaT94KJSjyDJ4zbSMHqxMP94AhgbjXzC8q6Qv6C+8WJuxQj6NWA8Bqzl5sMn
-	ZrrQ65gP667wms6puerHh5ZrtLPCiFpOKkSSg0EIVqlDQ=
-Received: from [IPV6:2408:820c:b60e:ad20:2092:3bb3:8555:f4a2] (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wBXXmmUw7JpG7FeAg--.2565S2;
-	Thu, 12 Mar 2026 21:45:57 +0800 (CST)
-Message-ID: <e00bace9-3826-4308-b083-9bd10682425d@163.com>
-Date: Thu, 12 Mar 2026 21:45:56 +0800
+	s=arc-20240116; t=1773323216; c=relaxed/simple;
+	bh=NK1kpQElP7tNVLZej9yCF2N25n97vfLQ1BBFkHBs9D0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C1ekyCr1mhVtT22qiP226Hn89spFj2TOFRWtaV4dvYKlVMmyvX0T5T3obvz3K+zNyatu+uQweJYwkS6gkLALHpvI8fGCw9UpFsioMmg866Xl/z1kFJ67gJMjpXs/DZhdfvcbHdFsxGXl+aq9QbCqA/F0tzeeLSN2G1AKrwfKIX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eQ3z5RCw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=X/6xw+BeY313gcMqR/pFQo1XTTFv4aKjsic0QBnZdo0=; b=eQ3z5RCwWKU5AfPBqS5uheIaUJ
+	3DuZU7lGyCHRJFIpXZ2TwJp4RvUSn4rGWk5clcHIrX+gibC6UCgkLqBMcCluNv2nA6CByqYPP2Fyw
+	mWyoBldBX4pt+KOicMYEIxBY/On1o1A1SRriOOTS918g9cjrno5KjXa7j5XR3knpUo6g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w0gN6-00BKQL-HQ; Thu, 12 Mar 2026 14:46:40 +0100
+Date: Thu, 12 Mar 2026 14:46:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+Message-ID: <171da8e9-fb09-4cfc-a29e-aefbdc8c3ce9@lunn.ch>
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-3-bjorn@kernel.org>
+ <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+ <87tsum3b1o.fsf@all.your.base.are.belong.to.us>
+ <ed30934a-4931-40e5-a659-6fc8d12741b5@lunn.ch>
+ <20260311194716.600704aa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] tcp: remove redundant memset in hot paths
- with CONFIG_INIT_STACK_ALL_ZERO
-To: Eric Dumazet <edumazet@google.com>, Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-References: <20260312124807.186341-1-jiayuan.chen@linux.dev>
- <CANn89i+urEcFJkOsE9_3nOzVa2Ee1sFb26vrNnJV-jW2z76y2w@mail.gmail.com>
-From: Jiayuan Chen <mrpre@163.com>
-In-Reply-To: <CANn89i+urEcFJkOsE9_3nOzVa2Ee1sFb26vrNnJV-jW2z76y2w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXXmmUw7JpG7FeAg--.2565S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrtFW5Ar1xGw43Gw13JryfCrg_yoWkZFbEgw
-	4Yyr1qy34qgrWDta1Dtr4Durs8K3yDta4jv348Xw13urs5Ja18Ja4vkr9rZ3W7Jr4jvF9F
-	krs0vF4rXry2qjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUUhSdPUUUUU==
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbC7BUdxGmyw5UBRAAA3o
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260311194716.600704aa@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267071-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267072-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[163.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mrpre@163.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,bootlin.com,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,pengutronix.de,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BD193272DB6
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3FD73272DDA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+> Which reminds me -- I was suggesting that we add an order / id to the
+> stages, not just name. Because AFAIU being able to request the loopback
+> "very last loopback point of MAC" or "first loopback point of PHY"
 
-On 3/12/26 8:53 PM, Eric Dumazet wrote:
-> On Thu, Mar 12, 2026 at 1:48 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
->> Modern compilers with CONFIG_INIT_STACK_ALL_ZERO enabled
->> (-ftrivial-auto-var-init=zero) automatically zero-initialize all stack
->> variables via `rep stos` in the function prologue. However, the compiler
->> cannot eliminate explicit memset() calls on those same variables,
->> resulting in redundant zeroing of the same memory region.
->>
->> Replace explicit memset() with `= {0}` initializers for stack variables
->> in TCP hot path functions. With `= {0}`, the compiler recognizes a single
->> initialization and generates only one zeroing sequence, whereas a
->> separate memset() after declaration always produces a second `rep stos`.
-> No sorry. It seems you missed
->
-> commit cfcceb7a39fc10a6f896af8229bf81d96acb22cc
-> Author: Keita Morisaki <kmta1236@gmail.com>
-> Date:   Wed Mar 4 20:15:17 2026 +0900
->
->      tcp: shrink per-packet memset in __tcp_transmit_skb()
->
-> No need to resend your patch, I do not think it is a good idea.
-Thanks. It seems this patch for __tcp_transmit_skb only saves a few bytes
-of memset.
+How do you define where the MAC ends?
 
+I suspect some vendors will include the PCS and the PMA, because the
+MAC ends at the MII pins on their SoC. Other vendors are going to say
+the MAC ends at the interface to the PCS, especially those who have
+licensed the PCS, and are using the shared Linux driver for the
+PCS. And the PMA might again be a shared implementation, since it is
+also used for USB, PCIe and SATA.
+
+If Linux is driving the hardware, using phylink, phylib, PCS drivers
+and generic PHY, we are very likely to have a uniform definition of
+all these parts. Are we happy firmware devices will have a much
+fuzzier, different interpretation, conglomerating it all together?
+
+	Andrew
 
