@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-266974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HoBJbqPsmlINgAAu9opvQ
-	(envelope-from <netdev+bounces-266974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:04:42 +0100
+	id uNKSMr6PsmlINgAAu9opvQ
+	(envelope-from <netdev+bounces-266975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:04:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3497126FF7D
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:04:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B88B26FF84
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72EFC3092D5E
+	by sea.lore.kernel.org (Postfix) with ESMTP id E237330A5291
 	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689123BE14F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F363BD633;
 	Thu, 12 Mar 2026 10:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lUFF4zJZ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hfN87aCJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617783BD25A
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FE9355803
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773309854; cv=none; b=KCljxkYF8CqSXaD+SZrtYSy58TOb7N4acr1/vEhwc5iMYuk1hJqZxr7hVzFlPQUjMoVfKnrmCwF4/N2bHml+ZmgZakE+LUInI5ByCl2llTZchPTZI5RpgrVKQYb/Z7dylfENrBZjea5+mxwkEkFDjRIFxRMJ6Pk9no3ozEVwy7Y=
+	t=1773309854; cv=none; b=NPPT/Y5SlydpgCio1C/rYscV4rjw3CAUCRQQwKllcbVGPC3Ts+v9cn2meC114hRF8Akl+V/3Vlb3KZvPKW4Y7IAK+Qca0LiK1ID6O873aXW0L0PZvz+yU676SKX/Ag+jceY3dWyC6KljJ9T6VDV0fUAhghBTEYanqqvfuxDt4KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773309854; c=relaxed/simple;
-	bh=Uit1Ti7AU3XxeFhawNvwoDfVMeh6nJo+iBe3Dbimg88=;
+	bh=BrwM4XM4KMM/lo8saPOgEzUdEI2YOnTiFYCS9aa1d5Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rnRrn5HqFLVrm8j4Psh8fkw6nNLgzWwgi7C1S86u2JV8jG6dNJPIsamwFPzgH3D3WQn7LhtuAi04EI/1ahXnPwtITxyI3JTcy9nWcueyelTVNXkGviXhLm6ld88mYtFMuuhymBQyb2aOgbZmNmFguSha4U2K/yD690pJKV3U7+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lUFF4zJZ; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=FYlRdj3YgwM5+J+KpDxMeGkVU5gJclRzcECsJ+CUKwm6Rq95U8D7VaV0lDzxmdS0H5hTruhcBe2D3d/788vvnIAfzPLBvPwhka7K2l11X5uZp8pkZPsEn2KqN3CJkrnx7UEzGzFb1PNZLa9vfQCXRo8g8BWY1vnS2rXFA8gS4to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=hfN87aCJ; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-485409ab264so5716875e9.1
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:04:11 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-485345e1013so14530535e9.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1773309850; x=1773914650; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1773309851; x=1773914651; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d9KLhKGx9RzUBsWoWUkwA/+vgETenzM1WQ8j317w0fU=;
-        b=lUFF4zJZa0hgvIg96v34U0oJWVRFcoFa9sPidhNW/r6tgorFPdAVBUOnJNwV84tpz6
-         gMs/NQWS0EqV6OK+nl1tgxtzz8AkxmsJnJ1RtRnpObyAr4PuEOwefSlyG3WECMcYVywD
-         imyEd50XMM2nyeLI/O22MjeIcSHIYSvHeP6KX9BEsJU90COAM7UK6UzXwMzGazwkqayQ
-         DSTlTolio/zV36wH1/oWeYKJPSdzQaHbT99CSx89fpcnXDqmWHHbAH/RzZIczhVIiNkx
-         HaaZlf3v1pSG8xQ9C0jrPB9HyZISmTrKlF+2WMaAT9MArIxRoDnoqYGR+fJ+JAIx0D3j
-         iDVw==
+        bh=bWrXUQ1J7/v/C4aUUHZrL7KMegfL3shCNXRwtxlNqOQ=;
+        b=hfN87aCJOqIm4z4wcX8FfLHsxby1l08Nu8cXC18bO8m85Xr9YhiFndGuJzRd2h3Jfz
+         8KdcgjPoQGnPF3o5OEl3hjJYJ0dY8sJP8WI2D0dnS3BRvK9u7Do28ZCSs/9cZwuF41cS
+         gZPPe2eWCs043B6pDeKy7w2uh2R16KtezxkNzVM6DXxixWegY1M+EXepqxD1gpVXFLru
+         WZQZb1b9NVJPENjWD7ob7V4c3Du6qulPHgcUl/NnihHJW0UxUBUCGo4uGpT+BO4iza6L
+         04YjuQSNGrcecL2GVpYJMGiICg4NFY8tmmvI+4Yqg4wJ6LuotnIlmdwqjwNWNmn9f+5f
+         IXog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773309850; x=1773914650;
+        d=1e100.net; s=20230601; t=1773309851; x=1773914651;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=d9KLhKGx9RzUBsWoWUkwA/+vgETenzM1WQ8j317w0fU=;
-        b=Pag6x+MFORsb7hCQH6Y82Pk+0PLJ/BJS33fYGnRyBZReT+4w5GsobnDXJW+ohxVDl3
-         G9/sPdmzIG8y4lk+lGzvYRLtfueKeBYzU2wMoSebheJJKaZwBBxNqJg2d/Qoh5UD+qkm
-         ZTgr1EzChx+Xnib3fhgYAPi/9rjpqeBb/PFVy30byYHhvDazq/cEBrkrRKaY4GA2iGTo
-         Hb1gDNv0eIOGYUWRRiozjgoA6omGbRl0V5pTOksqYPDjo8GTM4fwjeVZ2pZRHJX239FX
-         z9uV1vTmf+m83XxsVKFC01y6dtlDBxdH/oMA+vIfh5lS/CzDtDFCB5So7gEASaaDzhkH
-         0y6g==
-X-Gm-Message-State: AOJu0YyDJwQQYMcnDWF9ZwFFQ8dmTOJpDwv6D+ngUwBxv4K8xc9oKrus
-	qNd38BuwM3sp2eXnZ3lQNmHdyo4vq6Rso+phcAUwD430ur96nmPyGhY7M5F2cL1FaWkehOcLbie
-	0PGT9LtYcFA==
-X-Gm-Gg: ATEYQzwGpZ5ctRqC0a02RDLvA87LhFMW4rm+vVZsONAJPZC23VL601/6hc7I/eU9lWQ
-	BzHtMpNuHJddO7qxzjWn+/1MZ5IXtfW3/N/BaYG6cjUJ//h7AN1zfV7Y9lAkOZdjuWuJN0+ARms
-	TACdMVNUNVXbXTiv+tVRjDiuNlmPz2olIMzcgCd+6xB0jMGT8dHATSXrSwBRG5v8U2HczSQEm0l
-	IWGNe/sRmbrzrOQLhcQ4tBcXlmORTwNLZX8YqFswOnLtfGGoDWICo65c2UrAJ9HlYvUqPk3+H3S
-	4c4xcdNiCHTyORmc1OEkZXA0EmEsxgNHcbCItI8u182Of4jqs3NC7QNL+bt2bXUpG08KFb2orj8
-	x5VEoK/HqpE3ZGLudQeV7I8X1gwpzezwHBt9bMx/Jf3qa/6lUam0VgcReCYOYiQYifHkOYNfwHx
-	+K5nPuR5ZQuG5n4w==
-X-Received: by 2002:a05:600c:4fd5:b0:485:3989:b3e4 with SMTP id 5b1f17b1804b1-4854f578e86mr42674835e9.6.1773309849689;
-        Thu, 12 Mar 2026 03:04:09 -0700 (PDT)
+        bh=bWrXUQ1J7/v/C4aUUHZrL7KMegfL3shCNXRwtxlNqOQ=;
+        b=tc/bUmc3UnLRdV+7L12jmcTYLcB/bqexBxGJ4M0LsZuxP4AAMzdLpNvKnWSkBUcAen
+         9lerZYIvtGPyqXorRMNlrLR1QQt3rOJVRec99kSRQTXbkiodSR03ETmBv7e8L/GNGlVy
+         u+uL+6zR3KOUj9n/wGWeQoSSc2OeqI0v76udQHNclEh6go9LPRimFpJp1FI0LR4DU9il
+         qhicRzjmSmraqNE+wZIuUSYjC38/oXDlA5IjEZFHqhqyKhdPvGMcPjfwMRmqSoE5H3am
+         FNtN58BmdyYlkmCNz32XwfmG3+hJnZLFgIwhZRNIbv+g36ERe/9slot2xZFRtp/Qw+w7
+         UYvQ==
+X-Gm-Message-State: AOJu0YyGWMxI5NgGoAdch0nPKEVHaxRjX+x/cXGzHGWE4ljMWbvO6WTA
+	Ff40haO/bGcwVXWWdRe3g5cvTh3tJcKS875ImkkxgA+kLvm3zy3h8wupxBKh1+QPraRvUR0ROc1
+	f+lajzRzAnw==
+X-Gm-Gg: ATEYQzx/mZwltmdwxWgsDT64Zq/MTI9HkMR80LH8piJCMFneNZLkiuSHofCcliQXtyk
+	9atYsKXXh8gzYAC/4kzHrUaOhtMD7YNHDXlZuPAangSkYaJKXB98Ym9sEJ/Lu6hT0Vh8WFT3wgV
+	cBI/Uhb0slKJNfI5giZSeNVAmpPZaMzoqva6gM74aF4UiOrSwCjwfCx7ituDiFKWzZFc1tyAQoE
+	K2YhAVzrpiEUDidX6rMoZToJLrrsXHDLoqXSOfj/aNyzlb35kuOJFLYvFnrfDTKmFnKcvqgLKR1
+	ROwjD6/GRXOxtEvaJ5ZcMnrxIk99/hXr2ZxakgBZUneRhVm5BBa8PPaS9soGk/+3PY2h8ifz/pQ
+	po/0ir0Bl9ZZGIwVTJTVHYeHw9rX62QHyYvpok/D4ba60VdXZy980sA82NvwTh8SpBCXwav8voE
+	Hl09Y5ofPNpv9AGQ==
+X-Received: by 2002:a05:600c:4443:b0:485:3428:774c with SMTP id 5b1f17b1804b1-4854f56a097mr44614545e9.4.1773309850996;
+        Thu, 12 Mar 2026 03:04:10 -0700 (PDT)
 Received: from localhost ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541b6f6e6sm393371665e9.10.2026.03.12.03.04.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541b7f406sm212103385e9.13.2026.03.12.03.04.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 03:04:09 -0700 (PDT)
+        Thu, 12 Mar 2026 03:04:10 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -103,9 +103,9 @@ Cc: davem@davemloft.net,
 	linux-doc@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 01/13] devlink: expose devlink instance index over netlink
-Date: Thu, 12 Mar 2026 11:03:55 +0100
-Message-ID: <20260312100407.551173-2-jiri@resnulli.us>
+Subject: [PATCH net-next v4 02/13] devlink: add helpers to get bus_name/dev_name
+Date: Thu, 12 Mar 2026 11:03:56 +0100
+Message-ID: <20260312100407.551173-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20260312100407.551173-1-jiri@resnulli.us>
 References: <20260312100407.551173-1-jiri@resnulli.us>
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -131,10 +131,10 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DMARC_NA(0.00)[resnulli.us];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266974-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-266975-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
@@ -146,85 +146,195 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli.us:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim,nvidia.com:email]
-X-Rspamd-Queue-Id: 3497126FF7D
+X-Rspamd-Queue-Id: 2B88B26FF84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Each devlink instance has an internally assigned index used for xarray
-storage. Expose it as a new DEVLINK_ATTR_INDEX uint attribute alongside
-the existing bus_name and dev_name handle.
+Introduce devlink_bus_name() and devlink_dev_name() helpers and
+convert all direct accesses to devlink->dev->bus->name and
+dev_name(devlink->dev) to use them.
+
+This prepares for dev-less devlink instances where these helpers
+will be extended to handle the missing device.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml | 5 +++++
- include/uapi/linux/devlink.h             | 2 ++
- net/devlink/devl_internal.h              | 2 ++
- net/devlink/port.c                       | 1 +
- 4 files changed, 10 insertions(+)
+v2->v3:
+- don't store bus_name/dev_name in devlink struct
+---
+ include/net/devlink.h          |  2 ++
+ include/trace/events/devlink.h | 24 ++++++++++++------------
+ net/devlink/core.c             | 12 ++++++++++++
+ net/devlink/devl_internal.h    |  8 ++++----
+ net/devlink/netlink.c          |  4 ++--
+ net/devlink/port.c             |  4 ++--
+ 6 files changed, 34 insertions(+), 20 deletions(-)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 837112da6738..1bed67a0eefb 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -867,6 +867,10 @@ attribute-sets:
-         type: flag
-         doc: Request restoring parameter to its default value.
-         value: 183
-+      -
-+        name: index
-+        type: uint
-+        doc: Unique devlink instance index.
-   -
-     name: dl-dev-stats
-     subset-of: devlink
-@@ -1311,6 +1315,7 @@ operations:
-           attributes:
-             - bus-name
-             - dev-name
-+            - index
-             - reload-failed
-             - dev-stats
-       dump:
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index e7d6b6d13470..1ba3436db4ae 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -642,6 +642,8 @@ enum devlink_attr {
- 	DEVLINK_ATTR_PARAM_VALUE_DEFAULT,	/* dynamic */
- 	DEVLINK_ATTR_PARAM_RESET_DEFAULT,	/* flag */
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index cb839e0435a1..0afb0958b910 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -1611,6 +1611,8 @@ struct devlink_ops {
+ void *devlink_priv(struct devlink *devlink);
+ struct devlink *priv_to_devlink(void *priv);
+ struct device *devlink_to_dev(const struct devlink *devlink);
++const char *devlink_bus_name(const struct devlink *devlink);
++const char *devlink_dev_name(const struct devlink *devlink);
  
-+	DEVLINK_ATTR_INDEX,			/* uint */
+ /* Devlink instance explicit locking */
+ void devl_lock(struct devlink *devlink);
+diff --git a/include/trace/events/devlink.h b/include/trace/events/devlink.h
+index f241e204fe6b..32304ce9ad15 100644
+--- a/include/trace/events/devlink.h
++++ b/include/trace/events/devlink.h
+@@ -21,8 +21,8 @@ TRACE_EVENT(devlink_hwmsg,
+ 	TP_ARGS(devlink, incoming, type, buf, len),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__field(bool, incoming)
+ 		__field(unsigned long, type)
+@@ -55,8 +55,8 @@ TRACE_EVENT(devlink_hwerr,
+ 	TP_ARGS(devlink, err, msg),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__field(int, err)
+ 		__string(msg, msg)
+@@ -85,8 +85,8 @@ TRACE_EVENT(devlink_health_report,
+ 	TP_ARGS(devlink, reporter_name, msg),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__string(reporter_name, reporter_name)
+ 		__string(msg, msg)
+@@ -116,8 +116,8 @@ TRACE_EVENT(devlink_health_recover_aborted,
+ 	TP_ARGS(devlink, reporter_name, health_state, time_since_last_recover),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__string(reporter_name, reporter_name)
+ 		__field(bool, health_state)
+@@ -150,8 +150,8 @@ TRACE_EVENT(devlink_health_reporter_state_update,
+ 	TP_ARGS(devlink, reporter_name, new_state),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__string(reporter_name, reporter_name)
+ 		__field(u8, new_state)
+@@ -181,8 +181,8 @@ TRACE_EVENT(devlink_trap_report,
+ 	TP_ARGS(devlink, skb, metadata),
+ 
+ 	TP_STRUCT__entry(
+-		__string(bus_name, devlink_to_dev(devlink)->bus->name)
+-		__string(dev_name, dev_name(devlink_to_dev(devlink)))
++		__string(bus_name, devlink_bus_name(devlink))
++		__string(dev_name, devlink_dev_name(devlink))
+ 		__string(driver_name, devlink_to_dev(devlink)->driver->name)
+ 		__string(trap_name, metadata->trap_name)
+ 		__string(trap_group_name, metadata->trap_group_name)
+diff --git a/net/devlink/core.c b/net/devlink/core.c
+index d8e509a669bf..63709c132a7c 100644
+--- a/net/devlink/core.c
++++ b/net/devlink/core.c
+@@ -248,6 +248,18 @@ struct device *devlink_to_dev(const struct devlink *devlink)
+ }
+ EXPORT_SYMBOL_GPL(devlink_to_dev);
+ 
++const char *devlink_bus_name(const struct devlink *devlink)
++{
++	return devlink->dev->bus->name;
++}
++EXPORT_SYMBOL_GPL(devlink_bus_name);
 +
- 	/* Add new attributes above here, update the spec in
- 	 * Documentation/netlink/specs/devlink.yaml and re-generate
- 	 * net/devlink/netlink_gen.c.
++const char *devlink_dev_name(const struct devlink *devlink)
++{
++	return dev_name(devlink->dev);
++}
++EXPORT_SYMBOL_GPL(devlink_dev_name);
++
+ struct net *devlink_net(const struct devlink *devlink)
+ {
+ 	return read_pnet(&devlink->_net);
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 1377864383bc..31fa98af418e 100644
+index 31fa98af418e..1b770de0313e 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -178,6 +178,8 @@ devlink_nl_put_handle(struct sk_buff *msg, struct devlink *devlink)
+@@ -174,9 +174,9 @@ devlink_dump_state(struct netlink_callback *cb)
+ static inline int
+ devlink_nl_put_handle(struct sk_buff *msg, struct devlink *devlink)
+ {
+-	if (nla_put_string(msg, DEVLINK_ATTR_BUS_NAME, devlink->dev->bus->name))
++	if (nla_put_string(msg, DEVLINK_ATTR_BUS_NAME, devlink_bus_name(devlink)))
  		return -EMSGSIZE;
- 	if (nla_put_string(msg, DEVLINK_ATTR_DEV_NAME, dev_name(devlink->dev)))
+-	if (nla_put_string(msg, DEVLINK_ATTR_DEV_NAME, dev_name(devlink->dev)))
++	if (nla_put_string(msg, DEVLINK_ATTR_DEV_NAME, devlink_dev_name(devlink)))
  		return -EMSGSIZE;
-+	if (nla_put_uint(msg, DEVLINK_ATTR_INDEX, devlink->index))
-+		return -EMSGSIZE;
- 	return 0;
+ 	if (nla_put_uint(msg, DEVLINK_ATTR_INDEX, devlink->index))
+ 		return -EMSGSIZE;
+@@ -211,8 +211,8 @@ static inline void devlink_nl_obj_desc_init(struct devlink_obj_desc *desc,
+ 					    struct devlink *devlink)
+ {
+ 	memset(desc, 0, sizeof(*desc));
+-	desc->bus_name = devlink->dev->bus->name;
+-	desc->dev_name = dev_name(devlink->dev);
++	desc->bus_name = devlink_bus_name(devlink);
++	desc->dev_name = devlink_dev_name(devlink);
  }
  
+ static inline void devlink_nl_obj_desc_port_set(struct devlink_obj_desc *desc,
+diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
+index 593605c1b1ef..56817b85a3f9 100644
+--- a/net/devlink/netlink.c
++++ b/net/devlink/netlink.c
+@@ -193,8 +193,8 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs,
+ 	devname = nla_data(attrs[DEVLINK_ATTR_DEV_NAME]);
+ 
+ 	devlinks_xa_for_each_registered_get(net, index, devlink) {
+-		if (strcmp(devlink->dev->bus->name, busname) == 0 &&
+-		    strcmp(dev_name(devlink->dev), devname) == 0) {
++		if (strcmp(devlink_bus_name(devlink), busname) == 0 &&
++		    strcmp(devlink_dev_name(devlink), devname) == 0) {
+ 			devl_dev_lock(devlink, dev_lock);
+ 			if (devl_is_registered(devlink))
+ 				return devlink;
 diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 93d8a25bb920..1ff609571ea4 100644
+index 1ff609571ea4..fa3e1597711b 100644
 --- a/net/devlink/port.c
 +++ b/net/devlink/port.c
-@@ -222,6 +222,7 @@ size_t devlink_nl_port_handle_size(struct devlink_port *devlink_port)
+@@ -220,8 +220,8 @@ size_t devlink_nl_port_handle_size(struct devlink_port *devlink_port)
+ {
+ 	struct devlink *devlink = devlink_port->devlink;
  
- 	return nla_total_size(strlen(devlink->dev->bus->name) + 1) /* DEVLINK_ATTR_BUS_NAME */
- 	     + nla_total_size(strlen(dev_name(devlink->dev)) + 1) /* DEVLINK_ATTR_DEV_NAME */
-+	     + nla_total_size(8) /* DEVLINK_ATTR_INDEX */
+-	return nla_total_size(strlen(devlink->dev->bus->name) + 1) /* DEVLINK_ATTR_BUS_NAME */
+-	     + nla_total_size(strlen(dev_name(devlink->dev)) + 1) /* DEVLINK_ATTR_DEV_NAME */
++	return nla_total_size(strlen(devlink_bus_name(devlink)) + 1) /* DEVLINK_ATTR_BUS_NAME */
++	     + nla_total_size(strlen(devlink_dev_name(devlink)) + 1) /* DEVLINK_ATTR_DEV_NAME */
+ 	     + nla_total_size(8) /* DEVLINK_ATTR_INDEX */
  	     + nla_total_size(4); /* DEVLINK_ATTR_PORT_INDEX */
  }
- 
 -- 
 2.51.1
 
