@@ -1,169 +1,180 @@
-Return-Path: <netdev+bounces-267052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMZMHlC3smmYOwAAu9opvQ
-	(envelope-from <netdev+bounces-267052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:53:36 +0100
+	id IBjvLYK4smmYOwAAu9opvQ
+	(envelope-from <netdev+bounces-267053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:58:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CCD272083
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:53:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D5E92721D9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC2E2300D170
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:53:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C152E3129BD9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B073BED6D;
-	Thu, 12 Mar 2026 12:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5603C5DA5;
+	Thu, 12 Mar 2026 12:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QAucDxXK"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA52387597
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773320011; cv=pass; b=oLAiZnO0VgViYODvXBDXKIzbafLW+pGjBgPGK32aB+pUmzZIgLzecQrroZkOfO4XhzGXbrM2tyPtRoZi/qKZwomk2sbhEdI2tYDbkWBlGTbOc4y5vF7NAA/Zz3xsOmHVj0mbDtqLTgrRV4qYlwfz/L8MotGAdsRWpYCtAij3MyA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773320011; c=relaxed/simple;
-	bh=KFziMjOBcymobbH9+U0FWDKq4cjycH+PnY/wu6baXH8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aIJ7gjsDcSxuETNVoMjQ08PhwuP9Je6acaWvz5vGGDpckxmvUM33UYjqOkPIfZfBJ4BH5LqaSsDf9gzmLaY7rfxH3gfxbUB1uy39ojlSk4K0NN5dXMmqpUACgmh3msIzDsooEzr3Mo0HA7CbyQXYd+OKzTThWm2pTt5cF0BMjJ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QAucDxXK; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5094e1d17d3so4768921cf.3
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:53:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773320009; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DLnuMJocsWnUD5bkZ2UrkeCV9LmwVybYq0zLScGwCQIORPtJJHfGcLE+cr3pG/M1oz
-         RFJ7TjoLcMGKzONhXY0VbcR0e2p/nAXtgk84wUM2R2E8pB3NoXGfllLCj3h/hkdFB+ql
-         5lEvF4H1fLpXwLcR+xM82el3NAfadDvnlUR4N7Rc0H8kNCvCRZcsAfD3Q8MQ/5e6G0Hw
-         bgS1wRZGIeK7ipEbonXCcdX5ZERaa0PJPDqY5sHAVB5wvHQ8rmsDylNSsf8LwqO4DJc9
-         XjxfFzUb5o7AIheiNAPUeodb47D1bnodfRzaeCorWDlwBgHqWnGVnv9ReGDFVWzwE7Hi
-         o4bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
-        fh=G7T91DM+IJD7N449WJQR/xVG8VUQrxsh9mw03iisrxE=;
-        b=KGVraCGJlStY5692f8J9I4+JxbbfIIX6zIEMEy12C1/3du0sE9TpCO3UvF5w3A77TY
-         +WJA4Ev0wvDeCUJfoi3bT520KMiHZ7abBLB+UxyGkKgo/CF9WDo2KwzLeEy2+5o4enFQ
-         L6hDzQJPyW0R3Q00y9eMbDSvpysSo6fqOSywr4HqT4t0MeXTSpxo6dMUlQNBjogjEo8k
-         HbQlBw90FDKkf/yVyrfJ8tmMZ+h77uTbfqwLq31eAvNMq9dy4b/vvhRvXDWlo0t4yjC2
-         vEuex2VAvmPS6SLCJsclc0lO2rA5h5UAIZYiK1aDxU92JZyC0O1aAq2K+KdQOuLzxKpd
-         de8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77503C342E
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773320257; cv=none; b=ErZlv6CQiswLpT/U3DB5IjdBwrSBBM3aE8SSTt7xppAIXyLn772NsdiS/2Z2nIGkrUEY5BI+J3EUN4cj9hLWcnmxIVWA6/98Lq5CNgUI0/gXjIjypUQG+783ab3I8eXHNp9SzgjR3emi3XLPpsgv+kjLlbhJLH8z/Y15rql8mOs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773320257; c=relaxed/simple;
+	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50915e14cf6so7425501cf.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773320009; x=1773924809; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
-        b=QAucDxXKECQDJsSUSRU11tUioHzBoCISUI0l1EoO6cXwjA0sGvj5Hrlfg4KB2Uz0ww
-         Cl3L2AaMMfOkGp63MXGmnB6EpVfy6ebrq7Nknwn0VotmN9+PRecJ+29zwT4N/T/qq92i
-         7f1r714VwV97rQwbxGksvfgRu42B2UD+WBpYn3FgqXbeHEG+ai9eAAswwGAQau88apOh
-         xCi98k4g8Vv4v0ZnjEIIn97ngGhScQG8cCWHEjShzRt8ZaHrPjQHtHXjIHJiybqxVsEM
-         Ju5ZV0gJzlNdpKhTO9OzLQcNMfVCteSTjdULOfL7h5kpzzlNsqjaV+0F+odpzadbusds
-         dUOw==
+        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
+         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
+         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
+         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
+         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
+         JV6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773320009; x=1773924809;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
-        b=TB2mCd8mYR4yFD/sYSZaiOK/MDrpJy9irkLsIzGdUaYS+oCIhBxceWmWCUhvfOIA3P
-         YrRMcYAmr18m2Bkm02o0VPj7wOl75YJpAgFfTssA0XoQ0LH5BWqxeK30OK9KXKjJN6sT
-         bM+k91MQhLuk/tj/61Fw7weUWMSSsSs7aHTyMDDnkTuiaqUbgH7x9gJzG9xZc4CZbNRL
-         sWIdYLz3NTyE7hZw8XusfjxTtoWCyYCdmv05jj7a27k1Ci9W9bn/jjhpskSUgoAlZPvy
-         Us42Gwd+DKbFMvmUCE80C0AYiJ3XtYrjZBiS+wQolSJ/gdgRSG44iKy3/Kc9WjtufMxe
-         vjuA==
-X-Gm-Message-State: AOJu0YwryMWzyP2PYP9lxnq8sZ4rLzu/P6R3RtIo1Gad9PDiIVfZLjfR
-	MsvhPrVAIttj9HvG4MI1VM+VCjgIIMfcDVVMU1sq21qQmR+9dTYTIah/3vrO9KJGYUHGIpTusey
-	slmc+ItWDgNoukpRGR1Q6VKBEi4MJdaGLC8S0E1Dj
-X-Gm-Gg: ATEYQzzjamAehWqATVjizbGoGwx57BjqMkYQYMFocQf+K6fG57gyik58sIFigUgTTBm
-	PhJcE3ViQlIMxpJxG1jeP6YV+d1nUvIm008Cr35O0A48GUpyV1Ujxwg5dAsulyXvxNyNrNEP8Z9
-	qszf8ZdmABuS8DeHrRclfc7DmFSC5OS0dqTHdpNwpvEdrLtU1a39IB/YUzwyRdoE7cR6L4pUYkQ
-	z/8XucK0+9g/SD9Hn/wZoXWP1DJ+BU/JRtqse37SiIOzvCpZs5dnErRkq2vi1XruNtV/KVWrwg+
-	ulfoaM4q
-X-Received: by 2002:a05:622a:1444:b0:509:1d4b:f860 with SMTP id
- d75a77b69052e-5093a17bd2amr74313571cf.58.1773320008905; Thu, 12 Mar 2026
- 05:53:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=HjZR4rKXwRYMmZVMagxxuOLy2X3Wa7FAANS8XtMMqvUaeCJE8yR6RvcS7pc9BCCl8w
+         FCRcuFEwn8GE2flo1JZvya2uuxVyXdrsrIXOJQ6mCaPQ/0oVS7f8hhDgyQje0XdPe0ak
+         iLILvzMeSWmlQdt/ezwJKowEOfDLFx/Vw0qGdqfNO7nXoMTgI4Tj/arbpaPmP9jtPz9Y
+         9sh1WQ11KHfBFdRphgQHhfAhoL7tIh1s5w4YoiZliW6RLeX5cN9/M6UTFomvboNkQXi7
+         dCv7FIj8UzFzP2evkb/NOH15UKaZoulBT8w+kgRNegVh/fNslQ+3hIaAvLa4B/+mWwop
+         oSgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUs5RU1qIkHRAqJNvMP+jyIydlvjgpqoWdJtRFiD2PeR53FmC3te7q0NSD8P9VmXe7HowitG/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf5KvK9o5ro/gMBjV4VM/sqEKUFbdQrcNE8gvAs5FyazAGmvvR
+	kzmTg1VHs5Mnv7Qbmrz6Fzv0dDi//FURRoFs6/vLhKARoM8YSyQS/88Etp/5ycGPRfI=
+X-Gm-Gg: ATEYQzxL+48YhL/z2jkljuEd9lA0X/6iShZqoCqSq803NYZtAwmgaxTDkxhF4ku3Out
+	IMswhdMy4YKMi8LIegwxbzbYly103k1BsnPkouZpyYeBJdu5t5XAwJkSSqi6CFCUTABydg2iZPc
+	yGOhli1KcJU3zorHsWL0/TuH9MD1QBeqbP5QPvmWYYHMOttAcWzscH2O9O+ce12km6dVz3iSgmL
+	JWoKvFsSjGAd7wuAn4xUFE2kquT4ckJLeTpYAVAbFoFdlWcW79siYe3fwZMVvMIfUBZUaKNrQf8
+	oCnBqDfv/KfgK7o0Fvszq31NoAGK3nVdys/bM1H1aIekUcnLsm1Zsz1/JolbFc1dMisEl3P+8/v
+	u/w5gzjvLJyWcAVQmGFgh1oq2lkKFe9ofs75sO94tv3E5kkwz02OPoYQdpwMS2gDT8F2t+7c81D
+	5LxV9DdFo7yQkbhyCHAU16IIqTWHABXp1dYLmU95l6pz2qk39e+hOXZSTTo9IxBSgAmIfGxsvvU
+	80kPdz8
+X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1w0fbW-00000006fKD-1POa;
+	Thu, 12 Mar 2026 09:57:30 -0300
+Date: Thu, 12 Mar 2026 09:57:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
+	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
+	ceph-devel@vger.kernel.org, cocci@inria.fr,
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
+ check - refactor
+Message-ID: <20260312125730.GI1469476@ziepe.ca>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <abBlpGKO842B3yl9@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260312124807.186341-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260312124807.186341-1-jiayuan.chen@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 12 Mar 2026 13:53:16 +0100
-X-Gm-Features: AaiRm51C8JKaShcVCmTj8WnlFo47h4RuGaQUwtBwhV3ZwNIzVoTZf9wylwESeOc
-Message-ID: <CANn89i+urEcFJkOsE9_3nOzVa2Ee1sFb26vrNnJV-jW2z76y2w@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] tcp: remove redundant memset in hot paths
- with CONFIG_INIT_STACK_ALL_ZERO
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abBlpGKO842B3yl9@google.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267052-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[ziepe.ca];
+	TAGGED_FROM(0.00)[bounces-267053-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,linux.dev:email]
-X-Rspamd-Queue-Id: E6CCD272083
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[55];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:dkim,ziepe.ca:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5D5E92721D9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 1:48=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> Modern compilers with CONFIG_INIT_STACK_ALL_ZERO enabled
-> (-ftrivial-auto-var-init=3Dzero) automatically zero-initialize all stack
-> variables via `rep stos` in the function prologue. However, the compiler
-> cannot eliminate explicit memset() calls on those same variables,
-> resulting in redundant zeroing of the same memory region.
->
-> Replace explicit memset() with `=3D {0}` initializers for stack variables
-> in TCP hot path functions. With `=3D {0}`, the compiler recognizes a sing=
-le
-> initialization and generates only one zeroing sequence, whereas a
-> separate memset() after declaration always produces a second `rep stos`.
+On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
 
-No sorry. It seems you missed
+> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
+> flawed API design. It usually implies that the caller is unsure whether
+> a failure results in an error pointer or a NULL pointer. 
 
-commit cfcceb7a39fc10a6f896af8229bf81d96acb22cc
-Author: Keita Morisaki <kmta1236@gmail.com>
-Date:   Wed Mar 4 20:15:17 2026 +0900
++1
 
-    tcp: shrink per-packet memset in __tcp_transmit_skb()
+IS_ERR_OR_NULL() should always be looked on with suspicion. Very
+little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
+pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
+implies ERR and NULL are semanticly the same, so fix the things to
+always use ERR.
 
-No need to resend your patch, I do not think it is a good idea.
+If you want to improve things work to get rid of the NULL checks this
+script identifies. Remove ERR or NULL because only one can ever
+happen, or fix the source to consistently return ERR.
+
+Jason
 
