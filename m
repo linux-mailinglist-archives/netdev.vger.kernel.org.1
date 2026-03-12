@@ -1,103 +1,98 @@
-Return-Path: <netdev+bounces-267034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBWXNs+tsmlGOwAAu9opvQ
-	(envelope-from <netdev+bounces-267034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:13:03 +0100
+	id YGA5JFausmlGOwAAu9opvQ
+	(envelope-from <netdev+bounces-267035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:15:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC1D2717FA
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:13:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA257271879
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:15:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 14DC53159232
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:11:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3E30314148A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618523BE653;
-	Thu, 12 Mar 2026 12:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE13F377035;
+	Thu, 12 Mar 2026 12:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeC8RTSu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKQIKyCw"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NIOqQdnb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="S4EIcnpz";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NIOqQdnb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="S4EIcnpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547FA3BA25B
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBA038B122
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773317463; cv=none; b=iYgjsLeE66V0FZ1IdWwlD2LdTHumTXSkRlu6rzNfRqg+Yuv892m550mrDgcatyQkbXzndKSt3gOAEMQO8rLqu62a8Se0sRCSxx2WSA5+VNzdUyEr6xhnuhjM2XMcYpdMrm/UkjLjraSqe89JaLSu5thrmEyzvTdqj2TMkSOT6fs=
+	t=1773317537; cv=none; b=sYg/lauwyZLs2rRclas+tOAUxK+jtJuZ7auWmSLTTwZrdlvdmpMEshSrSf3SppBOJofAt0X2ghCrAtVjrR5p/Kaqr7aLEEj+oMkra1muFyTyeA2R8O4jLjTgDhB86voG2A4848KSfDJZgNCR/3Y7wCGPfdr8b2oXqKixqGazo1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773317463; c=relaxed/simple;
-	bh=p+91oaBdy5LOr7ECHuqNTLxmHXL5qoG8aRovl/HzNKk=;
+	s=arc-20240116; t=1773317537; c=relaxed/simple;
+	bh=BAobcb9CuFaakDdqoHMPQ+3oqwZVEllsE729QCLW8YU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tT80n+W4SUPs3wijloI8noWe9S8IlBEP6+9u4sAAqfFQZGo8LHh5cvAfEKWn6wv1PVUJOkYWl1H3SjnxhkL4vNAt8fWQOk2rd2SGa/BSJ3cLGbRwl3W3/aLLWSlPz3wAGtCkkRo9QJsRW+mv+TZmbwQbyaUfiLsPL9tW6xewd0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eeC8RTSu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKQIKyCw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773317459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=tUpcHYsub8YFo+q7vJXFJCcv5qsWpxj6Ki8QjXluaj9GzbeaHYJYLKsLzKmZEcsc3sseF1AkMFloQ03pc+eRVuDO758/IK/7tQTgbFwqDJJCMPkVi18rv7EblqoEV0UKVvnlgBkjFpcgYKFOLcBwv6WiHdi7r21rOMyg+y/j3Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NIOqQdnb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=S4EIcnpz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NIOqQdnb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=S4EIcnpz; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A205E4D3CA;
+	Thu, 12 Mar 2026 12:12:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773317531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zHd0YRN4Qe0P795vXGYLjKVeRfTp0aVarxI7kacSSBw=;
-	b=eeC8RTSutocvZ1Ler6OE/IucqZj099pTf2s5iIDqK+tcApCUlI+Dwe7K8S9IKVluBSZHdJ
-	VR5znOzJ4CWdm8Wtr322R1bA7CIs5hPNPH95cKlIanOKVkBzhXpmUoEJ41i2gUoRFBXH7p
-	7e2N9LtfPDl4BrejEsStPq8mH5FVyTw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-447-0UROx8OtPACGV8sVzOPyjw-1; Thu, 12 Mar 2026 08:10:58 -0400
-X-MC-Unique: 0UROx8OtPACGV8sVzOPyjw-1
-X-Mimecast-MFC-AGG-ID: 0UROx8OtPACGV8sVzOPyjw_1773317457
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439ae2cba40so875419f8f.1
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:10:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773317457; x=1773922257; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zHd0YRN4Qe0P795vXGYLjKVeRfTp0aVarxI7kacSSBw=;
-        b=NKQIKyCwItyVaGkoJnbOHnklw1cRILvO8uzsc92hWJda9JQiDUhTPMVZ11ta0VqOzT
-         0HVw/yW4obksSqqa2TMlpVNat1oY5vWcZZ1OlRgbPFa+sxXEBo4nyePhnGEFF254OK5z
-         +n3RGcGZw4YtbEZZarEMvQVLfw6MXV0f/ezCcC3YK1hkVw3QHWfsKDYjwwDQnSYb6LYA
-         irYueyqqAYFtM/+UMPWy6MWsYnSi4r7J/wxr5U6z8D16Asp7Dl799Pz0TSqafXcXCeAR
-         y8zwOAc7fjZfOXtmBl0avkQ6cwT08G5q7ztGWGR2GpVEzNETycqd6tMsNSS3gg4p8tKa
-         mRDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773317457; x=1773922257;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zHd0YRN4Qe0P795vXGYLjKVeRfTp0aVarxI7kacSSBw=;
-        b=PqTpO5SWTej4Szclq3dWVUB61C6dIXd4qLDoauTpsKTWC+O1dIOcoVL5+4TH/jRTPW
-         B3vR5QOmdra/4NOy8hHXw/VW4sy+DlieicaWSPRcxHBuzvQXvm/D49jluhxzIaTKm8Sb
-         UTHIIaTWF71VZJrt7rwAakopW7qj1NygZTHzFv6914P9W2VFlUUcvikTO9UHPuFHk49P
-         tEkORjai7Y1pVMrvuqijeFFSMA88eeZ8LC6CIBLAFEZgj+kYWhZ1L8FtFe+Z5+kVGp3Y
-         oBNTsXncs6W9X5qqSe3PWSoA+RIRi0vzTcB+34Y/ZzpRhYv9LwAByZ4oiHJRABdp46Dt
-         DNBg==
-X-Forwarded-Encrypted: i=1; AJvYcCWtZwQahs+uByZAU5bcntJWr+hdPSzHBwJSS2SRrsMQ/Ug/gdUrkjCuiN1gHcix19+mTYEork4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRg5XbqbLK1V+z6I5YTK3VIbZctOY4w4f2nUT5W41iimCkJx6z
-	CcnbMz1B1UGPTkAFPVu+cqn0lFow4UAaAN4lWaOa+BPBPPNiKAkCOi/RaTFwAIbJ+xE344xHRmL
-	XwsQGldTxnXFm/cvOjYZ5jjNLhLEB0jRvSRwEt1kFic4WOC1gmGcx2A2aSA==
-X-Gm-Gg: ATEYQzzxZG3Jov/T/P+i+PlkargQtXZFvgYLYOXOZYsrwRZx4KTfzOz/CMaCNx1Vl96
-	80wxY8XMI90bCE/uGBV8astg2Own3FAAnAZKwzrB/h13DOMxmEFQgC2qkMUfQEcaYSVjqzPF9tf
-	T7TkmQAtVs46uwIXjkJxS+gEpUpaRK7S1Wk7T7/g/saWjrArwIWlwNZHZ4eHOt8uyhDC1tIFZd8
-	1gNistv0oNs1u9F32cTVckwEHZy0xaTcZF0+KWcH6I3EDkh8l43irmU7MYXrREF1SRJPyLpsc+6
-	e0wvj3qP9pjv20dOzUP/EODYH0/v3haAvOSyMdkvxMtyo7CKCHeqvgPiAp1eqvxWV9kfK0KCCFC
-	dnc5nqVkNpZluXLsMU9siBUBLLD5EAQUdlyhv9pu5JriClp4mFEKsTYQ=
-X-Received: by 2002:a05:6000:603:b0:439:b6f9:b426 with SMTP id ffacd0b85a97d-439f81dde75mr10991301f8f.26.1773317456875;
-        Thu, 12 Mar 2026 05:10:56 -0700 (PDT)
-X-Received: by 2002:a05:6000:603:b0:439:b6f9:b426 with SMTP id ffacd0b85a97d-439f81dde75mr10991247f8f.26.1773317456386;
-        Thu, 12 Mar 2026 05:10:56 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fdf09abesm7439722f8f.0.2026.03.12.05.10.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 05:10:55 -0700 (PDT)
-Message-ID: <dcff36c0-2d63-4f4a-96f2-6b7cb3d933f1@redhat.com>
-Date: Thu, 12 Mar 2026 13:10:54 +0100
+	bh=StxNDEEJm/MKfQMlWCh7AudfdlhtE98aLWBisrKX4EA=;
+	b=NIOqQdnbEYh+pqxm3TY/oimbRa5hOKHYbUtH1jVAn/I52vBgJx2SpDRlQNcg0smmk/Cq9H
+	yJiEb/B04zxWVv4WyMP0aebhfAePEudiipb26ZHgykUenIhcor8hHxILqUbJ0FOQMUykeN
+	p3RIa2zLjvWSFGlv67a6PnhTtSyWNPs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773317531;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=StxNDEEJm/MKfQMlWCh7AudfdlhtE98aLWBisrKX4EA=;
+	b=S4EIcnpz+mreO6XXUTk4yVupHGKh3BhPGl8HWOlt01B85263TlOyqMdpOjqeVHSJTQCgmv
+	/fKroxjDWUduLgCA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773317531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=StxNDEEJm/MKfQMlWCh7AudfdlhtE98aLWBisrKX4EA=;
+	b=NIOqQdnbEYh+pqxm3TY/oimbRa5hOKHYbUtH1jVAn/I52vBgJx2SpDRlQNcg0smmk/Cq9H
+	yJiEb/B04zxWVv4WyMP0aebhfAePEudiipb26ZHgykUenIhcor8hHxILqUbJ0FOQMUykeN
+	p3RIa2zLjvWSFGlv67a6PnhTtSyWNPs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773317531;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=StxNDEEJm/MKfQMlWCh7AudfdlhtE98aLWBisrKX4EA=;
+	b=S4EIcnpz+mreO6XXUTk4yVupHGKh3BhPGl8HWOlt01B85263TlOyqMdpOjqeVHSJTQCgmv
+	/fKroxjDWUduLgCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A589F3FF6E;
+	Thu, 12 Mar 2026 12:12:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 740IJZqtsmnIXQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 12 Mar 2026 12:12:10 +0000
+Message-ID: <a18f93d5-af8c-4e67-90ae-f386af86ca0f@suse.de>
+Date: Thu, 12 Mar 2026 13:12:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,81 +100,194 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 09/11] net/nebula-matrix: add Dispatch layer
- implementation
-To: "illusion.wang" <illusion.wang@nebula-matrix.com>,
- dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
- sam.chen@nebula-matrix.com, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, corbet@lwn.net, kuba@kernel.org,
- linux-doc@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
- vadim.fedorenko@linux.dev, lukas.bulwahn@redhat.com, edumazet@google.com,
- open list <linux-kernel@vger.kernel.org>
-References: <20260310120959.22015-1-illusion.wang@nebula-matrix.com>
- <20260310120959.22015-10-illusion.wang@nebula-matrix.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: expose
+ gc_scan_interval_max via sysctl
+To: Prasanna S Panchamukhi <panchamukhi@arista.com>,
+ netfilter-devel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ coreteam@netfilter.org
+References: <20260311194058.13860-1-panchamukhi@arista.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260310120959.22015-10-illusion.wang@nebula-matrix.com>
-Content-Type: text/plain; charset=UTF-8
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260311194058.13860-1-panchamukhi@arista.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-267035-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267034-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,illusion.wang:url]
-X-Rspamd-Queue-Id: 4FC1D2717FA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arista.com:email,suse.de:dkim,suse.de:mid]
+X-Rspamd-Queue-Id: EA257271879
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 3/10/26 1:09 PM, illusion.wang wrote:
-> This patch can have a quick review, 
-
-I hope so :)
-
-> function is similar
-
-Similar to what?
-
-Possibly this sentence was not supposed to be here?!?
-
-> The primary issue in the Dispatch layer is how to determine
-> the routing approach
-> Two routing ways:
-> Dispatch Layer-> Resource Layer -> HW layer
-> The Dispatch Layer routes tasks to Resource Layer, which may interact
-> with the HW Layer for hardware writes.
+On 3/11/26 8:40 PM, Prasanna S Panchamukhi wrote:
+> The conntrack garbage collection worker uses an adaptive algorithm that
+> adjusts the scan interval based on the average timeout of tracked
+> entries.  The upper bound of this interval is hardcoded as
+> GC_SCAN_INTERVAL_MAX (60 seconds).
 > 
-> Dispatch Layer->Channel Layer
-> The Dispatch Layers redirects hooks to the Channel Layer.
+> Expose the upper bound as a new sysctl,
+> net.netfilter.nf_conntrack_gc_scan_interval_max, so it can be tuned at
+> runtime without rebuilding the kernel.  The default remains 60 seconds
+> to preserve existing behavior.  The sysctl is global and read-only in
+> non-init network namespaces, consistent with nf_conntrack_max and
+> nf_conntrack_buckets.
 > 
-> The primary challenge at the Dispatch layer lies in determining the
-> routing approach, 
-
-There is the same exact sentence a paragraph above. Possibly C&P error?
-
-/P
+> In environments where long-lived offloaded flows dominate the table,
+> the adaptive average drifts toward the maximum, delaying cleanup
+> of short-lived expired entries such as those in TCP CLOSE state
+> (10s timeout). Adding sysctl to set the maximum GC scan helps to
+> tune according to the evironment.
+> 
+> Signed-off-by: Prasanna S Panchamukhi <panchamukhi@arista.com>
+[...]
+> ---
+>   Documentation/networking/nf_conntrack-sysctl.rst | 11 +++++++++++
+>   include/net/netfilter/nf_conntrack.h             |  1 +
+>   net/netfilter/nf_conntrack_core.c                |  9 ++++++---
+>   net/netfilter/nf_conntrack_standalone.c          | 10 ++++++++++
+>   4 files changed, 28 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
+> index 35f889259fcd..c848eef9bc4f 100644
+> --- a/Documentation/networking/nf_conntrack-sysctl.rst
+> +++ b/Documentation/networking/nf_conntrack-sysctl.rst
+> @@ -64,6 +64,17 @@ nf_conntrack_frag6_timeout - INTEGER (seconds)
+>   
+>   	Time to keep an IPv6 fragment in memory.
+>   
+> +nf_conntrack_gc_scan_interval_max - INTEGER (seconds)
+> +	default 60
+> +
+> +	Maximum interval between garbage collection scans of the connection
+> +	tracking table. The GC worker uses an adaptive algorithm that adjusts
+> +	the scan interval based on average entry timeouts; this parameter caps
+> +	the upper bound. Lower values cause expired entries (e.g. connections
+> +	in CLOSE state) to be cleaned up faster, at the cost of slightly more
+> +	CPU usage. Minimum value is 1.
+> +	This sysctl is only writeable in the initial net namespace.
+> +
+>   nf_conntrack_generic_timeout - INTEGER (seconds)
+>   	default 600
+>   
+> diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+> index bc42dd0e10e6..0449577f322e 100644
+> --- a/include/net/netfilter/nf_conntrack.h
+> +++ b/include/net/netfilter/nf_conntrack.h
+> @@ -331,6 +331,7 @@ extern struct hlist_nulls_head *nf_conntrack_hash;
+>   extern unsigned int nf_conntrack_htable_size;
+>   extern seqcount_spinlock_t nf_conntrack_generation;
+>   extern unsigned int nf_conntrack_max;
+> +extern unsigned int nf_conntrack_gc_scan_interval_max;
+>   
+>   /* must be called with rcu read lock held */
+>   static inline void
+> diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+> index 27ce5fda8993..54949246f329 100644
+> --- a/net/netfilter/nf_conntrack_core.c
+> +++ b/net/netfilter/nf_conntrack_core.c
+> @@ -91,7 +91,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
+>    * allowing non-idle machines to wakeup more often when needed.
+>    */
+>   #define GC_SCAN_INITIAL_COUNT	100
+> -#define GC_SCAN_INTERVAL_INIT	GC_SCAN_INTERVAL_MAX
+> +#define GC_SCAN_INTERVAL_INIT	nf_conntrack_gc_scan_interval_max
+>   
+>   #define GC_SCAN_MAX_DURATION	msecs_to_jiffies(10)
+>   #define GC_SCAN_EXPIRED_MAX	(64000u / HZ)
+> @@ -204,6 +204,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+>   
+>   unsigned int nf_conntrack_max __read_mostly;
+>   EXPORT_SYMBOL_GPL(nf_conntrack_max);
+> +
+> +unsigned int nf_conntrack_gc_scan_interval_max __read_mostly = GC_SCAN_INTERVAL_MAX;
+> +
+>   seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+>   static siphash_aligned_key_t nf_conntrack_hash_rnd;
+>   
+> @@ -1568,7 +1571,7 @@ static void gc_worker(struct work_struct *work)
+>   				delta_time = nfct_time_stamp - gc_work->start_time;
+>   
+>   				/* re-sched immediately if total cycle time is exceeded */
+> -				next_run = delta_time < (s32)GC_SCAN_INTERVAL_MAX;
+> +				next_run = delta_time < (s32)nf_conntrack_gc_scan_interval_max;
+>   				goto early_exit;
+>   			}
+>   
+> @@ -1630,7 +1633,7 @@ static void gc_worker(struct work_struct *work)
+>   
+>   	gc_work->next_bucket = 0;
+>   
+> -	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_MAX);
+> +	next_run = clamp(next_run, GC_SCAN_INTERVAL_MIN, nf_conntrack_gc_scan_interval_max);
+>   
+>   	delta_time = max_t(s32, nfct_time_stamp - gc_work->start_time, 1);
+>   	if (next_run > (unsigned long)delta_time)
+> diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+> index 207b240b14e5..f8cab779763f 100644
+> --- a/net/netfilter/nf_conntrack_standalone.c
+> +++ b/net/netfilter/nf_conntrack_standalone.c
+> @@ -637,6 +637,7 @@ enum nf_ct_sysctl_index {
+>   	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE,
+>   	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE_STREAM,
+>   #endif
+> +	NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX,
+>   
+>   	NF_SYSCTL_CT_LAST_SYSCTL,
+>   };
+> @@ -920,6 +921,14 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+>   		.proc_handler   = proc_dointvec_jiffies,
+>   	},
+>   #endif
+> +	[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX] = {
+> +		.procname	= "nf_conntrack_gc_scan_interval_max",
+> +		.data		= &nf_conntrack_gc_scan_interval_max,
+> +		.maxlen		= sizeof(unsigned int),
+> +		.mode		= 0644,
+> +		.proc_handler	= proc_dointvec_jiffies,
+> +		.extra1		= SYSCTL_ONE,
+> +	},
+>   };
+>   
+>   static struct ctl_table nf_ct_netfilter_table[] = {
+> @@ -1043,6 +1052,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+>   		table[NF_SYSCTL_CT_MAX].mode = 0444;
+>   		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+>   		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+> +		table[NF_SYSCTL_CT_GC_SCAN_INTERVAL_MAX].mode = 0444;
+>   	}
+>   
+>   	cnet->sysctl_header = register_net_sysctl_sz(net, "net/netfilter",
 
 
