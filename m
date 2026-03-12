@@ -1,161 +1,169 @@
-Return-Path: <netdev+bounces-267051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNEjNh63smmYOwAAu9opvQ
-	(envelope-from <netdev+bounces-267051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:52:46 +0100
+	id YMZMHlC3smmYOwAAu9opvQ
+	(envelope-from <netdev+bounces-267052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:53:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C82272072
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:52:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6CCD272083
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:53:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9A3DB30074E3
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:52:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC2E2300D170
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C1A3BE658;
-	Thu, 12 Mar 2026 12:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B073BED6D;
+	Thu, 12 Mar 2026 12:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSaWi2gP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QAucDxXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729A92D8DC2;
-	Thu, 12 Mar 2026 12:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773319959; cv=none; b=aakc8qiZAGWXLeWipLdjbFBAN1KY1ZXRWS73zK3BztbyfOn36/z9Al9wXxpb36Cy8GtiRl14oHvkJUdfyT6ExIcD3+d0m/15oNxxCb6+zORvc17NzAMyepsGFhMAvg9CIX4f8vhzLkHlHuuiiQigVxvA+Vv0GCUpqWdyBk0Rwhk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773319959; c=relaxed/simple;
-	bh=XU3qMOLHx5LF82p/dzJ0X7DRVsKLx2VKAUG2jpRhIbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FRHmnmVojGQ4l3kLe9aqwGFkHvkSb5jIV7gVXxM7XvL3AtLcNDS45EH+VPko6maN4nMTTu+VB3Bpn2/QgwtKtpiR8MS76fRVgufaITvxw9+YwNw/w8Zc0etNwE5UvwQdMSZNFnuMOxiqKJN/IHxBJG9hsEhLbYGJsn3Acri/MnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSaWi2gP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EAEAC4CEF7;
-	Thu, 12 Mar 2026 12:52:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773319959;
-	bh=XU3qMOLHx5LF82p/dzJ0X7DRVsKLx2VKAUG2jpRhIbw=;
-	h=Date:From:To:Cc:Subject:From;
-	b=TSaWi2gPT0Fw5brUD+oEH/XSmmorUTSfBFou+F4EFlOtupQndlTy/pIvo0ps4BORl
-	 I5p6AuL8lhTH9v2GkNQNLBx0egM2sRL0pLp/jxfH8YwhHGRKyU4Z1YcGWmggLbjMhE
-	 Xd8uIL1eTOBAuCI/Zd3AonJInZZN5wALOpLy+YouIu5gkZ9DhyHaimn8WnOMvlAwpD
-	 7TzE7WJAhr8eX163NhgyIBWNKQwXMJW55t6z6YbS1K2tG27PjMY5A2R2z/3WZWsNbY
-	 PIKGmR4ImAGLQxl/AbR293U6MjL8OZPN37YMFiXHyZPVagCCMbBr1xiMZ25l6yehIf
-	 /MKax7YF1U45g==
-Date: Thu, 12 Mar 2026 12:52:34 +0000
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Chintan Vankar <c-vankar@ti.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <abK3EkIXuVgMyGI7@sirena.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA52387597
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773320011; cv=pass; b=oLAiZnO0VgViYODvXBDXKIzbafLW+pGjBgPGK32aB+pUmzZIgLzecQrroZkOfO4XhzGXbrM2tyPtRoZi/qKZwomk2sbhEdI2tYDbkWBlGTbOc4y5vF7NAA/Zz3xsOmHVj0mbDtqLTgrRV4qYlwfz/L8MotGAdsRWpYCtAij3MyA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773320011; c=relaxed/simple;
+	bh=KFziMjOBcymobbH9+U0FWDKq4cjycH+PnY/wu6baXH8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aIJ7gjsDcSxuETNVoMjQ08PhwuP9Je6acaWvz5vGGDpckxmvUM33UYjqOkPIfZfBJ4BH5LqaSsDf9gzmLaY7rfxH3gfxbUB1uy39ojlSk4K0NN5dXMmqpUACgmh3msIzDsooEzr3Mo0HA7CbyQXYd+OKzTThWm2pTt5cF0BMjJ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QAucDxXK; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5094e1d17d3so4768921cf.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:53:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773320009; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DLnuMJocsWnUD5bkZ2UrkeCV9LmwVybYq0zLScGwCQIORPtJJHfGcLE+cr3pG/M1oz
+         RFJ7TjoLcMGKzONhXY0VbcR0e2p/nAXtgk84wUM2R2E8pB3NoXGfllLCj3h/hkdFB+ql
+         5lEvF4H1fLpXwLcR+xM82el3NAfadDvnlUR4N7Rc0H8kNCvCRZcsAfD3Q8MQ/5e6G0Hw
+         bgS1wRZGIeK7ipEbonXCcdX5ZERaa0PJPDqY5sHAVB5wvHQ8rmsDylNSsf8LwqO4DJc9
+         XjxfFzUb5o7AIheiNAPUeodb47D1bnodfRzaeCorWDlwBgHqWnGVnv9ReGDFVWzwE7Hi
+         o4bg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
+        fh=G7T91DM+IJD7N449WJQR/xVG8VUQrxsh9mw03iisrxE=;
+        b=KGVraCGJlStY5692f8J9I4+JxbbfIIX6zIEMEy12C1/3du0sE9TpCO3UvF5w3A77TY
+         +WJA4Ev0wvDeCUJfoi3bT520KMiHZ7abBLB+UxyGkKgo/CF9WDo2KwzLeEy2+5o4enFQ
+         L6hDzQJPyW0R3Q00y9eMbDSvpysSo6fqOSywr4HqT4t0MeXTSpxo6dMUlQNBjogjEo8k
+         HbQlBw90FDKkf/yVyrfJ8tmMZ+h77uTbfqwLq31eAvNMq9dy4b/vvhRvXDWlo0t4yjC2
+         vEuex2VAvmPS6SLCJsclc0lO2rA5h5UAIZYiK1aDxU92JZyC0O1aAq2K+KdQOuLzxKpd
+         de8A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773320009; x=1773924809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
+        b=QAucDxXKECQDJsSUSRU11tUioHzBoCISUI0l1EoO6cXwjA0sGvj5Hrlfg4KB2Uz0ww
+         Cl3L2AaMMfOkGp63MXGmnB6EpVfy6ebrq7Nknwn0VotmN9+PRecJ+29zwT4N/T/qq92i
+         7f1r714VwV97rQwbxGksvfgRu42B2UD+WBpYn3FgqXbeHEG+ai9eAAswwGAQau88apOh
+         xCi98k4g8Vv4v0ZnjEIIn97ngGhScQG8cCWHEjShzRt8ZaHrPjQHtHXjIHJiybqxVsEM
+         Ju5ZV0gJzlNdpKhTO9OzLQcNMfVCteSTjdULOfL7h5kpzzlNsqjaV+0F+odpzadbusds
+         dUOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773320009; x=1773924809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=a8YJhd9gU2EuvqoJa544eSxYDsSx04FnxayPZrRsaKA=;
+        b=TB2mCd8mYR4yFD/sYSZaiOK/MDrpJy9irkLsIzGdUaYS+oCIhBxceWmWCUhvfOIA3P
+         YrRMcYAmr18m2Bkm02o0VPj7wOl75YJpAgFfTssA0XoQ0LH5BWqxeK30OK9KXKjJN6sT
+         bM+k91MQhLuk/tj/61Fw7weUWMSSsSs7aHTyMDDnkTuiaqUbgH7x9gJzG9xZc4CZbNRL
+         sWIdYLz3NTyE7hZw8XusfjxTtoWCyYCdmv05jj7a27k1Ci9W9bn/jjhpskSUgoAlZPvy
+         Us42Gwd+DKbFMvmUCE80C0AYiJ3XtYrjZBiS+wQolSJ/gdgRSG44iKy3/Kc9WjtufMxe
+         vjuA==
+X-Gm-Message-State: AOJu0YwryMWzyP2PYP9lxnq8sZ4rLzu/P6R3RtIo1Gad9PDiIVfZLjfR
+	MsvhPrVAIttj9HvG4MI1VM+VCjgIIMfcDVVMU1sq21qQmR+9dTYTIah/3vrO9KJGYUHGIpTusey
+	slmc+ItWDgNoukpRGR1Q6VKBEi4MJdaGLC8S0E1Dj
+X-Gm-Gg: ATEYQzzjamAehWqATVjizbGoGwx57BjqMkYQYMFocQf+K6fG57gyik58sIFigUgTTBm
+	PhJcE3ViQlIMxpJxG1jeP6YV+d1nUvIm008Cr35O0A48GUpyV1Ujxwg5dAsulyXvxNyNrNEP8Z9
+	qszf8ZdmABuS8DeHrRclfc7DmFSC5OS0dqTHdpNwpvEdrLtU1a39IB/YUzwyRdoE7cR6L4pUYkQ
+	z/8XucK0+9g/SD9Hn/wZoXWP1DJ+BU/JRtqse37SiIOzvCpZs5dnErRkq2vi1XruNtV/KVWrwg+
+	ulfoaM4q
+X-Received: by 2002:a05:622a:1444:b0:509:1d4b:f860 with SMTP id
+ d75a77b69052e-5093a17bd2amr74313571cf.58.1773320008905; Thu, 12 Mar 2026
+ 05:53:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="BKOKz4LaxThvnM+6"
-Content-Disposition: inline
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+References: <20260312124807.186341-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260312124807.186341-1-jiayuan.chen@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 12 Mar 2026 13:53:16 +0100
+X-Gm-Features: AaiRm51C8JKaShcVCmTj8WnlFo47h4RuGaQUwtBwhV3ZwNIzVoTZf9wylwESeOc
+Message-ID: <CANn89i+urEcFJkOsE9_3nOzVa2Ee1sFb26vrNnJV-jW2z76y2w@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] tcp: remove redundant memset in hot paths
+ with CONFIG_INIT_STACK_ALL_ZERO
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267051-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267052-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E0C82272072
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,linux.dev:email]
+X-Rspamd-Queue-Id: E6CCD272083
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Thu, Mar 12, 2026 at 1:48=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
+>
+> Modern compilers with CONFIG_INIT_STACK_ALL_ZERO enabled
+> (-ftrivial-auto-var-init=3Dzero) automatically zero-initialize all stack
+> variables via `rep stos` in the function prologue. However, the compiler
+> cannot eliminate explicit memset() calls on those same variables,
+> resulting in redundant zeroing of the same memory region.
+>
+> Replace explicit memset() with `=3D {0}` initializers for stack variables
+> in TCP hot path functions. With `=3D {0}`, the compiler recognizes a sing=
+le
+> initialization and generates only one zeroing sequence, whereas a
+> separate memset() after declaration always produces a second `rep stos`.
 
---BKOKz4LaxThvnM+6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No sorry. It seems you missed
 
-Hi all,
+commit cfcceb7a39fc10a6f896af8229bf81d96acb22cc
+Author: Keita Morisaki <kmta1236@gmail.com>
+Date:   Wed Mar 4 20:15:17 2026 +0900
 
-Today's linux-next merge of the net-next tree got a conflict in:
+    tcp: shrink per-packet memset in __tcp_transmit_skb()
 
-  drivers/net/ethernet/ti/am65-cpsw-nuss.c
-
-between commit:
-
-  840c9d13cb1ca ("net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter value fo=
-r PTP support")
-
-=66rom the net tree and commit:
-
-  a23c657e332f2 ("net: ethernet: ti: am65-cpsw: Use also port number to ide=
-ntify timestamps")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 265ce5479915f,a38bf7f4f4343..0000000000000
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@@ -1351,8 -1351,8 +1351,8 @@@ static int am65_cpsw_nuss_rx_packets(st
-  	ndev_priv =3D netdev_priv(ndev);
-  	am65_cpsw_nuss_set_offload_fwd_mark(skb, ndev_priv->offload_fwd_mark);
-  	skb_put(skb, pkt_len);
- -	if (port->rx_ts_enabled)
- +	if (port->rx_ts_filter)
-- 		am65_cpts_rx_timestamp(common->cpts, skb);
-+ 		am65_cpts_rx_timestamp(common->cpts, port_id, skb);
-  	skb_mark_for_recycle(skb);
-  	skb->protocol =3D eth_type_trans(skb, ndev);
-  	am65_cpsw_nuss_rx_csum(skb, csum_info);
-
---BKOKz4LaxThvnM+6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmytxEACgkQJNaLcl1U
-h9Ce4Qf/QPfy8FS3+1+khTB0KrNCnmKU0ylwfvhaX1tdznGj4KU/CepWn/xjjYUa
-3k7nVtTP12SbqEUMTgTcT/j2SOhj/C7SfBJBMSBZIm1mjihgSffHLEC6uwHKDmM8
-bqWjgG2q9REu7yNPGKD2CKNOLhXVaocMADhD9azPeOCleclRo6tWaZ45BIwKIpKh
-n2a8XMlr7AmbAiumB00gkWVyWMHDrOjf9l3dZeHCOqGOBCI2t/m/LaLgjWbGEr7J
-I4CpZQ8TaTJjdHGo1cCM0hXvMhDxKIaG9cVdurRbp2IbW+PzqBQkIfXc9A+QbJQA
-u8/vuVFbucpZrxZ92/RFQsUva6SPCA==
-=122z
------END PGP SIGNATURE-----
-
---BKOKz4LaxThvnM+6--
+No need to resend your patch, I do not think it is a good idea.
 
