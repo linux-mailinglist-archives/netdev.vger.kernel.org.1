@@ -1,78 +1,60 @@
-Return-Path: <netdev+bounces-267106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267107-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDE5Fn7PsmmPPwAAu9opvQ
-	(envelope-from <netdev+bounces-267106-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:36:46 +0100
+	id aFY4BEnRsmnrPwAAu9opvQ
+	(envelope-from <netdev+bounces-267107-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:44:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20EB27379D
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:36:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D42273909
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5E5BF3026A93
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:36:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C75D03160F79
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603E13750B5;
-	Thu, 12 Mar 2026 14:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2093A3C1979;
+	Thu, 12 Mar 2026 14:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOnWULja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bpMxmg5U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C519328243;
-	Thu, 12 Mar 2026 14:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B723A4F2C
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 14:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773326203; cv=none; b=KbrEYSWK28+//rOJF9NXx/8qlEt3e3v/009ZZceUTrBSOFme2ku6FelFPYDjbsAAhv+QD2kkdZmYFkaDRB6uxw8qVcyfOodsuMcVxDpn/aYbICF86iZNqZz2RdKAhIGaf1fzdr2UKV7XYV1NJn1ikNBYO8CMPfxNZxvMkeof6BU=
+	t=1773326547; cv=none; b=hwM4EbuLr1xPBZO0/SXE5fbJfqZULMM4D5RXSLwsBh+UZC8FSYO0D+2mWJRoIKisZQdguq2Z+3zaQgWphDSMMtuurCsOjQl6rZs3/4tZdHqduEUOD3SRd8bczO3D1BH5irPuvx7Rm9TMzQ39c4P7xRbIlz/o3LInVjWuezvcRQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773326203; c=relaxed/simple;
-	bh=uIol7kReUwc484w6eaVeHC9JSYYQ/xkuA7eqjzZdjWY=;
+	s=arc-20240116; t=1773326547; c=relaxed/simple;
+	bh=6Qr5Lqzt2TKO4ndBM40+Rf8eOWfEXXbUKDK6Jz+dC7Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pDPawfswkXfikqxhzcYO2LxWi1DpWmMp1ztChR6+SWmP5/9KXpp/nhs/cPA/nzB000PaWAEwrLT6kEvf7oXVVL9cRIBafGU8klmwKS2m9fjl4/Nb76/W9JO8UtLGji3MV1Q6o8lS5WEIVV9HCXuD58vA6smkNVsgTxD3xhXvI0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOnWULja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFAC3C4CEF7;
-	Thu, 12 Mar 2026 14:36:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=eYJsT/mDIgQ9McG4fWZMivAtqiENbHuETRlem417FqWCPmUTt6ognZhpYgidghqBPpl+yvd7GUPFNo0hpHCD5Z4rhf/i1JKYaf+srewkRzrLgRDUsaRgwEaMt4wK4yMgSyRpBFtZPoFxeBVQreP1gNZkRx8CJluATlkJBem5tUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bpMxmg5U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 919D0C4CEF7;
+	Thu, 12 Mar 2026 14:42:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773326202;
-	bh=uIol7kReUwc484w6eaVeHC9JSYYQ/xkuA7eqjzZdjWY=;
+	s=k20201202; t=1773326546;
+	bh=6Qr5Lqzt2TKO4ndBM40+Rf8eOWfEXXbUKDK6Jz+dC7Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fOnWULjaWfSeAL+ujb69MF5efDFV+BdDdjL+KJ6LPn1/sq6yWSyEvG19ajrOKCXTB
-	 B9C22iW21TAf4Kfv+kkOoWZUbUncIdI6cHV4KkNu1MbG/FKsk0kXSLq4E20/l5bsy8
-	 ltDEl8Zzvs1GWdKYysz6bIX0RXPX4cyvhFPd6xDeB8sCYpyYIt28Ml0ODdbKkxaM6I
-	 fmm3xAfvl4FBFjGgoDqXGq4Hp+FOCn0Kq4CeL5iE3cOl3VR5towpDhpuV6pKZpfS6k
-	 AX+qozqXUO1sXP2+3opJNOITzdgH1ApO40Xl07WPh9VEzDpIFVqRdWJvKssD5p1e6a
-	 baA2jFgDxmXmg==
-Date: Thu, 12 Mar 2026 07:36:41 -0700
+	b=bpMxmg5UOAiMC6OE7QbjMoUeH54aXEm+/rIn7I67Jte7+lCVTSt8PNv/SK/2PgcJ1
+	 7NnqyTBM3or2V3JebBnKcKwo9q4AFoIUKqKNTvuAThRp9F3MmA6LpsRhyniNBCkxnd
+	 a8EPBFNOG3M34p9mANm+KD3SRHwncDo0Umyp3ZBBQMgLk+DrOcKZein6OEVjdmVxoK
+	 Wxs70TUQvDOL3fYvT+C9Bp4X9YvAK+si0DtWrPjV/QOBvQDs18CvxZIHGOEoDAsCtS
+	 afLceEvdHAJ9NExeK9ptPZhHzoj4Ts+IytMXDssGBM24hQ6fCQrG7amoWN0ZV1t7SU
+	 qPo5WmV+bZ/4Q==
+Date: Thu, 12 Mar 2026 07:42:25 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Or Har-Toov <ohartoov@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark
- Bloch <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Dragos
- Tatulea <dtatulea@nvidia.com>, Shay Drory <shayd@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net-next V3 00/10] devlink: add per-port resource
- support
-Message-ID: <20260312073641.027d86e7@kernel.org>
-In-Reply-To: <fw6blzybx7hmvxvqoiy7civmzbf4yuhn2xzdna4apypkuwvck7@xh7iwjt27vi6>
-References: <np44uzfn6jea56uht4yq4te5clapgj7pk6ygyvkl22wxumwnvt@nrpvzjqzxenq>
-	<20260305063729.7e40775d@kernel.org>
-	<ni23r4jiwgc6zjjsubtl4ujjgxzwpxrylumofdwxgozfnieynm@zirlbneaz6p2>
-	<20260306120301.0ebe1ab2@kernel.org>
-	<74dcd7c5-8a2b-49a7-a23c-174d17a61955@nvidia.com>
-	<20260309133341.7e08b35d@kernel.org>
-	<5de5103e-e2e4-4b72-9c3c-22847728fbb8@nvidia.com>
-	<20260311145126.7dcca532@kernel.org>
-	<go5wr5qa7wxe7i4kkcbmecomshpkesr26alq4qmlbpjr72hxgt@mpwq6eufylpn>
-	<20260312071916.6b759c3f@kernel.org>
-	<fw6blzybx7hmvxvqoiy7civmzbf4yuhn2xzdna4apypkuwvck7@xh7iwjt27vi6>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-next v4 1/2] ethtool: treat RXH_GTP_TEID as
+ intrinsically symmetric
+Message-ID: <20260312074225.27a4a7b3@kernel.org>
+In-Reply-To: <20260312093101.1589970-2-aleksandr.loktionov@intel.com>
+References: <20260312093101.1589970-1-aleksandr.loktionov@intel.com>
+	<20260312093101.1589970-2-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,61 +63,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267106-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267107-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_THREE(0.00)[4];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F20EB27379D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 92D42273909
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 15:29:53 +0100 Jiri Pirko wrote:
-> >> I don't see the benefit of exposing the scope to the user to be honest.
-> >> I mean, dump would show all, dump with "dev" handle would be used as a
-> >> selector to dump only things related to "dev". What is the use case of
-> >> this "scope" granularity?  
-> >
-> >If we follow the logic that dump should show the user relevant
-> >resources, no matter which sub-object they are attached to -
-> >having a dev specified should only filter the objects to match
-> >the dev, including resources which are on ports of that dev.
-> >
-> >IDK if there's a strong use case for allowing the user to set
-> >scope on CLI but also - I don't see why not?  
-> 
-> At least some small sense of consistency with other dumps? Health
-> reporter and region does not have scope and output mixture of dev-based
-> and port-based objects. Why to confuse user?
+On Thu, 12 Mar 2026 10:31:00 +0100 Aleksandr Loktionov wrote:
+> +	/* Strip TEID before checking - it carries no src/dst asymmetry */
+> +	rxfh &= ~(u64)RXH_GTP_TEID;
 
-That's a judgment call - either we confuse users but two commands
-behaving differently, or we confuse users with devlink $thing not
-dumping all instances of the $thing.
-
-Especially that drivers often retroactively move $things from device
-scope to port scope :(
+No need for the u64 cast.
 
