@@ -1,168 +1,117 @@
-Return-Path: <netdev+bounces-266811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIc0EGwKsml7IAAAu9opvQ
-	(envelope-from <netdev+bounces-266811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:35:56 +0100
+	id uEX6L90LsmmmIAAAu9opvQ
+	(envelope-from <netdev+bounces-266812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:42:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A511426BB5A
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:35:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F6326BBAE
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F315830E2321
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 00:35:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 677D43064E9A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 00:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F78342538;
-	Thu, 12 Mar 2026 00:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58B2346FCF;
+	Thu, 12 Mar 2026 00:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="T6oJT5zW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bw+LA19b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8245633DEC0
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 00:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B991A184;
+	Thu, 12 Mar 2026 00:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773275748; cv=none; b=uxo7WyqGNkP18uMjxhelKgcjCD26TaEdWdyAhK89xWcf47qPsas4Z5QXHM93clNfIQ0WS7+4Dihe3OKIC5W6slzEQzMcpXFFjkDlHiAZaGLepD6y8pbVevB50nySoZMBiiIXESXoVnvgPhksV7uJ3DAWOSCzPEOKb8yhGn1tQEI=
+	t=1773276117; cv=none; b=kNOZnYz3vco2+0YkU3hW32LJ4OpUkF6gOJNi5cOS1Mhw1ey67W380+u/bxAfnMwi6fuuM4sbtxtPfFzNVT0ESRwcFLn7Qc8Kzpxb9kDBlpNoRtyYzpnizIyNi39hhDujwORPblrHTefUavDw6D1+mBbxO7eZwT1iKFG3e6eh/FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773275748; c=relaxed/simple;
-	bh=bu9Oih6osFV7rtjEbKgQ3kyOQcVL4TprE4RKoYQKLtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gzUSjm9jVFZ3uMKDhSYYnI/PvAjoIXORVogXlkcOQsbUiUvzVEZZoY7lEVWvTBVrRXl66oi1YaK4rD6+ajQJHG2xZrO3aBZ/R3PN8+4nexkBWbgE5HEvgLXtcTfKL0M+cGpgeRyL9r78vuoID2UmLSk3pNbdwmikAanoTeC+IYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=T6oJT5zW; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8ca01dc7d40so41820885a.1
-        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 17:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1773275746; x=1773880546; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bu9Oih6osFV7rtjEbKgQ3kyOQcVL4TprE4RKoYQKLtQ=;
-        b=T6oJT5zWuYFu//UQ44qIFvKBmmdQ907fAqU0B+SynFOCaH3CICCfLE0JIjo+TrRBCu
-         OWMafBCtK5bj9+8WW19IgoMJauzYE3PxouS7PlZhkKO5SK72+SCn5P420BHbtOt0bTmC
-         kuwmvPQZMYPvu/jJ3ucg4ED095KdqdtZEW9+LILVV5HHOmD4ibcRTe05tDLb8yag7tkD
-         syQ+G3523JJsJZhXT3omA0rJ9+mlqaWOlAx4NEkOcM4eHniVed/UyP8zYqhuVU/3p94v
-         qXvRZQSrkZLzBsLQceILOSorD+7MoYauHXw3sIbiclHi/HDiL9n36+GeHX5RM3minec6
-         +tDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773275746; x=1773880546;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bu9Oih6osFV7rtjEbKgQ3kyOQcVL4TprE4RKoYQKLtQ=;
-        b=kZuFYOJBc3fhT6rwxSfMeGXyrGDDxf4kQ4/+Nhf/ea486X2Nor9VWAPn+F7biLK8fQ
-         glWgn2/QyrRU32+2eIrao7SiRVJ/EHh5egniszsSeg+j5S9fXhodHMfE6VKEwG8S04nC
-         hfqe7lK0aB7kA4SvVnro07+xs7+stsGJLaB4nR0ctf47QRUi6S4pY69DoaK05NDVHpLS
-         PfsJ7Rwmazp0fEX4I9IkukPZwmPfX9Fdspj8xQB354VssTQhOSDlvTGD6hamubxz3/vY
-         DJswhXNcr1XYIZWMbQR7XP/l+K0pzeumloE9RAZnLKlXtDR9vLXONA8JOUnXJ+afZkCN
-         tcAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXo1DTU6fsvN4cllQD5+n++ujbZn49WL9IuAUX/UlwRmmPxZpxb4KFBmMBgjRNaCa0OKPXys5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0ApxGaWWjoA+2YTXN6tM0t9GwdwXrFG//l4CKA6dyFRVVUYhs
-	UGNiLl2OFB1zEcnU3sSalZJ+1JLF9dEZQ/MAxs0QJ0cm7eIc3PmpLZI1jZ0McIE91zA=
-X-Gm-Gg: ATEYQzxt0njXLNE0AaspNqs64MwUXwLs25hNDe540cKnFHztOnSHtXrACn1z8WfRX4q
-	+37FsmP4Umk8nPqoTd9oV82qT/tCGVUKjnCn+WNwipfOxV8SxFgs9Y9u7eE0AUFaWDOhiKo1GqE
-	tojbeGAtbEr36FrJDvu7MyijQItxsurf/8YprQfI9gSui0zbMpTq3gsxDcGQr6XH1NPn7VHYU28
-	DOa2CuX+6I3J8/MdkMK+CSxbYgYUvnNECltds/ksUkk1CKcImQFGvFNpZgkCsQuKdoK44otaTta
-	Q0It1NWmCHY5PAnl6hslVYxBBxpDdRvESf12erGhvfasJGb//NxoUiqyJ5eCDZX//7R6RtFVuQu
-	zqF0Do7gE5N1MtSrEwfOmz52YDnmj7J59Lx00/I2cdGl1bsb1nur9Maf2msnSI0dXOXIB+p2IWy
-	td+DvxBeRPvwezvqK/BwF6oKmbYEFxG6c0FBzcT3kj/gzGwAT2EBQzGxlJK/h+eW6d8SgftX/NH
-	eARb5ds/bjPl/V3Etw=
-X-Received: by 2002:a05:620a:711a:b0:8cb:5176:f00 with SMTP id af79cd13be357-8cda1a95cd3mr623140585a.45.1773275746517;
-        Wed, 11 Mar 2026 17:35:46 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cda21100cfsm239690985a.24.2026.03.11.17.35.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 17:35:45 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1w0U1g-00000006a0E-4BUf;
-	Wed, 11 Mar 2026 21:35:45 -0300
-Date: Wed, 11 Mar 2026 21:35:44 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Praveen Kannoju <praveen.kannoju@oracle.com>
-Cc: "saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"mbloch@nvidia.com" <mbloch@nvidia.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Rama Nichanamatlu <rama.nichanamatlu@oracle.com>,
-	Manjunath Patil <manjunath.b.patil@oracle.com>,
-	Anand Khoje <anand.a.khoje@oracle.com>
-Subject: Re: [PATCH] net/mlx5: poll mlx5 eq during irq migration
-Message-ID: <20260312003544.GB1469476@ziepe.ca>
-References: <20260304161704.910564-1-praveen.kannoju@oracle.com>
- <20260304201151.GI964116@ziepe.ca>
- <CH3PR10MB7704DD1E6B9A671796FC6B528C7DA@CH3PR10MB7704.namprd10.prod.outlook.com>
- <20260306003217.GB1687929@ziepe.ca>
- <CH3PR10MB7704ABC8F3909C60FFDFB1188C7AA@CH3PR10MB7704.namprd10.prod.outlook.com>
- <20260306231024.GF1687929@ziepe.ca>
- <CH3PR10MB7704D1DF6471E59D47ECEB098C7BA@CH3PR10MB7704.namprd10.prod.outlook.com>
+	s=arc-20240116; t=1773276117; c=relaxed/simple;
+	bh=m0D3pcE3jYTk271mEEpVdN7yiHD5YT9bVKW+WrAU2QI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nrrz1RAKrGtU3e1ZRZa4RrDq1x1tyBGdgpeYKu+e+YhVu3qC4BIwxc+AfFiJjldF2B4tlaZuG9QsuHQRVykPd8nunn9tAAtMUhOMN7uvFGpyrycKsY0vITpsdIj19370ivZLL2Mle0sQknMWq3U7RRAjW4V/TGDOeId4TUzcXac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bw+LA19b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96EC2C4CEF7;
+	Thu, 12 Mar 2026 00:41:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773276117;
+	bh=m0D3pcE3jYTk271mEEpVdN7yiHD5YT9bVKW+WrAU2QI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bw+LA19bmpT0cC42EkfWWon734d//jcwuISX9USljTKKXf6iDURtEgTy3v6NC6Dr8
+	 vEWx8oHqILiodJtOUBuqKBDW5pMh047H9qHoWXPfW4QcANCjkZ4q8pmsHOhZEwp6mz
+	 B/m1znH22QYv9Hh9fOtXJYGSnSb5oTNXGJjSom8BHPXfGd16qbqmI9EWdcfDZt15H7
+	 nLfJxEGogJVU8yCSIMj66qaVBP+vgxMgM4YnRH4NRZSHO13asmwL8NyyHfrnbRlClt
+	 88itsj0Vr5oGUulRPyHzgrbPUknHBg6ofNQ6B/QpoxCUEyffOEOUXEsH7KgYVFd64N
+	 zvgMi3y9zkr0Q==
+Date: Wed, 11 Mar 2026 17:41:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Wesley Atwell <atwellwea@gmail.com>, Simon Baatz <gmbnomis@gmail.com>,
+ davem@davemloft.net, pabeni@redhat.com, ncardwell@google.com,
+ dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, kuniyu@google.com,
+ horms@kernel.org, geliang@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, 0x7f454c46@gmail.com,
+ linux-doc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org
+Subject: Re: [PATCH net 0/7] tcp: preserve advertised rwnd accounting across
+ receive-memory decisions
+Message-ID: <20260311174154.5fadb207@kernel.org>
+In-Reply-To: <CANn89i+dojcg=TDh6E1++g_TM7qdcpnyu47n2Q9DRW_w73TjzA@mail.gmail.com>
+References: <20260311075600.948413-1-atwellwea@gmail.com>
+	<CANn89i+dojcg=TDh6E1++g_TM7qdcpnyu47n2Q9DRW_w73TjzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH3PR10MB7704D1DF6471E59D47ECEB098C7BA@CH3PR10MB7704.namprd10.prod.outlook.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[ziepe.ca];
-	TAGGED_FROM(0.00)[bounces-266811-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,redhat.com,google.com,kernel.org,vger.kernel.org,lists.linux.dev,lwn.net,linuxfoundation.org,goodmis.org,efficios.com];
+	TAGGED_FROM(0.00)[bounces-266812-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ziepe.ca:dkim,ziepe.ca:mid]
-X-Rspamd-Queue-Id: A511426BB5A
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 58F6326BBAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 07, 2026 at 05:43:56AM +0000, Praveen Kannoju wrote:
+On Wed, 11 Mar 2026 09:34:32 +0100 Eric Dumazet wrote:
+> Your series will heavily conflict with Simon's one
+> 
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=1063486&state=%2A&archive=both
+> 
+> I suggest you rebase/retest/resend after we merge it.
 
-> It had been very challenging to arrive at the cause.
-> we went thru many live debug sessions with Nvidia R&D team.
-> but we couldn't root cause. This tells why we eventually.
-> arrived at this mitigation as this issue is wide spread
-> and has been hurting many and many customers in cloud.
-
-It is almost certainly a qemu bug. If you cannot find it, then I
-suggest you work around it by having qemu inject a spurious interrupt
-around the migration situations.
-
-But make sure you have the already known qemu and kernel bug fixes for
-lost interrupts on MSI-X writes...
-
-Jason
+Would it make sense to extend netdevsim and packetdrill to be able to
+exercise scaling ratio a little more? Having it optionally clone the
+skb and truesize += X would be trivial. IDK how many bugs this would
+let us catch tho :(
 
