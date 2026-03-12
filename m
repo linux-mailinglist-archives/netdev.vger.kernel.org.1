@@ -1,734 +1,631 @@
-Return-Path: <netdev+bounces-266867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266857-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKeQDi8lsmnlIwAAu9opvQ
-	(envelope-from <netdev+bounces-266867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:30:07 +0100
+	id gLk6J9sksmnlIwAAu9opvQ
+	(envelope-from <netdev+bounces-266857-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:28:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F52926C3A0
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:30:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08FBB26C35D
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 24283303EFC2
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:28:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74BD230D3528
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BD5375F79;
-	Thu, 12 Mar 2026 02:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F288375F9D;
+	Thu, 12 Mar 2026 02:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fcoZZVI7"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Vll67GVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3B736DA0C;
-	Thu, 12 Mar 2026 02:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0898736C9CA
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 02:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773282527; cv=none; b=NnooTgCZrUet0YNOZUR7VrvOh8NBtTuUfRuIhrwvYegqqdlDVrNOD+sUNd+aSIPn03VukXldgUf0JRcju8Y33AFI4yPdMFQyqv1qoFk0hov49HVdeez9rwabpdsaQPZDnhkrYTJ+MfaEAGSNnn+DSbdEaGkj15UX3mqIjBuZ4Hc=
+	t=1773282491; cv=none; b=mm8x6hVXD2659t3LTdeihfMDVEmTdnBG0//+S2J6oFOcrM0d7AvJd1Qy+6Ne+hkdaZuKs3uaHg0nqiV964lGz7svyMNR7JmSK//JRFdu/D8Kby6FbyApNLcft1lq5xkShsyDzfJ/Eo6uh3lLhTFX7ADhOfBcIrkXoevVHJGG4Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773282527; c=relaxed/simple;
-	bh=RTKGQSqq7VwR0t/eA9PCss0VllwMJrx0v+S1psY2uEw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PU2hsLKX5LFV/O6z5m4SeUG49QilE5BuyHQACfC7ysAe0IU5uWY2qKbARQprb9tufTVeg0gu2mFoQ0cC2Pl/Rph9sLq/SmDL3KypRP6jPXdv2NoyI0gyA44D9biyuBFsQDIp5y7IiqXFWRRXYfOvotWO9ZfdBg7cXsOOf7gdBcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fcoZZVI7; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62BMQY3U2347242;
-	Wed, 11 Mar 2026 19:28:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=A
-	6PtOFCr6U3EoKPsTkPgBm7IF6sMPNp9GX+ZoBx9eZ0=; b=fcoZZVI72GdFvW/B4
-	07DJ/CfE7lpyDEwG+Jf8m15g0cnjjvYr8v8OzZtCOxb7vR0Kt5o7qElkW6RvEqn7
-	PrxnKjZtWGDVRkQWz2WZiuve2QGf/cSYDQrV25QSZ0comJxVD+/NF0fhW3AXKw56
-	EGeg35XrNqqskbPesWL9ueTnwNg7Qu/jOgfzONnbcf9qMMygZx7ScUJBrcWfQtPK
-	bnHkGMkgG/FJsHLrMf2XjnXzTl7XkBHBXPdxZwkjTX67nW9LfbYN8wgcp091Eza9
-	DFd1oK/KzqSSSjNGD0j1GgO9hUhY7kjpFa3wWk/3nRNkfUHB5GYFuYeZ2+Y5ffBw
-	ZAOtg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cuh6kgfq6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Mar 2026 19:28:32 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Mar 2026 19:28:31 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 11 Mar 2026 19:28:31 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 3FB4C3F705A;
-	Wed, 11 Mar 2026 19:28:27 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
-        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
-        <shshitrit@nvidia.com>, "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH v4 net-next 5/5] octeontx2-af: npc: Support for custom KPU profile from filesystem
-Date: Thu, 12 Mar 2026 07:57:54 +0530
-Message-ID: <20260312022754.2029595-6-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260312022754.2029595-1-rkannoth@marvell.com>
-References: <20260312022754.2029595-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1773282491; c=relaxed/simple;
+	bh=E4IKZv2ZIncofEPOfDM8VT2i+1hdV+fnSSIQ8Zz0wbw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HneLPfQrQxuHdlPwlmxf1yKIz/6Qs4lUL6vpnQlqTzbsDztSg60AIuB2o/pdEIG4nlVC0Gm34E/4XbbEhqvgLcQVE1efBESAAYnClTph+Fb5JTsXZouEUjvyrupi72lgL/HQewNsX4Vc6zu+o3vi3xTn2hu6ISfEq0cRq2Ue2iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Vll67GVf; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1773282483; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=ojFMQSfL17nouhZdT/Q9UYVjM603tTezBl8ptFJ8aKQ=;
+	b=Vll67GVf+eSTYTAWTLXaeKK/Jf+vsQmI3Jdy3FX1ZwoG+UWxTtNEWIwrMQUHy4uF0U12hJeP057SHa5bxCtniB65FRXa/G1vHXnxgcu5e8jzA+lZF7+RQvOifoJP3UmmI5iN4pLPCggM2rjsB+4Jibk6Am4HmMNBlBdntprqaTI=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-mnpd5_1773282482 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Mar 2026 10:28:03 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v29 2/8] eea: introduce ring and descriptor structures
+Date: Thu, 12 Mar 2026 10:27:55 +0800
+Message-Id: <20260312022801.90699-3-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+In-Reply-To: <20260312022801.90699-1-xuanzhuo@linux.alibaba.com>
+References: <20260312022801.90699-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 2825a2ca1173
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=aLz9aL9m c=1 sm=1 tr=0 ts=69b224d0 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=hjRhAe108ozKVIP6dDsA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: kBLEF5o6kewoXADu-JxdNddtUTZakDX2
-X-Proofpoint-GUID: kBLEF5o6kewoXADu-JxdNddtUTZakDX2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEyMDAxNyBTYWx0ZWRfXyZmEmOU/gNIf
- KDGQNgAcFIUJQOdWTnUZVlJH2SdeqA6cZJNZnR10JU+X+IA8psxtYN1f1tB0lcYMfrIE48fDIS6
- LEGHwHOTxZnoZnMT1kMfeG9jrjVBoVmyjhM4fjzatsvQbn9Cnu4oOlRsS9rej8VS7qYMmwzO9DO
- 0QV+O2jleXLeUfg5qJ1AmdfkLXZmcOEyJsfyBq1OmXL0F7bMBMvFLnO0eo8dgsJ6xtCjJHP91Ks
- IUaj0clONDPkjNbL3Nbv4um29UhF1UDALp2yq+ijwZhTFLs419tkNuvXqHCz03Sx9fMrkdD30qg
- qjA1EQqnoFrDF2DwpRpUCwTY3LtG62mIh+OLHmORxIFQzPoqcUDIbRTgf46bR1EyDRnW9usG+G1
- N2gvgGKYhxvU0t1lU0+0MgN6NvLn2xcD9HNfTzZz098Sr+8CGd9ZOOkJrdCtjMeBnhF7bziongl
- Jg+71YRr+M6vqIyMMtg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-11_02,2026-03-09_02,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-266867-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266857-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 9F52926C3A0
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid,alibaba.com:email,val.data:url]
+X-Rspamd-Queue-Id: 08FBB26C35D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Flashing updated firmware on deployed devices is cumbersome. Provide a
-mechanism to load a custom KPU (Key Parse Unit) profile directly from
-the filesystem at module load time.
+Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
 
-When the rvu_af module is loaded with the kpu_profile parameter, the
-specified profile is read from /lib/firmware/kpu and programmed into
-the KPU registers. Add npc_kpu_profile_cam2 for the extended cam format
-used by filesystem-loaded profiles and support ptype/ptype_mask in
-npc_config_kpucam when profile->from_fs is set.
+This commit introduces the ring and descriptor implementations.
 
-Usage:
-  1. Copy the KPU profile file to /lib/firmware/kpu.
-  2. Build OCTEONTX2_AF as a module.
-  3. Load: insmod rvu_af.ko kpu_profile=<profile_name>
+These structures and ring APIs are used by the RX, TX, and admin queues.
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c |  21 +-
- .../net/ethernet/marvell/octeontx2/af/npc.h   |  17 ++
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +-
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 269 +++++++++++++++---
- .../ethernet/marvell/octeontx2/af/rvu_npc.h   |  17 ++
- .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
- 6 files changed, 285 insertions(+), 46 deletions(-)
+ drivers/net/ethernet/alibaba/eea/Makefile   |   3 +-
+ drivers/net/ethernet/alibaba/eea/eea_desc.h | 134 +++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c | 252 ++++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h |  88 +++++++
+ 4 files changed, 476 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 8dad272fd069..c8c09a91b13f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -521,13 +521,17 @@ npc_program_single_kpm_profile(struct rvu *rvu, int blkaddr,
- 			       int kpm, int start_entry,
- 			       const struct npc_kpu_profile *profile)
- {
-+	int num_cam_entries, num_action_entries;
- 	int entry, num_entries, max_entries;
- 	u64 idx;
+diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
+index cf2acf1733fd..e5e4007810a6 100644
+--- a/drivers/net/ethernet/alibaba/eea/Makefile
++++ b/drivers/net/ethernet/alibaba/eea/Makefile
+@@ -1,3 +1,4 @@
  
--	if (profile->cam_entries != profile->action_entries) {
-+	num_cam_entries = npc_get_num_kpu_cam_entries(rvu, profile);
-+	num_action_entries = npc_get_num_kpu_action_entries(rvu, profile);
+ obj-$(CONFIG_EEA) += eea.o
+-eea-y := eea_pci.o
++eea-y :=  eea_ring.o \
++	eea_pci.o
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_desc.h b/drivers/net/ethernet/alibaba/eea/eea_desc.h
+new file mode 100644
+index 000000000000..90c402bd6c36
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_desc.h
+@@ -0,0 +1,134 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
 +
-+	if (num_cam_entries != num_action_entries) {
- 		dev_err(rvu->dev,
- 			"kpm%d: CAM and action entries [%d != %d] not equal\n",
--			kpm, profile->cam_entries, profile->action_entries);
-+			kpm, num_cam_entries, num_action_entries);
- 
- 		WARN(1, "Fatal error\n");
- 		return;
-@@ -536,16 +540,18 @@ npc_program_single_kpm_profile(struct rvu *rvu, int blkaddr,
- 	max_entries = rvu->hw->npc_kpu_entries / 2;
- 	entry = start_entry;
- 	/* Program CAM match entries for previous kpm extracted data */
--	num_entries = min_t(int, profile->cam_entries, max_entries);
-+	num_entries = min_t(int, num_cam_entries, max_entries);
- 	for (idx = 0; entry < num_entries + start_entry; entry++, idx++)
--		npc_config_kpmcam(rvu, blkaddr, &profile->cam[idx],
-+		npc_config_kpmcam(rvu, blkaddr,
-+				  npc_get_kpu_cam_nth_entry(rvu, profile, idx),
- 				  kpm, entry);
- 
- 	entry = start_entry;
- 	/* Program this kpm's actions */
--	num_entries = min_t(int, profile->action_entries, max_entries);
-+	num_entries = min_t(int, num_action_entries, max_entries);
- 	for (idx = 0; entry < num_entries + start_entry; entry++, idx++)
--		npc_config_kpmaction(rvu, blkaddr, &profile->action[idx],
-+		npc_config_kpmaction(rvu, blkaddr,
-+				     npc_get_kpu_action_nth_entry(rvu, profile, idx),
- 				     kpm, entry, false);
- }
- 
-@@ -666,7 +672,8 @@ void npc_cn20k_parser_profile_init(struct rvu *rvu, int blkaddr)
- 	num_pkinds = min_t(int, hw->npc_pkinds, num_pkinds);
- 
- 	for (idx = 0; idx < num_pkinds; idx++)
--		npc_config_kpmaction(rvu, blkaddr, &rvu->kpu.ikpu[idx],
-+		npc_config_kpmaction(rvu, blkaddr,
-+				     npc_get_ikpu_nth_entry(rvu, idx),
- 				     0, idx, true);
- 
- 	/* Program KPM CAM and Action profiles */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index cefc5d70f3e4..c8c0cb68535c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -265,6 +265,19 @@ struct npc_kpu_profile_cam {
- 	u16 dp2_mask;
- } __packed;
- 
-+struct npc_kpu_profile_cam2 {
-+	u8 state;
-+	u8 state_mask;
-+	u16 dp0;
-+	u16 dp0_mask;
-+	u16 dp1;
-+	u16 dp1_mask;
-+	u16 dp2;
-+	u16 dp2_mask;
-+	u8 ptype;
-+	u8 ptype_mask;
-+} __packed;
++#ifndef __EEA_DESC_H__
++#define __EEA_DESC_H__
 +
- struct npc_kpu_profile_action {
- 	u8 errlev;
- 	u8 errcode;
-@@ -290,6 +303,10 @@ struct npc_kpu_profile {
- 	int action_entries;
- 	struct npc_kpu_profile_cam *cam;
- 	struct npc_kpu_profile_action *action;
-+	int cam_entries2;
-+	int action_entries2;
-+	struct npc_kpu_profile_action *action2;
-+	struct npc_kpu_profile_cam2 *cam2;
- };
- 
- /* NPC KPU register formats */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index a466181cf908..eb2e4ccf070d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -553,8 +553,9 @@ struct npc_kpu_profile_adapter {
- 	const char			*name;
- 	u64				version;
- 	const struct npc_lt_def_cfg	*lt_def;
--	const struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
--	const struct npc_kpu_profile	*kpu; /* array[kpus] */
-+	struct npc_kpu_profile_action	*ikpu; /* array[pkinds] */
-+	struct npc_kpu_profile_action	*ikpu2; /* array[pkinds] */
-+	struct npc_kpu_profile	*kpu; /* array[kpus] */
- 	union npc_mcam_key_prfl {
- 		struct npc_mcam_kex		*mkex;
- 					/* used for cn9k and cn10k */
-@@ -564,6 +565,7 @@ struct npc_kpu_profile_adapter {
- 	bool				custom;
- 	size_t				pkinds;
- 	size_t				kpus;
-+	bool				from_fs;
- };
- 
- #define RVU_SWITCH_LBK_CHAN	63
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 352dc5f1d5b9..e348cdd375eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -1583,8 +1583,12 @@ static void npc_config_kpucam(struct rvu *rvu, int blkaddr,
- 			      const struct npc_kpu_profile_cam *kpucam,
- 			      int kpu, int entry)
- {
-+	const struct npc_kpu_profile_cam2 *kpucam2 = (void *)kpucam;
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
- 	struct npc_kpu_cam cam0 = {0};
- 	struct npc_kpu_cam cam1 = {0};
-+	u64 *val = (u64 *)&cam1;
-+	u64 *mask = (u64 *)&cam0;
- 
- 	cam1.state = kpucam->state & kpucam->state_mask;
- 	cam1.dp0_data = kpucam->dp0 & kpucam->dp0_mask;
-@@ -1596,6 +1600,14 @@ static void npc_config_kpucam(struct rvu *rvu, int blkaddr,
- 	cam0.dp1_data = ~kpucam->dp1 & kpucam->dp1_mask;
- 	cam0.dp2_data = ~kpucam->dp2 & kpucam->dp2_mask;
- 
-+	if (profile->from_fs) {
-+		u8 ptype = kpucam2->ptype;
-+		u8 pmask = kpucam2->ptype_mask;
++#define EEA_DESC_TS_MASK GENMASK(47, 0)
++#define EEA_DESC_TS(desc) (le64_to_cpu((desc)->ts) & EEA_DESC_TS_MASK)
 +
-+		*val |= FIELD_PREP(GENMASK_ULL(57, 56), ptype & pmask);
-+		*mask |= FIELD_PREP(GENMASK_ULL(57, 56), ~ptype & pmask);
++struct eea_aq_desc {
++	__le16 flags;
++	__le16 id;
++	__le16 reserved;
++	u8 classid;
++	u8 command;
++	__le64 data_addr;
++	__le64 reply_addr;
++	__le32 data_len;
++	__le32 reply_len;
++};
++
++struct eea_aq_cdesc {
++	__le16 flags;
++	__le16 id;
++#define EEA_OK     0
++#define EEA_ERR    0xffffffff
++	__le32 status;
++	__le32 reply_len;
++	__le32 reserved1;
++
++	__le64 reserved2;
++	__le64 reserved3;
++};
++
++struct eea_rx_desc {
++	__le16 flags;
++	__le16 id;
++	__le16 len;
++	__le16 reserved1;
++
++	__le64 addr;
++
++	__le64 hdr_addr;
++	__le32 reserved2;
++	__le32 reserved3;
++};
++
++#define EEA_RX_CDESC_HDR_LEN_MASK GENMASK(9, 0)
++
++struct eea_rx_cdesc {
++#define EEA_DESC_F_DATA_VALID	BIT(6)
++#define EEA_DESC_F_SPLIT_HDR	BIT(5)
++	__le16 flags;
++	__le16 id;
++	__le16 len;
++#define EEA_NET_PT_NONE      0
++#define EEA_NET_PT_IPv4      1
++#define EEA_NET_PT_TCPv4     2
++#define EEA_NET_PT_UDPv4     3
++#define EEA_NET_PT_IPv6      4
++#define EEA_NET_PT_TCPv6     5
++#define EEA_NET_PT_UDPv6     6
++#define EEA_NET_PT_IPv6_EX   7
++#define EEA_NET_PT_TCPv6_EX  8
++#define EEA_NET_PT_UDPv6_EX  9
++	/* [9:0] is packet type. */
++	__le16 type;
++
++	/* hw timestamp [0:47]: ts */
++	__le64 ts;
++
++	__le32 hash;
++
++	/* 0-9: hdr_len  split header
++	 * 10-15: reserved1
++	 */
++	__le16 len_ex;
++	__le16 reserved2;
++
++	__le32 reserved3;
++	__le32 reserved4;
++};
++
++#define EEA_TX_GSO_NONE   0
++#define EEA_TX_GSO_TCPV4  1
++#define EEA_TX_GSO_TCPV6  4
++#define EEA_TX_GSO_UDP_L4 5
++#define EEA_TX_GSO_ECN    0x80
++
++struct eea_tx_desc {
++#define EEA_DESC_F_DO_CSUM	BIT(6)
++	__le16 flags;
++	__le16 id;
++	__le16 len;
++	__le16 reserved1;
++
++	__le64 addr;
++
++	__le16 csum_start;
++	__le16 csum_offset;
++	u8 gso_type;
++	u8 reserved2;
++	__le16 gso_size;
++	__le64 reserved3;
++};
++
++struct eea_tx_cdesc {
++	__le16 flags;
++	__le16 id;
++	__le16 len;
++	__le16 reserved1;
++
++	/* hw timestamp [0:47]: ts */
++	__le64 ts;
++	__le64 reserved2;
++	__le64 reserved3;
++};
++
++struct eea_db {
++#define EEA_IDX_PRESENT   BIT(0)
++#define EEA_IRQ_MASK      BIT(1)
++#define EEA_IRQ_UNMASK    BIT(2)
++	u8 kick_flags;
++	u8 reserved;
++	__le16 idx;
++
++	__le16 tx_cq_head;
++	__le16 rx_cq_head;
++};
++#endif
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_ring.c b/drivers/net/ethernet/alibaba/eea/eea_ring.c
+new file mode 100644
+index 000000000000..9ef1cd819929
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_ring.c
+@@ -0,0 +1,252 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#include "eea_pci.h"
++#include "eea_ring.h"
++
++void ering_irq_active(struct eea_ring *ering, struct eea_ring *tx_ering)
++{
++	union {
++		u64 data;
++		struct eea_db db;
++	} val;
++
++	if (ering->mask == EEA_IRQ_UNMASK)
++		return;
++
++	ering->mask = EEA_IRQ_UNMASK;
++
++	val.data = 0;
++
++	val.db.kick_flags = EEA_IRQ_UNMASK;
++
++	val.db.tx_cq_head = cpu_to_le16(tx_ering->cq.hw_idx);
++	val.db.rx_cq_head = cpu_to_le16(ering->cq.hw_idx);
++
++	writeq(val.data, (void __iomem *)ering->db);
++}
++
++void *ering_cq_get_desc(const struct eea_ring *ering)
++{
++	u8 phase;
++	u8 *desc;
++
++	desc = ering->cq.desc + (ering->cq.head << ering->cq.desc_size_shift);
++
++	phase = *(u8 *)(desc + ering->cq.desc_size - 1);
++
++	if ((phase & EEA_RING_DESC_F_CQ_PHASE) == ering->cq.phase) {
++		dma_rmb();
++		return desc;
 +	}
 +
- 	rvu_write64(rvu, blkaddr,
- 		    NPC_AF_KPUX_ENTRYX_CAMX(kpu, entry, 0), *(u64 *)&cam0);
- 	rvu_write64(rvu, blkaddr,
-@@ -1607,34 +1619,104 @@ u64 npc_enable_mask(int count)
- 	return (((count) < 64) ? ~(BIT_ULL(count) - 1) : (0x00ULL));
- }
- 
-+struct npc_kpu_profile_action *
-+npc_get_ikpu_nth_entry(struct rvu *rvu, int n)
-+{
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
-+
-+	if (profile->from_fs)
-+		return &profile->ikpu2[n];
-+
-+	return &profile->ikpu[n];
++	return NULL;
 +}
 +
-+int
-+npc_get_num_kpu_cam_entries(struct rvu *rvu,
-+			    const struct npc_kpu_profile *kpu_pfl)
++/* sq api */
++void *ering_sq_alloc_desc(struct eea_ring *ering, u16 id, bool is_last,
++			  u16 flags)
 +{
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
++	struct eea_ring_sq *sq = &ering->sq;
++	struct eea_common_desc *desc;
 +
-+	if (profile->from_fs)
-+		return kpu_pfl->cam_entries2;
++	if (!sq->shadow_num) {
++		sq->shadow_idx = sq->head;
++		sq->shadow_id = cpu_to_le16(id);
++	}
 +
-+	return kpu_pfl->cam_entries;
++	if (!is_last)
++		flags |= EEA_RING_DESC_F_MORE;
++
++	desc = sq->desc + (sq->shadow_idx << sq->desc_size_shift);
++
++	desc->flags = cpu_to_le16(flags);
++	desc->id = sq->shadow_id;
++
++	if (unlikely(++sq->shadow_idx >= ering->num))
++		sq->shadow_idx = 0;
++
++	++sq->shadow_num;
++
++	return desc;
 +}
 +
-+struct npc_kpu_profile_cam *
-+npc_get_kpu_cam_nth_entry(struct rvu *rvu,
-+			  const struct npc_kpu_profile *kpu_pfl, int n)
++/* alloc desc for adminq */
++void *ering_aq_alloc_desc(struct eea_ring *ering)
 +{
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
++	struct eea_ring_sq *sq = &ering->sq;
++	struct eea_common_desc *desc;
 +
-+	if (profile->from_fs)
-+		return (void *)&kpu_pfl->cam2[n];
++	sq->shadow_idx = sq->head;
 +
-+	return (void *)&kpu_pfl->cam[n];
++	desc = sq->desc + (sq->shadow_idx << sq->desc_size_shift);
++
++	if (unlikely(++sq->shadow_idx >= ering->num))
++		sq->shadow_idx = 0;
++
++	++sq->shadow_num;
++
++	return desc;
 +}
 +
-+int
-+npc_get_num_kpu_action_entries(struct rvu *rvu,
-+			       const struct npc_kpu_profile *kpu_pfl)
++void ering_sq_commit_desc(struct eea_ring *ering)
 +{
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
++	struct eea_ring_sq *sq = &ering->sq;
++	int num;
 +
-+	if (profile->from_fs)
-+		return kpu_pfl->action_entries2;
++	num = sq->shadow_num;
 +
-+	return kpu_pfl->action_entries;
++	ering->num_free -= num;
++
++	sq->head       = sq->shadow_idx;
++	sq->hw_idx     += num;
++	sq->shadow_num = 0;
 +}
 +
-+struct npc_kpu_profile_action *
-+npc_get_kpu_action_nth_entry(struct rvu *rvu,
-+			     const struct npc_kpu_profile *kpu_pfl,
-+			     int n)
++void ering_sq_cancel(struct eea_ring *ering)
 +{
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
-+
-+	if (profile->from_fs)
-+		return (void *)&kpu_pfl->action2[n];
-+
-+	return (void *)&kpu_pfl->action[n];
++	ering->sq.shadow_num = 0;
 +}
 +
- static void npc_program_kpu_profile(struct rvu *rvu, int blkaddr, int kpu,
- 				    const struct npc_kpu_profile *profile)
- {
-+	int num_cam_entries, num_action_entries;
- 	int entry, num_entries, max_entries;
- 	u64 entry_mask;
- 
--	if (profile->cam_entries != profile->action_entries) {
-+	num_cam_entries = npc_get_num_kpu_cam_entries(rvu, profile);
-+	num_action_entries = npc_get_num_kpu_action_entries(rvu, profile);
-+
-+	if (num_cam_entries != num_action_entries) {
- 		dev_err(rvu->dev,
- 			"KPU%d: CAM and action entries [%d != %d] not equal\n",
--			kpu, profile->cam_entries, profile->action_entries);
-+			kpu, num_cam_entries, num_action_entries);
- 	}
- 
- 	max_entries = rvu->hw->npc_kpu_entries;
- 
-+	WARN(num_cam_entries > max_entries,
-+	     "KPU%u: err: hw max entries=%u, input entries=%u\n",
-+	     kpu,  rvu->hw->npc_kpu_entries, num_cam_entries);
-+
- 	/* Program CAM match entries for previous KPU extracted data */
--	num_entries = min_t(int, profile->cam_entries, max_entries);
-+	num_entries = min_t(int, num_cam_entries, max_entries);
- 	for (entry = 0; entry < num_entries; entry++)
- 		npc_config_kpucam(rvu, blkaddr,
--				  &profile->cam[entry], kpu, entry);
-+				  (void *)npc_get_kpu_cam_nth_entry(rvu, profile, entry),
-+				  kpu, entry);
- 
- 	/* Program this KPU's actions */
--	num_entries = min_t(int, profile->action_entries, max_entries);
-+	num_entries = min_t(int, num_action_entries, max_entries);
- 	for (entry = 0; entry < num_entries; entry++)
--		npc_config_kpuaction(rvu, blkaddr, &profile->action[entry],
-+		npc_config_kpuaction(rvu, blkaddr,
-+				     (void *)npc_get_kpu_action_nth_entry(rvu, profile, entry),
- 				     kpu, entry, false);
- 
- 	/* Enable all programmed entries */
--	num_entries = min_t(int, profile->action_entries, profile->cam_entries);
-+	num_entries = min_t(int, num_action_entries, num_cam_entries);
- 	entry_mask = npc_enable_mask(num_entries);
- 	/* Disable first KPU_MAX_CST_ENT entries for built-in profile */
- 	if (!rvu->kpu.custom)
-@@ -1678,26 +1760,50 @@ static void npc_prepare_default_kpu(struct rvu *rvu,
- 	npc_cn20k_update_action_entries_n_flags(rvu, profile);
- }
- 
-+static int npc_alloc_kpu_cam2_n_action2(struct rvu *rvu, int kpu_num,
-+					int num_entries)
++/* cq api */
++void ering_cq_ack_desc(struct eea_ring *ering, u32 num)
 +{
-+	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
-+	struct npc_kpu_profile *kpu;
++	struct eea_ring_cq *cq = &ering->cq;
 +
-+	kpu = &adapter->kpu[kpu_num];
++	cq->head += num;
++	cq->hw_idx += num;
 +
-+	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
-+				 sizeof(*kpu->cam2), GFP_KERNEL);
-+	if (!kpu->cam2)
++	if (unlikely(cq->head >= ering->num)) {
++		cq->head -= ering->num;
++		cq->phase ^= EEA_RING_DESC_F_CQ_PHASE;
++	}
++
++	ering->num_free += num;
++}
++
++/* notify */
++bool ering_kick(struct eea_ring *ering)
++{
++	union {
++		struct eea_db db;
++		u64 data;
++	} val;
++
++	val.data = 0;
++
++	val.db.kick_flags = EEA_IDX_PRESENT;
++	val.db.idx = cpu_to_le16(ering->sq.hw_idx);
++
++	writeq(val.data, (void __iomem *)ering->db);
++
++	return true;
++}
++
++/* ering alloc/free */
++static void ering_free_queue(struct eea_device *edev, size_t size,
++			     void *queue, dma_addr_t dma_handle)
++{
++	dma_free_coherent(edev->dma_dev, size, queue, dma_handle);
++}
++
++static void *ering_alloc_queue(struct eea_device *edev, size_t size,
++			       dma_addr_t *dma_handle)
++{
++	gfp_t flags = GFP_KERNEL | __GFP_NOWARN;
++
++	return dma_alloc_coherent(edev->dma_dev, size, dma_handle, flags);
++}
++
++static int ering_alloc_queues(struct eea_ring *ering, struct eea_device *edev,
++			      size_t num, u8 sq_desc_size, u8 cq_desc_size)
++{
++	dma_addr_t addr;
++	size_t size;
++	void *ring;
++
++	size = num * sq_desc_size;
++
++	ring = ering_alloc_queue(edev, size, &addr);
++	if (!ring)
 +		return -ENOMEM;
 +
-+	kpu->action2 = devm_kcalloc(rvu->dev, num_entries,
-+				    sizeof(*kpu->action2), GFP_KERNEL);
-+	if (!kpu->action2)
-+		return -ENOMEM;
++	ering->sq.desc     = ring;
++	ering->sq.dma_addr = addr;
++	ering->sq.dma_size = size;
++	ering->sq.desc_size = sq_desc_size;
++	ering->sq.desc_size_shift = fls(sq_desc_size) - 1;
++
++	size = num * cq_desc_size;
++
++	ring = ering_alloc_queue(edev, size, &addr);
++	if (!ring)
++		goto err_free_sq;
++
++	ering->cq.desc     = ring;
++	ering->cq.dma_addr = addr;
++	ering->cq.dma_size = size;
++	ering->cq.desc_size = cq_desc_size;
++	ering->cq.desc_size_shift = fls(cq_desc_size) - 1;
++
++	ering->num = num;
 +
 +	return 0;
++
++err_free_sq:
++	ering_free_queue(ering->edev, ering->sq.dma_size,
++			 ering->sq.desc, ering->sq.dma_addr);
++	return -ENOMEM;
 +}
 +
- static int npc_apply_custom_kpu(struct rvu *rvu,
--				struct npc_kpu_profile_adapter *profile)
-+				struct npc_kpu_profile_adapter *profile,
-+				bool from_fs, int *fw_kpus)
- {
- 	size_t hdr_sz = sizeof(struct npc_kpu_profile_fwdata), offset = 0;
- 	struct npc_kpu_profile_action *action;
-+	struct npc_kpu_profile_fwdata *sfw;
- 	struct npc_kpu_profile_fwdata *fw;
-+	struct npc_kpu_profile_cam2 *cam2;
- 	struct npc_kpu_profile_cam *cam;
- 	struct npc_kpu_fwdata *fw_kpu;
--	int entries;
-+	int entries, ret;
- 	u16 kpu, entry;
- 
- 	if (is_cn20k(rvu->pdev))
- 		return npc_cn20k_apply_custom_kpu(rvu, profile);
- 
--	fw = rvu->kpu_fwdata;
--
- 	if (rvu->kpu_fwdata_sz < hdr_sz) {
- 		dev_warn(rvu->dev, "Invalid KPU profile size\n");
- 		return -EINVAL;
- 	}
++static void ering_init(struct eea_ring *ering)
++{
++	ering->cq.phase = EEA_RING_DESC_F_CQ_PHASE;
++	ering->num_free = ering->num;
++}
 +
-+	fw = rvu->kpu_fwdata;
- 	if (le64_to_cpu(fw->signature) != KPU_SIGN) {
- 		dev_warn(rvu->dev, "Invalid KPU profile signature %llx\n",
- 			 fw->signature);
-@@ -1731,32 +1837,89 @@ static int npc_apply_custom_kpu(struct rvu *rvu,
- 		return -EINVAL;
- 	}
- 
-+	*fw_kpus = fw->kpus;
++struct eea_ring *ering_alloc(u32 index, u32 num, struct eea_device *edev,
++			     u8 sq_desc_size, u8 cq_desc_size,
++			     const char *name)
++{
++	struct eea_ring *ering;
 +
-+	sfw = devm_kcalloc(rvu->dev, 1, sizeof(*sfw), GFP_KERNEL);
-+	if (!sfw)
-+		return -ENOMEM;
++	if (!sq_desc_size || !is_power_of_2(sq_desc_size))
++		return NULL;
 +
-+	memcpy(sfw, fw, sizeof(*sfw));
++	if (!cq_desc_size || !is_power_of_2(cq_desc_size))
++		return NULL;
 +
- 	profile->custom = 1;
--	profile->name = fw->name;
-+	profile->name = sfw->name;
- 	profile->version = le64_to_cpu(fw->version);
--	profile->mcam_kex_prfl.mkex = &fw->mkex;
--	profile->lt_def = &fw->lt_def;
-+	profile->mcam_kex_prfl.mkex = &sfw->mkex;
-+	profile->lt_def = &sfw->lt_def;
++	ering = kzalloc(sizeof(*ering), GFP_KERNEL);
++	if (!ering)
++		return NULL;
 +
-+	/* Binary blob contains ikpu actions entries at start of data[0] */
-+	if (from_fs) {
-+		profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
-+					      sizeof(ikpu_action_entries),
-+					      GFP_KERNEL);
-+		if (!profile->ikpu2)
-+			return -ENOMEM;
++	ering->edev = edev;
++	ering->name = name;
++	ering->index = index;
 +
-+		action = (struct npc_kpu_profile_action *)(fw->data + offset);
++	if (ering_alloc_queues(ering, edev, num, sq_desc_size, cq_desc_size))
++		goto err_free;
 +
-+		if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
-+			return -ENOMEM;
++	ering_init(ering);
 +
-+		memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
-+		offset += sizeof(ikpu_action_entries);
-+	}
- 
- 	for (kpu = 0; kpu < fw->kpus; kpu++) {
- 		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
--		if (fw_kpu->entries > KPU_MAX_CST_ENT)
--			dev_warn(rvu->dev,
--				 "Too many custom entries on KPU%d: %d > %d\n",
--				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
--		entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
--		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
--		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-+		if (!from_fs) {
-+			if (fw_kpu->entries > KPU_MAX_CST_ENT)
-+				dev_warn(rvu->dev,
-+					 "Too many custom entries on KPU%d: %d > %d\n",
-+					 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
-+			entries = min(fw_kpu->entries, KPU_MAX_CST_ENT);
-+			cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
-+			offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
-+			action = (struct npc_kpu_profile_action *)(fw->data + offset);
-+			offset += fw_kpu->entries * sizeof(*action);
-+			if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
-+				dev_warn(rvu->dev,
-+					 "Profile size mismatch on KPU%i parsing.\n",
-+					 kpu + 1);
-+				return -EINVAL;
-+			}
-+			for (entry = 0; entry < entries; entry++) {
-+				profile->kpu[kpu].cam[entry] = cam[entry];
-+				profile->kpu[kpu].action[entry] = action[entry];
-+			}
-+			continue;
-+		}
-+		entries = fw_kpu->entries;
-+		dev_info(rvu->dev,
-+			 "Loading %u entries on KPU%d\n", entries, kpu);
++	return ering;
 +
-+		cam2 = (struct npc_kpu_profile_cam2 *)fw_kpu->data;
-+		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam2);
- 		action = (struct npc_kpu_profile_action *)(fw->data + offset);
- 		offset += fw_kpu->entries * sizeof(*action);
- 		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
- 			dev_warn(rvu->dev,
--				 "Profile size mismatch on KPU%i parsing.\n",
-+				 "profile size mismatch on kpu%i parsing.\n",
- 				 kpu + 1);
- 			return -EINVAL;
- 		}
++err_free:
++	kfree(ering);
++	return NULL;
++}
 +
-+		profile->kpu[kpu].cam_entries2 = entries;
-+		profile->kpu[kpu].action_entries2 = entries;
-+		ret = npc_alloc_kpu_cam2_n_action2(rvu, kpu, entries);
-+		if (ret) {
-+			dev_warn(rvu->dev,
-+				 "profile entry allocation failed for kpu=%d for %d entries\n",
-+				 kpu, entries);
-+			return -EINVAL;
-+		}
++void ering_free(struct eea_ring *ering)
++{
++	ering_free_queue(ering->edev, ering->cq.dma_size,
++			 ering->cq.desc, ering->cq.dma_addr);
 +
- 		for (entry = 0; entry < entries; entry++) {
--			profile->kpu[kpu].cam[entry] = cam[entry];
--			profile->kpu[kpu].action[entry] = action[entry];
-+			profile->kpu[kpu].cam2[entry] = cam2[entry];
-+			profile->kpu[kpu].action2[entry] = action[entry];
- 		}
- 	}
- 
-@@ -1853,7 +2016,10 @@ void npc_load_kpu_profile(struct rvu *rvu)
- 	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
- 	const char *kpu_profile = rvu->kpu_pfl_name;
- 	const struct firmware *fw = NULL;
--	bool retry_fwdb = false;
-+	int len, ret, fw_kpus = 0;
-+	char *path;
++	ering_free_queue(ering->edev, ering->sq.dma_size,
++			 ering->sq.desc, ering->sq.dma_addr);
 +
-+	profile->from_fs = false;
- 
- 	/* If user not specified profile customization */
- 	if (!strncmp(kpu_profile, def_pfl_name, KPU_NAME_LEN))
-@@ -1866,27 +2032,52 @@ void npc_load_kpu_profile(struct rvu *rvu)
- 	 * Firmware database method.
- 	 * Default KPU profile.
- 	 */
--	if (!request_firmware_direct(&fw, kpu_profile, rvu->dev)) {
--		dev_info(rvu->dev, "Loading KPU profile from firmware: %s\n",
--			 kpu_profile);
++	kfree(ering);
++}
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_ring.h b/drivers/net/ethernet/alibaba/eea/eea_ring.h
+new file mode 100644
+index 000000000000..50a74b4f48b2
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_ring.h
+@@ -0,0 +1,88 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
 +
-+#define PDIR "kpu/"
-+	len = strlen(kpu_profile) + sizeof(PDIR);
-+	path = kmalloc(len, GFP_KERNEL);
-+	if (!path)
-+		return;
++#ifndef __EEA_RING_H__
++#define __EEA_RING_H__
 +
-+	strscpy(path, PDIR, len);
-+	strcat(path, kpu_profile);
-+	if (!request_firmware_direct(&fw, path, rvu->dev)) {
-+		dev_info(rvu->dev, "Loading KPU profile from filesystem: %s\n",
-+			 path);
- 		rvu->kpu_fwdata = kzalloc(fw->size, GFP_KERNEL);
- 		if (rvu->kpu_fwdata) {
- 			memcpy(rvu->kpu_fwdata, fw->data, fw->size);
- 			rvu->kpu_fwdata_sz = fw->size;
- 		}
- 		release_firmware(fw);
--		retry_fwdb = true;
--		goto program_kpu;
-+		kfree(path);
++#include <linux/dma-mapping.h>
++#include "eea_desc.h"
 +
-+		ret = npc_apply_custom_kpu(rvu, profile, true, &fw_kpus);
-+		kfree(rvu->kpu_fwdata);
-+		rvu->kpu_fwdata = NULL;
++#define EEA_RING_DESC_F_MORE		BIT(0)
++#define EEA_RING_DESC_F_CQ_PHASE	BIT(7)
 +
-+		if (ret) {
-+			rvu->kpu_fwdata_sz = 0;
-+			npc_prepare_default_kpu(rvu, profile);
-+			dev_err(rvu->dev,
-+				"Loading KPU profile from filesystem failed\n");
-+			goto load_image_fwdb;
-+		}
++struct eea_common_desc {
++	__le16 flags;
++	__le16 id;
++};
 +
-+		rvu->kpu.kpus = fw_kpus;
-+		profile->from_fs = true;
-+		return;
- 	}
-+	kfree(path);
- 
- load_image_fwdb:
- 	/* Loading the KPU profile using firmware database */
- 	if (npc_load_kpu_profile_fwdb(rvu, kpu_profile))
- 		goto revert_to_default;
- 
--program_kpu:
- 	/* Apply profile customization if firmware was loaded. */
--	if (!rvu->kpu_fwdata_sz || npc_apply_custom_kpu(rvu, profile)) {
-+	if (!rvu->kpu_fwdata_sz ||
-+	    npc_apply_custom_kpu(rvu, profile, false, &fw_kpus)) {
- 		/* If image from firmware filesystem fails to load or invalid
- 		 * retry with firmware database method.
- 		 */
-@@ -1900,10 +2091,6 @@ void npc_load_kpu_profile(struct rvu *rvu)
- 			}
- 			rvu->kpu_fwdata = NULL;
- 			rvu->kpu_fwdata_sz = 0;
--			if (retry_fwdb) {
--				retry_fwdb = false;
--				goto load_image_fwdb;
--			}
- 		}
- 
- 		dev_warn(rvu->dev,
-@@ -1927,6 +2114,7 @@ void npc_load_kpu_profile(struct rvu *rvu)
- 
- static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
- {
-+	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
- 	struct rvu_hwinfo *hw = rvu->hw;
- 	int num_pkinds, num_kpus, idx;
- 
-@@ -1950,7 +2138,9 @@ static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
- 	num_pkinds = min_t(int, hw->npc_pkinds, num_pkinds);
- 
- 	for (idx = 0; idx < num_pkinds; idx++)
--		npc_config_kpuaction(rvu, blkaddr, &rvu->kpu.ikpu[idx], 0, idx, true);
-+		npc_config_kpuaction(rvu, blkaddr,
-+				     npc_get_ikpu_nth_entry(rvu, idx),
-+				     0, idx, true);
- 
- 	/* Program KPU CAM and Action profiles */
- 	num_kpus = rvu->kpu.kpus;
-@@ -1958,6 +2148,11 @@ static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
- 
- 	for (idx = 0; idx < num_kpus; idx++)
- 		npc_program_kpu_profile(rvu, blkaddr, idx, &rvu->kpu.kpu[idx]);
++struct eea_device;
 +
-+	if (profile->from_fs) {
-+		rvu_write64(rvu, blkaddr, NPC_AF_PKINDX_TYPE(54), 0x03);
-+		rvu_write64(rvu, blkaddr, NPC_AF_PKINDX_TYPE(58), 0x03);
-+	}
- }
- 
- void npc_mcam_rsrcs_deinit(struct rvu *rvu)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h
-index 83c5e32e2afc..662f6693cfe9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h
-@@ -18,4 +18,21 @@ int npc_fwdb_prfl_img_map(struct rvu *rvu, void __iomem **prfl_img_addr,
- 
- void npc_mcam_clear_bit(struct npc_mcam *mcam, u16 index);
- void npc_mcam_set_bit(struct npc_mcam *mcam, u16 index);
++struct eea_ring_sq {
++	void *desc;
 +
-+struct npc_kpu_profile_action *
-+npc_get_ikpu_nth_entry(struct rvu *rvu, int n);
++	u16 head;
++	u16 hw_idx;
 +
-+int
-+npc_get_num_kpu_cam_entries(struct rvu *rvu,
-+			    const struct npc_kpu_profile *kpu_pfl);
-+struct npc_kpu_profile_cam *
-+npc_get_kpu_cam_nth_entry(struct rvu *rvu,
-+			  const struct npc_kpu_profile *kpu_pfl, int n);
++	u16 shadow_idx;
++	__le16 shadow_id;
++	u16 shadow_num;
 +
-+int
-+npc_get_num_kpu_action_entries(struct rvu *rvu,
-+			       const struct npc_kpu_profile *kpu_pfl);
-+struct npc_kpu_profile_action *
-+npc_get_kpu_action_nth_entry(struct rvu *rvu,
-+			     const struct npc_kpu_profile *kpu_pfl, int n);
- #endif /* RVU_NPC_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-index 62cdc714ba57..ab89b8c6e490 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-@@ -596,6 +596,7 @@
- #define NPC_AF_INTFX_KEX_CFG(a)		(0x01010 | (a) << 8)
- #define NPC_AF_PKINDX_ACTION0(a)	(0x80000ull | (a) << 6)
- #define NPC_AF_PKINDX_ACTION1(a)	(0x80008ull | (a) << 6)
-+#define NPC_AF_PKINDX_TYPE(a)		(0x80010ull | (a) << 6)
- #define NPC_AF_PKINDX_CPI_DEFX(a, b)	(0x80020ull | (a) << 6 | (b) << 3)
- #define NPC_AF_KPUX_ENTRYX_CAMX(a, b, c) \
- 		(0x100000 | (a) << 14 | (b) << 6 | (c) << 3)
++	u8 desc_size;
++	u8 desc_size_shift;
++
++	dma_addr_t dma_addr;
++	u32 dma_size;
++};
++
++struct eea_ring_cq {
++	void *desc;
++
++	u16 head;
++	u16 hw_idx;
++
++	u8 phase;
++	u8 desc_size_shift;
++	u8 desc_size;
++
++	dma_addr_t dma_addr;
++	u32 dma_size;
++};
++
++struct eea_ring {
++	const char *name;
++	struct eea_device *edev;
++	u32 index;
++	void __iomem *db;
++	u16 msix_vec;
++
++	u8 mask;
++
++	u32 num;
++
++	u32 num_free;
++
++	struct eea_ring_sq sq;
++	struct eea_ring_cq cq;
++};
++
++struct eea_ring *ering_alloc(u32 index, u32 num, struct eea_device *edev,
++			     u8 sq_desc_size, u8 cq_desc_size,
++			     const char *name);
++void ering_free(struct eea_ring *ering);
++bool ering_kick(struct eea_ring *ering);
++
++void *ering_sq_alloc_desc(struct eea_ring *ering, u16 id,
++			  bool is_last, u16 flags);
++void *ering_aq_alloc_desc(struct eea_ring *ering);
++void ering_sq_commit_desc(struct eea_ring *ering);
++void ering_sq_cancel(struct eea_ring *ering);
++
++void ering_cq_ack_desc(struct eea_ring *ering, u32 num);
++
++void ering_irq_active(struct eea_ring *ering, struct eea_ring *tx_ering);
++void *ering_cq_get_desc(const struct eea_ring *ering);
++#endif
 -- 
-2.43.0
+2.32.0.3.g01195cf9f
 
 
