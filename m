@@ -1,195 +1,133 @@
-Return-Path: <netdev+bounces-266874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266873-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALYiGOwpsmleJQAAu9opvQ
-	(envelope-from <netdev+bounces-266874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:50:20 +0100
+	id yCkWB8EpsmleJQAAu9opvQ
+	(envelope-from <netdev+bounces-266873-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:49:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E614026C726
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:50:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6DD826C70C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:49:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CC537302BDCE
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:50:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B0D0E308DB97
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B29A382282;
-	Thu, 12 Mar 2026 02:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F933822A5;
+	Thu, 12 Mar 2026 02:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="TUT0okli"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t2BiD4VH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7D032B98A;
-	Thu, 12 Mar 2026 02:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4E238229D;
+	Thu, 12 Mar 2026 02:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773283816; cv=none; b=rLVS1osLgERaT0pIKEF462eH0k4+sEuW0I841K/8tZOV0wC66o9E7OFRlf9DLNQzdUk8uqaJNM1R1iQpEPT/MjsXGGcmNVbMlAUXtqYHZE960vGj/xuuG0XaWha9N9cuZ3Zp6/oVD5K7tUbNtvHp/LZgPHIpx4vy1/VQNapu1IY=
+	t=1773283770; cv=none; b=npgd3mtfbkX64SodQMlNtGq0iFDlSdKb3M2+UIZv/HjsoiS3fgQt03NXQIYEN82rmRWKuB1DNJ7TcZmYKGZiutTDOsiGwIua+ZJ/SJQ/Cd8KOefBziRKE1c7VwO60krXFd/1v5w/a9c6mfA0O5bSKtsvSGEhn+tbpsrawwK38Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773283816; c=relaxed/simple;
-	bh=Sj2VafoHdghFpP7ZB8Sh+tcZLjL2iv1MRtN2nGUsvqw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPgenV7SR0JZG4TpPtBFJCLU0LHSBtOrRbWdGiTGtpQsFzlG/dOMPBlrgtSyJxxJMIUkw5OXRG0fMmsUbIhdkdp/gVUsDG4/oeaOH++tKBMxW2Zd2HQScvtqX+qkH/wg297ay4DfzFieKPSDm4IF/33EGOX0lBVrvLcq8MIA6aA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=TUT0okli; arc=none smtp.client-ip=1.95.21.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=d1
-	OVm4u4vH8CiwTDihtBaUsbRQCL/Ky+yu0LSJVg9j8=; b=TUT0okligA7qFX3T6g
-	yMZL/W8hyngnWTJtIAXUuu3HsPQXUt8BHCCfFy4bHGIk1s5JNUzvb3fWjtnGljLU
-	sPHtlpwBUVfSWKKskQpirN3Rs/3mJ5YLPkF5mMBjexVKpEdzjpOTfc/AP3eb1H1V
-	rftWEqcIp0Hmsn2Ws0Nl9BcT0=
-Received: from localhost.net (unknown [])
-	by gzsmtp3 (Coremail) with UTF8SMTPA id M88vCgD3F7CmKbJphzd7Ag--.15484S2;
-	Thu, 12 Mar 2026 10:49:11 +0800 (CST)
-From: xietangxin <xietangxin@yeah.net>
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	xietangxin <xietangxin@yeah.net>
-Subject: [PATCH net v2] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
-Date: Thu, 12 Mar 2026 10:49:02 +0800
-Message-ID: <20260312024902.15627-1-xietangxin@yeah.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773283770; c=relaxed/simple;
+	bh=t29lE+1pJnepXVpEJVjVhLyFN27mXL8YNyxsbPCtvDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fDJiypkkqL64HbsAW/WsgNMr3e/ezDEjaD/uM4LA99kzi7YuugCONomKMOildJ/s4PzTJ6Zr5TvKqUn6yGJ3hR1N3zgjCL/vLwvI8r5KeoMts2oCYm+FG1Q0C5OIVeyjHXpIFh1YB3LUW0KrIBrSbKD5vHuvNWVJnzdq/Yxss8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t2BiD4VH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AABDC4CEF7;
+	Thu, 12 Mar 2026 02:49:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773283770;
+	bh=t29lE+1pJnepXVpEJVjVhLyFN27mXL8YNyxsbPCtvDM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t2BiD4VHgivekkZrTjByr8V0+e0f6fqP29pQ0wrzb8gNdNUs4ozcz7O0MxJB9ox6/
+	 zg8SWVskrvBqqvzfI+W/Qwg096+GPeKoS2pjLv82tmsecpUAGu0Ftg2q7cwnZz29Zy
+	 0jDTa4NZ6Lj8lMNFJ5a306C43jU9QAC/N0P5dFeF4fqQRFwrjtcEfQHsTgFCxkuvAq
+	 zd+cAEOGeliFaI7xQ3G6CWc46fO3EY8IjES+il/YAlFR4tjOxMrbQL2U4yn40OsxEv
+	 tlU2QXMac4rEdyWoJyCILEUHfTCiALTxF6bQkF1f71hz4bpnLI3FssN9zFjV4UdVbr
+	 X2mnUaqnRWv+A==
+Date: Wed, 11 Mar 2026 19:49:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, =?UTF-8?B?QmrDtnJu?=
+ =?UTF-8?B?IFTDtnBlbA==?= <bjorn@kernel.org>, netdev@vger.kernel.org, "David
+ S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Naveen Mamindlapalli <naveenm@marvell.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Danielle Ratson
+ <danieller@nvidia.com>, Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel
+ <idosch@nvidia.com>, Kory Maincent <kory.maincent@bootlin.com>, Leon
+ Romanovsky <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Russell King <linux@armlinux.org.uk>, Saeed
+ Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan
+ <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+Message-ID: <20260311194928.0d1dc338@kernel.org>
+In-Reply-To: <abFJB6mZc-0qNbrd@pengutronix.de>
+References: <20260310104743.907818-1-bjorn@kernel.org>
+	<20260310104743.907818-3-bjorn@kernel.org>
+	<580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+	<abFJB6mZc-0qNbrd@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:M88vCgD3F7CmKbJphzd7Ag--.15484S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxArW3XF43AFy5Jw1kArW3GFg_yoW5CFW5pF
-	4YyrW5Xr4vqry7Aa93Xw4kWry8Zan5J343Grs0gw13u398CFy5Kr1I934jqFWDCFs5Z347
-	ZrsYvr1UKrZ0vFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j8Ma8UUUUU=
-X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiNwd6rmmyKae8gAAA3N
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266874-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[yeah.net];
+	TAGGED_FROM(0.00)[bounces-266873-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[yeah.net:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,kernel.org,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,broadcom.com,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,yeah.net];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,yeah.net:dkim,yeah.net:email,yeah.net:mid]
-X-Rspamd-Queue-Id: E614026C726
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A6DD826C70C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
-and the device's IFF_XMIT_DST_RELEASE flag is cleared
-(e.g., during the configuration of tc route filter rules).
+On Wed, 11 Mar 2026 11:50:47 +0100 Oleksij Rempel wrote:
+> Looking at the current patch:
+> - component (MAC, PCS, PHY, MODULE)
+> - name (subsystem label)
+> - id (local instance selector)
+> - direction (near-end / far-end): These terms become highly ambiguous in
+>   branching topologies (like CPU port on DSA switches).
+> 
+> mixed loopbacks across complex interconnects, userspace will eventually need a
+> Directed Acyclic Graph (DAG) model.
+> 
+> By adopting a DAG topology now, we can reduce the load on the initial
+> implementation and bypass much of the ongoing naming discussions, as components
+> are identified by their topological relations rather than arbitrary string
+> labels.
 
-When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
-expects the driver to hold the reference to skb->dst until the packet
-is fully transmitted and freed. In virtio_net with napi_tx=N,
-skbs may remain in the virtio transmit ring for an extended period.
-
-If the network namespace is destroyed while these skbs are still pending,
-the corresponding dst_ops structure has freed. When a subsequent packet
-is transmitted, free_old_xmit() is triggered to clean up old skbs.
-It then calls dst_release() on the skb associated with the stale dst_entry.
-Since the dst_ops (referenced by the dst_entry) has already been freed,
-a UAF kernel paging request occurs.
-
-fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
-the dst reference before the skb is queued in virtio_net.
-
-Call Trace:
- Unable to handle kernel paging request at virtual address ffff80007e150000
- CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc1+ #6 PREEMPT
-  ...
-  percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
-  dst_release+0xe0/0x110  net/core/dst.c:177
-  skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
-  sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
-  dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
-  napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
-  __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_net]
-  free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
-  start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
-  ...
-
-Reproduction Steps:
-NETDEV="enp3s0"
-
-config_qdisc_route_filter() {
-    tc qdisc del dev $NETDEV root
-    tc qdisc add dev $NETDEV root handle 1: prio
-    tc filter add dev $NETDEV parent 1:0 \
-	protocol ip prio 100 route to 100 flowid 1:1
-    ip route add 192.168.1.100/32 dev $NETDEV realm 100
-}
-
-test_ns() {
-    ip netns add testns
-    ip link set $NETDEV netns testns
-    ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
-    ip netns exec testns ping -c 1 10.0.32.1
-    ip netns del testns
-}
-
-config_qdisc_route_filter
-
-test_ns
-sleep 2
-test_ns
-
-Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
-Cc: stable@vger.kernel.org
-Signed-off-by: xietangxin <xietangxin@yeah.net>
----
-change in v2: add cc stable and fix tag
-
-v1: https://lore.kernel.org/all/20260307035110.7121-1-xietangxin@yeah.net/
----
- drivers/net/virtio_net.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 72d6a9c6a..5b13a61b3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3351,6 +3351,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* Don't wait up for transmitted skbs to be freed. */
- 	if (!use_napi) {
- 		skb_orphan(skb);
-+		skb_dst_drop(skb);
- 		nf_reset_ct(skb);
- 	}
- 
--- 
-2.43.0
-
+Not sure we need parentage chain or just "stage id" within each
+component but FWIW if I interpret what you wrote right - I think 
+I agree :) What matters is the topology not the naming of things.
 
