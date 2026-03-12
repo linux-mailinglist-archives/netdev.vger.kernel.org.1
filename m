@@ -1,130 +1,165 @@
-Return-Path: <netdev+bounces-266936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJuRDEBwsmmuMgAAu9opvQ
-	(envelope-from <netdev+bounces-266936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:24 +0100
+	id eCHoBfR1sml/MwAAu9opvQ
+	(envelope-from <netdev+bounces-266938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:14:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD0D26E73E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF50D26EB94
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 27E82302F7F7
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:50:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1ECC7301D0D9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81EC3B27D7;
-	Thu, 12 Mar 2026 07:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD77732D0CC;
+	Thu, 12 Mar 2026 08:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GScT1G/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AA6303CA0;
-	Thu, 12 Mar 2026 07:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D52F3164AA
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773301818; cv=none; b=hvjUuoEckeqtpJvaN6nf/suUt+pEu7NdlhfuRxtS+cqEOhPTLKinvGWmy+jPmpkh6YezkQMi39dMfzfy1fUEB8jeqfd8U3U/zumnECoc35lT7X9SvxLh5WaX2z5e05pvr+MA4pmx8h25qk1Kox6hqyrRVAHmYe0e76/k6rtamto=
+	t=1773303282; cv=none; b=nC1IS6o6nw3sq/fFR41eUud+IC7dlQOBgYJJ+zndEsams1A1WOEHU22NS9tGHuI6Vizi+QIiaVvchcaUUr3Ne+lr5W07o7k+nc3VjT6BAd/MKuUZII4Z4NiwRXtsfJx4MS53rZm4FbPgoirzsz8GBNf8iifGyoJhxYPlURz0z7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773301818; c=relaxed/simple;
-	bh=G9iOh8MH53BV8yifyGIrscGOuqRgXXDAZ+PHM0PPFrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNE7VOM1RAg6W6bo+3ucTGim4GKJFDSUn87oMlVoJMTJ6Sz3YEKluEdco+3ezIcCITyqlKGj3YYcNbmpgETUeF2V6eA1yISAyTMnWv5vJcgSH+75ioQIYzlNwq9omb4lvCgYoPqcWwgaiiNWDEfhl4whO8mCbWw7p0AwLZ+zJDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 021B71A0542;
-	Thu, 12 Mar 2026 08:50:16 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id DE62A1A06DE;
-	Thu, 12 Mar 2026 08:50:15 +0100 (CET)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id AF65E20263;
-	Thu, 12 Mar 2026 08:50:15 +0100 (CET)
-Date: Thu, 12 Mar 2026 08:50:15 +0100
-From: Jan Petrous <jan.petrous@oss.nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com,
-	boon.khai.ng@altera.com
-Subject: Re: [PATCH v8 1/5] net: stmmac: Use helper macro for loop over
- queue-based arrays
-Message-ID: <abJwN5bulKxQpI+K@lsv051416.swis.nl-cdc01.nxp.com>
-References: <20260309-dwmac_multi_irq-v8-0-f0cc5bc811a7@oss.nxp.com>
- <20260309-dwmac_multi_irq-v8-1-f0cc5bc811a7@oss.nxp.com>
- <20260311203707.1d5ba94c@kernel.org>
+	s=arc-20240116; t=1773303282; c=relaxed/simple;
+	bh=er8uEkvKYbxMLBrtAkD/Ds/M1WLkmn8Sf0zjcM183JY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GVA+lgeNe9KhDt6ertd9UvOPkz3IlLgWFtGbNRqQfwL9v5WIJRHwXgHs2CMf8NR5JuKE+FaaOHtg9NbdCyMsU8BpWzME1bQzV3DrNT4NMxYIRdQZRQFeRpwd9QtpiRHytEVwHe2h5Ix711JqhkDczSio6c3QZgEFvvJlaf2KerU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GScT1G/Q; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-89a09ef1e3aso10133096d6.0
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 01:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773303279; x=1773908079; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FFkV5VaoXwwGdJuWMIX9rdpBK0Bevm1lwza2wIag9uc=;
+        b=GScT1G/QC06xwjZjYN4fFrJYyJxJmbl4ZisZxB4W5A/uG72wugoPvaypq0+s4v6SLD
+         KZ87wgBrD37o0xozTZeSvtAmoktf/FsZU7YqGpkK+dCvQ2PDPVcuCniCmeisHmeWUZYO
+         SesXyaia3c+w0tCUmey+8/B9YmQW7QYUcIaJ81nBuWnnAeYCMq+uP9B3bIV+e21ZT4w3
+         JI54AYhw0py911qybx4PYpf5Epcf8Y9jU/o0kAAxlmdcH7+oWr8VzQda4L6pC5vq8Y/l
+         +ZPluThT41N3n32mELnOv7uWGpY8okBHz2ub2T+YNo4/9CLfF9jskX6PTDhNH4JGUDsP
+         OfaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773303279; x=1773908079;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FFkV5VaoXwwGdJuWMIX9rdpBK0Bevm1lwza2wIag9uc=;
+        b=bthiMvXlJGbgHGtIWMYGlUoivetlo2+hFWQ/4D00qrQIpX+2MV2OTU7+mJkYds3NY5
+         AdYNfTkHApIDvloIglkbxSUurt4YC03Br/f3ar1ssVDlMNpUDcgKJ5CAo7w6b66Txctl
+         UdgHy/yh+bqGQh9/n2G8iKre/lp5TQit9h7l9icxpaefS9Gz/ySGp0hX2CqxTOIzda53
+         mtd7hMByUgGbTfRDe6eSGymrpMY1Hx7Ez1AIXuM74gmbA7teWyKQRGeYkEXBLI6vywpb
+         EVIgmgNaSXDg5AbU/uqOmSfzOWqHDwOq5K2r1kxF2w1JhfVVdvvHZpZjOpYYP/5KrfCc
+         mn4g==
+X-Gm-Message-State: AOJu0Ywt5WD4tXa1nj4zrSEiellxpJUcQeDAceABb+ap5m+QElVKtueB
+	McBNjKh5xGtfU4/b4VkrLsRD6KodriYylWcL6QGYQdXLeN5eAesw6SjR
+X-Gm-Gg: ATEYQzyME2JUDOd5Tes2fYt7xvgK6gkhRkcBIW0cp+IY9xmu6orRKAxGM6xYRLKewh3
+	cEzCoHkbSl0NPLy1Q3eTeKIOM2/WWOjye3RX1NFhmC3mjRkYRB8iUEiPIZisTvBvyc+heUoJEsG
+	/i/ngOZZk/u/qP2OEy548k9gQvtpMd+kSXX0IULhPN2gAVqg31ahaOnyaPE1UiakpFPYoOdPV8N
+	LltgVI1ETCUr5wtvt9mcG9KZyEuQPGiqygd7D58CuHOTjhZ8Wq68vykXpU2Z+XouYLEFZN7vkWR
+	uRkfOayp++JVpckvTXjuHFIxDOYHyV7jFOUMxvaMIEYwkSQ85Fc5+ZeZjNPg4LELDELr+m93LoZ
+	Ue2LThtRXlRo+Zb/lC5p6B04xgusOsBRiLuLWdfA0UEqUIREEu19Umx9zYg7nvxvHqHdBTzpAaD
+	wwomUWNER9Yh+illTJOg+B2w+IweAnmP3aQQ+g6Laqmq8=
+X-Received: by 2002:a0c:fec4:0:b0:89a:3013:be02 with SMTP id 6a1803df08f44-89a66b01056mr52519386d6.34.1773303278891;
+        Thu, 12 Mar 2026 01:14:38 -0700 (PDT)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65c122c0sm30423076d6.23.2026.03.12.01.14.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 01:14:38 -0700 (PDT)
+From: Kevin Hao <haokexin@gmail.com>
+Subject: [PATCH net 0/2] net: macb: Fix Ethernet malfunction on AMD Versal
+ board after suspend
+Date: Thu, 12 Mar 2026 16:13:57 +0800
+Message-Id: <20260312-macb-versal-v1-0-467647173fa4@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260311203707.1d5ba94c@kernel.org>
-X-Virus-Scanned: ClamAV using ClamSMTP
-X-Spamd-Result: default: False [0.14 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMV1smkC/x3MTQqAIBBA4avIrBPUfsCuEi3UxhooC40IxLsnL
+ b/FexkSRsIEI8sQ8aFEZ6iQDQO3mbAip6UalFCDaKXkh3GWPxiT2Tn2nW6tNU5oD7W4Inp6/9s
+ EAW+YS/kAAGvwsWIAAAA=
+X-Change-ID: 20260311-macb-versal-e5493bbac09f
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Kevin Hao <haokexin@gmail.com>, Quanyang Wang <quanyang.wang@windriver.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,armlinux.org.uk,altera.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,windriver.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-266936-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266938-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jan.petrous@oss.nxp.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,jan.petrous.oss.nxp.com,dt,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9CD0D26E73E
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,davemloft.net:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF50D26EB94
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 08:37:07PM -0700, Jakub Kicinski wrote:
-> On Mon, 09 Mar 2026 18:55:20 +0100 Jan Petrous via B4 Relay wrote:
-> > The stmmac driver contains similar pattern for processing queue-based
-> > arrays, ie. interrupt lines, etc. Factor out the for loop and provide
-> > a macro STMMAC_FOREACH_MTL_QUEUE(var, limit).
-> 
-> This is macro is neither shorter nor more readable.
-> I really don't see any benefit here..
+Hi,
 
-TBH me neither. Or, I see only "descriptive" benefit, what, of course,
-is nothing must-to-have.
+On Versal boards, the tx/rx queue pointer registers are cleared after suspend,
+which causes Ethernet malfunction. This patch series addresses this issue by
+reinitializing the tx/rx queue pointer registers and the rx ring.
 
-I will prepare v11 without this.
+---
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
 
-Thanks.
-/Jan
+---
+Kevin Hao (2):
+      net: macb: Introduce gem_init_rx_ring()
+      net: macb: Reinitialize tx/rx queue pointer registers and rx ring during resume
+
+ drivers/net/ethernet/cadence/macb_main.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+---
+base-commit: f90aadf1c67c8b4969d1e5e6d4fd7227adb6e4d7
+change-id: 20260311-macb-versal-e5493bbac09f
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
+
 
