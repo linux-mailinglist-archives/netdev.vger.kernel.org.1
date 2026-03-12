@@ -1,135 +1,154 @@
-Return-Path: <netdev+bounces-267233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EMyMnZRs2l8UwAAu9opvQ
-	(envelope-from <netdev+bounces-267233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:51:18 +0100
+	id mDqwNrNTs2l8VAAAu9opvQ
+	(envelope-from <netdev+bounces-267234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:00:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E13F27B570
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:51:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E5127B627
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE11C30FBDB9
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:51:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 08706301BD4F
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB34408251;
-	Thu, 12 Mar 2026 23:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDF320C490;
+	Fri, 13 Mar 2026 00:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKuiq7sy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrtCVVKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC92402434;
-	Thu, 12 Mar 2026 23:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCDA23EAB4
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 00:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773359476; cv=none; b=Tbc+GCOpz7ZaM5ZmZGYFOGbcxu/XmxUQCOZCsHPOMdgm/1PQFwk0ejNJHDZgLiK8ai6GS93f1z5zzYXwCuBpRPz7gJ1zcqCWwwTuttPsC34f8lyj7VDvrTcK+7k2wgXw+/EBR+rkEJ9PXroM74dwgnSmpbAvblZTyHaA6ElubcI=
+	t=1773360046; cv=none; b=FVE2rF0wIx4MM9dqip07qSTx9S+aKUu8VQwTqmI5cjiqF2XvLVmI2Kbgj5W6+0f/mpJFhFhWFoVrG5wU6hvOgAJNTnLaYLz4nPMttdeZ2JLIJbIZXuKIyhAetcdBDQVSdfSDreAc3X1rdmU5xpSOGBmhP1RdxEOJMVu6tyfh/A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773359476; c=relaxed/simple;
-	bh=j+iIf2CgdsCIx42yS6EMYtotC9J1oAn8bvNT3RWoS3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g/TUtsCGloLpkGRxFyAJoIzRrPscdAj9Jw5BjKf3ReEK3AT6XxP/BIbaHYn2k2Z7EMHRxjgwJo6KO8Gn6dqW7lbKw5zbUhxzDjDP7RTRrQGzWy5UdIcP+E0uKOJbEsyUnHV9mzufMvsoFtXqme+PtIQITtwekMCxU7FoGh4/M9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKuiq7sy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6CFC4CEF7;
-	Thu, 12 Mar 2026 23:51:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773359475;
-	bh=j+iIf2CgdsCIx42yS6EMYtotC9J1oAn8bvNT3RWoS3M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LKuiq7syko/TtMDXlmbT70PyYi7dZ9cgv0bdOmNIlWANEN5nyZm4Idtu30XmU0WnR
-	 93q/8VZjuf4pkNa0/eVrF/szwMugLfY11PHVLubl20eFapnRr0tDjM9SFH6Qv89dCC
-	 vpZyQGy3mko2amFNrMr16bhRO1u8bksXYYM7hlaMGwzLAwklxIQ+/ZYiVJoAoWEfgB
-	 NJtxKuvKK99JF3IXMBjdGban//UJO6e7rLyPus5Y+Fh95DLPqdxFabrzuWdRfd2WQt
-	 wgrukXXfZ6JG0ln5CLmhtkcD+yEJUB1zkr8Tm9FK74H7Kv4qA+/1AqEM+mX+cP3RVp
-	 I8eL3QvIhKmzg==
-Date: Thu, 12 Mar 2026 16:51:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, toke@toke.dk,
- vinicius.gomes@intel.com, stephen@networkplumber.org, vladbu@nvidia.com,
- cake@lists.bufferbloat.net, bpf@vger.kernel.org, ghandatmanas@gmail.com,
- km.kim1503@gmail.com, security@kernel.org, Victor Nogueira
- <victor@mojatatu.com>
-Subject: Re: [PATCH net] net/sched: Mark qdisc for deletion if graft cannot
- delete
-Message-ID: <20260312165113.773a5f44@kernel.org>
-In-Reply-To: <CAM0EoMnv14pSaJWW3ZQuegkbQEqqye0zp0-_tCaOEWEg=C3xCQ@mail.gmail.com>
-References: <20260307212058.169511-1-jhs@mojatatu.com>
-	<20260310184713.7e810431@kernel.org>
-	<CAM0EoM=TAAfwZc3q1=RKWPrS778R_B8uM18ev_jYYz8oj4YiBA@mail.gmail.com>
-	<20260311175249.54abe1b6@kernel.org>
-	<CAM0EoMnv14pSaJWW3ZQuegkbQEqqye0zp0-_tCaOEWEg=C3xCQ@mail.gmail.com>
+	s=arc-20240116; t=1773360046; c=relaxed/simple;
+	bh=unpDN0xSFAqZ7nYTSSNREqnY5W0AVi5GlC1hx8dlYz8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+Kq18++EqvBSRZcc9RxOGbymxVBGU/4blQKPF1zE0qnSUZoHQPklYJcOa/Qx3HGYx8Wfcu3NsH1EVGyvYKLpWz2wJHQQ6bVR02whRUNQDONDGaAiaosRWY95gkk7n0ZrEkzjMee5CvGmsSkAXh7mTXrAO2fl2O6K5sp5MiL47Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrtCVVKc; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4853aec185aso13974475e9.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 17:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773360044; x=1773964844; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AyEWphJeNnvkPez3fZUAj2xNcAS8g8xQPq60zu8rPdc=;
+        b=GrtCVVKctQjp4izWByIE1F8s/PkFOBazUIbH1vh9k6gqf82lIpl0n/xRqqESjMp1yx
+         Od45g93ByURWI760PRyjkod9nd5MSQur4LJf2x0ORaAAmdM1GbWjkfgU1kYSvAGVVVPQ
+         lLxjJMPTyCQZ2T45ESymWc3NmEsQgIGm/2VdbJEhnpq0SpMJDTzhw5LnPABs8DpS9x3m
+         dqWkK9JLYjHrUXU/9ZiZ4f8ozfkXgM63WulPJ27ECqGCUJ0nhCLeSfdE6QUSBSlCx6xF
+         wMddfWEXj5q+pSKEeRrpRhX9yqyOGmIyySVwI34vuGn/UA/cTowJn5Eou5orOYKef+ss
+         7RNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773360044; x=1773964844;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AyEWphJeNnvkPez3fZUAj2xNcAS8g8xQPq60zu8rPdc=;
+        b=gsyBtQoDxVhwIdIuSzZaSEXDTi8IandhgpjCiYaE5FOrBcerv1aNHPLnaPQ/iS+yPu
+         xqKes/1+1ZFYa0kOOkX4H86Io5kwhmr7q3OFQCmFOVPrjr3ZyB5S4+/1vJY9AEluar2R
+         MiRRiwYe/qNiNjMMC2vpN/ATNudkf8mLwq3TJom9szrmffeVbuHDbHyTQ0j8xiO535oo
+         FsbEn9agBX5AE3VYMYUXVP6iW1DrltXqx8b/B6qZY0Aa/9bHLfP66i1cHEsqXxVElVp+
+         oErD2uxn9mM+Ue7mMYdQpkVso8Tqx+kNYnlaejwO4NSE+95FrH/6u+v9HaDXjHdSoPuc
+         xNzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVqUmFdB6LOAn3JOJOM+2+zuN6Eg5ystq2Y0aFGKSWhKPiKr5AoZ3y1W/qhsxtmO8j/jZ5F1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymojC3LLp5Ez3/sTpABO7GzL2O3bv8gc52J0N6MuIkCC5436W5
+	A1smvM2QRkcdwanIo3HcwGgVcc/c1YeXN7yI/rMztIvTPH9stKcNY84N
+X-Gm-Gg: ATEYQzz/CuKKoQYVwpaV2PnulMZMaod1DcBSrOgneyczd/pLzw793K0T38h0czDj3eA
+	xwhR/xCmgUu6ThUQADdn26SrWvsXxgknOH94zXz/0P7BgZgCKpm1oIi2OfB+1LuxxC55Gvpb0Pa
+	rO7NaYaxSWRFQEyluS8iqBnCVGuHigQkdEFJS46Tu0VUge8F3r+CLqJkyRg3+KyIJ+4q5I+lZn+
+	fvhwCe++oDjZE6ohmrzKdg6xZ9TZRWe3V//TQzmGUD9qRd5MVAAOsBNPyDjh1eacnQKcGwttpHE
+	8KA61UuLnQXku3zsPC+3O8I0bR6/yKMWTi8k726NJU47KZpxaxJcnJ3QEggZik+AJJTlSBCEqnq
+	cJ90MHKlwIaFbSAcButwKdo/NjHcBZ67+vIfeLE6iB0EVKSeVPD3fVoySgm3AUHguxlkkrzhzJK
+	P6nuyyBFOb3P0lWV6rzrJVVQ==
+X-Received: by 2002:a05:600c:354b:b0:480:2521:4d92 with SMTP id 5b1f17b1804b1-485567071a0mr18402125e9.24.1773360043742;
+        Thu, 12 Mar 2026 17:00:43 -0700 (PDT)
+Received: from localhost ([87.254.0.141])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe21b631sm14641861f8f.27.2026.03.12.17.00.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 17:00:42 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Fan Gong <gongfan1@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] hinic3: Fix spelling mistake "capbility" -> "capability"
+Date: Thu, 12 Mar 2026 23:59:22 +0000
+Message-ID: <20260312235922.3442120-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267233-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,toke.dk,intel.com,networkplumber.org,nvidia.com,lists.bufferbloat.net,gmail.com,mojatatu.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267234-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[coliniking@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2E13F27B570
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: E7E5127B627
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 16:36:48 -0400 Jamal Hadi Salim wrote:
-> > > Two of the several (I think 4!) patches we had took a similar path. I
-> > > am trying to remember at least one variant was bad for performance and
-> > > the other was unstable. Let's see if we can revive it and take a
-> > > closer look. BTW - none were pretty, it was maybe half the lines of
-> > > code but touched many things.  
-> >
-> > FWIW / of course, we have to apply similar change to all(?) callers of
-> > __tcf_qdisc_find in cls_api. So LOC-wise it may end up also pretty long.
-> > And it's not going to help the already spaghetti-looking locking. But
-> > even if it's more LoC I quite like the idea of containing the poopy
-> > code to where problems originate which is the lockless filter handling.
-> > Fingers crossed..  
-> 
-> Something like attached.
-> Unfortunately after running it for a few hours it reproduced.
-> The action code path (entered by virtue of filter code path execution)
-> releases the rtnl when attempting to load an action module. A parallel
-> qdisc operation waiting for the lock then grabs it and we hit the same
-> issue...
-> 
-> So now we have to be more invasive and start coordinating the action
-> code etc, which is not appealing. Thoughts?
+There is a spelling mistake in a dev_dbg message. Fix it.
 
-I see. Doesn't seem entirely crazy to let tcf_proto_lookup_ops()
-return -EAGAIN without actually loading the module, and have it's
-call path (of which there are only 2?) do the module loading once
-all the locks are released. The call paths handle the EAGAIN and
-retry already they just assume tcf_proto_lookup_ops() has loaded
-the module so they don't have to.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+index 2dfa4fb39627..c5dd53a8fa96 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+@@ -44,7 +44,7 @@ static void hinic3_parse_l2nic_res_cap(struct hinic3_hwdev *hwdev,
+ 				   HINIC3_CFG_MAX_QP);
+ 	nic_svc_cap->default_num_queues = dev_cap->nic_default_num_queues;
+ 
+-	dev_dbg(hwdev->dev, "L2nic resource capbility, max_sqs: 0x%x, max_rqs: 0x%x\n",
++	dev_dbg(hwdev->dev, "L2nic resource capability, max_sqs: 0x%x, max_rqs: 0x%x\n",
+ 		nic_svc_cap->max_sqs, nic_svc_cap->max_rqs);
+ }
+ 
+-- 
+2.53.0
+
 
