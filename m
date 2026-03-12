@@ -1,163 +1,205 @@
-Return-Path: <netdev+bounces-267170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCpGKFDysmmLRAAAu9opvQ
-	(envelope-from <netdev+bounces-267170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:05:20 +0100
+	id KOAXKxTzsmmLRAAAu9opvQ
+	(envelope-from <netdev+bounces-267171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:08:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C0B276569
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:05:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E0C27664C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:08:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E2432303D5CD
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:03:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 055DF3014A0C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3283FB7E3;
-	Thu, 12 Mar 2026 17:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD473FB078;
+	Thu, 12 Mar 2026 17:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="bpoPhnD1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tZGbEI2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC483CAE8E;
-	Thu, 12 Mar 2026 17:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496923B27DB;
+	Thu, 12 Mar 2026 17:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773334994; cv=none; b=Z1Eq/3mfRpiSpvWNOYoUQ8ZKK1P8HvXTz2NtP+Xv1zsJkMcofw7flwCwoi0FM/kRyNsQfMU6wn9om8HDP6aC9z2wxkkQcsGJ2juDTjr+KWckbhLzGPcYZxvq3z2C7z1QqPtXwoVYUbQtphtxcrrz1cJa+8genGi/8y4RunMBzZg=
+	t=1773335286; cv=none; b=fbmmCGeV62ZzXlOwxnJCqPnXTE1KLAoIUFxUMqrFzd9wUmrle20TavxU2fMpZ+XfMYEMv3uKAARK9Z+opi4JEf+RCl6AYPbdJN/fSSbP4/zs+UHnAFjfR9d3AbQhjhSKUxjoAct6aP75hHtHm24M7gohy1xf8UKwr4qZnog74oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773334994; c=relaxed/simple;
-	bh=gymGM9n7wddVYvwk2Iyj0H5MpRVhidPG4DavbVCxGds=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bG5ihaMsPFngmAGcyqHMa3B9ZoapeLoaVI2NFNAQrywHYRSIQxXK47QHdcQ7aNptbfaYdg3o3iPRxnbGyhW4Jtq3/QdpzYQLXJ3DmNV7BcMAx6gQ8z3wJv7sNV9ikDehbn+CiygWxQx652HzkVxH970Jv5kCIYI+467JO4fstnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf03.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay09.hostedemail.com (Postfix) with ESMTP id B37CD8B479;
-	Thu, 12 Mar 2026 17:03:07 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf03.hostedemail.com (Postfix) with ESMTPA id 1BAFA6000C;
-	Thu, 12 Mar 2026 17:02:41 +0000 (UTC)
-Date: Thu, 12 Mar 2026 13:02:55 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Vineeth Remanan Pillai <vineeth@bitbyteword.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Peter Zijlstra <peterz@infradead.org>,
- Dmitry Ilvokhin <d@ilvokhin.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Marcelo Ricardo Leitner
- <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, Jon Maloy
- <jmaloy@redhat.com>, Aaron Conole <aconole@redhat.com>, Eelco Chaudron
- <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, dev@openvswitch.org, Oded Gabbay
- <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>,
- dri-devel@lists.freedesktop.org, "Rafael J. Wysocki" <rafael@kernel.org>,
- Viresh Kumar <viresh.kumar@linaro.org>, "Gautham R. Shenoy"
- <gautham.shenoy@amd.com>, Huang Rui <ray.huang@amd.com>, Mario Limonciello
- <mario.limonciello@amd.com>, Len Brown <lenb@kernel.org>, Srinivas
- Pandruvada <srinivas.pandruvada@linux.intel.com>, linux-pm@vger.kernel.org,
- MyungJoo Ham <myungjoo.ham@samsung.com>, Kyungmin Park
- <kyungmin.park@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Sumit Semwal
- <sumit.semwal@linaro.org>, linaro-mm-sig@lists.linaro.org, Eddie James
- <eajames@linux.ibm.com>, Andrew Jeffery <andrew@codeconstruct.com.au>, Joel
- Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alex Deucher
- <alexander.deucher@amd.com>, Danilo Krummrich <dakr@kernel.org>, Matthew
- Brost <matthew.brost@intel.com>, Philipp Stanner <phasta@kernel.org>, Harry
- Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>,
- amd-gfx@lists.freedesktop.org, Jiri Kosina <jikos@kernel.org>, Benjamin
- Tissoires <bentiss@kernel.org>, linux-input@vger.kernel.org, Wolfram Sang
- <wsa+renesas@sang-engineering.com>, linux-i2c@vger.kernel.org, Mark Brown
- <broonie@kernel.org>, Michael Hennerich <michael.hennerich@analog.com>,
- Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, linux-spi@vger.kernel.org,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K.
- Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, Chris
- Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
- linux-btrfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/15] tracepoint: Avoid double static_branch evaluation
- at guarded call sites
-Message-ID: <20260312130255.6476e560@gandalf.local.home>
-In-Reply-To: <CAEf4BzbnfyhCqp0ne=2gRnVxp-mdGmuZwDeFRyhRYH+eDcz2-w@mail.gmail.com>
-References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
-	<1e3c2830-765e-4271-89f7-0b6784b37597@efficios.com>
-	<20260312112354.3dd99e36@gandalf.local.home>
-	<219d015d-076b-4c80-8f63-88569115fdad@efficios.com>
-	<20260312114041.5193c729@gandalf.local.home>
-	<1becdbce-2c01-468a-bbab-42b5dea9fdf8@efficios.com>
-	<CAO7JXPjnnruhM5oC6xMgnYaQ9efzYFqMCFiJLNM3HCQ+ZeCiJw@mail.gmail.com>
-	<CAEf4BzbnfyhCqp0ne=2gRnVxp-mdGmuZwDeFRyhRYH+eDcz2-w@mail.gmail.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1773335286; c=relaxed/simple;
+	bh=9GUkX1UymzuCmF+KVbUDSfJHfjasrgyAK24MrqryyCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohgbqUALtpWoJ1ketslDlwtC+of2vydfaMU+rajLzK6p8ilbnrBT2c4dDpV4bRIeZZJOG9irN6zct6R7VWhL/BH4+adx7wb2wh23qSfop2UZuxYiOLGQe/ltooH/7XKTgaSADM4AYNdtNuYlv6tHRWrROQv4/FkV42HScODVJHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=bpoPhnD1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tZGbEI2U; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 67AFA7A0188;
+	Thu, 12 Mar 2026 13:07:55 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Thu, 12 Mar 2026 13:07:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1773335275; x=
+	1773421675; bh=IoHMK1Z5v/Far6DHpNRk4L2RknvP1nvllRWb9YRM5ro=; b=b
+	poPhnD19l6zP3OhPXXt7rqc0r7xNFyQDJpertDLSn6S797mUwW3BYmGSGR2+RzbQ
+	T6E3gs8Aepw2O0NkMySke902zenrCaSTzbJHt3TK6XDpJGfx68PA7+imBkCp33xu
+	yuBaSOY2D2qlfzsHokLy1XoZDgHBhSMFLu3dfxGQoSRaX32fJjqZbDBEheCFuWQ2
+	IfSnC4Car5NHtLTEkGcihx2mrkW/Pjxu3GciPeoW/nR4fHie6rf0dH4X1ZqkqB39
+	vAb+tJdtkuK7Id+qXxlXyosVyx6/h1KhFGw123ffYz4X4fblYLAD8XcHpA0csmQk
+	nfIx2Gh5yPOHXdlvxDAjA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1773335275; x=1773421675; bh=IoHMK1Z5v/Far6DHpNRk4L2RknvP1nvllRW
+	b9YRM5ro=; b=tZGbEI2U8nOqovnVql7AVObILEhslHJFP5BnxjbqUbCGeVPe12a
+	5K7RBtn+llzttiM4YH2cw6VJtQRrrJE5UHF+ZlYD5z8PJCfLrxBUqYqwJZyWO/+Z
+	tc6AHE/2DUnn5xyir1Np95LN5/iEOj1F3NXkZfKqRJM6OhwD7KcAdln0wbeb/4Vs
+	2qNOc0R7o2i2NKZzQM1aP3IcS854qrP26qzrQm1xCmhafzmeYZpr3vYT+5+QOW9a
+	PvFvEC9qEbRdWTQmFtpdoxIgjZasTzHvAAEQpMAS7tvTCYbzTO+VmBe71k/hhEeN
+	qgj2FUXBDZB7WSVNAD9zASxqIhPONBV3GLg==
+X-ME-Sender: <xms:6vKyabQs5P9vaG1ziPRYpzX31kJ3SGSPwC8lpi9LRwq9SD5rtEIpGw>
+    <xme:6vKyaeJXW6Q6lEOQEN_0DYIcKKb_795Fk-F8SIg_1a8_ZNbRcM2k-lQqg1YN9bZtl
+    JCw2L1Dgs9V2UgQov19_Fk8N3Q6bhk2HfifWGMX0ICsrur5gFskemU>
+X-ME-Received: <xmr:6vKyaaE26KepPkc5aKpgH0sSbkzyESmDfsJBx50hpwkWfccUv15n6JEvqVfZ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeejfeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedukedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthho
+    pehshiiisghothdotghitdelkehfrgejtgdujeelhegvtggvrggtsehshiiikhgrlhhlvg
+    hrrdgrphhpshhpohhtmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhn
+    nhdrtghhpdhrtghpthhtohepsghrihgughgvsehlihhsthhsrdhlihhnuhigrdguvghvpd
+    hrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegv
+    ughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepihguohhstghhsehnvhhiughirgdrtghomh
+X-ME-Proxy: <xmx:6vKyaTSfVh1FJzPyOUGL7DhbTwDn-Yp2V5srIUhMolYZADoMz53vjg>
+    <xmx:6vKyabWKgELkT5Y-lS2bhMwf1MJ-i6hQwewQQ54T8c-AgozTwoQZCA>
+    <xmx:6vKyaagKGbcFb7ArRNNCo5UZ-iOz1l7ZQhhDgDeg8ZmY-aB_1A5rtg>
+    <xmx:6vKyacfLC6q9OM5IgI9MOYrtNGt_zgZ_4st5VI9l1njoK4qVM3DFNA>
+    <xmx:6_KyacB1FvP7GYWqNBuuNTjbi9Dh11w-wtP0EsDuHahZ5x-ObUBSyHgD>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Mar 2026 13:07:53 -0400 (EDT)
+Date: Thu, 12 Mar 2026 18:07:51 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>,
+	syzbot ci <syzbot+ci098fa7c1795eceac@syzkaller.appspotmail.com>,
+	andrew@lunn.ch, bridge@lists.linux.dev, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, idosch@nvidia.com,
+	jiri@resnulli.us, jv@jvosburgh.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	razor@blackwall.org, sridhar.samudrala@intel.com,
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: net: move netdev_compute_master_upper_features
+ to ndo_set_features
+Message-ID: <abLy56AN2BgUI1nG@krikkit>
+References: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
+ <69b04e91.a70a0220.51e36.0000.GAE@google.com>
+ <abBuLV3P6aTzUg3W@krikkit>
+ <abC7rdjxv9ENw-tA@fedora>
+ <abHcP3GTO29rfKML@krikkit>
+ <bcc536ac-dde1-4b63-8fed-70850818472b@redhat.com>
+ <abKf8Fg865Fhipwk@krikkit>
+ <abLPBEg_-j5rp4IM@fedora>
+ <abLivB2KPK0JcTFR@krikkit>
+ <2d1e0acc-efad-4166-b738-721d88d533ca@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: kfs6qijpbuferuuhtorb6b835ny66tin
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18gNtqVqUvpV9OuqznTYLgQxysBeUr1V4g=
-X-HE-Tag: 1773334961-101407
-X-HE-Meta: U2FsdGVkX18nBBc/wjwt+Uq/UDhPM+TvyqJ3PzJ7XTdg8zJwcAeVzhmYzxHLf7pqvroMwwz3w+ZMve24FXDlwN4Al9l18e+sIMsly59QHs1WIGUGFWD+n9vC0YFBju5YF4U2cW8usaKA9ACod/DJfkWwChqILC7YI5fjo0jn+MDRzWgSUtcRWc+1ACqufST8GE1+cVaguSIGVLtHO49AgMgvbvjSqwoHR4+HUaDb14GsztIWWkzSI6t3CvJZWLJ62JKH4l1NZ0cseEdgq33l48qG8hnnyAiEMhQWmONsALjOWujHAfplawqsGy97HetKzPQbnSWVIVPTZt4F/YmoVmEIzpjR6X9B
-X-Spamd-Result: default: False [0.14 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2d1e0acc-efad-4166-b738-721d88d533ca@redhat.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[goodmis.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[bitbyteword.org,efficios.com,infradead.org,ilvokhin.com,kernel.org,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,gmail.com,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,hansenpartnership.com,oracle.com,fb.com,suse.com];
-	TAGGED_FROM(0.00)[bounces-267170-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267171-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[gmail.com,syzkaller.appspotmail.com,lunn.ch,lists.linux.dev,davemloft.net,google.com,kernel.org,nvidia.com,resnulli.us,jvosburgh.net,vger.kernel.org,blackwall.org,intel.com,googlegroups.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rostedt@goodmis.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[73];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gandalf.local.home:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 52C0B276569
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,ci098fa7c1795eceac];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 90E0C27664C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 12 Mar 2026 09:54:29 -0700
-Andrii Nakryiko <andrii.nakryiko@gmail.com> wrote:
-
-> > > emit_trace_foo()
-> > > __trace_foo()  
+2026-03-12, 17:47:45 +0100, Paolo Abeni wrote:
 > 
-> this seems like the best approach, IMO. double-underscored variants
-> are usually used for some specialized/internal version of a function
-> when we know that some conditions are correct (e.g., lock is already
-> taken, or something like that). Which fits here: trace_xxx() will
-> check if tracepoint is enabled, while __trace_xxx() will not check and
-> just invoke the tracepoint? It's short, it's distinct, and it says "I
-> know what I am doing".
+> 
+> On 3/12/26 4:58 PM, Sabrina Dubroca wrote:
+> > 2026-03-12, 14:34:44 +0000, Hangbin Liu wrote:
+> >> On Thu, Mar 12, 2026 at 12:13:52PM +0100, Sabrina Dubroca wrote:
+> >>> Proper fix (so that the notification we're sending during
+> >>> upper_dev_link has full linkinfo) would be to move
+> >>> netdev_upper_dev_link() to after macsec_changelink_common() and fix up
+> >>> the error handling. I don't see anything in macsec_add_dev or
+> >>> macsec_changelink_common that needs the device to be linked. But
+> >>
+> >> If we move the netdev_upper_dev_link() after macsec_changelink_common(),
+> >> we will not goto nla_put_failure via default, right?
+> > 
+> > Yes.
+> > 
+> >>> anyway it doesn't make sense for macsec_fill_info to return -EMSGSIZE
+> >>> on invalid data, so the "bandaid" should be included as well.
+> >>>
+> >>> Should this be part of this series (either just the "bandaid" or the
+> >>> "proper fix"+bandaid), since we never saw a problem before?
+> >>
+> >> Since macsec need the "bandaid" fix either way. How about you post the
+> >> "bandaid" fix to net. And I include the "proper fix" in this series for
+> >> net-next?
+> > 
+> > But I don't think it's needed in net. Am I missing a codepath (before
+> > your series) where macsec_fill_info could be called for the new device
+> > before macsec_newlink returns? If not, it doesn't really qualify as a
+> > fix, that's why I was asking Paolo.
+> 
+> FWIW, I don't see a codepath calling into rtmsg_ifinfo_build_skb()
+> before device initialization, so I would be fine targeting net-next with
+> the EMSGSIZE-related change.
+> 
+> Side note, it looks like that the WARN() in the rnnetlink code here
+> helped identifying a real problem and correctly returning 0 when the
+> key_len is not yet initialized will silence it forever, what about
+> preserving a warning for this kind of race? something alike:
 
-Honestly, I consider double underscore as internal only and not something
-anyone but the subsystem maintainers use.
+Right, I was thinking about putting a DEBUG_NET_WARN_ON_ONCE there.
 
-This, is a normal function where it's just saying: If you have it already
-enabled, then you can use this. Thus, I don't think it qualifies as a "you
-know what you are doing".
-
-Perhaps: call_trace_foo() ?
-
--- Steve
+-- 
+Sabrina
 
