@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-267200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENJbNf4cs2mDSAAAu9opvQ
-	(envelope-from <netdev+bounces-267200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:07:26 +0100
+	id SBsMMRwds2mDSAAAu9opvQ
+	(envelope-from <netdev+bounces-267201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:07:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42ADD2787F0
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 852F9278815
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:07:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43C393042757
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:07:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97558306ABDD
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 20:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2A402B90;
-	Thu, 12 Mar 2026 20:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21775402BB5;
+	Thu, 12 Mar 2026 20:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="q2dicZ3S"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="mAm7PGQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BF740242D
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 20:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DDF402B8A
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 20:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773346033; cv=none; b=Si6N8ogVvONZtlEP/uUv8uPJbEGh2nGP2pApiM11RUs7X8mxBXhIWbG4XsygxYKKZ9c2k4F15LBGSYLLkyLW68Sd4hvZ3DGyXXUrMV4oO3xM0QreKageWK3IMxcsbouybF4wHullEa1hxI3q9ktYV+458IMLYvB0d4tKEKq9M10=
+	t=1773346035; cv=none; b=UQGsIbamAxZcBwlgY33SkyeOjfRGswTmAXrqSYNgR4tkCEje9hahRygFY6vputFgnFeHiGy2ltIedP0XQhbrouNCP1Zy93VExtKFnwQm8CsyFt7Td3zlf+7Xq3zDFyfOh6iZ/Ta9qJLNrxI18+GKLuMj6EHIpYPHf0VZHTpLcac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773346033; c=relaxed/simple;
-	bh=mkPn6azSc5sBdNjIBFEPFL6chM6v748TKJtFgSgI6eQ=;
+	s=arc-20240116; t=1773346035; c=relaxed/simple;
+	bh=CMNpkQG0OX1ZmIY4eNoRhc5pN1fKRttQ1DPPmQGZ5Ok=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=LfXSo3QzL691zGln1/n3ekuYcF6om0A/6KeJTffwppo3BTDG4L9YKUi7rkajUnmb3wkNQNbs3Mo1KoOFRE3P/c2I5VYL7X2XA+KEpTndskMcvvtqbwaQViARrskXLNMx+y/2FLf+tmTYt8dS79SFktPKU+ECUNGChMG/kMtPoNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=q2dicZ3S; arc=none smtp.client-ip=209.85.160.50
+	 References:Date:Message-Id; b=RvbKvORYRSoGYwXzBS3/D/kLA/c/rYnYu6vumdfd5i35EnDYK8B0vMi5qw2iHYmgvDkzKR+5xtKBqGmiuzzSK7F1oiwrq9G8cOfKeOwj8o2Lfl7nVMpkgWnlB2XMZBpmvmVwBGbrixCD+CSiaq97yfJVIUqf5a3GCc3vKD/A0ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=mAm7PGQu; arc=none smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-41708f6c3feso935478fac.3
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:07:11 -0700 (PDT)
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-463a0e14abfso949065b6e.2
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:07:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1773346030; x=1773950830; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1773346032; x=1773950832; darn=vger.kernel.org;
         h=message-id:date:references:in-reply-to:cc:to:from:subject
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2pWby7tRTaFMLCxNO3vkJZ08S+rk6Df/iLShGmtlipk=;
-        b=q2dicZ3SnpIS4khOQpYl6JJsTkgwF/v8Tiyv5QrQWYES0Hp/od780CRaSel44Bpdd9
-         onKCoW/cyjl2cTrmfxnM/u8aEdTRWd7BrEe+uwxclSzBjHa+Av4bgrv9Lb0ezEQnBmom
-         QHQcouCrZgi9/OBimwLnWzyHUZ3juoVdN8myQKbqsNNa8+PPE5bO3/mKR+UQfQKqpVHx
-         rAdEHvXZINikjEUqVQFQgsKHxt1HaXUNDDEXAs3lQx9JHBvEPfaEhY7X0Xg+SV/sDnGc
-         eLg0jTbANl7prlenWHxeaSCBXxnSEG/qF5+/GkkQyk+nDQBlw2t4G0pJz8FTfzjM3K9P
-         ZVyg==
+        bh=TE8SfkVbVBBUM4eryiGIysgS23QgsEj7qFxF34WfEmM=;
+        b=mAm7PGQu766QLdcOkMPI+qUB5mZZPzXals0SwH6kB2P+4sWPgb87QZPSYPCL11TtpI
+         AX+rgqNIK1TeOHSn30zOXJNgxv7H6LXbfhriQjSY7sjIKP/beCMLNEOEPeYh1Vj6YLqG
+         Nu/X7Bwf2kOCIE4tslvrqPNVSSnpuR6dJgstefLiAihaLia32PeBJK0dhMbg85k9UxwR
+         ZxWYe5yLniCfvazFw3scVVby8X+aIJ3Gxof3H3eExroFRWiaSrYtaZ9hdmYXYEXrCJRB
+         /Pl+BeXF97DSlmpqrfgaAhIGgYWUjN/xWBkDSQ7I/LdNQubEovFcFEc2uZ96fp7VaXKs
+         oqhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773346030; x=1773950830;
+        d=1e100.net; s=20230601; t=1773346032; x=1773950832;
         h=message-id:date:references:in-reply-to:cc:to:from:subject
          :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2pWby7tRTaFMLCxNO3vkJZ08S+rk6Df/iLShGmtlipk=;
-        b=prIxg2llkm5GOrlgxZrIlYfaFCV8Bx88VOOSLfFLQmBOzOMA/JdhGJgASFgEiXrLGW
-         Yx1DLwa9hdRSjN1rXTUVq08zEjOXjjlet38sz6LxL+3BP32rMOKsTFEnvEfj9bjPX5ug
-         KR80vWSczW2hHU6Dam39E0CbHuVhiw7I5vzi8YxgPRzsnOpLUVfnTD5hUluLeXt3LfZx
-         WNCAddH82Y9h1DG072klJLCm3floa5xspVfAUVHWO0TIAzL5OhHeqgxdttE50X6k3oCV
-         P3g/svKNMGVw13gv9gzEqlrRlGJHmI0pwit9n8769t5nXUp8pBRbm3yiGpHHE8YZdYa0
-         ReOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXObdp0ApYeOZSvEzI6JNCpN+GpdW9M4v+VCO0QlLjO5VaVKPj2bVWNOj2oWzF2ZFRlC4HCH/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcbCnBc9uaSxDXLN9ORnPESzOHh46969+y4o47fMYtTXd/Naqb
-	w8iNNUagCoI2ifnA1hWI4jCFCY979xoFziGZw8AjzBH1aDdcNmzGTcZjG06oGNumsec=
-X-Gm-Gg: ATEYQzxXQlFcVIQGKbc09M3IxpaCteN8XWrIqCcyYWUHar8nzarpkXrXMpDm+ufiNex
-	UHjur+D2UzpqmDoOFvgYxQwOIBAHPikqOMqxauaIFLXzskzOIAVL7OxudWb432nj4JTEXTrLgvC
-	0e3i7kSwy8KxJ46rVDhcSjPtWzsklVyghD33hyvzjq8ko3HY1Qdff49Q3jz98+QARH+ZdU5KqZQ
-	PDbusZOaLBs9J4C3b1UHufOVbNBe45NFSEo2OhPLO9zeQuBiLocpAe0TcHV0Bkwe+Ic7cpMNHRJ
-	x36/4DAbaCL/9BYfSb8v4oS/uxzbQko8KwMzJX1o1lVL5ZspyON0l0MqIeYkFHeoGuzE5cMOiA+
-	9jgJlu1xPid5eOlKp6SRoxj/apsyes0QZ6hFsv+l4MeoBg8APkkSlcbVHcGXKW4zEcXXEjWmbUZ
-	qNpRFJHY+J+HxPRAOeJ4Tr3oiZyh2b
-X-Received: by 2002:a05:6870:a796:b0:3e8:8b6f:9d85 with SMTP id 586e51a60fabf-417b937d46cmr332682fac.29.1773346030308;
-        Thu, 12 Mar 2026 13:07:10 -0700 (PDT)
+        bh=TE8SfkVbVBBUM4eryiGIysgS23QgsEj7qFxF34WfEmM=;
+        b=Np7eIfA9KbFGDpFnGJMMLYcjl9bIovx5cxYrQPkPYgkaAam2TWEPhs4va3JrAaMF1n
+         xoLPhN+Occ+Ggm0aXtWgyoBBjSzogHbcaY13OUBIRiDrlR2BUsLD5CFjtfFaY9sduBSL
+         P6nt3rW4XsFEXDVg70gF6f7VKalCjCxa8a83YOnirhbBVTSMFB0on87831eHUGGEJ7oG
+         L7T77FM+30sIbTgazFL5031Qcck2m8bHq/S2z9ks7tgEhFLJ4d7poiNc+iiDHTUNHtyQ
+         U0nHI6dhqDllNUoHKidH5nTsOhBn5SUAKgQeQ23P77uSSOAznM2urh/s1bGRkzl1s+mx
+         LiVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlV8Az8/rzMSAm6khaI/AUlGa6KqZtsTslc4tIt6Kh5FcW4gUfrxUbGQeg9itMdUBtj/S9nj0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsUZ+hI8jsLbh8vL0gebPpw2obiwYWPaGSqag/YzDyvX0Y7r3K
+	Uc3R4mId7ojd0JaRk7/ZGbas87Aupb8x9UOTJcHYxcGTRELpa4WWUrZZyWi01m9O3Gk=
+X-Gm-Gg: ATEYQzxEdZ61X4FUbMOPV4GQv1fJtR4qNCEOOd5ZhqIrFB2lEvo4U8yVf+CsmbnROX2
+	4D4hT41yifhmfQwkJeBEynG2IexX0SJbBPB/KbMdU+q3xFZ6dfSjYXKimmVyQRIdoJRIzTuzMi0
+	7NxLp8LTU3An4i9LUaHJpsKayKiWCaghOAtnSGIB5ermS1+ffnMdCJ3EaW2KMyelJvz9Q9BVV11
+	De1SKv0P0Ph9DNli+r8KQmXemduE+bq/4VvS1fyV0bHJAb+fwzR88jBi9GkJpBdWqmJFU6Aad9N
+	HQ/6mkJGnB4xdsXwkBOQ2r+qbjxpPSg9CqM53pBwOKZt/CNpt10HEUOvSfOFn5scy9go1iP/S/6
+	tE+HdV0f+M5woQPMvPoMvHshBi8NknYB1jBZ7NcqF2eKH7jDM0Q2/bcqE7/rF/mXrA4l0n847An
+	mO0EgNUd91yZgUNkxBKgN4Ap0btAk14DmPqFhoTMY=
+X-Received: by 2002:a05:6808:86a4:b0:467:2584:873f with SMTP id 5614622812f47-467575432eamr241621b6e.40.1773346032433;
+        Thu, 12 Mar 2026 13:07:12 -0700 (PDT)
 Received: from [127.0.1.1] ([2600:8803:e7e4:500:1f95:f82e:8747:8137])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e6c7885sm5600081fac.17.2026.03.12.13.07.09
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e6c7885sm5600081fac.17.2026.03.12.13.07.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 13:07:09 -0700 (PDT)
+        Thu, 12 Mar 2026 13:07:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v6 03/18] clk: mediatek: Add MT8189 apmixedsys clock
+Subject: Re: [PATCH v6 15/18] clk: mediatek: Add MT8189 dispsys clock
  support
 From: David Lechner <dlechner@baylibre.com>
 To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
@@ -102,21 +102,21 @@ Cc: Michael Turquette <mturquette@baylibre.com>,
  netdev@vger.kernel.org, Project_Global_Chrome_Upstream_Group@mediatek.com, 
  Qiqi Wang <qiqi.wang@mediatek.com>, sirius.wang@mediatek.com, 
  vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-In-Reply-To: <20260309120512.3624804-4-irving-ch.lin@mediatek.com>
+In-Reply-To: <20260309120512.3624804-16-irving-ch.lin@mediatek.com>
 References: <20260309120512.3624804-1-irving-ch.lin@mediatek.com>
- <20260309120512.3624804-4-irving-ch.lin@mediatek.com>
+ <20260309120512.3624804-16-irving-ch.lin@mediatek.com>
 Date: Thu, 12 Mar 2026 15:06:36 -0500
-Message-Id: <177334599652.4124794.495599695131479130@freyr>
+Message-Id: <177334599652.4124794.12067751220383417571@freyr>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1679; i=dlechner@baylibre.com;
- h=from:subject:message-id; bh=mkPn6azSc5sBdNjIBFEPFL6chM6v748TKJtFgSgI6eQ=;
- b=owEBbQGS/pANAwAKAcLMIAH/AY/AAcsmYgBpsxzdMiMJbTxqXDno8lz7uKeJqq/XgEtUTcoAy
- ZhkKwBwxnOJATMEAAEKAB0WIQTsGNmeYg6D1pzYaJjCzCAB/wGPwAUCabMc3QAKCRDCzCAB/wGP
- wFqcB/48FpvKpV3InEamRZjYBZWJ6fLi/SAwUkbGJyUmItM/vnWwftYkuxXm1sC369JhkJ6LTZ6
- YfgivaaIA/87e8AwAr90CJKmSjB91XqNMT4+0k8RYkN+77VvJcZ2apyV/geYv8E1R7u7nT8gr0m
- fsxRyDy7ZrMFdpc8ENod3K9Tt/ord3fYSSeyUQBCbbZUha8Gsrh4ptu2rpCErKtQ6Vigzdjiw1z
- o+eTFnGlkzvD7rcJLxm1Qp8UAeRgvqtYIFmydhZNYocG71l1fIEkKe+XDpvnBMkYyj3dW1+mP+Z
- 1SKiymojf8wZ+PdFx4HI3agvkAyfo/sl9yqVkSAZvBJAm859
+X-Developer-Signature: v=1; a=openpgp-sha256; l=622; i=dlechner@baylibre.com;
+ h=from:subject:message-id; bh=CMNpkQG0OX1ZmIY4eNoRhc5pN1fKRttQ1DPPmQGZ5Ok=;
+ b=owEBbQGS/pANAwAKAcLMIAH/AY/AAcsmYgBpsxzklpGpUf/ZQQIyqz1DGbRxkAj3JX3gj9Fst
+ kHYKcWEcLiJATMEAAEKAB0WIQTsGNmeYg6D1pzYaJjCzCAB/wGPwAUCabMc5AAKCRDCzCAB/wGP
+ wAB9B/0amsj5mtHGl7JwYJ4m/8bCDd5vMrY9EYIYFmV67HC/3VsGnfj1wPsBIVVvEBbRl+IhIIA
+ ZsVi+f/fEjvU6prplQZ/YZd8np1yTT1IWdeKgbGDDKpmhj+ay9gbv30oTZ7hntcUeH8jUMJrP/q
+ tZU8uftAxgDKfME+lIWGswpoBwlUSOzobxeouycG+WNAHOkJA6P9MGeEtvRIK+FKpHbvhe8km04
+ Ox8e94DXUVshX9UMS9lDnF5G0nMYaWHn1RibGjXUQ/s0dnAAbbdC5p20fdx+NRF7/D6TTyYAO4N
+ AauC6vpKcGuJ+POQeLop+wx9WdMiq97CgGUQthHxIRLRvwFx
 X-Developer-Key: i=dlechner@baylibre.com; a=openpgp;
  fpr=8A73D82A6A1F509907F373881F8AF88C82F77C03
 X-Spamd-Result: default: False [0.34 / 15.00];
@@ -129,7 +129,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267200-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267201-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[baylibre.com];
 	MIME_TRACE(0.00)[0:+];
@@ -146,66 +146,28 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mediatek.com:email]
-X-Rspamd-Queue-Id: 42ADD2787F0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mediatek.com:email,baylibre-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 852F9278815
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 09 Mar 2026 20:04:45 +0800, irving.ch.lin <irving-ch.lin@mediatek.com> wrote:
-> Add support for the MT8189 apmixedsys clock controller, which provides
-> PLLs generated from SoC 26m.
+On Mon, 09 Mar 2026 20:04:57 +0800, irving.ch.lin <irving-ch.lin@mediatek.com> wrote:
+> Add support for the MT8189 dispsys clock controller,
+> which provides clock gate control for display system.
 > 
 
 ...
 
-> +static int clk_mt8189_apmixed_probe(struct platform_device *pdev)
-> +{
-> +	int r;
-> +	struct clk_hw_onecell_data *clk_data;
-> +	struct device_node *node = pdev->dev.of_node;
-> +	const u8 *fhctl_node = "mediatek,mt8189-fhctl";
-> +
-> +	clk_data = mtk_alloc_clk_data(ARRAY_SIZE(apmixed_plls));
-> +	if (!clk_data)
-> +		return -ENOMEM;
-> +
-> +	fhctl_parse_dt(fhctl_node, pllfhs, ARRAY_SIZE(pllfhs));
-> +
-> +	r = mtk_clk_register_pllfhs(&pdev->dev, apmixed_plls, ARRAY_SIZE(apmixed_plls),
-> +				    pllfhs, ARRAY_SIZE(pllfhs), clk_data);
-> +	if (r)
-> +		goto free_apmixed_data;
-> +
-> +	r = of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
-> +	if (r)
-> +		goto unregister_plls;
-> +
-> +	platform_set_drvdata(pdev, clk_data);
-> +
-> +	return 0;
-> +
-> +unregister_plls:
-> +	mtk_clk_unregister_plls(apmixed_plls, ARRAY_SIZE(apmixed_plls),
+> +	GATE_MM0(CLK_MMSYS_0_DISP_DVO, "mmsys_0_disp_dvo", "disp0_sel", 20),
+> +	GATE_MM0(CLK_MMSYS_0_DISP_DSI0, "mmsys_0_CLK0", "disp0_sel", 21),
 
-Should this be mtk_clk_unregister_pllfhs()?
+Why the random CAPS here? Seems like the name should be "mmsys_0_disp_dsi0"
+instead of "mmsys_0_CLK0".
 
-> +				clk_data);
-> +free_apmixed_data:
-> +	mtk_free_clk_data(clk_data);
-> +	return r;
-> +}
-> +
-> +static void clk_mt8189_apmixed_remove(struct platform_device *pdev)
-> +{
-> +	struct device_node *node = pdev->dev.of_node;
-> +	struct clk_hw_onecell_data *clk_data = platform_get_drvdata(pdev);
-> +
-> +	of_clk_del_provider(node);
-> +	mtk_clk_unregister_pllfhs(apmixed_plls, ARRAY_SIZE(apmixed_plls), pllfhs,
-> +				  ARRAY_SIZE(pllfhs), clk_data);
-> +	mtk_free_clk_data(clk_data);
-> +}
-> +
+> +	/* MM1 */
+> +	GATE_MM1(CLK_MMSYS_1_DISP_DSI0, "mmsys_1_CLK0", "dsi_occ_sel", 0),
+
+Similar case here.
 
 -- 
 David Lechner <dlechner@baylibre.com>
