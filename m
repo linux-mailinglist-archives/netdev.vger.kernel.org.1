@@ -1,103 +1,103 @@
-Return-Path: <netdev+bounces-267038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267039-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOK7BP6usmlGOwAAu9opvQ
-	(envelope-from <netdev+bounces-267038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:18:06 +0100
+	id kHySKW2vsmlGOwAAu9opvQ
+	(envelope-from <netdev+bounces-267039-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:19:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AA942718E3
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:18:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 166DA27195F
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:19:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D58D30713E2
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:14:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CD2C318DA4E
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB403B9DB9;
-	Thu, 12 Mar 2026 12:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC921A682A;
+	Thu, 12 Mar 2026 12:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/TL+ZzM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="V439FLrF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODJTs8II";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXJ47++w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06163BC67F
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8F15B0EC
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 12:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773317653; cv=none; b=Goutr3+Z/16s1Dlqh2vXwju81I7jBsWc7tQdcUtihil9mZzixToLdUmHByX4ru2hZrSvZnwFf4O5APMkOguPDtgOaQaOc6+5RGzMjZt3Xwceeh0kUG3DS39FboArof3zfVdqTk9Y9AMc9TECkCKQil4QEBKoJR4h8+v0PErwi3A=
+	t=1773317740; cv=none; b=ZpqcJL+UvuW+eswv+ZY0b4y7KD0ecVeG1TcNd+Ny26vOTXIFy3fJdSwHF1/XmiJzHYllpr1JdOxSwBkI7cZ2dfEXLAow9Xblmfg5xiO5rcubLHgqHFaHK7SgtvDLUirE1th3VffwJxEcdsAeTqj70ImlBz61XCf8LYNffYylJbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773317653; c=relaxed/simple;
-	bh=/5WC4DtB+P33LkUFjXpc3RwWaJ5s/itNh44N3ZhlLkQ=;
+	s=arc-20240116; t=1773317740; c=relaxed/simple;
+	bh=VGUC6wUOypIV4CsAk/cYVlAk1OOCaoat8J+NcnwZaqk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oi7T1Ol7AX6OuNDINcdGeg2Wuw/QVgUPOY1y73dXuQ8TwUws76rhaltuBcfmu0DEstClpp0bpywqaSxXC2PRoVhFZ/+4n15g07vB2uea3VvgkE4h8uL+wZN4CPao5k1FhBapjzOw0fcSG6PPAzxSP50e8WmTcp5P6DCO9z7GSZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O/TL+ZzM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=V439FLrF; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=R6UFMY45MBEhtQZwmDQCCQIfp0zKuX8Qmmjuz4UVdQsfwcECjCxWAh//lOiXh9ouhspUcoJeb+QfKhUC536zAgBgTJEJAx5CRphvQLGoADOzy9iUlCSON+m0RmeZdZCgzSYCKDkvhu8FMfu3LYiyv2bvBB0KPpGI3teN3E7G5os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ODJTs8II; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bXJ47++w; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773317648;
+	s=mimecast20190719; t=1773317734;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UxIY7QiuvILNkB7fWkebqkMSgc5l1psPdBFz/v32Yew=;
-	b=O/TL+ZzM0fGUbmMxCPz3eHEuMqUdoXtWOGlWIjGpUzbUVCCbDU9JmSV75wlQ202ou8CruN
-	GoovoE5vAndgbdBFRoyrc12dZxb+NYLbDSfoBjFXce7kiKLfCtMPRGWOqX0Y4fnrkbMbWb
-	fwxRbq7yV4qCK3hpnNp9lA5f3Wk0H68=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=loNIpigFiuTuj5urzh0sT/xjUHse+AOsRM2zfPikL40=;
+	b=ODJTs8IIKinuIZPSkxiPDWNy60g4f79MmwqgDIPkjiTG3axr5DFR/q4/fiu7qKyckHDbvQ
+	0pZvxhIGlqHctNZaSXeZfiwe6UYZjfuS3w5LNebmOhxtXqK9b8TeBeJ6Fq27yAsfwAc1R9
+	XZv4QDHLgdLp2B4Qh3joGpP3sbAdpnk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-JzswaUQcM2GpJqif2vZzQg-1; Thu, 12 Mar 2026 08:14:07 -0400
-X-MC-Unique: JzswaUQcM2GpJqif2vZzQg-1
-X-Mimecast-MFC-AGG-ID: JzswaUQcM2GpJqif2vZzQg_1773317646
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4853b0af42aso12173295e9.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:14:06 -0700 (PDT)
+ us-mta-526-y9Jpv41SOYq6PD_1FQGZZg-1; Thu, 12 Mar 2026 08:15:33 -0400
+X-MC-Unique: y9Jpv41SOYq6PD_1FQGZZg-1
+X-Mimecast-MFC-AGG-ID: y9Jpv41SOYq6PD_1FQGZZg_1773317732
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4852cf0318dso8734455e9.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 05:15:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773317646; x=1773922446; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1773317732; x=1773922532; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UxIY7QiuvILNkB7fWkebqkMSgc5l1psPdBFz/v32Yew=;
-        b=V439FLrF8XBBlE3vLcl9B30V43O9fpcc9HlRhVEHpJkLHyXndCq04XxaMpboT6GZgc
-         d5CyYhQcpllHE1hlTnABB+KDZhjDKZJN4LLqRSmyH5xeDr2MeTrIYL/4xSi/OKkG4vuQ
-         X/NtIoBLkc+3FfA+3L32vbk8A6fc1JEPfn4fuETi643WVEI/9j+sBME6LS6Q8A//x9Yd
-         lg3NOGVwEpXHtCbkteMauOnl+q51dAjidR3x1TZS1S2FFupkHzcqp43mHZ2sghP0y7Q5
-         vN3uAUFowZBljocKKYMQvaaZ6th/+kSOJImVIw1riTwQJNdWCW+5o2z6P9SDv8Yn+60C
-         uPmw==
+        bh=loNIpigFiuTuj5urzh0sT/xjUHse+AOsRM2zfPikL40=;
+        b=bXJ47++w5qRWlgCajG20ztHev//ND09tPL04sIVb44XJLHHvnIQFm7lDHhCK/Wemx+
+         ppq2tDhkJSlKhrfDuBiyJSJ02meVB2jw7tc5C298cRtKTQbu7+lYHK2EmGlLV3a6oMEQ
+         TkgoJ691iT5/8PdUhD0ApHfCrd39GTJHOAn3f4uPHtfj5/tuOXkq+0hhDt5R+ccF2LEX
+         dmuWuYQmzmzf1XSxdzvuBAJDKQxY9EyWMsNeNRwYA3qJWQzaYfH8FAbVn1IWdMHjgQfU
+         zHJH4LCBRjf2emRlNlB60XfQGmwqUzSGbyOV7K/n3BwIyiUhtTB0fPoNmUJ6IT8m+eyl
+         IPCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773317646; x=1773922446;
+        d=1e100.net; s=20230601; t=1773317732; x=1773922532;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UxIY7QiuvILNkB7fWkebqkMSgc5l1psPdBFz/v32Yew=;
-        b=LZc7KXF0gkgzMnIQyACD+wPGcwBVWFvdZU4bFgkaA2cTrkQh/qK/zW0Al272CJTcim
-         6Bq8jtwE6GjJSXy+5iYd8GF9/8dyuXXsPdgvDOq4sXV2RjIhVfZl/vAGsTjPZ81QpUB4
-         luBc+CkA+Vdp+Ov1seEtVg2/TfjO7ryexgrowoVBRsT9lF0S4q3N/PHIkAlUdMP3zajQ
-         BXHcamtmdyKTwLhbANid1WlCuZ2JAozP1O8Xc01lfx68wqmqynt/YaX+cxtiQRGjbjZK
-         H3DZKzx2prI34AXRt0PKtwqIVtA39pPFW5IAJZ29PXVpTEYe5QOPJUe2ig5K9Xyyx3pR
-         cA2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWdQURMb2yC5lpYdVRBonQpNEDeTQ87+qfRsXq8pYPxHkG5oHg49mufifxUG/GoKbwPKEwBY7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjoefTwOCZWvMGLitE0tYAjiVAuT0uINHfP7y+oi2MZ8NCZvxU
-	EfNTLatQ1fVydrTNYxN35dKTqcs4PrUUwvwjoMLsjbmfJf9484IveeYAgDhrL/rQvHHf2jsenXy
-	i4DiomcG4pHcag8qJnW0X37eWvAhMkZWvYJUTxHTwpiLXr+OpeVm5aDW5EA==
-X-Gm-Gg: ATEYQzwXZcB/5r1d1jDC1YAqsLmHQRRR3wk2ODqqF/POrBwiiAOj84JypiN6pQ8m+3M
-	wF9ztvX3SZ588QoeymuZKQkrJG9CPChJ6AOwQhgx8bygus+Zo3Ht26LXm3JVsAT7wGD6kJR3unp
-	ybjkBf9ztwwDogKp2JSGuHk7IP3kEsXs1w/j9ERwkN0AJ1xIBxUE76Z3fKPpQX4mwMuv82mTxDn
-	GcgqEuD2SN9BD6NBI8IC/QLpuwKCYmT5mbNdQawVbMm3RApgCEp4RFxlK5tN8WEpxMUgafakRWs
-	HvahQZg3e9O2R+hiZRWjjMBVgGubBTCBtygVtwaEdwTKJhrmS2TKStxOpzZMXtZK6pe81rr0nd8
-	/gc4caHm+CoUK7Ne4TJn9vAwBOrwoq9TUEScEs74bbhs7dTV7hrmo/Lc=
-X-Received: by 2002:a05:600c:46d3:b0:485:35ba:1d8a with SMTP id 5b1f17b1804b1-4854b111768mr102221125e9.27.1773317645548;
-        Thu, 12 Mar 2026 05:14:05 -0700 (PDT)
-X-Received: by 2002:a05:600c:46d3:b0:485:35ba:1d8a with SMTP id 5b1f17b1804b1-4854b111768mr102220745e9.27.1773317645070;
-        Thu, 12 Mar 2026 05:14:05 -0700 (PDT)
+        bh=loNIpigFiuTuj5urzh0sT/xjUHse+AOsRM2zfPikL40=;
+        b=ZUnDs7ExGae8/lqsuy+EzCFNzWADeUp23klDg6ylm1PL/0i1mzWDxccALG/4Pu/CCx
+         n4J+4zV4BUPxB9tYxRGmBnYozhSjJ1guWnlY6qqHVYBeZhchj6Kz8Myu8clCMncXMBgO
+         tYzvm+vg8YVEUt8Zv4SnYps30k92n8bGcz39Gw4GEtduOPNr3CSB8WfmhaeAl69bQQn2
+         JWsG3zCoB/GyxJ1ldEHTlGfvjJmjPN7iGWf3YO7UhoGpL7oAKP/GojJFvvu6dO95mf+i
+         NFlGbL2h/b2BSdb/AcvOxdsVBoeH+71o6+lJSUgvH9cyA+eoBwI6csYdsreapm9VU/6D
+         V3/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUtXNmqWMzb7BT9+WobMEiHHBEwLbnLInDca07vckNEcMX1KKwrGi2nvX8Ay8w7bB1nlf/NxhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMwNsDZUsXDwAe+Mu9j6T3LDIm+U+z+4KFfnIOdYmBzEIJYxkG
+	XEYsTabiS7aT81akWMv74KbaAAqVvwklfp25kElDkY4ru8ShrDlu+DaKfOCJTz0X74bNARtLueg
+	BLZGlVJ3jZtE+svcAAbDhEz1tgXJwzud5je0GXx/YmjshDfrO7ox/g8uomw==
+X-Gm-Gg: ATEYQzw1zLHcjUSjZzBe3PzyrE3+XDW1If+fr7zPxYHueHuUFf4m1U6A5oneC6vU+dj
+	GslLls2MlkoMYNA5Ds1INoJrv8rmTdEGD6PB9+4WCRZdWbMT3s+y1K/MmaIH3oSk6A4jbZEXvCu
+	wCn930l8nbRR8beX5mhARFxE83NvkjWAIiUSweHWHzgTByZ72aGE/lOU67S5Akk45QUqRMCTu1s
+	1XruC3A2rXgbcmfxGiaBjYEIjqE93f+hsN314UCI8YxalmkVq8RknR9HuJ6UaPuAFKRlCSd/8Cu
+	8d8wbeQboAiscexfthVDAQfIFpP5Yo3S6UwLZwqZFV4TBqTrrwmcuPm3plnLVbC913aGr9vZywM
+	Bal5DPVJOP4COxTRjFhYi+IX1DEuqx2XgnjyetuJvY6gjmPFFjnrAa78=
+X-Received: by 2002:a05:6000:2dc5:b0:439:be78:e1e9 with SMTP id ffacd0b85a97d-439f81c0248mr11988493f8f.14.1773317732154;
+        Thu, 12 Mar 2026 05:15:32 -0700 (PDT)
+X-Received: by 2002:a05:6000:2dc5:b0:439:be78:e1e9 with SMTP id ffacd0b85a97d-439f81c0248mr11988421f8f.14.1773317731647;
+        Thu, 12 Mar 2026 05:15:31 -0700 (PDT)
 Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541acea11sm257299255e9.7.2026.03.12.05.14.03
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1a737csm7076461f8f.10.2026.03.12.05.15.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 05:14:04 -0700 (PDT)
-Message-ID: <a4a6ae7d-fdab-4533-b56a-af9425bc2bb1@redhat.com>
-Date: Thu, 12 Mar 2026 13:14:03 +0100
+        Thu, 12 Mar 2026 05:15:31 -0700 (PDT)
+Message-ID: <606d9633-d48e-49ff-81c8-cbed7e92f698@redhat.com>
+Date: Thu, 12 Mar 2026 13:15:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,8 +105,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 10/11] net/nebula-matrix: add common/ctrl dev
- init/reinit operation
+Subject: Re: [PATCH v7 net-next 11/11] net/nebula-matrix: add common dev
+ start/stop operation
 To: "illusion.wang" <illusion.wang@nebula-matrix.com>,
  dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
  sam.chen@nebula-matrix.com, netdev@vger.kernel.org
@@ -115,10 +115,10 @@ Cc: andrew+netdev@lunn.ch, corbet@lwn.net, kuba@kernel.org,
  vadim.fedorenko@linux.dev, lukas.bulwahn@redhat.com, edumazet@google.com,
  open list <linux-kernel@vger.kernel.org>
 References: <20260310120959.22015-1-illusion.wang@nebula-matrix.com>
- <20260310120959.22015-11-illusion.wang@nebula-matrix.com>
+ <20260310120959.22015-12-illusion.wang@nebula-matrix.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260310120959.22015-11-illusion.wang@nebula-matrix.com>
+In-Reply-To: <20260310120959.22015-12-illusion.wang@nebula-matrix.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -133,7 +133,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267038-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267039-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -148,78 +148,50 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[illusion.wang:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6AA942718E3
+X-Rspamd-Queue-Id: 166DA27195F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 On 3/10/26 1:09 PM, illusion.wang wrote:
-> +/* ----------  Dev init process  ---------- */
-> +static int nbl_dev_setup_common_dev(struct nbl_adapter *adapter,
-> +				    struct nbl_init_param *param)
+> +static int nbl_dev_configure_msix_map(struct nbl_dev_mgt *dev_mgt)
 > +{
-> +	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
 > +	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-> +	struct nbl_dispatch_mgt *priv = dev_mgt->disp_ops_tbl->priv;
-> +	struct nbl_common_info *common = dev_mgt->common;
-> +	struct nbl_dev_common *common_dev;
-> +	int ret;
+> +	struct nbl_dev_common *dev_common = dev_mgt->common_dev;
+> +	struct nbl_msix_info *msix_info = &dev_common->msix_info;
+> +	bool mask_en = msix_info->serv_info[NBL_MSIX_NET_TYPE].hw_self_mask_en;
+> +	u16 msix_net_num = msix_info->serv_info[NBL_MSIX_NET_TYPE].num;
+> +	u16 msix_not_net_num = 0;
+> +	int err, i;
 > +
-> +	common_dev = devm_kzalloc(&adapter->pdev->dev,
-> +				  sizeof(struct nbl_dev_common), GFP_KERNEL);
-> +	if (!common_dev)
-> +		return -ENOMEM;
-> +	common_dev->dev_mgt = dev_mgt;
+> +	for (i = NBL_MSIX_NET_TYPE; i < NBL_MSIX_TYPE_MAX; i++)
+> +		msix_info->serv_info[i].base_vector_id =
+> +			msix_info->serv_info[i - 1].base_vector_id +
+> +			msix_info->serv_info[i - 1].num;
 > +
-> +	ret = nbl_dev_setup_chan_queue(dev_mgt, NBL_CHAN_TYPE_MAILBOX);
-> +	if (ret)
-> +		return ret;
+> +	for (i = NBL_MSIX_MAILBOX_TYPE; i < NBL_MSIX_TYPE_MAX; i++) {
+> +		if (i == NBL_MSIX_NET_TYPE)
+> +			continue;
 > +
-> +	INIT_WORK(&common_dev->clean_mbx_task, nbl_dev_clean_mailbox_task);
-> +	common->vsi_id = disp_ops->get_vsi_id(priv, 0, NBL_VSI_DATA);
-> +	disp_ops->get_eth_id(priv, common->vsi_id, &common->eth_mode,
-> +			     &common->eth_id, &common->logic_eth_id);
-> +
-> +	nbl_dev_register_chan_task(dev_mgt, NBL_CHAN_TYPE_MAILBOX,
-> +				   &common_dev->clean_mbx_task);
-> +
-> +	dev_mgt->common_dev = common_dev;
-> +	nbl_dev_init_msix_cnt(dev_mgt);
-> +	return 0;
-> +}
+> +		msix_not_net_num += msix_info->serv_info[i].num;
+> +	}
 
 AI review says:
 
-Is the 'param' parameter actually needed here? The function signature
-declares it but never references it anywhere in the body. All the data
-comes from 'adapter' and its sub-structures.
+Is the condition `if (i == NBL_MSIX_NET_TYPE) continue;` correct here?
+Looking at the enum in nbl_dev.h:
 
-> +static int nbl_dev_setup_ctrl_dev(struct nbl_adapter *adapter,
-> +				  struct nbl_init_param *param)
-> +{
-> +	struct nbl_dev_mgt *dev_mgt = adapter->core.dev_mgt;
-> +	struct nbl_dispatch_ops *disp_ops = dev_mgt->disp_ops_tbl->ops;
-> +	int i, ret;
-> +
-> +	ret = disp_ops->init_chip_module(dev_mgt->disp_ops_tbl->priv);
-> +	if (ret)
-> +		goto chip_init_fail;
-> +
-> +	for (i = 0; i < NBL_CHAN_TYPE_MAX; i++) {
-> +		ret = nbl_dev_setup_chan_qinfo(dev_mgt, i);
-> +		if (ret)
-> +			goto setup_chan_q_fail;
-> +	}
-> +
-> +	return 0;
-> +setup_chan_q_fail:
-> +	disp_ops->deinit_chip_module(dev_mgt->disp_ops_tbl->priv);
-> +chip_init_fail:
-> +	return ret;
-> +}
+enum nbl_msix_type {
+	NBL_MSIX_VIRTIO_TYPE = 0,
+	NBL_MSIX_NET_TYPE = 1,
+	NBL_MSIX_MAILBOX_TYPE = 2,
+	NBL_MSIX_TYPE_MAX = 3,
+};
 
-The 'param' parameter is also unused in this function. This will produce
--Wunused-parameter warnings when compiled with W=1.
+The loop starts at NBL_MSIX_MAILBOX_TYPE (value 2) and continues to
+NBL_MSIX_TYPE_MAX (value 3). Since the variable i never equals 1
+(NBL_MSIX_NET_TYPE), this branch can never execute.
 
-/P
+Should this dead code be removed, or should the loop start at a
+different value if the intent was to skip NBL_MSIX_NET_TYPE?
 
 
