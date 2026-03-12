@@ -1,214 +1,213 @@
-Return-Path: <netdev+bounces-267164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDKaEOHssmnAQwAAu9opvQ
-	(envelope-from <netdev+bounces-267164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:42:09 +0100
+	id oFKAD1rusmnAQwAAu9opvQ
+	(envelope-from <netdev+bounces-267165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:48:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED94275C40
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:42:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FD6275E8C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:48:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BBA013003D38
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:42:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 32D803035F65
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBE93914FB;
-	Thu, 12 Mar 2026 16:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783F13FBEAC;
+	Thu, 12 Mar 2026 16:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XoOXAdZS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSD11Ubg";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KaCIuvrP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB380302165;
-	Thu, 12 Mar 2026 16:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCBE3FB7E3
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 16:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773333721; cv=none; b=bwSgRaE5qitckVxpwwryaNAqPHy38bcdyoVACUxQcqe1M5dVGpAiZCXDQdyVoPUdGZ4tXTMDsPUm8x7QanqekqUuTmU2Lhv5o1wPnqRWIa3ApeL7YWUHYSp/6Vvl8NVni/SNtmZGnCjaB6XTC3/krCERY4wDcB3Bd7ufITcT044=
+	t=1773334081; cv=none; b=CiXGjZqpAXbxzCY3y3Y/uSYzOPR4dbnS6EherhX8lHB4NuVpnJVXChyOjHasccwGvhmmYoE3n0BcBmt6F/Ul8JgYp2Zej2q6xR3J9vcgyP6C8w5oD/wjMmDHr3i5CryPyJTXCPIoeAytsJIN4lOHGq4mekn7RpiG4lOMRzt2KGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773333721; c=relaxed/simple;
-	bh=VFVApfv21FiWkANMhfUKrWN7JISt2PdOs46M5JzpQvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UV//bg3CaBFDY9vEe+bLXhzHo4Q7WW6Gg3apKudqWjwufUWsnl+JZBXv6nZ5zaBHM4yeLEe7MQQrzWi4qBesQ73BLH9hW2/ODgyZOSKfb3BE/V/HreJ3DKZ8kmGzY2DroqoxGTLMrvumtR+S1SKQ6ThmW/yocX/ttIMzbrud2Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XoOXAdZS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41B58C4CEF7;
-	Thu, 12 Mar 2026 16:41:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773333721;
-	bh=VFVApfv21FiWkANMhfUKrWN7JISt2PdOs46M5JzpQvo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XoOXAdZSmhlP84Iviilz7IKwq6poxwZf0EUcJiPS1688CKBqqOwvo236tL7BNj7iO
-	 +3uZVBbyAFhG6hhiI6EK0OY/zPC+vgoh1ZkcoonEvdgKabUNwXByLErRc/iWo1v0+P
-	 eNA6b/PHhZl3Oz6m0Kh/gl0v9dJFE4IjHdTWWNaQGEWJjTEobohz0FhoBYgFIpZ+SX
-	 Ko/3xopA3zeHgYPsHc6pc5mkebM2XCrH51XD/sof+uLteF67EPyMGrZzQUbXlHwmhY
-	 OGuovWM8MXjiV/BaGMebOeKS8qkEQyAvMcAkwPjLVFtBdUjaXraJiCfF86uGGiNYD7
-	 KaNwg96OcXwLg==
-Date: Thu, 12 Mar 2026 16:41:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Antony Antony <antony@phenome.org>
-Cc: antony.antony@secunet.com, evitayan@google.com,
-	linux-kernel@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	herbert@gondor.apana.org.au, paul@paul-moore.com,
-	devel@linux-ipsec.org, davem@davemloft.net, nakam@linux-ipv6.org,
-	netdev@vger.kernel.org, edumazet@google.com,
-	stephen.smalley.work@gmail.com, steffen.klassert@secunet.com,
-	selinux@vger.kernel.org, linux-doc@vger.kernel.org,
-	chiachangwang@google.com, omosnace@redhat.com, corbet@lwn.net,
-	dsahern@kernel.org, skhan@linuxfoundation.org
-Subject: Re: [devel-ipsec] Re: [ipsec-next,v6,12/14] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <20260312164154.GW461701@kernel.org>
-References: <migrate-state-v6-12-9df9764ddb9e@secunet.com>
- <20260311195731.1147919-1-horms@kernel.org>
- <abHT2HLx-BvKnu-c@Antony2201.local>
+	s=arc-20240116; t=1773334081; c=relaxed/simple;
+	bh=IIb3lnFy9ZZgffcMQ1sb/OxpBNFDfrikKLoctgY2LdE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gm2tBJK4J7C+Fah4b0gZAAeKxuhmfY6LeDw7XHB9AN8ACHwF7lnr3hdJytxwVHaPhbwMG078vMe1VXKdAl6kxLychoU3WXJC15aFkJcrwAIdKcrPGg1cISrHuti+gPaq8gH6kdQEKIunW90E1r/Zb2PEhpJMV7dqcKT2wn2we50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSD11Ubg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KaCIuvrP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773334074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QopztaDQaDXdF0WurIHvj6v5UeE/ENNGQg9kHKBDRS8=;
+	b=HSD11UbgDtNkzf8JWpCHmLPrl9FJef5AoIbzkA9wK77toHHJ5A+byksQ7VPmYA/FSu9O3c
+	Top81AjbYKQWur9iVWX16m6CcggxM0psneK8U+Za07UYBFNULyOYZwTXyjsmtewmEBWt75
+	qnTiIFXj8QD3Gl/DknC6FHz31yinO84=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-9yjsAKvkNLW56IjzoHwl9g-1; Thu, 12 Mar 2026 12:47:52 -0400
+X-MC-Unique: 9yjsAKvkNLW56IjzoHwl9g-1
+X-Mimecast-MFC-AGG-ID: 9yjsAKvkNLW56IjzoHwl9g_1773334071
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5a1324aeb32so885607e87.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:47:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1773334070; x=1773938870; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QopztaDQaDXdF0WurIHvj6v5UeE/ENNGQg9kHKBDRS8=;
+        b=KaCIuvrPozJl4hzNOEU/PrWY3Qnw1BOto9eRbhUazRMIM3Vj2cZmIuRFH3QzZSABGb
+         pp5SQ8Th03YYwUHuvS5DYeLL04MmCb48zmhDextkfYJGb7KYGFmR2VKA15W4J0M7CTVc
+         cywPEVyV+9Dmx7EgA9xTm18+s+tQQ5ZHsuDhmv2Gn3kLQ+2dHstXHzDAFkZyls25evG7
+         wAowPw3dKTzpfGXuYEL+Zk+064kaU7Tj0aCxI8VyhEzhcyqBWHIPm6BxdQ+X5jJ0mu0t
+         6Tfd/vr28O31+2hxtZlpBz/Rjj0X3rTV7kHH1Ej02e8x8hdGNTMOanSNC2DJv50X4+8x
+         L0PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773334070; x=1773938870;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QopztaDQaDXdF0WurIHvj6v5UeE/ENNGQg9kHKBDRS8=;
+        b=s/tf1lchnZ1ccmVoVCig/TsOI5onfJaNk0g+eiphPA/NznKjhGxAHKPBPbjKhLDQUc
+         AYZbX5eowbF53reoYY8HLbEND3rpna1G6vq/c9vby1cI5OUL2qXBIRq/VrmgSvtZOJUt
+         BspYmpUismiBsywB7xzPHzqdmUBc1+tD5lqxRnEWt/Jn/TcJMHg1Zw5pFw5ykd6fZS7Y
+         U+VMlDztoKihkh5FcFxmvQ3DD4pNgGcXvJgP8HA2JrGh99sJbHr/m4NIccGY0+8/9Rx2
+         UQhOA9Du4fJtiiQ88xql/+KRxnXx8nIFRPdiaodU8R/A+0tYPxPiS/pt3smsUnRYVlsX
+         zfmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX26p41e84GXejkoAkIhQN1VGAkqGU9KgIxDYn+MD47KLhaWBhbabqS1CQODU4DIre+11rHHCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPGwm03q8i9BZftYoth/9cHdFU1AhWtskWUhkwBZvj25kqAoKA
+	n4s/xP8OfWAK6wtvHr8XaVpwjMzEDFOStYWIPhrznSqJFmpMpeAbZHmTIMZ2G3ZZX5EGobzXxAB
+	8DKTgY9RcPkuVjPB+cSevSDX+y7AUbkfxTcWMIB5zE3g6B/DmN8aIffKB2A==
+X-Gm-Gg: ATEYQzyNG8UyL5lzXZZAfBSihQm3EUhYq9d650MAMd3vZ/CvPF/prK2nx6FfYpdrOJt
+	WXjKjAKVvWVha5ySC2XTZlaHFx5FvKWlV582c1l39Flv/LyVGWYzuOJMqX7N0g/QQgKIJdlkdtU
+	2BRBvEKP7zw6rvoclwIEOK82vlGVfgU2IvDDafo91MfY4IHux1v1fib6s0/Yc388OLSmJt9Z7LI
+	NJ/RJOrHOL4Fk7cVfsjPa3vhvPctwsb4xI7GxyCUmPVcrBaLEMKwD/OD9e5Qtn42n8fGBkLR9g6
+	KADKxcXivjLSfYb8Igu++O8lAQnHt60DEzx4DSLHj3gh1Ml7Sc0rhJ1+lBiJyfQikg22JjaNuRI
+	4aHt6CSMPC0sSeXmjXp81/dynBBmBtsOKs0c3ynmffi2X1H1azaZ6QCs=
+X-Received: by 2002:ac2:4ed9:0:b0:5a0:ff97:4374 with SMTP id 2adb3069b0e04-5a162703bebmr82064e87.7.1773334070495;
+        Thu, 12 Mar 2026 09:47:50 -0700 (PDT)
+X-Received: by 2002:ac2:4ed9:0:b0:5a0:ff97:4374 with SMTP id 2adb3069b0e04-5a162703bebmr82051e87.7.1773334070004;
+        Thu, 12 Mar 2026 09:47:50 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.95])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a156366b22sm1021366e87.77.2026.03.12.09.47.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Mar 2026 09:47:49 -0700 (PDT)
+Message-ID: <2d1e0acc-efad-4166-b738-721d88d533ca@redhat.com>
+Date: Thu, 12 Mar 2026 17:47:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abHT2HLx-BvKnu-c@Antony2201.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot ci] Re: net: move netdev_compute_master_upper_features to
+ ndo_set_features
+To: Sabrina Dubroca <sd@queasysnail.net>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: syzbot ci <syzbot+ci098fa7c1795eceac@syzkaller.appspotmail.com>,
+ andrew@lunn.ch, bridge@lists.linux.dev, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, idosch@nvidia.com, jiri@resnulli.us,
+ jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, razor@blackwall.org, sridhar.samudrala@intel.com,
+ syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <20260310-offload_compute-v1-0-3df79c09ea65@gmail.com>
+ <69b04e91.a70a0220.51e36.0000.GAE@google.com> <abBuLV3P6aTzUg3W@krikkit>
+ <abC7rdjxv9ENw-tA@fedora> <abHcP3GTO29rfKML@krikkit>
+ <bcc536ac-dde1-4b63-8fed-70850818472b@redhat.com> <abKf8Fg865Fhipwk@krikkit>
+ <abLPBEg_-j5rp4IM@fedora> <abLivB2KPK0JcTFR@krikkit>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <abLivB2KPK0JcTFR@krikkit>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267164-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[secunet.com,google.com,vger.kernel.org,kernel.org,redhat.com,gondor.apana.org.au,paul-moore.com,linux-ipsec.org,davemloft.net,linux-ipv6.org,gmail.com,lwn.net,linuxfoundation.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[queasysnail.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-267165-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,ci098fa7c1795eceac];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: BED94275C40
+X-Rspamd-Queue-Id: D6FD6275E8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 09:43:04PM +0100, Antony Antony wrote:
-> Hi Simon,
-> 
-> On Wed, Mar 11, 2026 at 07:57:31PM +0000, Simon Horman via Devel wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> > ---
-> > xfrm: add XFRM_MSG_MIGRATE_STATE for single SA migration
-> > 
-> > This patch adds a new netlink method to migrate a single xfrm_state.
-> > Unlike the existing migration mechanism (SA + policy), this supports
-> > migrating only the SA and allows changing the reqid.
-> > 
-> > > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> > > index 4b29ab92c2a7..ae2a1cf2311a 100644
-> > > --- a/include/net/xfrm.h
-> > > +++ b/include/net/xfrm.h
-> > > @@ -683,11 +683,17 @@ struct xfrm_migrate {
-> > >  	xfrm_address_t		new_daddr;
-> > >  	xfrm_address_t		new_saddr;
-> > >  	struct xfrm_encap_tmpl *encap;
-> > > -	struct xfrm_user_offload *xuo;
-> > > +	struct xfrm_user_offload xuo;
-> > 
-> > [ ... ]
-> > 
-> > > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> > > index 2f23ca5b62a9..de8b038fc08c 100644
-> > > --- a/net/xfrm/xfrm_policy.c
-> > > +++ b/net/xfrm/xfrm_policy.c
-> > > @@ -4642,6 +4642,19 @@ static int xfrm_migrate_check(const struct xfrm_migrate *m, int num_migrate,
-> > >  	return 0;
-> > >  }
-> > >
-> > > +/* Fill migrate fields that are invariant in XFRM_MSG_MIGRATE: inherited
-> > > + * from the existing SA unchanged.
-> > > + */
-> > > +static void xfrm_migrate_copy_old(struct xfrm_migrate *mp,
-> > > +				  const struct xfrm_state *x)
-> > > +{
-> > > +	mp->smark                  = x->props.smark;
-> > > +	mp->new_reqid              = x->props.reqid;
-> > > +	mp->nat_keepalive_interval = x->nat_keepalive_interval;
-> > > +	mp->mapping_maxage         = x->mapping_maxage;
-> > > +	mp->new_mark               = x->mark;
-> > > +}
-> > > +
-> > >  int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
-> > >  		 struct xfrm_migrate *m, int num_migrate,
-> > >  		 struct xfrm_kmaddress *k, struct net *net,
-> > > @@ -4680,7 +4693,10 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
-> > >  			x_cur[nx_cur] = x;
-> > >  			nx_cur++;
-> > >  			mp->encap = encap;
-> > > -			mp->xuo = xuo;
-> > > +			if (xuo)
-> > > +				mp->xuo = *xuo;
-> >                                      ^^^^
-> > >  			xfrm_migrate_copy_old(mp, x);
-> > >
-> > 
-> > What happens to mp->xuo when xuo is NULL?
-> 
-> thanks. I also red this on NIPA AI reviews. I will fix it in the next 
-> version.
 
-Thanks, good to know.
 
+On 3/12/26 4:58 PM, Sabrina Dubroca wrote:
+> 2026-03-12, 14:34:44 +0000, Hangbin Liu wrote:
+>> On Thu, Mar 12, 2026 at 12:13:52PM +0100, Sabrina Dubroca wrote:
+>>> Proper fix (so that the notification we're sending during
+>>> upper_dev_link has full linkinfo) would be to move
+>>> netdev_upper_dev_link() to after macsec_changelink_common() and fix up
+>>> the error handling. I don't see anything in macsec_add_dev or
+>>> macsec_changelink_common that needs the device to be linked. But
+>>
+>> If we move the netdev_upper_dev_link() after macsec_changelink_common(),
+>> we will not goto nla_put_failure via default, right?
 > 
-> > 
-> > The xfrm_migrate structure changed its xuo field from a pointer
-> > (struct xfrm_user_offload *xuo) to an embedded value
-> > (struct xfrm_user_offload xuo).
-> > 
-> > In xfrm_migrate(), when the xuo parameter is NULL (PF_KEY path via
-> > pfkey_migrate, or XFRM_MSG_MIGRATE without XFRMA_OFFLOAD_DEV), the
-> > 'if (xuo) mp->xuo = *xuo' branch is skipped, leaving mp->xuo with
-> > uninitialized stack data.
-> > 
-> > Both callers declare 'struct xfrm_migrate m[XFRM_MAX_DEPTH]' on the
-> > stack without zeroing:
-> > 
-> > net/key/af_key.c:pfkey_migrate() {
-> >     struct xfrm_migrate m[XFRM_MAX_DEPTH];
-> >     ...
-> >     err = xfrm_migrate(&sel, dir, XFRM_POLICY_TYPE_MAIN, m, i,
-> >                        k.local && k.remote ? &k : NULL, net,
-> >                        NULL, 0, NULL);
-> > }
-> > 
-> > net/xfrm/xfrm_user.c:xfrm_do_migrate() {
-> >     struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> Yes.
 > 
-> -  struct xfrm_migrate m[XFRM_MAX_DEPTH];
-> +  struct xfrm_migrate m[XFRM_MAX_DEPTH] = {};
+>>> anyway it doesn't make sense for macsec_fill_info to return -EMSGSIZE
+>>> on invalid data, so the "bandaid" should be included as well.
+>>>
+>>> Should this be part of this series (either just the "bandaid" or the
+>>> "proper fix"+bandaid), since we never saw a problem before?
+>>
+>> Since macsec need the "bandaid" fix either way. How about you post the
+>> "bandaid" fix to net. And I include the "proper fix" in this series for
+>> net-next?
 > 
-> this should fix it.
+> But I don't think it's needed in net. Am I missing a codepath (before
+> your series) where macsec_fill_info could be called for the new device
+> before macsec_newlink returns? If not, it doesn't really qualify as a
+> fix, that's why I was asking Paolo.
 
-Yes, I agree that should fix the problem.
+FWIW, I don't see a codepath calling into rtmsg_ifinfo_build_skb()
+before device initialization, so I would be fine targeting net-next with
+the EMSGSIZE-related change.
 
-> 
-> >     ...
-> >     err = xfrm_migrate(&sel, dir, type, m, n, k, net, encap, xuo, extack);
-> > }
+Side note, it looks like that the WARN() in the rnnetlink code here
+helped identifying a real problem and correctly returning 0 when the
+key_len is not yet initialized will silence it forever, what about
+preserving a warning for this kind of race? something alike:
 
-...
+---
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index f6cad0746a02..82974d4fa3f6 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -4337,7 +4337,8 @@ static int macsec_fill_info(struct sk_buff *skb,
+ 		csid = secy->xpn ? MACSEC_CIPHER_ID_GCM_AES_XPN_256 :
+MACSEC_CIPHER_ID_GCM_AES_256;
+ 		break;
+ 	default:
+-		goto nla_put_failure;
++		WARN_ON_ONCE(1);
++		return 0;
+ 	}
+
 
