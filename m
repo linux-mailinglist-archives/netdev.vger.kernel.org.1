@@ -1,225 +1,212 @@
-Return-Path: <netdev+bounces-267018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDfDFKmasmnENwAAu9opvQ
-	(envelope-from <netdev+bounces-267018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:51:21 +0100
+	id WINvNx+bsmnENwAAu9opvQ
+	(envelope-from <netdev+bounces-267019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:53:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9D2270811
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:51:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FB0270830
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:53:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B23BC306CC06
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:51:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 74BF2301E5F2
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0DC390CAA;
-	Thu, 12 Mar 2026 10:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5149B391506;
+	Thu, 12 Mar 2026 10:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OuTYXSN9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsMy/Set"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSTWUdTg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29FD40DFAB
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D65A388E74;
+	Thu, 12 Mar 2026 10:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773312673; cv=none; b=NRTcani+pJpzdoXbHtkIWXd8kt+g8m80bbxtHAcXl21+kZvc0Nv/E5JNp2ZvR7OcgHFBUzH5IykWBda+Wc1iKzoOS1xo/FVEwGcE/u45C0wpJamvX0BqoU/gDaP8p9NwrFFfKUb/q5hoFOOGRQ6ZWV7ez43fsnX63c4PpO55M6A=
+	t=1773312797; cv=none; b=t3DIJosqRNYfJeswyNO5NbLqJkDyNCPIoa+E9aO22EFfYomkYgSYKraB6ytMHbgww55YRp91PAWIHwk55FqXGFPXi/MWiofpDv8hWIGf4sl99StWk3Auk2TkHot8O/xQY/vzQ+akwMI0dQGZAjhIQd9h+6ZZaFYCU70DqvCEu/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773312673; c=relaxed/simple;
-	bh=EQkW6+lM7nq1mEy4KqkJc8bvPxN1VhQdmSs8sInnBXs=;
+	s=arc-20240116; t=1773312797; c=relaxed/simple;
+	bh=1+8+XjrK7jO24bo8LDi66k0D/UNmRuJY8jK0hfbGfLM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wzo2zVBZS6BC5s02Cu01pjYmOL7oq+B3NnqsnutUn2rdqNF7owtbCifMG8ohIGkjuUqSH787z0c25U98AGhHQaLdvppFV38EchMi1VkIlLon+2dTIFOe6FksZsVE5HEfe9d531hfbzKWhWcNcaUyOwPb9uaYj99NZHTAlMucRcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OuTYXSN9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsMy/Set; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773312669;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CsY/vQXT9rNKMEUwHJ7p9ZkQrv3cw72S9U06qV9qj28=;
-	b=OuTYXSN9dIB3yL+VSZD5VhyCmw2eGAPZAAv3FKI1y0uTYgDZH2eOmySy3gbBr5jOEjOoq9
-	sxsM67bbHxSu2LdoQB6cy5Tg2Zqt50x0eQn5qt5Kq4ICJGWKQQ4PkMC0clPHJNSaYDcOog
-	LnVWsXaTOqt3xoXimTekVBmJSG91SCw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-369-Vm0jUYPpPgSR469pKrEbTw-1; Thu, 12 Mar 2026 06:51:08 -0400
-X-MC-Unique: Vm0jUYPpPgSR469pKrEbTw-1
-X-Mimecast-MFC-AGG-ID: Vm0jUYPpPgSR469pKrEbTw_1773312667
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4853553944fso13018905e9.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:51:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773312667; x=1773917467; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CsY/vQXT9rNKMEUwHJ7p9ZkQrv3cw72S9U06qV9qj28=;
-        b=hsMy/SetE+gflMxauowE/FCbKtG10b5eMz4KW+HzAblRRBPNkNdppDJorgvhVUNwn5
-         HpzesIm9DkMLuJYn0ZYeFZKKLCis2tTSEFHPjtxBXU+Vv9rYYscvBVE3ZrGGxf3qPI37
-         Xzwr80CcYpnnhRcvrM4E3QZIyyxor9KkfoG0jAptBZ8l//rd9xON+j/QdWvSbyHINMKA
-         4qm9bg8rt1nkyi2O5RV6DiYU4beSBONVvRYLoVA+HzP89RpA/Ig1PrXnk874sEcxo0WM
-         FDRZTGuh5Bw4u7MimJu+VKcogLfRLD6dfWc9PoCXCgPCQYa7Ms9KxFMRszLjoPkH9Rmm
-         k5Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773312667; x=1773917467;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CsY/vQXT9rNKMEUwHJ7p9ZkQrv3cw72S9U06qV9qj28=;
-        b=n7IvpeWqgMLuT0inDdhtaaewN0scsLDThvgWABOYCNHopIsKlat1a0xkz5/WvONt41
-         svbWc3lGJSC3wEpCtyC9Po93pFnuSaguJ43vSWc4SP3HmtxCcvAHl/wQVjxrr8sGNLma
-         zVRPm4CXJ6c3NG+tD6b9bzsHEs5SuyAGTuUQd/Iyo5DRL4Xyp0nXwkxYCNjxaLl7R8lZ
-         Lv7Dac+jukYnGjuAj3k0VgG/PaCE7sB7hZluDXplNSv8+vIiw2SxMF7aTfPkFBgNrn37
-         Xx6z8pGnPcwg5ewL/xYJpYYD0zBXIxWHgZNSOADwzdjIX/mukzIdZwAyVdRQ5jdNkqDc
-         xxTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXzwaR4iQoG1dKr9tT04dubnzZcftIH24gdOAHB/u55bVEpFy3utOGCx63ojKdqNiJkb90uMNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmfNE9S1QNbi6ui+OnoiY80JhCJ/uIQ2YPz1AzqTCO1z1+jOPv
-	/pyqNhng8btTpOENmg6AQDUpP1Kh27LRPkLvwtPCH4M4cB4VxU8cd060T1DkYSN2Btl8SOxTcBu
-	ETG1MGUqi/wvJ8aHh7z5l5wfBLHf6LTBJSWjVUJbnZ/8Gv3ghto6z3LXD9Q==
-X-Gm-Gg: ATEYQzz/tufZ3VaQ6mz3FMcn1o6gDzgUOmZtYbliA+nd5V3gP+1HMJGbfpC3lJOuHsw
-	TqNwglCGTJsZ86cuzwKAUFzypdgzJjTgFJCH0b3BhzcnwRNPolrorReU2VbWQnfb9noAyYlRKPF
-	M8INhBzMQ2JeqyWeat0QIXPRD/PW1KcD9ezaUiHexBOY24xe+4m3e4CWBIq3MsxXYNVDTI2OS3G
-	MxQKYtSKMCn51KonqxMV/po77xv6puvWA8t1Gx7ogxWoVyPMmCnTnShIDaOhOimUdqzhwIuv6z8
-	ZGuxlLssfhVxzeleWU5QCQgkDc7mXBRl+K+Io19t6v3q5rgx01kwYbuVxSIu4jHyXUizAi5b3Os
-	PgwHjRZ3Eufz3TCcXV4aEJYBlVF4eGIvs3q7c7UAGEMq+THzaEVE4Oss=
-X-Received: by 2002:a05:600c:c4a4:b0:485:3e00:944a with SMTP id 5b1f17b1804b1-4854f583e77mr36424165e9.9.1773312667381;
-        Thu, 12 Mar 2026 03:51:07 -0700 (PDT)
-X-Received: by 2002:a05:600c:c4a4:b0:485:3e00:944a with SMTP id 5b1f17b1804b1-4854f583e77mr36423755e9.9.1773312666862;
-        Thu, 12 Mar 2026 03:51:06 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b5e912fsm311838795e9.2.2026.03.12.03.51.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 03:51:06 -0700 (PDT)
-Message-ID: <d69b5b88-449a-40c9-a704-9ccdfb616ca0@redhat.com>
-Date: Thu, 12 Mar 2026 11:51:04 +0100
+	 In-Reply-To:Content-Type; b=UVoqazRdiLMoWo52GLnX20r/DNr2a+ME+ql9AayfkiktCSRq7TAfOyzq3oJggON1p2x1P4YOTTaOxt4fvSXox9T3s7Hz5vIqXO/xQvPczE8lTBnwXs/fBi7orxwnSR/kczMk63IPyGqEr6hMj31ets/6DlZ48iit8jEBqiJ4CvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSTWUdTg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B481EC19424;
+	Thu, 12 Mar 2026 10:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773312796;
+	bh=1+8+XjrK7jO24bo8LDi66k0D/UNmRuJY8jK0hfbGfLM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZSTWUdTg38joWylX5oE9mqRa+Kp/Yce0+4KDWynILpm/YX5UkVt/dF5wdfGJ8bDwR
+	 wyGwVhCpcUeHokDorBnKlyz2Fd4inWfV4LPmj29sBNKvBEXlMRL84GeNLZLLnqwYMo
+	 MtSoWZHzvvH3uS2lZlUU3xV9VhuBD/YUwOz49G/04we0iGz6Zbp8aesdJ2cw38RLLZ
+	 afsJ3A4MqYi7PmCbCCogH7fq2U2tkyPbbTh1PkWNro+CT6PAJ8qx0Q548m1qcLv4QV
+	 78kO8Sx77FpGv55rJA6wVGoxL7vZxzJy5F2nK0HP7ceoYpcwy1f+GPHG2qjYPjSP2y
+	 /VMrC1CP/7uqg==
+Message-ID: <2658280e-0206-4326-b8dd-d201fc604dbd@kernel.org>
+Date: Thu, 12 Mar 2026 11:53:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,v7,05/10] net: phy: Represent PHY-less SFP modules with
- phy_port
-To: maxime.chevallier@bootlin.com
-Cc: o.rempel@pengutronix.de, herve.codina@bootlin.com, andrew@lunn.ch,
- edumazet@google.com, linux-kernel@vger.kernel.org, hkallweit1@gmail.com,
- netdev@vger.kernel.org, kuba@kernel.org, romain.gantois@bootlin.com,
- f.fainelli@gmail.com, christophe.leroy@csgroup.eu,
- kory.maincent@bootlin.com, mwojtas@chromium.org,
- dimitri.fedrau@liebherr.com, nicveronese@gmail.com, horms@kernel.org,
- daniel@makrotopia.org, kabel@kernel.org, linux@armlinux.org.uk,
- vladimir.oltean@nxp.com, davem@davemloft.net, thomas.petazzoni@bootlin.com,
- bjorn@kernel.org
-References: <20260309152747.702373-6-maxime.chevallier@bootlin.com>
- <20260312104733.87688-1-pabeni@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260312104733.87688-1-pabeni@redhat.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter
+ value for PTP support: manual merge
+Content-Language: fr
+To: Chintan Vankar <c-vankar@ti.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Michael Walle <mwalle@kernel.org>, Nishanth Menon <nm@ti.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+ MD Danish Anwar <danishanwar@ti.com>, Vishnu Singh <v-singh1@ti.com>,
+ linux-next@vger.kernel.org, Mark Brown <broonie@kernel.org>
+References: <20260310160940.109822-1-c-vankar@ti.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260310160940.109822-1-c-vankar@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-267019-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[pengutronix.de,bootlin.com,lunn.ch,google.com,vger.kernel.org,gmail.com,kernel.org,csgroup.eu,chromium.org,liebherr.com,makrotopia.org,armlinux.org.uk,nxp.com,davemloft.net];
-	TAGGED_FROM(0.00)[bounces-267018-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: AC9D2270811
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 86FB0270830
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/12/26 11:47 AM, Paolo Abeni wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net: phy: Represent PHY-less SFP modules with phy_port
-> 
-> Now that the SFP bus infrastructure notifies when PHY-less modules are
-> connected, we can create a phy_port to represent it. Instead of letting
-> the SFP subsystem handle that, the Bus' upstream is in charge of
-> maintaining that phy_port and register it to the topology, as the
-> upstream (in this case a phy device) is directly interacting with the
-> underlying net_device.
-> 
-> Add a phy_caps helper to get the achievable modes on this module based
-> on what the phy_port representing the bus supports.
-> 
->> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
->> index 4b06644866b2..faa58a780477 100644
->> --- a/drivers/net/phy/phy_device.c
->> +++ b/drivers/net/phy/phy_device.c
-> 
-> [ ... ]
-> 
->> @@ -1483,6 +1483,8 @@ static int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
->>  	struct phy_device *phydev = upstream;
->>  	struct net_device *dev = phydev->attached_dev;
->>
->> +	phydev->has_sfp_mod_phy = true;
->> +
->>  	if (dev)
->>  		return phy_link_topo_add_phy(dev, phy, PHY_UPSTREAM_PHY, phydev);
-> 
-> If phy_link_topo_add_phy() fails, does has_sfp_mod_phy get cleaned up
-> correctly?
-> 
-> Looking at the SFP framework, when phy_link_topo_add_phy() fails here,
-> sfp_sm_probe_phy() in sfp.c will free the PHY but won't call
-> disconnect_phy (because sfp->mod_phy was not set). This leaves
-> has_sfp_mod_phy stuck as true.
-> 
-> On a subsequent SFP module insertion, phy_sfp_module_start() checks
-> !phydev->has_sfp_mod_phy:
-> 
-> drivers/net/phy/phy_device.c:phy_sfp_module_start() {
-> 	if (!phydev->has_sfp_mod_phy)
-> 		return phy_add_sfp_mod_port(phydev);
-> }
-> 
-> Seeing has_sfp_mod_phy is true (stale), it skips creating the mod_port
-> for a PHY-less module. The module then won't be represented in the link
-> topology.
-> 
-> Would it be better to either set has_sfp_mod_phy after
-> phy_link_topo_add_phy() succeeds, or clear it in an error path?
+Hi Chintan,
 
-Out of sheer ignorance IDK if phy_sfp_module_start() could really happen
-in practice after a phy_sfp_connect_phy() failure, but the inconsistency
-is likely worthy a cleanup?
++cc linux-next
 
-Leaving the series alive in PW, in case the phy crew disagree or a
-follow-up is preferred to a repost.
+On 10/03/2026 17:09, Chintan Vankar wrote:
+> The "rx_filter" member of "hwtstamp_config" structure is an enum field and
+> does not support bitwise OR combination of multiple filter values. It
+> causes error while linuxptp application tries to match rx filter version.
+> Fix this by storing the requested filter type in a new port field.
+FYI, we got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
 
-/P
+  840c9d13cb1c ("net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter value for PTP support")
+
+and this one from 'net-next':
+
+  a23c657e332f ("net: ethernet: ti: am65-cpsw: Use also port number to identify timestamps")
+
+----- Generic Message -----
+The best is to avoid conflicts between 'net' and 'net-next' trees but if
+they cannot be avoided when preparing patches, a note about how to fix
+them is much appreciated.
+
+The conflict has been resolved on our side [1] and the resolution we
+suggest is attached to this email. Please report any issues linked to
+this conflict resolution as it might be used by others. If you worked on
+the mentioned patches, don't hesitate to ACK this conflict resolution.
+---------------------------
+
+Rerere cache is available in [2].
+
+The conflict was in the context: this patch here in 'net' modified the
+if condition, while the one in 'net-next' modified the line below.
+
+----------- 8< -----------
+diff --cc drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index a38bf7f4f434,265ce5479915..d9400599e80a
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@@ -1351,8 -1351,8 +1351,8 @@@ static int am65_cpsw_nuss_rx_packets(st
+        ndev_priv = netdev_priv(ndev);
+        am65_cpsw_nuss_set_offload_fwd_mark(skb, ndev_priv->offload_fwd_mark);
+        skb_put(skb, pkt_len);
+-       if (port->rx_ts_enabled)
++       if (port->rx_ts_filter)
+ -              am65_cpts_rx_timestamp(common->cpts, skb);
+ +              am65_cpts_rx_timestamp(common->cpts, port_id, skb);
+        skb_mark_for_recycle(skb);
+        skb->protocol = eth_type_trans(skb, ndev);
+        am65_cpsw_nuss_rx_csum(skb, csum_info);
+----------- 8< -----------
+
+1: https://github.com/multipath-tcp/mptcp_net-next/commit/e9021220744d
+2: https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/c39c9fa
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
