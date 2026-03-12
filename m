@@ -1,66 +1,54 @@
-Return-Path: <netdev+bounces-267230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOSIKM1Bs2l6TgAAu9opvQ
-	(envelope-from <netdev+bounces-267230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:44:29 +0100
+	id 0KeuJOdHs2m3UAAAu9opvQ
+	(envelope-from <netdev+bounces-267231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:10:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E3427B0C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:44:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7556027B2F9
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 00:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F1D93170EE8
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:42:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AE6FA301C6AA
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3F33B0AE3;
-	Thu, 12 Mar 2026 22:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="sJVQXf86"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356083FCB2C;
+	Thu, 12 Mar 2026 23:10:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026BC387347;
-	Thu, 12 Mar 2026 22:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0C85474F;
+	Thu, 12 Mar 2026 23:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773355362; cv=none; b=JlqGGE9TG2i1K7Ryk4Qrog6pFv50mthFd4qUJDBqAWxNC2TTrVsC7u842otI1rShp8TCXMG6hLSDhUxwntqQUO6APhlX0hQfSSSW3K7Hpg1rLOsxyRg39TcvuaNOa9hbRwtT01G5T2fGbp+o6mgUYoLmJrGnra1kqtZdMEZlELs=
+	t=1773357025; cv=none; b=LjHqu+y/iS75uKlJHkgmCXdR1SBXx14aEbQh4XwYJ0ibwsez2DUKuoO20PDZ9W9T3X66HfpLLOzGbYhvVSSALBEs6RfFZRK50Ixczd62wNQSSI97Z0+rHR2LT81LOU31oW5sfzzakJNHZgbx7haERZ6UdrGlJMBhpguHhQ70VIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773355362; c=relaxed/simple;
-	bh=AnJagQrTLnBNlmaDDh5sry0hmrqIAgeRC5Do35XCdcU=;
+	s=arc-20240116; t=1773357025; c=relaxed/simple;
+	bh=V9MsJas5VqrwU+ZQcIln6/NPhLNGcGpWJ1IqyvVpnQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RXh63G0VUKfYe/77PCmpou9HgxZzI3hjHmN4ybXiO6WLAjd3GjNCuV6THDr439r6IoET53oA5JoX3n1XsrAdG2iL0ATRfou/gC1j+QqyghS2yXKCY3VNW4/UDYHm/Kj8uPlPLxJBYDS30Jf9cFzDRIbB3ZkHPUg+D44w4Ht2aMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=sJVQXf86; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 218AF60278;
-	Thu, 12 Mar 2026 23:42:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1773355359;
-	bh=Dm6Zx3wtYWTGilXG/dW4Y9m4SwWvkRH5uWCQU1sVNoU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sJVQXf86D/3OYkyMOgrXcxGd+3zAHdlq6yEkMJ6DGgGiysr3Emw11MRRlYY2VgJeq
-	 Bj28sSh3wEt9E/z2ZvZE7XqfFqssF0i1Cz0L0lpNwWgyoIb+YVGFfz+W6fTJUc2qNN
-	 muTLXiBJ2lybLvEr0GhnG8czPwBdtte3ILPVDNXOwZDGyV2iBygX+1F9qDW5RXvUSU
-	 njXumO3ooaJkD+/9ibnVhXF8owtlugK/A/TFQUJoVMpwlbNYZww0FS0uDG2F3emeeW
-	 aoEQx8XoO+VETt4v3ODh/Fg4v5DtWshL62S5+4p/2Oqnyxn9jZNlfc/FOyv38omAoj
-	 twxmuGrsxJFwQ==
-Date: Thu, 12 Mar 2026 23:42:36 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0/ZNtY4oUoTGdoJyV1OjbOZ6A+x3KZEvAYpVUM37JDcldFRmfN9+iD77Todfus23RLJqDl0gSR/Hhg0ZNU8LeHibW+e8n56UZ9xR1t0Rfer05kNCkfwCEXBaS5O9uBaN0GIhWlPqpRXl8G5AVoFdPwDxkqFpSa1C5myL7nCvUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 0743D60470; Fri, 13 Mar 2026 00:10:21 +0100 (CET)
+Date: Fri, 13 Mar 2026 00:10:23 +0100
+From: Florian Westphal <fw@strlen.de>
 To: Prasanna Panchamukhi <panchamukhi@arista.com>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
+Cc: netfilter-devel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, Phil Sutter <phil@nwl.cc>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, coreteam@netfilter.org
 Subject: Re: [PATCH net-next] netfilter: conntrack: expose
  gc_scan_interval_max via sysctl
-Message-ID: <abNBXCgi4x5WLkBa@chamomile>
+Message-ID: <abNH3xxxAU7U4zz5@strlen.de>
 References: <20260311194058.13860-1-panchamukhi@arista.com>
  <abKzWIhVz_SeiSOa@strlen.de>
  <CACqWiXD2_O32K4NhmNBZrAUG7U9-N93LTFjJHG6Tq=4vuafNuA@mail.gmail.com>
@@ -70,75 +58,54 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <CACqWiXD2_O32K4NhmNBZrAUG7U9-N93LTFjJHG6Tq=4vuafNuA@mail.gmail.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267231-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267230-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email,arista.com:email,netfilter.org:dkim]
-X-Rspamd-Queue-Id: 08E3427B0C7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arista.com:email,strlen.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7556027B2F9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Prasanna,
-
-On Thu, Mar 12, 2026 at 03:31:06PM -0700, Prasanna Panchamukhi wrote:
-> On Thu, Mar 12, 2026 at 5:36 AM Florian Westphal <fw@strlen.de> wrote:
-> >
-> > Prasanna S Panchamukhi <panchamukhi@arista.com> wrote:
-> > > The conntrack garbage collection worker uses an adaptive algorithm that
-> > > adjusts the scan interval based on the average timeout of tracked
-> > > entries.  The upper bound of this interval is hardcoded as
-> > > GC_SCAN_INTERVAL_MAX (60 seconds).
-> > >
-> > > Expose the upper bound as a new sysctl,
-> > > net.netfilter.nf_conntrack_gc_scan_interval_max, so it can be tuned at
-> > > runtime without rebuilding the kernel.  The default remains 60 seconds
-> > > to preserve existing behavior.  The sysctl is global and read-only in
-> > > non-init network namespaces, consistent with nf_conntrack_max and
-> > > nf_conntrack_buckets.
-> >
-> > This was proposed before, see:
-> >
-> > https://lore.kernel.org/netfilter-devel/aO-id5W6Tr7frdHN@strlen.de/
-> > https://lore.kernel.org/netfilter-devel/aRsuU57juCvsMBKE@strlen.de/
-> >
-> > I did not hear back wrt. the horizon cache.
-> >
-> > I'm not 100% opposed to this, but I do wonder if we really can't do
-> > better than the current avg strategy.
-> 
-> Hi Florian,
-> 
+Prasanna Panchamukhi <panchamukhi@arista.com> wrote:
 > Our primary goal is to cap the maximum time taken by the GC to clean
 > up expired entries. We rely on user-space notifications to clean up
 > these entries from the hardware, so ensuring a predictable upper bound
 > is important for our use case.
 
-Is there any reason why you decide not to use instead the existing
-hardware offload infrastructure for this purpose?
+Sure, but why can't we try to give a better default behavior?
+
+while true; conntrack -L >/dev/null;done
+
+basically does what you want already (but in a dumb way).
+
+> Regarding the adaptive strategy, we are using this sysctl to address
+> environments where the current average-based calculation delays the
+> cleanup of short-lived entries.
+
+Yes, and I did propose to adapt the existing strategy to provide more
+timely notifications.
 
