@@ -1,130 +1,137 @@
-Return-Path: <netdev+bounces-267179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIRhL8MFs2njRgAAu9opvQ
-	(envelope-from <netdev+bounces-267179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:28:19 +0100
+	id WKZnJqEHs2kMRwAAu9opvQ
+	(envelope-from <netdev+bounces-267180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:36:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3380E27724F
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:28:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A69F1277316
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 19:36:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2B641304AC18
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:28:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3E5E301731A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339AC3A381C;
-	Thu, 12 Mar 2026 18:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836203FCB1E;
+	Thu, 12 Mar 2026 18:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HicsbnDp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eq+5MwA5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95E438C423
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 18:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DFC3FB7D2
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 18:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773340096; cv=none; b=VIIa1exIESW96O74hy/MkM/JYGnYTHYATsFVNrU1SgsL89Sh2j9hpdWwm459/Tm+QymB5SV8ErL2+m++/ungIs80TXvpV9dHZN8UIC2A+H+uh3QdK0Fr+R6VoMbwuXONMPD1zkFFRFR/gpNULCeikviiPmR+ezYiXWUzxpAW3lo=
+	t=1773340572; cv=none; b=mPCLWkGajey7HOSefNnxzR9eydGusu2DgDMFNl/5YokcxYnkiH12SViknwHCN2uYimNDp4FqD0xH6zKWpvVx7U20ivHFJ2HfPn6YNXjRtGN9+fiY+lgKiYEyjiQIxCi7tl3UZRECPtf3mAdT+lIJzQbTlKWpTdVc09xcICvoSrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773340096; c=relaxed/simple;
-	bh=RCae1paGq9M0BmVz+wvTtgoP5qBKQHJfsSvMgH6WdbQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrgdOyxESJGNTQUzQuQ2EfSElt4Hl1UTObn/NZ6DGl7cn3ni1aMyw0xK0crwV71NBB77+IsyV+T+c3cyY/5CaSNNLvQKX9qeD1L03CWXRekeHMXnAafPnIxB927+1QnbAJxVRFQsp8aAPVqHBExEH9xcGbkEy/Iz/B+7Zb44G/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HicsbnDp; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 26FDC1A2E12;
-	Thu, 12 Mar 2026 18:28:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E51DC6001B;
-	Thu, 12 Mar 2026 18:28:11 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 784B410369547;
-	Thu, 12 Mar 2026 19:28:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773340090; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=gujxDKyu6aCh39EK6Isul8rgjIK7nOMe42cmvXCePbc=;
-	b=HicsbnDpp2NOFY0Vn3BjvAM9IvTWqwp+PF+sDkisrCwd09KHCy8Ri0e3EgNO+PvLYy+Yyi
-	e3zPRXPmzF3EdQL+8J0P0H1trK046dg8QpidnDmWz0OXNEuZPm47OA2XLmXzdTUdjtUmZW
-	rxbvDNg5QKDSPujvzeSNLpLrWVFiblywtnciP0Q0WBeaam/RYsD191Xm2daUk6KNNqy1Id
-	GS77Oh3ifJGgCNC0tHOdEd+1e+VYPRlYMK8cEQ1u3/oiDpss5D9teGHl5rwVCM9IIUPAfD
-	nQvkhB1reYk/gVNLBIlAbKIL6z64pXwnRaXCrL3COBE6gT7l7JuFJikZS/tLVA==
-Message-ID: <cd3acaab-5b77-461e-bbcf-de475ee29280@bootlin.com>
-Date: Thu, 12 Mar 2026 19:28:03 +0100
+	s=arc-20240116; t=1773340572; c=relaxed/simple;
+	bh=/5vfMWpgCKCseU9LBmPcKYOKOtJwradcFuOEu5ltkHA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sq7rAS4XyGNsPIoc1Hdi8E5Hsg+mwkueIbFTZFh0T0cvwdyp/+xpYa8SgtYMerP3jqJ63T+Ev5+nxqrd/QIfoFLii1r3HXqulTFdju9aCJiFnjyUxKPPbQ9NOCQk9JsNLJORQ0lJ64RIlfn3R/tk1kVZk9hVNv/lGi84V7PaV3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eq+5MwA5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773340570;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=v53NECPPfKFXRU01LnlwSY/I0xJH84s3Gsl6hj9nZU0=;
+	b=eq+5MwA5f0LKfz0rJR0ciS2p1to9ZTkMKhX0gthvg1GIEP8mmVUT+Wl4YsY3OBZYKqjmkK
+	/l9IOrzTMWk8KTysBr7r8Z5dkQuHKa6UOQMJqyXWOWIaQ+Z1Gkjdz28ASXsreZox+iNyR0
+	vqv/116vhRjFXKyoY9lp3aQG+hQ7jC4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-42-q5tjxeq2MKGbdClVla46JA-1; Thu,
+ 12 Mar 2026 14:36:06 -0400
+X-MC-Unique: q5tjxeq2MKGbdClVla46JA-1
+X-Mimecast-MFC-AGG-ID: q5tjxeq2MKGbdClVla46JA_1773340565
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4CED1953941;
+	Thu, 12 Mar 2026 18:36:05 +0000 (UTC)
+Received: from tc2.redhat.com (unknown [10.45.224.6])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6FA0030002DA;
+	Thu, 12 Mar 2026 18:36:03 +0000 (UTC)
+From: Andrea Claudi <aclaudi@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Ivan Vecera <ivecera@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>
+Subject: [PATCH] dpll: Fix missing notifications in monitor mode
+Date: Thu, 12 Mar 2026 19:35:47 +0100
+Message-ID: <a44724170d2c5e288062a923d93c3eaccdac97e3.1773340441.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
- KSZ8463 global irq
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
- pascal.eberhard@se.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
- Tristram.Ha@microchip.com
-References: <20260305125149.ejju5ptrkviqi3sm@skbuf>
- <a3a915af-5190-4582-a3e6-4ebf92a7e35d@bootlin.com>
- <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
- <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
- <20260309205401.bk5fpw6kqnmlktbu@skbuf>
- <dde60639-af13-4653-9a34-38c4bd98b149@bootlin.com>
- <20260311115356.windefb3j4kkuslg@skbuf>
- <c3812b1f-50b7-4663-92f5-14c5c6b483a2@bootlin.com>
- <20260311135610.oox5ahxcyvxkuegw@skbuf>
- <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
- <20260311212404.xsx55lh3gnuze253@skbuf>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260311212404.xsx55lh3gnuze253@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-267179-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267180-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aclaudi@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3380E27724F
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: A69F1277316
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/11/26 10:24 PM, Vladimir Oltean wrote:
-> On Wed, Mar 11, 2026 at 05:58:32PM +0100, Bastien Curutchet wrote:
->> In the end, it feels OK to me to migrate KSZ8463 into ksz8863.c but it's
->> hard to know for sure before actually doing it.
-> 
-> Sorry, what ksz8863.c? I may be misunderstanding something.
+When running dpll monitor with output redirected to a file, notifications
+could be lost because stdout is fully buffered for file redirection instead
+of line-buffered like in interactive mode. If the program is killed or
+crashes, buffered data is lost before reaching the file.
 
-I meant ksz8995.c sorry
+Fix by calling fflush(stdout) after each notification to ensure immediate
+writes to the log file.
+
+Fixes: 656cfc3ce05b ("dpll: Add dpll command")
+Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
+---
+ dpll/dpll.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dpll/dpll.c b/dpll/dpll.c
+index 846ad4b0..84f68f76 100644
+--- a/dpll/dpll.c
++++ b/dpll/dpll.c
+@@ -1936,6 +1936,7 @@ static int cmd_monitor(struct dpll *dpll)
+ 				       strerror(errno));
+ 				break;
+ 			}
++			fflush(stdout);
+ 		}
+ 	}
+ 
+-- 
+2.53.0
+
 
