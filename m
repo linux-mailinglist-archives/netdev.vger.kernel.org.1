@@ -1,181 +1,163 @@
-Return-Path: <netdev+bounces-266876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aF3wNUMqsmleJQAAu9opvQ
-	(envelope-from <netdev+bounces-266876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:51:47 +0100
+	id oOc0G2IqsmleJQAAu9opvQ
+	(envelope-from <netdev+bounces-266877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:52:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC57B26C762
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:51:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE3D26C778
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E2A5A300BEB6
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:51:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8F903300E490
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4274935DA5B;
-	Thu, 12 Mar 2026 02:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66076374E50;
+	Thu, 12 Mar 2026 02:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lx6Lm2rM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5GDGT0J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E83033D6E1;
-	Thu, 12 Mar 2026 02:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A8533F8B7;
+	Thu, 12 Mar 2026 02:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773283902; cv=none; b=VBQuVILdX4sj/jm/DbbuoDO32osVDdvqe08hJZkhQQ7A/3rlRIObwjhb/05l9Vni7L+5Y6oM7pNeHX+mCJWriyh1subhsweWm/ew6Z4n4pr5XhIdGD44XAxllb1eWU+6G53JPIDCRCP+IICa0m4GEr4wj5DodgwFv/TWf9qMF+8=
+	t=1773283929; cv=none; b=i05jOnYggNNgTvtANwGFMX2iE6udwXcRniuz2wnIw7FOWc8D6wyfwpzNtJHYtHp3n4pjGHyBQLB3p6JprSvQ8UzwdXldjJziyaH+Um0YSgoOHTwYCBXXnmt2aIvKT/Kw/npS49Fwi+NhUTcWX+cK1weOhZf6z1weaEObexSmA9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773283902; c=relaxed/simple;
-	bh=5w2lPpLvxTiUXiFxlKEBQjMl/vZ0mhlS88ypFqz7+58=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To; b=HPNQVd5QEcR4K9drG4aU4m39d57lCAStVVSrceaJxnYFfy7YZtAMJKFqLW9WFhRFIXNuYOJQTy9grsZcgKGFRftTgEd7rULuqPUoITUhmoGn9T7uPx05qMRQPRPFdnRhhcNyOadxpL0QmvwcaE+vwgPEzaClaSMkevSq7UVlP24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lx6Lm2rM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B93C9C4CEF7;
-	Thu, 12 Mar 2026 02:51:41 +0000 (UTC)
+	s=arc-20240116; t=1773283929; c=relaxed/simple;
+	bh=HSQM8TeR1XXEYwjyd/8yZVZDhU1JDCBPTz3eH73z4SU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kDTM3S+Zelz+CgNgiJtxkGQUKV6Mc04IMoZ8Rp0tbXZsvgZhafLz7rt9cJduX5+JgfuadDYLKcoyjv185pQxVRsAlLC6WkwsCp45PuFQ5r3rAfpxmD4XrjiPLKPLYMSzNCbP6Uozlt6t+Q2UD0JQ3i6fy6iHtnf6y6pLuknq8pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5GDGT0J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D316CC4CEF7;
+	Thu, 12 Mar 2026 02:52:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773283901;
-	bh=5w2lPpLvxTiUXiFxlKEBQjMl/vZ0mhlS88ypFqz7+58=;
-	h=From:Date:Subject:To:Reply-To:From;
-	b=lx6Lm2rMwe6/ZR5xnwI+5xqBlErNPyMO651kR32nXa9QDBkXdARgvtU/sxTKoaFaO
-	 RdOtXzI4R46AIzSYnu5RXbtXFzer/+f7gItpNRDneOD3gSxhUWlHgmZfSmTrJMZquF
-	 IU5ymf8hBwlPsaXdF1Za6+wziI0/KFfjHvnbKoH+2du/rM8tSXBLJm3Tdvod6OxcIa
-	 kwZO9fukNVQ6L8nbs6mjZDGU3M5j0DOwhtUO6uKHxph1WUXK3JrWRjh3RbT1PT9ab2
-	 M6dGP+Ph7DdcjXNg5OxM4wvfMnp5PdqDLXO18cToJOnJubj7NP3Lc9JNxvg+6CSZON
-	 41crZEHRwJjMg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A73C2103E2F4;
-	Thu, 12 Mar 2026 02:51:41 +0000 (UTC)
-From: Carl Lee via B4 Relay <devnull+carl.lee.amd.com@kernel.org>
-Date: Thu, 12 Mar 2026 10:51:35 +0800
-Subject: [PATCH v2] nfc: nxp-nci: i2c: restore IRQ trigger fallback
+	s=k20201202; t=1773283928;
+	bh=HSQM8TeR1XXEYwjyd/8yZVZDhU1JDCBPTz3eH73z4SU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=b5GDGT0J0hEjhisaOmnXr8/vuMQePX3qEmTUq34G2of2P0hHrLavg6UdnQVTuz9Ph
+	 FgaPCsdPV5KMMQJRnWlx6i6peeavTzlJzYBt8EL6wnQ8CnzUwBYT0GGIEZn82I3vp3
+	 3n0kv9GPoTD4li+sc+65Alkbnro70m6p61WTDbq932rO+V1AIgCX2yjCG/odMBexQY
+	 RqoKYUEbKZZ+7u0Atlo870sC3T7HUi+Th6mzAFPCGUZJzQ1rRiqd9J/h0smUEu5v/8
+	 Sxwv3ifmNWiO3shHM7wI/ftat1waXWMK/qPESKFk+BhAr34q3wEq+bHgICAN+bk4Jz
+	 A0CkwKxE3r3QQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: bjorn@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	danieller@nvidia.com,
+	michael.chan@broadcom.com,
+	saeedm@nvidia.com,
+	piergiorgio.beruto@gmail.com,
+	naveenm@marvell.com,
+	maxime.chevallier@bootlin.com,
+	linux-kselftest@vger.kernel.org,
+	kory.maincent@bootlin.com,
+	leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	idosch@nvidia.com,
+	davem@davemloft.net,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	o.rempel@pengutronix.de,
+	pavan.chebbi@broadcom.com,
+	willemb@google.com,
+	hkelam@marvell.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux@armlinux.org.uk,
+	andrew+netdev@lunn.ch,
+	tariqt@nvidia.com,
+	donald.hunter@gmail.com,
+	pabeni@redhat.com
+Subject: Re: [net-next,03/11] ethtool: Add loopback GET/SET netlink implementation
+Date: Wed, 11 Mar 2026 19:51:49 -0700
+Message-ID: <20260312025149.605627-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260310104743.907818-4-bjorn@kernel.org>
+References: <20260310104743.907818-4-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260312-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v2-1-362348f7fa30@amd.com>
-X-B4-Tracking: v=1; b=H4sIADYqsmkC/52NQQ6CMBBFr0K6dkxbEIIr72FY1GGAiVBwSgiGc
- HcLR3D5fv7/b1OBhCmoe7IpoYUDjz6CvSQKO+dbAq4jK6ttrlNjwDcIfp3AIwNbBKEwjxJr8oF
- ZuG1JoHF9/3L4BqxdmdlbqjHXKl5OQg2vp+5ZRe74GH9P+2KO9E/RYsBASVYXJsuMqYuHG+orj
- oOq9n3/ATh69MPmAAAA
-X-Change-ID: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, krzk@kernel.org, 
- carl.lee@amd.com, peter.shen@amd.com, colin.huang2@amd.com
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773283900; l=2295;
- i=carl.lee@amd.com; s=20260203; h=from:subject:message-id;
- bh=Vskvtr24ptKC6LYyjgFk7UbMzLWgrMQ1oXC18gOpBqg=;
- b=fgpkQ7Jh4s1/VnsV0T85utz6z5laWDnSt2PuOdU3vp1k+uGP182z4IZX4PHVblA73ft9IStqP
- KuuoJGKE75YAz8BeDX9JggIx2HF7/voaXQJujC7O15gzWyhgYroZP8I
-X-Developer-Key: i=carl.lee@amd.com; a=ed25519;
- pk=pyq7QaQvoxMg806KVkRwpCbiah+7ncWr4MBpK1AEyjA=
-X-Endpoint-Received: by B4 Relay for carl.lee@amd.com/20260203 with
- auth_id=623
-X-Original-From: Carl Lee <carl.lee@amd.com>
-Reply-To: carl.lee@amd.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,broadcom.com,gmail.com,marvell.com,bootlin.com,vger.kernel.org,davemloft.net,google.com,pengutronix.de,armlinux.org.uk,lunn.ch,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-266877-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-266876-lists,netdev=lfdr.de,carl.lee.amd.com];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	HAS_REPLYTO(0.00)[carl.lee@amd.com];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:replyto,amd.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC57B26C762
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: ACE3D26C778
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Carl Lee <carl.lee@amd.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-The driver previously relied on IRQF_TRIGGER_RISING when requesting
-the interrupt. This was removed to rely on the trigger type provided
-by firmware.
-
-However, some platforms do not propagate the interrupt trigger type
-to the IRQ descriptor, resulting in interrupts not being triggered.
-
-Use the trigger type provided by firmware when available and fall
-back to the historically used rising-edge trigger otherwise.
-
-Signed-off-by: Carl Lee <carl.lee@amd.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-Changes in v2:
-- Add missing <linux/irq.h> include for irq_get_trigger_type().
-- Link to v1: https://lore.kernel.org/r/20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com
----
- drivers/nfc/nxp-nci/i2c.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ethtool: Add loopback GET/SET netlink implementation
 
-diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-index 6a5ce8ff91f0..7aaab92c616c 100644
---- a/drivers/nfc/nxp-nci/i2c.c
-+++ b/drivers/nfc/nxp-nci/i2c.c
-@@ -16,6 +16,7 @@
- #include <linux/delay.h>
- #include <linux/i2c.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/module.h>
- #include <linux/nfc.h>
- #include <linux/gpio/consumer.h>
-@@ -268,6 +269,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- 	struct device *dev = &client->dev;
- 	struct nxp_nci_i2c_phy *phy;
- 	int r;
-+	unsigned long irqflags;
- 
- 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
- 		nfc_err(&client->dev, "Need I2C_FUNC_I2C\n");
-@@ -303,9 +305,17 @@ static int nxp_nci_i2c_probe(struct i2c_client *client)
- 	if (r < 0)
- 		return r;
- 
-+	/* Prefer the trigger type configured by firmware.
-+	 * Some platforms do not provide it, so fall back to the
-+	 * historically used rising-edge trigger.
-+	 */
-+	irqflags = irq_get_trigger_type(client->irq);
-+	if (!irqflags)
-+		irqflags = IRQF_TRIGGER_RISING;
-+
- 	r = request_threaded_irq(client->irq, NULL,
- 				 nxp_nci_i2c_irq_thread_fn,
--				 IRQF_ONESHOT,
-+				 irqflags | IRQF_ONESHOT,
- 				 NXP_NCI_I2C_DRIVER_NAME, phy);
- 	if (r < 0)
- 		nfc_err(&client->dev, "Unable to register IRQ handler\n");
+This commit adds kernel-side handlers for ETHTOOL_MSG_LOOPBACK_GET,
+ETHTOOL_MSG_LOOPBACK_SET, and ETHTOOL_MSG_LOOPBACK_NTF messages.
 
----
-base-commit: 7109a2155340cc7b21f27e832ece6df03592f2e8
-change-id: 20260311-nfc-nxp-nci-i2c-restore-irq-trigger-fallback-cda942530c60
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 83c375840835..c9beca11fc40 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -846,6 +846,22 @@ void ethtool_mmsv_set_mm(struct ethtool_mmsv *mmsv, struct ethtool_mm_cfg *cfg);
+>  void ethtool_mmsv_init(struct ethtool_mmsv *mmsv, struct net_device *dev,
+>  		       const struct ethtool_mmsv_ops *ops);
+>
+> +/**
+> + * struct ethtool_loopback_entry - Per-component loopback configuration
+> + * @id: Optional component instance identifier, 0 means not specified
+> + * @supported: Bitmask of supported directions
+> + * @component: Loopback component
+> + * @direction: Current loopback direction, 0 means disabled
+> + * @name: Subsystem-specific name for the loopback point
+> + */
+> +struct ethtool_loopback_entry {
+> +	enum ethtool_loopback_component component;
+> +	u32 id;
+> +	u32 supported;
+> +	u32 direction;
+> +	char name[ETH_GSTRING_LEN];
+> +};
 
-Best regards,
--- 
-Carl Lee <carl.lee@amd.com>
+The kernel-doc field tags don't match the struct field order. The
+documentation lists @id, @supported, @component, @direction, @name, but
+the struct declares them as component, id, supported, direction, name.
+Kernel-doc requires @field tags to follow the actual declaration order,
+and scripts/kernel-doc will emit warnings for this mismatch.
 
-
+[ ... ]
 
