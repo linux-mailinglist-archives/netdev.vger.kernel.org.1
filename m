@@ -1,145 +1,137 @@
-Return-Path: <netdev+bounces-267027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AG8ZGPalsmnwOQAAu9opvQ
-	(envelope-from <netdev+bounces-267027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:39:34 +0100
+	id eHLpDSCmsmnwOQAAu9opvQ
+	(envelope-from <netdev+bounces-267028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:40:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 576FA2711CF
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:39:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A058271202
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:40:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3026B300E189
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:39:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 714F9300F788
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201503A168C;
-	Thu, 12 Mar 2026 11:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53FB39E6C6;
+	Thu, 12 Mar 2026 11:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="s60zAnIR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMbPmSE9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4320.protonmail.ch (mail-4320.protonmail.ch [185.70.43.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3083AA50E
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 11:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C523314C2;
+	Thu, 12 Mar 2026 11:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773315566; cv=none; b=bR8mGx+4oZZ8qIJFceo8WIaz5ZEr7oMPu97IprVf1uriYzpfiqZPjtG9ciITBuHR7T8eMBrlR2OTPqFVcROcG74EOUofRw4PbBI6x5sCihEh9d465dtI95GebyXGhdZ9a8tumEokjSB09gbTS/gpxVBAt74+Kfl1hkSOhdQTc4w=
+	t=1773315610; cv=none; b=IaYDnrN26iedIaE4cRhoEe3NFQ/c/+LJV46639JLC8xWZrlJd0BF6Wyqi+24I3TdurA2q4TAXtm5XXEpH4EG7DenSkViETsNp2jwDOhIkk2eQptY5cZRkAsA+x/YRsd/Gm/Nq6cVxVxhB4jV96E7bfvcQbNdX4Wxk0a7lwTMz6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773315566; c=relaxed/simple;
-	bh=kyZAMKw4V1o9gGmNIRpZixDA50Qf3DiNCsfDJ1vw41k=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=FVkZBDpqhXqgihjlBz4KRdikNAE7CL1P/ne1c1QNPA4t1OrVTznLg5R0KhZERaBSuX/3rfml+zcF24iW8eMPUBBiIU49pkzZwytWjZptIL+5PyCTq7B9FHOh/O7n7mIIyZT9adc0FVgpjJxMeg02iRRDFyRFirduN/ewABYS/CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=s60zAnIR; arc=none smtp.client-ip=185.70.43.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1773315554; x=1773574754;
-	bh=kyZAMKw4V1o9gGmNIRpZixDA50Qf3DiNCsfDJ1vw41k=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=s60zAnIRfLkomsTfxSWfxjdMVXkSFN3Uk1KNb3rOFLIrAU2N0CRmR1VhcU7pwq9/u
-	 XG3mv9GcXLImNR+iZDZBZZ4pL1aZgam9eYchlwObdUc04XE6zUzpoUInp0jgDOo+VT
-	 tVoOPlQWoQ9NyMV+y4PUMILWgHnO0tyvsrQV4lrJmxGYIuYKznZ0fYQyk5Eb52nngO
-	 mENI6DSeY3kyCA29OGpV4nX14Xy3Sz+cUKVZ1pTEJhTHtWjx0t8sv+sMGiNkRoUYbC
-	 t2/x2Jgik4bG2xXvsWl0heBBJpZiIWCFpLp1chlAsGHDLRXNmYaTYcEOVRbHK9iNRj
-	 FFEGWXSRzTQ8Q==
-Date: Thu, 12 Mar 2026 11:39:09 +0000
-To: netdev@vger.kernel.org
-From: Paul Moses <p@1g4.org>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, chopps@labn.net, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>, stable@vger.kernel.org
-Subject: [PATCH net v2] xfrm: iptfs: only publish mode_data after clone setup
-Message-ID: <20260312113843.2883169-1-p@1g4.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: ff4493f192468e5adf684ad20129db110499d72e
+	s=arc-20240116; t=1773315610; c=relaxed/simple;
+	bh=5bAP25N26DNZvZYDaoJJAEnJi3gLAs8/Yn4kVXtSOgA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MQFvn7mqUFGTuT2LJvRXOTTfCdKGm6yXiztqZt90mYz2Nhxfroda5t1rbi8v0bP+E+oJssELJZHBPrxoVg8syxpNaTy30l0C346DfoiIBdCHcj74BYNzOcCQpHBmI2/F7R/A2x/9pTJUE891Mh9j3p4gFIGzs9oVXUFnTEyq2FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMbPmSE9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3722EC4CEF7;
+	Thu, 12 Mar 2026 11:40:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773315610;
+	bh=5bAP25N26DNZvZYDaoJJAEnJi3gLAs8/Yn4kVXtSOgA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lMbPmSE9ItIMHKHJ8fhn70K0/3Ohr4qUO31rCKUG1RQ776qXoPrQVWyttKfo1eOQ6
+	 s3Xf4JpPf2Ph+lyQVT5P4UaKePnMz36zFqnQFO2DxLEneflkNNUnTxii4Y89CHip/e
+	 YsciqaxX5jz5izTEd/H/+sRnNGnXKVqmgeDtN7TufBgHhJbmyqB9laqxy1S0+Jho+L
+	 3pQQAzAUI0l2qdx3KSfToU0whMEw+PCNU2d/8H807Pb3kazdrQfwSSCeY44Rr1vFJ/
+	 ZMqWc0HFOtc4f/LxtBqqW4225x4z0gPc+gzB7+Ghy6AYJn07m0x76esut2+Z3baqMr
+	 KSEz5lXEVAYxg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CD03808200;
+	Thu, 12 Mar 2026 11:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/2] IPA support on qcm2290
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177331560580.4062867.8199136096986692017.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Mar 2026 11:40:05 +0000
+References: <20260310112309.79261-1-wojciech.slenska@gmail.com>
+In-Reply-To: <20260310112309.79261-1-wojciech.slenska@gmail.com>
+To: Wojciech Slenska <wojciech.slenska@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, elder@kernel.org, andersson@kernel.org,
+ konradybcio@kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267028-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267027-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:dkim,1g4.org:email,1g4.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 576FA2711CF
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4A058271202
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-iptfs_clone_state() stores x->mode_data before allocating the reorder
-window. If that allocation fails, the code frees the cloned state and
-returns -ENOMEM, leaving x->mode_data pointing at freed memory.
+Hello:
 
-The xfrm clone unwind later runs destroy_state() through x->mode_data,
-so the failed clone path tears down IPTFS state that clone_state()
-already freed.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Keep the cloned IPTFS state private until all allocations succeed so
-failed clones leave x->mode_data unset. The destroy path already
-handles a NULL mode_data pointer.
+On Tue, 10 Mar 2026 12:22:29 +0100 you wrote:
+> This series adds IPA support for the QCM2290 SoC.
+> 
+> The configuration is based on SC7180, as both SoCs
+> implement IPA v4.2.
+> 
+> ---
+> Changes in v2:
+> - Order fallback list by priority
+> - Add leading zeros to register addresses
+> - Use RPM_ACTIVE_TAG instead of RPM_ALWAYS_TAG in the last path
+> - Link to v1: https://lore.kernel.org/all/20241220073540.37631-1-wojciech.slenska@gmail.com
+> 
+> [...]
 
-Fixes: 6be02e3e4f37 ("xfrm: iptfs: handle reordering of received packets")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paul Moses <p@1g4.org>
----
-Changes in v2:
-- Fix Fixes tag to point to 6be02e3e4f37
+Here is the summary with links:
+  - [v2,1/2] dt-bindings: net: qcom,ipa: document qcm2290 compatible
+    https://git.kernel.org/netdev/net-next/c/4320f1f111c5
+  - [v2,2/2] arm64: dts: qcom: agatti: Add IPA nodes
+    (no matching commit)
 
- net/xfrm/xfrm_iptfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 050a82101ca51..4d7a925f59b7c 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -2653,9 +2653,6 @@ static int iptfs_clone_state(struct xfrm_state *x, st=
-ruct xfrm_state *orig)
- =09if (!xtfs)
- =09=09return -ENOMEM;
-=20
--=09x->mode_data =3D xtfs;
--=09xtfs->x =3D x;
--
- =09xtfs->ra_newskb =3D NULL;
- =09if (xtfs->cfg.reorder_win_size) {
- =09=09xtfs->w_saved =3D kzalloc_objs(*xtfs->w_saved,
-@@ -2666,6 +2663,9 @@ static int iptfs_clone_state(struct xfrm_state *x, st=
-ruct xfrm_state *orig)
- =09=09}
- =09}
-=20
-+=09x->mode_data =3D xtfs;
-+=09xtfs->x =3D x;
-+
- =09return 0;
- }
-=20
---=20
-2.53.GIT
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
