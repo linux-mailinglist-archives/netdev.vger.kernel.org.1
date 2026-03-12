@@ -1,244 +1,188 @@
-Return-Path: <netdev+bounces-266937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266935-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NpiAmBwsmmuMgAAu9opvQ
-	(envelope-from <netdev+bounces-266937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:56 +0100
+	id GKg7IihwsmmuMgAAu9opvQ
+	(envelope-from <netdev+bounces-266935-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7513626E795
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC6D26E723
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3311304F0AF
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:50:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 855A530791E8
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669D33B2FEC;
-	Thu, 12 Mar 2026 07:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E6E3B27D3;
+	Thu, 12 Mar 2026 07:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ax/gNMry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B1A3B2FF0
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 07:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4444A3B0AC8
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 07:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773301822; cv=none; b=gn0OSkUZV+XANQ8codSpqR3UWZjqn9I4aeUm8RtYFqePCDvoyVyuVSgp7FylvX5/Sy0uPVOCeZczaZTyR9gFOLwW3aMf3RJvYW2R398dkRjkdbMr23vguwLZW1eG+cQMVYw3ytu/NuXnjEQn8dH3mYAEX+FQZDDcohKC+qXsBEU=
+	t=1773301796; cv=none; b=oliJSGb63Y/2z4yfSQTbb5FgUY/bPpt+eX1Kf52WeSW6vc6y7VLqU2Ck2vfYvYaeybO4xiDFt+uE2i6yAmliA/WZZ1Uhk2ETb+obWN1SGezUhdL8p3+ps28IYW7f44EEszscA5gWlvRZVHBGjLqOlcexPJo2WIlylQKzWy094CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773301822; c=relaxed/simple;
-	bh=r2PdE6HYGVzZYpXyEn5kett8unUMILRQGQuMPOiuUPo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YWfeXL9DGiGMVa+J6lRX0eEiBltElI9pIEPQD+9JF31lb7SiZJGtsULxxcokKWPF/2wjgp+vcgyHtUF87aSTavGryAVhvFQjJ6fWLud+grxN4ZJdiioD7arloy5E6+DaQQ15SyUcehsyKbC6ovXxbsNU+eH0Cz8nyPAfq1ZK44o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-82a124f3a5bso29150b3a.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 00:50:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773301820; x=1773906620;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/LhKuHInA3JH1whpdNQPR6DLSzWmpT0VhZEHTHtHiaY=;
-        b=vFbXlWrt0JYjxnRVe02O3dAZw/af/wEsRC/JEd0Jspj2iY34SzQ35RhxQ+onkzbG7J
-         7+2KihdLyU8EGI7TEWDWL2Vyrsa/kUgCDU5CDqLJN8BjKIJHpBgcTAIZmDPiP7YpOoaG
-         gMev0bouVORTbZZ67jZ/gmIgiKiA8cuma5doAAAHvZiLK6mT7s5I3s0VtOHMGIH4U62H
-         dnWINB+jigtkMLtKc+pfGC3wjmP0ndQm8k7w1nR05G/vK9JL0oNUdQQL6xJ5Zj1wvBrg
-         A0+B97zefDabP3gkFw+Y1pskeW1Gytam7tyXvVR065w0NgwvbbeTshdwXIvbZdTeBIlE
-         WlGQ==
-X-Gm-Message-State: AOJu0Yx4aNcTUNBapTnx0DHdIwoQXc9JV3Ht57d2JnmZu4lpGmCAe3/o
-	EP2ZkkwW3ZHtSPuv3f2YO06FpxpB9QihutLQVF44AxEX/cE95dNgsppqnFAJotEcBq+Arg==
-X-Gm-Gg: ATEYQzyDtJdsowIZRcrd3tFVKY+r72sMC0lfFarKs+LSmBPSBvoc1TtBZ2pxU6reDMK
-	mBUXqWSXL2p/8IXlAy3ih09v+iHWndThl2+KMT8jdWcZCc03ate0REAQwDCmUumsFnM1bz4ChBT
-	kmar8agVQhlkOKCo35nDbB4hDWmCd51M2K6stGoRgWoUhilMrUJKKFnABMtISYenLjoJngSH2cd
-	fGfRk687U8WokYLtPDcATfTDPQMyOuuG9yz6mbOao2to6pG8SlLUSfPLNL7J16BJxJFEK5ZM8zF
-	V6Dv2RJRv/EayQ1EVxT67eEhYfdl+QGOSvwyWq/AZnQrhenWQwXYTGyTV5GHqSpw1eby5nchaIy
-	CxbXF44KztrdTMwEV2omiDnj8J/3g4qhkQOPPKrb8fMxVSSDOvF9wFigq27LRZSGEF7qg4gRYHO
-	3N81hNXqPHDgT/vvNGcRI23EPXo+cwVM+Cs3kylNKym3syK4szU2IQTYyfTGXj3FM=
-X-Received: by 2002:a05:6a00:7595:b0:824:374a:1425 with SMTP id d2e1a72fcca58-829f70d58f3mr3400294b3a.53.1773301820500;
-        Thu, 12 Mar 2026 00:50:20 -0700 (PDT)
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com. [74.125.82.172])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a0725da07sm2014322b3a.19.2026.03.12.00.50.20
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 00:50:20 -0700 (PDT)
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2be06c02f66so1252507eec.1
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 00:50:20 -0700 (PDT)
-X-Received: by 2002:a05:6122:1b0f:b0:56a:9f03:1719 with SMTP id
- 71dfb90a1353d-56b47483c0fmr2043365e0c.7.1773301414536; Thu, 12 Mar 2026
- 00:43:34 -0700 (PDT)
+	s=arc-20240116; t=1773301796; c=relaxed/simple;
+	bh=qc6nhP5c2KbUKz7TVprgeRZu7pcKDVuliPuq3MEFpFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RlJvRa/iL4DbfjyqBkpQLgYww5EsYNRZFwGyIyaywv3kccRMglYFebHrdVVGLLbmuHAavywHGjqp1npIk4vuPYoWshXT2vUo0Yl7RYfPn6vs8flE6X0Q31dAhu5wOijaI7EUYeHdIqtrZG4F5azxFdfpmd+vi6MLwHspyvTVN7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ax/gNMry; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1E85F1A2DAB;
+	Thu, 12 Mar 2026 07:49:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D2AC65FDEB;
+	Thu, 12 Mar 2026 07:49:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BE4DD103685B6;
+	Thu, 12 Mar 2026 08:49:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1773301788; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=oT1XxdAl50AWEmjTvDhxYXZzFl6EH2KJUz4HxFpnESQ=;
+	b=Ax/gNMry1zn+jSGCJbygPm1MqxQ4xxoTT66fSRTc5nLHZg0smRQfQsCBxzFAgGLzAa5lfd
+	Af4Hzw3beOAKGJa2JoN1tyRRgpFbt2P1DrjSQJLrLuFisE3KcRi9NuOajpxaUhtjQbuHEK
+	kR3cJQ7kSGJyJSKLk1FFFNgbzO9Llxvoc0l+zkG8/VZWxfJJLvshOLgAEPhd0YVzYaaAc3
+	wf1CqHn90p9oxKToETmVmvknFNcnGt4nnaLz9lclipHxPR9jfhGQ3zeSz9iFLtb5+nxz2S
+	99oywt/IIeSV4UXD45vO3Bd0BvPnK1F/DNbgdI8WLyq0hFw/oXtfNgrByjMj/Q==
+Message-ID: <ebab1d3e-8967-444b-be54-437e4dfe3c7e@bootlin.com>
+Date: Thu, 12 Mar 2026 08:49:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310153506.5181-1-fmancera@suse.de> <20260310153506.5181-2-fmancera@suse.de>
-In-Reply-To: <20260310153506.5181-2-fmancera@suse.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 12 Mar 2026 08:43:23 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWj-7J5bMq=wpv12CGaV7xtq7=O3nLHLvOT_odxOE4ueA@mail.gmail.com>
-X-Gm-Features: AaiRm50vZ50YS2w5-6lod2s5W_kA6Ap8FK_nMN9HyVzDzz2AFRy7FAD50ZqnaYU
-Message-ID: <CAMuHMdWj-7J5bMq=wpv12CGaV7xtq7=O3nLHLvOT_odxOE4ueA@mail.gmail.com>
-Subject: Re: [PATCH 01/10 net-next v2] ipv6: convert CONFIG_IPV6 to built-in
- only and clean up Kconfigs
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, rbm@suse.com, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Selvin Xavier <selvin.xavier@broadcom.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Saurav Kashyap <skashyap@marvell.com>, Javed Hasan <jhasan@marvell.com>, 
-	"maintainer:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <GR-QLogic-Storage-Upstream@marvell.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali <njavali@marvell.com>, 
-	Manish Rangankar <mrangankar@marvell.com>, Varun Prakash <varun@chelsio.com>, 
-	Alexander Aring <aahringo@redhat.com>, David Teigland <teigland@redhat.com>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	David Ahern <dsahern@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, David Howells <dhowells@redhat.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Jon Maloy <jmaloy@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
-	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Eric Biggers <ebiggers@kernel.org>, Michal Simek <michal.simek@amd.com>, 
-	Luca Weiss <luca.weiss@fairphone.com>, Sven Peter <sven@kernel.org>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Gow <david@davidgow.net>, 
-	Kuan-Wei Chiu <visitorckw@gmail.com>, Ryota Sakamoto <sakamo.ryota@gmail.com>, 
-	Kir Chou <note351@hotmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Vikas Gupta <vikas.gupta@broadcom.com>, 
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>, 
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:M68K ARCHITECTURE" <linux-m68k@lists.linux-m68k.org>, 
-	"open list:INFINIBAND SUBSYSTEM" <linux-rdma@vger.kernel.org>, 
-	"open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>, 
-	"open list:BROADCOM BNX2FC 10 GIGABIT FCOE DRIVER" <linux-scsi@vger.kernel.org>, 
-	"open list:DISTRIBUTED LOCK MANAGER (DLM)" <gfs2@lists.linux.dev>, "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>, 
-	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>, 
-	"open list:NETFILTER" <coreteam@netfilter.org>, 
-	"open list:RXRPC SOCKETS (AF_RXRPC)" <linux-afs@lists.infradead.org>, 
-	"open list:SCTP PROTOCOL" <linux-sctp@vger.kernel.org>, 
-	"open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.04 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
+ definitions
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Naveen Mamindlapalli <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Leon Romanovsky
+ <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Saeed Mahameed <saeedm@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20260310104743.907818-1-bjorn@kernel.org>
+ <20260310104743.907818-3-bjorn@kernel.org>
+ <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
+ <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
+ <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
+ <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
+ <20260311195052.1202174f@kernel.org> <abJJY8whzSOB8O-X@pengutronix.de>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <abJJY8whzSOB8O-X@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,ziepe.ca,kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,marvell.com,hansenpartnership.com,oracle.com,chelsio.com,blackwall.org,netfilter.org,strlen.de,nwl.cc,auristor.com,gmail.com,oss.qualcomm.com,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,linux-foundation.org,davidgow.net,hotmail.com,gondor.apana.org.au,blochl.de,lists.linux-m68k.org,corigine.com,lists.linux.dev,lists.infradead.org,lists.sourceforge.net];
-	TAGGED_FROM(0.00)[bounces-266937-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
+	TAGGED_FROM(0.00)[bounces-266935-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_GT_50(0.00)[68];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linux-m68k.org:email,linux-m68k.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.de:email]
-X-Rspamd-Queue-Id: 7513626E795
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EBC6D26E723
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Fernando,
 
-On Tue, 10 Mar 2026 at 16:37, Fernando Fernandez Mancera
-<fmancera@suse.de> wrote:
-> Maintaining a modular IPv6 stack offers image size and memory savings
-> for specific setups, this benefit is outweighed by the architectural
-> burden it imposes on the subsystems on implementation and maintenance.
-> Therefore, drop it.
->
-> Change CONFIG_IPV6 from tristate to bool. Remove all Kconfig
-> dependencies across the tree that explicitly checked for IPV6=m. In
-> addition, remove MODULE_DESCRIPTION(), MODULE_ALIAS(), MODULE_AUTHOR()
-> and MODULE_LICENSE().
->
-> This is also replacing module_init() by device_initcall(). It is not
-> possible to use fs_initcall() as IPv4 does because that creates a race
-> condition on IPv6 addrconf.
->
-> Finally, modify the default configs from CONFIG_IPV6=m to CONFIG_IPV6=y
-> except for m68k as according to the bloat-o-meter the image is
-> increasing by 330KB~ and that isn't acceptable. Instead, disable IPv6 on
-> this architecture by default. This is aligned with m68k RAM requirements
-> and recommendations [1].
->
-> [1] http://www.linux-m68k.org/faq/ram.html
->
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-Thanks for your patch!
+On 12/03/2026 06:04, Oleksij Rempel wrote:
+> On Wed, Mar 11, 2026 at 07:50:52PM -0700, Jakub Kicinski wrote:
+>> On Wed, 11 Mar 2026 20:26:39 +0100 Andrew Lunn wrote:
+>>>> For that we have what we need with phy_link_topology, as each PHY has
+>>>> its index, we should be good to go in that regard hopefully :)  
+>>>
+>>> So depth would be local to a component? We could have two PHY
+>>> components, each with a different index, and depth = 0?
+>>>
+>>> I _think_ Jakub's depth was more at a global level? But then it would
+>>> need to be passed down as we do the enumeration.
+>>
+>> Oh, sorry, I responded without reading the whole discussion :)
+>> No, I imagined the depth would be within a single component, 
+>> so under control of a single driver (instance). The ordering
+>> between components should be defined by PHY topology etc so
+>> it's outside of the loopback config.
+> 
+> As for me, it is problematic to help the user to understand the datapath
+> depth on a switch. For example:
+> 
+> CPU -- xMII --- MAC1 [loop] --- fabric --- MAC2 [loop] --- xMII -- PHY
+>                                     \----- MACx [loop] ---
+> 
+> ... each port has two xMII loop configurations: towards the xMII or towards
+> the fabric. From a driver perspective, a loop towards the xMII is
+> "remote." However, from a system perspective, a "remote" loop on MAC1 is
+> a local loop at depth=0, whereas a "local" loop on MAC2 is a local loop
+> at depth=1.
 
->  arch/m68k/configs/amiga_defconfig           | 45 +-------------------
->  arch/m68k/configs/apollo_defconfig          | 46 +-------------------
->  arch/m68k/configs/atari_defconfig           | 45 +-------------------
->  arch/m68k/configs/bvme6000_defconfig        | 45 +-------------------
->  arch/m68k/configs/hp300_defconfig           | 47 +--------------------
->  arch/m68k/configs/mac_defconfig             | 45 +-------------------
->  arch/m68k/configs/multi_defconfig           | 45 +-------------------
->  arch/m68k/configs/mvme147_defconfig         | 45 +-------------------
->  arch/m68k/configs/mvme16x_defconfig         | 45 +-------------------
->  arch/m68k/configs/q40_defconfig             | 45 +-------------------
->  arch/m68k/configs/sun3_defconfig            | 45 +-------------------
->  arch/m68k/configs/sun3x_defconfig           | 45 +-------------------
+What's important is to specify clearly in the documentation from which
+end do we start, where representing the topology. From your scenario
+here, each block is already well represented and exposed, and if we use
+local depth definitions we should be fine ?
 
-Why are the stats not the same for each file?
+> 
+> Other example would be where we have a chain of components which are
+> attached on the system in a unexpected direction, where the MDI
+> interface is pointing towards the main CPU, so the remote loopbacks
+> became to local loop.
 
-> --- a/arch/m68k/configs/apollo_defconfig
-> +++ b/arch/m68k/configs/apollo_defconfig
+I have a few of these types of setup on my desk, where 3 PHY devices are
+daisy-chained, we don't support that for now. If we one day add support
+for standalone PHYs acting as media converters, I expect we'll be able
+to tell which end is pointing where, and let it up to the user to figure
+out what "remote" and "local" means in that case.
 
-> @@ -384,7 +343,6 @@ CONFIG_FB=y
->  CONFIG_FRAMEBUFFER_CONSOLE=y
->  CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
->  CONFIG_LOGO=y
-> -# CONFIG_LOGO_LINUX_VGA16 is not set
+> 
+> One more issue is the test data generator location. The data generator
+> is not always the CPU. We have HW generators located in components like
+> PHYs or we may use external source (remote loopback).
 
-Unrelated change.
+There were discussions about PRBS, I think the same idea of "pinpointing
+which block we want to use" can be applied for both loopback and
+generation ?
 
->  # CONFIG_LOGO_LINUX_CLUT224 is not set
->  CONFIG_HID=m
->  CONFIG_HIDRAW=y
+Maxime
 
-> --- a/arch/m68k/configs/hp300_defconfig
-> +++ b/arch/m68k/configs/hp300_defconfig
-
-> @@ -386,8 +345,6 @@ CONFIG_FB=y
->  CONFIG_FRAMEBUFFER_CONSOLE=y
->  CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
->  CONFIG_LOGO=y
-> -# CONFIG_LOGO_LINUX_MONO is not set
-> -# CONFIG_LOGO_LINUX_VGA16 is not set
-
-Two more.
-
->  CONFIG_HID=m
->  CONFIG_HIDRAW=y
->  CONFIG_UHID=m
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
