@@ -1,195 +1,115 @@
-Return-Path: <netdev+bounces-266880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFDyCEQrsmleJQAAu9opvQ
-	(envelope-from <netdev+bounces-266880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:56:04 +0100
+	id gMcnDncssmmlJQAAu9opvQ
+	(envelope-from <netdev+bounces-266881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:01:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17EE526C7F9
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:56:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C188E26C884
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EECBE3010705
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 02:55:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF0573033532
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81DD37EFF5;
-	Thu, 12 Mar 2026 02:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CC33264FE;
+	Thu, 12 Mar 2026 03:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="Fn7ECnfm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OtVH91Ar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31BC261B9C;
-	Thu, 12 Mar 2026 02:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.95.21.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDEB1F7575;
+	Thu, 12 Mar 2026 03:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773284157; cv=none; b=hl32Zjc44snTOuXPZxfGQE1Dhe6e4aeaNUk8BAJg6UTkVZovYDFORONwOMWOwJgtEFMviX5M+PDop582ug+iH50eHAL7cKdlrySaPyg2a/pWbb68oE1g0uhNPBOZDZN21sV8mhdwDEQV9vb+BQ80g/TIbA9esbKTv1pGAGVz/ZA=
+	t=1773284466; cv=none; b=i00frEibpt1lujnIdHVDox/LK6zC6uIntM1gRHjquiWdjL0UH2LvUKkCUf00087JdX+o0NyiW5HA3ZRKVEzC51oNevJb3yuOArkkcv0NMyrQrG7WDrRW+G7btu0J19tizFOvUrdXNTnBVwVTeXM8ylSOgDCYo52CDYcecPv2BEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773284157; c=relaxed/simple;
-	bh=Sj2VafoHdghFpP7ZB8Sh+tcZLjL2iv1MRtN2nGUsvqw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PpEOYVedLuL5v8t/QVAoqrbsh3BxrkMfrH6Rv7bJ/WhbDn0OoZ88lw+Qczwu0c+PfzTU2mTZlPaNdt985i2ZbgVwijb6Wn9REmf2QTmrqgaLHT7frDUrSvNowrJjoM7ERpExMk87CSRSI7uJodWC9NKoHp3FaXzQeFlr77KfeZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=Fn7ECnfm; arc=none smtp.client-ip=1.95.21.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=d1
-	OVm4u4vH8CiwTDihtBaUsbRQCL/Ky+yu0LSJVg9j8=; b=Fn7ECnfmVm+fQluGQz
-	Gw/qdCilTmAMVL8ix5ZxYBGrpHZy1mhqknMhZVGcbfOLkXRVPNvxgyDm3qrahUal
-	z/USE6fLtGYsbB8IxfwXSCs3hF/vX/zqYys7SwJ6iCSzpenZRUYgJzlw7SHlUCpa
-	dII5iZijK8TaZJ646VH2vgLPc=
-Received: from localhost.net (unknown [])
-	by gzsmtp3 (Coremail) with UTF8SMTPA id M88vCgBHv3gJK7JpMEd7Ag--.41375S2;
-	Thu, 12 Mar 2026 10:55:06 +0800 (CST)
-From: xietangxin <xietangxin@yeah.net>
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	xietangxin <xietangxin@yeah.net>
-Subject: [PATCH net v2] virtio_net: Fix UAF on dst_ops when IFF_XMIT_DST_RELEASE is cleared and napi_tx is false
-Date: Thu, 12 Mar 2026 10:54:06 +0800
-Message-ID: <20260312025406.15641-1-xietangxin@yeah.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1773284466; c=relaxed/simple;
+	bh=E8LcffMsqUht6BPTNw0PB+gJK0Ehr9KfshV5zjAvBE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S96BX1X8uC68MZukDRZAkEBdKy6YRGuzPfJ90DXBfJy2IQE7j4Q8mrg6l+Gbbo6CBKQvifAyUgZR9YciBpMUh067XAYM3QBCMCHQozGpxErakgM5KthiE1oBKytEJ2NASxI0j/Ne1WBwo/MPL4oMmL0EmrUEQlyNOjo1iGt3OmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OtVH91Ar; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F082AC4CEF7;
+	Thu, 12 Mar 2026 03:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773284466;
+	bh=E8LcffMsqUht6BPTNw0PB+gJK0Ehr9KfshV5zjAvBE0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OtVH91Arnc9zdFI46ZL8EQkMjbHjrtYhbtGmVeG3Ng6x4B7YymW6SAulfX1L6SVtK
+	 z8IeePgAPuw4tc7qf1Ofe0Vzy4jufjBCL7I8IVnF4XZSMSlq1sLTvZ8EXnOWoeTgqH
+	 QM/QSo1okolAUqpkJEyzaFLiMKvHv3GduJfXDQbiHWjecM2To2Dhh4n+r6F8yfpVRh
+	 wKdXqCfiVusl4a2kbQ7ypC3HO7JJIBahp9i4IiyZEhs9Tjnvr2DGH5ok5Pxq6sUg5V
+	 o1N8ElCxHSIdg+bJNh/6cQlFdCzTFXPCWOYu4OBRMieJyVM67Jhr43W+ZOjXD34bYu
+	 GfRP0gb2g/d1A==
+Date: Wed, 11 Mar 2026 20:01:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, rbm@suse.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ dsahern@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/10 net-next v2] Convert CONFIG_IPV6 to built-in and
+ remove stubs
+Message-ID: <20260311200105.3b5b5b60@kernel.org>
+In-Reply-To: <20260310153506.5181-1-fmancera@suse.de>
+References: <20260310153506.5181-1-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:M88vCgBHv3gJK7JpMEd7Ag--.41375S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxArW3XF43AFy5Jw1kArW3GFg_yoW5CFW5pF
-	4YyrW5Xr4vqry7Aa93Xw4kWry8Zan5J343Grs0gw13u398CFy5Kr1I934jqFWDCFs5Z347
-	ZrsYvr1UKrZ0vFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j8Ma8UUUUU=
-X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiNwvTCGmyKwvClgAA3I
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266880-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[yeah.net];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[yeah.net:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,yeah.net];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-266881-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[yeah.net:dkim,yeah.net:email,yeah.net:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 17EE526C7F9
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C188E26C884
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-A UAF issue occurs when the virtio_net driver is configured with napi_tx=N
-and the device's IFF_XMIT_DST_RELEASE flag is cleared
-(e.g., during the configuration of tc route filter rules).
+On Tue, 10 Mar 2026 16:34:23 +0100 Fernando Fernandez Mancera wrote:
+> Historically, the Linux kernel has supported compiling the IPv6 stack as
+> a loadable module. While this made sense in the early days of IPv6
+> adoption, modern deployments and distributions overwhelmingly either
+> build IPv6 directly into the kernel (CONFIG_IPV6=y) or disable it
+> entirely (CONFIG_IPV6=n). The modular IPv6 use-case offers image size
+> and memory savings for specific setups, this benefit is outweighed by
+> the architectural burden it imposes on the subsystems on implementation
+> and maintenance.
 
-When IFF_XMIT_DST_RELEASE is removed from the net_device, the network stack
-expects the driver to hold the reference to skb->dst until the packet
-is fully transmitted and freed. In virtio_net with napi_tx=N,
-skbs may remain in the virtio transmit ring for an extended period.
+Would you mind also listing in the cover letter the examples folks have
+provided on the RFC of distros etc validating that this is a common
+choice even for openwrt these days? Also I quite like Geert's analysis
+of kernel growing by this much anyway so this isn't a huge jump :)
 
-If the network namespace is destroyed while these skbs are still pending,
-the corresponding dst_ops structure has freed. When a subsequent packet
-is transmitted, free_old_xmit() is triggered to clean up old skbs.
-It then calls dst_release() on the skb associated with the stale dst_entry.
-Since the dst_ops (referenced by the dst_entry) has already been freed,
-a UAF kernel paging request occurs.
-
-fix it by adds skb_dst_drop(skb) in start_xmit to explicitly release
-the dst reference before the skb is queued in virtio_net.
-
-Call Trace:
- Unable to handle kernel paging request at virtual address ffff80007e150000
- CPU: 2 UID: 0 PID: 6236 Comm: ping Kdump: loaded Not tainted 7.0.0-rc1+ #6 PREEMPT
-  ...
-  percpu_counter_add_batch+0x3c/0x158 lib/percpu_counter.c:98 (P)
-  dst_release+0xe0/0x110  net/core/dst.c:177
-  skb_release_head_state+0xe8/0x108 net/core/skbuff.c:1177
-  sk_skb_reason_drop+0x54/0x2d8 net/core/skbuff.c:1255
-  dev_kfree_skb_any_reason+0x64/0x78 net/core/dev.c:3469
-  napi_consume_skb+0x1c4/0x3a0 net/core/skbuff.c:1527
-  __free_old_xmit+0x164/0x230  drivers/net/virtio_net.c:611 [virtio_net]
-  free_old_xmit drivers/net/virtio_net.c:1081 [virtio_net]
-  start_xmit+0x7c/0x530 drivers/net/virtio_net.c:3329 [virtio_net]
-  ...
-
-Reproduction Steps:
-NETDEV="enp3s0"
-
-config_qdisc_route_filter() {
-    tc qdisc del dev $NETDEV root
-    tc qdisc add dev $NETDEV root handle 1: prio
-    tc filter add dev $NETDEV parent 1:0 \
-	protocol ip prio 100 route to 100 flowid 1:1
-    ip route add 192.168.1.100/32 dev $NETDEV realm 100
-}
-
-test_ns() {
-    ip netns add testns
-    ip link set $NETDEV netns testns
-    ip netns exec testns ifconfig $NETDEV  10.0.32.46/24
-    ip netns exec testns ping -c 1 10.0.32.1
-    ip netns del testns
-}
-
-config_qdisc_route_filter
-
-test_ns
-sleep 2
-test_ns
-
-Fixes: f2fc6a54585a ("[NETNS][IPV6] route6 - move ip6_dst_ops inside the network namespace")
-Cc: stable@vger.kernel.org
-Signed-off-by: xietangxin <xietangxin@yeah.net>
----
-change in v2: add cc stable and fix tag
-
-v1: https://lore.kernel.org/all/20260307035110.7121-1-xietangxin@yeah.net/
----
- drivers/net/virtio_net.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 72d6a9c6a..5b13a61b3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3351,6 +3351,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* Don't wait up for transmitted skbs to be freed. */
- 	if (!use_napi) {
- 		skb_orphan(skb);
-+		skb_dst_drop(skb);
- 		nf_reset_ct(skb);
- 	}
- 
--- 
-2.43.0
-
+When you repost could you trim the "(open list:.." stuff form the CC
+lists? For lists just the email addr is enough, no need to quote the
+rest of get_maintainers output.
 
