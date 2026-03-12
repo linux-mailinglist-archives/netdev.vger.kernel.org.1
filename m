@@ -1,173 +1,256 @@
-Return-Path: <netdev+bounces-266928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aP5nNudfsmlmMAAAu9opvQ
-	(envelope-from <netdev+bounces-266928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:40:39 +0100
+	id mLjpKQ9dsmkZMAAAu9opvQ
+	(envelope-from <netdev+bounces-266911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:28:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E0DB26DFE9
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:40:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BBB26DA59
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 831903093244
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:36:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 108B530541EA
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:28:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4638A39EF02;
-	Thu, 12 Mar 2026 06:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47DC381B13;
+	Thu, 12 Mar 2026 06:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="YpeqQxRZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QuYTGHhY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654F538C40D
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB761B4F1F;
+	Thu, 12 Mar 2026 06:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773297417; cv=none; b=ljkaFc6nwT+tNktVmsfBzNxMa9/YBdtEvGIsOmwyq+5h7/dhuDBvF1q39xKSGN3qp7wQaN/W+Zr0ejlaoEsNWNQ4DmlulfBwEzaMPqcDxBmXbvMrWUDiLxRxMaG1h7hnNceW0Qk5Kb5/0saQdo2v49irL5G8zYybZ7SNro9cn2A=
+	t=1773296899; cv=none; b=mgxhR+PFgkbxl4RTrJsh/pQHIVOBYU2IuIt37cccbm9GYUIL3xdcp8s+uAs+RDL5oLLqx8/DGsW41hiw1DvbKspOfPJRjqCjgxys+jOP11YD2E/kKa6z2So5/U0HZrG6gZmFQ8B+PCGeTONldgfz0X9Q7em3F3CjHQA/xGUpBpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773297417; c=relaxed/simple;
-	bh=OeXeDMD6HirRqZTISbCpNb0ZIAgYnt7jVAhUMhiP3yo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eC306flxwihSvLXWXGKfU63aS8pLIzN5+rgWhGGDS5BoVqfGBPZfmauTEqLBKuPjr9J/2wl0qzRRVWj5/6mpnfHythhWbLLxG5+uRU0U9QpmZZCWBLZZ0C5rR4Xp+TH/iQGsMImrFXtcughIyde+T19AHkFWx3gHfk2AZ+M5BDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=YpeqQxRZ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 7B11D20799;
-	Thu, 12 Mar 2026 07:27:10 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KyymKwPJ0iCP; Thu, 12 Mar 2026 07:27:10 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id E26402064C;
-	Thu, 12 Mar 2026 07:27:09 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E26402064C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1773296829;
-	bh=qCMrG6R9wEgYocFLXELTgCv1qgm6eoLjiHswNf5w1Wo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=YpeqQxRZionh1zy32zOhz1ZvCAuO9b423vS6nACI6CJ/4qlz2NWFACZKt3MlqOMEY
-	 8LdOuJ9P3q6G0E6aC6mWIX6J9gHOZgZZV0QRRI7lc8kvDaRkd1QBgykINqaKaprbT1
-	 ZC/d/dRxe2Fy4zphJYIp6Br3axHoG3Ifs6WmuBFz3j78C89zRHzTHWh05JU/sWapXt
-	 24oBbNqKUIISNLVc2BlUwrtGuxnguRJw21TYjqbFNZwdvcHNtTTEABd6jG7M5c/Pr4
-	 WPMxQgg2YY6cNg3Ph2OzoMAJd/xgBAUw8B3H1txQ/7y4ayOr24FCPvs0rmQ9H06rPT
-	 0QuhPskMgcZig==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 12 Mar
- 2026 07:27:09 +0100
-Received: (nullmailer pid 2329501 invoked by uid 1000);
-	Thu, 12 Mar 2026 06:27:08 -0000
-Date: Thu, 12 Mar 2026 07:27:08 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: Leon Romanovsky <leon@kernel.org>, Simon Horman <horms@kernel.org>,
-	Florian Westphal <fw@strlen.de>, <netdev@vger.kernel.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>
-Subject: Re: [PATCH ipsec-next 01/10] xfrm: state: fix sparse warnings on
- xfrm_state_hold_rcu
-Message-ID: <abJcvFX-pbZ4WZry@secunet.com>
-References: <cover.1773051558.git.sd@queasysnail.net>
- <7388df7238672a92be0e4048f0225e6db294e736.1773051558.git.sd@queasysnail.net>
- <20260310103135.GB12611@unreal>
- <abABg6aO9twGIk7F@krikkit>
- <20260310182012.GF12611@unreal>
- <abBv6zR4Qq_lrzuC@strlen.de>
- <20260310194500.GO12611@unreal>
- <abB12Ae769OivuYB@strlen.de>
- <20260310201021.GP12611@unreal>
- <abCQGh5Ce9uDbOo9@krikkit>
+	s=arc-20240116; t=1773296899; c=relaxed/simple;
+	bh=gzjC3+HXwJYqJxbOxEjt7FRKLUrp3Sx8tGFp6KAYFyg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VkZ/5ZVnPopNsXOPvF0eXbdtyC0vSAgym3SHJ03Pv5Uq0Ey3Zm2yfY27e2Pu8L2SRcATjIg1MEOJlRni34mqO58VhMgs9bguLPfo+vKAK3xxmTCPji43Wde+aXumn1JNVR8Xa7EOhWJiXIGr1mcb3SRWOn6Gv4m9lqh2+l5nDOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QuYTGHhY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAE6EC4CEF7;
+	Thu, 12 Mar 2026 06:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773296899;
+	bh=gzjC3+HXwJYqJxbOxEjt7FRKLUrp3Sx8tGFp6KAYFyg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QuYTGHhYc3mF+ToCAl/YU2nORRURoLpgtIWhZaoxhM9y1isdCNmVBphhYPKYNcuCk
+	 MtSSCCihQdGnGVMfvEn6kNvFKgTgVtObil4m74Q2ATvVYQHU2kjnnspGpcIEkpnwgq
+	 4fYorrbf2rUfw6Wvp2D0iSKZuOFC58bp9u5HN/QCxrfcv1Lj4rwCGAf5H7eTll2Adc
+	 tJf3fzcducdbwGNeo1ZUnd/rg4EQazr/N4lq9hamfA/UswJt1YNqDY3F/IdNZj1DH3
+	 /6CnguYXyYLZF+Owj+hK+SWQ5GagYjg2kwcxAA8QjvFIp6Jl10AF4LgbKxEjkdu1bD
+	 S1kunhkCWRTdQ==
+From: Sumit Garg <sumit.garg@kernel.org>
+To: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org
+Cc: andersson@kernel.org,
+	konradybcio@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com,
+	sean@poorly.run,
+	akhilpo@oss.qualcomm.com,
+	lumag@kernel.org,
+	abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com,
+	marijn.suijten@somainline.org,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com,
+	bod@kernel.org,
+	mchehab@kernel.org,
+	elder@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jjohnson@kernel.org,
+	mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com,
+	jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org,
+	apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: [PATCH v2 00/15] firmware: qcom: Add OP-TEE PAS service support
+Date: Thu, 12 Mar 2026 11:57:41 +0530
+Message-ID: <20260312062756.694390-1-sumit.garg@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <abCQGh5Ce9uDbOo9@krikkit>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266928-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:mid];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-266911-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 4E0DB26DFE9
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 52BBB26DA59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 10, 2026 at 10:41:46PM +0100, Sabrina Dubroca wrote:
-> 
-> > Yes, this is possible scenario and this is what is worth to document.
-> 
-> 
-> We could add something like:
-> 
-> /* Take a reference to @x, when we know the state has a refcount >= 1.
->  * In this case, we can avoid refcount_inc_not_zero and the error
->  * handling it requires.
->  * In contexts where concurrent state deletion is possible and we
->  * don't already hold a reference to that state, xfrm_state_hold_rcu
->  * must be used.
->  */
-> 
-> Though it may not make much sense to refer to xfrm_state_hold_rcu
-> (implemented in net/xfrm/xfrm_state.c) from include/net/xfrm.h.
-> 
-> And if we consider the hashtables to be private to
-> net/xfrm/xfrm_state.c, nothing outside of it should ever see a state
-> with refcount=0, since they will only ever see states that already
-> have one reference held by whatever gave them the pointer.
-> 
-> So maybe it's more xfrm_state_hold_rcu that needs a mention of
-> "concurrent state deletion could bring the refcount to 0 while we're
-> doing the lookup"? I don't know, for me it's pretty obvious with the
-> _rcu suffix that RCU -> unlocked -> could be deleted in parallel.
-> 
-> 
-> We also have __xfrm_state_put, the commit message that introduced it
-> states:
-> 
->     We often just do an atomic_dec(&x->refcnt) on an xfrm_state object
->     because we know there is more than 1 reference remaining and thus
->     we can elide the heavier xfrm_state_put() call.
-> 
-> so we could add:
-> 
-> /* Drop a reference to @x, when we know there is more than 1 reference remaining.
->  * In this case, we can avoid refcount_dec_and_test and just decrement refcnt.
->  */
-> 
-> but maybe someone has a better suggestion.
+From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-I plan to take this series as is. If you feel we need a comment,
-just add it with a followup patch.
+Qcom platforms has the legacy of using non-standard SCM calls
+splintered over the various kernel drivers. These SCM calls aren't
+compliant with the standard SMC calling conventions which is a
+prerequisite to enable migration to the FF-A specifications from Arm.
+
+OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+support these non-standard SCM calls. And even for newer architectures
+with S-EL2 and Hafnium support, QTEE won't be able to support SCM
+calls either with FF-A requirements coming in. And with both OP-TEE
+and QTEE drivers well integrated in the TEE subsystem, it makes further
+sense to reuse the TEE bus client drivers infrastructure.
+
+The added benefit of TEE bus infrastructure is that there is support
+for discoverable/enumerable services. With that client drivers don't
+have to manually invoke a special SCM call to know the service status.
+
+So enable the generic Peripheral Authentication Service (PAS) provided
+by the firmware. It acts as the common layer with different TZ
+backends plugged in whether it's an SCM implementation or a proper
+TEE bus based PAS service implementation.
+
+The TEE PAS service ABI is designed to be extensible with additional API
+as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+extensions of the PAS service needed while still maintaining backwards
+compatibility.
+
+Currently OP-TEE support is being added to provide the backend PAS
+service implementation which can be found as part of this PR [1].
+This implementation has been tested on Kodiak/RB3Gen2 board with lemans
+EVK board being the next target. In addition to that WIN/IPQ targets
+planning to use OP-TEE will use this service too. Surely the backwards
+compatibility is maintained and tested for SCM backend.
+
+Patch summary:
+- Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
+  only allow UEFI and Linux to boot in EL2.
+- Patch #2: adds generic PAS service.
+- Patch #3: migrates SCM backend to generic PAS service.
+- Patch #4: adds TEE/OP-TEE backend for generic PAS service.
+- Patch #5-#13: migrates all client drivers to generic PAS service.
+- Patch #14: drops legacy PAS SCM exported APIs.
+
+The patch-set is based on v7.0-rc2 tag and can be found in git tree here
+[2].
+
+Merge strategy:
+
+It is expected due to APIs dependency, the entire patch-set to go via
+the Qcom tree. All other subsystem maintainers, it will be great if I
+can get acks for the corresponding subsystem patches.
+
+[1] https://github.com/OP-TEE/optee_os/pull/7721
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v1
+
+---
+Changes in v2:
+- Fixed kernel doc warnings.
+- Polish commit message and comments for patch #2.
+- Pass proper PAS ID in set_remote_state API for media firmware drivers.
+- Added Maintainer entry and dropped MODULE_AUTHOR.
+- Picked up ack from Jeff.
+
+Mukesh Ojha (1):
+  arm64: dts: qcom: kodiak: Add EL2 overlay
+
+Sumit Garg (14):
+  firmware: qcom: Add a generic PAS service
+  firmware: qcom_scm: Migrate to generic PAS service
+  firmware: qcom: Add a PAS TEE service
+  remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+  remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+  soc: qcom: mdtloader: Switch to generic PAS TZ APIs
+  remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+  remoteproc: qcom: Select QCOM_PAS_TEE service backend
+  drm/msm: Switch to generic PAS TZ APIs
+  media: qcom: Switch to generic PAS TZ APIs
+  net: ipa: Switch to generic PAS TZ APIs
+  wifi: ath12k: Switch to generic PAS TZ APIs
+  firmware: qcom_scm: Remove SCM PAS wrappers
+  MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+
+ MAINTAINERS                                   |   9 +
+ arch/arm64/boot/dts/qcom/Makefile             |   2 +
+ arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  35 ++
+ drivers/firmware/qcom/Kconfig                 |  18 +
+ drivers/firmware/qcom/Makefile                |   2 +
+ drivers/firmware/qcom/qcom_pas.c              | 298 +++++++++++
+ drivers/firmware/qcom/qcom_pas.h              |  53 ++
+ drivers/firmware/qcom/qcom_pas_tee.c          | 477 ++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c              | 304 ++++-------
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+ .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+ drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+ drivers/net/ipa/ipa_main.c                    |  13 +-
+ drivers/net/wireless/ath/ath12k/ahb.c         |   8 +-
+ drivers/remoteproc/Kconfig                    |   1 +
+ drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+ drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+ drivers/remoteproc/qcom_wcnss.c               |  12 +-
+ drivers/soc/qcom/mdt_loader.c                 |  12 +-
+ include/linux/firmware/qcom/qcom_pas.h        |  41 ++
+ include/linux/firmware/qcom/qcom_scm.h        |  29 --
+ include/linux/soc/qcom/mdt_loader.h           |   6 +-
+ 23 files changed, 1108 insertions(+), 303 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
+ create mode 100644 drivers/firmware/qcom/qcom_pas.c
+ create mode 100644 drivers/firmware/qcom/qcom_pas.h
+ create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+ create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+
+-- 
+2.51.0
+
 
