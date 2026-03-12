@@ -1,112 +1,220 @@
-Return-Path: <netdev+bounces-266889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aIooIVMysmkkJgAAu9opvQ
-	(envelope-from <netdev+bounces-266889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:26:11 +0100
+	id IBMMEdAysmkuJgAAu9opvQ
+	(envelope-from <netdev+bounces-266890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:28:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D238726CC5D
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:26:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD75726CC7E
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 04:28:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B26493052885
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:26:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5532E3013267
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 03:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9DF383C76;
-	Thu, 12 Mar 2026 03:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6043F383C76;
+	Thu, 12 Mar 2026 03:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJmC1fCE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MJHaDuDZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0039C346E7A;
-	Thu, 12 Mar 2026 03:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9E1B4F0A
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773285966; cv=none; b=uxvn4cYw2CBPqLtWG8xyHmtid8wXZv0ypgNux6pVMBFcyknf1c9+O2bjSK94Wefg65PxsK5lgxdeV5jR8mcwDYZbs8mAIuOI/f/KaAfmTWjQe+mZ77gnFaDQBd90SvUn8mTmVRLF56o8Xr+uZdn0/610JHDvrvXIbm3pQz2nHaU=
+	t=1773286094; cv=none; b=oCg6ivsBvAaF5b7Bj9yrZ7PtbfcBu4I1JzpyS2Xvf6OAK8cewDbB5nK4rrlZNFtZ2mPJ53pnat4sxysPvTRwQGCxVF2t8LMJAMp+mhSjyOik57fTXzc/cEg+zQs/Gn1hgIeZvel0uQQSCJs4Qa+HSB7MqXmqFfwgMYqIM2zeRxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773285966; c=relaxed/simple;
-	bh=q3EUBK4jLA/YX/UN7xyDj92eGsiZwUVakDFEjt10Fl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ry2xxoZFhJj/FioinTw3GHrEbJRn60Li/1kCzJDvTX3mWuFl1YYslixiZL9Z1WtBVHolQwSq33pRN/K/UAJAsqJtxauf8rqOSWfV+qvcC90EyfOxlKWQ5pUr3SVLRoxOhTA4ZSQb3uhZ690pHbtfNCnwA2j4VpFLH5H0D+/Oqw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJmC1fCE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B7CC4CEF7;
-	Thu, 12 Mar 2026 03:26:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773285965;
-	bh=q3EUBK4jLA/YX/UN7xyDj92eGsiZwUVakDFEjt10Fl0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MJmC1fCEFGd2aiqg/Nfeti+WGQRz0lh+Sk/uAGhMXCAbxw29f8GoDLRPaiANKC04s
-	 +kYyii6goR6ZsFgjqczIEeEcqrC1kmso8KG8j4nI8mlE20P5uDSDwe0LgPrTloz0jy
-	 tbi3xNalojfTbAzmba+ieKZyoh+UacDt78/Qs1tHemzJW4MJ26qBwIsGhAVLxAMq3M
-	 5ha8WpdQu+UmOqqdCLTxspVe3TpXQ0VklR31/UEA2/1Y85FKsmZsfjX1NAS6lw9zm0
-	 y+lFkJaJ11AEjz5V+9KU66eiHbhBscE7dts/k4nhLKSlK3uL02SpAwmKklPICRRxbm
-	 Wk9QfeDNQn6Qg==
-Date: Wed, 11 Mar 2026 20:26:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org, Jiayuan Chen
- <jiayuan.chen@shopee.com>, Jianzhou Zhao <luckd0g@163.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, Edward Srouji <edwards@nvidia.com>, Or Har-Toov
- <ohartoov@nvidia.com>, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- Patrisious Haddad <phaddad@nvidia.com>, Maher Sanalla
- <msanalla@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, Kees Cook
- <kees@kernel.org>, Jang Ingyu <ingyujang25@korea.ac.kr>, Moni Shoua
- <monis@mellanox.com>, Doug Ledford <dledford@redhat.com>, Christian
- Benvenuti <benve@cisco.com>, Selvin Xavier <selvin.xavier@broadcom.com>,
- Yuval Shaia <yuval.shaia@oracle.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] IB/core: Fix use-after-free of ipvlan phy_dev in
- ib_get_eth_speed
-Message-ID: <20260311202603.265198cf@kernel.org>
-In-Reply-To: <20260311100313.284589-1-jiayuan.chen@linux.dev>
-References: <20260311100313.284589-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1773286094; c=relaxed/simple;
+	bh=8go2IFq4rIEAN9M5SBSAkfUlbNjCnuvntdlcINAZArY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rl1EqH5JftH8ojFyCx8VbrvTko5cGilL0x6S5FvDYAdch+dgfx7zjhuMklxSElW+Ndx7zkcrBybA3ms99RSOaOiKZFVSVkz/6WTGiR+y2oexixNJUeliFB5sjC3SVOyjxOwHY0aMsUuZSeLIvNRaPW/sJeKP+0lB9auRpX6+5RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MJHaDuDZ; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7762c04a-e28c-4b29-af24-18550391f699@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773286080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G2SyG3QplUVb9nRJgkTAarwyWE9+/9zbBg+z/sU96iE=;
+	b=MJHaDuDZya55VDVFeNiZKEBGCspS3uviutCSigEAMTp79Vagsd4pLHTM8CH/z5VZcH7tgO
+	mqnU/FXe/9IrZGWXbG8+4fqgw3DQFMbPdWYBhqp0tDLxBKuUbRi1iiyen2gmGE1bg/WvX/
+	0Lof6tmjNFz6+zfipqo5qZt5ac5lQXw=
+Date: Thu, 12 Mar 2026 11:27:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [net,v4] net/smc: fix NULL dereference and UAF in
+ smc_tcp_syn_recv_sock()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jiayuan.chen@shopee.com, mjambigi@linux.ibm.com, wenjia@linux.ibm.com,
+ horms@kernel.org, sidraya@linux.ibm.com, guwen@linux.alibaba.com,
+ davem@davemloft.net, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, dust.li@linux.alibaba.com,
+ syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com, pabeni@redhat.com,
+ tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org, edumazet@google.com,
+ alibuda@linux.alibaba.com
+References: <20260311022451.395802-1-jiayuan.chen@linux.dev>
+ <20260312030520.626362-1-kuba@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260312030520.626362-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,163.com,ziepe.ca,kernel.org,nvidia.com,broadcom.com,korea.ac.kr,mellanox.com,redhat.com,cisco.com,oracle.com];
-	TAGGED_FROM(0.00)[bounces-266889-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-266890-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D238726CC5D
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,827ae2bfb3a3529333e9];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,linux.dev:url]
+X-Rspamd-Queue-Id: DD75726CC7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 11 Mar 2026 18:03:08 +0800 Jiayuan Chen wrote:
-> Subject: [PATCH net v1] IB/core: Fix use-after-free of ipvlan phy_dev in ib_get_eth_speed
+Thanks for the review.
 
-FWIW this is not a net patch (infiniband is not net)
--- 
-pw-bot: nap
+
+On 3/12/26 11:05 AM, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> net/smc: fix NULL dereference and UAF in smc_tcp_syn_recv_sock()
+>
+> This patch fixes a race condition in smc_tcp_syn_recv_sock() where
+> sk_user_data can be nullified or the smc_sock can be freed during
+> concurrent socket closure, using RCU and refcount_inc_not_zero() for
+> safe access.
+>
+> Closes: https://lore.kernel.org/all/67eaf9b8.050a0220.3c3d88.004a.GAE@google.com/T/
+>
+>> The race window looks like this:
+>>
+>>    CPU A (softirq)              CPU B (process ctx)
+>>
+>>    tcp_v4_rcv()
+>>      TCP_NEW_SYN_RECV:
+>>      sk = req->rsk_listener
+>>      sock_hold(sk)
+>>      /* No lock on listener */
+>>                                 smc_close_active():
+>>                                   write_lock_bh(cb_lock)
+>>                                   sk_user_data = NULL
+>>                                   write_unlock_bh(cb_lock)
+>>                                   ...
+>>                                   smc_clcsock_release()
+>>                                   sock_put(smc->sk) x2
+>>                                     -> smc_sock freed!
+>>      tcp_check_req()
+>>        smc_tcp_syn_recv_sock():
+>>          smc = user_data(sk)
+>>            -> NULL or dangling
+>>          smc->queued_smc_hs
+>>            -> crash!
+> The race diagram describes the tcp_check_req() path (TCP_NEW_SYN_RECV
+> handling), but the actual syzbot crash occurred through a different path.
+> Looking at the syzbot stacktrace, the crash shows:
+>
+> smc_tcp_syn_recv_sock+0xa7/0x4b0 called from tcp_get_cookie_sock+0xd5/0x790
+>
+> This is the SYN cookie path:
+>
+> tcp_v4_rcv() -> tcp_v4_do_rcv() -> tcp_v4_cookie_check() ->
+> cookie_v4_check() -> tcp_get_cookie_sock() -> smc_tcp_syn_recv_sock()
+>
+> The syzbot log even shows 'Possible SYN flooding on port [::]:20002.
+> Sending cookies.' confirming syncookies were active. Both paths are
+> vulnerable to the race, but the race diagram doesn't match the actual
+> crash path that the fuzzer triggered.
+>
+> Would it be more accurate to note that both paths (tcp_check_req for
+> normal SYN handling and tcp_get_cookie_sock for SYN cookies) can trigger
+> the race?
+
+
+For the first point about the call stack: both the tcp_check_req() path 
+(normal SYN handling)
+and the tcp_get_cookie_sock() path (SYN cookies) call syn_recv_sock() 
+without holding the
+listener lock, so the race condition is the same. The diagram uses 
+tcp_check_req() as an
+example because I have reproduced it under my env, but the fix covers 
+both paths.
+
+>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>> --- a/net/smc/af_smc.c
+>> +++ b/net/smc/af_smc.c
+>> @@ -131,7 +131,13 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+>>   	struct smc_sock *smc;
+>>   	struct sock *child;
+>>
+>> -	smc = smc_clcsock_user_data(sk);
+>> +	rcu_read_lock();
+>> +	smc = smc_clcsock_user_data_rcu(sk);
+>> +	if (!smc || !refcount_inc_not_zero(&smc->sk.sk_refcnt)) {
+>> +		rcu_read_unlock();
+>> +		return NULL;
+> When smc_tcp_syn_recv_sock() is called from the SYN cookie path
+> (tcp_get_cookie_sock() in net/ipv4/syncookies.c:205 and
+> net/ipv6/syncookies.c:275), the dst parameter is non-NULL.
+>
+> The new early return here returns NULL without calling dst_release(dst).
+> The syn_recv_sock contract requires the callee to either consume dst
+> (attach to child socket on success) or release it (call dst_release on
+> failure).
+>
+> Looking at tcp_get_cookie_sock() in net/ipv4/syncookies.c:
+>
+>      child = af_ops->syn_recv_sock(..., &dst, ...)
+>      if (!child) {
+>          reqsk_free(req);
+>          return NULL;
+>      }
+>
+> When syn_recv_sock returns NULL, tcp_get_cookie_sock immediately returns
+> NULL without releasing dst, expecting the syn_recv_sock callee to have
+> already handled it.
+>
+> The existing 'drop:' label at line 165 correctly calls dst_release(dst),
+> but the new early return at line 138 bypasses it. This causes a dst_entry
+> reference count leak under SYN flood conditions on an SMC listener.
+>
+> Should this be: goto drop instead of return NULL, or should dst_release(dst)
+> be added before the return NULL?
+
+
+
+The second point about the dst leak is valid. Will fix in v3.
+
 
