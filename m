@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-267019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WINvNx+bsmnENwAAu9opvQ
-	(envelope-from <netdev+bounces-267019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:53:19 +0100
+	id LdISNRWdsmndOAAAu9opvQ
+	(envelope-from <netdev+bounces-267020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:01:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FB0270830
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:53:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BC7C2708B7
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 74BF2301E5F2
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:53:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6695E3023A7C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5149B391506;
-	Thu, 12 Mar 2026 10:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29B139281B;
+	Thu, 12 Mar 2026 11:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSTWUdTg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+SGG5FR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D65A388E74;
-	Thu, 12 Mar 2026 10:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B91B823DD;
+	Thu, 12 Mar 2026 11:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773312797; cv=none; b=t3DIJosqRNYfJeswyNO5NbLqJkDyNCPIoa+E9aO22EFfYomkYgSYKraB6ytMHbgww55YRp91PAWIHwk55FqXGFPXi/MWiofpDv8hWIGf4sl99StWk3Auk2TkHot8O/xQY/vzQ+akwMI0dQGZAjhIQd9h+6ZZaFYCU70DqvCEu/Y=
+	t=1773313292; cv=none; b=Fh4EwCRoTl1XLCS4JbS6L8Wz66U1+lPqr5cltyLJ8n5WOYJBl/UTFEZZ9Q3MQJWIGQAq2AHZ2Xnbnm22k/+8uQ6aVALbDwDSIs3WhTzSUEEyuLcRZjM3k75m/h83LL/4RexAtAMtZZj7Ex3ZM8ftjXJpWjw5ZXQ0myaw8OW9V1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773312797; c=relaxed/simple;
-	bh=1+8+XjrK7jO24bo8LDi66k0D/UNmRuJY8jK0hfbGfLM=;
+	s=arc-20240116; t=1773313292; c=relaxed/simple;
+	bh=+Ulv+PCYekiAEop42YtuVmuhDO5Wmf5GGZG23pHYKps=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UVoqazRdiLMoWo52GLnX20r/DNr2a+ME+ql9AayfkiktCSRq7TAfOyzq3oJggON1p2x1P4YOTTaOxt4fvSXox9T3s7Hz5vIqXO/xQvPczE8lTBnwXs/fBi7orxwnSR/kczMk63IPyGqEr6hMj31ets/6DlZ48iit8jEBqiJ4CvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSTWUdTg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B481EC19424;
-	Thu, 12 Mar 2026 10:53:12 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=SEcJF27GIEhBbEk1m4R2vjVQjXkNCrfLd6MRMF+nVAaE4l6bNcdQeqnT2R3yqdLzMO1cKnytbxQ+3f4bCKWanmH7zbLbfmIvTmpupZcN2bWE4NJGy3F6nCJj2Y9XGK3RrIBnEWseAEaSFmUf8E1t0Yr5ODM3FjZGDNuZR/JarAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+SGG5FR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 591C6C4CEF7;
+	Thu, 12 Mar 2026 11:01:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773312796;
-	bh=1+8+XjrK7jO24bo8LDi66k0D/UNmRuJY8jK0hfbGfLM=;
+	s=k20201202; t=1773313291;
+	bh=+Ulv+PCYekiAEop42YtuVmuhDO5Wmf5GGZG23pHYKps=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZSTWUdTg38joWylX5oE9mqRa+Kp/Yce0+4KDWynILpm/YX5UkVt/dF5wdfGJ8bDwR
-	 wyGwVhCpcUeHokDorBnKlyz2Fd4inWfV4LPmj29sBNKvBEXlMRL84GeNLZLLnqwYMo
-	 MtSoWZHzvvH3uS2lZlUU3xV9VhuBD/YUwOz49G/04we0iGz6Zbp8aesdJ2cw38RLLZ
-	 afsJ3A4MqYi7PmCbCCogH7fq2U2tkyPbbTh1PkWNro+CT6PAJ8qx0Q548m1qcLv4QV
-	 78kO8Sx77FpGv55rJA6wVGoxL7vZxzJy5F2nK0HP7ceoYpcwy1f+GPHG2qjYPjSP2y
-	 /VMrC1CP/7uqg==
-Message-ID: <2658280e-0206-4326-b8dd-d201fc604dbd@kernel.org>
-Date: Thu, 12 Mar 2026 11:53:07 +0100
+	b=p+SGG5FRxlZ4uxcoqLLyxtMOuhYboEMc3iKZe+NZ8LRsukrNgN6+d6B5uyGWLC71y
+	 6fTSEq9NXVq3wpguq2DWqJbiAEl+bm3Jb6GCwCngidmv9YWRzV4yTyfBYE1t84CUrT
+	 dL+kXjY7gaKtBULPEUKubNEGW+tXF8GwO8s/fHtvRyORxb0E9ASZGbnAuAQa1CRKZ5
+	 MTaMHrNlASOYf8pr6ZITrsyx9OBXcSzOdoD/ex/srzXYQi/TRepcLBm6QBZKS6erBv
+	 AjyZpp2Jx7u79jhe5J5Nav83z/FZxx8qk1Nxz9AT7lz/s3u/pzZxETib+jNHEZt9eg
+	 HtCi9k+LloE1w==
+Message-ID: <bb4e4feb-cc51-4418-93a5-47c2781e6d17@kernel.org>
+Date: Thu, 12 Mar 2026 12:01:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,22 +53,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter
- value for PTP support: manual merge
+Subject: Re: [PATCH net-next v3 2/6] mptcp: keep rcv_mwnd_seq in sync with
+ subflow rcv_wnd
 Content-Language: fr
-To: Chintan Vankar <c-vankar@ti.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Michael Walle <mwalle@kernel.org>, Nishanth Menon <nm@ti.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Vignesh Raghavendra <vigneshr@ti.com>,
- Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
- MD Danish Anwar <danishanwar@ti.com>, Vishnu Singh <v-singh1@ti.com>,
- linux-next@vger.kernel.org, Mark Brown <broonie@kernel.org>
-References: <20260310160940.109822-1-c-vankar@ti.com>
+To: Simon Baatz <gmbnomis@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ mptcp@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ David Ahern <dsahern@kernel.org>, Jon Maloy <jmaloy@redhat.com>,
+ Jason Xing <kerneljasonxing@gmail.com>, mfreemon@cloudflare.com,
+ Shuah Khan <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>
+References: <20260309-tcp_rfc7323_retract_wnd_rfc-v3-0-4c7f96b1ec69@gmail.com>
+ <20260309-tcp_rfc7323_retract_wnd_rfc-v3-2-4c7f96b1ec69@gmail.com>
+ <334053df-9824-4bfe-b37c-8711d0a5a9bd@kernel.org>
+ <abHnyJInqmGNIWiq@gandalf.schnuecks.de>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -114,27 +117,28 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20260310160940.109822-1-c-vankar@ti.com>
+In-Reply-To: <abHnyJInqmGNIWiq@gandalf.schnuecks.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267019-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267020-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,cloudflare.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RSPAMD_EMAILBL_FAIL(0.00)[gmbnomis.gmail.com:query timed out];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
@@ -143,66 +147,75 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 86FB0270830
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8BC7C2708B7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Chintan,
+Hi Simon,
 
-+cc linux-next
+On 11/03/2026 23:08, Simon Baatz wrote:
+> On Wed, Mar 11, 2026 at 07:27:34PM +0100, Matthieu Baerts wrote:
+>> On 09/03/2026 09:02, Simon Baatz via B4 Relay wrote:
+>>> From: Simon Baatz <gmbnomis@gmail.com>
+>>>
+>>> MPTCP shares a receive window across subflows and applies it at the
+>>> subflow level by adjusting each subflow's rcv_wnd when needed.  With
+>>> the new TCP tracking of the maximum advertised window sequence,
+>>> rcv_mwnd_seq must stay consistent with these subflow-level rcv_wnd
+>>> adjustments.
+>>
+>> Thank you for these modifications!
+>>
+>>> Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
+>>> ---
+>>>  net/mptcp/options.c | 6 ++++--
+>>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+>>> index 43df4293f58bfbd8a8df6bf24b9f15e0f9e238f6..8a1c5698983cff3082d68290626dd8f1e044527f 100644
+>>> --- a/net/mptcp/options.c
+>>> +++ b/net/mptcp/options.c
+>>
+>> (...)
+>>
+>>> @@ -1338,8 +1339,9 @@ static void mptcp_set_rwin(struct tcp_sock *tp, struct tcphdr *th)
+>>>  		 */
+>>>  		rcv_wnd_new = rcv_wnd_old;
+>>>  		win = rcv_wnd_old - ack_seq;
+>>> -		tp->rcv_wnd = min_t(u64, win, U32_MAX);
+>>> -		new_win = tp->rcv_wnd;
+>>> +		new_win = min_t(u64, win, U32_MAX);
+>>> +		tp->rcv_wnd = new_win;
+>>
+>> Out of curiosity, why did you change the two lines above?
+>> (even if it makes sense, the diff is a bit confusing, and the commit
+>> message doesn't mention this :) )
+> 
+> I wanted to keep tcp_update_max_rcv_wnd_seq() calls close to the
+> respective update sites (same pattern everywhere).
 
-On 10/03/2026 17:09, Chintan Vankar wrote:
-> The "rx_filter" member of "hwtstamp_config" structure is an enum field and
-> does not support bitwise OR combination of multiple filter values. It
-> causes error while linuxptp application tries to match rx filter version.
-> Fix this by storing the requested filter type in a new port field.
-FYI, we got a small conflict when merging 'net' in 'net-next' in the
-MPTCP tree due to this patch applied in 'net':
+Thanks, I now understand the reason.
 
-  840c9d13cb1c ("net: ethernet: ti: am65-cpsw-nuss: Fix rx_filter value for PTP support")
+> In the original form
+> 
+> tp->rcv_wnd = min_t(u64, win, U32_MAX);
+> tcp_update_max_rcv_wnd_seq(tp);
+> new_win = tp->rcv_wnd;
+> 
+> the ordering suggests that tcp_update_max_rcv_wnd_seq() might modify
+> tp->rcv_wnd.
 
-and this one from 'net-next':
+Note that if tp->rcv_mwnd_seq always needs to be modified when
+tp->rcv_wnd and/or tp->rcv_wup are modified, maybe a single helper could
+be called to modify all of them, so it might be less likely to forget
+about modifying tp->rcv_mwnd_seq as well in the future.
 
-  a23c657e332f ("net: ethernet: ti: am65-cpsw: Use also port number to identify timestamps")
-
------ Generic Message -----
-The best is to avoid conflicts between 'net' and 'net-next' trees but if
-they cannot be avoided when preparing patches, a note about how to fix
-them is much appreciated.
-
-The conflict has been resolved on our side [1] and the resolution we
-suggest is attached to this email. Please report any issues linked to
-this conflict resolution as it might be used by others. If you worked on
-the mentioned patches, don't hesitate to ACK this conflict resolution.
----------------------------
-
-Rerere cache is available in [2].
-
-The conflict was in the context: this patch here in 'net' modified the
-if condition, while the one in 'net-next' modified the line below.
-
------------ 8< -----------
-diff --cc drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index a38bf7f4f434,265ce5479915..d9400599e80a
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@@ -1351,8 -1351,8 +1351,8 @@@ static int am65_cpsw_nuss_rx_packets(st
-        ndev_priv = netdev_priv(ndev);
-        am65_cpsw_nuss_set_offload_fwd_mark(skb, ndev_priv->offload_fwd_mark);
-        skb_put(skb, pkt_len);
--       if (port->rx_ts_enabled)
-+       if (port->rx_ts_filter)
- -              am65_cpts_rx_timestamp(common->cpts, skb);
- +              am65_cpts_rx_timestamp(common->cpts, port_id, skb);
-        skb_mark_for_recycle(skb);
-        skb->protocol = eth_type_trans(skb, ndev);
-        am65_cpsw_nuss_rx_csum(skb, csum_info);
------------ 8< -----------
-
-1: https://github.com/multipath-tcp/mptcp_net-next/commit/e9021220744d
-2: https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/c39c9fa
+But probably it might be unlikely to have new places where tp->rcv_wnd
+and/or tp->rcv_wup need to be modified like here with MPTCP. So probably
+fine like that.
 
 Cheers,
 Matt
