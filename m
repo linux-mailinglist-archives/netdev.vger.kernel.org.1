@@ -1,158 +1,167 @@
-Return-Path: <netdev+bounces-267177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8J1lAuz8smmQRQAAu9opvQ
-	(envelope-from <netdev+bounces-267177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:50:36 +0100
+	id OD+LOZ39smmQRQAAu9opvQ
+	(envelope-from <netdev+bounces-267178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:53:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2661276CFA
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:50:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE296276D86
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 18:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CE0383032D52
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:50:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E3353302BBBA
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD673FE64F;
-	Thu, 12 Mar 2026 17:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE3D3FE647;
+	Thu, 12 Mar 2026 17:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="G58LR6Jj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+pHDPxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9818A3FB7CB;
-	Thu, 12 Mar 2026 17:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C2F39D6E9
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 17:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773337824; cv=none; b=E7wILqRpjF0PNt3Z55BVzWZMu73SxLBt+k9qbd0I7ZPJBJF5yl3vV9TleFjvjai04etWQ/NJ3Xt2IGT07ZF9+2Z9B3azCB+mF9+SRrigYbsSN7M/P3A159uIMD668YyUbvpbrIGhhH3UD8alSK2RhpPg6VSnDEADsTQvPDwb35c=
+	t=1773338008; cv=none; b=MG/FYrb7B/tFymAQY5GCw755DRMCUlAThhhcFX+XAeowTXBGaFtOz2IHJlb4S5exrDfkOlhz/m/T/Ac/XzG62yAdmc24U6/Vb1CpcWZ6gos2DNf+N8DP3TkX7jSo8VId1a7Mh65VH7htPQsm1Je+bmqc1p8F9Xgo3VC8dtlkhv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773337824; c=relaxed/simple;
-	bh=IsEThd7GsyhWEeV2/SM0iVWiMYRRDn25JFdkjXlfAAk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KYQzazBMYEH6FWaIAa241EhIjQ3xFhaKU4Ux0+JYR63G3/SsPtKjiicSTkgPsTJTb8fb8p7rK5cQgBxX+m/ergVMW5xA7hHH18Ps4TExwOPy8U+Dz4tQ6oEdKm5Wa90QSWN7nicyyV8PJK8c8kXvau0qA3njH6k4FQYz5l2XTI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=G58LR6Jj; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773337822; x=1804873822;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IsEThd7GsyhWEeV2/SM0iVWiMYRRDn25JFdkjXlfAAk=;
-  b=G58LR6Jj2CUiy3RcNDPClYYFscPon17H6NVP9XYs4MX+nC4bvomvQFZ8
-   9hoL5SCDTtNMiLEdXgYyLFUwtg78XibiCk2cZkBI8ScwkMn5h/+cPz/pq
-   ItPo5URZElPmV6YzTJsUI89/lPURTcrBbpU9A+nX/eHk3fjI0LNZnvrVM
-   tfM4cyE4d2IXQsOxc3NQShSq62s4tp9a9JYmOhSI5JLfpmEvqVodXjOgE
-   hZj1oqOJ91yjy80zAfEZuhgwqy2AEDdR3+DciM7IXXzHtySDDrKu+ne/B
-   yjfk8+8RMK+B7FEG8g0raKJQaN6hCtvZQXZYxUcYW+HOxE5Ac+LvusRfC
-   A==;
-X-CSE-ConnectionGUID: YjJgL2AVTV2CqPhndswM1g==
-X-CSE-MsgGUID: RYvYDWjOT7WAb/3OggWH+w==
-X-IronPort-AV: E=Sophos;i="6.23,116,1770620400"; 
-   d="scan'208";a="221848534"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Mar 2026 10:50:15 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 12 Mar 2026 10:49:45 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Thu, 12 Mar 2026 10:49:44 -0700
-Date: Thu, 12 Mar 2026 10:49:42 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: Conor Dooley <conor@kernel.org>
-CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King
-	<linux@armlinux.org.uk>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: macb: set default_an_inband to true for
- SGMII
-Message-ID: <abL8tgDp2x4OlGjn@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260312133856.2911581-1-charles.perry@microchip.com>
- <20260312-poise-parade-97e9382718da@spud>
+	s=arc-20240116; t=1773338008; c=relaxed/simple;
+	bh=MhsJgQFY4vrXPiEOLHH1Do+q09FX86/J75fYIp8k5Zk=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=T+vfL1k6Np1z5s8+Z12o/zcJ5WwD1g0F8f6mPQig/m+UB6FcfmEf66i+qzy/izJkPpU7zPSDske0m81d8CZbBPtWBhujsb9leQPCgyP7Nr+cGDtpg/AuUTj5DigQ/eqDNtcaAmy0kMKT2iY2kxULeAA6SrkXr8e8kZsyltJ/RDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+pHDPxu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B9AC116C6;
+	Thu, 12 Mar 2026 17:53:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773338008;
+	bh=MhsJgQFY4vrXPiEOLHH1Do+q09FX86/J75fYIp8k5Zk=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=c+pHDPxubkO/+AS+eLnPyaa8iEeixgIvXm5u2JFKqrtTMq14tx4uZa5PJxlPvyz/D
+	 3qxNl+rFijJ0Em7+IeJ+ca2wdoc0B9iawCyKqhpHJf+pA5znToo0KXHAQZX0dmqUjV
+	 4NcWD0BkhrRr099QYsDy+UsI261VGo+nnX5T/lTHtrme2/9knf0wyEm1Ju4OGNc7kZ
+	 ax3cjXr10ogX/LnpBWd4MtULAJcXjVjB6uC+s5MboYjzOMq/ATe4laPr2PTU5k+Zws
+	 BUlb1WCKmdj+od8EE16ADs3eJt/ueqRw5eTqEIaZEU7uoriUYlaDXlcmnYONJJtdz0
+	 LPSTyOnug60Fw==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 273B7F40068;
+	Thu, 12 Mar 2026 13:53:27 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Thu, 12 Mar 2026 13:53:27 -0400
+X-ME-Sender: <xms:l_2yaSYZNZ0314EhSkKe570DMsnyRYRdmbW6uvc6sWNWuJWECYVzAA>
+    <xme:l_2yaQOtyqLpMwWoMuiZYYqk15x_GjzcMvHcStaAgAfvYTjQzVGdGsEVvbi6zvA2q
+    ynkFNirBpcPwBp_Rt9M1BmMPmXSyLrkksmp78EKUSxGQh4uqI8_ZQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeejgeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefghfeguedtieeiveeugfevtdejfedukeevgfeggfeugfetgfeltdetueelleelteen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepuggrvhhiugdrlhgrihhghhhtrdhlihhnuhigsehgmhgrihhlrdgtohhmpdhrtg
+    hpthhtohepshgvrghnfigrshgtohguihhnghesghhmrghilhdrtghomhdprhgtphhtthho
+    pegrnhgurhhihidrshhhvghvtghhvghnkhhosehinhhtvghlrdgtohhmpdhrtghpthhtoh
+    eprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhn
+    rdgthhdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdprh
+    gtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:l_2yaa7M5UY2SIHAtW0140wNZMjdfqil7NrW9Jf6-I8ZYCndkgLdmg>
+    <xmx:l_2yaQdh8LHO56-ZNQEYF7jGVz9bdWCb1r9XH0shGq0VHPy37AQC6w>
+    <xmx:l_2yad7Sn7JkbtyhruYjO2YqMlA45UrcOyDOxe4br4uxKFn48S9eLw>
+    <xmx:l_2yad89nb4bgEUELIXBL5Ko2xREW5wLvdpkQIDKp4S0a-se1674xw>
+    <xmx:l_2yafGJOzab1iw_2wAgfcvi6_bCBAFqhbAnjn0ct8y06ssRMHcoIEoT>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 00844780070; Thu, 12 Mar 2026 13:53:26 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260312-poise-parade-97e9382718da@spud>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-ThreadId: AhbZdgiYvuX7
+Date: Thu, 12 Mar 2026 13:52:58 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Sean Chang" <seanwascoding@gmail.com>
+Cc: "Andrew Lunn" <andrew@lunn.ch>, "Chuck Lever" <chuck.lever@oracle.com>,
+ "David Laight" <david.laight.linux@gmail.com>,
+ "Anna Schumaker" <anna@kernel.org>,
+ "Andy Shevchenko" <andriy.shevchenko@intel.com>, netdev@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <63721454-ffbe-4725-b2c3-843560a3d5e0@app.fastmail.com>
+In-Reply-To: 
+ <CAAb=EJViPvhD_ndONoU=OPcD_EXpA0Mh8500NJ9g9W_X0SpYRA@mail.gmail.com>
+References: <20260303140725.86260-1-seanwascoding@gmail.com>
+ <de652c45-9492-4bb8-a173-efce703b5174@app.fastmail.com>
+ <CAAb=EJViPvhD_ndONoU=OPcD_EXpA0Mh8500NJ9g9W_X0SpYRA@mail.gmail.com>
+Subject: Re: [PATCH v2] sunrpc: simplify dprintk() macros and cleanup redundant debug
+ guards
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267177-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	XM_UA_NO_VERSION(0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267178-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,intel.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:dkim,microchip.com:email,bby-cbu-swbuild03.eng.microchip.com:mid]
-X-Rspamd-Queue-Id: D2661276CFA
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: CE296276D86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 03:01:39PM +0000, Conor Dooley wrote:
-> On Thu, Mar 12, 2026 at 06:38:55AM -0700, Charles Perry wrote:
-> > Most platforms using GEM in SGMII mode use in-band autonegotiation
-> > because it is on by default in GEM's 1G PCS and is always on since
-> > commit e276e5e40e92 ("net: macb: Disable PCS auto-negotiation for SGMII
-> > fixed-link mode"). Leave it on if possible using the "default_an_inband"
-> > flag of "struct phylink_config" so that platforms that lack in-band
-> > autonegotiation configurability at the PHY do not break with commit
-> > 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled") which
-> > will turn off in-band autoneg for non hot pluggable PHYs.
-> > 
-> > Once the majority of the PHY drivers that support SGMII have the
-> > ->config_inband() callback, this commit could be reverted so that non
-> > hot pluggable PHY use outband negotiation with macb, like its the case
-> > for other MACs.
-> > 
-> > Fixes: 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
-> > Closes: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
-> 
-> Reported-by: Conor Dooley <conor.dooley@microchip.com>
-> 
-> > Tested-by: Conor Dooley <conor@kernel.org>
-> 
-> Just as an FYI, you shouldn't insert tags that "certify" the quality of
-> your patch that you weren't explicitly given. Reported-by/Suggested-by
-> you can conjure up yourself where appropriate, but Tested-by/Acked-by/Reviewed-by
-> need more care.
-> 
 
-Ok, thank you for pointing this out.
 
-> But of course, I did test it, and it restored functionality on both
-> boards that I have here, so:
-> Tested-by: Conor Dooley <conor.dooley@microchip.com>
-> 
+On Thu, Mar 12, 2026, at 11:54 AM, Sean Chang wrote:
+> On Thu, Mar 12, 2026 at 9:20=E2=80=AFPM Chuck Lever <cel@kernel.org> w=
+rote:
+>>
+>> Has a subsystem tree been chosen through which to merge these two pat=
+ches?
+>>
+>
+> Hi Chuck,
+> To make the review and merging process easier across different
+> subsystems, I will
+> send v3 as a 3-patch series:
+> [PATCH v3 1/3] sunrpc: Fix dprintk type mismatch using do-while(0)
+>     include/linux/sunrpc/debug.h
+> [PATCH v3 2/3] nfsd/lockd: Remove redundant debug checks
+>     fs/nfsd/nfsfh.c, fs/lockd/svclock.c
+> [PATCH v3 3/3] sunrpc/xprtrdma: Simplify variable declarations and deb=
+ug checks
+>     net/sunrpc/xprtrdma/svc_rdma_transport.c
 
-Thanks,
-Charles
+I can take all three of those, if that's what you'd like. Just let
+me know when the review is complete.
 
+
+--=20
+Chuck Lever
 
