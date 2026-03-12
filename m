@@ -1,203 +1,202 @@
-Return-Path: <netdev+bounces-267137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oH0/Kr3ismmWQgAAu9opvQ
-	(envelope-from <netdev+bounces-267137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:58:53 +0100
+	id yBnjCPbismmWQgAAu9opvQ
+	(envelope-from <netdev+bounces-267138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:59:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293CE2750D4
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C77F275113
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BFA8314A150
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:53:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88A5D3011F3B
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046E73B6358;
-	Thu, 12 Mar 2026 15:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A973B2FD5;
+	Thu, 12 Mar 2026 15:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="P6jfkVRh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJPPurVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C182BE02A;
-	Thu, 12 Mar 2026 15:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773330813; cv=none; b=isfAZ/e1wsUr9EKAdIijQW+bfWF/GAOurjrukC7vsBBJciL5XKulxL+4VBGKJOH6bS7qw5Ep1PHqm+XW+52+7ZNFPUcoYPgs3VPN/xKnv4PvVgOZVdPM2cmnWgQthajX2uI+ise3sf2EunA07QBDxrX6xIu/GS+r8PkuNSZkIXA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773330813; c=relaxed/simple;
-	bh=PkJcY5jw3a/IMyywYskRQhFWglzwewQyVwQJhJNMB14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uEwStlk8ZgB5bu8LSqakDOgX/qOmA+iY6iZX88eV2sHAlem4qEVZnL+6cCZAvbR8PVpUq/isakLMPxTTTT23XNGU4W6ZF1gaPkn+u+GinJ3m+wNwZuUZ094x7LudMyZCe1RqDphca2exTIKS2QLzcDFnIafWr2Hfrjz27KJ2P+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=P6jfkVRh; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=5pK/vbHjomF7ZCz8kPkvw2tTjUJzJ46B59krQRBArKA=; b=P6jfkVRhJlvjsFD7S+pYuzAuv4
-	MLDDYDxGdAfivMXXxo/ZUVApw1nd+jENAw0Lyqc4uWfI7XnqjHOAqA7ttXYJsxG4TAasEr7BjpDWo
-	aIeA1snKPi45aV1ULkpxeeIBktxDuhCSFmRpLsMt1+ttYrsG44v3EOWhuPyWXdpRzlHxyEOn74GDA
-	Z1CGVzkjGPeaU2YAiJd8rj+ihgYeubYRKoTBEzXo+qEnQBbcOv9+Up7MVLIY/DcZTAGZThMyG8xOO
-	o5W6SO+boLGEUOkS89Aq38o86dricntUVfJsA834gNk6HDFKQEuSPpArtEtoOedubfSWkO9Rzjeky
-	ZIr57Svw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w0iLn-00000001W9W-22gb;
-	Thu, 12 Mar 2026 15:53:27 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 6325030049C; Thu, 12 Mar 2026 16:53:26 +0100 (CET)
-Date: Thu, 12 Mar 2026 16:53:26 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Dmitry Ilvokhin <d@ilvokhin.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-sctp@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, dev@openvswitch.org,
-	Oded Gabbay <ogabbay@kernel.org>, Koby Elbaz <koby.elbaz@intel.com>,
-	dri-devel@lists.freedesktop.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
-	Huang Rui <ray.huang@amd.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Len Brown <lenb@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	linux-pm@vger.kernel.org, MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	linaro-mm-sig@lists.linaro.org, Eddie James <eajames@linux.ibm.com>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Joel Stanley <joel@jms.id.au>, linux-fsi@lists.ozlabs.org,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Philipp Stanner <phasta@kernel.org>,
-	Harry Wentland <harry.wentland@amd.com>,
-	Leo Li <sunpeng.li@amd.com>, amd-gfx@lists.freedesktop.org,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-i2c@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	linux-spi@vger.kernel.org,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/15] tracepoint: Add trace_invoke_##name() API
-Message-ID: <20260312155326.GB1282955@noisy.programming.kicks-ass.net>
-References: <20260312150523.2054552-1-vineeth@bitbyteword.org>
- <20260312150523.2054552-2-vineeth@bitbyteword.org>
- <20260312111255.7925b4e2@gandalf.local.home>
- <CAO7JXPhg-Etspj9YahZrq8cmZ2K6AGWDrMnHO+oD96P_SmOLBw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946243876A2
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773330869; cv=pass; b=sIpHEzbzmc+qqnO6SSYsmMWHa4fUnS0aiOz6eUyGT2f0RPqm8SN5Uj6rlA7D311nD5nR517KyhZ4vuE3/OlhEINFYyLIzfaWtqmlLIeqJRU8z3iIJ4FmvMMhB3R9d0afWEIau+utglRaMxhEiT/a9yVcVvWG7vV+ja/xLkScoHI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773330869; c=relaxed/simple;
+	bh=xRQ9RxoOagC+UbuuVdcPrUoQX/7LiLPSKHq71FYNf3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MVwUoDAcBrUtrGj7MBrPPnBN0716bIduZ0Ao/rsGocLN167j9NE6IJr/Hd8M/4yYsU0UT+X3lgQo1KKv99YQswtApbNe/kPr1JylpuF8i3xNE9qiZ7WjT9b+HKkJTczB25MQZhy1ba/X+3Ip1Xq8auViLDXSsXNPe4VcVYGMKW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJPPurVV; arc=pass smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-94ddba39060so336754241.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 08:54:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773330867; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Ysi8tJoE3SFgLKSs8GhxKXhMgfpUuXH3OvITWrq9tcaK+1hRAnXuukWYlKS9KPIaps
+         K21KHl1VfesTUMT3lXkLfQRTOGVf1NdHBYGKl2o6k5uWX3fd5Z91jFlyJd3TWYEuRFDS
+         NIEshHpmPOzixE1w4fslsWFPa/H4FhH0XK/sUe0+aotiugFoJYKrRElGJ4UuMCCyOmKY
+         Rn8PUbDPzOOr86LJdni0FSTRdLQvBCDVXxypa+y1/+Vx4dz/A78l4b/TqZL/hRhLL2ey
+         Sk748JvpmSgGzjqt9HGnQjIHdmRqmnK0yFzg+KU5/ARJGActccWIPi6/0m3Pa+v+AAIW
+         MhDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+GW9HNl3VoMD61R2LszbWalRUfrPs8bujj+OuPBOZoU=;
+        fh=oJ2HJxdvjlM1WaAYIFA7WnG+knjlX++j1MlbPjBTnek=;
+        b=QVq2EFisRWeH6JpPAWGxTpkmlbslSoXadHK4SzNXiX3KJbkqjXPuFrkAKBgXZcvzuM
+         6UAdk4X/d49xzFhd8Skz/W9tNS81jZlCkP8dNg9tpujw+AAWt7aJgMJRnajL9ZY7lcKP
+         oVhCK92hosuBAE0kpAppA5qD1zUUfDxlEQMM0zVzdZd+uDpOLdIHUIFWQg7ra2U8iSM5
+         9+fAeHEom5SL2niSYhHE/j3dBNV0k7mwd+Pne5huKxUd0VBRqIxCkxlk7448b2kJply0
+         Ein4BmYTOK9VG7HzjlIwKYQTZNSNV2agsIIVr57x2Nxuz70o9RyQY9iHWar/lsmZwFfm
+         U8Pg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773330867; x=1773935667; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+GW9HNl3VoMD61R2LszbWalRUfrPs8bujj+OuPBOZoU=;
+        b=DJPPurVV7GBCz9ALGvZiMM0n6gdQYMG/scLWMQOLjucK20KunPCgWJowDrXWi+i8Xi
+         ZKZa0B1tizfDKNqgDJjGNYkpTHXht7X54wTiKeidfabYIxsO4EWctCSdEiwK3KpJ9kuI
+         +/sgGlhjBP29+2LGAyISmYx5BNLAcjsyaI92J13KSWf6yPEfL7XDzOLyrGPOLurUWFI+
+         G9KJmtjp10EiMzbtK0EImVi904chB2+LVIDYWFVbOP+Qpv64A0s3E7IU9GI3TlYpqF3t
+         Kx6eUye1H4F+VdqdUtp7F4/5fx6t9mRUs7djPg4XTLYYruHzbJmRe0Xz13UZJSVuJCVt
+         FRFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773330867; x=1773935667;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+GW9HNl3VoMD61R2LszbWalRUfrPs8bujj+OuPBOZoU=;
+        b=kZI0GW84lL1uMrFh6M5455awTgn/WNpA7+Du0r0t2c41Lmt37C7pwGNr63JsrRRCME
+         ykGwl/zGMTm09qwe26PQaH7K/AN9MqO5PXAQvXXgjgq9jaf/OH1prHVioaS8UgzYg7TG
+         I1DftTyjmGHxc9cyo7/oUkK8AEct7d6sIzuz/9AxKCNJ53yiQ/qN+Dosa6bz4n6PyruG
+         uZ6DdKb8h/k3EEzNMep/ujKJtbYaft/9/zhvufAErC8Eb7e8i7S80/Ho1M+F0BEgo4dP
+         9+a65vYCCuY8INPHEJXT21rMgLony7bnyhH4Xr0YuqKgCtnEY59AoamKmfubxtWZTpyk
+         3zkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHw6kp4gLK6BDrXj9wxLpd+Hwj8Q7KxapMSdl8ulyt/5zsn2Rv2moutlljj9gu0AvRlc0T31w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLpecmFhoP8/UzJkc0jeX0vmecCLsbQdenZSmiNXh9AtID+EZ+
+	EUMRlPrA6EkB7ugb1wGrFjq2HFmRVLqbdn0RT1v66oo/vG3Y28+qQqpPw85bAean0LyqFs/5Rbe
+	+Fmnp2k6NHhZYUQLQDG0uIr0Y+z/RllU=
+X-Gm-Gg: ATEYQzyHcNhE2ef60oRPs+5xes3jplsZoJz5bo+kqRPX9hpoflu03K6XkTrOINS0QB9
+	jyfD1Gr3SQhfUIS4zCQpSXxY00xeW5GjafHh6tC8aTThIAMVNaDPgxQGKNXeAvfFwoZ7kgJoPOn
+	q/Oe6c4v5K0Xql+BGwvHW6FlPDVi9SD3qJaWe7D3eJMfGDPBm+2vDQEFZeeH5drKom304leGmO+
+	ypRiNriI8Rx6d2WI6034UPJd2zijJWDyp4foYqr8jmZcZaZVMBGbbaDx1a8Q7fboCZA6Zskh9RA
+	ajOSiuov
+X-Received: by 2002:a05:6102:1613:b0:5f8:e323:580d with SMTP id
+ ada2fe7eead31-601deb4d094mr2688557137.11.1773330867550; Thu, 12 Mar 2026
+ 08:54:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAO7JXPhg-Etspj9YahZrq8cmZ2K6AGWDrMnHO+oD96P_SmOLBw@mail.gmail.com>
+References: <20260303140725.86260-1-seanwascoding@gmail.com> <de652c45-9492-4bb8-a173-efce703b5174@app.fastmail.com>
+In-Reply-To: <de652c45-9492-4bb8-a173-efce703b5174@app.fastmail.com>
+From: Sean Chang <seanwascoding@gmail.com>
+Date: Thu, 12 Mar 2026 23:54:15 +0800
+X-Gm-Features: AaiRm530wpXoEJ0RfVzssU0-NmTo0KDz_Aq8_bT83Nj0JX-oY45ok05huyGafjM
+Message-ID: <CAAb=EJViPvhD_ndONoU=OPcD_EXpA0Mh8500NJ9g9W_X0SpYRA@mail.gmail.com>
+Subject: Re: [PATCH v2] sunrpc: simplify dprintk() macros and cleanup
+ redundant debug guards
+To: Chuck Lever <cel@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Chuck Lever <chuck.lever@oracle.com>, 
+	David Laight <david.laight.linux@gmail.com>, Anna Schumaker <anna@kernel.org>, 
+	Andy Shevchenko <andriy.shevchenko@intel.com>, netdev@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[goodmis.org,ilvokhin.com,kernel.org,efficios.com,redhat.com,kernel.dk,vger.kernel.org,davemloft.net,google.com,iogearbox.net,gmail.com,ovn.org,lists.sourceforge.net,openvswitch.org,intel.com,lists.freedesktop.org,linaro.org,amd.com,linux.intel.com,samsung.com,lists.linaro.org,linux.ibm.com,codeconstruct.com.au,jms.id.au,lists.ozlabs.org,ffwll.ch,sang-engineering.com,analog.com,hansenpartnership.com,oracle.com,fb.com,suse.com];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267137-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267138-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,intel.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[72];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:dkim,infradead.org:email,noisy.programming.kicks-ass.net:mid,goodmis.org:email,bitbyteword.org:email]
-X-Rspamd-Queue-Id: 293CE2750D4
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 7C77F275113
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 11:39:06AM -0400, Vineeth Remanan Pillai wrote:
-> On Thu, Mar 12, 2026 at 11:13 AM Steven Rostedt <rostedt@goodmis.org> wrote:
+On Thu, Mar 12, 2026 at 5:47=E2=80=AFAM Andy Shevchenko
+<andriy.shevchenko@intel.com> wrote:
+>
+> On Tue, Mar 03, 2026 at 10:07:25PM +0800, Sean Chang wrote:
+> > Following David Laight's suggestion, simplify the macro definitions by
+> > removing the unnecessary 'fmt' argument and using no_printk(__VA_ARGS__=
+)
+> > directly.
 > >
-> > On Thu, 12 Mar 2026 11:04:56 -0400
-> > "Vineeth Pillai (Google)" <vineeth@bitbyteword.org> wrote:
-> >
-> > > Add trace_invoke_##name() as a companion to trace_##name().  When a
-> > > caller already guards a tracepoint with an explicit enabled check:
-> > >
-> > >   if (trace_foo_enabled() && cond)
-> > >       trace_foo(args);
-> > >
-> > > trace_foo() internally repeats the static_branch_unlikely() test, which
-> > > the compiler cannot fold since static branches are patched binary
-> > > instructions.  This results in two static-branch evaluations for every
-> > > guarded call site.
-> > >
-> > > trace_invoke_##name() calls __do_trace_##name() directly, skipping the
-> > > redundant static-branch re-check.  This avoids leaking the internal
-> > > __do_trace_##name() symbol into call sites while still eliminating the
-> > > double evaluation:
-> > >
-> > >   if (trace_foo_enabled() && cond)
-> > >       trace_invoke_foo(args);   /* calls __do_trace_foo() directly */
-> > >
-> > > Three locations are updated:
-> > > - __DECLARE_TRACE: invoke form omits static_branch_unlikely, retains
-> > >   the LOCKDEP RCU-watching assertion.
-> > > - __DECLARE_TRACE_SYSCALL: same, plus retains might_fault().
-> > > - !TRACEPOINTS_ENABLED stub: empty no-op so callers compile cleanly
-> > >   when tracepoints are compiled out.
-> > >
-> > > Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-> > > Suggested-by: Peter Zijlstra <peterz@infradead.org>
-> > > Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
-> > > Assisted-by: Claude:claude-sonnet-4-6
-> >
-> > I'm guessing Claude helped with the other patches. Did it really help with this one?
-> >
-> 
-> Claude wrote and build tested the whole series based on my guidance
-> and prompt :-). I verified the series before sending it out, but
-> claude did the initial work.
+> > Verification with .lst files under -O2 confirms that the compiler
+> > successfully performs "dead code elimination". Even when variables
+> > (like char buf[] in nfsfh.c) or static helper functions (like
+> > nlmdbg_cookie2a() in svclock.c) are declared without #ifdef, they are
+> > completely optimized out (no stack allocation, no symbol references in
+> > the final executable) as they are only referenced within no_printk().
+>
+> Does this patch fixes also 202603110038.P6d14oxa-lkp@intel.com?
+>
 
-That seems like an unreasonable waste of energy. You could've had claude
-write a Coccinelle script for you and saved a ton of tokens.
+Hi Andy,
+Regarding the LKP report:
+I have reproduced the Sparse warning (void vs int mismatch) locally.
+To resolve this, I'll use the do-while(0) form in v3 to ensure the macro
+always evaluates to void:
+-# define dfprintk(fac, ...)            no_printk(__VA_ARGS__)
+-# define dfprintk_rcu(fac, ...)        no_printk(__VA_ARGS__)
++# define dfprintk(fac, ...)            do { no_printk(__VA_ARGS__); } whil=
+e (0)
++# define dfprintk_rcu(fac, ...)        do { no_printk(__VA_ARGS__); } whil=
+e (0)
+
+
+On Thu, Mar 12, 2026 at 9:20=E2=80=AFPM Chuck Lever <cel@kernel.org> wrote:
+>
+> Has a subsystem tree been chosen through which to merge these two patches=
+?
+>
+
+Hi Chuck,
+To make the review and merging process easier across different
+subsystems, I will
+send v3 as a 3-patch series:
+[PATCH v3 1/3] sunrpc: Fix dprintk type mismatch using do-while(0)
+    include/linux/sunrpc/debug.h
+[PATCH v3 2/3] nfsd/lockd: Remove redundant debug checks
+    fs/nfsd/nfsfh.c, fs/lockd/svclock.c
+[PATCH v3 3/3] sunrpc/xprtrdma: Simplify variable declarations and debug ch=
+ecks
+    net/sunrpc/xprtrdma/svc_rdma_transport.c
+
+Best Regards,
+Sean
 
