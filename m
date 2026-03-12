@@ -1,158 +1,154 @@
-Return-Path: <netdev+bounces-267214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHayOaM0s2ntSwAAu9opvQ
-	(envelope-from <netdev+bounces-267214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:48:19 +0100
+	id 0LRVL8c+s2k/TgAAu9opvQ
+	(envelope-from <netdev+bounces-267215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:31:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EA827A448
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:48:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF5A27AEA8
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 23:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17D5132118E3
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 21:45:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C9E13060B17
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 22:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B073F8DE9;
-	Thu, 12 Mar 2026 21:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C68D2E11D2;
+	Thu, 12 Mar 2026 22:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="P1U8+WnR"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="DdDsoHbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B34C3F0A9D
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 21:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129A13FF1
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 22:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773351902; cv=pass; b=J8fQzQJrP9tb4Qar3gaQP21arrpUb+wcOhu5324KzUHo9TNIzfe6tTAf1qWxhL9PfsYDK1otilDZDQcooXOWcdIbFn11a2vk6f7Yk68qDtkcasPpJeLJDJZZRtqBGqsZMYDzl2WcFcDjMPJQDzMHwrllVn7/K4rxOcdyag7ZdTg=
+	t=1773354681; cv=pass; b=JVzqFBuiuAyMyIVzybLmrCpYG+SOXkkvRFkvGDe3Jf/+FpxDC/WgrIgbapW6ITJ8uK1gmOCfvY+CawKuiWxDQ0ojX2TFCnBpxKfq7yDq3IQutvrfi3cpXKy7GBkYUeImadHA56573zuz9UMy6wTCd4JG63AVq5HhU2cHug9X4Ro=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773351902; c=relaxed/simple;
-	bh=VudM6nzCZVkA9277WVscwWUtl1xQAIgu3m2h8apEcxk=;
+	s=arc-20240116; t=1773354681; c=relaxed/simple;
+	bh=jIysDDa+z2vnCpZjDOfTgI4RhgB7fGnohz/dtG6w9Qs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ozp37fAfT02JaGkSg/ebF4g3Wo/vjEyyWEsJHqnXe3gljnPS+oZ9+My+0ogSp+XvFLBHELUYkt0ieD2CCg2vGvJHmY2rDMkwLv/gY8HU//w0GGwrnHFpfHr4cP4SjzRMLvxoHYYf+J4JdEGXG0wAWcqFSBB/KoyvDuB2or8unqc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=P1U8+WnR; arc=pass smtp.client-ip=209.85.167.41
+	 To:Cc:Content-Type; b=FxoZJ+b1LTXbyp3uaQhV+Se8Ityflmc7hHy4mtjRjTWu/YZq2du4vqpxnIjaz7sOYuKklWs7yHNBZT4M2bTQksMJwUEFdI5jZ9E0pkpiiXdy3L8mAFBwZxYcIvVnmSDpyGM/yNI/GPGYeGsWGYWxI29a9nSVavokngNcaqkCoec=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=DdDsoHbQ; arc=pass smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a0faa0d15cso1564986e87.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 14:45:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773351898; cv=none;
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5a142464316so2093702e87.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 15:31:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773354678; cv=none;
         d=google.com; s=arc-20240605;
-        b=Xw86DxdEjwDvNFJfsOzd4mh2LB8j5+fRQC6S6Zo7Y+WMIJUIU+WXyvtdIWxodBHLo8
-         6RwvWo7bIgMxOTnAPD+iDqCJGx4bYD45aQRGO00YKEPa23DFYaDd/4pwixsOgJJExbx+
-         DlSAh3haW5uB8s2RWM66g2PirDQjymj90aCIuLJFUA73ko2HX6vrw/cOpvrNCEMK1cV2
-         HACaS2w34zL3VT7zn6Enop1+KW6d5LjKhm3bLEr5+273U8DcEE92TuxQ+KvbrxIZMfcK
-         A1wkyvCGLzAOhQoQXIf7Wrv2swrvh8ptsvruWOzVKIDLn0GLhtCeRyBa0LiLbLsXUxKA
-         7tWg==
+        b=DCVwE5ugWP8AT4WEROnY9lYf0pBFWaOZXcnZ40E+yx1Rx5ttrrGVMtC98niZJhzXux
+         CL/l/iyx8lnMTz8TWhr1jcOjMCjmb1QnTPZ0vY5WGnL2RhfeFRdLsCarC8BdpnSbYQsR
+         8faSvxS8k+Rqxk2ilq8cuLUgniU7TxiP5WJlA5B/aNpgAD5H5na6rlTsTkwuuEQRgMxl
+         Hmzx/U+VutgYV/zqHHkKCLIt8SssXowSEstNDGYzaVrckDPxV2xhq1E5NaJHCfPka29c
+         kq/jHae92zcfaOklpEPDz6El7RBrWo9p++EUfm1fwVUDwIrBFf3vTqb46h+7DP3aZ551
+         yN+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
-        fh=78xIFwhwKjq+LFwbtnzKiur98HclKzI03ef+1sbu1HI=;
-        b=eilyih2c8mwt1e1fyM5bs358nuX7rdptqzaKmaztDMSXsRmna4pIMhIKC8v+SqSSH9
-         b1Gy5+BJTqmEGuEmRXNLE5TABoiuAGnmYV08aahPy5NE7kye3FFabos+WGxJS6iplgoh
-         nskks8jYM8m0vsx4j8DNUrVQ/fm+i0Ywpfuqz+XufsB9G6HrICAD7UEL2ISgm0OGVsZ+
-         zdcxepyfrA/ePKt4UtiFQaA8GUAXBjvTCtUpcAI7kORRIVTuIyPKdlj/gptWOgdwpooz
-         ItqngzeJA0taakEGWLUJ1eAOoL+RBRy9FVRgaIpPLKzlEcWuev2j6WS2qxWl4A/37AQq
-         g8UQ==;
+        bh=MpQacvF+mAyXs6pqu3/eg9OImF2i4oKZdu4qdPo1RFg=;
+        fh=q0q1LVsW8KZ2S2nG+Sea99yxc8SYnmwKK3DHkvnAhBw=;
+        b=BwwS9YvjqIQ5WhdmhFQGRw3SafUlF08QxZC0ZURnr8vvl31JCCiTLXxFei+9F64wGV
+         47x7P72yCoeea3odxgTx1HMOtCjX1NYfBADDj0LpGnImue3DpCkapoDSadhRVuGPV3l1
+         QpxYzwTe/anMRZTX97bU00UXCaLp907TWZPM50s1I9f3AsflzCuRzZPXmbt00hA2DT2F
+         3N/ZNhP4l4DPEpOtB5QKrFOkM71gtyNzJRGv+Be7S1u8LRpK4X20BGd6VQN+QAq7PJzr
+         hjSYXPFEI9/xEoNJ7V/s60/tOPFRYB77UQSb/uiAeCVXhh/6UfqYzBXAqM+x8IdYVC1g
+         Addg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1773351898; x=1773956698; darn=vger.kernel.org;
+        d=arista.com; s=google; t=1773354678; x=1773959478; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
-        b=P1U8+WnR1Lxln/UwJwc8ebgTjoABiPgnTSelTRWOxp1XWROJwkYsd/Rt1spe3UkyvU
-         aXXwCzrLM8uNc3VNLHKn8RC0MhQBW8+9aQnQplWSsYG9S5cs4H+6pmoYj0FFB2zlkm82
-         I6klhGgtdfGe+BD1ssrolYw0vvNsJVF183w+mExZ+N6oJ9WYbpvpkAkj8QgoaYTdke7W
-         VnVPd++/gk5rhpvgHTjo3oFsozsN2SjQ9kGTSJSYk+hERnR3hdGMXDVyOBq8DjFeew81
-         56Qfhf4fW2bz7KKGB1i/OUKLxpcczJRq1bNYM3AONlHtQvtSnTCVjj6LnKyexXbkfmpC
-         JvVQ==
+        bh=MpQacvF+mAyXs6pqu3/eg9OImF2i4oKZdu4qdPo1RFg=;
+        b=DdDsoHbQQpbbpq/aniI/yWh5R3J55sdzc7y2esgxiVMBisQV0mmbw7J4xD/vbx6mnA
+         vZ8MpbdMgXHHlRXWTxBxL7+mrlGy7fqAIHEgqzgT3obuSy3vgGwsV0KKK6MeP3QFBQqX
+         0ZPWU0FcDSs+SmnsWSVO1OISQfSdr4cJpvqEpszw+AtoZzw4bgqphM23E01clD8k7vFU
+         QKRcIakSsMXB10ZpuLVugLShLtv/MSWXphLe7Kr2qvBL67NWdaYqLkPXM7ipPB96f8QW
+         Lg2NHqumobwW9ZnPfCupHFpLNIb6ABk2sFwbLhNEImG8FSNaL6R6vv0XnAn+HiIFK9Hd
+         netw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773351898; x=1773956698;
+        d=1e100.net; s=20251104; t=1773354678; x=1773959478;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HfH7lKknQyQNOSVHyMK46+bKOSN4FbobYHp2cMfhjyE=;
-        b=WsZJbrINzUQPBlQ54Oa7PaBeSdc3aXIaqkwDtgAphw0OpV1gynmflFRVJOIxR2X5Sg
-         3GEspT+RmmfKFuqvMf0J23HGfbAEmOfXGePQBxEf0wS+yquJtfQUS8vQIwmSXaNYQJMF
-         L0NOvxpgAnwdttIlahpfkr5qv6C0tXxMnzb5oY8hzMgO5ZOgDDI4A1MdypOYb5LfkzFx
-         k3GTauEtcup554mTVAGxwQkjXlurABDjdAuJSFYH+8CUKlp2u/hjKE1ObPFwqnjZEMez
-         eTkTKTQQuQ8B+zdWTWjH8yByu6YPbhbmr6oVkqPjjyV4QCsIv56hvHQd2vBygf8cLVno
-         A+nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3y9hN40KFFXjl7sZw1kongj0muxgVI3z4R/8Fe8M0X7LHPqJLenQJENZcA7jeWHLhLlcd1Kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGb72dSrH1aktgD/PO9uW0VDfsjHCpHVyDxDy8CtUzagqYkT/o
-	aAoBiYUOY80+GUP8pFCavRw86egB1bz5m7TGlgpgySCYoBM/CpyR01mcSVfGU3cBXs+JyXQQ49Y
-	YZ6ou3AVX4sPGZdkjQud4I5bVOgHY1+nTMqHKQofh
-X-Gm-Gg: ATEYQzwwcANW6YtGBXbJfEIDam8xtXFyBFqS5iQLhK0+oil+hLBFQPG416m0etdjvGa
-	5zAZ1rjKVxq46LGSmtDnyQPUa+0WjnVveWbh5teiBJfTYTG1x1ebKx+D6OK0BIyDMdTzSmaXl/i
-	pzinMATYWNmS0DSd6csY8Qm3w5wW48SZ1qc2iSPxbWJIJVziCKy74EQ5fb7TvdtA2UHck6PzntX
-	HKj4RT3E5cz0WvmRqRtWtXpIZNIHRFwrKfk/i6LMh0QFkqW80AVHlYJcPKHmwUEC92vusmKqvN9
-	GCvpxg==
-X-Received: by 2002:a05:6512:254d:b0:5a1:45a2:2177 with SMTP id
- 2adb3069b0e04-5a162b2af9emr230055e87.44.1773351898274; Thu, 12 Mar 2026
- 14:44:58 -0700 (PDT)
+        bh=MpQacvF+mAyXs6pqu3/eg9OImF2i4oKZdu4qdPo1RFg=;
+        b=dJlE2fYhZCoDearmEgcP2vu2Bwb8yXdGQFFkTQ0np/Hf0h0DicVlwVDhVcWWJHdvKs
+         rqe9qseLaDYnv0cwRdpLceJAWJmQT34S+Os+kxbPFFT0BsjYrA+qFkChqtFxX3f4189p
+         Ic4/dGRnnLMtL3xLM8BgadT4fi87pAxXX07oIMi5FdyxBr4ZEuloeTnesOd/Tg3pG/cf
+         eitXAVhOe9VwjjCmJF1yGa1j47drB8IeYlV5w4ynRVwGUMtcSvWZf08oDJsd1GCGZQDk
+         JTwwYSPHalkbC6wh4R1Lu6yQ89D1r41Tx2Qwqo3zG/bPhfuOLfmIiwXxEF8mmixFQZ+N
+         s9qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ5Go98EGpHOhMwLj+RlxYzeBwDXxGiQzSxMOLatScaLYRzQ5WuNjhgU3I2VX5U6fSp3JJOGw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4Ku6FYD9SgmD/1ENsI6xqobhRT/qwzH6d4RTVwB/Naa//GbM6
+	kG0wp4LClyUcaIN3OsojIMxAOfH3WFuXYiD4T9xOkSqyQ0xWX8wpJ0mtKRgEHcpBBsGpnCXpURL
+	PitTxtzUkj2Bn3T8IUfdSHYcRDG6/sSUSjItkl4on
+X-Gm-Gg: ATEYQzwq25fFqpj5CCWr7J8zgFv8KlLWMvvR5Sud1Bdl2WwgWDb402TxBY0oGF8Qtkc
+	i1SDcl6TiDGyQz58+nRZECCPRvgOSQAuIhjCiaFde/6QGD326JDfoTuDW+DuCPE+r042Kz8BgSR
+	AgfL6pYwDjLItY03ukyQyPOg8grQX1rxhAaOp8eIM5R2UMdSW76pQaA9OtBreNVhBuJVrpJuwdT
+	MzWuzucjqLJrgArGMaMOGVCT+u3A+u+Vnb6ME2lwCV+1nGgRN+fjM32xkMZBS3MsrmIiE0STg1n
+	SFFabg==
+X-Received: by 2002:a05:6512:3b99:b0:5a1:36ac:2ca9 with SMTP id
+ 2adb3069b0e04-5a162b2fd47mr388247e87.49.1773354678175; Thu, 12 Mar 2026
+ 15:31:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260311194058.13860-1-panchamukhi@arista.com> <09e1535f-59fe-41eb-91ed-2aeb97957bfc@suse.de>
-In-Reply-To: <09e1535f-59fe-41eb-91ed-2aeb97957bfc@suse.de>
+References: <20260311194058.13860-1-panchamukhi@arista.com> <abKzWIhVz_SeiSOa@strlen.de>
+In-Reply-To: <abKzWIhVz_SeiSOa@strlen.de>
 From: Prasanna Panchamukhi <panchamukhi@arista.com>
-Date: Thu, 12 Mar 2026 14:44:46 -0700
-X-Gm-Features: AaiRm51hQ3Exo0jf6qTinlBXpNuOgadUGx__Nada8LeERG7UHXRQpfwz9Fpg_no
-Message-ID: <CACqWiXCufBst=oga885BjD2Dr3FSaEK-WcJCSC8kjL48BBABvQ@mail.gmail.com>
+Date: Thu, 12 Mar 2026 15:31:06 -0700
+X-Gm-Features: AaiRm51ZlKY4h04uIgBgBAaeWon8_os3iwnwKSpFi3tkPhPpb-qpMihKuCf8Q-8
+Message-ID: <CACqWiXD2_O32K4NhmNBZrAUG7U9-N93LTFjJHG6Tq=4vuafNuA@mail.gmail.com>
 Subject: Re: [PATCH net-next] netfilter: conntrack: expose gc_scan_interval_max
  via sysctl
-To: Fernando Fernandez Mancera <fmancera@suse.de>
+To: Florian Westphal <fw@strlen.de>
 Cc: netfilter-devel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
 	Shuah Khan <skhan@linuxfoundation.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	coreteam@netfilter.org
+	Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, coreteam@netfilter.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[arista.com,reject];
 	R_DKIM_ALLOW(-0.20)[arista.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267215-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[panchamukhi@arista.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267214-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[arista.com:+]
-X-Rspamd-Queue-Id: 69EA827A448
+	DKIM_TRACE(0.00)[arista.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DEF5A27AEA8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Fernando,
-
-Thank you for the quick review.
-
-On Thu, Mar 12, 2026 at 5:15=E2=80=AFAM Fernando Fernandez Mancera
-<fmancera@suse.de> wrote:
+On Thu, Mar 12, 2026 at 5:36=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
 >
-> On 3/11/26 8:40 PM, Prasanna S Panchamukhi wrote:
+> Prasanna S Panchamukhi <panchamukhi@arista.com> wrote:
 > > The conntrack garbage collection worker uses an adaptive algorithm that
 > > adjusts the scan interval based on the average timeout of tracked
 > > entries.  The upper bound of this interval is hardcoded as
@@ -164,146 +160,28 @@ On Thu, Mar 12, 2026 at 5:15=E2=80=AFAM Fernando Fernandez Mancera
 > > to preserve existing behavior.  The sysctl is global and read-only in
 > > non-init network namespaces, consistent with nf_conntrack_max and
 > > nf_conntrack_buckets.
-> >
-> > In environments where long-lived offloaded flows dominate the table,
-> > the adaptive average drifts toward the maximum, delaying cleanup
-> > of short-lived expired entries such as those in TCP CLOSE state
-> > (10s timeout). Adding sysctl to set the maximum GC scan helps to
-> > tune according to the evironment.
-> >
-> > Signed-off-by: Prasanna S Panchamukhi <panchamukhi@arista.com>
-> [...]
-> > ---
-> >   Documentation/networking/nf_conntrack-sysctl.rst | 11 +++++++++++
-> >   include/net/netfilter/nf_conntrack.h             |  1 +
-> >   net/netfilter/nf_conntrack_core.c                |  9 ++++++---
-> >   net/netfilter/nf_conntrack_standalone.c          | 10 ++++++++++
-> >   4 files changed, 28 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documen=
-tation/networking/nf_conntrack-sysctl.rst
-> > index 35f889259fcd..c848eef9bc4f 100644
-> > --- a/Documentation/networking/nf_conntrack-sysctl.rst
-> > +++ b/Documentation/networking/nf_conntrack-sysctl.rst
-> > @@ -64,6 +64,17 @@ nf_conntrack_frag6_timeout - INTEGER (seconds)
-> >
-> >       Time to keep an IPv6 fragment in memory.
-> >
-> > +nf_conntrack_gc_scan_interval_max - INTEGER (seconds)
-> > +     default 60
-> > +
-> > +     Maximum interval between garbage collection scans of the connecti=
-on
-> > +     tracking table. The GC worker uses an adaptive algorithm that adj=
-usts
-> > +     the scan interval based on average entry timeouts; this parameter=
- caps
-> > +     the upper bound. Lower values cause expired entries (e.g. connect=
-ions
-> > +     in CLOSE state) to be cleaned up faster, at the cost of slightly =
-more
-> > +     CPU usage. Minimum value is 1.
-> > +     This sysctl is only writeable in the initial net namespace.
-> > +
 >
-> I think it would be a good idea to add under which situations it is good
-> to tweak this setting.
-
-
-Done.
-
+> This was proposed before, see:
 >
+> https://lore.kernel.org/netfilter-devel/aO-id5W6Tr7frdHN@strlen.de/
+> https://lore.kernel.org/netfilter-devel/aRsuU57juCvsMBKE@strlen.de/
 >
-> >   nf_conntrack_generic_timeout - INTEGER (seconds)
-> >       default 600
-> >
-> > diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilt=
-er/nf_conntrack.h
-> > index bc42dd0e10e6..0449577f322e 100644
-> > --- a/include/net/netfilter/nf_conntrack.h
-> > +++ b/include/net/netfilter/nf_conntrack.h
-> > @@ -331,6 +331,7 @@ extern struct hlist_nulls_head *nf_conntrack_hash;
-> >   extern unsigned int nf_conntrack_htable_size;
-> >   extern seqcount_spinlock_t nf_conntrack_generation;
-> >   extern unsigned int nf_conntrack_max;
-> > +extern unsigned int nf_conntrack_gc_scan_interval_max;
-> >
+> I did not hear back wrt. the horizon cache.
 >
-> Could it be just int? so there is no need to cast it to s32 later?
+> I'm not 100% opposed to this, but I do wonder if we really can't do
+> better than the current avg strategy.
 
+Hi Florian,
 
+Our primary goal is to cap the maximum time taken by the GC to clean
+up expired entries. We rely on user-space notifications to clean up
+these entries from the hardware, so ensuring a predictable upper bound
+is important for our use case.
 
-Regarding the data type, I encountered the following compilation error
-when trying to address the signedness:
+Regarding the adaptive strategy, we are using this sysctl to address
+environments where the current average-based calculation delays the
+cleanup of short-lived entries.
 
-"../../net/netfilter/nf_conntrack_core.c: In function 'gc_worker':
-../../include/linux/compiler_types.h:548:45: error: call to
-'__compiletime_assert_1027' declared with attribute error:
-clamp(next_run, (1ul * 250), gc_scan_max) signedness error"
-
-
->
-> >   /* must be called with rcu read lock held */
-> >   static inline void
-> > diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_connt=
-rack_core.c
-> > index 27ce5fda8993..54949246f329 100644
-> > --- a/net/netfilter/nf_conntrack_core.c
-> > +++ b/net/netfilter/nf_conntrack_core.c
-> > @@ -91,7 +91,7 @@ static DEFINE_MUTEX(nf_conntrack_mutex);
-> >    * allowing non-idle machines to wakeup more often when needed.
-> >    */
-> >   #define GC_SCAN_INITIAL_COUNT       100
-> > -#define GC_SCAN_INTERVAL_INIT        GC_SCAN_INTERVAL_MAX
-> > +#define GC_SCAN_INTERVAL_INIT        nf_conntrack_gc_scan_interval_max
-> >
-> >   #define GC_SCAN_MAX_DURATION        msecs_to_jiffies(10)
-> >   #define GC_SCAN_EXPIRED_MAX (64000u / HZ)
-> > @@ -204,6 +204,9 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
-> >
-> >   unsigned int nf_conntrack_max __read_mostly;
-> >   EXPORT_SYMBOL_GPL(nf_conntrack_max);
-> > +
-> > +unsigned int nf_conntrack_gc_scan_interval_max __read_mostly =3D GC_SC=
-AN_INTERVAL_MAX;
-> > +
-> >   seqcount_spinlock_t nf_conntrack_generation __read_mostly;
-> >   static siphash_aligned_key_t nf_conntrack_hash_rnd;
-> >
-> > @@ -1568,7 +1571,7 @@ static void gc_worker(struct work_struct *work)
-> >                               delta_time =3D nfct_time_stamp - gc_work-=
->start_time;
-> >
-> >                               /* re-sched immediately if total cycle ti=
-me is exceeded */
-> > -                             next_run =3D delta_time < (s32)GC_SCAN_IN=
-TERVAL_MAX;
-> > +                             next_run =3D delta_time < (s32)nf_conntra=
-ck_gc_scan_interval_max;
-> >                               goto early_exit;
-> >                       }
-> >
->
-> READ_ONCE() is required IMHO as it can be modified from sysctl concurrent=
-ly.
-Done.
->
-> > @@ -1630,7 +1633,7 @@ static void gc_worker(struct work_struct *work)
-> >
-> >       gc_work->next_bucket =3D 0;
-> >
-> > -     next_run =3D clamp(next_run, GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERV=
-AL_MAX);
-> > +     next_run =3D clamp(next_run, GC_SCAN_INTERVAL_MIN, nf_conntrack_g=
-c_scan_interval_max);
-> >
->
-> Likewise here, READ_ONCE() recommended..
-
-Done. I have also added a local variable gc_scan_max to avoid multiple
-load instructions since it is referenced twice in the code.
-
->
-> Thanks,
-> Fernando.
+Thanks,
+Prasanna
 
