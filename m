@@ -1,169 +1,264 @@
-Return-Path: <netdev+bounces-267013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fukEO5eWsmmKNwAAu9opvQ
-	(envelope-from <netdev+bounces-267013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:33:59 +0100
+	id iLzNKTmXsmmKNwAAu9opvQ
+	(envelope-from <netdev+bounces-267014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:36:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5842705B6
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:33:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE3F27062D
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C3150302290B
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:33:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3532B3059AAD
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536333B27FC;
-	Thu, 12 Mar 2026 10:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A323BC688;
+	Thu, 12 Mar 2026 10:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfneSRB7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qVcGTJtv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xp0hcXsa";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKZbzCrh"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E4635A3A5
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8C13BAD8D
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 10:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773311631; cv=none; b=k+WE5LTYr89tcRb16B0nRvIjDy+xzW5y8wDvnF2SjZ/tF+Dzy3mkIputMWpXMurKNZrdauuYf0SmnSP7oU5dB7VgCHOP5MJAyQRghwLrPfXHrQ+ujXD71vTX7lBbs2uuB7YkJeVzQxX6kTnz1ugN0WcgBqr0Ys2CP68X9Isu9Sk=
+	t=1773311789; cv=none; b=s9wgYNpq8UJvI7uHPLCLjSjwAsHYBV5bg87gBspds7SRzOqeyqOCDhmBweZVoegKWcs2QGGvhEMYhhfvCcrKcTa9qHUFFSYryXEm0NpaYHIMfcdjAYNdlyXfmHzNLjptl8I1tEGta4etXWEmYDkFh6HHOENDMh2m8gfNDfNTvik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773311631; c=relaxed/simple;
-	bh=I92Dgb/jB1AYYveHEWh3vlctk8GDWQslLfVS20ovFMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FjBKKDjldVy9ZKzO2oNjUkAuiagcOuHmVDAXQhKJQcHALYM3VXbQwT+fps11xWlqfuShN4RpZH2zVk8FdTYNc6TS3IFvKK4Rr+1xtYD9EmcNN7/0U+IEBpBGMuJRwsE7PcUMHJWp9CBQSjUc/vXC12KtDCvg17ewrlyvm+MzwFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GfneSRB7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qVcGTJtv; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1773311789; c=relaxed/simple;
+	bh=U4scEkwLlZ0VuAmkLypf9F9edX/OF61hxlh8178UWxY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V+H9ce6uk/RwJf+/PruZHuPyZ2or7bIqqdJRMYpsDl/we7ObLs81zslL/tzBPPV/chHaNqiApMY2l/EmZWhlQ3ZEDtUXk1HPtoBwq8pmT0wpYofJscyu1l2JfWxfJJAVhPUagN/4yPRC0HhnnoO7eErL1/j1fzbkXBUF37l/W8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xp0hcXsa; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKZbzCrh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773311629;
+	s=mimecast20190719; t=1773311786;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uJdYNZn0cGEQz1MWLeFDFxPGUmz2ObZieG8rujhYFsA=;
-	b=GfneSRB7GPnm5+gKGJY5juQpMrgxKeTz8G77FhlnBw1Kgezz3wELtGPM1IJLEUFz8aWg3a
-	1GFadKOQR14bigLMS3Q+32WKaLZg7imAt6SDrbzzrfD0pGw9uml5ZynHOKNJjyyu8un0jS
-	XORebKot+lSx+Zu19uh7k6w3UWyfbOk=
+	bh=pr+iZcW0Vr1rZJU+b396wxsEji96fYKMPY7NwZ0isYc=;
+	b=Xp0hcXsaen/FaUNGVnwczL4Z7gg2isaP7WLifGG3FOJCI18vkH+BlO8yRpoY5uEyC7aIFH
+	1oWAnf/upkKtwDF+Mf4FdweehBBqucQHirXcqev4NFTsJ8tYfvEvWdH08yWOKfzSXKoYF+
+	yviCDCDdoH+bVYA5cAAiSNPzQ0hoxMA=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-210-wDovPhfKN-qTXiSiNDrZZg-1; Thu, 12 Mar 2026 06:33:47 -0400
-X-MC-Unique: wDovPhfKN-qTXiSiNDrZZg-1
-X-Mimecast-MFC-AGG-ID: wDovPhfKN-qTXiSiNDrZZg_1773311626
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-439c54e0f6aso1055957f8f.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:33:47 -0700 (PDT)
+ us-mta-550-aO4SVcp4OiWAB_hesitAdQ-1; Thu, 12 Mar 2026 06:36:25 -0400
+X-MC-Unique: aO4SVcp4OiWAB_hesitAdQ-1
+X-Mimecast-MFC-AGG-ID: aO4SVcp4OiWAB_hesitAdQ_1773311784
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-439cbfcfc21so970420f8f.2
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 03:36:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773311626; x=1773916426; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJdYNZn0cGEQz1MWLeFDFxPGUmz2ObZieG8rujhYFsA=;
-        b=qVcGTJtvdm9813erDkTRUrZmuZP/WWT41Ou9/c55Q5/t3tOi/dzULqqc/BxVO4akmV
-         0mEI7CnIYPKBhnIqhw2IBriNFifMGpP4xon34iGE6oiQjXDu9eXIEjIwFdj+efGp0lHh
-         AC2AF8t6VI8tNM4VMx0tHbtyKc4GQW1TfAVm45B1ca5mzTQt4wkk8DHlP9IJRbLXOAl3
-         Z9NJbQozP/vYLjKeILGHaeFnSIcznXLip9PIx1foWCJV6bXdW9ZhuMKJotEPU5QA3IjR
-         HHCSPANz9GhdeJCtbVZ7G7ioBEAcg5rMj0n2VrFEUToAZ+PiS72O4DdQkLofGXemNG6X
-         wCTA==
+        d=redhat.com; s=google; t=1773311784; x=1773916584; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pr+iZcW0Vr1rZJU+b396wxsEji96fYKMPY7NwZ0isYc=;
+        b=SKZbzCrhAwNnxZnaxQFPdwxbGklU0PMxnb0TP9YQ+rHtghOeCcW0NolpUNwZsj/n7X
+         FLFNvNc4tU5O+JM+tmFX1fMwiaYt75Px7FmKOT0I0qB6WBhec9j1LeXablK4Fldl9Xcb
+         nUYgQ9dKRjBr3Vp7apb7+KOQ+hLPosi4+cyEco3U3OFj8sQHq/9p1KDI+hRJAgD6Uj7I
+         DrcyA28xIdZHoTB9Tc5EXzbpCHTKm1dije/06zL8YdQ0PCbfi+uq4NIoKmPtlVkJdvw0
+         AieWLzoNp1q2dron/zgAIHvoA/Awu/maejeqRTwKgB2paHGGeQ2kHKPI31DhJ35MYfh+
+         Mi4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773311626; x=1773916426;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uJdYNZn0cGEQz1MWLeFDFxPGUmz2ObZieG8rujhYFsA=;
-        b=F6hByLvFwn4Ew/hpD/cETIAbN178gEiiDq0U9/aX3F6gSxTDs220qpKe8j7IkQncoQ
-         55X+yvhW5i3vytbb81vlwYSy9cv367GAbso/we7PJ2VsfNfd6zSWRxFo2YJgOK+iH7SP
-         t7C+wDtA1kP3TQVJRb/sYPfn4+UOy7NcET8C+/qTcSW+o7sgyjhxTS6sC3YLUO8L+4im
-         4CNDn+WEFAAhhF5b2XHClMzm7gmzU03OgcJizu2qssG7JAB+5fHHcigWKJh3uoR/z2x3
-         7hlyJZz8BoE4e5WlWJSSzQZmqC+EKjq7Zl6hYuRq6AF93BwkutoJIKIm3DUsuYfkR27z
-         +peQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaWmx+pbs+GI4d5SVc0Wi9G7zKIZIdL2nhdg4u5OUER4pbrD3mqZ84MjaAzQA+vHtRXte/W5A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXILHmPxi19yR9UxPkry5FCHwmrqFauIy53YRjdMl4yoJtTmXi
-	jqSdzDy2ne3d7by5HBDhF5GNrqAXvGLECgMdfonFcaVhl3ySP2HMfMz8YoFUDT0LPgUZC78L6lN
-	57NjccldtcpoocrC5FBG/4D3T16uEqgmeo8RqHeaGJHspRvwhmvfo9wDRQg==
-X-Gm-Gg: ATEYQzxSIGGCHApz88QnwLe5srIulFvHaxWLpVxA1QfG3EnZPAuMd2FTCErSJEwyH7f
-	FCSUHCMHdqCfvCPwbDb97IJQ7Zw2SPNT9ctlYTGU5MkvtNd90jaGuKIR/r+lWo5azHuzJ7XQF3u
-	48LJOG3+PHGw8uIv2IoQGEUcTviK/a3SWDSKXxqGleToQx9p3CwBR///MapQfC22vMSJp0Rol4J
-	XfIEzRIJpFCViVf/gkYTsreAV6u/oOO1eYuV22dxScP7dEg3XL7MLiWUcMMyKHItpcZyyb9ziQQ
-	fPj8Yp/2IIqAgJVZ3w7l+UTe7bu1W3yrfttxOSyAHkh8LT523lCJNg+6kHLFMekAWQ/Ql1CIsB3
-	t8YiEg//wTPRvHliqjdnTffg0T2fxQrMDx9k8FwOTMTvs+xgL6GRB4P8rram85QuPFIZGH6NKBg
-	L3
-X-Received: by 2002:a5d:5f96:0:b0:439:b69b:3c8d with SMTP id ffacd0b85a97d-439fe199aefmr5646850f8f.13.1773311626327;
-        Thu, 12 Mar 2026 03:33:46 -0700 (PDT)
-X-Received: by 2002:a5d:5f96:0:b0:439:b69b:3c8d with SMTP id ffacd0b85a97d-439fe199aefmr5646799f8f.13.1773311625877;
-        Thu, 12 Mar 2026 03:33:45 -0700 (PDT)
-Received: from debian (2a01cb05923c9a00df57bce05e743070.ipv6.abo.wanadoo.fr. [2a01:cb05:923c:9a00:df57:bce0:5e74:3070])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1affe9sm7241612f8f.15.2026.03.12.03.33.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 03:33:45 -0700 (PDT)
-Date: Thu, 12 Mar 2026 11:33:43 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net] ip_tunnel: adapt iptunnel_xmit_stats() to
- NETDEV_PCPU_STAT_DSTATS
-Message-ID: <abKWh_F-RgNUXpcD@debian>
-References: <20260311123110.1471930-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1773311784; x=1773916584;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pr+iZcW0Vr1rZJU+b396wxsEji96fYKMPY7NwZ0isYc=;
+        b=jib3AN/6yIz30CW3TelYbOWBMhtsJZOChHN0ECW187O2GCsq1Kb0njWcqBmhvNBbBt
+         zs0xTly6jNZeXtuLl8FRkUjMSuUHdBZ6TrHSkIgqtqhLtBI1bbb0FUhZnjJ/iieKCUVg
+         9rCx0SJlupCGoFhV0c0WbDM0aU0ZYAW6eY0+Qsw6K4L1yiMJYQ7lBT45xQSvykfUU5i/
+         Kz1ay+3GUFmIdo3zXFUwccDeJgU1nnVMCyhzn9MSIMLtu/2IAJ4Sq2TxJMSpKF6kI85+
+         9jpe83p4pMFkxkyY44ts0eCPfRLTWkbmIx0oKfyS6/d2b0ZhOfbVqePp6j6H4R+gclBb
+         9ZjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUU2GiCGHsCSRMJWkZ48Xm5nHBWgdedxtS4TpaWC+HAZl0AKe9Dp5Pd9gxLTwh0FmglPGqA6Yc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypeZNc6pjtgcIzUsjvtDh80sacLsgVv6J9OcW/qJUnT0L7L1zG
+	LgLZXJetxp76xPAJUAyokYS+o4uZTnWmX9OVp28KDQ6mfTMqvv3m2Lw1VcQAYHuA4ADTcDICzCv
+	GshfaCga+8dULInqGDW/RlPwAkBwU2fd0B3XsBTqwQxQ6kpqIpHlbtQOWSA==
+X-Gm-Gg: ATEYQzxs1wPZoMLcdb/Av2EHeTUPJORqZ8TUXg9QT55iGv8lvdub/0K0JuaGxa/RJRW
+	j8+U4CrVsXqIop5BgUo9S3KZ7DQEcngZpKufM40cY62cm4dwzXozJewkplXDg+SRd7bfZSyKfWr
+	3GpGRUsigpscOinqI0OtfiWroS3WgsyP9o1syxLMwj1erfRQLDPwDEmr3wzZruoldBL1rvZoTQF
+	zcs3ocXCm+M4AcHrXK5yGEJ7sq5CYlJn+lvatCQOAgi82GkMRqyxHowve9GCcDYdY1zqKFdKLG1
+	XZojbpxSX11v3Ih7d0HbQCi6TYfLZLjeitxHxMSi8IUZkOlesFOYtTjM9WdYh73dRwcbh0ajO9n
+	PmC/1zEdK74q3YvVu4uEkWd+AgKLY0ENq6SUEdl6c+2EHH+NpAjOb7YY=
+X-Received: by 2002:a05:6000:25c2:b0:439:df60:f87a with SMTP id ffacd0b85a97d-439f8434264mr10631517f8f.46.1773311783605;
+        Thu, 12 Mar 2026 03:36:23 -0700 (PDT)
+X-Received: by 2002:a05:6000:25c2:b0:439:df60:f87a with SMTP id ffacd0b85a97d-439f8434264mr10631438f8f.46.1773311783136;
+        Thu, 12 Mar 2026 03:36:23 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.95])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe20c0b4sm8118630f8f.25.2026.03.12.03.36.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Mar 2026 03:36:22 -0700 (PDT)
+Message-ID: <8d746046-eed9-4d82-a064-c20b6a131bdc@redhat.com>
+Date: Thu, 12 Mar 2026 11:36:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260311123110.1471930-1-edumazet@google.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5 1/2] bonding: fix null-ptr-deref in
+ bond_rr_gen_slave_id()
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Eric Dumazet <edumazet@google.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
+ jiayuan.chen@shopee.com,
+ syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
+ Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Clark Williams <clrkwllms@kernel.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Jussi Maki <joamaki@gmail.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-rt-devel@lists.linux.dev
+References: <20260309030702.128520-1-jiayuan.chen@linux.dev>
+ <20260309030702.128520-2-jiayuan.chen@linux.dev> <abAFRbJNinhN3O5v@penguin>
+ <CANn89i+5yOzdiBTWm4ekc0UvMxQp=mhXbz0rU5WnfxEu3NrAhg@mail.gmail.com>
+ <CANn89iLOyWzWW7w262Vsy2MOMVDXA0+UZGpEbsdLwe6e75mhKQ@mail.gmail.com>
+ <abARG4sHFdUNqcRV@penguin>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <abARG4sHFdUNqcRV@penguin>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[linux.dev,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch,davemloft.net,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,goodmis.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-267014-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267013-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gnault@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E5842705B6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4DE3F27062D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 12:31:10PM +0000, Eric Dumazet wrote:
-> Blamed commits forgot that vxlan/geneve use udp_tunnel[6]_xmit_skb() which
-> call iptunnel_xmit_stats().
+On 3/10/26 1:39 PM, Nikolay Aleksandrov wrote:
+> On Tue, Mar 10, 2026 at 01:07:15PM +0100, Eric Dumazet wrote:
+>> On Tue, Mar 10, 2026 at 1:00 PM Eric Dumazet <edumazet@google.com> wrote:
+>>>
+>>> On Tue, Mar 10, 2026 at 12:49 PM Nikolay Aleksandrov
+>>> <razor@blackwall.org> wrote:
+>>>>
+>>>> On Mon, Mar 09, 2026 at 11:06:58AM +0800, Jiayuan Chen wrote:
+>>>>> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>>>>>
+>>>>> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
+>>>>> check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
+>>>>> when the bond mode is round-robin. If the bond device was never brought
+>>>>> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
+>>>>>
+>>>>> The XDP redirect path can reach this code even when the bond is not up:
+>>>>> bpf_master_redirect_enabled_key is a global static key, so when any bond
+>>>>> device has native XDP attached, the XDP_TX -> xdp_master_redirect()
+>>>>> interception is enabled for all bond slaves system-wide. This allows the
+>>>>> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+>>>>> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
+>>>>> reached on a bond that was never opened.
+>>>>>
+>>>>> Fix this by adding a NULL check with unlikely() in bond_rr_gen_slave_id()
+>>>>> before dereferencing rr_tx_counter. When rr_tx_counter is NULL (bond was
+>>>>> never opened), fall back to get_random_u32() for slave selection. The
+>>>>> allocation in bond_open() is kept, with WRITE_ONCE() added to safely
+>>>>> publish the pointer to the XDP read side. A plain read suffices for the
+>>>>> !bond->rr_tx_counter guard in bond_open() itself, as bond_open() runs
+>>>>> under RTNL lock and is the only writer of rr_tx_counter.
+>>>>>
+>>>>> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
+>>>>> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
+>>>>> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
+>>>>> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+>>>>> ---
+>>>>>  drivers/net/bonding/bond_main.c | 9 +++++++--
+>>>>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>>>>
+>>>>
+>>>> This is Jay's patch + the unlikely change, looks good to me.
+>>>> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+>>>
+>>> Orthogonal to this patch  :
+>>>
+>>>  get_random_u32() typical cost is around 10 to 20 ns, I really wonder
+>>> if this makes sense
+>>> for the packets_per_slave == 0 or 1 case to haves this kind of
+>>> randomness in the first place.
+>>>
+>>> Perhaps we could use a
+>>>
+>>> static DEFINE_PER_CPU(u32, rr_tx_counter)
+>>>
+>>> And :
+>>>  slave_id = this_cpu_inc_return(rr_tx_counter);
+>>
+>> I also have mixed feelings about this patch.
+>>
+>> We probably should detect that the device is not ready before hitting
+>> something deeper in the stack.
+>>
+>> Sure, a NULL deref is avoided, bu what happens next ?
+>>
+>> We send a packet while the device is not UP, I am pretty sure this
+>> violates at least some RCU rules in device dismantling.
 > 
-> iptunnel_xmit_stats() was assuming tunnels were only using
-> NETDEV_PCPU_STAT_TSTATS.
+> IIRC when the redirect continues, the packet should get dropped if the device is
+> not up (checks at a few places), but that's outside of bond's jurisdiction and
+> after the slave id is needed in xdp master redirect's path unfortunately.
+> I'm not sure it can reach much further, it just has the master dev's slave id
+> generation in its path.
 > 
-> @syncp offset in pcpu_sw_netstats and pcpu_dstats is different.
-> 
-> 32bit kernels would either have corruptions or freezes if the syncp
-> sequence was overwritten.
-> 
-> This patch also moves pcpu_stat_type closer to dev->{t,d}stats to avoid
-> a potential cache line miss since iptunnel_xmit_stats() needs to read it.
+> In any case we shouldn't crash in the slave id generation in the bonding,
+> that ndo's only job is to return a slave id.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+I'm sorry for the back and forth, but I share Eric's concern. I think
+the approach suggested by Daniel:
 
-Thank!
+https://lore.kernel.org/netdev/4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net/
+
+or the initial patch form:
+
+https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.dev/T/#m7c67bb12f85bc88d583788fb6e41113c46208ae7
+
+would be better. To respond to old concerns raised there: the check is
+IMHO bond-specific, as control moves from the lower interface to the
+upper bonding device, and the code is under an RCU critical section, the
+device can't go away before the xmit is completed.
+
+/P
 
 
