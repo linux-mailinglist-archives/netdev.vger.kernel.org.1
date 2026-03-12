@@ -1,234 +1,250 @@
-Return-Path: <netdev+bounces-267058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENVCBVK7smmvPAAAu9opvQ
-	(envelope-from <netdev+bounces-267058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:10:42 +0100
+	id aJDVBAG8smmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:13:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B36272504
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:10:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A2D272556
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:13:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF5BF31AEC50
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:07:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21683300827A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC113C6A2E;
-	Thu, 12 Mar 2026 13:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="DknabfDH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB603C5532;
+	Thu, 12 Mar 2026 13:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5223C4566;
-	Thu, 12 Mar 2026 13:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95FC39936F
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773320825; cv=none; b=QfcGdirBN473ZwRvs0aOz837eqksG84vqQbtZOHST5pSPELm14HrzQRY1eqSqPjhOSGnZc7QKhtV0VGLEUxTEtIOff+b8AY2/FZR3qNlL4emysryjb0wGDL2uL3sPnwwFiqoR9Rwr5JH7a6c8UTkTfnnT3FBJNLBAq0vGTwC2+k=
+	t=1773321213; cv=none; b=YIgJJrBVK06amcvFtjFPXNUrDshjZFXuz7ZUBtnu/j07LfHK4cZv4Zr23ybUgM9iMBMPb6q17oqCa5eag2cGlCb0Id2RZYSC/pS+fs6z8ca/1jlBbP8Orui0nGcgH4KSL9M+U2hkTavIl3L1YPgXRrPSCflWGrOkJzgAtJ5BAYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773320825; c=relaxed/simple;
-	bh=14g8Dn3IYRYwobx+qBN31EM/eWBQu9pcStubPs0cKHc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KrItxwnIkSpvkt7Y8NPg17GHGfbSI1GpLa7oXzRlZQ6u2JtTf931haTk2iFH8bDVlivjv++48iQqveJjBB9CAwDOjPDYKg3rx+7OgbDTxbUaUk6aZTzlUOXnXMVNFKTlYJ8yPxjXj+XyPzDgoP1s4yJwSg9eOrTsEPzcdAR20II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=DknabfDH; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1773320812;
-	bh=14g8Dn3IYRYwobx+qBN31EM/eWBQu9pcStubPs0cKHc=;
-	h=From:To:Subject:Date:In-Reply-To:References;
-	b=DknabfDHUcW1dg3aQivqf4TQmz8Lm6eGW3e0/Qt/nDgixLG060gF/35aeJttA+sKX
-	 h2KpKNBEvPv3tOvGJmQLFFOcrjWdQwgh7+xV+7gMpr4UAaM06OZ1YH2m8MzPiXnWeM
-	 6cJe4xBcyTpGFmyoCOUjKMPr33vv2ea5dJwsUF+g=
-Received: from simon-Latitude-5450.fritz.box ([129.217.186.105])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 62CD6mqn014094
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 12 Mar 2026 14:06:52 +0100 (CET)
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
-        eperezma@redhat.com, leiyang@redhat.com, stephen@networkplumber.org,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de,
-        simon.schippers@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-Subject: [PATCH net-next v8 4/4] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
-Date: Thu, 12 Mar 2026 14:06:39 +0100
-Message-ID: <20260312130639.138988-5-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
-References: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+	s=arc-20240116; t=1773321213; c=relaxed/simple;
+	bh=9Xf09/CQRKakxUM97o3pjEHQxlgCJx2m/hZtTEYbHSM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GIHBu7PlJa+4ZX+rXy6NBPrEgYzmQSQoKH/TFwiNEbBtVQTadCJIyfvHBDAQLDvFEJ37dZ1alz/AyCKAQ8QZ19+hcByVj2jMu6lZUB/0eheJ+Y8NXXw069WRM1lHbM6BL4/WIinsC0dZsLQuhv1qrZxNzbUixGj59/JbtaNq83U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b943b75dc42so153729466b.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:13:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773321210; x=1773926010;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=udEH6r8HyARkgcp8nLO9sBcamtg2WZj/AdfmCmcqat4=;
+        b=nLqAAUzbhEawdQwqU3mU3KXuO2GC8pq/vq/2gLovbPVJOpfCmvnx40QIAoUDHk9nVU
+         sq0ZRdexy1hsqyij1SRQY+48YaZvn68b/3m+Jp1I85Xz6tkAa9fhjkNgh27Ydf7eCm+U
+         VxsAjppMAlxFIABSUW6Ou11eN//sBrYSv4aCYEhxTFjyQnzDiSWQW1lHbKjheoBN1+3O
+         rq7KJjVOYOyz+Zdf0XBttyyEJKvrCIWXFPzFxjYuOah4Sm4kikUqaHgnp8nS8iTJczVO
+         hhBH6CbFnr0dw/3tPkjoiM90ZkZ/UAL1oZq7sEMYxy8KPDgfzv2vZvZGBwE3cu6HiwJt
+         35Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7VPaLbFW+LpknqAZ3KwyvTkN3A9j0035DROhNLP0aOJgNsTKT+o14zkQbepYJXgYnkLfY6ro=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9sEVvqpX/2+2Kzuf+JjmjlhjkHmeDju18lygpsRb12O5g7stN
+	IG1g2UYLb1/aB0EPxL3GS0demlUXbbDLJo3jZb8xaRQvgNsFQXk0bfwKSphtstio7oI=
+X-Gm-Gg: ATEYQzxYxk9R+2pk2w3PytA/n3LNVLKs2tahRgamZHqq4zNwFOXuMCMBSjCYQuzB2bq
+	R3InuP+ourufFDx/7yj/VZiKtQR+8I0WyCj0nXd/jRpVfuyVshghMv3auZaxLqf8emgo8EdsT6z
+	jQEGKYE8vgf98f4kJOuB4baUGr9dm5dxoaGIXw6oodMtuh21WOa0YXIu/aQ71/pYZdJYSbppZLm
+	39lUGTMCAVpiaEwfULTGQ2VghkeHuYRHy234NiToUEeg43Lg2EzBSbSPCdeZIrzgCn0dHY6t8TL
+	B6ca4r8FsP639DyC+/5shaz32YsxyNT61oZdaLLsG4jppn9X0diDD5a/PwVeK2krIOeQzs+vcUS
+	Dq/XdM6mTaAbv/OL/ko54AIvDGBvH8pmb+tls3czAyvKzONBvYW8TMaWlQ4hTB71GuaOr0IrLBY
+	loyfTlP99b4naq41NiT087ijBUwZpVsLi/Sa4OEvmzKNtmM5SAmUrphObGuHSO
+X-Received: by 2002:a17:907:ea8:b0:b97:344:7d39 with SMTP id a640c23a62f3a-b972e57ad5cmr369670566b.45.1773321209863;
+        Thu, 12 Mar 2026 06:13:29 -0700 (PDT)
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com. [209.85.218.45])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b972e14dc3asm134506466b.39.2026.03.12.06.13.28
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Mar 2026 06:13:28 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b943b75dc42so153722166b.3
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:13:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX/5LF08o8VWbiPNWgDBEXs2x2AZVdDSegCHfLJwPdee8dOSanSD1DGudkOhF4RYHqygpQbVJY=@vger.kernel.org
+X-Received: by 2002:a17:907:7b93:b0:b91:2f65:e938 with SMTP id
+ a640c23a62f3a-b972e603b8amr390837366b.60.1773321208196; Thu, 12 Mar 2026
+ 06:13:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260203121723.312336-1-biju.das.jz@bp.renesas.com>
+ <CAL_JsqJK3brXxSeD-U42PBCeHoxUhWJYho3ZWj__t5C1LL-n-Q@mail.gmail.com> <TY3PR01MB11346B87DF83086FCFE19B15D8698A@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+In-Reply-To: <TY3PR01MB11346B87DF83086FCFE19B15D8698A@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Mar 2026 14:13:15 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdW7GeCF-xTNpRRNEBfzbqUA8ZNqFxctT8zufdRHkvSiAQ@mail.gmail.com>
+X-Gm-Features: AaiRm51xpIeuv2QHPm735sslWhSiZm3fYb3vmdcw6ZXZmPeZ7Qqh0uUgQF8JQ5U
+Message-ID: <CAMuHMdW7GeCF-xTNpRRNEBfzbqUA8ZNqFxctT8zufdRHkvSiAQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] dt-bindings: net: micrel: Fix dtbs compatible
+ too long warnings
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: Rob Herring <robh@kernel.org>, "biju.das.au" <biju.das.au@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Stefan Eichenberger <eichest@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,bp.renesas.com];
+	DMARC_NA(0.00)[linux-m68k.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267059-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-267058-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:dkim,tu-dortmund.de:email,tu-dortmund.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 72B36272504
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,renesas.com:email,mail.gmail.com:mid,linux-m68k.org:email]
+X-Rspamd-Queue-Id: A7A2D272556
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This commit prevents tail-drop when a qdisc is present and the ptr_ring
-becomes full. Once an entry is successfully produced and the ptr_ring
-reaches capacity, the netdev queue is stopped instead of dropping
-subsequent packets.
+Hi Biju,
 
-If producing an entry fails anyways due to a race, tun_net_xmit returns
-NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
-LLTX is enabled and the transmit path operates without the usual locking.
+On Wed, 4 Feb 2026 at 10:18, Biju Das <biju.das.jz@bp.renesas.com> wrote:
+> > From: Rob Herring <robh@kernel.org>
+> > On Tue, Feb 3, 2026 at 6:17=E2=80=AFAM Biju <biju.das.au@gmail.com> wro=
+te:
+> > > From: Biju Das <biju.das.jz@bp.renesas.com>
+> > > The KSZ9131 PHY is suitable for IEEE 802.3 applications.
+> > >
+> > > Fix the below dtbs warning "compatible: ['ethernet-phy-id0022.1640',
+> > > 'ethernet-phy-ieee802.3-c22'] is too long" on the below dts:
+> > >
+> > > r8a774b1-beacon-rzg2n-kit.dtb
+> > > r8a774a1-beacon-rzg2m-kit.dtb
+> > > r8a774e1-beacon-rzg2h-kit.dtb
+> > > r9a08g046l48-smarc.dtb
+> > > r9a07g043u11-smarc.dtb
+> > > r9a07g044c2-smarc.dtb
+> > > r9a07g044l2-smarc.dtb
+> > > r9a07g044l2-smarc.dtb
+> > > r9a07g054l2-smarc.dtb
+> > > r9a07g054l2-smarc.dtb
+> > > r9a09g047e57-smarc.dtb
+> > > r9a09g047e57-smarc.dtb
+> > > r9a09g056n48-rzv2n-evk.dtb
+> > > r9a09g056n48-rzv2n-evk.dtb
+> > > r9a09g057h44-rzv2h-evk.dtb
+> > > r9a09g057h44-rzv2h-evk.dtb
+> > > r9a07g043u11-smarc-cru-csi-ov5645.dtb
+> > > r9a07g043u11-smarc-pmod.dtb
+> > > r9a07g043u11-smarc-du-adv7513.dtb
+> > > r9a09g047e57-smarc-cru-csi-ov5645.dtb
+> > > r9a07g044c2-smarc-cru-csi-ov5645.dtb
+> > > r9a09g047e57-smarc-cru-csi-ov5645.dtb
+> > > r9a07g044l2-smarc-cru-csi-ov5645.dtb
+> > > r9a07g044l2-smarc-cru-csi-ov5645.dtb
+> > > r9a07g054l2-smarc-cru-csi-ov5645.dtb
+> > > r9a07g054l2-smarc-cru-csi-ov5645.dtb
+> > > r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
+> > > r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
+> > > r9a09g056n48-rzv2n-evk-cn15-sd.dtb
+> > > r9a09g057h44-rzv2h-evk-cn15-sd.dtb
+> > > r9a09g056n48-rzv2n-evk-cn15-sd.dtb
+> > > r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
+> > > r9a09g057h44-rzv2h-evk-cn15-sd.dtb
+> > > r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
+> > >
+> > > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+> > > ---
+> > >  .../bindings/net/micrel,gigabit.yaml          | 23 +++++++++++------=
+--
+> > >  1 file changed, 14 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/micrel,gigabit.yam=
+l
+> > > b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
+> > > index 384b4ea6181e..284c3ba379f3 100644
+> > > --- a/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
+> > > @@ -17,15 +17,20 @@ description:
+> > >
+> > >  properties:
+> > >    compatible:
+> > > -    enum:
+> > > -      - ethernet-phy-id0022.1610  # KSZ9021
+> > > -      - ethernet-phy-id0022.1611  # KSZ9021RLRN
+> > > -      - ethernet-phy-id0022.1620  # KSZ9031
+> > > -      - ethernet-phy-id0022.1631  # KSZ9477
+> > > -      - ethernet-phy-id0022.1640  # KSZ9131
+> > > -      - ethernet-phy-id0022.1650  # LAN8841
+> > > -      - ethernet-phy-id0022.1660  # LAN8814
+> > > -      - ethernet-phy-id0022.1670  # LAN8804
+> > > +    oneOf:
+> > > +      - items:
+> > > +          - const: ethernet-phy-id0022.1640
+> > > +          - const: ethernet-phy-ieee802.3-c22
+> >
+> > To avoid the errors, you would need a custom 'select' that excludes the=
+ c22 compatible from this
+> > schema (IOW, lists all the other compatibles here).
+>
+> OK.
+>
+> >
+> > However, I think the correct fix is probably dropping the c22 compatibl=
+e from your .dts files. I don't
+> > that compatible is useful on its own?
+>
+> I will wait for Geert's input to drop c22 from .dts files.
 
-The existing __tun_wake_queue() function wakes the netdev queue. Races
-between this wakeup and the queue-stop logic could leave the queue
-stopped indefinitely. To prevent this, a memory barrier is enforced
-(as discussed in a similar implementation in [1]), followed by a recheck
-that wakes the queue if space is already available.
+Makes sense.
 
-If no qdisc is present, the previous tail-drop behavior is preserved.
+So we should probably fix the following, too?
+Documentation/devicetree/bindings/net/ethernet-phy.yaml
+Documentation/devicetree/bindings/net/mscc-phy-vsc8531.yaml
+Documentation/devicetree/bindings/net/renesas,ether.yaml
+Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+Documentation/devicetree/bindings/net/amlogic,g12a-mdio-mux.yaml
 
-Benchmarks:
-The benchmarks show a slight regression in raw transmission performance,
-though no packets are lost anymore.
+> > Also, it doesn't make sense that ethernet-phy-id0022.1640 is sometimes =
+compatible with ethernet-phy-
+> > ieee802.3-c22 and sometimes isn't.
+>
+> OK.
 
-The previously introduced threshold to only wake after the queue stopped
-and half of the ring was consumed showed to be a descent choice:
-Waking the queue whenever a consume made space in the ring strongly
-degrades performance for tap, while waking only when the ring is empty
-is too late and also hurts throughput for tap & tap+vhost-net.
-Other ratios (3/4, 7/8) showed similar results (not shown here), so
-1/2 was chosen for the sake of simplicity for both tun/tap and
-tun/tap+vhost-net.
+Gr{oetje,eeting}s,
 
-Test setup:
-AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
-Average over 20 runs @ 100,000,000 packets. SRSO and spectre v2
-mitigations disabled.
+                        Geert
 
-Note for tap+vhost-net:
-XDP drop program active in VM -> ~2.5x faster, slower for tap due to
-more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-+--------------------------+--------------+----------------+----------+
-| 1 thread                 | Stock        | Patched with   | diff     |
-| sending                  |              | fq_codel qdisc |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Transmitted | 1.151 Mpps   | 1.139 Mpps     | -1.1%    |
-|            +-------------+--------------+----------------+----------+
-|            | Lost/s      | 3.606 Mpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Transmitted | 3.948 Mpps   | 3.738 Mpps     | -5.3%    |
-|            +-------------+--------------+----------------+----------+
-| +vhost-net | Lost/s      | 496.5 Kpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-
-+--------------------------+--------------+----------------+----------+
-| 2 threads                | Stock        | Patched with   | diff     |
-| sending                  |              | fq_codel qdisc |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Transmitted | 1.133 Mpps   | 1.109 Mpps     | -2.1%    |
-|            +-------------+--------------+----------------+----------+
-|            | Lost/s      | 8.269 Mpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Transmitted | 3.820 Mpps   | 3.513 Mpps     | -8.0%    |
-|            +-------------+--------------+----------------+----------+
-| +vhost-net | Lost/s      | 4.961 Mpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-
-[1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
-
-Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
- drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index b86582cc6cb6..9b7daec69acd 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct netdev_queue *queue;
- 	struct tun_file *tfile;
- 	int len = skb->len;
-+	bool qdisc_present;
-+	int ret;
- 
- 	rcu_read_lock();
- 	tfile = rcu_dereference(tun->tfiles[txq]);
-@@ -1063,13 +1065,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	nf_reset_ct(skb);
- 
--	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
-+	queue = netdev_get_tx_queue(dev, txq);
-+	qdisc_present = !qdisc_txq_has_no_queue(queue);
-+
-+	spin_lock(&tfile->tx_ring.producer_lock);
-+	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
-+	if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
-+		netif_tx_stop_queue(queue);
-+		/* Avoid races with queue wake-ups in __tun_wake_queue by
-+		 * waking if space is available in a re-check.
-+		 * The barrier makes sure that the stop is visible before
-+		 * we re-check.
-+		 */
-+		smp_mb__after_atomic();
-+		if (!__ptr_ring_produce_peek(&tfile->tx_ring))
-+			netif_tx_wake_queue(queue);
-+	}
-+	spin_unlock(&tfile->tx_ring.producer_lock);
-+
-+	if (ret) {
-+		/* If a qdisc is attached to our virtual device,
-+		 * returning NETDEV_TX_BUSY is allowed.
-+		 */
-+		if (qdisc_present) {
-+			rcu_read_unlock();
-+			return NETDEV_TX_BUSY;
-+		}
- 		drop_reason = SKB_DROP_REASON_FULL_RING;
- 		goto drop;
- 	}
- 
- 	/* dev->lltx requires to do our own update of trans_start */
--	queue = netdev_get_tx_queue(dev, txq);
- 	txq_trans_cond_update(queue);
- 
- 	/* Notify and wake up reader process */
--- 
-2.43.0
-
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
