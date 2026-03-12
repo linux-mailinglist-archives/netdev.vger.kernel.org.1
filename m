@@ -1,176 +1,174 @@
-Return-Path: <netdev+bounces-266927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266915-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEoSBm9esmlmMAAAu9opvQ
-	(envelope-from <netdev+bounces-266927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:34:23 +0100
+	id 6AajBFFdsmlmMAAAu9opvQ
+	(envelope-from <netdev+bounces-266915-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:29:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA0F26DE0B
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:34:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98C626DB2C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:29:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05A78311AC06
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:32:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A190F3022050
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 06:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA1539F174;
-	Thu, 12 Mar 2026 06:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C04389472;
+	Thu, 12 Mar 2026 06:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrEHxRTG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2bfxSm9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFD228B7DA;
-	Thu, 12 Mar 2026 06:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CF738238A
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773297144; cv=none; b=RJ7SlZqlq/vpZL1WUVxw9P337jFP5ZNsHSqVFeGHH5RlK/MOkWKkz4eUYi4y6zxprzK0V6+b0gaPSmSltk23YI71z1F1i7fM5XrZgpUe8feqsMP5Lz2zDmiinsnsELNftDewZIUibjVFrKB9D1SCNMrjn6Ci1WheZRX0dp/qBTg=
+	t=1773296960; cv=none; b=afaGcYavnJk7iM3a/smEg9dgMpQapGhu52vwpgMyN5I93FQU0g96jVaUA4HDbyeTzZt8kdk7miD1lbMkG0o55eiYEaZZXQDTQQNNZa/C9KIXH+dOIhLD4sEdCsw2S2oqPxBgAVc7GEAZLODt/nmFAfuFhjEUGvb3yBT/vuQjI9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773297144; c=relaxed/simple;
-	bh=KkrCQPuk5NSp3xHqruunZhn3/8ssDm+UZVNEv0P3bms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JTQ/SqpwOWb+umin9ACBLEw6dBYQBLwsYmJgTl6imEBQK9OafdY/V5Lb8tEZsVP9rwcZqM8eZN3OJecIcEms4GjFnXThfp9iRlMPtySE1Z9cWB8vz+Ro3Jptrd1W3wPWsIIiqaZhb3oqik3RjCD/lIUgCKIe4om3Pdh+ddrG/JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrEHxRTG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2BABC2BCB1;
-	Thu, 12 Mar 2026 06:32:08 +0000 (UTC)
+	s=arc-20240116; t=1773296960; c=relaxed/simple;
+	bh=5f8lz5fAU2KSI7baSw14/mD4GXpdAG8dN/4wJscx+g4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oO6W85t50v3ey/049AiJfHYJyFpstT5uOnXoNfvW3vj4lJcl1E8SvmWFzHaIcaj8v+wFTejOlVUECAbDBv90sKTBcMAptD8KaUeGMk1VCkANBvLe1NPb0+q2ETvbNTqBAM3zQoA99uIKt5Hyjutf9hHkp4uarW8qFtluq51/2oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2bfxSm9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8861C4AF09
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 06:29:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773297144;
-	bh=KkrCQPuk5NSp3xHqruunZhn3/8ssDm+UZVNEv0P3bms=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GrEHxRTGyhnx0bDmrlk/KRyum1eqD0B3AOjSqC4q8LRFqLV++KI2PjmyW37gdFB/W
-	 91Wg9NVU9sQ1p/iX1X1hRQrjqizeUh+c2mEnGMPuatawW/O+mD1j6QuYQTTmDpgBeK
-	 6CTcmtlrxOh4lZ8xQ6gd9qQoWEFGnFOs5EqclVWR/Crd597GQrcHQnisTWNY+MZzNh
-	 EheRdomGAYyE3ZA2rASVMP3r0J4FcE471VjfF0qQSJRqY3f8drzeRwUl3pEPS9Ea7I
-	 xhQxui745utU9Ylv+It5WSG+rjl6MVLDnjZJbHnrKC0eSYWONPTak4CdKzcHQatrlJ
-	 PuyDGX5/W3AmQ==
-From: Sumit Garg <sumit.garg@kernel.org>
-To: linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org
-Cc: andersson@kernel.org,
-	konradybcio@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com,
-	sean@poorly.run,
-	akhilpo@oss.qualcomm.com,
-	lumag@kernel.org,
-	abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com,
-	marijn.suijten@somainline.org,
-	airlied@gmail.com,
-	simona@ffwll.ch,
-	vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com,
-	bod@kernel.org,
-	mchehab@kernel.org,
-	elder@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jjohnson@kernel.org,
-	mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com,
-	mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com,
-	jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com,
-	vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com,
-	jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org,
-	apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com,
-	linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: [PATCH v2 15/15] MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
-Date: Thu, 12 Mar 2026 11:57:56 +0530
-Message-ID: <20260312062756.694390-16-sumit.garg@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260312062756.694390-1-sumit.garg@kernel.org>
-References: <20260312062756.694390-1-sumit.garg@kernel.org>
+	s=k20201202; t=1773296960;
+	bh=5f8lz5fAU2KSI7baSw14/mD4GXpdAG8dN/4wJscx+g4=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=h2bfxSm9wzsf/polDEIYiL5js/Faoto78VnkE14vjPt3yXmGy34sqnvVwcLxs6Dtu
+	 vPN9gjsDB4qA/G3xrAsq7bk0Cj33zvZNvMj7s1iFsK7Alc1LH6wk1aPKqMlWNM07lN
+	 G+mQ8RUyWauKGwtwHzu9ePPDjX9Fg4m1W99rSq2iYH6QC2o90nP7JccnfoS+SMGNkU
+	 eJ8fHfJOCLP4UNg5Me1PV2oy5philQBEi8SNi2DtWS3fdcxTqtLhM7G0ycefupuW2v
+	 gzDeDdxxWissPV3Mp9ea2z6jz8BG21QB405o8edtyO/Hi3T/8FjKj58RGV9t+cVeIt
+	 3pTWwbq9dJawA==
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38a3066b68bso6289211fa.3
+        for <netdev@vger.kernel.org>; Wed, 11 Mar 2026 23:29:20 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCURSWJMTPZcI4LGQHOxuUxdOt/w+/Z/mEsCnKJ13U38vf5t0l/b6fy74kDsEKOVqX8JMPO44Lg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw00X/MvDCA2NwLi6wepO7wbc+KLojjgakriAqS2K4PSjpRlisO
+	2X3BvF2850NZ7NI+TyVWQC6u5PPmgcHcDgKY0qygCtPM7p2sAnhZdHDxanAgLlW1AXyJ5J98DVR
+	QyaZSB8JDmBNU4T4NACBk6/xdSioboXs=
+X-Received: by 2002:a2e:a544:0:b0:389:fc6b:943f with SMTP id
+ 38308e7fff4ca-38a67de53a5mr18901371fa.11.1773296958936; Wed, 11 Mar 2026
+ 23:29:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+References: <20260302144458.3180702-1-wens@kernel.org> <5f8e32e1-c73c-4a3f-a1ff-21b78f764bfd@lunn.ch>
+In-Reply-To: <5f8e32e1-c73c-4a3f-a1ff-21b78f764bfd@lunn.ch>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Thu, 12 Mar 2026 14:29:05 +0800
+X-Gmail-Original-Message-ID: <CAGb2v66MY02xvA_Mvt=6O001XEgz1AVH6ePorPvNtL0s8=W8rw@mail.gmail.com>
+X-Gm-Features: AaiRm50N7EZSmg55aQpjnndqzFiacnsEDhd-Cbp1wYEVjcocF86lRPoMFnxLdVY
+Message-ID: <CAGb2v66MY02xvA_Mvt=6O001XEgz1AVH6ePorPvNtL0s8=W8rw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: phy: Handle PHY reset during initial PHY ID read
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TAGGED_FROM(0.00)[bounces-266927-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266915-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	HAS_REPLYTO(0.00)[wens@kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wens@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:email,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6EA0F26DE0B
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:email]
+X-Rspamd-Queue-Id: A98C626DB2C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+On Thu, Mar 12, 2026 at 3:05=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > This work was the result of Russell mentioning [1] that placing the
+> > reset GPIO under the PHY node in the device tree might result in it
+> > not working.
+> >
+> > I also talked about this at Plumbers in Tokyo last year during the
+> > Device Tree MC. There a few people mentioned that MDIO reset handling
+> > has been a pain point.
+>
+> It is definitely a pain point. I wish we never added support for
+> resets, just left it to the bootloader to get the hardware into a
+> usable state before starting linux.
+>
+> Anyway, i don't really see this being a MDIO/PHY problem. It is a
+> generic device driver model problem. We need the core to have generic
+> code used for any enumerable bus, PCIe, USB, SDIO, MDIO etc to ensure
+> the clocks, resets, regulators, etc are in the correct state that the
+> probe can work.
 
-Add Sumit Garg as the maintainer for the Qualcomm generic Peripheral
-Authentication Service (PAS) as well as the PAS TEE backend driver.
+I agree it's not just a MDIO/PHY problem. I am looking into it for all
+the common enumerable bus types. Currently SDIO, USB, and PCIe all have
+some solution, though the SDIO one is deprecated, and the USB one is
+incomplete.
 
-Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+That said, this doesn't fit into the driver model well: to create a struct
+device the device needs to be enumerated; to enumerate the device, its
+resources need to be provided and enabled, but at this point there's no
+device to tie the resources to.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 61bf550fd37c..88763b3b2a4a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21822,6 +21822,15 @@ F:	Documentation/devicetree/bindings/media/*qcom*
- F:	drivers/media/platform/qcom
- F:	include/dt-bindings/media/*qcom*
- 
-+QUALCOMM PAS TZ SERVICE
-+M:	Sumit Garg <sumit.garg@oss.qualcomm.com>
-+L:	linux-arm-msm@vger.kernel.org
-+S:	Maintained
-+F:	drivers/firmware/qcom/qcom_pas.c
-+F:	drivers/firmware/qcom/qcom_pas.h
-+F:	drivers/firmware/qcom/qcom_pas_tee.c
-+F:	include/linux/firmware/qcom/qcom_pas.h
-+
- QUALCOMM SMB CHARGER DRIVER
- M:	Casey Connolly <casey.connolly@linaro.org>
- L:	linux-arm-msm@vger.kernel.org
--- 
-2.51.0
+All the existing solutions scan the DT and create extra platform devices
+to handle the power sequencing. Some bus specific code is needed for this.
+USB is simpler, since once the USB device powers up it will initiate a
+handshake with the host. All the other bus types rely on the host controlle=
+r
+doing a scan to enumerate the devices, so the power sequencing code needs
+to be inserted into the bus scanning code. The PCI implementation is
+extra complicated: some controllers have dedicated PERST# functions
+that are toggled from the controller's registers instead of using
+GPIOs for the device reset.
 
+> Once the core has this facility, we can modify MDIO to make use of it,
+> if needed.
+
+We already have the power sequencing framework (drivers/power/sequencing).
+So instead of the open coded reset GPIO I did in this patch, it would
+just be calls to pwrseq_get() and pwrseq_power_on(). I would need to
+figure out how to actually work them into the MDIO subsystem, and also
+how to model a generic PHY power sequencing provider. But the recent
+M.2 slot work [1] provides some good examples.
+
+Does that sound more acceptable?
+
+
+Thanks
+ChenYu
+
+[1] https://lore.kernel.org/all/20260107-pci-m2-v5-0-8173d8a72641@oss.qualc=
+omm.com/
+[2] https://lore.kernel.org/all/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qua=
+lcomm.com/
 
