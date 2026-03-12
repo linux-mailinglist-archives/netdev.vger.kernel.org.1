@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-266989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNXDIOWQsml5NgAAu9opvQ
-	(envelope-from <netdev+bounces-266989-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:09:41 +0100
+	id 0NckEPuQsml5NgAAu9opvQ
+	(envelope-from <netdev+bounces-266990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:10:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F213027019D
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:09:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D9D2701D4
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 693DF3013B46
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:09:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4BCBD3025158
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432E53BE640;
-	Thu, 12 Mar 2026 10:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7013BF677;
+	Thu, 12 Mar 2026 10:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MMJ/LURe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FbiSLz+b"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B9E387342;
-	Thu, 12 Mar 2026 10:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC8435836A;
+	Thu, 12 Mar 2026 10:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773310139; cv=none; b=BDMs2Emnx5IOK5dl9Ui0TExzgUMMHIAlidOkrDl2A+loEzQ8hB/ApXHRNRsA0n2BAsIvDTCiTtvCR5a2tMen55DPbkEEHl7h/ESyZ0WsYPG41hz7/GAmhDZ0oz++hXlnEAOPCkIsLU6gVboaXDaBKTY8L7lkoRUxLq+IWnuqVg8=
+	t=1773310146; cv=none; b=sS8NWXXBXfIOrCOh+c31bwFs+lLaddt4mcsgx40Lcc64lehJWLJrzg7oYd/KoSB2HAs4eFpoovfx6IzBgx9DDj17wueFh7D/xWPJI/87d4ZMIkqAJ7ioZO5x2pRRcS2wIOApX4i0SB5LvmgnAfoY7yUpbQgZ+lPldzwV/NS/+kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773310139; c=relaxed/simple;
-	bh=40ha3UUc1mTF2YzNrGWxPNtWBskQkGWak6K81Ffdrl8=;
+	s=arc-20240116; t=1773310146; c=relaxed/simple;
+	bh=vmV76oO1JZB7prEq9gqCaaciuyEFx0XqgGYVquXhzRk=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=T53K2RyNBr3qIW2LlhrZWjtpOB4922ZHQP+mc2mIjLTdl+waIEfmW+uKL6seb/jvJT4QFy1fp+8YSrpQ8H7LkSJbGLegvg1b6l4E3/jLVkNlHhM7fFVNufyG/hp7kAL7pHjFyjufwc+GN4TyePf9s96vZgJOKZCcbYuLJ+Emdg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MMJ/LURe; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=jkmjPpjHSUEtBWHssqunaU+F1VcyqSzaSDY2RGyZ8D+9b1/igFh1DGB7IrzTrL+Vi2YxgekY+Ji17NijMPlyxIduwTNH/z7zUjIHciPBVBZYbJFruow35rJ1Kx0XkdCA4hpcPRI7Gpa6d890UC2mkWz2vtqc/Cp3dsCezdx5FfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FbiSLz+b; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tWUNNp6YFhZcSa6rDVrWkFfDII00kYuQk+eRtQg9bY8=; b=MMJ/LURe6HuHpmxDJswJRmX0Qi
-	3ircF5cNb5lsN47yRG05oVsKlxlqeTGZzBgZK0gQclGx6WZAwrf2I1Nuly7DTxuNVE94Ed6WgQ3V5
-	3F+JP/hvjp+7ZJuZBTOPWFDu86frAd2qs7PqdjR+BGq+iXZXR1k8iYw/iPMPmm22rRjjtRS6tcvK7
-	b1hJ8gCT5+zLpC1z5691Uakbd/i9abY8OgW9Qa8Xd9cKCk4fKErgU5NMXpxpdIc0oeFxtv9Kg/zSp
-	7puY7s/ANdWyTPtc6J6hN2iujkr4O+RpoAkyNBCWc4XjzE1Pjm77xqseBu4p4dOD1DjeW5Pcuvjkw
-	hXLDUAqQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42744 helo=rmk-PC.armlinux.org.uk)
+	bh=6iS/RgX6lu0f4umfKZBwVXa6SDtuz9v9yqZMmkoNc/c=; b=FbiSLz+b86lFy3+IYMLl3MXZKa
+	nQV3t1aDsvpQ65uIeZGCOIkKYRazJ60lXG+rsbD1WKJ8WlEKJ/xIbKSG0er7XWH+8E+zYUSOTt6kS
+	JaVqqQeIrcrFGwlyb2aZQa5rN9alPp1I9zvRxBTcog8mpj+qhcA1B0LVuH3b5JqNmmc9IXbym6uav
+	KWmWtFCIW+lbd5GmtQdQZeS/96xYCYbv1kEq8kOrNp/kG/qyrQtkLNpb8xXKEqgg/4qk/uYk7A9QQ
+	zRut1Pu/7JkgCVon3Nntti8l7syRTip38MCoFatE6WPglPhI+RoN1zyirjupmPwefbVqB4id2tXpk
+	271/3+2A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42758 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w0cyL-000000007XD-2X5o;
-	Thu, 12 Mar 2026 10:08:53 +0000
+	id 1w0cyQ-000000007XO-30M7;
+	Thu, 12 Mar 2026 10:08:58 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w0cyK-0000000CzFs-395A;
-	Thu, 12 Mar 2026 10:08:52 +0000
+	id 1w0cyP-0000000CzFy-3eF8;
+	Thu, 12 Mar 2026 10:08:57 +0000
 In-Reply-To: <abKQWloxp9_4OuJh@shell.armlinux.org.uk>
 References: <abKQWloxp9_4OuJh@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -74,8 +74,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next v2 01/15] net: stmmac: rearrange stmmac_tx_info
- members to pack better
+Subject: [PATCH net-next v2 02/15] net: stmmac: helpers for filling
+ tx_q->tx_skbuff_dma
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,9 +85,9 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w0cyK-0000000CzFs-395A@rmk-PC.armlinux.org.uk>
+Message-Id: <E1w0cyP-0000000CzFy-3eF8@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 12 Mar 2026 10:08:52 +0000
+Date: Thu, 12 Mar 2026 10:08:57 +0000
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266989-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-266990-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[15];
@@ -111,52 +111,240 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.982];
+	NEURAL_HAM(-0.00)[-0.974];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F213027019D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B2D9D2701D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Rearrange the struct stmmac_tx_info members to pack better, essentially
-by sorting by type size:
+Add helpers to fill in the transmit queue metadata to ensure that all
+entries are initialised when preparing to transmit. This avoids clean
+up code running into surprises.
 
-xsk_meta	embeds only a pointer - 32 or 64 bit
-buf		dma address, 32 or 64 bit
-len		normally 32 bit
-buf_type	dependent on arch
-map_as_page	normally 8 bit
-last_segment	normally 8 bit
-is_jumbo	normally 8 bit
+For example, stmmac_clean_desc3() (which calls clean_desc3() in
+chain_mode.c or ring_mode.c) looks at the .last_segment, and in the
+latter case, .is_jumbo members.
+
+AI believes that there is a missing .buf_type assignment in
+stmmac_tso_xmit(), but this is a mis-analysis. AI believes that
+stmmac_tso_allocator() which would increment tx_q->cur_tx will be
+called within the loop when nfrags is zero, but it's failing to
+realise that none of the code within the for() loop will be
+executed. In any case, at the point where the loop exits,
+tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type has been correctly set
+via the call to stmmac_set_tx_skb_dma_entry() - either the one
+before the loop, or the one at the end of the loop block.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 96 +++++++++++--------
+ 1 file changed, 54 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index bba9bb9c95bf..b096a9e090e3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -47,13 +47,13 @@ enum stmmac_txbuf_type {
- };
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 11150bddd872..0dcf4a31e314 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1925,6 +1925,34 @@ static int init_dma_rx_desc_rings(struct net_device *dev,
+ 	return ret;
+ }
  
- struct stmmac_tx_info {
-+	struct xsk_tx_metadata_compl xsk_meta;
- 	dma_addr_t buf;
--	bool map_as_page;
- 	unsigned len;
++static void stmmac_set_tx_dma_entry(struct stmmac_tx_queue *tx_q,
++				    unsigned int entry,
++				    enum stmmac_txbuf_type type,
++				    dma_addr_t addr, size_t len,
++				    bool map_as_page)
++{
++	tx_q->tx_skbuff_dma[entry].buf = addr;
++	tx_q->tx_skbuff_dma[entry].len = len;
++	tx_q->tx_skbuff_dma[entry].buf_type = type;
++	tx_q->tx_skbuff_dma[entry].map_as_page = map_as_page;
++	tx_q->tx_skbuff_dma[entry].last_segment = false;
++	tx_q->tx_skbuff_dma[entry].is_jumbo = false;
++}
++
++static void stmmac_set_tx_skb_dma_entry(struct stmmac_tx_queue *tx_q,
++					unsigned int entry, dma_addr_t addr,
++					size_t len, bool map_as_page)
++{
++	stmmac_set_tx_dma_entry(tx_q, entry, STMMAC_TXBUF_T_SKB, addr, len,
++				map_as_page);
++}
++
++static void stmmac_set_tx_dma_last_segment(struct stmmac_tx_queue *tx_q,
++					   unsigned int entry)
++{
++	tx_q->tx_skbuff_dma[entry].last_segment = true;
++}
++
+ /**
+  * __init_dma_tx_desc_rings - init the TX descriptor ring (per queue)
+  * @priv: driver private structure
+@@ -1970,11 +1998,8 @@ static int __init_dma_tx_desc_rings(struct stmmac_priv *priv,
+ 			p = tx_q->dma_tx + i;
+ 
+ 		stmmac_clear_desc(priv, p);
++		stmmac_set_tx_skb_dma_entry(tx_q, i, 0, 0, false);
+ 
+-		tx_q->tx_skbuff_dma[i].buf = 0;
+-		tx_q->tx_skbuff_dma[i].map_as_page = false;
+-		tx_q->tx_skbuff_dma[i].len = 0;
+-		tx_q->tx_skbuff_dma[i].last_segment = false;
+ 		tx_q->tx_skbuff[i] = NULL;
+ 	}
+ 
+@@ -2695,19 +2720,15 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+ 		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
+ 		xsk_buff_raw_dma_sync_for_device(pool, dma_addr, xdp_desc.len);
+ 
+-		tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_XSK_TX;
+-
+ 		/* To return XDP buffer to XSK pool, we simple call
+ 		 * xsk_tx_completed(), so we don't need to fill up
+ 		 * 'buf' and 'xdpf'.
+ 		 */
+-		tx_q->tx_skbuff_dma[entry].buf = 0;
+-		tx_q->xdpf[entry] = NULL;
++		stmmac_set_tx_dma_entry(tx_q, entry, STMMAC_TXBUF_T_XSK_TX,
++					0, xdp_desc.len, false);
++		stmmac_set_tx_dma_last_segment(tx_q, entry);
+ 
+-		tx_q->tx_skbuff_dma[entry].map_as_page = false;
+-		tx_q->tx_skbuff_dma[entry].len = xdp_desc.len;
+-		tx_q->tx_skbuff_dma[entry].last_segment = true;
+-		tx_q->tx_skbuff_dma[entry].is_jumbo = false;
++		tx_q->xdpf[entry] = NULL;
+ 
+ 		stmmac_set_desc_addr(priv, tx_desc, dma_addr);
+ 
+@@ -2882,6 +2903,9 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue,
+ 			tx_q->tx_skbuff_dma[entry].map_as_page = false;
+ 		}
+ 
++		/* This looks at tx_q->tx_skbuff_dma[tx_q->dirty_tx].is_jumbo
++		 * and tx_q->tx_skbuff_dma[tx_q->dirty_tx].last_segment
++		 */
+ 		stmmac_clean_desc3(priv, tx_q, p);
+ 
+ 		tx_q->tx_skbuff_dma[entry].last_segment = false;
+@@ -4471,10 +4495,8 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	 * this DMA buffer right after the DMA engine completely finishes the
+ 	 * full buffer transmission.
+ 	 */
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = des;
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].len = skb_headlen(skb);
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = false;
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
++	stmmac_set_tx_skb_dma_entry(tx_q, tx_q->cur_tx, des, skb_headlen(skb),
++				    false);
+ 
+ 	/* Prepare fragments */
+ 	for (i = 0; i < nfrags; i++) {
+@@ -4489,17 +4511,14 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		stmmac_tso_allocator(priv, des, skb_frag_size(frag),
+ 				     (i == nfrags - 1), queue);
+ 
+-		tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = des;
+-		tx_q->tx_skbuff_dma[tx_q->cur_tx].len = skb_frag_size(frag);
+-		tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = true;
+-		tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
++		stmmac_set_tx_skb_dma_entry(tx_q, tx_q->cur_tx, des,
++					    skb_frag_size(frag), true);
+ 	}
+ 
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].last_segment = true;
++	stmmac_set_tx_dma_last_segment(tx_q, tx_q->cur_tx);
+ 
+ 	/* Only the last descriptor gets to point to the skb. */
+ 	tx_q->tx_skbuff[tx_q->cur_tx] = skb;
+-	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
+ 
+ 	/* Manage tx mitigation */
+ 	tx_packets = CIRC_CNT(tx_q->cur_tx + 1, first_tx,
+@@ -4758,23 +4777,18 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		if (dma_mapping_error(priv->device, des))
+ 			goto dma_map_err; /* should reuse desc w/o issues */
+ 
+-		tx_q->tx_skbuff_dma[entry].buf = des;
+-
++		stmmac_set_tx_skb_dma_entry(tx_q, entry, des, len, true);
+ 		stmmac_set_desc_addr(priv, desc, des);
+ 
+-		tx_q->tx_skbuff_dma[entry].map_as_page = true;
+-		tx_q->tx_skbuff_dma[entry].len = len;
+-		tx_q->tx_skbuff_dma[entry].last_segment = last_segment;
+-		tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_SKB;
+-
+ 		/* Prepare the descriptor and set the own bit too */
+ 		stmmac_prepare_tx_desc(priv, desc, 0, len, csum_insertion,
+ 				priv->mode, 1, last_segment, skb->len);
+ 	}
+ 
++	stmmac_set_tx_dma_last_segment(tx_q, entry);
++
+ 	/* Only the last descriptor gets to point to the skb. */
+ 	tx_q->tx_skbuff[entry] = skb;
+-	tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_SKB;
+ 
+ 	/* According to the coalesce parameter the IC bit for the latest
+ 	 * segment is reset and the timer re-started to clean the tx status.
+@@ -4853,14 +4867,13 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		if (dma_mapping_error(priv->device, des))
+ 			goto dma_map_err;
+ 
+-		tx_q->tx_skbuff_dma[first_entry].buf = des;
+-		tx_q->tx_skbuff_dma[first_entry].buf_type = STMMAC_TXBUF_T_SKB;
+-		tx_q->tx_skbuff_dma[first_entry].map_as_page = false;
++		stmmac_set_tx_skb_dma_entry(tx_q, first_entry, des, nopaged_len,
++					    false);
+ 
+ 		stmmac_set_desc_addr(priv, first, des);
+ 
+-		tx_q->tx_skbuff_dma[first_entry].len = nopaged_len;
+-		tx_q->tx_skbuff_dma[first_entry].last_segment = last_segment;
++		if (last_segment)
++			stmmac_set_tx_dma_last_segment(tx_q, first_entry);
+ 
+ 		if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
+ 			     priv->hwts_tx_en)) {
+@@ -5062,6 +5075,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
+ 	bool csum = !priv->plat->tx_queues_cfg[queue].coe_unsupported;
+ 	unsigned int entry = tx_q->cur_tx;
 +	enum stmmac_txbuf_type buf_type;
-+	bool map_as_page;
- 	bool last_segment;
- 	bool is_jumbo;
--	enum stmmac_txbuf_type buf_type;
--	struct xsk_tx_metadata_compl xsk_meta;
- };
+ 	struct dma_desc *tx_desc;
+ 	dma_addr_t dma_addr;
+ 	bool set_ic;
+@@ -5089,7 +5103,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 		if (dma_mapping_error(priv->device, dma_addr))
+ 			return STMMAC_XDP_CONSUMED;
  
- #define STMMAC_TBS_AVAIL	BIT(0)
+-		tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_XDP_NDO;
++		buf_type = STMMAC_TXBUF_T_XDP_NDO;
+ 	} else {
+ 		struct page *page = virt_to_page(xdpf->data);
+ 
+@@ -5098,14 +5112,12 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 		dma_sync_single_for_device(priv->device, dma_addr,
+ 					   xdpf->len, DMA_BIDIRECTIONAL);
+ 
+-		tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_XDP_TX;
++		buf_type = STMMAC_TXBUF_T_XDP_TX;
+ 	}
+ 
+-	tx_q->tx_skbuff_dma[entry].buf = dma_addr;
+-	tx_q->tx_skbuff_dma[entry].map_as_page = false;
+-	tx_q->tx_skbuff_dma[entry].len = xdpf->len;
+-	tx_q->tx_skbuff_dma[entry].last_segment = true;
+-	tx_q->tx_skbuff_dma[entry].is_jumbo = false;
++	stmmac_set_tx_dma_entry(tx_q, entry, buf_type, dma_addr, xdpf->len,
++				false);
++	stmmac_set_tx_dma_last_segment(tx_q, entry);
+ 
+ 	tx_q->xdpf[entry] = xdpf;
+ 
 -- 
 2.47.3
 
