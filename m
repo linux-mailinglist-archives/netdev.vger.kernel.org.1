@@ -1,123 +1,111 @@
-Return-Path: <netdev+bounces-266816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266817-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FzPHakOsmkNIQAAu9opvQ
-	(envelope-from <netdev+bounces-266816-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:54:01 +0100
+	id qNNYAyoPsmkNIQAAu9opvQ
+	(envelope-from <netdev+bounces-266817-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:56:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D405826BC48
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:54:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C5B26BCBE
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 01:56:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFDA730DD36E
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 00:53:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A14D4301DEF2
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 00:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736DA337BA3;
-	Thu, 12 Mar 2026 00:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39CC337BA3;
+	Thu, 12 Mar 2026 00:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVifggrt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="deBANyDf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF5F28643C;
-	Thu, 12 Mar 2026 00:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06DF2DF68;
+	Thu, 12 Mar 2026 00:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773276832; cv=none; b=ZBwu1RMGPZuj4otyRPUgIrNDGpBz8mNIIPPTEu/ZdGRGh3LQJb6kF074lMWrxR+CHwW1mbNaA5BzJxlox2M0UGBt0aY78bhB5vFzmCK8PyDVPUnGkerWoqjY2XUWgT1eEDVqALq5+5yCeeeyHaNjCDsJn93dJ3kt7SH36QKTKd4=
+	t=1773276965; cv=none; b=LMqGkscOWvjlt5UKuOvDhY9Xv0TnTZAJUTy+dmOkk8pwb5o8+BVQnB+S7Vd1U9wLxR91kjImOV8bzfU/1iB9hDS1LIWGl4gqb5SSWtp0Ri4RXxH85ztjs6peXGqdbmTjqEXF3Qxj2mW6+1j8rB4Qcby309eV7W+kdj5VKdqFnQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773276832; c=relaxed/simple;
-	bh=Q3+4Ab/bSeTUBy88ojfJKjl/bLS0Ga6QdrWQdkBqNbw=;
+	s=arc-20240116; t=1773276965; c=relaxed/simple;
+	bh=dPjYe2JMfStgHEB0UVgva8X2gHI9DeelJ+D/y9pRC9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYPeRgJ2kpj5W/eSJOEW7HwL12chURHgNgCXCJ7cthE9vQ6HsahU+GzUUCUn8hcbiRmyx8xcJy0ICEy8oGi2CvQvDHC4nSIXashSOqj7NHn1ARrmsDGYF5+BpskJwgNR113bJJvGkxDC2rlpZtByqp0mRDMIP0sAvnop1Y11GmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVifggrt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69169C4CEF7;
-	Thu, 12 Mar 2026 00:53:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UF7a8a8DH+ckpe+bzgKXScXB5el/xxiVZd2/UIjsb8k06cZsGFIfsZUi6w9l1yPj1Zmfd3GM7fLDaGVoicSwgVn97zFM5bEXLiJ+fgh9t/Wd5A/+kvJQccFQSUX+P1eAoVus3YhAh5TcQUYMr/vCmOiwg/jBPEvbdvR+oCR7Brs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=deBANyDf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97F8C4CEF7;
+	Thu, 12 Mar 2026 00:56:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773276832;
-	bh=Q3+4Ab/bSeTUBy88ojfJKjl/bLS0Ga6QdrWQdkBqNbw=;
+	s=k20201202; t=1773276965;
+	bh=dPjYe2JMfStgHEB0UVgva8X2gHI9DeelJ+D/y9pRC9k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EVifggrtTEp+4NAYtK6ELbT1Xnkshsm4UeF3liKNNBqbm5701b5JN3hwfdKdzxomZ
-	 Ca4phC6HYlsjLcc7+2GGt0ZT9idjniOK1x42yHhv4JBnrl7Kbp9fLHXXxjCoelT2Bc
-	 NjRTGHVMGKyEkDx94WBLUg1rO1THwv8qFHu3S0WiU220rz4WYNgTOraBWXUuP//Yto
-	 aSVTLrkH62iLNFZZvlDnH4GDYKpjVnltWFHbHjl1zeB8B3UY32/V62+PRreNRNunI2
-	 v4mWt7m/I+G7VbE98PPZ5vJGvI2tLOagfEsv9ZnMA2cQtuY+ul9fuFuC3GGFdidwdF
-	 CNvV3GRvyKX4g==
-Date: Wed, 11 Mar 2026 17:53:46 -0700
+	b=deBANyDfqI0BN3u/S0MoLjpYeFOqbRRV1R8hINtx9pZkuj0WENHG3STveojBAJtBN
+	 zkAZC4OZ8InVcYbgOgnkHrnWt9lK0nGB9wPfe/b1pzVqac/59wwiaz67wRdJR/Qchv
+	 Zqg2H0862l1gAFWWY52k/N0b6gIFI9fRbVn5KPX+SYUPbeRFrOjFtn6VCV26zQL/JS
+	 /k1p9Uvn2Z0cLZau3f8KwdrSql9ERRicQ0Bsk/cXNbLA8iPEfZOP8gdANYN4POmb+8
+	 qAnDoOv6omJV6/Ml15unFubXpSlSStH8MVChvDgqmZDdsjBvXPwX6u6fJKvOx++0vq
+	 ofg7uOngXd8DQ==
+Date: Wed, 11 Mar 2026 17:56:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: "Ricardo B. =?UTF-8?B?TWFybGnDqHJl?=" <rbm@suse.com>, Martin KaFai Lau
- <martin.lau@linux.dev>, John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@redhat.com>, David Ahern <dsahern@kernel.org>, Jay Vosburgh
- <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Hangbin Liu
- <liuhangbin@gmail.com>, Fernando Fernandez Mancera <fmancera@suse.de>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 0/4] {net,bpf}: nd_tbl fixes for when
- ipv6.disable=1
-Message-ID: <20260311175346.3ce9df1f@kernel.org>
-In-Reply-To: <92cea50b-8187-459f-bd0f-be0d253f49ff@iogearbox.net>
-References: <20260307-net-nd_tbl_fixes-v4-0-e2677e85628c@suse.com>
-	<20260310175858.70ed0391@kernel.org>
-	<92cea50b-8187-459f-bd0f-be0d253f49ff@iogearbox.net>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Nimrod Oren <noren@nvidia.com>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos
+ Tatulea <dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net: page_pool: scale alloc cache with
+ PAGE_SIZE
+Message-ID: <20260311175602.62629255@kernel.org>
+In-Reply-To: <20260309081301.103152-1-noren@nvidia.com>
+References: <20260309081301.103152-1-noren@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266816-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,linux.dev,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch,suse.de,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-266817-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D405826BC48
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A6C5B26BCBE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 11 Mar 2026 06:50:18 +0100 Daniel Borkmann wrote:
-> On 3/11/26 1:58 AM, Jakub Kicinski wrote:
-> > On Sat, 07 Mar 2026 17:50:52 -0300 Ricardo B. Marli=C3=A8re wrote: =20
-> >>        bpf: bpf_out_neigh_v4: Fix nd_tbl NULL dereference when IPv6 is=
- disabled
-> >>        bpf: bpf_out_neigh_v6: Fix nd_tbl NULL dereference when IPv6 is=
- disabled =20
-> >=20
-> > Hi Daniel, are you okay with these for net? =20
-> Yes, these look good to me. Go for it via net!
+On Mon, 9 Mar 2026 10:13:01 +0200 Nimrod Oren wrote:
+> The current page_pool alloc-cache size and refill values were chosen to
+> match the NAPI budget and to leave headroom for XDP_DROP recycling.
+> These fixed values do not scale well with large pages,
+> as they significantly increase a given page_pool's memory footprint.
+> 
+> Scale these values to better balance memory footprint across page sizes,
+> while keeping behavior on 4KB-page systems unchanged.
 
-Thanks!
+Jesper WDYT? I'm of course happy with this simple approach.
+https://lore.kernel.org/all/20260309081301.103152-1-noren@nvidia.com/
 
