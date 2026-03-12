@@ -1,188 +1,130 @@
-Return-Path: <netdev+bounces-266935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKg7IihwsmmuMgAAu9opvQ
-	(envelope-from <netdev+bounces-266935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:00 +0100
+	id CJuRDEBwsmmuMgAAu9opvQ
+	(envelope-from <netdev+bounces-266936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC6D26E723
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:49:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CD0D26E73E
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 08:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 855A530791E8
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:49:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 27E82302F7F7
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 07:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E6E3B27D3;
-	Thu, 12 Mar 2026 07:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ax/gNMry"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81EC3B27D7;
+	Thu, 12 Mar 2026 07:50:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4444A3B0AC8
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 07:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AA6303CA0;
+	Thu, 12 Mar 2026 07:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773301796; cv=none; b=oliJSGb63Y/2z4yfSQTbb5FgUY/bPpt+eX1Kf52WeSW6vc6y7VLqU2Ck2vfYvYaeybO4xiDFt+uE2i6yAmliA/WZZ1Uhk2ETb+obWN1SGezUhdL8p3+ps28IYW7f44EEszscA5gWlvRZVHBGjLqOlcexPJo2WIlylQKzWy094CU=
+	t=1773301818; cv=none; b=hvjUuoEckeqtpJvaN6nf/suUt+pEu7NdlhfuRxtS+cqEOhPTLKinvGWmy+jPmpkh6YezkQMi39dMfzfy1fUEB8jeqfd8U3U/zumnECoc35lT7X9SvxLh5WaX2z5e05pvr+MA4pmx8h25qk1Kox6hqyrRVAHmYe0e76/k6rtamto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773301796; c=relaxed/simple;
-	bh=qc6nhP5c2KbUKz7TVprgeRZu7pcKDVuliPuq3MEFpFk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RlJvRa/iL4DbfjyqBkpQLgYww5EsYNRZFwGyIyaywv3kccRMglYFebHrdVVGLLbmuHAavywHGjqp1npIk4vuPYoWshXT2vUo0Yl7RYfPn6vs8flE6X0Q31dAhu5wOijaI7EUYeHdIqtrZG4F5azxFdfpmd+vi6MLwHspyvTVN7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ax/gNMry; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 1E85F1A2DAB;
-	Thu, 12 Mar 2026 07:49:50 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D2AC65FDEB;
-	Thu, 12 Mar 2026 07:49:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BE4DD103685B6;
-	Thu, 12 Mar 2026 08:49:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773301788; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=oT1XxdAl50AWEmjTvDhxYXZzFl6EH2KJUz4HxFpnESQ=;
-	b=Ax/gNMry1zn+jSGCJbygPm1MqxQ4xxoTT66fSRTc5nLHZg0smRQfQsCBxzFAgGLzAa5lfd
-	Af4Hzw3beOAKGJa2JoN1tyRRgpFbt2P1DrjSQJLrLuFisE3KcRi9NuOajpxaUhtjQbuHEK
-	kR3cJQ7kSGJyJSKLk1FFFNgbzO9Llxvoc0l+zkG8/VZWxfJJLvshOLgAEPhd0YVzYaaAc3
-	wf1CqHn90p9oxKToETmVmvknFNcnGt4nnaLz9lclipHxPR9jfhGQ3zeSz9iFLtb5+nxz2S
-	99oywt/IIeSV4UXD45vO3Bd0BvPnK1F/DNbgdI8WLyq0hFw/oXtfNgrByjMj/Q==
-Message-ID: <ebab1d3e-8967-444b-be54-437e4dfe3c7e@bootlin.com>
-Date: Thu, 12 Mar 2026 08:49:39 +0100
+	s=arc-20240116; t=1773301818; c=relaxed/simple;
+	bh=G9iOh8MH53BV8yifyGIrscGOuqRgXXDAZ+PHM0PPFrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNE7VOM1RAg6W6bo+3ucTGim4GKJFDSUn87oMlVoJMTJ6Sz3YEKluEdco+3ezIcCITyqlKGj3YYcNbmpgETUeF2V6eA1yISAyTMnWv5vJcgSH+75ioQIYzlNwq9omb4lvCgYoPqcWwgaiiNWDEfhl4whO8mCbWw7p0AwLZ+zJDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 021B71A0542;
+	Thu, 12 Mar 2026 08:50:16 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id DE62A1A06DE;
+	Thu, 12 Mar 2026 08:50:15 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id AF65E20263;
+	Thu, 12 Mar 2026 08:50:15 +0100 (CET)
+Date: Thu, 12 Mar 2026 08:50:15 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com,
+	boon.khai.ng@altera.com
+Subject: Re: [PATCH v8 1/5] net: stmmac: Use helper macro for loop over
+ queue-based arrays
+Message-ID: <abJwN5bulKxQpI+K@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20260309-dwmac_multi_irq-v8-0-f0cc5bc811a7@oss.nxp.com>
+ <20260309-dwmac_multi_irq-v8-1-f0cc5bc811a7@oss.nxp.com>
+ <20260311203707.1d5ba94c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
- Eric Dumazet <edumazet@google.com>,
- Naveen Mamindlapalli <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Leon Romanovsky
- <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Saeed Mahameed <saeedm@nvidia.com>,
- Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260310104743.907818-1-bjorn@kernel.org>
- <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
- <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
- <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
- <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
- <20260311195052.1202174f@kernel.org> <abJJY8whzSOB8O-X@pengutronix.de>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <abJJY8whzSOB8O-X@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260311203707.1d5ba94c@kernel.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266935-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,armlinux.org.uk,altera.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,davemloft.net,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-266936-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jan.petrous@oss.nxp.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EBC6D26E723
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,jan.petrous.oss.nxp.com,dt,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9CD0D26E73E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 12/03/2026 06:04, Oleksij Rempel wrote:
-> On Wed, Mar 11, 2026 at 07:50:52PM -0700, Jakub Kicinski wrote:
->> On Wed, 11 Mar 2026 20:26:39 +0100 Andrew Lunn wrote:
->>>> For that we have what we need with phy_link_topology, as each PHY has
->>>> its index, we should be good to go in that regard hopefully :)  
->>>
->>> So depth would be local to a component? We could have two PHY
->>> components, each with a different index, and depth = 0?
->>>
->>> I _think_ Jakub's depth was more at a global level? But then it would
->>> need to be passed down as we do the enumeration.
->>
->> Oh, sorry, I responded without reading the whole discussion :)
->> No, I imagined the depth would be within a single component, 
->> so under control of a single driver (instance). The ordering
->> between components should be defined by PHY topology etc so
->> it's outside of the loopback config.
+On Wed, Mar 11, 2026 at 08:37:07PM -0700, Jakub Kicinski wrote:
+> On Mon, 09 Mar 2026 18:55:20 +0100 Jan Petrous via B4 Relay wrote:
+> > The stmmac driver contains similar pattern for processing queue-based
+> > arrays, ie. interrupt lines, etc. Factor out the for loop and provide
+> > a macro STMMAC_FOREACH_MTL_QUEUE(var, limit).
 > 
-> As for me, it is problematic to help the user to understand the datapath
-> depth on a switch. For example:
-> 
-> CPU -- xMII --- MAC1 [loop] --- fabric --- MAC2 [loop] --- xMII -- PHY
->                                     \----- MACx [loop] ---
-> 
-> ... each port has two xMII loop configurations: towards the xMII or towards
-> the fabric. From a driver perspective, a loop towards the xMII is
-> "remote." However, from a system perspective, a "remote" loop on MAC1 is
-> a local loop at depth=0, whereas a "local" loop on MAC2 is a local loop
-> at depth=1.
+> This is macro is neither shorter nor more readable.
+> I really don't see any benefit here..
 
-What's important is to specify clearly in the documentation from which
-end do we start, where representing the topology. From your scenario
-here, each block is already well represented and exposed, and if we use
-local depth definitions we should be fine ?
+TBH me neither. Or, I see only "descriptive" benefit, what, of course,
+is nothing must-to-have.
 
-> 
-> Other example would be where we have a chain of components which are
-> attached on the system in a unexpected direction, where the MDI
-> interface is pointing towards the main CPU, so the remote loopbacks
-> became to local loop.
+I will prepare v11 without this.
 
-I have a few of these types of setup on my desk, where 3 PHY devices are
-daisy-chained, we don't support that for now. If we one day add support
-for standalone PHYs acting as media converters, I expect we'll be able
-to tell which end is pointing where, and let it up to the user to figure
-out what "remote" and "local" means in that case.
-
-> 
-> One more issue is the test data generator location. The data generator
-> is not always the CPU. We have HW generators located in components like
-> PHYs or we may use external source (remote loopback).
-
-There were discussions about PRBS, I think the same idea of "pinpointing
-which block we want to use" can be applied for both loopback and
-generation ?
-
-Maxime
-
+Thanks.
+/Jan
 
