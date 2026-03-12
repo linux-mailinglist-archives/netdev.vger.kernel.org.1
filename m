@@ -1,207 +1,271 @@
-Return-Path: <netdev+bounces-267022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDrkIECesmndOAAAu9opvQ
-	(envelope-from <netdev+bounces-267022-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:06:40 +0100
+	id yJLoKnyesmkOOQAAu9opvQ
+	(envelope-from <netdev+bounces-267023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:07:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7302709BB
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:06:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8DB4270A3B
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 12:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C3C89305FC4B
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:06:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 450D6307E86E
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 11:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A36139B971;
-	Thu, 12 Mar 2026 11:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A30C39BFF3;
+	Thu, 12 Mar 2026 11:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUBfpx6S";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWzZncL/"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="lo1fbn9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED65A39936E
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 11:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6D339B971
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 11:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773313577; cv=none; b=P1t+aWrhaDUBKo8LePwaBNGgYAreq4sZJ9By/CdEEWMzjaFtjT878PzpfCiUlJIXKK/OoEcELo3DAiqEWMUV5lWJHm0PzLCrCx2JAuy0FcG9vNMTpNDZf2dJU8gI6r4qcL4qqcRlrRSFKYYRo7bYtaG7ilFDH9JberY6YUO9ItM=
+	t=1773313585; cv=none; b=Za+yeLagmpqQsUV6YsSQScKsJ5dtQb0CZObd375mRDqHzrlWbQz5qZKp1TrTAXQh9+dOs6MxtI8ZQahekbDITuQrk9GQPpHzMQyCrRMGM0hO5Y6aDrOiengLSbkCjB2rjzRLJ/UATeXqqfqHmr08eBEEzVCDGGm1WbstNxf9UAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773313577; c=relaxed/simple;
-	bh=CgWNIiS+M0AOGBmsGiYrX0z/waqFRn3xgrom+Vf1ip8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Txh84J+iBGWMgtJ1aiY3w4kPE7ob11HhnDEl4ylxcp1cEhIu/8+Z1PuXWIAhw3q9gKOxtJJmvl1O1vRrwvDjpXX8Q+2zENsICm/yG2pjAa31xxilUOqKAw+Q0QzMdubRN9m2eTHpBs4wq+JcdIJLkdH/p888VJPWs401SWHhv80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RUBfpx6S; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CWzZncL/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773313575;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q0GjOCrLZMJdWmBqARXEFoO0AI1gLdN5XafIHahOrOo=;
-	b=RUBfpx6Sd2sqvki1w64iamZVIWTJndxzLy8KP8ZSh3lyfnmrZCcC+8cnLBWu+pV4FWw4sZ
-	uZOVG/eRm8oqzowyrscvf8RUzMhOzYUXAhFiNFMicb5a7cREbiXCcc/O4CTBkptir6WYoW
-	0441mB+wTqJLH2pfumtGlRh3U5rbjEc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-QxiGgpgYMxGo-6A4Pdz--w-1; Thu, 12 Mar 2026 07:06:13 -0400
-X-MC-Unique: QxiGgpgYMxGo-6A4Pdz--w-1
-X-Mimecast-MFC-AGG-ID: QxiGgpgYMxGo-6A4Pdz--w_1773313572
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439b3b408f9so833502f8f.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 04:06:13 -0700 (PDT)
+	s=arc-20240116; t=1773313585; c=relaxed/simple;
+	bh=/9J3tVGfkbfc2ZVBxryfqsIyn/sMRAL1gB1bZI9O198=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=otUfTzMOsH4wvVw5bDkc3bUVQK8fOlujzgpAQm8eSRFwSd3qKUkbtOChOMbGJSitlnd4M1Uv/KK3rX4DI8/Kj+5SsyfPZlwtDq0VHPlDXcrID7Yv3fnApHuAt+aYD3G8OipUEVTLldkT4g4dxd5Y8BcuUI9YpmQ9lqDVkEzOuPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=lo1fbn9I; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4853f2826f7so7853295e9.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 04:06:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773313572; x=1773918372; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0GjOCrLZMJdWmBqARXEFoO0AI1gLdN5XafIHahOrOo=;
-        b=CWzZncL/hOg+k6h5YFk7cwF7clCounjODLg75YCIkiud9zaa4WjkFuHMyJfSfWGSxs
-         G1HDOjMckGdPZ92idkolFPuzAdWBI0utK4W1U6TgX5Oabvsv65HxrJFzlLzFzHwdlrAk
-         yNLR1/XPf9VwfVBqbN6ktkBHcaIesxgnAP/twHSYizZKFjl6XeSkpfw4aHMN1dVMYmDY
-         IQ6CwD4Eoq/zXN2pFskKdCC7ZRTEI9FN+eBWCsAMY1uNyifQsVdMJc+tyXqjzszHgQQj
-         TUSsdbdhs/pwvqsS44/D1H8wUUIwESK+X3Bu0VmZefesp9BOwZHms8jPDOApmLrkhcM/
-         5nzA==
+        d=blackwall.org; s=google; t=1773313582; x=1773918382; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Xi90ehS/6At/d9Hc+H9BmnTyiPTBQruO8CzKtDXyqkU=;
+        b=lo1fbn9IUDe5MIIH1gniUfknj20+xbZ8vY5+XQiNnxehi4LaS6doKTkpmlD7GG92oE
+         ne8w9eOgJWzf9yXUKxgVbHk7dfp18IxPzx+fqsVOQWdNh/W3qIMW2Tt+mWW/QhzBvO+F
+         hKjv59akDwk7lecfhignf3LR+JJEjNWZ0s+snVtIPWetzHU4RaWAIlPPDA5DGlz4rfaY
+         SK5ECTrPjRv4dLQwWc1VlRGe/NvEkCLouTmZpaLGq40unimcx1te45kmCcUaZraVyYqa
+         TRQApYBMjSZKLhjItpWk+wISDadaC9ZyCSg7NRrPftjWXUeD7fpT7lFJah2rA+q/LEpa
+         StLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773313572; x=1773918372;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q0GjOCrLZMJdWmBqARXEFoO0AI1gLdN5XafIHahOrOo=;
-        b=tPU2Jlh1srf+s7feCKbuvDuqb1uqfoEFjEPHVTZUraBlmbUrwAZc49K/Fct4urghHW
-         IiDxUKRWETdKMTAA6ONtIz/4DVviwmuQvfp351ljIdiL5QZAorEpAW6+/fr7C/kRbiA1
-         Qg9aYdt4aE0VDAsXbV+wjlIkFYdVj7d8SzHHrchLlZky97ZOZBPMI9JvohTPOpsq5Xbl
-         QL0ABcG8HHLUKMaFs8W0S0KvQniiKfp3SNAvtX6CSnNkGw3AqESYuzqpZ9s1W8ES0vbW
-         XVljD0wLhtYL1cLK6fSGgf94GuRH6nHDjYoMGmlRnDsZf7xsj29CW+pSCw+WboX6s3tU
-         ykOg==
-X-Gm-Message-State: AOJu0YyKpfAIgWR27pcNsXC0fhTRIpKQJg0RHZRq1nxbY+ehVtDThoQJ
-	lIpKecaWa+atNg5W76VOwvPbrkrHpvrKs8tjUgQnPY2YDl3oPL9qeRVPQmbWgIHP/AQfpI+QTOG
-	MaR6MW39NIwMiKgqRQTXF67IMpiH4W+gok0f6jgiKo7Wvd6Ax01WwPFGQPQ==
-X-Gm-Gg: ATEYQzzrIHTjwBZeMMPqQ8YVo+S/Ty3HjUt8A6D5npKB023dXYH4LoKsfCwbsPD9J4c
-	9e7C+Zf0tUXGqi84SAEL5MMmu96BsB0bIcP99VKqePMNcjaqwjQasdZhjHe/ymW6wI9vSF5jNBK
-	JOIVvVoyXiuwa/4crYYeHOe2W0CjmhR8y5EWNzW47g2vGiPoswFwjkGQxVcYwFqPP4VKuqKmdUA
-	IOdHl5RcxW2iVnP6XqK0a9zTnyhtBjZeKilp4dACUlWeZU542jjmqLeUIzWIOpaQCdNGgU0ozFO
-	tjupP9XAAAKYE8OoraLFc3n7nRtfZ/7qLxlW21KL8vNtnEWhcH0W/JH/G9ouJjkqydQ8y/oAwWn
-	G0KgNGmoInCpaqv7S/RMxYuHPZWN6k+gX1KUa3lEjbuujCAzS4eiAx+c=
-X-Received: by 2002:a05:600c:3548:b0:485:345b:ccb1 with SMTP id 5b1f17b1804b1-4854b129fffmr97036335e9.27.1773313572437;
-        Thu, 12 Mar 2026 04:06:12 -0700 (PDT)
-X-Received: by 2002:a05:600c:3548:b0:485:345b:ccb1 with SMTP id 5b1f17b1804b1-4854b129fffmr97035605e9.27.1773313571932;
-        Thu, 12 Mar 2026 04:06:11 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b5f6b95sm116309065e9.6.2026.03.12.04.06.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2026 04:06:11 -0700 (PDT)
-Message-ID: <04439ab3-818d-460a-9307-2c6cca4f9ab7@redhat.com>
-Date: Thu, 12 Mar 2026 12:06:09 +0100
+        d=1e100.net; s=20230601; t=1773313582; x=1773918382;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xi90ehS/6At/d9Hc+H9BmnTyiPTBQruO8CzKtDXyqkU=;
+        b=jau8NH8FqecHJwEBHANgR4iW11qyZtaJ1TlK4C+nu/iKw4ZORvkLI9zN/ZHq9gq0fQ
+         R72meKtaURqicGf10ELBKkYPbmlwCGH4RpXP/Xm7u/DGGoq3XOu7tyvB5WopDBL7p/EH
+         9kU1pwNPl8lU8l2Sjonl1iJcRR7rpVuqAy2nfR7YAHgXiMMLGyAvmF62okTuuS5PdcSQ
+         J8oaxlIKmlN5+M8byzrPeNryB85PeaIsIXX5icynx11+lF8O2RXAp5Yf1DnDnuZgIJa3
+         KlccTvmgLPc1jrB4/Q/SjSSXT2D3wbsyOEc5MNaFLitxfiL9m6LiXX0yTtAj7AXBQAsM
+         IuTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWK9+UJSWCMO6SxFsmGnMQ4ly32kqrpDDNFXwfbezYzMHT7Y2xMb1Wh18ya/6+XcyC8qiXHfyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnslwtalWUPu2mwSWG7OZIZEvKtWM8SGxoQcWYcJEGXUnSszR+
+	I5lsGs3ZHvqLZjY6bwcTDvgLtDsJMKKcc4paswJRLcxyn0JJejkZ7acSkWcb5pzXOpU=
+X-Gm-Gg: ATEYQzyJ4AOy5IZvuVt7fwapiObfyOsP0p4LrP0vM4nUeoPsqWEXTR5IeNVFbMIUqUu
+	JYenHlrx1f53UKOYke+ra7FDXja5maa0oOjXn8+iTabX0Y7p/0hYV1zkSYhh0eVm7RPNmSNERyv
+	wf6nDITENkn/orG5XBcY84LldPjplYwoRVAjd24psnYUpqh1CLl4VLPo58hH9KCK+QWq0MLzVKH
+	JV7tmsISuKiN2+kR9t8xK+SGS4uiiu3n+RAPIbjg5GnB756Eau+u64RurUXIKk8WD4uqp8Z8Hr5
+	Zu0+GmRc+hyQzTMvVW1KtCeMnr38xszEdcO2D/76IRacJNWCiLJo2KTxggxz5LeLtPxhrML0ikR
+	A2dZlqTcOtm89o0Od2dTbcWx/A7yCTfkSU7G5rJwz20PeATOGpNFkm/kiXM94uSZC1tFsWCQ8k1
+	nZRZ2spczsX/YlZI5OW1ePLHvfniplNCDOn13ME46z8pJkLU+Wx9q+ztgDLNT9ATJk+SAb
+X-Received: by 2002:a05:600c:4752:b0:485:3692:e906 with SMTP id 5b1f17b1804b1-4854b0c77f4mr96011415e9.13.1773313581497;
+        Thu, 12 Mar 2026 04:06:21 -0700 (PDT)
+Received: from localhost (176.111.184.239.kyiv.nat.volia.net. [176.111.184.239])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854a18ddedsm108978795e9.0.2026.03.12.04.06.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 04:06:20 -0700 (PDT)
+Date: Thu, 12 Mar 2026 13:06:19 +0200
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
+	jiayuan.chen@shopee.com,
+	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Jussi Maki <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net v5 1/2] bonding: fix null-ptr-deref in
+ bond_rr_gen_slave_id()
+Message-ID: <abKeK-w7K7xLuWAH@penguin>
+References: <20260309030702.128520-1-jiayuan.chen@linux.dev>
+ <20260309030702.128520-2-jiayuan.chen@linux.dev>
+ <abAFRbJNinhN3O5v@penguin>
+ <CANn89i+5yOzdiBTWm4ekc0UvMxQp=mhXbz0rU5WnfxEu3NrAhg@mail.gmail.com>
+ <CANn89iLOyWzWW7w262Vsy2MOMVDXA0+UZGpEbsdLwe6e75mhKQ@mail.gmail.com>
+ <abARG4sHFdUNqcRV@penguin>
+ <8d746046-eed9-4d82-a064-c20b6a131bdc@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/5] net: phy: make mdio_device.c part of
- libphy
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- linux-arm-msm <linux-arm-msm@vger.kernel.org>, linux-clk@vger.kernel.org,
- linux-phy@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Vinod Koul <vkoul@kernel.org>,
- Neil Armstrong <neil.armstrong@linaro.org>
-References: <9d5724bc-e525-4f8f-b3f8-b16dd5a1164e@gmail.com>
- <c6dbf9b3-3ca0-434b-ad3a-71fe602ab809@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <c6dbf9b3-3ca0-434b-ad3a-71fe602ab809@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8d746046-eed9-4d82-a064-c20b6a131bdc@redhat.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-267022-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,baylibre.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267023-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,linutronix.de,linux.dev,vger.kernel.org,shopee.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch,davemloft.net,kernel.org,iogearbox.net,gmail.com,fomichev.me,goodmis.org,lists.linux.dev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blackwall.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3B7302709BB
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,shopee.com:email,blackwall.org:dkim,blackwall.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D8DB4270A3B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/9/26 6:03 PM, Heiner Kallweit wrote:
-> This patch
-> - makes mdio_device.c part of libphy
-> - makes mdio_device_(un)register_reset() static
-> - moves mdiobus_(un)register_device() from mdio_bus.c to mdio_device.c,
->   stops exporting both functions and makes them private to phylib
+On Thu, Mar 12, 2026 at 11:36:20AM +0100, Paolo Abeni wrote:
+> On 3/10/26 1:39 PM, Nikolay Aleksandrov wrote:
+> > On Tue, Mar 10, 2026 at 01:07:15PM +0100, Eric Dumazet wrote:
+> >> On Tue, Mar 10, 2026 at 1:00 PM Eric Dumazet <edumazet@google.com> wrote:
+> >>>
+> >>> On Tue, Mar 10, 2026 at 12:49 PM Nikolay Aleksandrov
+> >>> <razor@blackwall.org> wrote:
+> >>>>
+> >>>> On Mon, Mar 09, 2026 at 11:06:58AM +0800, Jiayuan Chen wrote:
+> >>>>> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >>>>>
+> >>>>> bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
+> >>>>> check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
+> >>>>> when the bond mode is round-robin. If the bond device was never brought
+> >>>>> up, rr_tx_counter remains NULL, causing a null-ptr-deref.
+> >>>>>
+> >>>>> The XDP redirect path can reach this code even when the bond is not up:
+> >>>>> bpf_master_redirect_enabled_key is a global static key, so when any bond
+> >>>>> device has native XDP attached, the XDP_TX -> xdp_master_redirect()
+> >>>>> interception is enabled for all bond slaves system-wide. This allows the
+> >>>>> path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+> >>>>> bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
+> >>>>> reached on a bond that was never opened.
+> >>>>>
+> >>>>> Fix this by adding a NULL check with unlikely() in bond_rr_gen_slave_id()
+> >>>>> before dereferencing rr_tx_counter. When rr_tx_counter is NULL (bond was
+> >>>>> never opened), fall back to get_random_u32() for slave selection. The
+> >>>>> allocation in bond_open() is kept, with WRITE_ONCE() added to safely
+> >>>>> publish the pointer to the XDP read side. A plain read suffices for the
+> >>>>> !bond->rr_tx_counter guard in bond_open() itself, as bond_open() runs
+> >>>>> under RTNL lock and is the only writer of rr_tx_counter.
+> >>>>>
+> >>>>> Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
+> >>>>> Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
+> >>>>> Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
+> >>>>> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >>>>> ---
+> >>>>>  drivers/net/bonding/bond_main.c | 9 +++++++--
+> >>>>>  1 file changed, 7 insertions(+), 2 deletions(-)
+> >>>>>
+> >>>>
+> >>>> This is Jay's patch + the unlikely change, looks good to me.
+> >>>> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> >>>
+> >>> Orthogonal to this patch  :
+> >>>
+> >>>  get_random_u32() typical cost is around 10 to 20 ns, I really wonder
+> >>> if this makes sense
+> >>> for the packets_per_slave == 0 or 1 case to haves this kind of
+> >>> randomness in the first place.
+> >>>
+> >>> Perhaps we could use a
+> >>>
+> >>> static DEFINE_PER_CPU(u32, rr_tx_counter)
+> >>>
+> >>> And :
+> >>>  slave_id = this_cpu_inc_return(rr_tx_counter);
+> >>
+> >> I also have mixed feelings about this patch.
+> >>
+> >> We probably should detect that the device is not ready before hitting
+> >> something deeper in the stack.
+> >>
+> >> Sure, a NULL deref is avoided, bu what happens next ?
+> >>
+> >> We send a packet while the device is not UP, I am pretty sure this
+> >> violates at least some RCU rules in device dismantling.
+> > 
+> > IIRC when the redirect continues, the packet should get dropped if the device is
+> > not up (checks at a few places), but that's outside of bond's jurisdiction and
+> > after the slave id is needed in xdp master redirect's path unfortunately.
+> > I'm not sure it can reach much further, it just has the master dev's slave id
+> > generation in its path.
+> > 
+> > In any case we shouldn't crash in the slave id generation in the bonding,
+> > that ndo's only job is to return a slave id.
 > 
-> This further decouples the MDIO consumer functionality from libphy.
+> I'm sorry for the back and forth, but I share Eric's concern. I think
+> the approach suggested by Daniel:
 > 
-> Note: This makes MDIO driver registration part of phylib, therefore
->       adjust Kconfig dependencies where needed.
+> https://lore.kernel.org/netdev/4d15be93-b497-4499-996d-9f3a67a2abc6@iogearbox.net/
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
-> v2:
-> - add needed Kconfig dependency changes
-> ---
->  drivers/clk/qcom/Kconfig          |  2 +-
->  drivers/net/phy/Makefile          |  6 ++---
->  drivers/net/phy/mdio-private.h    | 11 ---------
->  drivers/net/phy/mdio_bus.c        | 36 ----------------------------
->  drivers/net/phy/mdio_device.c     | 39 ++++++++++++++++++++++++++++---
->  drivers/net/phy/phylib-internal.h |  4 ++++
->  drivers/phy/broadcom/Kconfig      |  4 ++--
->  include/linux/mdio.h              |  2 --
->  8 files changed, 46 insertions(+), 58 deletions(-)
->  delete mode 100644 drivers/net/phy/mdio-private.h
-> 
-> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
-> index a8a86ea6bb7..a277c434d64 100644
-> --- a/drivers/clk/qcom/Kconfig
-> +++ b/drivers/clk/qcom/Kconfig
-> @@ -392,7 +392,7 @@ config IPQ_NSSCC_9574
->  
->  config IPQ_NSSCC_QCA8K
->  	tristate "QCA8K(QCA8386 or QCA8084) NSS Clock Controller"
-> -	depends on MDIO_BUS
-> +	depends on PHYLIB
->  	help
->  	  Support for NSS(Network SubSystem) clock controller on
->  	  qca8386/qca8084 chip.
 
-Bjorn, Micahel, Stephen: are you ok with this change?
+That will work, I like Daniel's patch as well. It will add a test for all redirects
+for master devices, but I guess that is ok. For bonding it will work because the bond
+has the problem only while it was never opened (before first up).
 
-Thanks,
+IMO this patch still has value, because currently the code implicitly relies on
+a specific sequence of events, who knows tomorrow someone may find another way
+and again call that ndo while the bond is down.
 
-Paolo
+> or the initial patch form:
+> 
+> https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.dev/T/#m7c67bb12f85bc88d583788fb6e41113c46208ae7
+> 
+> would be better. To respond to old concerns raised there: the check is
+> IMHO bond-specific, as control moves from the lower interface to the
+> upper bonding device, and the code is under an RCU critical section, the
+> device can't go away before the xmit is completed.
+
+This one I don't like, it is not about going away, it is more about adding 2 new
+tests for everyone and potentially 1 more cache line.
+
+> 
+> /P
+> 
+
+Cheers,
+ Nik
 
 
