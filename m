@@ -1,156 +1,144 @@
-Return-Path: <netdev+bounces-267108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267109-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFThCLrRsmnrPwAAu9opvQ
-	(envelope-from <netdev+bounces-267108-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:46:18 +0100
+	id oChuKMvRsmnrPwAAu9opvQ
+	(envelope-from <netdev+bounces-267109-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:46:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA219273969
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:46:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74832273980
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 15:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F190B300B5A7
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:46:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CE1FC300B1B3
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F32359A95;
-	Thu, 12 Mar 2026 14:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582343750DD;
+	Thu, 12 Mar 2026 14:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="cbg0LaTl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P256h7yN"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EA3376BF1;
-	Thu, 12 Mar 2026 14:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0351373C00
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 14:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773326773; cv=none; b=d2bMFIzUpihkHCYqghnCUdobsmuS31jU61PjIKVLGlod9dVfiADhTFGxBDzTIJiPGmIa/IXGh5qY0hFTdDnFwESo/NS8XRtO5jv2fEJVd7ZBwR9caN7oM03mNx+R3KzjWALIAzfchoIx1/u05dZg66iZ/Prr+Jv7nnHzMlij6Xg=
+	t=1773326792; cv=none; b=SRSdhmBqTNf7qEo++f7r7Tt3pznRWN24shWY9xK3aTDnsK7b6DcJibZ2IOsK5Iss5ysBzE1HEPRGPvZ3xT5BJ2LEpDvQEWPxWouXdtgH3bzi7fWc+XmcSRDmlNR+jfmV0k30uL4dPP6Lf1VrelhwINXHGluSDd0SjuNXJt81QxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773326773; c=relaxed/simple;
-	bh=JMB7nMHRCJ2NukyE7t95J5CarTlsyVXjAAdrzzx9NPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hEFTRYhobzN6MPMzu+q/Z2PAVsiJ4QHpe4BycWyIttF/kVs3qdYNNy+mPUeSuE//g6uKAlJ3PGoFt4SircvUPo1DrIerRUz30XnnCQrE1d51M4SYkH4p2I3u/xnfFHhFUE7ycTLHoiMbarWJOJPDz7Ees8kfBOkpqdUUONHsFXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=cbg0LaTl; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 81CA220B710C; Thu, 12 Mar 2026 07:46:08 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 81CA220B710C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1773326768;
-	bh=dn4sna73T608sAW83ClLRLUdcBy81wfv9Q/fnDJeO+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cbg0LaTlsaWNl1hdTzFFBt2El0BVeL+PtZkQhvoZcucagpcwrY6HZ60kUY06pU9jW
-	 uA005qJ9LQFrafdNJKxXw31c3svHiVe7qBolxYRhIXYa32fzYWwyXv0Dev05Gdjb97
-	 3r2J/Gbj4pe5SVR11Bjh9xKJxvlzUoL8Yb+XJmvk=
-Date: Thu, 12 Mar 2026 07:46:08 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, kotaranov@microsoft.com,
-	shradhagupta@linux.microsoft.com, dipayanroy@linux.microsoft.com,
-	yury.norov@gmail.com, kees@kernel.org, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: mana: Expose hardware diagnostic info
- via debugfs
-Message-ID: <abLRsHkzf4Gnf0KC@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260309143840.675606-1-ernis@linux.microsoft.com>
- <20260311164653.GS461701@kernel.org>
+	s=arc-20240116; t=1773326792; c=relaxed/simple;
+	bh=stY+trT96HJiU1r+bucUsh2tex/vjyCiTevinfj0ybo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XPvqKOSQp1juN83+urQT7XyTISnt3RKKdhVyhQvxfzqFX8Jh8x42VnknFjj8Eizq4i98UMuqug1o+MqoSF+4x6QNZ4088w455y8/yOkFM3AJ66qDmokeKflSsaTpznld1nHqU7d/bJzjMaTI7e3ivMfSEJpnNL3eYpJCoMJc+aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P256h7yN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7C9CC4CEF7;
+	Thu, 12 Mar 2026 14:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773326792;
+	bh=stY+trT96HJiU1r+bucUsh2tex/vjyCiTevinfj0ybo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P256h7yN3/E57yJgxhKfGO6cc0IlBJOyMqRAiqZjSprQ3CpSitNU5YWuyB60naXir
+	 66cWZr/x6xPs/LE8wHg2B2gRvM2CIIgUNd3756Fyowe5byrmoUJvlJAXkaIsrE7BE9
+	 y1Oe2/QUtaFCeDlXEq0L4XhkX1oQbzUEpQKlQffcFtQfY1nb1WM9THNxgjNUlw7Fw2
+	 HH3fVzJSTrwW4lkOn1HueqN9y7vL49Dh+Jm5Eml+YskzJ16ziGArAQZq56M/YR+c7k
+	 RdN6E2JWrUx562IRQITcha2Ku6Q5M0iHzp8j3RYayLhUo1pJCvOyA6G+QhCDuQKz5x
+	 2y0BrJk9nAmqw==
+Date: Thu, 12 Mar 2026 07:46:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, Guillaume Nault
+ <gnault@redhat.com>
+Subject: Re: [PATCH net] ip_tunnel: adapt iptunnel_xmit_stats() to
+ NETDEV_PCPU_STAT_DSTATS
+Message-ID: <20260312074630.52e7a311@kernel.org>
+In-Reply-To: <20260311123110.1471930-1-edumazet@google.com>
+References: <20260311123110.1471930-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260311164653.GS461701@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267108-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-267109-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BA219273969
+X-Rspamd-Queue-Id: 74832273980
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 11, 2026 at 04:46:53PM +0000, Simon Horman wrote:
-> On Mon, Mar 09, 2026 at 07:38:28AM -0700, Erni Sri Satya Vennela wrote:
+On Wed, 11 Mar 2026 12:31:10 +0000 Eric Dumazet wrote:
+> @syncp offset in pcpu_sw_netstats and pcpu_dstats is different.
 > 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> 
-> ...
-> 
-> > @@ -2128,6 +2140,9 @@ int mana_gd_suspend(struct pci_dev *pdev, pm_message_t state)
-> >  
-> >  	mana_gd_cleanup(pdev);
-> >  
-> > +	debugfs_remove_recursive(gc->mana_pci_debugfs);
-> > +	gc->mana_pci_debugfs = NULL;
-> 
-> Hi Erni,
-> 
-> The same cleanup of mana_pci_debugfs already appears in a couple of other
-> places. It seems that all such cleanup is now paired with a call to
-> mana_gd_cleanup().
-> 
-> So could you consider performing the mana_pci_debugfs cleanup in
-> mana_gd_cleanup()? Possibly also renaming that function?
-> 
-Yes, I think that makes sense to combine them in once function.
-I will make that change in the next version.
-> > +
-> >  	return 0;
-> >  }
-> >  
-> > @@ -2140,6 +2155,12 @@ int mana_gd_resume(struct pci_dev *pdev)
-> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> >  	int err;
-> >  
-> > +	if (gc->is_pf)
-> > +		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
-> > +	else
-> > +		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
-> > +							  mana_debugfs_root);
-> 
-> Likewise the setup of mana_pci_debugfs seems to now always be paired
-> with a call to mana_gd_setup().
-> 
-Thankyou for the review.
-I will send the next version with updated changes.
+> 32bit kernels would either have corruptions or freezes if the syncp
+> sequence was overwritten.
 
-Regards,
-Vennela
-> > +
-> >  	err = mana_gd_setup(pdev);
-> >  	if (err)
-> >  		return err;
-> 
-> ...
+And moving syncp would be too much of a hack? 
+
+>  	if (pkt_len > 0) {
+> -		struct pcpu_sw_netstats *tstats = get_cpu_ptr(dev->tstats);
+> -
+> -		u64_stats_update_begin(&tstats->syncp);
+> -		u64_stats_add(&tstats->tx_bytes, pkt_len);
+> -		u64_stats_inc(&tstats->tx_packets);
+> -		u64_stats_update_end(&tstats->syncp);
+> -		put_cpu_ptr(tstats);
+> +		if (dev->pcpu_stat_type == NETDEV_PCPU_STAT_DSTATS) {
+> +			struct pcpu_dstats *dstats = get_cpu_ptr(dev->dstats);
+> +
+> +			u64_stats_update_begin(&dstats->syncp);
+> +			u64_stats_add(&dstats->tx_bytes, pkt_len);
+> +			u64_stats_inc(&dstats->tx_packets);
+> +			u64_stats_update_end(&dstats->syncp);
+> +			put_cpu_ptr(dstats);
+> +			return;
+> +		}
+> +		if (dev->pcpu_stat_type == NETDEV_PCPU_STAT_TSTATS) {
+> +			struct pcpu_sw_netstats *tstats = get_cpu_ptr(dev->tstats);
+> +
+> +			u64_stats_update_begin(&tstats->syncp);
+> +			u64_stats_add(&tstats->tx_bytes, pkt_len);
+> +			u64_stats_inc(&tstats->tx_packets);
+> +			u64_stats_update_end(&tstats->syncp);
+> +			put_cpu_ptr(tstats);
+> +			return;
+> +		}
+> +		pr_err_once("iptunnel_xmit_stats pcpu_stat_type=%d\n",
+> +			    dev->pcpu_stat_type);
+> +		WARN_ON_ONCE(1);
+>  		return;
+>  	}
+
+This code can run with migration enabled? Cause dev_dstats_tx_add() etc
+exist
 
