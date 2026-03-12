@@ -1,77 +1,92 @@
-Return-Path: <netdev+bounces-266958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-266959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SF4vEfWIsml4NQAAu9opvQ
-	(envelope-from <netdev+bounces-266958-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:35:49 +0100
+	id ECdfBXGJsml4NQAAu9opvQ
+	(envelope-from <netdev+bounces-266959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:37:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8971B26FAA5
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:35:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FB626FAE9
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 10:37:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 441AE30E8752
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:31:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C82CF3033397
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 09:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A71D3B775C;
-	Thu, 12 Mar 2026 09:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5C338B7D5;
+	Thu, 12 Mar 2026 09:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iL5mfP+K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fkc7Kz06"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA053B6C1B
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735963B775C
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 09:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773307868; cv=none; b=e0W0JS62aQwfEId0cMehrswNp5IpZOg1UXcYCqnmQ4OKfxvm8zpbigQtt5OomgrqL0NA6s65nWViDXkx+JWOXKlj9NZPwpxM394AEEiaB+psvYv7bVrRTEa/yS5nMeFYsqyhXfoZ0RLwzVBqA0V375Tu6e8aJX1tJY2n5S7x9LI=
+	t=1773308265; cv=none; b=SrPu5PINGSTlYqTyQkBP4EGxpC7s6C3TUocdu+9oZNORFsoK5ke1fDZQl+oeEK1dvgr0QODZ5KmqKJjfvNXHaBUXj9mUH7FsmUf0nL41uro2KIxQkRzHxesXX/Dgk3Zm/LwQVuZNsIEY3aFCdwV0Yo4iz9tn3kMk6BdccIEabnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773307868; c=relaxed/simple;
-	bh=LFsIqutAzBuS+JuknBp9P19J4pCJ4Mbz6dWagWkuRNI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CKwhBiGmyOYzQLG3B4s8mtHZD5CTupGbYb5S9EpkMk8r7GfLayW3leblH3kLcwzeqll0kFexY/iWHGGeluf3Ar90r6H6+hbu83cLhUlFTcvafvxyxHtZADX2JY9Ey8SqbDrGFXXVcC5giaJx8oEPISlqOXgdtlQgwgJ/T7XqVW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iL5mfP+K; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773307867; x=1804843867;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=LFsIqutAzBuS+JuknBp9P19J4pCJ4Mbz6dWagWkuRNI=;
-  b=iL5mfP+KioZSaJK92Ak5Zb1N8X0NnNiqdnxGgypzTpNFT8KYqlTayd/Z
-   yt1jY241vvVydBcvLe/r+GFxmOQdlbbliY0p0baZSrdXwQlApAT0Im5Ou
-   kZtZhgREyZ0i/ha2+cO8zXkjwuPJfGbcCA3hs9ztnewZXVa3W16AMgNha
-   4ROxYdrDjkt+IYAIfmJ44x5UfiPBE8l0mg0fsFnIZcppHz7UyNVIWtiNh
-   1F5G5Q3NoKP2Do5+iy3n3sCKS/gc6GsMN2uHCy9CQ5QmNA7rM382adFcF
-   7zvCgPSBCi1VjjUuZQWcKqdIJgIolX14mCey8QH5PAFV+GE5xVZi9suDQ
-   w==;
-X-CSE-ConnectionGUID: IPx+QWjMSOS5wb4jbEXe0Q==
-X-CSE-MsgGUID: ZbEzeREKRZurXUTRVVwLxQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11726"; a="85868902"
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="85868902"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2026 02:31:07 -0700
-X-CSE-ConnectionGUID: Vh/QX/GRQsChbLpfa6z2WQ==
-X-CSE-MsgGUID: THDLKwKxSj2rd7wX+UxaBg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="223230614"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa004.fm.intel.com with ESMTP; 12 Mar 2026 02:31:05 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
+	s=arc-20240116; t=1773308265; c=relaxed/simple;
+	bh=nmS+lsmzgEPjEn3riI1mvL7c2Eoou0UuR1cS2D2z6U4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C0qAv9VwFquJTnVSVB4sdd5T3J6cDGylp4iCm6giKrzWGrz6Rc38QbMaDsQhnxNlPien/sDsrHJqd+U04xU/xPKH4CgimbSWtN3Qomles+6ihDGFR1qgViZZrTsooXvL1zn3MNuZHs68MOGCPtlkUmSl041n/NhikDnzZG0soTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fkc7Kz06; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b942424d231so93067866b.0
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 02:37:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773308260; x=1773913060; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OMylDifb+sgwUdyQ3doSis8cOmZPRv2aLJLRsCDWhws=;
+        b=Fkc7Kz06QLN/zyyVNUx84VpZu3Wefio2PbXKknTvreAJwVTi0A0GG78OEMONAeUHhr
+         Ygn+LRAEeRvixuubkQ7L/avK4ptZG1455jBA9ZnpkdIub1cV0wSl/QjyK8io0zrP/ykz
+         QYazmzU8AVxkEGNNNcWmdHN1CGK2euardpaC/o+PZopf42M7dFKzdvjPHhOrnaa3S+CT
+         PbyNYo+bYqLiffRSDo9EZhE9AZx/wKx6Ywt86/QncB8pAzfU4RJ1mLL+q1kGtjJ0yk5Y
+         ISxBn+duKirsLg22BKIeyW3YpQwGyDEtM9Ui8U6Oici9ZuebcHizFRl4FxkpFBxmvCLm
+         AQ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773308260; x=1773913060;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OMylDifb+sgwUdyQ3doSis8cOmZPRv2aLJLRsCDWhws=;
+        b=YfovO4+AR5QvLvR2Pv5KFGpkIsuvp4vmsj3mLLAceTM8biTgoLeMt/dsDVIKxFE2Fr
+         gr5LPNtsQnuPcik7Et9oE7J1LY4id0PIU60To24omYJwQIllRIGbPXDSJc9OAOV9bmNa
+         yh3wE6htuCADLgEVMbQY8sVmYY2YSAnq+9wTpwu0UXvd0kOrCc8leFEiHSMuE1P2braU
+         /c9j9OAmHnl4RKrcNVS/JUi0PoxTG0doopuCuG6JiLlb8uDMPN2hDjUY9PdbMuDNVStx
+         UJsVzzMwQgq7nYdxiwprBNkvhmdPhmgZmKuiMfMxf5T5xz+xInGgPDIX7ZhToxvwRa6c
+         wKSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6V81+rHfG5F//xDzc2diwQLYfNQ1YhTcIZyIsoCgGKDdPZwP9XRRmFs/lasFyr/ognZW+l60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5ukPdhnzGuMMbgFKQWsZ47oUH80j9JZSdburAFSwaOFwuiyXT
+	ojSZcqi2oM1IlpFdDrusd/SMkE/E3ogj2ZM8ie6MLa+9sfyWEAlhGDkq
+X-Gm-Gg: ATEYQzxbP8cjZ8VSqFXaHZ4An3cISfdEG5fvlJ3bOE/K8gLes/k0J5BEhMq1P57LgG8
+	VIhBdlcEXihbSeCE6lWzjp8CprVSd+qWpy/7cC/k5foOsA6cMre9cLxPfC7moF5P84wZ1LScZcE
+	77e0RlOtfSLuve2uBG/7TEsVxYFVke5Td2K/Re3d/a24DRpwIdZvXQhIhDvfIu8eHIvLdcHrxpE
+	taFib4kSDp8h9rapIq9ZU52FQn6Bd6XIQWZlKnee1NlQ3cqLDp51BILGHpu0IT2JUuZoE+4geoQ
+	FAppG/R2i+eXpl3HMY6/cqfTpIJ+hddnOYwoslCEKhqTFbLdyYaQzgFes6sqMQHkAIrM5EfABj7
+	oVPR2+4vxoY9T5dJ7Kl7qvPi5yB2fGI4icpqinf5DjZcjpeWkRSCvLiL2PT1uTS+hOAMN4Frg
+X-Received: by 2002:a17:907:9452:b0:b93:8995:8f3a with SMTP id a640c23a62f3a-b972e1ac726mr317393666b.3.1773308259284;
+        Thu, 12 Mar 2026 02:37:39 -0700 (PDT)
+Received: from gmail.com ([2a09:bac1:5560::49b:47])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b972de82bc0sm114022666b.27.2026.03.12.02.37.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 02:37:38 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
 	netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Subject: [PATCH iwl-next v4 2/2] ice: implement symmetric RSS hash configuration
-Date: Thu, 12 Mar 2026 10:31:01 +0100
-Message-ID: <20260312093101.1589970-3-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260312093101.1589970-1-aleksandr.loktionov@intel.com>
-References: <20260312093101.1589970-1-aleksandr.loktionov@intel.com>
+	linux-kernel@vger.kernel.org
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Subject: [PATCH net-next 1/2] ppp: disconnect channel before nullifying pch->chan
+Date: Thu, 12 Mar 2026 17:37:30 +0800
+Message-ID: <20260312093732.277254-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,186 +94,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-266958-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-266959-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 8971B26FAA5
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A3FB626FAE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The driver advertises symmetric RSS support via supported_input_xfrm
-but ice_set_rxfh() always programmed plain Toeplitz regardless of the
-requested input_xfrm, making it impossible to actually enable symmetric
-hashing.
+In ppp_unregister_channel(), pch->chan is set to NULL before calling
+ppp_disconnect_channel(), which removes the channel from ppp->channels
+list using list_del_rcu() + synchronize_net(). This creates an
+intermediate state where the channel is still connected (on the list)
+but already unregistered (pch->chan == NULL).
 
-Fix ice_set_rxfh() to honour rxfh->input_xfrm: program symmetric
-Toeplitz (ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ) when RXH_XFRM_SYM_XOR
-is requested, revert to plain Toeplitz when the transform is cleared,
-and skip the hardware write when the function has not changed.
+Call ppp_disconnect_channel() before setting pch->chan to NULL. After
+the synchronize_net(), no new reader on the transmit path will hold a
+reference to the channel from the list.
 
-Make ice_set_rss_vsi_ctx() non-static and export it so ice_set_rxfh()
-can reprogram the VSI context directly.  Change it to preserve
-vsi->rss_hfunc across VSI reinitialisation instead of always resetting
-to plain Toeplitz, which would silently undo any previously configured
-symmetric hash function.
+This eliminates the problematic state, and prepares for removing the
+pch->chan NULL checks from the transmit path in a subsequent patch.
 
-Fix ice_get_rxfh_fields() to report the hash fields actually programmed
-in hardware.  When the hardware hashes on only one half of an L3 or L4
-pair, complete the pair in the reported bitmap to satisfy the kernel's
-symmetry validator.  For GTP flow types, report RXH_GTP_TEID honestly;
-ethtool_rxfh_config_is_sym() now accepts TEID as an intrinsically
-symmetric field (see preceding patch).
-
-Tested with tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 40 ++++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_lib.c     |  7 ++--
- drivers/net/ethernet/intel/ice/ice_lib.h     |  1 +
- 3 files changed, 37 insertions(+), 11 deletions(-)
+ drivers/net/ppp/ppp_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index c6bc29c..6ccfe36 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3008,14 +3008,17 @@ ice_set_rxfh_fields(struct net_device *netdev,
- 	return 0;
- }
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 6344c5eb0f98..ad480b584e25 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -3032,12 +3032,12 @@ ppp_unregister_channel(struct ppp_channel *chan)
+ 	 * This ensures that we have returned from any calls into
+ 	 * the channel's start_xmit or ioctl routine before we proceed.
+ 	 */
++	ppp_disconnect_channel(pch);
+ 	down_write(&pch->chan_sem);
+ 	spin_lock_bh(&pch->downl);
+ 	WRITE_ONCE(pch->chan, NULL);
+ 	spin_unlock_bh(&pch->downl);
+ 	up_write(&pch->chan_sem);
+-	ppp_disconnect_channel(pch);
  
-+#define ICE_RSS_L3_PAIR		(RXH_IP_SRC | RXH_IP_DST)
-+#define ICE_RSS_L4_PAIR		(RXH_L4_B_0_1 | RXH_L4_B_2_3)
-+
- static int
- ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_vsi *vsi = np->vsi;
- 	struct ice_pf *pf = vsi->back;
-+	u64 l3, l4, hash_flds;
- 	struct device *dev;
--	u64 hash_flds;
- 	bool symm;
- 	u32 hdrs;
- 
-@@ -3067,6 +3070,13 @@ ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
- 	    hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
- 		nfc->data |= (u64)RXH_GTP_TEID;
- 
-+	l3 = nfc->data & ICE_RSS_L3_PAIR;
-+	l4 = nfc->data & ICE_RSS_L4_PAIR;
-+	if (l3 && l3 != ICE_RSS_L3_PAIR)
-+		nfc->data |= ICE_RSS_L3_PAIR;
-+	if (l4 && l4 != ICE_RSS_L4_PAIR)
-+		nfc->data |= ICE_RSS_L4_PAIR;
-+
- 	return 0;
- }
- 
-@@ -3667,7 +3677,6 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
- 	     struct netlink_ext_ack *extack)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
--	u8 hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
- 	struct ice_vsi *vsi = np->vsi;
- 	struct ice_pf *pf = vsi->back;
- 	struct device *dev;
-@@ -3689,13 +3698,28 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
- 		return -EOPNOTSUPP;
- 	}
- 
--	/* Update the VSI's hash function */
--	if (rxfh->input_xfrm & RXH_XFRM_SYM_XOR)
--		hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ;
-+	/* Handle RSS symmetric hash transformation */
-+	if (rxfh->input_xfrm != RXH_XFRM_NO_CHANGE) {
-+		u8 new_hfunc;
- 
--	err = ice_set_rss_hfunc(vsi, hfunc);
--	if (err)
--		return err;
-+		if (rxfh->input_xfrm == RXH_XFRM_SYM_XOR)
-+			new_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ;
-+		else if (!rxfh->input_xfrm)
-+			new_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
-+		else
-+			return -EOPNOTSUPP;
-+
-+		if (new_hfunc != vsi->rss_hfunc) {
-+			err = ice_set_rss_hfunc(vsi, new_hfunc);
-+			if (err) {
-+				netdev_err(netdev, "Failed to set RSS hash function\n");
-+				return err;
-+			}
-+			netdev_dbg(netdev, "RSS hash function: %sToeplitz\n",
-+				   new_hfunc == ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ ?
-+				    "Symmetric " : "");
-+		}
-+	}
- 
- 	if (rxfh->key) {
- 		if (!vsi->rss_hkey_user) {
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index d921269..5b1934b 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1155,7 +1155,7 @@ static void ice_set_fd_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
-  * @ctxt: the VSI context being set
-  * @vsi: the VSI being configured
-  */
--static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
-+void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
- {
- 	u8 lut_type, hash_type;
- 	struct device *dev;
-@@ -1181,8 +1181,9 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
- 		return;
- 	}
- 
--	hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
--	vsi->rss_hfunc = hash_type;
-+	if (!vsi->rss_hfunc)
-+		vsi->rss_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
-+	hash_type = vsi->rss_hfunc;
- 
- 	ctxt->info.q_opt_rss =
- 		FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_LUT_M, lut_type) |
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 49454d98..29ba335 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -46,6 +46,7 @@ void ice_vsi_delete(struct ice_vsi *vsi);
- int ice_vsi_cfg_tc(struct ice_vsi *vsi, u8 ena_tc);
- 
- int ice_vsi_cfg_rss_lut_key(struct ice_vsi *vsi);
-+void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi);
- 
- void ice_vsi_cfg_netdev_tc(struct ice_vsi *vsi, u8 ena_tc);
- 
+ 	pn = ppp_pernet(pch->chan_net);
+ 	spin_lock_bh(&pn->all_channels_lock);
 -- 
-2.52.0
+2.43.0
 
 
