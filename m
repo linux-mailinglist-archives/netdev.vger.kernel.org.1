@@ -1,212 +1,282 @@
-Return-Path: <netdev+bounces-267161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267162-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iN03DcDrsmnAQwAAu9opvQ
-	(envelope-from <netdev+bounces-267161-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:37:20 +0100
+	id KAkVGSvrsmnAQwAAu9opvQ
+	(envelope-from <netdev+bounces-267162-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:34:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A519275B48
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:37:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 056AF275ABC
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6C0843014A0A
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:33:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8294D302CB2C
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BBA38D00A;
-	Thu, 12 Mar 2026 16:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086A138F64C;
+	Thu, 12 Mar 2026 16:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hp0yl9dN"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="LL4Vppqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11020121.outbound.protection.outlook.com [52.101.201.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85EA2DEA86;
-	Thu, 12 Mar 2026 16:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773333199; cv=none; b=qmNu66/GlPBWnnYp/kXKHHdW1f/xyTfFBp8Lx/naLDXvSywbJmHUO3OQ0/RQv/dM6vRcLrSbAUHHcZ2xc9KQ3iImJCtL6vPi7CxvNp4aYy8z6/iLmQK8rmwxXn3Xl1xOva0werzVm4rpC1bP7s34JVtE8/I6O2qLu5eqLuNYgqU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773333199; c=relaxed/simple;
-	bh=GPNtDaDinweeeNRE+lD7M+Kk13rvwH5XMW6tRwPLK+4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QHQAmFz+w7HntGkr+lSN/aofkYakV2UNTUyWzig6mkET/McmhxB7ZxUwlAadwwJhAdgj3rH4bMYQs1K5vHwtWCbz5ICMqMbk6T/fVlK28eW77IDq9PsbPyQS9dJ8suxaIC1yS70XdcWpbmTYhJ1s86SpduJXq27LTY9c836Mtl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hp0yl9dN; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773333198; x=1804869198;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GPNtDaDinweeeNRE+lD7M+Kk13rvwH5XMW6tRwPLK+4=;
-  b=Hp0yl9dNuoNEhUuTShn4GNo3n1816wiK7cbhRNTP/mimVcklckqTIchK
-   /r6zCeGqvJ2RqfxUuwH6VWduaRVrAVIMnzXN+HPV/lI8AUKeEDpMCViqN
-   WeDeqV74zx5Bt2in8A76r7AWEccRwpF5eYwNqH6sUj88QGxwu95eKTsgi
-   T1G4wSPLXUd+ANrrBE3q04BDRVfT+Lkie/fa76liuSAYyzfFmzTylYlAY
-   of/3Pyejltf0U1b1O98pK8hUGT8MvjmtxNNCCmVRALpqYGJmfqSX2NLPX
-   QYpZbAWlfJS1g/lFM0QaYB1ynw1JFr3J8/gqzdsVkUFPBLeTlKrJDdTpX
-   g==;
-X-CSE-ConnectionGUID: q5+eOc9qSpGafGHu3aE19g==
-X-CSE-MsgGUID: P7fRKQUjQIeFOIY4lgyXKA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11727"; a="74349214"
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="74349214"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2026 09:33:17 -0700
-X-CSE-ConnectionGUID: 1YY5csTKRy6iBC2DxRBP3A==
-X-CSE-MsgGUID: p7syge5aQIOf1CHH3f8X6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,116,1770624000"; 
-   d="scan'208";a="246213940"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa001.fm.intel.com with ESMTP; 12 Mar 2026 09:33:14 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Steve Rutherford <srutherford@google.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	David Decotigny <decot@google.com>,
-	Anjali Singhai <anjali.singhai@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Brian Vazquez <brianvv@google.com>,
-	Li Li <boolli@google.com>,
-	emil.s.tantilov@intel.com
-Subject: Re: [RFC PATCHv2 1/1] idpf: Fix header clobber in IDPF with SWIOTLB enabled
-Date: Thu, 12 Mar 2026 17:30:24 +0100
-Message-ID: <20260312163025.3765321-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CABayD+dJOxYxZYBpUP06sbgEf4rzMTiVfdmqbR4wnY9C677RFg@mail.gmail.com>
-References: <20260227203457.558196-1-srutherford@google.com> <20260227203457.558196-2-srutherford@google.com> <6a7fbafa-cdcd-4bfa-ac00-204e68602f61@intel.com> <CABayD+eF30_OHRrGYiG-7qKbJjvs5=7U8H7SH9Hj=ou6aZJBbw@mail.gmail.com> <8b43d234-867a-481f-90e6-e155132100a5@intel.com> <CABayD+crjO3S2cC3=9HqSH+kngE1=yKp_MnKZmAdW-YwJH1idA@mail.gmail.com> <7c8ed118-d3c3-4bdc-913a-14f5537c44d3@intel.com> <CABayD+dJOxYxZYBpUP06sbgEf4rzMTiVfdmqbR4wnY9C677RFg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8297038F655;
+	Thu, 12 Mar 2026 16:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.121
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773333286; cv=fail; b=PkV+bpRCTprn1VDpD8X7TqMTA5WuGkXnAVg5eix3BzuXB0U1N7BL8TmM7Xt+yHzNazZ4V+NZ8dc/WssJf6q5vASiMV8u65VrOl+8tNazIH4HVwReF48egodo1QLEiz60GduLhvA87C3SSZE6pjS/yBbRJ6BPoZj9L56kMLzOL8A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773333286; c=relaxed/simple;
+	bh=e/IhYCl6qi00fKO/GSXU0TSIjvt0OmiLH1qCuulmuRs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nVdkX5HAeAdgO5RtTfOLY3gJHbuy/yBbMhPUxrU/V8v+aO92bGHBMDSJbgkqZBJTEosRi/pInNNoIBfYD60svoWwJi1Pvb9g0NGow7D+SFfymtao5x6IEr+opIMVSreK4Mjs7XWMuWRcH2Q8ua3TJwF399Mce2QTeAFRvPbnJQs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=LL4Vppqy; arc=fail smtp.client-ip=52.101.201.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QCw7ZhZaxACQVrwTAgihLq9r/MjhltHLTf/8p28mqYEkw+oy43s3g5ZSLldHZgC3sDaX7Kuw1M6M89rQM1cziMZsBtBaT2nAOleWteY9V+tYattwrO5+EaCHBh5J7fe/HmKVTOe6z5NVy8W491waVaVXnr8QGshF3fvyz/DduEc0sp64E8Hnc7+lBHdw7UOjzcanmEsROHMMFcZ5D0jz6UaToJffZT+BIQyaM9NOIvIQAlwjo/tLbFi+clJur+6oibvYbPlqG0fDyRuw+uQDnx/vjnZD6tttBaoR/NGwdEOrmfeYgslRdFUJK/JSYZKHKVJiUn7L02m6X5aBsFf1hQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WNepfN2kCCEdrhV2LpQSSxlhtB9P/pMEtq5YTFDenkU=;
+ b=NPScbLEkBJtk0BYSreMTbEC/1TLdB9b/9PJpryrftwAk8+mdbQfblaNS1mTRC9AZyEX3cVkH/pGSPnLiGGDBZCLfHdJ6VKD6CwvEbZ67koMQdSTlrR6Lu+rDKM8hvZ7MJVRvTbY+icLf8ds04GIcSVTbKo9q8sDUDIs02ZjkbWrWdiqooNBIgkcmukznuO+zIsCBfZ7kJuKfpMIBmGHdnVjCq1DmsEXpC7dxH4OLmC1nOzSRKvu7vJn/KhrV0S7UGUN9FXyQFRa68VYwYp0fAXTUMOGthXztLhwiM47A3uVD0n/WpQWbvwqR4c2J81Kr/Zzjt8gqakNantz3KI72vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WNepfN2kCCEdrhV2LpQSSxlhtB9P/pMEtq5YTFDenkU=;
+ b=LL4VppqyIVK6YLstVHhTKoXfzZ+a+k0OSINkYFwqNy5mCUvoW2qyz8biK3s2IF9IK5EURXCmEAOpIhJepkhTN925luv0/kqQdx+lf1dA8u8y/4wJJFV0GkTCAD8B7fXEqIOfnWzvzpZeyQ8o/ChUfAuJ9p8GE1K7lWuW55AM8dA=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by DM4PR21MB3057.namprd21.prod.outlook.com (2603:10b6:8:5d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.7; Thu, 12 Mar
+ 2026 16:34:41 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9700.006; Thu, 12 Mar 2026
+ 16:34:41 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Simon Horman <horms@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Konstantin Taranov <kotaranov@microsoft.com>, Erni Sri
+ Satya Vennela <ernis@linux.microsoft.com>, Dipayaan Roy
+	<dipayanroy@linux.microsoft.com>, Shradha Gupta
+	<shradhagupta@linux.microsoft.com>, Shiraz Saleem
+	<shirazsaleem@microsoft.com>, Kees Cook <kees@kernel.org>, Subbaraya Sundeep
+	<sbhatta@marvell.com>, Aditya Garg <gargaditya@linux.microsoft.com>, Breno
+ Leitao <leitao@debian.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next,V4, 3/3] net: mana: Add ethtool
+ counters for RX CQEs in coalesced type
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next,V4, 3/3] net: mana: Add ethtool
+ counters for RX CQEs in coalesced type
+Thread-Index: AQHcsAq02ZF6ukjrskyZCumOyafI0rWpoUaAgAF6wPA=
+Date: Thu, 12 Mar 2026 16:34:40 +0000
+Message-ID:
+ <SA3PR21MB38670E62065B5A6EC172037FCA44A@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <20260309212106.764156-1-haiyangz@linux.microsoft.com>
+ <20260309212106.764156-4-haiyangz@linux.microsoft.com>
+ <20260311175835.GV461701@kernel.org>
+In-Reply-To: <20260311175835.GV461701@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=21960a51-9238-44a9-a34a-716b4b14c26d;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-03-12T16:34:10Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|DM4PR21MB3057:EE_
+x-ms-office365-filtering-correlation-id: 569d2e6c-d74d-4d6f-0948-08de80554293
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021|22082099003|56012099003|18002099003;
+x-microsoft-antispam-message-info:
+ 3DtN/3qh1kK93ViHhho76RY4tQuSvaWwsCExdmUzzoyyQ6yRliyaCXHoK84p1hSNV4QpPfc4NtQvDnjDrp8oRW+f0TgD79LTvEEMm4wfiuwDxBE20YaHe7Pag3npx6VSG8WAMlS40CGkB227omGcsyyPXYaOLsg/m5XPwvD2l1L4pd0uyPyCsY2VzgNSPPd1KhhY7HUtP26LURqL4JjzB21XOstAXecPQW4XMBwP06ARsM6Xyr8d+rV1p7n7q0K7E6YdEoyoVv1a24LwCAGndHHGEMcFEcNOZaBzf2a2FkbRSYv8RkABsACKk6QeN3LulKo3zlKesDNZ0KbHJjUdNVEtE+sOvF5MRkhP8Uxdk6SbBQep2rA9+lL66kOGhUVBn3JCwpN399J70N9rD4cm72rIrDJQXpGM2wcJ+lAYxP0gouXQ9WV1rsEtfLnLrcU8ZjCFOdOAgm06Zt/pzXpKhzPs9fIbc1F7Q6ehHziBo9C6dGrc0XPmVYjmdwY/0+3kyzNB/zo1OmohIhpyhMfnSy2hkM1AQ4AWlL/erM9raHT8YSQy2K81FXo0QioFL3D2QK/8bZKA34IeL6Em/E4hjkVD9R/VGU/WIWcnr0u7zo6u+HIzXL1mDHTLaqukGAaRd9zZFO1ZZtfdcw8lvvxO7y38i4vitQOQgFz15dkx2T8GUwlLQ4ywbZWRp5UnfZx7ugbC3toyWynuNmDYcwoyoUN9aD9BbDufhpaqz9b/hqx6bmickxH85iA2Za+MOdtImDqC+BLlkE/Q8yyA8rPi2bXYjxMHN+pezPSJsQ96uAI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?vnsMC1IwHoE0Ydt/I3gkMcGrrG0VsqUOeYKZVi2e70VPw+txq+FbRvmJ/hGI?=
+ =?us-ascii?Q?mxFiY4jO7R9MBsy46o+g2X4gRV71ly8ktO7Xsvwmml1kHr9QiYvM/8TApDE/?=
+ =?us-ascii?Q?8eed4bKOeGRytENO0KoQ9k5cJPVwjenpuOqIH7SM54kuX7PjsHM41ids2sw8?=
+ =?us-ascii?Q?AoqlT/uxcAhpsG0+npF4N/68JdTZXrJFmpHBiCD58ROjfWrB1lU2q455ZDTu?=
+ =?us-ascii?Q?N8IcRjKWpoHgdVGJ2C0c6m0yXDWEOI9REN0LEu1L9CNVKsXtBSBFrmGbAp63?=
+ =?us-ascii?Q?+A/ajXYM6KzNtV9RE+WuczKGhtoQ4JL1IdbJWpDQrMfoj/M3qKbKsqqWkPxF?=
+ =?us-ascii?Q?696G1FT2rVla9tfrq4Qf5+Szlxxu7+yYdGIdk5sihIjEOF4J6QaDfsTSIQvr?=
+ =?us-ascii?Q?Nu0IALeXY7VF9SZqiep3sU3dmFP2spz8w66rIfhhGspC6epKTGj2CC5+lXeP?=
+ =?us-ascii?Q?19QV7w1ZwOpXfsMh0ydNmLNpBjxi7l+ydppM1F++OiIolzr8D9ucjZNYH2vP?=
+ =?us-ascii?Q?EH8FNHo+lJY1G5GNtd7bUBSCDiewgwuZXRxr2VsvBC9O81E8Qfjuyuz0bi8K?=
+ =?us-ascii?Q?K8ARuRlHAm7q2XN9S6qd6864agzeIhtjVJmkyyntx1b+U2kCYVoCIni+npRf?=
+ =?us-ascii?Q?Ze2X+/cqt35o2D3hK5VRhKKNhpulBxLeVtn674nhkzy4MC1BEvudVoNQ/gdP?=
+ =?us-ascii?Q?OkQG//hxTWyCxU/+OCIqeAwj59GF839hZEKNfVJ0wv3LoreZ051uNrct/Ilc?=
+ =?us-ascii?Q?QVEymjl/j35mQuvqnulj5/ojHHpxx94tb4ahasC2Y41MH1O9vpYhN7sBIKYz?=
+ =?us-ascii?Q?2obA6OhSKw9dmICIutqiclUagTMghyTjKgb9pJ8oClvl37+F2fnUxiqi28Bi?=
+ =?us-ascii?Q?UXSM+ratooDQM5I4E4JkR77GXJmF3FM26TlO+sCIblu0WVwmwGRkG/ruSaw2?=
+ =?us-ascii?Q?4e7BwBa/iFbpzRC8scSZE440MmQJ6U/Svi4gmHDY7P8FHX0ddCK8arcl+EVY?=
+ =?us-ascii?Q?Pz8O4mmYytRNFGrNiBsiaV0lKLBeK4YEMApo5Il/UCGMTaOeFhXjJPl36SVD?=
+ =?us-ascii?Q?xdwr5eazTNBbhvTZkgcht1ayPoXWyQIlXR5vKL+rnJciTqVwpMrv27PAyxMy?=
+ =?us-ascii?Q?HSqUwj96fg/O/++Gtv2crc+GtWZs7tsk+viSlReGEU3EJ3yjoRzR+0SXezep?=
+ =?us-ascii?Q?NquekR18JlZD1TuyqEu/sY7nOuyWBbYLm/kmX4GM2JV1QihIq0m1MtRmWJyQ?=
+ =?us-ascii?Q?V/g/eYHWB4jgo6rfDa5AT5JfUQlPVFla3i3PDDoT7MFQ2/LY/bQWGHqzj8K7?=
+ =?us-ascii?Q?zCoguJnIl0xiNyNuR5kHH+cmHWPW2kqEWjxZqWG/4EeFc6ZYMsyi6JFI7JqH?=
+ =?us-ascii?Q?bSiY0WczMRYFAi/M2LnMSdo7mPG09tzFuSdW935fdR6nGff6pNegKjw0UWM5?=
+ =?us-ascii?Q?rq68FeBDeU9zaye6iDvZL6szhHH946Cq1ZyGPLAzdhJQnP9+y+QUzxEZZEtB?=
+ =?us-ascii?Q?RPaxONnO7loUC48HDXwon2fmVY8mqbHbuc02Kb6THa5sdSXUV6P09V2VucbY?=
+ =?us-ascii?Q?bFYqaaaQqRHI1cYHTnyuCigoC/10E14EQ8BLRHxO+ho2EkWBQdFNlnPYykcs?=
+ =?us-ascii?Q?Cxh6bFPv5Y0MKR7/pny9vubQVaZpNdPBN6DX09Dym1oUhIOQ9U+bfzkx2bm9?=
+ =?us-ascii?Q?kR9VonGR/Gwzu6j02BqHvCSh3X8GRvmSFowBGYn0q9giDm8WhLTyHAlWA+Ch?=
+ =?us-ascii?Q?kUFa2b1PdQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 569d2e6c-d74d-4d6f-0948-08de80554293
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Mar 2026 16:34:41.0181
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QjaWIX9En/OOjvNfn/4n6tfsJiS4ynWAi5aUHAk6ZYAQWZT0YOfayWahpBcq9zoT3ni1b5SVUSKBSR472A7+tw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR21MB3057
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-267162-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267161-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 3A519275B48
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 056AF275ABC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hey,
 
-From: Steve Rutherford via Intel-wired-lan <intel-wired-lan@osuosl.org>
-Date: Fri, 6 Mar 2026 11:35:27 -0800
 
-> On Fri, Mar 6, 2026 at 6:52=E2=80=AFAM Alexander Lobakin
-> <aleksander.lobakin@intel.com> wrote:
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Wednesday, March 11, 2026 1:59 PM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
+> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu
+> <wei.liu@kernel.org>; Dexuan Cui <DECUI@microsoft.com>; Long Li
+> <longli@microsoft.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S.
+> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Konstantin
+> Taranov <kotaranov@microsoft.com>; Erni Sri Satya Vennela
+> <ernis@linux.microsoft.com>; Dipayaan Roy
+> <dipayanroy@linux.microsoft.com>; Shradha Gupta
+> <shradhagupta@linux.microsoft.com>; Shiraz Saleem
+> <shirazsaleem@microsoft.com>; Kees Cook <kees@kernel.org>; Subbaraya
+> Sundeep <sbhatta@marvell.com>; Aditya Garg
+> <gargaditya@linux.microsoft.com>; Breno Leitao <leitao@debian.org>; linux=
+-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org; Paul Rosswurm
+> <paulros@microsoft.com>
+> Subject: [EXTERNAL] Re: [PATCH net-next,V4, 3/3] net: mana: Add ethtool
+> counters for RX CQEs in coalesced type
+>=20
+> On Mon, Mar 09, 2026 at 02:20:45PM -0700, Haiyang Zhang wrote:
+> > From: Haiyang Zhang <haiyangz@microsoft.com>
 > >
-> > From: Steve Rutherford <srutherford@google.com>
-> > Date: Wed, 4 Mar 2026 14:01:46 -0800
+> > For RX CQEs with type CQE_RX_COALESCED_4, to measure the coalescing
+> > efficiency, add counters to count how many contains 2, 3, 4 packets
+> > respectively.
+> > Also, add a counter for the error case of first packet with length =3D=
+=3D 0.
 > >
-> > > I believe syncing twice isn't inherently wrong - it's more that you
-> > > can't synthesize the header via the workaround and then sync, since it
-> > > will pull the uninitialized header buffer from the SWIOTLB. Outside of
-> > > SWIOTLB, dma syncs are more or less no-ops, while (with SWIOTLB) they
-> > > are copies from/to the bounce buffers.
+> > Reviewed-by: Long Li <longli@microsoft.com>
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 21 ++++++++++++++++++-
+> >  .../ethernet/microsoft/mana/mana_ethtool.c    | 15 +++++++++++--
+> >  include/net/mana/mana.h                       |  9 +++++---
+> >  3 files changed, 39 insertions(+), 6 deletions(-)
 > >
-> > Ah I see.
-> >
-> > What if I add sync_for_device after copying the header? This should
-> > synchronize the bounce buffer with the copied data I guess? A bit of
-> > overhead, but this W/A triggers mostly on stuff like ARP/ICMP, "hotpath"
-> > L4 protos are fortunately not affected.
-> 
-> That should work fine as well. I'm not certain I have strong
-> preferences on the right answer here, other than "does it work and,
-> ideally, is it less confusing?" The patch I posted is a bit
-> unintuitive. I think what you are describing might make the workaround
-> self-contained.
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index fa30046dcd3d..85f7a56d0d90 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -2148,11 +2148,23 @@ static void mana_process_rx_cqe(struct mana_rxq
+> *rxq, struct mana_cq *cq,
+> >  		old_buf =3D NULL;
+> >  		pktlen =3D oob->ppi[i].pkt_len;
+> >  		if (pktlen =3D=3D 0) {
+> > -			if (i =3D=3D 0)
+> > +			/* Collect coalesced CQE count based on packets
+> processed.
+> > +			 * Coalesced CQEs have at least 2 packets, so index is i
+> - 2.
+> > +			 */
+> > +			if (i > 1) {
+> > +				u64_stats_update_begin(&rxq->stats.syncp);
+> > +				rxq->stats.coalesced_cqe[i - 2]++;
+> > +				u64_stats_update_end(&rxq->stats.syncp);
+> > +			} else if (i =3D=3D 0) {
+> > +				/* Error case stat */
+> > +				u64_stats_update_begin(&rxq->stats.syncp);
+> > +				rxq->stats.pkt_len0_err++;
+> > +				u64_stats_update_end(&rxq->stats.syncp);
+> >  				netdev_err_once(
+> >  					ndev,
+> >  					"RX pkt len=3D0, rq=3D%u, cq=3D%u,
+> rxobj=3D0x%llx\n",
+> >  					rxq->gdma_id, cq->gdma_id, rxq->rxobj);
+> > +			}
+> >  			break;
+>=20
+> Hi Haiyang Zhang,
+>=20
+> As there is a break here, can the accounting logic above be move out of
+> the
+> loop, and merged with the "Coalesced CQE with all 4 packets" accounting
+> logic that is already there?
+>=20
+> As is, accounting seems split between and slightly duplicated in two
+> locations.
 
-Could you please test this patch with SWIOTLB? If it doesn't fix
-the issue, you can try changing `page_pool_get_dma_dir(hdr_pp)`
-to `DMA_TO_DEVICE` and/or `DMA_BIDIRECTIONAL`.
-Currently, I don't have any machines with SWIOTLB unfortunately =\
-Let me know if any of these works. I'll submit it properly when we
-have a solution.
-
-(the patch applies cleanly to the latest net-next and should apply
- to a couple older kernel releases as well)
-
-> 
-> thanks,
-> Steve
->  [And sorry for my gmail-driven top posting crimes D: ]
+Will do.
 
 Thanks,
-Olek
----
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 45ee5b80479a..42111d56d66f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3475,7 +3475,8 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
- 			     struct libeth_fqe *buf, u32 data_len)
- {
- 	u32 copy = data_len <= L1_CACHE_BYTES ? data_len : ETH_HLEN;
--	struct page *hdr_page, *buf_page;
-+	const struct page_pool *hdr_pp;
-+	dma_addr_t hdr_addr;
- 	const void *src;
- 	void *dst;
- 
-@@ -3483,16 +3484,20 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
- 	    !libeth_rx_sync_for_cpu(buf, copy))
- 		return 0;
- 
--	hdr_page = __netmem_to_page(hdr->netmem);
--	buf_page = __netmem_to_page(buf->netmem);
--	dst = page_address(hdr_page) + hdr->offset +
--		pp_page_to_nmdesc(hdr_page)->pp->p.offset;
--	src = page_address(buf_page) + buf->offset +
--		pp_page_to_nmdesc(buf_page)->pp->p.offset;
-+	hdr_pp = __netmem_get_pp(hdr->netmem);
-+	dst = __netmem_address(hdr->netmem) + hdr->offset + hdr_pp->p.offset;
-+	src = __netmem_address(buf->netmem) + buf->offset +
-+	      __netmem_get_pp(buf->netmem)->p.offset;
- 
- 	memcpy(dst, src, LARGEST_ALIGN(copy));
- 	buf->offset += copy;
- 
-+	/* Make sure SWIOTLB is synced */
-+	hdr_addr = page_pool_get_dma_addr_netmem(hdr->netmem);
-+	dma_sync_single_range_for_device(hdr_pp->p.dev, hdr_addr,
-+					 hdr->offset + hdr_pp->p.offset,
-+					 copy, page_pool_get_dma_dir(hdr_pp));
-+
- 	return copy;
- }
- 
+- Haiyang
+
 
