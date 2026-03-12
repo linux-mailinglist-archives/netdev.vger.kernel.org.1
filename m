@@ -1,153 +1,214 @@
-Return-Path: <netdev+bounces-267163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKPPK//tsmnAQwAAu9opvQ
-	(envelope-from <netdev+bounces-267163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:46:55 +0100
+	id yDKaEOHssmnAQwAAu9opvQ
+	(envelope-from <netdev+bounces-267164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:42:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CB0275E08
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:46:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED94275C40
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 17:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6EC9312E974
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:40:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BBA013003D38
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 16:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25ECB3932D3;
-	Thu, 12 Mar 2026 16:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBE93914FB;
+	Thu, 12 Mar 2026 16:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YUqQ2YOG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XoOXAdZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D663914F9
-	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 16:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB380302165;
+	Thu, 12 Mar 2026 16:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773333615; cv=none; b=A5eOZVNJt5dnWci8DE5/9xF1W6NKkGpqgrf3tlo7fumpXBXcPdF5up3tf1YX1Db2kCmtvbrgyCU+ez0xmIaMIxdF3A0lIm8BI5vykqgBQdZ5r77AgsJ/X7XNiw80QFBx49Voz35Ye4Q2R9HyKRY7JuvKx9MTqUOR1z2ROf66H28=
+	t=1773333721; cv=none; b=bwSgRaE5qitckVxpwwryaNAqPHy38bcdyoVACUxQcqe1M5dVGpAiZCXDQdyVoPUdGZ4tXTMDsPUm8x7QanqekqUuTmU2Lhv5o1wPnqRWIa3ApeL7YWUHYSp/6Vvl8NVni/SNtmZGnCjaB6XTC3/krCERY4wDcB3Bd7ufITcT044=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773333615; c=relaxed/simple;
-	bh=q/NXnvhOQfWi+LbQbNSccqrwx2HfOA+DxhA9wpmm7FI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aiXdkE61c6R2djK8jYM6+2dDl5MnlYGVsWe7YQyuSmEGBJf++YnF4CBZSl5GtcU6oMTnUN2KCAfZcZUGhPgUDM1L/Rs8DUXZq+tHUHy68PFu96mx7OsRE3dQUXQnPkpWtHm7bd59GQNORwufBo7t+Nqd8CJM3duSsEGIVcIfKRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YUqQ2YOG; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 2C3FC1A2E14;
-	Thu, 12 Mar 2026 16:40:11 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E273B6001B;
-	Thu, 12 Mar 2026 16:40:10 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EB43910369E41;
-	Thu, 12 Mar 2026 17:40:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1773333608; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=kKLJaS6EbrB3sRJEyYBFRM7jRpN8Md6Kg5iHaeN/7t0=;
-	b=YUqQ2YOGos3AIyhx6et88pkmLUWI6BnfTIalcMT9G3y1US88cRcpAzAYM6nQ+V93UPc+0w
-	x2fZOK1KDHf48VUBWr+0p3F1e0hmDAzw1U1aLCzfui4RQsQxb79gWzoAt58D864dUUlHmP
-	YswFuSA1N7tiu/y9Yu2v5HxVAjyMIVVUwTUg45M+NLFX5Rjml7GBkdmklvhfEHcpdyLh6C
-	XeDce1JCvlc6oDP+89HHSe+GLax7IpJSNILM8AttHYfV2PgDkAbQAq90z3YoWwdPbdXtcz
-	D8THyOZRueXE5lQ1wgZYcWZ3AtTMHcCieO+eES76lzyTKpJ8O+7+NW04AdIDZQ==
-Message-ID: <42abf88e-4fbf-4966-9490-8315f118ddea@bootlin.com>
-Date: Thu, 12 Mar 2026 17:39:59 +0100
+	s=arc-20240116; t=1773333721; c=relaxed/simple;
+	bh=VFVApfv21FiWkANMhfUKrWN7JISt2PdOs46M5JzpQvo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UV//bg3CaBFDY9vEe+bLXhzHo4Q7WW6Gg3apKudqWjwufUWsnl+JZBXv6nZ5zaBHM4yeLEe7MQQrzWi4qBesQ73BLH9hW2/ODgyZOSKfb3BE/V/HreJ3DKZ8kmGzY2DroqoxGTLMrvumtR+S1SKQ6ThmW/yocX/ttIMzbrud2Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XoOXAdZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41B58C4CEF7;
+	Thu, 12 Mar 2026 16:41:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773333721;
+	bh=VFVApfv21FiWkANMhfUKrWN7JISt2PdOs46M5JzpQvo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XoOXAdZSmhlP84Iviilz7IKwq6poxwZf0EUcJiPS1688CKBqqOwvo236tL7BNj7iO
+	 +3uZVBbyAFhG6hhiI6EK0OY/zPC+vgoh1ZkcoonEvdgKabUNwXByLErRc/iWo1v0+P
+	 eNA6b/PHhZl3Oz6m0Kh/gl0v9dJFE4IjHdTWWNaQGEWJjTEobohz0FhoBYgFIpZ+SX
+	 Ko/3xopA3zeHgYPsHc6pc5mkebM2XCrH51XD/sof+uLteF67EPyMGrZzQUbXlHwmhY
+	 OGuovWM8MXjiV/BaGMebOeKS8qkEQyAvMcAkwPjLVFtBdUjaXraJiCfF86uGGiNYD7
+	 KaNwg96OcXwLg==
+Date: Thu, 12 Mar 2026 16:41:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Antony Antony <antony@phenome.org>
+Cc: antony.antony@secunet.com, evitayan@google.com,
+	linux-kernel@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	herbert@gondor.apana.org.au, paul@paul-moore.com,
+	devel@linux-ipsec.org, davem@davemloft.net, nakam@linux-ipv6.org,
+	netdev@vger.kernel.org, edumazet@google.com,
+	stephen.smalley.work@gmail.com, steffen.klassert@secunet.com,
+	selinux@vger.kernel.org, linux-doc@vger.kernel.org,
+	chiachangwang@google.com, omosnace@redhat.com, corbet@lwn.net,
+	dsahern@kernel.org, skhan@linuxfoundation.org
+Subject: Re: [devel-ipsec] Re: [ipsec-next,v6,12/14] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <20260312164154.GW461701@kernel.org>
+References: <migrate-state-v6-12-9df9764ddb9e@secunet.com>
+ <20260311195731.1147919-1-horms@kernel.org>
+ <abHT2HLx-BvKnu-c@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/11] ethtool: Add loopback netlink UAPI
- definitions
-To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
- Eric Dumazet <edumazet@google.com>,
- Naveen Mamindlapalli <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Leon Romanovsky
- <leon@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Saeed Mahameed <saeedm@nvidia.com>,
- Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260310104743.907818-1-bjorn@kernel.org>
- <20260310104743.907818-3-bjorn@kernel.org>
- <580debbb-8f6c-4b60-95ef-22c68480ded1@bootlin.com>
- <b3825c0d-02e5-4625-831f-4346ce4eabd2@lunn.ch>
- <085bb0a9-85d3-4d62-9ac4-3461b61da5f3@bootlin.com>
- <438dae03-4dac-4e66-9f4d-e08b0434c9b4@lunn.ch>
- <20260311195052.1202174f@kernel.org> <abJJY8whzSOB8O-X@pengutronix.de>
- <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <7c45ebf6-0cb2-4a4c-ac12-f4f9bb59c908@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abHT2HLx-BvKnu-c@Antony2201.local>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,lunn.ch,gmail.com,google.com,marvell.com,redhat.com,nvidia.com,bootlin.com,broadcom.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-267163-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267164-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[secunet.com,google.com,vger.kernel.org,kernel.org,redhat.com,gondor.apana.org.au,paul-moore.com,linux-ipsec.org,davemloft.net,linux-ipv6.org,gmail.com,lwn.net,linuxfoundation.org];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 69CB0275E08
+X-Rspamd-Queue-Id: BED94275C40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew,
-
->> One more issue is the test data generator location. The data generator
->> is not always the CPU. We have HW generators located in components like
->> PHYs or we may use external source (remote loopback).
+On Wed, Mar 11, 2026 at 09:43:04PM +0100, Antony Antony wrote:
+> Hi Simon,
 > 
-> At the moment, we don't have a Linux model for such generators. There
-> is interest in them, but nobody has actually stepped up and proposed
-> anything. I do see there is an intersect, we need to be able to
-> represent them in the topology, and know which way they are pointing,
-> but i don't think they have a direct influence on loopback.
+> On Wed, Mar 11, 2026 at 07:57:31PM +0000, Simon Horman via Devel wrote:
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > 
+> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> > ---
+> > xfrm: add XFRM_MSG_MIGRATE_STATE for single SA migration
+> > 
+> > This patch adds a new netlink method to migrate a single xfrm_state.
+> > Unlike the existing migration mechanism (SA + policy), this supports
+> > migrating only the SA and allows changing the reqid.
+> > 
+> > > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > > index 4b29ab92c2a7..ae2a1cf2311a 100644
+> > > --- a/include/net/xfrm.h
+> > > +++ b/include/net/xfrm.h
+> > > @@ -683,11 +683,17 @@ struct xfrm_migrate {
+> > >  	xfrm_address_t		new_daddr;
+> > >  	xfrm_address_t		new_saddr;
+> > >  	struct xfrm_encap_tmpl *encap;
+> > > -	struct xfrm_user_offload *xuo;
+> > > +	struct xfrm_user_offload xuo;
+> > 
+> > [ ... ]
+> > 
+> > > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> > > index 2f23ca5b62a9..de8b038fc08c 100644
+> > > --- a/net/xfrm/xfrm_policy.c
+> > > +++ b/net/xfrm/xfrm_policy.c
+> > > @@ -4642,6 +4642,19 @@ static int xfrm_migrate_check(const struct xfrm_migrate *m, int num_migrate,
+> > >  	return 0;
+> > >  }
+> > >
+> > > +/* Fill migrate fields that are invariant in XFRM_MSG_MIGRATE: inherited
+> > > + * from the existing SA unchanged.
+> > > + */
+> > > +static void xfrm_migrate_copy_old(struct xfrm_migrate *mp,
+> > > +				  const struct xfrm_state *x)
+> > > +{
+> > > +	mp->smark                  = x->props.smark;
+> > > +	mp->new_reqid              = x->props.reqid;
+> > > +	mp->nat_keepalive_interval = x->nat_keepalive_interval;
+> > > +	mp->mapping_maxage         = x->mapping_maxage;
+> > > +	mp->new_mark               = x->mark;
+> > > +}
+> > > +
+> > >  int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+> > >  		 struct xfrm_migrate *m, int num_migrate,
+> > >  		 struct xfrm_kmaddress *k, struct net *net,
+> > > @@ -4680,7 +4693,10 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+> > >  			x_cur[nx_cur] = x;
+> > >  			nx_cur++;
+> > >  			mp->encap = encap;
+> > > -			mp->xuo = xuo;
+> > > +			if (xuo)
+> > > +				mp->xuo = *xuo;
+> >                                      ^^^^
+> > >  			xfrm_migrate_copy_old(mp, x);
+> > >
+> > 
+> > What happens to mp->xuo when xuo is NULL?
+> 
+> thanks. I also red this on NIPA AI reviews. I will fix it in the next 
+> version.
 
-If I'm following Oleksij, the idea would be to have on one side the
-ability to "dump" the link topology with a finer granularity so that we
-can see all the different blocks (pcs, pma, pmd, etc.), how they are
-chained together and who's driving them (MAC, PHY (+ phy_index), module,
-etc.), and on another side commands to configure loopback on them, with
-the ability to also configure traffic generators in the future, gather
-stats, etc.
+Thanks, good to know.
 
-Another can of worms for sure, and probably too much for what Björn is
-trying to achieve. It's hard to say if this is overkill or not, there's
-interest in that for sure, but also quite a lot of work to do...
+> 
+> > 
+> > The xfrm_migrate structure changed its xuo field from a pointer
+> > (struct xfrm_user_offload *xuo) to an embedded value
+> > (struct xfrm_user_offload xuo).
+> > 
+> > In xfrm_migrate(), when the xuo parameter is NULL (PF_KEY path via
+> > pfkey_migrate, or XFRM_MSG_MIGRATE without XFRMA_OFFLOAD_DEV), the
+> > 'if (xuo) mp->xuo = *xuo' branch is skipped, leaving mp->xuo with
+> > uninitialized stack data.
+> > 
+> > Both callers declare 'struct xfrm_migrate m[XFRM_MAX_DEPTH]' on the
+> > stack without zeroing:
+> > 
+> > net/key/af_key.c:pfkey_migrate() {
+> >     struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> >     ...
+> >     err = xfrm_migrate(&sel, dir, XFRM_POLICY_TYPE_MAIN, m, i,
+> >                        k.local && k.remote ? &k : NULL, net,
+> >                        NULL, 0, NULL);
+> > }
+> > 
+> > net/xfrm/xfrm_user.c:xfrm_do_migrate() {
+> >     struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> 
+> -  struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> +  struct xfrm_migrate m[XFRM_MAX_DEPTH] = {};
+> 
+> this should fix it.
 
-Maxime
+Yes, I agree that should fix the problem.
+
+> 
+> >     ...
+> >     err = xfrm_migrate(&sel, dir, type, m, n, k, net, encap, xuo, extack);
+> > }
+
+...
 
