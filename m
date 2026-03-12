@@ -1,157 +1,145 @@
-Return-Path: <netdev+bounces-267068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGMQDlvDsmmvPAAAu9opvQ
-	(envelope-from <netdev+bounces-267068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:44:59 +0100
+	id iDyuDxTCsmmvPAAAu9opvQ
+	(envelope-from <netdev+bounces-267066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:39:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2105272D4D
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:44:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8212E272BD1
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 14:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEB86301C6DE
-	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:41:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35E54305AC8A
+	for <lists+netdev@lfdr.de>; Thu, 12 Mar 2026 13:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC363C13F9;
-	Thu, 12 Mar 2026 13:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FF93822BB;
+	Thu, 12 Mar 2026 13:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UwYZJNzx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IkOjbUcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DE230B51D;
-	Thu, 12 Mar 2026 13:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8947D34251B
+	for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 13:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773322906; cv=none; b=VJTSsjFLyQTdtcsCch+JfWf/4NuIQSmU8nhJWcnhQoaq+wR/m/D0/CIrxBDudBMsV6TrUjhYIqSqyS5Zc6Z/XDoP05xxd2QCZxZssVhrYyHfeFWtTD9cC/4lQUG5ciVdqBnSHlm0g7kLQsbZn7NGcZQGbk4n4uJ8G/CAjZ9Ykl0=
+	t=1773322761; cv=none; b=kwzpEDQky2znJMmXFQmM3iMfIhxZ0yvbC6eWmoPSvFt78nYhYdu17Vh2UEqwD6eJJvH58nWITXdaMOBGDWX67rTHGtu8kKSYKy4v9s8VglxmfBBIgli9gwuQcHRkwIeK2erj0EM7lNFa3r9L99ThCtYfOmwqVh4heTNDawYTTws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773322906; c=relaxed/simple;
-	bh=OIYxdZHWNquGPThxduQFNcu1VDsZM+QBbR+zNqLLiPg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vvd1r22vT5Lkd/TWXvQLY+B88OPNVmxiP70yfgN7BqooOM+K0y+XXR90p+8QYpFMbYpAob/3RUQmlOeW2+LVPjRVXy1VXOtpsjq3jqeC5WxMjpbT3TLI2p8tDQGNcwQGYrMyoa9IFDxC3YYyiB4Xy1qSTWMzd3jNaSn3/A+z+oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UwYZJNzx; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773322905; x=1804858905;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OIYxdZHWNquGPThxduQFNcu1VDsZM+QBbR+zNqLLiPg=;
-  b=UwYZJNzxqN7hjBnJoTi9C123BAKJQZf4s9YxJNdzDPCyi402XZxafeye
-   GTavtchqCQOU3/XFpeATa6uXgzexFB/PaYm/F/IC7++rToSFBw1ScAFXf
-   4LCx9S0kZwlF9nihck1RiJIk5gJxUERdngDurK6cpYdYTKFBSAfOcLDGH
-   n+0SOPugSoxFIkaznZA1KsOOh83QlHqOtQ9x4B44pK3XlVWRwpOvE6jO1
-   5WJkHKCnXUPWDF+VGH/bDmuXXIKDCfTlzwjwrTVjrSQlxeBolhccQ9npi
-   bKqyD2tjM+UA2H1atOSl21ZIpGmgxbr+w1Wp3nBaCK2brIigJWsT479Qu
-   A==;
-X-CSE-ConnectionGUID: RjybdDEQReW8VnevA8aLZA==
-X-CSE-MsgGUID: KwjeFn75QlephaHJsrijKg==
-X-IronPort-AV: E=Sophos;i="6.23,116,1770620400"; 
-   d="scan'208";a="54995152"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2026 06:41:44 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Thu, 12 Mar 2026 06:41:13 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 12 Mar 2026 06:41:12 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: Conor Dooley <conor@kernel.org>, Charles Perry
-	<charles.perry@microchip.com>, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] net: macb: set default_an_inband to true for SGMII
-Date: Thu, 12 Mar 2026 06:38:55 -0700
-Message-ID: <20260312133856.2911581-1-charles.perry@microchip.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1773322761; c=relaxed/simple;
+	bh=uCgy/4a3O45IKbt53bkbdtju6nVoH67NjrRZwRGOQKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fnlrLbFLifLU7durtep+NAzn3uy71L3aMbdUZ16McXZLJpFHrzIn/+EJZqovbBRQPc2mU1D3jy/FJGbEdwn/E/daHvg38Js9i7q7L1nLy3RQH6N3nefzM+8/iMfCIDrgWGA1xPJsOYyFsC95cCDy1JPdmaPeSkojf5xbOvHs93s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IkOjbUcC; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <14e9e301-38da-4800-a1a6-9913c8d3cbf9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773322757;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rMYxCY6UeSuDYqBhMw/GjMm6u1qYKBPdLAkA3zqj/aY=;
+	b=IkOjbUcC2VEP4LSLMMoZOUZeVQuS5QXzTMHpO6lSR8shlxoVxt9sz6+li1zVGw22ifVZKG
+	2hwPY0AvWefeYF1lFoDXA02IOu7sT2HB0bD8QruPmBC9AlSoGRUl9MZlc2+0TT5NNEAZwq
+	rPxTrFnaNGpH51JUlmZIGsIc4se4H/o=
+Date: Thu, 12 Mar 2026 21:39:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH bpf-next v3 3/6] bpf: Disallow !kprobe_write_ctx progs
+ tail-calling kprobe_write_ctx progs
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Shuah Khan <shuah@kernel.org>, Feng Yang <yangfeng@kylinos.cn>,
+ Menglong Dong <menglong8.dong@gmail.com>,
+ Puranjay Mohan <puranjay@kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Pu Lehui <pulehui@huawei.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-patches-bot@fb.com
+References: <20260303150639.85007-1-leon.hwang@linux.dev>
+ <20260303150639.85007-4-leon.hwang@linux.dev> <abHwii5stH93Vz5E@krava>
+ <931b490b-ab29-44fc-b888-8ac1ee8d8ccc@linux.dev> <abKZfhWs9Gojuvip@krava>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <abKZfhWs9Gojuvip@krava>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267066-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267068-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:dkim,microchip.com:email,microchip.com:mid]
-X-Rspamd-Queue-Id: C2105272D4D
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,fb.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 8212E272BD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Most platforms using GEM in SGMII mode use in-band autonegotiation
-because it is on by default in GEM's 1G PCS and is always on since
-commit e276e5e40e92 ("net: macb: Disable PCS auto-negotiation for SGMII
-fixed-link mode"). Leave it on if possible using the "default_an_inband"
-flag of "struct phylink_config" so that platforms that lack in-band
-autonegotiation configurability at the PHY do not break with commit
-1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled") which
-will turn off in-band autoneg for non hot pluggable PHYs.
+On 2026/3/12 18:46, Jiri Olsa wrote:
+> On Thu, Mar 12, 2026 at 10:24:24AM +0800, Leon Hwang wrote:
+>> On 12/3/26 06:45, Jiri Olsa wrote:
+[...]
+>>
+>> Actually, without this patch, when "bpf_fentry_test1" runs, the arg "a"
+>> will be updated as 0. Thus, bpf_prog_test_run_tracing() returns -EFAULT
+>> instead of 0.
+>>
+>> bpf_prog_test_run_tracing()
+>> |-->bpf_fentry_test1()
+>>     |-->dummy_kprobe()
+>>         |-->kprobe() /* via tail call */
+>>             |-->regs->di = 0;
+>>     return 1; /* instead of 2 */
+>> return -EFAULT;
+>>
+>> Yep, the commit log is not clear to describe this abuse problem. Will
+>> update it.
+> 
+> ah right :-\ ok, I think we need to do the suggested one way check and
+> that should prevent kprobes having writeable ctx
+> 
 
-Once the majority of the PHY drivers that support SGMII have the
-->config_inband() callback, this commit could be reverted so that non
-hot pluggable PHY use outband negotiation with macb, like its the case
-for other MACs.
+Yeah, will apply strict both-ways check. See
+https://lore.kernel.org/bpf/8a3c7f14-b3d1-4208-acbd-76e5db6c5320@linux.dev/.
 
-Fixes: 1338cfef1ff1 ("net: macb: fix SGMII with inband aneg disabled")
-Closes: https://lore.kernel.org/r/20260304-nebulizer-rounding-40fbc81a2ba1@spud
-Tested-by: Conor Dooley <conor@kernel.org>
-Signed-off-by: Charles Perry <charles.perry@microchip.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 963a5d4e1a88..d1fc6a9b9fe5 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -838,6 +838,12 @@ static int macb_mii_probe(struct net_device *dev)
- 	if (bp->phy_interface == PHY_INTERFACE_MODE_SGMII) {
- 		bp->phylink_config.poll_fixed_state = true;
- 		bp->phylink_config.get_fixed_state = macb_get_pcs_fixed_state;
-+		/* The PCSAUTONEG bit in PCSCNTRL is on out of reset. Setting
-+		 * default_an_inband to true tells phylink to turn it off only
-+		 * if necessary (e.g. a fixed link or a PHY that doesn't support
-+		 * inband).
-+		 */
-+		bp->phylink_config.default_an_inband = true;
- 	}
- 
- 	bp->phylink_config.mac_capabilities = MAC_ASYM_PAUSE |
--- 
-2.47.3
+Thanks,
+Leon
 
 
