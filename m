@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-267622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFCuKmWQtGl0qAAAu9opvQ
-	(envelope-from <netdev+bounces-267622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:32:05 +0100
+	id kN4pHF2QtGl0qAAAu9opvQ
+	(envelope-from <netdev+bounces-267623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:31:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C4228A6B8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:32:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73AA728A6A2
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 23:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 286B8307DF2A
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:31:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CE8833030DD7
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881BD386453;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC66C386541;
 	Fri, 13 Mar 2026 22:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HumhbsnZ"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IZmqc4iO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D5C384232
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 22:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4AE38643E
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 22:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773441059; cv=none; b=aqvqkm4vYGalv2JwMRmLupDpsKs/pJuJzC+K9os9NvoaPBYcp9wE4vaXCebRqRgefMkHG3TSli6JRfH5LXOfJImfbtsPF4Pq3gzNg84jBvCvEu2njvnCnB/7NC79juXZjqN9K/QASM+jGEu6KWbglUOIY4v+1hnUQaVA9/013rs=
+	t=1773441059; cv=none; b=LAkXoPQwM8dZHlGg7VF57/2qIuujjT9Dg1UrIgMtUadl/7yVBUKYPMZqE97z9JLmSLMh4p/zn398Tk0EHJDzJTbpwgngm0ivJ/SdGdVun/NpU0SO67aqpa6yV6PRwMPnW2qHnTi3CWdyxOdkb4FgV/eXTJlAx1Qnn7fftHGRw1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773441059; c=relaxed/simple;
-	bh=+1Nr0Jil7w93d9S780sxk/ZwDE85Lpd4DcR7sfP5MRg=;
+	bh=OtHFbcpOVbLFwcytf7vnE+Hfd6w3VV2I2VNOK9waWGA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DQBdaRnrH+ZDsdvoxxRBhfn6tHfzlzh2uIDydaaE6y0Vpz63zev6Q89fov4JJz86uHAStE/rIps4qUAwOtkAnh+Lxb4F583NJihjtXHAawu/7IP7mdIKfieS1qYXQYJgP9Vof3329GB+NcFye65rhIFKwQsNijnhHOreJPHwIH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HumhbsnZ; arc=none smtp.client-ip=209.85.167.173
+	 MIME-Version; b=YwpfHz35abfeKj0l1/IO8gdKmlZ3Rt5mtJcDILlv31OkUW3yDZ7WfPIFePhGdAV3TJ2BdD1Y0eHqwlapqmcl0c1p8JoOIWmcdFwBDva8tAfkGkBDTEdTU2kvs3Tyz9YS0xbvDTeyxv6E59ArGIRijRdg5Srb+u2PrcG7WA0e7I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IZmqc4iO; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-4672076355aso1886346b6e.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:30:56 -0700 (PDT)
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-464bc03efd8so1885876b6e.2
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1773441056; x=1774045856; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1773441057; x=1774045857; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H2JdvacgjZAGz3EP35cm2jBWXr/fY7/W6wCgdpj3LTQ=;
-        b=HumhbsnZ0OQqImvM/FAuL+yvccY6TB3Qa+TqffYleAjmL3FMy0oE/p2MLdQepEwO6K
-         Jl8lTK69o2R1NHuDvmhWAyw8eEzX2n4A1yk21/7Ek4r7LX+cX+8pj8e3ihmyxlJlcbQh
-         vXAGEZhOFiLPoXFGksnppg3lFDbq0zpvaoTur5joGoCbsLHXf0+a+zbvpdkD0BaAqLP8
-         wBPK9M1IwnNVGMGZvfyspY9SRZgjbykn8kdCf2g07KCT9tR1kOJx7bMu6KjgKoIrwvV8
-         quIyHdTBfuBePYyKpT+l8GhVaorgpORG+hu7y/EDWfNr8WHT/U0OoNqkh/pLb4ZMpiic
-         V0Cg==
+        bh=QLKdgna2TJg/4cf6a9WLp0moZG16XDEww02DyhezqPc=;
+        b=IZmqc4iOxoBtUFX6VTFP8z/4pf2m6t55C5WJyM7E6R8pUwH4XcXqwqhvf40zXvYOS4
+         O4stlxlMA+ijEMBcRLuvuQ9ioFM2WGqHfS5QYsh21PLWbEnOl+AdAqFmzckLECew1FB4
+         s5MMJoBrRIdkcJUbwJX7UaId8UHl/DPDBw00dDXMSVWiQJOA8q/39OQi+b5GimCYhYrK
+         C12qfD2xhl+4uwzOWBO8ivqS71X2UkboQ4a/+s4kft4DpPT8TWoxCKyd7aRNlXjR1pgG
+         RjVbgWXbJiwBRQieGGyOX9Lcb2aD0NHN9/e3S11ivhMIMuOTwYF+64ba8u2mKF1zft5O
+         nWSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773441056; x=1774045856;
+        d=1e100.net; s=20251104; t=1773441057; x=1774045857;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=H2JdvacgjZAGz3EP35cm2jBWXr/fY7/W6wCgdpj3LTQ=;
-        b=j6SIsIUvMmRdp31+2TSPctg+9nI9DR3FyKIAQ20rOCEqh0ODRt+lhpYxCDHXZjrRx3
-         YRJDZFyJzzM8z3s2GvjO7+7RU3fR62eIQdqTZ+I+hTHznLjI0od3ybT68ra1m4C0anCV
-         Nz/2GfVqFoTnmSHPVYW+1gRsmK+4Juq40e8BrvV8S0LXI3H+H7a21KC+uDXIefFNob/z
-         hXkIGaIpx/8w7DY9tu+Vd6wn+YNI9ErGj66wJAy4Ew9I5xvq+ZObygpVsyv1qXyVk+KK
-         8Bq1Y+0Y1sZnBl7NC2JKIeT9sS+ZVE/+Csq+m1PUtZCb/Ern7GtxXh78HYIvqlgpgnsy
-         C+uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPufnsT+Uf2td9Ocz2LWNpiSb22cevU8Zyx0ZA/x7weuyEz3JennTrV758HW/vHvrZUYxP2F8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUMqX6as3HLNxyZRmtnik2NDlxghfalrnwZlG4MBaIOOKgXFtU
-	v1T0Ih+ZbzD97PwfYieLbPQNMGoQDyTaJ8KYEi3OPvIuiLAHFHmRSi3b1tC9MCPX898=
-X-Gm-Gg: ATEYQzzGvZZbvjIIhY1HBehAqxBpskSSZl6qZfIbo/oZEIHbSta1/MadfptMD8qojHp
-	sve7Oexj1v7X8ikC8HsNfcc6976Uzbb7I0vHeT663pkSH4EShD1JJ38LswMsixk2J3CJf9+xj0T
-	C9B9tfi69kF7HSbSIy/iWPnBiCprBk+gJIW1nFrKwOxONACmvJ0UjQLzvXRn5dSq3QqLnaSJjTQ
-	ZRAmtuClq46rkLy+IcgWOIUHqUPi42PfxTtJRD1MKzwXNsY9CU8Y5YKmMIalv4WHA8sY2N+hHuI
-	nZBBFBaasnOTQrHM+frDvkI/pEAChwTY9p1mWSLkATF+J6me7ud6j9N3hq2/wBY4vUU3zGe4Iny
-	GGGV5zGZVu6Md6kKUix7bTV7/qpCsWaoj+hMAYgUy1oxosBrxTrGef45kO61cnsoNMdprOmbfgw
-	d1eI3qlFhn
-X-Received: by 2002:a05:6808:4f66:b0:45e:e52c:8a9b with SMTP id 5614622812f47-46757649336mr2867556b6e.59.1773441055758;
-        Fri, 13 Mar 2026 15:30:55 -0700 (PDT)
+        bh=QLKdgna2TJg/4cf6a9WLp0moZG16XDEww02DyhezqPc=;
+        b=dbsDdkQBmeFXBEqh1wNfLQSburd6mKTyX1MgqTiiwJsZ9jnBtdW10nGtjlnWa/e36j
+         Xqiz5N/7Ria7kuqAU4xiY5EZHOS62OqpXe8zMqA8A6DQMcR+EgWy4/cQ2vckFHNVrMzT
+         6Auwtab4OaRaBb1G9VYYryIQumb9z/zMVWzK1/iJq3yG5Aumb/ammxeJhe6f0cRa7ZsM
+         3w+ztQk3YcHs5jkZs1v30iyrick0WM0Z5qGQTH4Z9xHkQF0L8cknvAFnVP6F3OiH1lSn
+         w2K86BYM9wJu0KIxG71yU/9h1cEK8W/KEed/5q8e5Gjvj+b1hsrkfy0uJNLJ56/7/4q2
+         05bA==
+X-Forwarded-Encrypted: i=1; AJvYcCVo2OQT/G0tQb4HHWxFu4mQXjmlnMeIWCvvV5+0PUiw0DSBQyO0z8EJmddSj70XMFcuxO7WuK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPs5xzDxA134ru9OWOZ4O9S3oximu49bRAdj6/wmhPy8D+WAgT
+	sauCRmGaOQ20wHlI9zsm/GpgRvl6dPbDowfSBcK1KQ2+8hLU/mJpb+0YVSsR/8p7OnY=
+X-Gm-Gg: ATEYQzzASKQs0odzLm//YP6VRVxCzgnZtfRM92aw41s6AjTgEefv6uTioMgsTrmqhMH
+	8U/biTmJu3Mo3BEl87YBEUSGr+S5/qkVTZZp/yAU5wFSUKJKfgQbdr7p5bY3EZO7lYCMTq7yYHI
+	BE+uvPoPqhvZevuyiOcIUarfmyEqjRhTrXQHLJjgfszd0j5Ma1Bxql30+RSzY1S8+vFUdWV1eT1
+	6a9lKJpH8ve+MXeWo5/YIJpLVHwZBGwM5cpj/8mudV9SEbUdFufhyW2xme/k1YSAtqVcGPyLLCX
+	yAkYRmSUxHu3acveCkU+r7Qi5/PDCoXLRNKICEnWuYLJXDZJOrGRkky6oEClJ8Jz/ZTRuTdXfk4
+	2uhCD7YfDG0h0Ln3Fi0I/VTSf75My8ISQ/2q73ZLRudYfzp3+YrzRjokqE+ElXmqwA2PrUX9IFU
+	RefXe28cT75Ib1sCyYXbU=
+X-Received: by 2002:a05:6808:a550:20b0:467:2926:1252 with SMTP id 5614622812f47-46761727390mr1271145b6e.30.1773441057445;
+        Fri, 13 Mar 2026 15:30:57 -0700 (PDT)
 Received: from 20HS2G4.. ([2a09:bac1:76c0:540::22f:7d])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-467342fab49sm5408516b6e.16.2026.03.13.15.30.53
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-467342fab49sm5408516b6e.16.2026.03.13.15.30.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 15:30:54 -0700 (PDT)
+        Fri, 13 Mar 2026 15:30:56 -0700 (PDT)
 From: Chris J Arges <carges@cloudflare.com>
 To: Joe Damato <joe@dama.to>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -95,9 +95,9 @@ Cc: Chris J Arges <carges@cloudflare.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH net-next v4 2/6] bnxt_en: Implement XDP RSS hash metadata extraction
-Date: Fri, 13 Mar 2026 17:27:32 -0500
-Message-ID: <20260313223029.454755-3-carges@cloudflare.com>
+Subject: [PATCH net-next v4 3/6] bnxt_en: Move bnxt_rss_ext_op into header
+Date: Fri, 13 Mar 2026 17:27:33 -0500
+Message-ID: <20260313223029.454755-4-carges@cloudflare.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313223029.454755-1-carges@cloudflare.com>
 References: <20260313223029.454755-1-carges@cloudflare.com>
@@ -116,17 +116,17 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
 	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267622-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267623-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[dama.to,kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
@@ -137,139 +137,77 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid]
-X-Rspamd-Queue-Id: 60C4228A6B8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 73AA728A6A2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for extracting RSS hash values and hash types from hardware
-completion descriptors in XDP programs for bnxt_en.
-
-Add IP_TYPE definition for determining if completion is ipv4 or ipv6. In
-addition add ITYPE_ICMP flag for identifying ICMP completions.
+This allows bnxt_rss_ext_op to be used by other functions. In addition this
+modifies the rxcmp argument to be const since the function only reads from
+this structure.
 
 Signed-off-by: Chris J Arges <carges@cloudflare.com>
-Reviewed-by: Joe Damato <joe@dama.to>
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 ---
-v4: no changes
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 47 +++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  3 ++
- 4 files changed, 57 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 -----------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 17 +++++++++++++++++
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 1b170b9cf461..4881d9359549 100644
+index 4881d9359549..8176d34b3408 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15906,6 +15906,10 @@ static const struct net_device_ops bnxt_netdev_ops = {
- 	.ndo_hwtstamp_set	= bnxt_hwtstamp_set,
- };
+@@ -2077,23 +2077,6 @@ static struct sk_buff *bnxt_rx_vlan(struct sk_buff *skb, u8 cmp_type,
+ 	return NULL;
+ }
  
-+static const struct xdp_metadata_ops bnxt_xdp_metadata_ops = {
-+	.xmo_rx_hash		= bnxt_xdp_rx_hash,
-+};
-+
- static void bnxt_get_queue_stats_rx(struct net_device *dev, int i,
- 				    struct netdev_queue_stats_rx *stats)
- {
-@@ -16790,6 +16794,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto init_err_free;
- 
- 	dev->netdev_ops = &bnxt_netdev_ops;
-+	dev->xdp_metadata_ops = &bnxt_xdp_metadata_ops;
- 	dev->stat_ops = &bnxt_stat_ops;
- 	dev->watchdog_timeo = BNXT_TX_TIMEOUT;
- 	dev->ethtool_ops = &bnxt_ethtool_ops;
+-static enum pkt_hash_types bnxt_rss_ext_op(struct bnxt *bp,
+-					   struct rx_cmp *rxcmp)
+-{
+-	u8 ext_op;
+-
+-	ext_op = RX_CMP_V3_HASH_TYPE(bp, rxcmp);
+-	switch (ext_op) {
+-	case EXT_OP_INNER_4:
+-	case EXT_OP_OUTER_4:
+-	case EXT_OP_INNFL_3:
+-	case EXT_OP_OUTFL_3:
+-		return PKT_HASH_TYPE_L4;
+-	default:
+-		return PKT_HASH_TYPE_L3;
+-	}
+-}
+-
+ /* returns the following:
+  * 1       - 1 packet successfully received
+  * 0       - successful TPA_START, packet not completed yet
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 90fa3e93c8d6..34bb98709f2b 100644
+index 34bb98709f2b..f8b8068bb47e 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -232,6 +232,7 @@ struct rx_cmp {
- 	 #define RX_CMP_FLAGS_ITYPE_UDP				 (3 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_FCOE			 (4 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_ROCE			 (5 << 12)
-+	 #define RX_CMP_FLAGS_ITYPE_ICMP			 (7 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_PTP_WO_TS			 (8 << 12)
- 	 #define RX_CMP_FLAGS_ITYPE_PTP_W_TS			 (9 << 12)
- 	#define RX_CMP_LEN					(0xffff << 16)
-@@ -311,6 +312,7 @@ struct rx_cmp_ext {
- 	#define RX_CMP_FLAGS2_T_IP_CS_CALC			(0x1 << 2)
- 	#define RX_CMP_FLAGS2_T_L4_CS_CALC			(0x1 << 3)
- 	#define RX_CMP_FLAGS2_META_FORMAT_VLAN			(0x1 << 4)
-+	#define RX_CMP_FLAGS2_IP_TYPE				(0x1 << 8)
- 	__le32 rx_cmp_meta_data;
- 	#define RX_CMP_FLAGS2_METADATA_TCI_MASK			0xffff
- 	#define RX_CMP_FLAGS2_METADATA_VID_MASK			0xfff
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 85cbeb35681c..1f920464b426 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -472,3 +472,50 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
- 				  xdp_buff_get_skb_flags(xdp));
- 	return skb;
- }
-+
-+int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-+		     enum xdp_rss_hash_type *rss_type)
-+{
-+	const struct bnxt_xdp_buff *xdp = (void *)ctx;
-+	const struct rx_cmp_ext *rxcmp1 = xdp->rxcmp1;
-+	const struct rx_cmp *rxcmp = xdp->rxcmp;
-+	enum xdp_rss_hash_type hash_type = 0;
-+	u32 itypes;
-+
-+	if (!rxcmp || !RX_CMP_HASH_VALID(rxcmp))
-+		return -ENODATA;
-+
-+	*hash = le32_to_cpu(rxcmp->rx_cmp_rss_hash);
-+
-+	if (!rxcmp1) {
-+		*rss_type = XDP_RSS_TYPE_L2;
-+		return 0;
-+	}
-+
-+	if (xdp->cmp_type == CMP_TYPE_RX_L2_CMP) {
-+		itypes = RX_CMP_ITYPES(rxcmp);
-+		if (rxcmp1->rx_cmp_flags2 &
-+		    cpu_to_le32(RX_CMP_FLAGS2_IP_TYPE)) {
-+			hash_type |= XDP_RSS_TYPE_L3_IPV6;
-+		} else {
-+			hash_type |= XDP_RSS_TYPE_L3_IPV4;
-+		}
-+
-+		switch (itypes) {
-+		case RX_CMP_FLAGS_ITYPE_TCP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_TCP;
-+			break;
-+		case RX_CMP_FLAGS_ITYPE_UDP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_UDP;
-+			break;
-+		case RX_CMP_FLAGS_ITYPE_ICMP:
-+			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_ICMP;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	*rss_type = hash_type;
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-index 8c66698bde11..fb4f9143929f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-@@ -41,4 +41,7 @@ void bnxt_xdp_buff_frags_free(struct bnxt_rx_ring_info *rxr,
- struct sk_buff *bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb,
- 				   u8 num_frags, struct bnxt_rx_ring_info *rxr,
- 				   struct xdp_buff *xdp);
-+int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-+		     enum xdp_rss_hash_type *rss_type);
-+
+@@ -2902,6 +2902,23 @@ static inline bool bnxt_sriov_cfg(struct bnxt *bp)
  #endif
+ }
+ 
++static inline enum pkt_hash_types bnxt_rss_ext_op(struct bnxt *bp,
++						  const struct rx_cmp *rxcmp)
++{
++	u8 ext_op;
++
++	ext_op = RX_CMP_V3_HASH_TYPE(bp, rxcmp);
++	switch (ext_op) {
++	case EXT_OP_INNER_4:
++	case EXT_OP_OUTER_4:
++	case EXT_OP_INNFL_3:
++	case EXT_OP_OUTFL_3:
++		return PKT_HASH_TYPE_L4;
++	default:
++		return PKT_HASH_TYPE_L3;
++	}
++}
++
+ extern const u16 bnxt_bstore_to_trace[];
+ extern const u16 bnxt_lhint_arr[];
+ 
 -- 
 2.43.0
 
