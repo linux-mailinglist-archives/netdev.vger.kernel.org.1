@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-267288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBRnDMV+s2kDXQAAu9opvQ
-	(envelope-from <netdev+bounces-267288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 04:04:37 +0100
+	id 8BJ9LwB/s2kDXQAAu9opvQ
+	(envelope-from <netdev+bounces-267289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 04:05:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8F727CF82
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 04:04:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 583C627CFAB
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 04:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF95A302AC06
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:04:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E7A33145428
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 03:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591DC2E62B3;
-	Fri, 13 Mar 2026 03:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE8532AAD6;
+	Fri, 13 Mar 2026 03:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mi1UIez1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUF6SP+n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1162F5A29
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 03:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B822C3257
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 03:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773371041; cv=none; b=nekwRtafeMtW8qgyMbLk4AV99gUQmPiqyiYrXuk92cdPerJ85GXkCioA95jYYjmIJhOM/p+sIqeFUNrglpfAP1870ZaDnDK4Uu+XrXjTxs/Y31UKiEIo/xeEaweZ64rmn5I8CEcSah3415YR5hw/K8ANdrMojxjs0nQuAh3/0xE=
+	t=1773371054; cv=none; b=W69E+DYTjXun4QOZsCCfarJKxrDMdiIvOcbwh4zjFjmJDRahRkZLlCtSCWPErqLurmOct+i0gYYnWvqu8/h9w2qOCjDuFtM0ONdDXxGCIsPN/MEDGtrwNFhipaxVXeeaWEo4RxAudAIiAPCf3R/W33uLZC0e32eEZjXtSs5u0+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773371041; c=relaxed/simple;
-	bh=G4W6YNhY1DK0N/jD/Bs+737si/SON3wre12H8bnq7/w=;
+	s=arc-20240116; t=1773371054; c=relaxed/simple;
+	bh=pbtKIDznCvGEVtQHODrKsx+vVNFY8ZkNIx/vZ7lzIsQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sTj1b7b7pgZB6DQHU0kJmffC04TXHq3osNM71mytpBOA8POKTCB7JHwLnN83A441WVO4zo65Pj1/M44iAGqV9bkbcOyAdfs+DnMV0e/Ba9O46xcWOnC/cYusZL4ZaJnERQU20g0nMxpC0SWmQCHV9Hq0PZ63qz+nxEFiUNFYM+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mi1UIez1; arc=none smtp.client-ip=209.85.216.54
+	 In-Reply-To:To:Cc; b=NwHTzpBJUy9udJUdq0h2F2U0vv1BwUjVYwLHMESgt6pmSPQtSuiUwnWxPF/bJ/iCWtFVvOytLaVwZHbfVJEgydAcqTverHaeABL3gwfupXEl7kSCQCAkic993kE0+DufiWimWSl/ZGq2NZi1faCrM5zqRn63SdCb1aYrun2z4SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUF6SP+n; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-358e3cc5e7eso940345a91.0
-        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 20:03:59 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-35a132767c3so708867a91.1
+        for <netdev@vger.kernel.org>; Thu, 12 Mar 2026 20:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773371039; x=1773975839; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773371051; x=1773975851; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qBeXDORWZ/mDBhe03hVB52ezLWB2XO1J0L+2w863tec=;
-        b=mi1UIez1OOgw+Am+wYGD8FX1HXjsYFCISq/mPs5FmYgBb5pDDDo5wzBny7MgAnsDu9
-         QzFi/fRUFTm9GESi7Pp9JvFeAQTlSA5/wOFh0JorQ918lpy/00JZ3yUltDM3oEDsuRky
-         K1E31Gq68sSJAQ2CjL+KAUSPShqkXZprAu/S0FF4+RCMLRNsImRxucGT9R6R6Ws27klI
-         brhKvQXleFwQvFvi/RSX7mXgD7bLjLJ/7eYqUc6CC8TbRSXYqLVTyQwTNOqdekAiLxe3
-         UPS+R+kXItn4aiJg6o1EQNWjupCxENetMexuDhOXwmY+XfDKXEBY4r4vwUs0dSMI86/Y
-         CWlg==
+        bh=JPGq7YNOGl3DkR8NTBoIGDJAXGD2GV5oTegfoP6i0Xk=;
+        b=CUF6SP+nfvm8EGykUo+yEDyeYPu231983gEVErsdnljr4Uh8U1n71xl5duKcS2Q4/a
+         O+c3zpoaLPFsbSw2jBkHT3ftoUFS4QfgaHsSTS9+5wRVl9G/qyoSuXpYKdl7MEQGe2gE
+         UUbF6qnuCtlYiKwQty5J0AmgYDHc2o8rAqErUNJpBl4lW073H5mNKom04GOmHPH0ERNA
+         bswAzMfRLxi+skeU98p/uks4TeiLXzNMlc6kXDliluweXrEYWnsm54ZB2swTdfCq7txc
+         maSPWkrKYypLkbraokqeTQcM9/11cXTmK/g2pxlWPsnXrOnHIeSKY7eEQR+9R1oXobpY
+         dv0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773371039; x=1773975839;
+        d=1e100.net; s=20251104; t=1773371051; x=1773975851;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qBeXDORWZ/mDBhe03hVB52ezLWB2XO1J0L+2w863tec=;
-        b=Ced1lOuBh0VfFxGf55DtMmCn/hLuAIutVeca+VmDydiKyrRTd2z9me6MNWoxcE9eB4
-         Bt4k0AP0hnIT2M2SVw+7ulaD3NYZ/ojf52OWIjlSTezvUByTfGC/LMRXwgq+NbA7Ir7C
-         vgwpJNUJtSDlhPmhnfls4ydgPH3RlWqwfB1zyj6EwCNBwUY2Wvn2PTFdP4KYKgtd5sAU
-         f1TuMERaUxU3rXjTjVSuQAzbR8QyCZprbQENxVsdRnYSlQ5+iKG3ph2FttZWQNpIC2PL
-         tWNDqdmXCXzTUYuGCKin6+kiAhbezTDJybyKM+GxMqiDhzDp/KrkAvsYBzLyzHYbteiQ
-         IkjQ==
-X-Gm-Message-State: AOJu0YyN5QFuabXn31lZFgjRR+CAyMEk3QzNgdSP2V+6GJ+DiVTmXgV+
-	2jraDMIZBCwaEYXxuNk6TOyhlHoLBClNOn8dUKb8Ivgqom8OqI08r+N1
-X-Gm-Gg: ATEYQzznqGs5VZfIiJzqLxeFF3WTUrEPY3qgCldHoqK8rf3BYdXRgUbATaKCxMcJp7b
-	J3SjDlPb9U1Ju8KLuDr8D2TFZysT44X6BsvjOVrN9KyDEGe4vOlrSDCKxweQb9RuedIir+KKy+P
-	jKMgU5aSHpjyCNd552nhsQOEhUb38OkSqCvQgVvw1fJH5X03mhgO9z+7Tdf4ibHwPOJ9tu/Dzc/
-	9qI4RgFzS/bYlW7A+v4EpsAeFYh9iY5R39+xVzkzdPHl6SPcc9v+EudMLtcFUDOrijUpWDHvLYJ
-	/oBfw1RbES07A0dFtPKpEBZcJ8j39b5+Is7BkA7iffmgtNCYYBihfXY71dnp9eTWFdF2KWJyj/C
-	Y7vBuBk29qwXBAqBBUag/854kwISof8qgS4lMIBf8qPvKblVwoLxHtURZLFQb4gVeubG4TTTYFB
-	sITSPFqohYHGsO+4mH6cox4m4ByT73iPQUUcpsjVCTpIISh6XI9lWWAgORYKDaWLsWaizvluS7r
-	Uqw030FUUKz2aLF7/aYi1dRkhONX7R3IjnIxfuRcKtT7MwNzhv1Vztsah7psvk=
-X-Received: by 2002:a17:90b:2783:b0:359:3088:6ab1 with SMTP id 98e67ed59e1d1-35a21e1ca4fmr1607854a91.1.1773371039000;
-        Thu, 12 Mar 2026 20:03:59 -0700 (PDT)
+        bh=JPGq7YNOGl3DkR8NTBoIGDJAXGD2GV5oTegfoP6i0Xk=;
+        b=O9PYp9UbiWVm4GsfRsQqL44taauRF1K/46T82tjWDWn2WMUOzH7tFkDNSilOM6KT5/
+         p0OEoLO1yFWlL1ssqpP9toB2nIv1vKtCfj5M6MpbyFBxzmH3Ifep1N4eH0+u8s9lu63c
+         orSafxMa7dnH7kgHQU7OdJ0RpnlWUHH0XoO9NAxK+Aax/uTzYjx1SITS6crMw+//g6KI
+         /lBDUFfDzQN1RwfU0alISq+iJwBmTaVLI5ELIYWmZdP3m/RtLOTLkT2X+Y04DUneeCV3
+         UaC1Ti8zneX0woP20bRaDUafLkYSgTzNKeLYITp1XbOENzvU2JGH7L36WUk1YUNwvlOy
+         wXdA==
+X-Gm-Message-State: AOJu0Yw/QWwUGbTNrRb+6MLhI/duhX/yUMBgxbQSnMGerQ9OMPtQgpVp
+	KkIpf2m4m1XnXIurcabRX9D3+nbtH0q3CwPzUuczFcnPl4lV4cHV7rSEuEhKVTWHQ3yHcQ==
+X-Gm-Gg: ATEYQzz5p8lvqtMQxjiqHNErefoblEOmjT965Cx3X4s5M+v8Sl4pnmfOC8ngL0vCawD
+	YoeHmLY8JoZ5yyV0VwfhTkBzTV3xURInHOlpEV8fdsQwu/3cCko1iyaRwmyIzy6W5At9h97tCT9
+	Akkdcz/88GXtf1NpO6xnKxphs2zrGeujILFdWeEDmfD4Ame+jzGCOgfJrdaKui9rv4UpXSA6I9a
+	C2Y5WVFfi/U6shA9GEKyGvBXXw1useBXpYRAP9VboE39gDtDr+rN8oBpEi8NR1h7pcbooVmExmE
+	IQFDx2JuKRqlwnKwbzOKiICmVMmqJ7rd2hWs0TVphwheuPP6Fmzv6lXxWPEThnnp8nIWDHHVzVB
+	GXxA78lL5aIQ2v3gv6k1wIvAwwtH2UcWRuIEJS2b1BiGt2M3tBT4RINKXEj8N9re7S3SNF03UzK
+	XejWP9H3rJJoiZ7J8J3FHs0ofG8FtubQRfzTVeTLrc02Xr8VRuIeR0BWgEfhfwIAO7Y1GW2Eo02
+	6nIWigX+oPjcBOdTsLWi3sobPvKpVYuVeJR5FLz/+XZDtxvBK96Y/ecgQam5ek=
+X-Received: by 2002:a17:90b:3b41:b0:35a:3e2:7cbb with SMTP id 98e67ed59e1d1-35a220558b3mr1403433a91.29.1773371050802;
+        Thu, 12 Mar 2026 20:04:10 -0700 (PDT)
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([240e:34c:5765:adb0:54b3:92b9:a11b:1cae])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35a24a7dc1csm293967a91.1.2026.03.12.20.03.48
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35a24a7dc1csm293967a91.1.2026.03.12.20.03.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 20:03:58 -0700 (PDT)
+        Thu, 12 Mar 2026 20:04:10 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Fri, 13 Mar 2026 11:03:09 +0800
-Subject: [PATCH net-next v2 1/4] net: use ndo_set_features to set offload
- features for bonding/bridge/team
+Date: Fri, 13 Mar 2026 11:03:10 +0800
+Subject: [PATCH net-next v2 2/4] macsec: move netdev_upper_dev_link() after
+ macsec_changelink_common()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260313-offload_compute-v2-1-ffbc8ce5d50c@gmail.com>
+Message-Id: <20260313-offload_compute-v2-2-ffbc8ce5d50c@gmail.com>
 References: <20260313-offload_compute-v2-0-ffbc8ce5d50c@gmail.com>
 In-Reply-To: <20260313-offload_compute-v2-0-ffbc8ce5d50c@gmail.com>
 To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267288-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267289-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -130,237 +130,118 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8D8F727CF82
+X-Rspamd-Queue-Id: 583C627CFAB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert bonding, bridge, and team drivers to use ndo_set_features callback
-instead of manually calling netdev_compute_master_upper_features() during
-port add/remove operations.
+After calling netdev_change_features() in __netdev_upper_dev_link(),
+the call stack looks like:
 
-This change centralizes the feature computation flow:
+- netdev_upper_dev_link
+  - __netdev_upper_dev_link
+    - netdev_change_features
+      - notifier_call_chain
+        - rtnetlink_event
+          - rtmsg_ifinfo_event
+            - rtmsg_ifinfo_build_skb
 
-Before:
-- netdev_master_upper_dev_link()
-- netdev_compute_master_upper_features()  <- called manually
-  - compute offload features
-  - netdev_change_features()
-    - __netdev_update_features()
-      - update other features
+In macsec, we call netdev_upper_dev_link() before
+macsec_changelink_common(), which causes the fields of the MACsec
+Security Entity to be uninitialized. Later, macsec_fill_info() returns
+-EMSGSIZE and triggers WARN_ON() in rtmsg_ifinfo_build_skb.
 
-After:
-- netdev_master_upper_dev_link()
-  - __netdev_upper_dev_link()
-    - netdev_change_features()
-      - __netdev_update_features()
-        - ndo_set_features()
-          - netdev_compute_master_upper_features()
+Fix this by moving netdev_upper_dev_link() after
+macsec_changelink_common(), and return 0 if secy->key_len is not
+initialized yet.
 
-This ensures offload features are computed automatically when
-upper/lower device links change, removing the need for manual
-feature computation calls in the driver code.
-
-The netdev_change_features() call in team_uninit() is also removed
-since it calls team_port_del() for each port, which now triggers
-feature updates automatically.
-
+Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- drivers/net/bonding/bond_main.c | 11 ++++++++---
- drivers/net/team/team_core.c    | 12 ++++++++----
- net/bridge/br_device.c          |  7 +++++++
- net/bridge/br_if.c              |  4 ----
- net/core/dev.c                  |  8 ++++++--
- 5 files changed, 29 insertions(+), 13 deletions(-)
+ drivers/net/macsec.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 90b71bd53040..2c84d3ce3b04 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1509,6 +1509,12 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
- 	return features;
- }
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index f6cad0746a02..6bb38084bc1e 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -4161,10 +4161,6 @@ static int macsec_newlink(struct net_device *dev,
+ 	lockdep_set_class(&dev->addr_list_lock,
+ 			  &macsec_netdev_addr_lock_key);
  
-+static int bond_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, true);
-+	return 0;
-+}
+-	err = netdev_upper_dev_link(real_dev, dev, extack);
+-	if (err < 0)
+-		goto unregister;
+-
+ 	/* need to be already registered so that ->init has run and
+ 	 * the MAC addr is set
+ 	 */
+@@ -4177,12 +4173,12 @@ static int macsec_newlink(struct net_device *dev,
+ 
+ 	if (rx_handler && sci_exists(real_dev, sci)) {
+ 		err = -EBUSY;
+-		goto unlink;
++		goto unregister;
+ 	}
+ 
+ 	err = macsec_add_dev(dev, sci, icv_len);
+ 	if (err)
+-		goto unlink;
++		goto unregister;
+ 
+ 	if (data) {
+ 		err = macsec_changelink_common(dev, data);
+@@ -4190,6 +4186,10 @@ static int macsec_newlink(struct net_device *dev,
+ 			goto del_dev;
+ 	}
+ 
++	err = netdev_upper_dev_link(real_dev, dev, extack);
++	if (err < 0)
++		goto del_dev;
 +
- static int bond_header_create(struct sk_buff *skb, struct net_device *bond_dev,
- 			      unsigned short type, const void *daddr,
- 			      const void *saddr, unsigned int len)
-@@ -2273,7 +2279,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 	}
+ 	/* If h/w offloading is available, propagate to the device */
+ 	if (macsec_is_offloaded(macsec)) {
+ 		const struct macsec_ops *ops;
+@@ -4200,7 +4200,7 @@ static int macsec_newlink(struct net_device *dev,
+ 			ctx.secy = &macsec->secy;
+ 			err = macsec_offload(ops->mdo_add_secy, &ctx);
+ 			if (err)
+-				goto del_dev;
++				goto unlink;
  
- 	bond->slave_cnt++;
--	netdev_compute_master_upper_features(bond->dev, true);
- 	bond_set_carrier(bond);
+ 			macsec->insert_tx_tag =
+ 				macsec_needs_tx_tag(macsec, ops);
+@@ -4209,7 +4209,7 @@ static int macsec_newlink(struct net_device *dev,
  
- 	/* Needs to be called before bond_select_active_slave(), which will
-@@ -2528,7 +2533,6 @@ static int __bond_release_one(struct net_device *bond_dev,
- 		call_netdevice_notifiers(NETDEV_RELEASE, bond->dev);
- 	}
+ 	err = register_macsec_dev(real_dev, dev);
+ 	if (err < 0)
+-		goto del_dev;
++		goto unlink;
  
--	netdev_compute_master_upper_features(bond->dev, true);
- 	if (!(bond_dev->features & NETIF_F_VLAN_CHALLENGED) &&
- 	    (old_features & NETIF_F_VLAN_CHALLENGED))
- 		slave_info(bond_dev, slave_dev, "last VLAN challenged slave left bond - VLAN blocking is removed\n");
-@@ -4026,7 +4030,7 @@ static int bond_slave_netdev_event(unsigned long event,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!bond->notifier_ctx) {
- 			bond->notifier_ctx = true;
--			netdev_compute_master_upper_features(bond->dev, true);
-+			netdev_change_features(bond->dev);
- 			bond->notifier_ctx = false;
- 		}
+ 	netdev_update_features(dev);
+ 	netif_stacked_transfer_operstate(real_dev, dev);
+@@ -4219,10 +4219,10 @@ static int macsec_newlink(struct net_device *dev,
+ 
+ 	return 0;
+ 
+-del_dev:
+-	macsec_del_dev(macsec);
+ unlink:
+ 	netdev_upper_dev_unlink(real_dev, dev);
++del_dev:
++	macsec_del_dev(macsec);
+ unregister:
+ 	unregister_netdevice(dev);
+ 	return err;
+@@ -4337,7 +4337,8 @@ static int macsec_fill_info(struct sk_buff *skb,
+ 		csid = secy->xpn ? MACSEC_CIPHER_ID_GCM_AES_XPN_256 : MACSEC_CIPHER_ID_GCM_AES_256;
  		break;
-@@ -5953,6 +5957,7 @@ static const struct net_device_ops bond_netdev_ops = {
- 	.ndo_add_slave		= bond_enslave,
- 	.ndo_del_slave		= bond_release,
- 	.ndo_fix_features	= bond_fix_features,
-+	.ndo_set_features	= bond_set_features,
- 	.ndo_features_check	= passthru_features_check,
- 	.ndo_get_xmit_slave	= bond_xmit_get_slave,
- 	.ndo_sk_get_lower_dev	= bond_sk_get_lower_dev,
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index b7282f5c9632..4906ea3717b1 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1247,7 +1247,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	port->index = -1;
- 	list_add_tail_rcu(&port->list, &team->port_list);
- 	team_port_enable(team, port);
--	netdev_compute_master_upper_features(team->dev, true);
- 	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
- 	__team_options_change_check(team);
- 
-@@ -1337,7 +1336,6 @@ static int team_port_del(struct team *team, struct net_device *port_dev, bool un
+ 	default:
+-		goto nla_put_failure;
++		WARN_ON_ONCE(1);
++		return 0;
  	}
- 	kfree_rcu(port, rcu);
- 	netdev_info(dev, "Port device %s removed\n", portname);
--	netdev_compute_master_upper_features(team->dev, true);
  
- 	return 0;
- }
-@@ -1645,7 +1643,6 @@ static void team_uninit(struct net_device *dev)
- 	team_mcast_rejoin_fini(team);
- 	team_notify_peers_fini(team);
- 	team_queue_override_fini(team);
--	netdev_change_features(dev);
- }
- 
- static void team_destructor(struct net_device *dev)
-@@ -1972,6 +1969,12 @@ static netdev_features_t team_fix_features(struct net_device *dev,
- 	return features;
- }
- 
-+static int team_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, true);
-+	return 0;
-+}
-+
- static int team_change_carrier(struct net_device *dev, bool new_carrier)
- {
- 	struct team *team = netdev_priv(dev);
-@@ -2007,6 +2010,7 @@ static const struct net_device_ops team_netdev_ops = {
- 	.ndo_add_slave		= team_add_slave,
- 	.ndo_del_slave		= team_del_slave,
- 	.ndo_fix_features	= team_fix_features,
-+	.ndo_set_features	= team_set_features,
- 	.ndo_change_carrier     = team_change_carrier,
- 	.ndo_features_check	= passthru_features_check,
- };
-@@ -2944,7 +2948,7 @@ static int team_device_event(struct notifier_block *unused,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!port->team->notifier_ctx) {
- 			port->team->notifier_ctx = true;
--			netdev_compute_master_upper_features(port->team->dev, true);
-+			netdev_change_features(port->team->dev);
- 			port->team->notifier_ctx = false;
- 		}
- 		break;
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index f7502e62dd35..f82082050e36 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -289,6 +289,12 @@ static netdev_features_t br_fix_features(struct net_device *dev,
- 	return br_features_recompute(br, features);
- }
- 
-+static int br_set_features(struct net_device *dev, netdev_features_t features)
-+{
-+	netdev_compute_master_upper_features(dev, false);
-+	return 0;
-+}
-+
- #ifdef CONFIG_NET_POLL_CONTROLLER
- static void br_poll_controller(struct net_device *br_dev)
- {
-@@ -456,6 +462,7 @@ static const struct net_device_ops br_netdev_ops = {
- 	.ndo_add_slave		 = br_add_slave,
- 	.ndo_del_slave		 = br_del_slave,
- 	.ndo_fix_features        = br_fix_features,
-+	.ndo_set_features        = br_set_features,
- 	.ndo_fdb_add		 = br_fdb_add,
- 	.ndo_fdb_del		 = br_fdb_delete,
- 	.ndo_fdb_del_bulk	 = br_fdb_delete_bulk,
-diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
-index d39571e13744..030248bc94c5 100644
---- a/net/bridge/br_if.c
-+++ b/net/bridge/br_if.c
-@@ -680,8 +680,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
- 
- 	br_mtu_auto_adjust(br);
- 
--	netdev_compute_master_upper_features(br->dev, false);
--
- 	kobject_uevent(&p->kobj, KOBJ_ADD);
- 
- 	return 0;
-@@ -734,8 +732,6 @@ int br_del_if(struct net_bridge *br, struct net_device *dev)
- 	if (changed_addr)
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, br->dev);
- 
--	netdev_compute_master_upper_features(br->dev, false);
--
- 	return 0;
- }
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index f48dc299e4b2..16b3fc620807 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -8920,6 +8920,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
- 	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
- 				    priv);
- 
-+	/* re-compute all features after adding link */
-+	netdev_change_features(upper_dev);
-+
- 	return 0;
- 
- rollback:
-@@ -9012,6 +9015,9 @@ static void __netdev_upper_dev_unlink(struct net_device *dev,
- 	__netdev_update_lower_level(upper_dev, priv);
- 	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
- 				    priv);
-+
-+	/* re-compute all features after removing link */
-+	netdev_change_features(upper_dev);
- }
- 
- /**
-@@ -12874,8 +12880,6 @@ void netdev_compute_master_upper_features(struct net_device *dev, bool update_he
- 
- 	netif_set_tso_max_segs(dev, tso_max_segs);
- 	netif_set_tso_max_size(dev, tso_max_size);
--
--	netdev_change_features(dev);
- }
- EXPORT_SYMBOL(netdev_compute_master_upper_features);
- 
+ 	if (nla_put_sci(skb, IFLA_MACSEC_SCI, secy->sci,
 
 -- 
 Git-155)
