@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-267608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNzqJhp/tGmuowAAu9opvQ
-	(envelope-from <netdev+bounces-267608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:18 +0100
+	id eBq2Ed1+tGmuowAAu9opvQ
+	(envelope-from <netdev+bounces-267609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:17:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B8828A18E
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD46C28A159
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A64E30C6661
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 217B43026B47
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3808A372ED0;
-	Fri, 13 Mar 2026 21:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FDE372ED0;
+	Fri, 13 Mar 2026 21:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="QCTH4Ntm"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qpBYLL31"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000A5381AEC
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83953382398
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773436631; cv=none; b=AfSN6ET7KwvuEntiVoqvbuotNaU57m+eYf2QlTfc6tqKU0c2t4gRlvz9NLXyCf6VzS++DoPOxrO08XQsV0IA6Mf7QxhQoYfI41KBt7hbLKdSLRCxK3MD4QZGfSRS7AB2q1AetO3vgx1iL5ZxxX20SH+/0QTjfeUbwWTZw7rro/c=
+	t=1773436633; cv=none; b=eudxEOTZy+TNSSXXdXO4gic3SJZglHvsoO34qVZOZMrQ/YcwGLZbSJl/u1VQq82SDjfoWXUcVpjklvSMKMHLlckwKxAhj4Bc/cmXI98y22hYFzmG0DoCrwfwT6WgTJa8r4ZJZALnGRPzrTAvRpxMuEUbqjlSQtNAy5kj27h7naE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773436631; c=relaxed/simple;
-	bh=VkL7NwnVyK6lwRKvHFcm/DjShL/SWgHYHXNJch2eLl8=;
+	s=arc-20240116; t=1773436633; c=relaxed/simple;
+	bh=SRQC0qIPvPH4Zaa4Lji9uCOOr/A7JrWIHbpG6WWxAWI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q0igwe83MimwDgB6+Qgw4oDv5PSAmY7m48rLnTDl+lAyh/tSV+WxbVTWZambccSyuE5VvyL++AWN2fnO2fnv6G34IqdtQ9mZRPSZL+jGqs6ZVWAFSA/zRxkOBMyvCmbYS5IkwL5vcfBSCjBZyJY/yC5MtgS8HyJGqJxROa1VAAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=QCTH4Ntm; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=huH2xajKCay0kbbAKYJ/ugBkoIMKRZmwkKU2mKIyhDom4RyWhwud5suNLLAo4P4/YVNbT5wZCQcdn6ns4puhfGT3j0tYNLcm+djCR2bS9egwCA2/VXKoBLIGjTnF7xJDKV57Uox1dyQA6ZS/8h2sp3N3FLnypU5wn5WF4wi2upg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qpBYLL31; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ae43042ea7so33013745ad.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:17:09 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2b04075d1e5so2452865ad.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773436629; x=1774041429; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773436632; x=1774041432; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wqaazxaF0oL00PqnTnSE6dh5S+NYDElDLDEd9qHoVEE=;
-        b=QCTH4NtmYXcrSVTT3zB2cMFhGsIfU6wRPWVDen+EFopQFpPvt6f6Pg4waAQ4owwzgt
-         xKsCUG+Ht5+E74lG02NdNphvDtXtM5i4BrEQghlG3FPX5mWzh7T78hZ4JU601kcWpRii
-         weUQJaj+ke88ztJl7RiatrS1cJMKOLJz3r/p6RpVv/h8LBWSYqKJL2X8kf7uT/BKznCt
-         4SLl1x140talhh3EGDCsSvKIhNJiKqtLNs8tpEvnDjxtKroQJqdUuLrW95VxKdL515OM
-         T/zBVUUAwM8XEUV5Px45Bga6V5GCHFpRx+Jxf9L0VMqIc4o/vhuBUItbyoPNf/eahqCQ
-         IqYQ==
+        bh=1cWWpYe8hBBs+rQMuihqYMwajplJtF5OuTV/SBkrQGg=;
+        b=qpBYLL31HyZlOmzmld+fd+JylsF1/4HIx5Tbx0Lbwkkr7+kB9velrjC2RWSjrLzOpX
+         je0dAcw1ZVy5AeR+ncq7Np83D5Wdh+Z2mURnETGM6BoDr6ezWVnszQlVEnXFfpgnqaF6
+         pvlucZb/EihHWL0+i0Io8QiOP9ZnrN6gyseYY8bWSUz26RLsUwMSF6n3hR3M+2vvRMVQ
+         6jTpwEKTnrBJX6BEI8ekSHG3EyTOVENlTCGsKjK+x4Xd3kfvdCwdPh/1Gt4NXP7WGTag
+         zxUxYvdkWS/rGChCQrLKpQskHaaDHcLR0FPh39x/lIrnC/Pc9D0KrUp8FIOAiwgh94eN
+         KJng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773436629; x=1774041429;
+        d=1e100.net; s=20251104; t=1773436632; x=1774041432;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wqaazxaF0oL00PqnTnSE6dh5S+NYDElDLDEd9qHoVEE=;
-        b=RQxIy222of6KbGjcAIwUn/eSX04ikjnH1I6GaECq2uN7ndE4xOVI6mJfy5eUerX1Ze
-         g/NC9/fvU8ojSw4suHUqoOMxbhPu0VqLCBgnkX3f02pAbKoPLbHfERD7Rb0rhICS74+0
-         xafD/h6C1yqpRVCK/GMlETctxnP5WoAIWd2JE32pyaYuthXbFHZJmUfpzlAmlUlPQf9Q
-         2ul54NT5o3ygMwt3blBTmXeZFem0myzMdmuOL2sJ8jQOOPWQYvQFVs6mxrmeSg11wD0+
-         r5TE59DI7ql+Bb8pUeMg6D0FZekGfYPxcrRAs0mIQIBfZBrvsLm4AsmiW/4gFptsT0TT
-         BvJA==
-X-Gm-Message-State: AOJu0YxLPBgcxjV4UsSEWBCkaLyipunnqxvp+Y0STkvs7VtPQ8Iqfmw2
-	33hlF++5TeKLYk7QBlz/W9uIi1Q22F56kG74B5miWd74qmw1Y1wA6F8Mk4JwOCkbI/kVKpgNCcR
-	/FQigbjk=
-X-Gm-Gg: ATEYQzyyNQMBIwaXQ7f9YvY3pQr780+fYz/b1QF4mSqvNoVYxVFtxrR7//sSIHglb7D
-	m9UxX7WtzEjebucCHh2eWWKS9+wwHtNANaQiSf3Sp4rdRULyobv9KyTshc1k5lLaC63btgfMA4/
-	ZFDHQZoMbOW7g70qAdSRuRx0IZ+tAva9QVkaAdXBgZggZyvt3Mom8YhZTt/MQN0uRli3kI9TrFS
-	bC2zkhbujQNUSNlQmb7yTQurDUaO2AaLfjEYivAMrMXnOqy/SpLxvoTt9W/13gwzqkza3y7Zne6
-	+v+ofd4pa+jaPfKil206GfQFzf0UJjVTcZBZ0/zilWN3wYqww6FEywWQoavaGJLZeXGzG6elHVq
-	0SJerWQ0sscU77fPNr+rthBRGj3k9ZjANModZalbgAYH7j4W7AtTi4JRa3+9sAMXZEdNThBpXa/
-	1CTuPoKCONWeDO34hVJH5TM3CqO/CYpBrX
-X-Received: by 2002:a17:903:1aa7:b0:2aa:d67b:ef96 with SMTP id d9443c01a7336-2aecaaad119mr48063805ad.31.1773436629333;
-        Fri, 13 Mar 2026 14:17:09 -0700 (PDT)
+        bh=1cWWpYe8hBBs+rQMuihqYMwajplJtF5OuTV/SBkrQGg=;
+        b=mnstRfJ5BiSzqWYebFgq8Ecj6ofgAFztVGNZpmLIP1vCuQ5RdY7bMoscCxx4R1r0Ov
+         m8vauNFtLdvsOnn7K0lbiPaE2p0cFW6AKZKKRQbCa7y+oFGMJKQhd7T0af3P43u3EsBT
+         nEdXYymuVR8neo1UgHUNSc9cNy9+tpxngGWhv3eGadnIw8DpyCC8qQzaoQzWZZmC1pxy
+         W35m231IMa4oKbkLAcGPj+jmQ38l1Nj7/b4Lc//9mKPzD8J2FUVKLS1aeQYQz3orptul
+         rmTlaObXBvAh2ijQ83psEiVvInuGvFFao98bUkys4WJmYfUjiVFClOqwwUiCw0SKIB+h
+         TcZw==
+X-Gm-Message-State: AOJu0Yw4nuwE5dRQcZLEGNOFKQKTXXEYwzJ/QT7OxTfW869d1aVLKqq3
+	H+aXVaYLsdP3jMazKC3gZ/yPJRiN0l7vqR2I6182GD24dn8nfemW/yC+f96LuvsHeEury4QjRQ5
+	/gMqaVQ0=
+X-Gm-Gg: ATEYQzyT371ZlfIKkYrpwPbosrXuOv7sfajuMh1uRF9QiCkT+TmfGZUAPKauZXVBh0v
+	MopnCw1n1WUpS+Ug9pKUJUztfd/w67Uj1qwRdgFl+pO2UqXmKHta10dBT69I7HvDa2vIDueEOHq
+	lP5ok1QigvLLdXIut1GL/P4bnDLhxQLUXh8BZ7I+0Z3vYyXB/YlbAcEM45gZcPekAM+c0bsvXD3
+	a7zYpjZ6M+qXtXttGv03E6mtWvY2jeG+wsCYlTYLGIx5cpBKXYuglac9zUYhOB4yXFJW+/TGMEc
+	1mA6vIoG56hGv9q6N/GbqXjSnDjTrV5fJQ8wu9cYy88NjaJMbTTWbb80AIlH7/grwgbPvtmgoLc
+	ePaWRlPiO89IjwrtQcNXUFcXyh5rP/Es16LOXi+oFDTLsdr6CibQQFrXY5RIHLzlz9HV2jUbe5a
+	60N/6gy0P/AkppQTG/HnXCWtHtU1rOKBdh
+X-Received: by 2002:a17:902:d548:b0:2ae:5f65:171 with SMTP id d9443c01a7336-2aecab1ee59mr50093605ad.33.1773436631908;
+        Fri, 13 Mar 2026 14:17:11 -0700 (PDT)
 Received: from phoenix.lan ([104.202.29.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece81afccsm31204195ad.68.2026.03.13.14.17.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece81afccsm31204195ad.68.2026.03.13.14.17.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 14:17:09 -0700 (PDT)
+        Fri, 13 Mar 2026 14:17:11 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH 05/12] net/sched: netem: fix probability gaps in 4-state loss model
-Date: Fri, 13 Mar 2026 14:15:05 -0700
-Message-ID: <20260313211646.12549-6-stephen@networkplumber.org>
+Subject: [PATCH 06/12] net/sched: netem: fix slot delay calculation overflow
+Date: Fri, 13 Mar 2026 14:15:06 -0700
+Message-ID: <20260313211646.12549-7-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260313211646.12549-1-stephen@networkplumber.org>
 References: <20260313211646.12549-1-stephen@networkplumber.org>
@@ -92,82 +92,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267608-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWO(0.00)[2];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267609-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,networkplumber.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 06B8828A18E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber-org.20230601.gappssmtp.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,networkplumber.org:email,networkplumber.org:mid]
+X-Rspamd-Queue-Id: DD46C28A159
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The 4-state Markov chain in loss_4state() has gaps at the boundaries
-between transition probability ranges. The comparisons use:
+get_slot_next() computes a random delay between min_delay and
+max_delay using:
 
-  if (rnd < a4)
-  else if (a4 < rnd && rnd < a1 + a4)
+  get_random_u32() * (max_delay - min_delay) >> 32
 
-When rnd equals a boundary value exactly, neither branch matches and
-no state transition occurs. The redundant lower-bound check (a4 < rnd)
-is already implied by being in the else branch.
+This overflows signed 64-bit arithmetic when the delay range exceeds
+approximately 2.1 seconds (2^31 nanoseconds), producing a negative
+result that effectively disables slot-based pacing. This is a
+realistic configuration for WAN emulation (e.g., slot 1s 5s).
 
-Remove the unnecessary lower-bound comparisons so the ranges are
-contiguous and every random value produces a transition, matching
-the GI (General and Intuitive) loss model specification.
+Use mul_u64_u32_shr() which handles the widening multiply without
+overflow.
 
-This bug goes back to original implementation of this model.
-
-Fixes: 661b79725fea ("netem: revised correlated loss generator")
-
+Fixes: 0a9fe5c375b5 ("netem: slotting with non-uniform distribution")
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/sched/sch_netem.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/sched/sch_netem.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index 08006a60849e..00ece854280a 100644
+index 00ece854280a..afb89d318f41 100644
 --- a/net/sched/sch_netem.c
 +++ b/net/sched/sch_netem.c
-@@ -237,7 +237,7 @@ static bool loss_4state(struct netem_sched_data *q)
- 		if (rnd < clg->a4) {
- 			clg->state = LOST_IN_GAP_PERIOD;
- 			return true;
--		} else if (clg->a4 < rnd && rnd < clg->a1 + clg->a4) {
-+		} else if (rnd < clg->a1 + clg->a4) {
- 			clg->state = LOST_IN_BURST_PERIOD;
- 			return true;
- 		} else if (clg->a1 + clg->a4 < rnd) {
-@@ -257,7 +257,7 @@ static bool loss_4state(struct netem_sched_data *q)
- 	case LOST_IN_BURST_PERIOD:
- 		if (rnd < clg->a3)
- 			clg->state = TX_IN_BURST_PERIOD;
--		else if (clg->a3 < rnd && rnd < clg->a2 + clg->a3) {
-+		else if (rnd < clg->a2 + clg->a3) {
- 			clg->state = TX_IN_GAP_PERIOD;
- 		} else if (clg->a2 + clg->a3 < rnd) {
- 			clg->state = LOST_IN_BURST_PERIOD;
+@@ -680,9 +680,8 @@ static void get_slot_next(struct netem_sched_data *q, u64 now)
+ 
+ 	if (!q->slot_dist)
+ 		next_delay = q->slot_config.min_delay +
+-				(get_random_u32() *
+-				 (q->slot_config.max_delay -
+-				  q->slot_config.min_delay) >> 32);
++			mul_u64_u32_shr(q->slot_config.max_delay - q->slot_config.min_delay,
++					get_random_u32(), 32);
+ 	else
+ 		next_delay = tabledist(q->slot_config.dist_delay,
+ 				       (s32)(q->slot_config.dist_jitter),
 -- 
 2.51.0
 
