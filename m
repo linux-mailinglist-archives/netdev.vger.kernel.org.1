@@ -1,78 +1,76 @@
-Return-Path: <netdev+bounces-267492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFI3B+0ntGkQiQAAu9opvQ
-	(envelope-from <netdev+bounces-267492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:06:21 +0100
+	id 0EBYD9YptGkQiQAAu9opvQ
+	(envelope-from <netdev+bounces-267493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:14:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B802858BF
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:06:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EB8E285B65
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:14:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8486231C2D7C
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:54:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 87F0C3025F38
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447BA3B19D9;
-	Fri, 13 Mar 2026 14:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3A63B19CE;
+	Fri, 13 Mar 2026 14:51:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188A23B0AF7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118283B19D2
 	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413484; cv=none; b=AY5/0p4QC89BWnNSnr9Cf4Tea0J1xxQ28NIsVYrXuJEC7gjukPBzRr0bCwKr7Dtf5+vRe3ijDU/Fh8FypJO4mcWFjQW4X5tkMy6bVTnskvqT5vYeCmtddl51vj/Y5O6Kp48EneVT6kmk+i1ul/bDXkpHjOaWcNfWZVJSENzHNRE=
+	t=1773413485; cv=none; b=GBpby7ZpuSQbW7w44pjLSldnsVBJk+QhukuvMghP6MbzcojM4Ti0Rh62UgY5B9U4N5ruBtYOyrnmhMXExzX+RFT/9NPOlMF4JkVrBatYGoKTrhPFLzEhFg9Nh9twdV+boYenlu6fMUh2aChxH0K+Yzh4I20NKkpwPzEQajhSgMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413484; c=relaxed/simple;
-	bh=tpq4CPEg4PF7xY4vX/qaHiEsjc2ICDqk3bHyi4H6/ME=;
+	s=arc-20240116; t=1773413485; c=relaxed/simple;
+	bh=FkE3aEmYq3JFi5GpqJgM6OBmxi48BQXX3kwNVt8fzXo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EGL8rZT7IOTfUdbKruAZSy0vkujBnA2Z6uoDn4JMLSMLrfxVqzwAZrnKlAAcmgUIWs52C2/0aYmlc/o3lMAsnBxnu7eRJbrLUnuoKo1a1ZGp0OWAgtdY+mTWSHR3ZJKM72cotH5O6FLdQFNiUEfU089cWFww+/GXKQkYsPcBBCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.52
+	 MIME-Version; b=Mb0q4Ktqkgj6LZym64h2ekmPg55Ju/5kQG6b7vGeYQNOzssDA5yxHdSmZD4t0AyYGxg4BFAADqHITXiHtW3PzhH4Km1dLAfbjdpxpD2qLzd3pKyneuSIw7mgltDx1QAvjqORjZUGtVPvOObmhaMNdeWNlrtpe85TPJw1aTzoTlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1271195d2a7so571310c88.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:51:22 -0700 (PDT)
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1271257ae53so3486526c88.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:51:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773413482; x=1774018282;
+        d=1e100.net; s=20251104; t=1773413483; x=1774018283;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ZI1/cLnyDnVOs4qvF1/y00bhWF98dmH7Q3P7jVrTCz8=;
-        b=g/vWDQ4MNeG1LFFXiX0lU0Zc4/Pk9csdYFWVR21lbZUfwiAzmrc8NQVcBS//dZbnkV
-         NAEHpLL2TWdm0XnNMx6Nzzyo89iPE163COswH5oZonJZz0Ni1gDmhDGZAPbageON1zCu
-         6/UwnRMtF9+DZfvNrjVNMkOAhczjO4fsEw0XaJViBmWR80ZqZVRETkFG+8enpMWvsRxT
-         sOsi4HgfeMyMFdcQC9X1VF7zRh9A4PImxY3DdXaYCIwjZNhnVhh5A28J3P6I35/r/ju0
-         RRAXUCxD+AbHstusDlyXWyKAzGIypQZuXCdQjIIXi9ysEFT+I/GIU+bwBNKB1fkFa1Ci
-         MRLA==
-X-Gm-Message-State: AOJu0Yz0ts0PE1xWKqRJxd9ukkd2gg3jy4sTwwwhfkUC8TwtYsXri+4+
-	9qh/lvLN1RbVPPeObk84QbmSk64ktdoMJODaEprCNul9qv8JkkxCRWi6zDoH
-X-Gm-Gg: ATEYQzztpTYwwGti8fLxSAEUgDSxy6HO3tFBOgr8tKBYzE+N7La6r6jRcZYgvWkmKnm
-	uYZ+40s68Ac/1pvdXKvhDlnx8ITqqOHVuwCsaBwC0hR1YjB+6tNWIlDqRvdDHiNjbAr7hzObwG9
-	Quu8wsuEqwFe9G4mTsd71hUCVtnzUQzK64gnspE10vTYyoagfUf2d52l0k6lEfTANZDFxjnrlIr
-	Rif9qonJgChfxxaGN0G5CflRJx/Hghuzw1ysg2EdIwq9lalqfocP9YndDsEkjNXJMRU7YBeFeIv
-	gBAikNSJZV9cabkp2SP/ezNnPECTHIcqWQIYocVY6p0N26375nsk1PAObM4sTV+jSBOLChVjIVI
-	g+Ro9NJEGWE/b97UqAqpSQjlqCniE51GrOPv2Z8Bgx4x6G9NAn/9MtiQio/fENubb2TmSZVVJEo
-	8ejuX7ljzHpFuN7JqolmuPnAyKpHa5RvcHoNMEq68RaP+M+We4xH8CdJu81HlMAKm0QZ4XsxeKc
-	X18H0EKTGgtArVs9Q==
-X-Received: by 2002:a05:7022:4397:b0:128:d34a:320f with SMTP id a92af1059eb24-128f3d3be43mr1677962c88.12.1773413482159;
-        Fri, 13 Mar 2026 07:51:22 -0700 (PDT)
+        bh=RnwqqwAxnRG8s2vaRYDrbUdfVznpcDcr1raRDlnvaSE=;
+        b=pxVLWxc1augo3utcrTco+7Roc1mQKo/CPecguMCsiWjUhgAxSHynLV6dGMYbjtcvvF
+         h0MZoknSWE84/DNkpRoVMjlejJXP4GwC9UTMvFqSjsSeFfW4FyXcXvb8RKF2IlOrFWPo
+         WVY9lsP1KSu6pWJZicA1TRHimBAL3zhhyeAq76z7GcIWCqVWmK4TNpSrHwsHKLfMUtDm
+         A6JKLHu1/4T6nU4i2id8REkuZn8X4KVihrSX7uhrgX87gHyKBGnL5uCAUTXfrQfC3P1g
+         2QHxj8t7bc4uGq6KQPmPSlazVBdKlf78dYdBU7z26dMCvm9hfQK7rvuVaXPaCxtM2bWF
+         dhyQ==
+X-Gm-Message-State: AOJu0YxHsTxKcVfDXw7nd5A26rRqme45FZspzkkY7/V30OnYfUASUPuK
+	+AfCtkOyCExf/Bb88jgad6flzPjVtqYG2tl352/KXGYSQ/UiKmxofWD+uG0r
+X-Gm-Gg: ATEYQzwdl1yT2j+nN4W1T89xUtFWriwSDmt0rLaf3VCiKGzEwch+MTSWsRu4MloHMJ9
+	pWG/UNe3/ILl64q9g+bgBzwMHo0TdIuCnEOKTbhxaskKjaff50dC2BUEuiiaGZUxUTqQdkTWjny
+	lphVxs9vb2sQAVwJ2crsnZqRoIpOO9oK5gfLkhhUKvLezxssPGUOYqbqYARkfxIrUvoR+zvJi3d
+	vY675wG3W/fAVbRXQ+fm8xSAFugOdETxfW99xFcJnizakmzGxSR+pTE9875xGS/Dnbc2qcr7y2r
+	LcmYfB0I1NHX/GfZz1z1zGksqpUZ+XlUVjtAPqKQ3u0WyyTr9irv6cLlbRi1F87P/chPqNpVKjq
+	WvTQv6k+uCEN5BVXKtQBW7FGuQRPMaBcYtpbF8+4w607F4a58Q27h1xzxrK0eFcOTtKJt7lJcOw
+	tYoefBxfXavNGZBq6hN+yJjTVYF1ci0sJiL3W1dDT+DVPvLEoToCFE1Ylovfc6z4ulJLl70lfSJ
+	d5QcxlcL6TiQk1sgg==
+X-Received: by 2002:a05:7022:6b9a:b0:128:cda8:39fa with SMTP id a92af1059eb24-128f3c5add4mr1718245c88.0.1773413483097;
+        Fri, 13 Mar 2026 07:51:23 -0700 (PDT)
 Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62837ccsm2761133c88.3.2026.03.13.07.51.21
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f639d1e4sm2220832c88.13.2026.03.13.07.51.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 07:51:21 -0700 (PDT)
+        Fri, 13 Mar 2026 07:51:22 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next 07/11] iavf: convert to ndo_set_rx_mode_async
-Date: Fri, 13 Mar 2026 07:51:09 -0700
-Message-ID: <20260313145113.1424442-8-sdf@fomichev.me>
+	pabeni@redhat.com
+Subject: [PATCH net-next 08/11] netdevsim: convert to ndo_set_rx_mode_async
+Date: Fri, 13 Mar 2026 07:51:10 -0700
+Message-ID: <20260313145113.1424442-9-sdf@fomichev.me>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260313145113.1424442-1-sdf@fomichev.me>
 References: <20260313145113.1424442-1-sdf@fomichev.me>
@@ -87,13 +85,13 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267492-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-267493-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -102,76 +100,60 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.971];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.961];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fomichev.me:email,fomichev.me:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: D5B802858BF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid]
+X-Rspamd-Queue-Id: 3EB8E285B65
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert iavf from ndo_set_rx_mode to ndo_set_rx_mode_async.
-iavf_set_rx_mode now takes explicit uc/mc list parameters and
-uses __hw_addr_sync_dev on the snapshots instead of __dev_uc_sync
-and __dev_mc_sync.
+Convert netdevsim from ndo_set_rx_mode to ndo_set_rx_mode_async.
+The callback is a no-op stub so just update the signature and
+ops struct wiring.
 
-The iavf_configure internal caller passes the real lists directly.
-
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/ethernet/intel/iavf/iavf_main.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ drivers/net/netdevsim/netdev.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 7925ee152c76..6632d35ad0fe 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1147,14 +1147,18 @@ bool iavf_promiscuous_mode_changed(struct iavf_adapter *adapter)
- /**
-  * iavf_set_rx_mode - NDO callback to set the netdev filters
-  * @netdev: network interface device structure
-+ * @uc: snapshot of uc address list
-+ * @mc: snapshot of mc address list
-  **/
--static void iavf_set_rx_mode(struct net_device *netdev)
-+static void iavf_set_rx_mode(struct net_device *netdev,
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index 5ec028a00c62..9c9217792125 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -182,7 +182,9 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
+ }
+ 
+-static void nsim_set_rx_mode(struct net_device *dev)
++static void nsim_set_rx_mode(struct net_device *dev,
 +			     struct netdev_hw_addr_list *uc,
 +			     struct netdev_hw_addr_list *mc)
  {
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ }
  
- 	spin_lock_bh(&adapter->mac_vlan_list_lock);
--	__dev_uc_sync(netdev, iavf_addr_sync, iavf_addr_unsync);
--	__dev_mc_sync(netdev, iavf_addr_sync, iavf_addr_unsync);
-+	__hw_addr_sync_dev(uc, netdev, iavf_addr_sync, iavf_addr_unsync);
-+	__hw_addr_sync_dev(mc, netdev, iavf_addr_sync, iavf_addr_unsync);
- 	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+@@ -641,7 +643,7 @@ static const struct net_shaper_ops nsim_shaper_ops = {
  
- 	spin_lock_bh(&adapter->current_netdev_promisc_flags_lock);
-@@ -1207,7 +1211,7 @@ static void iavf_configure(struct iavf_adapter *adapter)
- 	struct net_device *netdev = adapter->netdev;
- 	int i;
- 
--	iavf_set_rx_mode(netdev);
-+	iavf_set_rx_mode(netdev, &netdev->uc, &netdev->mc);
- 
- 	iavf_configure_tx(adapter);
- 	iavf_configure_rx(adapter);
-@@ -5150,7 +5154,7 @@ static const struct net_device_ops iavf_netdev_ops = {
- 	.ndo_open		= iavf_open,
- 	.ndo_stop		= iavf_close,
- 	.ndo_start_xmit		= iavf_xmit_frame,
--	.ndo_set_rx_mode	= iavf_set_rx_mode,
-+	.ndo_set_rx_mode_async	= iavf_set_rx_mode,
+ static const struct net_device_ops nsim_netdev_ops = {
+ 	.ndo_start_xmit		= nsim_start_xmit,
+-	.ndo_set_rx_mode	= nsim_set_rx_mode,
++	.ndo_set_rx_mode_async	= nsim_set_rx_mode,
+ 	.ndo_set_mac_address	= eth_mac_addr,
  	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address	= iavf_set_mac,
- 	.ndo_change_mtu		= iavf_change_mtu,
+ 	.ndo_change_mtu		= nsim_change_mtu,
+@@ -664,7 +666,7 @@ static const struct net_device_ops nsim_netdev_ops = {
+ 
+ static const struct net_device_ops nsim_vf_netdev_ops = {
+ 	.ndo_start_xmit		= nsim_start_xmit,
+-	.ndo_set_rx_mode	= nsim_set_rx_mode,
++	.ndo_set_rx_mode_async	= nsim_set_rx_mode,
+ 	.ndo_set_mac_address	= eth_mac_addr,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_change_mtu		= nsim_change_mtu,
 -- 
 2.53.0
 
