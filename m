@@ -1,208 +1,143 @@
-Return-Path: <netdev+bounces-267347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WD9YGiXYs2mzbgAAu9opvQ
-	(envelope-from <netdev+bounces-267347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:25:57 +0100
+	id YJpgDl7Xs2mzbgAAu9opvQ
+	(envelope-from <netdev+bounces-267349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:22:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72D028073C
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:25:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19DB280661
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 781A131F4717
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:21:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 83CCD30351D2
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C512A3859DC;
-	Fri, 13 Mar 2026 09:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922F3367F35;
+	Fri, 13 Mar 2026 09:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="vBsSO7rU"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MG16jQRj";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="z5+i4IgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1336338C401;
-	Fri, 13 Mar 2026 09:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2812379EFC
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 09:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773393692; cv=none; b=K78VF59gH7XePKfEKnhVSM0lY4f10E291rf/QGjykWxlJFP4UpxdUb8H4MHRdf69tq6R83ACzVLlpOT89+mBC4Bcj0+ndu521Ybvb7Tb7ppd3S7s2spBb7DgoBL1cWRpKOQQBasvU/iSXJThoAltIIMhtr0mR6nkhAQp2zZPndQ=
+	t=1773393752; cv=none; b=N2O8tU868EUxv82zQZHktXAuIV6J0Sxy3Kq66g6PpyvpwjXLFEX5EFmC1bLS4CWjEIYGIs6JsabiHl0cL4Kxum5rgsiO9Ljiu12n0WVjPmFG2heJBP/+XQloMcgm4n3TzW2lUCDW4kPFIKPd+gvdG3I5LwXIXBbOdmcAPPTYhb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773393692; c=relaxed/simple;
-	bh=dje9lwINpGzPAN2nD/Zpfzj7I3u4WC3MpushQKChics=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cpdPNB+/S+8Us8OI+diQ0PliClYHdzGlonhArrzQhNjANXMarz46LD9+W7tcl+dVnyG9/1ghM3Z3KWDWC893RsjQEvjKdDaT4WBel/GKVQkEJDvpRb/+V+RXTnMCvAJN89TztB9nB4hC2n5UDrAobsq/PjiE7PDuePu7+r83FmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=vBsSO7rU; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3CDEBA570A;
-	Fri, 13 Mar 2026 10:21:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1773393683; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=nEAFoVy10TP5FGA/AYLXcX4sh50SwTFGkPjXzFPbrqw=;
-	b=vBsSO7rUUTqM4e7o1EAfqqYpMFznIs8fHA0LHuqRJ0kdcVOE3UbpWTFZrBlwUCkWoEj1F6
-	XBGNge+9op8r+17hMRziiq3g/H7KUxh77iqZm8CD1VhpLdtB0hSKeiV/irQxfc4YuLZv7f
-	WkWyrNmKB1J/crrW0IBXkRvi2aNRSnqp0wu0HlCxiOTcecwNSZQTdNZ9TnEFnhaPjrwi1a
-	UpVNSCKGmHl1hk8ng2rMgYe+0Xqi3B7xOXNzCqVQA1SbZgXCePXc3/tjmKPsh4V8NG7696
-	DIfjw7uGY4ptzJfetKi3WCgMZtSmQX404dEy95ESbH8L2WTf0oTXzGKdZ8IVWg==
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1773393752; c=relaxed/simple;
+	bh=/+WsiWwPai3aG6q0eTKytScZYgCVZiRVb1w1Ih/vpxU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uY3oN4UlsS2qgxKLnEw5dB/E3TL7AkjxPHkagfRqG4hiLBOxvwJgLQKcSDaPyuF2p4ZMmIrak3cAd+cqP2yc9NE1fENFILobWdBmFiALhYfj7PKuZKVi3Q6t1Vzq860jC4ZY/oDCUBmpbryQzU5xezVL/V2qVvB6MxWFdb0QfHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MG16jQRj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=z5+i4IgW; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 13 Mar 2026 10:22:26 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1773393748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+WsiWwPai3aG6q0eTKytScZYgCVZiRVb1w1Ih/vpxU=;
+	b=MG16jQRjPr1WRab2yjkQd1oVAcIYGDbe/XRRkJNG5TsN+EOSLkIgDQHQpyBopDV1FQM2dX
+	lGLJBGrzZgdvyh7wcI8sRHp3XtsyLoMkOkGco7cozF9f5izJnsQTtRbsQ2fH3IREiS8cQB
+	z3m5JUq/VvnvqdNjuWcFoc6yX+aLWDS+5KZ3dBleoDMf4QjMF4iD0Ot3ORwPrKSaSOQrQ8
+	mMj3f1+qqEDojEzENYj77uda0DXocXiUprTs1NKTtjbfc+85xWX++SeqCCdJVRKDk04Ed5
+	SUig0K4wzhIdF1zCRz0YntiuqsXQNTxnS2IHMeox/aSpqauzn9QhA2SDiY0fDg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1773393748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+WsiWwPai3aG6q0eTKytScZYgCVZiRVb1w1Ih/vpxU=;
+	b=z5+i4IgWX5Avk8VmPKX7V7FdrTYxHUf1EQcFUdXrWjDfz0qUWiYTxidCqY1FKIYLz8JRpY
+	OQ/5KqkFE8iL4yCA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "(JC), Jayachandran" <j-rameshbabu@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	=?UTF-8?q?Markus=20Bl=C3=B6chl?= <mbloch@rooftopnetworks.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next 6/6] net: bcmgenet: add XDP statistics counters
-Date: Fri, 13 Mar 2026 10:21:01 +0100
-Message-ID: <20260313092101.1344954-7-nb@tipi-net.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260313092101.1344954-1-nb@tipi-net.de>
-References: <20260313092101.1344954-1-nb@tipi-net.de>
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific
+ handling for HSR
+Message-ID: <20260313092226.SscHp2zQ@linutronix.de>
+References: <20260309-hsr_ptp-v2-0-798262aad3a4@linutronix.de>
+ <20260309-hsr_ptp-v2-2-798262aad3a4@linutronix.de>
+ <willemdebruijn.kernel.3b7b5294c6434@gmail.com>
+ <20260310105544.EVXIekwG@linutronix.de>
+ <willemdebruijn.kernel.3693c9aa8271@gmail.com>
+ <20260312154253.UC-QUPvD@linutronix.de>
+ <willemdebruijn.kernel.be379ee17449@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <willemdebruijn.kernel.be379ee17449@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-267347-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-267349-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,rooftopnetworks.de,arndb.de,vger.kernel.org,tipi-net.de];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
-X-Rspamd-Queue-Id: C72D028073C
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:mid]
+X-Rspamd-Queue-Id: D19DB280661
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Expose per-action XDP counters via ethtool -S: xdp_pass, xdp_drop,
-xdp_tx, xdp_tx_err, xdp_redirect, and xdp_redirect_err.
+On 2026-03-12 17:43:36 [-0400], Willem de Bruijn wrote:
+> > Yes, this is RX. If I open packet socket, bind to hsr0, how do I filter
+> > for packets from one of the slaves?
+>=20
+> I was thinking of attaching directly to the slave devices.
 
-These use the existing soft MIB infrastructure and are incremented in
-bcmgenet_run_xdp() alongside the existing driver statistics.
+That could work. Let me see.
 
-Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
----
- drivers/net/ethernet/broadcom/genet/bcmgenet.c | 17 ++++++++++++++++-
- drivers/net/ethernet/broadcom/genet/bcmgenet.h |  6 ++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+> > After some thinking and browsing through the packet code:
+> > The hsr stack creates hsrX. If it would create additionally hsrX_A and
+> > hsrX_B in order to be able to send and receive only on the relevant
+> > slave device then I wouldn't need the filters in packet code. That could
+> > work=E2=80=A6
+>=20
+> That's another option.
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 30181f9cff98..ef499192b325 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1168,6 +1168,13 @@ static const struct bcmgenet_stats bcmgenet_gstrings_stats[] = {
- 	STAT_GENET_SOFT_MIB("tx_realloc_tsb", mib.tx_realloc_tsb),
- 	STAT_GENET_SOFT_MIB("tx_realloc_tsb_failed",
- 			    mib.tx_realloc_tsb_failed),
-+	/* XDP counters */
-+	STAT_GENET_SOFT_MIB("xdp_pass", mib.xdp_pass),
-+	STAT_GENET_SOFT_MIB("xdp_drop", mib.xdp_drop),
-+	STAT_GENET_SOFT_MIB("xdp_tx", mib.xdp_tx),
-+	STAT_GENET_SOFT_MIB("xdp_tx_err", mib.xdp_tx_err),
-+	STAT_GENET_SOFT_MIB("xdp_redirect", mib.xdp_redirect),
-+	STAT_GENET_SOFT_MIB("xdp_redirect_err", mib.xdp_redirect_err),
- 	/* Per TX queues */
- 	STAT_GENET_Q(0),
- 	STAT_GENET_Q(1),
-@@ -2368,6 +2375,7 @@ bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring, struct bpf_prog *prog,
- 
- 	switch (act) {
- 	case XDP_PASS:
-+		priv->mib.xdp_pass++;
- 		return XDP_PASS;
- 	case XDP_TX: {
- 		struct bcmgenet_tx_ring *tx_ring;
-@@ -2381,18 +2389,24 @@ bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring, struct bpf_prog *prog,
- 		if (unlikely(!bcmgenet_xdp_xmit_frame(priv, tx_ring, xdpf))) {
- 			spin_unlock(&tx_ring->lock);
- 			xdp_return_frame_rx_napi(xdpf);
-+			priv->mib.xdp_tx_err++;
- 			return XDP_DROP;
- 		}
- 		bcmgenet_xdp_ring_doorbell(priv, tx_ring);
- 		spin_unlock(&tx_ring->lock);
-+		priv->mib.xdp_tx++;
- 		return XDP_TX;
- 	}
- 	case XDP_REDIRECT:
--		if (unlikely(xdp_do_redirect(priv->dev, xdp, prog)))
-+		if (unlikely(xdp_do_redirect(priv->dev, xdp, prog))) {
-+			priv->mib.xdp_redirect_err++;
- 			goto drop_page;
-+		}
-+		priv->mib.xdp_redirect++;
- 		return XDP_REDIRECT;
- 	case XDP_DROP:
- drop_page:
-+		priv->mib.xdp_drop++;
- 		page_pool_put_full_page(ring->page_pool, rx_page, true);
- 		return XDP_DROP;
- 	default:
-@@ -2400,6 +2414,7 @@ bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring, struct bpf_prog *prog,
- 		fallthrough;
- 	case XDP_ABORTED:
- 		trace_xdp_exception(priv->dev, prog, act);
-+		priv->mib.xdp_drop++;
- 		page_pool_put_full_page(ring->page_pool, rx_page, true);
- 		return XDP_ABORTED;
- 	}
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-index 192db0defbfc..b3f1b7ed604a 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-@@ -156,6 +156,12 @@ struct bcmgenet_mib_counters {
- 	u32	tx_dma_failed;
- 	u32	tx_realloc_tsb;
- 	u32	tx_realloc_tsb_failed;
-+	u32	xdp_pass;
-+	u32	xdp_drop;
-+	u32	xdp_tx;
-+	u32	xdp_tx_err;
-+	u32	xdp_redirect;
-+	u32	xdp_redirect_err;
- };
- 
- struct bcmgenet_tx_stats64 {
--- 
-2.51.0
+Okay. Let me add this as plan B then.
 
+Sebastian
 
