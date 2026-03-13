@@ -1,191 +1,143 @@
-Return-Path: <netdev+bounces-267496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267497-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Jz3NZ4qtGkQiQAAu9opvQ
-	(envelope-from <netdev+bounces-267496-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:17:50 +0100
+	id 8H97FN0mtGl7hwAAu9opvQ
+	(envelope-from <netdev+bounces-267497-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:01:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB9E285C77
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:17:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8A83285792
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 12E103096681
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:55:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 332C132B17D4
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEA83B2FF6;
-	Fri, 13 Mar 2026 14:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912CB3A5E68;
+	Fri, 13 Mar 2026 14:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3RdbZ9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D023B2FE3
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0B13A2558
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413488; cv=none; b=Fpip4IzYLB9WCaijVBBwZinHTaoL60yI5crWtp5MbQN706DCTKGllmnvYLZ9f3x27TgQqMxeOhDBeD4r/oxXWrObkjn53bER0PO6zpMWGbJ9clNWu/irpWNUOxavPxQvN0NFjOq8Pit33cv/X2mKq3Euns2rsCR32ZUHZN0uk7Q=
+	t=1773413793; cv=none; b=khze0N96IsoMR2MjIN8mU4asuhBLKy8sKHpw5Tm50SiYOFMkqLhOY5rvRidBQl+xVhJxsC8kak+m12thKNm3WrMPCeXJ/kUzdCpB8pI32IFjU497ippBOW0dVzOEUXGeu1hsLolFakuNPRyci1B0yStoTO8vHL4jQ+6FwFpNBNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413488; c=relaxed/simple;
-	bh=5L3rxVqo/q+LzdNYiYwvvqN4YwWQmTUyUp7q/mn5s18=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=deRPr0jriEtxsCVh4/ussEVTVX9AzHffLdurieOpXjWvWDsa0GOt9FxqhphB0Aa44zeTRew+7u+mQ75+Xza7GsqLs/WNot/9BzWwIpoMu0EN54COpmiDxEk0Yumcga3DxMpeW6Usn/309RWOKR0/jYsQqiN5Jro6OdmAHtMFRh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2be19f05d7dso545484eec.1
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:51:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773413486; x=1774018286;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HhwdugrCRsR5oiEhkEWTd6TGEnJjk75ILAki+ES5OCs=;
-        b=myqmlBmfYan4BF1c3/TdkeapwOgkjYDhxLjFIooiW+wEgekAop4mT1zCXpkyzCvnm7
-         UqrHlab/ZYKgFJ8Wyg7AqNgQBc5xLyIMs0b/gZL1uFoDq3P+p0Ml+AvKCVSjo+EGyst4
-         N6+zdMKrmcf9FERuVQgb7fzaaAnu0j6KqL39se/bbvdbPbtGRODNkfps4fOmzybotjca
-         /7UsWOm4FLw2k1nKNx2ttc0yo5X7gV71ieBb65cSQGydfVq3MAeRLqqhLmZfIwaDTHCF
-         /GCgqs0yG5YF+L6zkFFbzJkoDLeCAl1tiA+rZPHyf31HVpfW2S6O32M9exTWWCuWhqFl
-         TzWA==
-X-Gm-Message-State: AOJu0YyeuUGwIzPTyW8PhWh+F9z5ge7ul028DPOt5f8LAGZOMNJCsu6O
-	B7xGYl+DglYTxbF/kJBLGeXJOJs3AZCnFEIYc20wWEyBQDfae31rs86EJMiD
-X-Gm-Gg: ATEYQzxZusnjaLnloQRjEa7cDnuY4K2RjkTknf+z8bio8Ii7OivAKw/NOTDIW8LsfSq
-	GM4VUhT3MLEmuZJt3ULys48WUbi3sbpXsct0dDB9rbTB6vjljC/mR9S8suOr660FjUVCj573vZ1
-	ytQ8tCwIyX4BAqwDNvtFX8IRhLWhkDOfeB+ORFeMl+WaCov6Ct2Mhe2Sxj2LBphMhuMmrFgOEEk
-	Sgqt5iz2TjvxVY3Z8Z8TG8iIPnraaiPq4kwYqKXa29wbEnxPQAHPbR3nztaaPh+ZsSJPDj3HrlQ
-	ZnF6wqSNPbHHlZxYi6wf10EJCN3Rjc7tnLy0d9dP8M6dpM1kC+Cz6P6ELjhfSe5Vo7wGmME3CqX
-	/eoeLB32fv/XnQCX/hXLioWZFmrU7KNetDdUWtkIwbO9SIt/VaIGnfJuWfBq9M+1nqX6X0zHB6K
-	35LxMnPGGbSgBoXrgAPcFt38VmLSNUUD9GaNGxXKlxVdHgwS4QHSG+HRdVT1eVDAMduIQVg9qlD
-	3cqeyBk/N1YxR8MEg==
-X-Received: by 2002:a05:7022:68a9:b0:127:3b1d:14bd with SMTP id a92af1059eb24-128f3d81536mr1836126c88.20.1773413486040;
-        Fri, 13 Mar 2026 07:51:26 -0700 (PDT)
-Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-128f62af8desm2116707c88.6.2026.03.13.07.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 07:51:25 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next 11/11] selftests: net: add team_bridge_macvlan rx_mode test
-Date: Fri, 13 Mar 2026 07:51:13 -0700
-Message-ID: <20260313145113.1424442-12-sdf@fomichev.me>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260313145113.1424442-1-sdf@fomichev.me>
-References: <20260313145113.1424442-1-sdf@fomichev.me>
+	s=arc-20240116; t=1773413793; c=relaxed/simple;
+	bh=2FKwk7JQNn1KBP1EuttGVWJ/fhwdSmIPkJVOqoLSu7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kTenS7H/C5ismdFsC+a5H/vPacYoHbf3P+Nvl/yi7ofs8XZ6LLYRR+e0Oxtn1UsFZkQGbXQtJ7qNNYJqQFpW8y7J8YjlDUHCOdiG5p/Kvh7jboksIQ+DVDaaaMrCcEHF5Ni4COIAunZ3tSWkfagzSaa7vflTwMd/aeE+pDur00k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3RdbZ9d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A32C19421;
+	Fri, 13 Mar 2026 14:56:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773413793;
+	bh=2FKwk7JQNn1KBP1EuttGVWJ/fhwdSmIPkJVOqoLSu7I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=E3RdbZ9d2U789m3l66jEFLrklRoaqY9MMgo9+cjX5cdcTq8ucMoeZ49Lrum+udoRe
+	 tQX9AuHafOhwDe+WKPBBnCD0km4eGKaYoytuzWEjItWkbIx87Dy1BraQqtLLK4xezR
+	 G112vrP2XV6AdSp9Vt9GhMl23eOziEth3v5UdjOYkhG3N6KIOZ9bUCzd1VagR0zKl1
+	 iWrDLa7scaWDQN2RtuMWJZskaS47cBmdGlL+mD1kd+xKAiW05hDsjdU0JGTi7qLi8h
+	 ILwt7LH4odCDevoHTbRIIV4ZuMGU8tUsyNFBfYwvGBZGMGa6B65XONCe8AXQ1G8xw+
+	 o9VlI4su1pWmw==
+Message-ID: <1644761b-4960-431f-bf3d-5593007212fc@kernel.org>
+Date: Fri, 13 Mar 2026 08:56:31 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] ipv4: bump rt_genid when a relevant devconf value
+ changes through netlink
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: tgraf@infradead.org, horms@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net
+References: <20260313144555.4956-1-fmancera@suse.de>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260313144555.4956-1-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-267497-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-267496-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[fomichev.me];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.816];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid]
-X-Rspamd-Queue-Id: 1EB9E285C77
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A8A83285792
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a test that exercises the ndo_change_rx_flags path through a
-macvlan -> bridge -> team -> dummy stack. This triggers dev_uc_add
-under addr_list_lock which flips promiscuity on the lower device.
-With the new work queue approach, this must not deadlock.
+On 3/13/26 8:45 AM, Fernando Fernandez Mancera wrote:
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 537bb6c315d2..6dd8fd0a1323 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -2107,8 +2109,33 @@ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
+>  		return -EINVAL;
+>  
+>  	if (tb[IFLA_INET_CONF]) {
+> -		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem)
+> -			ipv4_devconf_set(in_dev, nla_type(a), nla_get_u32(a));
+> +		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem) {
+> +			int new_value = (int)nla_get_u32(a);
+> +
+> +			if (ipv4_devconf_get(in_dev, nla_type(a)) == new_value)
+> +				continue;
+> +
+> +			ipv4_devconf_set(in_dev, nla_type(a), new_value);
+> +			switch (nla_type(a)) {
+> +			case IPV4_DEVCONF_FORWARDING:
+> +				if (new_value)
+> +					netif_disable_lro(dev);
+> +				fallthrough;
+> +			case IPV4_DEVCONF_NOXFRM:
+> +			case IPV4_DEVCONF_NOPOLICY:
+> +			case IPV4_DEVCONF_PROMOTE_SECONDARIES:
+> +			case IPV4_DEVCONF_ROUTE_LOCALNET:
+> +			case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
+> +			case IPV4_DEVCONF_BC_FORWARDING:
+> +			case IPV4_DEVCONF_ACCEPT_LOCAL:
+> +				flush_cache = true;
+> +				break;
+> +			default:
+> +				break;
+> +			}
+> +		}
+> +		if (flush_cache)
+> +			rt_cache_flush(net);
+>  	}
+>  
+>  	return 0;
 
-Link: https://lore.kernel.org/netdev/20260214033859.43857-1-jiayuan.chen@linux.dev/
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- tools/testing/selftests/net/rtnetlink.sh | 44 ++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+This replicates logic in devinet_conf_proc for example. Why not refactor
+devinet.c to handle changes to values in 1 place only.
 
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 5a5ff88321d5..c499953d4885 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -23,6 +23,7 @@ ALL_TESTS="
- 	kci_test_encap
- 	kci_test_macsec
- 	kci_test_macsec_vlan
-+	kci_test_team_bridge_macvlan
- 	kci_test_ipsec
- 	kci_test_ipsec_offload
- 	kci_test_fdb_get
-@@ -636,6 +637,49 @@ kci_test_macsec_vlan()
- 	end_test "PASS: macsec_vlan"
- }
- 
-+# Test ndo_change_rx_flags call from dev_uc_add under addr_list_lock spinlock.
-+# When we are flipping the promisc, make sure it runs on the work queue.
-+#
-+# https://lore.kernel.org/netdev/20260214033859.43857-1-jiayuan.chen@linux.dev/
-+# With (more conventional) macvlan instead of macsec.
-+# macvlan -> bridge -> team -> dummy
-+kci_test_team_bridge_macvlan()
-+{
-+	local vlan="test_macv1"
-+	local bridge="test_br1"
-+	local team="test_team1"
-+	local dummy="test_dummy1"
-+	local ret=0
-+
-+	run_cmd ip link add $team type team
-+	if [ $ret -ne 0 ]; then
-+		end_test "SKIP: team_bridge_macvlan: can't add team interface"
-+		return $ksft_skip
-+	fi
-+
-+	run_cmd ip link add $dummy type dummy
-+	run_cmd ip link set $dummy master $team
-+	run_cmd ip link set $team up
-+	run_cmd ip link add $bridge type bridge vlan_filtering 1
-+	run_cmd ip link set $bridge up
-+	run_cmd ip link set $team master $bridge
-+	run_cmd ip link add link $bridge name $vlan \
-+		address 00:aa:bb:cc:dd:ee type macvlan mode bridge
-+	run_cmd ip link set $vlan up
-+
-+	run_cmd ip link del $vlan
-+	run_cmd ip link del $bridge
-+	run_cmd ip link del $team
-+	run_cmd ip link del $dummy
-+
-+	if [ $ret -ne 0 ]; then
-+		end_test "FAIL: team_bridge_macvlan"
-+		return 1
-+	fi
-+
-+	end_test "PASS: team_bridge_macvlan"
-+}
-+
- #-------------------------------------------------------------------
- # Example commands
- #   ip x s add proto esp src 14.0.0.52 dst 14.0.0.70 \
--- 
-2.53.0
-
+Also, you are flushing the cache for more values than sysfs does.
 
