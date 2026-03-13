@@ -1,152 +1,329 @@
-Return-Path: <netdev+bounces-267550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AB71AJVPtGk4kAAAu9opvQ
-	(envelope-from <netdev+bounces-267550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:55:33 +0100
+	id GNiTEp1PtGk4kAAAu9opvQ
+	(envelope-from <netdev+bounces-267551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:55:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01ED2885D3
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:55:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F3D2885DC
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 18:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4FBC3327271C
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:51:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40C7C32C482E
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D493D090B;
-	Fri, 13 Mar 2026 17:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CE33B0ADF;
+	Fri, 13 Mar 2026 17:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="TdEPBI/+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ragh8boM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8DD3CF67D
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 17:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773424275; cv=none; b=b1vxMJWfR1/hyHLCv3zdKJ3KzQ5EggL0enPM6kFSKn4j5Fsh3qc4EJYkZW8ybH+KVOP82ofhI6+u5FmXqtpdT1yxFdbD7y3c66adlsHzCR8rfIhbvnlP24lKIaUb7NnlNDyUCsxKIjbIE05LD+wZp2GmlLucvlygPCT2g0xRztA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773424275; c=relaxed/simple;
-	bh=qvsKtgFzPXN+lLScDp+m8HgvSi6kxwQ4R4oo464TpwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EdNDBGzC7EcIR3wZiGZKvyfvcywdu4sn6D3Cbe4/0IzRgTZLa9J83uQTWzkX1geqkoHWXVU1lKrzURn2+YqhvH+kqIkPLLgy0bEaopUK+NO0lfcMeYBxjfS2kCuljAgE0f/oYYL+2Acbb2fqXGRqwKDCPyZvJGS4AnDvyjrZQU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=TdEPBI/+; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-824c9da9928so1643800b3a.3
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 10:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1773424273; x=1774029073; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Ski0FE2bQULyvUQFwoDAaSkxf64xsZOdGRUr53F3qI=;
-        b=TdEPBI/+wTxj8FSgNM94AUShLvZUM+8PlbQ2C8Gjjz0RpH2hnyv6fEYNl5iBN28Dqp
-         612Z/Wgm9/ttkbD5spRPB4cKGP8ERi4/BwPFzZJFokeDOGu93QRFGw9arZRgbbN40CjG
-         eIB6iyJxR5TVW5EJEu0lUXw/JS51C0nakPRPorolqjV+c7t/UgTSX4KUomuNsBfu1WEb
-         NC2HnokmPUr5SYHUI+18g4ct3Xu1jAKjtDsocTE8AKJ+JjK987yoTMEetxrs/lh2jYam
-         i3qKK2HRGGLgdHf+1tJcEmZGBh+xUMbYubSj2T2JLLZ8/zKvlQzLi2NcgR8jhOrPCrqK
-         K/Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773424273; x=1774029073;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Ski0FE2bQULyvUQFwoDAaSkxf64xsZOdGRUr53F3qI=;
-        b=dUG0Go6p2PdkBJ7YU64ngsRqahPNIfhizFVfH1THhRedwBnrjXX7x0EyUKd/OJzQ1J
-         0r35T7P9qYk6/WgHo70Kfq0fGrjy6H3DxW6A9gI8IOVrZJ0i5aE/QtFm/l5Spkva92+4
-         5WZqj6AIGaU6VCKD1M4algz/kEhN2Ytf3beLWFw92aobltEimGBTHkBsxMyFtLZKYoiM
-         WTWmVV+CDXO+pxvr7YSpA2zsxfYyGcrCMRV08PTHyBSlNLI84OSUZwLthMGVZbr7gRZi
-         mTWY1xN+s5piFzJynN2JRpkyhpg2EwIqWebezr36mKOtbri0LmUhXriFSkVJ9SkojRBH
-         nP0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUCC3oA6OfvrQklcoAM2vjSaCEfp5juz+cDzWOUfrIgS4NIy9wDhCHsTq8l0fcs9ByS1RvFlpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywTc1hZeZa2DGorJyeIo0N0QutOFumn5YNZriOVG13Vfp7HlGD
-	n7apoLw1f1MG5M+DAFa4FDqu2Jyn/cRW4jJHw+f6lASHYDkAuswjQBnYJHY5ewy+Qrc=
-X-Gm-Gg: ATEYQzwowtrXTgZB85tKZJ536J0kevcHgGdm9UgQcnPTxjnEEd98uKS+FIITcMgSSW4
-	LfL33iNy8+Ke9KW06R5usDxRFSqbMwYDRVF0lsWdPQt/JhXS2EypuIugUs2a2w36+E0oxLQsgwV
-	HTur3IEJfPMcFaa7Zxzd3cgQMLoSgcVY+dhwzeYbOqrNjMxClsgWaN+lz4DQQoW098b52y0Uu9g
-	JGGmI4MO3u+DUcKmQU/m6PLILB7wr+rHDM85hBswQVQOFkeEV0W/4MNxwPTNdDEp0c81kkv881L
-	AjdDWxsi610kljUX7mS8uiusSGkUa0yV6EPdWmSHlU28URc46sxkAbBc2BDPqZHm6J/JAj5hkoz
-	Ijwe+tiLGfktws1oO3SYNRTIu2I0TyURp2mNQNkBE63Fr1qUcsjkf9TzoBPcPBBjQwdB7Hdk0Vo
-	R4PGyO
-X-Received: by 2002:a05:6a00:124d:b0:827:3914:f130 with SMTP id d2e1a72fcca58-82a198d0c53mr3634373b3a.36.1773424272713;
-        Fri, 13 Mar 2026 10:51:12 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:48::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a0725be23sm6290765b3a.15.2026.03.13.10.51.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 10:51:12 -0700 (PDT)
-Date: Fri, 13 Mar 2026 10:51:11 -0700
-From: Joe Damato <joe@dama.to>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Fan Gong <gongfan1@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] hinic3: Fix spelling mistake "capbility" ->
- "capability"
-Message-ID: <abROj00x3K/pauRL@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Fan Gong <gongfan1@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20260312235922.3442120-1-colin.i.king@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4368E2F851
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 17:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773424286; cv=fail; b=bXZ4xczeSz4Qwa5FyeZr6krnW7/+L5NLPQ8sp77m+KRiIJEFbJ8gss/grNFY5h9CVJBCf0xYZ9sQhRslj5oFldGudZNalf3AOx7RZdD0zVJ/6jdkYypip3zA2FmM59JWBrDkYv7RCZDxk4ZRqlY77DkHL2CzE7f2QnPiLBD4LKI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773424286; c=relaxed/simple;
+	bh=+TnUyjuuttpFm7d2dOkhLrqZkLifQKTHX4B+5FUwosk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z0zd4UUtoFT8PItAX6D5xMYHm2AxxRz/swVOAcqdL/C9CGtgBzKBbwMpyJXQ6H6k6RaImjA7BB10ckAWdO8lP9v7ao9QgWEMYaZy3LJWRhW04D5g/Cm7m1WYQbkxw6n6H/EHCKZabNdrR41dbaDkPMDSyjCJINGBLy+gdDMj0Og=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ragh8boM; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773424284; x=1804960284;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+TnUyjuuttpFm7d2dOkhLrqZkLifQKTHX4B+5FUwosk=;
+  b=Ragh8boMU3WnBL8BCfceXebvVI71poXuV3Cj+sdQpgH5MGN/x9iRO72u
+   Rlxz3QtnaUVstXfcEg0i3LvuuPlCSL7Ij+bnB7Iv79nTWxt0nlCRx3Lb6
+   H2OwRFovLoJKxYiZ+D9wySlwEPn+gslNRYtyOrZanwojPCSuQdOtpKZDm
+   cChBqtmTHGruIYTQ8xIPsWLqxis1EPsSzqf5D99VCiP4ENuAfQd8juwqV
+   BYQnMuRX40VDiRX4f9N6MJ21EYoCRnK6TsT3XhNP4MeiMrj8fa88dhEQ6
+   A9PY0rbjlPbqGfdvE5J1RDHJ6ZZeuxVccGM14v9klloFtTCeSvc9Cz7UQ
+   A==;
+X-CSE-ConnectionGUID: rUNIRvGgTJuGFmgoot01Aw==
+X-CSE-MsgGUID: 7P75cQT8S16SN3qgk9UKow==
+X-IronPort-AV: E=McAfee;i="6800,10657,11728"; a="74417017"
+X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
+   d="scan'208";a="74417017"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 10:51:23 -0700
+X-CSE-ConnectionGUID: JBjjroHhRyGaKJAttiE6Mg==
+X-CSE-MsgGUID: CA+fI4G0T1+TepBev1lA+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,118,1770624000"; 
+   d="scan'208";a="226220571"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 10:51:23 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 13 Mar 2026 10:51:22 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 13 Mar 2026 10:51:22 -0700
+Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.30) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 13 Mar 2026 10:51:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aLlNEMwoZSRSVaXzOwt6BT2JN4x4xaZpzfX9Uk+isAZegO0bOmToGLm68XaYnYUwpORSiY2I4jN2Vj5lk6u40b2L2ozO6mF6lGokCbd4OdQOIpqSXAwA2LAwcWonJxizopAFyhAqSzOoss9BpxbBY5PupyfZPd2iL4pxj6HjveQ4I3CBG5/gHL38uF7+YowMXGnZ/PUnnklHVBlKvxupcGyTLu2Lhlz4aQLBFlplkAkg9PrGEs4NJQeJkJ3euXqdqMjiB1aTfjSPg/kCNGQojF6+Ft4wuOP7rkjSsK2kwzhA1VIelvowpAZoZRQ8jTvL59WjsLOvHhR7njlH8N1bcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a+gTm0qQcYKQy5aZenWUtLBFb3190HmSpxbIo1z8Glc=;
+ b=TVbF6Z0hMo2O8bE+tSiPBGkieB12LsL2I17E2qKzxJ4bGAW9tOS0bKzYDb1x/fjAuPPAAvd3GRShYPNyCxvku15TRv/wfjILRSZSHv++4JE5ITP/0iGy74e4g2CMer0qmTl90oJZKe5Qo3WGfUBGyrvRcdKHXdeaPvO52nDe2bKBWr2oH/CVUptAKWtpysn9STYQ/5nQInzZ82YQ3kKTrGh/iIDiX4M7pWflZY82nxWAHWneUyh40AOKxfAJnGO2XhoWeqmf5wM6Pem6CHZ+wwILZvC6f/91ehyrzSNnbSSWJIxiLXfPnBmYbEK2wXdOkgtAAJj4X0UzfHnX74JoWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com (2603:10b6:8:158::21)
+ by PH0PR11MB4887.namprd11.prod.outlook.com (2603:10b6:510:30::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.4; Fri, 13 Mar
+ 2026 17:51:20 +0000
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40]) by DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40%4]) with mapi id 15.20.9723.008; Fri, 13 Mar 2026
+ 17:51:20 +0000
+Message-ID: <6cff08a5-1bee-4cd2-b8e8-aef6a8f4d498@intel.com>
+Date: Fri, 13 Mar 2026 10:51:18 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write support
+ for sideband queue operations
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Korba,
+ Przemyslaw" <przemyslaw.korba@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+References: <20260310110700.345904-1-przemyslaw.korba@intel.com>
+ <IA3PR11MB89862BC3078293849BE46C35E546A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <IA3PR11MB89862BC3078293849BE46C35E546A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0167.namprd04.prod.outlook.com
+ (2603:10b6:303:85::22) To DS0PR11MB8230.namprd11.prod.outlook.com
+ (2603:10b6:8:158::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260312235922.3442120-1-colin.i.king@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8230:EE_|PH0PR11MB4887:EE_
+X-MS-Office365-Filtering-Correlation-Id: de7da1de-c0c8-48a1-795b-08de81292246
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info: gkboXSF6H6AZo2yfq2PUSDihrysgtK1nhUSh+NQ5FNhP/pTiefpm3D2rgB7r2TJBjl0F7uVXRAQW4730jw2FfSRqnPjb132cCLixomQgOVj5YKNW4PqIU/h8XFzXHsU4CW2JjWYicL3vygZZ7+qasoA7OBhGVpIwe0zVAAbk55RYxKcz28zn4dFCtpG5ClRiR2jBpKVdydO6Hz9tYskc0+nHPK47P0VHnADcUHFngGiuqQEjRfIBYQFeSR03PvHsfO2pmOToHlUonJSh2boRv2p8fiFVLlHg7YqxnjMf7MOPQ+RydErXvylp8uQiK1k6C3VS/RjrmyTQKkx+Uhfm8g1w4pmugRkwcFO1gqp+/ooydLSITEYrPIe69O9vXK8WZ2CILMcGO9PWnIlPQEJTH29bK6lFiw+kcfwl2ckPJn5vu+UEWdGF8JO8sCbVp6JWIgmFm58TqDtd48dZd3bqGS+2SXFVFG8DP93M37hTKUNAxucs9g8ZlEGh3/7+MUQPf4jwC7ijTdPllQNeU9szkv0ZXsk9dN/gy24XCCO9MzKWWovR3VYHWP7SPHRhJaJWrJnJEZGPm/o4vP0mrAfKHxjFj27cevvlGZscB0DCFKhTAai2+LdSlaLLG1gXft717WXnH//3n6GjhBPYJX88HaU39S3QTlkYGMVwrP4XPwiHSbwpbcOhfrICHlVfmlj81pSz/yIRv/1GK7LNJ9s/H98fyF85/PKpM3tI0Tm3ljw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dTV3aWtxaUxrMko5VDJQbkJGcFJnTmRQVy9pNmk4NkVCbTZQc1M2WGordTY0?=
+ =?utf-8?B?RTBzYVNtd00ybHgvRVVmakk0bnNpTUZ1bzFyZWNGeHJQOHNRUEcxSDBILzY2?=
+ =?utf-8?B?NjdaM3NGQkV3NGp5cGNuR2k0MVdwRG1BZ1htTHpCYVVqeTNyZ3YzRmFNaHB1?=
+ =?utf-8?B?RE9PcjBXVjd6ME55c1lOR2VEUFlaamxtOThabndVQURickVRZmtRTTZ1Wks5?=
+ =?utf-8?B?TnFxSkE3cnlGQ1FxVHdkbDRHYm4vN2Z5WmdNd0ZFZjFQUmxCbmxLV1dac1pt?=
+ =?utf-8?B?bFNVRDU4dTIwd2xWTWsrekZhejlEZ0FaWWZMeEg5VG5mY0VMNC9tS3J2bFZu?=
+ =?utf-8?B?aG94dmJ5clNNK21WZmlZamJrSzVGaW1kNiswczFzT1ZETm55WjZRbFI3RFFj?=
+ =?utf-8?B?VXNMV05BUjJhVHRqMHNldWtoczE1aWQ0WFgxU1BiS2JobUswSUExU1REUXh1?=
+ =?utf-8?B?WmdsZHBqL1VmLzk0YmlXblpPdmVIdHZ1a1JQakpUZjNjdnFIZ0VGTEU0dDg3?=
+ =?utf-8?B?eEZBNjBFMi9qSllsc0RlZW9OVW1iSzZLUnh2eEk0dFZHQndVd2ZOTUlHYnRq?=
+ =?utf-8?B?YjRGTCtPRXFtRUkyck12eENOMmlMSVU1S0NwZWljSnp3L3g1bFRETytnOGsx?=
+ =?utf-8?B?SjF6ZFgxOEdnL0lNSTVvbERVbGhtUGpZNFBaZW5YRE1Hb25CS2Y5TCsyTEVu?=
+ =?utf-8?B?N0tEdkNVc1hjNkJkQmNKVkkway8vQzUwTHFmRU10RThKbkl5VDFRci9MTHVy?=
+ =?utf-8?B?eHJOZjVIU2JzbENtUEo0bHMvODlHQ0ZGRU5BalowNmpRSmRjTU5tYUJBQVg3?=
+ =?utf-8?B?VXpDaDYyRC81UkpmOVdwS2RhNkYvUmhpZklmSUJTT3N2TzI1RXRaRTExUkVH?=
+ =?utf-8?B?bXNya2JpYzUyWkF1SWpoSkRDNHQ4eFNNSVBIY2hWN0luT1d1RkxtWGZhSnVS?=
+ =?utf-8?B?ZGJRTnJqcy9EdmlwL21HVzVTRXdPYjJMZG5UaGs2N2xjdFhsd2phaDhlWkhv?=
+ =?utf-8?B?S1BkNm96OEFPYUlBRlJ5b0lMb25CSkp1Ui90cUFiRmlhZVo1TDF0b1c3WTR3?=
+ =?utf-8?B?V293RnBrL1hLWnVDQ2FIMHBISlpaaE1Vd3MwWG80MVIxT3RNbmVERnMvZUdy?=
+ =?utf-8?B?dzhVeXg1TWpScjl6Mk5ZdkxRV1RabVJqRVZZZjdCWUlmelIwNjBzemtLeFVD?=
+ =?utf-8?B?NEZRUFlmTElvOFN0OXNHazFrVjd3Tm5oa1h0UVNZR3VweEd4ZldTMnk4TUo5?=
+ =?utf-8?B?VkJhMXZDc2pPK01KUmtmcmxPdjFvSml6RnRFcTZVbzlMVHkxS3ZvZUZSbjgr?=
+ =?utf-8?B?SHRIREh0TEVxVEtNSWhHaEZuMSt5cHlBRUxvelNaY0dJcm9sckFRODRlV3dw?=
+ =?utf-8?B?Q2IxYy9NTE9oTUZrMDByMzdJa0xQcHZJZTNsYWg1RENSOHZDU29DQ0RIQVlr?=
+ =?utf-8?B?cTZJTTkwM0JVQ2dKN2RhVUZpOHZyWTFtNjZRS2pxM2daQ2xBRU15L25hK0Ny?=
+ =?utf-8?B?b3c1bCtiVTFlMGttelJCSjJ6SDFKNDJOWkc0ZmxDRGNLdWtIZ2h6YlhFcEs2?=
+ =?utf-8?B?VURRS1B2YVpEZ1kyTldxazlwRXF3dUwrd09QRkdMTU5sL2tQMTMvaVFLTDEz?=
+ =?utf-8?B?YlpqWjJweDZEK1pXbFFOQ3ZUb1lDQXlrWWNLK3hBUmFZNUJJSkNGRnMvY05Y?=
+ =?utf-8?B?cHVya3dkYlRZb0M0UDhBQ1NzbjBlQldZSnJCNjRnaXowSEdOcjRYNlNOT0Vy?=
+ =?utf-8?B?QzBVVDg3QnNjeHRXbW9aZlJtbFJKYUpLWnFNeFlLWXQ1eU9yU2QvM1hWckU1?=
+ =?utf-8?B?c2VPcmV2V2xySTZLdWRIaU96Ly9WSmI2SklqMlpGeW90cnZmUU1GVjZTMGw4?=
+ =?utf-8?B?MFpwQ2plOUZyQkFxa1I3OGxuVTE4aEFhbTJmMlBZektWQWNsMVgyOSt0a1hs?=
+ =?utf-8?B?cVdvUVhOcHpiUEtpcFBKb2pSYkJFSWFVWWV0eEZaTEtvTWRzZjlzODk3bVNL?=
+ =?utf-8?B?MzNacWpNdFMvMmZ6eEpXRDEwMnBKbzg5KzBza3ZuMHN0OHhWRmJRSytyYTJu?=
+ =?utf-8?B?TS80eDQzKy9KRGNTelBFWDZQVWdmWlJZc3EycnBDdUhjWjRrT0RCRlRpdXo1?=
+ =?utf-8?B?Yi84ditwQ0N0Y3IxVVcrSVViSVlwMVVSdkVGQ2dtNWxpVXNKOTF2b3Q2QXVo?=
+ =?utf-8?B?M2l3d1VQMHlRSWJVSjZQMmlZTkRDRndaYk5kNXV5TGhqa3ZNL1dQcnNTYU1r?=
+ =?utf-8?B?V3pvQWoxR1JaYjd1dm1BdUFqS0Nzc0EySG0wdGlvR1liRUVmZmdXWGc4aUZR?=
+ =?utf-8?B?d3V1WjRFUnNyYlJXeVpqUTFkNmRGYnpjTFJkU0Q0dk41SXBrSUhrbUZxb0hF?=
+ =?utf-8?Q?rauZlkMjx440PO8Y=3D?=
+X-Exchange-RoutingPolicyChecked: e9IZGaR1lCNoFX2E7cKuhLlBCFWz6zdZVHFi7PG3Pq2xD1/WVr7V6U2CaqVtbI1BLLBYrWmG70t5cZdmV90WwsmhKeQC1qhniM5zAHSmzrHvKBOJxqkMI9MAv8oo+uh6DU6x5BAGVCQME8DglpUA1lt8+2nazHu/GlIVVPyJeYAWCE1XnjTySYu1mjLzdV7x0suWNW1q8lObWioA+fB2NPv5G80+YJEAPFQCtm+yHS14h7eJJrvfU4rrZj35VLgG5jBTnoQkgSuhSbDzRkIrjDnS29vs6HXr7VQ0JJIyY+uSJ9gLdmuLU5HFE5+D6o0i3ltIWwjHN+/TJQ6sA8//hQ==
+X-MS-Exchange-CrossTenant-Network-Message-Id: de7da1de-c0c8-48a1-795b-08de81292246
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8230.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 17:51:20.3775
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rmEsBPjqtZZvCRpwkuCGVsQO5Sjcxs6nfznZ3t7nYSCFbfeIec2VunAHuitQO9UHCiQIwyeIZimFHc8/be74sFFWHlTii9DSJMfC2In3UyQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4887
+X-OriginatorOrg: intel.com
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267550-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DMARC_NA(0.00)[dama.to];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-267551-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20230601.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A01ED2885D3
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,msg.data:url,osuosl.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 71F3D2885DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 11:59:22PM +0000, Colin Ian King wrote:
-> There is a spelling mistake in a dev_dbg message. Fix it.
+
+
+On 3/10/2026 4:17 AM, Loktionov, Aleksandr wrote:
 > 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+>> Of Przemyslaw Korba
+>> Sent: Tuesday, March 10, 2026 12:07 PM
+>> To: intel-wired-lan@lists.osuosl.org
+>> Cc: netdev@vger.kernel.org; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>; Korba, Przemyslaw
+>> <przemyslaw.korba@intel.com>
+>> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: fix posted write
+>> support for sideband queue operations
+>>
+>> On E830, PTP time adjustment commands sent via SBQ don't generate
+>> completion responses, causing the driver to timeout waiting and return
+>> -EIO, when trying:
+>>
+>> phc_ctl eth8 get adj 2 get
+>> dmesg: ice 0000:1a:00.0: PTP failed to adjust time, err -5
+>>
+>> Add support for posted mode not to wait for completion response.
+>>
+>> Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
+>> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_common.c   | 7 ++++++-
+>>   drivers/net/ethernet/intel/ice/ice_controlq.c | 4 ++++
+>> drivers/net/ethernet/intel/ice/ice_controlq.h | 1 +
+>>   3 files changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
+>> b/drivers/net/ethernet/intel/ice/ice_common.c
+>> index 8866902efb91..df9e5422b981 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+>> @@ -1765,6 +1765,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct
+>> ice_sbq_msg_input *in, u16 flags)  {
+>>   	struct ice_sbq_cmd_desc desc = {0};
+>>   	struct ice_sbq_msg_req msg = {0};
+>> +	struct ice_sq_cd cd = {0};
+
+Please init without the 0 i.e. {}
+
+>>   	u16 msg_len;
+>>   	int status;
+>>
+>> @@ -1785,10 +1786,14 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct
+>> ice_sbq_msg_input *in, u16 flags)
+>>   		 */
+>>   		msg_len -= sizeof(msg.data);
+>>
+>> +	if (in->opcode == ice_sbq_msg_wr)
+>> +		cd.postpone = 1;
+>> +
+>>   	desc.flags = cpu_to_le16(flags);
+>>   	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
+>>   	desc.param0.cmd_len = cpu_to_le16(msg_len);
+>> -	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
+>> +	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
+>> +
+>>   	if (!status && !in->opcode)
+>>   		in->data = le32_to_cpu
+>>   			(((struct ice_sbq_msg_cmpl *)&msg)->data); diff -
+>> -git a/drivers/net/ethernet/intel/ice/ice_controlq.c
+>> b/drivers/net/ethernet/intel/ice/ice_controlq.c
+>> index dcb837cadd18..5fb3a8441beb 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_controlq.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
+>> @@ -1086,6 +1086,10 @@ ice_sq_send_cmd(struct ice_hw *hw, struct
+>> ice_ctl_q_info *cq,
+>>   	wr32(hw, cq->sq.tail, cq->sq.next_to_use);
+>>   	ice_flush(hw);
+>>
+>> +	/* If the message is posted, don't wait for completion. */
+>> +	if (cd && cd->postpone)
+>> +		goto sq_send_command_error;
+>> +
+>>   	/* Wait for the command to complete. If it finishes within the
+>>   	 * timeout, copy the descriptor back to temp.
+>>   	 */
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h
+>> b/drivers/net/ethernet/intel/ice/ice_controlq.h
+>> index 788040dd662e..7c98d3a0314e 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_controlq.h
+>> +++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
+>> @@ -77,6 +77,7 @@ struct ice_ctl_q_ring {
+>>   /* sq transaction details */
+>>   struct ice_sq_cd {
+>>   	struct libie_aq_desc *wb_desc;
+>> +	u8 postpone : 1;
+> I'd recommend to rename postpone -> posted to match terminology /* posted write */.
+
+I think the name is a bit misleading. To not wait, we need to set 
+'postpone'? I would think postpone means we want to wait. If we want to 
+represent functionality, maybe something like 'skip_wait' or if we 
+wanted to match the documentation, perhaps 'posted' as Alex suggested.
+
+Thanks,
+Tony
+
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+>>   };
+>>
+>>   /* rq event information */
+>>
+>> base-commit: acd2abc52dea91c3bc3d1b6dd8a92b9631d48bbf
+>> --
+>> 2.43.0
 > 
 
-Reviewed-by: Joe Damato <joe@dama.to>
 
