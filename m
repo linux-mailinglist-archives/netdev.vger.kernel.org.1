@@ -1,208 +1,292 @@
-Return-Path: <netdev+bounces-267444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBwsGOYItGlvfwAAu9opvQ
-	(envelope-from <netdev+bounces-267444-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:53:58 +0100
+	id gLkAByQLtGlvfwAAu9opvQ
+	(envelope-from <netdev+bounces-267446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:03:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CAAA28346F
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:53:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1B36283613
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 14:03:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5A27B3004699
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:53:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B8B113021421
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751BE37FF72;
-	Fri, 13 Mar 2026 12:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D045930AAD8;
+	Fri, 13 Mar 2026 13:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EmAzD+6Y"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="skOcv5Bn"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF60379EFD;
-	Fri, 13 Mar 2026 12:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6018C29A9C3;
+	Fri, 13 Mar 2026 13:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773406417; cv=none; b=oV8Xo+C6H1QuvQ3/e8wZHCulgs/mr7ZP+jf02QS8cuVxubYZp9FAj6wOaaxOsxpFcgc0sxEoUR/xmno44f/AM18BxPr6Dik9JgXXAHdXefkFRz/o54Le/sEOSquK1Bmr+Q0OQQ6gVT5IiZ5A+MzVe7ORF6teKFADxowerUW9fG4=
+	t=1773407003; cv=none; b=CROOQuAniy5Sw2w5VQXg5CtvQrjKptrbXJLbc/ondmisZ4HqHOoJ+aBFCw6w2X5WNWIRqdK1NwcWLHLZKuL5Jm2JfsjKnIGqd8h3624vPN4BdIk+yI7pscEGWXUqpOgai6OOhUx1nNc/tqRQ1VSEGnCCrBuxiLC6RrII9u/rNA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773406417; c=relaxed/simple;
-	bh=fVNG8XU8qrw3CqQjoIAdVbE7UZTFosXAF1TdDCwFDTw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXFFaz83hJGssdXnX16itOySsy7pi1mbhoP4GA4uK5YY9zKQfVcOas7mseZRhWZca0UMLRe8Z6Jo2chUnlmUZ5Hv0r9eitSPAjN7A0F+848Vwlnq06wNJ1w+4N1TkoZU+jD13l118chARFYDwIN8tVxakbuK2fzOK9UlGcH7BgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EmAzD+6Y; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1773406415; x=1804942415;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fVNG8XU8qrw3CqQjoIAdVbE7UZTFosXAF1TdDCwFDTw=;
-  b=EmAzD+6YHvP4RsClACtw8wErxnzDSnmVytN0hXhBfoyjI0Uzzft2F7Q5
-   evgzuxqRWkHgEAvufWfPf3uQxKm3CSulkYx6KDx0wNZuDJ4kX2H9TPaPS
-   8YO1XrmulmP3o3kC+L8I+FytfcsjS1lJ9/UMmaeJSwMyHKuk7r5q01X/w
-   PmrkTnNpiyctLw2LsNIdmuUP2c1BnCWEL6vA7uqNBqvMNiDq6RVraVQ1n
-   9n1bhQ1gUu62a/QasXnzacH4S0MpetkkeYKcO8wNV84VSxpH5I0nOBZy2
-   xTbaLo38iDLPrV4ZUAVG2Bx8W4J+J0mLIRzo77TVSH2IJ81+/V6+z3ljE
-   w==;
-X-CSE-ConnectionGUID: 9ff1ETxjS+mW1ReyoyIBew==
-X-CSE-MsgGUID: A8XVWbAdTUWuAn2xe5oUOw==
-X-IronPort-AV: E=Sophos;i="6.23,118,1770620400"; 
-   d="scan'208";a="221880347"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2026 05:53:34 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Fri, 13 Mar 2026 05:52:54 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Fri, 13 Mar 2026 05:52:53 -0700
-Date: Fri, 13 Mar 2026 05:52:52 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<claudiu.beznea@tuxon.dev>, <linux-kernel@vger.kernel.org>,
-	<horms@kernel.org>, <conor+dt@kernel.org>, <devicetree@vger.kernel.org>,
-	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
-	<nicolas.ferre@microchip.com>
-Subject: Re: [net-next,v2,1/3] dt-bindings: net: cdns,macb: add a compatible
- for Microchip pic64hpsc
-Message-ID: <abQIpGEGi7m3LqWy@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260310212202.3991199-2-charles.perry@microchip.com>
- <20260313014943.1513621-1-kuba@kernel.org>
+	s=arc-20240116; t=1773407003; c=relaxed/simple;
+	bh=s3FJkFotd4Eds4kopmSpApq1HpA/j5xKE7+3ITJ2OcE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ohvY+Gp+//1Hl/Tb3gfSKaPqODKO9+7rnqqicss6SZ58V16b52ibWNk09kqo4VpTS47eVi9UznP9jOW5S/GC4jt0HB/w4u0bvMlpGsBjXAIriUrIZA0Kd2AvwgbFzwTrvd7THcn4uOd2WKdQmzGEZC/xUo8m/ntof0tkEfvMk5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=skOcv5Bn; arc=none smtp.client-ip=148.163.148.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354651.ppops.net [127.0.0.1])
+	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D8p5wF3487944;
+	Fri, 13 Mar 2026 13:02:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=default; bh=mIvM1OD32wVVp
+	u6vP3udSB2Hf7pYb088B58KRuiz0Fs=; b=skOcv5Bnf2F3C9ijEw71JJbKBeZP6
+	osj8kg/VVARu2bCMWmhlYS8VNs5oFOaaXWt3z2NcV3x7LnkjJTTYgwA2EMQNzq53
+	t+Y11d6PnWfqj1SdWSSQMDv1amxQ0XGtp06SGXGO2lRxRPu9Nn59gfwKtJW1wT7c
+	Be9EIQhz4+QDqKF/pLlg9BjoCS4/HVxf4/kUS3FEAhTXgkFMVrpY8+0e9IbFEmoU
+	z+jAtv5iNvrwtbYkgKZSNa/e8ScHnWvM70c/kFGps/GImS89kghaYGQ33Qo0RpM2
+	ltsL+yioGeGQu8d5QA/sDD7jw3nWlLZNanvIBT0EnrdGUAqe4LCCEXaOA==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4cuh51fj7x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Mar 2026 13:02:31 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 13 Mar 2026 13:02:25 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>
+CC: <martin.lau@linux.dev>, <eddyz87@gmail.com>, <song@kernel.org>,
+        <yonghong.song@linux.dev>, <john.fastabend@gmail.com>,
+        <kpsingh@kernel.org>, <sdf@fomichev.me>, <haoluo@google.com>,
+        <jolsa@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <shuah@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
+        Slava Imameev
+	<slava.imameev@crowdstrike.com>
+Subject: [PATCH bpf-next v5 0/2] bpf: Add multi-level pointer parameter support for trampolines
+Date: Sat, 14 Mar 2026 00:02:18 +1100
+Message-ID: <20260313130220.18590-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260313014943.1513621-1-kuba@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: 04WPEXCH014.crowdstrike.sys (10.100.11.87) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDEwMyBTYWx0ZWRfXyAPBMVzI43Xj
+ 55TMmJP/6xeuTNXKCawlBx2JANhiEClMbsm1q20jPzaFUUg+sOlUt8yThKROfmceFU5F/Q6XnoL
+ HTETH+utoMjrY6JGclhcUvrwriBG+z4XgzjQmEdtPnoOsUocARGiS6foRRSH9Hd8R+wdfm8wqQW
+ bQJSpuSuqOVE6ROaDz22QrC/JaE9XVMoaQC9bVcs80Ko5m90tojjugY7K34ZyCtUGsQyyLT5648
+ NGRF45ubelrjAFeLtRFe0TbkpwaLinz0/dy4czUDk+bhhSjCVARx2VosxoRBnF/2hvEjuzCJF72
+ +ZxZnWkyfDAaNZyHiavHXwaTJMKsIWfmU807aGCiVBT1S/buC2pg8DcW2Cxh/A9JJoPcsTo7Cb3
+ E/gTnWjoszk+1ucXZ5qcdWbh5keyaR568thFLEotTn+qZQC4dqzziAsBNXFPkvB4CIerls8xy87
+ HoiwGUTiggwGkdNyR3w==
+X-Authority-Analysis: v=2.4 cv=dqHWylg4 c=1 sm=1 tr=0 ts=69b40ae7 cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=b3B37AjAgz0HnGB3MuNd:22 a=VwQbUJbxAAAA:8
+ a=QyXUC8HyAAAA:8 a=g1g6oSFQjXiNt9peMvgA:9
+X-Proofpoint-GUID: lA7EWQOqh5Ve59O58L5WciG924DywGUn
+X-Proofpoint-ORIG-GUID: lA7EWQOqh5Ve59O58L5WciG924DywGUn
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11728
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 clxscore=1015 adultscore=0 suspectscore=0 spamscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2603130103
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267444-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-267446-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:dkim,linux.dev:url,bby-cbu-swbuild03.eng.microchip.com:mid]
-X-Rspamd-Queue-Id: 5CAAA28346F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:dkim,crowdstrike.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E1B36283613
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 06:49:43PM -0700, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email says "Not sure about the first one but the second one looks
-> legit"
-> 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> dt-bindings: net: cdns,macb: add a compatible for Microchip pic64hpsc
-> 
-> This commit adds "microchip,pic64hpsc-gem" for "PIC64-HPSC" and
-> "microchip,pic64hx-gem" for "PIC64HX" compatible strings. It also adds a
-> conditional schema check to prevent adding PHYs under the GEM node for
-> hardware where MDIO controllers are unconnected from physical pins.
-> 
-> > diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > @@ -70,6 +70,14 @@
-> >                - microchip,sama7d65-gem   # Microchip SAMA7D65 gigabit ethernet interface
-> >            - const: microchip,sama7g5-gem # Microchip SAMA7G5 gigabit ethernet interface
-> >
-> > +      - items:
-> > +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
-> > +          - const: cdns,gem
-> > +      - items:
-> > +          - const: microchip,pic64hx-gem   # Microchip PIC64HX
-> > +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
-> > +          - const: cdns,gem
-> 
-> The fallback structure appears reversed from what was recommended in v1
-> review. Conor Dooley suggested that pic64hpsc should fallback to pic64hx:
-> 
->   - items:
->       - const: microchip,pic64hx-gem
->       - const: cdns,gem
->   - items:
->       - const: microchip,pic64hpsc-gem
->       - const: microchip,pic64hx-gem
->       - const: cdns,gem
-> 
-> However, the current implementation has pic64hx falling back to pic64hpsc
-> instead. Was this reversal intentional, or should the order match the
-> reviewer's recommendation?
-> 
+This is v5 of a series adding support for new pointer types for
+trampoline parameters.
 
-Yes, this is intentional.
+Originally, only support for multi-level pointers was proposed.
+As suggested during review, it was extended to single-level pointers.
+During discussion, it was proposed to add support for any single or
+multi-level pointer type that is not a single-level pointer to a
+structure, with the condition if (!btf_type_is_struct_ptr(t)). The
+safety of this condition is based on BTF data verification performed
+for modules and programs, and vmlinux BTF being trusted to not
+contain invalid types, so it is not possible for invalid types, like
+PTR->DATASEC, PTR->FUNC, PTR->VAR and corresponding multi-level
+pointers, to reach btf_ctx_access.
 
-> https://lore.kernel.org/netdev/20260303-emperor-childlike-6c43d8a91753@spud/
-> 
-> >
-> >    reg:
-> >      minItems: 1
-> 
-> [ ... ]
-> 
-> > @@ -196,6 +204,17 @@
-> >        required:
-> >          - phys
-> >
-> > +  - if:
-> > +      properties:
-> > +        compatible:
-> > +          contains:
-> > +            const: microchip,p64h-gem
-> > +    then:
-> > +      patternProperties:
-> > +        "^ethernet-phy@[0-9a-f]$": false
-> > +      properties:
-> > +        mdio: false
-> 
-> The conditional check references 'microchip,p64h-gem', but the compatible
-> strings actually added above are 'microchip,pic64hpsc-gem' and
-> 'microchip,pic64hx-gem'. This causes the validation rule to never trigger
-> for the new hardware variants.
-> 
-> According to the commit message, the GEM IPs within pic64hpsc have their
-> MDIO controllers unconnected from physical pins, and this check should
-> prevent adding PHYs under the GEM node. However, device trees using
-> 'microchip,pic64hpsc-gem' or 'microchip,pic64hx-gem' with invalid
-> MDIO/ethernet-phy configurations will silently pass schema validation.
-> 
-> Should this check use 'microchip,pic64hpsc-gem' instead?
-> 
+These changes appear to be a safe extension since any future support
+for arrays and output values would require annotation (similar to
+Microsoft SAL), which differentiates between current unannotated
+scalar cases and new annotated cases.
 
-Oops! Good catch! I'll send a v3.
+This series adds BPF verifier support for single- and multi-level
+pointer parameters and return values in BPF trampolines. The
+implementation treats these parameters as SCALAR_VALUE.
 
-Thanks,
-Charles 
+This is consistent with existing pointers to int and void that are
+already treated as SCALAR.
 
+This provides consistent logic for single- and multi-level pointers:
+if the type is treated as SCALAR for a single-level pointer, the
+same applies to multi-level pointers, except for pointers to structs
+which are currently PTR_TO_BTF_ID. However, in the case of
+multi-level pointers, they are treated as scalar since the verifier
+lacks the context to infer the size of their target memory regions.
+
+Background:
+
+Prior to these changes, accessing multi-level pointer parameters or
+return values through BPF trampoline context arrays resulted in
+verification failures in btf_ctx_access, producing errors such as:
+
+func '%s' arg%d type %s is not a struct
+
+For example, consider a BPF program that logs an input parameter of
+type struct posix_acl **:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    bpf_printk("__posix_acl_chmod ppacl = %px\n", ppacl);
+    return 0;
+}
+
+This program failed BPF verification with the following error:
+
+libbpf: prog 'trace_posix_acl_chmod': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl,
+gfp_t gfp, umode_t mode) @ posix_acl_monitor.bpf.c:23
+0: (79) r6 = *(u64 *)(r1 +16)         ; R1=ctx() R6_w=scalar()
+1: (79) r1 = *(u64 *)(r1 +0)
+func '__posix_acl_chmod' arg0 type PTR is not a struct
+invalid bpf_context access off=0 size=8
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
+peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+
+The common workaround involved using helper functions to fetch
+parameter values by passing the address of the context array entry:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    struct posix_acl **pp;
+    bpf_probe_read_kernel(&pp, sizeof(ppacl), &ctx[0]);
+    bpf_printk("__posix_acl_chmod %px\n", pp);
+    return 0;
+}
+
+This approach introduced helper call overhead and created
+inconsistency with parameter access patterns.
+
+Improvements:
+
+With this patch, trampoline programs can directly access multi-level
+pointer parameters, eliminating helper call overhead and explicit ctx
+access while ensuring consistent parameter handling. For example, the
+following ctx access with a helper call:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    struct posix_acl **pp;
+    bpf_probe_read_kernel(&pp, sizeof(pp), &ctx[0]);
+    bpf_printk("__posix_acl_chmod %px\n", pp);
+    ...
+}
+
+is replaced by a load instruction:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    bpf_printk("__posix_acl_chmod %px\n", ppacl);
+    ...
+}
+
+The bpf_core_cast macro can be used for deeper level dereferences.
+
+v1 -> v2:
+* corrected maintainer's email
+v2 -> v3:
+* Addressed reviewers' feedback:
+	* Changed the register type from PTR_TO_MEM to SCALAR_VALUE.
+	* Modified tests to accommodate SCALAR_VALUE handling.
+* Fixed a compilation error for loongarch
+	* https://lore.kernel.org/oe-kbuild-all/202602181710.tEK6nOl6-lkp@intel.com/
+* Addressed AI bot review
+	* Added a commentary to address a NULL pointer case
+	* Removed WARN_ON
+	* Fixed a commentary
+v3 -> v4:
+* Added more consistent support for single and multi-level pointers
+as suggested by reviewers.
+	* added single level pointers to enum 32 and 64
+	* added single level pointers to functions
+	* harmonized support for single and multi-level pointer types
+	* added new tests to support the above changes
+* Removed create_bad_kaddr that allocated and invalidated kernel VA
+for tests, and replaced it with hardcoded values similar to
+bpf_testmod_return_ptr as suggested by reviewers.
+v4 -> v5:
+* As suggested, extended support to single-level pointers and
+covered all supported valid pointer (single- and multi-level) types
+with a wider condition if (!btf_type_is_struct_ptr(t)).
+* As requested, simplified tests by keeping only tests that check
+the verifier log for scalar().
+
+Slava Imameev (2):
+  bpf: Support pointer param types via SCALAR_VALUE for trampolines
+  selftests/bpf: Add trampolines single and multi-level pointer params
+    test coverage
+
+ kernel/bpf/btf.c                              | 17 ++---
+ net/bpf/test_run.c                            | 17 +++++
+ .../selftests/bpf/prog_tests/verifier.c       |  2 +
+ .../bpf/progs/verifier_ctx_ptr_param.c        | 68 +++++++++++++++++++
+ 4 files changed, 94 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_ctx_ptr_param.c
+
+-- 
+2.34.1
 
