@@ -1,269 +1,312 @@
-Return-Path: <netdev+bounces-267307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gI0YIDC6s2lXaQAAu9opvQ
-	(envelope-from <netdev+bounces-267307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:18:08 +0100
+	id uIXNElm6s2lXaQAAu9opvQ
+	(envelope-from <netdev+bounces-267309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:18:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02FAC27EB66
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:18:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C0827EB89
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 712C430C0349
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:13:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C936308A403
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499CE36BCC8;
-	Fri, 13 Mar 2026 07:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F62D36B06A;
+	Fri, 13 Mar 2026 07:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRlC+PmQ"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kYOta4Hp";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="L26W6IOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2E036828A;
-	Fri, 13 Mar 2026 07:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D663536AB4C
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773386023; cv=none; b=Wj8dHx64l/9t8S9ZVhgzhZ6ja2kuwAGdk1tpQMATiDm3tNpbHgvJLpjNUP6IUePwmn5ZN2T6m0CObeTcc+YXPjWBw+n/rElzlfm63VNqjC1VfbMR2y5gb786HmLugzwESUw1YOyNJiIhjHWhudseUZWJ+dPTjsSqPEtkzUVm5sw=
+	t=1773386184; cv=none; b=rv7HCUU4CFHP8hNAdYP9qDfoxpcPIkKx47ECjJteV0FcM/2fY8WWr+RXE7+1qtHCHwke5yZNcU/ezkxsyu6PHWfc8xcX+67lOsEg0UNhdlwinioQnYnAG8kNcrOuAeP5hUzErTiyMaAY7i+vUDLQRY51+2CXhDXZtU3frrkFvJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773386023; c=relaxed/simple;
-	bh=irkQSwZ0ZgATCbIp5Z59MJUY/oOrgGe+E+CmoJMzRtM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ogtQiisjjQG8t8aUMzEiL240XgfF0050u6elDZxQ5UUlEnAv53klUG7vx99KsjHFxZvEEhIl+s+EpgWSVRG9a0rqjSBsXEuc6DcOhZrW5/FPZypGhrNTIO5yrYtf0hgkZfuyv5dT2ZUEXMeNM4WGswwH52xhmVw0mmUjxmEo83o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRlC+PmQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E069DC2BCAF;
-	Fri, 13 Mar 2026 07:13:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773386022;
-	bh=irkQSwZ0ZgATCbIp5Z59MJUY/oOrgGe+E+CmoJMzRtM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=VRlC+PmQRD0Fqh8YxhKtXiE90sfe0ukQXCzD8jJTt3/c8X9eQkodiH+ccFHReKaj/
-	 +G4B8tAVo7Jo24+8Ks6MD0Aa54TD11swIW/6tH30NW36ql6K8CY7/+Zgkz4x4YUQih
-	 xEsQbkP5poQe4qiRqrdfkad0sluFrpK0G0NVlRHV5gabkCnccfkHzpaDrVF0dCDBlh
-	 L84nPYvS/W6B/YYeyswYQ4SVq0IOsdgN4N8sScgO1YdABg9K3CT027ZHsn/xLsUojM
-	 7NEWqTIcIZBotKpfR2lpxl5NPrbkbipjo4/6L2O3A8wy52YQONbkIcYlgRoCYgHqgx
-	 UNoXxqKjgmQpQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8969106FD8A;
-	Fri, 13 Mar 2026 07:13:42 +0000 (UTC)
-From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Date: Fri, 13 Mar 2026 08:13:35 +0100
-Subject: [PATCH net-next v12 4/4] stmmac: s32: enable support for Multi-IRQ
- mode
+	s=arc-20240116; t=1773386184; c=relaxed/simple;
+	bh=SFwI+Jq/KJmOfA7abaLf8IREH4YS2mFFsWRr7zhWaVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I5FIbxF+tatXKuaGISXagStDjJXe/G255wfS38DwuaQMLzb8dysNVp9gXQMoOgSjuylT3S3Chc2mtHh1kC77g3T7KnmbDC2CvNgb6TQWRK4Ilern9wOvsXj7B2+TnIN9E24+O6hBKmUTEVry99xsV2SyvhrMExNRVzonRz9TP8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kYOta4Hp; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=L26W6IOq; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D5thVr070734
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:16:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	i2IlKIi4brx2n2555N+kXUhgIRruRM2KVO7+XTSNjAw=; b=kYOta4Hp6PVm9IEo
+	z0kzYQ7SouURAyJ6rUTTvPIoClsZXCgEpgm9eIegOOHN5QFlkHFjyubBt7hd7hyE
+	cbOMlzo76yJn1yxqMtA+ZqwPGfS3bCV34TogNZSJ5/VCPWu5j49ux1+sRj+B651n
+	QGMQiDz/iJd05KRzSFJVg/BFBYj4+WjCDwsdxWkF38g0A75m5ktyIstd2V8SbjET
+	zdzuNBkA1Zws7sfX9UWbOnpwy2H1OrCtQuJG/DgGhjZ0x0G+e++0ROoTnPyA5xE8
+	L1G9gTSRqrfL0RXA+uVzBkq+8GWOL5dpt1EhWOIeq/L6JCiZfHVex8W+W5phkdJb
+	rpJ2HA==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cuh4ymy3e-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 07:16:17 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2ae4af66f40so21098805ad.1
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 00:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1773386177; x=1773990977; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i2IlKIi4brx2n2555N+kXUhgIRruRM2KVO7+XTSNjAw=;
+        b=L26W6IOq3DoGxMkcjOM63FCCvWwjaQXV68rrx/Zs+ynuApdtW16hKcHLZwM1GuAIOq
+         Y5ULnumJFkIvMJBl8hgJGk3ZANh2TFQ+56T4CpuqyhAJrtl1vCEjFLutzKRCE+mY+LMm
+         +y5nkjdtoz6z9cACJX8RL78GGhRNS6lLkrZGwU1HhnVKXTx1loHNKHBbd7mAsgDORV8Z
+         3WZwXJWzmK+cnewSo8kTBrUcMCX3HSVr0Jq3ndXqzDeXEBs+HPuPZtpfAn6QKpvfp1YA
+         XPjLhUb3VRPNGbKg4JB2BhsndzRJZ6pwoNEFo+63VtMcmZ3UvBvXmWp6mWLzg8ZkM8Nl
+         zJmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773386177; x=1773990977;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i2IlKIi4brx2n2555N+kXUhgIRruRM2KVO7+XTSNjAw=;
+        b=L8HN7u/e1Gmf5j3bC84w3oPt6NjEuk3hU8GHGx36fcH4v3fDqAWCGe5B60VJNEzjbd
+         GL/W91JBhokpAE9nOQUxrqngX1L6ISQYDo81JaQciRcXPo2KbJRqyXx5TC5sgGglPXBz
+         V9MaHYHhSt+/yr7pypPpMH8jNSYflHfuVswvvKAGBPiKX575BYvBxyUw3UvDNjkzNLVN
+         HCCn9G55mNY6Mt+c4t/xpR53Tv2MfSF9SsQmOYofTlgD+Gt4ODJMKR3vTwm3x5ElJKn1
+         9j0VHFeUzsHxYyQR6T9xr6GBJBhaqTWRaszQKJpqZl/TnfIGaQN9ftr9QSPRM6jWtLut
+         1qvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvnOP/1TnBiysJgBJzkQcppye5GE8hKa3PkpM0vTE+RsGsm4ezrAsfkzTgyox/9G4WNE1znms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxdJ2pMtShYSVvtK619j+dS0TlhZArA1h8oE1vE3aI+pwsSMRi
+	iqVDlPHBsVkFaWpxzmIJHtfQF0Kx4mSv2JL9OGqtrEs/fO6vXgxo5HFxzwyXGrjqqWMsdNUiVoV
+	9a6THxiKcMRFE7VD4uTn//z67Mx3f3uvFPPflMRK/TEcP65z298WfBYtaqDyqBypmS2s=
+X-Gm-Gg: ATEYQzw7OiZXxvO/P40q5vUguBrrrDtQcfVSnmSFlSs24r314woCjnU4l/MRSed9rRe
+	nrMrjop6CeASAUuHUjXo+4OEVxi/ekf9U75dkYSEp1voIhZumFRlDLca4fvlNvN0J02l5Uq8EVM
+	LCf+qGTscQppZmcgAroPGGQuj0/OYehn1bAHCbW4IMRfQIJl/qtMFnxrWlYXTs5K5U27vaIjFYz
+	YgYq62lQVZaebKpSBuSLu2m3PCoQ7B2evuzQNZj+Ga3BIYzdSOt7LZnTgznyg7lesg461SIQK+v
+	VmBmq4Eks9YPp2cSjE0FkGUbC+gVdHjYtpfV2gMoi5GAH3XHE0WHOWr5FRS5nt6lk1CgAwjcLs7
+	Obk6SSo3jiePZ6WRSfTOWAl88T5Fnf1RbjcBcUqulsTj62TiiC2/rUw==
+X-Received: by 2002:a17:903:390d:b0:2ae:3cf0:3aa1 with SMTP id d9443c01a7336-2aecaa3bfe2mr25528695ad.37.1773386176725;
+        Fri, 13 Mar 2026 00:16:16 -0700 (PDT)
+X-Received: by 2002:a17:903:390d:b0:2ae:3cf0:3aa1 with SMTP id d9443c01a7336-2aecaa3bfe2mr25528405ad.37.1773386176268;
+        Fri, 13 Mar 2026 00:16:16 -0700 (PDT)
+Received: from [10.218.35.45] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece62c733sm16610105ad.35.2026.03.13.00.16.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Mar 2026 00:16:15 -0700 (PDT)
+Message-ID: <a17e4c07-1f00-4b0d-90e3-2eeb1e71a248@oss.qualcomm.com>
+Date: Fri, 13 Mar 2026 12:46:08 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] net: mhi_net: Implement runtime PM support
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+        Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
+        Oded Gabbay <ogabbay@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
+        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+        netdev@vger.kernel.org, mayank.rana@oss.qualcomm.com,
+        quic_vbadigan@quicinc.com, vivek.pernamitta@oss.qualcomm.com
+References: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
+ <20251201-mhi_runtimepm-v1-3-fab94399ca75@oss.qualcomm.com>
+ <nj4ovttt4i7hsqfdv5zhdotxrx3upxfq4ozuligwuheubnsmkd@e6bwzgkn55kl>
+Content-Language: en-US
+From: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
+In-Reply-To: <nj4ovttt4i7hsqfdv5zhdotxrx3upxfq4ozuligwuheubnsmkd@e6bwzgkn55kl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260313-dwmac_multi_irq-v12-4-b5c9d0aa13d6@oss.nxp.com>
-References: <20260313-dwmac_multi_irq-v12-0-b5c9d0aa13d6@oss.nxp.com>
-In-Reply-To: <20260313-dwmac_multi_irq-v12-0-b5c9d0aa13d6@oss.nxp.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
- Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
- NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- imx@lists.linux.dev, devicetree@vger.kernel.org, rmk+kernel@armlinux.org.uk, 
- vladimir.oltean@nxp.com, boon.khai.ng@altera.com, 
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773386021; l=4691;
- i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
- bh=Rdb+10aBIE2gR8Bncd1438yIs2mBOuENyRGkl1CSN58=;
- b=fB8QPeHuIKTmONfEhXXoeF5KRPH8jL6K8S6vwriB04EmaXI6DaSFv6ZzMZyeJVT3EO9EP1OuA
- E0qHUrIRz8BDcra8KcjoEkNKNEcLSnE9ELDzm5801yS23gfFATzO2SU
-X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
- pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
-X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
- auth_id=217
-X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-Reply-To: jan.petrous@oss.nxp.com
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDA1NyBTYWx0ZWRfX8jcdo7jq2ZfU
+ u+wDNceiAhVWmF2+LgLbg2irfS1OMjqwPL4qX/j4x0qzDRBWQ4JuTb+xGR2hP3YubIt4iAsBiZa
+ JsCfhMA61qKREG2Titl0Gn23Ed3L+kTyRGu6feWAIlCoY0eojQvDqqF44/6CUvtHGuRfkA5E4rX
+ dudwZYj4fVQgllm64+rTujIU6Ta879diFjmLfPPS0H/fx1lTbYs+FXdGPPiH1AsELEpgSULsXhY
+ 5a2cCzVA4avwmAvzibmbp6FnJXEFt9Mq+IxD9S3lXkKc/RgPZ7X+HyrzmclavjUdzoUIyR46M8g
+ JXywyuUbGPMJWSRKb8i4RsziESOZT0+YZ6NTjAP3uDIiqIGj2oxZxH+wZ73uR6IVPo/kgEXV13R
+ S8n1/p7mIDBrhQNg7G61mc7Tgy1+DqqJAjqxm6Vovl9+txSeLZFk6NzZJvlGQbD5SW4Zp/PDPf/
+ +pLE2nqmTIrDndfNUdA==
+X-Proofpoint-ORIG-GUID: zoTQkv-LGeF6oHbxZuzjZN_21eyn5EH5
+X-Authority-Analysis: v=2.4 cv=C+7kCAP+ c=1 sm=1 tr=0 ts=69b3b9c1 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=8pif782wAAAA:8 a=EUspDBNiAAAA:8 a=BRVcir-zca08BhkZB6AA:9 a=QEXdDO2ut3YA:10
+ a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-GUID: zoTQkv-LGeF6oHbxZuzjZN_21eyn5EH5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-13_01,2026-03-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 priorityscore=1501 phishscore=0 adultscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130057
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267307-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	HAS_REPLYTO(0.00)[jan.petrous@oss.nxp.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267309-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[4033c000:email,nxp.com:email,suse.com:email,oss.nxp.com:replyto,oss.nxp.com:mid,s32g399aevb3:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 02FAC27EB66
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,wikipedia.org:url,qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krishna.chundru@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: A0C0827EB89
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 
-Based on previous changes in platform driver, the vendor
-glue driver can enable Multi-IRQ mode, if needed.
 
-To get enabled Multi-IRQ mode for dwmac-s32, the driver checks:
+On 12/3/2025 3:07 AM, Bjorn Andersson wrote:
+> On Mon, Dec 01, 2025 at 06:13:19PM +0530, Krishna Chaitanya Chundru wrote:
+>> Add runtime power management support to the mhi_net driver to align with
+>> the updated MHI framework, which expects runtime PM to be enabled by client
+>> drivers. This ensures the controller remains active during data transfers
+>> and can autosuspend when idle.
+> This last sentence hints at there being an actual problem with the
+> current code. Perhaps we do this because it's the right thing to do,
+> perhaps we're making this change because devices are crashing and
+> burning?
+we are doing because its right thing to do, with current code we are not 
+seeing
+any issues.
+> Start your commit message with making the reason for your change clear.
+>
+> Ask yourself https://en.wikipedia.org/wiki/Five_whys when you come up
+> with your problem description.
+ack.
+>> The driver now uses pm_runtime_get() and pm_runtime_put() around
+>> transmit, receive, and buffer refill operations. Runtime PM is initialized
+>> during probe with autosuspend enabled and a 100ms delay. The device is
+>> marked with pm_runtime_no_callbacks() to notify PM framework that there
+>> are no callbacks for this driver.
+> This looks like an AI prompt, does it add value to the commit message?
+>
+> It can mostly be summarized as "Implement pm_runtime in the driver". The
+> only part that's not obvious is the 100ms autosuspend delay, but you
+> skipped explaining why you did choose this number.
+100ms taken from pci port bus driver reference, I will add the reason 
+for 100ms
+in next patch.
+>> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
+>> ---
+>>   drivers/net/mhi_net.c | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
+>>
+>> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+>> index ae169929a9d8e449b5a427993abf68e8d032fae2..c5c697f29e69e9bc874b6cfff4699de12a4af114 100644
+>> --- a/drivers/net/mhi_net.c
+>> +++ b/drivers/net/mhi_net.c
+>> @@ -9,6 +9,7 @@
+>>   #include <linux/mod_devicetable.h>
+>>   #include <linux/module.h>
+>>   #include <linux/netdevice.h>
+>> +#include <linux/pm_runtime.h>
+>>   #include <linux/skbuff.h>
+>>   #include <linux/u64_stats_sync.h>
+>>   
+>> @@ -76,6 +77,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>   	struct mhi_device *mdev = mhi_netdev->mdev;
+>>   	int err;
+>>   
+>> +	pm_runtime_get(&mdev->dev);
+> What happened to your error handling?
+ack I will add error handling.
 
-  1) property of 'snps,mtl-xx-config' subnode
-     defines 'snps,xx-queues-to-use' bigger then one, ie:
-
-     ethernet@4033c000 {
-         compatible = "nxp,s32g2-dwmac";
-         ...
-         snps,mtl-rx-config = <&mtl_rx_setup>;
-         ...
-
-         mtl_rx_setup: rx-queues-config {
-             snps,rx-queues-to-use = <2>;
-         };
-
-  2) queue based IRQs are set, ie:
-
-     ethernet@4033c000 {
-         compatible = "nxp,s32g2-dwmac";
-         ...
-         interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
-                      /* CHN 0: tx, rx */
-                      <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
-                      <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
-                      /* CHN 1: tx, rx */
-                      <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
-                      <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
-         interrupt-names = "macirq",
-                           "tx-queue-0", "rx-queue-0",
-                           "tx-queue-1", "rx-queue-1";
-
-If those prerequisites are met, the driver switches to Multi-IRQ mode,
-using per-queue IRQs for rx/tx data pathr:
-
-[    1.387045] s32-dwmac 4033c000.ethernet: Multi-IRQ mode (per queue IRQs) selected
-
-Now the driver owns all queues IRQs:
-
-root@s32g399aevb3:~# grep eth /proc/interrupts
- 29:    0    0    0    0    0    0    0    0    GICv3  89 Level   eth0:mac
- 30:    0    0    0    0    0    0    0    0    GICv3  91 Level   eth0:rx-0
- 31:    0    0    0    0    0    0    0    0    GICv3  93 Level   eth0:rx-1
- 32:    0    0    0    0    0    0    0    0    GICv3  95 Level   eth0:rx-2
- 33:    0    0    0    0    0    0    0    0    GICv3  97 Level   eth0:rx-3
- 34:    0    0    0    0    0    0    0    0    GICv3  99 Level   eth0:rx-4
- 35:    0    0    0    0    0    0    0    0    GICv3  90 Level   eth0:tx-0
- 36:    0    0    0    0    0    0    0    0    GICv3  92 Level   eth0:tx-1
- 37:    0    0    0    0    0    0    0    0    GICv3  94 Level   eth0:tx-2
- 38:    0    0    0    0    0    0    0    0    GICv3  96 Level   eth0:tx-3
- 39:    0    0    0    0    0    0    0    0    GICv3  98 Level   eth0:tx-4
-
-Otherwise, if one of the prerequisite don't met, the driver
-continue with MAC IRQ mode:
-
-[    1.387045] s32-dwmac 4033c000.ethernet: MAC IRQ mode selected
-
-And only MAC IRQ will be attached:
-
-root@s32g399aevb3:~# grep eth /proc/interrupts
- 29:    0    0    0    0    0    0    0    0    GICv3  89 Level   eth0:mac
-
-What represents the original MAC IRQ mode and is fully backward
-compatible.
-
-Reviewed-by: Matthias Brugger <mbrugger@suse.com>
-Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 36 ++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index 48fceadc55b1..024d8e10e918 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -2,7 +2,7 @@
- /*
-  * NXP S32G/R GMAC glue layer
-  *
-- * Copyright 2019-2024 NXP
-+ * Copyright 2019-2026 NXP
-  *
-  */
- 
-@@ -110,6 +110,37 @@ static void s32_gmac_exit(struct device *dev, void *priv)
- 	clk_disable_unprepare(gmac->rx_clk);
- }
- 
-+static void s32_gmac_setup_multi_irq(struct device *dev,
-+				     struct plat_stmmacenet_data *plat,
-+				     struct stmmac_resources *res)
-+{
-+	int i;
-+
-+	/* RX IRQs */
-+	for (i = 0; i < plat->rx_queues_to_use; i++) {
-+		if (res->rx_irq[i] <= 0) {
-+			dev_dbg(dev, "Missing RX queue %d interrupt\n", i);
-+			goto mac_irq_mode;
-+		}
-+	}
-+
-+	/* TX IRQs */
-+	for (i = 0; i < plat->tx_queues_to_use; i++) {
-+		if (res->tx_irq[i] <= 0) {
-+			dev_dbg(dev, "Missing TX queue %d interrupt\n", i);
-+			goto mac_irq_mode;
-+		}
-+	}
-+
-+	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-+	dev_info(dev, "Multi-IRQ mode (per queue IRQs) selected\n");
-+	return;
-+
-+mac_irq_mode:
-+	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
-+	dev_info(dev, "MAC IRQ mode selected\n");
-+}
-+
- static int s32_dwmac_probe(struct platform_device *pdev)
- {
- 	struct plat_stmmacenet_data *plat;
-@@ -165,6 +196,9 @@ static int s32_dwmac_probe(struct platform_device *pdev)
- 	plat->core_type = DWMAC_CORE_GMAC4;
- 	plat->pmt = true;
- 	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
-+
-+	s32_gmac_setup_multi_irq(dev, plat, &res);
-+
- 	plat->rx_fifo_size = 20480;
- 	plat->tx_fifo_size = 20480;
- 
-
--- 
-2.47.0
-
+- Krishna Chaitanya.
+>
+> Regards,
+> Bjorn
+>
+>>   	err = mhi_queue_skb(mdev, DMA_TO_DEVICE, skb, skb->len, MHI_EOT);
+>>   	if (unlikely(err)) {
+>>   		net_err_ratelimited("%s: Failed to queue TX buf (%d)\n",
+>> @@ -94,6 +96,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>   	u64_stats_inc(&mhi_netdev->stats.tx_dropped);
+>>   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
+>>   
+>> +	pm_runtime_put_autosuspend(&mdev->dev);
+>>   	return NETDEV_TX_OK;
+>>   }
+>>   
+>> @@ -261,6 +264,7 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
+>>   	}
+>>   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
+>>   
+>> +	pm_runtime_put_autosuspend(&mdev->dev);
+>>   	if (netif_queue_stopped(ndev) && !mhi_queue_is_full(mdev, DMA_TO_DEVICE))
+>>   		netif_wake_queue(ndev);
+>>   }
+>> @@ -277,6 +281,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+>>   
+>>   	size = mhi_netdev->mru ? mhi_netdev->mru : READ_ONCE(ndev->mtu);
+>>   
+>> +	pm_runtime_get_sync(&mdev->dev);
+>>   	while (!mhi_queue_is_full(mdev, DMA_FROM_DEVICE)) {
+>>   		skb = netdev_alloc_skb(ndev, size);
+>>   		if (unlikely(!skb))
+>> @@ -296,6 +301,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+>>   		cond_resched();
+>>   	}
+>>   
+>> +	pm_runtime_put_autosuspend(&mdev->dev);
+>>   	/* If we're still starved of rx buffers, reschedule later */
+>>   	if (mhi_get_free_desc_count(mdev, DMA_FROM_DEVICE) == mhi_netdev->rx_queue_sz)
+>>   		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
+>> @@ -362,12 +368,19 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+>>   
+>>   	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
+>>   
+>> +	pm_runtime_no_callbacks(&mhi_dev->dev);
+>> +	devm_pm_runtime_set_active_enabled(&mhi_dev->dev);
+>> +	pm_runtime_set_autosuspend_delay(&mhi_dev->dev, 100);
+>> +	pm_runtime_use_autosuspend(&mhi_dev->dev);
+>> +	pm_runtime_get(&mhi_dev->dev);
+>>   	err = mhi_net_newlink(mhi_dev, ndev);
+>>   	if (err) {
+>>   		free_netdev(ndev);
+>> +		pm_runtime_put_autosuspend(&mhi_dev->dev);
+>>   		return err;
+>>   	}
+>>   
+>> +	pm_runtime_put_autosuspend(&mhi_dev->dev);
+>>   	return 0;
+>>   }
+>>   
+>>
+>> -- 
+>> 2.34.1
+>>
+>>
 
 
