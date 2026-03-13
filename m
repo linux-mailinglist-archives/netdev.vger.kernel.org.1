@@ -1,194 +1,175 @@
-Return-Path: <netdev+bounces-267410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +FxJKnHus2m4dQAAu9opvQ
-	(envelope-from <netdev+bounces-267410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:01:05 +0100
+	id KNdLLdjus2m4dQAAu9opvQ
+	(envelope-from <netdev+bounces-267412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:02:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC0A281DB8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:01:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D62E281DE5
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 447B93264BA3
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:57:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3230D3028ED5
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EBF39098E;
-	Fri, 13 Mar 2026 10:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B94375F6D;
+	Fri, 13 Mar 2026 10:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="k2/DjPeG"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="fqFU3l+1"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013015.outbound.protection.outlook.com [40.107.162.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54E12BEFF5;
-	Fri, 13 Mar 2026 10:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773399468; cv=fail; b=fWgAZUDaG2tmpQMLx5BP0mA2aCZb9A+hygIuEnxptnHPOmrgiNMpDfrtZFSRmll1kTG6H+RHOYUUQK5nHKYQCb72ceQjMr4br/9QpdurqPVJ4NNWiS+n6y/O+4OMyRFIR6SFt9Cz1AgAXkHWKg7kCFUt2wXmgYQuzYWqPNiUC/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773399468; c=relaxed/simple;
-	bh=IhUDZXidQIR/5xm5DdRfpijg94FxbX21yktc10jOz68=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mgk2JCl2ubyyatq1IG4f5z6buNUekftNtGQYnmR+9dGxVBuLQJGigUzvtlAJXts+ZqtAVylpJG46l0tndLMhfMhD2wYCf5HVoCNIWMllsrUbullrjb9qOpCw+3YVqICHqMAa/oxMss9QDUXvmitwqdQecD8FtJ5MYUhHJ6KztCo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=k2/DjPeG; arc=fail smtp.client-ip=40.107.162.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hIMz1jh16vM4tXZpwbO7EC/XAKsnO5fzoVhAHo88+5tHVDoMLLRfcjYcyjHooVjSLGV/DNILmrfUAaXR3+i4W+yVsuyRZ0BDLGkhc6NU08Jd0z7i2jIkHgzArcgTtDE7aHBHY3pGvED9s+xA+OQ3G++SqeNKGsAUbx4na1YLezV15EVFbiRzfnAiqf/O0ImR7k2IfXZW42SdQyW6VCTd2hve5I8TKzIbiW3+Py4yEyC4PM/mylK9+cToGDHbSi3TbC3U9ew8N1qkYf2uASzmASQeWE4MIaBphGaiNp9PEVmOcskhhTs5MTAF0KE9FUr+bK2MPPmABtqRSxGQUBgPMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SYtLkffXcghrqEz9c92EUpXP0OAIWFAcQwu5IlJoR3k=;
- b=i7jcUoqCyXyvW136EHz6YpCU2uMwqYsGqVHS+vo5WaInbRKFtJWBaWgS+6Sst2lCFVoYCDnRtVuCUPri3svOc02kHuuC77Az3OgUYL11BQikLvmjAMMM2F4Av0NTWA9GE3M8vMOLhUEy/mstdibqLwrRcop5DOJSacYofRJ8KV5HUHLq6ejzBEwKEMuNjVLjRQY4vRMeqzSxIZobVJ3VFkUntUlCpJdqm9r5q+tKCZ6jXXaYn1kFG8qUSrOdT2XFizTfuSjaqn9GaC7KkFMwMcCy6K7gqS0MWFfx/uDzDvtAGym999Qd7KQghjf31XrVqpJ2Ibltm22mafRgMl7Npw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 164.130.1.60) smtp.rcpttodomain=lunn.ch smtp.mailfrom=foss.st.com; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=foss.st.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SYtLkffXcghrqEz9c92EUpXP0OAIWFAcQwu5IlJoR3k=;
- b=k2/DjPeGhiqcBpOWezHfXwV5tJRLrNDNkS/dHPF28bREv4sXz3e5GJgsrsn5+gCbkCwx9u9YmsqIf4zlE5wXFyBdaTwYk97C15zkTh0dhSFQjN4mA6BjPsrpIrKAC3d11wcrHT0FKxLX3Qmmr6+lhXAvRuxoendxmqLHqeOrK1snf3uZFcU0OGabITTIUT2TndIL0rVM1FZhfcPUX3dKS1V32+Hg6tYcsLt3eyxy9YsDdXDO+HvrDVp6y6MFIMZWshLYUgGYK6OmAIcDtvmDzOJq0eMsrQZDlu7k/OeAKE7Ojiyaeike486NwVU5lJYGMMtl9kws7WmA5vZm/Cv0nw==
-Received: from DB8P191CA0009.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:130::19)
- by DB8PR10MB3781.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:167::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.15; Fri, 13 Mar
- 2026 10:57:41 +0000
-Received: from DB1PEPF000509EE.eurprd03.prod.outlook.com
- (2603:10a6:10:130:cafe::ed) by DB8P191CA0009.outlook.office365.com
- (2603:10a6:10:130::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.27 via Frontend Transport; Fri,
- 13 Mar 2026 10:57:39 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 164.130.1.60)
- smtp.mailfrom=foss.st.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=foss.st.com;
-Received-SPF: Fail (protection.outlook.com: domain of foss.st.com does not
- designate 164.130.1.60 as permitted sender) receiver=protection.outlook.com;
- client-ip=164.130.1.60; helo=smtpO365.st.com;
-Received: from smtpO365.st.com (164.130.1.60) by
- DB1PEPF000509EE.mail.protection.outlook.com (10.167.242.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Fri, 13 Mar 2026 10:57:40 +0000
-Received: from STKDAG1NODE2.st.com (10.75.128.133) by smtpO365.st.com
- (10.250.44.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Fri, 13 Mar
- 2026 11:59:55 +0100
-Received: from localhost (10.48.87.194) by STKDAG1NODE2.st.com (10.75.128.133)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Fri, 13 Mar
- 2026 11:57:39 +0100
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>, <linusw@kernel.org>,
-	<antonio.borneo@foss.st.com>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 2/2] net: stmmac: manage error case during stmmac_dvr_probe
-Date: Fri, 13 Mar 2026 11:57:17 +0100
-Message-ID: <20260313105718.359614-3-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260313105718.359614-1-christophe.roullier@foss.st.com>
-References: <20260313105718.359614-1-christophe.roullier@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C5B305E3B
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 10:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773399588; cv=none; b=EKX6JPDZFS31/r+pNJm0E699KDIfVM3edbn+L0kO2djwoKd450Uhe0KB2FQ1hV1wFkWjhqdRPnek14WVpB0lbWOifAOmncgyLiFnJS8Z5GxKk0WYpVtKswsMhB6SM5SQfn6WWIxHws0UHe4xQVrRHQIw96zLKvfAINB/hods3tg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773399588; c=relaxed/simple;
+	bh=/DeGgks7prAMGk95laFynNNmC70BjO3fWEyuVcxeDvs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gmKf7JmNaA49g73s1lw/S54cjTjut/oEMks7Tezi2KZPsIBZRJ0AUS3VJJJ9zRq6jwXxbnlipLARH+xYYoBIgJ4Ag0iA7mxFPDDSPeD/cE1MycS0OyozgVsZlryKpPz28CBciiAK3zBoZFs5dpg4aWPjAm//W+ase6wSuINyJa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=fqFU3l+1; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-439bc1a201fso225009f8f.2
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 03:59:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1773399585; x=1774004385; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=m20ydtFr7k5vZRbqByGEDREDyMamYEcaHGNZVt6cmWQ=;
+        b=fqFU3l+1CQTx9FVAcu7wJJiCbdZlkOZidNBPVfdZ/PQ48McD0KeGLjHVyngGr3DMNW
+         8pc+Qht/E3pkHQCqHv2deltZ/jELVXeVKRs9AlM/OA7mGwfz1ZVJC1Shwd0m7qcdiQjR
+         5rMsyQEWJ6Hvqnp97QSAUvIrEx7W9fWPnbd8eTCxjyKMpDXYwMtbtFQURwvqyzvlh7CX
+         X+Dbbx6A5mVoBsYzJ+ELAzogRcMsmMIxUCWjChrTA+4y8ZyO9KpTv6739SVJHwjIJNxz
+         QMvvdUDGgULHj/tG4tUpcqPLz0fdKvErhZXpwTYVRBreqtzdocUOhY+XM8Ykc9ErH0Yz
+         kj5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773399585; x=1774004385;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m20ydtFr7k5vZRbqByGEDREDyMamYEcaHGNZVt6cmWQ=;
+        b=baXB0iPuN67Mz0BXsB1KRH26qRVv8SBPwTQcdnuIcjq55dudYhDqF5OjHu0DxgFSxF
+         R1g4/jok4S/ql+rAr4zoPTwS78VApOLG6yi79KwOrbZKrQPIrJ5QK32zdx00numTrT7s
+         yDgJw2Fze56RxMUZRXf2gevC4EiVpn4vkgElmPYUE/E4/HvDawmOS66O0hoseKhEHt/G
+         l7pg+E0lFToVdlnSSJC3Gx68jcfUiYGP5ULFq/LGxUNZ3GtaTLvwf6iczUGU2WFuDd5D
+         hJaXax5kkn7pWSaqix6VzI1xzgJwQpV77NYngCjA2yFE9Z5JC1DC+FYcjviVA7PAVA1t
+         4/Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVu6tGrELnV97O6p5FE+7DPsG4rgx3+GrokokFjItpap+PvjNVgYI1BovLv6owaFdQHlRbvGzE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbpG21NPrVRq4C19xTRGKYZRrtkZCac/HULes6eWiI9Yw8ePOz
+	A2329mCo5zXx2tWXlIWNAOsVHRGrT+GmHfQvyyIV2GYWjy8haE1OuL3lNbERtTpPajA=
+X-Gm-Gg: ATEYQzw49io9FKKx0Sg+tEHPcxiAGHItx7R06A/paK6PrrMEOMnqoFtBsWcN662dn4P
+	2fVCjtiJf3hGjo4GfeFhQFyhN1vFduBvynGMkQN+Y4zCjFAlDp2+Lvz/Ny5rbcD4zKchMigNFHg
+	t5BZrxb5+hcGbfAH8CfDQixmjjXkmvLqJ2vYuQUJWr2HV2jeMXBJEtvp0kJnXkMyrxfx9Dameqo
+	3/3eXiUmNbpjTjlJpGvL6HIpnamO0c/xr6O4sT2dWn+9hKg2dkeM7Ce0PY2Qy0KTlPJBOcTkpNy
+	zLfw2pdQRl4ycHBx104svrYPiXx09qqmKayowru2eQZXGYdZNVK7LTjcqMEEt15k/Yr3n2eaDg1
+	NBoHP/VGcg5nuPBIl2B4piSbhDCh3DwpV0HjUsyiqO4SvJvHBUSPr8n8VmL+leTUU51MgvImA6M
+	IcZpty28F+7v6vrf/63cl0Bku2h9X3eiVlH7ykpT/agqjAUrmFZERqQn3S3BMcJ8xvX3UduJe7w
+	fIh
+X-Received: by 2002:a05:600c:c4ab:b0:485:39a1:bcb3 with SMTP id 5b1f17b1804b1-4855670f7demr25687385e9.6.1773399584954;
+        Fri, 13 Mar 2026 03:59:44 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4854b5f6c24sm182910485e9.5.2026.03.13.03.59.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Mar 2026 03:59:44 -0700 (PDT)
+Message-ID: <3d9d384f-d001-4293-b7d5-7a88596ffc1d@6wind.com>
+Date: Fri, 13 Mar 2026 11:59:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next v2] seg6: add per-route tunnel source address
+To: Justin Iurman <justin.iurman@6wind.com>
+Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ justin.iurman@gmail.com, stefano.salsano@uniroma2.it
+References: <20260311152845.278354-1-justin.iurman@6wind.com>
+ <20260313030220.af70f3b5f2c5d2cb7b4a840e@uniroma2.it>
+ <CAOY2Bqz8_8iT2Auw=sWob0-XUQg-sPmdAFvzRLg+KszrU6LMqA@mail.gmail.com>
+ <43e16e45-5fb1-4413-bbd1-4752bbcdec7d@6wind.com>
+ <CAOY2Bqx6jjBc5FCoRg+64v2L17bBsaAE8sy7P4JCwVXc+1n7_Q@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <CAOY2Bqx6jjBc5FCoRg+64v2L17bBsaAE8sy7P4JCwVXc+1n7_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ENXCAS1NODE2.st.com (10.75.128.138) To STKDAG1NODE2.st.com
- (10.75.128.133)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509EE:EE_|DB8PR10MB3781:EE_
-X-MS-Office365-Filtering-Correlation-Id: 31b64024-d894-4241-12de-08de80ef5889
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|36860700016|376014|82310400026|921020|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	TvyonEfMHvLD6QHaZdcJDbEoIXj25TbuHmyOkMP4yc8PKg1aBRIVT6/PaygbMTLnrFF0z3ZlaQgJdb4eSZ1UYlxWyUwD3qdeoTTVUYTxzx07fDwgR1003xQS4gTN0qVBUM3vD0lxXjf5ySo2Qwo+1rtag62ZmQyj/aTjJnwKVSQAHfb/Ly93qv/H3H/qbM9qV6T7V3zpuTayHKXiymqKNsPJAaNo1EG1RqOE/EVkA31asChRgHzHHi4froC/2iklP5EOjAVbGShwMMinDqWcCCbhh6JV1ubmm0IdKrkXyhnU90rUU3WjDBMPKjNqEGJvXoxgjbi/V8BIezRML0gEU0ITz1/0uuhOqWBKo62h4fhagYhAmIFdEdZeOrgr//NZBoD5ecEqnUzx9X82fRUEowMSzXcLHa75kRIwTMwjsy24XG9Kg8eZKGInkiuHiixmKR6p4SMjqg0VKC9MLi0KraNCHKYe0ztqaZAItOzm8XI74e+FX96befGEumC1CDd49nG3UtW/VS95tqZBJ0RtVKMo0b5zTkfI27St+Iu/RxGLnnwOHpQpp00cfhw8+SL1145puezQZWxz3BwpkY7l71llgltbsvZres+rxYzFNtI7d3uXORvOWcx7tKhepLinwhU2Vb1XT4vVubb4aojTjnnvWIm3+TBHmz4hKcspG7B7nH9uP6TzKphdsKvsYPDJsI/l9bnvO4MtEzesLqZrS0F3vc2P6dacTFVn52v0130mlld9HzcngDxQazqI3LvnBJ87zEHtpIC0phRpQU7q8OeoNxNRETcUPEAKvk1J4OlrsSgTWjS31wk3onH+EhxT
-X-Forefront-Antispam-Report:
-	CIP:164.130.1.60;CTRY:IT;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:smtpO365.st.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700016)(376014)(82310400026)(921020)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	ywi9gMnoGpzeyJ6dXTwf0oUMkK3KuuVPToynuZExYGJ5DHFR/MlWjuRRGLZNxGUhby6r3Es+7QDUcJda28GVwra2arXBNquQ4dxuz73yVn9fxIzfbB/JfZb9CMtjg1GU4igUljyi+jDhCm57/ld1ec8yQY23rbXdyUTad5p3cvTQkVzIfqzeH8eoQtIPNV5zcl8LllAdX5sI6LKJIQ0aQsMqhMK1HcT51+LK4+qT0KkrQZ1XxWKP/tFNZQ8RJwvGnQocABnqEUkXFCgWkadZt5PO1IADax76GqGwoZutNaCy2t0/w/Uk7HcD8+R2gY4PqA+mTrEKlNxDztEPA9d6eT5+i9H0D4+fS+fIthqbDxouoq5nwUgBuZwNEQ9zgrcyXHZLO6uGuSrZGJGSnVWTCl4Q6OBrrFOS6lpYdY8UTfiuOU1Mho36oGIVaZTY1Sms
-X-OriginatorOrg: foss.st.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 10:57:40.3029
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31b64024-d894-4241-12de-08de80ef5889
-X-MS-Exchange-CrossTenant-Id: 75e027c9-20d5-47d5-b82f-77d7cd041e8f
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=75e027c9-20d5-47d5-b82f-77d7cd041e8f;Ip=[164.130.1.60];Helo=[smtpO365.st.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509EE.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR10MB3781
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[foss.st.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[foss.st.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267410-lists,netdev=lfdr.de];
-	RSPAMD_URIBL_FAIL(0.00)[armlinux.org.uk:query timed out];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,nxp.com];
-	DKIM_TRACE(0.00)[foss.st.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christophe.roullier@foss.st.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[uniroma2.it,vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-267412-lists,netdev=lfdr.de];
+	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[foss.st.com:dkim,foss.st.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,st.com:email,armlinux.org.uk:email];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-1.000];
-	RSPAMD_EMAILBL_FAIL(0.00)[christophe.roullier.foss.st.com:query timed out,rmk.armlinux.org.uk:query timed out];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[6wind.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 4EC0A281DB8
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:dkim,6wind.com:email,6wind.com:replyto,6wind.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D62E281DE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In case of error during stmmac_mdio_register, pm_runtime is not
-cleaning before exit probe.
-
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 26ac1cdc561c2..c3eaeffcb6aee 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -8057,6 +8057,8 @@ static int __stmmac_dvr_probe(struct device *device,
- error_pcs_setup:
- 	stmmac_mdio_unregister(ndev);
- error_mdio_register:
-+	pm_runtime_put_sync(device);
-+	pm_runtime_disable(device);
- 	stmmac_napi_del(ndev);
- error_hw_init:
- 	destroy_workqueue(priv->wq);
--- 
-2.43.0
-
+Le 13/03/2026 à 11:20, Justin Iurman a écrit :
+> On Fri, Mar 13, 2026 at 9:47 AM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
+>>
+>> Le 13/03/2026 à 09:44, Justin Iurman a écrit :
+>>> On Fri, Mar 13, 2026 at 2:02 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+>>>>
+>>>> On Wed, 11 Mar 2026 16:28:45 +0100
+>>>> Justin Iurman <justin.iurman@6wind.com> wrote:
+>>
+> 
+> [snip]
+> 
+>>>> Whether to also reject link-local is debatable: ip6_forward() does
+>>>> drop it, but is there a legitimate use case where a link-local tunnel
+>>>> source would actually be needed?!
+>>>> I'd argue we should reject link-local addresses as well.
+>>>> For instance, using them as a tunnel source violates scope boundaries and
+>>>> breaks ICMPv6 error reporting.
+>>>
+>>> IMHO, I also think we could reasonably forbid LLs.
+>>
+>> Why rejecting LL? It's legal to use LL as a source address of a tunnel (and
+>> forwarding packets in this tunnel). Is this forbidden with srv6?
+> 
+> Well, this is indeed legal (at least nothing prevents it), but they're
+> not routable. So question is does it make sense at all? We're talking
+> about two nodes on the same layer-2 link as the only valid use-case
+> here. I'm not sure it makes sense, especially in the context of SRv6.
+Yes, you're probably right. I'm usually uncomfortable with a configuration being
+forbidden without any real problem/reason.
 
