@@ -1,126 +1,143 @@
-Return-Path: <netdev+bounces-267341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGYOFEjWs2mzbgAAu9opvQ
-	(envelope-from <netdev+bounces-267341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:18:00 +0100
+	id aKhCBxzXs2mzbgAAu9opvQ
+	(envelope-from <netdev+bounces-267342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:21:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E501280560
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:17:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A853B28061D
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 10:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA829300B2A8
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:15:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 98EC03017254
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B255C32D7F8;
-	Fri, 13 Mar 2026 09:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CBD33F5BC;
+	Fri, 13 Mar 2026 09:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="jQ+TrQH2"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="pfE7c0x7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D7840DFD5;
-	Fri, 13 Mar 2026 09:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561C7283CB1;
+	Fri, 13 Mar 2026 09:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773393335; cv=none; b=W4pWTOLr6xmtvyyGPc83wWmnjUyQcG8UtIrtHxKRiWES97Xudf91+jChmWJJkPds5UgKIdM5X22Mgbj2yU2L/lpZsosOpDecNWcigPRTRZmkY381kv84/aOg0//8OC7NKNkdNWJsCojDNYQUttYlWBROlDixyV1dfwOX4iyqGS8=
+	t=1773393689; cv=none; b=RDqFslDRyPPbSzqxigfODuvwgvZwlK6zIvCfJw8p0uYqX5gllsoMQWplctyMqqF6V0CKWe5rUFewy2qRHXpD4YI9fKVkSMrDZjVLftbcPp5KxG3EHBP/pwCDYORBFtks4DtzWzXo888sFeXLOQyQaUwgqQaMMg73j/S+/qu2750=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773393335; c=relaxed/simple;
-	bh=9MRt/Y7RcStLkBJ6M+pZazZqfMDOw1FtgoPEAfrEudI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hvrudl+rpbm2wXn4NTA8Zae8ncHCSZB1YFbRSP6GMpnMRy4hO1MsrlmPPsvWK80Um79VLnStYl/Pq1ePqnf7vTP1DmxObdGqA7ZgERylY+Q5/iLFKJsuioS4Sh8W8OjJG7I0Gr8i1Qjc+tZ2qZODm/FROZvC5kmKlrsxuOpAr10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=jQ+TrQH2; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 8C7066017D;
-	Fri, 13 Mar 2026 10:15:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1773393330;
-	bh=yQapFJqhKntzIPlVM1NNvpzDIt8QDz9Eji9CDIS6gMY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jQ+TrQH2MuFf2d+qdP0ef24sn+cL2bmu5KY6wu613GeBQdKSJ4M3M15A4TMsAis7b
-	 brpfaCfqvVbhp5Ka1Zb/f0SyMMNe3RtiDmP8bpegd3JIqjgwfTFSosrwRBJMGtJEEn
-	 a4rheANZNIATNC9Jz6w2OIdOLK4PNMlzHEC9mR9Ex2qItzczteiT2ymxB0HRwqlS0k
-	 uZ77KIdS4kDyK0PKNvwlYV3z+HyX7EV+Mr++HmHtpPnbBI5tUvR7L7kYUnxXpyBD8V
-	 KK96EJTBJKhAe4RIPyXxvDh1Iar0pIV/xRJ30HWaZ0qEprlTN+JntSRobVF5NPhDjI
-	 tydtOfRpO8QnA==
-Date: Fri, 13 Mar 2026 10:15:27 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Prasanna S Panchamukhi <panchamukhi@arista.com>,
-	netfilter-devel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1773393689; c=relaxed/simple;
+	bh=Wxb2u96KoePw869ffsam6tjeZ/4nyHjobdEGPPgNXFQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=exZpMA2LzQV3DfJfcyiUEb2ixVWapbLtTODn29Mw7iB6cbhQ87/adroICAygxPIkCZ5APCn0HdI+tSfwCgJL3kn0292HOQ1i2R2zHgDGMXdorijaSoagGZdN6avIuvyeylO16gg8vjoyovdEndDCV2RKz6XdstOnu7fc66it250=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=pfE7c0x7; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A6F2CA20FA;
+	Fri, 13 Mar 2026 10:21:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1773393678; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=vXxZA4KpuJLnz7J4K96OCL4loTIcUeOjHbr5+Mu7vUI=;
+	b=pfE7c0x7HO3gko7HTczZ6nfoac53imLjtIn7X51nix1q5itSGglrP0Rz6meDu9E/rIRljQ
+	ilhMRtB4X/5cA/c1RlLrBkXKAOdiPBGGswxnqerx7pEKUwFIyjR0YlvYvRqGG+gw5Lx2Gv
+	kpNG587mLNFI2nDPTQ0j6wY9P2CsC3Q6SFNADkgSi2cg+v0+d8HKnZ0jiL7KOpGhsVH405
+	qJcFhUion5siNHR3X2n9K/8bsGHJqo0lc6c1A1zuQWn5rkFIVunbcU5eIwMgHlVH2QU5CZ
+	qgZYcpj6VMx5FsB9WMcV8HcbGWylXzU/h5+5r6t8BRrt8pxXuf9rqnWsb3w9bA==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, Phil Sutter <phil@nwl.cc>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net-next v2] netfilter: conntrack: expose
- gc_scan_interval_max via sysctl
-Message-ID: <abPVr5RtRmZeyszb@chamomile>
-References: <20260312223157.25083-1-panchamukhi@arista.com>
- <abNxz9T_XB-JtBCj@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	=?UTF-8?q?Markus=20Bl=C3=B6chl?= <mbloch@rooftopnetworks.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Nicolai Buchwitz <nb@tipi-net.de>
+Subject: [PATCH net-next 0/6] net: bcmgenet: add XDP support
+Date: Fri, 13 Mar 2026 10:20:55 +0100
+Message-ID: <20260313092101.1344954-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <abNxz9T_XB-JtBCj@strlen.de>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-267342-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267341-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,rooftopnetworks.de,arndb.de,vger.kernel.org,tipi-net.de];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,arista.com:email]
-X-Rspamd-Queue-Id: 5E501280560
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A853B28061D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 13, 2026 at 03:09:19AM +0100, Florian Westphal wrote:
-> Prasanna S Panchamukhi <panchamukhi@arista.com> wrote:
-> > The conntrack garbage collection worker uses an adaptive algorithm that
-> > adjusts the scan interval based on the average timeout of tracked
-> > entries.  The upper bound of this interval is hardcoded as
-> > GC_SCAN_INTERVAL_MAX (60 seconds).
-> 
-> I already said that I'm not keen on this approach.
-> Its a 'we can't do any better' type "solution".
->
-> If anything I'd be more inclined to make a change that allows to
-> more easily override the next_run computation via bpf.
+Add XDP support to the bcmgenet driver, covering XDP_PASS, XDP_DROP,
+XDP_TX, XDP_REDIRECT, and ndo_xdp_xmit.
 
-It is regrettable that the request for this knob appears to be
-intended to enable a potentially proprietary hardware offload
-extension, implemented through a userspace daemon and a proprietary
-SDK.
+The first patch converts the RX path from the existing kmalloc-based
+allocation to page_pool, which is a prerequisite for XDP. The remaining
+patches incrementally add XDP functionality and per-action statistics.
 
-It's 2026, there is plenty of infrastructure to offload the connection
-tracking upstream, such as act_ct.c and the flowtable.
+Tested on Raspberry Pi CM4 (BCM2711, bcmgenet, 1Gbps link):
+- XDP_PASS: 943 Mbit/s TX, 935 Mbit/s RX (no regression vs baseline)
+- XDP_PASS latency: 0.164ms avg, 0% packet loss
+- XDP_DROP: all inbound traffic blocked as expected
+- XDP_TX: TX counter increments (packet reflection working)
+- Link flap with XDP attached: no errors
+- Program swap under iperf3 load: no errors
+
+Nicolai Buchwitz (6):
+  net: bcmgenet: convert RX path to page_pool
+  net: bcmgenet: register xdp_rxq_info for each RX ring
+  net: bcmgenet: add basic XDP support (PASS/DROP)
+  net: bcmgenet: add XDP_TX support
+  net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
+  net: bcmgenet: add XDP statistics counters
+
+ drivers/net/ethernet/broadcom/Kconfig         |   1 +
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 484 +++++++++++++++---
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |  17 +
+ 3 files changed, 425 insertions(+), 77 deletions(-)
+
+-- 
+2.51.0
+
 
