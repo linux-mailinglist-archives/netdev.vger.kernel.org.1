@@ -1,422 +1,293 @@
-Return-Path: <netdev+bounces-267835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267529-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFbaKke3tWkj4AAAu9opvQ
-	(envelope-from <netdev+bounces-267835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:30:15 +0100
+	id eLyyIgE7tGk4jQAAu9opvQ
+	(envelope-from <netdev+bounces-267529-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:27:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF6A28E98B
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 20:30:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3590A286FF2
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 17:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C6516300B8F0
-	for <lists+netdev@lfdr.de>; Sat, 14 Mar 2026 19:30:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D445D30C76CD
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43FF349B0C;
-	Sat, 14 Mar 2026 19:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957BF3B7B6E;
+	Fri, 13 Mar 2026 16:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="9Sm5/vxO"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jy3sPAiC";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="btevF08+"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022112.outbound.protection.outlook.com [40.93.195.112])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA424267B07;
-	Sat, 14 Mar 2026 19:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773516609; cv=fail; b=mAYLT2iYO/NzrH705QMBQ4UEsgWBUKz8+irxgsEoBJwVclfNmcOfWxFlC75H7qON6JHNQjoinSvAmTv9R0w4Fm29xcA/+j+ROw3inYqi7jrnUqXM0RIRbuB3WCa8EMKZM91ijgNFktcS/QQ+gsKKZvsuCsoqYbc9EAnABV74HOM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773516609; c=relaxed/simple;
-	bh=fH7Z1YzQ0irm4/0Mr5JZ0u8/tgDCOwFhWEUuNrpYkA4=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=n1/Iz2a7xYWCr+yv64f7fM+UT0JqwU4C2w/fozufbAZ30AuEgfuG1pitV394ysetRxdH/4wJDuqBpTQDe5O32gSNVcZwzLC0wmY0Zwe7lcxfWvRvDdkjVyUjRrddEvGX14HyZjSPtsuiyk7BgJxCOeqAWaJprVST8piqqiQKgno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=9Sm5/vxO reason="key not found in DNS"; arc=fail smtp.client-ip=40.93.195.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D5HF5Nn/l3yIdk8wWSEQG408zUH2sX8nwaAzHeM7I3Ieenj8NuLJXPzui7z2V4mc7cYFpG1tDVO2LTA24GlRqbmFdP703ORMgvnsO9pP1AXhENxJAGqlEvKfxjTPDf0UlV1vp8ccKo6IbXTD9d2TRj1WfIhztTdBnQ6Bq7D9XsH9UqrSE04cR6DhIojnUmXTlxyohXxxnOb+gCFERdUUg6S+OZQvN76qfCEv2wkLiE7jeEFBrvUUna7CFKDUBHr7Hu6rgSc1ijj89HWX4jRjYmn+CSTIhAOarQ9UZVP2Qd/XNh4qsia6NDFmKth02SpYL1lFfaYcmyPUMabWz/5+TQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IWiXH80cuvF8lWVJNWV9nrbWIqW8LjzR4IoUHHQFJJY=;
- b=h3cbeTIoWsRrmUQrUPtk+T+4voWNYSGzVEjcDnY3jRsISjS/6qc/UV+F9p9z4g2xFeiIPvAx753UBvotXNJgh3bGVtADyYi3oqfW2xGPmwQdhoZiJ++6KgL9pL8vMCST/VUNWUrSVY/dTNzwDAlUaqa2e676ZMu88HfQ92FnGLD5dLTRCe8qfVtYcEguK/M3wpcn/svcz8UZUOtDPVRdbVNA26fh54LQwaJp0JabMeiUPcjou4qLhe7qEfJkGc24ckqX2Ba/v1O/jSkQHfLAJw79iPxSlP29fPpijHUzANHbIDcxV3Wx5VxWbyJIvXk24oRbFLqWCC1jKLDv9sZGtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2787A35E941
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 16:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773419015; cv=none; b=lUCAeWctFjTysh2pgZSHEhiHDOwrXmjTs9D5xpeZWJS7MGemU4i2Q28YvwnTcBZhqXBzmy+3lXZhS1vNrn1njHvTL55ROLsknv0McOXhtMU+beCc3USBuQtwZBbQFwLkYK+MyGDD46muHzPQgRb0GFcZI6bUtkbWuRcQdbjlP14=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773419015; c=relaxed/simple;
+	bh=tHbcA0byu4Y8ZDGc88V2vxlZ2JIf5T/Ft1pA6qUaujo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q46ijArzrQ2Z7SUJRl960h/Pk3VdMG2jswsxqwdV5y8cxrks3uAEXBh9fV1qVOTiBqjO/vNXs5CFo7bRPzLcStA9//iJ6xSdQFS8+pe0/DnIaH1PJFzHnpRewNCDFM6dsXPvwPlLwgLOWte5XyagmtMg/pBSOvJT0xCLpAf0m8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jy3sPAiC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=btevF08+; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62DEbddE2262702
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 16:23:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	RiOQjyp/BmFXVNg4p7wTJxHnEmuU0vEYGOEkg9dtv3Q=; b=jy3sPAiCmNubecU9
+	N0Wn9/88GrssM/d6B9HmWrxnjI+leHxHMUBdBlhrCkHw01ZYon5u1NWkewLd07sP
+	4cWTFCVajprXmwRTbzl43Bc+kcKME7XcehmbTTJvznfnBppSWYkSgwfBnbImk2E9
+	IW78wId2OPUOUBE0c62i+2aoIlVWvBKwajP3TpF/Ol3YOUexAmhpJgXWr0tTlang
+	FGlv6wlypM66WHxUBSYzwkCzTDC2gIt50B9YqCW3aDMAfpC7bjk/Ac2HOx9f+3bu
+	hMzQ7KInu7NhSOtrx+mmkobU+XpkPTXXYrUaqanHcrNA6sAy2wdYJhST0DnLnFqz
+	rRfQcw==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cvef4st2u-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 16:23:33 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8cd7774be64so1318597885a.0
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 09:23:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IWiXH80cuvF8lWVJNWV9nrbWIqW8LjzR4IoUHHQFJJY=;
- b=9Sm5/vxOn4nu1Fr3q5dKck/Libs6m8EFZR0m63K5ndZRqoZvRqsf7swlOBgfQG5Nqn+GoaTj5TsopLdd+51ra4qFlqr/AWAS03TxqFk/GS/LazIui1FZvPfI485QU/GczbDfteNMH5Sq9GvaJ6071yKq9waQHTGW9VpSBpJgfKA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
- SJ2PR01MB8483.prod.exchangelabs.com (2603:10b6:a03:55f::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.21; Sat, 14 Mar 2026 19:29:52 +0000
-Received: from BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::44f3:1050:dce8:1ea9]) by BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::44f3:1050:dce8:1ea9%6]) with mapi id 15.20.9700.017; Sat, 14 Mar 2026
- 19:29:41 +0000
-Message-ID: <b2811dac-5bb0-4d9f-882d-a8b40e49a37d@amperemail.onmicrosoft.com>
-Date: Fri, 13 Mar 2026 12:22:23 -0400
-User-Agent: Mozilla Thunderbird
-From: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Subject: Re: [net-next v32 2/2] mctp pcc: Implement MCTP over PCC Transport
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
- Adam Young <admiyo@os.amperecomputing.com>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Huisong Li <lihuisong@huawei.com>
-References: <20260303213649.237851-1-admiyo@os.amperecomputing.com>
- <20260303213649.237851-3-admiyo@os.amperecomputing.com>
- <d0c4ad6f1a5b7ed4326e3b4a64dfe1f21042da3e.camel@codeconstruct.com.au>
-Content-Language: en-US
-In-Reply-To: <d0c4ad6f1a5b7ed4326e3b4a64dfe1f21042da3e.camel@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0365.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::10) To BN3PR01MB9212.prod.exchangelabs.com
- (2603:10b6:408:2cb::8)
+        d=oss.qualcomm.com; s=google; t=1773419012; x=1774023812; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RiOQjyp/BmFXVNg4p7wTJxHnEmuU0vEYGOEkg9dtv3Q=;
+        b=btevF08+xcNG3I/gqZzM1J97NLLgTiw9T8C7kVD4Nk3aC5XvLF7nz7HHUkR+in3eOX
+         UpPw+y9PdoyZGvmS8cmgPRa2RiD6nDuF1nF/K3Qo7aPbk2zuR2m5ue8q40QH/WPbbeoC
+         4GdG4/U0aYbbFPyq8MIuw+oDuhwc6l4mwOnqsd1noTTfvitHh2y/ejczS/nMftccJIZY
+         VW3owJiGpB429O225s5X+0+G4xXId+twg0BPvEv/dAXQIesC1YF4pbbDIaFlYu/Qmuns
+         bevRBbvKAlzpmlNauNPKyg6xfVd7NvosXzGbOpL8lBeCgV0ewjIWTBYNDqzOnl3vOpND
+         S6KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773419012; x=1774023812;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RiOQjyp/BmFXVNg4p7wTJxHnEmuU0vEYGOEkg9dtv3Q=;
+        b=NkUMinvk8TYY/HlPjWHiI4S5HHuqyXuBYl1HdjS/SFAHM0tI6cXKFv5qvDj/xDDpKX
+         MAyD/6yCBZIjpDGcNzkhxfWSGJ5WEEVAxya6wFuCoTkfPZHzlK8ozmyXdQwr++uHMNCp
+         b+rULME1O6zWxJ8y94amAPuy6j7n/oh/l99FymBJvHh2l1z7edc5dqzUiITFIxvC0d3U
+         YI0CvH1KHR6RvCaaiiH7Gqd9KbcEHWYT62sZgS9ZSYTbnvNKYvHsjIGdIQABHQ84t4IB
+         QGMb3+fkNRESba44uEaqz0QqvVvn/EJNxZWCkz+UJNc1/U+wnE2qkP6Q9RE3aDFPr2yy
+         gPfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDjvraXQ+zQ3kzzripAoEc5JSHlUHh/sHpqRkpTyeYeDwypoIaBTbR8NxScopDcajmuyHJ7l0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLYGGxSZDQH67p6VCLDastvclLRdLC1eZotYB+YEgEGWC94hKy
+	dZAmev47W6W1qwBAnNa/p2YwHJ4p+uYr8GFwtrWPMp6ZFq9YswWlHADgykMdcLZWX6l1xraVmpx
+	9KCXr2c5PXhORB717c8ccSJWji4wd9mF3S4keLeD3wylZyZ5TV4/uoJ5/Xgw=
+X-Gm-Gg: ATEYQzwvK6aIErv2MN0ZWjYH0Yih8VPUjOwmMbeVL/BrA/exZhV18QX1se8iU6bTNL5
+	/32szPFKBEBU91WC6ddagv+a2jTmybudySkp0+D7XC5dxf9d1WRGw0nakvaOnmuguJI40xhCBza
+	Bsmxgl7Jo+llsHg/dTuVNtM5YYgmEpCpMWsmiV1INwzX1kAoYi7YfA2tPnVbNMmgFz1uYoRumpY
+	WBOvUpiSPfyEle+ZVSGkdpl+ga4TiEvOmfqofh6dCPC4IwWf99j6JF2cjuz3MaOomvWC8l4VNk8
+	p1DXKn/UKb/sOUuSL5XwlctHOoPI+BouiOYcXy5O/dMVUnBAq6RE0OaR+K/k0XpnBCBW+Au/Jbm
+	K5zLCEZfnM2rVgy81xE9wXFzVpKg2ltaKqS/xel8tZq3iKittDEIcxOWEXjIkKYUgm8fGEwTFkG
+	kD2mCMUkKlBD0cgQvafk+rd3u4fVCLutSdvok=
+X-Received: by 2002:a05:620a:4482:b0:8cd:97a7:a334 with SMTP id af79cd13be357-8cdb5a17627mr538296285a.4.1773419012276;
+        Fri, 13 Mar 2026 09:23:32 -0700 (PDT)
+X-Received: by 2002:a05:620a:4482:b0:8cd:97a7:a334 with SMTP id af79cd13be357-8cdb5a17627mr538290485a.4.1773419011740;
+        Fri, 13 Mar 2026 09:23:31 -0700 (PDT)
+Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a156366a74sm1632878e87.75.2026.03.13.09.23.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 09:23:30 -0700 (PDT)
+Date: Fri, 13 Mar 2026 18:23:28 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+        krzk+dt@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
+        r.mereu@arduino.cc, m.facchin@arduino.cc, geert+renesas@glider.be,
+        arnd@arndb.de, ebiggers@kernel.org, michal.simek@amd.com,
+        luca.weiss@fairphone.com, sven@kernel.org,
+        prabhakar.mahadev-lad.rj@bp.renesas.com,
+        kuninori.morimoto.gx@renesas.com, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, Loic Poulain <loic.poulain@oss.qualcomm.com>
+Subject: Re: [PATCH v2 6/7] arm64: dts: qcom: Add Arduino Monza (VENTUNO Q)
+ board support
+Message-ID: <exq6gd3hxf32frza57636a32asftp22ufledjo7qq5wow3lvym@2kyhucp5mqxq>
+References: <20260313103824.2634519-1-srinivas.kandagatla@oss.qualcomm.com>
+ <20260313103824.2634519-7-srinivas.kandagatla@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|SJ2PR01MB8483:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96f5863f-d927-4045-1356-08de82000a2d
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|366016|1800799024|7416014|376014|56012099003|18002099003|22082099003|55112099003;
-X-Microsoft-Antispam-Message-Info:
-	TrQ4tR7qw6vLZt/3FShU7N/xM54ucGy/1/fWSZBAFFDS3SvpuGAexuPnFHFtOlw5cyYKFA5G71jmvZmv/mRHKbCBeduHWDlr5x4k5+KlanojNQlorfmlijtHJ7fMAPozwGPNB+TqcuLxx9X57jLALDb+vhMoM7JQRWAg0+wHk8YhGfCsDsyPtHaaqG4+Z/j4dCo4LwV7VSOoOsCKImjEsVqGqZK+0rP73HpwUBrGS+gf0CrU824l/GpgFdvB19GOLTlQo0wJ7vFsdQggzeaexSoPZHbruzk9RAq7qt1ShLyuKJbGOjTFvVYGSUkVbEkh8L362SA05yApaDJHJaXVOE12SK9JMBpnQOH0Gy8xu08eK+9e107ScmeQ9Ioth8mTqX4q5UI2SUU5XWVEWog/d0wuz2KeerEgf5JAO80k1sFbD7Wnicc8TlA5NSfdoOxUqyO2w7SqlxpKGZ/QyBz+lQIFFBo2j+GGxJX+f9+z2v2IqZ1CLjq84BrIrw7pKPH0sFtE2FQPJ8ybM6iYWcml8nvFS0XTqS2I5iLAjG8f8dRGZGHJ10XADhBYv97bdRJtHnMBvzbU9D+VpQJrWFj7vqlYZXyq/7+aWSgBv2E9YwKzgM3Gd6pbWTdn6b+jbXcPDp87SYusjCxBo4CVLUWBtgXctGYoOyYzaieaU382WiDy2IHDIoek+0FuvYc4uEiAiyPnM9OF+r248PGhDt0NgFr3H/0+Exznc1K4K2wPKdo=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(1800799024)(7416014)(376014)(56012099003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cUVwdDdhZGVKYzQxTU5sTDFBc1MzaGxVckZoajBETlBCOHJUcC9lam1OQ0pj?=
- =?utf-8?B?UDlMRnVjTEp2eFZJbHdNdE51cE40U0ZZVHY3WVhiVEUxWWpCWlJkb1FKUHRD?=
- =?utf-8?B?MFRZR1o0VUp1UTdscURFa2xmMTYxdTFpcmpiakdBa09na0NEaUFsWFBybjVa?=
- =?utf-8?B?d1NlYW5ZV3g2R0JVZTN1RDlpVVdXb2pVa0lHc1Q3SURvdVppL0xweEFVaVlU?=
- =?utf-8?B?UkVsT3FuWU04RUN1M2RMbis5SnNEQlJxRFQyL2xnbnM0R1hLNFRNZDhNY1hp?=
- =?utf-8?B?MUt5L3ZZNFpPQzlwSVYwelRodEZBUEhzWEJxRE1VQzEzb1YwWU9VWis5bDJi?=
- =?utf-8?B?N25PdlBUY1FibEVOUzVrd0dKQkJUNXUvdGRiOUNjOXJXODBtR0FzVVdqdjk0?=
- =?utf-8?B?VTRoSWhWUmVjeWM5RkdsbUZVdmh6a0dvQUpWSGRLcFBLaTRodVlYUWxVcnRC?=
- =?utf-8?B?UlBRMTZLeFl4Vk0vdGg0enpTNmQ1MlFxeU54YWJ1YzBOS1A3UnlqV3RHY3JW?=
- =?utf-8?B?OFJiUmVYVitNUDM1VDlnbnlxMXV2TkNaZmZvNElZS1FabTNmNERMdlNKSVR0?=
- =?utf-8?B?akpidE5sS1JnajluL0hoTGxKQWlScitiR2pRMWVvUXlGU3hQRGxxMlBmS1pi?=
- =?utf-8?B?cFNQc1RYTXRvei94RFhkSXRydFNIcDZiRkwxQ0I2cWFNVDF6a0tkNWl6cGJp?=
- =?utf-8?B?SGpKV2lJOU9xTkl0Z2hmS2lWUnA2aHZydUZhSGpCTEt5NEsraWM3NkVicCtS?=
- =?utf-8?B?VWs4YnZvSmwzSTRlZll5YzEvNjVjcFp3b0RDODhnZVhyS0V5cmozL2hLMWZC?=
- =?utf-8?B?eVJlMVBWT1FFbVFNZjh3T3ZkVWNhc2I2Q1lNbnVKQ3JyQ0JOaDM1QndIK045?=
- =?utf-8?B?QVQ1bHNDSmQzYjNPb3hrdnp0SGFubEFCUnFaMVJwOE5XcEJRS2JpaHhHSzcx?=
- =?utf-8?B?MHZYMGVCTW1GUzNTaGJ0ZzIrSkFmb0tDMGZpcklOT0I3Z01NQVVOa1FuN2xV?=
- =?utf-8?B?RS9rVjRyWEF2MVB1WTR4N0pJVU5UWWZwOHFneGhUc2NSSGFhZFN0YWp0akNa?=
- =?utf-8?B?MGdUOGxkVC81VFVzK29lZ0xpQVIyQkE4eWw3SHBOYnNvWDdIaEVRNm82dkVk?=
- =?utf-8?B?TFRSbTRzZFBLRHM1QlRBR0Q1SjZlTnJjdWxSOVcycGQzcklpT29Od3JTc2tM?=
- =?utf-8?B?TGFYN0xhRng1WVBLNTVzT2ZRMGgrOWwvVGxkNUpGMTdNMjB1SHh2QkFVR0x4?=
- =?utf-8?B?c29VYU1LNnpseS9hazdZSVMrUVFJampwWWgzelptSFI0Yk16R05DVXdWdHUv?=
- =?utf-8?B?ditSRktoK2FiUXI2NHpFL0JvdHFNM1dlZitFRnpaMk5MZExTaUVvejM2NUxU?=
- =?utf-8?B?d0hTWmFsUVBFcG02OTFDT3VCRWhDcW44QzNFYmwvUlIwNktOYlNjVCtuQkQw?=
- =?utf-8?B?TzZWQ0xOVGNBWDZwUlI0VzZpejMwelgxTmZWS1l1MnhYRCs5NEttSHNzT3Np?=
- =?utf-8?B?MWZ1ZXBKbUhqbjcrUnBUcEFIRHMxc1ZGOENBSGd4cG90NVhCV3ptNjZDV3NT?=
- =?utf-8?B?V3RQVFdIZU9OWEMxajRNMlpEYk83QXlKeFlBZFlVeHQwdE5wMDNSTjhTR0hM?=
- =?utf-8?B?R05yc0RQZW5vMVZZY05MWkxJQkhMUHpyN3Q4KzBCbkl1ZDNOSU9BamJYb1JK?=
- =?utf-8?B?cGd6WEFHMUNzNXF2eEJmSUp4V1ZTWlNTaUpBOVZPMjJIKzZ2d0Q5MVN5QTVh?=
- =?utf-8?B?Q29INVdjOUJUci9seFhsYm5KL2dCaXpjdlBld2NYcXlHME91Y1dYOFFUVktw?=
- =?utf-8?B?d2ZVOW5VMjFKNzB0bHFrWGIvRC9OWmpCTkJJb1pnK3hmQTFFK1VxUGE3R1Y0?=
- =?utf-8?B?L1MvTG5iU0dSVzRPTERQZ3NtdkNXeUxnRGRybThySnppWWpndWZacjhNcktE?=
- =?utf-8?B?WGpzTzdGMEZRL1NmWFJYQitwSlhiOFNVYWNiNXUwdUY5S0JMV2RVVGQxazRh?=
- =?utf-8?B?aDJTcm9EdFQzcUl3R01sejRvNGw0M2JLSm5uM3EyNnJ3TEZZUmJ0QjVoN1pW?=
- =?utf-8?B?RTZtTkh6bEhnL2xNdE1EK3lVL24wVmVYMlo2ZTZEVFdyQUtlTm42WWhrbFpS?=
- =?utf-8?B?ZVBLV1YxSTFZS0pkOVNXN3E2RHJub0VQdG9OYVpjWDN1WnFQS1ltUnVKRStz?=
- =?utf-8?B?ejlLdmxwZUlyZlFzZldESG5KaFhpZHNPOG1OVUNkUnJBNUs3WGZHK0oybmxp?=
- =?utf-8?B?c1BMVVhwSlJZc0RJelNEbVlPVEZuaU5va2xUdlF4WUxpbFJHVURQajFJdlpm?=
- =?utf-8?B?U2pRVTdRRVNTcHQ3aXdIbDd4UExOcWM3K0gxZVBreFFlOFgzRDlWVndBcEI3?=
- =?utf-8?Q?lc64NlRdzNzHyMi/61OKs3eLifRqQdUyLf6yuX2ZMdA1l?=
-X-MS-Exchange-AntiSpam-MessageData-1:
-	RMbJUHOictxe2vDJTLjKdgVfkKk6cUyaD5dXqZ8c6+4pFRlZindqKvxA
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96f5863f-d927-4045-1356-08de82000a2d
-X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2026 19:29:41.7500
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nNWsMeebSy8i/gl9S9uee4RMhaFSDoOXupyP6zhZP601ZU5yK/CZFZFcsf28dl0+ZQfeqHfzgaWNMG59u1pjSfkEZQqvA2oYi2vLcEZHegAqy7xwgFeYoIOVTI1AtQfX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR01MB8483
-X-Spamd-Result: default: False [3.04 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260313103824.2634519-7-srinivas.kandagatla@oss.qualcomm.com>
+X-Proofpoint-ORIG-GUID: 9v0ShWCWCFF_ZyjbnIZFzabOwr9TAl-p
+X-Proofpoint-GUID: 9v0ShWCWCFF_ZyjbnIZFzabOwr9TAl-p
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDEzMSBTYWx0ZWRfX1RGFx2nlyKgm
+ LYbPRbQggnVhE0J/aQQwfvI+7PE3vSh+wKCC8jiCqh7bhU6ufClVQmpOCdPdkKtgTvyngxN46KQ
+ KKViGHca/NO1c0DNvqgLxUK8nvmYQWYOFkncRMHkhlBLc0DYdVSBSbqPJddswfoDpY5fewNsGzE
+ syP+Ujt9SLMi6oTTRGy1Kp6lCRFI/P0/BHi1EmlPBFbqXMV80XraYMX7UUqvmInS9SX5L9a5YfD
+ mZUic4ochDLXMXZZRgNXqlowLoafawzrsxm8sN8iVIp5O1FGynXaJIOxsK2sMo7UULiyz4/rJ7d
+ VPTLQIMWG15GYoS0d+T5sNGpauwQMuQ5iikTYDLXeHnmkblHAlVPUUzga1K/RvGUV3HX+BjlnkC
+ OYCKdf6MXgwLcr2RfsIbRzl0EJUBoQ34PGmJjyrUYerOe5ww6KRNlXbGehQkOnRtchKS8yXjFA/
+ 20yq7Zi1cbLW4XSxEsA==
+X-Authority-Analysis: v=2.4 cv=S9nUAYsP c=1 sm=1 tr=0 ts=69b43a05 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8
+ a=rta_p3Q9v_S9YyuTENUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ clxscore=1015 lowpriorityscore=0 phishscore=0 bulkscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603130131
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DATE_IN_PAST(1.00)[27];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267835-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	R_DKIM_PERMFAIL(0.00)[amperemail.onmicrosoft.com:s=selector1-amperemail-onmicrosoft-com];
-	DMARC_NA(0.00)[onmicrosoft.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-267529-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amperemail.onmicrosoft.com:~];
-	NEURAL_SPAM(0.00)[0.901];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[admiyo@amperemail.onmicrosoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arduino.cc,glider.be,arndb.de,amd.com,fairphone.com,bp.renesas.com,renesas.com,vger.kernel.org,oss.qualcomm.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,0.52.125.128:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,3c40000:email];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,dmtf.org:url,amperemail.onmicrosoft.com:mid]
-X-Rspamd-Queue-Id: AAF6A28E98B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 3590A286FF2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Fri, Mar 13, 2026 at 10:38:21AM +0000, Srinivas Kandagatla wrote:
+> From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> 
+> Add device tree support for the Arduino VENTUNO Q board,
+> based on the Qualcomm QCS8300 (Monaco) SoC.
+> 
+> The board features a Qualcomm Monza SoM and integrates various
+> peripherals, including:
+> - USB Type‑C connector with dual‑role support
+> - ADV7535 DSI‑to‑HDMI bridge
+> - MAX98091 audio codec
+> - 2.5G Ethernet PHY (HSGMII)
+> - PCIe0 (to onboard WiFi chipset and USB bridge)
+> - PCIe1 (to M2/nvme)
+> - Button (via GPIO‑keys)
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> Co-developed-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/Makefile             |   1 +
+>  .../boot/dts/qcom/monaco-arduino-monza.dts    | 466 ++++++++++++++++++
+>  arch/arm64/boot/dts/qcom/monaco.dtsi          |  55 +++
+>  3 files changed, 522 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/monaco.dtsi b/arch/arm64/boot/dts/qcom/monaco.dtsi
+> index 53cbc08d4df4..837adf569485 100644
+> --- a/arch/arm64/boot/dts/qcom/monaco.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/monaco.dtsi
+> @@ -2885,6 +2885,61 @@ lpass_tlmm: pinctrl@3440000 {
 
-On 3/3/26 20:12, Jeremy Kerr wrote:
-> Hi Adam,
->
-> This is looking pretty concise now, nice work. A few things inline:
->
->> diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
->> index c36006849a1e..0a591299ffa9 100644
->> --- a/drivers/net/mctp/Makefile
->> +++ b/drivers/net/mctp/Makefile
->> @@ -1,4 +1,5 @@
->>  obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
->>  obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
->>  obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
->> +obj-$(CONFIG_MCTP_TRANSPORT_PCC) += mctp-pcc.o
->>  obj-$(CONFIG_MCTP_TRANSPORT_USB) += mctp-usb.o
->> diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
->> new file mode 100644
->> index 000000000000..d0e7699ebe82
->> --- /dev/null
->> +++ b/drivers/net/mctp/mctp-pcc.c
->> @@ -0,0 +1,322 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * mctp-pcc.c - Driver for MCTP over PCC.
->> + * Copyright (c) 2024-2025, Ampere Computing LLC
-> Minor, but if you end up re-rolling: -2026.
-Lets hope that it goes not further with this first commit.
->
->> + *
->> + */
->> +
->> +/* Implementation of MCTP over PCC DMTF Specification DSP0256
->> + * 
->> https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
->> + */
->> +
->> +#include <linux/acpi.h>
->> +#include <linux/hrtimer.h>
->> +#include <linux/if_arp.h>
->> +#include <linux/init.h>
->> +#include <linux/kernel.h>
->> +#include <linux/mailbox_client.h>
->> +#include <linux/module.h>
->> +#include <linux/netdevice.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/skbuff.h>
->> +#include <linux/string.h>
->> +
->> +#include <acpi/acpi_bus.h>
->> +#include <acpi/acpi_drivers.h>
->> +#include <acpi/acrestyp.h>
->> +#include <acpi/actbl.h>
->> +#include <acpi/pcc.h>
->> +#include <net/mctp.h>
->> +#include <net/mctpdevice.h>
->> +
->> +#define MCTP_SIGNATURE          "MCTP"
->> +#define MCTP_SIGNATURE_LENGTH   (sizeof(MCTP_SIGNATURE) - 1)
->> +#define MCTP_MIN_MTU            68
->> +#define PCC_DWORD_TYPE          0x0c
->> +
->> +struct mctp_pcc_mailbox {
->> +       u32 index;
->> +       struct pcc_mbox_chan *chan;
->> +       struct mbox_client client;
->> +};
->> +
->> +/* The netdev structure. One of these per PCC adapter. */
->> +struct mctp_pcc_ndev {
->> +       struct net_device *ndev;
->> +       struct acpi_device *acpi_device;
->> +       struct mctp_pcc_mailbox inbox;
->> +       struct mctp_pcc_mailbox outbox;
->> +};
->> +
->> +static void mctp_pcc_client_rx_callback(struct mbox_client *cl, void 
->> *mssg)
->> +{
->> +       struct acpi_pcct_ext_pcc_shared_memory pcc_header;
->> +       struct mctp_pcc_ndev *mctp_pcc_ndev;
->> +       struct mctp_pcc_mailbox *inbox;
->> +       struct mctp_skb_cb *cb;
->> +       struct sk_buff *skb;
->> +       int size;
->> +
->> +       mctp_pcc_ndev = container_of(cl, struct mctp_pcc_ndev, 
->> inbox.client);
->> +       inbox = &mctp_pcc_ndev->inbox;
->> +       size = pcc_mbox_query_bytes_available(inbox->chan);
->> +       if (size == 0)
->> +               return;
-> Your new pcc_mbox_query_bytes_available() returns -1 on error, but you
-> don't handle that here.
+NIt: this might have better be squashed into the patch adding LPI TLMM.
 
-I've dropped QUery bytes, as well as the the other help functions from 
-mailbox/pcc.  This error case didn't really make sense on its own.
+Nevertheless,
 
 
->
->
->> +       skb = netdev_alloc_skb(mctp_pcc_ndev->ndev, size);
->> +       if (!skb) {
->> +               dev_dstats_rx_dropped(mctp_pcc_ndev->ndev);
->> +               return;
->> +       }
->> +       skb_put(skb, size);
->> +       skb->protocol = htons(ETH_P_MCTP);
->> +       pcc_mbox_read_from_buffer(inbox->chan, size, skb->data);
->> +       dev_dstats_rx_add(mctp_pcc_ndev->ndev, skb->len);
->> +       skb_reset_mac_header(skb);
->> +       skb_pull(skb, sizeof(pcc_header));
-> Do you want to check that the header describes a valid MCTP-over-PCC
-> packet?
-
-Yes I do.  Specifically, I can now check that the packet is both a PCC 
-and and MCTP packet by looking at the signature.
-
-Of course, that data is written into a shared buffer, and I don't think 
-there is an safe way to check that the data has actually updated (no 
-sequence numbers).  But this is an improvement, and will catch some data 
-corruption issues.
-
->
->> +       skb_reset_network_header(skb);
->> +       cb = __mctp_cb(skb);
->> +       cb->halen = 0;
->> +       netif_rx(skb);
->> +}
->> +
->> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct 
->> net_device *ndev)
->> +{
->> +       struct acpi_pcct_ext_pcc_shared_memory *pcc_header;
->> +       struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
->> +       int len = skb->len;
->> +       int rc;
->> +
->> +       rc = skb_cow_head(skb, sizeof(*pcc_header));
->> +       if (rc) {
->> +               dev_dstats_tx_dropped(ndev);
->> +               kfree_skb(skb);
->> +               return NETDEV_TX_OK;
->> +       }
->> +
->> +       pcc_header = skb_push(skb, sizeof(*pcc_header));
->> +       pcc_header->signature = PCC_SIGNATURE | mpnd->outbox.index;
->> +       pcc_header->flags = PCC_CMD_COMPLETION_NOTIFY;
->> +       memcpy(&pcc_header->command, MCTP_SIGNATURE, 
->> MCTP_SIGNATURE_LENGTH);
->> +       pcc_header->length = len + MCTP_SIGNATURE_LENGTH;
->> +
->> +       rc = mbox_send_message(mpnd->outbox.chan->mchan, skb);
->> +       if (rc < 0) {
->> +               netif_stop_queue(ndev);
->> +               return NETDEV_TX_BUSY;
-> If you return NETDEV_TX_BUSY here, and the core does a retransmit,
-> you will end up prepending another header.
-
-Good catch.  I can skb_pull the pcc header out before returning the packet.
+Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 
 
->
-> Just to confirm from earlier discussions: you have no way to determine
-> that the channel is unavailable in advance, right?
 
-That is correct.  The failure mode here would be if the ring buffer was 
-full, which could happen if we have too many incoming packets and the 
-backend is processing them slowly. mbox_send_message will only fail if 
-the the ring buffer is full, but does not check anything further along 
-in the process.  So A TX_BUSY seems appropriate.
+>  			gpio-controller;
+>  			#gpio-cells = <2>;
+>  			gpio-ranges = <&lpass_tlmm 0 0 23>;
+> +
+> +			quad_mclk_active: quad-mclk-state {
+> +				clk-pins {
+> +					pins = "gpio5";
+> +					function = "ext_mclk1_c";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +			};
+> +
+> +			quad_mi2s_active: quad-active-state {
+> +				data-pins {
+> +					pins = "gpio2", "gpio3";
+> +					function = "qua_mi2s_data";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +
+> +				sclk-pins {
+> +					pins = "gpio0";
+> +					function = "qua_mi2s_sclk";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +
+> +				ws-pins {
+> +					pins = "gpio1";
+> +					function = "qua_mi2s_ws";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +			};
+> +
+> +			lpi_i2s4_active: lpi_i2s4-active-state {
+> +				data0-pins {
+> +					pins = "gpio17";
+> +					function = "i2s4_data";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +
+> +				clk-pins {
+> +					pins = "gpio12";
+> +					function = "i2s4_clk";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +
+> +				ws-pins {
+> +					pins = "gpio13";
+> +					function = "i2s4_ws";
+> +					drive-strength = <8>;
+> +					bias-disable;
+> +				};
+> +			};
+>  		};
+>  
+>  		lpass_ag_noc: interconnect@3c40000 {
+> -- 
+> 2.47.3
+> 
 
-
->
->> +       }
->> +
->> +       dev_dstats_tx_add(ndev, len);
->> +       return NETDEV_TX_OK;
->> +}
->> +
->> +static void mctp_pcc_tx_prepare(struct mbox_client *cl, void *mssg)
->> +{
->> +       struct mctp_pcc_ndev *mctp_pcc_ndev;
->> +       struct mctp_pcc_mailbox *outbox;
->> +       struct sk_buff *skb = mssg;
->> +       int len_sent;
->> +
->> +       mctp_pcc_ndev = container_of(cl, struct mctp_pcc_ndev, 
->> outbox.client);
->> +       outbox = &mctp_pcc_ndev->outbox;
->> +
->> +       if (!skb)
->> +               return;
->> +
->> +       len_sent = pcc_mbox_write_to_buffer(outbox->chan, skb->len, 
->> skb->data);
->> +       if (len_sent == 0)
->> +               netdev_info(mctp_pcc_ndev->ndev,  "packet dropped");
-> You probably don't want a netdev_info() here, perhaps netdev_dbg().
-
-I will remove logging for now, as I don't report on other dropped packets.
-
-
->
-> Or, could you increment the tx_dropped stat? I see you're doing all the
-> stats accounting in start_xmit - I'm not familiar with the PCC API, but
-> there seem to be failure paths past that point. Is it possible to
-> distinguish between successful tx and dropped tx in the tx_done
-> callback, and do the accounting there, perhaps?
->
-> Or is this a trivial-enough case (len > shmem_size) to not worry about
-> accounting?
-
-I think that stats can move here from start_xmit.  This is the point 
-that we know that the packet has actually made it across the wire or 
-not, so recording success or failure here is correct.
-
-
-I just realized that I am reporting the number of bytes sent including 
-the pcc header.  I suspect that will mess up the byte accounting: these 
-are being reported on MCTP links, and they have no way of knowing that 
-they should be removing the PCC header length.  Should I be removing the 
-pcc Header length from the byte counts for packets-sent?
-
-
->
-> Cheers,
->
->
-> Jeremy
+-- 
+With best wishes
+Dmitry
 
