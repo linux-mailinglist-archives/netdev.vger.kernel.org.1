@@ -1,73 +1,70 @@
-Return-Path: <netdev+bounces-267316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GItnGFzEs2mEagAAu9opvQ
-	(envelope-from <netdev+bounces-267316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:01:32 +0100
+	id yMtNI8XCs2mEagAAu9opvQ
+	(envelope-from <netdev+bounces-267317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:54:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D8D27F2A1
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 09:01:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7617627F0B9
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 08:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C98C230EB902
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:54:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 43D2C303B913
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 07:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8EF36AB4F;
-	Fri, 13 Mar 2026 07:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F5F36EAAB;
+	Fri, 13 Mar 2026 07:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DEd2F7T6"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EE036D510;
-	Fri, 13 Mar 2026 07:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA42D36D510;
+	Fri, 13 Mar 2026 07:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773388465; cv=none; b=e5fqTUCo8G60oI8jljKRuERC+k40/js33quwt6Q8uJ9gRtqXaudDF16eawv6b8oHAHtThjk+mf/eXF16ViE/xCX2b1I/l6rZ6Udn266a4gH2SPePIqUQpbdAv21lrTw6Vt3KVtZIzkrHKK8qHOorZgxPPbcOiGzO/SrNz4cHQIw=
+	t=1773388475; cv=none; b=oDMDuDQY9Juheb1fmQaVwK2XASnRmv8FgmjykR/en4qRQmH/vb18MBESeXBUwpKs8zfEufrnZ2oWVX+8X2Sgv0w6en78gMyePSD2JubicvxCarfxfb7Bw9F4FqM/ZbeXYXk2f7JlEv7hjwEla46nftOPnd+3YhIU6qXLW5+Ylf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773388465; c=relaxed/simple;
-	bh=jsA5HAbyJZxG3qlVh/KMjlA7TBItah36I2FoFfnAVhA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KHoY8GN2Ddbg0M4AQUENU4A9ZfGo+cWzhYmDBxIkEK7oiAUozbYjutmY/5oyJH7q9ZHk4eIMRlt/ILBMslrN5t0YbzC7j3DSrpS/T3pu3J0GLYmm3MjBqE4+cUT5lcmxBDbtDOhceYW719O8G9pZERAMRXYbza/ci4L/0lAOCxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app2 (Coremail) with SMTP id TQJkCgDX7J+RwrNpCRYIAA--.10080S2;
-	Fri, 13 Mar 2026 15:53:54 +0800 (CST)
-From: lizhi2@eswincomputing.com
-To: devicetree@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	wens@kernel.org,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: ningyu@eswincomputing.com,
-	linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com,
-	pritesh.patel@einfochips.com,
-	weishangjuan@eswincomputing.com,
-	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH net-next v4 1/3] dt-bindings: ethernet: eswin: add clock sampling control
-Date: Fri, 13 Mar 2026 15:53:51 +0800
-Message-ID: <20260313075351.1584-1-lizhi2@eswincomputing.com>
-X-Mailer: git-send-email 2.52.0.windows.1
-In-Reply-To: <20260313075234.1567-1-lizhi2@eswincomputing.com>
-References: <20260313075234.1567-1-lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1773388475; c=relaxed/simple;
+	bh=uHOqNzvcP9QD1tepmN9ksz0SlAxPfdXVJel5SsIX00Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d7C61YAYXKKrZ2LGW3hwnxDpzQ5tvNgxln2/H/XMVChuNmbntQsHUjrnmmrKL2t/8rlfcEV/1IsDsD9UagXhC+uLQ4H/JpJMGz8eMZGiq/5O8qfm9yeWzvQKENX7MOhrIHJnYkHl8zrph0dNNguKykVbWULIp+yzzSlhN6n6Mpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DEd2F7T6; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=C3opMo0gBrkg9mjWXYEFQnBJeBIJ8E7IPTWkSnJI6Bg=;
+	b=DEd2F7T6hvNSKdH1/LZxwm0Jd39C8wKblLlJaBYKZHteNDXJsnDmNBMmFlvzlavc/pXtz6bw7
+	lG8ume6z4PG6oLCWOoXZASBEYaSXxn+rSJyJVBwUXXXq5M5m26qp2Li9dhC7j8/gsGzr0Zbb4hH
+	0aW6hOPUljL6wRqStsB0DGE=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fXGpD3P3gzpT03;
+	Fri, 13 Mar 2026 15:49:08 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5F9F640567;
+	Fri, 13 Mar 2026 15:54:23 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 13 Mar 2026 15:54:22 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Ioana Ciornei <ioana.ciornei@nxp.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
+	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v01 0/7] net: hinic3: PF initialization
+Date: Fri, 13 Mar 2026 15:54:07 +0800
+Message-ID: <cover.1773387649.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,249 +72,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgDX7J+RwrNpCRYIAA--.10080S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxKr1rtr45ur43Xr1UXr17trb_yoWxuw47pF
-	W5CrW5GFs5Xr1fCa17tF10kFyfJws7uF9xCr10y3Z7Xws09FWYqr12ya45Ga4UCr4xZFy5
-	WFWYgay8ua42k3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBm14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
-	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRimiiDUUUU
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
-X-Spamd-Result: default: False [1.54 / 15.00];
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-267316-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[eswincomputing.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com];
-	FROM_NO_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267317-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.871];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[3.1.11.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:url,3.1.50.16:email,eswincomputing.com:email,eswincomputing.com:mid]
-X-Rspamd-Queue-Id: 08D8D27F2A1
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:dkim]
+X-Rspamd-Queue-Id: 7617627F0B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhi Li <lizhi2@eswincomputing.com>
+This is [3/3] part of hinic3 Ethernet driver second submission.
+With this patch hinic3 becomes a complete Ethernet driver with
+pf and vf.
 
-Due to chip backend reasons, there is already an approximately 4-5 ns
-skew between the RX clock and data of the eth1 MAC controller inside
-the silicon.
+Add 20 ethtool ops for information of queue, rss, coalesce and eth data.
+Add MTU size validation
+Config netdev watchdog timeout.
+Remove unneed coalesce parameters.
 
-For 1000M, the RX clock must be inverted since it is not possible to
-meet the RGMII timing requirements using only rx-internal-delay-ps on
-the MAC together with the standard 2 ns delay on the PHY. Therefore,
-even on a properly designed board, eth1 still requires RX clock
-inversion.
+Changes:
 
-This behaviour effectively breaks the RGMII timing assumptions at the
-SoC level.
+PATCH 03 V01:
+* Add rmon/pause/phy/mac/ctrl stats (Ioana Ciornei)
 
-For the TX path of eth1, there is also a skew between the TX clock
-and data on the MAC controller inside the silicon. This skew happens
-to be approximately 2 ns. Therefore, it can be considered that the
-2 ns delay of TX is provided by the MAC, so the TX is compliant with
-the RGMII standard.
+Fan Gong (7):
+  hinic3: Add ethtool queue ops
+  hinic3: Add ethtool statistic ops
+  hinic3: Add ethtool coalesce ops
+  hinic3: Add ethtool rss ops
+  hinic3: Add MTU size validation
+  hinic3: Configure netdev->watchdog_timeo to set nic tx timeout
+  hinic3: Remove unneed coalesce parameters
 
-For 10/100 operation, the approximately 4-5 ns skew in the chip does
-not break the standard. The RGMII timing table (Section 3.3) specifies
-that for 10/100 operation the maximum value is unspecified:
-https://community.nxp.com/pwmxy87654/attachments/pwmxy87654/imx-processors/20655/1/RGMIIv2_0_final_hp.pdf
+ .../ethernet/huawei/hinic3/hinic3_ethtool.c   | 927 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  13 +-
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |   7 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  39 +
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  61 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   |  77 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   | 109 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  20 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |   4 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 487 ++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  19 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    |  57 +-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  17 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    |  79 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |   2 +
+ 16 files changed, 1905 insertions(+), 22 deletions(-)
 
-Due to the eth1 silicon behavior described above, a new compatible
-string "eswin,eic7700-qos-eth-clk-inversion" is added to the device
-tree. This allows the driver to handle the differences between eth1
-and eth0 through dedicated logic.
 
-The rx-internal-delay-ps and tx-internal-delay-ps properties now use
-minimum and maximum constraints to reflect the actual hardware delay
-range (0-2540 ps) applied in 20 ps steps. This relaxes the binding
-validation compared to the previous enum-based definition and avoids
-regressions for existing DTBs while keeping the same hardware limits.
-
-Treat the RX/TX internal delay properties as optional, board-specific
-tuning knobs and remove them from the example to avoid encouraging
-their use.
-
-In addition, the binding now includes additional background information
-about the HSP CSR registers accessed by the MAC. The TXD and RXD delay
-control registers are included so the driver can explicitly clear any
-residual configuration left by the bootloader.
-
-Background reference for the High-Speed Subsystem and HSP CSR block is
-available in Chapter 10 ("High-Speed Interface") of the EIC7700X SoC
-Technical Reference Manual, Part 4
-(EIC7700X_SoC_Technical_Reference_Manual_Part4.pdf):
-https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Manual/releases
-
-There are currently no in-tree users of the EIC7700 Ethernet driver, so
-these changes are safe.
-
-Fixes: 888bd0eca93c ("dt-bindings: ethernet: eswin: Document for EIC7700 SoC")
-Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
----
- .../bindings/net/eswin,eic7700-eth.yaml       | 69 +++++++++++++++----
- 1 file changed, 55 insertions(+), 14 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-index 91e8cd1db67b..0b27719feb7d 100644
---- a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-+++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-@@ -20,6 +20,7 @@ select:
-       contains:
-         enum:
-           - eswin,eic7700-qos-eth
-+          - eswin,eic7700-qos-eth-clk-inversion
-   required:
-     - compatible
- 
-@@ -29,7 +30,9 @@ allOf:
- properties:
-   compatible:
-     items:
--      - const: eswin,eic7700-qos-eth
-+      - enum:
-+          - eswin,eic7700-qos-eth
-+          - eswin,eic7700-qos-eth-clk-inversion
-       - const: snps,dwmac-5.20
- 
-   reg:
-@@ -63,16 +66,29 @@ properties:
-       - const: stmmaceth
- 
-   rx-internal-delay-ps:
--    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
-+    minimum: 0
-+    maximum: 2540
-+    multipleOf: 20
- 
-   tx-internal-delay-ps:
--    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
-+    minimum: 0
-+    maximum: 2540
-+    multipleOf: 20
- 
-   eswin,hsp-sp-csr:
-     description:
-       HSP CSR is to control and get status of different high-speed peripherals
-       (such as Ethernet, USB, SATA, etc.) via register, which can tune
-       board-level's parameters of PHY, etc.
-+
-+      Additional background information about the High-Speed Subsystem
-+      and the HSP CSR block is available in Chapter 10 ("High-Speed Interface")
-+      of the EIC7700X SoC Technical Reference Manual, Part 4
-+      (EIC7700X_SoC_Technical_Reference_Manual_Part4.pdf). The manual is
-+      publicly available at
-+      https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Manual/releases
-+
-+      This reference is provided for background information only.
-     $ref: /schemas/types.yaml#/definitions/phandle-array
-     items:
-       - items:
-@@ -82,6 +98,8 @@ properties:
-           - description: Offset of AXI clock controller Low-Power request
-                          register
-           - description: Offset of register controlling TX/RX clock delay
-+          - description: Offset of register controlling TXD delay
-+          - description: Offset of register controlling RXD delay
- 
- required:
-   - compatible
-@@ -93,8 +111,6 @@ required:
-   - phy-mode
-   - resets
-   - reset-names
--  - rx-internal-delay-ps
--  - tx-internal-delay-ps
-   - eswin,hsp-sp-csr
- 
- unevaluatedProperties: false
-@@ -104,24 +120,49 @@ examples:
-     ethernet@50400000 {
-         compatible = "eswin,eic7700-qos-eth", "snps,dwmac-5.20";
-         reg = <0x50400000 0x10000>;
-+        interrupt-parent = <&plic>;
-+        interrupts = <61>;
-+        interrupt-names = "macirq";
-         clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
-                 <&d0_clock 193>;
-         clock-names = "axi", "cfg", "stmmaceth", "tx";
-+        resets = <&reset 95>;
-+        reset-names = "stmmaceth";
-+        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118 0x114 0x11c>;
-+        phy-handle = <&gmac0_phy0>;
-+        phy-mode = "rgmii-id";
-+        snps,aal;
-+        snps,fixed-burst;
-+        snps,tso;
-+        snps,axi-config = <&stmmac_axi_setup_gmac0>;
-+
-+        stmmac_axi_setup_gmac0: stmmac-axi-config {
-+            snps,blen = <0 0 0 0 16 8 4>;
-+            snps,rd_osr_lmt = <2>;
-+            snps,wr_osr_lmt = <2>;
-+        };
-+    };
-+
-+    ethernet@50410000 {
-+        compatible = "eswin,eic7700-qos-eth-clk-inversion", "snps,dwmac-5.20";
-+        reg = <0x50410000 0x10000>;
-         interrupt-parent = <&plic>;
--        interrupts = <61>;
-+        interrupts = <70>;
-         interrupt-names = "macirq";
--        phy-mode = "rgmii-id";
--        phy-handle = <&phy0>;
--        resets = <&reset 95>;
-+        clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
-+                <&d0_clock 194>;
-+        clock-names = "axi", "cfg", "stmmaceth", "tx";
-+        resets = <&reset 94>;
-         reset-names = "stmmaceth";
--        rx-internal-delay-ps = <200>;
--        tx-internal-delay-ps = <200>;
--        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118>;
--        snps,axi-config = <&stmmac_axi_setup>;
-+        eswin,hsp-sp-csr = <&hsp_sp_csr 0x200 0x208 0x218 0x214 0x21c>;
-+        phy-handle = <&gmac1_phy0>;
-+        phy-mode = "rgmii-id";
-         snps,aal;
-         snps,fixed-burst;
-         snps,tso;
--        stmmac_axi_setup: stmmac-axi-config {
-+        snps,axi-config = <&stmmac_axi_setup_gmac1>;
-+
-+        stmmac_axi_setup_gmac1: stmmac-axi-config {
-             snps,blen = <0 0 0 0 16 8 4>;
-             snps,rd_osr_lmt = <2>;
-             snps,wr_osr_lmt = <2>;
+base-commit: 8e7adcf81564a3fe886a6270eea7558f063e5538
 -- 
-2.25.1
+2.43.0
 
 
