@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-267610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKxvCzZ/tGmuowAAu9opvQ
-	(envelope-from <netdev+bounces-267610-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:46 +0100
+	id cG5fDUN/tGmuowAAu9opvQ
+	(envelope-from <netdev+bounces-267611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805B128A195
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2A728A1A3
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 22:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50F4230D4917
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE55530AB8D3
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 21:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423B537F8DE;
-	Fri, 13 Mar 2026 21:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE5837F8DE;
+	Fri, 13 Mar 2026 21:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="RAJVQ5Ry"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="h5eVu/+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1752D372ED0
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F84D372ED0
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 21:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773436636; cv=none; b=H9x5COsiFhYLj3xBAFFzdfcdIgpfd0lrMts7HiCPnpi6JjrYeYfgcJa/XzsYBIpG9E62HTIMIVOprUvTW0EG3ZYL4a5vLjwN8EoZjnQUkGE0X+Z++Xw9sOZMC4BUCetVfe6zSH9/clE0bpKLpgLWq3KKvjdmVQu9Bnw8AdzBpzo=
+	t=1773436638; cv=none; b=snB0/oq2CJ/Mzqko7dlr1DHk328OEfhwZA+qy5iFsEubDHQcSOsx9B29yfBHfAWYCJ3BbmG0StX0btxCPOJKiy8iCcOGGuhJ2r+9tJp0elZqXCzCBXohA9H9Fivs8UVzB/SenyIedCQKE0a4llZG7LJM9jIz6fJYMbg3uV5Xo8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773436636; c=relaxed/simple;
-	bh=mi+OPjEJTrwbo7nqkxoeiRUL7H9QbH4Am1EsnDxrork=;
+	s=arc-20240116; t=1773436638; c=relaxed/simple;
+	bh=/bOLMfPL2Zm5NgiaIDMmMNvL8a6uqwzRFMGPHgiIj/k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HrScL2RH8YzvnDRrAqTuLxhVUvjtMgQ9tU17cjYLNEzFrkCwEufmwFJFR7L3cexa2jySK+Jjpb0OZkOv7IitPO7bL0KFTL5LbeWeVL1AGPwEnd2JnWAJgBYB8WDrnn3YNgs9+I/4QSbEBu3VSlLoyN/kICCQIFV44iaTrBx4q3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=RAJVQ5Ry; arc=none smtp.client-ip=209.85.215.180
+	 MIME-Version; b=uTY/FV1wtpZzaJ9kXhbUXyrU5ne3wTMpoyA6hrLmdezFrK7u9MwKIwrxrAJqUVHz90jZpG/AUsTVDYW1FTfRMm52JQAPvwMPWal4QR6z6XuC00ULCNy0l/avnwlxrzr5KyWW6pI8ooDys/fg3kyMjlO0dB+HiyCECyqvg2jxWyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=h5eVu/+A; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c73a12af63cso1577524a12.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:17:14 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2ae82df847bso20897795ad.2
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 14:17:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773436634; x=1774041434; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1773436637; x=1774041437; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rpeFDKYyMjnBciRFJqpsUYDqJs3fcTG1vhqpApyp93g=;
-        b=RAJVQ5RyhmZCEjPMDbZEPFwW/z9+NG4GAXYPnBFlED9lbRg/ajiD0AShTipUg3TQe6
-         71jeO6/3u7CyP6YOYaLJO3coWytRDpsTmsnkB+Hk6VeBuHuKxsjf7Fyuxnfnu9eh1Ewk
-         +ftI3Xijl3qbXMhFhw1DJ2Z+6JbD6MZeX4qdTsmUVIpGBfjtcD2F+dy8DGaG1a/mjlNB
-         Tq5M1c66nzWd0v4O6B8yg+O2xYbX0IEaeQpvr4gz3c9g6GFhbET9Z61yb8kpjfTeM3YQ
-         sEm1+h8Jn0kU08zeKciCQBKTyKLepFIqUUTzOgr0Cnpz+bhLIMzp2ug5XSFP8+9qlD4h
-         4UqQ==
+        bh=rDcdCUs+vjQGYVGoS9eiR5d8YYA/kqPZtrFyFXUh6c0=;
+        b=h5eVu/+ABiVLB/65u5eRP5/FrZWVZcbcBPg6+d1m1qGg+J1t+2hKLqV99gsRzhORdM
+         FjAhUDH8+gF/zBzbxFEE8g/6/PWeb303BFpPuhDz0c9nn4H1i1lhnVyspZhiKY/Aw2/w
+         5VfffouPIE/FjGuwiotMMQqSJ/z3HF4LuuK2JGR4if6vb38WlnJRuLapVQ3Xga0EnfcI
+         GzuQBJtuW6rod2JDp0idwiUxq+uV8uEL8xk3JwKJkRZIISocp6/lM5UwvhOloQ2QtB/t
+         /Wc0T65fLpSNPYqVKjHROJuq775bGjBRv2dpurb9ESVs8C9Dzlmp2dHR+F/aTFKNpiuE
+         APPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773436634; x=1774041434;
+        d=1e100.net; s=20251104; t=1773436637; x=1774041437;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rpeFDKYyMjnBciRFJqpsUYDqJs3fcTG1vhqpApyp93g=;
-        b=EevAZJ1yAfNu0bZK/UK5wHca3OxVs+PRxGqpp2BrJeg8XpghdVmjZg+qoU5wMz7RiW
-         5dUP5IUoJWQ4hAVrryjNcEcl1nt6bGIBdzinGtYmoNJDXnaNEjGXZRfruh6qPpSUs/AJ
-         NXSnFqYuJ6THf/L3CCj37FbHAlGpDYMgvHCo2zFRTaCYpOpBfPpXYUBHCxfg3fu5V04g
-         9UDTWpgIUjWrVxnpOuZQN+TlGvTjyqKXWYrHeStjwK03P/QduSqdfC3aQrBBVirgs4nk
-         LYCuOEnkpFYgbqfHAV5bnHZOhJLhF2mD4KDDI3Vr9IvDnItX/wZxbTK30lh8imvWE5SE
-         4tDw==
-X-Gm-Message-State: AOJu0YzAmFO5NfXk8SOgBqJTMyd+5ILy0k5CNtpfy4wGBip1wZlcDb8n
-	TzQHjL7g5uwsfzlK8g4m4Zi3NaK1tBDZCoR9xUc/E/AdhkGYZSRzzjuGMp+E6htR3zAE3658Upb
-	SqSbP0uM=
-X-Gm-Gg: ATEYQzytXOVe+ZErduXUxgeTDcyAa9bMd7C2EAqXzEvUl+L+z2Gf2Y1rmUbVuspXYpM
-	QPncJSDVWvSBySX0VUz7aMAfHo4w7JGGINBdFhLJclKMtROuwPpY+0/AMf8iseiIBmB1D+2Zt/D
-	nw5Jt96T/w/iCXxoCX0buPdoYnfTSKIOX+gRSpkNh7ATvGy4zXcpKiA5bMByi9Axyoe/fpiG1AD
-	Khb/HnhFwRgggHjwLXDw3dNrnjDMH442VZnEkmuIT3hHAbRqn2pYCEZ7g7Cu3mH0L4Th52xbkpv
-	f/sqR6lq5cVmt9ivhqBfMYxWawRbH9EsxNMI92ZhwMKG12EnnlvjeNu2TQz2es0ClQZWkMH95tD
-	qAilVfddhSn/H7qQuPpN1Rwq2NGCplcRM/J2edpqCu+gfjkBGMzdx4hzGyZz00l1qVfE6yKxpqB
-	qCB84h9R55SmL/UVKe4/Xlp8emTo66blzF
-X-Received: by 2002:a17:903:3905:b0:2ae:593c:48fe with SMTP id d9443c01a7336-2aeca9f8ddcmr50636015ad.13.1773436634363;
-        Fri, 13 Mar 2026 14:17:14 -0700 (PDT)
+        bh=rDcdCUs+vjQGYVGoS9eiR5d8YYA/kqPZtrFyFXUh6c0=;
+        b=LFmk+fFdVvFMfhlifI2tsCI5R08g6MQe2nGZ+nzrHHdOIH8sglsGi7eC6s+5w/ZFzE
+         r3lLjePyUq6T8gWUCjIWUZJbB1m+Xq1nSlfk+xZwUmXH3umSfV3aPnt0HrlLelTYN75K
+         iGjJd/M6Ks8mBdHWE9ICJ1UmyYp3YLUQR1VWBTeM8dR0a/Rf2wdBfrhedt9VtMD/aujf
+         axz4SEyH2gtHzz4dQJVDOdTYJ1K4EfA2tKGD7AER0/sSRlXHFWL3qznIheKQQwGIcCOv
+         /YTurU6K3LhrmbIau/HbFLZusr4m//fAovDk/AIqUP31y2LNYi0h0GBsJZ35a9Judzur
+         64Tg==
+X-Gm-Message-State: AOJu0YzmFcqv64odzLcEjYmiMQOI3lcqToPMhMVOgHSl81TdH3g5rPV6
+	FD+bPKf2tak952YgW+8LvWMalRc0I4ZG79Z1660Eqf4KTu1Vzl9V6CvNT7SiWdGMW+5QA285Aen
+	wWC7rziM=
+X-Gm-Gg: ATEYQzybDoZioadlpPZRrwrPiMGbVLUgl1IOtm5nmqwdxarMxOut+IjV6eOS+PNHjUj
+	hFWdWbmn0xXAAJXqxnZz9o3flQ/73G7u7ScQedvy00Hw72xxCR9QuVV5hX7cLrd2j4alpkv0v0A
+	f3g27Ag9cxt/u4kBtVUf3chqMDZ4b88kts/gJr9slltr2Wdu8EYF9ZjgIWHF5WwlulP0hhlyYLJ
+	KdxHCngPMrxXYCRSO5YByxOPoiRHKmIrwLH+gNNuCGjs4QnTaejYWGvcdOmRgH20aMOkfiMu5wS
+	4o8O0fsXTkmq0ZfRTmntmlCTKAx2/4IRR25fXjOcvnSlmiFbhn9cQey+kq7yLrTsbMw8TSY49n1
+	ET0p/dtebA9ufQ9h4U+FMAunDUUdV1RmXWHvqvsJbVxxc13m3S3WPWvB/OLQnBdAR43jYEif2e5
+	JaiCPLnlLjPlvuv0Rh0G8WFR+Sss3id4mp
+X-Received: by 2002:a17:902:d505:b0:2a9:616c:1711 with SMTP id d9443c01a7336-2aecac683c1mr47974905ad.42.1773436636823;
+        Fri, 13 Mar 2026 14:17:16 -0700 (PDT)
 Received: from phoenix.lan ([104.202.29.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece81afccsm31204195ad.68.2026.03.13.14.17.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece81afccsm31204195ad.68.2026.03.13.14.17.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 14:17:14 -0700 (PDT)
+        Fri, 13 Mar 2026 14:17:16 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH 07/12] net/sched: netem: fix queue limit check to include reordered packets
-Date: Fri, 13 Mar 2026 14:15:07 -0700
-Message-ID: <20260313211646.12549-8-stephen@networkplumber.org>
+Subject: [PATCH 08/12] net/sched: netem: null-terminate tfifo linear queue tail
+Date: Fri, 13 Mar 2026 14:15:08 -0700
+Message-ID: <20260313211646.12549-9-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260313211646.12549-1-stephen@networkplumber.org>
 References: <20260313211646.12549-1-stephen@networkplumber.org>
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267610-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267611-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -119,36 +119,34 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,networkplumber.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 805B128A195
+X-Rspamd-Queue-Id: 9A2A728A1A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The queue limit check in netem_enqueue() uses q->t_len which only
-counts packets in the internal tfifo. Packets placed in sch->q by
-the reorder path (__qdisc_enqueue_head) are not counted, allowing
-the total queue occupancy to exceed sch->limit under reordering.
+When tfifo_enqueue() appends a packet to the linear queue tail,
+nskb->next is never set to NULL. The list terminates correctly
+only by accident if the skb arrived with next already NULL.
 
-Include sch->q.qlen in the limit check.
+Explicitly null-terminate the tail to prevent list corruption.
 
-Fixes: 50612537e9ab ("netem: fix classful handling")
+Fixes: d66280b12bd7 ("net: netem: use a list in addition to rbtree")
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/sched/sch_netem.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/sched/sch_netem.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index afb89d318f41..df9049816623 100644
+index df9049816623..0f6817a472e6 100644
 --- a/net/sched/sch_netem.c
 +++ b/net/sched/sch_netem.c
-@@ -542,7 +542,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			1<<get_random_u32_below(8);
- 	}
- 
--	if (unlikely(q->t_len >= sch->limit)) {
-+	if (unlikely(sch->q.qlen >= sch->limit)) {
- 		/* re-link segs, so that qdisc_drop_all() frees them all */
- 		skb->next = segs;
- 		qdisc_drop_all(skb, sch, to_free);
+@@ -408,6 +408,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
+ 			q->t_tail->next = nskb;
+ 		else
+ 			q->t_head = nskb;
++		nskb->next = NULL;
+ 		q->t_tail = nskb;
+ 	} else {
+ 		struct rb_node **p = &q->t_root.rb_node, *parent = NULL;
 -- 
 2.51.0
 
