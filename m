@@ -1,76 +1,71 @@
-Return-Path: <netdev+bounces-267262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rnCOGIZss2noWAAAu9opvQ
-	(envelope-from <netdev+bounces-267262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:46:46 +0100
+	id 8CmgLGVts2kEWQAAu9opvQ
+	(envelope-from <netdev+bounces-267264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:50:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECD327C4AD
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:46:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B17727C4F1
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 02:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01E63300D319
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:46:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C05CB30624AE
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 01:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A9A21254B;
-	Fri, 13 Mar 2026 01:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FC8326952;
+	Fri, 13 Mar 2026 01:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMU70Twu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2KImEI5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B075D155389;
-	Fri, 13 Mar 2026 01:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E0C32470E;
+	Fri, 13 Mar 2026 01:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773366402; cv=none; b=EgAWzMixXZnS1xZqYMX7/iEnTceEuwfnJkFy4tdLWSRBN+AgrC4+zfmyCc5D2E3wjrtZMB/jCsE5H1LkrTfjp0MxezhkC7/fRtQIlpr+EZahVHHOBSXHEMFUIJHfzMFb05/8X67rfOmCZj46/M2lSc1AqRs1NFIZVWO3hdUDVfk=
+	t=1773366593; cv=none; b=QVo2xsz2s7p7OyEYPwpIIuf7VyGvo9i0eI8X5yfFyAmfZxYO/gZXzsOCSueQ9I4gQBlpegXr0QqMR6hyIh5RClHpi2C26/z89EJwkeuKugKEngVVOXqFpdufks+mXhk/klqcDT4nBHwo/kEWa+vS3JH98/EVkA7ozVaJ7lN1mXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773366402; c=relaxed/simple;
-	bh=JxLiJsJCjcSjqqg1Iejkt14acuRr9MgMMcPgKn1yzeE=;
+	s=arc-20240116; t=1773366593; c=relaxed/simple;
+	bh=F91gakCgMQJ71odPLD1BnZmnceEA8oexGyjaqdDD64A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A60gGvc/dveS8IOloi7VluoDpWbPCgyAVnBWpesm+6LHQcdo/fuLqB2CW+ux4RBq8yM+Ff8mmYkjXMJS65ObPwWKP/Bm/abCLEK048XkphjNXaOn5e5Vwk4eFzU27hk5Cp4jHMblCECatZfjRXifetzoBVyuPRt1tFAo+x86ahk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMU70Twu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54419C4CEF7;
-	Fri, 13 Mar 2026 01:46:41 +0000 (UTC)
+	 MIME-Version; b=nuNqzIqnVi3zEIjhKIMvVlyo/Q9BS1gvYY6PEp05MjJMvSVBi4N5tLAUrB2z25+QYyGfkBT+LpSbfiKATfF54skccLT1pgeU7/0A3+xoeK4H5Xq+RKckKozQuGm5R2Ldc0L1PLsYooMSm0DTW97QzZxpQA19nzJBBLfSwsQ6r6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2KImEI5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3546C4CEF7;
+	Fri, 13 Mar 2026 01:49:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773366402;
-	bh=JxLiJsJCjcSjqqg1Iejkt14acuRr9MgMMcPgKn1yzeE=;
+	s=k20201202; t=1773366592;
+	bh=F91gakCgMQJ71odPLD1BnZmnceEA8oexGyjaqdDD64A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HMU70TwufC5hBoEgocDZYlT0LM4cj5ifK7h2gplVyRXfFUVzRI9PlPqN/H2dsXh7z
-	 4OrsO98xox1SanwjyggQrgGVB1UT+OEzR8PVs2qArutxeviVOHrEIRmED85oKnj+Tc
-	 jsonszih7c2NUVgaliMYG+jkLSGTGC8z7azsf5WjuYKdm6okLfI/wxY35MPDTGChyF
-	 Arsw8HPFXXl9z/ndCBqKk0zbRCwxU7AYQKfrjYaKhCuE5BNuExpANOT3RJOql4MnF8
-	 b6OUw+6CQl1516Lqo88yJyZ1HhD3BszZKk6sIc/2E+Z+e2oeuEDYko2Cw2cP1TukqV
-	 dlEKye7upvmTQ==
+	b=j2KImEI5qMO7guoIMqk8r89msIKbSD6itp0DvbBzbdKIU7zAamLsu1X1k+nu5J/T+
+	 v7YR7YwSfoe3WksOaPaxXm7H4I5bmeU87rPn3YC0zzVC04R3knbicY5l18L1mmvzKH
+	 EcbJkF6anf7ccxf9AiNjsld1wT0EZ1nWPm6e9GprtYlYxTgaK+BhdfvwKigkhH8/5H
+	 l3xjcHZHKbIIjiUORJrV0p/3FXTzIOtOHELb5gONSNoFAT5xhMh6b15e1ieXsdDTlJ
+	 J6Enx5+zgrg2P9vV8vHJf63UEPRHhCpATz0JMgLGBmHX+C4XdLIMdSn+ePAnLC1RE+
+	 837mBfAcGpQCw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: anthony.l.nguyen@intel.com
+To: charles.perry@microchip.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	horms@kernel.org,
-	aleksander.lobakin@intel.com,
-	edumazet@google.com,
-	sdf@fomichev.me,
-	aleksandr.loktionov@intel.com,
-	ast@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	claudiu.beznea@tuxon.dev,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
 	davem@davemloft.net,
 	andrew+netdev@lunn.ch,
-	hawk@kernel.org,
-	nxne.cnse.osdt.itp.upstreaming@intel.com,
-	magnus.karlsson@intel.com,
-	pabeni@redhat.com,
-	jacob.e.keller@intel.com,
-	daniel@iogearbox.net,
-	maciej.fijalkowski@intel.com
-Subject: Re: [net-next,3/5] ice: migrate to netdev ops lock
-Date: Thu, 12 Mar 2026 18:46:28 -0700
-Message-ID: <20260313014628.1509116-1-kuba@kernel.org>
+	edumazet@google.com,
+	nicolas.ferre@microchip.com
+Subject: Re: [net-next,v2,1/3] dt-bindings: net: cdns,macb: add a compatible for Microchip pic64hpsc
+Date: Thu, 12 Mar 2026 18:49:43 -0700
+Message-ID: <20260313014943.1513621-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260310220624.537917-4-anthony.l.nguyen@intel.com>
-References: <20260310220624.537917-4-anthony.l.nguyen@intel.com>
+In-Reply-To: <20260310212202.3991199-2-charles.perry@microchip.com>
+References: <20260310212202.3991199-2-charles.perry@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,140 +79,121 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-267264-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267262-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,intel.com,google.com,fomichev.me,gmail.com,vger.kernel.org,davemloft.net,lunn.ch,redhat.com,iogearbox.net];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: AECD327C4AD
+X-Rspamd-Queue-Id: 1B17727C4F1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+email says "Not sure about the first one but the second one looks
+legit"
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-ice: migrate to netdev ops lock
+dt-bindings: net: cdns,macb: add a compatible for Microchip pic64hpsc
 
-This commit migrates the ice driver to use netdev ops locking. Queue
-management ops unconditionally enable netdev locking, so the driver now
-uses _locked counterparts of NAPI configuration functions to avoid
-deadlocks.
+This commit adds "microchip,pic64hpsc-gem" for "PIC64-HPSC" and
+"microchip,pic64hx-gem" for "PIC64HX" compatible strings. It also adds a
+conditional schema check to prevent adding PHYs under the GEM node for
+hardware where MDIO controllers are unconnected from physical pins.
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> index bd77f1c001ee..08157dc04ed6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-> @@ -273,14 +273,13 @@ void ice_vsi_cfg_dcb_rings(struct ice_vsi *vsi)
->  /**
->   * ice_dcb_ena_dis_vsi - disable certain VSIs for DCB config/reconfig
->   * @pf: pointer to the PF instance
->   * @ena: true to enable VSIs, false to disable
-> - * @locked: true if caller holds RTNL lock, false otherwise
->   *
->   * Before a new DCB configuration can be applied, VSIs of type PF, SWITCHDEV
->   * and CHNL need to be brought down. Following completion of DCB configuration
->   * the VSIs that were downed need to be brought up again. This helper function
->   * does both.
->   */
-> -static void ice_dcb_ena_dis_vsi(struct ice_pf *pf, bool ena, bool locked)
-> +static void ice_dcb_ena_dis_vsi(struct ice_pf *pf, bool ena)
->  {
->  	int i;
+> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> @@ -70,6 +70,14 @@
+>                - microchip,sama7d65-gem   # Microchip SAMA7D65 gigabit ethernet interface
+>            - const: microchip,sama7g5-gem # Microchip SAMA7G5 gigabit ethernet interface
 >
-> @@ -294,9 +293,9 @@ static void ice_dcb_ena_dis_vsi(struct ice_pf *pf, bool ena, bool locked)
->  		case ICE_VSI_CHNL:
->  		case ICE_VSI_PF:
->  			if (ena)
-> -				ice_ena_vsi(vsi, locked);
-> +				ice_ena_vsi(vsi, true);
->  			else
-> -				ice_dis_vsi(vsi, locked);
-> +				ice_dis_vsi_locked(vsi);
+> +      - items:
+> +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
+> +          - const: cdns,gem
+> +      - items:
+> +          - const: microchip,pic64hx-gem   # Microchip PIC64HX
+> +          - const: microchip,pic64hpsc-gem # Microchip PIC64-HPSC
+> +          - const: cdns,gem
 
-Does ice_dcb_ena_dis_vsi() need to acquire the netdev lock before calling
-ice_dis_vsi_locked() and ice_ena_vsi()?
+The fallback structure appears reversed from what was recommended in v1
+review. Conor Dooley suggested that pic64hpsc should fallback to pic64hx:
 
-Looking at the disable path, ice_dis_vsi_locked() calls ice_vsi_close()
-which goes through ice_down() -> ice_napi_disable_all() ->
-napi_disable_locked(), and that function has netdev_assert_locked(n->dev) in
-net/core/dev.c. Similarly, ice_vsi_close() calls
-ice_vsi_clear_napi_queues_locked() -> netif_napi_set_irq_locked() which
-checks netdev_assert_locked_or_invisible().
+  - items:
+      - const: microchip,pic64hx-gem
+      - const: cdns,gem
+  - items:
+      - const: microchip,pic64hpsc-gem
+      - const: microchip,pic64hx-gem
+      - const: cdns,gem
 
-The enable path calls ice_ena_vsi() -> ice_open_internal() ->
-ice_vsi_open(), and that now calls ice_vsi_set_napi_queues_locked() ->
-netif_napi_set_irq_locked() (requires netdev lock) and ice_up_complete() ->
-ice_napi_enable_all() -> napi_enable_locked().
+However, the current implementation has pic64hx falling back to pic64hpsc
+instead. Was this reversal intentional, or should the order match the
+reviewer's recommendation?
 
-The old code called ice_dis_vsi(vsi, locked) and ice_ena_vsi(vsi, locked)
-where the old ice_dis_vsi() only dealt with rtnl_lock. The new code switches
-to _locked variants that require the netdev lock but does not acquire it.
+https://lore.kernel.org/netdev/20260303-emperor-childlike-6c43d8a91753@spud/
 
-Callers ice_pf_dcb_cfg() and ice_dcb_process_lldp_set_mib_change() hold
-rtnl_lock but not the netdev lock.
+>
+>    reg:
+>      minItems: 1
 
 [ ... ]
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index e7308e381e2f..a8e2db6dc05a 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-
-[ ... ]
-
-> @@ -7563,7 +7570,7 @@ int ice_vsi_open(struct ice_vsi *vsi)
->  		if (err)
->  			goto err_set_qs;
+> @@ -196,6 +204,17 @@
+>        required:
+>          - phys
 >
-> -		ice_vsi_set_napi_queues(vsi);
-> +		ice_vsi_set_napi_queues_locked(vsi);
->  	}
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: microchip,p64h-gem
+> +    then:
+> +      patternProperties:
+> +        "^ethernet-phy@[0-9a-f]$": false
+> +      properties:
+> +        mdio: false
+
+The conditional check references 'microchip,p64h-gem', but the compatible
+strings actually added above are 'microchip,pic64hpsc-gem' and
+'microchip,pic64hx-gem'. This causes the validation rule to never trigger
+for the new hardware variants.
+
+According to the commit message, the GEM IPs within pic64hpsc have their
+MDIO controllers unconnected from physical pins, and this check should
+prevent adding PHYs under the GEM node. However, device trees using
+'microchip,pic64hpsc-gem' or 'microchip,pic64hx-gem' with invalid
+MDIO/ethernet-phy configurations will silently pass schema validation.
+
+Should this check use 'microchip,pic64hpsc-gem' instead?
+
+This appears to be a remnant from v1 of the patch, where 'p64h' was used
+as an abbreviation. Conor Dooley requested in v1 that the full 'pic'
+spelling be used instead of the shortened form, and the compatible names
+were updated accordingly, but this schema check was missed.
+
+https://lore.kernel.org/netdev/20260303-emperor-childlike-6c43d8a91753@spud/
+
 >
->  	err = ice_up_complete(vsi);
-
-Does ice_ena_vsi() need to take the netdev lock before calling
-ice_open_internal()?
-
-ice_vsi_open() now calls ice_vsi_set_napi_queues_locked() which requires the
-netdev lock via netif_napi_set_irq_locked() -> netdev_assert_locked_or_
-invisible(). It also calls ice_up_complete() -> ice_napi_enable_all() ->
-napi_enable_locked().
-
-However, ice_ena_vsi() in ice_lib.c calls ice_open_internal() ->
-ice_vsi_open() while holding only rtnl_lock, not the netdev lock. This path
-is reached during PF reset rebuild:
-
-ice_rebuild()
-    ice_vsi_rebuild_by_type()
-        ice_ena_vsi(vsi, false)
-            ice_open_internal()
-                ice_vsi_open()
-
-The netdev lock is NOT held at this point. ice_vsi_rebuild() took and
-released it earlier in ice_vsi_rebuild_by_type().
-
-Additionally, if ice_up_complete() fails, the error path goes through
-ice_down() -> ice_napi_disable_all() -> napi_disable_locked(), which has an
-explicit netdev_assert_locked(n->dev) check.
+>  unevaluatedProperties: false
+>
+>  examples:
 -- 
 pw-bot: cr
 
