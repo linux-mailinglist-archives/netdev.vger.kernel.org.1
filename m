@@ -1,171 +1,201 @@
-Return-Path: <netdev+bounces-267521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GI6xFpowtGmuigAAu9opvQ
-	(envelope-from <netdev+bounces-267521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:43:22 +0100
+	id yGpgJsEztGn4igAAu9opvQ
+	(envelope-from <netdev+bounces-267523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:56:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2B8A2863EC
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:43:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FFDB28671B
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 16:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52D613045C1C
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:39:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 437BC30087FD
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 15:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5F93BD24B;
-	Fri, 13 Mar 2026 15:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7874361DA4;
+	Fri, 13 Mar 2026 15:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aiernwCI"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="prh3beB8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD983BC697
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773416340; cv=none; b=J77IKdOa8MxmVcHt/kWt9tWcVaM2UZRqqYkjCAz+GeE0rVy7O6kiZJGPl3/GILBpsAyouDfrett5g/+Toi+Whz7lDkmzs9CBqgfyiAC3rgE3t5t4gNuCYSe0uPR2nCAZa43EX4tyNIceZuAblPH3Kriys1qcSggqOKBdnpY2r/E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773416340; c=relaxed/simple;
-	bh=6taFHZkgytK9Z293AzNZaJurmYT1xovlqM4MPRifUIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSjyre0AYN6TLVnXRAJSrH5rMRyKbi7LLJA7n3YdaiN1c6iDpgN/6iPe6a5pLVtnra9b8prj++as0qjyhmeU5tHOQH7wzdtfjm13A3yvLEg3h4LuEzL+pWfZSriEoYbuW5rNR3vmjDQVzW4vh0ps7dwxp2uzmR6jGcK7TR/GbDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aiernwCI; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-483ad568d68so3396215e9.2
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:38:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AE93630BC
+	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 15:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773417401; cv=pass; b=UiJUbeWi2muED9tobRyPcHaRIVjp+EhjLqVCXwpd4Qh1rEvea1vnOiit8aSPi64rn09mGqbLnUNy/ZzGSfP+7hgL7kGJKNBAurHsNFYTvoAEBAy/xKXyRvk7et/8IcnVm1XSxiJZ35PxN39pVcXcTumLVVqa15jKSm6FyyRKnqs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773417401; c=relaxed/simple;
+	bh=U4FXZqGedoQo6GHPwQEh4xyFD0HQuCVujMQty+kI5sY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WpVI42hO87f27sLc1qEED0Hdr/doLIV+TAUO6ilBUI5Ql/S3tGxkjKnTIGuriJtGip3Lcnc/4w4G7hyvCugbl2atTvbIyI4at9DHXZoSXBe0TBRn/Ct2MUyX3FekXlAbFKCqc+dabMqTpYPjL70aQMGg520V0iNTy0absrMT3SY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=prh3beB8; arc=pass smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82976220e97so1411146b3a.3
+        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 08:56:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773417399; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BmWVZeIUXoZUxParkVXJ393hbv8YQdN0NYUthmUwIYxPW4NXxHlY6y+FS1IWBLqGdD
+         ktIO85CmwQ24ZLHYVGA4sRoZ7hvgMJOzYmYvGqmNmHWTxHjxqwbtUWGcs1BaVBrYJWXW
+         bAS3jNlPOPWULRzphTtwYiV5bZt32ZlS7BYUouCPrhpus/xDBXRwvIC/wig35prf31ue
+         2D0Ggk6kJhkHWMlo0JRlufQEHxujehlY6w21IcC1lx2VMtaq4ScgBmOM3kfsZYBNQzD6
+         kM5046U9gs1nLVLb0uVYhGtn3S4nYeHXlZqp+lE5fKPX/Q7iMNakogcvwuN8wMB66c/j
+         COgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=nsUa3+3B6RN4LCDLMBVKPL0aCncmwB7rIzU/94GsesA=;
+        fh=Mp2hs9P3BP/QKqpP8CsYi+NLBnHRzFu06/7QBJ/Qy/k=;
+        b=UuNiTzbB4Nn4yNyNnFJvAq/uF6dovDHqywOvz+ShNMWcmiduXreoD7C11q4sM418Zt
+         mOPXhoB7nF2bbtpm+aws20xhBa/M5W8Lvaq+csKnk5SRMJ/IArYHXmKe69N7ol11KGoX
+         KhuH/vHVFoT/EIyjnzG41CKVdUS6xkZeTDdL0ct95+F3T+fXrh2A1KYemvYUu0MK0rHI
+         t1LVyFPcUGN2UY7fnGw5hBTTdYK9Qyw456EEmXEvQbCNrrbXlGJAz4xOUB0R4gc8xdKH
+         8iY1P1euhS/FjfflnM3WsqDikGLEZMxPHnUPYEscX8uiOeWCwBwP4agjSfOnrEHu0sdo
+         Qhqw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773416334; x=1774021134; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6taFHZkgytK9Z293AzNZaJurmYT1xovlqM4MPRifUIw=;
-        b=aiernwCIMKRduwDPIzZVYrl9nnodvl0mnL5ibRHNeWEiBVZRn2+NqftDtDW+TYtg/4
-         u2veDvcT3S8RloSY90AdWA4cz9tHX5xph03B8LQBhgAe0VRgCmu0j7MVRyXQM6cNwQ5w
-         s6qiyXIbER6ZeBKKrjvFuS+pSUjsonNMpmQi/aHuItT3fwKnlVAsJLZSmEdIGqkCbgAO
-         KbWy9TJjWpEU7LIlecFGyV4Ids4gJmBQt7xINygjGBZNZoP+bLDavOgMyeoDEjhny+HE
-         zbf5UYY6vl/LfauGkoVjCx6WUSA1T0V6cDpMATdHhLT3hnR9mlY1ieUVWMDhF+mJjDhE
-         eDYA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1773417399; x=1774022199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nsUa3+3B6RN4LCDLMBVKPL0aCncmwB7rIzU/94GsesA=;
+        b=prh3beB8/xEYRcUtT1w+blslPXzk1ky6aSg86RmuyQwYzVBxsUjcuOxPSh6TbxDBRL
+         ZdT/RfRiaHHxsoP2Xyw4JPzkhJELWsiTHAY+Z2x1R3EXzS7tm+Em//LusCeuqthDzc6D
+         W5sRRM+91FNVNAm20UyHN4cIQ4dBHsTesLlQgOEsn7DWsQGAWvXWQEzGUKMklM5eLjTD
+         u9B9oZxXTFYUICV8UH0o6k4a63vyA6MyJM8X7t4Ouv8bot+yPupuw9gCOpunC2XxxGd1
+         kLvSouH8TacmErFJOJQPSYo1+g3kB5SFeMnd5/XrWgmxopJ8wqgKBsus0awirTzZZ4K/
+         pLnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773416334; x=1774021134;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6taFHZkgytK9Z293AzNZaJurmYT1xovlqM4MPRifUIw=;
-        b=m3EdQPtKNM540FVKwk+1diMdjAM1Nw5jfW3uVTd5FBxFM6ICI3T6zsM+h3Pa37TsOh
-         mTQ8ktRMaSYv/vNLq9gU5Ar1K4aR7AvRAo36SU2LxJwPeGF5dj6aP8ZJQlwuMNmsW8qu
-         KdYT5KMt18Od85/x9l1vHkYsGtHVnoCyW2wxEZXKn09Xjn92FnuSprUBwhVwJg6hWSQO
-         pg6bJwIsc8LzStpLa7rQe+XIQ881eXdS43U8t2XRLL7FqTeXWorhG6ra7sg0D5Vj3uuq
-         rOv49FTU5s3fEJnOBmzctHndsdZOh0n6hnIaI10XyOssSuqzGSj1deaK4lrb5H4+i6r1
-         gYKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9hHaHcPlB4VzL9grjGeOLE51215U+po/0IC7wRvVtEQzIsyTDefw/H18uygUBF7QJ1zv789s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHzzAoQFNo+GsLEnIC6jNEIC9gNpMn8Zz0ONF5xxWY0QNEVh0W
-	AKTAbPz/eTy+V9uCIW52y/qWOUQG3V5M/8cWCtD17Wx8LyHs/CSgAhJv
-X-Gm-Gg: ATEYQzxlc35Mw1aC1v4X4lAUEeVP8i+3l92xZBa4MxbVFowdbOf6bJunqS8Mpbu+bDu
-	O+8VNEP/1BWQDB5ithuExtjXuxSoiQCG7lDcimW5DHP7KSHnzF0OjIMtADTcYDQTetaijC+U4dL
-	XfDObE+ymfDV8NmzCMadAd+NVYzRtAo5QrKu+FwvC7/tPH0TtQwgYmPH00faqgscL/T784VV8eU
-	hn+jjWupVJokBVMVhVzHN+Mp/b++IgHCd9R5Kk28gjmVYRM6oqvHzDwNlv+uFIm1IE75ThCRr8b
-	EM0aBCEobfVpkcqa/3n0f/T9C8p0Nn5WQGzUInkV+RYuFB2oI0vcPL02yQJmJF4hSTDnHFgc5/Y
-	C65mlhutCwv5CADJg7R/zPlqCt7JliyTR1SzwHIxkwXWu/qU5OKwh3SIHkRXb2q5HoogAJiGzdW
-	WuGJ8rmVfWXc3GAOtXgL1jfjAl
-X-Received: by 2002:a05:600c:c4a5:b0:47a:94fc:d063 with SMTP id 5b1f17b1804b1-485566e820dmr29502515e9.1.1773416333527;
-        Fri, 13 Mar 2026 08:38:53 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d00a:e00:9fd6:8180:3fc5:2b85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48557a738easm29417565e9.16.2026.03.13.08.38.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 08:38:52 -0700 (PDT)
-Date: Fri, 13 Mar 2026 17:38:49 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: bastien.curutchet@bootlin.com, Tristram.Ha@microchip.com
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
-	pascal.eberhard@se.com, miquel.raynal@bootlin.com,
-	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add support for
- KSZ8463 global irq
-Message-ID: <20260313153849.qkfzv5c2u6fepjku@skbuf>
-References: <DM3PR11MB87364DB5439A20F44AEB690DEC7AA@DM3PR11MB8736.namprd11.prod.outlook.com>
- <0658868d-671c-46a2-8daa-26420cdd2975@bootlin.com>
- <20260309205401.bk5fpw6kqnmlktbu@skbuf>
- <dde60639-af13-4653-9a34-38c4bd98b149@bootlin.com>
- <20260311115356.windefb3j4kkuslg@skbuf>
- <c3812b1f-50b7-4663-92f5-14c5c6b483a2@bootlin.com>
- <20260311135610.oox5ahxcyvxkuegw@skbuf>
- <c9c990b2-0fe3-4329-9a1a-e29aa0c9a6a6@bootlin.com>
- <DM3PR11MB87361761E911D6EAA0311DF2EC44A@DM3PR11MB8736.namprd11.prod.outlook.com>
- <20260312134526.3lnifstvb5dpghrg@skbuf>
+        d=1e100.net; s=20251104; t=1773417399; x=1774022199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nsUa3+3B6RN4LCDLMBVKPL0aCncmwB7rIzU/94GsesA=;
+        b=ZigC9FV0HWt45Ej1AC91C1rKwHm87HMpRnDz/Mea3SlWiQJeFzD6fNCiwqBcr+7Ph9
+         gsdx6l5pN6sXluqY3m1R4gb/a9gPlpP3bEqWVCb7DKTywxSmA2vc3rolIB+s1rvyiRYx
+         YlzbMdxN7htOwG7DkRU8QhI49Mp1XRS3UfRcUEDgWakllJHJPvkqfY36YarxXmYJ68YR
+         YbWb4rlCnfnq6G9C8SXBr8Acj/aL3Udxd/cLASYc5NqFXio19GxN0F86N2NwPvcPkRo6
+         LmTIpAhYhHBxu11errQL1W+552d/CSZkty+LOhhLwAhZP91CZceTQOLExZixXgS47MsQ
+         78AQ==
+X-Gm-Message-State: AOJu0YzSPy/Scojo0KCzAELJ/XJGazNdWXpOxv7yjFpUiJX3FXvpCYu7
+	rDKcOIZISI138PHVeAXWnJzpFHFTM4UNQ0jdSNK0lMGDRSD4YerGobr0MyVLqaraTmpkhdc/JbW
+	uqfTwGbU9vLPgZ3OwVbNQQPOHrwEm1g+RiaK/2J6C
+X-Gm-Gg: ATEYQzzCtz+wAorjGo7aW0VI7WzUDLQMAyVQjZJSJglvFYekVZfMqk07rY3BRPTUAc8
+	pUxSnqM8d9vJ5IYJ0ipIzWsvKCNTbxRuBaqf6iO19NblWGX8YM34xFK2ToeMaRBJeBZKejrfpjd
+	kEJDTtOeefNAfFveijN33XMXRca4pk1qnA1tMkRAqit3odKt6ggeKjjnDWxDQmXytHp3zXf90ud
+	KggMa9ivrGFcfKnZ2L+h0WtGaYcYKL3/Z9UlgAbZrw0aGdp5bmyY7UD1ClHj9CVz/b5BOqOtJeU
+	9uOuhSQ90oqs6pY=
+X-Received: by 2002:a05:6a00:7598:b0:827:28ba:ff00 with SMTP id
+ d2e1a72fcca58-82a19711a89mr2559770b3a.18.1773417398762; Fri, 13 Mar 2026
+ 08:56:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260312134526.3lnifstvb5dpghrg@skbuf>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+References: <20260307212058.169511-1-jhs@mojatatu.com> <20260310184713.7e810431@kernel.org>
+ <CAM0EoM=TAAfwZc3q1=RKWPrS778R_B8uM18ev_jYYz8oj4YiBA@mail.gmail.com>
+ <20260311175249.54abe1b6@kernel.org> <CAM0EoMnv14pSaJWW3ZQuegkbQEqqye0zp0-_tCaOEWEg=C3xCQ@mail.gmail.com>
+ <20260312165113.773a5f44@kernel.org>
+In-Reply-To: <20260312165113.773a5f44@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 13 Mar 2026 11:56:26 -0400
+X-Gm-Features: AaiRm50MOGl4w3-L4BgOwap80DymsQR40mcNnEN5B2Df3vQGH6sofP4bOPy4H1Y
+Message-ID: <CAM0EoMm0dMRKJyfCH80G=q4PnnTzzKVRvSrAU204FFKMn9NOtQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: Mark qdisc for deletion if graft cannot delete
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, toke@toke.dk, 
+	vinicius.gomes@intel.com, stephen@networkplumber.org, vladbu@nvidia.com, 
+	cake@lists.bufferbloat.net, bpf@vger.kernel.org, ghandatmanas@gmail.com, 
+	km.kim1503@gmail.com, security@kernel.org, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-267521-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-267523-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B2B8A2863EC
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,resnulli.us,toke.dk,intel.com,networkplumber.org,nvidia.com,lists.bufferbloat.net,gmail.com,mojatatu.com];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 2FFDB28671B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 12, 2026 at 03:45:26PM +0200, Vladimir Oltean wrote:
-> Thanks for the comment. I took a deeper look at the ksz_switch common
-> driver and I've started working on some patches. I'll return when
-> they're more or less ready.
+On Thu, Mar 12, 2026 at 7:51=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 12 Mar 2026 16:36:48 -0400 Jamal Hadi Salim wrote:
+> > > > Two of the several (I think 4!) patches we had took a similar path.=
+ I
+> > > > am trying to remember at least one variant was bad for performance =
+and
+> > > > the other was unstable. Let's see if we can revive it and take a
+> > > > closer look. BTW - none were pretty, it was maybe half the lines of
+> > > > code but touched many things.
+> > >
+> > > FWIW / of course, we have to apply similar change to all(?) callers o=
+f
+> > > __tcf_qdisc_find in cls_api. So LOC-wise it may end up also pretty lo=
+ng.
+> > > And it's not going to help the already spaghetti-looking locking. But
+> > > even if it's more LoC I quite like the idea of containing the poopy
+> > > code to where problems originate which is the lockless filter handlin=
+g.
+> > > Fingers crossed..
+> >
+> > Something like attached.
+> > Unfortunately after running it for a few hours it reproduced.
+> > The action code path (entered by virtue of filter code path execution)
+> > releases the rtnl when attempting to load an action module. A parallel
+> > qdisc operation waiting for the lock then grabs it and we hit the same
+> > issue...
+> >
+> > So now we have to be more invasive and start coordinating the action
+> > code etc, which is not appealing. Thoughts?
+>
+> I see. Doesn't seem entirely crazy to let tcf_proto_lookup_ops()
+> return -EAGAIN without actually loading the module, and have it's
+> call path (of which there are only 2?) do the module loading once
+> all the locks are released. The call paths handle the EAGAIN and
+> retry already they just assume tcf_proto_lookup_ops() has loaded
+> the module so they don't have to.
 
-So if the common ksz_switch were to remain preferable, we still have the
-problem that it's very cluttered/abstract and impossible to follow and
-ensure correctness/lack of regressions for other hardware.
+I might not be entirely following what you are saying. The core issue
+is not module loading perse. We can avoid module loading in
+tcf_proto_lookup_ops while the rtnl lock is released and the qdisc
+refcnt is greater than 1 (which is what the patch i sent attempted).
+The new quark is when we have actions associated with the filter.
 
-Bastien, Tristram, I've tried to address that very particular issue by
-giving KSZ8463 its very own dsa_switch_ops structure, which it doesn't
-have to share with anyone else.
+I will send you a much lengthier description of the issue in an hour
+or two  to get us on the same page.
 
-I have no hardware to test, but some patches are here:
-https://github.com/vladimiroltean/linux/tree/ksz_separate_dsa_switch_ops
-
-Do you think this would be useful? For now I've created a common ksz8_setup(),
-but it can be further split into whatever granularity is required for
-ksz8463 to have its own IRQ domain operations.
-
-One could conceivable walk this alternative route of having independent
-per-family dsa_switch_ops and only call ksz_common.c when something is
-truly common ad infinitum. We could use it to get rid of dev->info->regs[],
-dev->info->xmii_ctrl1, etc. We could further give ksz8463 a separate
-ksz_ptp_clock_register() implementation with different PTP operations,
-to address Bastien's concern. I stopped at only 19 patches though :-/
-
-What do you think, is this direction something worth exploring? Does it
-help with the PTP IRQ differences here?
+cheers,
+jamal
 
