@@ -1,170 +1,121 @@
-Return-Path: <netdev+bounces-267426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-267427-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENHpDPz6s2nWeQAAu9opvQ
-	(envelope-from <netdev+bounces-267426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:54:36 +0100
+	id OD5rLcP8s2nWeQAAu9opvQ
+	(envelope-from <netdev+bounces-267427-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:02:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6BB28280E
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:54:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD7422829D1
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 13:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16CA9301AD10
-	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 11:54:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D86E0300B2B7
+	for <lists+netdev@lfdr.de>; Fri, 13 Mar 2026 12:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940CC366575;
-	Fri, 13 Mar 2026 11:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB46376499;
+	Fri, 13 Mar 2026 12:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Am6yNwXK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FXHA9sHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E51C212D7C
-	for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 11:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBC51DDC28;
+	Fri, 13 Mar 2026 12:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773402873; cv=none; b=CVCZ15lI9U2rtr9bJL5ogz7kYWL/mn6Z7v59T7KJvdDdI3uFtKwZyzv44zGZ6IwGg6iNvvq4b/CTW9CvLJ9PPVo5r4e9Cw+9xaaDNeZq0pC8C7p8clfDncrDbKm9hxl2vladxt449Rzru5VgBJyoHwghmaYJM8ZpTEb4EmvAtJQ=
+	t=1773403317; cv=none; b=Frw8RLKTJN5gU+nU9tcEQPlBrhxt10APPmPK7wMfdzHOnC2+w0zBXFk82f/9z8GTfyqy2vFI+Ng6xAkQPb/xEX62cKqzi2WbrM4bsl7lPFcpE0E2rGFJFikmrqXtby4G3C1uSTMQqw9jSf7Z4NZE1xpSPvpqBFi4Z7bj5SdWfc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773402873; c=relaxed/simple;
-	bh=yuFNSvbd/GBD2Hea2tZ+VmOSRiEitFWDftzuSThsjR8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KZ6+YTJFAkFZ3+uFqQ0m3WD8F1CGuqxzBSpr80vSfvjlkU2b6Oqew0a2XddJ6yFH72RwkgzKonuBfj21qeuMaPw/mdDky57qym/aXH02iir+4s+zl4nHLa9n+C3mJzCUQPqDucKQe/ExQh+kIaxg5a+FLQ3T2Xnqo4/XPxatN6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Am6yNwXK; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cd849cd562so1321043985a.0
-        for <netdev@vger.kernel.org>; Fri, 13 Mar 2026 04:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773402871; x=1774007671; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5d0c+/jW+zBhRDYtm6gIQxc4BCZlre46j5/CC58kPwg=;
-        b=Am6yNwXK58EeMUf41aLq6qu0oIzsigKwasN7KDkzQXUT/gswM4R+zSKDE6kWJgqHfP
-         ogF4K3B1gFM0hrTYyyoobl+JBaPkX4QJSKbQomEuHIf7o9RLssL998h85i2/xptbJF/t
-         RPvetdhXn/ifMDUX0rWQMQWglRbyU5QHHJTa7AM9Gq318/xSxZwkHKVFxysjEEz8u5Xr
-         YTnjMnB5UlSKniSFjZpWZuwroYh7A6fo6879JdSV99w6lHM4A9Be5nwGdeF0dMTYsvC0
-         5/Mh6idYOOW6QrAok22uJQYh/+xyu4LNomod+sLtJqoOOq2ifSjefoXbts3xfZed2MZl
-         ZzCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773402871; x=1774007671;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5d0c+/jW+zBhRDYtm6gIQxc4BCZlre46j5/CC58kPwg=;
-        b=oNULS2xWca+zkv+2tbbRQFalvEv0q+6s+GA6A42LQqslwCmdyaeJ9c/BmCo61kN9B/
-         4kXfxdXQ3ROKNJjBnzoGodFsTWYXvpoRz6ilLqlvApaSrSIyI0127dJtVp9mQsc99XQl
-         EZZWGMhXtt7YAa+mtNy65/Vl+9DpNVBqoL5vDGh1gn0dtSwaQwHADlCE9HRizMP9Iupr
-         ui0eMW0VkKmlPweb2osBERvw8RYNbLRzeLNagJX/bwEpz80iMSxPbfXjtQHWzZWltgz8
-         CBZn28VVmMkNMmewFSvyNoWfNPkEQLaK5JLd0wpDX4lKe8Swn8AAWvKSzBX7Q74DTwiw
-         g2UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsFXf3vNPyU+U5KYd4eSw4ehj6E3YMasIW4Li2ixNUWUDKQfAPbOo7MlmJSW/4a2XzVxtfRrs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQNCe60fCZar4NQXmUNLF/iPbV07t/Y86Qx6zSuDjdrKKMYqk9
-	O5ZGijBtXPv4EkzItbGz9Ou0CW092ojLanNjhPgN7kpgtlyg10lfrNiCMFohOMbNKcaJGmvVHcZ
-	0zYUT4lOP4/8MFA==
-X-Received: from qkok7.prod.google.com ([2002:a05:620a:4147:b0:8cd:8b70:fdb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1a25:b0:8cd:94f9:1bcd with SMTP id af79cd13be357-8cdb5a502a3mr411489685a.12.1773402870772;
- Fri, 13 Mar 2026 04:54:30 -0700 (PDT)
-Date: Fri, 13 Mar 2026 11:54:29 +0000
+	s=arc-20240116; t=1773403317; c=relaxed/simple;
+	bh=klnlkVZW5ooK6rH93PXh5pZHgx2YTaJnnl4cniAe3sg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIxYcUyPnTbJLjJhVOXIQ765P2iA9H8g2WMGicxQe4yfUYJcX3IJyrr+ikaihr+stfrRAPNOhJGez/TyWPDHO9kLb3jJ3Xe2ETOUOPylB+XezxAAKUIA/rj2g7KWOcBUpAkCcIotrz2YNIFoMG1R4g0KPqnjrA3OaHz1RbVPh+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FXHA9sHu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=e/6Qya3g2Az9z6Fvg6kLMSVvcFkL/b4Ek7bHah/8dLM=; b=FXHA9sHul41Ys2QXs4Zu4NGtlX
+	5faRTuDKmDL1l7vCJllr7BX0zVv/Er6w5Ve6/REzVZ8KfEM048h3Eyz0TJJ4N4bBfjUIOq1LuC27p
+	27A2yReVgSJS4/gp2taA7v2nDVMniKpmR6NSdPikVNqhFsQi/T3lG5QgtGXO+/y8WL9E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w11Cu-00BUPh-Nq; Fri, 13 Mar 2026 13:01:32 +0100
+Date: Fri, 13 Mar 2026 13:01:32 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Junrui Luo <moonafterrain@outlook.com>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shruti Parab <shruti.parab@broadcom.com>,
+	Hongguang Gao <hongguang.gao@broadcom.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yuhao Jiang <danisjiang@gmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] bnxt_en: fix OOB access in DBG_BUF_PRODUCER async
+ event handler
+Message-ID: <be6c2fb6-1f34-4396-9b1d-3d1f156f3146@lunn.ch>
+References: <SYBPR01MB7881338BC956C39A9848EE86AF45A@SYBPR01MB7881.ausprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.880.g73c4285caa-goog
-Message-ID: <20260313115429.3365751-1-edumazet@google.com>
-Subject: [PATCH net-next] selftests/net: packetdrill: add tcp_disorder_fin_in_FIN_WAIT.pkt
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Menglong Dong <menglong8.dong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SYBPR01MB7881338BC956C39A9848EE86AF45A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-267426-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-267427-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[outlook.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5F6BB28280E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BD7422829D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Commit 795a7dfbc3d9 ("net: tcp: accept old ack during closing")
-was fixing an old bug, add a test to make sure we won't break
-this case in future kernels.
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -2929,6 +2929,8 @@ static int bnxt_async_event_process(struct bnxt *bp,
+>  		u16 type = (u16)BNXT_EVENT_BUF_PRODUCER_TYPE(data1);
+>  		u32 offset =  BNXT_EVENT_BUF_PRODUCER_OFFSET(data2);
+>  
+> +		if (type >= BNXT_TRACE_MAX)
+> +			goto async_event_process_exit;
+>  		bnxt_bs_trace_check_wrap(&bp->bs_trace[type], offset);
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>
----
- .../tcp_disorder_fin_in_FIN_WAIT.pkt          | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_disorder_fin_in_FIN_WAIT.pkt
+Using ARRAY_SIZE(&bp->bs_trace) makes it clearer why you are doing the
+check.
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_disorder_fin_in_FIN_WAIT.pkt b/tools/testing/selftests/net/packetdrill/tcp_disorder_fin_in_FIN_WAIT.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..336cbf7815c86cfdbc44a3322413abf0bfed1516
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_disorder_fin_in_FIN_WAIT.pkt
-@@ -0,0 +1,33 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+// Check fix in 795a7dfbc3d9 ("net: tcp: accept old ack during closing")
-+
-+// Set up config.
-+`./defaults.sh`
-+
-+// Initialize a server socket.
-+    0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S  0:0(0) win 65535 <mss 1000,sackOK,nop,nop,nop,wscale 7>
-+   *  > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
-+   +0 < .  1:1(0) ack 1 win 257
-+
-+   +0 accept(3, ..., ...) = 4
-+
-+   +0 shutdown(4, SHUT_WR) = 0
-+   *  > F. 1:1(0) ack 1
-+
-+// We expect to receive one ACK.
-+// But what happens if a FIN was already in transmt and received out-of-order ?
-+
-+   +0 < .  2:2(0) ack 2 win 257
-+
-+// This FIN packet was sent before the prior ACK (see ack 1).
-+   +0 < F. 1:1(0) ack 1 win 257
-+
-+// Even if the FIN is received out-of-order, we should ACK it.
-+
-+   *  > .  2:2(0) ack 2
--- 
-2.53.0.880.g73c4285caa-goog
+	Andrew
 
 
